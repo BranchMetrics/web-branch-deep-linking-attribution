@@ -180,7 +180,7 @@ branch.close(function(data){
 
 #### .logout()
 
-Not exactly sure what this does.  @DmitriGaskin, need you to halp.
+Logs the current user out.  Returns a new session.
 
 ##### Usage
 
