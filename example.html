@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Branch Metrics Web SDK Exaple App</title>
+  <script type="text/javascript">
+    (function() {
+
+      var config = {
+        app_id: '5680621892404085',
+        debug: true,
+        init_callback: function(){
+          document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(branch.utils.readSession());
+        }
+      };
+
+      // Begin Branch SDK //
+      var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,
+      self.queued=[],this.init=function(){for(var a=['close','logout','track','identify','createLink','showReferrals',
+      'showCredits','redeemCredits'],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a]
+      .concat(Array.prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement('script');
+      b.type='text/javascript',b.async=!0,b.src='https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js',document
+      .getElementsByTagName('head')[0].appendChild(b)};window.branch=new Branch_Init(config);
+      // End Branch SDK //
+
+    })();
+  </script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <style type="text/css">
+    .btn {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row col-lg-8 col-lg-offset-2">
+      <h2>Branch Metrics Web SDK Example</h2>
+    </div>
+    <section>
+      <div class="row col-lg-8 col-lg-offset-2">
+        <h4>Session Info</h4>
+        <pre class="info">Reading session from .init()...</pre>
+        <br>
+        <h4>Request</h4>
+        <pre class="request">Click a button!</pre>
+        <br>
+        <h4>Response</h4>
+        <pre class="response">Click a button!</pre>
+      </div>
+    </section>
+    <section>
+      <div class="row col-lg-8 col-lg-offset-2">
+        <h3>Methods</h3>
+      </div>
+      <div class="row col-lg-8 col-lg-offset-2">
+        <button id="init" class="btn btn-success">.init()</button>
+        <button id="close" class="btn btn-danger">.close()</button>
+        <button id="identify" class="btn btn-info">.identify()</button>
+        <button id="logout" class="btn btn-info">.logout()</button>
+        <button id="track" class="btn btn-info">.track()</button>
+        <button id="createLink" class="btn btn-info">.createLink()</button>
+        <button id="showReferrals" class="btn btn-info">.showReferrals()</button>
+        <button id="showCredits" class="btn btn-info">.showCredits()</button>
+        <button id="redeemCredits" class="btn btn-info">.redeemCredits()</button>
+      </div>
+    </section>
+  </div>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    
+    var info     = $('.info');
+    var request  = $('.request');
+    var response = $('.response');
+
+    $('#init').click(function(){
+      request.html('branch.init();');
+      branch.init(function(data){
+        response.html(JSON.stringify(data));
+        info.html(JSON.stringify(branch.utils.readSession()));
+      });
+    });
+
+    $('#identify').click(function(){
+      request.html('branch.identify({identity: \'Branch\'});');
+      branch.identify({
+        identity: 'Branch'
+      }, function(data){
+        response.html(JSON.stringify(data));
+        info.html(JSON.stringify(branch.utils.readSession()));
+      });
+    });
+
+    $('#logout').click(function(){
+      request.html('branch.logout();');
+      branch.logout(function(data){
+        response.html(JSON.stringify(data));
+        info.html(JSON.stringify(branch.utils.readSession()));
+      });
+    });
+
+    $('#close').click(function(){
+      alert('You will need to call .init() reinitialize the Branch SDK.');
+      request.html('branch.close();');
+      branch.close(function(data){
+        response.html(JSON.stringify(data));
+        info.html(JSON.stringify(branch.utils.readSession()));
+      });
+    });
+
+    $('#track').click(function(){
+      request.html('branch.track(\'Tracked this click\');');
+      branch.track('Tracked this click', function(data){
+        response.html(JSON.stringify(data));
+      });
+    });
+
+    $('#createLink').click(function(){
+      request.html("branch.createLink({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
+      branch.createLink({
+        tags: ['tag1', 'tag2'],
+        channel: 'sample app',
+        feature: 'create link',
+        stage: 'created link',
+        type: 1,
+        data: {  
+          mydata: {
+            foo: 'bar'
+          },
+          '$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com',
+          '$og_title': 'Branch Metrics',
+          '$og_description': 'Branch Metrics',
+          '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+        }
+      }, function(link){
+        response.html('<a href="' + link + '">' + link + '</a>');
+      });
+    });
+
+    $('#showReferrals').click(function(){
+      request.html('branch.showReferrals();');
+      branch.showReferrals(function(data){
+        response.html(JSON.stringify(data));
+      });
+    });
+
+    $('#showCredits').click(function(){
+      request.html('branch.showCredits();');
+      branch.showCredits(function(data){
+        response.html(JSON.stringify(data));
+      });
+    });
+
+    $('#redeemCredits').click(function(){
+      request.html('branch.redeemCredits({amount: 5, bucket: \'default\'});');
+      branch.redeemCredits({
+        amount: 5,
+        bucket: 'default',
+      }, function(data){
+        response.html(JSON.stringify(data));
+      });
+    });
+
+  </script>
+</body>
+</html>
