@@ -62,6 +62,8 @@ Place this code in the `</head>` statement in your HTML.  Be sure to replace `YO
    - **[.showCredits()](#showcredits)**  
    - **[.redeemCredits()](#redeemcredits)**  
 
+**[Bugs / Help / Support](#bugs--help--support)** 
+
 ### Constructor
 
 Loading the Branch SDK into your app will automatically instantiate the SDK class under the variable 
@@ -410,3 +412,7 @@ branch.redeemCredits({
 ```js
 {}
 ```
+
+## Bugs / Help / Support
+
+Feel free to report any bugs you might encounter in the repo's issues.  Any support inquiries outside of bugs please send to sean@branch.io.
