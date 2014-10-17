@@ -135,14 +135,20 @@ var Branch = function Branch(app_id, debug, callback) {
           delete data[resource.rest[rp]];
         }
       }
-      if (resource.method === 'GET') {
-        query = '?';
-        for (var key in data) {
-          query += key + '=' + data[key] + '&';
+      var connector_url = config.connector.url;
+      if(resource.api !== undefined && resource.api === false){
+        connector_url = '';
+      }else{
+        if (resource.method === 'GET') {
+          query = '?';
+          for (var key in data) {
+            query += key + '=' + data[key] + '&';
+          }
         }
       }
-      r.open(resource.method, config.connector.url + resource.endpoint + query.substring(0, query.length - 1), true);
+      r.open(resource.method, connector_url + resource.endpoint + query.substring(0, query.length - 1), true);
       r.setRequestHeader('Content-Type', 'application/json');
+      r.setRequestHeader('Accept', 'application/json');
       r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
       if (resource.ref) {
         data = self.utils.mergeMeta(data, data[resource.ref]);
@@ -302,10 +308,47 @@ var Branch = function Branch(app_id, debug, callback) {
   };
   this.createLink = function(obj, callback) {
     if (!self.initialized) return self.utils.console(config.debugMsgs['nonInit']);
+    obj.source = 'web-sdk';
     self.api.makeRequest(config.resources.links.createLink, {
       app_id: config.appId,
       identity: self.utils.identity(),
       obj: obj
+    }, function(data) {
+      if (typeof(callback) === 'function') callback(data.url);
+    });
+  };
+  this.createLinkClick = function(url, callback){
+    if (!self.initialized) return self.utils.console(config.debugMsgs['nonInit']);
+    self.api.makeRequest(config.resources.links.createLinkClick, {
+      url: url
+    }, function(data) {
+      if (typeof(callback) === 'function') callback(data.click_id);
+    });
+  };
+  this.SMSLink = function(obj, callback) {
+    if (!self.initialized) return self.utils.console(config.debugMsgs['nonInit']);
+    var phone = obj.phone;
+    obj.channel = 'sms';
+    if(config.linkId === undefined){
+      this.createLink(obj, function(url){
+        self.api.makeRequest(config.resources.links.createLinkClick, {
+          link_url: url + '?click'
+        }, function(data) {
+          self.sendSMSLink(phone, config.linkUrl + '/c/' + data.click_id, function(){
+            if (typeof(callback) === 'function') callback();
+          });
+        });
+      });
+    }else{
+      self.sendSMSLink(phone, config.linkUrl + '/c/' + config.linkId, function(){
+        if (typeof(callback) === 'function') callback();
+      });
+    }
+  };
+  this.sendSMSLink = function(phone, url, callback){
+    self.api.makeRequest(config.resources.links.sendSMSLink, {
+      link_url: url,
+      phone: phone
     }, function(data) {
       if (typeof(callback) === 'function') callback(data.url);
     });
@@ -345,10 +388,11 @@ var Branch = function Branch(app_id, debug, callback) {
   var config = {
     appId: app_id,
     connector: {
-      url: 'http://api.branchmetrics.io',
+      url: 'https://api.branch.io',
       name: 'web-sdk',
       version: '0.1'
     },
+    linkUrl: 'http://bnc.lt',
     linkId: self.utils.hashValue('r'),
     formap: branch_map.formap,
     resources: branch_map.resources,
