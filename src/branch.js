@@ -350,7 +350,7 @@ var Branch = function Branch(app_id, debug, callback) {
       link_url: url,
       phone: phone
     }, function(data) {
-      if (typeof(callback) === 'function') callback(data.url);
+      if (typeof(callback) === 'function') callback(data);
     });
   };
   this.showReferrals = function(callback) {
