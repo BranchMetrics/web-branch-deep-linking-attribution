@@ -29,6 +29,15 @@
     .btn {
       margin-top: 5px;
     }
+    #SMSNumber {
+      width: 125px;
+      display: inline-block;
+      margin-top: 5px;
+      vertical-align: middle;
+    }
+    .group {
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -59,6 +68,10 @@
         <button id="logout" class="btn btn-info">.logout()</button>
         <button id="track" class="btn btn-info">.track()</button>
         <button id="createLink" class="btn btn-info">.createLink()</button>
+        <div class="group">
+          <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
+          <button id="SMSLink" class="btn btn-info">.SMSLink()</button>
+        </div>
         <button id="showReferrals" class="btn btn-info">.showReferrals()</button>
         <button id="showCredits" class="btn btn-info">.showCredits()</button>
         <button id="redeemCredits" class="btn btn-info">.redeemCredits()</button>
@@ -68,11 +81,9 @@
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
-    
     var info     = $('.info');
     var request  = $('.request');
     var response = $('.response');
-
     $('#init').click(function(){
       request.html('branch.init();');
       branch.init(function(data){
@@ -80,7 +91,6 @@
         info.html(JSON.stringify(branch.utils.readSession()));
       });
     });
-
     $('#identify').click(function(){
       request.html('branch.identify({identity: \'Branch\'});');
       branch.identify({
@@ -90,7 +100,6 @@
         info.html(JSON.stringify(branch.utils.readSession()));
       });
     });
-
     $('#logout').click(function(){
       request.html('branch.logout();');
       branch.logout(function(data){
@@ -98,7 +107,6 @@
         info.html(JSON.stringify(branch.utils.readSession()));
       });
     });
-
     $('#close').click(function(){
       alert('You will need to call .init() reinitialize the Branch SDK.');
       request.html('branch.close();');
@@ -107,14 +115,12 @@
         info.html(JSON.stringify(branch.utils.readSession()));
       });
     });
-
     $('#track').click(function(){
       request.html('branch.track(\'Tracked this click\');');
       branch.track('Tracked this click', function(data){
         response.html(JSON.stringify(data));
       });
     });
-
     $('#createLink').click(function(){
       request.html("branch.createLink({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
       branch.createLink({
@@ -136,21 +142,43 @@
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
-
+    $('#SMSLink').click(function(){
+      var phone_number = $('#SMSNumber');
+      if(phone_number.val() == ''){
+        phone_number.parent().addClass('has-error');
+        return false;
+      }else{
+        phone_number.parent().removeClass('has-error');
+      }
+      request.html("branch.SMSLink({phone: " + phone_number + ",tags: ['tag1', 'tag2'],feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com'}});");
+      branch.SMSLink({
+        phone: phone_number.val(),
+        tags: ['tag1', 'tag2'],
+        feature: 'create link',
+        stage: 'created link',
+        type: 1,
+        data: {  
+          mydata: {
+            foo: 'bar'
+          },
+          '$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com'
+        }
+      }, function(link){
+        response.html('{}');
+      });
+    });
     $('#showReferrals').click(function(){
       request.html('branch.showReferrals();');
       branch.showReferrals(function(data){
         response.html(JSON.stringify(data));
       });
     });
-
     $('#showCredits').click(function(){
       request.html('branch.showCredits();');
       branch.showCredits(function(data){
         response.html(JSON.stringify(data));
       });
     });
-
     $('#redeemCredits').click(function(){
       request.html('branch.redeemCredits({amount: 5, bucket: \'default\'});');
       branch.redeemCredits({
@@ -160,7 +188,6 @@
         response.html(JSON.stringify(data));
       });
     });
-
   </script>
 </body>
 </html>
