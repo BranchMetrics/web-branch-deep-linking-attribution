@@ -56,13 +56,15 @@ Place this code in the `</head>` statement in your HTML.  Be sure to replace `YO
 
 **[Deeplinking Methods](#deeplinking-methods)**  
    - **[.createLink()](#createlink)**  
+   - **[.SMSLink()](#smslink)**  
+   - **[.createLinkClick()](#createlinkclick)** 
 
 **[Referral Methods](#referral-methods)**  
    - **[.showReferrals()](#showreferrals)**  
    - **[.showCredits()](#showcredits)**  
    - **[.redeemCredits()](#redeemcredits)**  
 
-**[Bugs / Help / Support](#bugs--help--support)** 
+**[Bugs / Help / Support](#bugs--help--support)**
 
 ### Constructor
 
@@ -109,7 +111,7 @@ branch.init(function(data){
   session_id:         '12345', // Server-generated ID of the session. Store this locally.
   identity_id:        '12345', // Server-generated ID of the user identity. Store this locally.
   device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint. Store this locally
-  data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here. [More]
+  data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
   link:               'url',   // Server-generated link, for synchronous link creation.
   referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with a developer identity, that identity is here.
 }
@@ -182,7 +184,7 @@ branch.close(function(data){
 
 #### .logout()
 
-Logs the current user out.  Returns a new session.
+Not exactly sure what this does.  @DmitriGaskin, need you to halp.
 
 ##### Usage
 
@@ -275,10 +277,42 @@ Branch.createLink(
 )
 ```
 
+#### .SMSLink()
+
+Calls `branch.CreateLink()` with a pre-filled `channel` parameter set to `sms` and sends an SMS message with a link to the 
+provided `phone` parameter.  International SMS supported.
+
+##### Usage
+
+```
+Branch.SMSLink(
+  (JSON Object, required) {
+    phone (long int, required)             // The phone number to send the SMS.
+    tags (JSON array, optional),           // An array of tags for splitting out data in the dashboard.
+    feature (string, optional),            // The string for a particular feature (invite, referral).
+    stage (string, optional),              // A string representing the progress of the user.
+    type (int, optional),                  // Use 1 for one time use links, 0 for persistent.
+    data (JSON object, optional) {         // This parameter takes any JSON object and attaches it to the link created.  Reserved
+                                           // parameters are denoted with '$'.
+      '$desktop_url' (url, optional),      // Custom redirect URL for desktop link clicks.
+      '$ios_url' (url, optional)           // Custom redirect URL for iOS device clicks.
+      '$ipad_url' (url, optional)          // Custom redirect URL for iPad clicks.  Overrides $ios_url on iPads.
+      '$android_url' (url, optional)       // Custom redirect URL for Android device clicks.
+      '$og_app_id' (string, optional)      // Facebook app ID for Open Graph data.
+      '$og_title', (string, optional)      // Open Graph page title.
+      '$og_description' (string, optional) // Open Graph page description.
+      '$og_image_url' (url, optional)      // Open graph page image/icon URL.
+    },
+    callback (function, optional)
+  }
+)
+```
+
 ##### Example
 
 ```js
-branch.createLink({
+branch.SMSLink({
+  phone: 1234567890,
   tags: ['tag1', 'tag2'],
   channel: 'facebook',
   feature: 'dashboard',
@@ -304,10 +338,96 @@ branch.createLink({
 
 ##### Returns
 
+```
+{}
+```
+
+#### .sendSMSLink()
+
+Not to be confused with `Branch.SMSLink()`.  This method sends a request to a pre-configured link for sending SMS
+links.  You can call this if you already have a link configured, i.e. `http://bnc.lt/c/randomStringId`.  It is 
+recommended you use the `Branch.SMSLink()` method as it is designed to handle this workflow.
+
+##### Usage
+
+```
+Branch.sendSMSLink(
+    link_url (string, required),
+    callback (function, optional)
+  }
+)
+```
+
+##### Example
+
 ```js
+branch.sendSMSLink('http://bnc.lt/c/randomStringId', function(data){
+  console.log(data)
+});
+```
+
+##### Returns
+
+```
 {
-  url: 'http://bnc.lt/l/randomString'
+  message: 'Text message sent.'
 }
+```
+
+#### .createLinkClick()
+
+Perform an anonymous click to a generated URL.  Used primarily to create a link click ID to be used for other SDK
+methods.  Clicks will not be attributed to a platfom, device or browser fingerprint.
+
+##### Usage
+
+```
+Branch.createLinkClick (
+  url (string, required),
+  callback (function, optional)
+)
+```
+
+##### Example
+
+```js
+branch.createLinkClick('http://bnc.lt/l/randomString', function(click_id){
+  console.log(click_id)
+});
+```
+
+##### Returns
+
+```
+randomStringId
+```
+
+#### .createLinkClick()
+
+Perform an anonymous click to a generated URL.  Used primarily to create a link click ID to be used for other SDK
+methods.  Clicks will not be attributed to a platfom, device or browser fingerprint.
+
+##### Usage
+
+```
+Branch.createLinkClick (
+  url (string, required),
+  callback (function, optional)
+)
+```
+
+##### Example
+
+```js
+branch.createLinkClick('http://bnc.lt/l/randomString', function(click_id){
+  console.log(click_id)
+});
+```
+
+##### Returns
+
+```
+randomStringId
 ```
 
 ### Referral Methods
@@ -415,4 +535,5 @@ branch.redeemCredits({
 
 ## Bugs / Help / Support
 
-Feel free to report any bugs you might encounter in the repo's issues.  Any support inquiries outside of bugs please send to sean@branch.io.
+Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs 
+please send to sean@branch.io.
