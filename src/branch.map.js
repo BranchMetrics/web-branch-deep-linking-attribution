@@ -224,6 +224,38 @@ var branch_map = {
             }
           }
         }
+      },
+      createLinkClick: {
+        api: false,
+        endpoint: ':link_url',
+        method: 'GET',
+        rest: [
+          'link_url'
+        ],
+        params: {
+          link_url: {
+            type: 'string',
+            required: true,
+          }
+        }
+      },
+      sendSMSLink: {
+        api: false,
+        endpoint: ':link_url',
+        method: 'POST',
+        rest: [
+          'link_url'
+        ],
+        params: {
+          phone: {
+            type: 'string',
+            required: true
+          },
+          link_url: {
+            type: 'string',
+            required: true,
+          }
+        }
       }
     },
     events: {
