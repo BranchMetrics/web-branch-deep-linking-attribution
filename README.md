@@ -2,7 +2,7 @@
 
 This README will outline the functionality of the Branch Metrics Web SDK.
 
-Live demo: http://s3-us-west-1.amazonaws.com/branch-sdk
+Live demo: http://s3-us-west-1.amazonaws.com/branch-sdk/example.html
 
 ## Installation
 
