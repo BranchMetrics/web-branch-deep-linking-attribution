@@ -150,7 +150,7 @@
       }else{
         phone_number.parent().removeClass('has-error');
       }
-      request.html("branch.SMSLink({phone: " + phone_number + ",tags: ['tag1', 'tag2'],feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com'}});");
+      request.html("branch.SMSLink({phone: " + phone_number.val() + ",tags: ['tag1', 'tag2'],feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com'}});");
       branch.SMSLink({
         phone: phone_number.val(),
         tags: ['tag1', 'tag2'],
