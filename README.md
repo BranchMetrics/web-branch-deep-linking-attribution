@@ -279,6 +279,39 @@ Branch.createLink(
 )
 ```
 
+##### Example
+
+```js
+branch.createLink({
+  tags: ['tag1', 'tag2'],
+  channel: 'facebook',
+  feature: 'dashboard',
+  stage: 'new user',
+  type: 1,
+  data: {
+    mydata: {
+      foo: 'bar'
+    },
+    '$desktop_url': 'http://myappwebsite.com',
+    '$ios_url': 'http://myappwebsite.com/ios',
+    '$ipad_url': 'http://myappwebsite.com/ipad',
+    '$android_url': 'http://myappwebsite.com/android',
+    '$og_app_id': '12345',
+    '$og_title': 'My App',
+    '$og_description': 'My app\'s description.',
+    '$og_image_url': 'http://myappwebsite.com/image.png'
+  }
+}, function(data){
+  console.log(data)
+});
+```
+
+##### Returns
+
+```
+{}
+```
+
 #### .SMSLink()
 
 Calls `branch.CreateLink()` with a pre-filled `channel` parameter set to `sms` and sends an SMS message with a link to the 
@@ -316,7 +349,6 @@ Branch.SMSLink(
 branch.SMSLink({
   phone: 1234567890,
   tags: ['tag1', 'tag2'],
-  channel: 'facebook',
   feature: 'dashboard',
   stage: 'new user',
   type: 1,
@@ -325,9 +357,9 @@ branch.SMSLink({
       foo: 'bar'
     },
     '$desktop_url': 'http://myappwebsite.com',
-    '$ios_url': 'myapp://someaction',
-    '$ipad_url': 'myipadapp://someaction',
-    '$android_url': 'com.myapp.app://someaction',
+    '$ios_url': 'http://myappwebsite.com/ios',
+    '$ipad_url': 'http://myappwebsite.com/ipad',
+    '$android_url': 'http://myappwebsite.com/android',
     '$og_app_id': '12345',
     '$og_title': 'My App',
     '$og_description': 'My app\'s description.',
