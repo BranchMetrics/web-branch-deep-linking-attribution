@@ -189,7 +189,7 @@ branch.close(function(data){
 
 #### .logout()
 
-Not exactly sure what this does.  @DmitriGaskin, need you to halp.
+Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
 
