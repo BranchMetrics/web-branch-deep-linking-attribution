@@ -416,11 +416,11 @@ var Branch = function Branch(app_id, debug, callback) {
           '#branch-banner .content { position: absolute; width: 100%; height: 71px; z-index: 99999; background: white; color: #444; border-bottom: 1px solid #ddd; }',
           '#branch-banner .content .left { width: 60%; float: left; padding: 5px 0 0 7px; }',
           '#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }',
-          '#branch-banner .content .left .details { margin: 10px 0; }',
-          '#branch-banner .content .left .details .title { display: block; font-size: 14px; font-weight: 400; }',
-          '#branch-banner .content .left .details .description { display: block; font-size: 12px; font-weight: 200; }',
-          '#branch-banner .content .right { width: 40%; float: left; padding: 21px 9px 0 0; text-align: right; }',
-          '#branch-banner .content .right a { display: block; float: right; margin-right: 7px; background: #6EBADF; color: white; font-size: 12px; font-weight: 400; padding: 6px 6px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }',
+          '#branch-banner .content .left .details { margin: 13px 0; }',
+          '#branch-banner .content .left .details .title { display: block; font-size: 12px; font-weight: 400; }',
+          '#branch-banner .content .left .details .description { display: block; font-size: 10px; font-weight: 200; }',
+          '#branch-banner .content .right { width: 40%; float: left; padding: 23px 6px 0 0; text-align: right; }',
+          '#branch-banner .content .right a { display: block; float: right; margin-right: 5px; background: #6EBADF; color: white; font-size: 10px; font-weight: 400; padding: 5px 5px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }',
           '#branch-banner .content .right a:hover { text-decoration: none; }'
         ].join('\n');
         head.appendChild(css);
