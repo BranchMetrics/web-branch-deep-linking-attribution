@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Branch Metrics Web SDK Exaple App</title>
   <script type="text/javascript">
     (function() {
@@ -15,11 +16,11 @@
 
       // Begin Branch SDK //
       var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,
-      self.queued=[],this.init=function(){for(var a=['close','logout','track','identify','createLink','showReferrals',
-      'showCredits','redeemCredits'],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a]
-      .concat(Array.prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement('script');
-      b.type='text/javascript',b.async=!0,b.src='https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js',document
-      .getElementsByTagName('head')[0].appendChild(b)};window.branch=new Branch_Init(config);
+      self.queued=[],this.init=function(){for(var a=['close','logout','track','identify','createLink','showReferrals','showCredits',
+      'redeemCredits','appBanner'],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
+      .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement('script');b.type='text/javascript',b
+      .async=!0,b.src='https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js',document.getElementsByTagName('head')[0]
+      .appendChild(b)};window.branch=new Branch_Init(config);
       // End Branch SDK //
 
     })();
@@ -75,6 +76,7 @@
         <button id="showReferrals" class="btn btn-info">.showReferrals()</button>
         <button id="showCredits" class="btn btn-info">.showCredits()</button>
         <button id="redeemCredits" class="btn btn-info">.redeemCredits()</button>
+        <button id="appBanner" class="btn btn-info">.appBanner()</button>
       </div>
     </section>
   </div>
@@ -187,6 +189,18 @@
       }, function(data){
         response.html(JSON.stringify(data));
       });
+    });
+    $('#appBanner').click(function(){
+      request.html('branch.appBanner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
+      branch.appBanner({
+        icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+        title: 'Branch Demo App',
+        description: 'The Branch demo app!',
+        data: {
+          foo: 'bar'
+        }
+      });
+      response.html('none');
     });
   </script>
 </body>

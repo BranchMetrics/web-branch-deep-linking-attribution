@@ -12,7 +12,7 @@ This SDK requires native browser Javascript and has been tested in all modern br
 
 You will need to create a Branch Metrics app to obtain your `app_id`.  
 
-Create your free account here: http://branchmetrics.io
+Create your free account here: http://branch.io
 
 ### Quick Install
 
@@ -32,13 +32,13 @@ Place this code in the `</head>` statement in your HTML.  Be sure to replace `YO
 
     // Begin Branch SDK //
     var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,
-    self.queued=[],this.init=function(){for(var a=['close','logout','track','identify','createLink','showReferrals',
-    'showCredits','redeemCredits'],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a]
-    .concat(Array.prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement('script');
-    b.type='text/javascript',b.async=!0,b.src='https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js',document
-    .getElementsByTagName('head')[0].appendChild(b)};window.branch=new Branch_Init(config);
+    self.queued=[],this.init=function(){for(var a=['close','logout','track','identify','createLink','showReferrals','showCredits',
+    'redeemCredits','appBanner'],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
+    .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement('script');b.type='text/javascript',b
+    .async=!0,b.src='https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js',document.getElementsByTagName('head')[0]
+    .appendChild(b)};window.branch=new Branch_Init(config);
     // End Branch SDK //
-    
+
   })();
 </script>
 ```
@@ -60,6 +60,9 @@ Place this code in the `</head>` statement in your HTML.  Be sure to replace `YO
    - **[.createLink()](#createlink)**  
    - **[.SMSLink()](#smslink)**  
    - **[.createLinkClick()](#createlinkclick)** 
+
+**[Smart Banners](#smart-banners)**  
+   - **[.appBanner()](#appbanner)**  
 
 **[Referral Methods](#referral-methods)**  
    - **[.showReferrals()](#showreferrals)**  
@@ -462,6 +465,46 @@ branch.createLinkClick('http://bnc.lt/l/randomString', function(click_id){
 
 ```
 randomStringId
+```
+
+### Smart Banners
+
+Generate on mobile and desktop browsers to direct to app installs through deeplinking.
+
+#### .appBanner()
+
+Display a smart banner directing a user to your app through a Branch referral link.  The `data` param is the exact same as in `Branch.createLink()`.
+
+##### Usage
+
+```
+Branch.appBanner(
+  (JSON object, required) {
+    icon (string, recommended),       // URL path to your app's icon.  Recommended size is 50px by 50px with no border or whitespace.
+    title (string, recommended)       // The title or name of your app.
+    description (string, recommended) // The description of your app.
+    data (JSON object, optional)      // Verbatim data used in Branch.createLink().  This data is passed with your clicked links.
+  }
+)
+```
+
+##### Example
+
+```js
+branch.appBanner({
+  icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+  title: 'My App',
+  description: 'This is my app!',
+  data: {
+    foo: 'bar'
+  }
+});
+```
+
+##### Returns
+
+```
+Nothing
 ```
 
 ### Referral Methods
