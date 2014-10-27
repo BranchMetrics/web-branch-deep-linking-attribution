@@ -15,12 +15,14 @@
       };
 
       // Begin Branch SDK //
-      var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,
-      self.queued=[],this.init=function(){for(var a=['close','logout','track','identify','createLink','showReferrals','showCredits',
-      'redeemCredits','appBanner'],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
-      .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement('script');b.type='text/javascript',b
-      .async=!0,b.src='https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js',document.getElementsByTagName('head')[0]
-      .appendChild(b)};window.branch=new Branch_Init(config);
+      var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,self
+      .queued=[],this.init=function(){for(var a=["close","logout","track","identify","createLink","showReferrals","showCredits",
+      "redeemCredits","appBanner"],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
+      .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement("script");b.type="text/javascript",
+      b.async=!0,b.src="http://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(b),self._r=function(){if(
+      void 0!==window.browser_fingerprint_id){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a
+      .src="https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js",document.getElementsByTagName("head")[0].appendChild(a)
+      }else window.setTimeout("self._r()",100)},self._r()};window.branch=new Branch_Init(config);
       // End Branch SDK //
 
     })();
@@ -80,7 +82,7 @@
       </div>
     </section>
   </div>
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
     var info     = $('.info');
