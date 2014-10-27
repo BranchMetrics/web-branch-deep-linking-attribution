@@ -179,7 +179,8 @@ var Branch = function Branch(app_id, debug, callback) {
           app_id: config.appId,
           identity_id: self.utils.identity(),
           link_identifier: (config.linkId !== undefined ? config.linkId : ''),
-          is_referrable: 1
+          is_referrable: 1,
+          browser_fingerprint_id: (window.browser_fingerprint_id !== undefined ? window.browser_fingerprint_id : null)
         }, function(data) {
           sessionStorage.setItem('branch_session', JSON.stringify(data));
           self.initialized = true;
@@ -540,6 +541,6 @@ branch.init(function(){
     }
   }
   if(typeof self.init_callback === 'function'){
-    self.init_callback()
+    self.init_callback();
   }
 });

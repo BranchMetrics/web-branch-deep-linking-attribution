@@ -38,6 +38,10 @@ var branch_map = {
           is_referrable: {
             type: 'number',
             required: true
+          },
+          browser_fingerprint_id: {
+            type: 'string',
+            required: false
           }
         }
       },
