@@ -520,7 +520,7 @@ var Branch = function Branch(app_id, debug, callback) {
       name: 'web-sdk',
       version: '0.1'
     },
-    linkUrl: 'http://bnc.lt',
+    linkUrl: 'https://bnc.lt',
     linkId: self.utils.hashValue('r'),
     formap: branch_map.formap,
     resources: branch_map.resources,

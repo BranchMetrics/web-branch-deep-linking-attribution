@@ -35,7 +35,7 @@ Place this code in the `</head>` statement in your HTML.  Be sure to replace `YO
     .queued=[],this.init=function(){for(var a=["close","logout","track","identify","createLink","showReferrals","showCredits",
     "redeemCredits","appBanner"],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
     .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement("script");b.type="text/javascript",
-    b.async=!0,b.src="http://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(b),self._r=function(){if(
+    b.async=!0,b.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(b),self._r=function(){if(
     void 0!==window.browser_fingerprint_id){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a
     .src="https://s3-us-west-1.amazonaws.com/branch-sdk/branch.min.js",document.getElementsByTagName("head")[0].appendChild(a)
     }else window.setTimeout("self._r()",100)},self._r()};window.branch=new Branch_Init(config);
