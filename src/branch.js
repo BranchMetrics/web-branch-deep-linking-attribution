@@ -323,6 +323,9 @@ var Branch = function Branch(app_id, debug, callback) {
   this.createLink = function(obj, callback) {
     if (!self.initialized) return self.utils.console(config.debugMsgs['nonInit']);
     obj.source = 'web-sdk';
+    if(obj.data['$desktop_url'] !== undefined){
+      obj.data['$desktop_url'] = obj.data['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
+    }
     self.api.makeRequest(config.resources.links.createLink, {
       app_id: config.appId,
       identity: self.utils.identity(),
