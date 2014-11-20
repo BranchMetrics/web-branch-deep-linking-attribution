@@ -362,7 +362,7 @@ var Branch = function Branch(app_id, debug, callback) {
 		if (config.linkId === undefined) {
 			this.createLink(obj, function(url) {
 				self.api.makeRequest(config.resources.links.createLinkClick, {
-					link_url: url + '?click'
+					link_url: url.replace(/^http:\/\/[^\/]+/, 'https://bnc.lt') + '?click'
 				}, function(data) {
 					self.sendSMSLink(phone, config.linkUrl + '/c/' + data.click_id, function() {
 						if (typeof callback == 'function') { callback(); }
