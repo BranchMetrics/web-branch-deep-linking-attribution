@@ -45,14 +45,6 @@ Place this code in the `</head>` statement in your HTML.  Be sure to replace `YO
 </script>
 ```
 
-### Install via Bower
-
-[Bower](http://bower.io/) is a package manager for the web. To install the SDK type the following in your terminal:
-
-```bash
-bower install branch-web-sdk
-```
-
 ## API Reference
 
 **[Constructor](#constructor)**  
