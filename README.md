@@ -10,9 +10,7 @@ Live demo: http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html
 
 This SDK requires native browser Javascript and has been tested in all modern browsers with `sessionStorage` capability.  A more verbose list of supported browsers will be available soon.  No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript. 
 
-You will need to create a Branch Metrics app to obtain your `app_id`.  
-
-Create your free account here: http://branch.io
+You will need to [create a Branch Metrics](https://dashboard.branch.io/?origin=web-sdk-docs) app to obtain your `app_id`.  
 
 ### Quick Install
 
@@ -81,7 +79,7 @@ setup your SDK environment.
 
 ### Queued Methods
 
-This SDK allows queued method calls before the SDK has called `.init()`  This allows you to call methods 
+This SDK allows queued method calls before the SDK has called `.init()`. This allows you to call methods 
 before the SDK is ready for real-time calls.  Any method called before the SDK is ready will be queued 
 in the DOM and executed thereafter in order of execution.
 
@@ -138,7 +136,7 @@ Branch.identify(
   (JSON object, required) {
     identity (string, required), // Identity of the loaded user.  Normally used to pass service username or email address.
   }, 
-  callback (fuction, optional)
+  callback (function, optional)
 )
 ```
 
@@ -165,7 +163,7 @@ branch.identify({
 
 #### .close()
 
-This closes the active session, removing any relevant session inforation stored in `sessionStorage`.
+This closes the active session, removing any relevant session Create your accountrmation stored in `sessionStorage`.
 
 ##### Usage
 
@@ -319,8 +317,7 @@ branch.createLink({
 
 #### .SMSLink()
 
-Calls `branch.CreateLink()` with a pre-filled `channel` parameter set to `sms` and sends an SMS message with a link to the 
-provided `phone` parameter.  International SMS supported.
+Calls `branch.CreateLink()` with a pre-filled `channel` parameter set to `sms` and sends an SMS message with a link to the provided `phone` parameter.  International SMS supported.
 
 ##### Usage
 
@@ -385,15 +382,15 @@ branch.SMSLink({
 
 Not to be confused with `Branch.SMSLink()`.  This method sends a request to a pre-configured link for sending SMS
 links.  You can call this if you already have a link configured, i.e. `http://bnc.lt/c/randomStringId`.  It is 
-recommended you use the `Branch.SMSLink()` method as it is designed to handle this workflow.
+recommended you use the `Branch.SMSLink()` method as it is designed to handle this workflow. International SMS supported.
 
 ##### Usage
 
 ```
 Branch.sendSMSLink(
-    link_url (string, required),
-    callback (function, optional)
-  }
+  phone (string, required),
+  link_url (string, required),
+  callback (function, optional)
 )
 ```
 
@@ -411,34 +408,6 @@ branch.sendSMSLink('http://bnc.lt/c/randomStringId', function(data){
 {
   message: 'Text message sent.'
 }
-```
-
-#### .createLinkClick()
-
-Perform an anonymous click to a generated URL.  Used primarily to create a link click ID to be used for other SDK
-methods.  Clicks will not be attributed to a platfom, device or browser fingerprint.
-
-##### Usage
-
-```
-Branch.createLinkClick (
-  url (string, required),
-  callback (function, optional)
-)
-```
-
-##### Example
-
-```js
-branch.createLinkClick('http://bnc.lt/l/randomString', function(click_id){
-  console.log(click_id)
-});
-```
-
-##### Returns
-
-```
-randomStringId
 ```
 
 #### .createLinkClick()
