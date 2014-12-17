@@ -59,7 +59,7 @@ var branch_map = {
 						required: false
 					},
 					obj: {
-						type: 'jsonObj', 
+						type: 'jsonObj',
 						required: true,
 						ref: 'obj',
 						params: {

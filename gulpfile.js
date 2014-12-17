@@ -16,7 +16,6 @@ gulp.task('build', function() {
 
 var JSHintOptions = {
 	'browser': true,
-
 	'undef': true,
 	'trailing': true,
 	'curly': true,
