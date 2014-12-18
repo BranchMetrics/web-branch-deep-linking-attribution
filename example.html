@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Branch Metrics Web SDK Exaple App</title>
+  <title>Branch Metrics Web SDK Example App</title>
   <script type="text/javascript">
   (function() {
 
@@ -32,18 +32,14 @@
                       }
                   }(a[b])
           }
-          var oldBranch = Branch;
-          Branch.app_id = oldBranch.app_id;
-          Branch.debug = oldBranch.debug;
-          Branch.init_callback = oldBranch.init_callback;
-          Branch.queued = oldBranch.queued;
-          Branch.init();
 
           var a = document.createElement("script");
           a.type = "text/javascript";
           a.async = !0;
           a.src = "dist/branch.min.js";
           document.getElementsByTagName("head")[0].appendChild(a);
+
+          Branch.init();
 
       };
       window.branch = new Branch_Init(config);

@@ -6,7 +6,7 @@ var gulp = require('gulp'),
 	concat = require('gulp-concat');
 
 gulp.task('build', function() {
-	return gulp.src([ './src/branch.map.js', './src/branch.js' ])
+	return gulp.src([ './src/branch.js' ])
 		.pipe(concat('branch.min.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest('./dist/'));

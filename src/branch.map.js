@@ -1,3 +1,4 @@
+(function () {
 var branch_map = {
 	debugMessages: {
 		'nonInit': 'Branch SDK not initialized',
@@ -288,3 +289,4 @@ var branch_map = {
 		}
 	}
 };
+})();
