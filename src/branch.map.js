@@ -1,3 +1,4 @@
+(function () {
 var branch_map = {
 	debugMessages: {
 		'nonInit': 'Branch SDK not initialized',
@@ -59,7 +60,7 @@ var branch_map = {
 						required: false
 					},
 					obj: {
-						type: 'jsonObj', 
+						type: 'jsonObj',
 						required: true,
 						ref: 'obj',
 						params: {
@@ -288,3 +289,4 @@ var branch_map = {
 		}
 	}
 };
+})();
