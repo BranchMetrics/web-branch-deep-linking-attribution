@@ -126,7 +126,7 @@
       });
     });
     $('#createLink').click(function(){
-      request.html("branch.createLink({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
+      request.html("branch.createLink({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
       branch.createLink({
         tags: ['tag1', 'tag2'],
         channel: 'sample app',
@@ -154,7 +154,7 @@
       }else{
         phone_number.parent().removeClass('has-error');
       }
-      request.html("branch.SMSLink({phone: " + phone_number.val() + ",tags: ['tag1', 'tag2'],feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com'}});");
+      request.html("branch.SMSLink({phone: " + phone_number.val() + ",tags: ['tag1', 'tag2'],feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html'}});");
       branch.SMSLink({
         phone: phone_number.val(),
         tags: ['tag1', 'tag2'],
@@ -165,7 +165,7 @@
           mydata: {
             foo: 'bar'
           },
-          '$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com'
+          '$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html'
         }
       }, function(link){
         response.html('{}');
