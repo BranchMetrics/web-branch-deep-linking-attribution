@@ -152,6 +152,15 @@ var Branch = function Branch(app_id, debug, callback) {
 						error: 'Not enough credits to redeem.'
 					});
 				}
+				else if (r.readyState === 4) {
+					try {
+						var err = JSON.parse(r.responseText);
+						error(err.message || err);
+					}
+					catch (e) {
+						error(r.status || 'unknown error');
+					}
+				}
 			};
 			var query = '';
 			if (resource.rest) {
@@ -333,7 +342,7 @@ var Branch = function Branch(app_id, debug, callback) {
 			});
 		});
 	};
-	this.createLink = function(obj, callback) {
+	this.createLink = function(obj, callback, errorCallback) {
 		if (!self.initialized) { return self.utils.console(config.debugMsgs.nonInit); }
 		obj.source = 'web-sdk';
 		if (obj.data.$desktop_url !== undefined) {
@@ -345,7 +354,7 @@ var Branch = function Branch(app_id, debug, callback) {
 			obj: obj
 		}, function(data) {
 			if (typeof callback == 'function') { callback(data.url); }
-		});
+		}, errorCallback);
 	};
 	this.createLinkClick = function(url, callback) {
 		if (!self.initialized) { return self.utils.console(config.debugMsgs.nonInit); }
@@ -355,7 +364,7 @@ var Branch = function Branch(app_id, debug, callback) {
 			if (typeof callback == 'function') { callback(data.click_id); }
 		});
 	};
-	this.SMSLink = function(obj, callback) {
+	this.SMSLink = function(obj, callback, errorCallback) {
 		if (!self.initialized) { return self.utils.console(config.debugMsgs.nonInit); }
 		var phone = obj.phone;
 		obj.channel = 'sms';
@@ -366,23 +375,23 @@ var Branch = function Branch(app_id, debug, callback) {
 				}, function(data) {
 					self.sendSMSLink(phone, config.linkUrl + '/c/' + data.click_id, function() {
 						if (typeof callback == 'function') { callback(); }
-					});
-				});
-			});
+					}, errorCallback);
+				}, errorCallback);
+			}, errorCallback);
 		}
 		else {
 			self.sendSMSLink(phone, config.linkUrl + '/c/' + config.linkId, function() {
 				if (typeof callback == 'function') { callback(); }
-			});
+			}, errorCallback);
 		}
 	};
-	this.sendSMSLink = function(phone, url, callback) {
+	this.sendSMSLink = function(phone, url, callback, errorCallback) {
 		self.api.makeRequest(config.resources.links.sendSMSLink, {
 			link_url: url.replace(/^http:\/\/[^\/]+/, 'https://bnc.lt'), // Always go to HTTPS.
 			phone: phone
 		}, function(data) {
 			if (typeof callback == 'function') { callback(data); }
-		});
+		}, errorCallback);
 	};
 	this.showReferrals = function(callback) {
 		if (!self.initialized) { return self.utils.console(config.debugMsgs.nonInit); }

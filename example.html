@@ -169,6 +169,8 @@
         }
       }, function(link){
         response.html('{}');
+      }, function(err) {
+        response.html('error: ' + err);
       });
     });
     $('#showReferrals').click(function(){
