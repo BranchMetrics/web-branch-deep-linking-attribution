@@ -29,14 +29,7 @@ Place this code in the `</head>` statement in your HTML.  Be sure to replace `YO
     };
 
     // Begin Branch SDK //
-    var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,self
-    .queued=[],this.init=function(){for(var a=["close","logout","track","identify","createLink","showReferrals","showCredits",
-    "redeemCredits","appBanner"],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
-    .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement("script");b.type="text/javascript",
-    b.async=!0,b.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(b),self._r=function(){if(
-    void 0!==window.browser_fingerprint_id){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a
-    .src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js",document.getElementsByTagName("head")[0].appendChild(a)
-    }else window.setTimeout("self._r()",100)},self._r()};window.branch=new Branch_Init(config);
+      var Branch_Init=function(e){var t=this;t.app_id=e.app_id,t.debug=e.debug,t.init_callback=e.init_callback,t.queued=[],t.init=function(){for(var e=["close","logout","track","identify","createLink","showReferrals","showCredits","redeemCredits","appBanner"],n=0;n<e.length;n++)t[e[n]]=function(e){return function(){t.queued.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(e[n])},t.init();var n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(n),t._r=function(){if(void 0!==window.browser_fingerprint_id){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="http://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.2.x.min.js",document.getElementsByTagName("head")[0].appendChild(e)}else window.setTimeout(function(){t._r()},100)},t._r()};window.branch=new Branch_Init(config);
     // End Branch SDK //
 
   })();

@@ -124,6 +124,18 @@ var Branch = function Branch(app_id, debug, callback) {
 		}
 		return true;
 	};
+
+	function serializeUrl(data) {
+		var query = [];
+		for (var key in data) {
+			if (data.hasOwnProperty(key)) {
+				query.push(encodeURIComponent(key) + '=' + (data[key] ? encodeURIComponent(data[key]) : ''));
+			}
+		}
+		return query.join('&');
+	}
+
+
 	this.api.makeRequest = function(resource, data, callback, error) {
 		if (self.api.validateRequest(resource, data)) {
 			if (typeof(callback) !== 'function') {
@@ -136,29 +148,45 @@ var Branch = function Branch(app_id, debug, callback) {
 					self.utils.console('Request failed', [xhr, status, error]);
 				};
 			}
-			var r;
-			if (window.XMLHttpRequest) {
+			var r, xdomain = false;
+			if (window.XDomainRequest) {
+				xdomain = true;
+				r = new XDomainRequest();
+				r.onload = function() {
+					try {
+						var data = JSON.parse(r.responseText);
+						if (data.message) { error(data.message); }
+						else { callback(data); }
+					}
+					catch (e) {
+						error('unknown error');
+					}
+				};
+			}
+			else if (window.XMLHttpRequest) {
 				r = new XMLHttpRequest();
 			}
 			else {
 				r = new ActiveXObject("Microsoft.XMLHTTP");
 			}
 			r.onreadystatechange = function() {
-				if (r.readyState === 4 && r.status === 200) {
-					callback(JSON.parse(r.responseText));
-				}
-				else if (r.readyState === 4 && r.status === 402) {
-					callback({
-						error: 'Not enough credits to redeem.'
-					});
-				}
-				else if (r.readyState === 4) {
-					try {
-						var err = JSON.parse(r.responseText);
-						error(err.message || err);
+				if (r.readyState === 4) {
+					if (r.status === 200) {
+						callback(JSON.parse(r.responseText));
 					}
-					catch (e) {
-						error(r.status || 'unknown error');
+					else if (r.status === 402) {
+						callback({
+							error: 'Not enough credits to redeem.'
+						});
+					}
+					else {
+						try {
+							var err = JSON.parse(r.responseText);
+							error(err.message || err);
+						}
+						catch (e) {
+							error(r.status || 'unknown error');
+						}
 					}
 				}
 			};
@@ -175,18 +203,16 @@ var Branch = function Branch(app_id, debug, callback) {
 			}
 			else {
 				if (resource.method === 'GET') {
-					query = '?';
-					for (var key in data) {
-						if (data.hasOwnProperty(key)) {
-							query += key + '=' + data[key] + '&';
-						}
-					}
+					query = '?' + serializeUrl(data);
 				}
 			}
+
 			r.open(resource.method, connector_url + resource.endpoint + query.substring(0, query.length - 1), true);
-			r.setRequestHeader('Content-Type', 'application/json');
-			r.setRequestHeader('Accept', 'application/json');
-			r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
+			if (!xdomain) {
+				r.setRequestHeader('Content-Type', 'application/json');
+				r.setRequestHeader('Accept', 'application/json');
+				r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
+			}
 			if (resource.ref) {
 				data = self.utils.mergeMeta(data, data[resource.ref]);
 				delete data[resource.ref];
@@ -555,15 +581,15 @@ var Branch = function Branch(app_id, debug, callback) {
 	}
 	self.q = new self.utils.queue();
 };
-var q = window.branch.queued;
+var q = window.branch.queued, init_callback = window.branch.init_callback;
 window.branch = new Branch(window.branch.app_id, window.branch.debug, window.branch.callback);
-branch.init(function() {
+branch.init(function(data) {
 	if (q.length) {
 		for (var i = 0; i < q.length; i++) {
 			window.branch[q[i].shift()].apply(window.branch, q[i]);
 		}
 	}
-	if (typeof self.init_callback == 'function') {
-		self.init_callback();
+	if (typeof init_callback == 'function') {
+		init_callback(data);
 	}
 });

@@ -3,6 +3,8 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Branch Metrics Web SDK Exaple App</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
     (function() {
 
@@ -10,19 +12,12 @@
         app_id: '5680621892404085',
         debug: true,
         init_callback: function(){
-          document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(branch.utils.readSession());
+          $('.info').text(JSON.stringify(branch.utils.readSession()));
         }
       };
 
       // Begin Branch SDK //
-      var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,self
-      .queued=[],this.init=function(){for(var a=["close","logout","track","identify","createLink","showReferrals","showCredits",
-      "redeemCredits","appBanner"],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
-      .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement("script");b.type="text/javascript",
-      b.async=!0,b.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(b),self._r=function(){if(
-      void 0!==window.browser_fingerprint_id){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a
-      .src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js",document.getElementsByTagName("head")[0].appendChild(a)
-      }else window.setTimeout("self._r()",100)},self._r()};window.branch=new Branch_Init(config);
+      var Branch_Init=function(e){var t=this;t.app_id=e.app_id,t.debug=e.debug,t.init_callback=e.init_callback,t.queued=[],t.init=function(){for(var e=["close","logout","track","identify","createLink","showReferrals","showCredits","redeemCredits","appBanner"],n=0;n<e.length;n++)t[e[n]]=function(e){return function(){t.queued.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(e[n])},t.init();var n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(n),t._r=function(){if(void 0!==window.browser_fingerprint_id){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="http://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.2.x.min.js",document.getElementsByTagName("head")[0].appendChild(e)}else window.setTimeout(function(){t._r()},100)},t._r()};window.branch=new Branch_Init(config);
       // End Branch SDK //
 
     })();
@@ -82,8 +77,6 @@
       </div>
     </section>
   </div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
     var info     = $('.info');
     var request  = $('.request');
@@ -189,7 +182,7 @@
       request.html('branch.redeemCredits({amount: 5, bucket: \'default\'});');
       branch.redeemCredits({
         amount: 5,
-        bucket: 'default',
+        bucket: 'default'
       }, function(data){
         response.html(JSON.stringify(data));
       });

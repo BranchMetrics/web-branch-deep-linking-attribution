@@ -143,7 +143,7 @@ var branch_map = {
 				params: {
 					app_id: {
 						type: 'appId',
-						required: true,
+						required: true
 					},
 					identity_id: {
 						type: 'identityId',
@@ -158,7 +158,7 @@ var branch_map = {
 				params: {
 					app_id: {
 						type: 'appId',
-						required: true,
+						required: true
 					},
 					identity_id: {
 						type: 'identityId',
@@ -239,7 +239,7 @@ var branch_map = {
 				params: {
 					link_url: {
 						type: 'string',
-						required: true,
+						required: true
 					}
 				}
 			},
@@ -257,7 +257,7 @@ var branch_map = {
 					},
 					link_url: {
 						type: 'string',
-						required: true,
+						required: true
 					}
 				}
 			}
@@ -269,7 +269,7 @@ var branch_map = {
 				params: {
 					app_id: {
 						type: 'appId',
-						required: true,
+						required: true
 					},
 					session_id: {
 						type: 'sessionId',
