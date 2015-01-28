@@ -565,11 +565,11 @@ var Branch = function Branch(app_id, debug, callback) {
 	var config = {
 		appId: app_id,
 		connector: {
-			url: 'https://api.branch.io',
+			url: ((document.location.toString().indexOf('https') === -1 && window.XDomainRequest) ? 'http' : 'https') + '://api.branch.io',
 			name: 'web-sdk',
 			version: '0.1'
 		},
-		linkUrl: 'https://bnc.lt',
+		linkUrl: ((document.location.toString().indexOf('https') === -1 && window.XDomainRequest) ? 'http' : 'https') + '://bnc.lt',
 		linkId: self.utils.hashValue('r'),
 		formap: branch_map.formap,
 		resources: branch_map.resources,
@@ -581,6 +581,7 @@ var Branch = function Branch(app_id, debug, callback) {
 	}
 	self.q = new self.utils.queue();
 };
+
 var q = window.branch.queued, init_callback = window.branch.init_callback;
 window.branch = new Branch(window.branch.app_id, window.branch.debug, window.branch.callback);
 branch.init(function(data) {

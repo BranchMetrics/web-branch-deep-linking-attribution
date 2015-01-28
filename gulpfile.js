@@ -11,6 +11,11 @@ gulp.task('build', function() {
 		.pipe(uglify())
 		.pipe(gulp.dest('./dist/'));
 });
+gulp.task('build-unminified', function() {
+	return gulp.src([ './src/json2.js', './src/branch.map.js', './src/branch.js' ])
+		.pipe(concat('branch.js'))
+		.pipe(gulp.dest('./dist/'));
+});
 
 /* ----- Linting ----- */
 
