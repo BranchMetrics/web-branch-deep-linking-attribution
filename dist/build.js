@@ -23,12 +23,6 @@ utils.readStore = function() {
 utils.store = function(a) {
   sessionStorage.setItem("branch_session", JSON.stringify(a));
 };
-utils.identity = function() {
-  return utils.readSession() && utils.readSession().identity_id;
-};
-utils.session = function() {
-  return utils.readSession() && utils.readSession().session_id;
-};
 utils.merge = function(a, b) {
   for (var d in b) {
     b.hasOwnProperty(d) && (a[d] = b[d]);
