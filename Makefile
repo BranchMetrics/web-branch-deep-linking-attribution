@@ -9,7 +9,6 @@ dist/build.js: $(SOURCES) $(EXTERN)
 	$(COMPILER) $(COMPILER_ARGS) \
 		--formatting=print_input_delimiter \
 		--formatting=pretty_print \
-		--compilation_level ADVANCED_OPTIMIZATIONS \
 		--define 'DEBUG=true' > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN)
