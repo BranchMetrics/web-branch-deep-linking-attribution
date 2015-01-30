@@ -1,6 +1,11 @@
+/**
+ * This provides the principal function to make a call to the API. Basically
+ * a fancy wrapper around XHR/JSONP/etc.
+ */
+
+goog.provide('api');
 goog.require('config');
 goog.require('utils');
-goog.provide('api');
 
 function serializeObject(obj, prefix) {
 	var pairs = [];

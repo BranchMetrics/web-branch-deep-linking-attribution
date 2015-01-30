@@ -1,5 +1,10 @@
-goog.require('utils')
+/**
+ * This provides a list of endpoints and client-side validation for any calls
+ * to those endpoints.
+ */
+
 goog.provide('resources');
+goog.require('utils')
 goog.require('config');
 
 /** @enum {string} */

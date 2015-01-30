@@ -1,3 +1,8 @@
+/**
+ * This provides a UMD-style module wrapper for the branch instance, meaning
+ * that the SDK can be used in any CommonJS, RequireJS, and vanilla JS environment.
+ */
+
 goog.require('branch_instance');
 
 // AMD

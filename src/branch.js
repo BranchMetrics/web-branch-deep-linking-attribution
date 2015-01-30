@@ -1,3 +1,7 @@
+/**
+ * This file provides the main Branch function.
+ */
+
 goog.provide('Branch');
 goog.require('utils');
 goog.require('resources');

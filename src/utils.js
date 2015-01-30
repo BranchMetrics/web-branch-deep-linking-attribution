@@ -1,3 +1,7 @@
+/**
+ * Just provides a couple of utilities.
+ */
+
 goog.provide('utils');
 
 /** @define {boolean} */
@@ -58,13 +62,6 @@ utils.store = function(data) {
 	sessionStorage.setItem('branch_session', JSON.stringify(data));
 };
 
-utils.identity = function() {
-	return utils.readSession() && utils.readSession().identity_id;
-};
-utils.session = function() {
-	return utils.readSession() && utils.readSession().session_id;
-};
-
 utils.merge = function(to, from) {
 	for (var attr in from) {
 		if (from.hasOwnProperty(attr)) { to[attr] = from[attr]; }
@@ -81,10 +78,12 @@ utils.hashValue = function(key) {
 	}
 };
 
+// TODO: needs a better name
 utils.mobileReady = function() {
 	return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i);
 };
 
+// TODO: this probably should not be a utility
 utils.closeBanner = function() {
 	var d = document.getElementById('branch-banner');
 	if (d) {

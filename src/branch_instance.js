@@ -1,3 +1,9 @@
+/**
+ * This file initialzes the main branch instance, and re-runs any tasks that
+ * were any tasks that were executed on the dummy branch object before real
+ * branch was loaded.
+ */
+
 goog.require('Branch');
 goog.provide('branch_instance');
 
