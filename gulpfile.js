@@ -1,16 +1,6 @@
 var gulp = require('gulp'),
 	gutil = require('gulp-util'),
-	rename = require('gulp-rename'),
-	jshint = require('gulp-jshint'),
-	uglify = require('gulp-uglify'),
-	concat = require('gulp-concat');
-
-gulp.task('build', function() {
-	return gulp.src([ './src/branch.map.js', './src/branch.js' ])
-		.pipe(concat('branch.min.js'))
-		.pipe(uglify())
-		.pipe(gulp.dest('./dist/'));
-});
+	jshint = require('gulp-jshint');
 
 /* ----- Linting ----- */
 

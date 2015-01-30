@@ -4,28 +4,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Branch Metrics Web SDK Exaple App</title>
   <script type="text/javascript">
-    (function() {
 
-      var config = {
-        app_id: '5680621892404085',
-        debug: true,
-        init_callback: function(){
-          document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(branch.utils.readSession());
-        }
-      };
+!function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
+"http://localhost:8000/dist/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
+e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
+"init;close;logout;track;identify;createLink;showReferrals;showCredits;redeemCredits;appBanner".split(";"),0);
 
-      // Begin Branch SDK //
-      var Branch_Init=function(a){self=this,self.app_id=a.app_id,self.debug=a.debug,self.init_callback=a.init_callback,self
-      .queued=[],this.init=function(){for(var a=["close","logout","track","identify","createLink","showReferrals","showCredits",
-      "redeemCredits","appBanner"],b=0;b<a.length;b++)self[a[b]]=function(a){return function(){self.queued.push([a].concat(Array
-      .prototype.slice.call(arguments,0)))}}(a[b])},self.init();var b=document.createElement("script");b.type="text/javascript",
-      b.async=!0,b.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(b),self._r=function(){if(
-      void 0!==window.browser_fingerprint_id){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a
-      .src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js",document.getElementsByTagName("head")[0].appendChild(a)
-      }else window.setTimeout("self._r()",100)},self._r()};window.branch=new Branch_Init(config);
-      // End Branch SDK //
-
-    })();
+branch.init('5680621892404085', function(err, data) {
+  document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+});
   </script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <style type="text/css">
@@ -121,7 +108,7 @@
     });
     $('#track').click(function(){
       request.html('branch.track(\'Tracked this click\');');
-      branch.track('Tracked this click', function(data){
+      branch.track('Tracked this click', function(err, data){
         response.html(JSON.stringify(data));
       });
     });
@@ -142,7 +129,7 @@
           '$og_description': 'Branch Metrics',
           '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
         }
-      }, function(link){
+      }, function(err, link){
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
