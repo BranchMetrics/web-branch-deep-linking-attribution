@@ -197,43 +197,6 @@ Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 /*
 ===== THESE ARE OLD FUNCTIONS FROM THE WEB SDK THAT NEED TO BE MOVED OVER =====
 
-this.createLinkClick = function(url, callback) {
-	if (!self.initialized) { return utils.console(config.debugMsgs.nonInit); }
-	self.api.makeRequest(config.resources.links.createLinkClick, {
-		url: url
-	}, function(data) {
-		if (typeof callback == 'function') { callback(data.click_id); }
-	});
-};
-this.SMSLink = function(obj, callback) {
-	if (!self.initialized) { return utils.console(config.debugMsgs.nonInit); }
-	var phone = obj.phone;
-	obj.channel = 'sms';
-	if (config.linkId === undefined) {
-		this.createLink(obj, function(url) {
-			self.api.makeRequest(config.resources.links.createLinkClick, {
-				link_url: url.replace(/^http:\/\/[^\/]+/, 'https://bnc.lt') + '?click'
-			}, function(data) {
-				self.sendSMSLink(phone, config.linkUrl + '/c/' + data.click_id, function() {
-					if (typeof callback == 'function') { callback(); }
-				});
-			});
-		});
-	}
-	else {
-		self.sendSMSLink(phone, config.linkUrl + '/c/' + config.linkId, function() {
-			if (typeof callback == 'function') { callback(); }
-		});
-	}
-};
-this.sendSMSLink = function(phone, url, callback) {
-	self.api.makeRequest(config.resources.links.sendSMSLink, {
-		link_url: url.replace(/^http:\/\/[^\/]+/, 'https://bnc.lt'), // Always go to HTTPS.
-		phone: phone
-	}, function(data) {
-		if (typeof callback == 'function') { callback(data); }
-	});
-};
 this.showReferrals = function(callback) {
 	if (!self.initialized) { return utils.console(config.debugMsgs.nonInit); }
 	self.api.makeRequest(config.resources.referrals.showReferrals, {
