@@ -144,6 +144,55 @@ Branch.prototype['createLink'] = function(obj, callback) {
 	});
 };
 
+/**
+ * @param {?String} url
+ * @param {?function} callback
+ */
+Branch.prototype['createLinkClick'] = function(url, callback) {
+	if (!this.initialized) { return utils.console(config.debugMsgs.nonInit); }
+	this.api(resources.createLinkClick, {
+		link_url: url.replace('https://bnc.lt/', ''),
+		click: " "
+	}, function(err, data) {
+		if (typeof callback == 'function') { callback(data); }
+	});
+};
+
+/**
+ * @param {?Object} metadata
+ * @param {?function} callback
+ */
+Branch.prototype['SMSLink'] = function(obj, callback) {
+	if (!this.initialized) { return utils.console(config.debugMsgs.nonInit); }
+	obj.channel = 'sms';
+	var self = this;
+	this.createLink(obj, function(err, url) {
+		if (err) { callback(err); }
+		else {
+			self.createLinkClick(url, function(data) {
+				data.url = url;
+				self.sendSMSLink(obj["phone"], data, function(data) {
+					if (typeof callback == 'function') { callback(data); }
+				});
+			});
+		}
+	});
+};
+
+/**
+ * @param {?String} phone
+ * @param {?String} url
+ * @param {?function} callback
+ */
+Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
+	this.api(resources.sendSMSLink, {
+		click_id: data.click_id,
+		link_url: data.click_id,
+		phone: phone
+	}, function(err, data) {
+		if (typeof callback == 'function') { callback(data); }
+	});
+};
 
 /*
 ===== THESE ARE OLD FUNCTIONS FROM THE WEB SDK THAT NEED TO BE MOVED OVER =====

@@ -152,20 +152,20 @@ resources.createLinkClick = {
 	destination: config.link_service_endpoint,
 	endpoint: '',
 	method: 'GET',
-	queryPart: {
-		"link_url": validator(true, validationTypes.str)
-	}
+	queryPart: { "link_url": validator(true, validationTypes.str) },
+	params: { "click": validator(true, validationTypes.str) }
 };
 /** @type {resources.resource} */
 resources.sendSMSLink = {
 	destination: config.link_service_endpoint,
-	endpoint: '',
+	endpoint: '/c',
+	method: 'POST',
 	queryPart: {
 		"link_url": validator(true, validationTypes.str)
 	},
-	method: 'POST',
 	params: {
-		"phone": validator(true, validationTypes.str)
+		"phone": validator(true, validationTypes.str),
+		"click_id": validator(true, validationTypes.str)
 	}
 	
 };

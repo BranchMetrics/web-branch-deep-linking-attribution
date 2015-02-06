@@ -65,14 +65,14 @@ function getUrl(a, b) {
       a.queryPart.hasOwnProperty(c) && (a.queryPart[c](a.endpoint, c, b[c]), d += "/" + b[c]);
     }
   }
-  var f = {};
+  var e = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      var e = a.params[c](a.endpoint, c, b[c]);
-      "undefined" != typeof e && "" !== e && null !== e && (f[c] = e);
+      var f = a.params[c](a.endpoint, c, b[c]);
+      "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
     }
   }
-  return{data:serializeObject(f), url:d};
+  return{data:serializeObject(e), url:d};
 }
 var _jsonp_callbackId = 0;
 function jsonp(a, b) {
@@ -90,34 +90,34 @@ var api = function(a, b, d) {
   d = d || function() {
   };
   b = getUrl(a, b);
-  var c, f = "";
-  "GET" == a.method ? c = b.url + "?" + b.data : (c = b.url, f = b.data);
+  var c, e = "";
+  "GET" == a.method ? c = b.url + "?" + b.data : (c = b.url, e = b.data);
   if (a.jsonp) {
     return jsonp(c, d);
   }
-  var e = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  e.onreadystatechange = function() {
-    if (4 === e.readyState && 200 === e.status) {
+  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  f.onreadystatechange = function() {
+    if (4 === f.readyState && 200 === f.status) {
       try {
-        d(null, JSON.parse(e.responseText));
+        d(null, JSON.parse(f.responseText));
       } catch (a) {
         d(a);
       }
     } else {
-      4 === e.readyState && 402 === e.status ? d(Error("Not enough credits to redeem.")) : d(Error("Error in API: " + e.status));
+      4 === f.readyState && 402 === f.status ? d(Error("Not enough credits to redeem.")) : d(Error("Error in API: " + f.status));
     }
   };
-  e.open(a.method, c, !0);
-  e.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  e.send(f);
+  f.open(a.method, c, !0);
+  f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  f.send(e);
 };
 // Input 3
 var resources = {}, methods = {POST:"POST", GET:"GET"}, validationTypes = {obj:0, str:1, num:2, arr:3};
 function validator(a, b) {
-  return function(d, c, f) {
-    f ? b == validationTypes.obj ? "object" != typeof f && utils.error(utils.messages.invalidType, [d, c, "an object"]) : b == validationTypes.arr ? f instanceof Array || utils.error(utils.messages.invalidType, [d, c, "an array"]) : b == validationTypes.str ? "string" != typeof f && utils.error(utils.messages.invalidType, [d, c, "a string"]) : b == validationTypes.num ? "number" != typeof f && utils.error(utils.messages.invalidType, [d, c, "a number"]) : b && (b.test(f) || utils.error(utils.messages.invalidType, 
+  return function(d, c, e) {
+    e ? b == validationTypes.obj ? "object" != typeof e && utils.error(utils.messages.invalidType, [d, c, "an object"]) : b == validationTypes.arr ? e instanceof Array || utils.error(utils.messages.invalidType, [d, c, "an array"]) : b == validationTypes.str ? "string" != typeof e && utils.error(utils.messages.invalidType, [d, c, "a string"]) : b == validationTypes.num ? "number" != typeof e && utils.error(utils.messages.invalidType, [d, c, "a number"]) : b && (b.test(e) || utils.error(utils.messages.invalidType, 
     [d, c, "in the proper format"])) : a && utils.error(utils.messages.missingParam, [d, c]);
-    return f;
+    return e;
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
@@ -130,8 +130,8 @@ resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", me
 resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:"GET", jsonp:!0, params:{app_id:validator(!0, branch_id)}};
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}};
 resources.createLink = {destination:config.api_endpoint, endpoint:"/v1/url", method:"POST", ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
-resources.createLinkClick = {destination:config.link_service_endpoint, endpoint:"", method:"GET", queryPart:{link_url:validator(!0, validationTypes.str)}};
-resources.sendSMSLink = {destination:config.link_service_endpoint, endpoint:"", queryPart:{link_url:validator(!0, validationTypes.str)}, method:"POST", params:{phone:validator(!0, validationTypes.str)}};
+resources.createLinkClick = {destination:config.link_service_endpoint, endpoint:"", method:"GET", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
+resources.sendSMSLink = {destination:config.link_service_endpoint, endpoint:"/c", method:"POST", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str), click_id:validator(!0, validationTypes.str)}};
 resources.track = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
 // Input 4
 var Branch = function() {
@@ -209,6 +209,34 @@ Branch.prototype.createLink = function(a, b) {
   a.data = JSON.stringify(a.data);
   this.api(resources.createLink, a, function(a, c) {
     "function" == typeof b && (a ? b(a) : b(null, c.url));
+  });
+};
+Branch.prototype.createLinkClick = function(a, b) {
+  if (!this.initialized) {
+    return utils.console(config.debugMsgs.nonInit);
+  }
+  this.api(resources.createLinkClick, {link_url:a.replace("https://bnc.lt/", ""), click:" "}, function(a, c) {
+    "function" == typeof b && b(c);
+  });
+};
+Branch.prototype.SMSLink = function(a, b) {
+  if (!this.initialized) {
+    return utils.console(config.debugMsgs.nonInit);
+  }
+  a.channel = "sms";
+  var d = this;
+  this.createLink(a, function(c, e) {
+    c ? b(c) : d.createLinkClick(e, function(c) {
+      c.url = e;
+      d.sendSMSLink(a.phone, c, function(a) {
+        "function" == typeof b && b(a);
+      });
+    });
+  });
+};
+Branch.prototype.sendSMSLink = function(a, b, d) {
+  this.api(resources.sendSMSLink, {click_id:b.click_id, link_url:b.click_id, phone:a}, function(a, b) {
+    "function" == typeof d && d(b);
   });
 };
 // Input 5
