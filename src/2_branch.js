@@ -152,7 +152,7 @@ Branch.prototype['createLinkClick'] = function(url, callback) {
 	if (!this.initialized) { return utils.console(config.debugMsgs.nonInit); }
 	this.api(resources.createLinkClick, {
 		link_url: url.replace('https://bnc.lt/', ''),
-		click: " "
+		click: "click"
 	}, function(err, data) {
 		if (err) { callback(err); }
 		else { callback(null, data); }
@@ -165,14 +165,13 @@ Branch.prototype['createLinkClick'] = function(url, callback) {
  */
 Branch.prototype['SMSLink'] = function(obj, callback) {
 	if (!this.initialized) { return utils.console(config.debugMsgs.nonInit); }
-	obj.channel = 'sms';
+	obj["channel"] = 'sms';
 	var self = this;
 	this.createLink(obj, function(err, url) {
 		if (err) { callback(err); }
 		else {
 			self.createLinkClick(url, function(err, data) {
 				if (!err) {
-					data.url = url;
 					self.sendSMSLink(obj["phone"], data, function(data) {
 						if (typeof callback == 'function') { callback(data); }
 					});
@@ -184,16 +183,16 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 
 /**
  * @param {?String} phone
- * @param {?String} url
+ * @param {?Object} data
  * @param {?function} callback
  */
 Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 	this.api(resources.sendSMSLink, {
 		link_url: data.click_id,
 		phone: phone
-	}, function(err) {
+	}, function(err, data) {
 		if (err) { callback(err); }
-		else { callback({}); }
+		else { callback(data); }
 	});
 };
 

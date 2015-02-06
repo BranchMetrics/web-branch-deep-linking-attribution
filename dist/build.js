@@ -215,7 +215,7 @@ Branch.prototype.createLinkClick = function(a, b) {
   if (!this.initialized) {
     return utils.console(config.debugMsgs.nonInit);
   }
-  this.api(resources.createLinkClick, {link_url:a.replace("https://bnc.lt/", ""), click:" "}, function(a, c) {
+  this.api(resources.createLinkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
     a ? b(a) : b(null, c);
   });
 };
@@ -226,16 +226,16 @@ Branch.prototype.SMSLink = function(a, b) {
   a.channel = "sms";
   var d = this;
   this.createLink(a, function(c, e) {
-    c ? b(c) : d.createLinkClick(e, function(c, g) {
-      c || (g.url = e, d.sendSMSLink(a.phone, g, function(a) {
+    c ? b(c) : d.createLinkClick(e, function(c, e) {
+      c || d.sendSMSLink(a.phone, e, function(a) {
         "function" == typeof b && b(a);
-      }));
+      });
     });
   });
 };
 Branch.prototype.sendSMSLink = function(a, b, d) {
-  this.api(resources.sendSMSLink, {link_url:b.click_id, phone:a}, function(a) {
-    a ? d(a) : d({});
+  this.api(resources.sendSMSLink, {link_url:b.click_id, phone:a}, function(a, b) {
+    a ? d(a) : d(b);
   });
 };
 // Input 5
