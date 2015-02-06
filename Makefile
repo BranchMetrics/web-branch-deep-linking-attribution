@@ -1,4 +1,4 @@
-COMPILER=java -jar /Users/dmitrig01/Downloads/compiler-latest/compiler.jar
+COMPILER=java -jar ../closure-compiler/compiler.jar
 SOURCES=src/0_config.js src/0_utils.js src/1_api.js src/1_resources.js src/2_branch.js src/3_branch_instance.js src/4_umd.js
 EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"

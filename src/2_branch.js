@@ -66,7 +66,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 					}
 				});
 			}
-		})
+		});
 	}
 };
 
