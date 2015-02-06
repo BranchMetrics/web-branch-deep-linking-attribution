@@ -157,8 +157,8 @@ branch.init('5680621892404085', function(err, data) {
           '$og_description': 'Branch Metrics',
           '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
         }
-      }, function(link){
-        response.html('<a href="' + link + '">' + link + '</a>');
+      }, function(data){
+        response.html(data);
       });
     });
     $('#showReferrals').click(function(){

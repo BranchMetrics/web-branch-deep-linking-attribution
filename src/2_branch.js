@@ -154,7 +154,8 @@ Branch.prototype['createLinkClick'] = function(url, callback) {
 		link_url: url.replace('https://bnc.lt/', ''),
 		click: " "
 	}, function(err, data) {
-		if (typeof callback == 'function') { callback(data); }
+		if (err) { callback(err); }
+		else { callback(null, data); }
 	});
 };
 
@@ -169,11 +170,13 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 	this.createLink(obj, function(err, url) {
 		if (err) { callback(err); }
 		else {
-			self.createLinkClick(url, function(data) {
-				data.url = url;
-				self.sendSMSLink(obj["phone"], data, function(data) {
-					if (typeof callback == 'function') { callback(data); }
-				});
+			self.createLinkClick(url, function(err, data) {
+				if (!err) {
+					data.url = url;
+					self.sendSMSLink(obj["phone"], data, function(data) {
+						if (typeof callback == 'function') { callback(data); }
+					});
+				}
 			});
 		}
 	});
@@ -188,8 +191,9 @@ Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 	this.api(resources.sendSMSLink, {
 		link_url: data.click_id,
 		phone: phone
-	}, function(err, data) {
-		if (typeof callback == 'function') { callback(data); }
+	}, function(err) {
+		if (err) { callback(err); }
+		else { callback({}); }
 	});
 };
 
