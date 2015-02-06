@@ -164,8 +164,7 @@ resources.sendSMSLink = {
 		"link_url": validator(true, validationTypes.str)
 	},
 	params: {
-		"phone": validator(true, validationTypes.str),
-		"click_id": validator(true, validationTypes.str)
+		"phone": validator(true, validationTypes.str)
 	}
 	
 };

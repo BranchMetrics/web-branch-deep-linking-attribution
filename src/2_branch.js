@@ -186,7 +186,6 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
  */
 Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 	this.api(resources.sendSMSLink, {
-		click_id: data.click_id,
 		link_url: data.click_id,
 		phone: phone
 	}, function(err, data) {
