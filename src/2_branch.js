@@ -171,9 +171,10 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 		if (err) { callback(err); }
 		else {
 			self.createLinkClick(url, function(err, data) {
-				if (!err) {
+				if (err) { callback(err); }
+				else {
 					self.sendSMSLink(obj["phone"], data, function(data) {
-						if (typeof callback == 'function') { callback(data); }
+						if (typeof callback == 'function') { callback({}); } //Fifure this out, {} instead of data
 					});
 				}
 			});

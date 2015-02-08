@@ -8,7 +8,7 @@ goog.provide('utils');
 var DEBUG = true;
 
 /** @typedef {string} */
-message;
+var message;
 
 /** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string}} */
 utils.sessionData;

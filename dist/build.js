@@ -1,7 +1,7 @@
 (function() {// Input 0
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:1};
 // Input 1
-var utils = {}, DEBUG = !0;
+var utils = {}, DEBUG = !0, message;
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID"};
 utils.error = function(a, b) {
   throw Error(utils.message(a, b));
@@ -99,12 +99,12 @@ var api = function(a, b, d) {
   f.onreadystatechange = function() {
     if (4 === f.readyState && 200 === f.status) {
       try {
-        d(null, JSON.parse(f.responseText));
+        console.log(f), console.log(f.responseText), d(null, JSON.parse(f.responseText));
       } catch (a) {
         d(a);
       }
     } else {
-      4 === f.readyState && 402 === f.status ? d(Error("Not enough credits to redeem.")) : d(Error("Error in API: " + f.status));
+      4 === f.readyState && 402 === f.status && d(Error("Not enough credits to redeem."));
     }
   };
   f.open(a.method, c, !0);
@@ -227,7 +227,7 @@ Branch.prototype.SMSLink = function(a, b) {
   var d = this;
   this.createLink(a, function(c, e) {
     c ? b(c) : d.createLinkClick(e, function(c, e) {
-      c || d.sendSMSLink(a.phone, e, function(a) {
+      c ? b(c) : d.sendSMSLink(a.phone, e, function(a) {
         "function" == typeof b && b(a);
       });
     });

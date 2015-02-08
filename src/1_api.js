@@ -102,6 +102,8 @@ api = function(resource, data, callback) {
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
 			try {
+				console.log(req);
+				console.log(req.responseText);
 				callback(null, JSON.parse(req.responseText));
 			}
 			catch(e) {
@@ -112,7 +114,7 @@ api = function(resource, data, callback) {
 			callback(new Error('Not enough credits to redeem.'));
 		}
 		else {
-			callback(new Error('Error in API: ' + req.status));
+			//callback(new Error('Error in API: ' + req.status));
 		}
 	};
 
