@@ -11,7 +11,7 @@ var params;
 var branch;
 var stubs;
 var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
-var reachedSMSMissingPhoneFinal;
+var asyncReachedFinal;
 
 /**
  * Setup the Branch Function
@@ -29,7 +29,7 @@ var setUpPage = function() {
 	});
 
 	// Test for callbacks
-	reachedSMSMissingPhoneFinal = false;
+	asyncReachedFinal = false;
 
 	// Maximum wait time for async tests (ms)
 	maxWaitTime = 10000;
@@ -62,7 +62,7 @@ var setUpPage = function() {
  * SMS Tests
  */
 
- // SMS sens with phone param
+ // SMS sends with phone param
 var testSMSLink = function() {
 
 	var recievedData = {};
@@ -75,7 +75,7 @@ var testSMSLink = function() {
 			 },
 		function() {
 			assertObjectEquals("should send SMS with phone number", recievedData, expectedData);
-			reachedSMSMissingPhoneFinal = true;
+			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -102,7 +102,7 @@ var testMissingPhoneSMSLink = function() {
 			 },
 		function() {
 			assertObjectEquals("should require a phone number", recievedData, expectedData);
-			reachedSMSMissingPhoneFinal = true;
+			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -115,7 +115,39 @@ var testMissingPhoneSMSLink = function() {
 };
 
 // ===========================================================================================
+/**
+ * Create link tests
+ */
 
+// Returns link with required params
+var testCreateLink = function() {
+
+	var recievedData = {};
+	var expectedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertNonEmptyString("should create link with required params", recievedData);
+			var branchURL = "https://bnc.lt/l/";
+			var recievedURLRoot = recievedData.substring(0, 17);
+			assertEquals("should return branch URL", branchURL, recievedURLRoot);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	branch.createLink(params, function(err, data) {
+		recievedFired = true;
+		recievedData = data;
+	});
+};
+
+ // ===========================================================================================
 /**
  * Clean up post tests
  */
