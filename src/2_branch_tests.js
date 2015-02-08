@@ -3,12 +3,24 @@
  */
 
 /**
+ * Defines global test variables
+ */
+var maxWaitTime;
+var asyncPollingInterval;
+var params;
+var branch;
+var stubs;
+var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
+var reachedSMSMissingPhoneFinal;
+
+/**
  * Setup the Branch Function
  */
 var setUpPage = function() {
 
 	asyncTestCase.autoDiscoverTests();
 	G_testRunner.initialize(asyncTestCase);
+	stubs = new goog.testing.PropertyReplacer();
 
 	// Main Branch object
 	branch = new Branch();
@@ -45,14 +57,44 @@ var setUpPage = function() {
 	};
 }
 
+// ===========================================================================================
 /**
  * SMS Tests
  */
-var testMissingPhoneSMSLink = function() {
+
+ // SMS sens with phone param
+var testSMSLink = function() {
 
 	var recievedData = {};
 	var expectedData = {};
 	var recievedFired;
+	
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertObjectEquals("should send SMS with phone number", recievedData, expectedData);
+			reachedSMSMissingPhoneFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+	
+	branch.SMSLink(params, function(data) {
+		recievedFired = true;
+		recievedData = data;
+	});
+};
+
+// Fails on missing phone number
+var testMissingPhoneSMSLink = function() {
+
+	var recievedData = {};
+	var expectedData = new Error(utils.message(utils.messages.missingParam, 'phone'));
+	var recievedFired;
+
+	stubs.replace(params, 'phone', '');
 	
 	waitForCondition(
 		function() {
@@ -67,18 +109,16 @@ var testMissingPhoneSMSLink = function() {
 	);
 	
 	branch.SMSLink(params, function(data) {
-		console.log(data);
 		recievedFired = true;
 		recievedData = data;
 	});
 };
 
-/*
- * Defines global test variables
+// ===========================================================================================
+
+/**
+ * Clean up post tests
  */
-var maxWaitTime;
-var asyncPollingInterval;
-var params;
-var branch;
-var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
-var reachedSMSMissingPhoneFinal;
+var tearDown = function() {
+  stubs.reset();
+};

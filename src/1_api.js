@@ -102,8 +102,6 @@ api = function(resource, data, callback) {
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
 			try {
-				console.log(req);
-				console.log(req.responseText);
 				callback(null, JSON.parse(req.responseText));
 			}
 			catch(e) {
