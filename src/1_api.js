@@ -112,7 +112,7 @@ api = function(resource, data, callback) {
 			callback(new Error('Not enough credits to redeem.'));
 		}
 		else {
-			//callback(new Error('Error in API: ' + req.status));
+			//callback(new Error('Error in API: ' + req.status));  // TODO, do we need this case?
 		}
 	};
 

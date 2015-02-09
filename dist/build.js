@@ -262,37 +262,30 @@ Branch.prototype.appBanner = function(a) {
   if (!this.initialized) {
     return callback(utils.message(utils.messages.nonInit));
   }
-  var b = document.head, d = document.body, c = document.createElement("style"), e = document.createElement("div"), f = document.createElement("div");
-  if (utils.mobileUserAgent()) {
-    this.createLink({channel:"appBanner", data:a.data ? a.data : {}}, function(h) {
-      c.type = "text/css";
-      c.innerHTML = "#branch-banner { position: fixed; top: 0px; width: 100%; font-family: Helvetica, Arial, sans-serif; }#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }#branch-banner .content { position: absolute; width: 100%; height: 71px; z-index: 99999; background: white; color: #444; border-bottom: 1px solid #ddd; }#branch-banner .content .left { width: 60%; float: left; padding: 5px 0 0 7px; }#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }#branch-banner .content .left .details { margin: 13px 0; }#branch-banner .content .left .details .title { display: block; font-size: 12px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 10px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 23px 6px 0 0; text-align: right; }#branch-banner .content .right a { display: block; float: right; margin-right: 5px; background: #6EBADF; color: white; font-size: 10px; font-weight: 400; padding: 5px 5px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }#branch-banner .content .right a:hover { text-decoration: none; }";
-      b.appendChild(c);
-      d.style.marginTop = "71px";
-      f.innerHTML = '<div id="branch-banner"><div class="content"><div class="left"><div class="close-x" onclick="branch.closeBanner();">&times;</div><div class="icon" style="float: left;"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right"><a href="' + h + '">View in App</a></div></div></div>';
-      e.appendChild(f);
-      d.appendChild(e);
-    });
-  } else {
-    c.innerHTML = "#branch-banner { position: fixed; top: 0px; width: 100%; font-family: Helvetica, Arial, sans-serif; }#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }#branch-banner .content { position: absolute; width: 100%; height: 71px; z-index: 99999; background: white; color: #444; border-bottom: 1px solid #ddd; }#branch-banner .content .left { width: 60%; float: left; padding: 5px 0 0 7px; }#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }#branch-banner .content .left .details { margin: 10px 0; }#branch-banner .content .left .details .title { display: block; font-size: 14px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 12px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 21px 9px 0 0; text-align: right; }#branch-banner .content .right input { font-weight: 100; border-radius: 2px; border: 1px solid #bbb; padding: 5px 7px 4px; width: 125px; text-align: center; font-size: 12px; }#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 28px; float: right; margin-left: 5px; font-family: Helvetica, Arial, sans-serif; font-weight: 400; border-radius: 2px; border: 1px solid #6EBADF; background: #6EBADF; color: white; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 0px 12px; }#branch-banner .content .right button:hover { color: #6EBADF; background: white; }#branch-banner .content .right input:focus, button:focus { outline: none; }#branch-banner .content .right input.error { color: red; border-color: red; }#branch-banner .content .right span { display: inline-block; font-weight: 100; margin: 7px 9px; font-size: 12px; }";
-    b.appendChild(c);
-    d.style.marginTop = "71px";
-    f.innerHTML = '<div id="branch-banner"><div class="content"><div class="left"><div class="close-x" onclick="branch.closeBanner();">&times;</div><div class="icon" style="float: left;"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right"><div id="branch-sms-block"><input type="phone" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999"><button id="branch-sms-send">TXT Me The App!</button></div></div></div></div>';
-    e.appendChild(f);
-    d.appendChild(e);
-    var g = document.getElementById("branch-sms-phone");
-    document.getElementById("branch-sms-send").onclick = function() {
-      g.className = "";
-      var b = g.value.replace(/[^0-9.]/g, "");
-      "" !== b && 5 <= b.length ? this.SMSLink({phone:b, data:a.data ? a.data : {}}, function() {
-        document.getElementById("branch-sms-block").innerHTML = '<span class="sms-sent">App link sent to ' + b + "!</span>";
-      }) : g.className = "error";
-    };
-  }
-};
-Branch.prototype.closeBanner = function() {
-  var a = document.getElementById("branch-banner");
-  a && (a.parentNode.removeChild(a), document.body.style.marginTop = "0px");
+  var b = document.head, d = document.body, c = document.createElement("style"), e = document.createElement("div"), f = document.createElement("div"), g = document.createElement("div");
+  d.style.marginTop = "71px";
+  c.type = "text/css";
+  c.innerHTML = "#branch-banner { position: fixed; top: 0px; width: 100%; font-family: Helvetica, Arial, sans-serif; }#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }#branch-banner .content { position: absolute; width: 100%; height: 71px; z-index: 99999; background: white; color: #444; border-bottom: 1px solid #ddd; }#branch-banner .content .left { width: 60%; float: left; padding: 5px 0 0 7px; }#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }";
+  f.innerHTML = '<div id="branch-banner"><div class="content"><div class="left"><div class="close-x" id="branch-banner-close">&times;</div><div class="icon" style="float: left;"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action"></div></div></div>';
+  var h = function() {
+    var b = document.getElementById("branch-sms-phone"), c = b.value.replace(/[^0-9.]/g, "");
+    /^\d{7,}$/.test(c.replace(/[\s()+\-\.]|ext/gi, "")) ? branch.SMSLink({phone:c, data:a.data ? a.data : {}}, function() {
+      document.getElementById("branch-sms-block").innerHTML = '<span class="sms-sent">App link sent to ' + c + "!</span>";
+    }) : b.className = "error";
+  };
+  b.appendChild(c);
+  e.appendChild(f);
+  d.appendChild(e);
+  document.getElementById("branch-banner-action").appendChild(g);
+  document.getElementById("branch-banner-close").onclick = function() {
+    var a = document.getElementById("branch-banner");
+    a && (a.parentNode.removeChild(a), document.body.style.marginTop = "0px");
+  };
+  utils.mobileUserAgent() ? this.createLink({channel:"appBanner", data:a.data || {}}, function(a) {
+    c.innerHTML += "#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }#branch-banner .content .left .details { margin: 13px 0; }#branch-banner .content .left .details .title { display: block; font-size: 12px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 10px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 23px 6px 0 0; text-align: right; }#branch-banner .content .right a { display: block; float: right; margin-right: 5px; background: #6EBADF; color: white; font-size: 10px; font-weight: 400; padding: 5px 5px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }#branch-banner .content .right a:hover { text-decoration: none; }";
+    g.innerHTML = '<a href="' + a + '">View in App</a>';
+  }) : (c.innerHTML += "#branch-banner .content .left .details { margin: 10px 0; }#branch-banner .content .left .details .title { display: block; font-size: 14px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 12px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 21px 9px 0 0; text-align: right; }#branch-banner .content .right input { font-weight: 100; border-radius: 2px; border: 1px solid #bbb; padding: 5px 7px 4px; width: 125px; text-align: center; font-size: 12px; }#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 28px; float: right; margin-left: 5px; font-family: Helvetica, Arial, sans-serif; font-weight: 400; border-radius: 2px; border: 1px solid #6EBADF; background: #6EBADF; color: white; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 0px 12px; }#branch-banner .content .right button:hover { color: #6EBADF; background: white; }#branch-banner .content .right input:focus, button:focus { outline: none; }#branch-banner .content .right input.error { color: red; border-color: red; }#branch-banner .content .right span { display: inline-block; font-weight: 100; margin: 7px 9px; font-size: 12px; }", 
+  g.innerHTML = '<div id="branch-sms-block"><input type="phone" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999"><button id="branch-sms-send">TXT Me The App!</button></div>', document.getElementById("branch-sms-send").onclick = h);
 };
 // Input 5
 var branch_instance = new Branch;
