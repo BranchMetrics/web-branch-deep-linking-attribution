@@ -197,37 +197,52 @@ Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 	});
 };
 
+/**
+ * @param {?function} callback
+ */
+Branch.prototype["showReferrals"] = function(callback) {
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	this.api(resources.referrals, {
+		identity_id: this.app_id
+	}, function(err, data) {
+		if (err) { callback(err); }
+		else { callback(data); }
+	});
+};
+
+/**
+ * @param {?function} callback
+ */
+Branch.prototype["showCredits"] = function(callback) {
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	this.api(resources.credits, {
+		identity_id: this.app_id
+	}, function(err, data) {
+		if (err) { callback(err); }
+		else { callback(data); }
+	});
+};
+
+
+/**
+ * @param {?Object} obj
+ * @param {?function} callback
+ */
+Branch.prototype["redeemCredits"] = function(obj, callback) {
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	this.api(resources.redeem, {
+		identity_id: this.app_id,
+		amount: obj["amount"],
+		bucket: obj["bucket"]
+	}, function(err, data) {
+		if (err) { callback(err); }
+		else { callback(data); }
+	});
+};
+
 /*
 ===== THESE ARE OLD FUNCTIONS FROM THE WEB SDK THAT NEED TO BE MOVED OVER =====
 
-this.showReferrals = function(callback) {
-	if (!self.initialized) { return utils.console(config.debugMsgs.nonInit); }
-	self.api.makeRequest(config.resources.referrals.showReferrals, {
-		app_id: config.appId,
-		identity_id: utils.identity()
-	}, function(data) {
-		if (typeof callback == 'function') { callback(data); }
-	});
-};
-this.showCredits = function(callback) {
-	if (!self.initialized) { return utils.console(config.debugMsgs.nonInit); }
-	self.api.makeRequest(config.resources.referrals.showCredits, {
-		app_id: config.appId,
-		identity_id: utils.identity()
-	}, function(data) {
-		if (typeof callback == 'function') { callback(data); }
-	});
-};
-this.redeemCredits = function(obj, callback) {
-	if (!self.initialized) { return utils.console(config.debugMsgs.nonInit); }
-	self.api.makeRequest(config.resources.referrals.redeemCredits, {
-		app_id: config.appId,
-		identity_id: utils.identity(),
-		obj: obj
-	}, function(data) {
-		if (typeof callback == 'function') { callback(data); }
-	});
-};
 // End API Requests
 // Begin Smart Banners
 this.appBanner = function(obj) {

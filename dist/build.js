@@ -99,7 +99,7 @@ var api = function(a, b, d) {
   f.onreadystatechange = function() {
     if (4 === f.readyState && 200 === f.status) {
       try {
-        console.log(f), console.log(f.responseText), d(null, JSON.parse(f.responseText));
+        d(null, JSON.parse(f.responseText));
       } catch (a) {
         d(a);
       }
@@ -228,7 +228,7 @@ Branch.prototype.SMSLink = function(a, b) {
   this.createLink(a, function(c, e) {
     c ? b(c) : d.createLinkClick(e, function(c, e) {
       c ? b(c) : d.sendSMSLink(a.phone, e, function(a) {
-        "function" == typeof b && b(a);
+        "function" == typeof b && b({});
       });
     });
   });
@@ -236,6 +236,30 @@ Branch.prototype.SMSLink = function(a, b) {
 Branch.prototype.sendSMSLink = function(a, b, d) {
   this.api(resources.sendSMSLink, {link_url:b.click_id, phone:a}, function(a, b) {
     a ? d(a) : d(b);
+  });
+};
+Branch.prototype.showReferrals = function(a) {
+  if (!this.initialized) {
+    return a(utils.message(utils.messages.nonInit));
+  }
+  this.api(resources.referrals, {identity_id:this.app_id}, function(b, d) {
+    b ? a(b) : a(d);
+  });
+};
+Branch.prototype.showCredits = function(a) {
+  if (!this.initialized) {
+    return a(utils.message(utils.messages.nonInit));
+  }
+  this.api(resources.credits, {identity_id:this.app_id}, function(b, d) {
+    b ? a(b) : a(d);
+  });
+};
+Branch.prototype.redeemCredits = function(a, b) {
+  if (!this.initialized) {
+    return b(utils.message(utils.messages.nonInit));
+  }
+  this.api(resources.redeem, {identity_id:this.app_id, amount:a.amount, bucket:a.bucket}, function(a, c) {
+    a ? b(a) : b(c);
   });
 };
 // Input 5

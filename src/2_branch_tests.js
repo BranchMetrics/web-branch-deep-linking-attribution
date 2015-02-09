@@ -9,7 +9,7 @@ var maxWaitTime;
 var asyncPollingInterval;
 var params;
 var branch;
-var stubs;
+var stubs = new goog.testing.PropertyReplacer();
 var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
 var asyncReachedFinal;
 
@@ -20,13 +20,10 @@ var setUpPage = function() {
 
 	asyncTestCase.autoDiscoverTests();
 	G_testRunner.initialize(asyncTestCase);
-	stubs = new goog.testing.PropertyReplacer();
 
 	// Main Branch object
 	branch = new Branch();
-	branch.init('5680621892404085', function(err, data) {
-	  //document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
-	});
+	branch.init('5680621892404085', function(err, data) {});
 
 	// Test for callbacks
 	asyncReachedFinal = false;
@@ -91,11 +88,11 @@ var testSMSLink = function() {
 var testMissingPhoneSMSLink = function() {
 
 	var recievedData = {};
-	var expectedData = new Error(utils.message(utils.messages.missingParam, 'phone'));
+	var expectedData = new Error(utils.message(utils.messages.missingParam, ['/c', 'phone']));
 	var recievedFired;
 
 	stubs.replace(params, 'phone', '');
-	
+
 	waitForCondition(
 		function() {
 			return recievedFired;
@@ -107,11 +104,11 @@ var testMissingPhoneSMSLink = function() {
 		asyncPollingInterval,
 		maxWaitTime
 	);
-	
+
 	branch.SMSLink(params, function(data) {
 		recievedFired = true;
 		recievedData = data;
-	});
+	}
 };
 
 // ===========================================================================================
@@ -144,6 +141,42 @@ var testCreateLink = function() {
 	branch.createLink(params, function(err, data) {
 		recievedFired = true;
 		recievedData = data;
+	});
+};
+
+// Fails on missing app id
+var testMissingAppIdCreateLink = function() {
+
+	var recievedData = {};
+	var expectedData = new Error(utils.message(utils.messages.missingParam, ['/v1/url', 'app_id']));
+	var recievedFired;
+
+	stubs.replace(branch, 'app_id', '');
+	stubs.replace(params, 'app_id', '');
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			console.log("Recieved: " + recievedData);
+			console.log("Expected: " + expectedData);
+			assertObjectEquals("should require app id", recievedData.message, expectedData);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+	
+	branch.createLink(params, function(err, data) {
+		try {
+			recievedFired = true;
+			recievedData = data;
+		} catch(e) {
+			recievedFired = true;
+			recievedData = e;
+		}
+		
 	});
 };
 
