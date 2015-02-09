@@ -78,16 +78,9 @@ utils.hashValue = function(key) {
 	}
 };
 
-// TODO: needs a better name
-utils.mobileReady = function() {
+/**
+ * Mobile user agent, used for app banner
+ */
+ utils.mobileUserAgent = function() {
 	return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i);
-};
-
-// TODO: this probably should not be a utility
-utils.closeBanner = function() {
-	var d = document.getElementById('branch-banner');
-	if (d) {
-		d.parentNode.removeChild(d);
-		document.body.style.marginTop = '0px';
-	}
 };

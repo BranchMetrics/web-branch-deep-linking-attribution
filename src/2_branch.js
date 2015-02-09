@@ -174,7 +174,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 				if (err) { callback(err); }
 				else {
 					self.sendSMSLink(obj["phone"], data, function(data) {
-						if (typeof callback == 'function') { callback({}); } //Fifure this out, {} instead of data
+						if (typeof callback == 'function') { callback({}); } //Figure this out, {} instead of data
 					});
 				}
 			});
@@ -241,21 +241,19 @@ Branch.prototype["redeemCredits"] = function(obj, callback) {
 	});
 };
 
-/*
-===== THESE ARE OLD FUNCTIONS FROM THE WEB SDK THAT NEED TO BE MOVED OVER =====
-
-// End API Requests
-// Begin Smart Banners
-this.appBanner = function(obj) {
-	if (!self.initialized) { return utils.console(config.debugMsgs.nonInit); }
+/**
+ * Open Banner
+ */
+Branch.prototype["appBanner"] = function(obj) {
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var data = obj;
 	var head = document.head;
 	var body = document.body;
 	var css = document.createElement("style");
 	var banner = document.createElement('div');
 	var interior = document.createElement('div');
-	if (utils.mobileReady()) {
-		self.createLink({
+	if (utils.mobileUserAgent()) {
+		this.createLink({
 			channel: 'appBanner',
 			data: (data.data ? data.data : {})
 		}, function(url) {
@@ -278,7 +276,7 @@ this.appBanner = function(obj) {
 				'<div id="branch-banner">' +
 					'<div class="content">' +
 						'<div class="left">' +
-							'<div class="close-x" onclick="branch.utils.closeBanner();">&times;</div>' +
+							'<div class="close-x" onclick="branch.closeBanner();">&times;</div>' +
 							'<div class="icon" style="float: left;">' +
 								'<img src="' + data.icon + '">' +
 							'</div>' +
@@ -319,7 +317,7 @@ this.appBanner = function(obj) {
 			'<div id="branch-banner">' +
 				'<div class="content">' +
 					'<div class="left">' +
-						'<div class="close-x" onclick="branch.utils.closeBanner();">&times;</div>' +
+						'<div class="close-x" onclick="branch.closeBanner();">&times;</div>' +
 						'<div class="icon" style="float: left;">' +
 							'<img src="' + obj.icon + '">' +
 						'</div>' +
@@ -343,7 +341,7 @@ this.appBanner = function(obj) {
 			phone.className = '';
 			var phone_val = phone.value.replace(/[^0-9.]/g, '');
 			if (phone_val !== '' && phone_val.length >= 5) {
-				self.SMSLink({
+				this.SMSLink({
 					phone: phone_val,
 					 data: (data.data ? data.data : {})
 				 }, function() {
@@ -355,4 +353,14 @@ this.appBanner = function(obj) {
 		};
 	}
 };
-*/
+
+/**
+ * Close Banner
+ */
+Branch.prototype["closeBanner"] = function() {
+	var d = document.getElementById('branch-banner');
+	if (d) {
+		d.parentNode.removeChild(d);
+		document.body.style.marginTop = '0px';
+	}
+};
