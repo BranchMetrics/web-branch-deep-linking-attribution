@@ -111,8 +111,8 @@ api = function(resource, data, callback) {
 		else if (req.readyState === 4 && req.status === 402) {
 			callback(new Error('Not enough credits to redeem.'));
 		}
-		else {
-			//callback(new Error('Error in API: ' + req.status));  // TODO, do we need this case?
+		else if (req.readyState === 4 && req.status.substring(0,1) != "4") {
+			callback(new Error('Error in API: ' + req.status));
 		}
 	};
 

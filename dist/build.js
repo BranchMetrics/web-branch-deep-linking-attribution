@@ -100,7 +100,7 @@ var api = function(a, b, d) {
         d(a);
       }
     } else {
-      4 === f.readyState && 402 === f.status && d(Error("Not enough credits to redeem."));
+      4 === f.readyState && 402 === f.status ? d(Error("Not enough credits to redeem.")) : 4 === f.readyState && "4" != f.status.substring(0, 1) && d(Error("Error in API: " + f.status));
     }
   };
   f.open(a.method, c, !0);

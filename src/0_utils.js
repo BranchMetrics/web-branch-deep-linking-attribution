@@ -51,7 +51,7 @@ utils.readStore = function() {
 		return JSON.parse(sessionStorage.getItem('branch_session')) || {};
 	}
 	catch (e) {
-		return {};
+		return {}; //TODO: Look into why we dont return the error
 	}
 };
 
@@ -74,7 +74,7 @@ utils.hashValue = function(key) {
 		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
 	}
 	catch (e) {
-		return '';
+		return ''; //TODO: Look into why we dont return the error
 	}
 };
 
