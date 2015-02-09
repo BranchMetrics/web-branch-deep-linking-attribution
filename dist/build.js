@@ -242,7 +242,7 @@ Branch.prototype.showReferrals = function(a) {
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.referrals, {identity_id:this.app_id}, function(b, d) {
+  this.api(resources.referrals, {identity_id:this.identity_id}, function(b, d) {
     b ? a(b) : a(d);
   });
 };
@@ -250,7 +250,7 @@ Branch.prototype.showCredits = function(a) {
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.credits, {identity_id:this.app_id}, function(b, d) {
+  this.api(resources.credits, {identity_id:this.identity_id}, function(b, d) {
     b ? a(b) : a(d);
   });
 };
@@ -258,7 +258,7 @@ Branch.prototype.redeemCredits = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.redeem, {identity_id:this.app_id, amount:a.amount, bucket:a.bucket}, function(a, c) {
+  this.api(resources.redeem, {identity_id:this.identity_id, app_id:this.app_id, amount:a.amount, bucket:a.bucket}, function(a, c) {
     a ? b(a) : b(c);
   });
 };

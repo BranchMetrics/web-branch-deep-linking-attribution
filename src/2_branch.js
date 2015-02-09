@@ -203,7 +203,7 @@ Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 Branch.prototype["showReferrals"] = function(callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	this.api(resources.referrals, {
-		identity_id: this.app_id
+		identity_id: this.identity_id
 	}, function(err, data) {
 		if (err) { callback(err); }
 		else { callback(data); }
@@ -216,7 +216,7 @@ Branch.prototype["showReferrals"] = function(callback) {
 Branch.prototype["showCredits"] = function(callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	this.api(resources.credits, {
-		identity_id: this.app_id
+		identity_id: this.identity_id
 	}, function(err, data) {
 		if (err) { callback(err); }
 		else { callback(data); }
@@ -231,7 +231,8 @@ Branch.prototype["showCredits"] = function(callback) {
 Branch.prototype["redeemCredits"] = function(obj, callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	this.api(resources.redeem, {
-		identity_id: this.app_id,
+		identity_id: this.identity_id,
+		app_id: this.app_id,
 		amount: obj["amount"],
 		bucket: obj["bucket"]
 	}, function(err, data) {
