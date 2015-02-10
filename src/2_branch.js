@@ -116,16 +116,17 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 Branch.prototype['identify'] = function(identity, callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
+	var self = this;
 	callback = callback || function() {};
-	this.api(resources.profile, { identity: identity }, function(data) {
-		var session = utils.readSession();
-		session.identity_id = data.identity_id;
-		session.link = data.link;
-		session.referring_data = data.referring_data;
-		session.referring_identity = data.referring_identity;
-		sessionStorage.setItem('branch_session', JSON.stringify(session));
-		// TODO: gotta change branch_instance.session_id etc
-		callback(data);
+	this.api(resources.profile, {
+			identity: identity.identity,
+			app_id: this.app_id,
+			identity_id: this.identity_id
+		}, function(err, data) {
+			self.session_id = data['session_id'];
+			self.identity_id = data['identity_id'];
+			utils.store(data);
+			callback(data);
 	});
 };
 
@@ -343,7 +344,7 @@ Branch.prototype["appBanner"] = function(obj) {
 	document.getElementById('branch-banner-action').appendChild(action);
 	document.getElementById('branch-banner-close').onclick = closeBrancheBanner;
 
-	// Append action to DOM (Device specific)
+	// Append open app action to DOM (Device specific)
 	if (utils.mobileUserAgent()) {
 		this.createLink({
 			channel: 'appBanner',

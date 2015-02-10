@@ -78,16 +78,14 @@ branch.init('5680621892404085', function(err, data) {
     $('#init').click(function(){
       request.html('branch.init();');
       branch.init('5680621892404085', function(err, data) {
-        document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+        info.innerHTML = JSON.stringify(data);
       });
     });
     $('#identify').click(function(){
-      request.html('branch.identify({identity: \'Branch\'});');
-      branch.identify({
-        identity: 'Branch'
-      }, function(data){
+      request.html("branch.identify({ identity: 'Branch' });");
+      branch.identify({identity: 'Branch' }
+        , function(data){
         response.html(JSON.stringify(data));
-        info.html(JSON.stringify(branch.utils.readSession()));
       });
     });
     $('#logout').click(function(){

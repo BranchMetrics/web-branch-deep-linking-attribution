@@ -71,7 +71,8 @@ resources.profile = {
 	method:	 'POST',
 	params: {
 		"app_id": validator(true, branch_id),
-		"identity": validator(true, branch_id)
+		"identity_id": validator(true, branch_id),
+		"identity": validator(true, validationTypes.str)
 	}
 };
 /** @type {resources.resource} */

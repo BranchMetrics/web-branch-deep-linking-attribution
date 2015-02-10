@@ -118,7 +118,7 @@ function validator(a, b) {
 }
 var branch_id = /^[0-9]{15,20}$/;
 resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}};
-resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:"POST", params:{app_id:validator(!0, branch_id), identity:validator(!0, branch_id)}};
+resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}};
 resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
 resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:"GET", queryPart:{identity_id:validator(!0, branch_id)}};
@@ -184,16 +184,14 @@ Branch.prototype.identify = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
+  var d = this;
   b = b || function() {
   };
-  this.api(resources.profile, {identity:a}, function(a) {
-    var c = utils.readSession();
-    c.identity_id = a.identity_id;
-    c.link = a.link;
-    c.referring_data = a.referring_data;
-    c.referring_identity = a.referring_identity;
-    sessionStorage.setItem("branch_session", JSON.stringify(c));
-    b(a);
+  this.api(resources.profile, {identity:a.identity, app_id:this.app_id, identity_id:this.identity_id}, function(a, e) {
+    d.session_id = e.session_id;
+    d.identity_id = e.identity_id;
+    utils.store(e);
+    b(e);
   });
 };
 Branch.prototype.createLink = function(a, b) {
