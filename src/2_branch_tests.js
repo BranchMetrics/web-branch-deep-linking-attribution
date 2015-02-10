@@ -218,7 +218,7 @@ var testIdentify = function() {
 		maxWaitTime
 	);
 
-	branch.identify({identity: 'Branch' }, function(data) {
+	branch.identify('Branch', function(data) {
 		recievedFired = true;
 		recievedData = data;
 	});

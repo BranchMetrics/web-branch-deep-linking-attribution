@@ -190,7 +190,7 @@ Branch.prototype.identify = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.profile, {identity:a.identity, app_id:this.app_id, identity_id:this.identity_id}, function(a, c) {
+  this.api(resources.profile, {identity:a, app_id:this.app_id, identity_id:this.identity_id}, function(a, c) {
     b(c);
   });
 };

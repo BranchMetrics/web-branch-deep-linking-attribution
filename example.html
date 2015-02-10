@@ -82,9 +82,8 @@ branch.init('5680621892404085', function(data) {
       });
     });
     $('#identify').click(function(){
-      request.html("branch.identify({ identity: 'Branch' });");
-      branch.identify({identity: 'Branch' }
-        , function(data){
+      request.html("branch.identify('Branch');");
+      branch.identify('Branch', function(data){
         response.html(JSON.stringify(data));
       });
     });

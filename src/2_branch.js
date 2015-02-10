@@ -146,7 +146,7 @@ Branch.prototype['identify'] = function(identity, callback) {
 	var self = this;
 	
 	this.api(resources.profile, {
-			identity: identity.identity,
+			identity: identity,
 			app_id: this.app_id,
 			identity_id: this.identity_id
 		}, function(err, data) {
