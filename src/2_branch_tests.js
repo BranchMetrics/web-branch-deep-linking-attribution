@@ -54,6 +54,13 @@ var setUpPage = function() {
 	};
 }
 
+/**
+ * Clean up post tests
+ */
+var tearDown = function() {
+  stubs.reset();
+};
+
 // ===========================================================================================
 /**
  * SMS Tests
@@ -83,7 +90,7 @@ var testSMSLink = function() {
 		recievedData = data;
 	});
 };
-
+/*
 // Fails on missing phone number
 var testMissingPhoneSMSLink = function() {
 
@@ -108,8 +115,169 @@ var testMissingPhoneSMSLink = function() {
 	branch.SMSLink(params, function(data) {
 		recievedFired = true;
 		recievedData = data;
-	}
+	});
 };
+*/
+
+ // ===========================================================================================
+/**
+ * Track tests
+ */
+ // Track event with required params
+ var testTrack = function() {
+
+	var recievedData = {};
+	var expectedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertObjectEquals("should return empty object", recievedData, expectedData);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	branch.track('Tracked this click', function(data) {
+		recievedFired = true;
+		recievedData = data;
+	});
+};
+
+  // ===========================================================================================
+/**
+ * Show Referrals tests
+ */
+  var testReferrals = function() {
+
+	var recievedData = {};
+	var expectedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertObjectEquals("should return empty object if no referrals on test account", recievedData, expectedData);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	branch.track('Tracked this click', function(data) {
+		recievedFired = true;
+		recievedData = data;
+	});
+};
+
+  // ===========================================================================================
+/**
+ * Show Credits tests
+ */
+   var testShowCredits = function() {
+
+	var recievedData = {};
+	var expectedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertObjectEquals("should return empty object if no credits on test account", recievedData, expectedData);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	branch.showCredits(function(data) {
+		recievedFired = true;
+		recievedData = data;
+	});
+};
+
+  // ===========================================================================================
+/**
+ * Identify tests
+ */
+ // Returns identity with required params
+var testIdentify = function() {
+
+	var recievedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertNonEmptyString("should return correct identity id", recievedData.identity_id);
+			assertNonEmptyString("should return correct identity id", recievedData.link_click_id);
+			assertNonEmptyString("should return correct identity id", recievedData.link);
+			assertNonEmptyString("should return correct identity id", recievedData.referring_data);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	branch.identify({identity: 'Branch' }, function(data) {
+		recievedFired = true;
+		recievedData = data;
+	});
+};
+
+
+ // ===========================================================================================
+/**
+ * Redeem Credits tests
+ */
+ //TODO: Fails because throws error
+ /*
+ var testRedeemCredits = function() {
+
+	var recievedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertNonEmptyString("should return correct identity id", recievedData.identity_id);
+			assertNonEmptyString("should return correct identity id", recievedData.link_click_id);
+			assertNonEmptyString("should return correct identity id", recievedData.link);
+			assertNonEmptyString("should return correct identity id", recievedData.referring_data);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	var creditParams = {
+        amount: 5,
+        bucket: 'default',
+      };
+	branch.redeemCredits(creditParams, function(data) {
+		console.log(data);
+		recievedFired = true;
+		recievedData = data;
+	});
+};
+*/
+
+  // ===========================================================================================
+/**
+ * App banner tests
+ */
 
 // ===========================================================================================
 /**
@@ -120,7 +288,6 @@ var testMissingPhoneSMSLink = function() {
 var testCreateLink = function() {
 
 	var recievedData = {};
-	var expectedData = {};
 	var recievedFired;
 
 	waitForCondition(
@@ -138,12 +305,12 @@ var testCreateLink = function() {
 		maxWaitTime
 	);
 
-	branch.createLink(params, function(err, data) {
+	branch.createLink(params, function(data) {
 		recievedFired = true;
 		recievedData = data;
 	});
 };
-
+/*
 // Fails on missing app id
 var testMissingAppIdCreateLink = function() {
 
@@ -179,11 +346,69 @@ var testMissingAppIdCreateLink = function() {
 		
 	});
 };
+*/
+
+// ===========================================================================================
+/**
+ * Logout tests
+ */
+ // Logs out with required params
+var testLogout = function() {
+
+	var recievedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertEquals("should return correct session id", branch.session_id, recievedData.session_id);
+			assertEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
+			asyncReachedFinal = true;
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	branch.logout(function(data) {
+		recievedFired = true;
+		recievedData = data;
+	});
+};
 
  // ===========================================================================================
 /**
- * Clean up post tests
+ * Close tests
  */
-var tearDown = function() {
-  stubs.reset();
+ /*
+// Closes session with required params
+ var testClose = function() {
+
+	var recievedData = {};
+	var expectedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+			 },
+		function() {
+			assertEquals("should return correct session id", branch.session_id, recievedData.session_id);
+			assertEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
+			branch.init('5680621892404085', function(err, data) {
+				asyncReachedFinal = true;
+			});
+			
+		},
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	branch.close(function(data) {
+		console.log(data);
+		recievedFired = true;
+		recievedData = data;
+	});
 };
+*/

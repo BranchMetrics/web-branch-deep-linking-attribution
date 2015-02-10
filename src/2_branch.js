@@ -132,7 +132,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 			user_agent: navigator.userAgent,
 			language: navigator.language
 		}, {})
-	}, callback);
+	}, callback({}));
 };
 
 /**

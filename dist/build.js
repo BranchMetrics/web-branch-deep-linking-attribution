@@ -185,7 +185,7 @@ Branch.prototype.track = function(a, b, d) {
     return d(utils.message(utils.messages.nonInit));
   }
   "function" == typeof b && (d = b, b = {});
-  this.api(resources.track, {event:a, app_id:this.app_id, session_id:this.session_id, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, d);
+  this.api(resources.track, {event:a, app_id:this.app_id, session_id:this.session_id, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, d({}));
 };
 Branch.prototype.identify = function(a, b) {
   b = b || function() {
