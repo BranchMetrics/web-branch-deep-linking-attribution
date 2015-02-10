@@ -36,9 +36,6 @@ utils.hashValue = function(a) {
     return "";
   }
 };
-utils.mobileUserAgent = function() {
-  return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i);
-};
 // Input 2
 function serializeObject(a, b) {
   var d = [];
@@ -293,7 +290,7 @@ Branch.prototype.appBanner = function(a) {
     var a = document.getElementById("branch-banner");
     a && (a.parentNode.removeChild(a), document.body.style.marginTop = "0px");
   };
-  utils.mobileUserAgent() ? this.createLink({channel:"appBanner", data:a.data || {}}, function(a) {
+  navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? this.createLink({channel:"appBanner", data:a.data || {}}, function(a) {
     c.innerHTML += "#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }#branch-banner .content .left .details { margin: 13px 0; }#branch-banner .content .left .details .title { display: block; font-size: 12px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 10px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 23px 6px 0 0; text-align: right; }#branch-banner .content .right a { display: block; float: right; margin-right: 5px; background: #6EBADF; color: white; font-size: 10px; font-weight: 400; padding: 5px 5px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }#branch-banner .content .right a:hover { text-decoration: none; }";
     g.innerHTML = '<a href="' + a + '">View in App</a>';
   }) : (c.innerHTML += "#branch-banner .content .left .details { margin: 10px 0; }#branch-banner .content .left .details .title { display: block; font-size: 14px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 12px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 21px 9px 0 0; text-align: right; }#branch-banner .content .right input { font-weight: 100; border-radius: 2px; border: 1px solid #bbb; padding: 5px 7px 4px; width: 125px; text-align: center; font-size: 12px; }#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 28px; float: right; margin-left: 5px; font-family: Helvetica, Arial, sans-serif; font-weight: 400; border-radius: 2px; border: 1px solid #6EBADF; background: #6EBADF; color: white; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 0px 12px; }#branch-banner .content .right button:hover { color: #6EBADF; background: white; }#branch-banner .content .right input:focus, button:focus { outline: none; }#branch-banner .content .right input.error { color: red; border-color: red; }#branch-banner .content .right span { display: inline-block; font-weight: 100; margin: 7px 9px; font-size: 12px; }", 

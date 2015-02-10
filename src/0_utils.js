@@ -77,10 +77,3 @@ utils.hashValue = function(key) {
 		return ''; //TODO: Look into why we dont return the error
 	}
 };
-
-/**
- * Mobile user agent, used for app banner
- */
- utils.mobileUserAgent = function() {
-	return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i);
-};

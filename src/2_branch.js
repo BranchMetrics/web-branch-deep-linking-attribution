@@ -375,7 +375,7 @@ Branch.prototype["appBanner"] = function(obj) {
 	document.getElementById('branch-banner-close').onclick = closeBrancheBanner;
 
 	// Append open app action to DOM (Device specific)
-	if (utils.mobileUserAgent()) {
+	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
 		this.createLink({
 			channel: 'appBanner',
 			data: obj.data || {}
