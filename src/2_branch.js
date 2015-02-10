@@ -172,7 +172,7 @@ Branch.prototype['createLink'] = function(obj, callback) {
 	this.api(resources.createLink, obj, function(err, data) {
 		if (typeof callback == 'function') {
 			if (err) { callback(err); }
-			else { callback(null, data['url']); }
+			else { callback(data['url']); }
 		}
 	});
 };
@@ -203,18 +203,16 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
 	obj["channel"] = 'sms';
 	var self = this;
-	this.createLink(obj, function(err, url) {
-		if (err) { callback(err); }
-		else {
-			self.createLinkClick(url, function(err, data) {
-				if (err) { callback(err); }
-				else {
-					self.sendSMSLink(obj["phone"], data, function(data) {
-						if (typeof callback == 'function') { callback({}); }
-					});
-				}
-			});
-		}
+	this.createLink(obj, function(url) {
+		self.createLinkClick(url, function(err, data) {
+			if (err) { callback(err); }
+			else {
+				self.sendSMSLink(obj["phone"], data, function(data) {
+					if (err) { callback(err); }
+					else { callback({}); }
+				});
+			}
+		});
 	});
 };
 
@@ -229,8 +227,7 @@ Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 		link_url: data.click_id,
 		phone: phone
 	}, function(err, data) {
-		if (err) { callback(err); }
-		else { callback(data); }
+		callback(err, data);
 	});
 };
 

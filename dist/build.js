@@ -61,14 +61,14 @@ function getUrl(a, b) {
       a.queryPart.hasOwnProperty(c) && (a.queryPart[c](a.endpoint, c, b[c]), d += "/" + b[c]);
     }
   }
-  var e = {};
+  var f = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      var f = a.params[c](a.endpoint, c, b[c]);
-      "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
+      var e = a.params[c](a.endpoint, c, b[c]);
+      "undefined" != typeof e && "" !== e && null !== e && (f[c] = e);
     }
   }
-  return{data:serializeObject(e), url:d};
+  return{data:serializeObject(f), url:d};
 }
 var _jsonp_callbackId = 0;
 function jsonp(a, b) {
@@ -86,34 +86,34 @@ var api = function(a, b, d) {
   d = d || function() {
   };
   b = getUrl(a, b);
-  var c, e = "";
-  "GET" == a.method ? c = b.url + "?" + b.data : (c = b.url, e = b.data);
+  var c, f = "";
+  "GET" == a.method ? c = b.url + "?" + b.data : (c = b.url, f = b.data);
   if (a.jsonp) {
     return jsonp(c, d);
   }
-  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  f.onreadystatechange = function() {
-    if (4 === f.readyState && 200 === f.status) {
+  var e = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  e.onreadystatechange = function() {
+    if (4 === e.readyState && 200 === e.status) {
       try {
-        d(null, JSON.parse(f.responseText));
+        d(null, JSON.parse(e.responseText));
       } catch (a) {
         d(a);
       }
     } else {
-      4 === f.readyState && 402 === f.status ? d(Error("Not enough credits to redeem.")) : 4 === f.readyState && "4" != f.status.substring(0, 1) && d(Error("Error in API: " + f.status));
+      4 === e.readyState && 402 === e.status ? d(Error("Not enough credits to redeem.")) : 4 === e.readyState && "4" != e.status.substring(0, 1) && d(Error("Error in API: " + e.status));
     }
   };
-  f.open(a.method, c, !0);
-  f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  f.send(e);
+  e.open(a.method, c, !0);
+  e.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  e.send(f);
 };
 // Input 3
 var resources = {}, methods = {POST:"POST", GET:"GET"}, validationTypes = {obj:0, str:1, num:2, arr:3};
 function validator(a, b) {
-  return function(d, c, e) {
-    e ? b == validationTypes.obj ? "object" != typeof e && utils.error(utils.messages.invalidType, [d, c, "an object"]) : b == validationTypes.arr ? e instanceof Array || utils.error(utils.messages.invalidType, [d, c, "an array"]) : b == validationTypes.str ? "string" != typeof e && utils.error(utils.messages.invalidType, [d, c, "a string"]) : b == validationTypes.num ? "number" != typeof e && utils.error(utils.messages.invalidType, [d, c, "a number"]) : b && (b.test(e) || utils.error(utils.messages.invalidType, 
+  return function(d, c, f) {
+    f ? b == validationTypes.obj ? "object" != typeof f && utils.error(utils.messages.invalidType, [d, c, "an object"]) : b == validationTypes.arr ? f instanceof Array || utils.error(utils.messages.invalidType, [d, c, "an array"]) : b == validationTypes.str ? "string" != typeof f && utils.error(utils.messages.invalidType, [d, c, "a string"]) : b == validationTypes.num ? "number" != typeof f && utils.error(utils.messages.invalidType, [d, c, "a number"]) : b && (b.test(f) || utils.error(utils.messages.invalidType, 
     [d, c, "in the proper format"])) : a && utils.error(utils.messages.missingParam, [d, c]);
-    return e;
+    return f;
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
@@ -207,7 +207,7 @@ Branch.prototype.createLink = function(a, b) {
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
   a.data = JSON.stringify(a.data);
   this.api(resources.createLink, a, function(a, c) {
-    "function" == typeof b && (a ? b(a) : b(null, c.url));
+    "function" == typeof b && (a ? b(a) : b(c.url));
   });
 };
 Branch.prototype.createLinkClick = function(a, b) {
@@ -228,10 +228,10 @@ Branch.prototype.SMSLink = function(a, b) {
   }
   a.channel = "sms";
   var d = this;
-  this.createLink(a, function(c, e) {
-    c ? b(c) : d.createLinkClick(e, function(c, e) {
+  this.createLink(a, function(c) {
+    d.createLinkClick(c, function(c, e) {
       c ? b(c) : d.sendSMSLink(a.phone, e, function(a) {
-        "function" == typeof b && b({});
+        c ? b(c) : b({});
       });
     });
   });
@@ -240,7 +240,7 @@ Branch.prototype.sendSMSLink = function(a, b, d) {
   d = d || function() {
   };
   this.api(resources.sendSMSLink, {link_url:b.click_id, phone:a}, function(a, b) {
-    a ? d(a) : d(b);
+    d(a, b);
   });
 };
 Branch.prototype.showReferrals = function(a) {
@@ -274,11 +274,11 @@ Branch.prototype.redeemCredits = function(a, b) {
   });
 };
 Branch.prototype.appBanner = function(a) {
-  var b = document.head, d = document.body, c = document.createElement("style"), e = document.createElement("div"), f = document.createElement("div"), g = document.createElement("div");
+  var b = document.head, d = document.body, c = document.createElement("style"), f = document.createElement("div"), e = document.createElement("div"), g = document.createElement("div");
   d.style.marginTop = "71px";
   c.type = "text/css";
   c.innerHTML = "#branch-banner { position: fixed; top: 0px; width: 100%; font-family: Helvetica, Arial, sans-serif; }#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }#branch-banner .content { position: absolute; width: 100%; height: 71px; z-index: 99999; background: white; color: #444; border-bottom: 1px solid #ddd; }#branch-banner .content .left { width: 60%; float: left; padding: 5px 0 0 7px; }#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }";
-  f.innerHTML = '<div id="branch-banner"><div class="content"><div class="left"><div class="close-x" id="branch-banner-close">&times;</div><div class="icon" style="float: left;"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action"></div></div></div>';
+  e.innerHTML = '<div id="branch-banner"><div class="content"><div class="left"><div class="close-x" id="branch-banner-close">&times;</div><div class="icon" style="float: left;"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action"></div></div></div>';
   var h = function() {
     var b = document.getElementById("branch-sms-phone"), c = b.value;
     /^\d{7,}$/.test(c.replace(/[\s()+\-\.]|ext/gi, "")) ? branch.SMSLink({phone:c, data:a.data || {}}, function() {
@@ -286,8 +286,8 @@ Branch.prototype.appBanner = function(a) {
     }) : b.className = "error";
   };
   b.appendChild(c);
-  e.appendChild(f);
-  d.appendChild(e);
+  f.appendChild(e);
+  d.appendChild(f);
   document.getElementById("branch-banner-action").appendChild(g);
   document.getElementById("branch-banner-close").onclick = function() {
     var a = document.getElementById("branch-banner");
