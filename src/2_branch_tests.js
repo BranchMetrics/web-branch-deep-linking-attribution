@@ -85,7 +85,7 @@ var testSMSLink = function() {
 		recievedData = data;
 	});
 };
-/*
+
 // Fails on missing phone number
 var testMissingPhoneSMSLink = function() {
 
@@ -111,7 +111,6 @@ var testMissingPhoneSMSLink = function() {
 		recievedData = data;
 	});
 };
-*/
 
 // ===========================================================================================
 /**
@@ -230,11 +229,10 @@ var testIdentify = function() {
 /**
  * Redeem Credits tests
  */
- //TODO: Fails because throws error
- /*
  var testRedeemCredits = function() {
 
 	var recievedData = {};
+	var expectedData = new Error('Not enough credits to redeem.');
 	var recievedFired;
 
 	waitForCondition(
@@ -242,10 +240,7 @@ var testIdentify = function() {
 			return recievedFired;
 			 },
 		function() {
-			assertNonEmptyString("should return correct identity id", recievedData.identity_id);
-			assertNonEmptyString("should return correct identity id", recievedData.link_click_id);
-			assertNonEmptyString("should return correct identity id", recievedData.link);
-			assertNonEmptyString("should return correct identity id", recievedData.referring_data);
+			assertObjectEquals("should return error for not enough credits", expectedData, recievedData);
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -256,12 +251,10 @@ var testIdentify = function() {
         bucket: 'default',
       };
 	branch.redeemCredits(creditParams, function(data) {
-		console.log(data);
 		recievedFired = true;
 		recievedData = data;
-	});
+	})
 };
-*/
 
 // ===========================================================================================
 /**
@@ -316,25 +309,18 @@ var testMissingAppIdCreateLink = function() {
 		function() {
 			console.log("Recieved: " + recievedData);
 			console.log("Expected: " + expectedData);
-			assertObjectEquals("should require app id", recievedData.message, expectedData);
+			assertObjectEquals("should require app id", recievedData, expectedData);
 		},
 		asyncPollingInterval,
 		maxWaitTime
 	);
 	
 	branch.createLink(params, function(err, data) {
-		try {
-			recievedFired = true;
-			recievedData = data;
-		} catch(e) {
-			recievedFired = true;
-			recievedData = e;
-		}
-		
+		recievedFired = true;
+		recievedData = data;
 	});
 };
 */
-
 // ===========================================================================================
 /**
  * Logout tests

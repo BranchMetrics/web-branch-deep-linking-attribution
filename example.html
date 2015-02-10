@@ -160,6 +160,7 @@ branch.init('5680621892404085', function(data) {
     $('#showReferrals').click(function(){
       request.html('branch.showReferrals();');
       branch.showReferrals(function(data){
+        console.log(data);
         response.html(JSON.stringify(data));
       });
     });
