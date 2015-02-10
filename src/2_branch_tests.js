@@ -11,7 +11,6 @@ var params;
 var branch;
 var stubs = new goog.testing.PropertyReplacer();
 var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
-var asyncReachedFinal;
 
 /**
  * Setup the Branch Function
@@ -24,9 +23,6 @@ var setUpPage = function() {
 	// Main Branch object
 	branch = new Branch();
 	branch.init('5680621892404085', function(err, data) {});
-
-	// Test for callbacks
-	asyncReachedFinal = false;
 
 	// Maximum wait time for async tests (ms)
 	maxWaitTime = 10000;
@@ -79,7 +75,6 @@ var testSMSLink = function() {
 			 },
 		function() {
 			assertObjectEquals("should send SMS with phone number", recievedData, expectedData);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -106,7 +101,6 @@ var testMissingPhoneSMSLink = function() {
 			 },
 		function() {
 			assertObjectEquals("should require a phone number", recievedData, expectedData);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -119,7 +113,7 @@ var testMissingPhoneSMSLink = function() {
 };
 */
 
- // ===========================================================================================
+// ===========================================================================================
 /**
  * Track tests
  */
@@ -136,7 +130,6 @@ var testMissingPhoneSMSLink = function() {
 			 },
 		function() {
 			assertObjectEquals("should return empty object", recievedData, expectedData);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -148,7 +141,7 @@ var testMissingPhoneSMSLink = function() {
 	});
 };
 
-  // ===========================================================================================
+// ===========================================================================================
 /**
  * Show Referrals tests
  */
@@ -164,7 +157,6 @@ var testMissingPhoneSMSLink = function() {
 			 },
 		function() {
 			assertObjectEquals("should return empty object if no referrals on test account", recievedData, expectedData);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -176,7 +168,7 @@ var testMissingPhoneSMSLink = function() {
 	});
 };
 
-  // ===========================================================================================
+// ===========================================================================================
 /**
  * Show Credits tests
  */
@@ -192,7 +184,6 @@ var testMissingPhoneSMSLink = function() {
 			 },
 		function() {
 			assertObjectEquals("should return empty object if no credits on test account", recievedData, expectedData);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -204,7 +195,7 @@ var testMissingPhoneSMSLink = function() {
 	});
 };
 
-  // ===========================================================================================
+// ===========================================================================================
 /**
  * Identify tests
  */
@@ -223,7 +214,6 @@ var testIdentify = function() {
 			assertNonEmptyString("should return correct identity id", recievedData.link_click_id);
 			assertNonEmptyString("should return correct identity id", recievedData.link);
 			assertNonEmptyString("should return correct identity id", recievedData.referring_data);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -236,7 +226,7 @@ var testIdentify = function() {
 };
 
 
- // ===========================================================================================
+// ===========================================================================================
 /**
  * Redeem Credits tests
  */
@@ -256,7 +246,6 @@ var testIdentify = function() {
 			assertNonEmptyString("should return correct identity id", recievedData.link_click_id);
 			assertNonEmptyString("should return correct identity id", recievedData.link);
 			assertNonEmptyString("should return correct identity id", recievedData.referring_data);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -274,7 +263,7 @@ var testIdentify = function() {
 };
 */
 
-  // ===========================================================================================
+// ===========================================================================================
 /**
  * App banner tests
  */
@@ -299,7 +288,6 @@ var testCreateLink = function() {
 			var branchURL = "https://bnc.lt/l/";
 			var recievedURLRoot = recievedData.substring(0, 17);
 			assertEquals("should return branch URL", branchURL, recievedURLRoot);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -329,7 +317,6 @@ var testMissingAppIdCreateLink = function() {
 			console.log("Recieved: " + recievedData);
 			console.log("Expected: " + expectedData);
 			assertObjectEquals("should require app id", recievedData.message, expectedData);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -365,7 +352,6 @@ var testLogout = function() {
 		function() {
 			assertEquals("should return correct session id", branch.session_id, recievedData.session_id);
 			assertEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
-			asyncReachedFinal = true;
 		},
 		asyncPollingInterval,
 		maxWaitTime
@@ -377,38 +363,31 @@ var testLogout = function() {
 	});
 };
 
- // ===========================================================================================
+// ===========================================================================================
 /**
  * Close tests
  */
- /*
 // Closes session with required params
  var testClose = function() {
 
-	var recievedData = {};
-	var expectedData = {};
 	var recievedFired;
+	var recievedData = {};
 
 	waitForCondition(
 		function() {
 			return recievedFired;
 			 },
 		function() {
-			assertEquals("should return correct session id", branch.session_id, recievedData.session_id);
-			assertEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
-			branch.init('5680621892404085', function(err, data) {
-				asyncReachedFinal = true;
-			});
-			
+			assertObjectEquals("should return empty object", {}, recievedData);
 		},
 		asyncPollingInterval,
 		maxWaitTime
 	);
 
 	branch.close(function(data) {
-		console.log(data);
-		recievedFired = true;
 		recievedData = data;
+		branch.init('5680621892404085', function(err, data) {
+			recievedFired = true;
+		});
 	});
 };
-*/
