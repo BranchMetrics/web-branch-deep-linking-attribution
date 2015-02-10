@@ -31,10 +31,9 @@ Branch.prototype.api = function(resource, data, callback) {
  * @param {function|null} callback
  */
 Branch.prototype['init'] = function(app_id, callback) {
+	callback = callback || function() {};
 	if (this.initialized) { return callback(utils.message(utils.messages.existingInit)); }
 	this.initialized = true;
-
-	callback = callback || function() {};
 	this.app_id = app_id;
 
 	var self = this, sessionData = utils.readStore();
@@ -46,7 +45,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 	}
 
 	if (sessionData && !utils.hashValue('r')) {
-		callback(null, sessionData);
+		callback(sessionData);
 	}
 	else {
 		this.api(resources._r, {}, function(err, browser_fingerprint_id) {
@@ -62,7 +61,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 						self.session_id = data['session_id'];
 						self.identity_id = data['identity_id'];
 						utils.store(data);
-						callback(null, data);
+						callback(data);
 					}
 				});
 			}
@@ -74,16 +73,40 @@ Branch.prototype['init'] = function(app_id, callback) {
  * @param {function|null} callback
  */
 Branch.prototype['logout'] = function(callback) {
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	callback = callback || function() {};
-	api(resources.logout, {}, function(data) {
-		var sessionData = utils.readStore();
-		sessionData.session_id = data.session_id;
-		sessionData.identity_id = data.identity_id;
-		sessionData.link = data.link;
-		sessionStorage.setItem('branch_session', JSON.stringify(session));
-		// TODO: gotta change branch_instance.session_id etc
-		callback(data);
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	var self = this;
+	this.api(resources.logout, {
+		session_id: this.session_id,
+		app_id: this.app_id
+	}, function(err, data) {
+		if (err) { callback(err); }
+		else {
+			self.session_id = data['session_id'];
+			self.identity_id = data['identity_id'];
+			utils.store(data);
+			callback(data);
+		}
+	});
+};
+
+/**
+ * @param {function|null} callback
+ */
+Branch.prototype['close'] = function(callback) {
+	callback = callback || function() {};
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	var self = this;
+	this.api(resources.close, {
+		app_id: this.app_id,
+		session_id: this.session_id
+	}, function(err, data) {
+		if (err) { callback(err); }
+		else {
+			sessionStorage.clear();
+			self.initialized = false;
+			callback(data);
+		}
 	});
 };
 
@@ -93,18 +116,21 @@ Branch.prototype['logout'] = function(callback) {
  * @param {?function} callback
  */
 Branch.prototype['track'] = function(event, metadata, callback) {
+	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	if (typeof metadata == 'function') {
 		callback = metadata;
 		metadata = {};
 	}
-	callback = callback || function() {};
+	
 	this.api(resources.track, {
-		"event": event,
-		"metadata": utils.merge({
-			"url": document.URL,
-			"user_agent": navigator.userAgent,
-			"language": navigator.language
+		event: event,
+		app_id: this.app_id,
+		session_id: this.session_id,
+		metadata: utils.merge({
+			url: document.URL,
+			user_agent: navigator.userAgent,
+			language: navigator.language
 		}, {})
 	}, callback);
 };
@@ -114,18 +140,16 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * @param {?function} callback
  */
 Branch.prototype['identify'] = function(identity, callback) {
+	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	var self = this;
-	callback = callback || function() {};
+	
 	this.api(resources.profile, {
 			identity: identity.identity,
 			app_id: this.app_id,
 			identity_id: this.identity_id
 		}, function(err, data) {
-			self.session_id = data['session_id'];
-			self.identity_id = data['identity_id'];
-			utils.store(data);
 			callback(data);
 	});
 };
@@ -135,7 +159,9 @@ Branch.prototype['identify'] = function(identity, callback) {
  * @param {?function} callback
  */
 Branch.prototype['createLink'] = function(obj, callback) {
-	if (!this.initialized) { return utils.console(config.debugMsgs.nonInit); }
+	callback = callback || function() {};
+	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
+	
 
 	obj['source'] = 'web-sdk';
 	if (obj['data']['$desktop_url'] !== undefined) {
@@ -156,7 +182,9 @@ Branch.prototype['createLink'] = function(obj, callback) {
  * @param {?function} callback
  */
 Branch.prototype['createLinkClick'] = function(url, callback) {
-	if (!this.initialized) { return utils.console(config.debugMsgs.nonInit); }
+	callback = callback || function() {};
+	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
+	
 	this.api(resources.createLinkClick, {
 		link_url: url.replace('https://bnc.lt/', ''),
 		click: "click"
@@ -171,7 +199,8 @@ Branch.prototype['createLinkClick'] = function(url, callback) {
  * @param {?function} callback
  */
 Branch.prototype['SMSLink'] = function(obj, callback) {
-	if (!this.initialized) { return utils.console(config.debugMsgs.nonInit); }
+	callback = callback || function() {};
+	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
 	obj["channel"] = 'sms';
 	var self = this;
 	this.createLink(obj, function(err, url) {
@@ -181,7 +210,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 				if (err) { callback(err); }
 				else {
 					self.sendSMSLink(obj["phone"], data, function(data) {
-						if (typeof callback == 'function') { callback({}); } //Figure this out, {} instead of data
+						if (typeof callback == 'function') { callback({}); }
 					});
 				}
 			});
@@ -195,6 +224,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
  * @param {?function} callback
  */
 Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
+	callback = callback || function() {};
 	this.api(resources.sendSMSLink, {
 		link_url: data.click_id,
 		phone: phone
@@ -208,7 +238,9 @@ Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
  * @param {?function} callback
  */
 Branch.prototype["showReferrals"] = function(callback) {
+	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	
 	this.api(resources.referrals, {
 		identity_id: this.identity_id
 	}, function(err, data) {
@@ -221,7 +253,9 @@ Branch.prototype["showReferrals"] = function(callback) {
  * @param {?function} callback
  */
 Branch.prototype["showCredits"] = function(callback) {
+	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	
 	this.api(resources.credits, {
 		identity_id: this.identity_id
 	}, function(err, data) {
@@ -236,7 +270,9 @@ Branch.prototype["showCredits"] = function(callback) {
  * @param {?function} callback
  */
 Branch.prototype["redeemCredits"] = function(obj, callback) {
+	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	
 	this.api(resources.redeem, {
 		identity_id: this.identity_id,
 		app_id: this.app_id,
@@ -252,8 +288,6 @@ Branch.prototype["redeemCredits"] = function(obj, callback) {
  * @param {?Object} obj
  */
 Branch.prototype["appBanner"] = function(obj) {
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
 	// Elements
 	var head = document.head;
 	var body = document.body;
@@ -314,12 +348,11 @@ Branch.prototype["appBanner"] = function(obj) {
 	var sendBannerSMS =
 		function(){
 			var phone = document.getElementById('branch-sms-phone');
-			//phone.className = ''; //why is this here?
-			var phone_val = phone.value.replace(/[^0-9.]/g, '');
+			var phone_val = phone.value;
 			if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
 				branch.SMSLink({
 					phone: phone_val,
-					 data: (obj.data ? obj.data : {})
+					 data: obj.data || {}
 				 }, function() {
 					 document.getElementById('branch-sms-block').innerHTML = '<span class="sms-sent">App link sent to ' + phone_val + '!</span>';
 				 });
