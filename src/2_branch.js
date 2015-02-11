@@ -344,7 +344,7 @@ Branch.prototype["appBanner"] = function(obj) {
 		};
 
 	// Close banner
-	var closeBrancheBanner = function() {
+	var closeBranchBanner = function() {
 			var d = document.getElementById('branch-banner');
 			if (d) {
 				d.parentNode.removeChild(d);
@@ -357,7 +357,7 @@ Branch.prototype["appBanner"] = function(obj) {
 	banner.appendChild(interior);
 	body.appendChild(banner);
 	document.getElementById('branch-banner-action').appendChild(action);
-	document.getElementById('branch-banner-close').onclick = closeBrancheBanner;
+	document.getElementById('branch-banner-close').onclick = closeBranchBanner;
 
 	// Append open app action to DOM (Device specific)
 	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
