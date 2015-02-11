@@ -76,15 +76,9 @@ Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
-	this.api(resources.logout, {
-		session_id: this.session_id,
-		app_id: this.app_id
-	}, function(err, data) {
+	this.api(resources.logout, {}, function(err, data) {
 		if (err) { callback(err); }
 		else {
-			self.session_id = data['session_id'];
-			self.identity_id = data['identity_id'];
-			utils.store(data);
 			callback(data);
 		}
 	});
@@ -97,10 +91,7 @@ Branch.prototype['close'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
-	this.api(resources.close, {
-		app_id: this.app_id,
-		session_id: this.session_id
-	}, function(err, data) {
+	this.api(resources.close, {}, function(err, data) {
 		if (err) { callback(err); }
 		else {
 			sessionStorage.clear();
@@ -125,8 +116,6 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 	
 	this.api(resources.track, {
 		event: event,
-		app_id: this.app_id,
-		session_id: this.session_id,
 		metadata: utils.merge({
 			url: document.URL,
 			user_agent: navigator.userAgent,
@@ -146,9 +135,7 @@ Branch.prototype['identify'] = function(identity, callback) {
 	var self = this;
 	
 	this.api(resources.profile, {
-			identity: identity,
-			app_id: this.app_id,
-			identity_id: this.identity_id
+			identity: identity
 		}, function(err, data) {
 			callback(data);
 	});
@@ -271,8 +258,6 @@ Branch.prototype["redeemCredits"] = function(obj, callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
 	this.api(resources.redeem, {
-		identity_id: this.identity_id,
-		app_id: this.app_id,
 		amount: obj["amount"],
 		bucket: obj["bucket"]
 	}, function(err, data) {

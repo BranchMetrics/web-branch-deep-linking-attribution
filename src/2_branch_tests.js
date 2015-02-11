@@ -336,8 +336,8 @@ var testLogout = function() {
 			return recievedFired;
 			 },
 		function() {
-			assertEquals("should return correct session id", branch.session_id, recievedData.session_id);
-			assertEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
+			assertNotEquals("should return correct session id", branch.session_id, recievedData.session_id);
+			assertNotEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
 		},
 		asyncPollingInterval,
 		maxWaitTime

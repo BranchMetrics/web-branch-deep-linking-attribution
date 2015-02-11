@@ -159,9 +159,8 @@ Branch.prototype.logout = function(a) {
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  var b = this;
-  this.api(resources.logout, {session_id:this.session_id, app_id:this.app_id}, function(d, c) {
-    d ? a(d) : (b.session_id = c.session_id, b.identity_id = c.identity_id, utils.store(c), a(c));
+  this.api(resources.logout, {}, function(b, d) {
+    b ? a(b) : a(d);
   });
 };
 Branch.prototype.close = function(a) {
@@ -171,7 +170,7 @@ Branch.prototype.close = function(a) {
     return a(utils.message(utils.messages.nonInit));
   }
   var b = this;
-  this.api(resources.close, {app_id:this.app_id, session_id:this.session_id}, function(d, c) {
+  this.api(resources.close, {}, function(d, c) {
     d ? a(d) : (sessionStorage.clear(), b.initialized = !1, a(c));
   });
 };
@@ -182,7 +181,7 @@ Branch.prototype.track = function(a, b, d) {
     return d(utils.message(utils.messages.nonInit));
   }
   "function" == typeof b && (d = b, b = {});
-  this.api(resources.track, {event:a, app_id:this.app_id, session_id:this.session_id, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, d({}));
+  this.api(resources.track, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, d({}));
 };
 Branch.prototype.identify = function(a, b) {
   b = b || function() {
@@ -190,7 +189,7 @@ Branch.prototype.identify = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.profile, {identity:a, app_id:this.app_id, identity_id:this.identity_id}, function(a, c) {
+  this.api(resources.profile, {identity:a}, function(a, c) {
     b(c);
   });
 };
@@ -266,7 +265,7 @@ Branch.prototype.redeemCredits = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.redeem, {identity_id:this.identity_id, app_id:this.app_id, amount:a.amount, bucket:a.bucket}, function(a, c) {
+  this.api(resources.redeem, {amount:a.amount, bucket:a.bucket}, function(a, c) {
     a ? b(a) : b(c);
   });
 };
