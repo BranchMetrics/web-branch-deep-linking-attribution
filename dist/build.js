@@ -14,11 +14,7 @@ utils.message = function(a, b) {
   return d;
 };
 utils.readStore = function() {
-  try {
-    return JSON.parse(sessionStorage.getItem("branch_session")) || {};
-  } catch (a) {
-    return{};
-  }
+  return JSON.parse(sessionStorage.getItem("branch_session")) || {};
 };
 utils.store = function(a) {
   sessionStorage.setItem("branch_session", JSON.stringify(a));
@@ -122,10 +118,10 @@ resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals"
 resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:"GET", queryPart:{identity_id:validator(!0, branch_id)}};
 resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:"GET", jsonp:!0, params:{app_id:validator(!0, branch_id)}};
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}};
-resources.createLink = {destination:config.api_endpoint, endpoint:"/v1/url", method:"POST", ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
-resources.createLinkClick = {destination:config.link_service_endpoint, endpoint:"", method:"GET", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
+resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:"POST", ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
+resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:"GET", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
 resources.sendSMSLink = {destination:config.link_service_endpoint, endpoint:"/c", method:"POST", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
-resources.track = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
+resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
 // Input 4
 var Branch = function() {
   this.initialized = !1;
@@ -174,16 +170,16 @@ Branch.prototype.close = function(a) {
     d ? a(d) : (sessionStorage.clear(), b.initialized = !1, a(c));
   });
 };
-Branch.prototype.track = function(a, b, d) {
+Branch.prototype.event = function(a, b, d) {
   d = d || function() {
   };
   if (!this.initialized) {
     return d(utils.message(utils.messages.nonInit));
   }
   "function" == typeof b && (d = b, b = {});
-  this.api(resources.track, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, d({}));
+  this.api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, d({}));
 };
-Branch.prototype.identify = function(a, b) {
+Branch.prototype.profile = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
@@ -193,7 +189,7 @@ Branch.prototype.identify = function(a, b) {
     b(c);
   });
 };
-Branch.prototype.createLink = function(a, b) {
+Branch.prototype.link = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
@@ -202,17 +198,17 @@ Branch.prototype.createLink = function(a, b) {
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
   a.data = JSON.stringify(a.data);
-  this.api(resources.createLink, a, function(a, c) {
+  this.api(resources.link, a, function(a, c) {
     "function" == typeof b && (a ? b(a) : b(c.url));
   });
 };
-Branch.prototype.createLinkClick = function(a, b) {
+Branch.prototype.linkClick = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
     return utils.console(utils.messages.nonInit);
   }
-  this.api(resources.createLinkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
+  this.api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
     a ? b(a) : b(null, c);
   });
 };
@@ -224,8 +220,8 @@ Branch.prototype.SMSLink = function(a, b) {
   }
   a.channel = "sms";
   var d = this;
-  this.createLink(a, function(c) {
-    d.createLinkClick(c, function(c, e) {
+  this.link(a, function(c) {
+    d.linkClick(c, function(c, e) {
       c ? b(c) : d.sendSMSLink(a.phone, e, function(a) {
         c ? b(c) : b({});
       });
@@ -239,17 +235,17 @@ Branch.prototype.sendSMSLink = function(a, b, d) {
     d(a, b);
   });
 };
-Branch.prototype.showReferrals = function(a) {
+Branch.prototype.referrals = function(a) {
   a = a || function() {
   };
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.referrals, {identity_id:this.identity_id}, function(b, d) {
+  this.api(resources.referrals, {}, function(b, d) {
     b ? a(b) : a(d);
   });
 };
-Branch.prototype.showCredits = function(a) {
+Branch.prototype.credits = function(a) {
   a = a || function() {
   };
   if (!this.initialized) {
@@ -259,7 +255,7 @@ Branch.prototype.showCredits = function(a) {
     b ? a(b) : a(d);
   });
 };
-Branch.prototype.redeemCredits = function(a, b) {
+Branch.prototype.redeem = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
@@ -269,7 +265,7 @@ Branch.prototype.redeemCredits = function(a, b) {
     a ? b(a) : b(c);
   });
 };
-Branch.prototype.appBanner = function(a) {
+Branch.prototype.banner = function(a) {
   var b = document.head, d = document.body, c = document.createElement("style"), f = document.createElement("div"), e = document.createElement("div"), g = document.createElement("div");
   d.style.marginTop = "71px";
   c.type = "text/css";
@@ -289,7 +285,7 @@ Branch.prototype.appBanner = function(a) {
     var a = document.getElementById("branch-banner");
     a && (a.parentNode.removeChild(a), document.body.style.marginTop = "0px");
   };
-  navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? this.createLink({channel:"appBanner", data:a.data || {}}, function(a) {
+  navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? this.link({channel:"appBanner", data:a.data || {}}, function(a) {
     c.innerHTML += "#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }#branch-banner .content .left .details { margin: 13px 0; }#branch-banner .content .left .details .title { display: block; font-size: 12px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 10px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 23px 6px 0 0; text-align: right; }#branch-banner .content .right a { display: block; float: right; margin-right: 5px; background: #6EBADF; color: white; font-size: 10px; font-weight: 400; padding: 5px 5px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }#branch-banner .content .right a:hover { text-decoration: none; }";
     g.innerHTML = '<a href="' + a + '">View in App</a>';
   }) : (c.innerHTML += "#branch-banner .content .left .details { margin: 10px 0; }#branch-banner .content .left .details .title { display: block; font-size: 14px; font-weight: 400; }#branch-banner .content .left .details .description { display: block; font-size: 12px; font-weight: 200; }#branch-banner .content .right { width: 40%; float: left; padding: 21px 9px 0 0; text-align: right; }#branch-banner .content .right input { font-weight: 100; border-radius: 2px; border: 1px solid #bbb; padding: 5px 7px 4px; width: 125px; text-align: center; font-size: 12px; }#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 28px; float: right; margin-left: 5px; font-family: Helvetica, Arial, sans-serif; font-weight: 400; border-radius: 2px; border: 1px solid #6EBADF; background: #6EBADF; color: white; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 0px 12px; }#branch-banner .content .right button:hover { color: #6EBADF; background: white; }#branch-banner .content .right input:focus, button:focus { outline: none; }#branch-banner .content .right input.error { color: red; border-color: red; }#branch-banner .content .right span { display: inline-block; font-weight: 100; margin: 7px 9px; font-size: 12px; }", 

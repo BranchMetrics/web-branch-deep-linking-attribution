@@ -106,7 +106,7 @@ Branch.prototype['close'] = function(callback) {
  * @param {?Object} metadata
  * @param {?function} callback
  */
-Branch.prototype['track'] = function(event, metadata, callback) {
+Branch.prototype['event'] = function(event, metadata, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	if (typeof metadata == 'function') {
@@ -114,7 +114,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 		metadata = {};
 	}
 	
-	this.api(resources.track, {
+	this.api(resources.event, {
 		event: event,
 		metadata: utils.merge({
 			url: document.URL,
@@ -128,7 +128,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * @param {string} identity 
  * @param {?function} callback
  */
-Branch.prototype['identify'] = function(identity, callback) {
+Branch.prototype['profile'] = function(identity, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
@@ -145,7 +145,7 @@ Branch.prototype['identify'] = function(identity, callback) {
  * @param {?Object} metadata
  * @param {?function} callback
  */
-Branch.prototype['createLink'] = function(obj, callback) {
+Branch.prototype['link'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
 	
@@ -156,7 +156,7 @@ Branch.prototype['createLink'] = function(obj, callback) {
 	}
 
 	obj['data'] = JSON.stringify(obj['data']);
-	this.api(resources.createLink, obj, function(err, data) {
+	this.api(resources.link, obj, function(err, data) {
 		if (typeof callback == 'function') {
 			if (err) { callback(err); }
 			else { callback(data['url']); }
@@ -168,11 +168,11 @@ Branch.prototype['createLink'] = function(obj, callback) {
  * @param {?String} url
  * @param {?function} callback
  */
-Branch.prototype['createLinkClick'] = function(url, callback) {
+Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
 	
-	this.api(resources.createLinkClick, {
+	this.api(resources.linkClick, {
 		link_url: url.replace('https://bnc.lt/', ''),
 		click: "click"
 	}, function(err, data) {
@@ -190,8 +190,8 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
 	obj["channel"] = 'sms';
 	var self = this;
-	this.createLink(obj, function(url) {
-		self.createLinkClick(url, function(err, data) {
+	this.link(obj, function(url) {
+		self.linkClick(url, function(err, data) {
 			if (err) { callback(err); }
 			else {
 				self.sendSMSLink(obj["phone"], data, function(data) {
@@ -221,13 +221,11 @@ Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
 /**
  * @param {?function} callback
  */
-Branch.prototype["showReferrals"] = function(callback) {
+Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
-	this.api(resources.referrals, {
-		identity_id: this.identity_id
-	}, function(err, data) {
+	this.api(resources.referrals, {}, function(err, data) {
 		if (err) { callback(err); }
 		else { callback(data); }
 	});
@@ -236,7 +234,7 @@ Branch.prototype["showReferrals"] = function(callback) {
 /**
  * @param {?function} callback
  */
-Branch.prototype["showCredits"] = function(callback) {
+Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
@@ -253,7 +251,7 @@ Branch.prototype["showCredits"] = function(callback) {
  * @param {?Object} obj
  * @param {?function} callback
  */
-Branch.prototype["redeemCredits"] = function(obj, callback) {
+Branch.prototype["redeem"] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
@@ -269,7 +267,7 @@ Branch.prototype["redeemCredits"] = function(obj, callback) {
 /**
  * @param {?Object} obj
  */
-Branch.prototype["appBanner"] = function(obj) {
+Branch.prototype["banner"] = function(obj) {
 	// Elements
 	var head = document.head;
 	var body = document.body;
@@ -361,7 +359,7 @@ Branch.prototype["appBanner"] = function(obj) {
 
 	// Append open app action to DOM (Device specific)
 	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
-		this.createLink({
+		this.link({
 			channel: 'appBanner',
 			data: obj.data || {}
 		}, function(url) {

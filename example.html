@@ -8,7 +8,7 @@
 !function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
 "dist/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
 e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-"init;close;logout;track;identify;createLink;showReferrals;showCredits;redeemCredits;appBanner".split(";"),0);
+"init;close;logout;event;profile;link;referrals;credits;redeem;appBanner".split(";"),0);
 
 branch.init('5680621892404085', function(data) {
   document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
@@ -54,17 +54,17 @@ branch.init('5680621892404085', function(data) {
       <div class="row col-lg-8 col-lg-offset-2">
         <button id="init" class="btn btn-success">.init()</button>
         <button id="close" class="btn btn-danger">.close()</button>
-        <button id="identify" class="btn btn-info">.identify()</button>
+        <button id="profile" class="btn btn-info">.profile()</button>
         <button id="logout" class="btn btn-info">.logout()</button>
-        <button id="track" class="btn btn-info">.track()</button>
-        <button id="createLink" class="btn btn-info">.createLink()</button>
+        <button id="event" class="btn btn-info">.event()</button>
+        <button id="link" class="btn btn-info">.link()</button>
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
           <button id="SMSLink" class="btn btn-info">.SMSLink()</button>
         </div>
-        <button id="showReferrals" class="btn btn-info">.showReferrals()</button>
-        <button id="showCredits" class="btn btn-info">.showCredits()</button>
-        <button id="redeemCredits" class="btn btn-info">.redeemCredits()</button>
+        <button id="referrals" class="btn btn-info">.referrals()</button>
+        <button id="credits" class="btn btn-info">.credits()</button>
+        <button id="redeem" class="btn btn-info">.redeem()</button>
         <button id="appBanner" class="btn btn-info">.appBanner()</button>
       </div>
     </section>
@@ -81,9 +81,9 @@ branch.init('5680621892404085', function(data) {
         info.innerHTML = JSON.stringify(data);
       });
     });
-    $('#identify').click(function(){
-      request.html("branch.identify('Branch');");
-      branch.identify('Branch', function(data){
+    $('#profile').click(function(){
+      request.html("branch.profile('Branch');");
+      branch.profile('Branch', function(data){
         response.html(JSON.stringify(data));
       });
     });
@@ -100,15 +100,15 @@ branch.init('5680621892404085', function(data) {
         response.html(JSON.stringify(data));
       });
     });
-    $('#track').click(function(){
-      request.html('branch.track(\'Tracked this click\');');
-      branch.track('Tracked this click', function(err, data){
+    $('#event').click(function(){
+      request.html('branch.event(\'Tracked this event\');');
+      branch.event('Tracked this event', function(data){
         response.html(JSON.stringify(data));
       });
     });
-    $('#createLink').click(function(){
-      request.html("branch.createLink({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
-      branch.createLink({
+    $('#link').click(function(){
+      request.html("branch.link({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
+      branch.link({
         tags: ['tag1', 'tag2'],
         channel: 'sample app',
         feature: 'create link',
@@ -156,22 +156,22 @@ branch.init('5680621892404085', function(data) {
         response.html(JSON.stringify(data));
       });
     });
-    $('#showReferrals').click(function(){
-      request.html('branch.showReferrals();');
-      branch.showReferrals(function(data){
+    $('#referrals').click(function(){
+      request.html('branch.referrals();');
+      branch.referrals(function(data){
         console.log(data);
         response.html(JSON.stringify(data));
       });
     });
-    $('#showCredits').click(function(){
-      request.html('branch.showCredits();');
-      branch.showCredits(function(data){
+    $('#credits').click(function(){
+      request.html('branch.credits();');
+      branch.credits(function(data){
         response.html(JSON.stringify(data));
       });
     });
-    $('#redeemCredits').click(function(){
-      request.html('branch.redeemCredits({amount: 5, bucket: \'default\'});');
-      branch.redeemCredits({
+    $('#redeem').click(function(){
+      request.html('branch.redeem({amount: 5, bucket: \'default\'});');
+      branch.redeem({
         amount: 5,
         bucket: 'default',
       }, function(data){

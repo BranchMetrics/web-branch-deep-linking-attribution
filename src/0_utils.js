@@ -8,7 +8,7 @@ goog.provide('utils');
 var DEBUG = true;
 
 /** @typedef {string} */
-message;
+var message;
 
 /** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string}} */
 utils.sessionData;
@@ -47,12 +47,7 @@ utils.message = function(message, param) {
  * @returns {?utils.sessionData}
  */
 utils.readStore = function() {
-	try {
-		return JSON.parse(sessionStorage.getItem('branch_session')) || {};
-	}
-	catch (e) {
-		return {}; //TODO: Look into why we dont return the error
-	}
+	return JSON.parse(sessionStorage.getItem('branch_session')) || {};
 };
 
 /**
@@ -72,8 +67,7 @@ utils.merge = function(to, from) {
 utils.hashValue = function(key) {
 	try {
 		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
-	}
-	catch (e) {
-		return ''; //TODO: Look into why we dont return the error
+	} catch(e) {
+		return '';
 	}
 };

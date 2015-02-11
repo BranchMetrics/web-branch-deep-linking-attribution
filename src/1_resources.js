@@ -132,7 +132,7 @@ resources.redeem =  {
 	}
 };
 /** @type {resources.resource} */
-resources.createLink = {
+resources.link = {
 	destination: config.api_endpoint,
 	endpoint: '/v1/url',
 	method: 'POST',
@@ -149,7 +149,7 @@ resources.createLink = {
 	}
 };
 /** @type {resources.resource} */
-resources.createLinkClick = {
+resources.linkClick = {
 	destination: config.link_service_endpoint,
 	endpoint: '',
 	method: 'GET',
@@ -170,7 +170,7 @@ resources.sendSMSLink = {
 	
 };
 /** @type {resources.resource} */
-resources.track = {
+resources.event = {
 	destination: config.api_endpoint,
 	endpoint: '/v1/event',
 	method: 'POST',
