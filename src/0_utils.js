@@ -8,7 +8,7 @@ goog.provide('utils');
 var DEBUG = true;
 
 /** @typedef {string} */
-var message;
+var message; //Does not work with tests
 
 /** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string, link_click:string}} */
 utils.sessionData;

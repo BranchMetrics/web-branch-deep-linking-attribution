@@ -299,7 +299,7 @@ Branch.prototype["banner"] = function(obj) {
 		'#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 28px; float: right; margin-left: 5px; font-family: Helvetica, Arial, sans-serif; font-weight: 400; border-radius: 2px; border: 1px solid #6EBADF; background: #6EBADF; color: white; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 0px 12px; }' +
 		'#branch-banner .content .right button:hover { color: #6EBADF; background: white; }' +
 		'#branch-banner .content .right input:focus, button:focus { outline: none; }' +
-		'#branch-banner .content .right input.error { color: red; border-color: red; }' +
+		//'#branch-banner .content .right input.error { color: red; border-color: red; }' +
 		'#branch-banner .content .right span { display: inline-block; font-weight: 100; margin: 7px 9px; font-size: 12px; }';
 
 	// Banner HTML
