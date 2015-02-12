@@ -286,14 +286,13 @@ Branch.prototype["banner"] = function(obj) {
 		'#branch-banner .content .left { width: 70%; float: left; padding: 8px 8px 8px 8px; }' +
 		'#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }' +
 		'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }' +
-		'#branch-banner .content .left .details { margin-top: 6px; margin-left: 3px; overflow:hidden; }' +
-		'#branch-banner .content .left .details .title { font: 13px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }' +
-		'#branch-banner .content .left .details .description { font-size: 10px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: inline-block; }' +
-		'#branch-banner .content .right { width: 30%; display:inline-block; }';
+		'#branch-banner .content .left .details { margin-top: 3px; padding-left: 4px; overflow:hidden; }' +
+		'#branch-banner .content .left .details .title { font: 14px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }' +
+		'#branch-banner .content .left .details .description { font-size: 12px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: inline-block; }' +
+		'#branch-banner .content .right { width: 30%; display:inline-block; margin-top: 25px; }';
 	var mobileCSS =
-		
-		'#branch-banner .content .right a { display: block; float: right; margin-right: 5px; background: #6EBADF; color: white; font-size: 10px; font-weight: 400; padding: 5px 5px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }' +
-		'#branch-banner .content .right a:hover { text-decoration: none; }';
+		'#branch-banner .content .right a { font-size: 16px; font-weight: 500; color: #007aff; }' +
+		'#branch-banner-action div { float: right; margin-right: 8px; }';
 	var desktopCSS = 
 		'#branch-banner .content .right input { font-weight: 100; border-radius: 2px; border: 1px solid #bbb; padding: 5px 7px 4px; width: 125px; text-align: center; font-size: 12px; }' +
 		'#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 28px; float: right; margin-left: 5px; font-family: Helvetica, Arial, sans-serif; font-weight: 400; border-radius: 2px; border: 1px solid #6EBADF; background: #6EBADF; color: white; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 0px 12px; }' +
