@@ -57,8 +57,27 @@ var tearDown = function() {
   stubs.reset();
 };
 
-var runAsyncTest = function() {
+/**
+ * Helper function for tests
+ */
+var runAsyncTest = function(testFunction, assertions) {
 
+	var recievedData = {};
+	var recievedFired;
+
+	waitForCondition(
+		function() {
+			return recievedFired;
+		},
+		function() { assertions(recievedData) },
+		asyncPollingInterval,
+		maxWaitTime
+	);
+
+	testFunction(function(err, data) {
+		recievedFired = true;
+		recievedData = err || data;
+	});
 };
 
 // ===========================================================================================
@@ -68,55 +87,26 @@ var runAsyncTest = function() {
 
  // SMS sends with phone param
 var testSMSLink = function() {
-
-	var recievedData = {};
-	var expectedData = {};
-	var recievedFired;
-	
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertObjectEquals("should send SMS with phone number", recievedData, expectedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-	
-	branch.SMSLink(params, function(err, data) {
-		recievedFired = true;
-		recievedData = data;
+	runAsyncTest(function(callback) {
+		branch.SMSLink(params, function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertObjectEquals("should send SMS with phone number", recievedData, {});
 	});
-};
-/*
+}
+
 // For whatever reason, the callbacl in api.js:105 is fired twice, the second time, data is empty
 // Fails on missing phone number
+/*
 var testMissingPhoneSMSLink = function() {
-
-	var recievedData = {};
 	var expectedData = new Error(utils.message(utils.messages.missingParam, ['/c', 'phone']));
-	var recievedFired;
-
 	stubs.replace(params, 'phone', '');
 
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertTrue(true);
-			//assertObjectEquals("should require a phone number", recievedData, expectedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.SMSLink(params, function(err, data) {
-		recievedFired = true;
-		recievedData = data;
+	runAsyncTest(function(callback) {
+		branch.SMSLink(params, function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertObjectEquals("should require a phone number", recievedData, expectedData);
 	});
-};
+}
 */
 // ===========================================================================================
 /**
@@ -124,143 +114,71 @@ var testMissingPhoneSMSLink = function() {
  */
  // Track event with required params
  var testEvent = function() {
-
-	var recievedData = {};
-	var expectedData = {};
-	var recievedFired;
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertObjectEquals("should return empty object", recievedData, expectedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.event('Tracked this click', function(err, data) {
-		recievedFired = true;
-		recievedData = data;
+	runAsyncTest(function(callback) {
+		branch.event('Tracked this click', function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertObjectEquals("should return empty object", recievedData, {});
 	});
-};
+}
 
 // ===========================================================================================
 /**
  * Show Referrals tests
  */
-  var testReferrals = function() {
-
-	var recievedData = {};
-	var expectedData = {};
-	var recievedFired;
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertObjectEquals("should return empty object if no referrals on test account", recievedData, expectedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.referrals(function(err, data) {
-		recievedFired = true;
-		recievedData = data;
+var testReferrals = function() {
+	runAsyncTest(function(callback) {
+		branch.referrals(function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertTrue("should return an object", (typeof recievedData && recievedData != null));
 	});
-};
+}
 
 // ===========================================================================================
 /**
  * Show Credits tests
  */
-   var testCredits = function() {
-
-	var recievedData = {};
-	var expectedData = {"default":"0"};
-	var recievedFired;
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertObjectEquals("should return empty object if no credits on test account", recievedData, expectedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.credits(function(err, data) {
-		recievedFired = true;
-		recievedData = data;
+var testCredits = function() {
+	runAsyncTest(function(callback) {
+		branch.credits(function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertObjectEquals("should return empty object if no credits on test account", recievedData, {"default":"0"});
 	});
-};
+}
 
 // ===========================================================================================
 /**
  * Identify tests
  */
- // Returns identity with required params
 var testProfile = function() {
-
-	var recievedData = {};
-	var recievedFired;
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertNonEmptyString("should return correct identity id", recievedData.identity_id);
+	runAsyncTest(function(callback) {
+		branch.profile('Branch', function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertNonEmptyString("should return correct identity id", recievedData.identity_id);
 			assertNonEmptyString("should return correct identity id", recievedData.link_click_id);
 			assertNonEmptyString("should return correct identity id", recievedData.link);
 			assertNonEmptyString("should return correct identity id", recievedData.referring_data);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.profile('Branch', function(err, data) {
-		recievedFired = true;
-		recievedData = data;
 	});
-};
-
+}
 
 // ===========================================================================================
 /**
  * Redeem Credits tests
  */
- var testRedeem = function() {
-
-	var recievedData = {};
+var testRedeem = function() {
 	var expectedData = new Error('Not enough credits to redeem.');
-	var recievedFired;
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertObjectEquals("should return error for not enough credits", expectedData, recievedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
 
 	var creditParams = {
         amount: 5,
         bucket: 'default',
-      };
-	branch.redeem(creditParams, function(err, data) {
-		recievedFired = true;
-		recievedData = err;
-	})
-};
+	};
+
+	runAsyncTest(function(callback) {
+		branch.redeem(creditParams, function(err, data) { 
+			callback(err, data) });
+	}, function(recievedData) {
+		assertObjectEquals("should return error for not enough credits", expectedData, recievedData);
+	});
+}
 
 // ===========================================================================================
 /**
@@ -271,116 +189,42 @@ var testProfile = function() {
 /**
  * Create link tests
  */
-
-// Returns link with required params
 var testLink = function() {
-
-	var recievedData = {};
-	var recievedFired;
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertNonEmptyString("should create link with required params", recievedData);
-			var branchURL = "https://bnc.lt/l/";
-			var recievedURLRoot = recievedData.substring(0, 17);
-			assertEquals("should return branch URL", branchURL, recievedURLRoot);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.link(params, function(err, data) {
-		recievedFired = true;
-		recievedData = data;
+	runAsyncTest(function(callback) {
+		branch.link(params, function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertNonEmptyString("should create link with required params", recievedData);
+		var branchURL = "https://bnc.lt/l/";
+		var recievedURLRoot = recievedData.substring(0, 17);
+		assertEquals("should return branch URL", branchURL, recievedURLRoot);
 	});
-};
-/*
-// Fails on missing app id
-var testMissingAppIdCreateLink = function() {
+}
 
-	var recievedData = {};
-	var expectedData = new Error(utils.message(utils.messages.missingParam, ['/v1/url', 'app_id']));
-	var recievedFired;
-
-	stubs.replace(branch, 'app_id', '');
-	stubs.replace(params, 'app_id', '');
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			console.log("Recieved: " + recievedData);
-			console.log("Expected: " + expectedData);
-			assertObjectEquals("should require app id", recievedData, expectedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-	
-	branch.link(params, function(err, data) {
-		recievedFired = true;
-		recievedData = err;
-		console.log(err);
-	});
-};
-*/
 // ===========================================================================================
 /**
  * Logout tests
  */
- // Logs out with required params
 var testLogout = function() {
-
-	var recievedData = {};
-	var recievedFired;
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertNotEquals("should return correct session id", branch.session_id, recievedData.session_id);
-			assertNotEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.logout(function(err, data) {
-		recievedFired = true;
-		recievedData = data;
+	runAsyncTest(function(callback) {
+		branch.logout(function(err, data) { callback(err, data) });
+	}, function(recievedData) {
+		assertNotEquals("should return correct session id", branch.session_id, recievedData.session_id);
+		assertNotEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
 	});
-};
+}
 
 // ===========================================================================================
 /**
  * Close tests
  */
-// Closes session with required params
  var testClose = function() {
-
-	var recievedFired;
-	var recievedData = {};
-
-	waitForCondition(
-		function() {
-			return recievedFired;
-			 },
-		function() {
-			assertObjectEquals("should return empty object", {}, recievedData);
-		},
-		asyncPollingInterval,
-		maxWaitTime
-	);
-
-	branch.close(function(err, data) {
-		recievedData = data;
-		branch.init('5680621892404085', function(err, data) {
-			recievedFired = true;
+	runAsyncTest(function(callback) {
+		branch.close(function(err, closeData) { 
+			branch.init('5680621892404085', function(err, data) {
+				callback(err, closeData);
+			});
 		});
+	}, function(recievedData) {
+		assertObjectEquals("should return empty object", {}, recievedData);
 	});
-};
+}

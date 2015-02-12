@@ -25,8 +25,8 @@ branch.init('5680621892404085', function(err, data) {
       margin-top: 5px;
       vertical-align: middle;
     }
-    .group {
-      display: inline-block;
+    .row {
+      margin-bottom: 30px;
     }
   </style>
 </head>
@@ -50,22 +50,39 @@ branch.init('5680621892404085', function(err, data) {
     <section>
       <div class="row col-lg-8 col-lg-offset-2">
         <h3>Methods</h3>
+        <hr>
+        <h4>Session and Identity</h4>
+        <div class="group">
+          <button id="init" class="btn btn-success">.init()</button>
+          <button id="close" class="btn btn-danger">.close()</button>
+          <button id="profile" class="btn btn-info">.profile()</button>
+          <button id="logout" class="btn btn-info">.logout()</button>
+        </div>
       </div>
       <div class="row col-lg-8 col-lg-offset-2">
-        <button id="init" class="btn btn-success">.init()</button>
-        <button id="close" class="btn btn-danger">.close()</button>
-        <button id="profile" class="btn btn-info">.profile()</button>
-        <button id="logout" class="btn btn-info">.logout()</button>
-        <button id="event" class="btn btn-info">.event()</button>
-        <button id="link" class="btn btn-info">.link()</button>
+        <h4>Sharing and Tracking</h4>
+        <div class="group">
+          <button id="event" class="btn btn-info">.event()</button>
+          <button id="link" class="btn btn-info">.link()</button>
+          <button id="banner" class="btn btn-info">.banner()</button>
+        </div>
+      </div>
+      <div class="row col-lg-8 col-lg-offset-2">
+      <h4>SMS</h4>
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
           <button id="SMSLink" class="btn btn-info">.SMSLink()</button>
+          <button id="SMSLinkNew" class="btn btn-info">.SMSLinkNew()</button>
+          <button id="SMSLinkExisting" class="btn btn-info">.SMSLinkExisting()</button>
         </div>
-        <button id="referrals" class="btn btn-info">.referrals()</button>
-        <button id="credits" class="btn btn-info">.credits()</button>
-        <button id="redeem" class="btn btn-info">.redeem()</button>
-        <button id="banner" class="btn btn-info">.banner()</button>
+      </div>
+      <div class="row col-lg-8 col-lg-offset-2">
+        <h4>Referral</h4>
+        <div class="group">
+          <button id="referrals" class="btn btn-info">.referrals()</button>
+          <button id="credits" class="btn btn-info">.credits()</button>
+          <button id="redeem" class="btn btn-info">.redeem()</button>
+        </div>
       </div>
     </section>
   </div>
@@ -75,24 +92,56 @@ branch.init('5680621892404085', function(err, data) {
     var info     = $('.info');
     var request  = $('.request');
     var response = $('.response');
+
+    var sampleParams = {
+        tags: ['tag1', 'tag2'],
+        channel: 'sample app',
+        feature: 'create link',
+        stage: 'created link',
+        type: 1,
+        data: {  
+          mydata: {
+            foo: 'bar'
+          },
+          '$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-sdk/example.html',
+          '$og_title': 'Branch Metrics',
+          '$og_description': 'Branch Metrics',
+          '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+        }
+      };
+
+      var phoneNumber = function() {
+        var phoneNumberID = $('#SMSNumber');
+        if(phoneNumberID.val() == ''){
+          phoneNumberID.parent().addClass('has-error');
+          return false;
+        }else{
+          phoneNumberID.parent().removeClass('has-error');
+        }
+        return phoneNumberID.val();
+      }
+
     $('#init').click(function(){
       request.html('branch.init();');
       branch.init('5680621892404085', function(err, data) {
         info.innerHTML = JSON.stringify(data);
       });
     });
+
     $('#profile').click(function(){
       request.html("branch.profile('Branch');");
       branch.profile('Branch', function(err, data){
         response.html(JSON.stringify(data));
       });
     });
+
     $('#logout').click(function(){
       request.html('branch.logout();');
       branch.logout(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
+
     $('#close').click(function(){
       alert('You will need to call .init() reinitialize the Branch SDK.');
       request.html('branch.close();');
@@ -100,74 +149,60 @@ branch.init('5680621892404085', function(err, data) {
         response.html(JSON.stringify(data));
       });
     });
+
     $('#event').click(function(){
       request.html('branch.event(\'Tracked this event\');');
       branch.event('Tracked this event', function(err, data){
         response.html(JSON.stringify(data));
       });
     });
+
     $('#link').click(function(){
-      request.html("branch.link({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
-      branch.link({
-        tags: ['tag1', 'tag2'],
-        channel: 'sample app',
-        feature: 'create link',
-        stage: 'created link',
-        type: 1,
-        data: {  
-          mydata: {
-            foo: 'bar'
-          },
-          '$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-sdk/example.html',
-          '$og_title': 'Branch Metrics',
-          '$og_description': 'Branch Metrics',
-          '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
-        }
-      }, function(err, link){
+      request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
+      branch.link(sampleParams, function(err, link){
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
+
     $('#SMSLink').click(function(){
-      var phone_number = $('#SMSNumber');
-      if(phone_number.val() == ''){
-        phone_number.parent().addClass('has-error');
-        return false;
-      }else{
-        phone_number.parent().removeClass('has-error');
-      }
-      request.html("branch.SMSLink({phone: " + phone_number.val() + ",tags: ['tag1', 'tag2'],feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://branch-example.s3-website-us-west-2.amazonaws.com'}});");
-      branch.SMSLink({
-        phone: phone_number.val(),
-        tags: ['tag1', 'tag2'],
-        channel: 'sample app',
-        feature: 'create link',
-        stage: 'created link',
-        type: 1,
-        data: {  
-          mydata: {
-            foo: 'bar'
-          },
-          '$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-sdk/example.html',
-          '$og_title': 'Branch Metrics',
-          '$og_description': 'Branch Metrics',
-          '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
-        }
-      }, function(err, data){
+      sampleParams.phone = phoneNumber();
+      request.html("branch.SMSLink(" + JSON.stringify(sampleParams) + ");");
+      branch.SMSLink(sampleParams, function(err, data){
+        response.html(JSON.stringify(data));
+        delete sampleParams.phone;
+      });
+    });
+
+    $('#SMSLinkNew').click(function(){
+      sampleParams.phone = phoneNumber();
+      request.html("branch.SMSLinkNew(" + JSON.stringify(sampleParams) + ");");
+      branch.SMSLinkNew(sampleParams, function(err, data){
+        response.html(JSON.stringify(data));
+        delete sampleParams.phone;
+      });
+    });
+
+    $('#SMSLinkExisting').click(function(){
+      request.html("branch.SMSLinkExisting(\"" + phoneNumber() + "\");");
+      branch.SMSLinkExisting(phoneNumber(), function(err, data){
         response.html(JSON.stringify(data));
       });
     });
+
     $('#referrals').click(function(){
       request.html('branch.referrals();');
       branch.referrals(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
+
     $('#credits').click(function(){
       request.html('branch.credits();');
       branch.credits(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
+
     $('#redeem').click(function(){
       request.html('branch.redeem({amount: 5, bucket: \'default\'});');
       branch.redeem({
@@ -177,6 +212,7 @@ branch.init('5680621892404085', function(err, data) {
         response.html(JSON.stringify(data));
       });
     });
+
     $('#banner').click(function(){
       request.html('branch.banner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
       branch.banner({
@@ -189,6 +225,7 @@ branch.init('5680621892404085', function(err, data) {
       });
       response.html('none');
     });
+    
   </script>
 </body>
 </html>
