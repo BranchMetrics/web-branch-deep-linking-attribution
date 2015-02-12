@@ -102,10 +102,10 @@ api = function(resource, data, callback) {
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
 			try {
-				callback(null, JSON.parse(req.responseText));
+				callback(null, JSON.parse(req.responseText)); //We try to catch errors here because sendSMSLink does not return JSON
 			}
 			catch(e) {
-				callback(e);
+				callback(null, {});
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {

@@ -157,7 +157,7 @@ resources.linkClick = {
 	params: { "click": validator(true, validationTypes.str) }
 };
 /** @type {resources.resource} */
-resources.sendSMSLink = {
+resources.SMSLinkSend = {
 	destination: config.link_service_endpoint,
 	endpoint: '/c',
 	method: 'POST',

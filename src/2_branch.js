@@ -42,29 +42,25 @@ Branch.prototype['init'] = function(app_id, callback) {
 	if (sessionData) {
 		this.session_id = sessionData['session_id'];
 		this.identity_id = sessionData['identity_id'];
+		this.sessionLink = sessionData["link"];
 	}
 
 	if (sessionData && !utils.hashValue('r')) {
-		callback(sessionData);
+		callback(null, sessionData);
 	}
 	else {
 		this.api(resources._r, {}, function(err, browser_fingerprint_id) {
-			if (err) { callback(err); }
-			else {
-				self.api(resources.open, {
-					"link_identifier": utils.hashValue('r'),
-					"is_referrable": 1,
-					"browser_fingerprint_id": browser_fingerprint_id
-				}, function(err, data) {
-					if (err) { callback(err); }
-					else {
-						self.session_id = data['session_id'];
-						self.identity_id = data['identity_id'];
-						utils.store(data);
-						callback(data);
-					}
-				});
-			}
+			self.api(resources.open, {
+				"link_identifier": utils.hashValue('r'),
+				"is_referrable": 1,
+				"browser_fingerprint_id": browser_fingerprint_id
+			}, function(err, data) {
+				self.session_id = data['session_id'];
+				self.identity_id = data['identity_id'];
+				self.sessionLink = data["link"];
+				utils.store(data);
+				callback(err, data);
+			});
 		});
 	}
 };
@@ -77,10 +73,7 @@ Branch.prototype['logout'] = function(callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
 	this.api(resources.logout, {}, function(err, data) {
-		if (err) { callback(err); }
-		else {
-			callback(data);
-		}
+		callback(err, data);
 	});
 };
 
@@ -92,17 +85,14 @@ Branch.prototype['close'] = function(callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
 	this.api(resources.close, {}, function(err, data) {
-		if (err) { callback(err); }
-		else {
-			sessionStorage.clear();
-			self.initialized = false;
-			callback(data);
-		}
+		sessionStorage.clear();
+		self.initialized = false;
+		callback(err, data);
 	});
 };
 
 /**
- * @param {string} event 
+ * @param {String} event 
  * @param {?Object} metadata
  * @param {?function} callback
  */
@@ -121,7 +111,9 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 			user_agent: navigator.userAgent,
 			language: navigator.language
 		}, {})
-	}, callback({}));
+	}, function(err, data) {
+		callback(err, data);
+	});
 };
 
 /**
@@ -137,7 +129,7 @@ Branch.prototype['profile'] = function(identity, callback) {
 	this.api(resources.profile, {
 			identity: identity
 		}, function(err, data) {
-			callback(data);
+			callback(err,data);
 	});
 };
 
@@ -147,7 +139,7 @@ Branch.prototype['profile'] = function(identity, callback) {
  */
 Branch.prototype['link'] = function(obj, callback) {
 	callback = callback || function() {};
-	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
 
 	obj['source'] = 'web-sdk';
@@ -158,8 +150,7 @@ Branch.prototype['link'] = function(obj, callback) {
 	obj['data'] = JSON.stringify(obj['data']);
 	this.api(resources.link, obj, function(err, data) {
 		if (typeof callback == 'function') {
-			if (err) { callback(err); }
-			else { callback(data['url']); }
+			callback(err, data['url']);
 		}
 	});
 };
@@ -170,14 +161,14 @@ Branch.prototype['link'] = function(obj, callback) {
  */
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() {};
-	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
 	this.api(resources.linkClick, {
 		link_url: url.replace('https://bnc.lt/', ''),
 		click: "click"
 	}, function(err, data) {
-		if (err) { callback(err); }
-		else { callback(null, data); }
+		utils.storeLinkClickId(data["click_id"]);
+		if(err || data) { callback(err, data); }
 	});
 };
 
@@ -187,31 +178,44 @@ Branch.prototype['linkClick'] = function(url, callback) {
  */
 Branch.prototype['SMSLink'] = function(obj, callback) {
 	callback = callback || function() {};
-	if (!this.initialized) { return utils.console(utils.messages.nonInit); }
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+
+	if(utils.readStore()["click_id"]) {
+		this.SMSLinkExisting(obj["phone"], callback);
+	} else {
+		this.SMSLinkNew(obj, callback);
+	}
+}
+
+/**
+ * @param {?Object} metadata
+ * @param {?function} callback
+ */
+Branch.prototype['SMSLinkNew'] = function(obj, callback) {
+	callback = callback || function() {};
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+
 	obj["channel"] = 'sms';
 	var self = this;
-	this.link(obj, function(url) {
+	this.link(obj, function(err, url) {
 		self.linkClick(url, function(err, data) {
-			if (err) { callback(err); }
-			else {
-				self.sendSMSLink(obj["phone"], data, function(data) {
-					if (err) { callback(err); }
-					else { callback({}); }
-				});
-			}
+			self.SMSLinkExisting(obj["phone"], function(err, data) {
+				callback(err, data);
+			});
 		});
 	});
 };
 
 /**
  * @param {?String} phone
- * @param {?Object} data
  * @param {?function} callback
  */
-Branch.prototype['sendSMSLink'] = function(phone, data, callback) {
+Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
 	callback = callback || function() {};
-	this.api(resources.sendSMSLink, {
-		link_url: data.click_id,
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+
+	this.api(resources.SMSLinkSend, {
+		link_url: utils.readStore()["click_id"],
 		phone: phone
 	}, function(err, data) {
 		callback(err, data);
@@ -226,8 +230,7 @@ Branch.prototype["referrals"] = function(callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
 	this.api(resources.referrals, {}, function(err, data) {
-		if (err) { callback(err); }
-		else { callback(data); }
+		callback(err, data);
 	});
 };
 
@@ -241,11 +244,9 @@ Branch.prototype["credits"] = function(callback) {
 	this.api(resources.credits, {
 		identity_id: this.identity_id
 	}, function(err, data) {
-		if (err) { callback(err); }
-		else { callback(data); }
+		callback(err, data);
 	});
 };
-
 
 /**
  * @param {?Object} obj
@@ -259,8 +260,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
 		amount: obj["amount"],
 		bucket: obj["bucket"]
 	}, function(err, data) {
-		if (err) { callback(err); }
-		else { callback(data); }
+		callback(err, data);
 	});
 };
 
@@ -280,24 +280,21 @@ Branch.prototype["banner"] = function(obj) {
 	body.style.marginTop = '71px';
 	css.type = "text/css";
 	css.innerHTML = 
-		'#branch-banner { position: fixed; top: 0px; width: 100%; font-family: Helvetica, Arial, sans-serif; }' +
-		'#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }' +
-		'#branch-banner .content { position: absolute; width: 100%; height: 71px; z-index: 99999; background: white; color: #444; border-bottom: 1px solid #ddd; }' +
-		'#branch-banner .content .left { width: 60%; float: left; padding: 5px 0 0 7px; }' +
-		'#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }';
+		'#branch-banner { position: absolute; top: 0px; width: 100%; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all 0.3s ease; transition: all 0.3s ease; }' +
+		'#branch-banner .close-x { float: left; font-weight: 400; color: #aaa; font-size: 20px; margin-top: 13px; margin-right: 6px; margin-left: 0; cursor: pointer; }' +
+		'#branch-banner .content { position: absolute; width: 100%; height: 76px; z-index: 99999; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; }' +
+		'#branch-banner .content .left { width: 70%; float: left; padding: 8px 8px 8px 8px; }' +
+		'#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }' +
+		'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }' +
+		'#branch-banner .content .left .details { margin-top: 6px; margin-left: 3px; overflow:hidden; }' +
+		'#branch-banner .content .left .details .title { font: 13px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }' +
+		'#branch-banner .content .left .details .description { font-size: 10px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: inline-block; }' +
+		'#branch-banner .content .right { width: 30%; display:inline-block; }';
 	var mobileCSS =
-		'#branch-banner .close-x { float: left; font-weight: 200; color: #aaa; font-size: 14px; padding-right: 4px; margin-top: -5px; margin-left: -2px; cursor: pointer; }' +
-		'#branch-banner .content .left .details { margin: 13px 0; }' +
-		'#branch-banner .content .left .details .title { display: block; font-size: 12px; font-weight: 400; }' +
-		'#branch-banner .content .left .details .description { display: block; font-size: 10px; font-weight: 200; }' +
-		'#branch-banner .content .right { width: 40%; float: left; padding: 23px 6px 0 0; text-align: right; }' +
+		
 		'#branch-banner .content .right a { display: block; float: right; margin-right: 5px; background: #6EBADF; color: white; font-size: 10px; font-weight: 400; padding: 5px 5px 4px; border-radius: 2px; letter-spacing: .08rem; text-transform: uppercase; }' +
 		'#branch-banner .content .right a:hover { text-decoration: none; }';
 	var desktopCSS = 
-		'#branch-banner .content .left .details { margin: 10px 0; }' +
-		'#branch-banner .content .left .details .title { display: block; font-size: 14px; font-weight: 400; }' +
-		'#branch-banner .content .left .details .description { display: block; font-size: 12px; font-weight: 200; }' +
-		'#branch-banner .content .right { width: 40%; float: left; padding: 21px 9px 0 0; text-align: right; }'+
 		'#branch-banner .content .right input { font-weight: 100; border-radius: 2px; border: 1px solid #bbb; padding: 5px 7px 4px; width: 125px; text-align: center; font-size: 12px; }' +
 		'#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 28px; float: right; margin-left: 5px; font-family: Helvetica, Arial, sans-serif; font-weight: 400; border-radius: 2px; border: 1px solid #6EBADF; background: #6EBADF; color: white; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 0px 12px; }' +
 		'#branch-banner .content .right button:hover { color: #6EBADF; background: white; }' +

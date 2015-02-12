@@ -10,7 +10,7 @@ var DEBUG = true;
 /** @typedef {string} */
 var message;
 
-/** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string}} */
+/** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string, link_click:string}} */
 utils.sessionData;
 
 /** @type {Object<string,message>} */
@@ -56,6 +56,15 @@ utils.readStore = function() {
 utils.store = function(data) {
 	sessionStorage.setItem('branch_session', JSON.stringify(data));
 };
+
+/**
+ * @param {?string} click_id
+ */
+utils.storeLinkClickId = function(click_id) {
+	var currentSession = utils.readStore();
+	currentSession["click_id"] = click_id;
+	utils.store(currentSession);
+}
 
 utils.merge = function(to, from) {
 	for (var attr in from) {

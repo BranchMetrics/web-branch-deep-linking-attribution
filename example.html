@@ -8,9 +8,9 @@
 !function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
 "dist/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
 e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-"init;close;logout;event;profile;link;referrals;credits;redeem;appBanner".split(";"),0);
+"init;close;logout;event;profile;link;referrals;credits;redeem;banner".split(";"),0);
 
-branch.init('5680621892404085', function(data) {
+branch.init('5680621892404085', function(err, data) {
   document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
 });
   </script>
@@ -65,7 +65,7 @@ branch.init('5680621892404085', function(data) {
         <button id="referrals" class="btn btn-info">.referrals()</button>
         <button id="credits" class="btn btn-info">.credits()</button>
         <button id="redeem" class="btn btn-info">.redeem()</button>
-        <button id="appBanner" class="btn btn-info">.appBanner()</button>
+        <button id="banner" class="btn btn-info">.banner()</button>
       </div>
     </section>
   </div>
@@ -77,32 +77,32 @@ branch.init('5680621892404085', function(data) {
     var response = $('.response');
     $('#init').click(function(){
       request.html('branch.init();');
-      branch.init('5680621892404085', function(data) {
+      branch.init('5680621892404085', function(err, data) {
         info.innerHTML = JSON.stringify(data);
       });
     });
     $('#profile').click(function(){
       request.html("branch.profile('Branch');");
-      branch.profile('Branch', function(data){
+      branch.profile('Branch', function(err, data){
         response.html(JSON.stringify(data));
       });
     });
     $('#logout').click(function(){
       request.html('branch.logout();');
-      branch.logout(function(data){
+      branch.logout(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
     $('#close').click(function(){
       alert('You will need to call .init() reinitialize the Branch SDK.');
       request.html('branch.close();');
-      branch.close(function(data){
+      branch.close(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
     $('#event').click(function(){
       request.html('branch.event(\'Tracked this event\');');
-      branch.event('Tracked this event', function(data){
+      branch.event('Tracked this event', function(err, data){
         response.html(JSON.stringify(data));
       });
     });
@@ -123,7 +123,7 @@ branch.init('5680621892404085', function(data) {
           '$og_description': 'Branch Metrics',
           '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
         }
-      }, function(link){
+      }, function(err, link){
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
@@ -152,20 +152,19 @@ branch.init('5680621892404085', function(data) {
           '$og_description': 'Branch Metrics',
           '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
         }
-      }, function(data){
+      }, function(err, data){
         response.html(JSON.stringify(data));
       });
     });
     $('#referrals').click(function(){
       request.html('branch.referrals();');
-      branch.referrals(function(data){
-        console.log(data);
+      branch.referrals(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
     $('#credits').click(function(){
       request.html('branch.credits();');
-      branch.credits(function(data){
+      branch.credits(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
@@ -174,13 +173,13 @@ branch.init('5680621892404085', function(data) {
       branch.redeem({
         amount: 5,
         bucket: 'default',
-      }, function(data){
+      }, function(err, data){
         response.html(JSON.stringify(data));
       });
     });
-    $('#appBanner').click(function(){
-      request.html('branch.appBanner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
-      branch.appBanner({
+    $('#banner').click(function(){
+      request.html('branch.banner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
+      branch.banner({
         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
         title: 'Branch Demo App',
         description: 'The Branch demo app!',
