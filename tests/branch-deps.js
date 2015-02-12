@@ -7,6 +7,6 @@ goog.addDependency("../../../Web-SDK/src/2_branch.js", ['Branch'], ['utils', 're
 goog.addDependency("../../../Web-SDK/src/2_branch_tests.js", [], ['Branch', 'goog.testing.AsyncTestCase', 'goog.testing.jsunit']);
 goog.addDependency("../../../Web-SDK/src/3_branch_instance.js", ['branch_instance'], ['Branch']);
 goog.addDependency("../../../Web-SDK/src/4_umd.js", [], ['branch_instance']);
-goog.addDependency("../../../Web-SDK/src/branch-deps.js", [], []);
+goog.addDependency("../../../Web-SDK/tests/branch-deps.js", [], []);
 goog.addDependency("../../../Web-SDK/src/extern.js", [], []);
 goog.addDependency("../../../Web-SDK/src/onpage.js", [], []);
