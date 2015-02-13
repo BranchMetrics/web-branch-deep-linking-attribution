@@ -1,7 +1,7 @@
 (function() {// Input 0
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:1};
 // Input 1
-var utils = {}, DEBUG = !0, message;
+var utils = {}, DEBUG = !0;
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID"};
 utils.error = function(a, b) {
   throw Error(utils.message(a, b));
