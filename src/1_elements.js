@@ -58,13 +58,12 @@ elements.appendSmartBannerActions = function(obj) {
 		action.innerHTML = bannerMobileActionHTML;
 	} else {
 		action.innerHTML = bannerDesktopActionHTML;
-		var onclickEvent = addEventListener("click", function(){
-		    sendBannerSMS(obj);
-		});
 	};
 
 	document.getElementById('branch-banner-action').appendChild(action);
-	var branchSMSAction = (document.getElementById('branch-sms-send') || {onclick:''}).onclick = onclickEvent ;
+	(document.getElementById('branch-sms-send') || {onclick:''}).addEventListener("click", function(){
+		    sendBannerSMS(obj);
+		});
 	document.getElementById('branch-banner-close').onclick = closeBranchBanner;
 };
 
@@ -187,5 +186,5 @@ var bannerDesktopCSS =
 	'#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 30px;; float: right; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }' +
 	'#branch-banner .content .right button:hover { border: 1px solid #BABABA; background: #E0E0E0; }' +
 	'#branch-banner .content .right input:focus, button:focus { outline: none; }' +
-	'#branch-banner .content .right input .error { color: red; border-color: red; }' +
-	'#branch-banner .content .right span { display: inline-block; font-weight: 100; margin: 7px 9px; font-size: 12px; }';
+	'#branch-banner .content .right input.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }' +
+	'#branch-banner .content .right span { display: inline-block; font-weight: 400; margin: 7px 9px; font-size: 14px; }';
