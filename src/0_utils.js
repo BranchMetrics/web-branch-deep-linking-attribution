@@ -58,7 +58,8 @@ utils.store = function(data) {
 };
 
 /**
- * @param {?string} click_id
+ * @param {?string} key
+ * @param {?string} value
  */
 utils.storeKeyValue = function(key, value) {
 	var currentSession = utils.readStore();
@@ -66,9 +67,16 @@ utils.storeKeyValue = function(key, value) {
 	utils.store(currentSession);
 }
 
+/**
+ * @param {?string} key
+ */
 utils.readKeyValue = function(key) {
 	var currentSession = utils.readStore();
 	return currentSession[key];
+}
+
+utils.hasApp  =function() {
+	return utils.readKeyValue("has_app");
 }
 
 utils.merge = function(to, from) {
