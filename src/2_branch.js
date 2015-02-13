@@ -168,7 +168,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 		link_url: url.replace('https://bnc.lt/', ''),
 		click: "click"
 	}, function(err, data) {
-		utils.storeLinkClickId(data["click_id"]);
+		utils.storeKeyValue("click_id", data["click_id"]);
 		if(err || data) { callback(err, data); }
 	});
 };
@@ -181,7 +181,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if(utils.readStore()["click_id"]) {
+	if(utils.readKeyValue("click_id")) {
 		this.SMSLinkExisting(obj["phone"], callback);
 	} else {
 		this.SMSLinkNew(obj, callback);
@@ -269,7 +269,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
  * @param {?Object} obj
  */
 Branch.prototype["banner"] = function(obj) {
-	if (!document.getElementById('branch-banner')) {
+	if (!document.getElementById('branch-banner') && !utils.readKeyValue("bannerShown")) {
 		document.head.appendChild(elements.smartBannerStyles());
 		document.body.appendChild(elements.smartBannerMarkup(obj));
 		document.getElementById('branch-banner').style.top = '-76px';

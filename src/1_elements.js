@@ -3,6 +3,7 @@
  */
 
 goog.provide('elements');
+goog.require('utils');
 
 // UI Animation transition speed in ms
 var animationSpeed = 250;
@@ -114,6 +115,8 @@ var closeBranchBanner = function() {
 	}, animationDelay);
 	
 	document.getElementById('branch-banner').style.top = '-76px';
+
+	utils.storeKeyValue("bannerShown", true);
 };
 
 var mobileUserAgent = navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i);
@@ -151,7 +154,7 @@ var bannerDesktopActionHTML =
 	'</div>';
 
 var bannerLinkSentHTML = function(phone) {
-	return '<span class="sms-sent">App link sent to ' + phone + '!</span>';
+	return '<span class="sms-sent">Link sent to ' + phone + '</span>';
 }
 
 var bannerMobileActionHTML =

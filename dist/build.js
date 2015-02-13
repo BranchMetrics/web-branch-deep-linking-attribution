@@ -19,10 +19,13 @@ utils.readStore = function() {
 utils.store = function(a) {
   sessionStorage.setItem("branch_session", JSON.stringify(a));
 };
-utils.storeLinkClickId = function(a) {
-  var b = utils.readStore();
-  b.click_id = a;
-  utils.store(b);
+utils.storeKeyValue = function(a, b) {
+  var d = utils.readStore();
+  d[a] = b;
+  utils.store(d);
+};
+utils.readKeyValue = function(a) {
+  return utils.readStore()[a];
 };
 utils.merge = function(a, b) {
   for (var d in b) {
@@ -89,12 +92,13 @@ var removeElement = function(a) {
     document.body.style.marginTop = "0px";
   }, animationDelay);
   document.getElementById("branch-banner").style.top = "-76px";
+  utils.storeKeyValue("bannerShown", !0);
 }, mobileUserAgent = navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i), validatePhoneNumber = function(a) {
   return/^\d{7,}$/.test(a.replace(/[\s()+\-\.]|ext/gi, ""));
 }, bannerHTML = function(a) {
   return'<div class="content"><div class="left"><div class="close-x" id="branch-banner-close">&times;</div><div class="icon" style="float: left;"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action"></div></div>';
 }, bannerDesktopActionHTML = '<div id="branch-sms-block"><input type="phone" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999"><button id="branch-sms-send">Send Link</button></div>', bannerLinkSentHTML = function(a) {
-  return'<span class="sms-sent">App link sent to ' + a + "!</span>";
+  return'<span class="sms-sent">Link sent to ' + a + "</span>";
 }, bannerMobileActionHTML = '<a id="branch-mobile-action" href="#">View in App</a>', bannerCSS = "body { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }#branch-banner { top: -76px; width: 100%; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + 
 animationSpeed / 1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + 's ease; }#branch-banner .close-x { float: left; font-weight: 400; color: #aaa; font-size: 20px; margin-top: 13px; margin-right: 6px; margin-left: 0; cursor: pointer; }#branch-banner .content { position: absolute; width: 100%; height: 76px; z-index: 99999; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; }#branch-banner .content .left { width: 70%; float: left; padding: 8px 8px 8px 8px; }#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }#branch-banner .content .right a { font-size: 16px; font-weight: 500; color: #007aff; }#branch-banner-action div { float: right; margin-right: 8px; }#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }#branch-banner .content .left .details { margin-top: 3px; padding-left: 4px; }#branch-banner .content .left .details .title { font: 14px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }#branch-banner .content .left .details .description { font-size: 12px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: block; }#branch-banner .content .right { display:inline-block; position: relative; top: 50%; transform: translateY(-50%); }', 
 bannerMobileCSS = "#branch-banner .content .left { width: 70% }#branch-banner .content .right { width: 30% }#branch-banner { position: absolute; }", bannerDesktopCSS = "#branch-banner .content .left { width: 50% }#branch-banner .content .right { width: 50% }#branch-banner { position: fixed; }#branch-banner .content .right input { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 125px; font-size: 14px; }#branch-banner .content .right button { margin-top: 0px; display: inline-block; height: 30px;; float: right; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }#branch-banner .content .right button:hover { border: 1px solid #BABABA; background: #E0E0E0; }#branch-banner .content .right input:focus, button:focus { outline: none; }#branch-banner .content .right input.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }#branch-banner .content .right span { display: inline-block; font-weight: 400; margin: 7px 9px; font-size: 14px; }";
@@ -283,7 +287,7 @@ Branch.prototype.linkClick = function(a, b) {
     return b(utils.message(utils.messages.nonInit));
   }
   this.api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
-    utils.storeLinkClickId(c.click_id);
+    utils.storeKeyValue("click_id", c.click_id);
     (a || c) && b(a, c);
   });
 };
@@ -293,7 +297,7 @@ Branch.prototype.SMSLink = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  utils.readStore().click_id ? this.SMSLinkExisting(a.phone, b) : this.SMSLinkNew(a, b);
+  utils.readKeyValue("click_id") ? this.SMSLinkExisting(a.phone, b) : this.SMSLinkNew(a, b);
 };
 Branch.prototype.SMSLinkNew = function(a, b) {
   b = b || function() {
@@ -352,7 +356,7 @@ Branch.prototype.redeem = function(a, b) {
   });
 };
 Branch.prototype.banner = function(a) {
-  document.getElementById("branch-banner") || (document.head.appendChild(elements.smartBannerStyles()), document.body.appendChild(elements.smartBannerMarkup(a)), document.getElementById("branch-banner").style.top = "-76px", elements.appendSmartBannerActions(a), elements.triggerBannerAnimation());
+  document.getElementById("branch-banner") || utils.readKeyValue("bannerShown") || (document.head.appendChild(elements.smartBannerStyles()), document.body.appendChild(elements.smartBannerMarkup(a)), document.getElementById("branch-banner").style.top = "-76px", elements.appendSmartBannerActions(a), elements.triggerBannerAnimation());
 };
 // Input 6
 var branch_instance = new Branch;

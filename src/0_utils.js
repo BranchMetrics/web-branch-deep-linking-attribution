@@ -60,10 +60,15 @@ utils.store = function(data) {
 /**
  * @param {?string} click_id
  */
-utils.storeLinkClickId = function(click_id) {
+utils.storeKeyValue = function(key, value) {
 	var currentSession = utils.readStore();
-	currentSession["click_id"] = click_id;
+	currentSession[key] = value;
 	utils.store(currentSession);
+}
+
+utils.readKeyValue = function(key) {
+	var currentSession = utils.readStore();
+	return currentSession[key];
 }
 
 utils.merge = function(to, from) {
