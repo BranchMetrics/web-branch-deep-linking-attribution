@@ -168,10 +168,10 @@ var bannerMobileActionHTML =
 	'#branch-banner .content .right a { font-size: 16px; font-weight: 500; color: #007aff; }' +
 	'#branch-banner-action div { float: right; margin-right: 8px; }' +
 	'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }' +
-	'#branch-banner .content .left .details { margin-top: 3px; padding-left: 4px; overflow:hidden; }' +
+	'#branch-banner .content .left .details { margin-top: 3px; padding-left: 4px; }' +
 	'#branch-banner .content .left .details .title { font: 14px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }' +
 	'#branch-banner .content .left .details .description { font-size: 12px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: block; }' +
-	'#branch-banner .content .right { display:inline-block; margin-top: 25px; }';
+	'#branch-banner .content .right { display:inline-block; position: relative; top: 50%; transform: translateY(-50%); }';
 
 var bannerMobileCSS =
 	'#branch-banner .content .left { width: 70% }' +
