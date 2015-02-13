@@ -270,9 +270,10 @@ Branch.prototype["redeem"] = function(obj, callback) {
  */
 Branch.prototype["banner"] = function(obj) {
 	if (!document.getElementById('branch-banner')) {
-		document.body.style.marginTop = '71px';
 		document.head.appendChild(elements.smartBannerStyles());
 		document.body.appendChild(elements.smartBannerMarkup(obj));
+		document.getElementById('branch-banner').style.top = '-76px';
 		elements.appendSmartBannerActions(obj);
+		elements.triggerBannerAnimation();
 	}
 };
