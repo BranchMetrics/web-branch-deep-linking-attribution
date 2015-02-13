@@ -1,6 +1,6 @@
 COMPILER=java -jar compiler/compiler.jar
 COMPILER_LIBRARY=compiler/library/closure-library-master/closure
-SOURCES=src/0_config.js src/0_utils.js src/1_api.js src/1_resources.js src/2_branch.js src/3_branch_instance.js src/4_umd.js
+SOURCES=src/0_config.js src/0_utils.js src/1_elements.js src/1_api.js src/1_resources.js src/2_branch.js src/3_branch_instance.js src/4_umd.js
 EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
