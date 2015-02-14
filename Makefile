@@ -4,22 +4,33 @@ SOURCES=src/0_config.js src/0_utils.js src/1_elements.js src/1_api.js src/1_reso
 EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
-all: dist/build.js dist/build.min.js calcdeps.py
+all: dist/build.js dist/build.min.js doc/index.html
 
 # Kinda gross, but will download closure compiler if you don't have it.
 compiler/compiler.jar:
+	@echo "\nFetching and installing closure compiler..."
 	mkdir -p compiler && \
 	wget http://dl.google.com/closure-compiler/compiler-latest.zip && \
 	unzip compiler-latest.zip -d compiler && \
 	rm -f compiler-latest.zip
 
 compiler/library:
+	@echo "\nFetching and installing closure library..."
 	mkdir -p compiler/library && \
 	wget https://github.com/google/closure-library/archive/master.zip && \
 	unzip master.zip -d compiler/library && \
 	rm -f master.zip
 
+#jsdoc:
+#	@echo "\nFetching and installing JSDoc..."
+#	npm install jsdoc
+
+#jsdox:
+#	@echo "\nFetching and installing JSDox..."
+#	npm install jsdox
+
 calcdeps.py: $(SOURCES) compiler/library
+	@echo "\nCalculating dependencies for compiler tests..."
 	python $(COMPILER_LIBRARY)/bin/calcdeps.py \
 	--dep $(COMPILER_LIBRARY)/goog \
 	--path src \
@@ -28,13 +39,22 @@ calcdeps.py: $(SOURCES) compiler/library
 	--exclude tests/branch-deps.js \
 	> tests/branch-deps.js
 
-dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+doc/index.html: $(SOURCES)
+	@echo "\nGenerating docs..."
+	mkdir -p docs
+	jsdox src/2_branch.js \
+	--output docs
+	cat docs/Intro.md docs/2_branch.md > README.md
+
+dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
+	@echo "\nCompiling debug compressed js..."
 	$(COMPILER) $(COMPILER_ARGS) \
 		--formatting=print_input_delimiter \
 		--formatting=pretty_print \
 		--define 'DEBUG=true' > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+	@echo "\nCompiling compressed and gzipped js..."
 	$(COMPILER) $(COMPILER_ARGS) \
 		--compilation_level ADVANCED_OPTIMIZATIONS \
 		--define 'DEBUG=false' > dist/build.min.js

@@ -1,4 +1,4 @@
-/**
+/***
  * This file provides the main Branch function.
  */
 
@@ -8,14 +8,15 @@ goog.require('resources');
 goog.require('api');
 goog.require('elements');
 
-/**
+/***
+ *
  * @constructor
  */
 Branch = function() {
 	this.initialized = false;
 };
 
-/**
+/***
  * @param {resources.resource} resource
  * @param {Object.<string, *>} data
  * @param {function(?new:Error,*)|null} callback
@@ -28,8 +29,20 @@ Branch.prototype.api = function(resource, data, callback) {
 };
 
 /**
- * @param {number} app_id
- * @param {function|null} callback
+ * Adding the Branch script to your page, automatically creates a window.branch object with all of the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully insantiated, calls made to it will be queed in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session if it doesn't already exist in `sessionStorage`.
+ * 
+ * ##### Usage
+ * 
+ * ```
+ * Branch.init(
+ *   callback (function, optional)
+ * )
+ * ```
+ * 
+ * @param {number} app_id - **Required** Found in your Branch dashboard
+ * @param {function|null} callback - Callback function that reeturns as callback(err, data)
+ * 
+ * ---
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback || function() {};
@@ -67,6 +80,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 };
 
 /**
+ * 
  * @param {function|null} callback
  */
 Branch.prototype['logout'] = function(callback) {
@@ -79,6 +93,7 @@ Branch.prototype['logout'] = function(callback) {
 };
 
 /**
+ *
  * @param {function|null} callback
  */
 Branch.prototype['close'] = function(callback) {
@@ -93,6 +108,7 @@ Branch.prototype['close'] = function(callback) {
 };
 
 /**
+ *
  * @param {String} event 
  * @param {?Object} metadata
  * @param {?function} callback
@@ -118,6 +134,7 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 };
 
 /**
+ * Sets the profile of a user and returns the data.
  * @param {string} identity 
  * @param {?function} callback
  */
@@ -135,6 +152,7 @@ Branch.prototype['profile'] = function(identity, callback) {
 };
 
 /**
+ * Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
  * @param {?Object} metadata
  * @param {?function} callback
  */
@@ -156,7 +174,8 @@ Branch.prototype['link'] = function(obj, callback) {
 	});
 };
 
-/**
+/***
+ *
  * @param {?String} url
  * @param {?function} callback
  */
@@ -174,6 +193,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 };
 
 /**
+ *
  * @param {?Object} metadata
  * @param {?function} callback
  */
@@ -189,6 +209,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 }
 
 /**
+ *
  * @param {?Object} metadata
  * @param {?function} callback
  */
@@ -208,6 +229,7 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
 };
 
 /**
+ *
  * @param {?String} phone
  * @param {?function} callback
  */
@@ -224,6 +246,7 @@ Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
 };
 
 /**
+ *
  * @param {?function} callback
  */
 Branch.prototype["referrals"] = function(callback) {
@@ -236,6 +259,7 @@ Branch.prototype["referrals"] = function(callback) {
 };
 
 /**
+ *
  * @param {?function} callback
  */
 Branch.prototype["credits"] = function(callback) {
@@ -250,6 +274,7 @@ Branch.prototype["credits"] = function(callback) {
 };
 
 /**
+ *
  * @param {?Object} obj
  * @param {?function} callback
  */
@@ -266,6 +291,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
 };
 
 /**
+ *
  * @param {?Object} obj
  */
 Branch.prototype["banner"] = function(obj) {
