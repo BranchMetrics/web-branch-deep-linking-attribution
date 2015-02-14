@@ -9,6 +9,7 @@ var Branch = function Branch(app_id, debug, callback) {
 		return false;
 	};
 	this.utils.readSession = function() {
+		console.log(sessionStorage.getItem('branch_session'));
 		return JSON.parse(sessionStorage.getItem('branch_session'));
 	};
 	this.utils.identity = function() {
@@ -148,27 +149,8 @@ var Branch = function Branch(app_id, debug, callback) {
 					self.utils.console('Request failed', [xhr, status, error]);
 				};
 			}
-			var r, xdomain = false;
-			if (window.XDomainRequest) {
-				xdomain = true;
-				r = new XDomainRequest();
-				r.onload = function() {
-					try {
-						var data = JSON.parse(r.responseText);
-						if (data.message) { error(data.message); }
-						else { callback(data); }
-					}
-					catch (e) {
-						error('unknown error');
-					}
-				};
-			}
-			else if (window.XMLHttpRequest) {
-				r = new XMLHttpRequest();
-			}
-			else {
-				r = new ActiveXObject("Microsoft.XMLHTTP");
-			}
+
+			var r = new XMLHttpRequest();
 			r.onreadystatechange = function() {
 				if (r.readyState === 4) {
 					if (r.status === 200) {
@@ -190,6 +172,7 @@ var Branch = function Branch(app_id, debug, callback) {
 					}
 				}
 			};
+
 			var query = '';
 			if (resource.rest) {
 				for (var rp = 0; rp < resource.rest.length; rp++) {
@@ -208,11 +191,9 @@ var Branch = function Branch(app_id, debug, callback) {
 			}
 
 			r.open(resource.method, connector_url + resource.endpoint + query.substring(0, query.length - 1), true);
-			if (!xdomain) {
-				r.setRequestHeader('Content-Type', 'application/json');
-				r.setRequestHeader('Accept', 'application/json');
-				r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
-			}
+			r.setRequestHeader('Content-Type', 'application/json');
+			r.setRequestHeader('Accept', 'application/json');
+			r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
 			if (resource.ref) {
 				data = self.utils.mergeMeta(data, data[resource.ref]);
 				delete data[resource.ref];
@@ -232,6 +213,7 @@ var Branch = function Branch(app_id, debug, callback) {
 					is_referrable: 1,
 					browser_fingerprint_id: (window.browser_fingerprint_id !== undefined ? window.browser_fingerprint_id : null)
 				}, function(data) {
+					console.log(data);
 					sessionStorage.setItem('branch_session', JSON.stringify(data));
 					self.initialized = true;
 					if (typeof cb == 'function') { cb(data); }
@@ -565,11 +547,11 @@ var Branch = function Branch(app_id, debug, callback) {
 	var config = {
 		appId: app_id,
 		connector: {
-			url: ((document.location.toString().indexOf('https') === -1 && window.XDomainRequest) ? 'http' : 'https') + '://api.branch.io',
+			url: 'https' + '://api.branch.io',
 			name: 'web-sdk',
 			version: '0.1'
 		},
-		linkUrl: ((document.location.toString().indexOf('https') === -1 && window.XDomainRequest) ? 'http' : 'https') + '://bnc.lt',
+		linkUrl: 'https' + '://bnc.lt',
 		linkId: self.utils.hashValue('r'),
 		formap: branch_map.formap,
 		resources: branch_map.resources,
