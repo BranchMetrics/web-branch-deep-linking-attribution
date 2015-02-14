@@ -38,4 +38,5 @@ dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	$(COMPILER) $(COMPILER_ARGS) \
 		--compilation_level ADVANCED_OPTIMIZATIONS \
 		--define 'DEBUG=false' > dist/build.min.js
+	gzip -c dist/build.min.js > dist/build.min.js.gzip
 
