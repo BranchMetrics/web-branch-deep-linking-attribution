@@ -54,12 +54,12 @@ branch.init('APP-KEY', function(err, data) {
    + [.SMSLinkExisting()](#smslinkexistingphone-callback)
 
 1. Referral Methods
-   + [.referrals()](#referrals)
-   + [.credits()](#credits)
-   + [.redeem()](#redeem)
+   + [.referrals()](#referralscallback)
+   + [.credits()](#creditscallback)
+   + [.redeem()](#redeemobj-callback)
 
 1. Smart Banner
-   + [.banner()](#bannercallback)
+   + [.banner()](#bannerdata)
 
 ___
 
