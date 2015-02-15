@@ -35,8 +35,8 @@ Branch.prototype.api = function(resource, data, callback) {
  * 
  * ```
  * Branch.init(
- *	 app_di,
- *   callback(err, data)
+ *		app_di,
+ * 		callback(err, data)
  * )
  * ```
  *
@@ -44,12 +44,12 @@ Branch.prototype.api = function(resource, data, callback) {
  * 
  * ```js
  * {
- *   session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
- *   identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
- *   device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
- *   data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
- *   link:               'url',   // Server-generated link identity, for synchronous link creation.
- *   referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+ * 		session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
+ * 		identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+ * 		device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
+ * 		data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+ * 		link:               'url',   // Server-generated link identity, for synchronous link creation.
+ * 		referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  * }
  * ```
  * 
@@ -102,8 +102,8 @@ Branch.prototype['init'] = function(app_id, callback) {
  * 
  * ```
  * Branch.profile(
- *   identity, 
- *   callback(err, data)
+ * 		identity, 
+ * 		callback(err, data)
  * )
  * ```
  * 
@@ -111,14 +111,14 @@ Branch.prototype['init'] = function(app_id, callback) {
  * 
  * ```js
  * {
- *   identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
- *   link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
- *   referring_data:     {},      // Returns the initial referring data for this identity, if exists.
- *   referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+ * 			identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+ * 			link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+ * 			referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+ * 			referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
  * }
  * ```
  * @param {string} identity - **Required** A string uniquely identifying the user
- * @param {?function} callback - Callback that returns the user's Branch identity id and unique link
+ * @param {function|null} callback - Callback that returns the user's Branch identity id and unique link
  *
  * ___
  */
@@ -142,7 +142,7 @@ Branch.prototype['profile'] = function(identity, callback) {
  * 
  * ```
  * Branch.logout(
- *   callback(err, data)
+ * 		callback(err, data)
  * )
  * ```
  *
@@ -150,9 +150,9 @@ Branch.prototype['profile'] = function(identity, callback) {
  *
  * ```js
  * {
- *  session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
- *  identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
- *  link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
+ * 		session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
+ * 		identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+ * 		link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
  * }
  * ```
  * 
@@ -176,7 +176,7 @@ Branch.prototype['logout'] = function(callback) {
  * 
  * ```
  * Branch.close(
- *   callback(err, data)
+ * 		callback(err, data)
  * )
  * ```
  *
@@ -184,9 +184,9 @@ Branch.prototype['logout'] = function(callback) {
  * 
  * ```
  * {}
- * ``
+ * ```
  *
- * @param {function|null} callback - Returns an empty object
+ * @param {function|null} callback - Returns an empty object or an error
  *
  * ---
  */
@@ -201,11 +201,32 @@ Branch.prototype['close'] = function(callback) {
 	});
 };
 
-/***
+/**
  *
- * @param {String} event 
- * @param {?Object} metadata
- * @param {?function} callback
+ * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
+ * The `metadata` parameter is a formatted JSON object that can contain any data, and has limitless hierarchy. 
+ *
+ * ##### Usage
+ * 
+ * ```
+ * Branch.event(
+ * 		event,	
+ * 		metadata, 
+ * 		callback(err, data)
+ * )
+ * ```
+ * 
+ * ##### Returns 
+ * 
+ * ```js
+ * {}
+ * ```
+ * @param {String} event - **Required** The name of the event to be tracked
+ * @param {Object|null} metadata - Object of event metadata
+ * @param {function|null} callback - Returns an empty object or an error
+ *
+ * ___
+ *
  */
 Branch.prototype['event'] = function(event, metadata, callback) {
 	callback = callback || function() {};
@@ -227,10 +248,62 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 	});
 };
 
-/***
- * Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
- * @param {?Object} metadata
- * @param {?function} callback
+/**
+ *
+ * Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+ *
+ * #### Usage
+ *
+ * ```
+ * Branch.link(
+ * 		metadata,
+ *		callback(err, data)
+ * )
+ * ```
+ *
+ * #### Example
+ *
+ * ````
+ * branch.link({
+ *		tags: ['tag1', 'tag2'],
+ *		channel: 'facebook',
+ *		feature: 'dashboard',
+ *		stage: 'new user',
+ *		type: 1,
+ *		data: {
+ *			mydata: {
+ *				foo: 'bar'
+ *			},
+ *		'$desktop_url': 'http://myappwebsite.com',
+ *		'$ios_url': 'http://myappwebsite.com/ios',
+ *		'$ipad_url': 'http://myappwebsite.com/ipad',
+ *		'$android_url': 'http://myappwebsite.com/android',
+ *		'$og_app_id': '12345',
+ *		'$og_title': 'My App',
+ *		'$og_description': 'My app\'s description.',
+ *		'$og_image_url': 'http://myappwebsite.com/image.png'
+ *		}
+ *	}, function(err, data) {
+ *		console.log(err || data);
+ *	});
+ * ````
+ *
+ * ##### Returns 
+ * 
+ * ```js
+ * { 
+ *		link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+ *	}
+ * ```
+ *
+ * ##### Returns 
+ * 
+ * ```js
+ * {}
+ * ```
+ * @param {Object|null} metadata - Object of link metadata
+ * @param {function|null} callback - Returns a string of the Branch deep linking URL
+ *
  */
 Branch.prototype['link'] = function(obj, callback) {
 	callback = callback || function() {};
@@ -251,9 +324,10 @@ Branch.prototype['link'] = function(obj, callback) {
 };
 
 /***
+ * Is there any reason we need to make this an external function?
  *
- * @param {?String} url
- * @param {?function} callback
+ * @param {String} url - **Required** Branch deep linking URL to register link click on
+ * @param {function|null} callback - Returns an empty object or an error
  */
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() {};
@@ -268,10 +342,49 @@ Branch.prototype['linkClick'] = function(url, callback) {
 	});
 };
 
-/***
+/**
+ * Uses the already created link that is stored in `sessionStorage`, or creates a link if one has not been created, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
- * @param {?Object} metadata
- * @param {?function} callback
+ * #### Usage
+ *
+ * ```
+ * Branch.SMSLink(
+ * 		metadata, 	// Metadata must include phone number as `phone`
+ *		callback(err, data)
+ * )
+ * ```
+ *
+ * #### Example
+ *
+ * ```
+ * branch.SMSLink(
+ *		phone: '9999999999',
+ *		tags: ['tag1', 'tag2'],
+ *		channel: 'facebook',
+ *		feature: 'dashboard',
+ *		stage: 'new user',
+ *		type: 1,
+ *		data: {
+ *			mydata: {
+ *				foo: 'bar'
+ *			},
+ *		'$desktop_url': 'http://myappwebsite.com',
+ *		'$ios_url': 'http://myappwebsite.com/ios',
+ *		'$ipad_url': 'http://myappwebsite.com/ipad',
+ *		'$android_url': 'http://myappwebsite.com/android',
+ *		'$og_app_id': '12345',
+ *		'$og_title': 'My App',
+ *		'$og_description': 'My app\'s description.',
+ *		'$og_image_url': 'http://myappwebsite.com/image.png'
+ *		}
+ *	}, function(err, data) {
+ *		console.log(err || data);
+ *	});
+ * ```
+ *
+ * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
+ * @param {function|null} callback - Returns an empty object or an error
+ *
  */
 Branch.prototype['SMSLink'] = function(obj, callback) {
 	callback = callback || function() {};
@@ -286,8 +399,19 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 
 /***
  *
- * @param {?Object} metadata
- * @param {?function} callback
+ * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+ *
+ * #### Usage
+ *
+ * ```
+ * Branch.SMSLinkNew(
+ * 		metadata, 	// Metadata must include phone number as `phone`
+ *		callback(err, data)
+ * )
+ * ```
+ *
+ * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
+ * @param {function|null} callback - Returns an error or empyy object on success
  */
 Branch.prototype['SMSLinkNew'] = function(obj, callback) {
 	callback = callback || function() {};
@@ -304,10 +428,20 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
 	});
 };
 
-/***
+/**
+ * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
- * @param {?String} phone
- * @param {?function} callback
+ * #### Usage
+ *
+ * ```
+ * Branch.SMSLinkNew(
+ * 		metadata, 	// Metadata must include phone number as `phone`
+ *		callback(err, data)
+ * )
+ * ```
+ *
+ * @param {String} phone - **Required** String of phone number the link should be sent to
+ * @param {function} callback - Returns an error or empty object on success
  */
 Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
 	callback = callback || function() {};

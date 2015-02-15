@@ -149,6 +149,9 @@ var bannerHTML = function(obj)  {
 		'</div>';
 };
 
+/**
+ * @param {?Object} obj
+ */
 var bannerDesktopActionHTML = function(obj) {
 	return '<div id="branch-sms-block">' +
 				'<input type="phone" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999">' +
@@ -156,12 +159,18 @@ var bannerDesktopActionHTML = function(obj) {
 			'</div>';
 }
 
+/**
+ * @param {?Object} obj
+ */
 var bannerMobileActionHTML = function(obj) {
 	var openButtonText = obj["openAppButtonText"] || 'View in app';
 	var downloadButtonText = obj["downloadAppButtonText"] || 'Download App';
 	return '<a id="branch-mobile-action" href="#">' + (utils.hasApp() ? openButtonText : downloadButtonText) + '</a>';
 }
 	
+	/**
+ * @param {?String} phone
+ */
 var bannerLinkSentHTML = function(phone) {
 	return '<span class="sms-sent">Link sent to ' + phone + '</span>';
 }

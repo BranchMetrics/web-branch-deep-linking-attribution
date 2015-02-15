@@ -41,22 +41,22 @@ branch.init('APP-KEY', function(err, data) {
 1. Branch Session
   + [.init()](#initapp_id-callback)
   + [.profile()](#profileidentity-callback)
-  + [.logout()](#logout-callback)
-  + [.close()](#close-callback)
+  + [.logout()](#logoutcallback)
+  + [.close()](#closecallback)
 
-1. [Event Tracking Methods](#event--action-methods)
+1. Event Tracking Methods
   + [.event()](#track)
 
-1. [Deeplinking Methods](#deeplinking-methods)
+1. Deeplinking Methods
    + [.link()](#link)
    + [.SMSLink()](#smslink)
    + [.SMSLinkNew()](#smslinknew)
    + [.SMSLinkExisting()](#smslinkexisting)
 
-1. [Smart Banner](#smart-banners)
+1. Smart Banner
    + [.banner()](#appbanner)
 
-1. [Referral Methods](#referral-methods)
+1. Referral Methods
    + [.referrals()](#referrals)
    + [.credits()](#credits)
    + [.redeem()](#redeem)

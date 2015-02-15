@@ -14,8 +14,8 @@ Adding the Branch script to your page, automatically creates a window.branch obj
 
 ```
 Branch.init(
-	 app_di,
-  callback(err, data)
+		app_di,
+		callback(err, data)
 )
 ```
 
@@ -23,12 +23,12 @@ Branch.init(
 
 ```js
 {
-  session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
-  identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
-  device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
-  data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
-  link:               'url',   // Server-generated link identity, for synchronous link creation.
-  referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+		session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
+		identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+		device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
+		data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+		link:               'url',   // Server-generated link identity, for synchronous link creation.
+		referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
 }
 ```
 
@@ -52,8 +52,8 @@ Sets the profile of a user and returns the data.
 
 ```
 Branch.profile(
-  identity, 
-  callback(err, data)
+		identity, 
+		callback(err, data)
 )
 ```
 
@@ -61,10 +61,10 @@ Branch.profile(
 
 ```js
 {
-  identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
-  link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
-  referring_data:     {},      // Returns the initial referring data for this identity, if exists.
-  referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+			identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+			link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+			referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+			referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
 }
 ```
 
@@ -72,7 +72,7 @@ Branch.profile(
 
 **identity**: `string`, **Required** A string uniquely identifying the user
 
-**callback**: `function`, Callback that returns the user's Branch identity id and unique link
+**callback**: `function | null`, Callback that returns the user's Branch identity id and unique link
 
 ___
 
@@ -86,7 +86,7 @@ Logs out the current session, replaces session IDs and identity IDs.
 
 ```
 Branch.logout(
-  callback(err, data)
+		callback(err, data)
 )
 ```
 
@@ -94,9 +94,9 @@ Branch.logout(
 
 ```js
 {
- session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
- identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
- link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
+		session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
+		identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+		link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
 }
 ```
 
@@ -116,7 +116,7 @@ This closes the active session, removing any relevant session Create your accoun
 
 ```
 Branch.close(
-  callback(err, data)
+		callback(err, data)
 )
 ```
 
@@ -124,13 +124,178 @@ Branch.close(
 
 ```
 {}
-``
+```
 
 **Parameters**
 
-**callback**: `function | null`, Returns an empty object
+**callback**: `function | null`, Returns an empty object or an error
 
 ---
+
+
+
+### &#39;event&#39;(event, metadata, callback) 
+
+This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
+The `metadata` parameter is a formatted JSON object that can contain any data, and has limitless hierarchy. 
+
+##### Usage
+
+```
+Branch.event(
+		event,	
+		metadata, 
+		callback(err, data)
+)
+```
+
+##### Returns 
+
+```js
+{}
+```
+
+**Parameters**
+
+**event**: `String`, **Required** The name of the event to be tracked
+
+**metadata**: `Object | null`, Object of event metadata
+
+**callback**: `function | null`, Returns an empty object or an error
+
+___
+
+
+
+### &#39;link&#39;(metadata, callback) 
+
+Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+
+#### Usage
+
+```
+Branch.link(
+		metadata,
+		callback(err, data)
+)
+```
+
+#### Example
+
+````
+branch.link({
+		tags: ['tag1', 'tag2'],
+		channel: 'facebook',
+		feature: 'dashboard',
+		stage: 'new user',
+		type: 1,
+		data: {
+			mydata: {
+				foo: 'bar'
+			},
+		'$desktop_url': 'http://myappwebsite.com',
+		'$ios_url': 'http://myappwebsite.com/ios',
+		'$ipad_url': 'http://myappwebsite.com/ipad',
+		'$android_url': 'http://myappwebsite.com/android',
+		'$og_app_id': '12345',
+		'$og_title': 'My App',
+		'$og_description': 'My app\'s description.',
+		'$og_image_url': 'http://myappwebsite.com/image.png'
+		}
+	}, function(err, data) {
+		console.log(err || data);
+	});
+````
+
+##### Returns 
+
+```js
+{ 
+		link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+	}
+```
+
+##### Returns 
+
+```js
+{}
+```
+
+**Parameters**
+
+**metadata**: `Object | null`, Object of link metadata
+
+**callback**: `function | null`, Returns a string of the Branch deep linking URL
+
+
+
+### &#39;SMSLink&#39;(metadata, callback) 
+
+Uses the already created link that is stored in `sessionStorage`, or creates a link if one has not been created, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+
+#### Usage
+
+```
+Branch.SMSLink(
+		metadata, 	// Metadata must include phone number as `phone`
+		callback(err, data)
+)
+```
+
+#### Example
+
+```
+branch.SMSLink(
+		phone: '9999999999',
+		tags: ['tag1', 'tag2'],
+		channel: 'facebook',
+		feature: 'dashboard',
+		stage: 'new user',
+		type: 1,
+		data: {
+			mydata: {
+				foo: 'bar'
+			},
+		'$desktop_url': 'http://myappwebsite.com',
+		'$ios_url': 'http://myappwebsite.com/ios',
+		'$ipad_url': 'http://myappwebsite.com/ipad',
+		'$android_url': 'http://myappwebsite.com/android',
+		'$og_app_id': '12345',
+		'$og_title': 'My App',
+		'$og_description': 'My app\'s description.',
+		'$og_image_url': 'http://myappwebsite.com/image.png'
+		}
+	}, function(err, data) {
+		console.log(err || data);
+	});
+```
+
+**Parameters**
+
+**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
+
+**callback**: `function | null`, Returns an empty object or an error
+
+
+
+### &#39;SMSLinkExisting&#39;(phone, callback) 
+
+Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+
+#### Usage
+
+```
+Branch.SMSLinkNew(
+		metadata, 	// Metadata must include phone number as `phone`
+		callback(err, data)
+)
+```
+
+**Parameters**
+
+**phone**: `String`, **Required** String of phone number the link should be sent to
+
+**callback**: `function`, Returns an error or empty object on success
 
 
 
