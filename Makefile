@@ -20,7 +20,7 @@ compiler/library:
 	wget https://github.com/google/closure-library/archive/master.zip && \
 	unzip master.zip -d compiler/library && \
 	rm -f master.zip
-	
+
 # need a lil help with this
 #jsdoc:
 #	@echo "\nFetching and installing JSDoc..."
@@ -45,7 +45,7 @@ doc/index.html: $(SOURCES)
 	mkdir -p docs
 	jsdox src/2_branch.js \
 	--output docs
-	cat docs/Intro.md docs/2_branch.md > README.md
+	cat docs/intro.md docs/2_branch.md docs/footer.md> README.md
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
 	@echo "\nCompiling debug compressed js..."

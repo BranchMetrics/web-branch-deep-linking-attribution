@@ -50,13 +50,16 @@ branch.init('APP-KEY', function(err, data) {
 1. Deeplinking Methods
    + [.link()](#linkmetadata-callback)
    + [.SMSLink()](#smslinkmetadata-callback)
-   + [.SMSLinkNew()](#smslinknew)
-   + [.SMSLinkExisting()](#smslinkexisting)
-
-1. Smart Banner
-   + [.banner()](#bannercallback)
+   + [.SMSLinkNew()](#smslinknewmetadata-callback)
+   + [.SMSLinkExisting()](#smslinkexistingphone-callback)
 
 1. Referral Methods
    + [.referrals()](#referrals)
    + [.credits()](#credits)
    + [.redeem()](#redeem)
+
+1. Smart Banner
+   + [.banner()](#bannercallback)
+
+___
+

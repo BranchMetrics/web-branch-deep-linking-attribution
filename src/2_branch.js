@@ -16,7 +16,7 @@ Branch = function() {
 	this.initialized = false;
 };
 
-/***
+/*** <--- TIP: 3 stars means JSDoc ignores it
  * @param {resources.resource} resource
  * @param {Object.<string, *>} data
  * @param {function(?new:Error,*)|null} callback
@@ -304,6 +304,7 @@ Branch.prototype['event'] = function(event, metadata, callback) {
  * @param {Object|null} metadata - Object of link metadata
  * @param {function|null} callback - Returns a string of the Branch deep linking URL
  *
+ * ___
  */
 Branch.prototype['link'] = function(obj, callback) {
 	callback = callback || function() {};
@@ -385,6 +386,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
  * @param {function|null} callback - Returns an empty object or an error
  *
+ * ___
  */
 Branch.prototype['SMSLink'] = function(obj, callback) {
 	callback = callback || function() {};
@@ -412,6 +414,8 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
  *
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
  * @param {function|null} callback - Returns an error or empyy object on success
+ *
+ * ___
  */
 Branch.prototype['SMSLinkNew'] = function(obj, callback) {
 	callback = callback || function() {};
@@ -441,7 +445,9 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
  * ```
  *
  * @param {String} phone - **Required** String of phone number the link should be sent to
- * @param {function} callback - Returns an error or empty object on success
+ * @param {function|null} callback - Returns an error or empty object on success
+ *
+ * ___
  */
 Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
 	callback = callback || function() {};
@@ -455,9 +461,38 @@ Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
 	});
 };
 
-/***
+/**
+ * Retrieves list of referrals for the current user.
  *
- * @param {?function} callback
+ * ##### Usage
+ * ```
+ * Branch.referrals(
+ *   callback(err, data)
+ * )
+ * ```
+ *
+ * ##### Returns
+ * 
+ * ```js
+ * {
+ *   'install': { 
+ *     total: 5, 
+ *     unique: 2
+ *   },
+ *   'open': {
+ *     total: 4, 
+ *     unique: 3
+ *   },
+ *   'buy': {
+ *     total: 7,
+ *     unique: 3
+ *   }
+ * }
+ * 
+ * ```
+ * @param {function|null} callback - Returns an error or object with referral data on success
+ *
+ * ___
  */
 Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() {};
@@ -468,9 +503,28 @@ Branch.prototype["referrals"] = function(callback) {
 	});
 };
 
-/***
+/**
+ * Retrieves a list of credits for the current user.
  *
- * @param {?function} callback
+ * ##### Usage
+ * ```
+ * Branch.credits(
+ *   callback(err, data)
+ * )
+ * ```
+ *
+ * ##### Returns 
+ * 
+ * ```js
+ * {
+ *	'default': 15,
+ *	'other bucket': 9
+ * }
+ * ```
+ *
+ * @param {function|null} callback - Returns an error or object with credit data on success
+ *
+ * ___
  */
 Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() {};
@@ -483,10 +537,40 @@ Branch.prototype["credits"] = function(callback) {
 	});
 };
 
-/***
+/**
+ * Redeem credits from a credit bucket.
  *
- * @param {?Object} obj
- * @param {?function} callback
+ * ```
+ * Branch.redeem(
+ *   {
+ *     amount, // amount of credits to be redeemed
+ *     bucket  // String of bucket name to redeem credits from
+ *   },
+ *   callback(err, data)
+ * )
+ * ```
+ *
+ * ##### Example
+ * 
+ * ```
+ * branch.redeem({
+ * 		5,
+ * 		'bucket'
+ * 	}, function(data){
+ * 		console.log(data)
+ *	});
+ * ```
+ *
+ * ##### Returns 
+ * 
+ * ```js
+ * {}
+ * ```
+ *
+ * @param {Object} obj - **Required** Object with an `amount` (int) param of number of credits to redeem, and `bucket` (string) param of which bucket to redeem the credits from
+ * @param {function|null} callback - Returns an error or empty object on success
+ *
+ * ___
  */
 Branch.prototype["redeem"] = function(obj, callback) {
 	callback = callback || function() {};
@@ -500,16 +584,24 @@ Branch.prototype["redeem"] = function(obj, callback) {
 	});
 };
 
-/***
+/**
+ * Display a smart banner directing a user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
  *
- * @param {?Object} obj
+ * #### Usage
+ *
+ * ```
+ * Branch.banner(
+ * 		metadata, 	// Metadata must include phone number as `phone`
+ * )
+ * ```
+ * @param {Object} data - **Required** Object of all link data
  */
-Branch.prototype["banner"] = function(obj) {
+Branch.prototype["banner"] = function(data) {
 	if (!document.getElementById('branch-banner') && !utils.readKeyValue("bannerShown")) {
 		document.head.appendChild(elements.smartBannerStyles());
-		document.body.appendChild(elements.smartBannerMarkup(obj));
+		document.body.appendChild(elements.smartBannerMarkup(data));
 		document.getElementById('branch-banner').style.top = '-76px';
-		elements.appendSmartBannerActions(obj);
+		elements.appendSmartBannerActions(data);
 		elements.triggerBannerAnimation();
 	}
 };

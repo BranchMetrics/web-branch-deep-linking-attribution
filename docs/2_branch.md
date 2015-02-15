@@ -227,6 +227,8 @@ branch.link({
 
 **callback**: `function | null`, Returns a string of the Branch deep linking URL
 
+___
+
 
 
 ### &#39;SMSLink&#39;(metadata, callback) 
@@ -276,6 +278,8 @@ branch.SMSLink(
 
 **callback**: `function | null`, Returns an empty object or an error
 
+___
+
 
 
 ### &#39;SMSLinkNew&#39;(metadata, callback) 
@@ -297,6 +301,8 @@ Branch.SMSLinkNew(
 
 **callback**: `function | null`, Returns an error or empyy object on success
 
+___
+
 
 
 ### &#39;SMSLinkExisting&#39;(phone, callback) 
@@ -316,7 +322,135 @@ Branch.SMSLinkNew(
 
 **phone**: `String`, **Required** String of phone number the link should be sent to
 
-**callback**: `function`, Returns an error or empty object on success
+**callback**: `function | null`, Returns an error or empty object on success
+
+___
+
+
+
+### &quot;referrals&quot;(callback) 
+
+Retrieves list of referrals for the current user.
+
+##### Usage
+```
+Branch.referrals(
+  callback(err, data)
+)
+```
+
+##### Returns
+
+```js
+{
+  'install': { 
+    total: 5, 
+    unique: 2
+  },
+  'open': {
+    total: 4, 
+    unique: 3
+  },
+  'buy': {
+    total: 7,
+    unique: 3
+  }
+}
+
+```
+
+**Parameters**
+
+**callback**: `function | null`, Returns an error or object with referral data on success
+
+___
+
+
+
+### &quot;credits&quot;(callback) 
+
+Retrieves a list of credits for the current user.
+
+##### Usage
+```
+Branch.credits(
+  callback(err, data)
+)
+```
+
+##### Returns 
+
+```js
+{
+	'default': 15,
+	'other bucket': 9
+}
+```
+
+**Parameters**
+
+**callback**: `function | null`, Returns an error or object with credit data on success
+
+___
+
+
+
+### &quot;redeem&quot;(obj, callback) 
+
+Redeem credits from a credit bucket.
+
+```
+Branch.redeem(
+  {
+    amount, // amount of credits to be redeemed
+    bucket  // String of bucket name to redeem credits from
+  },
+  callback(err, data)
+)
+```
+
+##### Example
+
+```
+branch.redeem({
+		5,
+		'bucket'
+	}, function(data){
+		console.log(data)
+	});
+```
+
+##### Returns 
+
+```js
+{}
+```
+
+**Parameters**
+
+**obj**: `Object`, **Required** Object with an `amount` (int) param of number of credits to redeem, and `bucket` (string) param of which bucket to redeem the credits from
+
+**callback**: `function | null`, Returns an error or empty object on success
+
+___
+
+
+
+### &quot;banner&quot;(data) 
+
+Display a smart banner directing a user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+
+#### Usage
+
+```
+Branch.banner(
+		metadata, 	// Metadata must include phone number as `phone`
+)
+```
+
+**Parameters**
+
+**data**: `Object`, **Required** Object of all link data
 
 
 
