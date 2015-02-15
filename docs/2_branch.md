@@ -278,6 +278,27 @@ branch.SMSLink(
 
 
 
+### &#39;SMSLinkNew&#39;(metadata, callback) 
+
+Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+
+#### Usage
+
+```
+Branch.SMSLinkNew(
+		metadata, 	// Metadata must include phone number as `phone`
+		callback(err, data)
+)
+```
+
+**Parameters**
+
+**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
+
+**callback**: `function | null`, Returns an error or empyy object on success
+
+
+
 ### &#39;SMSLinkExisting&#39;(phone, callback) 
 
 Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.

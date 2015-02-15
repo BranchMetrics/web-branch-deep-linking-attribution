@@ -45,16 +45,16 @@ branch.init('APP-KEY', function(err, data) {
   + [.close()](#closecallback)
 
 1. Event Tracking Methods
-  + [.event()](#track)
+  + [.event()](#eventevent-metadata-callback)
 
 1. Deeplinking Methods
-   + [.link()](#link)
-   + [.SMSLink()](#smslink)
+   + [.link()](#linkmetadata-callback)
+   + [.SMSLink()](#smslinkmetadata-callback)
    + [.SMSLinkNew()](#smslinknew)
    + [.SMSLinkExisting()](#smslinkexisting)
 
 1. Smart Banner
-   + [.banner()](#appbanner)
+   + [.banner()](#bannercallback)
 
 1. Referral Methods
    + [.referrals()](#referrals)
@@ -336,6 +336,27 @@ branch.SMSLink(
 **metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
 
 **callback**: `function | null`, Returns an empty object or an error
+
+
+
+### &#39;SMSLinkNew&#39;(metadata, callback) 
+
+Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+
+#### Usage
+
+```
+Branch.SMSLinkNew(
+		metadata, 	// Metadata must include phone number as `phone`
+		callback(err, data)
+)
+```
+
+**Parameters**
+
+**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
+
+**callback**: `function | null`, Returns an error or empyy object on success
 
 
 

@@ -45,16 +45,16 @@ branch.init('APP-KEY', function(err, data) {
   + [.close()](#closecallback)
 
 1. Event Tracking Methods
-  + [.event()](#track)
+  + [.event()](#eventevent-metadata-callback)
 
 1. Deeplinking Methods
-   + [.link()](#link)
-   + [.SMSLink()](#smslink)
+   + [.link()](#linkmetadata-callback)
+   + [.SMSLink()](#smslinkmetadata-callback)
    + [.SMSLinkNew()](#smslinknew)
    + [.SMSLinkExisting()](#smslinkexisting)
 
 1. Smart Banner
-   + [.banner()](#appbanner)
+   + [.banner()](#bannercallback)
 
 1. Referral Methods
    + [.referrals()](#referrals)

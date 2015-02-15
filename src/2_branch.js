@@ -397,7 +397,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
 	}
 }
 
-/***
+/**
  *
  * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
