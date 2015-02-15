@@ -18,11 +18,26 @@ Branch.init(
 )
 ```
 
+##### Returns
+
+```js
+{
+  session_id:         '12345', // Server-generated ID of the session that is stored in `sessionStorage`
+  identity_id:        '12345', // Server-generated ID of the user identity that is stored in `sessionStorage`
+  device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint that is stored in `sessionStorage`
+  data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+  link:               'url',   // Server-generated link identity, for synchronous link creation.
+  referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+}
+```
+
 **Parameters**
 
 **app_id**: `number`, **Required** Found in your Branch dashboard
 
 **callback**: `function | null`, Callback function that reeturns as callback(err, data)
+
+**Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
 
 ---
 
@@ -30,117 +45,29 @@ Branch.init(
 
 ### &#39;logout&#39;(callback) 
 
-**Parameters**
+Logs out the current session, replaces session IDs and identity IDs.
 
-**callback**: `function | null`
+##### Usage
 
+```
+Branch.logout(
+  callback (function, optional)
+)
+```
 
+##### Returns 
 
-### &#39;close&#39;(callback) 
-
-**Parameters**
-
-**callback**: `function | null`
-
-
-
-### &#39;event&#39;(event, metadata, callback) 
-
-**Parameters**
-
-**event**: `String`
-
-**metadata**: `Object`
-
-**callback**: `function`
-
-
-
-### &#39;profile&#39;(identity, callback) 
-
-Sets the profile of a user and returns the data.
+```js
+{
+ session_id:  '12345', // Server-generated ID of the session that is stored in `sessionStorage`
+ identity_id: '12345', // Server-generated ID of the user identity that is stored in `sessionStorage`
+ link:        'url',   // Server-generated link identity, for synchronous link creation that is stored in `sessionStorage`
+}
+```
 
 **Parameters**
 
-**identity**: `string`, Sets the profile of a user and returns the data.
-
-**callback**: `function`, Sets the profile of a user and returns the data.
-
-
-
-### &#39;link&#39;(metadata, callback) 
-
-Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-**Parameters**
-
-**metadata**: `Object`, Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-**callback**: `function`, Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-
-
-### &#39;SMSLink&#39;(metadata, callback) 
-
-**Parameters**
-
-**metadata**: `Object`
-
-**callback**: `function`
-
-
-
-### &#39;SMSLinkNew&#39;(metadata, callback) 
-
-**Parameters**
-
-**metadata**: `Object`
-
-**callback**: `function`
-
-
-
-### &#39;SMSLinkExisting&#39;(phone, callback) 
-
-**Parameters**
-
-**phone**: `String`
-
-**callback**: `function`
-
-
-
-### &quot;referrals&quot;(callback) 
-
-**Parameters**
-
-**callback**: `function`
-
-
-
-### &quot;credits&quot;(callback) 
-
-**Parameters**
-
-**callback**: `function`
-
-
-
-### &quot;redeem&quot;(obj, callback) 
-
-**Parameters**
-
-**obj**: `Object`
-
-**callback**: `function`
-
-
-
-### &quot;banner&quot;(obj) 
-
-**Parameters**
-
-**obj**: `Object`
+**callback**: `function | null`, ---
 
 
 

@@ -32,32 +32,32 @@ e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.pu
 "init;close;logout;event;profile;link;referrals;credits;redeem;banner".split(";"),0);
 
 branch.init('APP-KEY', function(err, data) {
-  document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+  // callback to handle err or data
 });
 </script>
 ```
 ## API Reference
 
-1. [Constructor](#constructor)
-2. [Session Methods](#session-methods)
-  + [.init()](#init)
-  + [.profile()](#profile)
-  + [.close()](#close)
-  + [.logout()](#logout)
+1. Branch Session
+  + [.init()](#initapp_id-callback)
+  + [.profile()](#profileidentity-callback)
+  + [.logout()](#logout-callback)
+  + [.close()](#close-callback)
+  
 
-3. [Event Tracking Methods](#event--action-methods)
+1. [Event Tracking Methods](#event--action-methods)
   + [.event()](#track)
 
-4. [Deeplinking Methods](#deeplinking-methods)
+1. [Deeplinking Methods](#deeplinking-methods)
    + [.link()](#link)
    + [.SMSLink()](#smslink)
    + [.SMSLinkNew()](#smslinknew)
    + [.SMSLinkExisting()](#smslinkexisting)
 
-5. [Smart Banner](#smart-banners)
+1. [Smart Banner](#smart-banners)
    + [.banner()](#appbanner)
 
-6. [Referral Methods](#referral-methods)
+1. [Referral Methods](#referral-methods)
    + [.referrals()](#referrals)
    + [.credits()](#credits)
    + [.redeem()](#redeem)

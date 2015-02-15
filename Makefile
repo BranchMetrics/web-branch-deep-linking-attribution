@@ -20,7 +20,8 @@ compiler/library:
 	wget https://github.com/google/closure-library/archive/master.zip && \
 	unzip master.zip -d compiler/library && \
 	rm -f master.zip
-
+	
+# need a lil help with this
 #jsdoc:
 #	@echo "\nFetching and installing JSDoc..."
 #	npm install jsdoc

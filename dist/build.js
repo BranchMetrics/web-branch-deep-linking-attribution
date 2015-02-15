@@ -235,6 +235,16 @@ Branch.prototype.init = function(a, b) {
     });
   });
 };
+Branch.prototype.profile = function(a, b) {
+  b = b || function() {
+  };
+  if (!this.initialized) {
+    return b(utils.message(utils.messages.nonInit));
+  }
+  this.api(resources.profile, {identity:a}, function(a, c) {
+    b(a, c);
+  });
+};
 Branch.prototype.logout = function(a) {
   a = a || function() {
   };
@@ -267,16 +277,6 @@ Branch.prototype.event = function(a, b, d) {
   "function" == typeof b && (d = b, b = {});
   this.api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a, b) {
     d(a, b);
-  });
-};
-Branch.prototype.profile = function(a, b) {
-  b = b || function() {
-  };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
-  this.api(resources.profile, {identity:a}, function(a, c) {
-    b(a, c);
   });
 };
 Branch.prototype.link = function(a, b) {

@@ -32,32 +32,32 @@ e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.pu
 "init;close;logout;event;profile;link;referrals;credits;redeem;banner".split(";"),0);
 
 branch.init('APP-KEY', function(err, data) {
-  document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+  // callback to handle err or data
 });
 </script>
 ```
 ## API Reference
 
-1. [Constructor](#constructor)
-2. [Session Methods](#session-methods)
-  + [.init()](#init)
-  + [.profile()](#profile)
-  + [.close()](#close)
-  + [.logout()](#logout)
+1. Branch Session
+  + [.init()](#initapp_id-callback)
+  + [.profile()](#profileidentity-callback)
+  + [.logout()](#logout-callback)
+  + [.close()](#close-callback)
+  
 
-3. [Event Tracking Methods](#event--action-methods)
+1. [Event Tracking Methods](#event--action-methods)
   + [.event()](#track)
 
-4. [Deeplinking Methods](#deeplinking-methods)
+1. [Deeplinking Methods](#deeplinking-methods)
    + [.link()](#link)
    + [.SMSLink()](#smslink)
    + [.SMSLinkNew()](#smslinknew)
    + [.SMSLinkExisting()](#smslinkexisting)
 
-5. [Smart Banner](#smart-banners)
+1. [Smart Banner](#smart-banners)
    + [.banner()](#appbanner)
 
-6. [Referral Methods](#referral-methods)
+1. [Referral Methods](#referral-methods)
    + [.referrals()](#referrals)
    + [.credits()](#credits)
    + [.redeem()](#redeem)# Global
@@ -80,11 +80,26 @@ Branch.init(
 )
 ```
 
+##### Returns
+
+```js
+{
+  session_id:         '12345', // Server-generated ID of the session that is stored in `sessionStorage`
+  identity_id:        '12345', // Server-generated ID of the user identity that is stored in `sessionStorage`
+  device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint that is stored in `sessionStorage`
+  data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+  link:               'url',   // Server-generated link identity, for synchronous link creation.
+  referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+}
+```
+
 **Parameters**
 
 **app_id**: `number`, **Required** Found in your Branch dashboard
 
 **callback**: `function | null`, Callback function that reeturns as callback(err, data)
+
+**Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
 
 ---
 
@@ -92,117 +107,29 @@ Branch.init(
 
 ### &#39;logout&#39;(callback) 
 
-**Parameters**
+Logs out the current session, replaces session IDs and identity IDs.
 
-**callback**: `function | null`
+##### Usage
 
+```
+Branch.logout(
+  callback (function, optional)
+)
+```
 
+##### Returns 
 
-### &#39;close&#39;(callback) 
-
-**Parameters**
-
-**callback**: `function | null`
-
-
-
-### &#39;event&#39;(event, metadata, callback) 
-
-**Parameters**
-
-**event**: `String`
-
-**metadata**: `Object`
-
-**callback**: `function`
-
-
-
-### &#39;profile&#39;(identity, callback) 
-
-Sets the profile of a user and returns the data.
+```js
+{
+ session_id:  '12345', // Server-generated ID of the session that is stored in `sessionStorage`
+ identity_id: '12345', // Server-generated ID of the user identity that is stored in `sessionStorage`
+ link:        'url',   // Server-generated link identity, for synchronous link creation that is stored in `sessionStorage`
+}
+```
 
 **Parameters**
 
-**identity**: `string`, Sets the profile of a user and returns the data.
-
-**callback**: `function`, Sets the profile of a user and returns the data.
-
-
-
-### &#39;link&#39;(metadata, callback) 
-
-Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-**Parameters**
-
-**metadata**: `Object`, Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-**callback**: `function`, Createa and returns a deep linking URL.  The `data` parameter can include Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-
-
-### &#39;SMSLink&#39;(metadata, callback) 
-
-**Parameters**
-
-**metadata**: `Object`
-
-**callback**: `function`
-
-
-
-### &#39;SMSLinkNew&#39;(metadata, callback) 
-
-**Parameters**
-
-**metadata**: `Object`
-
-**callback**: `function`
-
-
-
-### &#39;SMSLinkExisting&#39;(phone, callback) 
-
-**Parameters**
-
-**phone**: `String`
-
-**callback**: `function`
-
-
-
-### &quot;referrals&quot;(callback) 
-
-**Parameters**
-
-**callback**: `function`
-
-
-
-### &quot;credits&quot;(callback) 
-
-**Parameters**
-
-**callback**: `function`
-
-
-
-### &quot;redeem&quot;(obj, callback) 
-
-**Parameters**
-
-**obj**: `Object`
-
-**callback**: `function`
-
-
-
-### &quot;banner&quot;(obj) 
-
-**Parameters**
-
-**obj**: `Object`
+**callback**: `function | null`, ---
 
 
 
