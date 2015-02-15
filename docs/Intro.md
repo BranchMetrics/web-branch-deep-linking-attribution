@@ -43,7 +43,6 @@ branch.init('APP-KEY', function(err, data) {
   + [.profile()](#profileidentity-callback)
   + [.logout()](#logout-callback)
   + [.close()](#close-callback)
-  
 
 1. [Event Tracking Methods](#event--action-methods)
   + [.event()](#track)

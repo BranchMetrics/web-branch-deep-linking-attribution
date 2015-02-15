@@ -35,7 +35,8 @@ Branch.prototype.api = function(resource, data, callback) {
  * 
  * ```
  * Branch.init(
- *   callback (function, optional)
+ *	 app_di,
+ *   callback(err, data)
  * )
  * ```
  *
@@ -43,9 +44,9 @@ Branch.prototype.api = function(resource, data, callback) {
  * 
  * ```js
  * {
- *   session_id:         '12345', // Server-generated ID of the session that is stored in `sessionStorage`
- *   identity_id:        '12345', // Server-generated ID of the user identity that is stored in `sessionStorage`
- *   device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint that is stored in `sessionStorage`
+ *   session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
+ *   identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+ *   device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
  *   data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
  *   link:               'url',   // Server-generated link identity, for synchronous link creation.
  *   referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
@@ -53,11 +54,11 @@ Branch.prototype.api = function(resource, data, callback) {
  * ```
  * 
  * @param {number} app_id - **Required** Found in your Branch dashboard
- * @param {function|null} callback - Callback function that reeturns as callback(err, data)
+ * @param {function|null} callback - Callback function that returns the data
  *
  * **Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
  * 
- * ---
+ * ___
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback || function() {};
@@ -94,12 +95,32 @@ Branch.prototype['init'] = function(app_id, callback) {
 	}
 };
 
-/***
+/**
  * Sets the profile of a user and returns the data.
- * @param {string} identity 
- * @param {?function} callback
+ * 
+ * ##### Usage
+ * 
+ * ```
+ * Branch.profile(
+ *   identity, 
+ *   callback(err, data)
+ * )
+ * ```
+ * 
+ *  ##### Returns 
+ * 
+ * ```js
+ * {
+ *   identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+ *   link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+ *   referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+ *   referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+ * }
+ * ```
+ * @param {string} identity - **Required** A string uniquely identifying the user
+ * @param {?function} callback - Callback that returns the user's Branch identity id and unique link
  *
- * ---
+ * ___
  */
 Branch.prototype['profile'] = function(identity, callback) {
 	callback = callback || function() {};
@@ -121,7 +142,7 @@ Branch.prototype['profile'] = function(identity, callback) {
  * 
  * ```
  * Branch.logout(
- *   callback (function, optional)
+ *   callback(err, data)
  * )
  * ```
  *
@@ -129,15 +150,15 @@ Branch.prototype['profile'] = function(identity, callback) {
  *
  * ```js
  * {
- *  session_id:  '12345', // Server-generated ID of the session that is stored in `sessionStorage`
- *  identity_id: '12345', // Server-generated ID of the user identity that is stored in `sessionStorage`
- *  link:        'url',   // Server-generated link identity, for synchronous link creation that is stored in `sessionStorage`
+ *  session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
+ *  identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+ *  link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
  * }
  * ```
  * 
- * @param {function|null} callback
+ * @param {function|null} callback - Returns id's of the session and user identity, and the link
  *
- * ---
+ * ___
  */
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() {};
@@ -148,9 +169,24 @@ Branch.prototype['logout'] = function(callback) {
 	});
 };
 
-/***
+/**
+ * This closes the active session, removing any relevant session Create your accountrmation stored in `sessionStorage`.
  *
- * @param {function|null} callback
+ * ##### Usage
+ * 
+ * ```
+ * Branch.close(
+ *   callback(err, data)
+ * )
+ * ```
+ *
+ * ##### Returns 
+ * 
+ * ```
+ * {}
+ * ``
+ *
+ * @param {function|null} callback - Returns an empty object
  *
  * ---
  */
