@@ -509,7 +509,7 @@ Display a smart banner directing a user to your app through a Branch referral li
 
 ```
 Branch.banner(
-		metadata, 	// Metadata must include phone number as `phone`
+		metadata, 	// Metadata, same as Branch.link()
 )
 ```
 

@@ -591,7 +591,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
  *
  * ```
  * Branch.banner(
- * 		metadata, 	// Metadata must include phone number as `phone`
+ * 		metadata, 	// Metadata, same as Branch.link()
  * )
  * ```
  * @param {Object} data - **Required** Object of all link data
