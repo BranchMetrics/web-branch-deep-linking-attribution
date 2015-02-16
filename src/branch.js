@@ -9,7 +9,6 @@ var Branch = function Branch(app_id, debug, callback) {
 		return false;
 	};
 	this.utils.readSession = function() {
-		console.log(sessionStorage.getItem('branch_session'));
 		return JSON.parse(sessionStorage.getItem('branch_session'));
 	};
 	this.utils.identity = function() {
@@ -213,7 +212,6 @@ var Branch = function Branch(app_id, debug, callback) {
 					is_referrable: 1,
 					browser_fingerprint_id: (window.browser_fingerprint_id !== undefined ? window.browser_fingerprint_id : null)
 				}, function(data) {
-					console.log(data);
 					sessionStorage.setItem('branch_session', JSON.stringify(data));
 					self.initialized = true;
 					if (typeof cb == 'function') { cb(data); }
