@@ -585,7 +585,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
 };
 
 /**
- * Display a smart banner directing a user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+ * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
  *
  * #### Usage
  *
