@@ -120,7 +120,7 @@ var bannerResources = {
 		'#branch-banner .content .left .details { margin-top: 3px; padding-left: 4px; }' +
 		'#branch-banner .content .left .details .title { font: 14px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }' +
 		'#branch-banner .content .left .details .description { font-size: 12px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: block; }' +
-		'#branch-banner .content .right { display:inline-block; position: relative; top: 50%; transform: translateY(-50%); }',
+		'#branch-banner .content .right { display:inline-block; position: relative; top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); }',
 
 		iOS: 'body { -webkit-transition: all ' + (animationSpeed * 1.5)/1000 + 's ease; transition: all 0' + (animationSpeed * 1.5)/1000 + 's ease; }' +
 		'#branch-banner { position: absolute; top: -76px; width: 100%; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + animationSpeed/1000 + 's ease; transition: all 0' + animationSpeed/1000 + 's ease; }' +
@@ -134,7 +134,7 @@ var bannerResources = {
 		'#branch-banner .content .left .details { margin-top: 3px; padding-left: 4px; }' +
 		'#branch-banner .content .left .details .title { font: 14px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }' +
 		'#branch-banner .content .left .details .description { font-size: 12px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: block; }' +
-		'#branch-banner .content .right { display:inline-block; position: relative; top: 50%; transform: translateY(-50%); }',
+		'#branch-banner .content .right { display:inline-block; position: relative; top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); }',
 
 		desktop: '#branch-banner .content .left { width: 50% }' +
 		'#branch-banner .close-x { color: #aaa; margin-top: 13px; font-size: 20px; }' +
