@@ -24,7 +24,7 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 # TODO: Update src of actual gziped js file
 
-```javascript
+```html
 <script type="text/javascript">
 !function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
 "https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.3.x.min.js.gzip",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),

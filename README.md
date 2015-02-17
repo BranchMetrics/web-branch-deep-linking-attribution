@@ -24,7 +24,7 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 # TODO: Update src of actual gziped js file
 
-```javascript
+```html
 <script type="text/javascript">
 !function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
 "https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.3.x.min.js.gzip",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
@@ -104,7 +104,6 @@ Branch.init(
 **callback**: `function | null`, Callback function that returns the data
 
 **Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
-
 ___
 
 
@@ -112,6 +111,9 @@ ___
 ### &#39;profile&#39;(identity, callback) 
 
 Sets the profile of a user and returns the data.
+
+**Formerly `identify()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
 
@@ -204,6 +206,9 @@ Branch.close(
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data, and has limitless hierarchy. 
 
+**Formerly `track()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
+
 ##### Usage
 
 ```
@@ -235,6 +240,9 @@ ___
 ### &#39;link&#39;(metadata, callback) 
 
 Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+
+**Formerly `createLink()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 #### Usage
 
@@ -377,7 +385,7 @@ Registers a click event on the already created Branch link stored in `sessionSto
 #### Usage
 
 ```
-Branch.SMSLinkNew(
+Branch.SMSLinkExisting(
 		metadata, 	// Metadata must include phone number as `phone`
 		callback(err, data)
 )
@@ -396,6 +404,9 @@ ___
 ### &quot;referrals&quot;(callback) 
 
 Retrieves list of referrals for the current user.
+
+**Formerly `showReferrals()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
 ```
@@ -436,6 +447,9 @@ ___
 
 Retrieves a list of credits for the current user.
 
+**Formerly `showCredits()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
+
 ##### Usage
 ```
 Branch.credits(
@@ -463,6 +477,9 @@ ___
 ### &quot;redeem&quot;(obj, callback) 
 
 Redeem credits from a credit bucket.
+
+**Formerly `redeemCredits()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.redeem(
@@ -504,6 +521,9 @@ ___
 ### &quot;banner&quot;(data) 
 
 Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+
+**Formerly `appBanner()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 #### Usage
 

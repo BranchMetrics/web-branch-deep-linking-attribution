@@ -57,7 +57,6 @@ Branch.prototype.api = function(resource, data, callback) {
  * @param {function|null} callback - Callback function that returns the data
  *
  * **Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
- * 
  * ___
  */
 Branch.prototype['init'] = function(app_id, callback) {
@@ -98,6 +97,9 @@ Branch.prototype['init'] = function(app_id, callback) {
 /**
  * Sets the profile of a user and returns the data.
  * 
+ * **Formerly `identify()` (depreciated).**
+ * See [CHANGELOG](CHANGELOG.md)
+ *
  * ##### Usage
  * 
  * ```
@@ -206,6 +208,9 @@ Branch.prototype['close'] = function(callback) {
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
  * The `metadata` parameter is a formatted JSON object that can contain any data, and has limitless hierarchy. 
  *
+ * **Formerly `track()` (depreciated).**
+ * See [CHANGELOG](CHANGELOG.md)
+ *
  * ##### Usage
  * 
  * ```
@@ -251,6 +256,9 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 /**
  *
  * Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+ *
+ * **Formerly `createLink()` (depreciated).**
+ * See [CHANGELOG](CHANGELOG.md)
  *
  * #### Usage
  *
@@ -438,7 +446,7 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
  * #### Usage
  *
  * ```
- * Branch.SMSLinkNew(
+ * Branch.SMSLinkExisting(
  * 		metadata, 	// Metadata must include phone number as `phone`
  *		callback(err, data)
  * )
@@ -463,6 +471,9 @@ Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
 
 /**
  * Retrieves list of referrals for the current user.
+ *
+ * **Formerly `showReferrals()` (depreciated).**
+ * See [CHANGELOG](CHANGELOG.md)
  *
  * ##### Usage
  * ```
@@ -506,6 +517,9 @@ Branch.prototype["referrals"] = function(callback) {
 /**
  * Retrieves a list of credits for the current user.
  *
+ * **Formerly `showCredits()` (depreciated).**
+ * See [CHANGELOG](CHANGELOG.md)
+ *
  * ##### Usage
  * ```
  * Branch.credits(
@@ -539,6 +553,9 @@ Branch.prototype["credits"] = function(callback) {
 
 /**
  * Redeem credits from a credit bucket.
+ *
+ * **Formerly `redeemCredits()` (depreciated).**
+ * See [CHANGELOG](CHANGELOG.md)
  *
  * ```
  * Branch.redeem(
@@ -586,6 +603,9 @@ Branch.prototype["redeem"] = function(obj, callback) {
 
 /**
  * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+ *
+ * **Formerly `appBanner()` (depreciated).**
+ * See [CHANGELOG](CHANGELOG.md)
  *
  * #### Usage
  *
