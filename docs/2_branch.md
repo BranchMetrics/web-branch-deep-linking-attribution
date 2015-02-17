@@ -444,8 +444,25 @@ Display a smart banner directing the user to your app through a Branch referral 
 
 ```
 Branch.banner(
-		metadata, 	// Metadata, same as Branch.link()
+		metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
 )
+```
+
+ ##### Example
+
+```
+branch.banner({
+		icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+		title: 'Branch Demo App',
+		description: 'The Branch demo app!',
+		openAppButtonText: 'Open',
+		downloadAppButtonText: 'Download',
+		data: {
+        foo: 'bar'
+     }
+	}, function(data){
+		console.log(data)
+	});
 ```
 
 **Parameters**

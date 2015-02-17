@@ -591,9 +591,27 @@ Branch.prototype["redeem"] = function(obj, callback) {
  *
  * ```
  * Branch.banner(
- * 		metadata, 	// Metadata, same as Branch.link()
+ * 		metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
  * )
  * ```
+ *
+ *  ##### Example
+ * 
+ * ```
+ * branch.banner({
+ * 		icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ * 		title: 'Branch Demo App',
+ *		description: 'The Branch demo app!',
+ *		openAppButtonText: 'Open',
+ *		downloadAppButtonText: 'Download',
+ *		data: {
+ *         foo: 'bar'
+ *      }
+ * 	}, function(data){
+ * 		console.log(data)
+ *	});
+ * ```
+ *
  * @param {Object} data - **Required** Object of all link data
  */
 Branch.prototype["banner"] = function(data) {
