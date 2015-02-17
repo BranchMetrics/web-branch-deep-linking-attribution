@@ -18,6 +18,8 @@
   "homepage": "https://github.com/BranchMetrics/Web-SDK",
   "devDependencies": {
     "gulp": "^3.8.10",
-    "gulp-jshint": "^1.9.0"
+    "gulp-jshint": "^1.9.0",
+    "jsdoc": "<=3.3.0",
+    "jsdox": "0.4.9"
   }
 }

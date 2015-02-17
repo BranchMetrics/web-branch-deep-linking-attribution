@@ -4,7 +4,7 @@ SOURCES=src/0_config.js src/0_utils.js src/1_elements.js src/1_api.js src/1_reso
 EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
-all: dist/build.js dist/build.min.js doc/index.html
+all: dist/build.js dist/build.min.js
 
 # Kinda gross, but will download closure compiler if you don't have it.
 compiler/compiler.jar:
@@ -21,15 +21,6 @@ compiler/library:
 	unzip master.zip -d compiler/library && \
 	rm -f master.zip
 
-# need a lil help with this
-#jsdoc:
-#	@echo "\nFetching and installing JSDoc..."
-#	npm install jsdoc
-
-#jsdox:
-#	@echo "\nFetching and installing JSDox..."
-#	npm install jsdox
-
 calcdeps.py: $(SOURCES) compiler/library
 	@echo "\nCalculating dependencies for compiler tests..."
 	python $(COMPILER_LIBRARY)/bin/calcdeps.py \
@@ -40,7 +31,7 @@ calcdeps.py: $(SOURCES) compiler/library
 	--exclude tests/branch-deps.js \
 	> tests/branch-deps.js
 
-doc/index.html: $(SOURCES)
+docs: $(SOURCES)
 	@echo "\nGenerating docs..."
 	mkdir -p docs
 	jsdox src/2_branch.js \
