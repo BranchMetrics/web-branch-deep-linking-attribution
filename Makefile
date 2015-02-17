@@ -5,6 +5,7 @@ EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
 all: dist/build.js dist/build.min.js
+docs: README.md
 
 # Kinda gross, but will download closure compiler if you don't have it.
 compiler/compiler.jar:
@@ -31,11 +32,14 @@ calcdeps.py: $(SOURCES) compiler/library
 	--exclude tests/branch-deps.js \
 	> tests/branch-deps.js
 
-docs: $(SOURCES)
+docs/2_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
 	mkdir -p docs
 	jsdox src/2_branch.js \
 	--output docs
+
+README.md: docs/2_branch.md
+	@echo "\nConcatinating readme"
 	cat docs/intro.md docs/2_branch.md docs/footer.md > README.md
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
