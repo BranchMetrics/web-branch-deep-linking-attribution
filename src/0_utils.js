@@ -22,6 +22,18 @@ utils.messages = {
 	missingAppId: 'Missing Branch app ID'
 };
 
+/***
+ * @param {resources.resource} resource
+ * @param {Object.<string, *>} data
+ * @param {function(?new:Error,*)|null} callback
+ */
+utils.api = function(resource, data, callback) {
+	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && branch.app_id) { data['app_id'] = branch.app_id; }
+	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && branch.session_id) { data['session_id'] = branch.session_id; }
+	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && branch.identity_id) { data['identity_id'] = branch.identity_id; }
+	return api(resource, data, callback);
+};
+
 /**
  * @param {message}
  * @param {?Array.<*>}

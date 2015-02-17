@@ -8,13 +8,13 @@
 
 ### &#39;init&#39;(app_id, callback) 
 
-Adding the Branch script to your page, automatically creates a window.branch object with all of the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully insantiated, calls made to it will be queed in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session if it doesn't already exist in `sessionStorage`.
+Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
 
 ##### Usage
 
 ```
 Branch.init(
-    app_di,
+    app_id,
     callback(err, data)
 )
 ```
@@ -43,9 +43,9 @@ ___
 
 
 
-### &#39;profile&#39;(identity, callback) 
+### &#39;setIdentity&#39;(identity, callback) 
 
-Sets the profile of a user and returns the data.
+Sets the identity of a user and returns the data.
 
 **Formerly `identify()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
@@ -53,7 +53,7 @@ See [CHANGELOG](CHANGELOG.md)
 ##### Usage
 
 ```
-Branch.profile(
+Branch.setIdentity(
     identity, 
     callback(err, data)
 )
@@ -113,7 +113,7 @@ ___
 ### &#39;event&#39;(event, metadata, callback) 
 
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
-The `metadata` parameter is a formatted JSON object that can contain any data, and has limitless hierarchy. 
+The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
 
 **Formerly `track()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
@@ -140,7 +140,7 @@ Branch.event(
 
 **metadata**: `Object | null`, Object of event metadata
 
-**callback**: `function | null`, Returns an empty object or an error
+**callback**: `function | null`, Returns an error or empty object on success
 
 ___
 
@@ -215,7 +215,7 @@ ___
 
 ### &#39;SMSLink&#39;(metadata, callback) 
 
-Uses the already created link that is stored in `sessionStorage`, or creates a link if one has not been created, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+Uses the previously created link stored in `sessionStorage` or creates a link if one has not been created, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
 
 #### Usage
 
@@ -258,7 +258,7 @@ branch.SMSLink(
 
 **metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
 
-**callback**: `function | null`, Returns an empty object or an error
+**callback**: `function | null`, Returns an error or empty object on success
 
 ___
 

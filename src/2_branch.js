@@ -8,7 +8,7 @@ goog.require('resources');
 goog.require('api');
 goog.require('elements');
 
-/***
+/*** <--- TIP: 3 stars means JSDoc ignores it
  *
  * @constructor
  */
@@ -16,26 +16,14 @@ Branch = function() {
 	this.initialized = false;
 };
 
-/*** <--- TIP: 3 stars means JSDoc ignores it
- * @param {resources.resource} resource
- * @param {Object.<string, *>} data
- * @param {function(?new:Error,*)|null} callback
- */
-Branch.prototype.api = function(resource, data, callback) {
-	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && this.app_id) { data['app_id'] = this.app_id; }
-	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { data['session_id'] = this.session_id; }
-	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { data['identity_id'] = this.identity_id; }
-	return api(resource, data, callback);
-};
-
 /**
- * Adding the Branch script to your page, automatically creates a window.branch object with all of the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully insantiated, calls made to it will be queed in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session if it doesn't already exist in `sessionStorage`.
+ * Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
  * 
  * ##### Usage
  * 
  * ```
  * Branch.init(
- *     app_di,
+ *     app_id,
  *     callback(err, data)
  * )
  * ```
@@ -78,8 +66,8 @@ Branch.prototype['init'] = function(app_id, callback) {
 		callback(null, sessionData);
 	}
 	else {
-		this.api(resources._r, {}, function(err, browser_fingerprint_id) {
-			self.api(resources.open, {
+		utils.api(resources._r, {}, function(err, browser_fingerprint_id) {
+			utils.api(resources.open, {
 				"link_identifier": utils.hashValue('r'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
@@ -95,7 +83,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 };
 
 /**
- * Sets the profile of a user and returns the data.
+ * Sets the identity of a user and returns the data.
  * 
  * **Formerly `identify()` (depreciated).**
  * See [CHANGELOG](CHANGELOG.md)
@@ -103,7 +91,7 @@ Branch.prototype['init'] = function(app_id, callback) {
  * ##### Usage
  * 
  * ```
- * Branch.profile(
+ * Branch.setIdentity(
  *     identity, 
  *     callback(err, data)
  * )
@@ -124,13 +112,13 @@ Branch.prototype['init'] = function(app_id, callback) {
  *
  * ___
  */
-Branch.prototype['profile'] = function(identity, callback) {
+Branch.prototype['setIdentity'] = function(identity, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	var self = this;
 	
-	this.api(resources.profile, {
+	utils.api(resources.profile, {
 			identity: identity
 		}, function(err, data) {
 			callback(err,data);
@@ -166,13 +154,13 @@ Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
-	this.api(resources.logout, {}, function(err, data) {
+	utils.api(resources.logout, {}, function(err, data) {
 		callback(err, data);
 	});
 };
 
 /*** NOT USED
- * This closes the active session, removing any relevant session Create your accountrmation stored in `sessionStorage`.
+ * This closes the active session, removing any relevant session account info stored in `sessionStorage`.
  *
  * ##### Usage
  * 
@@ -197,7 +185,7 @@ Branch.prototype['close'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
-	this.api(resources.close, {}, function(err, data) {
+	utils.api(resources.close, {}, function(err, data) {
 		sessionStorage.clear();
 		self.initialized = false;
 		callback(err, data);
@@ -207,7 +195,7 @@ Branch.prototype['close'] = function(callback) {
 /**
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
- * The `metadata` parameter is a formatted JSON object that can contain any data, and has limitless hierarchy. 
+ * The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
  *
  * **Formerly `track()` (depreciated).**
  * See [CHANGELOG](CHANGELOG.md)
@@ -229,7 +217,7 @@ Branch.prototype['close'] = function(callback) {
  * ```
  * @param {String} event - **Required** The name of the event to be tracked
  * @param {Object|null} metadata - Object of event metadata
- * @param {function|null} callback - Returns an empty object or an error
+ * @param {function|null} callback - Returns an error or empty object on success
  *
  * ___
  *
@@ -242,7 +230,7 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 		metadata = {};
 	}
 	
-	this.api(resources.event, {
+	utils.api(resources.event, {
 		event: event,
 		metadata: utils.merge({
 			url: document.URL,
@@ -326,7 +314,7 @@ Branch.prototype['link'] = function(obj, callback) {
 	}
 
 	obj['data'] = JSON.stringify(obj['data']);
-	this.api(resources.link, obj, function(err, data) {
+	utils.api(resources.link, obj, function(err, data) {
 		if (typeof callback == 'function') {
 			callback(err, data['url']);
 		}
@@ -337,13 +325,13 @@ Branch.prototype['link'] = function(obj, callback) {
  * Is there any reason we need to make this an external function?
  *
  * @param {String} url - **Required** Branch deep linking URL to register link click on
- * @param {function|null} callback - Returns an empty object or an error
+ * @param {function|null} callback - Returns an error or empty object on success
  */
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
-	this.api(resources.linkClick, {
+	utils.api(resources.linkClick, {
 		link_url: url.replace('https://bnc.lt/', ''),
 		click: "click"
 	}, function(err, data) {
@@ -353,7 +341,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 };
 
 /**
- * Uses the already created link that is stored in `sessionStorage`, or creates a link if one has not been created, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+ * Uses the previously created link stored in `sessionStorage` or creates a link if one has not been created, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
  * #### Usage
  *
@@ -393,7 +381,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * ```
  *
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
- * @param {function|null} callback - Returns an empty object or an error
+ * @param {function|null} callback - Returns an error or empty object on success
  *
  * ___
  */
@@ -462,7 +450,7 @@ Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	this.api(resources.SMSLinkSend, {
+	utils.api(resources.SMSLinkSend, {
 		link_url: utils.readStore()["click_id"],
 		phone: phone
 	}, function(err, data) {
@@ -510,7 +498,7 @@ Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
-	this.api(resources.referrals, {}, function(err, data) {
+	utils.api(resources.referrals, {}, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -545,7 +533,7 @@ Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
-	this.api(resources.credits, {
+	utils.api(resources.credits, {
 		identity_id: this.identity_id
 	}, function(err, data) {
 		callback(err, data);
@@ -594,7 +582,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	
-	this.api(resources.redeem, {
+	utils.api(resources.redeem, {
 		amount: obj["amount"],
 		bucket: obj["bucket"]
 	}, function(err, data) {

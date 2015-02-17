@@ -8,7 +8,7 @@
 !function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
 "dist/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
 e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-"init;close;logout;event;profile;link;referrals;credits;redeem;banner".split(";"),0);
+"init;close;logout;event;setIdentity;link;referrals;credits;redeem;banner".split(";"),0);
 
 branch.init('5680621892404085', function(err, data) {
   document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
@@ -55,7 +55,7 @@ branch.init('5680621892404085', function(err, data) {
         <div class="group">
           <button id="init" class="btn btn-success">.init()</button>
           <button id="close" class="btn btn-danger">.close()</button>
-          <button id="profile" class="btn btn-info">.profile()</button>
+          <button id="setIdentity" class="btn btn-info">.setIdentity()</button>
           <button id="logout" class="btn btn-info">.logout()</button>
         </div>
       </div>
@@ -128,9 +128,9 @@ branch.init('5680621892404085', function(err, data) {
       });
     });
 
-    $('#profile').click(function(){
-      request.html("branch.profile('Branch');");
-      branch.profile('Branch', function(err, data){
+    $('#setIdentity').click(function(){
+      request.html("branch.setIdentity('Branch');");
+      branch.setIdentity('Branch', function(err, data){
         response.html(JSON.stringify(data));
       });
     });

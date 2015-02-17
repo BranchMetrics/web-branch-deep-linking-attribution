@@ -3,6 +3,12 @@ var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.
 // Input 1
 var utils = {}, DEBUG = !0;
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID"};
+utils.api = function(a, b, d) {
+  (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && branch.app_id && (b.app_id = branch.app_id);
+  (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && branch.session_id && (b.session_id = branch.session_id);
+  (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && branch.identity_id && (b.identity_id = branch.identity_id);
+  return api(a, b, d);
+};
 utils.error = function(a, b) {
   throw Error(utils.message(a, b));
 };
@@ -213,12 +219,6 @@ resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method
 var Branch = function() {
   this.initialized = !1;
 };
-Branch.prototype.api = function(a, b, d) {
-  (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && this.app_id && (b.app_id = this.app_id);
-  (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && this.session_id && (b.session_id = this.session_id);
-  (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && this.identity_id && (b.identity_id = this.identity_id);
-  return api(a, b, d);
-};
 Branch.prototype.init = function(a, b) {
   b = b || function() {
   };
@@ -230,8 +230,8 @@ Branch.prototype.init = function(a, b) {
   var d = this, c = utils.readStore();
   c && !c.session_id && (c = null);
   c && (this.session_id = c.session_id, this.identity_id = c.identity_id, this.sessionLink = c.link);
-  c && !utils.hashValue("r") ? b(null, c) : this.api(resources._r, {}, function(a, c) {
-    d.api(resources.open, {link_identifier:utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:c}, function(a, c) {
+  c && !utils.hashValue("r") ? b(null, c) : utils.api(resources._r, {}, function(a, c) {
+    utils.api(resources.open, {link_identifier:utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:c}, function(a, c) {
       d.session_id = c.session_id;
       d.identity_id = c.identity_id;
       d.sessionLink = c.link;
@@ -240,13 +240,13 @@ Branch.prototype.init = function(a, b) {
     });
   });
 };
-Branch.prototype.profile = function(a, b) {
+Branch.prototype.setIdentity = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.profile, {identity:a}, function(a, c) {
+  utils.api(resources.profile, {identity:a}, function(a, c) {
     b(a, c);
   });
 };
@@ -256,21 +256,8 @@ Branch.prototype.logout = function(a) {
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.logout, {}, function(b, d) {
+  utils.api(resources.logout, {}, function(b, d) {
     a(b, d);
-  });
-};
-Branch.prototype.close = function(a) {
-  a = a || function() {
-  };
-  if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
-  }
-  var b = this;
-  this.api(resources.close, {}, function(d, c) {
-    sessionStorage.clear();
-    b.initialized = !1;
-    a(d, c);
   });
 };
 Branch.prototype.event = function(a, b, d) {
@@ -280,7 +267,7 @@ Branch.prototype.event = function(a, b, d) {
     return d(utils.message(utils.messages.nonInit));
   }
   "function" == typeof b && (d = b, b = {});
-  this.api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a, b) {
+  utils.api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a, b) {
     d(a, b);
   });
 };
@@ -293,7 +280,7 @@ Branch.prototype.link = function(a, b) {
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
   a.data = JSON.stringify(a.data);
-  this.api(resources.link, a, function(a, c) {
+  utils.api(resources.link, a, function(a, c) {
     "function" == typeof b && b(a, c.url);
   });
 };
@@ -303,7 +290,7 @@ Branch.prototype.linkClick = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
+  utils.api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
     utils.storeKeyValue("click_id", c.click_id);
     (a || c) && b(a, c);
   });
@@ -338,7 +325,7 @@ Branch.prototype.SMSLinkExisting = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.SMSLinkSend, {link_url:utils.readStore().click_id, phone:a}, function(a, c) {
+  utils.api(resources.SMSLinkSend, {link_url:utils.readStore().click_id, phone:a}, function(a, c) {
     b(a, c);
   });
 };
@@ -348,7 +335,7 @@ Branch.prototype.referrals = function(a) {
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.referrals, {}, function(b, d) {
+  utils.api(resources.referrals, {}, function(b, d) {
     a(b, d);
   });
 };
@@ -358,7 +345,7 @@ Branch.prototype.credits = function(a) {
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.credits, {identity_id:this.identity_id}, function(b, d) {
+  utils.api(resources.credits, {identity_id:this.identity_id}, function(b, d) {
     a(b, d);
   });
 };
@@ -368,7 +355,7 @@ Branch.prototype.redeem = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.redeem, {amount:a.amount, bucket:a.bucket}, function(a, c) {
+  utils.api(resources.redeem, {amount:a.amount, bucket:a.bucket}, function(a, c) {
     b(a, c);
   });
 };
