@@ -13,7 +13,7 @@ This SDK requires native browser Javascript and has been tested in all modern br
 ### Browser Specific Support
 | Chrome | Firefox | Safari |     IE     |
 | ------ | ------- | ------ | ---------- |
-|    X   |    X    |   X    |  9, 10, 11 |
+|    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
 
 ### API Key
 
@@ -79,8 +79,8 @@ Adding the Branch script to your page, automatically creates a window.branch obj
 
 ```
 Branch.init(
-		app_di,
-		callback(err, data)
+    app_di,
+    callback(err, data)
 )
 ```
 
@@ -88,12 +88,12 @@ Branch.init(
 
 ```js
 {
-		session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
-		identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
-		device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
-		data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
-		link:               'url',   // Server-generated link identity, for synchronous link creation.
-		referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+    session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
+    identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+    device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
+    data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+    link:               'url',   // Server-generated link identity, for synchronous link creation.
+    referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
 }
 ```
 
@@ -119,8 +119,8 @@ See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.profile(
-		identity, 
-		callback(err, data)
+    identity, 
+    callback(err, data)
 )
 ```
 
@@ -128,10 +128,10 @@ Branch.profile(
 
 ```js
 {
-			identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
-			link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
-			referring_data:     {},      // Returns the initial referring data for this identity, if exists.
-			referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+    identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+    link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+    referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+    referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
 }
 ```
 
@@ -153,7 +153,7 @@ Logs out the current session, replaces session IDs and identity IDs.
 
 ```
 Branch.logout(
-		callback(err, data)
+    callback(err, data)
 )
 ```
 
@@ -161,9 +161,9 @@ Branch.logout(
 
 ```js
 {
-		session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
-		identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
-		link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
+    session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
+    identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+    link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
 }
 ```
 
@@ -172,32 +172,6 @@ Branch.logout(
 **callback**: `function | null`, Returns id's of the session and user identity, and the link
 
 ___
-
-
-
-### &#39;close&#39;(callback) 
-
-This closes the active session, removing any relevant session Create your accountrmation stored in `sessionStorage`.
-
-##### Usage
-
-```
-Branch.close(
-		callback(err, data)
-)
-```
-
-##### Returns 
-
-```
-{}
-```
-
-**Parameters**
-
-**callback**: `function | null`, Returns an empty object or an error
-
----
 
 
 
@@ -213,9 +187,9 @@ See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.event(
-		event,	
-		metadata, 
-		callback(err, data)
+    event,	
+    metadata, 
+    callback(err, data)
 )
 ```
 
@@ -248,8 +222,8 @@ See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.link(
-		metadata,
-		callback(err, data)
+    metadata,
+    callback(err, data)
 )
 ```
 
@@ -257,35 +231,35 @@ Branch.link(
 
 ````
 branch.link({
-		tags: ['tag1', 'tag2'],
-		channel: 'facebook',
-		feature: 'dashboard',
-		stage: 'new user',
-		type: 1,
-		data: {
-			mydata: {
-				foo: 'bar'
-			},
-		'$desktop_url': 'http://myappwebsite.com',
-		'$ios_url': 'http://myappwebsite.com/ios',
-		'$ipad_url': 'http://myappwebsite.com/ipad',
-		'$android_url': 'http://myappwebsite.com/android',
-		'$og_app_id': '12345',
-		'$og_title': 'My App',
-		'$og_description': 'My app\'s description.',
-		'$og_image_url': 'http://myappwebsite.com/image.png'
+    tags: ['tag1', 'tag2'],
+    channel: 'facebook',
+    feature: 'dashboard',
+    stage: 'new user',
+    type: 1,
+    data: {
+        mydata: {
+	           foo: 'bar'
+        },
+    '$desktop_url': 'http://myappwebsite.com',
+    '$ios_url': 'http://myappwebsite.com/ios',
+    '$ipad_url': 'http://myappwebsite.com/ipad',
+    '$android_url': 'http://myappwebsite.com/android',
+    '$og_app_id': '12345',
+    '$og_title': 'My App',
+    '$og_description': 'My app\'s description.',
+    '$og_image_url': 'http://myappwebsite.com/image.png'
 		}
-	}, function(err, data) {
-		console.log(err || data);
-	});
+}, function(err, data) {
+    console.log(err || data);
+});
 ````
 
 ##### Returns 
 
 ```js
 { 
-		link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
-	}
+    link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+}
 ```
 
 ##### Returns 
@@ -312,8 +286,8 @@ Uses the already created link that is stored in `sessionStorage`, or creates a l
 
 ```
 Branch.SMSLink(
-		metadata, 	// Metadata must include phone number as `phone`
-		callback(err, data)
+    metadata,    // Metadata must include phone number as `phone`
+    callback(err, data)
 )
 ```
 
@@ -321,28 +295,28 @@ Branch.SMSLink(
 
 ```
 branch.SMSLink(
-		phone: '9999999999',
-		tags: ['tag1', 'tag2'],
-		channel: 'facebook',
-		feature: 'dashboard',
-		stage: 'new user',
-		type: 1,
-		data: {
-			mydata: {
-				foo: 'bar'
-			},
-		'$desktop_url': 'http://myappwebsite.com',
-		'$ios_url': 'http://myappwebsite.com/ios',
-		'$ipad_url': 'http://myappwebsite.com/ipad',
-		'$android_url': 'http://myappwebsite.com/android',
-		'$og_app_id': '12345',
-		'$og_title': 'My App',
-		'$og_description': 'My app\'s description.',
-		'$og_image_url': 'http://myappwebsite.com/image.png'
-		}
-	}, function(err, data) {
-		console.log(err || data);
-	});
+    phone: '9999999999',
+    tags: ['tag1', 'tag2'],
+    channel: 'facebook',
+    feature: 'dashboard',
+    stage: 'new user',
+    type: 1,
+    data: {
+        mydata: {
+            foo: 'bar'
+        },
+    '$desktop_url': 'http://myappwebsite.com',
+    '$ios_url': 'http://myappwebsite.com/ios',
+    '$ipad_url': 'http://myappwebsite.com/ipad',
+    '$android_url': 'http://myappwebsite.com/android',
+    '$og_app_id': '12345',
+    '$og_title': 'My App',
+    '$og_description': 'My app\'s description.',
+    '$og_image_url': 'http://myappwebsite.com/image.png'
+    }
+}, function(err, data) {
+    console.log(err || data);
+});
 ```
 
 **Parameters**
@@ -363,8 +337,8 @@ Forces the creation of a new link and stores it in `sessionStorage`, then regist
 
 ```
 Branch.SMSLinkNew(
-		metadata, 	// Metadata must include phone number as `phone`
-		callback(err, data)
+    metadata,    // Metadata must include phone number as `phone`
+    callback(err, data)
 )
 ```
 
@@ -386,8 +360,8 @@ Registers a click event on the already created Branch link stored in `sessionSto
 
 ```
 Branch.SMSLinkExisting(
-		metadata, 	// Metadata must include phone number as `phone`
-		callback(err, data)
+    metadata,     // Metadata must include phone number as `phone`
+    callback(err, data)
 )
 ```
 
@@ -411,7 +385,7 @@ See [CHANGELOG](CHANGELOG.md)
 ##### Usage
 ```
 Branch.referrals(
-  callback(err, data)
+    callback(err, data)
 )
 ```
 
@@ -419,18 +393,18 @@ Branch.referrals(
 
 ```js
 {
-  'install': { 
-    total: 5, 
-    unique: 2
-  },
-  'open': {
-    total: 4, 
-    unique: 3
-  },
-  'buy': {
-    total: 7,
-    unique: 3
-  }
+    'install': { 
+        total: 5, 
+        unique: 2
+    },
+    'open': {
+        total: 4, 
+        unique: 3
+    },
+   'buy': {
+        total: 7,
+        unique: 3
+    }
 }
 
 ```
@@ -453,7 +427,7 @@ See [CHANGELOG](CHANGELOG.md)
 ##### Usage
 ```
 Branch.credits(
-  callback(err, data)
+    callback(err, data)
 )
 ```
 
@@ -461,8 +435,8 @@ Branch.credits(
 
 ```js
 {
-	'default': 15,
-	'other bucket': 9
+    'default': 15,
+    'other bucket': 9
 }
 ```
 
@@ -483,11 +457,11 @@ See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.redeem(
-  {
+{
     amount, // amount of credits to be redeemed
     bucket  // String of bucket name to redeem credits from
-  },
-  callback(err, data)
+},
+    callback(err, data)
 )
 ```
 
@@ -495,11 +469,11 @@ Branch.redeem(
 
 ```
 branch.redeem({
-		5,
-		'bucket'
-	}, function(data){
-		console.log(data)
-	});
+    5,
+    'bucket'
+}, function(data){
+    console.log(data)
+});
 ```
 
 ##### Returns 
@@ -529,7 +503,7 @@ See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.banner(
-		metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
+    metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
 )
 ```
 
@@ -537,17 +511,17 @@ Branch.banner(
 
 ```
 branch.banner({
-		icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-		title: 'Branch Demo App',
-		description: 'The Branch demo app!',
-		openAppButtonText: 'Open',
-		downloadAppButtonText: 'Download',
-		data: {
+    icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+    title: 'Branch Demo App',
+    description: 'The Branch demo app!',
+    openAppButtonText: 'Open',
+    downloadAppButtonText: 'Download',
+    data: {
         foo: 'bar'
-     }
-	}, function(data){
-		console.log(data)
-	});
+    }
+}, function(data){
+    console.log(data)
+});
 ```
 
 **Parameters**

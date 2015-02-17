@@ -35,8 +35,8 @@ Branch.prototype.api = function(resource, data, callback) {
  * 
  * ```
  * Branch.init(
- *		app_di,
- * 		callback(err, data)
+ *     app_di,
+ *     callback(err, data)
  * )
  * ```
  *
@@ -44,12 +44,12 @@ Branch.prototype.api = function(resource, data, callback) {
  * 
  * ```js
  * {
- * 		session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
- * 		identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
- * 		device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
- * 		data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
- * 		link:               'url',   // Server-generated link identity, for synchronous link creation.
- * 		referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+ *     session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
+ *     identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+ *     device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
+ *     data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+ *     link:               'url',   // Server-generated link identity, for synchronous link creation.
+ *     referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  * }
  * ```
  * 
@@ -104,8 +104,8 @@ Branch.prototype['init'] = function(app_id, callback) {
  * 
  * ```
  * Branch.profile(
- * 		identity, 
- * 		callback(err, data)
+ *     identity, 
+ *     callback(err, data)
  * )
  * ```
  * 
@@ -113,10 +113,10 @@ Branch.prototype['init'] = function(app_id, callback) {
  * 
  * ```js
  * {
- * 			identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
- * 			link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
- * 			referring_data:     {},      // Returns the initial referring data for this identity, if exists.
- * 			referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+ *     identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+ *     link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+ *     referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+ *     referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
  * }
  * ```
  * @param {string} identity - **Required** A string uniquely identifying the user
@@ -144,7 +144,7 @@ Branch.prototype['profile'] = function(identity, callback) {
  * 
  * ```
  * Branch.logout(
- * 		callback(err, data)
+ *     callback(err, data)
  * )
  * ```
  *
@@ -152,9 +152,9 @@ Branch.prototype['profile'] = function(identity, callback) {
  *
  * ```js
  * {
- * 		session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
- * 		identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
- * 		link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
+ *     session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
+ *     identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+ *     link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
  * }
  * ```
  * 
@@ -171,14 +171,14 @@ Branch.prototype['logout'] = function(callback) {
 	});
 };
 
-/**
+/*** NOT USED
  * This closes the active session, removing any relevant session Create your accountrmation stored in `sessionStorage`.
  *
  * ##### Usage
  * 
  * ```
  * Branch.close(
- * 		callback(err, data)
+ *     callback(err, data)
  * )
  * ```
  *
@@ -192,6 +192,7 @@ Branch.prototype['logout'] = function(callback) {
  *
  * ---
  */
+ /*
 Branch.prototype['close'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
@@ -202,7 +203,7 @@ Branch.prototype['close'] = function(callback) {
 		callback(err, data);
 	});
 };
-
+*/
 /**
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
@@ -215,9 +216,9 @@ Branch.prototype['close'] = function(callback) {
  * 
  * ```
  * Branch.event(
- * 		event,	
- * 		metadata, 
- * 		callback(err, data)
+ *     event,	
+ *     metadata, 
+ *     callback(err, data)
  * )
  * ```
  * 
@@ -264,8 +265,8 @@ Branch.prototype['event'] = function(event, metadata, callback) {
  *
  * ```
  * Branch.link(
- * 		metadata,
- *		callback(err, data)
+ *     metadata,
+ *     callback(err, data)
  * )
  * ```
  *
@@ -273,35 +274,35 @@ Branch.prototype['event'] = function(event, metadata, callback) {
  *
  * ````
  * branch.link({
- *		tags: ['tag1', 'tag2'],
- *		channel: 'facebook',
- *		feature: 'dashboard',
- *		stage: 'new user',
- *		type: 1,
- *		data: {
- *			mydata: {
- *				foo: 'bar'
- *			},
- *		'$desktop_url': 'http://myappwebsite.com',
- *		'$ios_url': 'http://myappwebsite.com/ios',
- *		'$ipad_url': 'http://myappwebsite.com/ipad',
- *		'$android_url': 'http://myappwebsite.com/android',
- *		'$og_app_id': '12345',
- *		'$og_title': 'My App',
- *		'$og_description': 'My app\'s description.',
- *		'$og_image_url': 'http://myappwebsite.com/image.png'
+ *     tags: ['tag1', 'tag2'],
+ *     channel: 'facebook',
+ *     feature: 'dashboard',
+ *     stage: 'new user',
+ *     type: 1,
+ *     data: {
+ *         mydata: {
+ *	           foo: 'bar'
+ *         },
+ *     '$desktop_url': 'http://myappwebsite.com',
+ *     '$ios_url': 'http://myappwebsite.com/ios',
+ *     '$ipad_url': 'http://myappwebsite.com/ipad',
+ *     '$android_url': 'http://myappwebsite.com/android',
+ *     '$og_app_id': '12345',
+ *     '$og_title': 'My App',
+ *     '$og_description': 'My app\'s description.',
+ *     '$og_image_url': 'http://myappwebsite.com/image.png'
  *		}
- *	}, function(err, data) {
- *		console.log(err || data);
- *	});
+ * }, function(err, data) {
+ *     console.log(err || data);
+ * });
  * ````
  *
  * ##### Returns 
  * 
  * ```js
  * { 
- *		link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
- *	}
+ *     link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+ * }
  * ```
  *
  * ##### Returns 
@@ -358,8 +359,8 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *
  * ```
  * Branch.SMSLink(
- * 		metadata, 	// Metadata must include phone number as `phone`
- *		callback(err, data)
+ *     metadata,    // Metadata must include phone number as `phone`
+ *     callback(err, data)
  * )
  * ```
  *
@@ -367,28 +368,28 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *
  * ```
  * branch.SMSLink(
- *		phone: '9999999999',
- *		tags: ['tag1', 'tag2'],
- *		channel: 'facebook',
- *		feature: 'dashboard',
- *		stage: 'new user',
- *		type: 1,
- *		data: {
- *			mydata: {
- *				foo: 'bar'
- *			},
- *		'$desktop_url': 'http://myappwebsite.com',
- *		'$ios_url': 'http://myappwebsite.com/ios',
- *		'$ipad_url': 'http://myappwebsite.com/ipad',
- *		'$android_url': 'http://myappwebsite.com/android',
- *		'$og_app_id': '12345',
- *		'$og_title': 'My App',
- *		'$og_description': 'My app\'s description.',
- *		'$og_image_url': 'http://myappwebsite.com/image.png'
- *		}
- *	}, function(err, data) {
- *		console.log(err || data);
- *	});
+ *     phone: '9999999999',
+ *     tags: ['tag1', 'tag2'],
+ *     channel: 'facebook',
+ *     feature: 'dashboard',
+ *     stage: 'new user',
+ *     type: 1,
+ *     data: {
+ *         mydata: {
+ *             foo: 'bar'
+ *         },
+ *     '$desktop_url': 'http://myappwebsite.com',
+ *     '$ios_url': 'http://myappwebsite.com/ios',
+ *     '$ipad_url': 'http://myappwebsite.com/ipad',
+ *     '$android_url': 'http://myappwebsite.com/android',
+ *     '$og_app_id': '12345',
+ *     '$og_title': 'My App',
+ *     '$og_description': 'My app\'s description.',
+ *     '$og_image_url': 'http://myappwebsite.com/image.png'
+ *     }
+ * }, function(err, data) {
+ *     console.log(err || data);
+ * });
  * ```
  *
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
@@ -415,8 +416,8 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
  *
  * ```
  * Branch.SMSLinkNew(
- * 		metadata, 	// Metadata must include phone number as `phone`
- *		callback(err, data)
+ *     metadata,    // Metadata must include phone number as `phone`
+ *     callback(err, data)
  * )
  * ```
  *
@@ -447,8 +448,8 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
  *
  * ```
  * Branch.SMSLinkExisting(
- * 		metadata, 	// Metadata must include phone number as `phone`
- *		callback(err, data)
+ *     metadata,     // Metadata must include phone number as `phone`
+ *     callback(err, data)
  * )
  * ```
  *
@@ -478,7 +479,7 @@ Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
  * ##### Usage
  * ```
  * Branch.referrals(
- *   callback(err, data)
+ *     callback(err, data)
  * )
  * ```
  *
@@ -486,18 +487,18 @@ Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
  * 
  * ```js
  * {
- *   'install': { 
- *     total: 5, 
- *     unique: 2
- *   },
- *   'open': {
- *     total: 4, 
- *     unique: 3
- *   },
- *   'buy': {
- *     total: 7,
- *     unique: 3
- *   }
+ *     'install': { 
+ *         total: 5, 
+ *         unique: 2
+ *     },
+ *     'open': {
+ *         total: 4, 
+ *         unique: 3
+ *     },
+ *    'buy': {
+ *         total: 7,
+ *         unique: 3
+ *     }
  * }
  * 
  * ```
@@ -523,7 +524,7 @@ Branch.prototype["referrals"] = function(callback) {
  * ##### Usage
  * ```
  * Branch.credits(
- *   callback(err, data)
+ *     callback(err, data)
  * )
  * ```
  *
@@ -531,8 +532,8 @@ Branch.prototype["referrals"] = function(callback) {
  * 
  * ```js
  * {
- *	'default': 15,
- *	'other bucket': 9
+ *     'default': 15,
+ *     'other bucket': 9
  * }
  * ```
  *
@@ -559,11 +560,11 @@ Branch.prototype["credits"] = function(callback) {
  *
  * ```
  * Branch.redeem(
- *   {
+ * {
  *     amount, // amount of credits to be redeemed
  *     bucket  // String of bucket name to redeem credits from
- *   },
- *   callback(err, data)
+ * },
+ *     callback(err, data)
  * )
  * ```
  *
@@ -571,11 +572,11 @@ Branch.prototype["credits"] = function(callback) {
  * 
  * ```
  * branch.redeem({
- * 		5,
- * 		'bucket'
- * 	}, function(data){
- * 		console.log(data)
- *	});
+ *     5,
+ *     'bucket'
+ * }, function(data){
+ *     console.log(data)
+ * });
  * ```
  *
  * ##### Returns 
@@ -611,7 +612,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
  *
  * ```
  * Branch.banner(
- * 		metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
+ *     metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
  * )
  * ```
  *
@@ -619,17 +620,17 @@ Branch.prototype["redeem"] = function(obj, callback) {
  * 
  * ```
  * branch.banner({
- * 		icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- * 		title: 'Branch Demo App',
- *		description: 'The Branch demo app!',
- *		openAppButtonText: 'Open',
- *		downloadAppButtonText: 'Download',
- *		data: {
+ *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *     title: 'Branch Demo App',
+ *     description: 'The Branch demo app!',
+ *     openAppButtonText: 'Open',
+ *     downloadAppButtonText: 'Download',
+ *     data: {
  *         foo: 'bar'
- *      }
- * 	}, function(data){
- * 		console.log(data)
- *	});
+ *     }
+ * }, function(data){
+ *     console.log(data)
+ * });
  * ```
  *
  * @param {Object} data - **Required** Object of all link data

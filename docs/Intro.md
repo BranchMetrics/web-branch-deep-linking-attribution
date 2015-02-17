@@ -13,7 +13,7 @@ This SDK requires native browser Javascript and has been tested in all modern br
 ### Browser Specific Support
 | Chrome | Firefox | Safari |     IE     |
 | ------ | ------- | ------ | ---------- |
-|    X   |    X    |   X    |  9, 10, 11 |
+|    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
 
 ### API Key
 
@@ -42,7 +42,6 @@ branch.init('APP-KEY', function(err, data) {
   + [.init()](#initapp_id-callback)
   + [.profile()](#profileidentity-callback)
   + [.logout()](#logoutcallback)
-  + [.close()](#closecallback)
 
 1. Event Tracking Methods
   + [.event()](#eventevent-metadata-callback)
