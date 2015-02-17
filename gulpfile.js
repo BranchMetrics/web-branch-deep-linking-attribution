@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
 	gutil = require('gulp-util'),
-	jshint = require('gulp-jshint');
+	jshint = require('gulp-jshint'),
+	jscs = require('gulp-jscs');
 
 /* ----- Linting ----- */
 
@@ -29,4 +30,10 @@ gulp.task('hint', function() {
 		.pipe(jshint(JSHintOptions))
 		.pipe(jshint.reporter('default'))
 		.pipe(jshint.reporter('fail'));
+});
+
+gulp.task('jscs', function() {
+	return gulp.src([
+		'./src/*.js'
+	]).pipe(jscs());
 });
