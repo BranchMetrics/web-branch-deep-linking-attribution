@@ -211,6 +211,9 @@ resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c"
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
 // Input 5
 var Branch = function() {
+  if (!(this instanceof Branch)) {
+    return new Branch;
+  }
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {

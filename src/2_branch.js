@@ -13,6 +13,9 @@ goog.require('elements');
  * @constructor
  */
 Branch = function() {
+	if (!(this instanceof Branch)) {
+		return new Branch();
+	}
 	this.initialized = false;
 };
 
