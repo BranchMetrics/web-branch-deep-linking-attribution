@@ -183,7 +183,10 @@ var Branch = function Branch(app_id, debug, callback) {
 					var callback_name = options.callbackName || 'callback';
 					var on_success = options.onSuccess || function(){};
 					var on_timeout = options.onTimeout || function(){};
-					var data = encodeURIComponent(Base64.encode(JSON.stringify(options.data))) || "";
+					var data;
+					if(options.method == "POST") {
+						data = encodeURIComponent(Base64.encode(JSON.stringify(options.data))) || "";
+					}
 					var timeout = options.timeout || 10; // sec
 
 					var timeout_trigger = window.setTimeout(function(){
@@ -206,7 +209,7 @@ var Branch = function Branch(app_id, debug, callback) {
 				return request;
 			})();
 
-			var jsonpMakeRequest = function(requestURL, requestData) {
+			var jsonpMakeRequest = function(requestURL, requestData, requestMethod) {
 				jsonpRequest.send(requestURL, {
 					callbackName: 'callback',
 					onSuccess: function(json){
@@ -218,7 +221,8 @@ var Branch = function Branch(app_id, debug, callback) {
 						});
 					},
 					timeout: 5,
-					data: requestData
+					data: requestData,
+					method: requestMethod
 				});
 			};
 
@@ -253,10 +257,10 @@ var Branch = function Branch(app_id, debug, callback) {
 					r.send(JSON.stringify(data));
 				} catch(e) {
 					sessionStorage.setItem('use_jsonp', true);
-					jsonpMakeRequest(requestURL, data);
+					jsonpMakeRequest(requestURL, data, resource.method);
 				}
 			} else {
-				jsonpMakeRequest(requestURL, data);
+				jsonpMakeRequest(requestURL, data, resource.method);
 			}
 		}
 	};
