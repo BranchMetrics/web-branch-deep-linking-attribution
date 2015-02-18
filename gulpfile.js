@@ -38,3 +38,5 @@ gulp.task('jscs', function() {
 		'./src/*.js'
 	]).pipe(jscs());
 });
+
+gulp.task('check', [ 'hint', 'jscs' ]);
