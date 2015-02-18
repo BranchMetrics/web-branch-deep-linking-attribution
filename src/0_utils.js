@@ -7,11 +7,13 @@ goog.provide('utils');
 /** @define {boolean} */
 var DEBUG = true;
 
+/* jshint ignore:start */
 /** @typedef {string} */
-message; //Does not work with tests
+message; // Does not work with tests
 
 /** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string, link_click:string}} */
 utils.sessionData;
+/* jshint ignore:end */
 
 /** @type {Object<string,message>} */
 utils.messages = {
@@ -20,18 +22,6 @@ utils.messages = {
 	nonInit: 'Branch SDK not initialized',
 	existingInit: 'Branch SDK already initilized',
 	missingAppId: 'Missing Branch app ID'
-};
-
-/***
- * @param {resources.resource} resource
- * @param {Object.<string, *>} data
- * @param {function(?new:Error,*)|null} callback
- */
-utils.api = function(resource, data, callback) {
-	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && branch.app_id) { data['app_id'] = branch.app_id; }
-	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && branch.session_id) { data['session_id'] = branch.session_id; }
-	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && branch.identity_id) { data['identity_id'] = branch.identity_id; }
-	return api(resource, data, callback);
 };
 
 /**
@@ -77,7 +67,7 @@ utils.storeKeyValue = function(key, value) {
 	var currentSession = utils.readStore();
 	currentSession[key] = value;
 	utils.store(currentSession);
-}
+};
 
 /**
  * @param {?string} key
@@ -85,11 +75,11 @@ utils.storeKeyValue = function(key, value) {
 utils.readKeyValue = function(key) {
 	var currentSession = utils.readStore();
 	return currentSession[key];
-}
+};
 
-utils.hasApp  =function() {
+utils.hasApp = function() {
 	return utils.readKeyValue("has_app");
-}
+};
 
 utils.merge = function(to, from) {
 	for (var attr in from) {
@@ -101,7 +91,8 @@ utils.merge = function(to, from) {
 utils.hashValue = function(key) {
 	try {
 		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
-	} catch(e) {
+	}
+	catch (e) {
 		return '';
 	}
 };

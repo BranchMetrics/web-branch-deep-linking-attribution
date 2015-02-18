@@ -72,7 +72,7 @@ ___
 
 ### &#39;init&#39;(app_id, callback) 
 
-Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
+Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorageHEA *
 
 **Parameters**
 
@@ -124,7 +124,7 @@ See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.setIdentity(
-    identity, 
+    identity,
     callback(err, data)
 )
 ```
@@ -159,7 +159,7 @@ Branch.logout(
 )
 ```
 
-##### Returns 
+##### Returns
 
 ```js
 {
@@ -168,7 +168,6 @@ Branch.logout(
     link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
 }
 ```
-
 ___
 
 
@@ -193,13 +192,13 @@ See [CHANGELOG](CHANGELOG.md)
 
 ```
 Branch.event(
-    event,	
-    metadata, 
+    event,
+    metadata,
     callback(err, data)
 )
 ```
 
-##### Returns 
+##### Returns
 
 ```js
 {}
@@ -257,9 +256,10 @@ branch.link({
 });
 ````
 
-##### Returns 
+##### Returns
 
 ```js
+
 { 
     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
 }
@@ -386,12 +386,12 @@ Branch.referrals(
 
 ```js
 {
-    'install': { 
-        total: 5, 
+    'install': {
+        total: 5,
         unique: 2
     },
     'open': {
-        total: 4, 
+        total: 4,
         unique: 3
     },
    'buy': {
@@ -423,7 +423,7 @@ Branch.credits(
 )
 ```
 
-##### Returns 
+##### Returns
 
 ```js
 {
@@ -470,7 +470,7 @@ branch.redeem({
 });
 ```
 
-##### Returns 
+##### Returns
 
 ```js
 {}
