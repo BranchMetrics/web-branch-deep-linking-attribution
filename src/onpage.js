@@ -26,12 +26,4 @@
     branch._q.push([ name, arguments ]);
   };
 }, { _q: [], _v: 1 }, // _q: the "queue" of calls, _v: the "version" of the embed script
-'init;close;logout;track;identify;createLink;showReferrals;showCredits;redeemCredits;appBanner'.split(';'), 0)
-
-/*
-
-!function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
-"http://localhost:8000/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
-e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-"init;close;logout;track;identify;createLink;showReferrals;showCredits;redeemCredits;appBanner".split(";"),0)
-*/
+'init;close;logout;track;identify;createLink;showReferrals;showCredits;redeemCredits;appBanner'.split(';'), 0);

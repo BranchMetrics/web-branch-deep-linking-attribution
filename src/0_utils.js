@@ -4,14 +4,16 @@
 
 goog.provide('utils');
 
+/* jshint ignore:start */
 /** @define {boolean} */
 var DEBUG = true;
 
 /** @typedef {string} */
-message; //Does not work with tests
+message; // Does not work with tests
 
 /** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string, link_click:string}} */
 utils.sessionData;
+/* jshint ignore:end */
 
 /** @type {Object<string,message>} */
 utils.messages = {
@@ -77,7 +79,7 @@ utils.storeKeyValue = function(key, value) {
 	var currentSession = utils.readStore();
 	currentSession[key] = value;
 	utils.store(currentSession);
-}
+};
 
 /**
  * @param {?string} key
@@ -85,11 +87,11 @@ utils.storeKeyValue = function(key, value) {
 utils.readKeyValue = function(key) {
 	var currentSession = utils.readStore();
 	return currentSession[key];
-}
+};
 
-utils.hasApp  =function() {
+utils.hasApp = function() {
 	return utils.readKeyValue("has_app");
-}
+};
 
 utils.merge = function(to, from) {
 	for (var attr in from) {
@@ -101,7 +103,8 @@ utils.merge = function(to, from) {
 utils.hashValue = function(key) {
 	try {
 		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
-	} catch(e) {
+	}
+	catch (e) {
 		return '';
 	}
 };

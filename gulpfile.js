@@ -8,7 +8,8 @@ var gulp = require('gulp'),
 var JSHintOptions = {
 	'browser': true,
 
-	'undef': true,
+	'sub': true,
+	// 'undef': true,
 	'trailing': true,
 	'curly': true,
 	'bitwise': true,
@@ -20,13 +21,13 @@ var JSHintOptions = {
 	'unused': true,
 	'latedef': true,
 	'scripturl': true,
-	'predef': [ 'console' ]
+	'predef': [ 'console', 'module', 'goog', 'define' ]
 };
 
 gulp.task('hint', function() {
 	var errors = false;
 
-	return gulp.src([ './src/*.js' ])
+	return gulp.src([ './src/[0-9]_*.js' ])
 		.pipe(jshint(JSHintOptions))
 		.pipe(jshint.reporter('default'))
 		.pipe(jshint.reporter('fail'));

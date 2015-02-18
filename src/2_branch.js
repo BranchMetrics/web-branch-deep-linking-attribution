@@ -8,7 +8,7 @@ goog.require('resources');
 goog.require('api');
 goog.require('elements');
 
-/*** <--- TIP: 3 stars means JSDoc ignores it
+/***
  *
  * @constructor
  */
@@ -18,9 +18,9 @@ Branch = function() {
 
 /**
  * Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
- * 
+ *
  * ##### Usage
- * 
+ *
  * ```
  * Branch.init(
  *     app_id,
@@ -29,7 +29,7 @@ Branch = function() {
  * ```
  *
  *##### Returns
- * 
+ *
  * ```js
  * {
  *     session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
@@ -40,7 +40,7 @@ Branch = function() {
  *     referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  * }
  * ```
- * 
+ *
  * @param {number} app_id - **Required** Found in your Branch dashboard
  * @param {function|null} callback - Callback function that returns the data
  *
@@ -52,16 +52,13 @@ Branch.prototype['init'] = function(app_id, callback) {
 	if (this.initialized) { return callback(utils.message(utils.messages.existingInit)); }
 	this.initialized = true;
 	this.app_id = app_id;
-
 	var self = this, sessionData = utils.readStore();
 	if (sessionData && !sessionData['session_id']) { sessionData = null; }
-
 	if (sessionData) {
 		this.session_id = sessionData['session_id'];
 		this.identity_id = sessionData['identity_id'];
 		this.sessionLink = sessionData["link"];
 	}
-
 	if (sessionData && !utils.hashValue('r')) {
 		callback(null, sessionData);
 	}
@@ -84,21 +81,21 @@ Branch.prototype['init'] = function(app_id, callback) {
 
 /**
  * Sets the identity of a user and returns the data.
- * 
+ *
  * **Formerly `identify()` (depreciated).**
  * See [CHANGELOG](CHANGELOG.md)
  *
  * ##### Usage
- * 
+ *
  * ```
  * Branch.setIdentity(
- *     identity, 
+ *     identity,
  *     callback(err, data)
  * )
  * ```
- * 
- *  ##### Returns 
- * 
+ *
+ *  ##### Returns
+ *
  * ```js
  * {
  *     identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
@@ -115,13 +112,8 @@ Branch.prototype['init'] = function(app_id, callback) {
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
-	var self = this;
-	
-	utils.api(resources.profile, {
-			identity: identity
-		}, function(err, data) {
-			callback(err,data);
+	utils.api(resources.profile, { identity: identity }, function(err, data) {
+		callback(err, data);
 	});
 };
 
@@ -129,14 +121,14 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * Logs out the current session, replaces session IDs and identity IDs.
  *
  * ##### Usage
- * 
+ *
  * ```
  * Branch.logout(
  *     callback(err, data)
  * )
  * ```
  *
- * ##### Returns 
+ * ##### Returns
  *
  * ```js
  * {
@@ -145,7 +137,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  *     link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
  * }
  * ```
- * 
+ *
  * @param {function|null} callback - Returns id's of the session and user identity, and the link
  *
  * ___
@@ -153,7 +145,6 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	var self = this;
 	utils.api(resources.logout, {}, function(err, data) {
 		callback(err, data);
 	});
@@ -163,15 +154,15 @@ Branch.prototype['logout'] = function(callback) {
  * This closes the active session, removing any relevant session account info stored in `sessionStorage`.
  *
  * ##### Usage
- * 
+ *
  * ```
  * Branch.close(
  *     callback(err, data)
  * )
  * ```
  *
- * ##### Returns 
- * 
+ * ##### Returns
+ *
  * ```
  * {}
  * ```
@@ -192,6 +183,7 @@ Branch.prototype['close'] = function(callback) {
 	});
 };
 */
+
 /**
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
@@ -201,17 +193,17 @@ Branch.prototype['close'] = function(callback) {
  * See [CHANGELOG](CHANGELOG.md)
  *
  * ##### Usage
- * 
+ *
  * ```
  * Branch.event(
- *     event,	
- *     metadata, 
+ *     event,
+ *     metadata,
  *     callback(err, data)
  * )
  * ```
- * 
- * ##### Returns 
- * 
+ *
+ * ##### Returns
+ *
  * ```js
  * {}
  * ```
@@ -229,7 +221,7 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 		callback = metadata;
 		metadata = {};
 	}
-	
+
 	utils.api(resources.event, {
 		event: event,
 		metadata: utils.merge({
@@ -285,16 +277,16 @@ Branch.prototype['event'] = function(event, metadata, callback) {
  * });
  * ````
  *
- * ##### Returns 
- * 
+ * ##### Returns
+ *
  * ```js
- * { 
+ * {
  *     link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
  * }
  * ```
  *
- * ##### Returns 
- * 
+ * ##### Returns
+ *
  * ```js
  * {}
  * ```
@@ -306,13 +298,10 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 Branch.prototype['link'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	
-
 	obj['source'] = 'web-sdk';
 	if (obj['data']['$desktop_url'] !== undefined) {
 		obj['data']['$desktop_url'] = obj['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
-
 	obj['data'] = JSON.stringify(obj['data']);
 	utils.api(resources.link, obj, function(err, data) {
 		if (typeof callback == 'function') {
@@ -330,13 +319,13 @@ Branch.prototype['link'] = function(obj, callback) {
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	
-	utils.api(resources.linkClick, {
+
+	this.api(resources.linkClick, {
 		link_url: url.replace('https://bnc.lt/', ''),
 		click: "click"
 	}, function(err, data) {
 		utils.storeKeyValue("click_id", data["click_id"]);
-		if(err || data) { callback(err, data); }
+		if (err || data) { callback(err, data); }
 	});
 };
 
@@ -389,12 +378,13 @@ Branch.prototype['sendSMS'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if(utils.readKeyValue("click_id")) {
+	if (utils.readKeyValue("click_id")) {
 		this.sendSMSExisting(obj["phone"], callback);
-	} else {
+	}
+	else {
 		this.sendSMSNew(obj, callback);
 	}
-}
+};
 
 /**
  *
@@ -417,11 +407,12 @@ Branch.prototype['sendSMS'] = function(obj, callback) {
 Branch.prototype['sendSMSNew'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
 	obj["channel"] = 'sms';
 	var self = this;
 	this.link(obj, function(err, url) {
-		self.linkClick(url, function(err, data) {
+		if (err) { return callback(err); }
+		self.linkClick(url, function(err) {
+			if (err) { return callback(err); }
 			self.sendSMSExisting(obj["phone"], function(err, data) {
 				callback(err, data);
 			});
@@ -472,15 +463,15 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  * ```
  *
  * ##### Returns
- * 
+ *
  * ```js
  * {
- *     'install': { 
- *         total: 5, 
+ *     'install': {
+ *         total: 5,
  *         unique: 2
  *     },
  *     'open': {
- *         total: 4, 
+ *         total: 4,
  *         unique: 3
  *     },
  *    'buy': {
@@ -488,7 +479,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  *         unique: 3
  *     }
  * }
- * 
+ *
  * ```
  * @param {function|null} callback - Returns an error or object with referral data on success
  *
@@ -497,7 +488,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	
+
 	utils.api(resources.referrals, {}, function(err, data) {
 		callback(err, data);
 	});
@@ -516,8 +507,8 @@ Branch.prototype["referrals"] = function(callback) {
  * )
  * ```
  *
- * ##### Returns 
- * 
+ * ##### Returns
+ *
  * ```js
  * {
  *     'default': 15,
@@ -532,7 +523,7 @@ Branch.prototype["referrals"] = function(callback) {
 Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	
+
 	utils.api(resources.credits, {
 		identity_id: this.identity_id
 	}, function(err, data) {
@@ -557,7 +548,7 @@ Branch.prototype["credits"] = function(callback) {
  * ```
  *
  * ##### Example
- * 
+ *
  * ```
  * branch.redeem({
  *     5,
@@ -567,8 +558,8 @@ Branch.prototype["credits"] = function(callback) {
  * });
  * ```
  *
- * ##### Returns 
- * 
+ * ##### Returns
+ *
  * ```js
  * {}
  * ```
@@ -581,7 +572,7 @@ Branch.prototype["credits"] = function(callback) {
 Branch.prototype["redeem"] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	
+
 	utils.api(resources.redeem, {
 		amount: obj["amount"],
 		bucket: obj["bucket"]
@@ -605,7 +596,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
  * ```
  *
  *  ##### Example
- * 
+ *
  * ```
  * branch.banner({
  *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',

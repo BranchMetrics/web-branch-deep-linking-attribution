@@ -35,9 +35,10 @@ function serializeObject(obj, prefix) {
  * @param Object.<string, *>
  */
 function getUrl(resource, data) {
+	var k;
 	var url = resource.destination + resource.endpoint;
 	if (resource.queryPart) {
-		for (var k in resource.queryPart) {
+		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
 				resource.queryPart[k](resource.endpoint, k, data[k]); // validate -- will throw
 				url += '/' + data[k];
@@ -45,7 +46,7 @@ function getUrl(resource, data) {
 		}
 	}
 	var d = {};
-	for (var k in resource.params) {
+	for (k in resource.params) {
 		if (resource.params.hasOwnProperty(k)) {
 			var v = resource.params[k](resource.endpoint, k, data[k]);
 			if (!(typeof v == 'undefined' || v === '' || v === null)) {
@@ -73,7 +74,7 @@ function jsonp(url, callback) {
 	a.async = true;
 	a.src = url + (url.indexOf('?') ? '&' : '?') + 'callback=' + encodeURIComponent(func);
 	document.getElementsByTagName("head")[0].appendChild(a);
-};
+}
 
 
 /**
@@ -102,16 +103,17 @@ api = function(resource, data, callback) {
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
 			try {
-				callback(null, JSON.parse(req.responseText)); //We try to catch errors here because sendSMSLink does not return JSON
+				// We try to catch errors here because sendSMSLink does not return JSON
+				callback(null, JSON.parse(req.responseText));
 			}
-			catch(e) {
+			catch (e) {
 				callback(null, {});
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {
 			callback(new Error('Not enough credits to redeem.'));
 		}
-		else if (req.readyState === 4 && req.status.substring(0,1) != "4") {
+		else if (req.readyState === 4 && req.status.substring(0, 1) != "4") {
 			callback(new Error('Error in API: ' + req.status));
 		}
 	};
