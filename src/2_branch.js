@@ -346,7 +346,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * #### Usage
  *
  * ```
- * Branch.SMSLink(
+ * Branch.sendSMS(
  *     metadata,    // Metadata must include phone number as `phone`
  *     callback(err, data)
  * )
@@ -355,7 +355,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * #### Example
  *
  * ```
- * branch.SMSLink(
+ * branch.sendSMS(
  *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
  *     channel: 'facebook',
@@ -385,14 +385,14 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *
  * ___
  */
-Branch.prototype['SMSLink'] = function(obj, callback) {
+Branch.prototype['sendSMS'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	if(utils.readKeyValue("click_id")) {
-		this.SMSLinkExisting(obj["phone"], callback);
+		this.sendSMSExisting(obj["phone"], callback);
 	} else {
-		this.SMSLinkNew(obj, callback);
+		this.sendSMSNew(obj, callback);
 	}
 }
 
@@ -403,7 +403,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
  * #### Usage
  *
  * ```
- * Branch.SMSLinkNew(
+ * Branch.sendSMSNew(
  *     metadata,    // Metadata must include phone number as `phone`
  *     callback(err, data)
  * )
@@ -414,7 +414,7 @@ Branch.prototype['SMSLink'] = function(obj, callback) {
  *
  * ___
  */
-Branch.prototype['SMSLinkNew'] = function(obj, callback) {
+Branch.prototype['sendSMSNew'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
@@ -422,7 +422,7 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
 	var self = this;
 	this.link(obj, function(err, url) {
 		self.linkClick(url, function(err, data) {
-			self.SMSLinkExisting(obj["phone"], function(err, data) {
+			self.sendSMSExisting(obj["phone"], function(err, data) {
 				callback(err, data);
 			});
 		});
@@ -435,7 +435,7 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
  * #### Usage
  *
  * ```
- * Branch.SMSLinkExisting(
+ * Branch.sendSMSExisting(
  *     metadata,     // Metadata must include phone number as `phone`
  *     callback(err, data)
  * )
@@ -446,7 +446,7 @@ Branch.prototype['SMSLinkNew'] = function(obj, callback) {
  *
  * ___
  */
-Branch.prototype['SMSLinkExisting'] = function(phone, callback) {
+Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 

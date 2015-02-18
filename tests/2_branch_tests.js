@@ -86,9 +86,9 @@ var runAsyncTest = function(testFunction, assertions) {
  */
 
  // SMS sends with phone param
-var testSMSLink = function() {
+var testsendSMS = function() {
 	runAsyncTest(function(callback) {
-		branch.SMSLink(params, function(err, data) { callback(err, data) });
+		branch.sendSMS(params, function(err, data) { callback(err, data) });
 	}, function(recievedData) {
 		assertObjectEquals("should send SMS with phone number", recievedData, {});
 	});
@@ -97,12 +97,12 @@ var testSMSLink = function() {
 // For whatever reason, the callbacl in api.js:105 is fired twice, the second time, data is empty
 // Fails on missing phone number
 /*
-var testMissingPhoneSMSLink = function() {
+var testMissingPhonesendSMS = function() {
 	var expectedData = new Error(utils.message(utils.messages.missingParam, ['/c', 'phone']));
 	stubs.replace(params, 'phone', '');
 
 	runAsyncTest(function(callback) {
-		branch.SMSLink(params, function(err, data) { callback(err, data) });
+		branch.sendSMS(params, function(err, data) { callback(err, data) });
 	}, function(recievedData) {
 		assertObjectEquals("should require a phone number", recievedData, expectedData);
 	});

@@ -71,9 +71,9 @@ branch.init('5680621892404085', function(err, data) {
       <h4>SMS</h4>
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
-          <button id="SMSLink" class="btn btn-info">.SMSLink()</button>
-          <button id="SMSLinkNew" class="btn btn-info">.SMSLinkNew()</button>
-          <button id="SMSLinkExisting" class="btn btn-info">.SMSLinkExisting()</button>
+          <button id="sendSMS" class="btn btn-info">.sendSMS()</button>
+          <button id="sendSMSNew" class="btn btn-info">.sendSMSNew()</button>
+          <button id="sendSMSExisting" class="btn btn-info">.sendSMSExisting()</button>
         </div>
       </div>
       <div class="row col-lg-8 col-lg-offset-2">
@@ -164,27 +164,27 @@ branch.init('5680621892404085', function(err, data) {
       });
     });
 
-    $('#SMSLink').click(function(){
+    $('#sendSMS').click(function(){
       sampleParams.phone = phoneNumber();
-      request.html("branch.SMSLink(" + JSON.stringify(sampleParams) + ");");
-      branch.SMSLink(sampleParams, function(err, data){
+      request.html("branch.sendSMS(" + JSON.stringify(sampleParams) + ");");
+      branch.sendSMS(sampleParams, function(err, data){
         response.html(JSON.stringify(data));
         delete sampleParams.phone;
       });
     });
 
-    $('#SMSLinkNew').click(function(){
+    $('#sendSMSNew').click(function(){
       sampleParams.phone = phoneNumber();
-      request.html("branch.SMSLinkNew(" + JSON.stringify(sampleParams) + ");");
-      branch.SMSLinkNew(sampleParams, function(err, data){
+      request.html("branch.sendSMSNew(" + JSON.stringify(sampleParams) + ");");
+      branch.sendSMSNew(sampleParams, function(err, data){
         response.html(JSON.stringify(data));
         delete sampleParams.phone;
       });
     });
 
-    $('#SMSLinkExisting').click(function(){
-      request.html("branch.SMSLinkExisting(\"" + phoneNumber() + "\");");
-      branch.SMSLinkExisting(phoneNumber(), function(err, data){
+    $('#sendSMSExisting').click(function(){
+      request.html("branch.sendSMSExisting(\"" + phoneNumber() + "\");");
+      branch.sendSMSExisting(phoneNumber(), function(err, data){
         response.html(JSON.stringify(data));
       });
     });

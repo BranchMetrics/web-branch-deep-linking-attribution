@@ -295,15 +295,15 @@ Branch.prototype.linkClick = function(a, b) {
     (a || c) && b(a, c);
   });
 };
-Branch.prototype.SMSLink = function(a, b) {
+Branch.prototype.sendSMS = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  utils.readKeyValue("click_id") ? this.SMSLinkExisting(a.phone, b) : this.SMSLinkNew(a, b);
+  utils.readKeyValue("click_id") ? this.sendSMSExisting(a.phone, b) : this.sendSMSNew(a, b);
 };
-Branch.prototype.SMSLinkNew = function(a, b) {
+Branch.prototype.sendSMSNew = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
@@ -313,13 +313,13 @@ Branch.prototype.SMSLinkNew = function(a, b) {
   var d = this;
   this.link(a, function(c, f) {
     d.linkClick(f, function(c, f) {
-      d.SMSLinkExisting(a.phone, function(a, c) {
+      d.sendSMSExisting(a.phone, function(a, c) {
         b(a, c);
       });
     });
   });
 };
-Branch.prototype.SMSLinkExisting = function(a, b) {
+Branch.prototype.sendSMSExisting = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {

@@ -213,14 +213,14 @@ ___
 
 
 
-### &#39;SMSLink&#39;(metadata, callback) 
+### &#39;sendSMS&#39;(metadata, callback) 
 
 Uses the previously created link stored in `sessionStorage` or creates a link if one has not been created, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
 
 #### Usage
 
 ```
-Branch.SMSLink(
+Branch.sendSMS(
     metadata,    // Metadata must include phone number as `phone`
     callback(err, data)
 )
@@ -229,7 +229,7 @@ Branch.SMSLink(
 #### Example
 
 ```
-branch.SMSLink(
+branch.sendSMS(
     phone: '9999999999',
     tags: ['tag1', 'tag2'],
     channel: 'facebook',
@@ -264,14 +264,14 @@ ___
 
 
 
-### &#39;SMSLinkNew&#39;(metadata, callback) 
+### &#39;sendSMSNew&#39;(metadata, callback) 
 
 Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
 
 #### Usage
 
 ```
-Branch.SMSLinkNew(
+Branch.sendSMSNew(
     metadata,    // Metadata must include phone number as `phone`
     callback(err, data)
 )
@@ -287,14 +287,14 @@ ___
 
 
 
-### &#39;SMSLinkExisting&#39;(phone, callback) 
+### &#39;sendSMSExisting&#39;(phone, callback) 
 
 Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
 
 #### Usage
 
 ```
-Branch.SMSLinkExisting(
+Branch.sendSMSExisting(
     metadata,     // Metadata must include phone number as `phone`
     callback(err, data)
 )
