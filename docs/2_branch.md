@@ -10,6 +10,12 @@
 
 Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
 
+**Parameters**
+
+**app_id**: `number`, **Required** Found in your Branch dashboard
+
+**callback**: `function | null`, Callback function that returns the data
+
 ##### Usage
 
 ```
@@ -32,12 +38,6 @@ Branch.init(
 }
 ```
 
-**Parameters**
-
-**app_id**: `number`, **Required** Found in your Branch dashboard
-
-**callback**: `function | null`, Callback function that returns the data
-
 **Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
 ___
 
@@ -50,6 +50,12 @@ Sets the identity of a user and returns the data.
 **Formerly `identify()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
+**Parameters**
+
+**identity**: `string`, **Required** A string uniquely identifying the user
+
+**callback**: `function | null`, Callback that returns the user's Branch identity id and unique link
+
 ##### Usage
 
 ```
@@ -59,7 +65,7 @@ Branch.setIdentity(
 )
 ```
 
- ##### Returns 
+##### Returns 
 
 ```js
 {
@@ -69,13 +75,6 @@ Branch.setIdentity(
     referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
 }
 ```
-
-**Parameters**
-
-**identity**: `string`, **Required** A string uniquely identifying the user
-
-**callback**: `function | null`, Callback that returns the user's Branch identity id and unique link
-
 ___
 
 
@@ -83,6 +82,10 @@ ___
 ### &#39;logout&#39;(callback) 
 
 Logs out the current session, replaces session IDs and identity IDs.
+
+**Parameters**
+
+**callback**: `function | null`, Returns id's of the session and user identity, and the link
 
 ##### Usage
 
@@ -102,10 +105,6 @@ Branch.logout(
 }
 ```
 
-**Parameters**
-
-**callback**: `function | null`, Returns id's of the session and user identity, and the link
-
 ___
 
 
@@ -117,6 +116,14 @@ The `metadata` parameter is a formatted JSON object that can contain any data an
 
 **Formerly `track()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
+
+**Parameters**
+
+**event**: `String`, **Required** The name of the event to be tracked
+
+**metadata**: `Object | null`, Object of event metadata
+
+**callback**: `function | null`, Returns an error or empty object on success
 
 ##### Usage
 
@@ -133,15 +140,6 @@ Branch.event(
 ```js
 {}
 ```
-
-**Parameters**
-
-**event**: `String`, **Required** The name of the event to be tracked
-
-**metadata**: `Object | null`, Object of event metadata
-
-**callback**: `function | null`, Returns an error or empty object on success
-
 ___
 
 
@@ -152,6 +150,12 @@ Creates and returns a deep linking URL.  The `data` parameter can include an obj
 
 **Formerly `createLink()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
+
+**Parameters**
+
+**metadata**: `Object | null`, Object of link metadata
+
+**callback**: `function | null`, Returns a string of the Branch deep linking URL
 
 #### Usage
 
@@ -193,29 +197,22 @@ branch.link({
 
 ```js
 { 
-    link: 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+    'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
 }
 ```
-
-##### Returns 
-
-```js
-{}
-```
-
-**Parameters**
-
-**metadata**: `Object | null`, Object of link metadata
-
-**callback**: `function | null`, Returns a string of the Branch deep linking URL
-
 ___
 
 
 
 ### &#39;sendSMS&#39;(metadata, callback) 
 
-Uses the previously created link stored in `sessionStorage` or creates a link if one has not been created, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+A powerful function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
+
+**Parameters**
+
+**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
+
+**callback**: `function | null`, Returns an error or empty object on success
 
 #### Usage
 
@@ -254,12 +251,6 @@ branch.sendSMS(
 });
 ```
 
-**Parameters**
-
-**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
-
-**callback**: `function | null`, Returns an error or empty object on success
-
 ___
 
 
@@ -267,6 +258,12 @@ ___
 ### &#39;sendSMSNew&#39;(metadata, callback) 
 
 Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+
+**Parameters**
+
+**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
+
+**callback**: `function | null`, Returns an error or empyy object on success
 
 #### Usage
 
@@ -277,12 +274,6 @@ Branch.sendSMSNew(
 )
 ```
 
-**Parameters**
-
-**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
-
-**callback**: `function | null`, Returns an error or empyy object on success
-
 ___
 
 
@@ -290,6 +281,12 @@ ___
 ### &#39;sendSMSExisting&#39;(phone, callback) 
 
 Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+
+**Parameters**
+
+**phone**: `String`, **Required** String of phone number the link should be sent to
+
+**callback**: `function | null`, Returns an error or empty object on success
 
 #### Usage
 
@@ -299,13 +296,6 @@ Branch.sendSMSExisting(
     callback(err, data)
 )
 ```
-
-**Parameters**
-
-**phone**: `String`, **Required** String of phone number the link should be sent to
-
-**callback**: `function | null`, Returns an error or empty object on success
-
 ___
 
 
@@ -316,6 +306,10 @@ Retrieves list of referrals for the current user.
 
 **Formerly `showReferrals()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
+
+**Parameters**
+
+**callback**: `function | null`, Returns an error or object with referral data on success
 
 ##### Usage
 ```
@@ -343,11 +337,6 @@ Branch.referrals(
 }
 
 ```
-
-**Parameters**
-
-**callback**: `function | null`, Returns an error or object with referral data on success
-
 ___
 
 
@@ -358,6 +347,10 @@ Retrieves a list of credits for the current user.
 
 **Formerly `showCredits()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
+
+**Parameters**
+
+**callback**: `function | null`, Returns an error or object with credit data on success
 
 ##### Usage
 ```
@@ -375,10 +368,6 @@ Branch.credits(
 }
 ```
 
-**Parameters**
-
-**callback**: `function | null`, Returns an error or object with credit data on success
-
 ___
 
 
@@ -389,6 +378,12 @@ Redeem credits from a credit bucket.
 
 **Formerly `redeemCredits()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
+
+**Parameters**
+
+**obj**: `Object`, **Required** Object with an `amount` (int) param of number of credits to redeem, and `bucket` (string) param of which bucket to redeem the credits from
+
+**callback**: `function | null`, Returns an error or empty object on success
 
 ```
 Branch.redeem(
@@ -416,13 +411,6 @@ branch.redeem({
 ```js
 {}
 ```
-
-**Parameters**
-
-**obj**: `Object`, **Required** Object with an `amount` (int) param of number of credits to redeem, and `bucket` (string) param of which bucket to redeem the credits from
-
-**callback**: `function | null`, Returns an error or empty object on success
-
 ___
 
 
@@ -433,6 +421,10 @@ Display a smart banner directing the user to your app through a Branch referral 
 
 **Formerly `appBanner()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
+
+**Parameters**
+
+**data**: `Object`, **Required** Object of all link data
 
 #### Usage
 
@@ -458,10 +450,6 @@ branch.banner({
     console.log(data)
 });
 ```
-
-**Parameters**
-
-**data**: `Object`, **Required** Object of all link data
 
 
 

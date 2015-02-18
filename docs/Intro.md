@@ -40,7 +40,7 @@ branch.init('APP-KEY', function(err, data) {
 
 1. Branch Session
   + [.init()](#initapp_id-callback)
-  + [.profile()](#profileidentity-callback)
+  + [.setIdentity()](#setIdentityidentity-callback)
   + [.logout()](#logoutcallback)
 
 1. Event Tracking Methods
@@ -48,9 +48,9 @@ branch.init('APP-KEY', function(err, data) {
 
 1. Deeplinking Methods
    + [.link()](#linkmetadata-callback)
-   + [.SMSLink()](#smslinkmetadata-callback)
-   + [.SMSLinkNew()](#smslinknewmetadata-callback)
-   + [.SMSLinkExisting()](#smslinkexistingphone-callback)
+   + [.sendSMS()](#sendSMSmetadata-callback)
+   + [.sendSMSNew()](#sendSMSnewmetadata-callback)
+   + [.sendSMSExisting()](#sendSMSexistingphone-callback)
 
 1. Referral Methods
    + [.referrals()](#referralscallback)
