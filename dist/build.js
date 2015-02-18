@@ -351,7 +351,7 @@ Branch.prototype.credits = function(a) {
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
-  this._api(resources.credits, {identity_id:this.identity_id}, function(b, c) {
+  this._api(resources.credits, {}, function(b, c) {
     a(b, c);
   });
 };

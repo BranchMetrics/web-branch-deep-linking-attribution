@@ -124,7 +124,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	this._api(resources.profile, { identity: identity }, function(err, data) {
+	this._api(resources.profile, { "identity": identity }, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -235,11 +235,11 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 	}
 
 	this._api(resources.event, {
-		event: event,
-		metadata: utils.merge({
-			url: document.URL,
-			user_agent: navigator.userAgent,
-			language: navigator.language
+		"event": event,
+		"metadata": utils.merge({
+			"url": document.URL,
+			"user_agent": navigator.userAgent,
+			"language": navigator.language
 		}, {})
 	}, function(err, data) {
 		callback(err, data);
@@ -333,8 +333,8 @@ Branch.prototype['linkClick'] = function(url, callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	this.api(resources.linkClick, {
-		link_url: url.replace('https://bnc.lt/', ''),
-		click: "click"
+		"link_url": url.replace('https://bnc.lt/', ''),
+		"click": "click"
 	}, function(err, data) {
 		utils.storeKeyValue("click_id", data["click_id"]);
 		if (err || data) { callback(err, data); }
@@ -454,8 +454,8 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	this._api(resources.SMSLinkSend, {
-		link_url: utils.readStore()["click_id"],
-		phone: phone
+		"link_url": utils.readStore()["click_id"],
+		"phone": phone
 	}, function(err, data) {
 		callback(err, data);
 	});
@@ -536,9 +536,7 @@ Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	this._api(resources.credits, {
-		identity_id: this.identity_id
-	}, function(err, data) {
+	this._api(resources.credits, {}, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -585,10 +583,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	this._api(resources.redeem, {
-		amount: obj["amount"],
-		bucket: obj["bucket"]
-	}, function(err, data) {
+	this._api(resources.redeem, { "amount": obj["amount"], "bucket": obj["bucket"] }, function(err, data) {
 		callback(err, data);
 	});
 };
