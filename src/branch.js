@@ -231,7 +231,7 @@ var Branch = function Branch(app_id, debug, callback) {
 					var callback_name = options.callbackName || 'callback';
 					var on_success = options.onSuccess || function(){};
 					var on_timeout = options.onTimeout || function(){};
-					var data = base64Encode(JSON.stringify(options.data)) || "";
+					var data = encodeURIcomponent(base64Encode(JSON.stringify(options.data))) || "";
 					var timeout = options.timeout || 10; // sec
 
 					var timeout_trigger = window.setTimeout(function(){
@@ -247,7 +247,7 @@ var Branch = function Branch(app_id, debug, callback) {
 					var script = document.createElement('script');
 					script.type = 'text/javascript';
 					script.async = true;
-					script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (data ? '&data=' + data : '');
+					script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (data ? '&data=' + data : '') + '&callback=' + callback_name;
 
 					document.getElementsByTagName('head')[0].appendChild(script);
 				}
@@ -258,10 +258,12 @@ var Branch = function Branch(app_id, debug, callback) {
 				jsonpRequest.send(requestURL, {
 					callbackName: 'callback',
 					onSuccess: function(json){
-						console.log('jsonp success!', json);
+						callback(json);
 					},
 					onTimeout: function(){
-						console.log('jsonp timeout!');
+						callback({
+							error: 'Request timed out.'
+						});
 					},
 					timeout: 5,
 					data: requestData
