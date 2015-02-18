@@ -184,9 +184,16 @@ var Branch = function Branch(app_id, debug, callback) {
 					var on_success = options.onSuccess || function(){};
 					var on_timeout = options.onTimeout || function(){};
 					var data;
+
 					if(options.method == "POST") {
 						data = encodeURIComponent(Base64.encode(JSON.stringify(options.data))) || "";
 					}
+
+					var postDataString = '&data=';
+					if(url.indexOf('bnc.lt') >= 0) {
+						postDataString = '&post_data=';
+					}
+
 					var timeout = options.timeout || 10; // sec
 
 					var timeout_trigger = window.setTimeout(function(){
@@ -202,7 +209,7 @@ var Branch = function Branch(app_id, debug, callback) {
 					var script = document.createElement('script');
 					script.type = 'text/javascript';
 					script.async = true;
-					script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (data ? '&data=' + data : '') + '&callback=' + callback_name + (url.indexOf('/c/') ? '&click=1' : '');
+					script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (data ? postDataString + data : '') + '&callback=' + callback_name + (url.indexOf('/c/') >= 0 ? '&click=1' : '');
 
 					document.getElementsByTagName('head')[0].appendChild(script);
 				}
