@@ -166,9 +166,60 @@ var Branch = function Branch(app_id, debug, callback) {
 				}
 			}
 
-			var r;
+			if (resource.ref) {
+				data = self.utils.mergeMeta(data, data[resource.ref]);
+				delete data[resource.ref];
+			}
+
+			var requestURL = connector_url + resource.endpoint + query.substring(0, query.length - 1);
+
+			//define jsonp request
+			var jsonpRequest = (function(){
+				var request = {};
+
+				request.send = function(url, options) {
+					var callback_name = options.callbackName || 'callback';
+					var on_success = options.onSuccess || function(){};
+					var on_timeout = options.onTimeout || function(){};
+					var data = btoa(JSON.stringify(options.data)) || "";
+					var timeout = options.timeout || 10; // sec
+
+					var timeout_trigger = window.setTimeout(function(){
+					window[callback_name] = function(){};
+						on_timeout();
+					}, timeout * 1000);
+
+					window[callback_name] = function(data){
+						window.clearTimeout(timeout_trigger);
+						on_success(data);
+					}
+
+					var script = document.createElement('script');
+					script.type = 'text/javascript';
+					script.async = true;
+					script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (data ? '&data=' + data : '');
+
+					document.getElementsByTagName('head')[0].appendChild(script);
+				}
+				return request;
+			})();
+
+			var jsonpMakeRequest = function(requestURL, requestData) {
+				jsonpRequest.send(requestURL, {
+					callbackName: 'callback',
+					onSuccess: function(json){
+						console.log('jsonp success!', json);
+					},
+					onTimeout: function(){
+						console.log('jsonp timeout!');
+					},
+					timeout: 5,
+					data: requestData
+				});
+			};
+
 			if(!sessionStorage.getItem('use_jsonp')) {
-				r = new XMLHttpRequest();
+				var r = new XMLHttpRequest();
 				r.onreadystatechange = function() {
 					if (r.readyState === 4) {
 						if (r.status === 200) {
@@ -190,25 +241,18 @@ var Branch = function Branch(app_id, debug, callback) {
 						}
 					}
 				};
-			} else {
-				//jsonp request
-				console.log('only make jsonp requests for now on');
-			}
-
-			try {
-				r.open(resource.method, connector_url + resource.endpoint + query.substring(0, query.length - 1), true);
-				r.setRequestHeader('Content-Type', 'application/json');
-				r.setRequestHeader('Accept', 'application/json');
-				r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
-				if (resource.ref) {
-					data = self.utils.mergeMeta(data, data[resource.ref]);
-					delete data[resource.ref];
+				try {
+					r.open(resource.method, requestURL, true);
+					r.setRequestHeader('Content-Type', 'application/json');
+					r.setRequestHeader('Accept', 'application/json');
+					r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
+					r.send(JSON.stringify(data));
+				} catch(e) {
+					sessionStorage.setItem('use_jsonp', true);
+					jsonpMakeRequest(requestURL, data);
 				}
-				r.send(JSON.stringify(data));
-			} catch(e) {
-				sessionStorage.setItem('use_jsonp', true);
-				console.log(e);
-				//jsonp shit here
+			} else {
+				jsonpMakeRequest(requestURL, data);
 			}
 		}
 	};
