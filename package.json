@@ -21,6 +21,7 @@
     "gulp-jscs": "^1.4.0",
     "gulp-jshint": "^1.9.0",
     "jsdoc": "<=3.3.0",
-    "jsdox": "0.4.9"
+    "jsdox": "0.4.9",
+    "through": "^2.3.6"
   }
 }

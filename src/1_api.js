@@ -4,8 +4,6 @@
  */
 
 goog.provide('api');
-goog.require('config');
-goog.require('utils');
 
 function serializeObject(obj, prefix) {
 	var pairs = [];

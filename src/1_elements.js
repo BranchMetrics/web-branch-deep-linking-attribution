@@ -125,7 +125,7 @@ var bannerResources = {
 				foundElement.parentNode.removeChild(foundElement);
 			}
 		},
-		sendSMS: function(obj) {
+		sendSMS: function(branch, obj) {
 			var phone = document.getElementById('branch-sms-phone');
 			if (phone) {
 				var phone_val = phone.value;
@@ -201,7 +201,7 @@ elements.smartBannerStyles = function() {
 /**
  * @param {Object} obj
  */
-elements.appendSmartBannerActions = function(obj) {
+elements.appendSmartBannerActions = function(branch, obj) {
 	var action = document.createElement('div');
 
 	// User agent specific markup
@@ -220,9 +220,8 @@ elements.appendSmartBannerActions = function(obj) {
 
 	document.getElementById('branch-banner-action').appendChild(action);
 	try {
-		sendAction = bannerResources.actions.sendSMS;
 		document.getElementById('branch-sms-send').addEventListener("click", function() {
-		    sendAction(obj);
+		    bannerResources.actions.sendSMS(branch, obj);
 		});
 	}
 	catch (e) {}

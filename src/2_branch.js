@@ -16,6 +16,18 @@ Branch = function() {
 	this.initialized = false;
 };
 
+/***
+ * @param {resources.resource} resource
+ * @param {Object.<string, *>} data
+ * @param {function(?new:Error,*)|null} callback
+ */
+Branch.prototype._api = function(resource, data, callback) {
+	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && this.app_id) { data['app_id'] = this.app_id; }
+	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { data['session_id'] = this.session_id; }
+	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { data['identity_id'] = this.identity_id; }
+	return api(resource, data, callback);
+};
+
 /**
  * Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
  *
@@ -63,8 +75,8 @@ Branch.prototype['init'] = function(app_id, callback) {
 		callback(null, sessionData);
 	}
 	else {
-		utils.api(resources._r, {}, function(err, browser_fingerprint_id) {
-			utils.api(resources.open, {
+		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
+			self._api(resources.open, {
 				"link_identifier": utils.hashValue('r'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
@@ -112,7 +124,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	utils.api(resources.profile, { identity: identity }, function(err, data) {
+	this._api(resources.profile, { identity: identity }, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -145,7 +157,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	utils.api(resources.logout, {}, function(err, data) {
+	this._api(resources.logout, {}, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -176,7 +188,7 @@ Branch.prototype['close'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
-	utils.api(resources.close, {}, function(err, data) {
+	this._api(resources.close, {}, function(err, data) {
 		sessionStorage.clear();
 		self.initialized = false;
 		callback(err, data);
@@ -222,7 +234,7 @@ Branch.prototype['event'] = function(event, metadata, callback) {
 		metadata = {};
 	}
 
-	utils.api(resources.event, {
+	this._api(resources.event, {
 		event: event,
 		metadata: utils.merge({
 			url: document.URL,
@@ -303,7 +315,7 @@ Branch.prototype['link'] = function(obj, callback) {
 		obj['data']['$desktop_url'] = obj['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
 	obj['data'] = JSON.stringify(obj['data']);
-	utils.api(resources.link, obj, function(err, data) {
+	this._api(resources.link, obj, function(err, data) {
 		if (typeof callback == 'function') {
 			callback(err, data['url']);
 		}
@@ -441,7 +453,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	utils.api(resources.SMSLinkSend, {
+	this._api(resources.SMSLinkSend, {
 		link_url: utils.readStore()["click_id"],
 		phone: phone
 	}, function(err, data) {
@@ -489,7 +501,7 @@ Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	utils.api(resources.referrals, {}, function(err, data) {
+	this._api(resources.referrals, {}, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -524,7 +536,7 @@ Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	utils.api(resources.credits, {
+	this._api(resources.credits, {
 		identity_id: this.identity_id
 	}, function(err, data) {
 		callback(err, data);
@@ -573,7 +585,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	utils.api(resources.redeem, {
+	this._api(resources.redeem, {
 		amount: obj["amount"],
 		bucket: obj["bucket"]
 	}, function(err, data) {
@@ -619,7 +631,7 @@ Branch.prototype["banner"] = function(data) {
 		document.head.appendChild(elements.smartBannerStyles());
 		document.body.appendChild(elements.smartBannerMarkup(data));
 		document.getElementById('branch-banner').style.top = '-76px';
-		elements.appendSmartBannerActions(data);
+		elements.appendSmartBannerActions(this, data);
 		elements.triggerBannerAnimation();
 	}
 };

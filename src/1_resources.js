@@ -7,17 +7,20 @@ goog.provide('resources');
 goog.require('utils');
 goog.require('config');
 
-/* jshint ignore:start */
-/** @enum {string} */
-var methods = { POST: 'POST', GET: 'GET' };
-
 /** @enum {string} */
 var validationTypes = { obj: 0, str: 1, num: 2, arr: 3 };
 
+/* jshint ignore:start */
+
+/** @enum {string} */
+var methods = { POST: 'POST', GET: 'GET' };
+
 /** @typedef {function(string, string, *)} */
 resources.validator;
+
 /** @typedef {{destination: string, endpoint: string, method: {methods}, params: Object.<string, resources.validator>, queryPart: Object.<string, resources.validator>, jsonp: boolean }} */
 resources.resource;
+
 /* jshint ignore:end */
 
 /**
