@@ -149,29 +149,6 @@ var Branch = function Branch(app_id, debug, callback) {
 				};
 			}
 
-			var r = new XMLHttpRequest();
-			r.onreadystatechange = function() {
-				if (r.readyState === 4) {
-					if (r.status === 200) {
-						callback(JSON.parse(r.responseText));
-					}
-					else if (r.status === 402) {
-						callback({
-							error: 'Not enough credits to redeem.'
-						});
-					}
-					else {
-						try {
-							var err = JSON.parse(r.responseText);
-							error(err.message || err);
-						}
-						catch (e) {
-							error(r.status || 'unknown error');
-						}
-					}
-				}
-			};
-
 			var query = '';
 			if (resource.rest) {
 				for (var rp = 0; rp < resource.rest.length; rp++) {
@@ -189,15 +166,50 @@ var Branch = function Branch(app_id, debug, callback) {
 				}
 			}
 
-			r.open(resource.method, connector_url + resource.endpoint + query.substring(0, query.length - 1), true);
-			r.setRequestHeader('Content-Type', 'application/json');
-			r.setRequestHeader('Accept', 'application/json');
-			r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
-			if (resource.ref) {
-				data = self.utils.mergeMeta(data, data[resource.ref]);
-				delete data[resource.ref];
+			var r;
+			if(!sessionStorage.getItem('use_jsonp')) {
+				r = new XMLHttpRequest();
+				r.onreadystatechange = function() {
+					if (r.readyState === 4) {
+						if (r.status === 200) {
+							callback(JSON.parse(r.responseText));
+						}
+						else if (r.status === 402) {
+							callback({
+								error: 'Not enough credits to redeem.'
+							});
+						}
+						else {
+							try {
+								var err = JSON.parse(r.responseText);
+								error(err.message || err);
+							}
+							catch (e) {
+								error(r.status || 'unknown error');
+							}
+						}
+					}
+				};
+			} else {
+				//jsonp request
+				console.log('only make jsonp requests for now on');
 			}
-			r.send(JSON.stringify(data));
+
+			try {
+				r.open(resource.method, connector_url + resource.endpoint + query.substring(0, query.length - 1), true);
+				r.setRequestHeader('Content-Type', 'application/json');
+				r.setRequestHeader('Accept', 'application/json');
+				r.setRequestHeader('Branch-Connector', config.connector.name + '/' + config.connector.version);
+				if (resource.ref) {
+					data = self.utils.mergeMeta(data, data[resource.ref]);
+					delete data[resource.ref];
+				}
+				r.send(JSON.stringify(data));
+			} catch(e) {
+				sessionStorage.setItem('use_jsonp', true);
+				console.log(e);
+				//jsonp shit here
+			}
 		}
 	};
 	// End API Routines
