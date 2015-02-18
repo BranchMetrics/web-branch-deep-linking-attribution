@@ -231,7 +231,7 @@ var Branch = function Branch(app_id, debug, callback) {
 					var callback_name = options.callbackName || 'callback';
 					var on_success = options.onSuccess || function(){};
 					var on_timeout = options.onTimeout || function(){};
-					var data = encodeURIcomponent(base64Encode(JSON.stringify(options.data))) || "";
+					var data = encodeURIComponent(base64Encode(JSON.stringify(options.data))) || "";
 					var timeout = options.timeout || 10; // sec
 
 					var timeout_trigger = window.setTimeout(function(){
