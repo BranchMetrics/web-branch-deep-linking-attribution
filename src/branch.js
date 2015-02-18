@@ -220,7 +220,6 @@ var Branch = function Branch(app_id, debug, callback) {
 
 			var jsonpMakeRequest = function(requestURL, requestData, requestMethod) {
 				jsonpRequest.send(requestURL, {
-					callbackName: 'callback',
 					onSuccess: function(json) {
 						callback(json);
 					},
