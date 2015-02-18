@@ -210,9 +210,9 @@ resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", me
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:"POST", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
 // Input 5
-var Branch = function() {
+var default_branch, Branch = function() {
   if (!(this instanceof Branch)) {
-    return new Branch;
+    return default_branch || (default_branch = new Branch), default_branch;
   }
   this.initialized = !1;
 };

@@ -8,13 +8,15 @@ goog.require('resources');
 goog.require('api');
 goog.require('elements');
 
+var default_branch;
+
 /***
- *
  * @constructor
  */
 Branch = function() {
 	if (!(this instanceof Branch)) {
-		return new Branch();
+		if (!default_branch) { default_branch = new Branch(); }
+		return default_branch;
 	}
 	this.initialized = false;
 };
