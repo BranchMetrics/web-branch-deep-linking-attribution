@@ -202,7 +202,7 @@ var Branch = function Branch(app_id, debug, callback) {
 					var script = document.createElement('script');
 					script.type = 'text/javascript';
 					script.async = true;
-					script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (data ? '&data=' + data : '') + '&callback=' + callback_name;
+					script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (data ? '&data=' + data : '') + '&callback=' + callback_name + (url.indexOf('/c/') ? '&click=1' : '');
 
 					document.getElementsByTagName('head')[0].appendChild(script);
 				}
