@@ -4,7 +4,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - unreleased
 ### Changed
-- **identify()** changed to **profile()**. **profile()** now accepts a single string `identity` and callback, rather than an object `{ identity: "" }` and a callback.
+- **identify()** changed to **setIdentity()**. **setIdentity()** now accepts a single string `identity` and callback, rather than an object `{ identity: "" }` and a callback.
 - **appBanner()** changed to **banner()**. Two new metadata parameters have been added to allow custom Download and Open text: `openAppButtonText`, and `downloadAppButtonText`. The banner will display the relevant text, dependant on wether the user has the app installed.
 - **track()** changed to **event()**.
 - **createLink()** changed to **link()**.

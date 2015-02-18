@@ -34,7 +34,10 @@ Branch.prototype._api = function(resource, data, callback) {
 };
 
 /**
- * Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorageHEA * 
+ * Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
+ * The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
+ * **Useful Tip**: The init fucntion returns a data object where you can read the link the user was referred by.
+ *
  * @param {number} app_id - **Required** Found in your Branch dashboard
  * @param {function|null} callback - Callback function that returns the data
  *
@@ -51,16 +54,12 @@ Branch.prototype._api = function(resource, data, callback) {
  *
  * ```js
  * {
- *     session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
- *     identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
- *     device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
  *     data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
- *     link:               'url',   // Server-generated link identity, for synchronous link creation.
  *     referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  * }
  * ```
  *
- * **Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
+ * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
 Branch.prototype['init'] = function(app_id, callback) {
@@ -69,6 +68,17 @@ Branch.prototype['init'] = function(app_id, callback) {
 	this.initialized = true;
 	this.app_id = app_id;
 	var self = this, sessionData = utils.readStore();
+
+	var cleanseReturnData = function(data) {
+		delete data['session_id'];
+		delete data['identity_id'];
+		delete data["link"];
+		delete data["device_fingerprint"];
+		delete data["device_fingerprint_id"];
+		delete data["browser_fingerprint_id"];
+		return data;
+	};
+
 	if (sessionData && !sessionData['session_id']) { sessionData = null; }
 	if (sessionData) {
 		this.session_id = sessionData['session_id'];
@@ -76,7 +86,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 		this.sessionLink = sessionData["link"];
 	}
 	if (sessionData && !utils.hashValue('r')) {
-		callback(null, sessionData);
+		callback(null, cleanseReturnData(sessionData));
 	}
 	else {
 		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
@@ -89,14 +99,14 @@ Branch.prototype['init'] = function(app_id, callback) {
 				self.identity_id = data['identity_id'];
 				self.sessionLink = data["link"];
 				utils.store(data);
-				callback(err, data);
+				callback(err, cleanseReturnData(data));
 			});
 		});
 	}
 };
 
 /**
- * Sets the identity of a user and returns the data.
+ * Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
  *
  * **Formerly `identify()` (depreciated).**
  * See [CHANGELOG](CHANGELOG.md)

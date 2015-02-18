@@ -141,14 +141,14 @@ function getUrl(a, b) {
       a.queryPart.hasOwnProperty(c) && (a.queryPart[c](a.endpoint, c, b[c]), d += "/" + b[c]);
     }
   }
-  var f = {};
+  var e = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      var e = a.params[c](a.endpoint, c, b[c]);
-      "undefined" != typeof e && "" !== e && null !== e && (f[c] = e);
+      var f = a.params[c](a.endpoint, c, b[c]);
+      "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
     }
   }
-  return{data:serializeObject(f), url:d};
+  return{data:serializeObject(e), url:d};
 }
 var _jsonp_callbackId = 0;
 function jsonp(a, b) {
@@ -166,34 +166,34 @@ var api = function(a, b, c) {
   c = c || function() {
   };
   b = getUrl(a, b);
-  var d, f = "";
-  "GET" == a.method ? d = b.url + "?" + b.data : (d = b.url, f = b.data);
+  var d, e = "";
+  "GET" == a.method ? d = b.url + "?" + b.data : (d = b.url, e = b.data);
   if (a.jsonp) {
     return jsonp(d, c);
   }
-  var e = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  e.onreadystatechange = function() {
-    if (4 === e.readyState && 200 === e.status) {
+  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  f.onreadystatechange = function() {
+    if (4 === f.readyState && 200 === f.status) {
       try {
-        c(null, JSON.parse(e.responseText));
+        c(null, JSON.parse(f.responseText));
       } catch (a) {
         c(null, {});
       }
     } else {
-      4 === e.readyState && 402 === e.status ? c(Error("Not enough credits to redeem.")) : 4 === e.readyState && "4" != e.status.substring(0, 1) && c(Error("Error in API: " + e.status));
+      4 === f.readyState && 402 === f.status ? c(Error("Not enough credits to redeem.")) : 4 === f.readyState && "4" != f.status.substring(0, 1) && c(Error("Error in API: " + f.status));
     }
   };
-  e.open(a.method, d, !0);
-  e.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  e.send(f);
+  f.open(a.method, d, !0);
+  f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  f.send(e);
 };
 // Input 4
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};
 function validator(a, b) {
-  return function(c, d, f) {
-    f ? b == validationTypes.obj ? "object" != typeof f && utils.error(utils.messages.invalidType, [c, d, "an object"]) : b == validationTypes.arr ? f instanceof Array || utils.error(utils.messages.invalidType, [c, d, "an array"]) : b == validationTypes.str ? "string" != typeof f && utils.error(utils.messages.invalidType, [c, d, "a string"]) : b == validationTypes.num ? "number" != typeof f && utils.error(utils.messages.invalidType, [c, d, "a number"]) : b && (b.test(f) || utils.error(utils.messages.invalidType, 
+  return function(c, d, e) {
+    e ? b == validationTypes.obj ? "object" != typeof e && utils.error(utils.messages.invalidType, [c, d, "an object"]) : b == validationTypes.arr ? e instanceof Array || utils.error(utils.messages.invalidType, [c, d, "an array"]) : b == validationTypes.str ? "string" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a string"]) : b == validationTypes.num ? "number" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a number"]) : b && (b.test(e) || utils.error(utils.messages.invalidType, 
     [c, d, "in the proper format"])) : a && utils.error(utils.messages.missingParam, [c, d]);
-    return f;
+    return e;
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
@@ -230,16 +230,24 @@ Branch.prototype.init = function(a, b) {
   }
   this.initialized = !0;
   this.app_id = a;
-  var c = this, d = utils.readStore();
+  var c = this, d = utils.readStore(), e = function(a) {
+    delete a.session_id;
+    delete a.identity_id;
+    delete a.link;
+    delete a.device_fingerprint;
+    delete a.device_fingerprint_id;
+    delete a.browser_fingerprint_id;
+    return a;
+  };
   d && !d.session_id && (d = null);
   d && (this.session_id = d.session_id, this.identity_id = d.identity_id, this.sessionLink = d.link);
-  d && !utils.hashValue("r") ? b(null, d) : this._api(resources._r, {}, function(a, d) {
+  d && !utils.hashValue("r") ? b(null, e(d)) : this._api(resources._r, {}, function(a, d) {
     c._api(resources.open, {link_identifier:utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:d}, function(a, d) {
       c.session_id = d.session_id;
       c.identity_id = d.identity_id;
       c.sessionLink = d.link;
       utils.store(d);
-      b(a, d);
+      b(a, e(d));
     });
   });
 };
@@ -314,11 +322,11 @@ Branch.prototype.sendSMSNew = function(a, b) {
   }
   a.channel = "sms";
   var c = this;
-  this.link(a, function(d, f) {
+  this.link(a, function(d, e) {
     if (d) {
       return b(d);
     }
-    c.linkClick(f, function(d) {
+    c.linkClick(e, function(d) {
       if (d) {
         return b(d);
       }

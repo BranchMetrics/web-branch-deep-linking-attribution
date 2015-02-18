@@ -8,7 +8,9 @@
 
 ### &#39;init&#39;(app_id, callback) 
 
-Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called. The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorageHEA *
+Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
+The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
+**Useful Tip**: The init fucntion returns a data object where you can read the link the user was referred by.
 
 **Parameters**
 
@@ -29,23 +31,19 @@ Branch.init(
 
 ```js
 {
-    session_id:         '12345', // Server-generated ID of the session, stored in `sessionStorage`
-    identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
-    device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint, stored in `sessionStorage`
     data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
-    link:               'url',   // Server-generated link identity, for synchronous link creation.
     referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
 }
 ```
 
-**Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session environment, allowing controlled access to the other SDK methods.
+**Note:** `Branch.init` must be called prior to calling any other Branch functions.
 ___
 
 
 
 ### &#39;setIdentity&#39;(identity, callback) 
 
-Sets the identity of a user and returns the data.
+Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
 
 **Formerly `identify()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
