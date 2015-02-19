@@ -7,8 +7,8 @@ utils.error = function(a, b) {
   throw Error(utils.message(a, b));
 };
 utils.message = function(a, b) {
-  var c = a.replace(/\$(\d)/g, function(a, c) {
-    return b[parseInt(c) - 1];
+  var c = a.replace(/\$(\d)/g, function(c, a) {
+    return b[parseInt(a) - 1];
   });
   DEBUG && console && console.log(c);
   return c;
@@ -104,8 +104,8 @@ banner.smartBannerStyles = function(a, b) {
 banner.appendSmartBannerActions = function(a, b, c, d) {
   if (bannerResources.actions.shouldAppend(c, d)) {
     c = document.createElement("div");
-    bannerResources.actions.mobileUserAgent() ? (a.link({channel:"appBanner", data:b.data || {}}, function(a, b) {
-      document.getElementById("branch-mobile-action").href = b;
+    bannerResources.actions.mobileUserAgent() ? (a.link({channel:"appBanner", data:b.data || {}}, function(b, c) {
+      document.getElementById("branch-mobile-action").href = c;
     }), c.innerHTML = bannerResources.html.mobileAction(b)) : c.innerHTML = bannerResources.html.desktopAction(b);
     document.getElementById("branch-banner-action").appendChild(c);
     try {
@@ -147,48 +147,94 @@ function getUrl(a, b) {
   var e = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      var f = a.params[c](a.endpoint, c, b[c]);
-      "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
+      var g = a.params[c](a.endpoint, c, b[c]);
+      "undefined" != typeof g && "" !== g && null !== g && (e[c] = g);
     }
   }
   return{data:serializeObject(e), url:d};
 }
-var _jsonp_callbackId = 0;
-function jsonp(a, b) {
-  var c = "branch$$callback$$" + _jsonp_callbackId++;
-  window[c] = function(a) {
-    b(null, a);
-  };
-  var d = document.createElement("script");
-  d.type = "text/javascript";
-  d.async = !0;
-  d.src = a + (a.indexOf("?") ? "&" : "?") + "callback=" + encodeURIComponent(c);
-  document.getElementsByTagName("head")[0].appendChild(d);
+var _jsonp_callback_index = 0, jsonpRequest = function() {
+  var a = {_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode:function(b) {
+    var c = "", d, e, g, f, k, h, l = 0;
+    for (b = a._utf8_encode(b);l < b.length;) {
+      d = b.charCodeAt(l++), e = b.charCodeAt(l++), g = b.charCodeAt(l++), f = d >> 2, d = (d & 3) << 4 | e >> 4, k = (e & 15) << 2 | g >> 6, h = g & 63, isNaN(e) ? k = h = 64 : isNaN(g) && (h = 64), c = c + this._keyStr.charAt(f) + this._keyStr.charAt(d) + this._keyStr.charAt(k) + this._keyStr.charAt(h);
+    }
+    return c;
+  }, decode:function(b) {
+    var c = "", d, e, g, f, k, h = 0;
+    for (b = b.replace(/[^A-Za-z0-9\+\/\=]/g, "");h < b.length;) {
+      d = this._keyStr.indexOf(b.charAt(h++)), e = this._keyStr.indexOf(b.charAt(h++)), f = this._keyStr.indexOf(b.charAt(h++)), k = this._keyStr.indexOf(b.charAt(h++)), d = d << 2 | e >> 4, e = (e & 15) << 4 | f >> 2, g = (f & 3) << 6 | k, c += String.fromCharCode(d), 64 != f && (c += String.fromCharCode(e)), 64 != k && (c += String.fromCharCode(g));
+    }
+    return c = a._utf8_decode(c);
+  }, _utf8_encode:function(b) {
+    b = b.replace(/\r\n/g, "\n");
+    for (var c = "", a = 0;a < b.length;a++) {
+      var e = b.charCodeAt(a);
+      128 > e ? c += String.fromCharCode(e) : (127 < e && 2048 > e ? c += String.fromCharCode(e >> 6 | 192) : (c += String.fromCharCode(e >> 12 | 224), c += String.fromCharCode(e >> 6 & 63 | 128)), c += String.fromCharCode(e & 63 | 128));
+    }
+    return c;
+  }, _utf8_decode:function(b) {
+    for (var c = "", a = 0, e = c1 = c2 = 0;a < b.length;) {
+      e = b.charCodeAt(a), 128 > e ? (c += String.fromCharCode(e), a++) : 191 < e && 224 > e ? (c2 = b.charCodeAt(a + 1), c += String.fromCharCode((e & 31) << 6 | c2 & 63), a += 2) : (c2 = b.charCodeAt(a + 1), c3 = b.charCodeAt(a + 2), c += String.fromCharCode((e & 15) << 12 | (c2 & 63) << 6 | c3 & 63), a += 3);
+    }
+    return c;
+  }};
+  return{send:function(b, c) {
+    var d = c.callbackName || "branch_callback__" + _jsonp_callback_index++, e = c.onSuccess || function() {
+    }, g = c.onTimeout || function() {
+    }, f;
+    "POST" == c.method && (f = encodeURIComponent(a.encode(JSON.stringify(c.data))) || "");
+    var k = "&data=";
+    0 <= b.indexOf("bnc.lt") && (k = "&post_data=");
+    var h = window.setTimeout(function() {
+      window[d] = function() {
+      };
+      g();
+    }, 1E3 * (c.timeout || 10));
+    window[d] = function(a) {
+      window.clearTimeout(h);
+      e(a);
+    };
+    var l = document.createElement("script");
+    l.type = "text/javascript";
+    l.async = !0;
+    l.src = b + (0 > b.indexOf("?") ? "?" : "") + (f ? k + f : "") + "&callback=" + d + (0 <= b.indexOf("/c/") ? "&click=1" : "");
+    document.getElementsByTagName("head")[0].appendChild(l);
+  }};
+}();
+function jsonpMakeRequest(a, b, c, d) {
+  jsonpRequest.send(a, {onSuccess:function(a) {
+    d(null, a);
+  }, onTimeout:function() {
+    d({error:"Request timed out."});
+  }, timeout:3, data:b, method:c});
 }
 var api = function(a, b, c) {
   c = c || function() {
   };
-  b = getUrl(a, b);
-  var d, e = "";
-  "GET" == a.method ? d = b.url + "?" + b.data : (d = b.url, e = b.data);
-  if (a.jsonp) {
-    return jsonp(d, c);
-  }
-  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  f.onreadystatechange = function() {
-    if (4 === f.readyState && 200 === f.status) {
-      try {
-        c(null, JSON.parse(f.responseText));
-      } catch (a) {
-        c(null, {});
+  var d = getUrl(a, b), e, g = "";
+  "GET" == a.method ? e = d.url + "?" + d.data : (e = d.url, g = d.data);
+  if (sessionStorage.getItem("use_jsonp") || a.jsonp) {
+    jsonpMakeRequest(e, b, a.method, c);
+  } else {
+    var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+    f.onreadystatechange = function() {
+      if (4 === f.readyState && 200 === f.status) {
+        try {
+          c(null, JSON.parse(f.responseText));
+        } catch (a) {
+          c(null, {});
+        }
+      } else {
+        4 === f.readyState && 402 === f.status ? c(Error("Not enough credits to redeem.")) : 4 === f.readyState && "4" != f.status.substring(0, 1) && c(Error("Error in API: " + f.status));
       }
-    } else {
-      4 === f.readyState && 402 === f.status ? c(Error("Not enough credits to redeem.")) : 4 === f.readyState && "4" != f.status.substring(0, 1) && c(Error("Error in API: " + f.status));
+    };
+    try {
+      f.open(a.method, e, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(g);
+    } catch (k) {
+      sessionStorage.setItem("use_jsonp", !0), jsonpMakeRequest(e, b, a.method, c);
     }
-  };
-  f.open(a.method, d, !0);
-  f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  f.send(e);
+  }
 };
 // Input 4
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};
