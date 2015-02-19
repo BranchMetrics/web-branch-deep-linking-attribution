@@ -56,7 +56,7 @@ See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
 
-```
+```js
 Branch.setIdentity(
     identity,
     callback(err, data)
@@ -87,7 +87,7 @@ Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
 
-```
+```js
 Branch.logout(
     callback(err, data)
 )
@@ -126,7 +126,7 @@ See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
 
-```
+```js
 Branch.event(
     event,
     metadata,
@@ -171,7 +171,7 @@ Branch.link(
 
 #### Example
 
-````
+```js
 branch.link({
     tags: ['tag1', 'tag2'],
     channel: 'facebook',
@@ -194,7 +194,7 @@ branch.link({
 }, function(err, data) {
     console.log(err || data);
 });
-````
+```
 
 ##### Returns
 
@@ -234,7 +234,7 @@ Branch.sendSMS(
 
 #### Example
 
-```
+```js
 branch.sendSMS(
     phone: '9999999999',
     tags: ['tag1', 'tag2'],
@@ -290,7 +290,7 @@ See [CHANGELOG](CHANGELOG.md)
 **callback**: `function | null`, Returns an error or object with referral data on success
 
 ##### Usage
-```
+```js
 Branch.referrals(
     callback(err, data)
 )
@@ -331,7 +331,7 @@ See [CHANGELOG](CHANGELOG.md)
 **callback**: `function | null`, Returns an error or object with credit data on success
 
 ##### Usage
-```
+```js
 Branch.credits(
     callback(err, data)
 )
@@ -363,7 +363,7 @@ See [CHANGELOG](CHANGELOG.md)
 
 **callback**: `function | null`, Returns an error or empty object on success
 
-```
+```js
 Branch.redeem(
 {
     amount, // amount of credits to be redeemed
@@ -375,7 +375,7 @@ Branch.redeem(
 
 ##### Example
 
-```
+```js
 branch.redeem({
     5,
     'bucket'
@@ -399,7 +399,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### &quot;banner&quot;(data) 
+### &quot;banner&quot;(data, mobile, desktop) 
 
 Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
 
@@ -410,17 +410,23 @@ See [CHANGELOG](CHANGELOG.md)
 
 **data**: `Object`, **Required** Object of all link data
 
+**mobile**: `Boolean | true`, **Default: true** Should Branch show a banner on mobile devices?
+
+**desktop**: `Boolean | true`, **Default: true** Show Branch show a banner on desktop devices?
+
 #### Usage
 
-```
+```js
 Branch.banner(
     metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
+    showMobile,
+    showDesktop
 )
 ```
 
  ##### Example
 
-```
+```js
 branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
@@ -430,8 +436,6 @@ branch.banner({
     data: {
         foo: 'bar'
     }
-}, function(data){
-    console.log(data)
 });
 ```
 

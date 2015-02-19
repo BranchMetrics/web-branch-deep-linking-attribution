@@ -1,5 +1,5 @@
 /**
- * This provides the markup, styles, and helper functions for all UI elements
+ * This provides the markup, styles, and helper functions for all Banner UI Elements
  */
 
 goog.provide('banner');
@@ -158,6 +158,9 @@ var bannerResources = {
 		},
 		mobileUserAgent: function() {
 			return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? (navigator.userAgent.match(/android/i) ? 'android' : 'ios') : false;
+		},
+		shouldAppend: function(mobile, desktop) {
+			return (desktop && !bannerResources.actions.mobileUserAgent()) || (mobile && bannerResources.actions.mobileUserAgent());
 		}
 	}
 };
@@ -167,33 +170,38 @@ var bannerResources = {
 /**
  * @param {Object} obj
  */
-elements.smartBannerMarkup = function(obj) {
-	// Consturct Banner Markup
-	var banner = document.createElement('div');
-	banner.id = 'branch-banner';
-	banner.innerHTML = bannerResources.html.banner(obj);
-	return banner;
+banner.smartBannerMarkup = function(obj, mobile, desktop) {
+	if(bannerResources.actions.shouldAppend(mobile, desktop)) {
+		// Consturct Banner Markup
+		var banner = document.createElement('div');
+		banner.id = 'branch-banner';
+		banner.innerHTML = bannerResources.html.banner(obj);
+		document.body.appendChild(banner);
+	}
 };
 
-elements.smartBannerStyles = function() {
-	// Construct Banner CSS
-	var css = document.createElement("style");
-	css.type = "text/css";
-	css.id = 'branch-css';
-	css.innerHTML = bannerResources.css.banner;
+banner.smartBannerStyles = function(mobile, desktop) {
+	if(bannerResources.actions.shouldAppend(mobile, desktop)) {
+		// Construct Banner CSS
+		var css = document.createElement("style");
+		css.type = "text/css";
+		css.id = 'branch-css';
+		css.innerHTML = bannerResources.css.banner;
 
-	// User agent specific styles
-	var userAgent = bannerResources.actions.mobileUserAgent();
-	if (userAgent == 'ios') {
-		css.innerHTML += bannerResources.css.iOS;
+		// User agent specific styles
+		var userAgent = bannerResources.actions.mobileUserAgent();
+		if (userAgent == 'ios' && mobile) {
+			css.innerHTML += bannerResources.css.iOS;
+		}
+		else if (userAgent == 'android' && mobile) {
+			css.innerHTML += bannerResources.css.android;
+		}
+		else if (desktop) {
+			css.innerHTML += bannerResources.css.desktop;
+		}
+		document.head.appendChild(css);
+		document.getElementById('branch-banner').style.top = '-76px';
 	}
-	else if (userAgent == 'android') {
-		css.innerHTML += bannerResources.css.android;
-	}
-	else {
-		css.innerHTML += bannerResources.css.desktop;
-	}
-	return css;
 };
 
 // Element Activities
@@ -201,36 +209,40 @@ elements.smartBannerStyles = function() {
 /**
  * @param {Object} obj
  */
-elements.appendSmartBannerActions = function(branch, obj) {
-	var action = document.createElement('div');
+banner.appendSmartBannerActions = function(branch, obj, mobile, desktop) {
+	if(bannerResources.actions.shouldAppend(mobile, desktop)) {
+		var action = document.createElement('div');
 
-	// User agent specific markup
-	if (bannerResources.actions.mobileUserAgent()) {
-		branch.link({
-			channel: 'appBanner',
-			data: obj.data || {}
-		}, function(err, url) {
-			document.getElementById('branch-mobile-action').href = url;
-		});
-		action.innerHTML = bannerResources.html.mobileAction(obj);
-	}
-	else {
-		action.innerHTML = bannerResources.html.desktopAction(obj);
-	}
+		// User agent specific markup
+		if (bannerResources.actions.mobileUserAgent()) {
+			branch.link({
+				channel: 'appBanner',
+				data: obj.data || {}
+			}, function(err, url) {
+				document.getElementById('branch-mobile-action').href = url;
+			});
+			action.innerHTML = bannerResources.html.mobileAction(obj);
+		}
+		else {
+			action.innerHTML = bannerResources.html.desktopAction(obj);
+		}
 
-	document.getElementById('branch-banner-action').appendChild(action);
-	try {
-		document.getElementById('branch-sms-send').addEventListener("click", function() {
-		    bannerResources.actions.sendSMS(branch, obj);
-		});
+		document.getElementById('branch-banner-action').appendChild(action);
+		try {
+			document.getElementById('branch-sms-send').addEventListener("click", function() {
+			    bannerResources.actions.sendSMS(branch, obj);
+			});
+		}
+		catch (e) {}
+		document.getElementById('branch-banner-close').onclick = bannerResources.actions.close;
 	}
-	catch (e) {}
-	document.getElementById('branch-banner-close').onclick = bannerResources.actions.close;
 };
 
-elements.triggerBannerAnimation = function() {
-	document.body.style.marginTop = '71px';
-	setTimeout(function() {
-		document.getElementById('branch-banner').style.top = '0';
-	}, animationDelay);
+banner.triggerBannerAnimation = function(mobile, desktop) {
+	if(bannerResources.actions.shouldAppend(mobile, desktop)) {
+		document.body.style.marginTop = '71px';
+		setTimeout(function() {
+			document.getElementById('branch-banner').style.top = '0';
+		}, animationDelay);
+	}
 };

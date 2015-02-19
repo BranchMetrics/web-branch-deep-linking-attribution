@@ -83,41 +83,44 @@ html:{banner:function(a) {
   utils.storeKeyValue("hideBanner", !0);
 }, mobileUserAgent:function() {
   return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : "ios" : !1;
+}, shouldAppend:function(a, b) {
+  return b && !bannerResources.actions.mobileUserAgent() || a && bannerResources.actions.mobileUserAgent();
 }}};
-elements.smartBannerMarkup = function(a) {
-  var b = document.createElement("div");
-  b.id = "branch-banner";
-  b.innerHTML = bannerResources.html.banner(a);
-  return b;
+banner.smartBannerMarkup = function(a, b, c) {
+  bannerResources.actions.shouldAppend(b, c) && (b = document.createElement("div"), b.id = "branch-banner", b.innerHTML = bannerResources.html.banner(a), document.body.appendChild(b));
 };
-elements.smartBannerStyles = function() {
-  var a = document.createElement("style");
-  a.type = "text/css";
-  a.id = "branch-css";
-  a.innerHTML = bannerResources.css.banner;
-  var b = bannerResources.actions.mobileUserAgent();
-  a.innerHTML = "ios" == b ? a.innerHTML + bannerResources.css.iOS : "android" == b ? a.innerHTML + bannerResources.css.android : a.innerHTML + bannerResources.css.desktop;
-  return a;
-};
-elements.appendSmartBannerActions = function(a, b) {
-  var c = document.createElement("div");
-  bannerResources.actions.mobileUserAgent() ? (a.link({channel:"appBanner", data:b.data || {}}, function(a, b) {
-    document.getElementById("branch-mobile-action").href = b;
-  }), c.innerHTML = bannerResources.html.mobileAction(b)) : c.innerHTML = bannerResources.html.desktopAction(b);
-  document.getElementById("branch-banner-action").appendChild(c);
-  try {
-    document.getElementById("branch-sms-send").addEventListener("click", function() {
-      bannerResources.actions.sendSMS(a, b);
-    });
-  } catch (d) {
+banner.smartBannerStyles = function(a, b) {
+  if (bannerResources.actions.shouldAppend(a, b)) {
+    var c = document.createElement("style");
+    c.type = "text/css";
+    c.id = "branch-css";
+    c.innerHTML = bannerResources.css.banner;
+    var d = bannerResources.actions.mobileUserAgent();
+    "ios" == d && a ? c.innerHTML += bannerResources.css.iOS : "android" == d && a ? c.innerHTML += bannerResources.css.android : b && (c.innerHTML += bannerResources.css.desktop);
+    document.head.appendChild(c);
+    document.getElementById("branch-banner").style.top = "-76px";
   }
-  document.getElementById("branch-banner-close").onclick = bannerResources.actions.close;
 };
-elements.triggerBannerAnimation = function() {
-  document.body.style.marginTop = "71px";
-  setTimeout(function() {
+banner.appendSmartBannerActions = function(a, b, c, d) {
+  if (bannerResources.actions.shouldAppend(c, d)) {
+    c = document.createElement("div");
+    bannerResources.actions.mobileUserAgent() ? (a.link({channel:"appBanner", data:b.data || {}}, function(a, b) {
+      document.getElementById("branch-mobile-action").href = b;
+    }), c.innerHTML = bannerResources.html.mobileAction(b)) : c.innerHTML = bannerResources.html.desktopAction(b);
+    document.getElementById("branch-banner-action").appendChild(c);
+    try {
+      document.getElementById("branch-sms-send").addEventListener("click", function() {
+        bannerResources.actions.sendSMS(a, b);
+      });
+    } catch (e) {
+    }
+    document.getElementById("branch-banner-close").onclick = bannerResources.actions.close;
+  }
+};
+banner.triggerBannerAnimation = function(a, b) {
+  bannerResources.actions.shouldAppend(a, b) && (document.body.style.marginTop = "71px", setTimeout(function() {
     document.getElementById("branch-banner").style.top = "0";
-  }, animationDelay);
+  }, animationDelay));
 };
 // Input 3
 function serializeObject(a, b) {
@@ -378,8 +381,10 @@ Branch.prototype.redeem = function(a, b) {
     b(a, d);
   });
 };
-Branch.prototype.banner = function(a) {
-  document.getElementById("branch-banner") || utils.readKeyValue("hideBanner") || (document.head.appendChild(elements.smartBannerStyles()), document.body.appendChild(elements.smartBannerMarkup(a)), document.getElementById("branch-banner").style.top = "-76px", elements.appendSmartBannerActions(this, a), elements.triggerBannerAnimation());
+Branch.prototype.banner = function(a, b, c) {
+  b = void 0 == b ? !0 : b;
+  c = void 0 == c ? !0 : c;
+  document.getElementById("branch-banner") || utils.readKeyValue("hideBanner") || (banner.smartBannerMarkup(a, b, c), banner.smartBannerStyles(b, c), banner.appendSmartBannerActions(this, a, b, c), banner.triggerBannerAnimation(b, c));
 };
 // Input 6
 var branch_instance = new Branch;

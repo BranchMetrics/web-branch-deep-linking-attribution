@@ -116,7 +116,7 @@ Branch.prototype['init'] = function(app_id, callback) {
  *
  * ##### Usage
  *
- * ```
+ * ```js
  * Branch.setIdentity(
  *     identity,
  *     callback(err, data)
@@ -150,7 +150,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  *
  * ##### Usage
  *
- * ```
+ * ```js
  * Branch.logout(
  *     callback(err, data)
  * )
@@ -185,7 +185,7 @@ Branch.prototype['logout'] = function(callback) {
  *
  * ##### Usage
  *
- * ```
+ * ```js
  * Branch.close(
  *     callback(err, data)
  * )
@@ -193,7 +193,7 @@ Branch.prototype['logout'] = function(callback) {
  *
  * ##### Returns
  *
- * ```
+ * ```js
  * {}
  * ```
  *
@@ -226,7 +226,7 @@ Branch.prototype['close'] = function(callback) {
  *
  * ##### Usage
  *
- * ```
+ * ```js
  * Branch.event(
  *     event,
  *     metadata,
@@ -287,7 +287,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *
  * #### Example
  *
- * ````
+ * ```js
  * branch.link({
  *     tags: ['tag1', 'tag2'],
  *     channel: 'facebook',
@@ -310,7 +310,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * }, function(err, data) {
  *     console.log(err || data);
  * });
- * ````
+ * ```
  *
  * ##### Returns
  *
@@ -379,7 +379,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *
  * #### Example
  *
- * ```
+ * ```js
  * branch.sendSMS(
  *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
@@ -445,7 +445,7 @@ Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
  *
  * #### Usage
  *
- * ```
+ * ```js
  * Branch.sendSMSNew(
  *     metadata,    // Metadata must include phone number as `phone`
  *     callback(err, data)
@@ -479,7 +479,7 @@ Branch.prototype['sendSMSNew'] = function(obj, callback) {
  *
  * #### Usage
  *
- * ```
+ * ```js
  * Branch.sendSMSExisting(
  *     metadata,     // Metadata must include phone number as `phone`
  *     callback(err, data)
@@ -508,7 +508,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  * @param {function|null} callback - Returns an error or object with referral data on success
  *
  * ##### Usage
- * ```
+ * ```js
  * Branch.referrals(
  *     callback(err, data)
  * )
@@ -554,7 +554,7 @@ Branch.prototype["referrals"] = function(callback) {
  * @param {function|null} callback - Returns an error or object with credit data on success
  *
  * ##### Usage
- * ```
+ * ```js
  * Branch.credits(
  *     callback(err, data)
  * )
@@ -590,7 +590,7 @@ Branch.prototype["credits"] = function(callback) {
  * @param {Object} obj - **Required** Object with an `amount` (int) param of number of credits to redeem, and `bucket` (string) param of which bucket to redeem the credits from
  * @param {function|null} callback - Returns an error or empty object on success
  *
- * ```
+ * ```js
  * Branch.redeem(
  * {
  *     amount, // amount of credits to be redeemed
@@ -602,7 +602,7 @@ Branch.prototype["credits"] = function(callback) {
  *
  * ##### Example
  *
- * ```
+ * ```js
  * branch.redeem({
  *     5,
  *     'bucket'
@@ -641,18 +641,22 @@ Branch.prototype["redeem"] = function(obj, callback) {
  * See [CHANGELOG](CHANGELOG.md)
  *
  * @param {Object} data - **Required** Object of all link data
+ * @param {Boolean|true} mobile - **Default: true** Should Branch show a banner on mobile devices?
+ * @param {Boolean|true} desktop - **Default: true** Show Branch show a banner on desktop devices?
  *
  * #### Usage
  *
- * ```
+ * ```js
  * Branch.banner(
  *     metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
+ *     showMobile,
+ *     showDesktop
  * )
  * ```
  *
  *  ##### Example
  *
- * ```
+ * ```js
  * branch.banner({
  *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
  *     title: 'Branch Demo App',
@@ -662,17 +666,16 @@ Branch.prototype["redeem"] = function(obj, callback) {
  *     data: {
  *         foo: 'bar'
  *     }
- * }, function(data){
- *     console.log(data)
  * });
  * ```
  */
-Branch.prototype["banner"] = function(data) {
+Branch.prototype["banner"] = function(data, mobile, desktop) {
+	mobile = (mobile == undefined) ? true : mobile;
+	desktop = (desktop == undefined) ? true : desktop;
 	if (!document.getElementById('branch-banner') && !utils.readKeyValue("hideBanner")) {
-		document.head.appendChild(elements.smartBannerStyles());
-		document.body.appendChild(elements.smartBannerMarkup(data));
-		document.getElementById('branch-banner').style.top = '-76px';
-		elements.appendSmartBannerActions(this, data);
-		elements.triggerBannerAnimation();
+		banner.smartBannerMarkup(data, mobile, desktop);
+		banner.smartBannerStyles(mobile, desktop);
+		banner.appendSmartBannerActions(this, data, mobile, desktop);
+		banner.triggerBannerAnimation(mobile, desktop);
 	}
 };
