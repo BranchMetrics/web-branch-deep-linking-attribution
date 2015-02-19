@@ -3,17 +3,6 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Branch Metrics Web SDK Exaple App</title>
-  <script type="text/javascript">
-
-!function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
-"dist/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
-e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-"init;logout;event;setIdentity;link;referrals;credits;redeem;banner".split(";"),0);
-
-branch.init('5680621892404085', function(err, data) {
-  document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
-});
-  </script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <style type="text/css">
     .btn {
@@ -87,6 +76,17 @@ branch.init('5680621892404085', function(err, data) {
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+
+  !function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
+  "dist/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
+  e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
+  "init;logout;event;setIdentity;link;referrals;credits;redeem;banner".split(";"),0);
+
+  branch.init('5680621892404085', function(err, data) {
+    document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+  });
+  </script>
   <script type="text/javascript">
     var info     = $('.info');
     var request  = $('.request');
