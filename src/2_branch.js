@@ -340,14 +340,15 @@ Branch.prototype['link'] = function(obj, callback) {
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
-	this.api(resources.linkClick, {
-		"link_url": url.replace('https://bnc.lt/', ''),
-		"click": "click"
-	}, function(err, data) {
-		utils.storeKeyValue("click_id", data["click_id"]);
-		if (err || data) { callback(err, data); }
-	});
+	if (url) {
+		this._api(resources.linkClick, {
+			"link_url": url.replace('https://bnc.lt/', ''),
+			"click": "click"
+		}, function(err, data) {
+			utils.storeKeyValue("click_id", data["click_id"]);
+			if (err || data) { callback(err, data); }
+		});
+	}
 };
 
 /**
@@ -355,13 +356,15 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
  * @param {function|null} callback - Returns an error or empty object on success
+ * @param {String|true} use_existing_link - If set to false, forces the creation of a new link that will be sent send, even if a link already exists
  *
  * #### Usage
  *
  * ```
  * Branch.sendSMS(
- *     metadata,    // Metadata must include phone number as `phone`
- *     callback(err, data)
+ *     metadata,            // Metadata must include phone number as `phone`
+ *     callback(err, data),
+ *     use_existing_link    // Deafult: true
  * )
  * ```
  *
@@ -388,18 +391,22 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *     '$og_description': 'My app\'s description.',
  *     '$og_image_url': 'http://myappwebsite.com/image.png'
  *     }
+ *
  * }, function(err, data) {
  *     console.log(err || data);
- * });
+ *
+ * }, use_existing_link);
  * ```
  *
  * ___
  */
-Branch.prototype['sendSMS'] = function(obj, callback) {
+Branch.prototype['sendSMS'] = function(obj, callback, use_existing_link) {
 	callback = callback || function() {};
+	use_existing_link = use_existing_link || true;
+
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if (utils.readKeyValue("click_id")) {
+	if (utils.readKeyValue("click_id") && use_existing_link) {
 		this.sendSMSExisting(obj["phone"], callback);
 	}
 	else {
@@ -407,7 +414,7 @@ Branch.prototype['sendSMS'] = function(obj, callback) {
 	}
 };
 
-/**
+/***
  *
  * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
@@ -441,7 +448,7 @@ Branch.prototype['sendSMSNew'] = function(obj, callback) {
 	});
 };
 
-/**
+/***
  * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
  * @param {String} phone - **Required** String of phone number the link should be sent to

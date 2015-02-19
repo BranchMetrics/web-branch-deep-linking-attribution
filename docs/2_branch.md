@@ -202,7 +202,7 @@ ___
 
 
 
-### &#39;sendSMS&#39;(metadata, callback) 
+### &#39;sendSMS&#39;(metadata, callback, use_existing_link) 
 
 A powerful function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
 
@@ -212,12 +212,15 @@ A powerful function to give your users the ability to share links via SMS. If th
 
 **callback**: `function | null`, Returns an error or empty object on success
 
+**use_existing_link**: `String | true`, If set to false, forces the creation of a new link that will be sent send, even if a link already exists
+
 #### Usage
 
 ```
 Branch.sendSMS(
-    metadata,    // Metadata must include phone number as `phone`
-    callback(err, data)
+    metadata,            // Metadata must include phone number as `phone`
+    callback(err, data),
+    use_existing_link    // Deafult: true
 )
 ```
 
@@ -244,56 +247,13 @@ branch.sendSMS(
     '$og_description': 'My app\'s description.',
     '$og_image_url': 'http://myappwebsite.com/image.png'
     }
+
 }, function(err, data) {
     console.log(err || data);
-});
+
+}, use_existing_link);
 ```
 
-___
-
-
-
-### &#39;sendSMSNew&#39;(metadata, callback) 
-
-Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
-
-**Parameters**
-
-**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
-
-**callback**: `function | null`, Returns an error or empyy object on success
-
-#### Usage
-
-```
-Branch.sendSMSNew(
-    metadata,    // Metadata must include phone number as `phone`
-    callback(err, data)
-)
-```
-
-___
-
-
-
-### &#39;sendSMSExisting&#39;(phone, callback) 
-
-Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
-
-**Parameters**
-
-**phone**: `String`, **Required** String of phone number the link should be sent to
-
-**callback**: `function | null`, Returns an error or empty object on success
-
-#### Usage
-
-```
-Branch.sendSMSExisting(
-    metadata,     // Metadata must include phone number as `phone`
-    callback(err, data)
-)
-```
 ___
 
 

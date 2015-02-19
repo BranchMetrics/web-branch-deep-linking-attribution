@@ -301,18 +301,19 @@ Branch.prototype.linkClick = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this.api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, d) {
+  a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, d) {
     utils.storeKeyValue("click_id", d.click_id);
     (a || d) && b(a, d);
   });
 };
-Branch.prototype.sendSMS = function(a, b) {
+Branch.prototype.sendSMS = function(a, b, c) {
   b = b || function() {
   };
+  c = c || !0;
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  utils.readKeyValue("click_id") ? this.sendSMSExisting(a.phone, b) : this.sendSMSNew(a, b);
+  utils.readKeyValue("click_id") && c ? this.sendSMSExisting(a.phone, b) : this.sendSMSNew(a, b);
 };
 Branch.prototype.sendSMSNew = function(a, b) {
   b = b || function() {
