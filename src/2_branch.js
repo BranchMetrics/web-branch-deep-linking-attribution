@@ -6,7 +6,7 @@ goog.provide('Branch');
 goog.require('utils');
 goog.require('resources');
 goog.require('api');
-goog.require('elements');
+goog.require('banner');
 
 var default_branch;
 
@@ -668,7 +668,7 @@ Branch.prototype["redeem"] = function(obj, callback) {
  * ```
  */
 Branch.prototype["banner"] = function(data) {
-	if (!document.getElementById('branch-banner') && !utils.readKeyValue("bannerShown")) {
+	if (!document.getElementById('branch-banner') && !utils.readKeyValue("hideBanner")) {
 		document.head.appendChild(elements.smartBannerStyles());
 		document.body.appendChild(elements.smartBannerMarkup(data));
 		document.getElementById('branch-banner').style.top = '-76px';

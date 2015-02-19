@@ -2,7 +2,7 @@
  * This provides the markup, styles, and helper functions for all UI elements
  */
 
-goog.provide('elements');
+goog.provide('banner');
 goog.require('utils');
 
 // UI Animation transition speed in ms
@@ -154,7 +154,7 @@ var bannerResources = {
 
 			document.getElementById('branch-banner').style.top = '-76px';
 
-			utils.storeKeyValue("bannerShown", true);
+			utils.storeKeyValue("hideBanner", true);
 		},
 		mobileUserAgent: function() {
 			return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? (navigator.userAgent.match(/android/i) ? 'android' : 'ios') : false;
