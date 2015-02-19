@@ -42,7 +42,8 @@ ___
 
 
 
-### setIdentity(identity, callback) 
+### Branch.setIdentity
+**Formerly `identify()` (depreciated).**(identity, callback) 
 
 **Parameters**
 
@@ -52,7 +53,6 @@ ___
 
 Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
 
-**Formerly `identify()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
@@ -122,7 +122,6 @@ ___
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
 
-**Formerly `track()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
@@ -148,7 +147,8 @@ ___
 
 
 
-### link(metadata, callback) 
+### Branch.link
+**Formerly `createLink()` (depreciated).**(metadata, callback) 
 
 **Parameters**
 
@@ -158,7 +158,6 @@ ___
 
 Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
-**Formerly `createLink()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
 #### Usage
@@ -279,7 +278,8 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### referrals(callback) 
+### Branch.referrals
+**Formerly `showReferrals()` (depreciated).**(callback) 
 
 **Parameters**
 
@@ -287,7 +287,6 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 Retrieves a complete summary of the referrals the current user has made.
 
-**Formerly `showReferrals()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
@@ -320,7 +319,8 @@ Branch.referrals(
 
 
 
-### credits(callback) 
+### Branch.credits
+**Formerly `showCredits()` (depreciated).**(callback) 
 
 **Parameters**
 
@@ -328,7 +328,6 @@ Branch.referrals(
 
 This call will retrieve the entire history of credits and redemptions from the individual user.
 
-**Formerly `showCredits()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
@@ -351,7 +350,8 @@ Branch.credits(
 
 
 
-### redeem(obj, callback) 
+### Branch.redeem
+**Formerly `redeemCredits()` (depreciated).**(obj, callback) 
 
 **Parameters**
 
@@ -361,7 +361,6 @@ Branch.credits(
 
 Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
 
-**Formerly `redeemCredits()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
 ```js
@@ -400,7 +399,8 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### banner(data, mobile, desktop) 
+### Branch.banner
+**Formerly `appBanner()` (depreciated).**(data, mobile, desktop) 
 
 **Parameters**
 
@@ -412,7 +412,6 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
 
-**Formerly `appBanner()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
 
 #### Usage
