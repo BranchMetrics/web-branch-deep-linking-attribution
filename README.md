@@ -90,7 +90,6 @@ Adding the Branch script to your page automatically creates a window.branch obje
 The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
 **Useful Tip**: The init fucntion returns a data object where you can read the link the user was referred by.
 
-
 ##### Usage
 
 ```js
@@ -114,8 +113,7 @@ ___
 
 
 
-### Branch.setIdentity
-**Formerly `identify()` (depreciated).**(identity, callback) 
+### setIdentity(identity, callback) 
 
 **Parameters**
 
@@ -123,9 +121,10 @@ ___
 
 **callback**: `function | null`, Callback that returns the user's Branch identity id and unique link
 
+**Formerly `identify()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+
 Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
 
-See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
 
@@ -194,8 +193,6 @@ ___
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
 
-See [CHANGELOG](CHANGELOG.md)
-
 ##### Usage
 
 ```js
@@ -219,8 +216,7 @@ ___
 
 
 
-### Branch.link
-**Formerly `createLink()` (depreciated).**(metadata, callback) 
+### link(metadata, callback) 
 
 **Parameters**
 
@@ -228,9 +224,9 @@ ___
 
 **callback**: `function | null`, Returns a string of the Branch deep linking URL
 
-Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+**Formerly `createLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
-See [CHANGELOG](CHANGELOG.md)
+Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
 #### Usage
 
@@ -271,10 +267,7 @@ branch.link({
 ##### Returns
 
 ```js
-
-{ 
-    'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
-}
+'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
 ```
 ___
 
@@ -292,11 +285,13 @@ ___
 
 **make_new_link**: `String | true`, If true, forces the creation of a new link that will be sent, even if a link already exists
 
+**Formerly `SMSLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+
 A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
 
 #### Usage
 
-```
+```js
 Branch.sendSMS(
     metadata,            // Metadata must include phone number as `phone`
     callback(err, data),
@@ -304,7 +299,7 @@ Branch.sendSMS(
 )
 ```
 
-#### Example
+##### Example
 
 ```js
 branch.sendSMS(
@@ -334,6 +329,11 @@ branch.sendSMS(
 }, make_new_link);
 ```
 
+##### Returns
+
+```js
+{}
+```
 ___
 
 # Referral system rewarding functionality
@@ -350,16 +350,15 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### Branch.referrals
-**Formerly `showReferrals()` (depreciated).**(callback) 
+### referrals(callback) 
 
 **Parameters**
 
 **callback**: `function | null`, Returns an error or object with referral data on success
 
-Retrieves a complete summary of the referrals the current user has made.
+**Formerly `showReferrals()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
-See [CHANGELOG](CHANGELOG.md)
+Retrieves a complete summary of the referrals the current user has made.
 
 ##### Usage
 ```js
@@ -391,16 +390,15 @@ Branch.referrals(
 
 
 
-### Branch.credits
-**Formerly `showCredits()` (depreciated).**(callback) 
+### credits(callback) 
 
 **Parameters**
 
 **callback**: `function | null`, Returns an error or object with credit data on success
 
-This call will retrieve the entire history of credits and redemptions from the individual user.
+**Formerly `showCredits()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
-See [CHANGELOG](CHANGELOG.md)
+This call will retrieve the entire history of credits and redemptions from the individual user.
 
 ##### Usage
 ```js
@@ -422,8 +420,7 @@ Branch.credits(
 
 
 
-### Branch.redeem
-**Formerly `redeemCredits()` (depreciated).**(obj, callback) 
+### redeem(obj, callback) 
 
 **Parameters**
 
@@ -431,9 +428,9 @@ Branch.credits(
 
 **callback**: `function | null`, Returns an error or empty object on success
 
-Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
+**Formerly `redeemCredits()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
-See [CHANGELOG](CHANGELOG.md)
+Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
 
 ```js
 Branch.redeem(
@@ -471,8 +468,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### Branch.banner
-**Formerly `appBanner()` (depreciated).**(data, mobile, desktop) 
+### banner(data, mobile, desktop) 
 
 **Parameters**
 
@@ -482,9 +478,9 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 **desktop**: `Boolean | true`, **Default: true** Show Branch show a banner on desktop devices?
 
-Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+**Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
-See [CHANGELOG](CHANGELOG.md)
+Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
 
 #### Usage
 
@@ -496,7 +492,7 @@ Branch.banner(
 )
 ```
 
- ##### Example
+##### Example
 
 ```js
 branch.banner({
