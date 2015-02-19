@@ -48,17 +48,15 @@ branch.init('APP-KEY', function(err, data) {
 
 1. Branch Session
   + [.init()](#initapp_id-callback)
-  + [.setIdentity()](#setIdentityidentity-callback)
+  + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
 
 1. Event Tracking Methods
-  + [.event()](#eventevent-metadata-callback)
+  + [.event()](#trackevent-metadata-callback)
 
 1. Deeplinking Methods
    + [.link()](#linkmetadata-callback)
-   + [.sendSMS()](#sendSMSmetadata-callback)
-   + [.sendSMSNew()](#sendSMSnewmetadata-callback)
-   + [.sendSMSExisting()](#sendSMSexistingphone-callback)
+   + [.sendSMS()](#sendsmsmetadata-callback-make_new_link)
 
 1. Referral Methods
    + [.referrals()](#referralscallback)
@@ -66,7 +64,7 @@ branch.init('APP-KEY', function(err, data) {
    + [.redeem()](#redeemobj-callback)
 
 1. Smart Banner
-   + [.banner()](#bannerdata)
+   + [.banner()](#bannerdata-mobile-desktop)
 
 ___
 
