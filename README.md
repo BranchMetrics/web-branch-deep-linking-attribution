@@ -52,7 +52,7 @@ branch.init('APP-KEY', function(err, data) {
   + [.logout()](#logoutcallback)
 
 1. Event Tracking Methods
-  + [.event()](#trackevent-metadata-callback)
+  + [.track()](#trackevent-metadata-callback)
 
 1. Deeplinking Methods
    + [.link()](#linkmetadata-callback)
