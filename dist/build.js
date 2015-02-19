@@ -271,7 +271,7 @@ Branch.prototype.logout = function(a) {
     a(b, c);
   });
 };
-Branch.prototype.event = function(a, b, c) {
+Branch.prototype.track = function(a, b, c) {
   c = c || function() {
   };
   if (!this.initialized) {

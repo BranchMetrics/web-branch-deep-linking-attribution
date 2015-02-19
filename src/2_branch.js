@@ -166,6 +166,8 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * }
  * ```
  * ___
+ *
+ * ## Tracking events
  */
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() {};
@@ -239,8 +241,12 @@ Branch.prototype['close'] = function(callback) {
  * ```
  * ___
  *
+ * # Deeplinking Methods
+ *
+ * ## Creating a deep linking link
+ *
  */
-Branch.prototype['event'] = function(event, metadata, callback) {
+Branch.prototype['track'] = function(event, metadata, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	if (typeof metadata == 'function') {
@@ -315,6 +321,9 @@ Branch.prototype['event'] = function(event, metadata, callback) {
  * }
  * ```
  * ___
+ *
+ * ## Sharing links via SMS
+ *
  */
 Branch.prototype['link'] = function(obj, callback) {
 	callback = callback || function() {};
@@ -352,7 +361,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 };
 
 /**
- * A powerful function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
+ * A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
  *
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
  * @param {function|null} callback - Returns an error or empty object on success
@@ -399,6 +408,19 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * ```
  *
  * ___
+ *
+ * # Referral system rewarding functionality
+ * In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
+ * 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
+ * 2. Reward the invitee for installing the app from the original user's referral link
+ * 3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
+ *
+ * These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
+ *
+ * Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+ *
+ * ## Retrieve referrals list
+ *
  */
 Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
 	callback = callback || function() {};
@@ -414,7 +436,7 @@ Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
 	}
 };
 
-/***
+/*** <--- Not in docs
  *
  * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
@@ -449,7 +471,7 @@ Branch.prototype['sendSMSNew'] = function(obj, callback) {
 	});
 };
 
-/***
+/*** <--- Not in docs
  * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
  * @param {String} phone - **Required** String of phone number the link should be sent to
@@ -478,7 +500,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 };
 
 /**
- * Retrieves list of referrals for the current user.
+ * Retrieves a complete summary of the referrals the current user has made.
  *
  * **Formerly `showReferrals()` (depreciated).**
  * See [CHANGELOG](CHANGELOG.md)
@@ -511,7 +533,8 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  * }
  *
  * ```
- * ___
+ * ## Credit history
+ *
  */
 Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() {};
@@ -523,7 +546,7 @@ Branch.prototype["referrals"] = function(callback) {
 };
 
 /**
- * Retrieves a list of credits for the current user.
+ * This call will retrieve the entire history of credits and redemptions from the individual user.
  *
  * **Formerly `showCredits()` (depreciated).**
  * See [CHANGELOG](CHANGELOG.md)
@@ -546,7 +569,8 @@ Branch.prototype["referrals"] = function(callback) {
  * }
  * ```
  *
- * ___
+ * ## Credit redemption
+ *
  */
 Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() {};
@@ -558,7 +582,7 @@ Branch.prototype["credits"] = function(callback) {
 };
 
 /**
- * Redeem credits from a credit bucket.
+ * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
  *
  * **Formerly `redeemCredits()` (depreciated).**
  * See [CHANGELOG](CHANGELOG.md)
@@ -593,6 +617,13 @@ Branch.prototype["credits"] = function(callback) {
  * {}
  * ```
  * ___
+ *
+ * # Smart App Sharing Banner
+ * 
+ * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for texting yourself the download link is shown.
+ * Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on wheather or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
+ * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
+ * 
  */
 Branch.prototype["redeem"] = function(obj, callback) {
 	callback = callback || function() {};

@@ -62,7 +62,7 @@ branch.init('5680621892404085', function(err, data) {
       <div class="row col-lg-8 col-lg-offset-2">
         <h4>Sharing and Tracking</h4>
         <div class="group">
-          <button id="event" class="btn btn-info">.event()</button>
+          <button id="track" class="btn btn-info">.track()</button>
           <button id="link" class="btn btn-info">.link()</button>
           <button id="banner" class="btn btn-info">.banner()</button>
         </div>
@@ -149,9 +149,9 @@ branch.init('5680621892404085', function(err, data) {
       });
     });
 
-    $('#event').click(function(){
-      request.html('branch.event(\'Tracked this event\');');
-      branch.event('Tracked this event', function(err, data){
+    $('#track').click(function(){
+      request.html('branch.track(\'Tracked this event\');');
+      branch.track('Tracked this event', function(err, data){
         response.html(JSON.stringify(data));
       });
     });
