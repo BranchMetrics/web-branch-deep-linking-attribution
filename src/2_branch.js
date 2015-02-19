@@ -43,7 +43,7 @@ Branch.prototype._api = function(resource, data, callback) {
  *
  * ##### Usage
  *
- * ```
+ * ```js
  * Branch.init(
  *     app_id,
  *     callback(err, data)
