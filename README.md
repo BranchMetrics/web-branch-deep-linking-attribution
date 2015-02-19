@@ -70,11 +70,7 @@ ___
 
 * * *
 
-### &#39;init&#39;(app_id, callback) 
-
-Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
-The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
-**Useful Tip**: The init fucntion returns a data object where you can read the link the user was referred by.
+### init(app_id, callback) 
 
 **Parameters**
 
@@ -82,9 +78,14 @@ The init function on the Branch object initiates the Branch session and creates 
 
 **callback**: `function | null`, Callback function that returns the data
 
+Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
+The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
+**Useful Tip**: The init fucntion returns a data object where you can read the link the user was referred by.
+
+
 ##### Usage
 
-```
+```js
 Branch.init(
     app_id,
     callback(err, data)
@@ -105,18 +106,18 @@ ___
 
 
 
-### &#39;setIdentity&#39;(identity, callback) 
-
-Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
-
-**Formerly `identify()` (depreciated).**
-See [CHANGELOG](CHANGELOG.md)
+### setIdentity(identity, callback) 
 
 **Parameters**
 
 **identity**: `string`, **Required** A string uniquely identifying the user
 
 **callback**: `function | null`, Callback that returns the user's Branch identity id and unique link
+
+Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
+
+**Formerly `identify()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
 
@@ -141,13 +142,13 @@ ___
 
 
 
-### &#39;logout&#39;(callback) 
-
-Logs out the current session, replaces session IDs and identity IDs.
+### logout(callback) 
 
 **Parameters**
 
 **callback**: `function | null`, Returns id's of the session and user identity, and the link
+
+Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
 
@@ -172,13 +173,7 @@ ___
 
 
 
-### &#39;track&#39;(event, metadata, callback) 
-
-This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
-The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
-
-**Formerly `track()` (depreciated).**
-See [CHANGELOG](CHANGELOG.md)
+### track(event, metadata, callback) 
 
 **Parameters**
 
@@ -187,6 +182,12 @@ See [CHANGELOG](CHANGELOG.md)
 **metadata**: `Object | null`, Object of event metadata
 
 **callback**: `function | null`, Returns an error or empty object on success
+
+This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
+The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
+
+**Formerly `track()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 ##### Usage
 
@@ -211,18 +212,18 @@ ___
 
 
 
-### &#39;link&#39;(metadata, callback) 
-
-Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-**Formerly `createLink()` (depreciated).**
-See [CHANGELOG](CHANGELOG.md)
+### link(metadata, callback) 
 
 **Parameters**
 
 **metadata**: `Object | null`, Object of link metadata
 
 **callback**: `function | null`, Returns a string of the Branch deep linking URL
+
+Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+
+**Formerly `createLink()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 #### Usage
 
@@ -274,9 +275,7 @@ ___
 
 
 
-### &#39;sendSMS&#39;(metadata, callback, make_new_link) 
-
-A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
+### sendSMS(metadata, callback, make_new_link) 
 
 **Parameters**
 
@@ -285,6 +284,8 @@ A robust function to give your users the ability to share links via SMS. If the 
 **callback**: `function | null`, Returns an error or empty object on success
 
 **make_new_link**: `String | true`, If true, forces the creation of a new link that will be sent, even if a link already exists
+
+A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
 
 #### Usage
 
@@ -342,16 +343,16 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### &quot;referrals&quot;(callback) 
+### referrals(callback) 
+
+**Parameters**
+
+**callback**: `function | null`, Returns an error or object with referral data on success
 
 Retrieves a complete summary of the referrals the current user has made.
 
 **Formerly `showReferrals()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
-
-**Parameters**
-
-**callback**: `function | null`, Returns an error or object with referral data on success
 
 ##### Usage
 ```js
@@ -383,16 +384,16 @@ Branch.referrals(
 
 
 
-### &quot;credits&quot;(callback) 
+### credits(callback) 
+
+**Parameters**
+
+**callback**: `function | null`, Returns an error or object with credit data on success
 
 This call will retrieve the entire history of credits and redemptions from the individual user.
 
 **Formerly `showCredits()` (depreciated).**
 See [CHANGELOG](CHANGELOG.md)
-
-**Parameters**
-
-**callback**: `function | null`, Returns an error or object with credit data on success
 
 ##### Usage
 ```js
@@ -414,18 +415,18 @@ Branch.credits(
 
 
 
-### &quot;redeem&quot;(obj, callback) 
-
-Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
-
-**Formerly `redeemCredits()` (depreciated).**
-See [CHANGELOG](CHANGELOG.md)
+### redeem(obj, callback) 
 
 **Parameters**
 
 **obj**: `Object`, **Required** Object with an `amount` (int) param of number of credits to redeem, and `bucket` (string) param of which bucket to redeem the credits from
 
 **callback**: `function | null`, Returns an error or empty object on success
+
+Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
+
+**Formerly `redeemCredits()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 ```js
 Branch.redeem(
@@ -463,12 +464,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### &quot;banner&quot;(data, mobile, desktop) 
-
-Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
-
-**Formerly `appBanner()` (depreciated).**
-See [CHANGELOG](CHANGELOG.md)
+### banner(data, mobile, desktop) 
 
 **Parameters**
 
@@ -477,6 +473,11 @@ See [CHANGELOG](CHANGELOG.md)
 **mobile**: `Boolean | true`, **Default: true** Should Branch show a banner on mobile devices?
 
 **desktop**: `Boolean | true`, **Default: true** Show Branch show a banner on desktop devices?
+
+Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+
+**Formerly `appBanner()` (depreciated).**
+See [CHANGELOG](CHANGELOG.md)
 
 #### Usage
 
