@@ -309,11 +309,11 @@ Branch.prototype.linkClick = function(a, b) {
 Branch.prototype.sendSMS = function(a, b, c) {
   b = b || function() {
   };
-  c = c || !0;
+  c = c || !1;
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  utils.readKeyValue("click_id") && c ? this.sendSMSExisting(a.phone, b) : this.sendSMSNew(a, b);
+  utils.readKeyValue("click_id") && !c ? this.sendSMSExisting(a.phone, b) : this.sendSMSNew(a, b);
 };
 Branch.prototype.sendSMSNew = function(a, b) {
   b = b || function() {
@@ -328,10 +328,11 @@ Branch.prototype.sendSMSNew = function(a, b) {
       return b(d);
     }
     c.linkClick(e, function(d) {
+      var e = a.phone;
       if (d) {
         return b(d);
       }
-      c.sendSMSExisting(a.phone, function(a, c) {
+      c.sendSMSExisting(e, function(a, c) {
         b(a, c);
       });
     });

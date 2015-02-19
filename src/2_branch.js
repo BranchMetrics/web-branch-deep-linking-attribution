@@ -356,7 +356,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
  * @param {function|null} callback - Returns an error or empty object on success
- * @param {String|true} use_existing_link - If set to false, forces the creation of a new link that will be sent send, even if a link already exists
+ * @param {String|true} make_new_link - If true, forces the creation of a new link that will be sent, even if a link already exists
  *
  * #### Usage
  *
@@ -364,7 +364,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * Branch.sendSMS(
  *     metadata,            // Metadata must include phone number as `phone`
  *     callback(err, data),
- *     use_existing_link    // Deafult: true
+ *     make_new_link    // Deafult: false
  * )
  * ```
  *
@@ -395,18 +395,18 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * }, function(err, data) {
  *     console.log(err || data);
  *
- * }, use_existing_link);
+ * }, make_new_link);
  * ```
  *
  * ___
  */
-Branch.prototype['sendSMS'] = function(obj, callback, use_existing_link) {
+Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
 	callback = callback || function() {};
-	use_existing_link = use_existing_link || true;
+	make_new_link = make_new_link || false;
 
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if (utils.readKeyValue("click_id") && use_existing_link) {
+	if (utils.readKeyValue("click_id") && !make_new_link) {
 		this.sendSMSExisting(obj["phone"], callback);
 	}
 	else {
@@ -440,8 +440,9 @@ Branch.prototype['sendSMSNew'] = function(obj, callback) {
 	this.link(obj, function(err, url) {
 		if (err) { return callback(err); }
 		self.linkClick(url, function(err) {
+			var phone = obj["phone"];
 			if (err) { return callback(err); }
-			self.sendSMSExisting(obj["phone"], function(err, data) {
+			self.sendSMSExisting(phone, function(err, data) {
 				callback(err, data);
 			});
 		});

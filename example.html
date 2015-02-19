@@ -72,8 +72,7 @@ branch.init('5680621892404085', function(err, data) {
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
           <button id="sendSMS" class="btn btn-info">.sendSMS()</button>
-          <button id="sendSMSNew" class="btn btn-info">.sendSMSNew()</button>
-          <button id="sendSMSExisting" class="btn btn-info">.sendSMSExisting()</button>
+          <button id="sendSMSNew" class="btn btn-info">.sendSMS('#', cb(), true)</button>
         </div>
       </div>
       <div class="row col-lg-8 col-lg-offset-2">
@@ -169,24 +168,15 @@ branch.init('5680621892404085', function(err, data) {
       request.html("branch.sendSMS(" + JSON.stringify(sampleParams) + ");");
       branch.sendSMS(sampleParams, function(err, data){
         response.html(JSON.stringify(data));
-        delete sampleParams.phone;
       });
     });
 
     $('#sendSMSNew').click(function(){
       sampleParams.phone = phoneNumber();
-      request.html("branch.sendSMSNew(" + JSON.stringify(sampleParams) + ");");
-      branch.sendSMSNew(sampleParams, function(err, data){
+      request.html("branch.sendSMS(" + JSON.stringify(sampleParams) + "m cb(), true);");
+      branch.sendSMS(sampleParams, function(err, data){
         response.html(JSON.stringify(data));
-        delete sampleParams.phone;
-      });
-    });
-
-    $('#sendSMSExisting').click(function(){
-      request.html("branch.sendSMSExisting(\"" + phoneNumber() + "\");");
-      branch.sendSMSExisting(phoneNumber(), function(err, data){
-        response.html(JSON.stringify(data));
-      });
+      }, true);
     });
 
     $('#referrals').click(function(){

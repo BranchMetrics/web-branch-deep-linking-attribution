@@ -202,7 +202,7 @@ ___
 
 
 
-### &#39;sendSMS&#39;(metadata, callback, use_existing_link) 
+### &#39;sendSMS&#39;(metadata, callback, make_new_link) 
 
 A powerful function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
 
@@ -212,7 +212,7 @@ A powerful function to give your users the ability to share links via SMS. If th
 
 **callback**: `function | null`, Returns an error or empty object on success
 
-**use_existing_link**: `String | true`, If set to false, forces the creation of a new link that will be sent send, even if a link already exists
+**make_new_link**: `String | true`, If true, forces the creation of a new link that will be sent, even if a link already exists
 
 #### Usage
 
@@ -220,7 +220,7 @@ A powerful function to give your users the ability to share links via SMS. If th
 Branch.sendSMS(
     metadata,            // Metadata must include phone number as `phone`
     callback(err, data),
-    use_existing_link    // Deafult: true
+    make_new_link    // Deafult: false
 )
 ```
 
@@ -251,7 +251,7 @@ branch.sendSMS(
 }, function(err, data) {
     console.log(err || data);
 
-}, use_existing_link);
+}, make_new_link);
 ```
 
 ___
