@@ -640,8 +640,8 @@ Branch.prototype["redeem"] = function(obj, callback) {
 
 /**
  * @function Branch.banner
- * @param {Object} linkData - **Required** Object of all the options to setup the banner
- * @param {Object} linkData - **Required** Object of all link data
+ * @param {Object} options - **Required** Object of all the options to setup the banner
+ * @param {Object} linkData - **Required** Object of all link data, same as Branch.link()
  * 
  * **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
  *
