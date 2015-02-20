@@ -268,8 +268,6 @@ Branch.prototype.init = function(a, b) {
   this.app_id = a;
   var d = this, c = utils.readStore(), e = function(a) {
     delete a.session_id;
-    delete a.identity_id;
-    delete a.link;
     delete a.device_fingerprint;
     delete a.device_fingerprint_id;
     delete a.browser_fingerprint_id;

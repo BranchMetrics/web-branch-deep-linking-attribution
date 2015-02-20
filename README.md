@@ -478,6 +478,16 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
 
+![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png)
+##### iOS Smart Banner
+___
+![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png)
+##### Android Smart Banner
+___
+![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png)
+##### Desktop Smart Banner
+___
+
 #### Usage
 
 ```js

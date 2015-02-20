@@ -71,9 +71,10 @@ Branch.prototype['init'] = function(app_id, callback) {
 	var self = this, sessionData = utils.readStore();
 
 	var cleanseReturnData = function(data) {
+		// change to light list
+		// document what these are
+		// return data, referring_identity, identity, has_app
 		delete data['session_id'];
-		delete data['identity_id'];
-		delete data["link"];
 		delete data["device_fingerprint"];
 		delete data["device_fingerprint_id"];
 		delete data["browser_fingerprint_id"];
@@ -646,6 +647,16 @@ Branch.prototype["redeem"] = function(obj, callback) {
  * **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
  *
  * Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
+ *
+ * ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png)
+ * ##### iOS Smart Banner
+ * ___
+ * ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png)
+ * ##### Android Smart Banner
+ * ___
+ * ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png)
+ * ##### Desktop Smart Banner
+ * ___
  *
  * #### Usage
  *
