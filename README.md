@@ -56,15 +56,15 @@ branch.init('APP-KEY', function(err, data) {
 
 1. Deeplinking Methods
    + [.link()](#linkmetadata-callback)
-   + [.sendSMS()](#sendsmsmetadata-callback-make_new_link)
+   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
 
 1. Referral Methods
    + [.referrals()](#referralscallback)
    + [.credits()](#creditscallback)
-   + [.redeem()](#redeemobj-callback)
+   + [.redeem()](#redeemamount-bucket-callback)
 
 1. Smart Banner
-   + [.banner()](#bannerdata-mobile-desktop)
+   + [.banner()](#banneroptions-linkdata)
 
 ___
 
