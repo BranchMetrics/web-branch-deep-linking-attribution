@@ -16,7 +16,7 @@
 
 Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
 The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
-**Useful Tip**: The init fucntion returns a data object where you can read the link the user was referred by.
+**Useful Tip**: The init function returns a data object where you can read the link the user was referred by.
 
 ##### Usage
 
@@ -223,14 +223,14 @@ A robust function to give your users the ability to share links via SMS. If the 
 Branch.sendSMS(
     metadata,            // Metadata must include phone number as `phone`
     callback(err, data),
-    make_new_link    // Deafult: false
+    make_new_link    // Default: false
 )
 ```
 
 ##### Example
 
 ```js
-branch.sendSMS(
+branch.sendSMS({
     phone: '9999999999',
     tags: ['tag1', 'tag2'],
     channel: 'facebook',
@@ -390,33 +390,30 @@ ___
 
 # Smart App Sharing Banner
 
-The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for texting yourself the download link is shown.
-Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on wheather or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
+The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
+Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
 **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
 
 
 
-### banner(data, mobile, desktop) 
+### banner(linkData, linkData) 
 
 **Parameters**
 
-**data**: `Object`, **Required** Object of all link data
+**linkData**: `Object`, **Required** Object of all the options to setup the banner
 
-**mobile**: `Boolean | true`, **Default: true** Should Branch show a banner on mobile devices?
-
-**desktop**: `Boolean | true`, **Default: true** Show Branch show a banner on desktop devices?
+**linkData**: `Object`, **Required** Object of all link data
 
 **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
-Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
 
 #### Usage
 
 ```js
 Branch.banner(
-    metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
-    showMobile,
-    showDesktop
+    options, 	// Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
+    linkData     // Metadata for link, same as Branch.link()
 )
 ```
 
@@ -427,11 +424,30 @@ branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
     description: 'The Branch demo app!',
-    openAppButtonText: 'Open',
-    downloadAppButtonText: 'Download',
+    openAppButtonText: 'Open',             // Text to show on button if the user has the app installed
+    downloadAppButtonText: 'Download',     // Text to show on button if the user does not have the app installed
+    showMobile: true,                      // Should the banner be shown on mobile devices?
+    showDesktop: true                      // Should the banner be shown on mobile devices?
+}, {
+    phone: '9999999999',
+    tags: ['tag1', 'tag2'],
+    feature: 'dashboard',
+    stage: 'new user',
+    type: 1,
     data: {
-        foo: 'bar'
+        mydata: {
+            foo: 'bar'
+        },
+    '$desktop_url': 'http://myappwebsite.com',
+    '$ios_url': 'http://myappwebsite.com/ios',
+    '$ipad_url': 'http://myappwebsite.com/ipad',
+    '$android_url': 'http://myappwebsite.com/android',
+    '$og_app_id': '12345',
+    '$og_title': 'My App',
+    '$og_description': 'My app\'s description.',
+    '$og_image_url': 'http://myappwebsite.com/image.png'
     }
+
 });
 ```
 

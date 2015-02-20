@@ -379,7 +379,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * ##### Example
  *
  * ```js
- * branch.sendSMS(
+ * branch.sendSMS({
  *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
  *     channel: 'facebook',
@@ -461,7 +461,7 @@ Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
 Branch.prototype['sendSMSNew'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	obj["channel"] = 'sms';
+	if(obj["channel"] != "app banner") { obj["channel"] = 'sms'; };
 	var self = this;
 	this.link(obj, function(err, url) {
 		if (err) { return callback(err); }
@@ -640,21 +640,19 @@ Branch.prototype["redeem"] = function(obj, callback) {
 
 /**
  * @function Branch.banner
- * @param {Object} data - **Required** Object of all link data
- * @param {Boolean|true} mobile - **Default: true** Should Branch show a banner on mobile devices?
- * @param {Boolean|true} desktop - **Default: true** Show Branch show a banner on desktop devices?
+ * @param {Object} linkData - **Required** Object of all the options to setup the banner
+ * @param {Object} linkData - **Required** Object of all link data
  * 
  * **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
  *
- * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+ * Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
  *
  * #### Usage
  *
  * ```js
  * Branch.banner(
- *     metadata, 	// Metadata, same as Branch.link(), plus 5 extra parameters as shown below in the example
- *     showMobile,
- *     showDesktop
+ *     options, 	// Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
+ *     linkData     // Metadata for link, same as Branch.link()
  * )
  * ```
  *
@@ -665,21 +663,40 @@ Branch.prototype["redeem"] = function(obj, callback) {
  *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
  *     title: 'Branch Demo App',
  *     description: 'The Branch demo app!',
- *     openAppButtonText: 'Open',
- *     downloadAppButtonText: 'Download',
+ *     openAppButtonText: 'Open',             // Text to show on button if the user has the app installed
+ *     downloadAppButtonText: 'Download',     // Text to show on button if the user does not have the app installed
+ *     showMobile: true,                      // Should the banner be shown on mobile devices?
+ *     showDesktop: true                      // Should the banner be shown on mobile devices?
+ * }, {
+ *     phone: '9999999999',
+ *     tags: ['tag1', 'tag2'],
+ *     feature: 'dashboard',
+ *     stage: 'new user',
+ *     type: 1,
  *     data: {
- *         foo: 'bar'
+ *         mydata: {
+ *             foo: 'bar'
+ *         },
+ *     '$desktop_url': 'http://myappwebsite.com',
+ *     '$ios_url': 'http://myappwebsite.com/ios',
+ *     '$ipad_url': 'http://myappwebsite.com/ipad',
+ *     '$android_url': 'http://myappwebsite.com/android',
+ *     '$og_app_id': '12345',
+ *     '$og_title': 'My App',
+ *     '$og_description': 'My app\'s description.',
+ *     '$og_image_url': 'http://myappwebsite.com/image.png'
  *     }
+ *
  * });
  * ```
  */
-Branch.prototype["banner"] = function(data, mobile, desktop) {
-	mobile = (mobile == undefined) ? true : mobile;
-	desktop = (desktop == undefined) ? true : desktop;
+Branch.prototype["banner"] = function(options, linkData) {
+	options.showMobile = (options.showMobile == undefined) ? true : options.showMobile;
+	options.showDesktop = (options.showDesktop == undefined) ? true : options.showDesktop;
 	if (!document.getElementById('branch-banner') && !utils.readKeyValue("hideBanner")) {
-		banner.smartBannerMarkup(data, mobile, desktop);
-		banner.smartBannerStyles(mobile, desktop);
-		banner.appendSmartBannerActions(this, data, mobile, desktop);
-		banner.triggerBannerAnimation(mobile, desktop);
+		banner.smartBannerMarkup(options);
+		banner.smartBannerStyles(options);
+		banner.appendSmartBannerActions(this, options, linkData);
+		banner.triggerBannerAnimation(options);
 	}
 };
