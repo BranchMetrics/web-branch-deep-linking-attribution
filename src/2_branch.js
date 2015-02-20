@@ -43,7 +43,6 @@ Branch.prototype._api = function(resource, data, callback) {
  * **Useful Tip**: The init function returns a data object where you can read the link the user was referred by.
  *
  * ##### Usage
- *
  * ```js
  * Branch.init(
  *     app_id,
@@ -51,13 +50,14 @@ Branch.prototype._api = function(resource, data, callback) {
  * )
  * ```
  *
- *##### Returns
- *
+ * ##### Callback
  * ```js
- * {
- *     data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
- *     referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
- * }
+ * callback(
+ *      error: "Error message",
+ *      {
+ *           data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+ *           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+ *      });
  * ```
  *
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
@@ -116,9 +116,7 @@ Branch.prototype['init'] = function(app_id, callback) {
  *
  * Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
  *
- *
  * ##### Usage
- *
  * ```js
  * Branch.setIdentity(
  *     identity,
@@ -126,15 +124,16 @@ Branch.prototype['init'] = function(app_id, callback) {
  * )
  * ```
  * 
- * ##### Returns 
- *
+ * ##### Callback 
  * ```js
- * {
- *     identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
- *     link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
- *     referring_data:     {},      // Returns the initial referring data for this identity, if exists.
- *     referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
- * }
+ * callback(
+ *      error: "Error message",
+ *      {
+ *           identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+ *           link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+ *           referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+ *           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+ *      });
  * ```
  * ___
  */
@@ -153,21 +152,21 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * Logs out the current session, replaces session IDs and identity IDs.
  *
  * ##### Usage
- *
  * ```js
  * Branch.logout(
  *     callback(err, data)
  * )
  * ```
  *
- * ##### Returns
- *
+ * ##### Callback
  * ```js
- * {
- *     session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
- *     identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
- *     link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
- * }
+ * callback(
+ *      error: "Error message",
+ *      {
+ *           session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
+ *           identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+ *           link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
+ *      });
  * ```
  * ___
  *
@@ -184,11 +183,9 @@ Branch.prototype['logout'] = function(callback) {
 /*** NOT USED
  * This closes the active session, removing any relevant session account info stored in `sessionStorage`.
  *
- *
  * @param {function|null} callback - Returns an empty object or an error
  *
  * ##### Usage
- *
  * ```js
  * Branch.close(
  *     callback(err, data)
@@ -196,7 +193,6 @@ Branch.prototype['logout'] = function(callback) {
  * ```
  *
  * ##### Returns
- *
  * ```js
  * {}
  * ```
@@ -226,7 +222,6 @@ Branch.prototype['close'] = function(callback) {
  * The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
  *
  * ##### Usage
- *
  * ```js
  * Branch.event(
  *     event,
@@ -235,10 +230,9 @@ Branch.prototype['close'] = function(callback) {
  * )
  * ```
  *
- * ##### Returns
- *
+ * ##### Callback
  * ```js
- * {}
+ * callback( error: "Error message" );
  * ```
  * ___
  *
@@ -263,7 +257,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 			"language": navigator.language
 		}, {})
 	}, function(err, data) {
-		callback(err, data);
+		callback(err);
 	});
 };
 
@@ -277,7 +271,6 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
  *
  * #### Usage
- *
  * ```
  * Branch.link(
  *     metadata,
@@ -286,7 +279,6 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ```
  *
  * #### Example
- *
  * ```js
  * branch.link({
  *     tags: ['tag1', 'tag2'],
@@ -312,10 +304,12 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * });
  * ```
  *
- * ##### Returns
- *
+ * ##### Callback
  * ```js
- * 'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+ * callback(
+ *      error: "Error message",
+ *      'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+ *      );
  * ```
  * ___
  *
@@ -368,7 +362,6 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
  *
  * #### Usage
- *
  * ```js
  * Branch.sendSMS(
  *     metadata,            // Metadata must include phone number as `phone`
@@ -378,7 +371,6 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * ```
  *
  * ##### Example
- *
  * ```js
  * branch.sendSMS({
  *     phone: '9999999999',
@@ -407,10 +399,9 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * }, make_new_link);
  * ```
  *
- * ##### Returns
- *
+ * ##### Callback
  * ```js
- * {}
+ * callback( error: "Error message" );
  * ```
  * ___
  *
@@ -449,7 +440,6 @@ Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
  * @param {function|null} callback - Returns an error or empty object on success
  *
  * #### Usage
- *
  * ```js
  * Branch.sendSMSNew(
  *     metadata,    // Metadata must include phone number as `phone`
@@ -469,8 +459,8 @@ Branch.prototype['sendSMSNew'] = function(obj, callback) {
 		self.linkClick(url, function(err) {
 			var phone = obj["phone"];
 			if (err) { return callback(err); }
-			self.sendSMSExisting(phone, function(err, data) {
-				callback(err, data);
+			self.sendSMSExisting(phone, function(err) {
+				callback(err);
 			});
 		});
 	});
@@ -483,7 +473,6 @@ Branch.prototype['sendSMSNew'] = function(obj, callback) {
  * @param {function|null} callback - Returns an error or empty object on success
  *
  * #### Usage
- *
  * ```js
  * Branch.sendSMSExisting(
  *     metadata,     // Metadata must include phone number as `phone`
@@ -500,7 +489,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 		"link_url": utils.readStore()["click_id"],
 		"phone": phone
 	}, function(err, data) {
-		callback(err, data);
+		callback(err);
 	});
 };
 
@@ -519,25 +508,26 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  * )
  * ```
  *
- * ##### Returns
- *
+ * ##### Callback
  * ```js
- * {
- *     'install': {
- *         total: 5,
- *         unique: 2
- *     },
- *     'open': {
- *         total: 4,
- *         unique: 3
- *     },
- *    'buy': {
- *         total: 7,
- *         unique: 3
- *     }
- * }
- *
+ * callback(
+ *      error: "Error message",
+ *     {
+ *          'install': {
+ *               total: 5,
+ *               unique: 2
+ *          },
+ *          'open': {
+ *               total: 4,
+ *               unique: 3
+ *          },
+ *         'buy': {
+ *              total: 7,
+ *              unique: 3
+ *          }
+ *     });
  * ```
+ *
  * ## Credit history
  *
  */
@@ -565,13 +555,14 @@ Branch.prototype["referrals"] = function(callback) {
  * )
  * ```
  *
- * ##### Returns
- *
+ * ##### Callback
  * ```js
- * {
- *     'default': 15,
- *     'other bucket': 9
- * }
+ * callback(
+ *      error: "Error message",
+ *      {
+ *           'default': 15,
+ *           'other bucket': 9
+ *      });
  * ```
  *
  * ## Credit redemption
@@ -616,10 +607,9 @@ Branch.prototype["credits"] = function(callback) {
  * });
  * ```
  *
- * ##### Returns
- *
+ * ##### Callback
  * ```js
- * {}
+ * callback( error: "Error message" );
  * ```
  * ___
  *

@@ -313,7 +313,7 @@ Branch.prototype.track = function(a, b, d) {
   }
   "function" == typeof b && (d = b, b = {});
   this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a, b) {
-    d(a, b);
+    d(a);
   });
 };
 Branch.prototype.link = function(a, b) {
@@ -366,8 +366,8 @@ Branch.prototype.sendSMSNew = function(a, b) {
       if (c) {
         return b(c);
       }
-      d.sendSMSExisting(e, function(a, c) {
-        b(a, c);
+      d.sendSMSExisting(e, function(a) {
+        b(a);
       });
     });
   });
@@ -379,7 +379,7 @@ Branch.prototype.sendSMSExisting = function(a, b) {
     return b(utils.message(utils.messages.nonInit));
   }
   this._api(resources.SMSLinkSend, {link_url:utils.readStore().click_id, phone:a}, function(a, c) {
-    b(a, c);
+    b(a);
   });
 };
 Branch.prototype.referrals = function(a) {

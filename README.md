@@ -89,7 +89,6 @@ The init function on the Branch object initiates the Branch session and creates 
 **Useful Tip**: The init function returns a data object where you can read the link the user was referred by.
 
 ##### Usage
-
 ```js
 Branch.init(
     app_id,
@@ -97,13 +96,14 @@ Branch.init(
 )
 ```
 
-##### Returns
-
+##### Callback
 ```js
-{
-    data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
-    referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
-}
+callback(
+     error: "Error message",
+     {
+          data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+          referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+     });
 ```
 
 **Note:** `Branch.init` must be called prior to calling any other Branch functions.
@@ -123,9 +123,7 @@ ___
 
 Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
 
-
 ##### Usage
-
 ```js
 Branch.setIdentity(
     identity,
@@ -133,15 +131,16 @@ Branch.setIdentity(
 )
 ```
 
-##### Returns 
-
+##### Callback 
 ```js
-{
-    identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
-    link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
-    referring_data:     {},      // Returns the initial referring data for this identity, if exists.
-    referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
-}
+callback(
+     error: "Error message",
+     {
+          identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+          link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+          referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+          referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+     });
 ```
 ___
 
@@ -156,21 +155,21 @@ ___
 Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
-
 ```js
 Branch.logout(
     callback(err, data)
 )
 ```
 
-##### Returns
-
+##### Callback
 ```js
-{
-    session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
-    identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
-    link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
-}
+callback(
+     error: "Error message",
+     {
+          session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
+          identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
+          link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
+     });
 ```
 ___
 
@@ -192,7 +191,6 @@ This function allows you to track any event with supporting metadata. Use the ev
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
 
 ##### Usage
-
 ```js
 Branch.event(
     event,
@@ -201,10 +199,9 @@ Branch.event(
 )
 ```
 
-##### Returns
-
+##### Callback
 ```js
-{}
+callback( error: "Error message" );
 ```
 ___
 
@@ -227,7 +224,6 @@ ___
 Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
 #### Usage
-
 ```
 Branch.link(
     metadata,
@@ -236,7 +232,6 @@ Branch.link(
 ```
 
 #### Example
-
 ```js
 branch.link({
     tags: ['tag1', 'tag2'],
@@ -262,10 +257,12 @@ branch.link({
 });
 ```
 
-##### Returns
-
+##### Callback
 ```js
-'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+callback(
+     error: "Error message",
+     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+     );
 ```
 ___
 
@@ -288,7 +285,6 @@ ___
 A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
 
 #### Usage
-
 ```js
 Branch.sendSMS(
     metadata,            // Metadata must include phone number as `phone`
@@ -298,7 +294,6 @@ Branch.sendSMS(
 ```
 
 ##### Example
-
 ```js
 branch.sendSMS({
     phone: '9999999999',
@@ -327,10 +322,9 @@ branch.sendSMS({
 }, make_new_link);
 ```
 
-##### Returns
-
+##### Callback
 ```js
-{}
+callback( error: "Error message" );
 ```
 ___
 
@@ -365,25 +359,26 @@ Branch.referrals(
 )
 ```
 
-##### Returns
-
+##### Callback
 ```js
-{
-    'install': {
-        total: 5,
-        unique: 2
-    },
-    'open': {
-        total: 4,
-        unique: 3
-    },
-   'buy': {
-        total: 7,
-        unique: 3
-    }
-}
-
+callback(
+     error: "Error message",
+    {
+         'install': {
+              total: 5,
+              unique: 2
+         },
+         'open': {
+              total: 4,
+              unique: 3
+         },
+        'buy': {
+             total: 7,
+             unique: 3
+         }
+    });
 ```
+
 ## Credit history
 
 
@@ -405,13 +400,14 @@ Branch.credits(
 )
 ```
 
-##### Returns
-
+##### Callback
 ```js
-{
-    'default': 15,
-    'other bucket': 9
-}
+callback(
+     error: "Error message",
+     {
+          'default': 15,
+          'other bucket': 9
+     });
 ```
 
 ## Credit redemption
@@ -451,10 +447,9 @@ branch.redeem({
 });
 ```
 
-##### Returns
-
+##### Callback
 ```js
-{}
+callback( error: "Error message" );
 ```
 ___
 
