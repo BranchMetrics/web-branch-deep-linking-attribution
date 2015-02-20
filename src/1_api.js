@@ -80,7 +80,7 @@ var jsonpRequest = function(url, options, callback) {
 	window[callback] = function(data) {
 		window.clearTimeout(timeout_trigger);
 		options.onSuccess(data);
-	}
+	};
 
 	var script = document.createElement('script');
 	script.type = 'text/javascript';

@@ -360,7 +360,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * @function Branch.sendSMS
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
  * @param {function|null} callback - Returns an error or empty object on success
- * @param {String|true} make_new_link - If true, forces the creation of a new link that will be sent, even if a link already exists
+ * @param {Boolean|true} make_new_link - If true, forces the creation of a new link that will be sent, even if a link already exists
  *
  * **Formerly `SMSLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
  *
@@ -461,7 +461,7 @@ Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
 Branch.prototype['sendSMSNew'] = function(obj, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	if(obj["channel"] != "app banner") { obj["channel"] = 'sms'; };
+	if(obj["channel"] != "app banner") { obj["channel"] = 'sms'; }
 	var self = this;
 	this.link(obj, function(err, url) {
 		if (err) { return callback(err); }
@@ -691,8 +691,8 @@ Branch.prototype["redeem"] = function(obj, callback) {
  * ```
  */
 Branch.prototype["banner"] = function(options, linkData) {
-	options.showMobile = (options.showMobile == undefined) ? true : options.showMobile;
-	options.showDesktop = (options.showDesktop == undefined) ? true : options.showDesktop;
+	options.showMobile = (options.showMobile === undefined) ? true : options.showMobile;
+	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
 	if (!document.getElementById('branch-banner') && !utils.readKeyValue("hideBanner")) {
 		banner.smartBannerMarkup(options);
 		banner.smartBannerStyles(options);

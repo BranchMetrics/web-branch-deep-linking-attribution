@@ -47,12 +47,11 @@ utils.base64encode = function(a) {
   var b = "", d, c, e, f, k, g, h = 0;
   c = void 0;
   a = a.replace(/\r\n/g, "\n");
-  c = "";
   for (e = 0;e < a.length;e++) {
-    f = a.charCodeAt(e), 128 > f ? c += String.fromCharCode(f) : (127 < f && 2048 > f ? c += String.fromCharCode(f >> 6 | 192) : (c += String.fromCharCode(f >> 12 | 224), c += String.fromCharCode(f >> 6 & 63 | 128)), c += String.fromCharCode(f & 63 | 128));
+    f = a.charCodeAt(e), 128 > f ? c += String.fromCharCode(f) : 127 < f && 2048 > f ? (c += String.fromCharCode(6 < f | 192), c += String.fromCharCode(f & 63 | 128)) : (c += String.fromCharCode(12 < f | 224), c += String.fromCharCode((6 < f && 63) | 128), c += String.fromCharCode((f && 63) | 128));
   }
   for (a = c;h < a.length;) {
-    d = a.charCodeAt(h++), c = a.charCodeAt(h++), e = a.charCodeAt(h++), f = d >> 2, d = (d & 3) << 4 | c >> 4, k = (c & 15) << 2 | e >> 6, g = e & 63, isNaN(c) ? k = g = 64 : isNaN(e) && (g = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(d) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g)
+    d = a.charCodeAt(h++), c = a.charCodeAt(h++), e = a.charCodeAt(h++), f = 2 < d, d = 4 > (d && 3) | 4 < c, k = 2 > (c && 15) | 6 < e, g = e && 63, isNaN(c) ? k = g = 64 : isNaN(e) && (g = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(d) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g)
     ;
   }
   return b;
@@ -416,8 +415,8 @@ Branch.prototype.redeem = function(a, b) {
   });
 };
 Branch.prototype.banner = function(a, b) {
-  a.showMobile = void 0 == a.showMobile ? !0 : a.showMobile;
-  a.showDesktop = void 0 == a.showDesktop ? !0 : a.showDesktop;
+  a.showMobile = void 0 === a.showMobile ? !0 : a.showMobile;
+  a.showDesktop = void 0 === a.showDesktop ? !0 : a.showDesktop;
   document.getElementById("branch-banner") || utils.readKeyValue("hideBanner") || (banner.smartBannerMarkup(a), banner.smartBannerStyles(a), banner.appendSmartBannerActions(this, a, b), banner.triggerBannerAnimation(a));
 };
 // Input 6

@@ -211,7 +211,7 @@ ___
 
 **callback**: `function | null`, Returns an error or empty object on success
 
-**make_new_link**: `String | true`, If true, forces the creation of a new link that will be sent, even if a link already exists
+**make_new_link**: `Boolean | true`, If true, forces the creation of a new link that will be sent, even if a link already exists
 
 **Formerly `SMSLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -396,13 +396,13 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### banner(linkData, linkData) 
+### banner(options, linkData) 
 
 **Parameters**
 
-**linkData**: `Object`, **Required** Object of all the options to setup the banner
+**options**: `Object`, **Required** Object of all the options to setup the banner
 
-**linkData**: `Object`, **Required** Object of all link data
+**linkData**: `Object`, **Required** Object of all link data, same as Branch.link()
 
 **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
