@@ -40,7 +40,7 @@ Branch.prototype._api = function(resource, data, callback) {
  *
  * Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
  * The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
- * **Useful Tip**: The init fucntion returns a data object where you can read the link the user was referred by.
+ * **Useful Tip**: The init function returns a data object where you can read the link the user was referred by.
  *
  * ##### Usage
  *
@@ -372,7 +372,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * Branch.sendSMS(
  *     metadata,            // Metadata must include phone number as `phone`
  *     callback(err, data),
- *     make_new_link    // Deafult: false
+ *     make_new_link    // Default: false
  * )
  * ```
  *
@@ -442,10 +442,10 @@ Branch.prototype['sendSMS'] = function(obj, callback, make_new_link) {
 
 /*** <--- Not in docs
  *
- * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+ * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
  * @param {Object} metadata - **Required** Object of all link data, requires phone number as `phone`
- * @param {function|null} callback - Returns an error or empyy object on success
+ * @param {function|null} callback - Returns an error or empty object on success
  *
  * #### Usage
  *
@@ -476,7 +476,7 @@ Branch.prototype['sendSMSNew'] = function(obj, callback) {
 };
 
 /*** <--- Not in docs
- * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` prefilled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
+ * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
  * @param {String} phone - **Required** String of phone number the link should be sent to
  * @param {function|null} callback - Returns an error or empty object on success
@@ -624,8 +624,8 @@ Branch.prototype["credits"] = function(callback) {
  *
  * # Smart App Sharing Banner
  * 
- * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for texting yourself the download link is shown.
- * Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on wheather or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
+ * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
+ * Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
  * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
  * 
  */
