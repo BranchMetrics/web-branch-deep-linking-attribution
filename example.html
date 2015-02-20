@@ -60,8 +60,8 @@
       <h4>SMS</h4>
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
-          <button id="sendSMS" class="btn btn-info">.sendSMS()</button>
-          <button id="sendSMSNew" class="btn btn-info">.sendSMS('#', cb(), true)</button>
+          <button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, {})</button>
+          <button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, {make_new_link: true})</button>
         </div>
       </div>
       <div class="row col-lg-8 col-lg-offset-2">
@@ -164,19 +164,21 @@
     });
 
     $('#sendSMS').click(function(){
-      sampleParams.phone = phoneNumber();
-      request.html("branch.sendSMS(" + JSON.stringify(sampleParams) + ");");
-      branch.sendSMS(sampleParams, function(err, data){
+      var smsOptions = {};
+      var phone = phoneNumber();
+      request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
+      branch.sendSMS(phone, sampleParams, smsOptions, function(err, data){
         response.html(JSON.stringify(data));
       });
     });
 
     $('#sendSMSNew').click(function(){
-      sampleParams.phone = phoneNumber();
-      request.html("branch.sendSMS(" + JSON.stringify(sampleParams) + "m cb(), true);");
-      branch.sendSMS(sampleParams, function(err, data){
+      var smsOptions = { make_new_link: true };
+      var phone = phoneNumber();
+      request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
+      branch.sendSMS(phone, sampleParams, smsOptions, function(err, data){
         response.html(JSON.stringify(data));
-      }, true);
+      });
     });
 
     $('#referrals').click(function(){
@@ -195,10 +197,7 @@
 
     $('#redeem').click(function(){
       request.html('branch.redeem({amount: 5, bucket: \'default\'});');
-      branch.redeem({
-        amount: 5,
-        bucket: 'default',
-      }, function(err, data){
+      branch.redeem( 5, 'default', function(err, data){
         response.html(JSON.stringify(data));
       });
     });

@@ -12,7 +12,7 @@
 
 **app_id**: `number`, **Required** Found in your Branch dashboard
 
-**callback**: `function | null`, Callback function that returns the data
+**callback**: `function | null`, Callback function that returns the session data
 
 Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
 The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
@@ -115,7 +115,7 @@ ___
 
 **metadata**: `Object | null`, Object of event metadata
 
-**callback**: `function | null`, Returns an error or empty object on success
+**callback**: `function | null`, Returns an error if unsuccessful
 
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -125,7 +125,7 @@ The `metadata` parameter is a formatted JSON object that can contain any data an
 Branch.event(
     event,
     metadata,
-    callback(err, data)
+    callback(err)
 )
 ```
 
@@ -200,15 +200,17 @@ ___
 
 
 
-### sendSMS(metadata, callback, make_new_link) 
+### sendSMS(phone, linkData, options, callback) 
 
 **Parameters**
 
-**metadata**: `Object`, **Required** Object of all link data, requires phone number as `phone`
+**phone**: `String`, **Required** Phone number to txt
 
-**callback**: `function | null`, Returns an error or empty object on success
+**linkData**: `Object`, **Required** Object of all link data
 
-**make_new_link**: `Boolean | true`, If true, forces the creation of a new link that will be sent, even if a link already exists
+**options**: `Object | null`, Options, currently only includes: make_new_link, which forces the creation of a new link even if one already exists
+
+**callback**: `function | null`, Returns an error if unsuccessful
 
 **Formerly `SMSLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -227,29 +229,29 @@ Branch.sendSMS(
 ```js
 branch.sendSMS({
     phone: '9999999999',
-    tags: ['tag1', 'tag2'],
-    channel: 'facebook',
-    feature: 'dashboard',
-    stage: 'new user',
-    type: 1,
-    data: {
-        mydata: {
-            foo: 'bar'
-        },
-    '$desktop_url': 'http://myappwebsite.com',
-    '$ios_url': 'http://myappwebsite.com/ios',
-    '$ipad_url': 'http://myappwebsite.com/ipad',
-    '$android_url': 'http://myappwebsite.com/android',
-    '$og_app_id': '12345',
-    '$og_title': 'My App',
-    '$og_description': 'My app\'s description.',
-    '$og_image_url': 'http://myappwebsite.com/image.png'
-    }
-
-}, function(err, data) {
-    console.log(err || data);
-
-}, make_new_link);
+    {
+         tags: ['tag1', 'tag2'],
+         channel: 'facebook',
+         feature: 'dashboard',
+         stage: 'new user',
+         type: 1,
+         data: {
+             mydata: {
+                 foo: 'bar'
+             },
+         '$desktop_url': 'http://myappwebsite.com',
+         '$ios_url': 'http://myappwebsite.com/ios',
+         '$ipad_url': 'http://myappwebsite.com/ipad',
+         '$android_url': 'http://myappwebsite.com/android',
+         '$og_app_id': '12345',
+         '$og_title': 'My App',
+         '$og_description': 'My app\'s description.',
+         '$og_image_url': 'http://myappwebsite.com/image.png'
+         }
+    },
+    { make_new_link: true}, // Default: false. If set to true, sendSMS will generate a new link even if one already exists
+    function(err) { console.log(err); }
+});
 ```
 
 ##### Callback
@@ -344,13 +346,15 @@ callback(
 
 
 
-### redeem(obj, callback) 
+### redeem(amount, bucket, callback) 
 
 **Parameters**
 
-**obj**: `Object`, **Required** Object with an `amount` (int) param of number of credits to redeem, and `bucket` (string) param of which bucket to redeem the credits from
+**amount**: `Int`, **Required** An `amount` (int) of number of credits to redeem
 
-**callback**: `function | null`, Returns an error or empty object on success
+**bucket**: `String`, **Required** A name of the `bucket` (string) of which bucket to redeem the credits from
+
+**callback**: `function | null`, Returns an error if unsuccessful
 
 **Formerly `redeemCredits()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -358,22 +362,20 @@ Credits are stored in `buckets`, which you can define as points, currency, whate
 
 ```js
 Branch.redeem(
-{
     amount, // amount of credits to be redeemed
-    bucket  // String of bucket name to redeem credits from
-},
-    callback(err, data)
+    bucket,  // String of bucket name to redeem credits from
+    callback(err)
 )
 ```
 
 ##### Example
 
 ```js
-branch.redeem({
+branch.redeem(
     5,
-    'bucket'
-}, function(data){
-    console.log(data)
+    "Rubies",
+    function(data){
+         console.log(data)
 });
 ```
 
@@ -418,7 +420,7 @@ ___
 ```js
 Branch.banner(
     options, 	// Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
-    linkData     // Metadata for link, same as Branch.link()
+    linkData     // Data for link, same as Branch.link()
 )
 ```
 
