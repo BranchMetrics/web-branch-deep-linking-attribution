@@ -57,14 +57,13 @@ utils.base64encode = function(a) {
   return b;
 };
 utils.enqueue = function(a) {
-  utils.queue || (utils.queue = []);
+  utils.queue || (utils.queue = [], utils.branchInitialized = !1);
   utils.queue.push(a);
-  utils.running || utils.dequeue();
+  !utils.running && utils.branchInitialized && utils.dequeue();
   utils.running = !0;
 };
 utils.dequeue = function() {
-  utils.queue[0] && utils.queue.shift()();
-  0 === utils.queue.length && (utils.running = !1);
+  utils.queue && utils.branchInitialized && (utils.queue.length && utils.queue.shift()(), 0 === utils.queue.length && (utils.running = !1));
 };
 utils.packageRequest = function(a, b, c) {
   return function() {
@@ -72,9 +71,20 @@ utils.packageRequest = function(a, b, c) {
   };
 };
 utils.injectDequeue = function(a) {
-  return function(b, c) {
+  return utils.branchInitialized ? injectFunction(utils.dequeue, a) : utils.injectRunQueue(a);
+};
+utils.injectRunQueue = function(a) {
+  return injectFunction(function() {
+    utils.running = !0;
+    utils.queue || (utils.queue = []);
+    utils.branchInitialized = !0;
     utils.dequeue();
-    a(b, c);
+  }, a);
+};
+var injectFunction = function(a, b) {
+  return function(c, d) {
+    a();
+    b(c, d);
   };
 };
 // Input 2
@@ -284,7 +294,7 @@ Branch.prototype.init = function(a, b) {
   b = b || function() {
   };
   if (this.initialized) {
-    return b(utils.message(utils.messages.existingInit));
+    return utils.injectRunQueue(b)(utils.message(utils.messages.existingInit));
   }
   this.initialized = !0;
   this.app_id = a;
@@ -297,7 +307,7 @@ Branch.prototype.init = function(a, b) {
   };
   d && !d.session_id && (d = null);
   d && (this.session_id = d.session_id, this.identity_id = d.identity_id, this.sessionLink = d.link);
-  d && !utils.hashValue("r") ? b(null, e(d)) : this._api(resources._r, {}, function(a, d) {
+  d && !utils.hashValue("r") ? utils.injectRunQueue(b)(null, e(d)) : this._api(resources._r, {}, function(a, d) {
     c._api(resources.open, {link_identifier:utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:d}, function(a, d) {
       c.session_id = d.session_id;
       c.identity_id = d.identity_id;

@@ -150,26 +150,32 @@ utils.base64encode = function(input) {
 // ======= Begin queue functions
 
 /**
- * Enqueue an async request, and if it's first in the queue, call it
+ * Enqueue an async request, and if it's first in the queue, inititate the queue array call the request
  * @param {Function} request
  */
 utils.enqueue = function(request) {
-	if (!utils.queue) { utils.queue = []; }
+	if (!utils.queue) { 
+		utils.queue = [];
+		utils.branchInitialized = false;
+	}
 	utils.queue.push(request);
-	if (!utils.running) { utils.dequeue(); }
+	if (!utils.running && utils.branchInitialized) { utils.dequeue(); }
 	utils.running = true;
 };
 
 /**
- * Dequeue the next request in the queue
+ * Dequeue the next request in the queue and execute
  */
 utils.dequeue = function() {
-	if (utils.queue[0]) { (utils.queue.shift())(); }
-	if (utils.queue.length === 0) { utils.running = false; }
+	if (utils.queue && utils.branchInitialized) { 
+		utils.queue.length && (utils.queue.shift())();
+		if (utils.queue.length === 0) { utils.running = false; }
+	}
+	
 };
 
 /**
- * Package the request to keep the context of "this"
+ * Package the request to keep the context of "this", and call it with all of it's arguments
  */
 utils.packageRequest = function(request, context, params) {
 	return function() {
@@ -181,8 +187,29 @@ utils.packageRequest = function(request, context, params) {
  * Inject dequeue in the request callback, to automatically call the next request in the queue
  */
 utils.injectDequeue = function(callback) {
-	return function(err, data) {
+	if(!utils.branchInitialized) { return utils.injectRunQueue(callback); }
+	return injectFunction(utils.dequeue, callback);
+};
+
+/**
+ * Inject run queue - initiates running the rest of the queue after Branch is initialized
+ */
+utils.injectRunQueue = function(callback) {
+	var runQueue = function() {
+		utils.running = true;
+		if (!utils.queue) { utils.queue = []; }
+		utils.branchInitialized = true;
 		utils.dequeue();
+	};
+	return injectFunction(runQueue, callback);
+};
+
+/**
+ * Generic function into callback. Used for triggering branch init, and dequeueing the next request
+ */
+var injectFunction = function(injection, callback) {
+	return function(err, data) {
+		injection();
 		callback(err, data);
 	};
 };

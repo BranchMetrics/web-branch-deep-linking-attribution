@@ -65,7 +65,7 @@ Branch.prototype._api = function(resource, data, callback) {
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback || function() {};
-	if (this.initialized) { return callback(utils.message(utils.messages.existingInit)); }
+	if (this.initialized) { return utils.injectRunQueue(callback)(utils.message(utils.messages.existingInit)); }
 	this.initialized = true;
 	this.app_id = app_id;
 	var self = this, sessionData = utils.readStore();
@@ -88,7 +88,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 		this.sessionLink = sessionData["link"];
 	}
 	if (sessionData && !utils.hashValue('r')) {
-		callback(null, cleanseReturnData(sessionData));
+		utils.injectRunQueue(callback)(null, cleanseReturnData(sessionData));
 	}
 	else {
 		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
