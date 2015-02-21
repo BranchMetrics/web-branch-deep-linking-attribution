@@ -56,6 +56,27 @@ utils.base64encode = function(a) {
   }
   return b;
 };
+utils.enqueue = function(a) {
+  utils.queue || (utils.queue = []);
+  utils.queue.push(a);
+  utils.running || utils.dequeue();
+  utils.running = !0;
+};
+utils.dequeue = function() {
+  utils.queue[0] && utils.queue.shift()();
+  0 === utils.queue.length && (utils.running = !1);
+};
+utils.packageRequest = function(a, b, c) {
+  return function() {
+    a.apply(b, c);
+  };
+};
+utils.injectDequeue = function(a) {
+  return function(b, c) {
+    utils.dequeue();
+    a(b, c);
+  };
+};
 // Input 2
 var banner = {}, animationSpeed = 250, animationDelay = 20, bannerResources = {css:{banner:"body { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }#branch-banner { top: -76px; width: 100%; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + 
 animationSpeed / 1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + 's ease; }#branch-banner .close-x { float: left; font-weight: 400; margin-right: 6px; margin-left: 0; cursor: pointer; }#branch-banner .content { position: absolute; width: 100%; height: 76px; z-index: 99999; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; }#branch-banner .content .left { width: 70%; float: left; padding: 8px 8px 8px 8px; }#branch-banner .content .left .icon img { width: 60px; height: 60px; margin-right: 6px; }#branch-banner .content .right a { font-size: 14px; font-weight: 500; }#branch-banner-action div { float: right; margin-right: 8px; }#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }#branch-banner .content .left .details { margin-top: 3px; padding-left: 4px; }#branch-banner .content .left .details .title { font: 14px/1.5em HelveticaNeue-Medium, Helvetica Neue Medium, Helvetica Neue, Sans-serif; color: rgba(0, 0, 0, 0.9); display: inline-block; }#branch-banner .content .left .details .description { font-size: 12px; font-weight: normal; line-height: 1.5em; color: rgba(0, 0, 0, 0.5); display: block; }#branch-banner .content .right { display:inline-block; position: relative; top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); }', 
@@ -217,11 +238,11 @@ var jsonpRequest = function(a, b, c) {
     sessionStorage.setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, d);
   }
 }, api = function(a, b, c) {
-  c = c || function() {
-  };
+  c = utils.injectDequeue(c || function() {
+  });
   var d = getUrl(a, b), e, f = "";
   "GET" == a.method ? e = d.url + "?" + d.data : (e = d.url, f = d.data);
-  sessionStorage.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(e, b, a.method, c) : XHRRequest(e, f, a.method, c);
+  sessionStorage.getItem("use_jsonp") || a.jsonp ? utils.enqueue(utils.packageRequest(jsonpMakeRequest, this, [e, b, a.method, c])) : utils.enqueue(utils.packageRequest(XHRRequest, this, [e, f, a.method, c]));
 };
 // Input 4
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};

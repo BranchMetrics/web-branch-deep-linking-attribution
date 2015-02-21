@@ -97,6 +97,10 @@ utils.hashValue = function(key) {
 	}
 };
 
+/**
+ * Base64 encoding because ie9 does not have bota()
+ * @param {string} input
+ */
 utils.base64encode = function(input) {
 	var utf8_encode = function(string, utftext) {
 		string = string.replace(/\r\n/g, "\n");
@@ -143,3 +147,42 @@ utils.base64encode = function(input) {
 	return output;
 };
 
+// ======= Begin queue functions
+
+/**
+ * Enqueue an async request, and if it's first in the queue, call it
+ * @param {Function} request
+ */
+utils.enqueue = function(request) {
+	if (!utils.queue) { utils.queue = []; }
+	utils.queue.push(request);
+	if (!utils.running) { utils.dequeue(); }
+	utils.running = true;
+};
+
+/**
+ * Dequeue the next request in the queue
+ */
+utils.dequeue = function() {
+	if (utils.queue[0]) { (utils.queue.shift())(); }
+	if (utils.queue.length === 0) { utils.running = false; }
+};
+
+/**
+ * Package the request to keep the context of "this"
+ */
+utils.packageRequest = function(request, context, params) {
+	return function() {
+		request.apply(context, params);
+	};
+};
+
+/**
+ * Inject dequeue in the request callback, to automatically call the next request in the queue
+ */
+utils.injectDequeue = function(callback) {
+	return function(err, data) {
+		utils.dequeue();
+		callback(err, data);
+	};
+};
