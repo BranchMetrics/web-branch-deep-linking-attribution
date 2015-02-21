@@ -57,6 +57,8 @@ Branch.prototype._api = function(resource, data, callback) {
  *      {
  *           data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
  *           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+ *           has_app: true,               // Does the user have the app installed already?
+ *           identity: 'BranchUser'       // Unique string that identifies the user
  *      });
  * ```
  *
