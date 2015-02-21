@@ -98,11 +98,12 @@ html:{banner:function(a) {
   var a = document.getElementById("branch-banner");
   a && a.parentNode.removeChild(a);
 }, sendSMS:function(a, b, c) {
-  if (b = document.getElementById("branch-sms-phone")) {
-    var d = b.value;
-    /^\d{7,}$/.test(d.replace(/[\s()+\-\.]|ext/gi, "")) ? (c.phone = d, a.sendSMS(c, function() {
-      document.getElementById("branch-sms-block").innerHTML = bannerResources.html.linkSent(d);
-    })) : b.className = "error";
+  var d = document.getElementById("branch-sms-phone");
+  if (d) {
+    var e = d.value;
+    /^\d{7,}$/.test(e.replace(/[\s()+\-\.]|ext/gi, "")) ? a.sendSMS(e, c, b, function() {
+      document.getElementById("branch-sms-block").innerHTML = bannerResources.html.linkSent(e);
+    }) : d.className = "error";
   }
 }, close:function() {
   setTimeout(function() {

@@ -130,8 +130,7 @@ var bannerResources = {
 			if (phone) {
 				var phone_val = phone.value;
 				if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
-					linkData["phone"] = phone_val;
-					branch.sendSMS(linkData, function() {
+					branch.sendSMS(phone_val, linkData, options, function() {
 						 document.getElementById('branch-sms-block').innerHTML = bannerResources.html.linkSent(phone_val);
 					 });
 				}
