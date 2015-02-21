@@ -71,14 +71,14 @@ Branch.prototype['init'] = function(app_id, callback) {
 	var self = this, sessionData = utils.readStore();
 
 	var cleanseReturnData = function(data) {
-		// change to light list
-		// document what these are
-		// return data, referring_identity, identity, has_app
-		delete data['session_id'];
-		delete data["device_fingerprint"];
-		delete data["device_fingerprint_id"];
-		delete data["browser_fingerprint_id"];
-		return data;
+		var whiteList = ['data', 'referring_identity', 'identity', 'has_app'];
+		var returnData = {};
+		for (key in data) {
+			if(whiteList.indexOf(key) > -1) {
+				returnData[key] = data[key];
+			}
+		}
+		return returnData;
 	};
 
 	if (sessionData && !sessionData['session_id']) { sessionData = null; }

@@ -299,11 +299,11 @@ Branch.prototype.init = function(a, b) {
   this.initialized = !0;
   this.app_id = a;
   var c = this, d = utils.readStore(), e = function(a) {
-    delete a.session_id;
-    delete a.device_fingerprint;
-    delete a.device_fingerprint_id;
-    delete a.browser_fingerprint_id;
-    return a;
+    var b = ["data", "referring_identity", "identity", "has_app"], c = {};
+    for (key in a) {
+      -1 < b.indexOf(key) && (c[key] = a[key]);
+    }
+    return c;
   };
   d && !d.session_id && (d = null);
   d && (this.session_id = d.session_id, this.identity_id = d.identity_id, this.sessionLink = d.link);
