@@ -52,6 +52,17 @@ utils.readStore = function() {
 	return JSON.parse(sessionStorage.getItem('branch_session')) || {};
 };
 
+utils.cleansSessionData = function(data) {
+	var whiteList = ['data', 'referring_identity', 'identity', 'has_app'];
+	var returnData = {};
+	for (var key in data) {
+		if(whiteList.indexOf(key) > -1) {
+			returnData[key] = data[key];
+		}
+	}
+	return returnData;
+};
+
 /**
  * @param {utils.sessionData}
  */
@@ -154,25 +165,21 @@ utils.base64encode = function(input) {
  * @param {Function} request
  */
 utils.enqueue = function(request) {
-	if (!utils.queue) { 
-		utils.queue = [];
-		utils.branchInitialized = false;
-	}
+	utils.queue || (utils.queue = []);
 	utils.queue.push(request);
-	if (!utils.running && utils.branchInitialized) { utils.dequeue(); }
-	utils.running = true;
+	if (utils.queue.length === 1) { utils.runFront(); }
 };
 
 /**
  * Dequeue the next request in the queue and execute
  */
-utils.dequeue = function() {
-	if (utils.queue && utils.branchInitialized) { 
-		utils.queue.length && (utils.queue.shift())();
-		if (utils.queue.length === 0) { utils.running = false; }
-	}
-	
+utils.runFront = function() {
+	utils.queue && (utils.queue.length > 0) && utils.queue[0]();
 };
+
+utils.dequeue = function() {
+	utils.queue && (utils.queue.length > 0) && utils.queue.shift();
+}
 
 /**
  * Package the request to keep the context of "this", and call it with all of it's arguments
@@ -184,32 +191,21 @@ utils.packageRequest = function(request, context, params) {
 };
 
 /**
- * Inject dequeue in the request callback, to automatically call the next request in the queue
- */
-utils.injectDequeue = function(callback) {
-	if(!utils.branchInitialized) { return utils.injectRunQueue(callback); }
-	return injectFunction(utils.dequeue, callback);
-};
-
-/**
- * Inject run queue - initiates running the rest of the queue after Branch is initialized
- */
-utils.injectRunQueue = function(callback) {
-	var runQueue = function() {
-		utils.running = true;
-		if (!utils.queue) { utils.queue = []; }
-		utils.branchInitialized = true;
-		utils.dequeue();
-	};
-	return injectFunction(runQueue, callback);
-};
-
-/**
- * Generic function into callback. Used for triggering branch init, and dequeueing the next request
+ * Generic function into callback. Currently used to inject dequeueing and running the next request.
  */
 var injectFunction = function(injection, callback) {
 	return function(err, data) {
 		injection();
 		callback(err, data);
 	};
+};
+
+/**
+ * Inject dequeue in the request callback, to automatically call the next request in the queue
+ */
+utils.injectDequeue = function(callback) {
+	return injectFunction(function() {
+		utils.dequeue();
+		utils.runFront();
+	}, callback);
 };

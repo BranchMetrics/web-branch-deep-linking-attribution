@@ -67,22 +67,13 @@ Branch.prototype._api = function(resource, data, callback) {
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback || function() {};
-	if (this.initialized) { return utils.injectRunQueue(callback)(utils.message(utils.messages.existingInit)); }
+	if (this.initialized) {
+		callback = utils.injectDequeue(callback);
+		utils.enqueue(utils.packageRequest(callback, this, [utils.message(utils.messages.existingInit)]));
+	}
 	this.initialized = true;
 	this.app_id = app_id;
 	var self = this, sessionData = utils.readStore();
-
-	var cleanseReturnData = function(data) {
-		var whiteList = ['data', 'referring_identity', 'identity', 'has_app'];
-		var returnData = {};
-		for (key in data) {
-			if(whiteList.indexOf(key) > -1) {
-				returnData[key] = data[key];
-			}
-		}
-		return returnData;
-	};
-
 	if (sessionData && !sessionData['session_id']) { sessionData = null; }
 	if (sessionData) {
 		this.session_id = sessionData['session_id'];
@@ -90,9 +81,10 @@ Branch.prototype['init'] = function(app_id, callback) {
 		this.sessionLink = sessionData["link"];
 	}
 	if (sessionData && !utils.hashValue('r')) {
-		utils.injectRunQueue(callback)(null, cleanseReturnData(sessionData));
+		callback = utils.injectDequeue(callback);
+		utils.enqueue(utils.packageRequest(callback, this, [null, utils.cleansSessionData(sessionData)]));
 	}
-	else {
+	else {	
 		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
 			self._api(resources.open, {
 				"link_identifier": utils.hashValue('r'),
@@ -103,9 +95,23 @@ Branch.prototype['init'] = function(app_id, callback) {
 				self.identity_id = data['identity_id'];
 				self.sessionLink = data["link"];
 				utils.store(data);
-				callback(err, cleanseReturnData(data));
+				callback(err, utils.cleansSessionData(data));
 			});
 		});
+	}
+};
+
+/**
+ * @function Branch.readSession
+ * @param {string} callback - Callback function that returns the session data
+ *
+ * Returns the same session information and any referring data, as `Branch.init`, but does not require the `app_id`. This is meant to be called after `Branch.init` has been called if you need the session information at a later point. If the Branch session has already been initialized, the callback will return immediately, otherwise, it will return once Branch has been initialized.
+ */
+Branch.prototype["readSession"] = function(callback) {
+	if(this.initialized) {
+		callback(null, utils.cleansSessionData(utils.readStore()));
+	} else {
+		// ???
 	}
 };
 
