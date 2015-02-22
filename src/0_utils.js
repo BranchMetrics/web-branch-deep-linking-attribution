@@ -21,7 +21,9 @@ utils.messages = {
 	invalidType: 'API request $1, parameter $2 is not $3',
 	nonInit: 'Branch SDK not initialized',
 	existingInit: 'Branch SDK already initilized',
-	missingAppId: 'Missing Branch app ID'
+	missingAppId: 'Missing Branch app ID',
+	callBranchInitFirst: 'Branch.init must be called first',
+	timeout: 'Request timed out'
 };
 
 /**
@@ -52,7 +54,7 @@ utils.readStore = function() {
 	return JSON.parse(sessionStorage.getItem('branch_session')) || {};
 };
 
-utils.cleansSessionData = function(data) {
+utils.whiteListSessionData = function(data) {
 	var whiteList = ['data', 'referring_identity', 'identity', 'has_app'];
 	var returnData = {};
 	for (var key in data) {
@@ -97,15 +99,6 @@ utils.merge = function(to, from) {
 		if (from.hasOwnProperty(attr)) { to[attr] = from[attr]; }
 	}
 	return to;
-};
-
-utils.hashValue = function(key) {
-	try {
-		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
-	}
-	catch (e) {
-		return '';
-	}
 };
 
 /**
@@ -162,27 +155,55 @@ utils.base64encode = function(input) {
 
 /**
  * Enqueue an async request, and if it's first in the queue, inititate the queue array call the request
+ *
  * @param {Function} request
  */
-utils.enqueue = function(request) {
-	utils.queue || (utils.queue = []);
-	utils.queue.push(request);
+utils.enqueue = function(request, resource) {
+	utils.queue || (utils.queue = [], utils.injectionQueue = []);
+	resource = resource || "";
+	utils.queue.push({
+		"request": request,
+		"resource": resource
+	});
 	if (utils.queue.length === 1) { utils.runFront(); }
 };
 
 /**
- * Dequeue the next request in the queue and execute
+ * Runs the next request in the queue
  */
 utils.runFront = function() {
-	utils.queue && (utils.queue.length > 0) && utils.queue[0]();
+	utils.queue && (utils.queue.length > 0) && utils.queue[0].request();
 };
 
+/**
+ * Dequeue the next request in the queue
+ */
 utils.dequeue = function() {
 	utils.queue && (utils.queue.length > 0) && utils.queue.shift();
-}
+};
+
+/**
+ * The injection queue is a queue of objects, each with a function matched to a specific resource type (i.e. open, link, etc.)
+ * Every time the front request in the queue is ran, the injection queue is checked. Every injection object that matches the resource type being ran will be called.
+ * Example use case: `Branch.readSession()` is called prior to `Branch.init()` is finished. `Branch.readSession` is placed in the injection queue for the next available
+ * call to an `open` resource, then `Branch.readSession` can still return with the session information.
+ *
+ */
+ utils.checkInjectionQueue = function() {
+ 	for (var i = 0; i < utils.injectionQueue.length; i++) {
+ 		if(utils.injectionQueue[i].resource == utils.queue[0].resource) {
+ 			var injectionQueueRequest = utils.injectionQueue.splice(i, 1)[0];
+ 			return injectionQueueRequest.injection;
+ 		}
+ 	}
+ };
 
 /**
  * Package the request to keep the context of "this", and call it with all of it's arguments
+ *
+ * @param {Function} request
+ * @param {Object} context
+ * @param {Array} params
  */
 utils.packageRequest = function(request, context, params) {
 	return function() {
@@ -191,20 +212,28 @@ utils.packageRequest = function(request, context, params) {
 };
 
 /**
- * Generic function into callback. Currently used to inject dequeueing and running the next request.
+ * Generic function into callback. Currently used by the queue itself to inject dequeueing and running the next request,
+ * and by Branch.readSession() to inject a callback to the Branch.init function at the front of the queue.
+ *
+ * @param {Function} injection
+ * @param {Function} callback
  */
-var injectFunction = function(injection, callback) {
+utils.injectFunction = function(injection, reciever) {
 	return function(err, data) {
-		injection();
-		callback(err, data);
+		injection(err, data);
+		reciever(err, data);
 	};
 };
 
 /**
  * Inject dequeue in the request callback, to automatically call the next request in the queue
+ *
+ * @param {Function} callback
  */
 utils.injectDequeue = function(callback) {
-	return injectFunction(function() {
+	return utils.injectFunction(function(err, data) {
+		var queuedInjection = utils.checkInjectionQueue();
+		queuedInjection && queuedInjection(err, data);
 		utils.dequeue();
 		utils.runFront();
 	}, callback);

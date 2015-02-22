@@ -49,7 +49,8 @@ ___
 
 **callback**: `string`, Callback function that returns the session data
 
-Returns the same session information and any referring data, as `Branch.init`, but does not require the `app_id`. This is meant to be called after `Branch.init` has been called if you need the session information at a later point. If the Branch session has already been initialized, the callback will return immediately, otherwise, it will return once Branch has been initialized.
+Returns the same session information and any referring data, as `Branch.init`, but does not require the `app_id`. This is meant to be called after `Branch.init` has been called if you need the session information at a later point.
+If the Branch session has already been initialized, the callback will return immediately, otherwise, it will return once Branch has been initialized.
 
 
 

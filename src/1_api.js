@@ -102,9 +102,7 @@ var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback
 			callback(null, json);
 		},
 		onTimeout: function() {
-			callback({
-				error: 'Request timed out.'
-			});
+			callback(utils.error(utils.messages.timeout));
 		},
 		timeout: 3,
 		data: requestData,
@@ -165,8 +163,8 @@ api = function(resource, data, callback) {
 		postData = u.data;
 	}	
 	if (sessionStorage.getItem('use_jsonp') || resource.jsonp) {
-		utils.enqueue(utils.packageRequest(jsonpMakeRequest, this, [url, data, resource.method, callback]));
+		utils.enqueue(utils.packageRequest(jsonpMakeRequest, this, [url, data, resource.method, callback]), resource.endpoint);
 	} else {
-		utils.enqueue(utils.packageRequest(XHRRequest, this, [url, postData, resource.method, callback]));
+		utils.enqueue(utils.packageRequest(XHRRequest, this, [url, postData, resource.method, callback]), resource.endpoint);
 	}
 };
