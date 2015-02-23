@@ -90,7 +90,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
 			}, function(err, data) {
-				setBranchValues(sessionData);
+				setBranchValues(data);
 				utils.store(data);
 				callback(err, utils.whiteListSessionData(data));
 			});
