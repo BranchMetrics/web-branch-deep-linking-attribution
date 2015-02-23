@@ -435,6 +435,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  */
 Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
 	callback = callback || function() {};
+	options = options || {};
 	options["make_new_link"] = options["make_new_link"] || false;
 
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }

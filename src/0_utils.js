@@ -9,7 +9,7 @@ var DEBUG = true;
 
 /* jshint ignore:start */
 /** @typedef {string} */
-message; // Does not work with tests
+/*var */message; // Does not work with tests
 
 /** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string, link_click:string}} */
 utils.sessionData;

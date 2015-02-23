@@ -25,14 +25,13 @@ var setUpPage = function() {
 	branch.init('5680621892404085', function(err, data) {});
 
 	// Maximum wait time for async tests (ms)
-	maxWaitTime = 10000;
+	maxWaitTime = 15000;
 
 	// How often we should check for the finished state of an async test
 	asyncPollingInterval = 500;
 
 	//Standard set of dummy params
 	params = {
-		phone: "5177401526",
 		tags: ['tag1', 'tag2'],
 		channel: 'sample app',
 		feature: 'create link',
@@ -86,11 +85,11 @@ var runAsyncTest = function(testFunction, assertions) {
  */
 
  // SMS sends with phone param
-var testsendSMS = function() {
+var testSendSMS = function() {
 	runAsyncTest(function(callback) {
-		branch.sendSMS(params, function(err, data) { callback(err, data) });
+		branch.sendSMS('5177401526', params, {}, function(err, data) { callback(err, data) });
 	}, function(recievedData) {
-		assertObjectEquals("should send SMS with phone number", recievedData, {});
+		assertUndefined("should send SMS with phone number and return undefined", recievedData);
 	});
 }
 
@@ -113,11 +112,11 @@ var testMissingPhonesendSMS = function() {
  * Track tests
  */
  // Track event with required params
- var testEvent = function() {
+ var testTrack = function() {
 	runAsyncTest(function(callback) {
-		branch.event('Tracked this click', function(err, data) { callback(err, data) });
+		branch.track('Tracked this click', function(err, data) { callback(err, data) });
 	}, function(recievedData) {
-		assertObjectEquals("should return empty object", recievedData, {});
+		assertUndefined("should return undefined", recievedData);
 	});
 }
 
@@ -141,7 +140,7 @@ var testCredits = function() {
 	runAsyncTest(function(callback) {
 		branch.credits(function(err, data) { callback(err, data) });
 	}, function(recievedData) {
-		assertObjectEquals("should return empty object if no credits on test account", recievedData, {"default":"0"});
+		assertTrue("should return an object", (typeof recievedData && recievedData != null));
 	});
 }
 
@@ -149,14 +148,12 @@ var testCredits = function() {
 /**
  * Identify tests
  */
-var testProfile = function() {
+var testSetIdentity = function() {
 	runAsyncTest(function(callback) {
-		branch.profile('Branch', function(err, data) { callback(err, data) });
+		branch.setIdentity('Branch', function(err, data) { callback(err, data) });
 	}, function(recievedData) {
-		assertNonEmptyString("should return correct identity id", recievedData.identity_id);
-			assertNonEmptyString("should return correct identity id", recievedData.link_click_id);
-			assertNonEmptyString("should return correct identity id", recievedData.link);
-			assertNonEmptyString("should return correct identity id", recievedData.referring_data);
+			assertNonEmptyString("should return correct link", recievedData.link);
+			assertNonEmptyString("should return correct referring_data", recievedData.referring_data);
 	});
 }
 
@@ -167,13 +164,11 @@ var testProfile = function() {
 var testRedeem = function() {
 	var expectedData = new Error('Not enough credits to redeem.');
 
-	var creditParams = {
-        amount: 5,
-        bucket: 'default',
-	};
+    var amount = 5;
+    var bucket = 'default';
 
 	runAsyncTest(function(callback) {
-		branch.redeem(creditParams, function(err, data) { 
+		branch.redeem(amount, bucket, function(err, data) { 
 			callback(err, data) });
 	}, function(recievedData) {
 		assertObjectEquals("should return error for not enough credits", expectedData, recievedData);
@@ -208,23 +203,6 @@ var testLogout = function() {
 	runAsyncTest(function(callback) {
 		branch.logout(function(err, data) { callback(err, data) });
 	}, function(recievedData) {
-		assertNotEquals("should return correct session id", branch.session_id, recievedData.session_id);
-		assertNotEquals("should return correct identity id", branch.identity_id, recievedData.identity_id);
-	});
-}
-
-// ===========================================================================================
-/**
- * Close tests
- */
- var testClose = function() {
-	runAsyncTest(function(callback) {
-		branch.close(function(err, closeData) { 
-			branch.init('5680621892404085', function(err, data) {
-				callback(err, closeData);
-			});
-		});
-	}, function(recievedData) {
-		assertObjectEquals("should return empty object", {}, recievedData);
+		assertUndefined("should return undefined", recievedData);
 	});
 }

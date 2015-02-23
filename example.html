@@ -157,7 +157,7 @@
     $('#track').click(function(){
       request.html('branch.track(\'Tracked this event\');');
       branch.track('Tracked this event', function(err, data){
-        response.html(JSON.stringify(data));
+        response.html(JSON.stringify(data || 'undefined'));
       });
     });
 
@@ -173,7 +173,7 @@
       var phone = phoneNumber();
       request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
       branch.sendSMS(phone, sampleParams, smsOptions, function(err, data){
-        response.html(JSON.stringify(data));
+        response.html(JSON.stringify(data || 'undefined'));
       });
     });
 
@@ -182,7 +182,7 @@
       var phone = phoneNumber();
       request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
       branch.sendSMS(phone, sampleParams, smsOptions, function(err, data){
-        response.html(JSON.stringify(data));
+        response.html(JSON.stringify(data || 'undefined'));
       });
     });
 

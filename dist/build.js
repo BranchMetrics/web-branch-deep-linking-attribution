@@ -381,6 +381,7 @@ Branch.prototype.linkClick = function(a, b) {
 Branch.prototype.sendSMS = function(a, b, c, d) {
   d = d || function() {
   };
+  c = c || {};
   c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
     return d(utils.message(utils.messages.nonInit));
