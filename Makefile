@@ -4,7 +4,7 @@ SOURCES=src/0_config.js src/0_utils.js src/1_banner.js src/1_api.js src/1_resour
 EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
-all: dist/build.js dist/build.min.js
+all: dist/build.js dist/build.min.js dist/onpage.min.js
 docs: README.md
 
 # Kinda gross, but will download closure compiler if you don't have it.
@@ -40,19 +40,23 @@ docs/2_branch.md: $(SOURCES)
 
 README.md: docs/2_branch.md docs/footer.md docs/intro.md
 	@echo "\nConcatinating readme"
-	cat docs/intro.md docs/2_branch.md docs/footer.md > README.md
+	cat docs/intro.md dist/onpage.min.js docs/Intro2.md docs/2_branch.md docs/footer.md > README.md
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
-	@echo "\nCompiling debug compressed js..."
+	@echo "\Minifying debug compressed js..."
 	$(COMPILER) $(COMPILER_ARGS) \
 		--formatting=print_input_delimiter \
 		--formatting=pretty_print \
 		--define 'DEBUG=true' > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	@echo "\nCompiling compressed and gzipped js..."
+	@echo "\Minifying compressed and gzipped js..."
 	$(COMPILER) $(COMPILER_ARGS) \
 		--compilation_level ADVANCED_OPTIMIZATIONS \
 		--define 'DEBUG=false' > dist/build.min.js
 	gzip -c dist/build.min.js > dist/build.min.js.gzip
 
+dist/onpage.min.js: src/onpage.js compiler/compiler.jar
+	@echo "\nMinifying on page script into README"
+	$(COMPILER) --js src/onpage.js \
+		--define 'DEBUG=false' > dist/onpage.min.js

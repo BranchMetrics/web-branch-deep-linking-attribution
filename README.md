@@ -34,10 +34,10 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 ```html
 <script type="text/javascript">
-!function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
-"https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.3.x.min.js.gzip",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
-e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-"init;close;logout;event;profile;link;referrals;credits;redeem;banner".split(";"),0);
+
+
+
+(function() {var a=window;function b(){var e=c,h=d[f++];e[h]=function(){e.a.push([h,arguments])}}var c={a:[],b:1},d="init readSession setIdentity logout track link linkClick sendSMS referrals credits redeem banner".split(" "),f=0,g=void 0,k=void 0;if(!a.branch||!a.branch.a){for(;f<d.length;)b();g=document.createElement("script");g.async=1;g.src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";k=document.getElementsByTagName("script")[0];k.parentNode.insertBefore(g,k);a.branch=c};})();
 
 branch.init('APP-KEY', function(err, data) {
   // callback to handle err or data
@@ -66,9 +66,7 @@ branch.init('APP-KEY', function(err, data) {
 1. Smart Banner
    + [.banner()](#banneroptions-linkdata)
 
-___
-
-# Global
+___# Global
 
 
 

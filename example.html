@@ -44,6 +44,7 @@
         <div class="group">
           <button id="init" class="btn btn-success">.init()</button>
           <!-- <button id="close" class="btn btn-danger">.close()</button> -->
+          <button id="readSession" class="btn btn-info">.readSession()</button>
           <button id="setIdentity" class="btn btn-info">.setIdentity()</button>
           <button id="logout" class="btn btn-info">.logout()</button>
         </div>
@@ -78,17 +79,11 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
 
-  !function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
-  "dist/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
-  e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-  "init;logout;event;setIdentity;link;readSession;referrals;credits;redeem;banner".split(";"),0);
+(function(a,b,f,d,l,g,h,k,c,e){if(!a[d]||!a[d]._q){for(;k<h.length;)l(g,h[k++]);c=b.createElement(f);c.async=1;c.src="dist/build.js";e=b.getElementsByTagName(f)[0];e.parentNode.insertBefore(c,e);a[d]=g}})(window,document,"script","branch",function(a,b){a[b]=function(){a._q.push([b,arguments])}},{_q:[],_v:1},"init readSession setIdentity logout track link linkClick sendSMS referrals credits redeem banner".split(" "),0);
+
 
   branch.init('5680621892404085', function(err, data) {
     document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
-  });
-  branch.readSession(function(err, data) {
-    console.log("Session:");
-    console.log(err || data);
   });
   
   </script>
@@ -129,6 +124,13 @@
       request.html('branch.init();');
       branch.init('5680621892404085', function(err, data) {
         info.innerHTML = JSON.stringify(data);
+      });
+    });
+
+    $('#readSession').click(function(){
+      request.html("branch.readSession();");
+      branch.readSession(function(err, data) {
+        response.html(JSON.stringify(data));
       });
     });
 
