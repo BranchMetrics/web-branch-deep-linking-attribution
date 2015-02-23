@@ -13,7 +13,7 @@ var JSHintOptions = {
 	'undef': true,
 	'trailing': true,
 	'curly': true,
-	'bitwise': true,
+	'bitwise': false,
 	'forin': true,
 	'freeze': true,
 	'immed': true,
