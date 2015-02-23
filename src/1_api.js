@@ -104,7 +104,7 @@ var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback
 		onTimeout: function() {
 			callback(utils.error(utils.messages.timeout));
 		},
-		timeout: 3,
+		timeout: 10,
 		data: requestData,
 		method: requestMethod
 	});

@@ -236,7 +236,7 @@ var jsonpRequest = function(a, b, c) {
     d(null, a);
   }, onTimeout:function() {
     d(utils.error(utils.messages.timeout));
-  }, timeout:3, data:b, method:c});
+  }, timeout:10, data:b, method:c});
 }, XHRRequest = function(a, b, c, d) {
   var e = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   e.onreadystatechange = function() {
