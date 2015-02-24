@@ -44,15 +44,15 @@ utils.merge = function(a, b) {
   return a;
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, h, n, u, q = 0;
   d = void 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
-    f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
+    h = a.charCodeAt(e), 128 > h ? d += String.fromCharCode(h) : (127 < h && 2048 > h ? d += String.fromCharCode(h >> 6 | 192) : (d += String.fromCharCode(h >> 12 | 224), d += String.fromCharCode(h >> 6 & 63 | 128)), d += String.fromCharCode(h & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+  for (a = d;q < a.length;) {
+    c = a.charCodeAt(q++), d = a.charCodeAt(q++), e = a.charCodeAt(q++), h = c >> 2, c = (c & 3) << 4 | d >> 4, n = (d & 15) << 2 | e >> 6, u = e & 63, isNaN(d) ? n = u = 64 : isNaN(e) && (u = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(n) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(u)
     ;
   }
   return b;
@@ -180,8 +180,8 @@ function getUrl(a, b) {
   var e = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      var f = a.params[c](a.endpoint, c, b[c]);
-      "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
+      var h = a.params[c](a.endpoint, c, b[c]);
+      "undefined" != typeof h && "" !== h && null !== h && (e[c] = h);
     }
   }
   return{data:serializeObject(e), url:d};
@@ -202,11 +202,11 @@ var jsonpRequest = function(a, b, c) {
     window.clearTimeout(e);
     b.onSuccess(a);
   };
-  var f = document.createElement("script");
-  f.type = "text/javascript";
-  f.async = !0;
-  f.src = a + (0 > a.indexOf("?") ? "?" : "") + (b.data ? d + b.data : "") + "&callback=" + c + (0 <= a.indexOf("/c/") ? "&click=1" : "");
-  document.getElementsByTagName("head")[0].appendChild(f);
+  var h = document.createElement("script");
+  h.type = "text/javascript";
+  h.async = !0;
+  h.src = a + (0 > a.indexOf("?") ? "?" : "") + (b.data ? d + b.data : "") + "&callback=" + c + (0 <= a.indexOf("/c/") ? "&click=1" : "");
+  document.getElementsByTagName("head")[0].appendChild(h);
 }, jsonpMakeRequest = function(a, b, c, d) {
   jsonpRequest(a, {onSuccess:function(a) {
     d(null, a);
@@ -228,13 +228,13 @@ var jsonpRequest = function(a, b, c) {
   };
   try {
     e.open(c, a, !0), e.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), e.send(b);
-  } catch (f) {
+  } catch (h) {
     sessionStorage.setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, d);
   }
 }, api = function(a, b, c) {
-  var d = getUrl(a, b), e, f = "";
-  "GET" == a.method ? e = d.url + "?" + d.data : (e = d.url, f = d.data);
-  sessionStorage.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(e, b, a.method, c) : XHRRequest(e, f, a.method, c);
+  var d = getUrl(a, b), e, h = "";
+  "GET" == a.method ? e = d.url + "?" + d.data : (e = d.url, h = d.data);
+  sessionStorage.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(e, b, a.method, c) : XHRRequest(e, h, a.method, c);
 };
 // Input 4
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};
@@ -279,15 +279,15 @@ Branch.prototype.init = function(a, b) {
       return this.nextQueue(), b(utils.message(utils.messages.existingInit));
     }
     this.app_id = a;
-    var e = this, f = utils.readStore(), g = function(a) {
+    var e = this, h = utils.readStore(), n = function(a) {
       e.session_id = a.session_id;
       e.identity_id = a.identity_id;
       e.sessionLink = a.link;
       e.initialized = !0;
     };
-    f && f.session_id ? (g(f), this.nextQueue(), b(null, utils.whiteListSessionData(f))) : this._api(resources._r, {}, function(a, c) {
+    h && h.session_id ? (n(h), this.nextQueue(), b(null, utils.whiteListSessionData(h))) : this._api(resources._r, {}, function(a, c) {
       e._api(resources.open, {is_referrable:1, browser_fingerprint_id:c}, function(a, c) {
-        g(c);
+        n(c);
         utils.store(c);
         e.nextQueue();
         b(a, utils.whiteListSessionData(c));
@@ -393,11 +393,11 @@ Branch.prototype.sendSMSNew = function(a, b, c) {
   }
   "app banner" != b.channel && (b.channel = "sms");
   d = this;
-  this.link(b, function(b, f) {
+  this.link(b, function(b, h) {
     if (b) {
       return c(b);
     }
-    d.linkClick(f, function(b) {
+    d.linkClick(h, function(b) {
       if (b) {
         return c(b);
       }
@@ -478,4 +478,436 @@ if (window.branch && window.branch._q) {
   return branch_instance;
 }) : "object" === typeof exports && (module.exports = branch_instance);
 window && (window.branch = branch_instance);
+// Input 8
+(function() {
+  function a(b, d) {
+    function h(a, b) {
+      try {
+        a();
+      } catch (c) {
+        b && b();
+      }
+    }
+    function k(a) {
+      if (null != k[a]) {
+        return k[a];
+      }
+      var b;
+      if ("bug-string-char-index" == a) {
+        b = "a" != "a"[0];
+      } else {
+        if ("json" == a) {
+          b = k("json-stringify") && k("date-serialization") && k("json-parse");
+        } else {
+          if ("date-serialization" == a) {
+            if (b = k("json-stringify") && v) {
+              var c = d.stringify;
+              h(function() {
+                b = '"-271821-04-20T00:00:00.000Z"' == c(new w(-864E13)) && '"+275760-09-13T00:00:00.000Z"' == c(new w(864E13)) && '"-000001-01-01T00:00:00.000Z"' == c(new w(-621987552E5)) && '"1969-12-31T23:59:59.999Z"' == c(new w(-1));
+              });
+            }
+          } else {
+            var e;
+            if ("json-stringify" == a) {
+              var c = d.stringify, f = "function" == typeof c;
+              f && ((e = function() {
+                return 1;
+              }).toJSON = e, h(function() {
+                f = "0" === c(0) && "0" === c(new n) && '""' == c(new u) && c(r) === t && c(t) === t && c() === t && "1" === c(e) && "[1]" == c([e]) && "[null]" == c([t]) && "null" == c(null) && "[null,null,null]" == c([t, r, null]) && '{"a":[1,true,false,null,"\\u0000\\b\\n\\f\\r\\t"]}' == c({a:[e, !0, !1, null, "\x00\b\n\f\r\t"]}) && "1" === c(null, e) && "[\n 1,\n 2\n]" == c([1, 2], null, 1);
+              }, function() {
+                f = !1;
+              }));
+              b = f;
+            }
+            if ("json-parse" == a) {
+              var z = d.parse, g;
+              "function" == typeof z && h(function() {
+                0 === z("0") && !z(!1) && (e = z('{"a":[1,true,false,null,"\\u0000\\b\\n\\f\\r\\t"]}'), g = 5 == e.a.length && 1 === e.a[0]) && (h(function() {
+                  g = !z('"\t"');
+                }), g && h(function() {
+                  g = 1 !== z("01");
+                }), g && h(function() {
+                  g = 1 !== z("1.");
+                }));
+              }, function() {
+                g = !1;
+              });
+              b = g;
+            }
+          }
+        }
+      }
+      return k[a] = !!b;
+    }
+    b || (b = e.Object());
+    d || (d = e.Object());
+    var n = b.Number || e.Number, u = b.String || e.String, q = b.Object || e.Object, w = b.Date || e.Date, A = b.SyntaxError || e.SyntaxError, O = b.TypeError || e.TypeError, P = b.Math || e.Math, C = b.JSON || e.JSON;
+    "object" == typeof C && C && (d.stringify = C.stringify, d.parse = C.parse);
+    var q = q.prototype, r = q.toString, D = q.hasOwnProperty, t, v = new w(-0xc782b5b800cec);
+    h(function() {
+      v = -109252 == v.getUTCFullYear() && 0 === v.getUTCMonth() && 1 === v.getUTCDate() && 10 == v.getUTCHours() && 37 == v.getUTCMinutes() && 6 == v.getUTCSeconds() && 708 == v.getUTCMilliseconds();
+    });
+    k["bug-string-char-index"] = k["date-serialization"] = k.json = k["json-stringify"] = k["json-parse"] = null;
+    if (!k("json")) {
+      var G = k("bug-string-char-index"), B = function(a, b) {
+        var d = 0, e, f, h;
+        (e = function() {
+          this.valueOf = 0;
+        }).prototype.valueOf = 0;
+        f = new e;
+        for (h in f) {
+          D.call(f, h) && d++;
+        }
+        e = f = null;
+        d ? B = function(a, b) {
+          var c = "[object Function]" == r.call(a), d, e;
+          for (d in a) {
+            c && "prototype" == d || !D.call(a, d) || (e = "constructor" === d) || b(d);
+          }
+          (e || D.call(a, d = "constructor")) && b(d);
+        } : (f = "valueOf toString toLocaleString propertyIsEnumerable isPrototypeOf hasOwnProperty constructor".split(" "), B = function(a, b) {
+          var d = "[object Function]" == r.call(a), e, K = !d && "function" != typeof a.constructor && c[typeof a.hasOwnProperty] && a.hasOwnProperty || D;
+          for (e in a) {
+            d && "prototype" == e || !K.call(a, e) || b(e);
+          }
+          for (d = f.length;e = f[--d];K.call(a, e) && b(e)) {
+          }
+        });
+        return B(a, b);
+      };
+      if (!k("json-stringify") && !k("date-serialization")) {
+        var Q = {92:"\\\\", 34:'\\"', 8:"\\b", 12:"\\f", 10:"\\n", 13:"\\r", 9:"\\t"}, x = function(a, b) {
+          return("000000" + (b || 0)).slice(-a);
+        }, E = function(a) {
+          var b, c, d, e, f, g, h, k, l;
+          if (v) {
+            b = function(a) {
+              c = a.getUTCFullYear();
+              d = a.getUTCMonth();
+              e = a.getUTCDate();
+              g = a.getUTCHours();
+              h = a.getUTCMinutes();
+              k = a.getUTCSeconds();
+              l = a.getUTCMilliseconds();
+            };
+          } else {
+            var p = P.floor, q = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], n = function(a, b) {
+              return q[b] + 365 * (a - 1970) + p((a - 1969 + (b = +(1 < b))) / 4) - p((a - 1901 + b) / 100) + p((a - 1601 + b) / 400);
+            };
+            b = function(a) {
+              e = p(a / 864E5);
+              for (c = p(e / 365.2425) + 1970 - 1;n(c + 1, 0) <= e;c++) {
+              }
+              for (d = p((e - n(c, 0)) / 30.42);n(c, d + 1) <= e;d++) {
+              }
+              e = 1 + e - n(c, d);
+              f = (a % 864E5 + 864E5) % 864E5;
+              g = p(f / 36E5) % 24;
+              h = p(f / 6E4) % 60;
+              k = p(f / 1E3) % 60;
+              l = f % 1E3;
+            };
+          }
+          E = function(a) {
+            a > -1 / 0 && a < 1 / 0 ? (b(a), a = (0 >= c || 1E4 <= c ? (0 > c ? "-" : "+") + x(6, 0 > c ? -c : c) : x(4, c)) + "-" + x(2, d + 1) + "-" + x(2, e) + "T" + x(2, g) + ":" + x(2, h) + ":" + x(2, k) + "." + x(3, l) + "Z", c = d = e = g = h = k = l = null) : a = null;
+            return a;
+          };
+          return E(a);
+        };
+        if (k("json-stringify") && !k("date-serialization")) {
+          var R = function(a) {
+            return E(this);
+          }, S = d.stringify;
+          d.stringify = function(a, b, c) {
+            var d = w.prototype.toJSON;
+            w.prototype.toJSON = R;
+            a = S(a, b, c);
+            w.prototype.toJSON = d;
+            return a;
+          };
+        } else {
+          var T = function(a) {
+            a = a.charCodeAt(0);
+            var b = Q[a];
+            return b ? b : "\\u00" + x(2, a.toString(16));
+          }, H = /[\x00-\x1f\x22\x5c]/g, L = function(a) {
+            H.lastIndex = 0;
+            return'"' + (H.test(a) ? a.replace(H, T) : a) + '"';
+          }, I = function(a, b, c, d, e, f, g) {
+            var m, k, l, p, n, q;
+            h(function() {
+              m = b[a];
+            });
+            "object" == typeof m && m && (m.getUTCFullYear && "[object Date]" == r.call(m) && m.toJSON === w.prototype.toJSON ? m = E(m) : "function" == typeof m.toJSON && (m = m.toJSON(a)));
+            c && (m = c.call(b, a, m));
+            if (m == t) {
+              return m === t ? m : "null";
+            }
+            k = typeof m;
+            "object" == k && (l = r.call(m));
+            switch(l || k) {
+              case "boolean":
+              ;
+              case "[object Boolean]":
+                return "" + m;
+              case "number":
+              ;
+              case "[object Number]":
+                return m > -1 / 0 && m < 1 / 0 ? "" + m : "null";
+              case "string":
+              ;
+              case "[object String]":
+                return L("" + m);
+            }
+            if ("object" == typeof m) {
+              for (k = g.length;k--;) {
+                if (g[k] === m) {
+                  throw O();
+                }
+              }
+              g.push(m);
+              p = [];
+              q = f;
+              f += e;
+              if ("[object Array]" == l) {
+                n = 0;
+                for (k = m.length;n < k;n++) {
+                  l = I(n, m, c, d, e, f, g), p.push(l === t ? "null" : l);
+                }
+                k = p.length ? e ? "[\n" + f + p.join(",\n" + f) + "\n" + q + "]" : "[" + p.join(",") + "]" : "[]";
+              } else {
+                B(d || m, function(a) {
+                  var b = I(a, m, c, d, e, f, g);
+                  b !== t && p.push(L(a) + ":" + (e ? " " : "") + b);
+                }), k = p.length ? e ? "{\n" + f + p.join(",\n" + f) + "\n" + q + "}" : "{" + p.join(",") + "}" : "{}";
+              }
+              g.pop();
+              return k;
+            }
+          };
+          d.stringify = function(a, b, d) {
+            var e, f, h, g;
+            if (c[typeof b] && b) {
+              if (g = r.call(b), "[object Function]" == g) {
+                f = b;
+              } else {
+                if ("[object Array]" == g) {
+                  h = {};
+                  for (var k = 0, l = b.length, n;k < l;n = b[k++], (g = r.call(n), "[object String]" == g || "[object Number]" == g) && (h[n] = 1)) {
+                  }
+                }
+              }
+            }
+            if (d) {
+              if (g = r.call(d), "[object Number]" == g) {
+                if (0 < (d -= d % 1)) {
+                  for (e = "", 10 < d && (d = 10);e.length < d;e += " ") {
+                  }
+                }
+              } else {
+                "[object String]" == g && (e = 10 >= d.length ? d : d.slice(0, 10));
+              }
+            }
+            return I("", (n = {}, n[""] = a, n), f, h, e, "", []);
+          };
+        }
+      }
+      if (!k("json-parse")) {
+        var U = u.fromCharCode, V = {92:"\\", 34:'"', 47:"/", 98:"\b", 116:"\t", 110:"\n", 102:"\f", 114:"\r"}, f, F, l = function() {
+          f = F = null;
+          throw A();
+        }, y = function() {
+          for (var a = F, b = a.length, c, d, e, h, g;f < b;) {
+            switch(g = a.charCodeAt(f), g) {
+              case 9:
+              ;
+              case 10:
+              ;
+              case 13:
+              ;
+              case 32:
+                f++;
+                break;
+              case 123:
+              ;
+              case 125:
+              ;
+              case 91:
+              ;
+              case 93:
+              ;
+              case 58:
+              ;
+              case 44:
+                return c = G ? a.charAt(f) : a[f], f++, c;
+              case 34:
+                c = "@";
+                for (f++;f < b;) {
+                  if (g = a.charCodeAt(f), 32 > g) {
+                    l();
+                  } else {
+                    if (92 == g) {
+                      switch(g = a.charCodeAt(++f), g) {
+                        case 92:
+                        ;
+                        case 34:
+                        ;
+                        case 47:
+                        ;
+                        case 98:
+                        ;
+                        case 116:
+                        ;
+                        case 110:
+                        ;
+                        case 102:
+                        ;
+                        case 114:
+                          c += V[g];
+                          f++;
+                          break;
+                        case 117:
+                          d = ++f;
+                          for (e = f + 4;f < e;f++) {
+                            g = a.charCodeAt(f), 48 <= g && 57 >= g || 97 <= g && 102 >= g || 65 <= g && 70 >= g || l();
+                          }
+                          c += U("0x" + a.slice(d, f));
+                          break;
+                        default:
+                          l();
+                      }
+                    } else {
+                      if (34 == g) {
+                        break;
+                      }
+                      g = a.charCodeAt(f);
+                      for (d = f;32 <= g && 92 != g && 34 != g;) {
+                        g = a.charCodeAt(++f);
+                      }
+                      c += a.slice(d, f);
+                    }
+                  }
+                }
+                if (34 == a.charCodeAt(f)) {
+                  return f++, c;
+                }
+                l();
+              default:
+                d = f;
+                45 == g && (h = !0, g = a.charCodeAt(++f));
+                if (48 <= g && 57 >= g) {
+                  for (48 == g && (g = a.charCodeAt(f + 1), 48 <= g && 57 >= g) && l();f < b && (g = a.charCodeAt(f), 48 <= g && 57 >= g);f++) {
+                  }
+                  if (46 == a.charCodeAt(f)) {
+                    for (e = ++f;e < b && (g = a.charCodeAt(e), 48 <= g && 57 >= g);e++) {
+                    }
+                    e == f && l();
+                    f = e;
+                  }
+                  g = a.charCodeAt(f);
+                  if (101 == g || 69 == g) {
+                    g = a.charCodeAt(++f);
+                    43 != g && 45 != g || f++;
+                    for (e = f;e < b && (g = a.charCodeAt(e), 48 <= g && 57 >= g);e++) {
+                    }
+                    e == f && l();
+                    f = e;
+                  }
+                  return+a.slice(d, f);
+                }
+                h && l();
+                c = a.slice(f, f + 4);
+                if ("true" == c) {
+                  return f += 4, !0;
+                }
+                if ("fals" == c && 101 == a.charCodeAt(f + 4)) {
+                  return f += 5, !1;
+                }
+                if ("null" == c) {
+                  return f += 4, null;
+                }
+                l();
+            }
+          }
+          return "$";
+        }, J = function(a) {
+          var b, c;
+          "$" == a && l();
+          if ("string" == typeof a) {
+            if ("@" == (G ? a.charAt(0) : a[0])) {
+              return a.slice(1);
+            }
+            if ("[" == a) {
+              for (b = [];;) {
+                a = y();
+                if ("]" == a) {
+                  break;
+                }
+                c ? "," == a ? (a = y(), "]" == a && l()) : l() : c = !0;
+                "," == a && l();
+                b.push(J(a));
+              }
+              return b;
+            }
+            if ("{" == a) {
+              for (b = {};;) {
+                a = y();
+                if ("}" == a) {
+                  break;
+                }
+                c ? "," == a ? (a = y(), "}" == a && l()) : l() : c = !0;
+                "," != a && "string" == typeof a && "@" == (G ? a.charAt(0) : a[0]) && ":" == y() || l();
+                b[a.slice(1)] = J(y());
+              }
+              return b;
+            }
+            l();
+          }
+          return a;
+        }, N = function(a, b, c) {
+          c = M(a, b, c);
+          c === t ? delete a[b] : a[b] = c;
+        }, M = function(a, b, c) {
+          var d = a[b], e;
+          if ("object" == typeof d && d) {
+            if ("[object Array]" == r.call(d)) {
+              for (e = d.length;e--;N(d, e, c)) {
+              }
+            } else {
+              B(d, function(a) {
+                N(d, a, c);
+              });
+            }
+          }
+          return c.call(a, b, d);
+        };
+        d.parse = function(a, b) {
+          var c, d;
+          f = 0;
+          F = "" + a;
+          c = J(y());
+          "$" != y() && l();
+          f = F = null;
+          return b && "[object Function]" == r.call(b) ? M((d = {}, d[""] = c, d), "", b) : c;
+        };
+      }
+    }
+    d.runInContext = a;
+    return d;
+  }
+  var b = "function" === typeof define && define.amd, c = {"function":!0, object:!0}, d = c[typeof exports] && exports && !exports.nodeType && exports, e = c[typeof window] && window || this, h = d && c[typeof module] && module && !module.nodeType && "object" == typeof global && global;
+  !h || h.global !== h && h.window !== h && h.self !== h || (e = h);
+  if (d && !b) {
+    a(e, d);
+  } else {
+    var n = e.JSON, u = e.JSON3, q = !1, A = a(e, e.JSON3 = {noConflict:function() {
+      q || (q = !0, e.JSON = n, e.JSON3 = u, n = u = null);
+      return A;
+    }});
+    e.JSON = {parse:A.parse, stringify:A.stringify};
+  }
+  b && define(function() {
+    return A;
+  });
+}).call(this);
 })();
