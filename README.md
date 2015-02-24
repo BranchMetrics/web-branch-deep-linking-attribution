@@ -297,11 +297,11 @@ ___
 
 
 
-### sendSMS(phone,, linkData, options, callback) 
+### sendSMS(phone, linkData, options, callback) 
 
 **Parameters**
 
-**phone,**: `String`, _required_ phone number to send SMS to
+**phone**: `String`, _required_ phone number to send SMS to
 
 **linkData**: `Object`, _required_ - object of link data
 

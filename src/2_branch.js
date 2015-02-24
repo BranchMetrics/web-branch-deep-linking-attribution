@@ -409,7 +409,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 
 /**
  * @function Branch.sendSMS
- * @param {String} phone, _required_ phone number to send SMS to
+ * @param {String} phone - _required_ phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
  * @param {Object|null} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
  * @param {function|null} callback - _optional_ - Returns an error if unsuccessful
