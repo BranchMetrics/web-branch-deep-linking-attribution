@@ -144,7 +144,7 @@ Branch.prototype["data"] = function(callback) {
  * @param {string} identity - __required__ - a string uniquely identifying the user – often a user ID or email address.
  * @param {function|null} callback - __optional__ - callback that returns the user's Branch identity id and unique link.
  *
- * **Formerly `identify()` (depreciated). **See [CHANGELOG](CHANGELOG.md)**
+ * **[Formerly `identify()`](CHANGELOG.md)**
  *
  * Sets the identity of a user and returns the data. To use this function, pass
  * a unique string that identifies the user - this could be an email address,
@@ -309,9 +309,11 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * @param {Object} linkData - __required__ - link data and metadata.
  * @param {function|null} callback - __optional__ - returns a string of the Branch deep linking URL.
  *
- * **Formerly `createLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+ * **[Formerly `createLink()`](CHANGELOG.md)**
  *
- * Creates and returns a deep linking URL.  The `data` parameter can include an object with optional data you would like to store, including Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+ * Creates and returns a deep linking URL.  The `data` parameter can include an
+ * object with optional data you would like to store, including Facebook
+ * [Open Graph data](https://developers.facebook.com/docs/opengraph).
  *
  * #### Usage
  * ```
@@ -412,9 +414,15 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * @param {Object|null} options - __optional__ - options: make_new_link, which forces the creation of a new link even if one already exists
  * @param {function|null} callback - __optional__ - Returns an error if unsuccessful
  *
- * **Formerly `SMSLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+ * **[Formerly `SMSLink()`](CHANGELOG.md)**
  *
- * A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `metadata` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms. **Supports international SMS**.
+ * A robust function to give your users the ability to share links via SMS. If
+ * the user navigated to this page via a Branch link, `sendSMS` will send that
+ * same link. Otherwise, it will create a new link with the data provided in
+ * the `metadata` argument. `sendSMS` also  registers a click event with the
+ * `channel` pre-filled with `'sms'` before sending an sms to the provided
+ * `phone` parameter. This way the entire link click event is recorded starting
+ * with the user sending an sms. **Supports international SMS**.
  *
  * #### Usage
  * ```js
@@ -562,7 +570,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  * @function Branch.referrals
  * @param {function} callback - __required__ - returns an object with referral data.
  *
- * **Formerly `showReferrals()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+ * **[Formerly `showReferrals()`](CHANGELOG.md)**
  *
  * Retrieves a complete summary of the referrals the current user has made.
  *
@@ -616,7 +624,7 @@ Branch.prototype["referrals"] = function(callback) {
  * @function Branch.credits
  * @param {function} callback - __required__ - returns an object with credit data.
  *
- * **Formerly `showCredits()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+ * **[Formerly `showCredits()`](CHANGELOG.md)**
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
  *
@@ -662,7 +670,7 @@ Branch.prototype["credits"] = function(callback) {
  * @param {String} bucket - __required__ - the name of the `bucket` (string) of which bucket to redeem the credits from
  * @param {function|null} callback - __optional__ - returns an error if unsuccessful
  *
- * **Formerly `redeemCredits()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+ * **[Formerly `redeemCredits()`](CHANGELOG.md)
  *
  * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
  *
@@ -719,7 +727,7 @@ Branch.prototype["redeem"] = function(amount, bucket, callback) {
  * @param {Object} options - __required__ - object of all the options to setup the banner
  * @param {Object} linkData - __required__ - object of all link data, same as Branch.link()
  *
- * **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+ * **[Formerly `appBanner()`](CHANGELOG.md)**
  *
  * Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
  *
