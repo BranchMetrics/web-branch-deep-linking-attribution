@@ -267,9 +267,8 @@ branch.link({
     stage: 'new user',
     type: 1,
     data: {
-        mydata: {
-            foo: 'bar'
-        },
+        mydata: 'something',
+        foo: 'bar',
         '$desktop_url': 'http://myappwebsite.com',
         '$ios_url': 'http://myappwebsite.com/ios',
         '$ipad_url': 'http://myappwebsite.com/ipad',
@@ -340,9 +339,8 @@ branch.sendSMS({
         stage: 'new user',
         type: 1,
         data: {
-            mydata: {
-                foo: 'bar'
-            },
+            mydata: 'something',
+            foo: 'bar',
             '$desktop_url': 'http://myappwebsite.com',
             '$ios_url': 'http://myappwebsite.com/ios',
             '$ipad_url': 'http://myappwebsite.com/ipad',
@@ -543,9 +541,8 @@ branch.banner({
     stage: 'new user',
     type: 1,
     data: {
-        mydata: {
-            foo: 'bar'
-        },
+        mydata: 'something',
+        foo: 'bar',
         '$desktop_url': 'http://myappwebsite.com',
         '$ios_url': 'http://myappwebsite.com/ios',
         '$ipad_url': 'http://myappwebsite.com/ipad',

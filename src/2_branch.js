@@ -332,9 +332,8 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *     stage: 'new user',
  *     type: 1,
  *     data: {
- *         mydata: {
- *             foo: 'bar'
- *         },
+ *         mydata: 'something',
+ *         foo: 'bar',
  *         '$desktop_url': 'http://myappwebsite.com',
  *         '$ios_url': 'http://myappwebsite.com/ios',
  *         '$ipad_url': 'http://myappwebsite.com/ipad',
@@ -445,9 +444,8 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *         stage: 'new user',
  *         type: 1,
  *         data: {
- *             mydata: {
- *                 foo: 'bar'
- *             },
+ *             mydata: 'something',
+ *             foo: 'bar',
  *             '$desktop_url': 'http://myappwebsite.com',
  *             '$ios_url': 'http://myappwebsite.com/ios',
  *             '$ipad_url': 'http://myappwebsite.com/ipad',
@@ -762,9 +760,8 @@ Branch.prototype["redeem"] = function(amount, bucket, callback) {
  *     stage: 'new user',
  *     type: 1,
  *     data: {
- *         mydata: {
- *             foo: 'bar'
- *         },
+ *         mydata: 'something',
+ *         foo: 'bar',
  *         '$desktop_url': 'http://myappwebsite.com',
  *         '$ios_url': 'http://myappwebsite.com/ios',
  *         '$ipad_url': 'http://myappwebsite.com/ipad',
