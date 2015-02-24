@@ -4,7 +4,7 @@ SOURCES=src/0_config.js src/0_utils.js src/1_banner.js src/1_api.js src/1_resour
 EXTERN=src/extern.js externs/json3/lib/json3.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
-all: dist/build.js dist/build.min.js dist/onpage.min.js
+all: dist/build.js dist/build.min.js dist/onpage.min.js README.md
 docs: README.md
 
 # Kinda gross, but will download closure compiler if you don't have it.

@@ -67,7 +67,9 @@ branch.init('APP-KEY', function(err, data) {
 1. Smart Banner
    + [.banner()](#banneroptions-linkdata)
 
-___# Global
+___
+
+# Global
 
 
 
