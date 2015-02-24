@@ -186,7 +186,7 @@ Logs out the current session, replaces session IDs and identity IDs.
 ##### Usage
 ```js
 branch.logout(
-    callback(err)
+    callback (err)
 );
 ```
 

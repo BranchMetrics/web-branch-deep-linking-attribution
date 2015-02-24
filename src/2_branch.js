@@ -193,7 +193,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * ##### Usage
  * ```js
  * branch.logout(
- *     callback(err)
+ *     callback (err)
  * );
  * ```
  *
