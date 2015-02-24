@@ -265,6 +265,8 @@ var default_branch, Branch = function() {
   }
   this.initialized = !1;
 };
+Branch.prototype.pushQueue = utils.pushQueue;
+Branch.prototype.nextQueue = utils.nextQueue;
 Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && this.app_id && (b.app_id = this.app_id);
   (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && this.session_id && (b.session_id = this.session_id);
@@ -272,9 +274,9 @@ Branch.prototype._api = function(a, b, c) {
   return api(a, b, c);
 };
 Branch.prototype.init = function(a, b) {
-  utils.pushQueue(function(a, b) {
+  this.pushQueue(function(a, b) {
     if (this.initialized) {
-      return utils.nextQueue(), b(utils.message(utils.messages.existingInit));
+      return this.nextQueue(), b(utils.message(utils.messages.existingInit));
     }
     this.app_id = a;
     var e = this, f = utils.readStore(), g = function(a) {
@@ -283,11 +285,11 @@ Branch.prototype.init = function(a, b) {
       e.sessionLink = a.link;
       e.initialized = !0;
     };
-    f && f.session_id ? (g(f), utils.nextQueue(), b(null, utils.whiteListSessionData(f))) : this._api(resources._r, {}, function(a, c) {
+    f && f.session_id ? (g(f), this.nextQueue(), b(null, utils.whiteListSessionData(f))) : this._api(resources._r, {}, function(a, c) {
       e._api(resources.open, {is_referrable:1, browser_fingerprint_id:c}, function(a, c) {
         g(c);
         utils.store(c);
-        utils.nextQueue();
+        e.nextQueue();
         b(a, utils.whiteListSessionData(c));
       });
     });
@@ -295,78 +297,84 @@ Branch.prototype.init = function(a, b) {
   }]);
 };
 Branch.prototype.data = function(a) {
-  utils.pushQueue(function(a) {
-    utils.nextQueue();
+  var b = this;
+  this.pushQueue(function(a) {
+    b.nextQueue();
     a(null, utils.whiteListSessionData(utils.readStore()));
   }, this, [a || function() {
   }]);
 };
 Branch.prototype.setIdentity = function(a, b) {
-  utils.pushQueue(function(a, b) {
+  var c = this;
+  this.pushQueue(function(a, b) {
     if (!this.initialized) {
       return b(utils.message(utils.messages.nonInit));
     }
-    this._api(resources.profile, {identity:a}, function(a, c) {
-      utils.nextQueue();
-      b(a, c);
+    this._api(resources.profile, {identity:a}, function(a, d) {
+      c.nextQueue();
+      b(a, d);
     });
   }, this, [a, b || function() {
   }]);
 };
 Branch.prototype.logout = function(a) {
-  utils.pushQueue(function(a) {
+  var b = this;
+  this.pushQueue(function(a) {
     if (!this.initialized) {
       return a(utils.message(utils.messages.nonInit));
     }
-    this._api(resources.logout, {}, function(c) {
-      utils.nextQueue();
-      a(c);
+    this._api(resources.logout, {}, function(d) {
+      b.nextQueue();
+      a(d);
     });
   }, this, [a || function() {
   }]);
 };
 Branch.prototype.track = function(a, b, c) {
-  utils.pushQueue(function(a, b, c) {
+  var d = this;
+  this.pushQueue(function(a, b, c) {
     if (!this.initialized) {
       return c(utils.message(utils.messages.nonInit));
     }
     "function" == typeof b && (c = b, b = {});
     this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a) {
-      utils.nextQueue();
+      d.nextQueue();
       c(a);
     });
   }, this, [a, b, c || function() {
   }]);
 };
 Branch.prototype.link = function(a, b) {
-  utils.pushQueue(function(a, b) {
+  var c = this;
+  this.pushQueue(function(a, b) {
     if (!this.initialized) {
       return b(utils.message(utils.messages.nonInit));
     }
     a.source = "web-sdk";
     void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
     a.data = JSON.stringify(a.data);
-    this._api(resources.link, a, function(a, c) {
-      "function" == typeof b && (utils.nextQueue(), b(a, c.url));
+    this._api(resources.link, a, function(a, d) {
+      "function" == typeof b && (c.nextQueue(), b(a, d.url));
     });
   }, this, [a, b || function() {
   }]);
 };
 Branch.prototype.linkClick = function(a, b) {
-  utils.pushQueue(function(a, b) {
+  var c = this;
+  this.pushQueue(function(a, b) {
     if (!this.initialized) {
-      return utils.nextQueue(), b(utils.message(utils.messages.nonInit));
+      return this.nextQueue(), b(utils.message(utils.messages.nonInit));
     }
-    a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
-      utils.nextQueue();
-      utils.storeKeyValue("click_id", c.click_id);
-      (a || c) && b(a, c);
+    a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, d) {
+      c.nextQueue();
+      utils.storeKeyValue("click_id", d.click_id);
+      (a || d) && b(a, d);
     });
   }, this, [a, b || function() {
   }]);
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
-  utils.pushQueue(function(a, b, c, d) {
+  this.pushQueue(function(a, b, c, d) {
     c = c || {};
     c.make_new_link = c.make_new_link || !1;
     if (!this.initialized) {
@@ -379,11 +387,12 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
 Branch.prototype.sendSMSNew = function(a, b, c) {
   c = c || function() {
   };
+  var d = this;
   if (!this.initialized) {
     return c(utils.message(utils.messages.nonInit));
   }
   "app banner" != b.channel && (b.channel = "sms");
-  var d = this;
+  d = this;
   this.link(b, function(b, f) {
     if (b) {
       return c(b);
@@ -393,7 +402,7 @@ Branch.prototype.sendSMSNew = function(a, b, c) {
         return c(b);
       }
       d.sendSMSExisting(a, function(a) {
-        utils.nextQueue();
+        d.nextQueue();
         c(a);
       });
     });
@@ -402,45 +411,49 @@ Branch.prototype.sendSMSNew = function(a, b, c) {
 Branch.prototype.sendSMSExisting = function(a, b) {
   b = b || function() {
   };
+  var c = this;
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
   this._api(resources.SMSLinkSend, {link_url:utils.readStore().click_id, phone:a}, function(a) {
-    utils.nextQueue();
+    c.nextQueue();
     b(a);
   });
 };
 Branch.prototype.referrals = function(a) {
-  utils.pushQueue(function(a) {
+  var b = this;
+  this.pushQueue(function(a) {
     if (!this.initialized) {
-      return utils.nextQueue(), a(utils.message(utils.messages.nonInit));
+      return this.nextQueue(), a(utils.message(utils.messages.nonInit));
     }
-    this._api(resources.referrals, {}, function(c, d) {
-      utils.nextQueue();
-      a(c, d);
+    this._api(resources.referrals, {}, function(d, e) {
+      b.nextQueue();
+      a(d, e);
     });
   }, this, [a || function() {
   }]);
 };
 Branch.prototype.credits = function(a) {
-  utils.pushQueue(function(a) {
+  var b = this;
+  this.pushQueue(function(a) {
     if (!this.initialized) {
-      return utils.nextQueue(), a(utils.message(utils.messages.nonInit));
+      return this.nextQueue(), a(utils.message(utils.messages.nonInit));
     }
-    this._api(resources.credits, {}, function(c, d) {
-      utils.nextQueue();
-      a(c, d);
+    this._api(resources.credits, {}, function(d, e) {
+      b.nextQueue();
+      a(d, e);
     });
   }, this, [a || function() {
   }]);
 };
 Branch.prototype.redeem = function(a, b, c) {
-  utils.pushQueue(function(a, b, c) {
+  var d = this;
+  this.pushQueue(function(a, b, c) {
     if (!this.initialized) {
-      return utils.nextQueue(), c(utils.message(utils.messages.nonInit));
+      return this.nextQueue(), c(utils.message(utils.messages.nonInit));
     }
     this._api(resources.redeem, {amount:a, bucket:b}, function(a, b) {
-      utils.nextQueue();
+      d.nextQueue();
       c(a, b);
     });
   }, this, [a, b, c || function() {

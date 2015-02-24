@@ -38,7 +38,7 @@ docs/2_branch.md: $(SOURCES)
 	jsdox src/2_branch.js \
 	--output docs
 
-README.md: docs/2_branch.md docs/footer.md docs/intro.md
+README.md: docs/2_branch.md dist/onpage.min.js docs/footer.md docs/intro.md docs/intro2.md
 	@echo "\nConcatinating readme"
 	cat docs/intro.md dist/onpage.min.js docs/Intro2.md docs/2_branch.md docs/footer.md > README.md
 
