@@ -14,7 +14,7 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 
 ## Installation
 
-### Requriements
+### Requirements
 
 This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
 
@@ -34,9 +34,6 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 ```html
 <script type="text/javascript">
-
-
-
 (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link linkClick sendSMS referrals credits redeem banner".split(" "),0);
 
 
@@ -67,9 +64,7 @@ branch.init('APP-KEY', function(err, data) {
 1. Smart Banner
    + [.banner()](#banneroptions-linkdata)
 
-___
-
-# Global
+___# Global
 
 
 
@@ -86,27 +81,28 @@ ___
 **callback**: `function | null`, Callback function that returns the session data
 
 Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
-The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
+The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
 **Useful Tip**: The init function returns a data object where you can read the link the user was referred by.
 
 ##### Usage
 ```js
-Branch.init(
+branch.init(
     app_id,
-    callback(err, data)
-)
+    callback (err, data)
+);
 ```
 
-##### Callback
+##### Callback Format
 ```js
 callback(
-     error: "Error message",
+     "Error message",
      {
           data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
-          has_app: true,               // Does the user have the app installed already?
-          identity: 'BranchUser'       // Unique string that identifies the user
-     });
+          has_app:            true,    // Does the user have the app installed already?
+          identity:       'BranchUser' // Unique string that identifies the user
+     }
+);
 ```
 
 **Note:** `Branch.init` must be called prior to calling any other Branch functions.
@@ -122,6 +118,7 @@ ___
 
 Returns the same session information and any referring data, as `Branch.init`, but does not require the `app_id`. This is meant to be called after `Branch.init` has been called if you need the session information at a later point.
 If the Branch session has already been initialized, the callback will return immediately, otherwise, it will return once Branch has been initialized.
+___
 
 
 
@@ -139,22 +136,23 @@ Sets the identity of a user and returns the data. To use this function, pass a u
 
 ##### Usage
 ```js
-Branch.setIdentity(
+branch.setIdentity(
     identity,
-    callback(err, data)
-)
+    callback (err, data)
+);
 ```
 
-##### Callback 
+##### Callback Format
 ```js
 callback(
-     error: "Error message",
+     "Error message",
      {
           identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
           link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
           referring_data:     {},      // Returns the initial referring data for this identity, if exists.
           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
-     });
+     }
+);
 ```
 ___
 
@@ -170,20 +168,21 @@ Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
 ```js
-Branch.logout(
+branch.logout(
     callback(err, data)
-)
+);
 ```
 
-##### Callback
+##### Callback Format
 ```js
 callback(
-     error: "Error message",
+     "Error message",
      {
           session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
           identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
           link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
-     });
+     }
+);
 ```
 ___
 
@@ -206,16 +205,16 @@ The `metadata` parameter is a formatted JSON object that can contain any data an
 
 ##### Usage
 ```js
-Branch.event(
+branch.event(
     event,
     metadata,
-    callback(err)
-)
+    callback (err)
+);
 ```
 
-##### Callback
+##### Callback Format
 ```js
-callback( error: "Error message" );
+callback("Error message");
 ```
 ___
 
@@ -239,10 +238,10 @@ Creates and returns a deep linking URL.  The `data` parameter can include an obj
 
 #### Usage
 ```
-Branch.link(
+branch.link(
     metadata,
-    callback(err, data)
-)
+    callback (err, data)
+);
 ```
 
 #### Example
@@ -257,26 +256,26 @@ branch.link({
         mydata: {
 	           foo: 'bar'
         },
-    '$desktop_url': 'http://myappwebsite.com',
-    '$ios_url': 'http://myappwebsite.com/ios',
-    '$ipad_url': 'http://myappwebsite.com/ipad',
-    '$android_url': 'http://myappwebsite.com/android',
-    '$og_app_id': '12345',
-    '$og_title': 'My App',
-    '$og_description': 'My app\'s description.',
-    '$og_image_url': 'http://myappwebsite.com/image.png'
-		}
+        '$desktop_url': 'http://myappwebsite.com',
+        '$ios_url': 'http://myappwebsite.com/ios',
+        '$ipad_url': 'http://myappwebsite.com/ipad',
+        '$android_url': 'http://myappwebsite.com/android',
+        '$og_app_id': '12345',
+        '$og_title': 'My App',
+        '$og_description': 'My app\'s description.',
+        '$og_image_url': 'http://myappwebsite.com/image.png'
+    }
 }, function(err, data) {
-    console.log(err || data);
+    console.log(err, data);
 });
 ```
 
-##### Callback
+##### Callback Format
 ```js
 callback(
-     error: "Error message",
-     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
-     );
+    "Error message",
+    'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+);
 ```
 ___
 
@@ -302,12 +301,12 @@ A robust function to give your users the ability to share links via SMS. If the 
 
 #### Usage
 ```js
-Branch.sendSMS(
+branch.sendSMS(
     phone,
     linkData,
-    options,
-    callback(err, data),
-)
+    options (optional),
+    callback (err, data)
+);
 ```
 
 ##### Example
@@ -315,33 +314,33 @@ Branch.sendSMS(
 branch.sendSMS({
     phone: '9999999999',
     {
-         tags: ['tag1', 'tag2'],
-         channel: 'facebook',
-         feature: 'dashboard',
-         stage: 'new user',
-         type: 1,
-         data: {
-             mydata: {
-                 foo: 'bar'
-             },
-         '$desktop_url': 'http://myappwebsite.com',
-         '$ios_url': 'http://myappwebsite.com/ios',
-         '$ipad_url': 'http://myappwebsite.com/ipad',
-         '$android_url': 'http://myappwebsite.com/android',
-         '$og_app_id': '12345',
-         '$og_title': 'My App',
-         '$og_description': 'My app\'s description.',
-         '$og_image_url': 'http://myappwebsite.com/image.png'
-         }
+        tags: ['tag1', 'tag2'],
+        channel: 'facebook',
+        feature: 'dashboard',
+        stage: 'new user',
+        type: 1,
+        data: {
+            mydata: {
+                foo: 'bar'
+            },
+            '$desktop_url': 'http://myappwebsite.com',
+            '$ios_url': 'http://myappwebsite.com/ios',
+            '$ipad_url': 'http://myappwebsite.com/ipad',
+            '$android_url': 'http://myappwebsite.com/android',
+            '$og_app_id': '12345',
+            '$og_title': 'My App',
+            '$og_description': 'My app\'s description.',
+            '$og_image_url': 'http://myappwebsite.com/image.png'
+        }
     },
-    { make_new_link: true}, // Default: false. If set to true, sendSMS will generate a new link even if one already exists
+    { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
     function(err) { console.log(err); }
 });
 ```
 
-##### Callback
+##### Callback Format
 ```js
-callback( error: "Error message" );
+callback("Error message");
 ```
 ___
 
@@ -371,29 +370,30 @@ Retrieves a complete summary of the referrals the current user has made.
 
 ##### Usage
 ```js
-Branch.referrals(
-    callback(err, data)
-)
+branch.referrals(
+    callback (err, data)
+);
 ```
 
-##### Callback
+##### Callback Format
 ```js
 callback(
-     error: "Error message",
+    "Error message",
     {
-         'install': {
-              total: 5,
-              unique: 2
-         },
-         'open': {
-              total: 4,
-              unique: 3
-         },
-        'buy': {
-             total: 7,
+        'install': {
+             total: 5,
+             unique: 2
+        },
+        'open': {
+             total: 4,
              unique: 3
-         }
-    });
+        },
+        'buy': {
+            total: 7,
+            unique: 3
+        }
+    }
+);
 ```
 
 ## Credit history
@@ -412,19 +412,20 @@ This call will retrieve the entire history of credits and redemptions from the i
 
 ##### Usage
 ```js
-Branch.credits(
-    callback(err, data)
-)
+branch.credits(
+    callback (err, data)
+);
 ```
 
-##### Callback
+##### Callback Format
 ```js
 callback(
-     error: "Error message",
-     {
-          'default': 15,
-          'other bucket': 9
-     });
+    "Error message",
+    {
+        'default': 15,
+        'other bucket': 9
+    }
+);
 ```
 
 ## Credit redemption
@@ -446,11 +447,11 @@ callback(
 Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
 
 ```js
-Branch.redeem(
+branch.redeem(
     amount, // amount of credits to be redeemed
     bucket,  // String of bucket name to redeem credits from
-    callback(err)
-)
+    callback (err)
+);
 ```
 
 ##### Example
@@ -459,14 +460,15 @@ Branch.redeem(
 branch.redeem(
     5,
     "Rubies",
-    function(data){
-         console.log(data)
-});
+    function(data) {
+        console.log(data);
+    }
+);
 ```
 
-##### Callback
+##### Callback Format
 ```js
-callback( error: "Error message" );
+callback("Error message");
 ```
 ___
 
@@ -503,10 +505,10 @@ ___
 #### Usage
 
 ```js
-Branch.banner(
+branch.banner(
     options, 	// Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
     linkData     // Data for link, same as Branch.link()
-)
+);
 ```
 
 ##### Example
@@ -530,16 +532,15 @@ branch.banner({
         mydata: {
             foo: 'bar'
         },
-    '$desktop_url': 'http://myappwebsite.com',
-    '$ios_url': 'http://myappwebsite.com/ios',
-    '$ipad_url': 'http://myappwebsite.com/ipad',
-    '$android_url': 'http://myappwebsite.com/android',
-    '$og_app_id': '12345',
-    '$og_title': 'My App',
-    '$og_description': 'My app\'s description.',
-    '$og_image_url': 'http://myappwebsite.com/image.png'
+        '$desktop_url': 'http://myappwebsite.com',
+        '$ios_url': 'http://myappwebsite.com/ios',
+        '$ipad_url': 'http://myappwebsite.com/ipad',
+        '$android_url': 'http://myappwebsite.com/android',
+        '$og_app_id': '12345',
+        '$og_title': 'My App',
+        '$og_description': 'My app\'s description.',
+        '$og_image_url': 'http://myappwebsite.com/image.png'
     }
-
 });
 ```
 

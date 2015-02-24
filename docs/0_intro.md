@@ -14,7 +14,7 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 
 ## Installation
 
-### Requriements
+### Requirements
 
 This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
 
@@ -34,6 +34,3 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 ```html
 <script type="text/javascript">
-
-
-
