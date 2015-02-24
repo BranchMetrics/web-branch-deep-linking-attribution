@@ -44,55 +44,31 @@ utils.merge = function(a, b) {
   return a;
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, k, g, h = 0;
+  var b = "", c, d, e, f, g, h, k = 0;
   d = void 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, k = (d & 15) << 2 | e >> 6, g = e & 63, isNaN(d) ? k = g = 64 : isNaN(e) && (g = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g)
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
 };
-utils.enqueue = function(a, b) {
-  utils.queue || (utils.queue = [], utils.injectionQueue = []);
-  utils.queue.push({request:a, resource:b || ""});
-  1 === utils.queue.length && utils.runFront();
-};
-utils.runFront = function() {
-  utils.queue && 0 < utils.queue.length && utils.queue[0].request();
-};
-utils.dequeue = function() {
-  utils.queue && 0 < utils.queue.length && utils.queue.shift();
-};
-utils.checkInjectionQueue = function() {
-  for (var a = 0;a < utils.injectionQueue.length;a++) {
-    if (utils.injectionQueue[a].resource == utils.queue[0].resource) {
-      return utils.injectionQueue.splice(a, 1)[0].injection;
-    }
-  }
-};
-utils.packageRequest = function(a, b, c) {
-  return function() {
+utils.pushQueue = function(a, b, c) {
+  b = b || window;
+  c = c || [];
+  utils.queue = utils.queue || [];
+  utils.queueRunning = utils.queueRunning || !1;
+  utils.queue.push(function() {
     a.apply(b, c);
-  };
+  });
+  utils.queueRunning || (utils.queueRunning = !0, utils.nextQueue());
 };
-utils.injectFunction = function(a, b) {
-  return function(c, d) {
-    a(c, d);
-    b(c, d);
-  };
-};
-utils.injectDequeue = function(a) {
-  return utils.injectFunction(function(a, c) {
-    var d = utils.checkInjectionQueue();
-    d && d(a, c);
-    utils.dequeue();
-    utils.runFront();
-  }, a);
+utils.nextQueue = function() {
+  utils.queue.length ? utils.queue.shift().call() : utils.queueRunning = !1;
 };
 // Input 2
 var banner = {}, animationSpeed = 250, animationDelay = 20, bannerResources = {css:{banner:"body { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }#branch-banner { top: -76px; width: 100%; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + 
@@ -256,11 +232,9 @@ var jsonpRequest = function(a, b, c) {
     sessionStorage.setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, d);
   }
 }, api = function(a, b, c) {
-  c = utils.injectDequeue(c || function() {
-  });
   var d = getUrl(a, b), e, f = "";
   "GET" == a.method ? e = d.url + "?" + d.data : (e = d.url, f = d.data);
-  sessionStorage.getItem("use_jsonp") || a.jsonp ? utils.enqueue(utils.packageRequest(jsonpMakeRequest, this, [e, b, a.method, c]), a.endpoint) : utils.enqueue(utils.packageRequest(XHRRequest, this, [e, f, a.method, c]), a.endpoint);
+  sessionStorage.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(e, b, a.method, c) : XHRRequest(e, f, a.method, c);
 };
 // Input 4
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};
@@ -298,95 +272,109 @@ Branch.prototype._api = function(a, b, c) {
   return api(a, b, c);
 };
 Branch.prototype.init = function(a, b) {
-  b = b || function() {
-  };
-  if (this.initialized) {
-    return b(utils.message(utils.messages.existingInit));
-  }
-  this.app_id = a;
-  var c = this, d = utils.readStore(), e = function(a) {
-    c.session_id = a.session_id;
-    c.identity_id = a.identity_id;
-    c.sessionLink = a.link;
-    c.initialized = !0;
-  };
-  d && d.session_id ? (e(d), b(null, utils.whiteListSessionData(d))) : this._api(resources._r, {}, function(a, d) {
-    c._api(resources.open, {is_referrable:1, browser_fingerprint_id:d}, function(a, c) {
-      e(c);
-      utils.store(c);
-      b(a, utils.whiteListSessionData(c));
+  utils.pushQueue(function(a, b) {
+    if (this.initialized) {
+      return utils.nextQueue(), b(utils.message(utils.messages.existingInit));
+    }
+    this.app_id = a;
+    var e = this, f = utils.readStore(), g = function(a) {
+      e.session_id = a.session_id;
+      e.identity_id = a.identity_id;
+      e.sessionLink = a.link;
+      e.initialized = !0;
+    };
+    f && f.session_id ? (g(f), utils.nextQueue(), b(null, utils.whiteListSessionData(f))) : this._api(resources._r, {}, function(a, c) {
+      e._api(resources.open, {is_referrable:1, browser_fingerprint_id:c}, function(a, c) {
+        g(c);
+        utils.store(c);
+        utils.nextQueue();
+        b(a, utils.whiteListSessionData(c));
+      });
     });
-  });
+  }, this, [a, b || function() {
+  }]);
 };
-Branch.prototype.readSession = function(a) {
-  this.initialized ? a(null, utils.whiteListSessionData(utils.readStore())) : utils.queue && 1 == utils.queue.length ? utils.injectionQueue.push({injection:function(b, c) {
-    a(null, utils.whiteListSessionData(c));
-  }, resource:resources.open.endpoint}) : a(utils.error(utils.messages.callBranchInitFirst));
+Branch.prototype.data = function(a) {
+  utils.pushQueue(function(a) {
+    utils.nextQueue();
+    a(null, utils.whiteListSessionData(utils.readStore()));
+  }, this, [a || function() {
+  }]);
 };
 Branch.prototype.setIdentity = function(a, b) {
-  b = b || function() {
-  };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
-  this._api(resources.profile, {identity:a}, function(a, d) {
-    b(a, d);
-  });
+  utils.pushQueue(function(a, b) {
+    if (!this.initialized) {
+      return b(utils.message(utils.messages.nonInit));
+    }
+    this._api(resources.profile, {identity:a}, function(a, c) {
+      utils.nextQueue();
+      b(a, c);
+    });
+  }, this, [a, b || function() {
+  }]);
 };
 Branch.prototype.logout = function(a) {
-  a = a || function() {
-  };
-  if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
-  }
-  this._api(resources.logout, {}, function(b) {
-    a(b);
-  });
+  utils.pushQueue(function(a) {
+    if (!this.initialized) {
+      return a(utils.message(utils.messages.nonInit));
+    }
+    this._api(resources.logout, {}, function(c) {
+      utils.nextQueue();
+      a(c);
+    });
+  }, this, [a || function() {
+  }]);
 };
 Branch.prototype.track = function(a, b, c) {
-  c = c || function() {
-  };
-  if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
-  }
-  "function" == typeof b && (c = b, b = {});
-  this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a) {
-    c(a);
-  });
+  utils.pushQueue(function(a, b, c) {
+    if (!this.initialized) {
+      return c(utils.message(utils.messages.nonInit));
+    }
+    "function" == typeof b && (c = b, b = {});
+    this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a) {
+      utils.nextQueue();
+      c(a);
+    });
+  }, this, [a, b, c || function() {
+  }]);
 };
 Branch.prototype.link = function(a, b) {
-  b = b || function() {
-  };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
-  a.source = "web-sdk";
-  void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
-  a.data = JSON.stringify(a.data);
-  this._api(resources.link, a, function(a, d) {
-    "function" == typeof b && b(a, d.url);
-  });
+  utils.pushQueue(function(a, b) {
+    if (!this.initialized) {
+      return b(utils.message(utils.messages.nonInit));
+    }
+    a.source = "web-sdk";
+    void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
+    a.data = JSON.stringify(a.data);
+    this._api(resources.link, a, function(a, c) {
+      "function" == typeof b && (utils.nextQueue(), b(a, c.url));
+    });
+  }, this, [a, b || function() {
+  }]);
 };
 Branch.prototype.linkClick = function(a, b) {
-  b = b || function() {
-  };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
-  a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, d) {
-    utils.storeKeyValue("click_id", d.click_id);
-    (a || d) && b(a, d);
-  });
+  utils.pushQueue(function(a, b) {
+    if (!this.initialized) {
+      return utils.nextQueue(), b(utils.message(utils.messages.nonInit));
+    }
+    a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
+      utils.nextQueue();
+      utils.storeKeyValue("click_id", c.click_id);
+      (a || c) && b(a, c);
+    });
+  }, this, [a, b || function() {
+  }]);
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
-  d = d || function() {
-  };
-  c = c || {};
-  c.make_new_link = c.make_new_link || !1;
-  if (!this.initialized) {
-    return d(utils.message(utils.messages.nonInit));
-  }
-  utils.readKeyValue("click_id") && !c.make_new_link ? this.sendSMSExisting(a, d) : this.sendSMSNew(a, b, d);
+  utils.pushQueue(function(a, b, c, d) {
+    c = c || {};
+    c.make_new_link = c.make_new_link || !1;
+    if (!this.initialized) {
+      return d(utils.message(utils.messages.nonInit));
+    }
+    utils.readKeyValue("click_id") && !c.make_new_link ? this.sendSMSExisting(a, d) : this.sendSMSNew(a, b, d);
+  }, this, [a, b, c, d || function() {
+  }]);
 };
 Branch.prototype.sendSMSNew = function(a, b, c) {
   c = c || function() {
@@ -405,6 +393,7 @@ Branch.prototype.sendSMSNew = function(a, b, c) {
         return c(b);
       }
       d.sendSMSExisting(a, function(a) {
+        utils.nextQueue();
         c(a);
       });
     });
@@ -417,38 +406,45 @@ Branch.prototype.sendSMSExisting = function(a, b) {
     return b(utils.message(utils.messages.nonInit));
   }
   this._api(resources.SMSLinkSend, {link_url:utils.readStore().click_id, phone:a}, function(a) {
+    utils.nextQueue();
     b(a);
   });
 };
 Branch.prototype.referrals = function(a) {
-  a = a || function() {
-  };
-  if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
-  }
-  this._api(resources.referrals, {}, function(b, c) {
-    a(b, c);
-  });
+  utils.pushQueue(function(a) {
+    if (!this.initialized) {
+      return utils.nextQueue(), a(utils.message(utils.messages.nonInit));
+    }
+    this._api(resources.referrals, {}, function(c, d) {
+      utils.nextQueue();
+      a(c, d);
+    });
+  }, this, [a || function() {
+  }]);
 };
 Branch.prototype.credits = function(a) {
-  a = a || function() {
-  };
-  if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
-  }
-  this._api(resources.credits, {}, function(b, c) {
-    a(b, c);
-  });
+  utils.pushQueue(function(a) {
+    if (!this.initialized) {
+      return utils.nextQueue(), a(utils.message(utils.messages.nonInit));
+    }
+    this._api(resources.credits, {}, function(c, d) {
+      utils.nextQueue();
+      a(c, d);
+    });
+  }, this, [a || function() {
+  }]);
 };
 Branch.prototype.redeem = function(a, b, c) {
-  c = c || function() {
-  };
-  if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
-  }
-  this._api(resources.redeem, {amount:a, bucket:b}, function(a, b) {
-    c(a, b);
-  });
+  utils.pushQueue(function(a, b, c) {
+    if (!this.initialized) {
+      return utils.nextQueue(), c(utils.message(utils.messages.nonInit));
+    }
+    this._api(resources.redeem, {amount:a, bucket:b}, function(a, b) {
+      utils.nextQueue();
+      c(a, b);
+    });
+  }, this, [a, b, c || function() {
+  }]);
 };
 Branch.prototype.banner = function(a, b) {
   a.showMobile = void 0 === a.showMobile ? !0 : a.showMobile;

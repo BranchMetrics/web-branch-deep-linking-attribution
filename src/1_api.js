@@ -151,7 +151,7 @@ var XHRRequest = function(url, data, method, callback) {
  * @param {function(?new:Error,*)|null} callback
  */
 api = function(resource, data, callback) {
-	callback = utils.injectDequeue( callback || function() {} );
+	//callback = utils.injectDequeue( callback || function() {} );
 
 	var u = getUrl(resource, data);
 	var url, postData = "";
@@ -163,8 +163,8 @@ api = function(resource, data, callback) {
 		postData = u.data;
 	}	
 	if (sessionStorage.getItem('use_jsonp') || resource.jsonp) {
-		utils.enqueue(utils.packageRequest(jsonpMakeRequest, this, [url, data, resource.method, callback]), resource.endpoint);
+		jsonpMakeRequest(url, data, resource.method, callback);
 	} else {
-		utils.enqueue(utils.packageRequest(XHRRequest, this, [url, postData, resource.method, callback]), resource.endpoint);
+		XHRRequest(url, postData, resource.method, callback);
 	}
 };

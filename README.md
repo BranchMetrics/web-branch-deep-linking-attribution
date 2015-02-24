@@ -37,7 +37,7 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 
 
-(function() {var a=window;function b(){var e=c,h=d[f++];e[h]=function(){e.a.push([h,arguments])}}var c={a:[],b:1},d="init readSession setIdentity logout track link linkClick sendSMS referrals credits redeem banner".split(" "),f=0,g=void 0,k=void 0;if(!a.branch||!a.branch.a){for(;f<d.length;)b();g=document.createElement("script");g.async=1;g.src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";k=document.getElementsByTagName("script")[0];k.parentNode.insertBefore(g,k);a.branch=c};})();
+(function(a,b,f,d,l,g,h,k,c,e){if(!a[d]||!a[d]._q){for(;k<h.length;)l(g,h[k++]);c=b.createElement(f);c.async=1;c.src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";e=b.getElementsByTagName(f)[0];e.parentNode.insertBefore(c,e);a[d]=g}})(window,document,"script","branch",function(a,b){a[b]=function(){a._q.push([b,arguments])}},{_q:[],_v:1},"init readSession setIdentity logout track link linkClick sendSMS referrals credits redeem banner".split(" "),0);
 
 branch.init('APP-KEY', function(err, data) {
   // callback to handle err or data

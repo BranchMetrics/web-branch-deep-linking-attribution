@@ -9,7 +9,7 @@ var DEBUG = true;
 
 /* jshint ignore:start */
 /** @typedef {string} */
-/*var */message; // Does not work with tests
+message; // Does not work with tests
 
 /** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string, link_click:string}} */
 utils.sessionData;
@@ -152,90 +152,25 @@ utils.base64encode = function(input) {
 	return output;
 };
 
+
 // ======= Begin queue functions
 
-/**
- * Enqueue an async request, and if it's first in the queue, inititate the queue array call the request
- *
- * @param {Function} request
- */
-utils.enqueue = function(request, resource) {
-	utils.queue || (utils.queue = [], utils.injectionQueue = []);
-	resource = resource || "";
-	utils.queue.push({
-		"request": request,
-		"resource": resource
-	});
-	if (utils.queue.length === 1) { utils.runFront(); }
+utils.pushQueue = function (func, context, args) {
+	context = context || window;
+	args = args || [];
+	utils.queue = utils.queue || [];
+	utils.queueRunning = utils.queueRunning || false;
+	utils.queue.push(function() { func.apply(context, args); });
+	if (!utils.queueRunning) { 
+		utils.queueRunning = true;
+		utils.nextQueue();
+	}
 };
 
-/**
- * Runs the next request in the queue
- */
-utils.runFront = function() {
-	utils.queue && (utils.queue.length > 0) && utils.queue[0].request();
-};
-
-/**
- * Dequeue the next request in the queue
- */
-utils.dequeue = function() {
-	utils.queue && (utils.queue.length > 0) && utils.queue.shift();
-};
-
-/**
- * The injection queue is a queue of objects, each with a function matched to a specific resource type (i.e. open, link, etc.)
- * Every time the front request in the queue is ran, the injection queue is checked. Every injection object that matches the resource type being ran will be called.
- * Example use case: `Branch.readSession()` is called prior to `Branch.init()` is finished. `Branch.readSession` is placed in the injection queue for the next available
- * call to an `open` resource, then `Branch.readSession` can still return with the session information.
- *
- */
- utils.checkInjectionQueue = function() {
- 	for (var i = 0; i < utils.injectionQueue.length; i++) {
- 		if(utils.injectionQueue[i].resource == utils.queue[0].resource) {
- 			var injectionQueueRequest = utils.injectionQueue.splice(i, 1)[0];
- 			return injectionQueueRequest.injection;
- 		}
- 	}
- };
-
-/**
- * Package the request to keep the context of "this", and call it with all of it's arguments
- *
- * @param {Function} request
- * @param {Object} context
- * @param {Array} params
- */
-utils.packageRequest = function(request, context, params) {
-	return function() {
-		request.apply(context, params);
-	};
-};
-
-/**
- * Generic function into callback. Currently used by the queue itself to inject dequeueing and running the next request,
- * and by Branch.readSession() to inject a callback to the Branch.init function at the front of the queue.
- *
- * @param {Function} injection
- * @param {Function} callback
- */
-utils.injectFunction = function(injection, reciever) {
-	return function(err, data) {
-		injection(err, data);
-		reciever(err, data);
-	};
-};
-
-/**
- * Inject dequeue in the request callback, to automatically call the next request in the queue
- *
- * @param {Function} callback
- */
-utils.injectDequeue = function(callback) {
-	return utils.injectFunction(function(err, data) {
-		var queuedInjection = utils.checkInjectionQueue();
-		queuedInjection && queuedInjection(err, data);
-		utils.dequeue();
-		utils.runFront();
-	}, callback);
+utils.nextQueue = function() {
+	if (!utils.queue.length) {
+		utils.queueRunning = false;
+		return;
+	}
+	utils.queue.shift().call();
 };
