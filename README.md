@@ -78,13 +78,22 @@ ___
 
 **Parameters**
 
-**app_id**: `number`, **Required** Found in your Branch dashboard
+**app_id**: `string`, __required__ - Your Branch [app key](http://dashboard.branch.io/settings).
 
-**callback**: `function | null`, Callback function that returns the session data
+**callback**: `function | null`, __optional__ - callback to read the session data.
 
-Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
-The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
-**Useful Tip**: The init function returns a data object where you can read the link the user was referred by.
+Adding the Branch script to your page automatically creates a window.branch
+object with all the external methods described below. All calls made to
+Branch methods are stored in a queue, so even if the SDK is not fully
+instantiated, calls made to it will be queued in the order they were
+originally called.
+
+The init function on the Branch object initiates the Branch session and
+creates a new user session, if it doesn't already exist, in
+`sessionStorage`.
+
+**Useful Tip**: The init function returns a data object where you can read
+the link the user was referred by.
 
 ##### Usage
 ```js
@@ -116,10 +125,14 @@ ___
 
 **Parameters**
 
-**callback**: `string`, Callback function that returns the session data
+**callback**: `function | null`, __optional__ - callback to read the session data.
 
-Returns the same session information and any referring data, as `Branch.init`, but does not require the `app_id`. This is meant to be called after `Branch.init` has been called if you need the session information at a later point.
-If the Branch session has already been initialized, the callback will return immediately, otherwise, it will return once Branch has been initialized.
+Returns the same session information and any referring data, as
+`Branch.init`, but does not require the `app_id`. This is meant to be called
+after `Branch.init` has been called if you need the session information at a
+later point.
+If the Branch session has already been initialized, the callback will return
+immediately, otherwise, it will return once Branch has been initialized.
 ___
 
 
@@ -128,13 +141,15 @@ ___
 
 **Parameters**
 
-**identity**: `string`, **Required** A string uniquely identifying the user
+**identity**: `string`, __required__ - a string uniquely identifying the user – often a user ID or email address.
 
-**callback**: `function | null`, Callback that returns the user's Branch identity id and unique link
+**callback**: `function | null`, __optional__ - callback that returns the user's Branch identity id and unique link.
 
 **Formerly `identify()` (depreciated). **See [CHANGELOG](CHANGELOG.md)**
 
-Sets the identity of a user and returns the data. To use this function, pass a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
+Sets the identity of a user and returns the data. To use this function, pass
+a unique string that identifies the user - this could be an email address,
+UUID, Facebook ID, etc.
 
 ##### Usage
 ```js
@@ -164,26 +179,21 @@ ___
 
 **Parameters**
 
-**callback**: `function | null`, Returns id's of the session and user identity, and the link
+**callback**: `function | null`, __optional__
 
 Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
 ```js
 branch.logout(
-    callback(err, data)
+    callback(err)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-     "Error message",
-     {
-          session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
-          identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
-          link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
-     }
+     "Error message"
 );
 ```
 ___
@@ -192,15 +202,15 @@ ___
 
 
 
-### track(event, linkData, callback) 
+### track(event, metadata, callback) 
 
 **Parameters**
 
-**event**: `String`, **Required** The name of the event to be tracked
+**event**: `String`, __required__ - name of the event to be tracked.
 
-**linkData**: `Object | null`, Object of event metadata
+**metadata**: `Object | null`, __optional__ - object of event metadata.
 
-**callback**: `function | null`, Returns an error if unsuccessful
+**callback**: `function | null`, __optional__
 
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -230,9 +240,9 @@ ___
 
 **Parameters**
 
-**linkData**: `Object | null`, Object of link metadata
+**linkData**: `Object`, __required__ - link data and metadata.
 
-**callback**: `function | null`, Returns a string of the Branch deep linking URL
+**callback**: `function | null`, __optional__ - returns a string of the Branch deep linking URL.
 
 **Formerly `createLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -249,14 +259,14 @@ branch.link(
 #### Example
 ```js
 branch.link({
-    tags: ['tag1', 'tag2'],
+    tags: [ 'tag1', 'tag2' ],
     channel: 'facebook',
     feature: 'dashboard',
     stage: 'new user',
     type: 1,
     data: {
         mydata: {
-	           foo: 'bar'
+            foo: 'bar'
         },
         '$desktop_url': 'http://myappwebsite.com',
         '$ios_url': 'http://myappwebsite.com/ios',
@@ -285,17 +295,17 @@ ___
 
 
 
-### sendSMS(phone, linkData, options, callback) 
+### sendSMS(phone,, linkData, options, callback) 
 
 **Parameters**
 
-**phone**: `String`, **Required** Phone number to txt
+**phone,**: `String`, __required__ phone number to send SMS to
 
-**linkData**: `Object`, **Required** Object of all link data
+**linkData**: `Object`, __required__ - object of link data
 
-**options**: `Object | null`, Options, currently only includes: make_new_link, which forces the creation of a new link even if one already exists
+**options**: `Object | null`, __optional__ - options: make_new_link, which forces the creation of a new link even if one already exists
 
-**callback**: `function | null`, Returns an error if unsuccessful
+**callback**: `function | null`, __optional__ - Returns an error if unsuccessful
 
 **Formerly `SMSLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -364,7 +374,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 **Parameters**
 
-**callback**: `function | null`, Returns an error or object with referral data on success
+**callback**: `function`, __required__ - returns an object with referral data.
 
 **Formerly `showReferrals()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -406,7 +416,7 @@ callback(
 
 **Parameters**
 
-**callback**: `function | null`, Returns an error or object with credit data on success
+**callback**: `function`, __required__ - returns an object with credit data.
 
 **Formerly `showCredits()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -438,11 +448,11 @@ callback(
 
 **Parameters**
 
-**amount**: `Int`, **Required** An `amount` (int) of number of credits to redeem
+**amount**: `Int`, __required__ - an `amount` (int) of number of credits to redeem
 
-**bucket**: `String`, **Required** A name of the `bucket` (string) of which bucket to redeem the credits from
+**bucket**: `String`, __required__ - the name of the `bucket` (string) of which bucket to redeem the credits from
 
-**callback**: `function | null`, Returns an error if unsuccessful
+**callback**: `function | null`, __optional__ - returns an error if unsuccessful
 
 **Formerly `redeemCredits()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -486,9 +496,9 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 **Parameters**
 
-**options**: `Object`, **Required** Object of all the options to setup the banner
+**options**: `Object`, __required__ - object of all the options to setup the banner
 
-**linkData**: `Object`, **Required** Object of all link data, same as Branch.link()
+**linkData**: `Object`, __required__ - object of all link data, same as Branch.link()
 
 **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
 
@@ -508,8 +518,8 @@ ___
 
 ```js
 branch.banner(
-    options, 	// Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
-    linkData     // Data for link, same as Branch.link()
+    options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
+    linkData // Data for link, same as Branch.link()
 );
 ```
 
@@ -520,10 +530,10 @@ branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
     description: 'The Branch demo app!',
-    openAppButtonText: 'Open',             // Text to show on button if the user has the app installed
-    downloadAppButtonText: 'Download',     // Text to show on button if the user does not have the app installed
-    showMobile: true,                      // Should the banner be shown on mobile devices?
-    showDesktop: true                      // Should the banner be shown on mobile devices?
+    openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
+    downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
+    showMobile: true,                  // Should the banner be shown on mobile devices?
+    showDesktop: true                  // Should the banner be shown on mobile devices?
 }, {
     phone: '9999999999',
     tags: ['tag1', 'tag2'],
