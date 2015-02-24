@@ -43,7 +43,7 @@ ___
 
 
 
-### readSession(callback) 
+### data(callback) 
 
 **Parameters**
 
@@ -62,9 +62,9 @@ If the Branch session has already been initialized, the callback will return imm
 
 **callback**: `function | null`, Callback that returns the user's Branch identity id and unique link
 
-**Formerly `identify()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+**Formerly `identify()` (depreciated). **See [CHANGELOG](CHANGELOG.md)**
 
-Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
+Sets the identity of a user and returns the data. To use this function, pass a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
 
 ##### Usage
 ```js
@@ -120,13 +120,13 @@ ___
 
 
 
-### track(event, metadata, callback) 
+### track(event, linkData, callback) 
 
 **Parameters**
 
 **event**: `String`, **Required** The name of the event to be tracked
 
-**metadata**: `Object | null`, Object of event metadata
+**linkData**: `Object | null`, Object of event metadata
 
 **callback**: `function | null`, Returns an error if unsuccessful
 
@@ -154,11 +154,11 @@ ___
 
 
 
-### link(metadata, callback) 
+### link(linkData, callback) 
 
 **Parameters**
 
-**metadata**: `Object | null`, Object of link metadata
+**linkData**: `Object | null`, Object of link metadata
 
 **callback**: `function | null`, Returns a string of the Branch deep linking URL
 
@@ -232,9 +232,10 @@ A robust function to give your users the ability to share links via SMS. If the 
 #### Usage
 ```js
 Branch.sendSMS(
-    metadata,            // Metadata must include phone number as `phone`
+    phone,
+    linkData,
+    options,
     callback(err, data),
-    make_new_link    // Default: false
 )
 ```
 

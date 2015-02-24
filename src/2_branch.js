@@ -104,7 +104,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 };
 
 /**
- * @function Branch.readSession
+ * @function Branch.data
  * @param {string} callback - Callback function that returns the session data
  *
  * Returns the same session information and any referring data, as `Branch.init`, but does not require the `app_id`. This is meant to be called after `Branch.init` has been called if you need the session information at a later point.
@@ -123,9 +123,9 @@ Branch.prototype["data"] = function(callback) {
  * @param {string} identity - **Required** A string uniquely identifying the user
  * @param {function|null} callback - Callback that returns the user's Branch identity id and unique link
  *
- * **Formerly `identify()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
+ * **Formerly `identify()` (depreciated). **See [CHANGELOG](CHANGELOG.md)**
  *
- * Sets the identity of a user and returns the data. To use this function, pas a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
+ * Sets the identity of a user and returns the data. To use this function, pass a unique string that identifies the user - this could be an email address, UUID, Facebook ID, etc.
  *
  * ##### Usage
  * ```js
@@ -232,7 +232,7 @@ Branch.prototype['close'] = function(callback) {
 /**
  * @function Branch.track
  * @param {String} event - **Required** The name of the event to be tracked
- * @param {Object|null} metadata - Object of event metadata
+ * @param {Object|null} linkData - Object of event metadata
  * @param {function|null} callback - Returns an error if unsuccessful
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
@@ -283,7 +283,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 
 /**
  * @function Branch.link
- * @param {Object|null} metadata - Object of link metadata
+ * @param {Object|null} linkData - Object of link metadata
  * @param {function|null} callback - Returns a string of the Branch deep linking URL
  *
  * **Formerly `createLink()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
@@ -394,9 +394,10 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * #### Usage
  * ```js
  * Branch.sendSMS(
- *     metadata,            // Metadata must include phone number as `phone`
+ *     phone,
+ *     linkData,
+ *     options,
  *     callback(err, data),
- *     make_new_link    // Default: false
  * )
  * ```
  *
