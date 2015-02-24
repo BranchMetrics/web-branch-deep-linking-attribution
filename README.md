@@ -28,7 +28,8 @@ This SDK requires native browser Javascript and has been tested in all modern br
 You will need to create a [Branch Metrics app](http://branch.io) to obtain your app_key.
 
 ### Quick Install
-*Be sure to replace APP-KEY with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings).
+
+_Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
 # TODO: Update src of actual gziped js file
 
@@ -36,9 +37,8 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 <script type="text/javascript">
 (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link linkClick sendSMS referrals credits redeem banner".split(" "),0);
 
-
 branch.init('APP-KEY', function(err, data) {
-  // callback to handle err or data
+    // callback to handle err or data
 });
 </script>
 ```
@@ -78,9 +78,9 @@ ___
 
 **Parameters**
 
-**app_id**: `string`, __required__ - Your Branch [app key](http://dashboard.branch.io/settings).
+**app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
 
-**callback**: `function | null`, __optional__ - callback to read the session data.
+**callback**: `function | null`, _optional_ - callback to read the session data.
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -125,7 +125,7 @@ ___
 
 **Parameters**
 
-**callback**: `function | null`, __optional__ - callback to read the session data.
+**callback**: `function | null`, _optional_ - callback to read the session data.
 
 Returns the same session information and any referring data, as
 `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -141,9 +141,9 @@ ___
 
 **Parameters**
 
-**identity**: `string`, __required__ - a string uniquely identifying the user – often a user ID or email address.
+**identity**: `string`, _required_ - a string uniquely identifying the user – often a user ID or email address.
 
-**callback**: `function | null`, __optional__ - callback that returns the user's Branch identity id and unique link.
+**callback**: `function | null`, _optional_ - callback that returns the user's Branch identity id and unique link.
 
 **[Formerly `identify()`](CHANGELOG.md)**
 
@@ -179,7 +179,7 @@ ___
 
 **Parameters**
 
-**callback**: `function | null`, __optional__
+**callback**: `function | null`, _optional_
 
 Logs out the current session, replaces session IDs and identity IDs.
 
@@ -206,11 +206,11 @@ ___
 
 **Parameters**
 
-**event**: `String`, __required__ - name of the event to be tracked.
+**event**: `String`, _required_ - name of the event to be tracked.
 
-**metadata**: `Object | null`, __optional__ - object of event metadata.
+**metadata**: `Object | null`, _optional_ - object of event metadata.
 
-**callback**: `function | null`, __optional__
+**callback**: `function | null`, _optional_
 
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -240,9 +240,9 @@ ___
 
 **Parameters**
 
-**linkData**: `Object`, __required__ - link data and metadata.
+**linkData**: `Object`, _required_ - link data and metadata.
 
-**callback**: `function | null`, __optional__ - returns a string of the Branch deep linking URL.
+**callback**: `function | null`, _optional_ - returns a string of the Branch deep linking URL.
 
 **[Formerly `createLink()`](CHANGELOG.md)**
 
@@ -301,13 +301,13 @@ ___
 
 **Parameters**
 
-**phone,**: `String`, __required__ phone number to send SMS to
+**phone,**: `String`, _required_ phone number to send SMS to
 
-**linkData**: `Object`, __required__ - object of link data
+**linkData**: `Object`, _required_ - object of link data
 
-**options**: `Object | null`, __optional__ - options: make_new_link, which forces the creation of a new link even if one already exists
+**options**: `Object | null`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
 
-**callback**: `function | null`, __optional__ - Returns an error if unsuccessful
+**callback**: `function | null`, _optional_ - Returns an error if unsuccessful
 
 **[Formerly `SMSLink()`](CHANGELOG.md)**
 
@@ -382,7 +382,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 **Parameters**
 
-**callback**: `function`, __required__ - returns an object with referral data.
+**callback**: `function`, _required_ - returns an object with referral data.
 
 **[Formerly `showReferrals()`](CHANGELOG.md)**
 
@@ -424,7 +424,7 @@ callback(
 
 **Parameters**
 
-**callback**: `function`, __required__ - returns an object with credit data.
+**callback**: `function`, _required_ - returns an object with credit data.
 
 **[Formerly `showCredits()`](CHANGELOG.md)**
 
@@ -456,11 +456,11 @@ callback(
 
 **Parameters**
 
-**amount**: `Int`, __required__ - an `amount` (int) of number of credits to redeem
+**amount**: `Int`, _required_ - an `amount` (int) of number of credits to redeem
 
-**bucket**: `String`, __required__ - the name of the `bucket` (string) of which bucket to redeem the credits from
+**bucket**: `String`, _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
 
-**callback**: `function | null`, __optional__ - returns an error if unsuccessful
+**callback**: `function | null`, _optional_ - returns an error if unsuccessful
 
 **[Formerly `redeemCredits()`](CHANGELOG.md)
 
@@ -504,9 +504,9 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 **Parameters**
 
-**options**: `Object`, __required__ - object of all the options to setup the banner
+**options**: `Object`, _required_ - object of all the options to setup the banner
 
-**linkData**: `Object`, __required__ - object of all link data, same as Branch.link()
+**linkData**: `Object`, _required_ - object of all link data, same as Branch.link()
 
 **[Formerly `appBanner()`](CHANGELOG.md)**
 

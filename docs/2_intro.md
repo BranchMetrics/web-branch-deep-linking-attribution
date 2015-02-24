@@ -1,6 +1,5 @@
-
 branch.init('APP-KEY', function(err, data) {
-  // callback to handle err or data
+    // callback to handle err or data
 });
 </script>
 ```

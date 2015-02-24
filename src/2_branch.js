@@ -39,8 +39,8 @@ Branch.prototype._api = function(resource, data, callback) {
 
 /**
  * @function Branch.init
- * @param {string} app_id - __required__ - Your Branch [app key](http://dashboard.branch.io/settings).
- * @param {function|null} callback - __optional__ - callback to read the session data.
+ * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
+ * @param {function|null} callback - _optional_ - callback to read the session data.
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -120,7 +120,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 
 /**
  * @function Branch.data
- * @param {function|null} callback - __optional__ - callback to read the session data.
+ * @param {function|null} callback - _optional_ - callback to read the session data.
  *
  * Returns the same session information and any referring data, as
  * `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -141,8 +141,8 @@ Branch.prototype["data"] = function(callback) {
 
 /**
  * @function Branch.setIdentity
- * @param {string} identity - __required__ - a string uniquely identifying the user – often a user ID or email address.
- * @param {function|null} callback - __optional__ - callback that returns the user's Branch identity id and unique link.
+ * @param {string} identity - _required_ - a string uniquely identifying the user – often a user ID or email address.
+ * @param {function|null} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
  *
  * **[Formerly `identify()`](CHANGELOG.md)**
  *
@@ -186,7 +186,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 
 /**
  * @function Branch.logout
- * @param {function|null} callback - __optional__
+ * @param {function|null} callback - _optional_
  *
  * Logs out the current session, replaces session IDs and identity IDs.
  *
@@ -253,9 +253,9 @@ Branch.prototype['close'] = function(callback) {
 
 /**
  * @function Branch.track
- * @param {String} event - __required__ - name of the event to be tracked.
- * @param {Object|null} metadata - __optional__ - object of event metadata.
- * @param {function|null} callback - __optional__
+ * @param {String} event - _required_ - name of the event to be tracked.
+ * @param {Object|null} metadata - _optional_ - object of event metadata.
+ * @param {function|null} callback - _optional_
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
  * The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -306,8 +306,8 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 
 /**
  * @function Branch.link
- * @param {Object} linkData - __required__ - link data and metadata.
- * @param {function|null} callback - __optional__ - returns a string of the Branch deep linking URL.
+ * @param {Object} linkData - _required_ - link data and metadata.
+ * @param {function|null} callback - _optional_ - returns a string of the Branch deep linking URL.
  *
  * **[Formerly `createLink()`](CHANGELOG.md)**
  *
@@ -383,8 +383,8 @@ Branch.prototype['link'] = function(obj, callback) {
 /***
  * Is there any reason we need to make this an external function?
  *
- * @param {String} url - __required__ - branch deep linking URL to register link click on.
- * @param {function|null} callback - __optional__ - returns an error if unsuccessful.
+ * @param {String} url - _required_ - branch deep linking URL to register link click on.
+ * @param {function|null} callback - _optional_ - returns an error if unsuccessful.
  */
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() { };
@@ -409,10 +409,10 @@ Branch.prototype['linkClick'] = function(url, callback) {
 
 /**
  * @function Branch.sendSMS
- * @param {String} phone, __required__ phone number to send SMS to
- * @param {Object} linkData - __required__ - object of link data
- * @param {Object|null} options - __optional__ - options: make_new_link, which forces the creation of a new link even if one already exists
- * @param {function|null} callback - __optional__ - Returns an error if unsuccessful
+ * @param {String} phone, _required_ phone number to send SMS to
+ * @param {Object} linkData - _required_ - object of link data
+ * @param {Object|null} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+ * @param {function|null} callback - _optional_ - Returns an error if unsuccessful
  *
  * **[Formerly `SMSLink()`](CHANGELOG.md)**
  *
@@ -506,7 +506,7 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
  *
  * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
- * @param {Object} metadata - __required__ Object of all link data, requires phone number as `phone`
+ * @param {Object} metadata - _required_ Object of all link data, requires phone number as `phone`
  * @param {function|null} callback - Returns an error if unsuccessful
  *
  * #### Usage
@@ -540,7 +540,7 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
 /*** <--- Not in docs
  * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
- * @param {String} phone - __required__ String of phone number the link should be sent to
+ * @param {String} phone - _required_ String of phone number the link should be sent to
  * @param {function|null} callback - Returns an error if unsuccessful
  *
  * #### Usage
@@ -568,7 +568,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 
 /**
  * @function Branch.referrals
- * @param {function} callback - __required__ - returns an object with referral data.
+ * @param {function} callback - _required_ - returns an object with referral data.
  *
  * **[Formerly `showReferrals()`](CHANGELOG.md)**
  *
@@ -622,7 +622,7 @@ Branch.prototype["referrals"] = function(callback) {
 
 /**
  * @function Branch.credits
- * @param {function} callback - __required__ - returns an object with credit data.
+ * @param {function} callback - _required_ - returns an object with credit data.
  *
  * **[Formerly `showCredits()`](CHANGELOG.md)**
  *
@@ -666,9 +666,9 @@ Branch.prototype["credits"] = function(callback) {
 
 /**
  * @function Branch.redeem
- * @param {Int} amount - __required__ - an `amount` (int) of number of credits to redeem
- * @param {String} bucket - __required__ - the name of the `bucket` (string) of which bucket to redeem the credits from
- * @param {function|null} callback - __optional__ - returns an error if unsuccessful
+ * @param {Int} amount - _required_ - an `amount` (int) of number of credits to redeem
+ * @param {String} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
+ * @param {function|null} callback - _optional_ - returns an error if unsuccessful
  *
  * **[Formerly `redeemCredits()`](CHANGELOG.md)
  *
@@ -724,8 +724,8 @@ Branch.prototype["redeem"] = function(amount, bucket, callback) {
 
 /**
  * @function Branch.banner
- * @param {Object} options - __required__ - object of all the options to setup the banner
- * @param {Object} linkData - __required__ - object of all link data, same as Branch.link()
+ * @param {Object} options - _required_ - object of all the options to setup the banner
+ * @param {Object} linkData - _required_ - object of all link data, same as Branch.link()
  *
  * **[Formerly `appBanner()`](CHANGELOG.md)**
  *
