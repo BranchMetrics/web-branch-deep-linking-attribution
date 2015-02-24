@@ -670,7 +670,7 @@ Branch.prototype["credits"] = function(callback) {
  * @param {String} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
  * @param {function|null} callback - _optional_ - returns an error if unsuccessful
  *
- * **[Formerly `redeemCredits()`](CHANGELOG.md)
+ * **[Formerly `redeemCredits()`](CHANGELOG.md)**
  *
  * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
  *
