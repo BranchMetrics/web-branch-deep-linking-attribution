@@ -27,3 +27,4 @@ branch.init('APP-KEY', function(err, data) {
    + [.banner()](#banneroptions-linkdata)
 
 ___
+
