@@ -43,27 +43,28 @@ Branch.prototype._api = function(resource, data, callback) {
  * @param {function|null} callback - Callback function that returns the session data
  *
  * Adding the Branch script to your page automatically creates a window.branch object with all the external methods described below. All calls made to Branch methods are stored in a queue, so even if the SDK is not fully instantiated, calls made to it will be queued in the order they were originally called.
- * The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`. 
+ * The init function on the Branch object initiates the Branch session and creates a new user session, if it doesn't already exist, in `sessionStorage`.
  * **Useful Tip**: The init function returns a data object where you can read the link the user was referred by.
  *
  * ##### Usage
  * ```js
- * Branch.init(
+ * branch.init(
  *     app_id,
- *     callback(err, data)
- * )
+ *     callback (err, data)
+ * );
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
  * callback(
- *      error: "Error message",
+ *      "Error message",
  *      {
  *           data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
  *           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
- *           has_app: true,               // Does the user have the app installed already?
- *           identity: 'BranchUser'       // Unique string that identifies the user
- *      });
+ *           has_app:            true,    // Does the user have the app installed already?
+ *           identity:       'BranchUser' // Unique string that identifies the user
+ *      }
+ * );
  * ```
  *
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
@@ -91,7 +92,8 @@ Branch.prototype['init'] = function(app_id, callback) {
 			setBranchValues(sessionData);
 			this.nextQueue();
 			callback(null, utils.whiteListSessionData(sessionData));
-		} else {
+		}
+		else {
 			this._api(resources._r, {}, function(err, browser_fingerprint_id) {
 				self._api(resources.open, {
 					"is_referrable": 1,
@@ -104,7 +106,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 				});
 			});
 		}
-	}, this, [app_id, callback]);
+	}, this, [ app_id, callback ]);
 };
 
 /**
@@ -113,6 +115,7 @@ Branch.prototype['init'] = function(app_id, callback) {
  *
  * Returns the same session information and any referring data, as `Branch.init`, but does not require the `app_id`. This is meant to be called after `Branch.init` has been called if you need the session information at a later point.
  * If the Branch session has already been initialized, the callback will return immediately, otherwise, it will return once Branch has been initialized.
+ * ___
  */
 Branch.prototype["data"] = function(callback) {
 	callback = callback || function() { };
@@ -120,7 +123,7 @@ Branch.prototype["data"] = function(callback) {
 	this.pushQueue(function(callback) {
 		self.nextQueue();
 		callback(null, utils.whiteListSessionData(utils.readStore()));
-	}, this, [callback]);
+	}, this, [ callback ]);
 };
 
 /**
@@ -134,22 +137,23 @@ Branch.prototype["data"] = function(callback) {
  *
  * ##### Usage
  * ```js
- * Branch.setIdentity(
+ * branch.setIdentity(
  *     identity,
- *     callback(err, data)
- * )
+ *     callback (err, data)
+ * );
  * ```
- * 
- * ##### Callback 
+ *
+ * ##### Callback Format
  * ```js
  * callback(
- *      error: "Error message",
+ *      "Error message",
  *      {
  *           identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
  *           link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
  *           referring_data:     {},      // Returns the initial referring data for this identity, if exists.
  *           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
- *      });
+ *      }
+ * );
  * ```
  * ___
  */
@@ -162,7 +166,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 			self.nextQueue();
 			callback(err, data);
 		});
-	}, this, [identity, callback]);
+	}, this, [ identity, callback ]);
 };
 
 /**
@@ -173,20 +177,21 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  *
  * ##### Usage
  * ```js
- * Branch.logout(
+ * branch.logout(
  *     callback(err, data)
- * )
+ * );
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
  * callback(
- *      error: "Error message",
+ *      "Error message",
  *      {
  *           session_id:  '12345', // Server-generated ID of the session, stored in `sessionStorage`
  *           identity_id: '12345', // Server-generated ID of the user identity, stored in `sessionStorage`
  *           link:        'url',   // Server-generated link identity, for synchronous link creation, stored in `sessionStorage`
- *      });
+ *      }
+ * );
  * ```
  * ___
  *
@@ -201,7 +206,7 @@ Branch.prototype['logout'] = function(callback) {
 			self.nextQueue();
 			callback(err);
 		});
-	}, this, [callback]);
+	}, this, [ callback ]);
 };
 
 /*** NOT USED
@@ -211,14 +216,14 @@ Branch.prototype['logout'] = function(callback) {
  *
  * ##### Usage
  * ```js
- * Branch.close(
- *     callback(err, data)
- * )
+ * branch.close(
+ *     callback (err, data)
+ * );
  * ```
  *
  * ##### Callback
  * ```js
- * callback( error: "Error message" );
+ * callback("Error message");
  * ```
  *
  * ---
@@ -247,16 +252,16 @@ Branch.prototype['close'] = function(callback) {
  *
  * ##### Usage
  * ```js
- * Branch.event(
+ * branch.event(
  *     event,
  *     metadata,
- *     callback(err)
- * )
+ *     callback (err)
+ * );
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
- * callback( error: "Error message" );
+ * callback("Error message");
  * ```
  * ___
  *
@@ -286,7 +291,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 			self.nextQueue();
 			callback(err);
 		});
-	}, this, [event, metadata, callback]);
+	}, this, [ event, metadata, callback ]);
 };
 
 /**
@@ -300,10 +305,10 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *
  * #### Usage
  * ```
- * Branch.link(
+ * branch.link(
  *     metadata,
- *     callback(err, data)
- * )
+ *     callback (err, data)
+ * );
  * ```
  *
  * #### Example
@@ -318,26 +323,26 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *         mydata: {
  *	           foo: 'bar'
  *         },
- *     '$desktop_url': 'http://myappwebsite.com',
- *     '$ios_url': 'http://myappwebsite.com/ios',
- *     '$ipad_url': 'http://myappwebsite.com/ipad',
- *     '$android_url': 'http://myappwebsite.com/android',
- *     '$og_app_id': '12345',
- *     '$og_title': 'My App',
- *     '$og_description': 'My app\'s description.',
- *     '$og_image_url': 'http://myappwebsite.com/image.png'
- *		}
+ *         '$desktop_url': 'http://myappwebsite.com',
+ *         '$ios_url': 'http://myappwebsite.com/ios',
+ *         '$ipad_url': 'http://myappwebsite.com/ipad',
+ *         '$android_url': 'http://myappwebsite.com/android',
+ *         '$og_app_id': '12345',
+ *         '$og_title': 'My App',
+ *         '$og_description': 'My app\'s description.',
+ *         '$og_image_url': 'http://myappwebsite.com/image.png'
+ *     }
  * }, function(err, data) {
- *     console.log(err || data);
+ *     console.log(err, data);
  * });
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
  * callback(
- *      error: "Error message",
- *      'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
- *      );
+ *     "Error message",
+ *     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+ * );
  * ```
  * ___
  *
@@ -360,7 +365,7 @@ Branch.prototype['link'] = function(obj, callback) {
 				callback(err, data['url']);
 			}
 		});
-	}, this, [obj, callback]);
+	}, this, [ obj, callback ]);
 };
 
 /***
@@ -373,7 +378,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() { };
 	var self = this;
 	this.pushQueue(function(url, callback) {
-		if (!this.initialized) { 
+		if (!this.initialized) {
 			this.nextQueue();
 			return callback(utils.message(utils.messages.nonInit));
 		}
@@ -387,7 +392,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 				if (err || data) { callback(err, data); }
 			});
 		}
-	}, this, [url, callback]);
+	}, this, [ url, callback ]);
 };
 
 /**
@@ -403,12 +408,12 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *
  * #### Usage
  * ```js
- * Branch.sendSMS(
+ * branch.sendSMS(
  *     phone,
  *     linkData,
- *     options,
- *     callback(err, data),
- * )
+ *     options (optional),
+ *     callback (err, data)
+ * );
  * ```
  *
  * ##### Example
@@ -416,33 +421,33 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * branch.sendSMS({
  *     phone: '9999999999',
  *     {
- *          tags: ['tag1', 'tag2'],
- *          channel: 'facebook',
- *          feature: 'dashboard',
- *          stage: 'new user',
- *          type: 1,
- *          data: {
- *              mydata: {
- *                  foo: 'bar'
- *              },
- *          '$desktop_url': 'http://myappwebsite.com',
- *          '$ios_url': 'http://myappwebsite.com/ios',
- *          '$ipad_url': 'http://myappwebsite.com/ipad',
- *          '$android_url': 'http://myappwebsite.com/android',
- *          '$og_app_id': '12345',
- *          '$og_title': 'My App',
- *          '$og_description': 'My app\'s description.',
- *          '$og_image_url': 'http://myappwebsite.com/image.png'
- *          }
+ *         tags: ['tag1', 'tag2'],
+ *         channel: 'facebook',
+ *         feature: 'dashboard',
+ *         stage: 'new user',
+ *         type: 1,
+ *         data: {
+ *             mydata: {
+ *                 foo: 'bar'
+ *             },
+ *             '$desktop_url': 'http://myappwebsite.com',
+ *             '$ios_url': 'http://myappwebsite.com/ios',
+ *             '$ipad_url': 'http://myappwebsite.com/ipad',
+ *             '$android_url': 'http://myappwebsite.com/android',
+ *             '$og_app_id': '12345',
+ *             '$og_title': 'My App',
+ *             '$og_description': 'My app\'s description.',
+ *             '$og_image_url': 'http://myappwebsite.com/image.png'
+ *         }
  *     },
- *     { make_new_link: true}, // Default: false. If set to true, sendSMS will generate a new link even if one already exists
+ *     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
  *     function(err) { console.log(err); }
  * });
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
- * callback( error: "Error message" );
+ * callback("Error message");
  * ```
  * ___
  *
@@ -473,7 +478,7 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
 		else {
 			this.sendSMSNew(phone, obj, callback);
 		}
-	}, this, [phone, obj, options, callback]);
+	}, this, [ phone, obj, options, callback ]);
 };
 
 /*** <--- Not in docs
@@ -485,10 +490,10 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
  *
  * #### Usage
  * ```js
- * Branch.sendSMSNew(
- *     metadata,    // Metadata must include phone number as `phone`
- *     callback(err, data)
- * )
+ * branch.sendSMSNew(
+ *     metadata, // Metadata must include phone number as `phone`
+ *     callback (err, data)
+ * );
  * ```
  *
  * ___
@@ -497,7 +502,7 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
 	callback = callback || function() { };
 	var self = this;
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	if(obj["channel"] != "app banner") { obj["channel"] = 'sms'; }
+	if (obj["channel"] != "app banner") { obj["channel"] = 'sms'; }
 	var self = this;
 	this.link(obj, function(err, url) {
 		if (err) { return callback(err); }
@@ -519,10 +524,10 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
  *
  * #### Usage
  * ```js
- * Branch.sendSMSExisting(
- *     metadata,     // Metadata must include phone number as `phone`
- *     callback(err, data)
- * )
+ * branch.sendSMSExisting(
+ *     metadata, // Metadata must include phone number as `phone`
+ *     callback (err, data)
+ * );
  * ```
  * ___
  */
@@ -550,29 +555,30 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  *
  * ##### Usage
  * ```js
- * Branch.referrals(
- *     callback(err, data)
- * )
+ * branch.referrals(
+ *     callback (err, data)
+ * );
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
  * callback(
- *      error: "Error message",
+ *     "Error message",
  *     {
- *          'install': {
- *               total: 5,
- *               unique: 2
- *          },
- *          'open': {
- *               total: 4,
- *               unique: 3
- *          },
- *         'buy': {
- *              total: 7,
+ *         'install': {
+ *              total: 5,
+ *              unique: 2
+ *         },
+ *         'open': {
+ *              total: 4,
  *              unique: 3
- *          }
- *     });
+ *         },
+ *         'buy': {
+ *             total: 7,
+ *             unique: 3
+ *         }
+ *     }
+ * );
  * ```
  *
  * ## Credit history
@@ -582,7 +588,7 @@ Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() { };
 	var self = this;
 	this.pushQueue(function(callback) {
-		if (!this.initialized) { 
+		if (!this.initialized) {
 			this.nextQueue();
 			return callback(utils.message(utils.messages.nonInit));
 		}
@@ -590,7 +596,7 @@ Branch.prototype["referrals"] = function(callback) {
 			self.nextQueue();
 			callback(err, data);
 		});
-	}, this, [callback]);
+	}, this, [ callback ]);
 };
 
 /**
@@ -603,19 +609,20 @@ Branch.prototype["referrals"] = function(callback) {
  *
  * ##### Usage
  * ```js
- * Branch.credits(
- *     callback(err, data)
- * )
+ * branch.credits(
+ *     callback (err, data)
+ * );
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
  * callback(
- *      error: "Error message",
- *      {
- *           'default': 15,
- *           'other bucket': 9
- *      });
+ *     "Error message",
+ *     {
+ *         'default': 15,
+ *         'other bucket': 9
+ *     }
+ * );
  * ```
  *
  * ## Credit redemption
@@ -625,7 +632,7 @@ Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() { };
 	var self = this;
 	this.pushQueue(function(callback) {
-		if (!this.initialized) { 
+		if (!this.initialized) {
 			this.nextQueue();
 			return callback(utils.message(utils.messages.nonInit));
 		}
@@ -633,7 +640,7 @@ Branch.prototype["credits"] = function(callback) {
 			self.nextQueue();
 			callback(err, data);
 		});
-	}, this, [callback]);
+	}, this, [ callback ]);
 };
 
 /**
@@ -647,11 +654,11 @@ Branch.prototype["credits"] = function(callback) {
  * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
  *
  * ```js
- * Branch.redeem(
+ * branch.redeem(
  *     amount, // amount of credits to be redeemed
  *     bucket,  // String of bucket name to redeem credits from
- *     callback(err)
- * )
+ *     callback (err)
+ * );
  * ```
  *
  * ##### Example
@@ -660,29 +667,30 @@ Branch.prototype["credits"] = function(callback) {
  * branch.redeem(
  *     5,
  *     "Rubies",
- *     function(data){
- *          console.log(data)
- * });
+ *     function(data) {
+ *         console.log(data);
+ *     }
+ * );
  * ```
  *
- * ##### Callback
+ * ##### Callback Format
  * ```js
- * callback( error: "Error message" );
+ * callback("Error message");
  * ```
  * ___
  *
  * # Smart App Sharing Banner
- * 
+ *
  * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
  * Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
  * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
- * 
+ *
  */
 Branch.prototype["redeem"] = function(amount, bucket, callback) {
 	callback = callback || function() { };
 	var self = this;
 	this.pushQueue(function(amount, bucket, callback) {
-		if (!this.initialized) { 
+		if (!this.initialized) {
 			this.nextQueue();
 			return callback(utils.message(utils.messages.nonInit));
 		}
@@ -690,14 +698,14 @@ Branch.prototype["redeem"] = function(amount, bucket, callback) {
 			self.nextQueue();
 			callback(err, data);
 		});
-	}, this, [amount, bucket, callback]);
+	}, this, [ amount, bucket, callback ]);
 };
 
 /**
  * @function Branch.banner
  * @param {Object} options - **Required** Object of all the options to setup the banner
  * @param {Object} linkData - **Required** Object of all link data, same as Branch.link()
- * 
+ *
  * **Formerly `appBanner()` (depreciated).** See [CHANGELOG](CHANGELOG.md)
  *
  * Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
@@ -715,10 +723,10 @@ Branch.prototype["redeem"] = function(amount, bucket, callback) {
  * #### Usage
  *
  * ```js
- * Branch.banner(
+ * branch.banner(
  *     options, 	// Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
  *     linkData     // Data for link, same as Branch.link()
- * )
+ * );
  * ```
  *
  * ##### Example
@@ -742,16 +750,15 @@ Branch.prototype["redeem"] = function(amount, bucket, callback) {
  *         mydata: {
  *             foo: 'bar'
  *         },
- *     '$desktop_url': 'http://myappwebsite.com',
- *     '$ios_url': 'http://myappwebsite.com/ios',
- *     '$ipad_url': 'http://myappwebsite.com/ipad',
- *     '$android_url': 'http://myappwebsite.com/android',
- *     '$og_app_id': '12345',
- *     '$og_title': 'My App',
- *     '$og_description': 'My app\'s description.',
- *     '$og_image_url': 'http://myappwebsite.com/image.png'
+ *         '$desktop_url': 'http://myappwebsite.com',
+ *         '$ios_url': 'http://myappwebsite.com/ios',
+ *         '$ipad_url': 'http://myappwebsite.com/ipad',
+ *         '$android_url': 'http://myappwebsite.com/android',
+ *         '$og_app_id': '12345',
+ *         '$og_title': 'My App',
+ *         '$og_description': 'My app\'s description.',
+ *         '$og_image_url': 'http://myappwebsite.com/image.png'
  *     }
- *
  * });
  * ```
  */
