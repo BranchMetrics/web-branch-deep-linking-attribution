@@ -1,5 +1,5 @@
 {
-	"fileExtensions": [".js", ".jsx"],
+	"fileExtensions": [ ".js" ],
 
 	"requireCurlyBraces": [ "if", "else", "for", "while", "do", "try", "catch" ],
 	"requireSpaceAfterKeywords": [ "if", "else", "for", "while", "do", "switch", "return", "try", "catch" ],
@@ -21,8 +21,8 @@
 	"requireSpacesInsideArrayBrackets": "allButNested",
 	"disallowSpaceAfterObjectKeys": true,
 	"requireCommaBeforeLineBreak": true,
-	"disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"],
-	"disallowSpaceBeforePostfixUnaryOperators": ["++", "--", ";"],
+	"disallowSpaceAfterPrefixUnaryOperators": [ "++", "--", "+", "-", "~", "!" ],
+	"disallowSpaceBeforePostfixUnaryOperators": [ "++", "--", ";" ],
 	"disallowSpaceBeforeBinaryOperators": [ "," ],
 	"requireSpaceBeforeBinaryOperators": [ "=", "+", "-", "/", "*", "==", "===", "!=", "!==" ],
 	"requireSpaceAfterBinaryOperators": [ "=", ",", "+", "-", "/", "*", "==", "===", "!=", "!==" ],
