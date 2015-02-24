@@ -7,19 +7,19 @@
  * call them, it saves your call for later.
  */
 
-(function(root, doc, script, branchStr, createCallback, branch, funcs, i, scriptTag, firstScript) {
+(function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
   if (!root[branchStr] || !root[branchStr]._q) {
     while (i < funcs.length) {
-      createCallback(branch, funcs[i++]);
+      createCallback(branchSdk, funcs[i++]);
     }
 
-    scriptTag = doc.createElement(script);
+    scriptTag = doc.createElement(scriptStr);
     scriptTag.async = 1;
     scriptTag.src = "https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";
-    firstScript = doc.getElementsByTagName(script)[0];
+    firstScript = doc.getElementsByTagName(scriptStr)[0];
     firstScript.parentNode.insertBefore(scriptTag, firstScript);
 
-    root[branchStr] = branch;
+    root[branchStr] = branchSdk;
   }
 })(window, document, "script", 'branch', function(branch, name) {
   branch[name] = function() {

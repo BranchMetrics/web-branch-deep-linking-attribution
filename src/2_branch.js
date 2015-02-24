@@ -12,6 +12,7 @@ var default_branch;
 
 /***
  * @class Branch
+ * @constructor
  */
 Branch = function() {
 	if (!(this instanceof Branch)) {

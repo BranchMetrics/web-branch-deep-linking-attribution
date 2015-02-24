@@ -1,7 +1,7 @@
 COMPILER=java -jar compiler/compiler.jar
 COMPILER_LIBRARY=compiler/library/closure-library-master/closure
 SOURCES=src/0_config.js src/0_utils.js src/1_banner.js src/1_api.js src/1_resources.js src/2_branch.js src/3_branch_instance.js src/4_umd.js
-EXTERN=src/extern.js json3/lib/json3.js
+EXTERN=src/extern.js externs/json3/lib/json3.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
 all: dist/build.js dist/build.min.js dist/onpage.min.js
@@ -59,4 +59,4 @@ dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 dist/onpage.min.js: src/onpage.js compiler/compiler.jar
 	@echo "\nMinifying on page script into README"
 	$(COMPILER) --js src/onpage.js \
-		--define 'DEBUG=false' > dist/onpage.min.js
+		--define 'DEBUG=false' | node transform.js branch_sdk > dist/onpage.min.js
