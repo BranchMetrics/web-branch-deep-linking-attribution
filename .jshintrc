@@ -1,0 +1,17 @@
+{
+	"browser": true,
+	"sub": true,
+	"undef": true,
+	"trailing": true,
+	"curly": true,
+	"bitwise": false,
+	"forin": true,
+	"freeze": true,
+	"immed": true,
+	"noarg": true,
+	"nonbsp": true,
+	"unused": true,
+	"latedef": true,
+	"scripturl": true,
+	"predef": [ "console", "module", "goog", "define", "ActiveXObject" ]
+}

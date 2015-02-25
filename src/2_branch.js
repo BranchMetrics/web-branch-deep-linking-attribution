@@ -136,7 +136,7 @@ Branch.prototype["data"] = function(callback) {
 	this.pushQueue(function(callback) {
 		self.nextQueue();
 		callback(null, utils.whiteListSessionData(utils.readStore()));
-	}, this, [ callback ]);
+	}, this, [ callback ]);
 };
 
 /**
@@ -403,7 +403,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 				if (err || data) { callback(err, data); }
 			});
 		}
-	}, this, [ url, callback ]);
+	}, this, [ url, callback ]);
 };
 
 /**
@@ -522,7 +522,6 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
 	var self = this;
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	if (obj["channel"] != "app banner") { obj["channel"] = 'sms'; }
-	var self = this;
 	this.link(obj, function(err, url) {
 		if (err) { return callback(err); }
 		self.linkClick(url, function(err) {

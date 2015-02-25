@@ -4,27 +4,6 @@ var gulp = require('gulp'),
 	through = require('through'),
 	jscs = require('gulp-jscs');
 
-/* ----- Linting ----- */
-
-var JSHintOptions = {
-	'browser': true,
-
-	'sub': true,
-	'undef': true,
-	'trailing': true,
-	'curly': true,
-	'bitwise': false,
-	'forin': true,
-	'freeze': true,
-	'immed': true,
-	'noarg': true,
-	'nonbsp': true,
-	'unused': true,
-	'latedef': true,
-	'scripturl': true,
-	'predef': [ 'console', 'module', 'goog', 'define', 'ActiveXObject' ]
-};
-
 gulp.task('hint', function() {
 	var errors = false;
 
@@ -36,14 +15,15 @@ gulp.task('hint', function() {
 			data.contents = new Buffer(file);
 			this.queue(data);
 		}))
-		.pipe(jshint(JSHintOptions))
+		.pipe(jshint())
 		.pipe(jshint.reporter('default'))
 		.pipe(jshint.reporter('fail'));
 });
 
 gulp.task('jscs', function() {
 	return gulp.src([
-		'./src/*.js'
+		'./src/*.js',
+		'./tests/*.js'
 	]).pipe(jscs());
 });
 

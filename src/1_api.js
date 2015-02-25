@@ -139,7 +139,8 @@ var XHRRequest = function(url, data, method, callback) {
 		req.open(method, url, true);
 		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		req.send(data);
-	} catch(e) {
+	}
+	catch (e) {
 		sessionStorage.setItem('use_jsonp', true);
 		jsonpMakeRequest(url, data, method, callback);
 	}
@@ -151,7 +152,7 @@ var XHRRequest = function(url, data, method, callback) {
  * @param {function(?new:Error,*)|null} callback
  */
 api = function(resource, data, callback) {
-	//callback = utils.injectDequeue( callback || function() {} );
+	// callback = utils.injectDequeue( callback || function() {} );
 
 	var u = getUrl(resource, data);
 	var url, postData = "";
@@ -160,11 +161,12 @@ api = function(resource, data, callback) {
 	}
 	else {
 		url = u.url;
-		postData = u.data;
-	}	
+		postData = u.data; 
+	}
 	if (sessionStorage.getItem('use_jsonp') || resource.jsonp) {
 		jsonpMakeRequest(url, data, resource.method, callback);
-	} else {
+	}
+	else {
 		XHRRequest(url, postData, resource.method, callback);
 	}
 };
