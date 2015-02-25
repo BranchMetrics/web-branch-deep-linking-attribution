@@ -55,10 +55,10 @@ utils.readStore = function() {
 };
 
 utils.whiteListSessionData = function(data) {
-	var whiteList = ['data', 'referring_identity', 'identity', 'has_app'];
+	var whiteList = [ 'data', 'referring_identity', 'identity', 'has_app' ];
 	var returnData = {};
 	for (var key in data) {
-		if(whiteList.indexOf(key) > -1) {
+		if (whiteList.indexOf(key) > -1) {
 			returnData[key] = data[key];
 		}
 	}
@@ -144,7 +144,8 @@ utils.base64encode = function(input) {
 		enc4 = chr3 & 63;
 		if (isNaN(chr2)) {
 			enc3 = enc4 = 64;
-		} else if (isNaN(chr3)) {
+		}
+		else if (isNaN(chr3)) {
 			enc4 = 64;
 		}
 		output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);

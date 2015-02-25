@@ -302,8 +302,6 @@ Branch.prototype.init = function(a, b) {
   });
 };
 Branch.prototype.data = function(a) {
-  (a || function() {
-  })(null, utils.whiteListSessionData(utils.readStore()));
 };
 Branch.prototype.setIdentity = function(a, b) {
   b = b || function() {
@@ -353,7 +351,7 @@ Branch.prototype.linkClick = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
-    return this.nextQueue(), b(utils.message(utils.messages.nonInit));
+    return b(utils.message(utils.messages.nonInit));
   }
   a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, c) {
     utils.storeKeyValue("click_id", c.click_id);
@@ -406,7 +404,7 @@ Branch.prototype.referrals = function(a) {
   a = a || function() {
   };
   if (!this.initialized) {
-    return this.nextQueue(), a(utils.message(utils.messages.nonInit));
+    return a(utils.message(utils.messages.nonInit));
   }
   this._api(resources.referrals, {}, function(b, d) {
     a(b, d);

@@ -4,8 +4,12 @@ SOURCES=src/0_config.js src/0_utils.js src/0_queue.js src/1_banner.js src/1_api.
 EXTERN=src/extern.js externs/json3/lib/json3.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
 
-all: dist/build.js dist/build.min.js dist/onpage.min.js
+.PHONY: clean
+
+all: dist/build.js dist/build.min.js.gz README.md
 docs: README.md
+clean:
+	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md
 
 # Kinda gross, but will download closure compiler if you don't have it.
 compiler/compiler.jar:
@@ -32,31 +36,35 @@ calcdeps.py: $(SOURCES) compiler/library
 	--exclude tests/branch-deps.js \
 	> tests/branch-deps.js
 
-docs/2_branch.md: $(SOURCES)
+docs/3_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
-	mkdir -p docs
-	jsdox src/2_branch.js \
-	--output docs
-
-README.md: docs/2_branch.md dist/onpage.min.js docs/footer.md docs/intro.md docs/intro2.md
-	@echo "\nConcatinating readme"
-	cat docs/intro.md dist/onpage.min.js docs/Intro2.md docs/2_branch.md docs/footer.md > README.md
+	jsdox src/2_branch.js --output docs && mv docs/2_branch.md docs/3_branch.md
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
-	@echo "\Minifying debug compressed js..."
+	@echo "\nMinifying debug js..."
+	mkdir -p dist
 	$(COMPILER) $(COMPILER_ARGS) \
 		--formatting=print_input_delimiter \
 		--formatting=pretty_print \
 		--define 'DEBUG=true' > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	@echo "\Minifying compressed and gzipped js..."
+	@echo "\nMinifying compressed js..."
+	mkdir -p dist
 	$(COMPILER) $(COMPILER_ARGS) \
 		--compilation_level ADVANCED_OPTIMIZATIONS \
 		--define 'DEBUG=false' > dist/build.min.js
-	gzip -c dist/build.min.js > dist/build.min.js.gzip
 
-dist/onpage.min.js: src/onpage.js compiler/compiler.jar
+dist/build.min.js.gz: dist/build.min.js
+	@echo "\nCompressing JS js..."
+	gzip -c dist/build.min.js > dist/build.min.js.gz
+
+docs/1_onpage.md: src/onpage.js compiler/compiler.jar
 	@echo "\nMinifying on page script into README"
 	$(COMPILER) --js src/onpage.js \
-		--define 'DEBUG=false' > dist/onpage.min.js
+		--define 'DEBUG=false' | node transform.js branch_sdk > docs/1_onpage.md
+
+README.md: docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md
+	@echo "\nConcatinating readme"
+	cat docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md > README.md
+

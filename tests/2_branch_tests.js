@@ -30,14 +30,14 @@ var setUpPage = function() {
 	// How often we should check for the finished state of an async test
 	asyncPollingInterval = 500;
 
-	//Standard set of dummy params
+	// Standard set of dummy params
 	params = {
-		tags: ['tag1', 'tag2'],
+		tags: [ 'tag1', 'tag2' ],
 		channel: 'sample app',
 		feature: 'create link',
 		stage: 'created link',
 		type: 1,
-		data: {  
+		data: {
 			mydata: {
 				foo: 'bar'
 			},
@@ -61,21 +61,21 @@ var tearDown = function() {
  */
 var runAsyncTest = function(testFunction, assertions) {
 
-	var recievedData = {};
+	var receivedData = {};
 	var recievedFired;
 
 	waitForCondition(
 		function() {
 			return recievedFired;
 		},
-		function() { assertions(recievedData) },
+		function() { assertions(receivedData) },
 		asyncPollingInterval,
 		maxWaitTime
 	);
 
 	testFunction(function(err, data) {
 		recievedFired = true;
-		recievedData = err || data;
+		receivedData = err || data;
 	});
 };
 
@@ -88,8 +88,8 @@ var runAsyncTest = function(testFunction, assertions) {
 var testSendSMS = function() {
 	runAsyncTest(function(callback) {
 		branch.sendSMS('5177401526', params, {}, function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-		assertUndefined("should send SMS with phone number and return undefined", recievedData);
+	}, function(receivedData) {
+		assertUndefined("should send SMS with phone number and return undefined", receivedData);
 	});
 }
 
@@ -102,8 +102,8 @@ var testMissingPhonesendSMS = function() {
 
 	runAsyncTest(function(callback) {
 		branch.sendSMS(params, function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-		assertObjectEquals("should require a phone number", recievedData, expectedData);
+	}, function(receivedData) {
+		assertObjectEquals("should require a phone number", receivedData, expectedData);
 	});
 }
 */
@@ -115,8 +115,8 @@ var testMissingPhonesendSMS = function() {
  var testTrack = function() {
 	runAsyncTest(function(callback) {
 		branch.track('Tracked this click', function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-		assertUndefined("should return undefined", recievedData);
+	}, function(receivedData) {
+		assertUndefined("should return undefined", receivedData);
 	});
 }
 
@@ -127,8 +127,8 @@ var testMissingPhonesendSMS = function() {
 var testReferrals = function() {
 	runAsyncTest(function(callback) {
 		branch.referrals(function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-		assertTrue("should return an object", (typeof recievedData && recievedData != null));
+	}, function(receivedData) {
+		assertTrue("should return an object", (typeof receivedData && receivedData != null));
 	});
 }
 
@@ -139,8 +139,8 @@ var testReferrals = function() {
 var testCredits = function() {
 	runAsyncTest(function(callback) {
 		branch.credits(function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-		assertTrue("should return an object", (typeof recievedData && recievedData != null));
+	}, function(receivedData) {
+		assertTrue("should return an object", (typeof receivedData && receivedData != null));
 	});
 }
 
@@ -151,9 +151,9 @@ var testCredits = function() {
 var testSetIdentity = function() {
 	runAsyncTest(function(callback) {
 		branch.setIdentity('Branch', function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-			assertNonEmptyString("should return correct link", recievedData.link);
-			assertNonEmptyString("should return correct referring_data", recievedData.referring_data);
+	}, function(receivedData) {
+			assertNonEmptyString("should return correct link", receivedData.link);
+			assertNonEmptyString("should return correct referring_data", receivedData.referring_data);
 	});
 }
 
@@ -168,10 +168,10 @@ var testRedeem = function() {
     var bucket = 'default';
 
 	runAsyncTest(function(callback) {
-		branch.redeem(amount, bucket, function(err, data) { 
+		branch.redeem(amount, bucket, function(err, data) {
 			callback(err, data) });
-	}, function(recievedData) {
-		assertObjectEquals("should return error for not enough credits", expectedData, recievedData);
+	}, function(receivedData) {
+		assertObjectEquals("should return error for not enough credits", expectedData, receivedData);
 	});
 }
 
@@ -187,10 +187,10 @@ var testRedeem = function() {
 var testLink = function() {
 	runAsyncTest(function(callback) {
 		branch.link(params, function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-		assertNonEmptyString("should create link with required params", recievedData);
+	}, function(receivedData) {
+		assertNonEmptyString("should create link with required params", receivedData);
 		var branchURL = "https://bnc.lt/l/";
-		var recievedURLRoot = recievedData.substring(0, 17);
+		var recievedURLRoot = receivedData.substring(0, 17);
 		assertEquals("should return branch URL", branchURL, recievedURLRoot);
 	});
 }
@@ -202,7 +202,7 @@ var testLink = function() {
 var testLogout = function() {
 	runAsyncTest(function(callback) {
 		branch.logout(function(err, data) { callback(err, data) });
-	}, function(recievedData) {
-		assertUndefined("should return undefined", recievedData);
+	}, function(receivedData) {
+		assertUndefined("should return undefined", receivedData);
 	});
 }

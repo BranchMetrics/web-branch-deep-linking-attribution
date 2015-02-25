@@ -168,7 +168,7 @@ var bannerResources = {
  * @param {Object} options
  */
 banner.smartBannerMarkup = function(options) {
-	if(bannerResources.actions.shouldAppend(options)) {
+	if (bannerResources.actions.shouldAppend(options)) {
 		// Consturct Banner Markup
 		var banner = document.createElement('div');
 		banner.id = 'branch-banner';
@@ -178,7 +178,7 @@ banner.smartBannerMarkup = function(options) {
 };
 
 banner.smartBannerStyles = function(options) {
-	if(bannerResources.actions.shouldAppend(options)) {
+	if (bannerResources.actions.shouldAppend(options)) {
 		// Construct Banner CSS
 		var css = document.createElement("style");
 		css.type = "text/css";
@@ -211,7 +211,7 @@ banner.smartBannerStyles = function(options) {
  * @param {Boolean} desktop
  */
 banner.appendSmartBannerActions = function(branch, options, linkData) {
-	if(bannerResources.actions.shouldAppend(options)) {
+	if (bannerResources.actions.shouldAppend(options)) {
 		var action = document.createElement('div');
 
 		// User agent specific markup
@@ -238,7 +238,7 @@ banner.appendSmartBannerActions = function(branch, options, linkData) {
 };
 
 banner.triggerBannerAnimation = function(options) {
-	if(bannerResources.actions.shouldAppend(options)) {
+	if (bannerResources.actions.shouldAppend(options)) {
 		document.body.style.marginTop = '71px';
 		setTimeout(function() {
 			document.getElementById('branch-banner').style.top = '0';
