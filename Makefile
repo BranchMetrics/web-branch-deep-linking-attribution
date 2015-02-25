@@ -64,7 +64,7 @@ docs/1_onpage.md: src/onpage.js compiler/compiler.jar
 	$(COMPILER) --js src/onpage.js \
 		--define 'DEBUG=false' | node transform.js branch_sdk > docs/1_onpage.md
 
-README.md: docs/0_intro.md docs/1_onpage.js docs/2_intro.md docs/3_branch.md docs/4_footer.md
+README.md: docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md
 	@echo "\nConcatinating readme"
-	cat docs/0_intro.md docs/1_onpage.js docs/2_intro.md docs/3_branch.md docs/4_footer.md > README.md
+	cat docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md > README.md
 
