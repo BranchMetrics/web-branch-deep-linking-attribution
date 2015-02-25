@@ -161,7 +161,7 @@ api = function(resource, data, callback) {
 	}
 	else {
 		url = u.url;
-		postData = u.data; 
+		postData = u.data;
 	}
 	if (sessionStorage.getItem('use_jsonp') || resource.jsonp) {
 		jsonpMakeRequest(url, data, resource.method, callback);

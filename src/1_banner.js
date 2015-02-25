@@ -86,7 +86,7 @@ var bannerResources = {
 	},
 
 	html: {
-		banner: function(options) { 
+		banner: function(options) {
 			return '<div class="content">' +
 				'<div class="left">' +
 					'<div class="close-x" id="branch-banner-close">&times;</div>' +

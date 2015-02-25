@@ -4,7 +4,7 @@
   "description": "Branch Metrics Web SDK",
   "main": "index.js",
   "scripts": {
-    "lint": "gulp hint"
+    "lint": "gulp check"
   },
   "repository": {
     "type": "git",
