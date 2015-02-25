@@ -7,6 +7,7 @@ goog.require('utils');
 goog.require('resources');
 goog.require('api');
 goog.require('banner');
+goog.require('Queue');
 
 var default_branch;
 
@@ -18,22 +19,26 @@ Branch = function() {
 		if (!default_branch) { default_branch = new Branch(); }
 		return default_branch;
 	}
+	this._queue = new Queue();
 	this.initialized = false;
 };
-
-Branch.prototype.pushQueue = utils.pushQueue;
-Branch.prototype.nextQueue = utils.nextQueue;
 
 /***
  * @param {resources.resource} resource
  * @param {Object.<string, *>} data
  * @param {function(?new:Error,*)|null} callback
  */
-Branch.prototype._api = function(resource, data, callback) {
-	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && this.app_id) { data['app_id'] = this.app_id; }
-	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { data['session_id'] = this.session_id; }
-	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { data['identity_id'] = this.identity_id; }
-	return api(resource, data, callback);
+Branch.prototype._api = function(resource, obj, callback) {
+	var self = this;
+	this._queue(function(next) {
+		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
+		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
+		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
+		return api(resource, obj, function(err, data) {
+			next();
+			callback(err, data);
+		});
+	});
 };
 
 /**
@@ -70,40 +75,35 @@ Branch.prototype._api = function(resource, data, callback) {
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback|| function() { };
-	this.pushQueue(function(app_id, callback) {
-		if (this.initialized) {
-			this.nextQueue();
-			return callback(utils.message(utils.messages.existingInit));
-		}
+	if (this.initialized) {
+		return callback(utils.message(utils.messages.existingInit));
+	}
 
-		this.app_id = app_id;
-		var self = this, sessionData = utils.readStore();
+	this.app_id = app_id;
+	var self = this, sessionData = utils.readStore();
 
-		var setBranchValues = function(data) {
-			self.session_id = data['session_id'];
-			self.identity_id = data['identity_id'];
-			self.sessionLink = data["link"];
-			self.initialized = true;
-		};
+	var setBranchValues = function(data) {
+		self.session_id = data['session_id'];
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data["link"];
+		self.initialized = true;
+	};
 
-		if (sessionData  && sessionData['session_id']) {
-			setBranchValues(sessionData);
-			this.nextQueue();
-			callback(null, utils.whiteListSessionData(sessionData));
-		} else {
-			this._api(resources._r, {}, function(err, browser_fingerprint_id) {
-				self._api(resources.open, {
-					"is_referrable": 1,
-					"browser_fingerprint_id": browser_fingerprint_id
-				}, function(err, data) {
-					setBranchValues(data);
-					utils.store(data);
-					self.nextQueue();
-					callback(err, utils.whiteListSessionData(data));
-				});
+	if (sessionData  && sessionData['session_id']) {
+		setBranchValues(sessionData);
+		callback(null, utils.whiteListSessionData(sessionData));
+	} else {
+		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
+			self._api(resources.open, {
+				"is_referrable": 1,
+				"browser_fingerprint_id": browser_fingerprint_id
+			}, function(err, data) {
+				setBranchValues(data);
+				utils.store(data);
+				callback(err, utils.whiteListSessionData(data));
 			});
-		}
-	}, this, [app_id, callback]);
+		});
+	}
 };
 
 /**
@@ -115,11 +115,7 @@ Branch.prototype['init'] = function(app_id, callback) {
  */
 Branch.prototype["data"] = function(callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(callback) {
-		self.nextQueue();
-		callback(null, utils.whiteListSessionData(utils.readStore()));
-	}, this, [callback]);
+	callback(null, utils.whiteListSessionData(utils.readStore()));
 };
 
 /**
@@ -154,14 +150,10 @@ Branch.prototype["data"] = function(callback) {
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(identity, callback) {
-		if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-		this._api(resources.profile, { "identity": identity }, function(err, data) {
-			self.nextQueue();
-			callback(err, data);
-		});
-	}, this, [identity, callback]);
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	this._api(resources.profile, { "identity": identity }, function(err, data) {
+		callback(err, data);
+	});
 };
 
 /**
@@ -193,14 +185,10 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  */
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(callback) {
-		if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-		this._api(resources.logout, {}, function(err) {
-			self.nextQueue();
-			callback(err);
-		});
-	}, this, [callback]);
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	this._api(resources.logout, {}, function(err) {
+		callback(err);
+	});
 };
 
 /*** NOT USED
@@ -266,26 +254,22 @@ Branch.prototype['close'] = function(callback) {
  */
 Branch.prototype['track'] = function(event, metadata, callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(event, metadata, callback) {
-		if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-		if (typeof metadata == 'function') {
-			callback = metadata;
-			metadata = {};
-		}
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (typeof metadata == 'function') {
+		callback = metadata;
+		metadata = {};
+	}
 
-		this._api(resources.event, {
-			"event": event,
-			"metadata": utils.merge({
-				"url": document.URL,
-				"user_agent": navigator.userAgent,
-				"language": navigator.language
-			}, {})
-		}, function(err) {
-			self.nextQueue();
-			callback(err);
-		});
-	}, this, [event, metadata, callback]);
+	this._api(resources.event, {
+		"event": event,
+		"metadata": utils.merge({
+			"url": document.URL,
+			"user_agent": navigator.userAgent,
+			"language": navigator.language
+		}, {})
+	}, function(err) {
+		callback(err);
+	});
 };
 
 /**
@@ -345,21 +329,17 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  */
 Branch.prototype['link'] = function(obj, callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(obj, callback) {
-		if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-		obj['source'] = 'web-sdk';
-		if (obj['data']['$desktop_url'] !== undefined) {
-			obj['data']['$desktop_url'] = obj['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	obj['source'] = 'web-sdk';
+	if (obj['data']['$desktop_url'] !== undefined) {
+		obj['data']['$desktop_url'] = obj['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
+	}
+	obj['data'] = JSON.stringify(obj['data']);
+	this._api(resources.link, obj, function(err, data) {
+		if (typeof callback == 'function') {
+			callback(err, data['url']);
 		}
-		obj['data'] = JSON.stringify(obj['data']);
-		this._api(resources.link, obj, function(err, data) {
-			if (typeof callback == 'function') {
-				self.nextQueue();
-				callback(err, data['url']);
-			}
-		});
-	}, this, [obj, callback]);
+	});
 };
 
 /***
@@ -370,23 +350,19 @@ Branch.prototype['link'] = function(obj, callback) {
  */
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(url, callback) {
-		if (!this.initialized) { 
-			this.nextQueue();
-			return callback(utils.message(utils.messages.nonInit));
-		}
-		if (url) {
-			this._api(resources.linkClick, {
-				"link_url": url.replace('https://bnc.lt/', ''),
-				"click": "click"
-			}, function(err, data) {
-				self.nextQueue();
-				utils.storeKeyValue("click_id", data["click_id"]);
-				if (err || data) { callback(err, data); }
-			});
-		}
-	}, this, [url, callback]);
+	if (!this.initialized) { 
+		this.nextQueue();
+		return callback(utils.message(utils.messages.nonInit));
+	}
+	if (url) {
+		this._api(resources.linkClick, {
+			"link_url": url.replace('https://bnc.lt/', ''),
+			"click": "click"
+		}, function(err, data) {
+			utils.storeKeyValue("click_id", data["click_id"]);
+			if (err || data) { callback(err, data); }
+		});
+	}
 };
 
 /**
@@ -460,19 +436,17 @@ Branch.prototype['linkClick'] = function(url, callback) {
  */
 Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
 	callback = callback || function() { };
-	this.pushQueue(function(phone, obj, options, callback) {
-		options = options || {};
-		options["make_new_link"] = options["make_new_link"] || false;
+	options = options || {};
+	options["make_new_link"] = options["make_new_link"] || false;
 
-		if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-		if (utils.readKeyValue("click_id") && !options["make_new_link"]) {
-			this.sendSMSExisting(phone, callback);
-		}
-		else {
-			this.sendSMSNew(phone, obj, callback);
-		}
-	}, this, [phone, obj, options, callback]);
+	if (utils.readKeyValue("click_id") && !options["make_new_link"]) {
+		this.sendSMSExisting(phone, callback);
+	}
+	else {
+		this.sendSMSNew(phone, obj, callback);
+	}
 };
 
 /*** <--- Not in docs
@@ -497,13 +471,11 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
 	var self = this;
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	if(obj["channel"] != "app banner") { obj["channel"] = 'sms'; }
-	var self = this;
 	this.link(obj, function(err, url) {
 		if (err) { return callback(err); }
 		self.linkClick(url, function(err) {
 			if (err) { return callback(err); }
 			self.sendSMSExisting(phone, function(err) {
-				self.nextQueue();
 				callback(err);
 			});
 		});
@@ -527,14 +499,12 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
  */
 Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 	callback = callback || function() { };
-	var self = this;
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	this._api(resources.SMSLinkSend, {
 		"link_url": utils.readStore()["click_id"],
 		"phone": phone
 	}, function(err) {
-		self.nextQueue();
 		callback(err);
 	});
 };
@@ -579,17 +549,13 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  */
 Branch.prototype["referrals"] = function(callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(callback) {
-		if (!this.initialized) { 
-			this.nextQueue();
-			return callback(utils.message(utils.messages.nonInit));
-		}
-		this._api(resources.referrals, {}, function(err, data) {
-			self.nextQueue();
-			callback(err, data);
-		});
-	}, this, [callback]);
+	if (!this.initialized) { 
+		this.nextQueue();
+		return callback(utils.message(utils.messages.nonInit));
+	}
+	this._api(resources.referrals, {}, function(err, data) {
+		callback(err, data);
+	});
 };
 
 /**
@@ -622,17 +588,13 @@ Branch.prototype["referrals"] = function(callback) {
  */
 Branch.prototype["credits"] = function(callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(callback) {
-		if (!this.initialized) { 
-			this.nextQueue();
-			return callback(utils.message(utils.messages.nonInit));
-		}
-		this._api(resources.credits, {}, function(err, data) {
-			self.nextQueue();
-			callback(err, data);
-		});
-	}, this, [callback]);
+	if (!this.initialized) { 
+		this.nextQueue();
+		return callback(utils.message(utils.messages.nonInit));
+	}
+	this._api(resources.credits, {}, function(err, data) {
+		callback(err, data);
+	});
 };
 
 /**
@@ -679,17 +641,13 @@ Branch.prototype["credits"] = function(callback) {
  */
 Branch.prototype["redeem"] = function(amount, bucket, callback) {
 	callback = callback || function() { };
-	var self = this;
-	this.pushQueue(function(amount, bucket, callback) {
-		if (!this.initialized) { 
-			this.nextQueue();
-			return callback(utils.message(utils.messages.nonInit));
-		}
-		this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err, data) {
-			self.nextQueue();
-			callback(err, data);
-		});
-	}, this, [amount, bucket, callback]);
+	if (!this.initialized) { 
+		this.nextQueue();
+		return callback(utils.message(utils.messages.nonInit));
+	}
+	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err, data) {
+		callback(err, data);
+	});
 };
 
 /**

@@ -151,26 +151,3 @@ utils.base64encode = function(input) {
 	}
 	return output;
 };
-
-
-// ======= Begin queue functions
-
-utils.pushQueue = function (func, context, args) {
-	context = context || window;
-	args = args || [];
-	utils.queue = utils.queue || [];
-	utils.queueRunning = utils.queueRunning || false;
-	utils.queue.push(function() { func.apply(context, args); });
-	if (!utils.queueRunning) { 
-		utils.queueRunning = true;
-		utils.nextQueue();
-	}
-};
-
-utils.nextQueue = function() {
-	if (!utils.queue.length) {
-		utils.queueRunning = false;
-		return;
-	}
-	utils.queue.shift().call();
-};
