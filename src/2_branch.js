@@ -96,14 +96,15 @@ Branch.prototype['init'] = function(app_id, callback) {
 	var setBranchValues = function(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
-		self.sessionLink = data["link"];
+		self.sessionLink = data['link'];
 		self.initialized = true;
 	};
 
 	if (sessionData  && sessionData['session_id']) {
 		setBranchValues(sessionData);
 		callback(null, utils.whiteListSessionData(sessionData));
-	} else {
+	}
+	else {
 		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
 			self._api(resources.open, {
 				"is_referrable": 1,
@@ -129,7 +130,7 @@ Branch.prototype['init'] = function(app_id, callback) {
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
-Branch.prototype["data"] = function(callback) {
+Branch.prototype['data'] = function(callback) {
 	callback = callback || function() { };
 };
 
@@ -372,7 +373,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
 			"link_url": url.replace('https://bnc.lt/', ''),
 			"click": "click"
 		}, function(err, data) {
-			utils.storeKeyValue("click_id", data["click_id"]);
+			utils.storeKeyValue('click_id', data['click_id']);
 			if (err || data) { callback(err, data); }
 		});
 	}
@@ -455,11 +456,11 @@ Branch.prototype['linkClick'] = function(url, callback) {
 Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
 	callback = callback || function() { };
 	options = options || {};
-	options["make_new_link"] = options["make_new_link"] || false;
+	options['make_new_link'] = options['make_new_link'] || false;
 
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if (utils.readKeyValue("click_id") && !options["make_new_link"]) {
+	if (utils.readKeyValue('click_id') && !options['make_new_link']) {
 		this.sendSMSExisting(phone, callback);
 	}
 	else {
@@ -489,7 +490,7 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
 	var self = this;
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if (obj["channel"] != "app banner") { obj["channel"] = 'sms'; }
+	if (obj['channel'] != 'app banner') { obj['channel'] = 'sms'; }
 	this.link(obj, function(err, url) {
 		if (err) { return callback(err); }
 		self.linkClick(url, function(err) {
@@ -522,7 +523,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	this._api(resources.SMSLinkSend, {
-		"link_url": utils.readStore()["click_id"],
+		"link_url": utils.readStore()['click_id'],
 		"phone": phone
 	}, function(err) {
 		callback(err);
@@ -568,7 +569,7 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  * ## Credit history
  *
  */
-Branch.prototype["referrals"] = function(callback) {
+Branch.prototype['referrals'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { 
 		return callback(utils.message(utils.messages.nonInit));
@@ -607,7 +608,7 @@ Branch.prototype["referrals"] = function(callback) {
  * ## Credit redemption
  *
  */
-Branch.prototype["credits"] = function(callback) {
+Branch.prototype['credits'] = function(callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { 
 		this.nextQueue();
@@ -661,7 +662,7 @@ Branch.prototype["credits"] = function(callback) {
  * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
  *
  */
-Branch.prototype["redeem"] = function(amount, bucket, callback) {
+Branch.prototype['redeem'] = function(amount, bucket, callback) {
 	callback = callback || function() {};
 	if (!this.initialized) { 
 		this.nextQueue();
@@ -726,10 +727,10 @@ Branch.prototype["redeem"] = function(amount, bucket, callback) {
  * });
  * ```
  */
-Branch.prototype["banner"] = function(options, linkData) {
+Branch.prototype['banner'] = function(options, linkData) {
 	options.showMobile = (options.showMobile === undefined) ? true : options.showMobile;
 	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
-	if (!document.getElementById('branch-banner') && !utils.readKeyValue("hideBanner")) {
+	if (!document.getElementById('branch-banner') && !utils.readKeyValue('hideBanner')) {
 		banner.smartBannerMarkup(options);
 		banner.smartBannerStyles(options);
 		banner.appendSmartBannerActions(this, options, linkData);

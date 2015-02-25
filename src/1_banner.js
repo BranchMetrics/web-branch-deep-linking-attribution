@@ -109,8 +109,8 @@ var bannerResources = {
 			'</div>';
 		},
 		mobileAction: function(options) {
-			var openButtonText = options["openAppButtonText"] || 'View in app';
-			var downloadButtonText = options["downloadAppButtonText"] || 'Download App';
+			var openButtonText = options['openAppButtonText'] || 'View in app';
+			var downloadButtonText = options['downloadAppButtonText'] || 'Download App';
 			return '<a id="branch-mobile-action" href="#">' + (utils.hasApp() ? openButtonText : downloadButtonText) + '</a>';
 		},
 		linkSent: function(phone) {
@@ -151,7 +151,7 @@ var bannerResources = {
 
 			document.getElementById('branch-banner').style.top = '-76px';
 
-			utils.storeKeyValue("hideBanner", true);
+			utils.storeKeyValue('hideBanner', true);
 		},
 		mobileUserAgent: function() {
 			return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? (navigator.userAgent.match(/android/i) ? 'android' : 'ios') : false;
@@ -180,8 +180,8 @@ banner.smartBannerMarkup = function(options) {
 banner.smartBannerStyles = function(options) {
 	if (bannerResources.actions.shouldAppend(options)) {
 		// Construct Banner CSS
-		var css = document.createElement("style");
-		css.type = "text/css";
+		var css = document.createElement('style');
+		css.type = 'text/css';
 		css.id = 'branch-css';
 		css.innerHTML = bannerResources.css.banner;
 
@@ -216,7 +216,7 @@ banner.appendSmartBannerActions = function(branch, options, linkData) {
 
 		// User agent specific markup
 		if (bannerResources.actions.mobileUserAgent()) {
-			linkData["channel"] = 'app banner';
+			linkData['channel'] = 'app banner';
 			branch.link(linkData, function(err, url) {
 				document.getElementById('branch-mobile-action').href = url;
 			});
@@ -228,7 +228,7 @@ banner.appendSmartBannerActions = function(branch, options, linkData) {
 
 		document.getElementById('branch-banner-action').appendChild(action);
 		try {
-			document.getElementById('branch-sms-send').addEventListener("click", function() {
+			document.getElementById('branch-sms-send').addEventListener('click', function() {
 			    bannerResources.actions.sendSMS(branch, options, linkData);
 			});
 		}

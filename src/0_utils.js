@@ -91,7 +91,7 @@ utils.readKeyValue = function(key) {
 };
 
 utils.hasApp = function() {
-	return utils.readKeyValue("has_app");
+	return utils.readKeyValue('has_app');
 };
 
 utils.merge = function(to, from) {
@@ -108,7 +108,7 @@ utils.merge = function(to, from) {
 utils.base64encode = function(input) {
 	var utf8_encode = function(string, utftext) {
 		string = string.replace(/\r\n/g, "\n");
-		utftext = "";
+		utftext = '';
 		for (var n = 0; n < string.length; n++) {
 			var c = string.charCodeAt(n);
 			if (c < 128) {
@@ -127,9 +127,9 @@ utils.base64encode = function(input) {
 		return utftext;
 	};
 
-	var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
-	var output = "";
+	var output = '';
 	var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
 	var i = 0;
 	input = utf8_encode(input);

@@ -10,7 +10,7 @@ var _jsonp_callback_index = 0;
 
 function serializeObject(obj, prefix) {
 	var pairs = [];
-	prefix = prefix || "";
+	prefix = prefix || '';
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
 			pairs.push(encodeURIComponent(prefix) + '[]=' + encodeURIComponent(obj[i]));
@@ -67,7 +67,7 @@ var jsonpRequest = function(url, options, callback) {
 	callback = callback || 'branch_callback__' + (_jsonp_callback_index++);
 	options.onSuccess = options.onSuccess || function() {};
 	options.onTimeout = options.onTimeout || function() {};
-	options.data = (options.method == "POST") ? encodeURIComponent(utils.base64encode(JSON.stringify(options.data))) : "";
+	options.data = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(JSON.stringify(options.data))) : "";
 
 	var postDataString = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=';
 	var timeout = options.timeout || 10; // sec
@@ -155,7 +155,7 @@ api = function(resource, data, callback) {
 	// callback = utils.injectDequeue( callback || function() {} );
 
 	var u = getUrl(resource, data);
-	var url, postData = "";
+	var url, postData = '';
 	if (resource.method == 'GET') {
 		url = u.url + '?' + u.data;
 	}

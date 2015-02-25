@@ -15,13 +15,13 @@
 
 		scriptTag = doc.createElement(scriptStr);
 		scriptTag.async = 1;
-		scriptTag.src = "https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";
+		scriptTag.src = 'https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js';
 		firstScript = doc.getElementsByTagName(scriptStr)[0];
 		firstScript.parentNode.insertBefore(scriptTag, firstScript);
 
 		root[branchStr] = branchSdk;
 	}
-})(window, document, "script", 'branch', function(branch, name) {
+})(window, document, 'script', 'branch', function(branch, name) {
 	branch[name] = function() {
 		branch._q.push([ name, arguments ]);
 	};

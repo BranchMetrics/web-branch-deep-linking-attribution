@@ -60,8 +60,8 @@ var branch_id = /^[0-9]{15,20}$/;
 /** @type {resources.resource} */
 resources.open = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/open',
-	method:	 'POST',
+	endpoint: "/v1/open",
+	method:	 "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(false, branch_id),
@@ -72,8 +72,8 @@ resources.open = {
 };
 resources.profile = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/profile',
-	method:	 'POST',
+	endpoint: "/v1/profile",
+	method:	 "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(true, branch_id),
@@ -83,8 +83,8 @@ resources.profile = {
 /** @type {resources.resource} */
 resources.close = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/close',
-	method: 'POST',
+	endpoint: "/v1/close",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"session_id": validator(true, branch_id)
@@ -93,8 +93,8 @@ resources.close = {
 /** @type {resources.resource} */
 resources.logout = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/logout',
-	method: 'POST',
+	endpoint: "/v1/logout",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"session_id": validator(true, branch_id)
@@ -103,22 +103,22 @@ resources.logout = {
 /** @type {resources.resource} */
 resources.referrals = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/referrals',
-	method: 'GET',
+	endpoint: "/v1/referrals",
+	method: "GET",
 	queryPart: { "identity_id": validator(true, branch_id) }
 };
 /** @type {resources.resource} */
 resources.credits = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/credits',
-	method: 'GET',
+	endpoint: "/v1/credits",
+	method: "GET",
 	queryPart: { "identity_id": validator(true, branch_id) }
 };
 /** @type {resources.resource} */
 resources._r = {
 	destination: config.link_service_endpoint,
-	endpoint: '/_r',
-	method: 'GET',
+	endpoint: "/_r",
+	method: "GET",
 	jsonp: true,
 	params: {
 		"app_id": validator(true, branch_id)
@@ -127,8 +127,8 @@ resources._r = {
 /** @type {resources.resource} */
 resources.redeem =  {
 	destination: config.api_endpoint,
-	endpoint: '/v1/redeem',
-	method: 'POST',
+	endpoint: "/v1/redeem",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(true, branch_id),
@@ -139,9 +139,9 @@ resources.redeem =  {
 /** @type {resources.resource} */
 resources.link = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/url',
-	method: 'POST',
-	ref: 'obj',
+	endpoint: "/v1/url",
+	method: "POST",
+	ref: "obj",
 	params: {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(true, branch_id),
@@ -156,16 +156,16 @@ resources.link = {
 /** @type {resources.resource} */
 resources.linkClick = {
 	destination: config.link_service_endpoint,
-	endpoint: '',
-	method: 'GET',
+	endpoint: "",
+	method: "GET",
 	queryPart: { "link_url": validator(true, validationTypes.str) },
 	params: { "click": validator(true, validationTypes.str) }
 };
 /** @type {resources.resource} */
 resources.SMSLinkSend = {
 	destination: config.link_service_endpoint,
-	endpoint: '/c',
-	method: 'POST',
+	endpoint: "/c",
+	method: "POST",
 	queryPart: {
 		"link_url": validator(true, validationTypes.str)
 	},
@@ -177,8 +177,8 @@ resources.SMSLinkSend = {
 /** @type {resources.resource} */
 resources.event = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/event',
-	method: 'POST',
+	endpoint: "/v1/event",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"session_id": validator(true, branch_id),
