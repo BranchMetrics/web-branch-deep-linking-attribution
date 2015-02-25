@@ -5,6 +5,8 @@
 
 goog.provide('api');
 goog.require('utils');
+goog.require('goog.json.Processor');
+goog.require('goog.json.Serializer');
 
 var _jsonp_callback_index = 0;
 
@@ -67,7 +69,7 @@ var jsonpRequest = function(url, options, callback) {
 	callback = callback || 'branch_callback__' + (_jsonp_callback_index++);
 	options.onSuccess = options.onSuccess || function() {};
 	options.onTimeout = options.onTimeout || function() {};
-	options.data = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(JSON.stringify(options.data))) : "";
+	options.data = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(options.data))) : "";
 
 	var postDataString = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=';
 	var timeout = options.timeout || 10; // sec
@@ -121,7 +123,7 @@ var XHRRequest = function(url, data, method, callback) {
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
 			try {
-				callback(null, JSON.parse(req.responseText));
+				callback(null, goog.json.parse(req.responseText));
 			}
 			catch (e) {
 				callback(null, {});

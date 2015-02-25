@@ -1,3 +1,0 @@
-[submodule "json3"]
-	path = externs/json3
-	url = git@github.com:bestiejs/json3.git

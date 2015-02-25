@@ -3,6 +3,8 @@
  */
 
 goog.provide('utils');
+goog.require('goog.json.Processor');
+goog.require('goog.json.Serializer');
 
 /** @define {boolean} */
 var DEBUG = true;
@@ -51,7 +53,12 @@ utils.message = function(message, param) {
  * @returns {?utils.sessionData}
  */
 utils.readStore = function() {
-	return JSON.parse(sessionStorage.getItem('branch_session')) || {};
+	try {
+		return goog.json.parse(sessionStorage.getItem('branch_session'));
+	}
+	catch(e) {
+		{};
+	}
 };
 
 utils.whiteListSessionData = function(data) {
@@ -69,7 +76,7 @@ utils.whiteListSessionData = function(data) {
  * @param {utils.sessionData}
  */
 utils.store = function(data) {
-	sessionStorage.setItem('branch_session', JSON.stringify(data));
+	sessionStorage.setItem('branch_session', goog.json.serialize(data));
 };
 
 /**

@@ -8,6 +8,7 @@ goog.require('resources');
 goog.require('api');
 goog.require('banner');
 goog.require('Queue');
+goog.require('goog.json.Serializer');
 
 var default_branch;
 
@@ -349,7 +350,7 @@ Branch.prototype['link'] = function(obj, callback) {
 	if (obj['data']['$desktop_url'] !== undefined) {
 		obj['data']['$desktop_url'] = obj['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
-	obj['data'] = JSON.stringify(obj['data']);
+	obj['data'] = goog.json.serialize(obj['data']);
 	this._api(resources.link, obj, function(err, data) {
 		if (typeof callback == 'function') {
 			callback(err, data['url']);

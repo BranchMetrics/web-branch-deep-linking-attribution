@@ -1,8 +1,8 @@
 COMPILER=java -jar compiler/compiler.jar
 COMPILER_LIBRARY=compiler/library/closure-library-master/closure
-SOURCES=src/0_config.js src/0_utils.js src/0_queue.js src/1_banner.js src/1_api.js src/1_resources.js src/2_branch.js src/3_branch_instance.js src/4_umd.js
-EXTERN=src/extern.js externs/json3/lib/json3.js
-COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();"
+SOURCES=src/0_config.js src/0_utils.js src/0_queue.js src/1_banner.js src/1_api.js src/1_resources.js src/2_branch.js src/3_branch_instance.js src/4_umd.js $(COMPILER_LIBRARY)/goog/**
+EXTERN=src/extern.js
+COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --only_closure_dependencies --closure_entry_point umd
 
 .PHONY: clean
 
