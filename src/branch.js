@@ -42,15 +42,24 @@ var Branch = function Branch(app_id, debug, callback) {
 		return fin;
 	};
 	this.utils.hashValue = function(key) {
-		var v;
 		try {
-			v = location.hash.match(new RegExp(key + ':([^&]*)'))[1];
+			return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
 		}
 		catch (e) {
-			v = undefined;
+			return undefined;
 		}
-		return v;
 	};
+	this.utils.getParamValue = function(key) {
+		try {
+			return window.location.search.substring(1).match(new RegExp(key + '=([^&]*)'))[1];
+		}
+		catch (e) {
+			return undefined;
+		}
+	}
+	this.utils.urlValue = function(key) {
+		return this.getParamValue(key) || this.hashValue(key);
+	}
 	this.utils.queue = function(){
 		var self = this;
 		self.free = true;
@@ -625,7 +634,7 @@ var Branch = function Branch(app_id, debug, callback) {
 			version: '0.1'
 		},
 		linkUrl: 'https' + '://bnc.lt',
-		linkId: self.utils.hashValue('r'),
+		linkId: self.utils.urlValue('r'),
 		formap: branch_map.formap,
 		resources: branch_map.resources,
 		debugMsgs: branch_map.debugMessages
