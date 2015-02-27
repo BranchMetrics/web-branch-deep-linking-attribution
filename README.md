@@ -533,7 +533,7 @@ branch.banner({
     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
     showMobile: true,                  // Should the banner be shown on mobile devices?
-    showDesktop: true                  // Should the banner be shown on mobile devices?
+    showDesktop: true                  // Should the banner be shown on desktop devices?
 }, {
     phone: '9999999999',
     tags: ['tag1', 'tag2'],
