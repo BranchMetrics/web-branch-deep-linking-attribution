@@ -8,7 +8,7 @@ goog.require('resources');
 goog.require('api');
 goog.require('banner');
 goog.require('Queue');
-goog.require('goog.json.Serializer');
+goog.require('goog.json');
 
 var default_branch;
 
@@ -21,7 +21,7 @@ Branch = function() {
 		if (!default_branch) { default_branch = new Branch(); }
 		return default_branch;
 	}
-	this._queue = new Queue();
+	this._queue = Queue();
 	this.initialized = false;
 };
 

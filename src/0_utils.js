@@ -3,8 +3,7 @@
  */
 
 goog.provide('utils');
-goog.require('goog.json.Processor');
-goog.require('goog.json.Serializer');
+goog.require('goog.json');
 
 /** @define {boolean} */
 var DEBUG = true;

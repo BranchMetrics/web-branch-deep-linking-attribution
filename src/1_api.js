@@ -5,8 +5,7 @@
 
 goog.provide('api');
 goog.require('utils');
-goog.require('goog.json.Processor');
-goog.require('goog.json.Serializer');
+goog.require('goog.json');
 
 var _jsonp_callback_index = 0;
 
