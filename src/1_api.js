@@ -5,6 +5,7 @@
 
 goog.provide('api');
 goog.require('utils');
+/*jshint unused:false*/
 goog.require('goog.json');
 
 var _jsonp_callback_index = 0;
@@ -131,7 +132,7 @@ var XHRRequest = function(url, data, method, callback) {
 		else if (req.readyState === 4 && req.status === 402) {
 			callback(new Error('Not enough credits to redeem.'));
 		}
-		else if (req.readyState === 4 && req.status.substring(0, 1) != "4") {
+		else if (req.readyState === 4 && (req.status.toString().substring(0, 1) == "4" || req.status.toString().substring(0, 1) == "5")) {
 			callback(new Error('Error in API: ' + req.status));
 		}
 	};

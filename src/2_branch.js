@@ -8,6 +8,7 @@ goog.require('resources');
 goog.require('api');
 goog.require('banner');
 goog.require('Queue');
+/*jshint unused:false*/
 goog.require('goog.json');
 
 var default_branch;
@@ -691,7 +692,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *
  * ```js
  * branch.banner(
- *     options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, showMobile, showDesktop
+ *     options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, iframe, showMobile, showDesktop
  *     linkData // Data for link, same as Branch.link()
  * );
  * ```
@@ -705,6 +706,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     description: 'The Branch demo app!',
  *     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
  *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
+ *     iframe: true,                      // Show banner in an iframe if CSS on your page is conflicting
  *     showMobile: true,                  // Should the banner be shown on mobile devices?
  *     showDesktop: true                  // Should the banner be shown on mobile devices?
  * }, {
@@ -731,7 +733,8 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
 Branch.prototype['banner'] = function(options, linkData) {
 	options.showMobile = (options.showMobile === undefined) ? true : options.showMobile;
 	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
-	if (!document.getElementById('branch-banner') && !utils.readKeyValue('hideBanner')) {
+	options.iframe = (options.iframe === undefined) ? true : options.iframe;
+	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && !utils.readKeyValue('hideBanner')) {
 		banner.smartBannerMarkup(options);
 		banner.smartBannerStyles(options);
 		banner.appendSmartBannerActions(this, options, linkData);

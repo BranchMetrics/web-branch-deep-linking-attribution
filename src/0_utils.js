@@ -3,6 +3,7 @@
  */
 
 goog.provide('utils');
+/*jshint unused:false*/
 goog.require('goog.json');
 
 /** @define {boolean} */
@@ -55,9 +56,7 @@ utils.readStore = function() {
 	try {
 		return goog.json.parse(sessionStorage.getItem('branch_session'));
 	}
-	catch(e) {
-		{};
-	}
+	catch(e) { {} }
 };
 
 utils.whiteListSessionData = function(data) {
