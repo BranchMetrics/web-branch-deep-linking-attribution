@@ -146,8 +146,10 @@ var bannerResources = {
 		},
 		desktopAction:
 			'<div id="branch-sms-block">' +
-				'<input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999">' +
-				'<button id="branch-sms-send" class="branch-animation" >Send Link</button>' +
+				'<form id="sms-form">' +
+					'<input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999">' +
+					'<button type="submit" id="branch-sms-send" class="branch-animation" >Send Link</button>' +
+				'</form>' +
 			'</div>' +
 			'<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;">' +
 				'<div id="branch-spinner"></div>' +
@@ -385,12 +387,11 @@ banner.appendSmartBannerActions = function(branch, options, linkData) {
 		}
 
 		bannerResources.utils.branchDocument().getElementById('branch-banner-action').appendChild(action);
-		try {
-			bannerResources.utils.branchDocument().getElementById('branch-sms-send').addEventListener('click', function() {
-			    bannerResources.actions.sendSMS(branch, options, linkData);
-			});
-		}
-		catch (e) {}
+		var submitSMS = function(event) {
+			event.preventDefault();
+		    bannerResources.actions.sendSMS(branch, options, linkData);
+		};
+		bannerResources.utils.branchDocument().getElementById('sms-form').addEventListener('submit', submitSMS);
 		bannerResources.utils.branchDocument().getElementById('branch-banner-close').onclick = bannerResources.actions.close;
 	}
 };

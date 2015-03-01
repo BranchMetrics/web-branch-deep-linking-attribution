@@ -789,7 +789,7 @@ iframe_mobile:"#branch-banner-iframe { position: absolute; }\n"}, html:{banner:f
   var b = a.openAppButtonText || "View in app";
   a = a.downloadAppButtonText || "Download App";
   return'<a id="branch-mobile-action" href="#" target="_parent">' + (utils.hasApp() ? b : a) + "</a>";
-}, desktopAction:'<div id="branch-sms-block"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999"><button id="branch-sms-send" class="branch-animation" >Send Link</button></div><div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div>', appendiFrame:function(a) {
+}, desktopAction:'<div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999"><button type="submit" id="branch-sms-send" class="branch-animation" >Send Link</button></form></div><div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div>', appendiFrame:function(a) {
   var b = document.createElement("iframe");
   a = "<html><head></head><body>" + a.outerHTML + "</body></html>";
   b.src = "about:blank";
@@ -896,12 +896,10 @@ banner.appendSmartBannerActions = function(a, b, c) {
       bannerResources.utils.branchDocument().getElementById("branch-mobile-action").href = b;
     }), d.innerHTML = bannerResources.html.mobileAction(b)) : d.innerHTML = bannerResources.html.desktopAction;
     bannerResources.utils.branchDocument().getElementById("branch-banner-action").appendChild(d);
-    try {
-      bannerResources.utils.branchDocument().getElementById("branch-sms-send").addEventListener("click", function() {
-        bannerResources.actions.sendSMS(a, b, c);
-      });
-    } catch (e) {
-    }
+    bannerResources.utils.branchDocument().getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      bannerResources.actions.sendSMS(a, b, c);
+    });
     bannerResources.utils.branchDocument().getElementById("branch-banner-close").onclick = bannerResources.actions.close;
   }
 };
