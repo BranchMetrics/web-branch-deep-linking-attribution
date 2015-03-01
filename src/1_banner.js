@@ -78,12 +78,17 @@ var bannerResources = {
 		'#branch-sms-phone:focus, button:focus { outline: none; }\n' +
 		'#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n' +
 		'#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; position: absolute; margin-top: 3px; }\n' +
-		'#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n' +
-		'@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n' +
-		'@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n' +
 		'@keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n' +
 		'@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n' +
 		'#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n',
+
+		nonie:
+		'#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n' +
+		'@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n' +
+		'@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n',
+
+		ie:
+		'#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n',
 
 		mobile:
 		'#branch-banner { position: absolute; }\n' +
@@ -160,11 +165,19 @@ var bannerResources = {
 			bannerResources.utils.branchiFrame().contentWindow.document.write(iframeHTML);
 			bannerResources.utils.branchiFrame().contentWindow.document.close();
 		},
-		checkmark:
-			'<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5" enable-background="new 0 0 98.5 98.5" xml:space="preserve">' +
-				'<path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10" d="M81.7,17.8C73.5,9.3,62,4,49.2,4' +
-				'C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/>' +
-			'</svg>'
+		checkmark: function() {
+			if (window.ActiveXObject) {
+				return '<span class="checkmark">&#x2713;</span>';
+			}
+			else {
+				return '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5" enable-background="new 0 0 98.5 98.5" xml:space="preserve">' +
+						'<path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10" d="M81.7,17.8C73.5,9.3,62,4,49.2,4' +
+						'C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/>' +
+					'</svg>';
+			}
+			
+		}
+			
 	},
 
 	utils: {
@@ -220,7 +233,7 @@ var bannerResources = {
 				checkmark.className = 'branch-icon-wrapper';
 				checkmark.id = 'branch-checkmark';
 				checkmark.style = 'opacity: 0;';
-				checkmark.innerHTML = bannerResources.html.checkmark;
+				checkmark.innerHTML = bannerResources.html.checkmark();
 				sendButton.style.opacity = '0';
 				phone.style.opacity = '0';
 				branchLoader.style.opacity ='0';
@@ -323,6 +336,12 @@ banner.smartBannerStyles = function(options) {
 		}
 		else if (options.showDesktop) {
 			css.innerHTML += bannerResources.css.desktop;
+			if (window.ActiveXObject) {
+				css.innerHTML += bannerResources.css.ie;
+			}
+			else {
+				css.innerHTML += bannerResources.css.nonie;
+			}
 		}
 
 		if (options.iframe) {
