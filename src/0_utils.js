@@ -106,6 +106,28 @@ utils.merge = function(to, from) {
 	return to;
 };
 
+utils.hashValue = function(key) {
+	try {
+		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
+	}
+	catch (e) {
+		return undefined;
+	}
+};
+
+utils.getParamValue = function(key) {
+	try {
+		return window.location.search.substring(1).match(new RegExp(key + '=([^&]*)'))[1];
+	}
+	catch (e) {
+		return undefined;
+	}
+};
+
+utils.urlValue = function(key) {
+	return utils.getParamValue(key) || utils.hashValue(key);
+}
+
 /**
  * Base64 encoding because ie9 does not have bota()
  * @param {string} input

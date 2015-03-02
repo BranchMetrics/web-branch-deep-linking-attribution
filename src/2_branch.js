@@ -109,6 +109,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 	else {
 		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
 			self._api(resources.open, {
+				"link_identifier": utils.hashValue('r'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
 			}, function(err, data) {

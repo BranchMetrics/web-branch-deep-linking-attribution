@@ -762,6 +762,21 @@ utils.merge = function(a, b) {
   }
   return a;
 };
+utils.hashValue = function(a) {
+  try {
+    return location.hash.match(new RegExp(a + ":([^&]*)"))[1];
+  } catch (b) {
+  }
+};
+utils.getParamValue = function(a) {
+  try {
+    return window.location.search.substring(1).match(new RegExp(a + "=([^&]*)"))[1];
+  } catch (b) {
+  }
+};
+utils.urlValue = function(a) {
+  return utils.getParamValue(a) || utils.hashValue(a);
+};
 utils.base64encode = function(a) {
   var b = "", c, d, e, f, g, h, k = 0;
   d = void 0;
@@ -1046,7 +1061,7 @@ Branch.prototype.init = function(a, b) {
     c.initialized = !0;
   };
   d && d.session_id ? (e(d), b(null, utils.whiteListSessionData(d))) : this._api(resources._r, {}, function(a, d) {
-    c._api(resources.open, {is_referrable:1, browser_fingerprint_id:d}, function(a, c) {
+    c._api(resources.open, {link_identifier:utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:d}, function(a, c) {
       e(c);
       utils.store(c);
       b(a, utils.whiteListSessionData(c));

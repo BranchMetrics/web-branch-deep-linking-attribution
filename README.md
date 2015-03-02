@@ -6,7 +6,7 @@ Live demo: [http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html](http:
 
 ## Overview
 
-The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~4kB gzipped.
+The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~7K gzipped.
 
 To use the Web SDK, you'll need to first initialize it with your API key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
 
