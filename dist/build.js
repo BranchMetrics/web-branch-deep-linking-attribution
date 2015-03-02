@@ -1069,8 +1069,17 @@ Branch.prototype.init = function(a, b) {
   });
 };
 Branch.prototype.data = function(a) {
-  (a || function() {
-  })(null, utils.whiteListSessionData(utils.readStore()));
+  a = a || function() {
+  };
+  if (this.initialized) {
+    return a(utils.message(utils.messages.existingInit));
+  }
+  this._queue(function(b) {
+    return function() {
+      a(null, utils.whiteListSessionData(utils.readStore()));
+      b();
+    };
+  });
 };
 Branch.prototype.setIdentity = function(a, b) {
   b = b || function() {
@@ -1183,7 +1192,7 @@ Branch.prototype.credits = function(a) {
   a = a || function() {
   };
   if (!this.initialized) {
-    return this.nextQueue(), a(utils.message(utils.messages.nonInit));
+    return a(utils.message(utils.messages.nonInit));
   }
   this._api(resources.credits, {}, function(b, c) {
     a(b, c);
@@ -1193,7 +1202,7 @@ Branch.prototype.redeem = function(a, b, c) {
   c = c || function() {
   };
   if (!this.initialized) {
-    return this.nextQueue(), c(utils.message(utils.messages.nonInit));
+    return c(utils.message(utils.messages.nonInit));
   }
   this._api(resources.redeem, {amount:a, bucket:b}, function(a, b) {
     c(a, b);
