@@ -135,6 +135,7 @@ Branch.prototype['init'] = function(app_id, callback) {
  */
 Branch.prototype['data'] = function(callback) {
 	callback = callback || function() { };
+	callback(null, utils.whiteListSessionData(utils.readStore()));
 };
 
 /**

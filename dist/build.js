@@ -1069,6 +1069,8 @@ Branch.prototype.init = function(a, b) {
   });
 };
 Branch.prototype.data = function(a) {
+  (a || function() {
+  })(null, utils.whiteListSessionData(utils.readStore()));
 };
 Branch.prototype.setIdentity = function(a, b) {
   b = b || function() {
