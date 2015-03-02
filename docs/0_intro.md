@@ -31,7 +31,5 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 _Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
-# TODO: Update src of actual gziped js file
-
 ```html
 <script type="text/javascript">

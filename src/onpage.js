@@ -15,7 +15,7 @@
 
 		scriptTag = doc.createElement(scriptStr);
 		scriptTag.async = 1;
-		scriptTag.src = 'https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js';
+		scriptTag.src = 'https://cdn.branch.io/branch-1.0.0.min.js';
 		firstScript = doc.getElementsByTagName(scriptStr)[0];
 		firstScript.parentNode.insertBefore(scriptTag, firstScript);
 
