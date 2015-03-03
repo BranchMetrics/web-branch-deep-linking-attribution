@@ -1,580 +1,576 @@
 # Branch Metrics Web SDK
 
-This README will outline the functionality of the Branch Metrics Web SDK.
+This README outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a web app.
 
-Live demo: http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html
+Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
+
+## Overview
+
+The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~7K gzipped.
+
+To use the Web SDK, you'll need to first initialize it with your API key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
+
+Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
 
 ## Installation
 
 ### Requirements
 
-This SDK requires native browser Javascript and has been tested in all modern browsers with `sessionStorage` capability.  A more verbose list of supported browsers will be available soon.  No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript. 
+This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
 
-You will need to [create a Branch Metrics](https://dashboard.branch.io/?origin=web-sdk-docs) app to obtain your `app_id`.  
+### Browser Specific Support
+| Chrome | Firefox | Safari |     IE     |
+| ------ | ------- | ------ | ---------- |
+|    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
+
+### API Key
+
+You will need to create a [Branch Metrics app](http://branch.io) to obtain your app_key.
 
 ### Quick Install
 
-Place this code in the `</head>` statement in your HTML.  Be sure to replace `YOUR_APP_ID` with your Branch app ID.
+_Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
 ```html
 <script type="text/javascript">
-  (function() {
 
-    var config = {
-      app_id: 'YOUR_APP_ID',
-      debug: true,
-      init_callback: function(){
-        console.log('Branch SDK initialized!');
-      }
-    };
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-1.0.0.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
-    // Begin Branch SDK //
-      var Branch_Init=function(e){var t=this;t.app_id=e.app_id,t.debug=e.debug,t.init_callback=e.init_callback,t.queued=[],t.init=function(){for(var e=["close","logout","track","identify","createLink","showReferrals","showCredits","redeemCredits","appBanner"],n=0;n<e.length;n++)t[e[n]]=function(e){return function(){t.queued.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(e[n])},t.init();var n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(n),t._r=function(){if(void 0!==window.browser_fingerprint_id){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.2.x.min.js",document.getElementsByTagName("head")[0].appendChild(e)}else window.setTimeout(function(){t._r()},100)},t._r()};window.branch=new Branch_Init(config);
-    // End Branch SDK //
+branch.init('APP-KEY', function(err, data) {
+    // callback to handle err or data
+});
 
-  })();
 </script>
 ```
-
 ## API Reference
 
-**[Constructor](#constructor)**  
-**[Queued Methods](#queued-methods)**  
-**[Session Methods](#session-methods)**  
-   - **[.init()](#init)**  
-   - **[.identify()](#identify)**  
-   - **[.close()](#close)**  
-   - **[.logout()](#logout)**  
+1. Branch Session
+  + [.init()](#initapp_id-callback)
+  + [.setIdentity()](#setidentityidentity-callback)
+  + [.logout()](#logoutcallback)
 
-**[Event / Action Methods](#event--action-methods)**  
-   - **[.track()](#track)**  
+1. Event Tracking Methods
+  + [.track()](#trackevent-metadata-callback)
 
-**[Deeplinking Methods](#deeplinking-methods)**  
-   - **[.createLink()](#createlink)**  
-   - **[.SMSLink()](#smslink)**  
-   - **[.createLinkClick()](#createlinkclick)** 
+1. Deeplinking Methods
+   + [.link()](#linkmetadata-callback)
+   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
 
-**[Smart Banners](#smart-banners)**  
-   - **[.appBanner()](#appbanner)**  
+1. Referral Methods
+   + [.referrals()](#referralscallback)
+   + [.credits()](#creditscallback)
+   + [.redeem()](#redeemamount-bucket-callback)
 
-**[Referral Methods](#referral-methods)**  
-   - **[.showReferrals()](#showreferrals)**  
-   - **[.showCredits()](#showcredits)**  
-   - **[.redeemCredits()](#redeemcredits)**  
+1. Smart Banner
+   + [.banner()](#banneroptions-linkdata)
 
-**[Bugs / Help / Support](#bugs--help--support)**
+___
 
-### Constructor
+# Global
 
-Loading the Branch SDK into your app will automatically instantiate the SDK class under the variable 
-`branch` that is immediately available in the DOM.  Instantiation also calls `.init()` to properly 
-setup your SDK environment.
 
-### Queued Methods
 
-This SDK allows queued method calls before the SDK has called `.init()`. This allows you to call methods 
-before the SDK is ready for real-time calls.  Any method called before the SDK is ready will be queued 
-in the DOM and executed thereafter in order of execution.
 
-### Session Methods
 
-These are the core methods of the SDK.  These are only accessible if the `Branch()` construct is 
-initilized properly.
+* * *
 
-#### .init()
+### init(app_id, callback) 
 
-This initilizes the Branch SDK and creates a new user session if `branch_session` does not exist in 
-`sessionStorage`.  If there is a valid session in `sessionStorage`, this will be used in place.
+**Parameters**
 
-##### Usage
+**app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
 
-```
-Branch.init(
-  callback (function, optional)
-)
-```
+**callback**: `function | null`, _optional_ - callback to read the session data.
 
-##### Example
+Adding the Branch script to your page automatically creates a window.branch
+object with all the external methods described below. All calls made to
+Branch methods are stored in a queue, so even if the SDK is not fully
+instantiated, calls made to it will be queued in the order they were
+originally called.
 
-```javascript
-branch.init(function(data){
-  console.log(data)
-});
-```
+The init function on the Branch object initiates the Branch session and
+creates a new user session, if it doesn't already exist, in
+`sessionStorage`.
 
-##### Returns
-
-```js
-{
-  session_id:         '12345', // Server-generated ID of the session. Store this locally.
-  identity_id:        '12345', // Server-generated ID of the user identity. Store this locally.
-  device_fingerprint: 'abcde', // Server-generated ID of the device fingerprint. Store this locally
-  data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
-  link:               'url',   // Server-generated link, for synchronous link creation.
-  referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with a developer identity, that identity is here.
-}
-```
-
-**Note:** `Branch.init` is called every time the constructor is loaded.  This is to properly set the session 
-environment, allowing controlled access to the other SDK methods.
-
-#### .identify()
-
-Set profile data.
+**Useful Tip**: The init function returns a data object where you can read
+the link the user was referred by.
 
 ##### Usage
-
-```
-Branch.identify(
-  (JSON object, required) {
-    identity (string, required), // Identity of the loaded user.  Normally used to pass service username or email address.
-  }, 
-  callback (function, optional)
-)
-```
-
-##### Example
-
 ```js
-branch.identify({
-  identity: 'username'
-}, function(data){
-  console.log(data)
-});
+branch.init(
+    app_id,
+    callback (err, data)
+);
 ```
 
-##### Returns 
-
+##### Callback Format
 ```js
-{
-  identity_id:        '12345', // Server-generated ID of the user identity. Store this locally.
-  link:               'url',   // New link to use (replaces old stored link).
-  referring_data:     {},      // Returns the initial referring data for this identity, if exists.
-  referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
-}
+callback(
+     "Error message",
+     {
+          data:               { },      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+          referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+          has_app:            true,    // Does the user have the app installed already?
+          identity:       'BranchUser' // Unique string that identifies the user
+     }
+);
 ```
 
-#### .close()
+**Note:** `Branch.init` must be called prior to calling any other Branch functions.
+___
 
-This closes the active session, removing any relevant session Create your accountrmation stored in `sessionStorage`.
+
+
+### data(callback) 
+
+**Parameters**
+
+**callback**: `function | null`, _optional_ - callback to read the session data.
+
+Returns the same session information and any referring data, as
+`Branch.init`, but does not require the `app_id`. This is meant to be called
+after `Branch.init` has been called if you need the session information at a
+later point.
+If the Branch session has already been initialized, the callback will return
+immediately, otherwise, it will return once Branch has been initialized.
+___
+
+
+
+### setIdentity(identity, callback) 
+
+**Parameters**
+
+**identity**: `string`, _required_ - a string uniquely identifying the user – often a user ID or email address.
+
+**callback**: `function | null`, _optional_ - callback that returns the user's Branch identity id and unique link.
+
+**[Formerly `identify()`](CHANGELOG.md)**
+
+Sets the identity of a user and returns the data. To use this function, pass
+a unique string that identifies the user - this could be an email address,
+UUID, Facebook ID, etc.
 
 ##### Usage
-
-```
-Branch.close(
-  callback (function, optional)
-)
-```
-
-##### Example
-
 ```js
-branch.close(function(data){
-  console.log(data)
-});
+branch.setIdentity(
+    identity,
+    callback (err, data)
+);
 ```
 
-##### Returns 
-
+##### Callback Format
+```js
+callback(
+     "Error message",
+     {
+          identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+          link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+          referring_data:     { },      // Returns the initial referring data for this identity, if exists.
+          referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+     }
+);
 ```
-{}
-```
+___
 
-#### .logout()
+
+
+### logout(callback) 
+
+**Parameters**
+
+**callback**: `function | null`, _optional_
 
 Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
-
-```
-Branch.logout(
-  callback (function, optional)
-)
-```
-
-##### Example
-
 ```js
-branch.logout(function(data){
-  console.log(data)
+branch.logout(
+    callback (err)
+);
+```
+
+##### Callback Format
+```js
+callback(
+     "Error message"
+);
+```
+___
+
+## Tracking events
+
+
+
+### track(event, metadata, callback) 
+
+**Parameters**
+
+**event**: `String`, _required_ - name of the event to be tracked.
+
+**metadata**: `Object | null`, _optional_ - object of event metadata.
+
+**callback**: `function | null`, _optional_
+
+This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
+The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
+
+##### Usage
+```js
+branch.event(
+    event,
+    metadata,
+    callback (err)
+);
+```
+
+##### Callback Format
+```js
+callback("Error message");
+```
+___
+
+# Deeplinking Methods
+
+## Creating a deep linking link
+
+
+
+### link(linkData, callback) 
+
+**Parameters**
+
+**linkData**: `Object`, _required_ - link data and metadata.
+
+**callback**: `function | null`, _optional_ - returns a string of the Branch deep linking URL.
+
+**[Formerly `createLink()`](CHANGELOG.md)**
+
+Creates and returns a deep linking URL.  The `data` parameter can include an
+object with optional data you would like to store, including Facebook
+[Open Graph data](https://developers.facebook.com/docs/opengraph).
+
+#### Usage
+```
+branch.link(
+    metadata,
+    callback (err, data)
+);
+```
+
+#### Example
+```js
+branch.link({
+    tags: [ 'tag1', 'tag2' ],
+    channel: 'facebook',
+    feature: 'dashboard',
+    stage: 'new user',
+    type: 1,
+    data: {
+        mydata: 'something',
+        foo: 'bar',
+        '$desktop_url': 'http://myappwebsite.com',
+        '$ios_url': 'http://myappwebsite.com/ios',
+        '$ipad_url': 'http://myappwebsite.com/ipad',
+        '$android_url': 'http://myappwebsite.com/android',
+        '$og_app_id': '12345',
+        '$og_title': 'My App',
+        '$og_description': 'My app\'s description.',
+        '$og_image_url': 'http://myappwebsite.com/image.png'
+    }
+}, function(err, data) {
+    console.log(err, data);
 });
 ```
 
-##### Returns 
-
+##### Callback Format
 ```js
-{
-  session_id:  '12345', // Server-generated ID of the session. Store this locally.
-  identity_id: '12345', // Server-generated ID of the user identity. Store this locally.
-  link:        'url',   // Server-generated link, for synchronous link creation.
-}
+callback(
+    "Error message",
+    'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+);
 ```
+___
 
-### Event / Action Methods
+## Sharing links via SMS
 
-#### .track()
 
-Track any event with supporting metadata.  Events are used to create funnels.
 
-The `metadata` parameter is a formatted JSON object that can contain any data, and has limitless hierarchy. 
+### sendSMS(phone, linkData, options, callback) 
 
-##### Usage
+**Parameters**
 
-```
-Branch.track(
-  event (string, required),         // The event name; i.e. 'Loaded a page'
-  metadata (JSON object, optional), // Additional information attached to the event in JSON format.
-  callback (function, optional)
-)
+**phone**: `String`, _required_ - phone number to send SMS to
+
+**linkData**: `Object`, _required_ - object of link data
+
+**options**: `Object | null`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+
+**callback**: `function | null`, _optional_ - Returns an error if unsuccessful
+
+**[Formerly `SMSLink()`](CHANGELOG.md)**
+
+A robust function to give your users the ability to share links via SMS. If
+the user navigated to this page via a Branch link, `sendSMS` will send that
+same link. Otherwise, it will create a new link with the data provided in
+the `metadata` argument. `sendSMS` also  registers a click event with the
+`channel` pre-filled with `'sms'` before sending an sms to the provided
+`phone` parameter. This way the entire link click event is recorded starting
+with the user sending an sms. **Supports international SMS**.
+
+#### Usage
+```js
+branch.sendSMS(
+    phone,
+    linkData,
+    options,
+    callback (err, data)
+);
 ```
 
 ##### Example
-
 ```js
-branch.track('Loaded a page', {page: 'Homepage'}, function(data){
-  console.log(data)
-});
-```
-
-##### Returns 
-
-```js
-{}
-```
-
-### Deeplinking Methods
-
-#### .createLink()
-
-Create a deep linking URL.  The `data` parameter can include Facebook Open Graph data.  To read more about 
-Open Graph, visit https://developers.facebook.com/docs/opengraph.
-
-##### Usage
-
-```
-Branch.createLink(
-  (JSON Object, required) {
-    tags (JSON array, optional),           // An array of tags for splitting out data in the dashboard.
-    channel (string, optional),            // A string to indicate the external channel (text_message, mail, facebook, etc).
-    feature (string, optional),            // The string for a particular feature (invite, referral).
-    stage (string, optional),              // A string representing the progress of the user.
-    type (int, optional),                  // Use 1 for one time use links, 0 for persistent.
-    data (JSON object, optional) {         // This parameter takes any JSON object and attaches it to the link created.  Reserved
-                                           // parameters are denoted with '$'.
-      '$desktop_url' (url, optional),      // Custom redirect URL for desktop link clicks.
-      '$ios_url' (url, optional)           // Custom redirect URL for iOS device clicks.
-      '$ipad_url' (url, optional)          // Custom redirect URL for iPad clicks.  Overrides $ios_url on iPads.
-      '$android_url' (url, optional)       // Custom redirect URL for Android device clicks.
-      '$og_app_id' (string, optional)      // Facebook app ID for Open Graph data.
-      '$og_title', (string, optional)      // Open Graph page title.
-      '$og_description' (string, optional) // Open Graph page description.
-      '$og_image_url' (url, optional)      // Open graph page image/icon URL.
+branch.sendSMS(
+    phone: '9999999999',
+    {
+        tags: ['tag1', 'tag2'],
+        channel: 'facebook',
+        feature: 'dashboard',
+        stage: 'new user',
+        type: 1,
+        data: {
+            mydata: 'something',
+            foo: 'bar',
+            '$desktop_url': 'http://myappwebsite.com',
+            '$ios_url': 'http://myappwebsite.com/ios',
+            '$ipad_url': 'http://myappwebsite.com/ipad',
+            '$android_url': 'http://myappwebsite.com/android',
+            '$og_app_id': '12345',
+            '$og_title': 'My App',
+            '$og_description': 'My app\'s description.',
+            '$og_image_url': 'http://myappwebsite.com/image.png'
+        }
     },
-    callback (function, optional)
-  }
-)
-```
-
-##### Example
-
-```js
-branch.createLink({
-  tags: ['tag1', 'tag2'],
-  channel: 'facebook',
-  feature: 'dashboard',
-  stage: 'new user',
-  type: 1,
-  data: {
-    mydata: {
-      foo: 'bar'
-    },
-    '$desktop_url': 'http://myappwebsite.com',
-    '$ios_url': 'http://myappwebsite.com/ios',
-    '$ipad_url': 'http://myappwebsite.com/ipad',
-    '$android_url': 'http://myappwebsite.com/android',
-    '$og_app_id': '12345',
-    '$og_title': 'My App',
-    '$og_description': 'My app\'s description.',
-    '$og_image_url': 'http://myappwebsite.com/image.png'
-  }
-}, function(data){
-  console.log(data)
+    { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
+    function(err) { console.log(err); }
 });
 ```
 
-##### Returns
-
+##### Callback Format
+```js
+callback("Error message");
 ```
-{}
-```
+___
 
-#### .SMSLink()
+# Referral system rewarding functionality
+In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
+1. Reward the original user for taking action (eg. inviting, purchasing, etc)
+2. Reward the invitee for installing the app from the original user's referral link
+3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
 
-Calls `branch.CreateLink()` with a pre-filled `channel` parameter set to `sms` and sends an SMS message with a link to the provided `phone` parameter.  International SMS supported.
+These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
+
+Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+
+## Retrieve referrals list
+
+
+
+### referrals(callback) 
+
+**Parameters**
+
+**callback**: `function`, _required_ - returns an object with referral data.
+
+**[Formerly `showReferrals()`](CHANGELOG.md)**
+
+Retrieves a complete summary of the referrals the current user has made.
 
 ##### Usage
-
-```
-Branch.SMSLink(
-  (JSON Object, required) {
-    phone (long int, required)             // The phone number to send the SMS.
-    tags (JSON array, optional),           // An array of tags for splitting out data in the dashboard.
-    feature (string, optional),            // The string for a particular feature (invite, referral).
-    stage (string, optional),              // A string representing the progress of the user.
-    type (int, optional),                  // Use 1 for one time use links, 0 for persistent.
-    data (JSON object, optional) {         // This parameter takes any JSON object and attaches it to the link created.  Reserved
-                                           // parameters are denoted with '$'.
-      '$desktop_url' (url, optional),      // Custom redirect URL for desktop link clicks.
-      '$ios_url' (url, optional)           // Custom redirect URL for iOS device clicks.
-      '$ipad_url' (url, optional)          // Custom redirect URL for iPad clicks.  Overrides $ios_url on iPads.
-      '$android_url' (url, optional)       // Custom redirect URL for Android device clicks.
-      '$og_app_id' (string, optional)      // Facebook app ID for Open Graph data.
-      '$og_title', (string, optional)      // Open Graph page title.
-      '$og_description' (string, optional) // Open Graph page description.
-      '$og_image_url' (url, optional)      // Open graph page image/icon URL.
-    },
-    callback (function, optional)
-  }
-)
-```
-
-##### Example
-
 ```js
-branch.SMSLink({
-  phone: 1234567890,
-  tags: ['tag1', 'tag2'],
-  feature: 'dashboard',
-  stage: 'new user',
-  type: 1,
-  data: {
-    mydata: {
-      foo: 'bar'
-    },
-    '$desktop_url': 'http://myappwebsite.com',
-    '$ios_url': 'http://myappwebsite.com/ios',
-    '$ipad_url': 'http://myappwebsite.com/ipad',
-    '$android_url': 'http://myappwebsite.com/android',
-    '$og_app_id': '12345',
-    '$og_title': 'My App',
-    '$og_description': 'My app\'s description.',
-    '$og_image_url': 'http://myappwebsite.com/image.png'
-  }
-}, function(data){
-  console.log(data)
-});
+branch.referrals(
+    callback (err, data)
+);
 ```
 
-##### Returns
-
+##### Callback Format
+```js
+callback(
+    "Error message",
+    {
+        'install': {
+             total: 5,
+             unique: 2
+        },
+        'open': {
+             total: 4,
+             unique: 3
+        },
+        'buy': {
+            total: 7,
+            unique: 3
+        }
+    }
+);
 ```
-{}
-```
 
-#### .sendSMSLink()
+## Credit history
 
-Not to be confused with `Branch.SMSLink()`.  This method sends a request to a pre-configured link for sending SMS
-links.  You can call this if you already have a link configured, i.e. `http://bnc.lt/c/randomStringId`.  It is 
-recommended you use the `Branch.SMSLink()` method as it is designed to handle this workflow. International SMS supported.
+
+
+### credits(callback) 
+
+**Parameters**
+
+**callback**: `function`, _required_ - returns an object with credit data.
+
+**[Formerly `showCredits()`](CHANGELOG.md)**
+
+This call will retrieve the entire history of credits and redemptions from the individual user.
 
 ##### Usage
-
+```js
+branch.credits(
+    callback (err, data)
+);
 ```
-Branch.sendSMSLink(
-  phone (string, required),
-  link_url (string, required),
-  callback (function, optional)
-)
+
+##### Callback Format
+```js
+callback(
+    "Error message",
+    {
+        'default': 15,
+        'other bucket': 9
+    }
+);
+```
+
+## Credit redemption
+
+
+
+### redeem(amount, bucket, callback) 
+
+**Parameters**
+
+**amount**: `Int`, _required_ - an `amount` (int) of number of credits to redeem
+
+**bucket**: `String`, _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
+
+**callback**: `function | null`, _optional_ - returns an error if unsuccessful
+
+**[Formerly `redeemCredits()`](CHANGELOG.md)**
+
+Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
+
+```js
+branch.redeem(
+    amount, // amount of credits to be redeemed
+    bucket,  // String of bucket name to redeem credits from
+    callback (err)
+);
 ```
 
 ##### Example
 
 ```js
-branch.sendSMSLink('http://bnc.lt/c/randomStringId', function(data){
-  console.log(data)
-});
+branch.redeem(
+    5,
+    "Rubies",
+    function(data) {
+        console.log(data);
+    }
+);
 ```
 
-##### Returns
-
+##### Callback Format
+```js
+callback("Error message");
 ```
-{
-  message: 'Text message sent.'
-}
-```
+___
 
-#### .createLinkClick()
+# Smart App Sharing Banner
 
-Perform an anonymous click to a generated URL.  Used primarily to create a link click ID to be used for other SDK
-methods.  Clicks will not be attributed to a platfom, device or browser fingerprint.
+The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
+Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
+**Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
 
-##### Usage
 
-```
-Branch.createLinkClick (
-  url (string, required),
-  callback (function, optional)
-)
+
+### banner(options, linkData) 
+
+**Parameters**
+
+**options**: `Object`, _required_ - object of all the options to setup the banner
+
+**linkData**: `Object`, _required_ - object of all link data, same as Branch.link()
+
+**[Formerly `appBanner()`](CHANGELOG.md)**
+
+Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
+
+| iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
+|------------------|----------------------|----------------------|
+| ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
+
+#### Usage
+
+```js
+branch.banner(
+    options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, iframe, showMobile, showDesktop
+    linkData // Data for link, same as Branch.link()
+);
 ```
 
 ##### Example
 
 ```js
-branch.createLinkClick('http://bnc.lt/l/randomString', function(click_id){
-  console.log(click_id)
+branch.banner({
+    icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+    title: 'Branch Demo App',
+    description: 'The Branch demo app!',
+    openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
+    downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
+    iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
+    showMobile: true,                  // Should the banner be shown on mobile devices?
+    showDesktop: true                  // Should the banner be shown on mobile devices?
+}, {
+    phone: '9999999999',
+    tags: ['tag1', 'tag2'],
+    feature: 'dashboard',
+    stage: 'new user',
+    type: 1,
+    data: {
+        mydata: 'something',
+        foo: 'bar',
+        '$desktop_url': 'http://myappwebsite.com',
+        '$ios_url': 'http://myappwebsite.com/ios',
+        '$ipad_url': 'http://myappwebsite.com/ipad',
+        '$android_url': 'http://myappwebsite.com/android',
+        '$og_app_id': '12345',
+        '$og_title': 'My App',
+        '$og_description': 'My app\'s description.',
+        '$og_image_url': 'http://myappwebsite.com/image.png'
+    }
 });
 ```
 
-##### Returns
 
-```
-randomStringId
-```
 
-### Smart Banners
 
-Generate on mobile and desktop browsers to direct to app installs through deeplinking.
+* * *
 
-#### .appBanner()
 
-Display a smart banner directing a user to your app through a Branch referral link.  The `data` param is the exact same as in `Branch.createLink()`.
 
-##### Usage
 
-```
-Branch.appBanner(
-  (JSON object, required) {
-    icon (string, recommended),       // URL path to your app's icon.  Recommended size is 50px by 50px with no border or whitespace.
-    title (string, recommended)       // The title or name of your app.
-    description (string, recommended) // The description of your app.
-    data (JSON object, optional)      // Verbatim data used in Branch.createLink().  This data is passed with your clicked links.
-  }
-)
-```
 
-##### Example
 
-```js
-branch.appBanner({
-  icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-  title: 'My App',
-  description: 'This is my app!',
-  data: {
-    foo: 'bar'
-  }
-});
-```
 
-##### Returns
 
-```
-Nothing
-```
 
-### Referral Methods
-
-#### .showReferrals()
-
-Retrieve list of referral for the current user.
-
-##### Usage
-
-```
-Branch.showReferrals(
-  callback (function, optional)
-)
-```
-
-##### Example
-
-```js
-branch.showReferrals(function(data){
-  console.log(data)
-});
-```
-
-##### Returns
-
-```js
-{
-  'install': { 
-    total: 5, 
-    unique: 2
-  },
-  'open': {
-    total: 4, 
-    unique: 3
-  },
-  'buy': {
-    total: 7,
-    unique: 3
-  }
-}
-```
-
-#### .showCredits()
-
-Retrieve a list of credits for the current user.
-
-##### Usage
-
-```
-Branch.showCredits(
-  callback (function, optional)
-)
-```
-
-##### Example
-
-```js
-branch.showCredits(function(data){
-  console.log(data)
-});
-```
-
-##### Returns
-
-```js
-{
-  'default': 15,
-  'other bucket': 4
-}
-```
-
-#### .redeemCredits()
-
-Redeem credits from a credit bucket.
-
-##### Usage
-
-```
-Branch.redeemCredits(
-  (JSON object, required) {
-    amount (int, required),
-    bucket (string, required)
-  },
-  callback (function, optional)
-)
-```
-
-##### Example
-
-```js
-branch.redeemCredits({
-  5,
-  'bucket'
-}, function(data){
-  console.log(data)
-});
-```
-
-##### Returns
-
-```js
-{}
-```
 
 ## Bugs / Help / Support
 
 Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs 
-please send to dmitri@branch.io.
+please send to [dmitri@branch.io](mailto:dmitri@branch.io).

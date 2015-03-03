@@ -1,0 +1,25 @@
+{
+	"name": "BranchWebSDK",
+	"version": "1.0.0",
+	"main": "dist/build.min.js",
+	"ignore": [
+		"compiler",
+		"docs",
+		"externs",
+		"node_modules",
+		"tests",
+		".jscsrc",
+		".jshintignore",
+		".jshintrc",
+		"CHANGELOG.md",
+		"LICENSE",
+		"Makefile",
+		"README.md",
+		"bower.json",
+		"example.html",
+		"gulpfile.js",
+		"package.json",
+		"transform.js",
+		".gitignore"
+	]
+}

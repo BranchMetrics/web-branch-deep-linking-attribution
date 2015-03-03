@@ -2,26 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Branch Metrics Web SDK Exaple App</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-  <script type="text/javascript">
-    (function() {
-
-      var config = {
-        app_id: '5680621892404085',
-        debug: true,
-        init_callback: function(){
-          $('.info').text(JSON.stringify(branch.utils.readSession()));
-        }
-      };
-
-      // Begin Branch SDK //
-      var Branch_Init=function(e){var t=this;t.app_id=e.app_id,t.debug=e.debug,t.init_callback=e.init_callback,t.queued=[],t.init=function(){for(var e=["close","logout","track","identify","createLink","showReferrals","showCredits","redeemCredits","appBanner"],n=0;n<e.length;n++)t[e[n]]=function(e){return function(){t.queued.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(e[n])},t.init();var n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://bnc.lt/_r",document.getElementsByTagName("head")[0].appendChild(n),t._r=function(){if(void 0!==window.browser_fingerprint_id){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://192.168.1.99:8000/dist/branch-0.2.x.min.js",document.getElementsByTagName("head")[0].appendChild(e)}else window.setTimeout(function(){t._r()},100)},t._r()};window.branch=new Branch_Init(config);
-      // End Branch SDK //
-
-    })();
-  </script>
+  <title>Branch Metrics Web SDK Example App</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <style type="text/css">
     .btn {
@@ -33,8 +14,8 @@
       margin-top: 5px;
       vertical-align: middle;
     }
-    .group {
-      display: inline-block;
+    .row {
+      margin-bottom: 30px;
     }
   </style>
 </head>
@@ -58,147 +39,190 @@
     <section>
       <div class="row col-lg-8 col-lg-offset-2">
         <h3>Methods</h3>
+        <hr>
+        <h4>Session and Identity</h4>
+        <div class="group">
+          <button id="init" class="btn btn-success">.init()</button>
+          <!-- <button id="close" class="btn btn-danger">.close()</button> -->
+          <button id="data" class="btn btn-info">.data()</button>
+          <button id="setIdentity" class="btn btn-info">.setIdentity()</button>
+          <button id="logout" class="btn btn-info">.logout()</button>
+        </div>
       </div>
       <div class="row col-lg-8 col-lg-offset-2">
-        <button id="init" class="btn btn-success">.init()</button>
-        <button id="close" class="btn btn-danger">.close()</button>
-        <button id="identify" class="btn btn-info">.identify()</button>
-        <button id="logout" class="btn btn-info">.logout()</button>
-        <button id="track" class="btn btn-info">.track()</button>
-        <button id="createLink" class="btn btn-info">.createLink()</button>
+        <h4>Sharing and Tracking</h4>
+        <div class="group">
+          <button id="track" class="btn btn-info">.track()</button>
+          <button id="link" class="btn btn-info">.link()</button>
+          <button id="banner" class="btn btn-info">.banner()</button>
+        </div>
+      </div>
+      <div class="row col-lg-8 col-lg-offset-2">
+      <h4>SMS</h4>
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
-          <button id="SMSLink" class="btn btn-info">.SMSLink()</button>
+          <button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, {})</button>
+          <button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, {make_new_link: true})</button>
         </div>
-        <button id="showReferrals" class="btn btn-info">.showReferrals()</button>
-        <button id="showCredits" class="btn btn-info">.showCredits()</button>
-        <button id="redeemCredits" class="btn btn-info">.redeemCredits()</button>
-        <button id="appBanner" class="btn btn-info">.appBanner()</button>
+      </div>
+      <div class="row col-lg-8 col-lg-offset-2">
+        <h4>Referral</h4>
+        <div class="group">
+          <button id="referrals" class="btn btn-info">.referrals()</button>
+          <button id="credits" class="btn btn-info">.credits()</button>
+          <button id="redeem" class="btn btn-info">.redeem()</button>
+        </div>
       </div>
     </section>
   </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
-    var info     = $('.info');
-    var request  = $('.request');
+
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+
+  branch.init('5680621892404085', function(err, data) {
+    document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+  });
+  
+  </script>
+  <script type="text/javascript">
+    var info = $('.info');
+    var request = $('.request');
     var response = $('.response');
-    $('#init').click(function(){
-      request.html('branch.init();');
-      branch.init(function(data){
-        response.html(JSON.stringify(data));
-        info.html(JSON.stringify(branch.utils.readSession()));
-      });
-    });
-    $('#identify').click(function(){
-      request.html('branch.identify({identity: \'Branch\'});');
-      branch.identify({
-        identity: 'Branch'
-      }, function(data){
-        response.html(JSON.stringify(data));
-        info.html(JSON.stringify(branch.utils.readSession()));
-      });
-    });
-    $('#logout').click(function(){
-      request.html('branch.logout();');
-      branch.logout(function(data){
-        response.html(JSON.stringify(data));
-        info.html(JSON.stringify(branch.utils.readSession()));
-      });
-    });
-    $('#close').click(function(){
-      alert('You will need to call .init() reinitialize the Branch SDK.');
-      request.html('branch.close();');
-      branch.close(function(data){
-        response.html(JSON.stringify(data));
-        info.html(JSON.stringify(branch.utils.readSession()));
-      });
-    });
-    $('#track').click(function(){
-      request.html('branch.track(\'Tracked this click\');');
-      branch.track('Tracked this click', function(data){
-        response.html(JSON.stringify(data));
-      });
-    });
-    $('#createLink').click(function(){
-      request.html("branch.createLink({tags: ['tag1', 'tag2'],channel: 'sample app',feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html','$og_title': 'Branch Metrics','$og_description': 'Branch Metrics','$og_image_url': 'http://branch.io/img/logo_icon_white.png'}});");
-      branch.createLink({
+
+    var sampleParams = {
         tags: ['tag1', 'tag2'],
         channel: 'sample app',
         feature: 'create link',
         stage: 'created link',
         type: 1,
         data: {  
-          mydata: {
-            foo: 'bar'
-          },
-          '$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html',
+          mydata: 'bar',
+          '$desktop_url': 'https://cdn.branch.io/example.html',
           '$og_title': 'Branch Metrics',
           '$og_description': 'Branch Metrics',
           '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
         }
-      }, function(link){
+      };
+
+      var phoneNumber = function() {
+        var phoneNumberID = $('#SMSNumber');
+        if(phoneNumberID.val() == ''){
+          phoneNumberID.parent().addClass('has-error');
+          return false;
+        }else{
+          phoneNumberID.parent().removeClass('has-error');
+        }
+        return phoneNumberID.val();
+      }
+
+    $('#init').click(function(){
+      request.html('branch.init();');
+      branch.init('5680621892404085', function(err, data) {
+        info.innerHTML = JSON.stringify(data);
+      });
+    });
+
+    $('#data').click(function(){
+      request.html("branch.data();");
+      branch.data(function(err, data) {
+        response.html(JSON.stringify(data));
+      });
+    });
+
+    $('#setIdentity').click(function(){
+      request.html("branch.setIdentity('Branch');");
+      branch.setIdentity('Branch', function(err, data){
+        response.html(JSON.stringify(data));
+      });
+    });
+
+    $('#logout').click(function(){
+      request.html('branch.logout();');
+      branch.logout(function(err, data){
+        response.html(JSON.stringify(data));
+      });
+    });
+    /*
+    $('#close').click(function(){
+      alert('You will need to call .init() reinitialize the Branch SDK.');
+      request.html('branch.close();');
+      branch.close(function(err, data){
+        response.html(JSON.stringify(data));
+      });
+    });
+  */
+    $('#track').click(function(){
+      request.html('branch.track(\'Tracked this event\');');
+      branch.track('Tracked this event', function(err, data){
+        response.html(JSON.stringify(data || 'undefined'));
+      });
+    });
+
+    $('#link').click(function(){
+      request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
+      branch.link(sampleParams, function(err, link){
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
-    $('#SMSLink').click(function(){
-      var phone_number = $('#SMSNumber');
-      if(phone_number.val() == ''){
-        phone_number.parent().addClass('has-error');
-        return false;
-      }else{
-        phone_number.parent().removeClass('has-error');
-      }
-      request.html("branch.SMSLink({phone: " + phone_number.val() + ",tags: ['tag1', 'tag2'],feature: 'create link',stage: 'created link',type: 1,data: {mydata: {foo: 'bar'},'$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html'}});");
-      branch.SMSLink({
-        phone: phone_number.val(),
-        tags: ['tag1', 'tag2'],
-        feature: 'create link',
-        stage: 'created link',
-        type: 1,
-        data: {  
-          mydata: {
-            foo: 'bar'
-          },
-          '$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-web-sdk/example.html'
-        }
-      }, function(link){
-        response.html('{}');
-      }, function(err) {
-        response.html('error: ' + err);
+
+    $('#sendSMS').click(function(){
+      var smsOptions = {};
+      var phone = phoneNumber();
+      request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
+      branch.sendSMS(phone, sampleParams, smsOptions, function(err, data){
+        response.html(JSON.stringify(data || 'undefined'));
       });
     });
-    $('#showReferrals').click(function(){
-      request.html('branch.showReferrals();');
-      branch.showReferrals(function(data){
+
+    $('#sendSMSNew').click(function(){
+      var smsOptions = { make_new_link: true };
+      var phone = phoneNumber();
+      request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
+      branch.sendSMS(phone, sampleParams, smsOptions, function(err, data){
+        response.html(JSON.stringify(data || 'undefined'));
+      });
+    });
+
+    $('#referrals').click(function(){
+      request.html('branch.referrals();');
+      branch.referrals(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
-    $('#showCredits').click(function(){
-      request.html('branch.showCredits();');
-      branch.showCredits(function(data){
+
+    $('#credits').click(function(){
+      request.html('branch.credits();');
+      branch.credits(function(err, data){
         response.html(JSON.stringify(data));
       });
     });
-    $('#redeemCredits').click(function(){
-      request.html('branch.redeemCredits({amount: 5, bucket: \'default\'});');
-      branch.redeemCredits({
-        amount: 5,
-        bucket: 'default'
-      }, function(data){
+    $('#redeem').click(function(){
+      request.html('branch.redeem({amount: 5, bucket: \'default\'});');
+      branch.redeem( 5, 'default', function(err, data){
         response.html(JSON.stringify(data));
       });
     });
-    $('#appBanner').click(function(){
-      request.html('branch.appBanner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
-      branch.appBanner({
+
+    $('#banner').click(function(){
+      request.html('branch.banner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
+      branch.banner(
+        // Banner Options
+      {
         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-        title: 'Branch Demo App',
-        description: 'The Branch demo app!',
-        data: {
-          foo: 'bar'
-        }
-      });
+        title: 'Demo App',
+        description: 'Branch Demo app!',
+        openAppButtonText: 'Open',
+        downloadAppButtonText: 'Download',
+        iframe: true,     // Show banner in an iframe if CSS on your page is conflicting
+        showMobile: true, // true by default, just set here for an example
+        showDesktop: true // true by default, just set here for an example
+      }, 
+      // Link data or string of link
+      sampleParams);
       response.html('none');
-    });
+    }); 
   </script>
 </body>
 </html>
