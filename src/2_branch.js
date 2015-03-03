@@ -372,7 +372,7 @@ Branch.prototype['link'] = function(obj, callback) {
  */
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { 
+	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
 	if (url) {
@@ -617,7 +617,7 @@ Branch.prototype['referrals'] = function(callback) {
  */
 Branch.prototype['credits'] = function(callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { 
+	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
 	this._api(resources.credits, { }, function(err, data) {
@@ -670,7 +670,7 @@ Branch.prototype['credits'] = function(callback) {
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { 
+	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err, data) {

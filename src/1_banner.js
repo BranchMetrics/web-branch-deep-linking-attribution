@@ -36,7 +36,7 @@ var bannerHeight = '76px';
  *			desktopAction: (string),
  *          appendiFrame: (function(banner)),
  *          checkmark: (string)
- *		},   
+ *		},
  *		actions: {
  *			sendSMS: (function(options)),
  * 			close: (function()),
@@ -61,8 +61,8 @@ var bannerResources = {
 		'#branch-banner-close { font-weight: 400; cursor: pointer; }\n' +
 		'#branch-banner .content { width: 100%; overflow: hidden; height: ' + bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n' +
 		'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
-		'#branch-banner .details { top: 16px; }\n' + 
-		'#branch-banner .details > * { display: block; }\n' + 
+		'#branch-banner .details { top: 16px; }\n' +
+		'#branch-banner .details > * { display: block; }\n' +
 		'#branch-banner .right > div { float: right; }\n' +
 		'#branch-banner-action { top: 17px; }\n' +
 		'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n',
@@ -160,7 +160,7 @@ var bannerResources = {
 		appendiFrame: function(banner) {
 			var iframe = document.createElement('iframe');
 			var iframeHTML = '<html><head></head><body>' + banner.outerHTML + '</body></html>';
-			iframe.src = 'about:blank'; //solves CORS issues, test in IE
+			iframe.src = 'about:blank'; // solves CORS issues, test in IE
 			iframe.style.overflow = "hidden";
 			iframe.scrolling = 'no';
 			iframe.id = 'branch-banner-iframe';
@@ -180,9 +180,7 @@ var bannerResources = {
 						'C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/>' +
 					'</svg>';
 			}
-			
 		}
-			
 	},
 
 	utils: {
@@ -221,7 +219,7 @@ var bannerResources = {
 				phone.setAttribute('disabled', '');
 				sendButton.style.opacity = '.4';
 				phone.style.opacity = '.4';
-				branchLoader.style.opacity ='1';
+				branchLoader.style.opacity = '1';
 				phone.className = '';
 			};
 
@@ -230,7 +228,7 @@ var bannerResources = {
 				phone.removeAttribute('disabled');
 				sendButton.style.opacity = '1';
 				phone.style.opacity = '1';
-				branchLoader.style.opacity ='0';
+				branchLoader.style.opacity = '0';
 			};
 
 			var hideFormShowSuccess = function() {
@@ -241,7 +239,7 @@ var bannerResources = {
 				checkmark.innerHTML = bannerResources.html.checkmark();
 				sendButton.style.opacity = '0';
 				phone.style.opacity = '0';
-				branchLoader.style.opacity ='0';
+				branchLoader.style.opacity = '0';
 				smsFormContainer.appendChild(checkmark);
 				setTimeout(function() {
 					checkmark.style.opacity = '1';
@@ -264,9 +262,10 @@ var bannerResources = {
 				if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
 					disableForm();
 					branch.sendSMS(phone_val, linkData, options, function(err) {
-						if(err) {
+						if (err) {
 							errorForm();
-						} else {
+						}
+						else {
 							hideFormShowSuccess();
 							setTimeout(function() {
 								smsFormContainer.removeChild(checkmark);
@@ -314,7 +313,8 @@ banner.bannerMarkup = function(options) {
 		document.body.className = 'branch-animation';
 		if (options.iframe) {
 			bannerResources.html.appendiFrame(banner);
-		} else {
+		}
+		else {
 			document.body.appendChild(banner);
 		}
 	}
@@ -358,7 +358,8 @@ banner.bannerStyles = function(options) {
 			document.head.appendChild(iFrameCSS);
 			bannerResources.utils.branchiFrame().contentWindow.document.head.appendChild(css);
 			bannerResources.utils.branchiFrame().style.top = '-' + bannerHeight;
-		} else {
+		}
+		else {
 			document.head.appendChild(css);
 			bannerResources.utils.branchBanner().style.top = '-' + bannerHeight;
 		}
