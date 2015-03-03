@@ -4,19 +4,24 @@
  */
 
 goog.provide('resources');
-goog.require('utils')
+goog.require('utils');
 goog.require('config');
-
-/** @enum {string} */
-var methods = { POST: 'POST', GET: 'GET' };
 
 /** @enum {string} */
 var validationTypes = { obj: 0, str: 1, num: 2, arr: 3 };
 
+/* jshint ignore:start */
+
+/** @enum {string} */
+var methods = { POST: 'POST', GET: 'GET' };
+
 /** @typedef {function(string, string, *)} */
 resources.validator;
+
 /** @typedef {{destination: string, endpoint: string, method: {methods}, params: Object.<string, resources.validator>, queryPart: Object.<string, resources.validator>, jsonp: boolean }} */
 resources.resource;
+
+/* jshint ignore:end */
 
 /**
  * @param {boolean} required
@@ -47,7 +52,7 @@ function validator(required, type) {
 			}
 		}
 		return data;
-	}
+	};
 }
 
 var branch_id = /^[0-9]{15,20}$/;
@@ -55,8 +60,8 @@ var branch_id = /^[0-9]{15,20}$/;
 /** @type {resources.resource} */
 resources.open = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/open',
-	method:	 'POST',
+	endpoint: "/v1/open",
+	method:	 "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(false, branch_id),
@@ -67,18 +72,19 @@ resources.open = {
 };
 resources.profile = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/profile',
-	method:	 'POST',
+	endpoint: "/v1/profile",
+	method:	 "POST",
 	params: {
 		"app_id": validator(true, branch_id),
-		"identity": validator(true, branch_id)
+		"identity_id": validator(true, branch_id),
+		"identity": validator(true, validationTypes.str)
 	}
 };
 /** @type {resources.resource} */
 resources.close = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/close',
-	method: 'POST',
+	endpoint: "/v1/close",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"session_id": validator(true, branch_id)
@@ -87,8 +93,8 @@ resources.close = {
 /** @type {resources.resource} */
 resources.logout = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/logout',
-	method: 'POST',
+	endpoint: "/v1/logout",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"session_id": validator(true, branch_id)
@@ -97,22 +103,22 @@ resources.logout = {
 /** @type {resources.resource} */
 resources.referrals = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/referrals',
-	method: 'GET',
+	endpoint: "/v1/referrals",
+	method: "GET",
 	queryPart: { "identity_id": validator(true, branch_id) }
 };
 /** @type {resources.resource} */
 resources.credits = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/credits',
-	method: 'GET',
+	endpoint: "/v1/credits",
+	method: "GET",
 	queryPart: { "identity_id": validator(true, branch_id) }
 };
 /** @type {resources.resource} */
 resources._r = {
 	destination: config.link_service_endpoint,
-	endpoint: '/_r',
-	method: 'GET',
+	endpoint: "/_r",
+	method: "GET",
 	jsonp: true,
 	params: {
 		"app_id": validator(true, branch_id)
@@ -121,8 +127,8 @@ resources._r = {
 /** @type {resources.resource} */
 resources.redeem =  {
 	destination: config.api_endpoint,
-	endpoint: '/v1/redeem',
-	method: 'POST',
+	endpoint: "/v1/redeem",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(true, branch_id),
@@ -131,11 +137,11 @@ resources.redeem =  {
 	}
 };
 /** @type {resources.resource} */
-resources.createLink = {
+resources.link = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/url',
-	method: 'POST',
-	ref: 'obj',
+	endpoint: "/v1/url",
+	method: "POST",
+	ref: "obj",
 	params: {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(true, branch_id),
@@ -148,32 +154,31 @@ resources.createLink = {
 	}
 };
 /** @type {resources.resource} */
-resources.createLinkClick = {
+resources.linkClick = {
 	destination: config.link_service_endpoint,
-	endpoint: '',
-	method: 'GET',
-	queryPart: {
-		"link_url": validator(true, validationTypes.str)
-	}
+	endpoint: "",
+	method: "GET",
+	queryPart: { "link_url": validator(true, validationTypes.str) },
+	params: { "click": validator(true, validationTypes.str) }
 };
 /** @type {resources.resource} */
-resources.sendSMSLink = {
+resources.SMSLinkSend = {
 	destination: config.link_service_endpoint,
-	endpoint: '',
+	endpoint: "/c",
+	method: "POST",
 	queryPart: {
 		"link_url": validator(true, validationTypes.str)
 	},
-	method: 'POST',
 	params: {
 		"phone": validator(true, validationTypes.str)
 	}
-	
+
 };
 /** @type {resources.resource} */
-resources.track = {
+resources.event = {
 	destination: config.api_endpoint,
-	endpoint: '/v1/event',
-	method: 'POST',
+	endpoint: "/v1/event",
+	method: "POST",
 	params: {
 		"app_id": validator(true, branch_id),
 		"session_id": validator(true, branch_id),

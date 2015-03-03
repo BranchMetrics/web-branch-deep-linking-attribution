@@ -4,8 +4,8 @@
  * branch was loaded.
  */
 
-goog.require('Branch');
 goog.provide('branch_instance');
+goog.require('Branch');
 
 branch_instance = new Branch();
 

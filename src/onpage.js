@@ -7,31 +7,23 @@
  * call them, it saves your call for later.
  */
 
-(function(root, doc, script, branchStr, createCallback, branch, funcs, i, scriptTag, firstScript) {
-  if (!root[branchStr] || !root[branchStr]._q) {
-    while (i < funcs.length) {
-      createCallback(branch, funcs[i++]);
-    }
+(function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
+	if (!root[branchStr] || !root[branchStr]._q) {
+		while (i < funcs.length) {
+			createCallback(branchSdk, funcs[i++]);
+		}
 
-    scriptTag = doc.createElement(script);
-    scriptTag.async = 1;
-    scriptTag.src = "https://s3-us-west-1.amazonaws.com/branch-web-sdk/branch-0.x.min.js";
-    firstScript = doc.getElementsByTagName(script)[0];
-    firstScript.parentNode.insertBefore(scriptTag, firstScript);
+		scriptTag = doc.createElement(scriptStr);
+		scriptTag.async = 1;
+		scriptTag.src = 'https://cdn.branch.io/branch-1.0.0.min.js';
+		firstScript = doc.getElementsByTagName(scriptStr)[0];
+		firstScript.parentNode.insertBefore(scriptTag, firstScript);
 
-    root[branchStr] = branch;
-  }
-})(window, document, "script", 'branch', function(branch, name) {
-  branch[name] = function() {
-    branch._q.push([ name, arguments ]);
-  };
+		root[branchStr] = branchSdk;
+	}
+})(window, document, 'script', 'branch', function(branch, name) {
+	branch[name] = function() {
+		branch._q.push([ name, arguments ]);
+	};
 }, { _q: [], _v: 1 }, // _q: the "queue" of calls, _v: the "version" of the embed script
-'init;close;logout;track;identify;createLink;showReferrals;showCredits;redeemCredits;appBanner'.split(';'), 0)
-
-/*
-
-!function(e,n,t,s,r,a,i,c,o,m){if(!e[s]||!e[s]._q){for(;c<i.length;)r(a,i[c++]);o=n.createElement(t),o.async=1,o.src=
-"http://localhost:8000/build.js",m=n.getElementsByTagName(t)[0],m.parentNode.insertBefore(o,m),
-e[s]=a}}(window,document,"script","branch",function(e,n){e[n]=function(){e._q.push([n,arguments])}},{_q:[],_v:1},
-"init;close;logout;track;identify;createLink;showReferrals;showCredits;redeemCredits;appBanner".split(";"),0)
-*/
+'init;data;setIdentity;logout;track;link;sendSMS;referrals;credits;redeem;banner'.split(';'), 0);
