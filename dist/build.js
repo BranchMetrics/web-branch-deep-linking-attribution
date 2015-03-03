@@ -1061,7 +1061,7 @@ Branch.prototype.init = function(a, b) {
     c.initialized = !0;
   };
   d && d.session_id ? (e(d), b(null, utils.whiteListSessionData(d))) : this._api(resources._r, {}, function(a, d) {
-    c._api(resources.open, {link_identifier:utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:d}, function(a, c) {
+    c._api(resources.open, {link_identifier:utils.urlValue("_branch_click_id"), is_referrable:1, browser_fingerprint_id:d}, function(a, c) {
       e(c);
       utils.store(c);
       b(a, utils.whiteListSessionData(c));
