@@ -57,4 +57,8 @@ then
 	git commit -am"Resetting to HEAD"
 fi
 
-echo "Done script. Now push!"
+echo "Done script. Now push:"
+echo "    git push"
+echo "    git push origin $VERSION"
+
+echo ""
