@@ -413,14 +413,14 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * branch.sendSMS(
  *     phone,
  *     linkData,
- *     options (optional),
+ *     options,
  *     callback (err, data)
  * );
  * ```
  *
  * ##### Example
  * ```js
- * branch.sendSMS({
+ * branch.sendSMS(
  *     phone: '9999999999',
  *     {
  *         tags: ['tag1', 'tag2'],
@@ -714,7 +714,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     description: 'The Branch demo app!',
  *     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
  *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
- *     iframe: true,                      // Show banner in an iframe if CSS on your page is conflicting
+ *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     showMobile: true,                  // Should the banner be shown on mobile devices?
  *     showDesktop: true                  // Should the banner be shown on mobile devices?
  * }, {
