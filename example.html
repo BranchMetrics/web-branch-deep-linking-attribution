@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Branch Metrics Web SDK Exaple App</title>
+  <title>Branch Metrics Web SDK Example App</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <style type="text/css">
     .btn {
@@ -87,8 +87,8 @@
   
   </script>
   <script type="text/javascript">
-    var info     = $('.info');
-    var request  = $('.request');
+    var info = $('.info');
+    var request = $('.request');
     var response = $('.response');
 
     var sampleParams = {
@@ -98,9 +98,7 @@
         stage: 'created link',
         type: 1,
         data: {  
-          mydata: {
-            foo: 'bar'
-          },
+          mydata: 'bar',
           '$desktop_url': 'https://cdn.branch.io/example.html',
           '$og_title': 'Branch Metrics',
           '$og_description': 'Branch Metrics',
@@ -225,8 +223,7 @@
       // Link data or string of link
       sampleParams);
       response.html('none');
-    });
-    
+    }); 
   </script>
 </body>
 </html>
