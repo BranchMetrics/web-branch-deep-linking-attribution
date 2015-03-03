@@ -733,6 +733,7 @@ utils.readStore = function() {
   try {
     return goog.json.parse(sessionStorage.getItem("branch_session"));
   } catch (a) {
+    return{};
   }
 };
 utils.whiteListSessionData = function(a) {

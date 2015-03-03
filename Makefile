@@ -6,10 +6,11 @@ COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() 
 
 .PHONY: clean
 
-all: dist/build.js dist/build.min.js.gz README.md
+all: dist/build.js dist/build.min.js.gz README.md example.html
 docs: README.md
 clean:
-	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md
+	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md xaa xab example.html; \
+
 
 # Kinda gross, but will download closure compiler if you don't have it.
 compiler/compiler.jar:
@@ -19,7 +20,7 @@ compiler/compiler.jar:
 	unzip compiler-latest.zip -d compiler && \
 	rm -f compiler-latest.zip
 
-compiler/library:
+compiler/library/closure-library-master/closure/goog/**:
 	@echo "\nFetching and installing closure library..."
 	mkdir -p compiler/library && \
 	wget https://github.com/google/closure-library/archive/master.zip && \
@@ -61,8 +62,17 @@ dist/build.min.js.gz: dist/build.min.js
 
 docs/1_onpage.md: src/onpage.js compiler/compiler.jar
 	@echo "\nMinifying on page script into README"
-	$(COMPILER) --js src/onpage.js \
+	sed -e 's/SCRIPT_URL_HERE/https:\/\/cdn.branch.io\/branch-'`cat VERSION`'.min.js/' src/onpage.js > xaa
+	$(COMPILER) --js xaa \
 		--define 'DEBUG=false' | node transform.js branch_sdk > docs/1_onpage.md
+	rm xaa
+
+example.html: src/example.template.html docs/1_onpage.md
+	split -p '// INSERT INIT CODE' src/example.template.html
+	cat xaa > example.html
+	cat docs/1_onpage.md >> example.html
+	sed 1d xab >> example.html
+	rm xaa xab
 
 README.md: docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md
 	@echo "\nConcatinating readme"
