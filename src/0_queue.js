@@ -1,3 +1,6 @@
+/**
+ * A simple blocking queue for the API requests
+ */
 goog.provide('Queue');
 
 Queue = function() {

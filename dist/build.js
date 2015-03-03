@@ -881,7 +881,7 @@ iframe_mobile:"#branch-banner-iframe { position: absolute; }\n"}, html:{banner:f
   bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = "-" + bannerHeight : bannerResources.utils.branchBanner().style.top = "-" + bannerHeight;
   utils.storeKeyValue("hideBanner", !0);
 }}};
-banner.smartBannerMarkup = function(a) {
+banner.bannerMarkup = function(a) {
   if (bannerResources.utils.shouldAppend(a)) {
     var b = document.createElement("div");
     b.id = "branch-banner";
@@ -891,7 +891,7 @@ banner.smartBannerMarkup = function(a) {
     a.iframe ? bannerResources.html.appendiFrame(b) : document.body.appendChild(b);
   }
 };
-banner.smartBannerStyles = function(a) {
+banner.bannerStyles = function(a) {
   if (bannerResources.utils.shouldAppend(a)) {
     var b = document.createElement("style");
     b.type = "text/css";
@@ -903,7 +903,7 @@ banner.smartBannerStyles = function(a) {
     bannerResources.utils.branchBanner().style.top = "-" + bannerHeight);
   }
 };
-banner.appendSmartBannerActions = function(a, b, c) {
+banner.bannerActions = function(a, b, c) {
   if (bannerResources.utils.shouldAppend(b)) {
     var d = document.createElement("div");
     d.id = "branch-sms-form-container";
@@ -1071,14 +1071,9 @@ Branch.prototype.init = function(a, b) {
 Branch.prototype.data = function(a) {
   a = a || function() {
   };
-  if (this.initialized) {
-    return a(utils.message(utils.messages.existingInit));
-  }
   this._queue(function(b) {
-    return function() {
-      a(null, utils.whiteListSessionData(utils.readStore()));
-      b();
-    };
+    a(null, utils.whiteListSessionData(utils.readStore()));
+    b();
   });
 };
 Branch.prototype.setIdentity = function(a, b) {
@@ -1212,7 +1207,7 @@ Branch.prototype.banner = function(a, b) {
   a.showMobile = void 0 === a.showMobile ? !0 : a.showMobile;
   a.showDesktop = void 0 === a.showDesktop ? !0 : a.showDesktop;
   a.iframe = void 0 === a.iframe ? !0 : a.iframe;
-  document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") || utils.readKeyValue("hideBanner") || (banner.smartBannerMarkup(a), banner.smartBannerStyles(a), banner.appendSmartBannerActions(this, a, b), banner.triggerBannerAnimation(a));
+  document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") || utils.readKeyValue("hideBanner") || (banner.bannerMarkup(a), banner.bannerStyles(a), banner.bannerActions(this, a, b), banner.triggerBannerAnimation(a));
 };
 // Input 9
 var branch_instance = new Branch;

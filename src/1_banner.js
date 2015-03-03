@@ -20,6 +20,9 @@ var bannerHeight = '76px';
  *		css: {
  *			banner: (string),
  *			desktop: (string),
+ *          nonie: (string),
+ *          ie: (string),
+ *          mobile: (string),
  *			ios: (string),
  *			android: (string),
  *			iframe: (string),
@@ -33,6 +36,10 @@ var bannerHeight = '76px';
  *			desktopAction: (string),
  *          appendiFrame: (function(banner)),
  *          checkmark: (string)
+ *		},   
+ *		actions: {
+ *			sendSMS: (function(options)),
+ * 			close: (function()),
  *		},
  *      utils: {
  *          removeElement: (element),
@@ -41,11 +48,7 @@ var bannerHeight = '76px';
  *          branchBanner: (function()),
  *          branchDocument: (function()),
  *          branchiFrame: (function())
- *      },   
- *		actions: {
- *			sendSMS: (function(options)),
- * 			close: (function()),
- *		}
+ *      }
  * }
  *
  */
@@ -301,7 +304,7 @@ var bannerResources = {
 /**
  * @param {Object} options
  */
-banner.smartBannerMarkup = function(options) {
+banner.bannerMarkup = function(options) {
 	if (bannerResources.utils.shouldAppend(options)) {
 		// Consturct Banner Markup
 		var banner = document.createElement('div');
@@ -320,7 +323,7 @@ banner.smartBannerMarkup = function(options) {
 /**
  * @param {Object} options
  */
-banner.smartBannerStyles = function(options) {
+banner.bannerStyles = function(options) {
 	if (bannerResources.utils.shouldAppend(options)) {
 		// Construct Banner CSS
 		var css = document.createElement('style');
@@ -369,7 +372,7 @@ banner.smartBannerStyles = function(options) {
  * @param {Object} options
  * @param {Object} linkData
  */
-banner.appendSmartBannerActions = function(branch, options, linkData) {
+banner.bannerActions = function(branch, options, linkData) {
 	if (bannerResources.utils.shouldAppend(options)) {
 		var action = document.createElement('div');
 		action.id = 'branch-sms-form-container';

@@ -75,7 +75,7 @@ Branch.prototype._api = function(resource, obj, callback) {
  * callback(
  *      "Error message",
  *      {
- *           data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+ *           data:               { },      // If the user was referred from a link, and the link has associated data, the data is passed in here.
  *           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  *           has_app:            true,    // Does the user have the app installed already?
  *           identity:       'BranchUser' // Unique string that identifies the user
@@ -107,7 +107,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 		callback(null, utils.whiteListSessionData(sessionData));
 	}
 	else {
-		this._api(resources._r, {}, function(err, browser_fingerprint_id) {
+		this._api(resources._r, { }, function(err, browser_fingerprint_id) {
 			self._api(resources.open, {
 				"link_identifier": utils.hashValue('r'),
 				"is_referrable": 1,
@@ -135,14 +135,9 @@ Branch.prototype['init'] = function(app_id, callback) {
  */
 Branch.prototype['data'] = function(callback) {
 	callback = callback || function() { };
-	if (this.initialized) {
-		return callback(utils.message(utils.messages.existingInit));
-	}
 	this._queue(function(next) {
-		return function() {
-			callback(null, utils.whiteListSessionData(utils.readStore()));
-			next();
-		};
+		callback(null, utils.whiteListSessionData(utils.readStore()));
+		next();
 	});
 };
 
@@ -172,7 +167,7 @@ Branch.prototype['data'] = function(callback) {
  *      {
  *           identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
  *           link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
- *           referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+ *           referring_data:     { },      // Returns the initial referring data for this identity, if exists.
  *           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
  *      }
  * );
@@ -213,7 +208,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() { };
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	this._api(resources.logout, {}, function(err) {
+	this._api(resources.logout, { }, function(err) {
 		callback(err);
 	});
 };
@@ -239,10 +234,10 @@ Branch.prototype['logout'] = function(callback) {
  */
  /*
 Branch.prototype['close'] = function(callback) {
-	callback = callback || function() {};
+	callback = callback || function() { };
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	var self = this;
-	this._api(resources.close, {}, function(err, data) {
+	this._api(resources.close, { }, function(err, data) {
 		sessionStorage.clear();
 		self.initialized = false;
 		callback(err, data);
@@ -284,7 +279,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	if (typeof metadata == 'function') {
 		callback = metadata;
-		metadata = {};
+		metadata = { };
 	}
 	this._api(resources.event, {
 		"event": event,
@@ -292,7 +287,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 			"url": document.URL,
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
-		}, {})
+		}, { })
 	}, function(err) {
 		callback(err);
 	});
@@ -467,7 +462,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  */
 Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
 	callback = callback || function() { };
-	options = options || {};
+	options = options || { };
 	options['make_new_link'] = options['make_new_link'] || false;
 
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
@@ -530,7 +525,7 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
  * ___
  */
 Branch.prototype['sendSMSExisting'] = function(phone, callback) {
-	callback = callback || function() {};
+	callback = callback || function() { };
 
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
@@ -582,11 +577,11 @@ Branch.prototype['sendSMSExisting'] = function(phone, callback) {
  *
  */
 Branch.prototype['referrals'] = function(callback) {
-	callback = callback || function() {};
-	if (!this.initialized) { 
+	callback = callback || function() { };
+	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
-	this._api(resources.referrals, {}, function(err, data) {
+	this._api(resources.referrals, { }, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -621,11 +616,11 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	callback = callback || function() {};
+	callback = callback || function() { };
 	if (!this.initialized) { 
 		return callback(utils.message(utils.messages.nonInit));
 	}
-	this._api(resources.credits, {}, function(err, data) {
+	this._api(resources.credits, { }, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -674,7 +669,7 @@ Branch.prototype['credits'] = function(callback) {
  *
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
-	callback = callback || function() {};
+	callback = callback || function() { };
 	if (!this.initialized) { 
 		return callback(utils.message(utils.messages.nonInit));
 	}
@@ -743,9 +738,9 @@ Branch.prototype['banner'] = function(options, linkData) {
 	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
 	options.iframe = (options.iframe === undefined) ? true : options.iframe;
 	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && !utils.readKeyValue('hideBanner')) {
-		banner.smartBannerMarkup(options);
-		banner.smartBannerStyles(options);
-		banner.appendSmartBannerActions(this, options, linkData);
+		banner.bannerMarkup(options);
+		banner.bannerStyles(options);
+		banner.bannerActions(this, options, linkData);
 		banner.triggerBannerAnimation(options);
 	}
 };

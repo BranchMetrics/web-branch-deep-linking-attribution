@@ -10,6 +10,10 @@ goog.require('goog.json');
 
 var _jsonp_callback_index = 0;
 
+/**
+ * @param {Object} obj
+ * @param {String} prefix
+ */
 function serializeObject(obj, prefix) {
 	var pairs = [];
 	prefix = prefix || '';
@@ -48,7 +52,7 @@ function getUrl(resource, data) {
 			}
 		}
 	}
-	var d = {};
+	var d = { };
 	for (k in resource.params) {
 		if (resource.params.hasOwnProperty(k)) {
 			var v = resource.params[k](resource.endpoint, k, data[k]);
@@ -67,15 +71,15 @@ function getUrl(resource, data) {
  */
 var jsonpRequest = function(url, options, callback) {
 	callback = callback || 'branch_callback__' + (_jsonp_callback_index++);
-	options.onSuccess = options.onSuccess || function() {};
-	options.onTimeout = options.onTimeout || function() {};
+	options.onSuccess = options.onSuccess || function() { };
+	options.onTimeout = options.onTimeout || function() { };
 	options.data = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(options.data))) : "";
 
 	var postDataString = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=';
 	var timeout = options.timeout || 10; // sec
 
 	var timeout_trigger = window.setTimeout(function() {
-		window[callback] = function() {};
+		window[callback] = function() { };
 		options.onTimeout();
 	}, timeout * 1000);
 
@@ -126,7 +130,7 @@ var XHRRequest = function(url, data, method, callback) {
 				callback(null, goog.json.parse(req.responseText));
 			}
 			catch (e) {
-				callback(null, {});
+				callback(null, { });
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {
@@ -154,7 +158,7 @@ var XHRRequest = function(url, data, method, callback) {
  * @param {function(?new:Error,*)|null} callback
  */
 api = function(resource, data, callback) {
-	// callback = utils.injectDequeue( callback || function() {} );
+	// callback = utils.injectDequeue( callback || function() { } );
 
 	var u = getUrl(resource, data);
 	var url, postData = '';

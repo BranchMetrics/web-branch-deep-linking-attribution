@@ -106,7 +106,7 @@ branch.init(
 callback(
      "Error message",
      {
-          data:               {},      // If the user was referred from a link, and the link has associated data, the data is passed in here.
+          data:               { },      // If the user was referred from a link, and the link has associated data, the data is passed in here.
           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
           has_app:            true,    // Does the user have the app installed already?
           identity:       'BranchUser' // Unique string that identifies the user
@@ -164,7 +164,7 @@ callback(
      {
           identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
           link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
-          referring_data:     {},      // Returns the initial referring data for this identity, if exists.
+          referring_data:     { },      // Returns the initial referring data for this identity, if exists.
           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
      }
 );

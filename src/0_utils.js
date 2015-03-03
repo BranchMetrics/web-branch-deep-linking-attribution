@@ -59,6 +59,9 @@ utils.readStore = function() {
 	catch(e) { {} }
 };
 
+/**
+ * @param {Object} data
+ */
 utils.whiteListSessionData = function(data) {
 	var whiteList = [ 'data', 'referring_identity', 'identity', 'has_app' ];
 	var returnData = {};
@@ -99,6 +102,10 @@ utils.hasApp = function() {
 	return utils.readKeyValue('has_app');
 };
 
+/**
+ * @param {Object} to
+ * @param {Object} from
+ */
 utils.merge = function(to, from) {
 	for (var attr in from) {
 		if (from.hasOwnProperty(attr)) { to[attr] = from[attr]; }
@@ -106,6 +113,9 @@ utils.merge = function(to, from) {
 	return to;
 };
 
+/**
+ * @param {?string} key
+ */
 utils.hashValue = function(key) {
 	try {
 		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
@@ -115,6 +125,9 @@ utils.hashValue = function(key) {
 	}
 };
 
+/**
+ * @param {?string} key
+ */
 utils.getParamValue = function(key) {
 	try {
 		return window.location.search.substring(1).match(new RegExp(key + '=([^&]*)'))[1];
@@ -124,6 +137,9 @@ utils.getParamValue = function(key) {
 	}
 };
 
+/**
+ * @param {?string} key
+ */
 utils.urlValue = function(key) {
 	return utils.getParamValue(key) || utils.hashValue(key);
 };
