@@ -17,12 +17,12 @@ Storage = function() {
 	};
 
 	this.getItem = function(key) {
-	if (typeof sessionStorageStructure[key] != 'undefined') {
-		return sessionStorageStructure[key];
-	}
-	else {
-		return null;
-	}
+		if (typeof sessionStorageStructure[key] != 'undefined') {
+			return sessionStorageStructure[key];
+		}
+		else {
+			return null;
+		}
 	};
 
 	this.removeItem = function(key) {
