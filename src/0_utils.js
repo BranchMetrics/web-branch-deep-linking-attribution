@@ -6,6 +6,7 @@ goog.provide('utils');
 /*jshint unused:false*/
 goog.require('goog.json');
 
+
 /** @define {boolean} */
 var DEBUG = true;
 
@@ -52,9 +53,9 @@ utils.message = function(message, param) {
 /**
  * @returns {?utils.sessionData}
  */
-utils.readStore = function() {
+utils.readStore = function(sessionFallback) {
 	try {
-		return goog.json.parse(sessionStorage.getItem('branch_session'));
+		return goog.json.parse(sessionFallback().getItem('branch_session') || { });
 	}
 	catch (e) {
 		return {};
@@ -78,30 +79,31 @@ utils.whiteListSessionData = function(data) {
 /**
  * @param {utils.sessionData}
  */
-utils.store = function(data) {
-	sessionStorage.setItem('branch_session', goog.json.serialize(data));
+utils.store = function(data, sessionFallback) {
+	sessionFallback().setItem('branch_session', goog.json.serialize(data));
+	sessionFallback().getItem('branch_session');
 };
 
 /**
  * @param {?string} key
  * @param {?string} value
  */
-utils.storeKeyValue = function(key, value) {
-	var currentSession = utils.readStore();
+utils.storeKeyValue = function(key, value, sessionFallback) {
+	var currentSession = utils.readStore(sessionFallback);
 	currentSession[key] = value;
-	utils.store(currentSession);
+	utils.store(currentSession, sessionFallback);
 };
 
 /**
  * @param {?string} key
  */
-utils.readKeyValue = function(key) {
-	var currentSession = utils.readStore();
-	return currentSession[key];
+utils.readKeyValue = function(key, sessionFallback) {
+	var currentSession = utils.readStore(sessionFallback);
+	return (currentSession && currentSession[key]) ? currentSession[key] : null;
 };
 
-utils.hasApp = function() {
-	return utils.readKeyValue('has_app');
+utils.hasApp = function(sessionFallback) {
+	return utils.readKeyValue('has_app', sessionFallback);
 };
 
 /**

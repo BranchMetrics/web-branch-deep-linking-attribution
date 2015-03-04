@@ -3,6 +3,10 @@
  */
 goog.provide('Queue');
 
+/***
+ * @class Queue
+ * @constructor
+ */
 Queue = function() {
     var queue = [],
     next = function() {

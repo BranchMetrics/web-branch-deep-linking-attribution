@@ -56,10 +56,10 @@ var bannerResources = {
 	css: {
 		banner:
 		'.branch-animation { -webkit-transition: all ' + (animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (animationSpeed * 1.5 / 1000) + 's ease; }\n' +
-		'#branch-banner { width: 100%;` z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (animationSpeed / 1000) + 's ease; transition: all 0' + (animationSpeed / 1000) + 's ease; }\n' +
+		'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (animationSpeed / 1000) + 's ease; transition: all 0' + (animationSpeed / 1000) + 's ease; }\n' +
 		'#branch-banner * { margin-right: 4px; position: relative; display: inline-block; line-height: 1.2em; vertical-align: top; }\n' +
 		'#branch-banner-close { font-weight: 400; cursor: pointer; }\n' +
-		'#branch-banner .content { width: 100%; overflow: hidden; height: ' + bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n' +
+		'#branch-banner .content { width:100%; overflow: hidden; height: ' + bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n' +
 		'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
 		'#branch-banner .details { top: 16px; }\n' +
 		'#branch-banner .details > * { display: block; }\n' +
@@ -69,7 +69,7 @@ var bannerResources = {
 
 		desktop:
 		'#branch-banner { position: fixed; min-width: 600px; }\n' +
-		'#branch-banner-close { color: #aaa; font-size: 20px; top: 18px; }\n' +
+		'#branch-banner-close { color: #aaa; font-size: 24px; top: 18px; }\n' +
 		'#branch-banner-close:hover { color: #000; }\n' +
 		'#branch-banner .left, .right { width: 47%;  top: 0; }\n' +
 		'#branch-banner .title { font-size: 14px; }\n' +
@@ -113,7 +113,7 @@ var bannerResources = {
 
 		iframe:
 		'body { -webkit-transition: all ' + (animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (animationSpeed * 1.5 / 1000) + 's ease; }\n' +
-		'#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 100%; left: 0; right: 0; border: 0; height: ' + bannerHeight + '; z-index: 99999; -webkit-transition: all ' + (animationSpeed / 1000) + 's ease; transition: all 0' + (animationSpeed / 1000) + 's ease; }\n',
+		'#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: ' + bannerHeight + '; z-index: 99999; -webkit-transition: all ' + (animationSpeed / 1000) + 's ease; transition: all 0' + (animationSpeed / 1000) + 's ease; }\n',
 
 		inneriframe:
 		'body { margin: 0; }\n',
@@ -261,7 +261,7 @@ var bannerResources = {
 				var phone_val = phone.value;
 				if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
 					disableForm();
-					branch.sendSMS(phone_val, linkData, options, function(err) {
+					branch["sendSMS"](phone_val, linkData, options, function(err) {
 						if (err) {
 							errorForm();
 						}
@@ -279,21 +279,23 @@ var bannerResources = {
 				}
 			}
 		},
-		close: function() {
-			setTimeout(function() {
-				bannerResources.utils.removeElement(bannerResources.utils.branchBanner());
-				bannerResources.utils.removeElement(bannerResources.utils.branchiFrame());
-				bannerResources.utils.removeElement(document.getElementById('branch-css'));
-			}, animationSpeed + animationDelay);
+		close: function(branch) {
+				return function() {
+				setTimeout(function() {
+					bannerResources.utils.removeElement(bannerResources.utils.branchBanner());
+					bannerResources.utils.removeElement(bannerResources.utils.branchiFrame());
+					bannerResources.utils.removeElement(document.getElementById('branch-css'));
+				}, animationSpeed + animationDelay);
 
-			setTimeout(function() {
-				document.body.style.marginTop = '0px';
-			}, animationDelay);
+				setTimeout(function() {
+					document.body.style.marginTop = '0px';
+				}, animationDelay);
 
-			 /*jshint -W030 */
-			bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = '-' + bannerHeight : bannerResources.utils.branchBanner().style.top = '-' + bannerHeight;
+				 /*jshint -W030 */
+				bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = '-' + bannerHeight : bannerResources.utils.branchBanner().style.top = '-' + bannerHeight;
 
-			utils.storeKeyValue('hideBanner', true);
+				utils.storeKeyValue('hideBanner', true, branch._storage);
+			};
 		}
 	}
 };
@@ -374,29 +376,29 @@ banner.bannerStyles = function(options) {
  * @param {Object} linkData
  */
 banner.bannerActions = function(branch, options, linkData) {
-	if (bannerResources.utils.shouldAppend(options)) {
+	if (bannerResources.utils.shouldAppend(options) && bannerResources.utils.branchDocument()) {
 		var action = document.createElement('div');
 		action.id = 'branch-sms-form-container';
 
 		// User agent specific markup
 		if (bannerResources.utils.mobileUserAgent()) {
 			linkData['channel'] = 'app banner';
-			branch.link(linkData, function(err, url) {
+			action.innerHTML = bannerResources.html.mobileAction(options);
+			bannerResources.utils.branchDocument().getElementById('branch-banner-action').appendChild(action);
+			branch["link"](linkData, function(err, url) {
 				bannerResources.utils.branchDocument().getElementById('branch-mobile-action').href = url;
 			});
-			action.innerHTML = bannerResources.html.mobileAction(options);
 		}
 		else {
 			action.innerHTML = bannerResources.html.desktopAction;
+			bannerResources.utils.branchDocument().getElementById('branch-banner-action').appendChild(action);
+			var submitSMS = function(event) {
+				event.preventDefault();
+			    bannerResources.actions.sendSMS(branch, options, linkData);
+			};
+			bannerResources.utils.branchDocument().getElementById('sms-form').addEventListener('submit', submitSMS);
 		}
-
-		bannerResources.utils.branchDocument().getElementById('branch-banner-action').appendChild(action);
-		var submitSMS = function(event) {
-			event.preventDefault();
-		    bannerResources.actions.sendSMS(branch, options, linkData);
-		};
-		bannerResources.utils.branchDocument().getElementById('sms-form').addEventListener('submit', submitSMS);
-		bannerResources.utils.branchDocument().getElementById('branch-banner-close').onclick = bannerResources.actions.close;
+		bannerResources.utils.branchDocument().getElementById('branch-banner-close').onclick = bannerResources.actions.close(branch);
 	}
 };
 

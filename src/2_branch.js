@@ -8,6 +8,7 @@ goog.require('resources');
 goog.require('api');
 goog.require('banner');
 goog.require('Queue');
+goog.require('Storage');
 /*jshint unused:false*/
 goog.require('goog.json');
 
@@ -23,6 +24,7 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
+	this._storage = Storage();
 	this.initialized = false;
 };
 
@@ -37,7 +39,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
-		return api(resource, obj, function(err, data) {
+		return api(resource, obj, self._storage, function(err, data) {
 			next();
 			callback(err, data);
 		});
@@ -93,7 +95,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 	}
 
 	this.app_id = app_id;
-	var self = this, sessionData = utils.readStore();
+	var self = this, sessionData = utils.readStore(this._storage);
 
 	var setBranchValues = function(data) {
 		self.session_id = data['session_id'];
@@ -114,7 +116,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 				"browser_fingerprint_id": browser_fingerprint_id
 			}, function(err, data) {
 				setBranchValues(data);
-				utils.store(data);
+				utils.store(data, self._storage);
 				callback(err, utils.whiteListSessionData(data));
 			});
 		});
@@ -135,8 +137,9 @@ Branch.prototype['init'] = function(app_id, callback) {
  */
 Branch.prototype['data'] = function(callback) {
 	callback = callback || function() { };
+	var self = this;
 	this._queue(function(next) {
-		callback(null, utils.whiteListSessionData(utils.readStore()));
+		callback(null, utils.whiteListSessionData(utils.readStore(self._storage)));
 		next();
 	});
 };
@@ -375,12 +378,13 @@ Branch.prototype['linkClick'] = function(url, callback) {
 	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
+	var self = this;
 	if (url) {
 		this._api(resources.linkClick, {
 			"link_url": url.replace('https://bnc.lt/', ''),
 			"click": "click"
 		}, function(err, data) {
-			utils.storeKeyValue('click_id', data['click_id']);
+			utils.storeKeyValue('click_id', data['click_id'], self._storage);
 			if (err || data) { callback(err, data); }
 		});
 	}
@@ -467,11 +471,11 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
 
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if (utils.readKeyValue('click_id') && !options['make_new_link']) {
-		this.sendSMSExisting(phone, callback);
+	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
+		this["sendSMSExisting"](phone, callback);
 	}
 	else {
-		this.sendSMSNew(phone, obj, callback);
+		this["sendSMSNew"](phone, obj, callback);
 	}
 };
 
@@ -492,17 +496,17 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
  *
  * ___
  */
-Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
+Branch.prototype["sendSMSNew"] = function(phone, obj, callback) {
 	callback = callback || function() { };
 	var self = this;
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	if (obj['channel'] != 'app banner') { obj['channel'] = 'sms'; }
-	this.link(obj, function(err, url) {
+	this["link"](obj, function(err, url) {
 		if (err) { return callback(err); }
-		self.linkClick(url, function(err) {
+		self["linkClick"](url, function(err) {
 			if (err) { return callback(err); }
-			self.sendSMSExisting(phone, function(err) {
+			self["sendSMSExisting"](phone, function(err) {
 				callback(err);
 			});
 		});
@@ -524,13 +528,14 @@ Branch.prototype['sendSMSNew'] = function(phone, obj, callback) {
  * ```
  * ___
  */
-Branch.prototype['sendSMSExisting'] = function(phone, callback) {
+Branch.prototype["sendSMSExisting"] = function(phone, callback) {
 	callback = callback || function() { };
 
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
+	var self = this;
 	this._api(resources.SMSLinkSend, {
-		"link_url": utils.readStore()['click_id'],
+		"link_url": utils.readKeyValue('click_id', self._storage),
 		"phone": phone
 	}, function(err) {
 		callback(err);
@@ -737,7 +742,7 @@ Branch.prototype['banner'] = function(options, linkData) {
 	options.showMobile = (options.showMobile === undefined) ? true : options.showMobile;
 	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
 	options.iframe = (options.iframe === undefined) ? true : options.iframe;
-	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && !utils.readKeyValue('hideBanner')) {
+	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && !utils.readKeyValue('hideBanner', this._storage)) {
 		banner.bannerMarkup(options);
 		banner.bannerStyles(options);
 		banner.bannerActions(this, options, linkData);

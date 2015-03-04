@@ -607,6 +607,29 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:1};
 // Input 2
+var Storage = function() {
+  var a = {};
+  this.setItem = function(b, c) {
+    a[b] = c;
+  };
+  this.getItem = function(b) {
+    return "undefined" != typeof a[b] ? a[b] : null;
+  };
+  this.removeItem = function(b) {
+    delete a[b];
+  };
+  this.clear = function() {
+    a = {};
+  };
+  return function() {
+    try {
+      return sessionStorage.setItem("test", ""), sessionStorage.removeItem("test"), sessionStorage;
+    } catch (a) {
+      return this;
+    }
+  };
+};
+// Input 3
 var Queue = function() {
   var a = [], b = function() {
     if (a.length) {
@@ -621,7 +644,7 @@ var Queue = function() {
     1 == a.length && b();
   };
 };
-// Input 3
+// Input 4
 goog.json = {};
 goog.json.USE_NATIVE_JSON = !1;
 goog.json.isValid = function(a) {
@@ -716,7 +739,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   }
   b.push("}");
 };
-// Input 4
+// Input 5
 var utils = {}, DEBUG = !0;
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out"};
 utils.error = function(a, b) {
@@ -729,10 +752,10 @@ utils.message = function(a, b) {
   DEBUG && console && console.log(c);
   return c;
 };
-utils.readStore = function() {
+utils.readStore = function(a) {
   try {
-    return goog.json.parse(sessionStorage.getItem("branch_session"));
-  } catch (a) {
+    return goog.json.parse(a().getItem("branch_session") || {});
+  } catch (b) {
     return{};
   }
 };
@@ -743,19 +766,21 @@ utils.whiteListSessionData = function(a) {
   }
   return c;
 };
-utils.store = function(a) {
-  sessionStorage.setItem("branch_session", goog.json.serialize(a));
+utils.store = function(a, b) {
+  b().setItem("branch_session", goog.json.serialize(a));
+  b().getItem("branch_session");
 };
-utils.storeKeyValue = function(a, b) {
-  var c = utils.readStore();
-  c[a] = b;
-  utils.store(c);
+utils.storeKeyValue = function(a, b, c) {
+  var d = utils.readStore(c);
+  d[a] = b;
+  utils.store(d, c);
 };
-utils.readKeyValue = function(a) {
-  return utils.readStore()[a];
+utils.readKeyValue = function(a, b) {
+  var c = utils.readStore(b);
+  return c && c[a] ? c[a] : null;
 };
-utils.hasApp = function() {
-  return utils.readKeyValue("has_app");
+utils.hasApp = function(a) {
+  return utils.readKeyValue("has_app", a);
 };
 utils.merge = function(a, b) {
   for (var c in b) {
@@ -792,13 +817,13 @@ utils.base64encode = function(a) {
   }
   return b;
 };
-// Input 5
-var banner = {}, animationSpeed = 250, animationDelay = 20, bannerHeight = "76px", bannerResources = {css:{banner:".branch-animation { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }\n#branch-banner { width: 100%;` z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + animationSpeed / 
-1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; display: inline-block; line-height: 1.2em; vertical-align: top; }\n#branch-banner-close { font-weight: 400; cursor: pointer; }\n#branch-banner .content { width: 100%; overflow: hidden; height: " + bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .details { top: 16px; }\n#branch-banner .details > * { display: block; }\n#branch-banner .right > div { float: right; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n', 
-desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 20px; top: 18px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .left, .right { width: 47%;  top: 0; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 125px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; position: absolute; margin-top: 3px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n", 
+// Input 6
+var banner = {}, animationSpeed = 250, animationDelay = 20, bannerHeight = "76px", bannerResources = {css:{banner:".branch-animation { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + animationSpeed / 
+1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; display: inline-block; line-height: 1.2em; vertical-align: top; }\n#branch-banner-close { font-weight: 400; cursor: pointer; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .details { top: 16px; }\n#branch-banner .details > * { display: block; }\n#branch-banner .right > div { float: right; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n', 
+desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 24px; top: 18px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .left, .right { width: 47%;  top: 0; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 125px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; position: absolute; margin-top: 3px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n", 
 nonie:"#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n", ie:"#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n", mobile:"#branch-banner { position: absolute; }\n#branch-banner .content .left { width: 60%; }\n#branch-banner .content .right { width: 35%; height: 24px; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-banner a { text-decoration: none; }\n#branch-mobile-action { top: 6px; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n", 
 ios:"#branch-banner a { color: #428bca; }\n", android:"#branch-banner-close { text-align: center; font-size: 15px; border-radius:14px; border:0; width:17px; height:17px; line-height:14px; color:#b1b1b3; background:#efefef; }\n#branch-mobile-action { text-decoration:none; border-bottom: 3px solid #b3c833; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #b3c833; border-radius: 5px; }\n#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n", 
-iframe:"body { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 100%; left: 0; right: 0; border: 0; height: " + bannerHeight + "; z-index: 99999; -webkit-transition: all " + animationSpeed / 1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + "s ease; }\n", inneriframe:"body { margin: 0; }\n", iframe_desktop:"#branch-banner-iframe { position: fixed; }\n", 
+iframe:"body { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + bannerHeight + "; z-index: 99999; -webkit-transition: all " + animationSpeed / 1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + "s ease; }\n", inneriframe:"body { margin: 0; }\n", iframe_desktop:"#branch-banner-iframe { position: fixed; }\n", 
 iframe_mobile:"#branch-banner-iframe { position: absolute; }\n"}, html:{banner:function(a) {
   return'<div class="content"><div class="left"><div id="branch-banner-close" class="branch-animation">&times;</div><div class="icon"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action"></div></div>';
 }, mobileAction:function(a) {
@@ -870,17 +895,19 @@ iframe_mobile:"#branch-banner-iframe { position: absolute; }\n"}, html:{banner:f
       }, 3E3));
     })) : l();
   }
-}, close:function() {
-  setTimeout(function() {
-    bannerResources.utils.removeElement(bannerResources.utils.branchBanner());
-    bannerResources.utils.removeElement(bannerResources.utils.branchiFrame());
-    bannerResources.utils.removeElement(document.getElementById("branch-css"));
-  }, animationSpeed + animationDelay);
-  setTimeout(function() {
-    document.body.style.marginTop = "0px";
-  }, animationDelay);
-  bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = "-" + bannerHeight : bannerResources.utils.branchBanner().style.top = "-" + bannerHeight;
-  utils.storeKeyValue("hideBanner", !0);
+}, close:function(a) {
+  return function() {
+    setTimeout(function() {
+      bannerResources.utils.removeElement(bannerResources.utils.branchBanner());
+      bannerResources.utils.removeElement(bannerResources.utils.branchiFrame());
+      bannerResources.utils.removeElement(document.getElementById("branch-css"));
+    }, animationSpeed + animationDelay);
+    setTimeout(function() {
+      document.body.style.marginTop = "0px";
+    }, animationDelay);
+    bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = "-" + bannerHeight : bannerResources.utils.branchBanner().style.top = "-" + bannerHeight;
+    utils.storeKeyValue("hideBanner", !0, a._storage);
+  };
 }}};
 banner.bannerMarkup = function(a) {
   if (bannerResources.utils.shouldAppend(a)) {
@@ -905,18 +932,16 @@ banner.bannerStyles = function(a) {
   }
 };
 banner.bannerActions = function(a, b, c) {
-  if (bannerResources.utils.shouldAppend(b)) {
+  if (bannerResources.utils.shouldAppend(b) && bannerResources.utils.branchDocument()) {
     var d = document.createElement("div");
     d.id = "branch-sms-form-container";
-    bannerResources.utils.mobileUserAgent() ? (c.channel = "app banner", a.link(c, function(a, b) {
+    bannerResources.utils.mobileUserAgent() ? (c.channel = "app banner", d.innerHTML = bannerResources.html.mobileAction(b), bannerResources.utils.branchDocument().getElementById("branch-banner-action").appendChild(d), a.link(c, function(a, b) {
       bannerResources.utils.branchDocument().getElementById("branch-mobile-action").href = b;
-    }), d.innerHTML = bannerResources.html.mobileAction(b)) : d.innerHTML = bannerResources.html.desktopAction;
-    bannerResources.utils.branchDocument().getElementById("branch-banner-action").appendChild(d);
-    bannerResources.utils.branchDocument().getElementById("sms-form").addEventListener("submit", function(d) {
+    })) : (d.innerHTML = bannerResources.html.desktopAction, bannerResources.utils.branchDocument().getElementById("branch-banner-action").appendChild(d), bannerResources.utils.branchDocument().getElementById("sms-form").addEventListener("submit", function(d) {
       d.preventDefault();
       bannerResources.actions.sendSMS(a, b, c);
-    });
-    bannerResources.utils.branchDocument().getElementById("branch-banner-close").onclick = bannerResources.actions.close;
+    }));
+    bannerResources.utils.branchDocument().getElementById("branch-banner-close").onclick = bannerResources.actions.close(a);
   }
 };
 banner.triggerBannerAnimation = function(a) {
@@ -924,7 +949,7 @@ banner.triggerBannerAnimation = function(a) {
     bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = "0" : bannerResources.utils.branchBanner().style.top = "0";
   }, animationDelay));
 };
-// Input 6
+// Input 7
 var _jsonp_callback_index = 0;
 function serializeObject(a, b) {
   var c = [];
@@ -983,30 +1008,30 @@ var jsonpRequest = function(a, b, c) {
   }, onTimeout:function() {
     d(utils.error(utils.messages.timeout));
   }, timeout:10, data:b, method:c});
-}, XHRRequest = function(a, b, c, d) {
-  var e = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  e.onreadystatechange = function() {
-    if (4 === e.readyState && 200 === e.status) {
+}, XHRRequest = function(a, b, c, d, e) {
+  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  f.onreadystatechange = function() {
+    if (4 === f.readyState && 200 === f.status) {
       try {
-        d(null, goog.json.parse(e.responseText));
+        e(null, goog.json.parse(f.responseText));
       } catch (a) {
-        d(null, {});
+        e(null, {});
       }
     } else {
-      4 === e.readyState && 402 === e.status ? d(Error("Not enough credits to redeem.")) : 4 !== e.readyState || "4" != e.status.toString().substring(0, 1) && "5" != e.status.toString().substring(0, 1) || d(Error("Error in API: " + e.status));
+      4 === f.readyState && 402 === f.status ? e("Not enough credits to redeem.") : 4 !== f.readyState || "4" != f.status.toString().substring(0, 1) && "5" != f.status.toString().substring(0, 1) || e("Error in API: " + f.status);
     }
   };
   try {
-    e.open(c, a, !0), e.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), e.send(b);
-  } catch (f) {
-    sessionStorage.setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, d);
+    f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
+  } catch (g) {
+    d().setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, e);
   }
-}, api = function(a, b, c) {
-  var d = getUrl(a, b), e, f = "";
-  "GET" == a.method ? e = d.url + "?" + d.data : (e = d.url, f = d.data);
-  sessionStorage.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(e, b, a.method, c) : XHRRequest(e, f, a.method, c);
+}, api = function(a, b, c, d) {
+  var e = getUrl(a, b), f, g = "";
+  "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
+  c().getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c(), d);
 };
-// Input 7
+// Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};
 function validator(a, b) {
   return function(c, d, e) {
@@ -1028,12 +1053,13 @@ resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:"P
 resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:"GET", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:"POST", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
-// Input 8
+// Input 9
 var default_branch, Branch = function() {
   if (!(this instanceof Branch)) {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
+  this._storage = Storage();
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1042,7 +1068,7 @@ Branch.prototype._api = function(a, b, c) {
     (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && d.app_id && (b.app_id = d.app_id);
     (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && d.session_id && (b.session_id = d.session_id);
     (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && d.identity_id && (b.identity_id = d.identity_id);
-    return api(a, b, function(a, b) {
+    return api(a, b, d._storage, function(a, b) {
       e();
       c(a, b);
     });
@@ -1055,26 +1081,27 @@ Branch.prototype.init = function(a, b) {
     return b(utils.message(utils.messages.existingInit));
   }
   this.app_id = a;
-  var c = this, d = utils.readStore(), e = function(a) {
+  var c = this, d = utils.readStore(this._storage), e = function(a) {
     c.session_id = a.session_id;
     c.identity_id = a.identity_id;
     c.sessionLink = a.link;
     c.initialized = !0;
   };
   d && d.session_id ? (e(d), b(null, utils.whiteListSessionData(d))) : this._api(resources._r, {}, function(a, d) {
-    c._api(resources.open, {link_identifier:utils.urlValue("_branch_click_id"), is_referrable:1, browser_fingerprint_id:d}, function(a, c) {
-      e(c);
-      utils.store(c);
-      b(a, utils.whiteListSessionData(c));
+    c._api(resources.open, {link_identifier:utils.urlValue("_branch_click_id"), is_referrable:1, browser_fingerprint_id:d}, function(a, d) {
+      e(d);
+      utils.store(d, c._storage);
+      b(a, utils.whiteListSessionData(d));
     });
   });
 };
 Branch.prototype.data = function(a) {
   a = a || function() {
   };
-  this._queue(function(b) {
-    a(null, utils.whiteListSessionData(utils.readStore()));
-    b();
+  var b = this;
+  this._queue(function(c) {
+    a(null, utils.whiteListSessionData(utils.readStore(b._storage)));
+    c();
   });
 };
 Branch.prototype.setIdentity = function(a, b) {
@@ -1127,9 +1154,10 @@ Branch.prototype.linkClick = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, d) {
-    utils.storeKeyValue("click_id", d.click_id);
-    (a || d) && b(a, d);
+  var c = this;
+  a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, e) {
+    utils.storeKeyValue("click_id", e.click_id, c._storage);
+    (a || e) && b(a, e);
   });
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
@@ -1140,7 +1168,7 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
   if (!this.initialized) {
     return d(utils.message(utils.messages.nonInit));
   }
-  utils.readKeyValue("click_id") && !c.make_new_link ? this.sendSMSExisting(a, d) : this.sendSMSNew(a, b, d);
+  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? this.sendSMSExisting(a, d) : this.sendSMSNew(a, b, d);
 };
 Branch.prototype.sendSMSNew = function(a, b, c) {
   c = c || function() {
@@ -1170,7 +1198,7 @@ Branch.prototype.sendSMSExisting = function(a, b) {
   if (!this.initialized) {
     return b(utils.message(utils.messages.nonInit));
   }
-  this._api(resources.SMSLinkSend, {link_url:utils.readStore().click_id, phone:a}, function(a) {
+  this._api(resources.SMSLinkSend, {link_url:utils.readKeyValue("click_id", this._storage), phone:a}, function(a) {
     b(a);
   });
 };
@@ -1208,9 +1236,9 @@ Branch.prototype.banner = function(a, b) {
   a.showMobile = void 0 === a.showMobile ? !0 : a.showMobile;
   a.showDesktop = void 0 === a.showDesktop ? !0 : a.showDesktop;
   a.iframe = void 0 === a.iframe ? !0 : a.iframe;
-  document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") || utils.readKeyValue("hideBanner") || (banner.bannerMarkup(a), banner.bannerStyles(a), banner.bannerActions(this, a, b), banner.triggerBannerAnimation(a));
+  document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") || utils.readKeyValue("hideBanner", this._storage) || (banner.bannerMarkup(a), banner.bannerStyles(a), banner.bannerActions(this, a, b), banner.triggerBannerAnimation(a));
 };
-// Input 9
+// Input 10
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
@@ -1219,7 +1247,7 @@ if (window.branch && window.branch._q) {
   }
 }
 ;
-// Input 10
+// Input 11
 var umd = {};
 "function" === typeof define && define.amd ? define("branch", function() {
   return branch_instance;

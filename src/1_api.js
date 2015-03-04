@@ -122,7 +122,7 @@ var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback
  * @param {String} method
  * @param {Function|null} callback
  */
-var XHRRequest = function(url, data, method, callback) {
+var XHRRequest = function(url, data, method, sessionFallback, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
@@ -134,10 +134,10 @@ var XHRRequest = function(url, data, method, callback) {
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {
-			callback(new Error('Not enough credits to redeem.'));
+			callback('Not enough credits to redeem.');
 		}
 		else if (req.readyState === 4 && (req.status.toString().substring(0, 1) == "4" || req.status.toString().substring(0, 1) == "5")) {
-			callback(new Error('Error in API: ' + req.status));
+			callback('Error in API: ' + req.status);
 		}
 	};
 
@@ -147,7 +147,7 @@ var XHRRequest = function(url, data, method, callback) {
 		req.send(data);
 	}
 	catch (e) {
-		sessionStorage.setItem('use_jsonp', true);
+		sessionFallback().setItem('use_jsonp', true);
 		jsonpMakeRequest(url, data, method, callback);
 	}
 };
@@ -157,7 +157,7 @@ var XHRRequest = function(url, data, method, callback) {
  * @param {Object.<string, *>} data
  * @param {function(?new:Error,*)|null} callback
  */
-api = function(resource, data, callback) {
+api = function(resource, data, sessionFallback, callback) {
 	// callback = utils.injectDequeue( callback || function() { } );
 
 	var u = getUrl(resource, data);
@@ -169,10 +169,10 @@ api = function(resource, data, callback) {
 		url = u.url;
 		postData = u.data;
 	}
-	if (sessionStorage.getItem('use_jsonp') || resource.jsonp) {
+	if (sessionFallback().getItem('use_jsonp') || resource.jsonp) {
 		jsonpMakeRequest(url, data, resource.method, callback);
 	}
 	else {
-		XHRRequest(url, postData, resource.method, callback);
+		XHRRequest(url, postData, resource.method, sessionFallback(), callback);
 	}
 };

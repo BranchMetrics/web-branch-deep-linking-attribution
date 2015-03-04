@@ -2,7 +2,12 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.0.1] - 2015-03-03
+### Fixed
+- **sendSMS()** Undefined method when sending SMS with minified Web SDK
+- **banner()** Uncaught TypeError on iOS and Android app banner
+- **banner()** Width of banner slightly more than 100% width on iOS Safari
+- Fallback when sessionStorage is not available, i.e. on Mobile Safari Private mode.
 
 ## [v1.0.0] - 2015-03-02
 ### Changed
