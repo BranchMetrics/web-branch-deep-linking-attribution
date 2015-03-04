@@ -16,6 +16,7 @@
     "url": "https://github.com/BranchMetrics/Web-SDK/issues"
   },
   "homepage": "https://github.com/BranchMetrics/Web-SDK",
+  "main": "dist/build.js",
   "devDependencies": {
     "falafel": "^1.0.1",
     "gulp": "^3.8.10",
