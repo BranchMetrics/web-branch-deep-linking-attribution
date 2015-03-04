@@ -41,5 +41,5 @@
 		catch (e) {
 			return  this;
 		}
-	}
+	};
 };
