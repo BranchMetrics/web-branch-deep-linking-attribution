@@ -10,14 +10,14 @@
  * @constructor
  */
  Storage = function() {
- 	var sessionStorageStructure = { };
+	var sessionStorageStructure = { };
 
 	this.setItem = function(key, value) {
 		sessionStorageStructure[key] = value;
 	};
 
 	this.getItem = function(key) {
-		if(typeof sessionStorageStructure[key] != 'undefined' ) {
+		if (typeof sessionStorageStructure[key] != 'undefined') {
 			return sessionStorageStructure[key];
 		}
 		else {
@@ -39,7 +39,7 @@
 			return sessionStorage;
 		}
 		catch (e) {
-			return  this;
+			return this;
 		}
-	}
+	};
 };
