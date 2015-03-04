@@ -1,15 +1,17 @@
 #!/bin/bash
 
+[ $# -eq 0 ] && { echo "Usage: $0 v1.0.0"; exit 1; }
+
+gulp check
+
 VERSION=$1
 DATE=$(date "+%Y-%m-%d")
-
-echo $VERSION > VERSION
 
 echo "Releasing Branch Web SDK"
 
 echo "Building files"
 make clean
-make all
+make version=$VERSION all
 
 read -p "Bump changelog version? " -n 1 -r
 echo
@@ -40,8 +42,8 @@ read -p "Copy to S3? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	mv dist/build.js dist/branch-$VERSION.js
-	mv dist/build.min.js.gz dist/branch-$VERSION.min.js
+	cp dist/build.js dist/branch-$VERSION.js
+	cp dist/build.min.js.gz dist/branch-$VERSION.min.js
 	aws s3 cp --content-type="text/javascript" dist/branch-$VERSION.js s3://branch-web-sdk/branch-$VERSION.js --acl public-read
 	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/branch-$VERSION.min.js s3://branch-web-sdk/branch-$VERSION.min.js  --acl public-read
 	aws s3 cp example.html s3://branch-web-sdk/example.html --acl public-read

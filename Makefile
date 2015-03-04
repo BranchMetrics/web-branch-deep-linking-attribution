@@ -9,7 +9,7 @@ COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() 
 all: dist/build.js dist/build.min.js.gz README.md example.html
 docs: README.md
 clean:
-	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md xaa xab example.html; \
+	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md example.html
 
 
 # Kinda gross, but will download closure compiler if you don't have it.
@@ -62,17 +62,12 @@ dist/build.min.js.gz: dist/build.min.js
 
 docs/1_onpage.md: src/onpage.js compiler/compiler.jar
 	@echo "\nMinifying on page script into README"
-	sed -e 's/SCRIPT_URL_HERE/https:\/\/cdn.branch.io\/branch-'`cat VERSION`'.min.js/' src/onpage.js > xaa
-	$(COMPILER) --js xaa \
-		--define 'DEBUG=false' | node transform.js branch_sdk > docs/1_onpage.md
-	rm xaa
+	perl -pe 'BEGIN{$$sub="$(version)"?"https://cdn.branch.io/branch-$(version).min.js":"dist/branch.js"};s#SCRIPT_URL_HERE#$$sub#' src/onpage.js | \
+		$(COMPILER) | \
+		node transform.js branch_sdk > docs/1_onpage.md
 
 example.html: src/example.template.html docs/1_onpage.md
-	split -p '// INSERT INIT CODE' src/example.template.html
-	cat xaa > example.html
-	cat docs/1_onpage.md >> example.html
-	sed 1d xab >> example.html
-	rm xaa xab
+	perl -pe 'BEGIN{$$a=`cat docs/1_onpage.md`}; s#// INSERT INIT CODE#$$a#' src/example.template.html > example.html
 
 README.md: docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md
 	@echo "\nConcatinating readme"

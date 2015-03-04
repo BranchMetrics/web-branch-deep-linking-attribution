@@ -13,8 +13,6 @@ node_modules
 compiler
 *.sublime-project
 *.sublime-workspace
-dist/build.js
-dist/build.min.js
 dist/build.min.js.gz
 docs/1_onpage.md
 docs/3_branch.md
