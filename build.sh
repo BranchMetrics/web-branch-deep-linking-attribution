@@ -5,6 +5,7 @@
 gulp check
 
 VERSION=$1
+VERSION_NO_V=$(echo $VERSION | tr -d "\nv")
 DATE=$(date "+%Y-%m-%d")
 
 echo "Releasing Branch Web SDK"
@@ -23,6 +24,14 @@ then
 	mv a CHANGELOG.md
 fi
 
+read -p "Update package.json? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	sed -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json > a
+	mv a package.json
+fi
+
 read -p "Commit? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -36,7 +45,6 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	git tag $VERSION
 fi
-
 
 read -p "Copy to S3? " -n 1 -r
 echo
