@@ -57,6 +57,12 @@ then
 	aws s3 cp example.html s3://branch-web-sdk/example.html --acl public-read
 fi
 
+read -p "Publish to NPM? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	npm publish
+fi
 
 read -p "Reset? " -n 1 -r
 echo
