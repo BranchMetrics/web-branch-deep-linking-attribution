@@ -6,6 +6,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ### New Functionality
 - **bower** and **npm**: you can now `bower install branch-web-sdk` or `npm install branch-sdk` to get the Branch SDK!
 - **RequireJS** and **CommonJS**: you can now use the Branch library in both RequireJS and CommonJS contexts; just `require('branch')` or `define(['branch'], function(branch) { ... });`!
+
 ### Fixed
 - **sendSMS()** Incorrect URL path for link clicks when using whitelabeled domains
 
