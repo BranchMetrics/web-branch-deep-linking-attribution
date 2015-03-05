@@ -16,7 +16,7 @@
 	"ignore": [
 		"compiler",
 		"docs",
-		"src/",
+		"src/**",
 		"dist/build.min.js",
 		"dist/build.min.js.gzip",
 		"externs",

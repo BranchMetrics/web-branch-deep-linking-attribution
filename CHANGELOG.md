@@ -2,7 +2,10 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.1.0] - 2015-03005
+### Fixed
+- **sendSMS()** Incorrect URL path for link clicks when using whitelabeled domains
+- **bower.json** Updated to include correct version
 
 ## [v1.0.1] - 2015-03-03
 ### Fixed

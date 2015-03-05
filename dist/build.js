@@ -1155,10 +1155,13 @@ Branch.prototype.linkClick = function(a, b) {
     return b(utils.message(utils.messages.nonInit));
   }
   var c = this;
-  a && this._api(resources.linkClick, {link_url:a.replace("https://bnc.lt/", ""), click:"click"}, function(a, e) {
-    utils.storeKeyValue("click_id", e.click_id, c._storage);
-    (a || e) && b(a, e);
-  });
+  if (a) {
+    var d = a.split("/");
+    this._api(resources.linkClick, {link_url:"/l/" + d[d.length - 1], click:"click"}, function(a, d) {
+      utils.storeKeyValue("click_id", d.click_id, c._storage);
+      (a || d) && b(a, d);
+    });
+  }
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
   d = d || function() {

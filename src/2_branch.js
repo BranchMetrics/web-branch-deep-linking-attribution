@@ -380,8 +380,10 @@ Branch.prototype['linkClick'] = function(url, callback) {
 	}
 	var self = this;
 	if (url) {
+		var urlArray = url.split('/');
+		var linkid = urlArray[urlArray.length - 1];
 		this._api(resources.linkClick, {
-			"link_url": url.replace('https://bnc.lt/', ''),
+			"link_url": '/l/' + linkid,
 			"click": "click"
 		}, function(err, data) {
 			utils.storeKeyValue('click_id', data['click_id'], self._storage);
