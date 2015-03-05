@@ -20,7 +20,6 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	# this is dumb, dunno why  it does this
 	sed -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md > a
-	rm CHANGELOG.md
 	mv a CHANGELOG.md
 fi
 
@@ -30,6 +29,14 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	sed -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json > a
 	mv a package.json
+fi
+
+read -p "Update bower.json? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	sed -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" bower.json > a
+	mv a bower.json
 fi
 
 read -p "Commit? " -n 1 -r
