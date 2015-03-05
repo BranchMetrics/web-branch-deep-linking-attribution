@@ -29,32 +29,29 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 ### Quick Install
 
+#### Manual installation
+
 _Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
-
-#### 1. Bower installation
-
-Simply run `bower install branch-web-sdk`
-
-Then include:
-````html
-<script type="text/javascript">
-branch.init('APP-KEY', function(err, data) {
-    // callback to handle err or data
-});
-</script>
-````
-
-#### 2. Manual installation
 
 ```html
 <script type="text/javascript">
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.1.0.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 branch.init('APP-KEY', function(err, data) {
     // callback to handle err or data
 });
 </script>
 ```
+
+#### Bower or npm installation
+
+If you use Bower or npm, you can run `bower install branch-web-sdk` or `npm install branch-sdk` respectively to get the SDK.
+
+#### Common.JS and RequireJS compatibility
+
+In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
+
+
 ## API Reference
 
 1. Branch Session
