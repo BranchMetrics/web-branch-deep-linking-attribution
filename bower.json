@@ -16,6 +16,9 @@
 	"ignore": [
 		"compiler",
 		"docs",
+		"src",
+		"dist/build.min.js",
+		"dist/build.min.js.gzip",
 		"externs",
 		"node_modules",
 		"tests",
