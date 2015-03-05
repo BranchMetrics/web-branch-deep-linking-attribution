@@ -2,7 +2,9 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.1.1] - 2015-03-05
+### New Functionality
+- Added **forgetHide** option to banner, allowing you to show the banner even if the user has disabled it.
 
 ## [v1.1.0] - 2015-03-05
 ### New Functionality

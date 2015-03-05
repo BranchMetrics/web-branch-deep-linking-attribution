@@ -1239,7 +1239,7 @@ Branch.prototype.banner = function(a, b) {
   a.showMobile = void 0 === a.showMobile ? !0 : a.showMobile;
   a.showDesktop = void 0 === a.showDesktop ? !0 : a.showDesktop;
   a.iframe = void 0 === a.iframe ? !0 : a.iframe;
-  document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") || utils.readKeyValue("hideBanner", this._storage) || (banner.bannerMarkup(a), banner.bannerStyles(a), banner.bannerActions(this, a, b), banner.triggerBannerAnimation(a));
+  document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") || utils.readKeyValue("hideBanner", this._storage) && !a.forgetHide || (banner.bannerMarkup(a), banner.bannerStyles(a), banner.bannerActions(this, a, b), banner.triggerBannerAnimation(a));
 };
 // Input 10
 var branch_instance = new Branch;

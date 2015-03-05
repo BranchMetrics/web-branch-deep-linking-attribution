@@ -62,7 +62,7 @@ dist/build.min.js.gz: dist/build.min.js
 
 docs/1_onpage.md: src/onpage.js compiler/compiler.jar
 	@echo "\nMinifying on page script into README"
-	perl -pe 'BEGIN{$$sub="$(version)"?"https://cdn.branch.io/branch-$(version).min.js":"dist/branch.js"};s#SCRIPT_URL_HERE#$$sub#' src/onpage.js | \
+	perl -pe 'BEGIN{$$sub="$(version)"?"https://cdn.branch.io/branch-$(version).min.js":"dist/build.js"};s#SCRIPT_URL_HERE#$$sub#' src/onpage.js | \
 		$(COMPILER) | \
 		node transform.js branch_sdk > docs/1_onpage.md
 
