@@ -719,6 +719,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     showMobile: true,                  // Should the banner be shown on mobile devices?
  *     showDesktop: true                  // Should the banner be shown on mobile devices?
+ *     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
  * }, {
  *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
@@ -744,7 +745,7 @@ Branch.prototype['banner'] = function(options, linkData) {
 	options.showMobile = (options.showMobile === undefined) ? true : options.showMobile;
 	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
 	options.iframe = (options.iframe === undefined) ? true : options.iframe;
-	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && !utils.readKeyValue('hideBanner', this._storage)) {
+	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && (!utils.readKeyValue('hideBanner', this._storage) || options.forgetHide)) {
 		banner.bannerMarkup(options);
 		banner.bannerStyles(options);
 		banner.bannerActions(this, options, linkData);

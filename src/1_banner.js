@@ -291,8 +291,12 @@ var bannerResources = {
 					document.body.style.marginTop = '0px';
 				}, animationDelay);
 
-				 /*jshint -W030 */
-				bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = '-' + bannerHeight : bannerResources.utils.branchBanner().style.top = '-' + bannerHeight;
+				if (bannerResources.utils.branchiFrame()) {
+					bannerResources.utils.branchiFrame().style.top = '-' + bannerHeight;
+				}
+				else {
+					bannerResources.utils.branchBanner().style.top = '-' + bannerHeight;
+				}
 
 				utils.storeKeyValue('hideBanner', true, branch._storage);
 			};
