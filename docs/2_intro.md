@@ -3,6 +3,16 @@ branch.init('APP-KEY', function(err, data) {
 });
 </script>
 ```
+
+#### Bower or npm installation
+
+If you use Bower or npm, you can run `bower install branch-web-sdk` or `npm install branch-sdk` respectively to get the SDK.
+
+#### Common.JS and RequireJS compatibility
+
+In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
+
+
 ## API Reference
 
 1. Branch Session

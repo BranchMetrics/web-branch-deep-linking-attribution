@@ -29,20 +29,7 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 ### Quick Install
 
-#### 1. Bower installation
-
-Simply run `bower install branch-web-sdk`
-
-Then include:
-````html
-<script type="text/javascript">
-branch.init('APP-KEY', function(err, data) {
-    // callback to handle err or data
-});
-</script>
-```
-
-#### 2. Manual installation
+#### Manual installation
 
 _Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
