@@ -158,8 +158,6 @@ var XHRRequest = function(url, data, method, storage, callback) {
  * @param {function(?Error,*=)=} callback
  */
 api = function(resource, data, storage, callback) {
-	// callback = utils.injectDequeue( callback || function() { } );
-
 	var u = getUrl(resource, data);
 	var url, postData = '';
 	if (resource.method == 'GET') {

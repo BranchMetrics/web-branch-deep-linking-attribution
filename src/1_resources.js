@@ -123,7 +123,8 @@ resources._r = {
 	method: utils.httpMethod.GET,
 	jsonp: true,
 	params: {
-		"app_id": validator(true, branch_id)
+		"app_id": validator(true, branch_id),
+		"v": validator(true, validationTypes.str)
 	}
 };
 

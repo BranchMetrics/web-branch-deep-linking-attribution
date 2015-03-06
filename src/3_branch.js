@@ -9,6 +9,7 @@ goog.require('api');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
+goog.require('config');
 /*jshint unused:false*/
 goog.require('goog.json');
 
@@ -106,7 +107,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 		callback(null, utils.whiteListSessionData(sessionData));
 	}
 	else {
-		this._api(resources._r, { }, function(err, browser_fingerprint_id) {
+		this._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
 			self._api(resources.open, {
 				"link_identifier": utils.urlValue('_branch_click_id'),
 				"is_referrable": 1,
