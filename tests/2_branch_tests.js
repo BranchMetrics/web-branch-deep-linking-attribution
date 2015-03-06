@@ -52,10 +52,14 @@ var tearDown = function() {
 /**
  * Helper function for tests
  */
-var runAsyncTest = function(testFunction, assertions) {
+var runAsyncTest = function(testFunction, assertions, expectedError, expectedResponse) {
 
-	var receivedData = { };
+	var receivedData = {};
 	var recievedFired;
+
+	stubs.replace(branch, '_api', function(resource, obj, callback) {
+		callback(expectedError, expectedResponse);
+	});
 
 	waitForCondition(
 		function() {
@@ -82,8 +86,10 @@ var testSendSMS = function() {
 	runAsyncTest(function(callback) {
 		branch.sendSMS('5177401526', params, { }, function(err, data) { callback(err, data) });
 	}, function(receivedData) {
-		assertUndefined("should send SMS with phone number and return undefined", receivedData);
-	});
+		assertUndefined("should return undefined", receivedData);
+	},
+	null,
+	undefined);
 }
 
 // ===========================================================================================
@@ -96,7 +102,9 @@ var testSendSMS = function() {
 		branch.track('Tracked this click', function(err, data) { callback(err, data) });
 	}, function(receivedData) {
 		assertUndefined("should return undefined", receivedData);
-	});
+	},
+	null,
+	undefined);
 }
 
 // ===========================================================================================
@@ -108,7 +116,9 @@ var testReferrals = function() {
 		branch.referrals(function(err, data) { callback(err, data) });
 	}, function(receivedData) {
 		assertTrue("should return an object", (typeof receivedData && receivedData != null));
-	});
+	},
+	null,
+	{ });
 }
 
 // ===========================================================================================
@@ -120,7 +130,9 @@ var testCredits = function() {
 		branch.credits(function(err, data) { callback(err, data) });
 	}, function(receivedData) {
 		assertTrue("should return an object", (typeof receivedData && receivedData != null));
-	});
+	},
+	null,
+	{ });
 }
 
 // ===========================================================================================
@@ -128,12 +140,19 @@ var testCredits = function() {
  * Identify tests
  */
 var testSetIdentity = function() {
+	var expectedData = {
+		"link": "https://bnc.lt/i/3T0CTu--23",
+		"referring_data": "awesome data"
+	};
+
 	runAsyncTest(function(callback) {
 		branch.setIdentity('Branch', function(err, data) { callback(err, data) });
 	}, function(receivedData) {
 			assertNonEmptyString("should return correct link", receivedData.link);
 			assertNonEmptyString("should return correct referring_data", receivedData.referring_data);
-	});
+	},
+	null,
+	expectedData);
 }
 
 // ===========================================================================================
@@ -141,7 +160,7 @@ var testSetIdentity = function() {
  * Redeem Credits tests
  */
 var testRedeem = function() {
-	var expectedData = new Error('Not enough credits to redeem.');
+	var expectedError = new Error('Not enough credits to redeem.');
 
     var amount = 5;
     var bucket = 'default';
@@ -150,8 +169,9 @@ var testRedeem = function() {
 		branch.redeem(amount, bucket, function(err, data) {
 			callback(err, data) });
 	}, function(receivedData) {
-		assertObjectEquals("should return error for not enough credits", expectedData, receivedData);
-	});
+		assertObjectEquals("should return error for not enough credits", expectedError, receivedData);
+	},
+	expectedError);
 }
 
 // ===========================================================================================
@@ -171,7 +191,9 @@ var testLink = function() {
 		var branchURL = "https://bnc.lt/l/";
 		var recievedURLRoot = receivedData.substring(0, 17);
 		assertEquals("should return branch URL", branchURL, recievedURLRoot);
-	});
+	},
+	null,
+	'https://bnc.lt/l/3ffPbeE-_K');
 }
 
 // ===========================================================================================
@@ -183,14 +205,21 @@ var testLogout = function() {
 		branch.logout(function(err, data) { callback(err, data) });
 	}, function(receivedData) {
 		assertUndefined("should return undefined", receivedData);
-	});
+	},
+	null,
+	undefined);
 }
 
 // ===========================================================================================
+
 /**
  * Start the tests
  */
+ /** @type {goog.testing.PropertyReplacer} */
 var stubs = new goog.testing.PropertyReplacer();
+
+ /** @type {goog.testing.ContinuationTestCase} */
 var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
+
 asyncTestCase.autoDiscoverTests();
 G_testRunner.initialize(asyncTestCase);
