@@ -10,6 +10,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Added **disableHide** option to banner, allows you to control if the banner lets the user disable (close) the banner.
 - Added **showiOS** option to banner, replaces **showMobile**, allows you to control if the banner shows on iOS devices
 - Added **showAndroid** option to banner, replaces **showMobile**, allows you to control if the banner shows on Android devices
+- Added **makeNewLink** option to banner, sendSMS, and link. If set to true, forces the creation of a new link, even if one already exists
 
 ## [v1.1.0] - 2015-03-05
 ### New Functionality

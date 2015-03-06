@@ -122,7 +122,7 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document.getElementById('branch-banner');
 		if (banner_utils.mobileUserAgent()) {
-			branch["link"](linkData, function(err, url) {
+			branch["link"](linkData, options, function(err, url) {
 				doc.getElementById('branch-mobile-action').href = url;
 			});
 		}

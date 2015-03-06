@@ -742,7 +742,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 // Input 5
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
-utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out"};
+utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", missingUrl:"Required argument: URL, is missing"};
 utils.error = function(a, b) {
   throw Error(utils.message(a, b));
 };
@@ -1028,7 +1028,7 @@ var sendSMS = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document.getElementById("branch-banner");
-    banner_utils.mobileUserAgent() ? a.link(c, function(a, b) {
+    banner_utils.mobileUserAgent() ? a.link(c, b, function(a, b) {
       f.getElementById("branch-mobile-action").href = b;
     }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
       d.preventDefault();
@@ -1128,74 +1128,59 @@ Branch.prototype.track = function(a, b, c) {
     c(a);
   });
 };
-Branch.prototype.link = function(a, b) {
-  b = b || function() {
+Branch.prototype.link = function(a, b, c) {
+  c = c || function() {
   };
   if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
+    return c(utils.message(utils.messages.nonInit));
   }
+  b = b || {};
+  "function" == typeof b && (c = b, b = {});
+  b.makeNewLink = b.makeNewLink || b.make_new_link || !1;
+  var d = this;
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
-  a.data = goog.json.serialize(a.data);
-  this._api(resources.link, a, function(a, d) {
-    b(a, d && d.url);
-  });
+  utils.readKeyValue("link_url", this._storage) && !b.makeNewLink ? c(null, utils.readKeyValue("link_url", this._storage)) : (a.data = goog.json.serialize(a.data), this._api(resources.link, a, function(a, b) {
+    utils.storeKeyValue("link_url", b.url, d._storage);
+    c(a, b && b.url);
+  }));
 };
-Branch.prototype.linkClick = function(a, b) {
-  b = b || function() {
+Branch.prototype.linkClick = function(a, b, c) {
+  c = c || function() {
   };
   if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
+    return c(utils.message(utils.messages.nonInit));
   }
-  var c = this;
-  if (a) {
-    var d = a.split("/");
-    this._api(resources.linkClick, {link_url:"/l/" + d[d.length - 1], click:"click"}, function(a, d) {
-      utils.storeKeyValue("click_id", d.click_id, c._storage);
-      (a || d) && b(a, d);
-    });
-  }
+  b = b || {};
+  b.makeNewLink = b.makeNewLink || b.make_new_link || !1;
+  "function" == typeof b && (c = b, b = {});
+  var d = this;
+  utils.readKeyValue("click_id", this._storage) && !b.makeNewLink ? c(null, utils.readKeyValue("click_id", this._storage)) : (a = a.split("/"), this._api(resources.linkClick, {link_url:"/l/" + a[a.length - 1], click:"click"}, function(a, b) {
+    utils.storeKeyValue("click_id", b.click_id, d._storage);
+    (a || b) && c(a, b);
+  }));
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
   d = d || function() {
   };
-  c = c || {};
-  c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
     return d(utils.message(utils.messages.nonInit));
   }
-  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? this.sendSMSExisting(a, d) : this.sendSMSNew(a, b, d);
-};
-Branch.prototype.sendSMSNew = function(a, b, c) {
-  c = c || function() {
-  };
-  var d = this;
-  if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
-  }
+  c = c || {};
+  var e = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
-  this.link(b, function(b, f) {
+  this.link(b, c, function(b, g) {
     if (b) {
-      return c(b);
+      return d(b);
     }
-    d.linkClick(f, function(b) {
+    e.linkClick(g, c, function(b) {
       if (b) {
-        return c(b);
+        return d(b);
       }
-      d.sendSMSExisting(a, function(a) {
-        c(a);
+      e._api(resources.SMSLinkSend, {link_url:utils.readKeyValue("click_id", e._storage), phone:a}, function(a) {
+        d(a);
       });
     });
-  });
-};
-Branch.prototype.sendSMSExisting = function(a, b) {
-  b = b || function() {
-  };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
-  this._api(resources.SMSLinkSend, {link_url:utils.readKeyValue("click_id", this._storage), phone:a}, function(a) {
-    b(a);
   });
 };
 Branch.prototype.referrals = function(a) {
@@ -1226,7 +1211,7 @@ Branch.prototype.redeem = function(a, b, c) {
 };
 Branch.prototype.banner = function(a, b) {
   var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:"undefined" == typeof a.disableHide ? 
-  !1 : a.disableHide, forgetHide:"undefined" == typeof a.forgetHide ? !0 : a.forgetHide};
+  !1 : a.disableHide, forgetHide:"undefined" == typeof a.forgetHide ? !0 : a.forgetHide, makeNewLink:"undefined" == typeof a.makeNewLink ? !1 : a.makeNewLink};
   "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
   banner(this, c, b, this._storage);
 };

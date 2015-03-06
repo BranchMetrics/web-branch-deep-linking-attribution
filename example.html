@@ -54,6 +54,7 @@
         <div class="group">
           <button id="track" class="btn btn-info">.track()</button>
           <button id="link" class="btn btn-info">.link()</button>
+          <button id="linkNew" class="btn btn-info">.link({ make_new_link': true })</button>
           <button id="banner" class="btn btn-info">.banner()</button>
         </div>
       </div>
@@ -61,8 +62,8 @@
       <h4>SMS</h4>
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
-          <button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, {})</button>
-          <button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, {make_new_link: true})</button>
+          <button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, { })</button>
+          <button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, { make_new_link: true })</button>
         </div>
       </div>
       <div class="row col-lg-8 col-lg-offset-2">
@@ -170,6 +171,13 @@
       });
     });
 
+    $('#linkNew').click(function() {
+      request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
+      branch.link(sampleParams, { 'makeNewLink': true }, function(err, link) {
+        response.html('<a href="' + link + '">' + link + '</a>');
+      });
+    });
+
     $('#sendSMS').click(function() {
       var smsOptions = {};
       var phone = phoneNumber();
@@ -219,12 +227,13 @@
         description: 'Branch Demo app!',
         openAppButtonText: 'Open',
         downloadAppButtonText: 'Download',
-        iframe: true,        // true by default, Show banner in an iframe if CSS on your page is conflicting
-        showiOS: true,       // true by default, Should the banner be shown on iOS devices?
-        showAndroid: true,   // true by default, Should the banner be shown on Android devices?
-        showDesktop: true,   // true by default, Should the banner be shown on desktop devices?
-        disableHide: true,  // false by default, Should the user have the ability to hide the banner? (show's X on left side)
-        forgetHide: true     // true by default, Should we remember or forget whether the user hid the banner?
+        iframe: true,          // true by default, Show banner in an iframe if CSS on your page is conflicting
+        showiOS: true,         // true by default, Should the banner be shown on iOS devices?
+        showAndroid: true,     // true by default, Should the banner be shown on Android devices?
+        showDesktop: true,     // true by default, Should the banner be shown on desktop devices?
+        disableHide: false,    // false by default, Should the user have the ability to hide the banner? (show's X on left side)
+        forgetHide: true,      // true by default, Should we remember or forget whether the user hid the banner?
+        makeNewLink: false     // false by default, Should a new link be created, even if one already exists?
       },
       // Link data or string of link
       sampleParams);

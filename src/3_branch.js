@@ -90,10 +90,7 @@ Branch.prototype._api = function(resource, obj, callback) {
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback|| function() { };
-	if (this.initialized) {
-		return callback(utils.message(utils.messages.existingInit));
-	}
-
+	if (this.initialized) { return callback(utils.message(utils.messages.existingInit)); }
 	this.app_id = app_id;
 	var self = this, sessionData = utils.readStore(this._storage);
 
@@ -299,6 +296,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 /**
  * @function Branch.link
  * @param {Object} linkData - _required_ - link data and metadata.
+ * @param {Object} options - _optional_ - Options for making link, see example below
  * @param {Function=} callback - _optional_ - returns a string of the Branch deep linking URL.
  *
  * **[Formerly `createLink()`](CHANGELOG.md)**
@@ -311,6 +309,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ```
  * branch.link(
  *     linkData,
+ *     options,
  *     callback (err, data)
  * );
  * ```
@@ -335,6 +334,9 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *         '$og_description': 'My app\'s description.',
  *         '$og_image_url': 'http://myappwebsite.com/image.png'
  *     }
+ * },
+ * {
+ *     "makeNewLink": true    // Should a new link be created, even if one already exists?
  * }, function(err, data) {
  *     console.log(err, data);
  * });
@@ -352,17 +354,30 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ## Sharing links via SMS
  *
  */
-Branch.prototype['link'] = function(linkData, callback) {
+Branch.prototype['link'] = function(linkData, options, callback) {
 	callback = callback || function() { };
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	options = options || { };
+	if (typeof options == 'function') {
+		callback = options;
+		options = { };
+	}
+	options['makeNewLink'] = options['makeNewLink'] || options['make_new_link'] || false;
+	var self = this;
 	linkData['source'] = 'web-sdk';
 	if (linkData['data']['$desktop_url'] !== undefined) {
 		linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
-	linkData['data'] = goog.json.serialize(linkData['data']);
-	this._api(resources.link, linkData, function(err, data) {
-		callback(err, data && data['url']);
-	});
+	if (utils.readKeyValue('link_url', this._storage) && !options['makeNewLink']) {
+		callback(null, utils.readKeyValue('link_url', this._storage));
+	}
+	else {
+		linkData['data'] = goog.json.serialize(linkData['data']);
+		this._api(resources.link, linkData, function(err, data) {
+			utils.storeKeyValue('link_url', data['url'], self._storage);
+			callback(err, data && data['url']);
+		});
+	}
 };
 
 /***
@@ -371,13 +386,22 @@ Branch.prototype['link'] = function(linkData, callback) {
  * @param {string} url - _required_ - branch deep linking URL to register link click on.
  * @param {Function=} callback - _optional_ - returns an error if unsuccessful.
  */
-Branch.prototype['linkClick'] = function(url, callback) {
+Branch.prototype['linkClick'] = function(url, options, callback) {
 	callback = callback || function() { };
 	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
+	options = options || { };
+	options['makeNewLink'] = options['makeNewLink'] || options['make_new_link'] || false;
+	if (typeof options == 'function') {
+		callback = options;
+		options = { };
+	}
 	var self = this;
-	if (url) {
+	if (utils.readKeyValue('click_id', this._storage) && !options['makeNewLink']) {
+		callback(null, utils.readKeyValue('click_id', this._storage));
+	}
+	else {
 		var urlArray = url.split('/');
 		var linkid = urlArray[urlArray.length - 1];
 		this._api(resources.linkClick, {
@@ -394,7 +418,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * @function Branch.sendSMS
  * @param {string} phone - _required_ - phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
- * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+ * @param {Object=} options - _optional_ - options: makeNewLink, which forces the creation of a new link even if one already exists
  * @param {Function=} callback - _optional_ - Returns an error if unsuccessful
  *
  * **[Formerly `SMSLink()`](CHANGELOG.md)**
@@ -440,7 +464,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  *             '$og_image_url': 'http://myappwebsite.com/image.png'
  *         }
  *     },
- *     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
+ *     { makeNewLink: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
  *     function(err) { console.log(err); }
  * });
  * ```
@@ -466,80 +490,22 @@ Branch.prototype['linkClick'] = function(url, callback) {
  */
 Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 	callback = callback || function() { };
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	options = options || { };
-	options['make_new_link'] = options['make_new_link'] || false;
-
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
-	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
-		this["sendSMSExisting"](phone, callback);
-	}
-	else {
-		this["sendSMSNew"](phone, linkData, callback);
-	}
-};
-
-/*** <--- Not in docs
- *
- * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
- *
- * @param {string} phone
- * @param {Object} linkData
- * @param {Function=} callback
- *
- * #### Usage
- * ```js
- * branch.sendSMSNew(
- *     metadata, // Metadata must include phone number as `phone`
- *     callback (err, data)
- * );
- * ```
- *
- * ___
- */
-Branch.prototype["sendSMSNew"] = function(phone, linkData, callback) {
-	callback = callback || function() { };
 	var self = this;
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
 	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
-	this["link"](linkData, function(err, url) {
+	this["link"](linkData, options, function(err, url) {
 		if (err) { return callback(err); }
-		self["linkClick"](url, function(err) {
+		self["linkClick"](url, options, function(err) {
 			if (err) { return callback(err); }
-			self["sendSMSExisting"](phone, function(err) {
+			self._api(resources.SMSLinkSend, {
+				"link_url": utils.readKeyValue('click_id', self._storage),
+				"phone": phone
+			}, function(err) {
 				callback(err);
 			});
 		});
-	});
-};
-
-/*** <--- Not in docs
- * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
- *
- * @param {string} phone
- * @param {Function=} callback
- *
- * #### Usage
- * ```js
- * branch.sendSMSExisting(
- *     metadata, // Metadata must include phone number as `phone`
- *     callback (err, data)
- * );
- * ```
- * ___
- */
-Branch.prototype["sendSMSExisting"] = function(phone, callback) {
-	callback = callback || function() { };
-
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
-	var self = this;
-	this._api(resources.SMSLinkSend, {
-		"link_url": utils.readKeyValue('click_id', self._storage),
-		"phone": phone
-	}, function(err) {
-		callback(err);
 	});
 };
 
@@ -621,9 +587,7 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
-	}
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	this._api(resources.credits, { }, function(err, data) {
 		callback(err, data);
 	});
@@ -674,9 +638,7 @@ Branch.prototype['credits'] = function(callback) {
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
 	callback = callback || function() {};
-	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
-	}
+	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err) {
 		callback(err);
 	});
@@ -718,7 +680,8 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     showAndroid: true,                 // Should the banner be shown on Android devices?
  *     showDesktop: true,                 // Should the banner be shown on desktop devices?
  *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
- *     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
+ *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+ *     makeNewLink: false                 // Should the banner create a new link, even if a link already exists?
  * }, {
  *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
@@ -752,7 +715,8 @@ Branch.prototype['banner'] = function(options, linkData) {
 		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 		disableHide: typeof options['disableHide'] == 'undefined' ? false : options['disableHide'],
-		forgetHide: typeof options['forgetHide'] == 'undefined' ? true : options['forgetHide']
+		forgetHide: typeof options['forgetHide'] == 'undefined' ? true : options['forgetHide'],
+		makeNewLink: typeof options['makeNewLink'] == 'undefined' ? false : options['makeNewLink']
 	};
 
 	if (typeof options['showMobile'] != 'undefined') {

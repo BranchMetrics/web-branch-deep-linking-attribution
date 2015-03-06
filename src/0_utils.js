@@ -36,7 +36,8 @@ utils.messages = {
 	existingInit: 'Branch SDK already initilized',
 	missingAppId: 'Missing Branch app ID',
 	callBranchInitFirst: 'Branch.init must be called first',
-	timeout: 'Request timed out'
+	timeout: 'Request timed out',
+	missingUrl: 'Required argument: URL, is missing'
 };
 
 /**
