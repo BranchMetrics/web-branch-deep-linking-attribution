@@ -741,8 +741,8 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 };
 // Input 5
 var utils = {}, DEBUG = !0, message;
-utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out"};
 utils.httpMethod = {POST:"POST", GET:"GET"};
+utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out"};
 utils.error = function(a, b) {
   throw Error(utils.message(a, b));
 };
@@ -1051,7 +1051,7 @@ var default_branch, Branch = function() {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
-  this._storage = Storage();
+  this._storage = storage();
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
