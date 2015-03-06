@@ -852,7 +852,7 @@ function getUrl(a, b) {
   return{data:serializeObject(e, ""), url:d};
 }
 var jsonpRequest = function(a, b) {
-  var c = "branch_callback__" + _jsonp_callback_index++, d = 0 <= a.indexOf("bnc.lt") ? "&post_data=" : "&data=", e = "POST" == b.method ? encodeURIComponent(utils.base64encode(goog.json.serialize(b.data))) : "", f = window.setTimeout(function() {
+  var c = "branch_callback__" + _jsonp_callback_index++, d = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=", e = "POST" == b.method ? encodeURIComponent(utils.base64encode(goog.json.serialize(b.data))) : "", f = window.setTimeout(function() {
     window[c] = function() {
     };
     b.onTimeout();

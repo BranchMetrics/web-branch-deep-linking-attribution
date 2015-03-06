@@ -72,7 +72,7 @@ var jsonpRequest = function(url, options) {
 	// options.onSuccess = options.onSuccess || function() { };
 	// options.onTimeout = options.onTimeout || function() { };
 
-	var postPrefix = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=',
+	var postPrefix = (url.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
 		postData = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(options.data))) : "";
 	var timeout = options.timeout || 10; // sec
 
