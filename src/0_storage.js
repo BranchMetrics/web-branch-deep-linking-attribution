@@ -10,7 +10,7 @@ goog.provide('storage');
  * @constructor
  */
 var BranchStorage = function() {
-	this._store = {};
+	this._store = { };
 };
 
 /**

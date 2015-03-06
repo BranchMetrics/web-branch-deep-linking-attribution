@@ -36,10 +36,13 @@ calcdeps.py: $(SOURCES) compiler/library
 	--output_mode deps \
 	--exclude tests/branch-deps.js \
 	> tests/branch-deps.js
+	echo "//jscs:disable"|cat - tests/branch-deps.js > \
+	tests/branch-deps.js.tmp && \
+	mv tests/branch-deps.js.tmp tests/branch-deps.js
 
 docs/3_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
-	jsdox src/3_branch.js --output docs
+	jsdox src/3_branch.js --output docs2
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
 	@echo "\nMinifying debug js..."

@@ -3,26 +3,21 @@
  */
 
 /**
- * Defines global test variables
+ * Defines test variables
  */
 var maxWaitTime;
 var asyncPollingInterval;
 var params;
 var branch;
-var stubs = new goog.testing.PropertyReplacer();
-var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
 
 /**
  * Setup the Branch Function
  */
-var setUpPage = function() {
-
-	asyncTestCase.autoDiscoverTests();
-	G_testRunner.initialize(asyncTestCase);
+var setUp = function() {
 
 	// Main Branch object
 	branch = new Branch();
-	branch.init('5680621892404085', function(err, data) {});
+	branch.init('5680621892404085', function(err, data) { });
 
 	// Maximum wait time for async tests (ms)
 	maxWaitTime = 15000;
@@ -38,9 +33,7 @@ var setUpPage = function() {
 		stage: 'created link',
 		type: 1,
 		data: {
-			mydata: {
-				foo: 'bar'
-			},
+			mydata: 'bar',
 			'$desktop_url': 'http://s3-us-west-1.amazonaws.com/branch-sdk/example.html',
 			'$og_title': 'Branch Metrics',
 			'$og_description': 'Branch Metrics',
@@ -61,7 +54,7 @@ var tearDown = function() {
  */
 var runAsyncTest = function(testFunction, assertions) {
 
-	var receivedData = {};
+	var receivedData = { };
 	var recievedFired;
 
 	waitForCondition(
@@ -87,26 +80,12 @@ var runAsyncTest = function(testFunction, assertions) {
  // SMS sends with phone param
 var testSendSMS = function() {
 	runAsyncTest(function(callback) {
-		branch.sendSMS('5177401526', params, {}, function(err, data) { callback(err, data) });
+		branch.sendSMS('5177401526', params, { }, function(err, data) { callback(err, data) });
 	}, function(receivedData) {
 		assertUndefined("should send SMS with phone number and return undefined", receivedData);
 	});
 }
 
-// For whatever reason, the callbacl in api.js:105 is fired twice, the second time, data is empty
-// Fails on missing phone number
-/*
-var testMissingPhonesendSMS = function() {
-	var expectedData = new Error(utils.message(utils.messages.missingParam, ['/c', 'phone']));
-	stubs.replace(params, 'phone', '');
-
-	runAsyncTest(function(callback) {
-		branch.sendSMS(params, function(err, data) { callback(err, data) });
-	}, function(receivedData) {
-		assertObjectEquals("should require a phone number", receivedData, expectedData);
-	});
-}
-*/
 // ===========================================================================================
 /**
  * Track tests
@@ -206,3 +185,12 @@ var testLogout = function() {
 		assertUndefined("should return undefined", receivedData);
 	});
 }
+
+// ===========================================================================================
+/**
+ * Start the tests
+ */
+var stubs = new goog.testing.PropertyReplacer();
+var asyncTestCase = new goog.testing.ContinuationTestCase("Branch test case");
+asyncTestCase.autoDiscoverTests();
+G_testRunner.initialize(asyncTestCase);
