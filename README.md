@@ -543,8 +543,10 @@ branch.banner({
     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
-    showMobile: true,                  // Should the banner be shown on mobile devices?
-    showDesktop: true                  // Should the banner be shown on desktop devices?
+    showiOS: true,                     // Should the banner be shown on iOS devices?
+    showAndroid: true,                 // Should the banner be shown on Android devices?
+    showDesktop: true,                  // Should the banner be shown on desktop devices?
+    showMobile: true,                   // Should the banner be shown on any mobile device? (overrides showiOS and showAndroid)
     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
 }, {
     phone: '9999999999',
