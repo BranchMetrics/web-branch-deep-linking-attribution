@@ -699,7 +699,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *
  * ```js
  * branch.banner(
- *     options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, iframe, showMobile, showDesktop
+ *     options, // Banner options: See example for all available options
  *     linkData // Data for link, same as Branch.link()
  * );
  * ```
@@ -716,8 +716,8 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     showiOS: true,                     // Should the banner be shown on iOS devices?
  *     showAndroid: true,                 // Should the banner be shown on Android devices?
- *     showDesktop: true,                  // Should the banner be shown on desktop devices?
- *     showMobile: true,                   // Should the banner be shown on any mobile device? (overrides showiOS and showAndroid)
+ *     showDesktop: true,                 // Should the banner be shown on desktop devices?
+ *     enableHide: true,                  // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
  * }, {
  *     phone: '9999999999',
@@ -751,6 +751,7 @@ Branch.prototype['banner'] = function(options, linkData) {
 		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
 		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
+		enableHide: typeof options['enableHide'] == 'undefined' ? true : options['enableHide'],
 		forgetHide: typeof options['forgetHide'] == 'undefined' ? true : options['forgetHide']
 	};
 

@@ -528,7 +528,7 @@ Display a smart banner directing the user to your app through a Branch referral 
 
 ```js
 branch.banner(
-    options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, iframe, showMobile, showDesktop
+    options, // Banner options: See example for all available options
     linkData // Data for link, same as Branch.link()
 );
 ```
@@ -545,8 +545,8 @@ branch.banner({
     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
     showiOS: true,                     // Should the banner be shown on iOS devices?
     showAndroid: true,                 // Should the banner be shown on Android devices?
-    showDesktop: true,                  // Should the banner be shown on desktop devices?
-    showMobile: true,                   // Should the banner be shown on any mobile device? (overrides showiOS and showAndroid)
+    showDesktop: true,                 // Should the banner be shown on desktop devices?
+    enableHide: true,                  // Should the user have the ability to hide the banner? (show's X on left side)
     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
 }, {
     phone: '9999999999',

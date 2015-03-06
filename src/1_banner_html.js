@@ -11,7 +11,7 @@ goog.require('storage'); // jshint unused:false
 banner_html.banner = function(options, action) {
 	return '<div class="content">' +
 		'<div class="left">' +
-			'<div id="branch-banner-close" class="branch-animation">&times;</div>' +
+			 (options.enableHide ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
 			'<div class="icon">' +
 				'<img src="' + options.icon + '">' +
 			'</div>' +

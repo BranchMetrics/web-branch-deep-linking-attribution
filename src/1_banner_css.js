@@ -16,7 +16,7 @@ banner_css.banner =
 
 banner_css.desktop =
 	'#branch-banner { position: fixed; min-width: 600px; }\n' +
-	'#branch-banner-close { color: #aaa; font-size: 24px; top: 18px; }\n' +
+	'#branch-banner-close { color: #aaa; font-size: 24px; top: 14px; }\n' +
 	'#branch-banner-close:hover { color: #000; }\n' +
 	'#branch-banner .left, .right { width: 47%;  top: 0; }\n' +
 	'#branch-banner .title { font-size: 14px; }\n' +

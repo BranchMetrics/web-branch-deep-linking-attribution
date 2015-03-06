@@ -132,10 +132,13 @@ banner = function(branch, options, linkData, storage) {
 				sendSMS(doc, branch, options, linkData);
 			});
 		}
-		doc.getElementById('branch-banner-close').onclick = function(ev) {
-			ev.preventDefault();
-			closeBanner(element, storage);
-		};
+		var closeButton = doc.getElementById('branch-banner-close');
+		if (closeButton) {
+			closeButton.onclick = function(ev) {
+				ev.preventDefault();
+				closeBanner(element, storage);
+			};
+		}
 
 		// Trigger animation
 		document.body.className = 'branch-animation';
