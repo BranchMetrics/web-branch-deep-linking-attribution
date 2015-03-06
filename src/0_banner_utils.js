@@ -1,19 +1,24 @@
 goog.provide('banner_utils');
 goog.require('utils');
-goog.require('Storage'); // jshint unused:false
+goog.require('storage'); // jshint unused:false
 
 /** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean}} */
 banner_utils.options; // jshint ignore:line
 
 // UI Animation transition speed in ms.
+/** @type {number} */
 banner_utils.animationSpeed = 250;
+
 // UIAnimation delay between juxtaposed elements.
+/** @type {number} */
 banner_utils.animationDelay = 20;
+
 // Height of banner.
-banner_utils.height = '76px';
+/** @type {string} */
+banner_utils.bannerHeight = '76px';
 
 /**
- * @param {DOMElement} element
+ * @param {Object} element
  */
 banner_utils.removeElement = function(element) {
 	if (element) {
@@ -26,9 +31,9 @@ banner_utils.mobileUserAgent = function() {
 };
 
 /**
- * @param {boolean} hidden
  * @param {BranchStorage} storage
- * @return {?utils.sessionData}
+ * @param {banner_utils.options} options
+ * @return {boolean}
  */
 banner_utils.shouldAppend = function(storage, options) {
 	return !document.getElementById('branch-banner') &&
@@ -36,7 +41,7 @@ banner_utils.shouldAppend = function(storage, options) {
 		(!utils.readKeyValue('hideBanner', storage) || options.forgetHide) &&
 		(
 			(options.showDesktop && !banner_utils.mobileUserAgent()) ||
-			(options.showAndroid && banner_utils.mobileUserAgent() == 'android')
+			(options.showAndroid && banner_utils.mobileUserAgent() == 'android') ||
 			(options.showiOS && banner_utils.mobileUserAgent() == 'ios')
 		);
 };

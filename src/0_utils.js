@@ -5,7 +5,7 @@
 goog.provide('utils');
 /*jshint unused:false*/
 goog.require('goog.json');
-goog.require('Storage');
+goog.require('storage');
 
 
 /** @define {boolean} */
@@ -13,10 +13,19 @@ var DEBUG = true;
 
 /* jshint ignore:start */
 /** @typedef {string} */
-message; // Does not work with tests
+var message;
 
-/** @typedef {{session_id:string, identity_id:string, link:string, data:string, referring_identity:string, link_click:string}} */
+/** @typedef {{data:?string, referring_identity:?string, identity:?string, has_app:?boolean}} */
 utils.sessionData;
+
+/** @typedef {string} */
+utils._httpMethod;
+
+/** @enum {utils._httpMethod} */
+utils.httpMethod = { POST: 'POST', GET: 'GET' };
+
+/** @typedef {{destination: string, endpoint: string, method: utils._httpMethod, params: ?Object.<string, _validator>, queryPart: ?Object.<string, _validator>, jsonp: ?boolean }} */
+utils.resource;
 /* jshint ignore:end */
 
 /** @type {Object<string,message>} */
@@ -31,8 +40,8 @@ utils.messages = {
 };
 
 /**
- * @param {message}
- * @param {?Array.<*>}
+ * @param {message} message
+ * @param {Array.<*>=} params
  * @throws {Error}
  */
 utils.error = function(message, params) {
@@ -40,12 +49,13 @@ utils.error = function(message, params) {
 };
 
 /**
- * @param {message}
- * @param {?Array.<*>}
+ * @param {message} message
+ * @param {Array.<*>=} params
+ * @return {string}
  */
-utils.message = function(message, param) {
+utils.message = function(message, params) {
 	var msg = message.replace(/\$(\d)/g, function(_, place) {
-		return param[parseInt(place) - 1];
+		return params[parseInt(place, 10) - 1];
 	});
 	if (DEBUG && console) { console.log(msg); }
 	return msg;
@@ -53,25 +63,24 @@ utils.message = function(message, param) {
 
 /**
  * @param {Object} data
+ * @return {utils.sessionData}
  */
 utils.whiteListSessionData = function(data) {
-	var whiteList = [ 'data', 'referring_identity', 'identity', 'has_app' ];
-	var returnData = {};
-	for (var key in data) {
-		if (whiteList.indexOf(key) > -1) {
-			returnData[key] = data[key];
-		}
-	}
-	return returnData;
+	return {
+		'data': data['data'] || null,
+		'referring_identity': data['referring_identity'] || null,
+		'identity': data['identity'] || null,
+		'has_app': data['has_app'] || null
+	};
 };
 
 /**
  * @param {BranchStorage} storage
- * @return {?utils.sessionData}
+ * @return {Object}
  */
 utils.readStore = function(storage) {
 	try {
-		return goog.json.parse(storage.getItem('branch_session') || { });
+		return goog.json.parse(storage['getItem']('branch_session') || { });
 	}
 	catch (e) {
 		return {};
@@ -79,17 +88,16 @@ utils.readStore = function(storage) {
 };
 
 /**
- * @param {utils.sessionData}
+ * @param {Object} data
  * @param {BranchStorage} storage
  */
 utils.store = function(data, storage) {
-	storage.setItem('branch_session', goog.json.serialize(data));
-	storage.getItem('branch_session');
+	storage['setItem']('branch_session', goog.json.serialize(data));
 };
 
 /**
- * @param {?string} key
- * @param {?string} value
+ * @param {string} key
+ * @param {*} value
  * @param {BranchStorage} storage
  */
 utils.storeKeyValue = function(key, value, storage) {
@@ -99,7 +107,7 @@ utils.storeKeyValue = function(key, value, storage) {
 };
 
 /**
- * @param {?string} key
+ * @param {string} key
  * @param {BranchStorage} storage
  */
 utils.readKeyValue = function(key, storage) {
@@ -126,7 +134,7 @@ utils.merge = function(to, from) {
 };
 
 /**
- * @param {?string} key
+ * @param {string} key
  */
 utils.hashValue = function(key) {
 	try {
@@ -138,7 +146,7 @@ utils.hashValue = function(key) {
 };
 
 /**
- * @param {?string} key
+ * @param {string} key
  */
 utils.getParamValue = function(key) {
 	try {
@@ -150,7 +158,7 @@ utils.getParamValue = function(key) {
 };
 
 /**
- * @param {?string} key
+ * @param {string} key
  */
 utils.urlValue = function(key) {
 	return utils.getParamValue(key) || utils.hashValue(key);
@@ -158,12 +166,13 @@ utils.urlValue = function(key) {
 
 /**
  * Base64 encoding because ie9 does not have bota()
+ *
  * @param {string} input
  */
 utils.base64encode = function(input) {
-	var utf8_encode = function(string, utftext) {
+	var utf8_encode = function(string) {
 		string = string.replace(/\r\n/g, "\n");
-		utftext = '';
+		var utftext = '';
 		for (var n = 0; n < string.length; n++) {
 			var c = string.charCodeAt(n);
 			if (c < 128) {
@@ -207,3 +216,4 @@ utils.base64encode = function(input) {
 	}
 	return output;
 };
+

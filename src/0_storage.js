@@ -3,7 +3,7 @@
  * Note: this session does not persist after the user navigates away.
  */
 
-goog.provide('Storage');
+goog.provide('storage');
 
 /**
  * @class BranchStorage
@@ -13,10 +13,17 @@ var BranchStorage = function() {
 	this._store = {};
 };
 
+/**
+ * @param {string} key
+ * @param {*} value
+ */
 BranchStorage.prototype['setItem'] = function(key, value) {
 	this._store[key] = value;
 };
 
+/**
+ * @param {string} key
+ */
 BranchStorage.prototype['getItem'] = function(key) {
 	if (typeof this._store[key] != 'undefined') {
 		return this._store[key];
@@ -26,6 +33,9 @@ BranchStorage.prototype['getItem'] = function(key) {
 	}
 };
 
+/**
+ * @param {string} key
+ */
 BranchStorage.prototype['removeItem'] = function(key) {
 	delete this._store[key];
 };
@@ -35,9 +45,9 @@ BranchStorage.prototype['clear'] = function() {
 };
 
 /**
- * @return BranchStorage
+ * @return {BranchStorage}
  */
-Storage = function() {
+storage = function() {
 	try {
 		sessionStorage.setItem("test", "");
 		sessionStorage.removeItem("test");

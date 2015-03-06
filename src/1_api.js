@@ -6,17 +6,16 @@
 goog.provide('api');
 goog.require('utils');
 goog.require('goog.json');
-goog.require('Storage'); // jshint unused:false
+goog.require('storage'); // jshint unused:false
 
 var _jsonp_callback_index = 0;
 
 /**
  * @param {Object} obj
- * @param {String} prefix
+ * @param {string} prefix
  */
 function serializeObject(obj, prefix) {
 	var pairs = [];
-	prefix = prefix || '';
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
 			pairs.push(encodeURIComponent(prefix) + '[]=' + encodeURIComponent(obj[i]));
@@ -38,8 +37,8 @@ function serializeObject(obj, prefix) {
 }
 
 /**
- * @param {resources.resource} resource
- * @param Object.<string, *>
+ * @param {utils.resource} resource
+ * @param {Object.<string, *>} data
  */
 function getUrl(resource, data) {
 	var k;
@@ -61,21 +60,20 @@ function getUrl(resource, data) {
 			}
 		}
 	}
-	return { data: serializeObject(d), url: url };
+	return { data: serializeObject(d, ''), url: url };
 }
 
 /**
- * @param {String} url
- * @param {Object} options
- * @param {Function|null} callback
+ * @param {string} url
+ * @param {{ onSuccess:Function, onTimeout:Function, timeout:number, data:Object, method:utils._httpMethod }} options
  */
-var jsonpRequest = function(url, options, callback) {
-	callback = callback || 'branch_callback__' + (_jsonp_callback_index++);
-	options.onSuccess = options.onSuccess || function() { };
-	options.onTimeout = options.onTimeout || function() { };
-	options.data = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(options.data))) : "";
+var jsonpRequest = function(url, options) {
+	var callback = 'branch_callback__' + (_jsonp_callback_index++);
+	// options.onSuccess = options.onSuccess || function() { };
+	// options.onTimeout = options.onTimeout || function() { };
 
-	var postDataString = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=';
+	var postPrefix = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=',
+		postData = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(options.data))) : "";
 	var timeout = options.timeout || 10; // sec
 
 	var timeout_trigger = window.setTimeout(function() {
@@ -91,16 +89,16 @@ var jsonpRequest = function(url, options, callback) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.async = true;
-	script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (options.data ? postDataString + options.data : '') + '&callback=' + callback + (url.indexOf('/c/') >= 0 ? '&click=1' : '');
+	script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + '&callback=' + callback + (url.indexOf('/c/') >= 0 ? '&click=1' : '');
 
 	document.getElementsByTagName('head')[0].appendChild(script);
 };
 
 /**
- * @param {String} requestURL
+ * @param {string} requestURL
  * @param {Object} requestData
- * @param {String} requestMethod
- * @param {Function|null} callback
+ * @param {utils._httpMethod} requestMethod
+ * @param {function(?Error,*=)=} callback
  */
 var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback) {
 	jsonpRequest(requestURL, {
@@ -108,7 +106,7 @@ var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback
 			callback(null, json);
 		},
 		onTimeout: function() {
-			callback(utils.error(utils.messages.timeout));
+			callback(new Error(utils.messages.timeout));
 		},
 		timeout: 10,
 		data: requestData,
@@ -117,11 +115,11 @@ var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback
 };
 
 /**
- * @param {String} url
+ * @param {string} url
  * @param {Object} data
- * @param {String} method
+ * @param {utils._httpMethod} method
  * @param {BranchStorage} storage
- * @param {Function|null} callback
+ * @param {function(?Error,*=)=} callback
  */
 var XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
@@ -135,10 +133,10 @@ var XHRRequest = function(url, data, method, storage, callback) {
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {
-			callback('Not enough credits to redeem.');
+			callback(new Error('Not enough credits to redeem.'));
 		}
 		else if (req.readyState === 4 && (req.status.toString().substring(0, 1) == "4" || req.status.toString().substring(0, 1) == "5")) {
-			callback('Error in API: ' + req.status);
+			callback(new Error('Error in API: ' + req.status));
 		}
 	};
 
@@ -148,16 +146,16 @@ var XHRRequest = function(url, data, method, storage, callback) {
 		req.send(data);
 	}
 	catch (e) {
-		storage.setItem('use_jsonp', true);
+		storage['setItem']('use_jsonp', true);
 		jsonpMakeRequest(url, data, method, callback);
 	}
 };
 
 /**
- * @param {resources.resource} resource
+ * @param {utils.resource} resource
  * @param {Object.<string, *>} data
  * @param {BranchStorage} storage
- * @param {function(?new:Error,*)|null} callback
+ * @param {function(?Error,*=)=} callback
  */
 api = function(resource, data, storage, callback) {
 	// callback = utils.injectDequeue( callback || function() { } );
@@ -171,7 +169,7 @@ api = function(resource, data, storage, callback) {
 		url = u.url;
 		postData = u.data;
 	}
-	if (storage.getItem('use_jsonp') || resource.jsonp) {
+	if (storage['getItem']('use_jsonp') || resource.jsonp) {
 		jsonpMakeRequest(url, data, resource.method, callback);
 	}
 	else {

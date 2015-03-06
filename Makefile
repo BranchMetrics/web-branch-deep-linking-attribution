@@ -47,6 +47,7 @@ dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	$(COMPILER) $(COMPILER_ARGS) \
 		--formatting=print_input_delimiter \
 		--formatting=pretty_print \
+		--warning_level=VERBOSE \
 		--define 'DEBUG=true' > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar

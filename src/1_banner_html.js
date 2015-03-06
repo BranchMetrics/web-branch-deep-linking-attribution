@@ -1,12 +1,12 @@
 goog.provide('banner_html');
 goog.require('banner_utils');
 goog.require('utils');
-goog.require('Storage'); // jshint unused:false
+goog.require('storage'); // jshint unused:false
 
 
 /**
  * @param {banner_utils.options} options
- * @param {String} action
+ * @param {string} action
  */
 banner_html.banner = function(options, action) {
 	return '<div class="content">' +
@@ -90,9 +90,13 @@ banner_html.div = function(options, action) {
 	return banner;
 };
 
-banner_html.markup = function(options) {
+/**
+ * @param {banner_utils.options} options
+ * @param {BranchStorage} storage
+ */
+banner_html.markup = function(options, storage) {
 	var action = '<div id="branch-sms-form-container">' +
-		(banner_utils.mobileUserAgent() ? banner_html.mobileAction(options) : banner_html.desktopAction) +
+		(banner_utils.mobileUserAgent() ? banner_html.mobileAction(options, storage) : banner_html.desktopAction) +
 	'</div>';
 
 	if (options.iframe) {

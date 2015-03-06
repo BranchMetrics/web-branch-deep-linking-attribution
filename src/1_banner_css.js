@@ -69,7 +69,7 @@ banner_css.iframe_mobile = '#branch-banner-iframe { position: absolute; }\n';
 
 /**
  * @param {banner_utils.options} options
- * @param {DOMElement} element
+ * @param {Object} element
  */
 banner_css.css = function(options, element) {
 	// Construct Banner CSS

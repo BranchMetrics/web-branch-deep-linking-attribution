@@ -105,14 +105,14 @@ var closeBanner = function(element, storage) {
 
 /**
  * @param {Object} branch
- * @param {banner.options} options
+ * @param {banner_utils.options} options
  * @param {Object} linkData
  * @param {BranchStorage} storage
  */
 banner = function(branch, options, linkData, storage) {
 	if (banner_utils.shouldAppend(storage, options)) {
 		// Create markup
-		var element = banner_html.markup(options);
+		var element = banner_html.markup(options, storage);
 
 		// Add CSS
 		banner_css.css(options, element);

@@ -622,7 +622,7 @@ BranchStorage.prototype.removeItem = function(a) {
 BranchStorage.prototype.clear = function() {
   this._store = {};
 };
-var Storage = function() {
+var storage = function() {
   try {
     return sessionStorage.setItem("test", ""), sessionStorage.removeItem("test"), sessionStorage;
   } catch (a) {
@@ -740,24 +740,21 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 5
-var utils = {}, DEBUG = !0;
+var utils = {}, DEBUG = !0, message;
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out"};
+utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.error = function(a, b) {
   throw Error(utils.message(a, b));
 };
 utils.message = function(a, b) {
   var c = a.replace(/\$(\d)/g, function(a, c) {
-    return b[parseInt(c) - 1];
+    return b[parseInt(c, 10) - 1];
   });
   DEBUG && console && console.log(c);
   return c;
 };
 utils.whiteListSessionData = function(a) {
-  var b = ["data", "referring_identity", "identity", "has_app"], c = {}, d;
-  for (d in a) {
-    -1 < b.indexOf(d) && (c[d] = a[d]);
-  }
-  return c;
+  return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null};
 };
 utils.readStore = function(a) {
   try {
@@ -768,7 +765,6 @@ utils.readStore = function(a) {
 };
 utils.store = function(a, b) {
   b.setItem("branch_session", goog.json.serialize(a));
-  b.getItem("branch_session");
 };
 utils.storeKeyValue = function(a, b, c) {
   var d = utils.readStore(c);
@@ -805,7 +801,6 @@ utils.urlValue = function(a) {
 };
 utils.base64encode = function(a) {
   var b = "", c, d, e, f, g, k, h = 0;
-  d = void 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
@@ -818,18 +813,17 @@ utils.base64encode = function(a) {
   return b;
 };
 // Input 6
-var banner_utils = {animationSpeed:250, animationDelay:20, height:"76px", removeElement:function(a) {
+var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", removeElement:function(a) {
   a && a.parentNode.removeChild(a);
 }, mobileUserAgent:function() {
   return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : "ios" : !1;
 }, shouldAppend:function(a, b) {
-  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || (b.showAndroid && "android" == banner_utils.mobileUserAgent())(b.showiOS && "ios" == banner_utils.mobileUserAgent()));
+  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
 var _jsonp_callback_index = 0;
 function serializeObject(a, b) {
   var c = [];
-  b = b || "";
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
       c.push(encodeURIComponent(b) + "[]=" + encodeURIComponent(a[d]));
@@ -855,34 +849,28 @@ function getUrl(a, b) {
       "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
     }
   }
-  return{data:serializeObject(e), url:d};
+  return{data:serializeObject(e, ""), url:d};
 }
-var jsonpRequest = function(a, b, c) {
-  c = c || "branch_callback__" + _jsonp_callback_index++;
-  b.onSuccess = b.onSuccess || function() {
-  };
-  b.onTimeout = b.onTimeout || function() {
-  };
-  b.data = "POST" == b.method ? encodeURIComponent(utils.base64encode(goog.json.serialize(b.data))) : "";
-  var d = 0 <= a.indexOf("bnc.lt") ? "&post_data=" : "&data=", e = window.setTimeout(function() {
+var jsonpRequest = function(a, b) {
+  var c = "branch_callback__" + _jsonp_callback_index++, d = 0 <= a.indexOf("bnc.lt") ? "&post_data=" : "&data=", e = "POST" == b.method ? encodeURIComponent(utils.base64encode(goog.json.serialize(b.data))) : "", f = window.setTimeout(function() {
     window[c] = function() {
     };
     b.onTimeout();
   }, 1E3 * (b.timeout || 10));
   window[c] = function(a) {
-    window.clearTimeout(e);
+    window.clearTimeout(f);
     b.onSuccess(a);
   };
-  var f = document.createElement("script");
-  f.type = "text/javascript";
-  f.async = !0;
-  f.src = a + (0 > a.indexOf("?") ? "?" : "") + (b.data ? d + b.data : "") + "&callback=" + c + (0 <= a.indexOf("/c/") ? "&click=1" : "");
-  document.getElementsByTagName("head")[0].appendChild(f);
+  var g = document.createElement("script");
+  g.type = "text/javascript";
+  g.async = !0;
+  g.src = a + (0 > a.indexOf("?") ? "?" : "") + (e ? d + e : "") + "&callback=" + c + (0 <= a.indexOf("/c/") ? "&click=1" : "");
+  document.getElementsByTagName("head")[0].appendChild(g);
 }, jsonpMakeRequest = function(a, b, c, d) {
   jsonpRequest(a, {onSuccess:function(a) {
     d(null, a);
   }, onTimeout:function() {
-    d(utils.error(utils.messages.timeout));
+    d(Error(utils.messages.timeout));
   }, timeout:10, data:b, method:c});
 }, XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
@@ -894,7 +882,7 @@ var jsonpRequest = function(a, b, c) {
         e(null, {});
       }
     } else {
-      4 === f.readyState && 402 === f.status ? e("Not enough credits to redeem.") : 4 !== f.readyState || "4" != f.status.toString().substring(0, 1) && "5" != f.status.toString().substring(0, 1) || e("Error in API: " + f.status);
+      4 === f.readyState && 402 === f.status ? e(Error("Not enough credits to redeem.")) : 4 !== f.readyState || "4" != f.status.toString().substring(0, 1) && "5" != f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
     }
   };
   try {
@@ -908,7 +896,7 @@ var jsonpRequest = function(a, b, c) {
   c.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
 };
 // Input 8
-var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};
+var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
     e ? b == validationTypes.obj ? "object" != typeof e && utils.error(utils.messages.invalidType, [c, d, "an object"]) : b == validationTypes.arr ? e instanceof Array || utils.error(utils.messages.invalidType, [c, d, "an array"]) : b == validationTypes.str ? "string" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a string"]) : b == validationTypes.num ? "number" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a number"]) : b && (b.test(e) || utils.error(utils.messages.invalidType, 
@@ -917,18 +905,18 @@ function validator(a, b) {
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
-resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}};
-resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}};
-resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
-resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
-resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:"GET", queryPart:{identity_id:validator(!0, branch_id)}};
-resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:"GET", queryPart:{identity_id:validator(!0, branch_id)}};
-resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:"GET", jsonp:!0, params:{app_id:validator(!0, branch_id)}};
-resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}};
-resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:"POST", ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
-resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:"GET", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
-resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:"POST", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
-resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
+resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}};
+resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}};
+resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
+resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
+resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}};
+resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}};
+resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{app_id:validator(!0, branch_id)}};
+resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}};
+resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
+resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
+resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
+resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
 // Input 9
 var banner_css = {};
 banner_css.banner = ".branch-animation { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
@@ -980,9 +968,9 @@ var banner_html = {banner:function(a, b) {
   c.className = "branch-animation";
   c.innerHTML = banner_html.banner(a, b);
   return c;
-}, markup:function(a) {
-  var b = '<div id="branch-sms-form-container">' + (banner_utils.mobileUserAgent() ? banner_html.mobileAction(a) : banner_html.desktopAction) + "</div>";
-  return a.iframe ? banner_html.iframe(a, b) : banner_html.div(a, b);
+}, markup:function(a, b) {
+  var c = '<div id="branch-sms-form-container">' + (banner_utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction) + "</div>";
+  return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
 }};
 // Input 11
 var sendSMS = function(a, b, c, d) {
@@ -1024,7 +1012,7 @@ var sendSMS = function(a, b, c, d) {
       }, 3E3));
     })) : m();
   }
-}, close = function(a, b) {
+}, closeBanner = function(a, b) {
   setTimeout(function() {
     banner_utils.removeElement(a);
     banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1036,7 +1024,7 @@ var sendSMS = function(a, b, c, d) {
   utils.storeKeyValue("hideBanner", !0, b);
 }, banner = function(a, b, c, d) {
   if (banner_utils.shouldAppend(d, b)) {
-    var e = banner_html.markup(b);
+    var e = banner_html.markup(b, d);
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document.getElementById("branch-banner");
@@ -1048,7 +1036,7 @@ var sendSMS = function(a, b, c, d) {
     });
     f.getElementById("branch-banner-close").onclick = function(a) {
       a.preventDefault();
-      close(e, d);
+      closeBanner(e, d);
     };
     document.body.className = "branch-animation";
     document.body.style.marginTop = banner_utils.bannerHeight;
@@ -1149,7 +1137,7 @@ Branch.prototype.link = function(a, b) {
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
   a.data = goog.json.serialize(a.data);
   this._api(resources.link, a, function(a, d) {
-    "function" == typeof b && b(a, d.url);
+    b(a, d && d.url);
   });
 };
 Branch.prototype.linkClick = function(a, b) {
@@ -1184,7 +1172,7 @@ Branch.prototype.sendSMSNew = function(a, b, c) {
   if (!this.initialized) {
     return c(utils.message(utils.messages.nonInit));
   }
-  "app banner" != b.channel && (b.channel = "sms");
+  b.channel && "app banner" != b.channel || (b.channel = "sms");
   this.link(b, function(b, f) {
     if (b) {
       return c(b);
@@ -1210,8 +1198,6 @@ Branch.prototype.sendSMSExisting = function(a, b) {
   });
 };
 Branch.prototype.referrals = function(a) {
-  a = a || function() {
-  };
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
@@ -1220,8 +1206,6 @@ Branch.prototype.referrals = function(a) {
   });
 };
 Branch.prototype.credits = function(a) {
-  a = a || function() {
-  };
   if (!this.initialized) {
     return a(utils.message(utils.messages.nonInit));
   }
@@ -1235,8 +1219,8 @@ Branch.prototype.redeem = function(a, b, c) {
   if (!this.initialized) {
     return c(utils.message(utils.messages.nonInit));
   }
-  this._api(resources.redeem, {amount:a, bucket:b}, function(a, b) {
-    c(a, b);
+  this._api(resources.redeem, {amount:a, bucket:b}, function(a) {
+    c(a);
   });
 };
 Branch.prototype.banner = function(a, b) {

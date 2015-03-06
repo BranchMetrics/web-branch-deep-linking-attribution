@@ -90,7 +90,7 @@ ___
 
 **app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
 
-**callback**: `function | null`, _optional_ - callback to read the session data.
+**callback**: `function`, _optional_ - callback to read the session data.
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -135,7 +135,7 @@ ___
 
 **Parameters**
 
-**callback**: `function | null`, _optional_ - callback to read the session data.
+**callback**: `function`, _optional_ - callback to read the session data.
 
 Returns the same session information and any referring data, as
 `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -153,7 +153,7 @@ ___
 
 **identity**: `string`, _required_ - a string uniquely identifying the user – often a user ID or email address.
 
-**callback**: `function | null`, _optional_ - callback that returns the user's Branch identity id and unique link.
+**callback**: `function`, _optional_ - callback that returns the user's Branch identity id and unique link.
 
 **[Formerly `identify()`](CHANGELOG.md)**
 
@@ -189,7 +189,7 @@ ___
 
 **Parameters**
 
-**callback**: `function | null`, _optional_
+**callback**: `function`, _optional_
 
 Logs out the current session, replaces session IDs and identity IDs.
 
@@ -216,11 +216,11 @@ ___
 
 **Parameters**
 
-**event**: `String`, _required_ - name of the event to be tracked.
+**event**: `string`, _required_ - name of the event to be tracked.
 
-**metadata**: `Object | null`, _optional_ - object of event metadata.
+**metadata**: `Object`, _optional_ - object of event metadata.
 
-**callback**: `function | null`, _optional_
+**callback**: `function`, _optional_
 
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -252,7 +252,7 @@ ___
 
 **linkData**: `Object`, _required_ - link data and metadata.
 
-**callback**: `function | null`, _optional_ - returns a string of the Branch deep linking URL.
+**callback**: `function`, _optional_ - returns a string of the Branch deep linking URL.
 
 **[Formerly `createLink()`](CHANGELOG.md)**
 
@@ -263,7 +263,7 @@ object with optional data you would like to store, including Facebook
 #### Usage
 ```
 branch.link(
-    metadata,
+    linkData,
     callback (err, data)
 );
 ```
@@ -310,13 +310,13 @@ ___
 
 **Parameters**
 
-**phone**: `String`, _required_ - phone number to send SMS to
+**phone**: `string`, _required_ - phone number to send SMS to
 
 **linkData**: `Object`, _required_ - object of link data
 
-**options**: `Object | null`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+**options**: `Object`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
 
-**callback**: `function | null`, _optional_ - Returns an error if unsuccessful
+**callback**: `function`, _optional_ - Returns an error if unsuccessful
 
 **[Formerly `SMSLink()`](CHANGELOG.md)**
 
@@ -464,11 +464,11 @@ callback(
 
 **Parameters**
 
-**amount**: `Int`, _required_ - an `amount` (int) of number of credits to redeem
+**amount**: `number`, _required_ - an `amount` (int) of number of credits to redeem
 
-**bucket**: `String`, _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
+**bucket**: `string`, _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
 
-**callback**: `function | null`, _optional_ - returns an error if unsuccessful
+**callback**: `function`, _optional_ - returns an error if unsuccessful
 
 **[Formerly `redeemCredits()`](CHANGELOG.md)**
 
@@ -488,8 +488,8 @@ branch.redeem(
 branch.redeem(
     5,
     "Rubies",
-    function(data) {
-        console.log(data);
+    function(err) {
+        console.log(err);
     }
 );
 ```

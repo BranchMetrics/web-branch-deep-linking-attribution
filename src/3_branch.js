@@ -8,7 +8,7 @@ goog.require('resources');
 goog.require('api');
 goog.require('banner');
 goog.require('Queue');
-goog.require('Storage');
+goog.require('storage');
 /*jshint unused:false*/
 goog.require('goog.json');
 
@@ -24,14 +24,14 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = Storage();
+	this._storage = storage();
 	this.initialized = false;
 };
 
 /***
- * @param {resources.resource} resource
- * @param {Object.<string, *>} data
- * @param {function(?new:Error,*)|null} callback
+ * @param {utils.resource} resource
+ * @param {Object.<string, *>} obj
+ * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
@@ -49,7 +49,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 /**
  * @function Branch.init
  * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
- * @param {function|null} callback - _optional_ - callback to read the session data.
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -125,7 +125,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 
 /**
  * @function Branch.data
- * @param {function|null} callback - _optional_ - callback to read the session data.
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * Returns the same session information and any referring data, as
  * `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -147,7 +147,7 @@ Branch.prototype['data'] = function(callback) {
 /**
  * @function Branch.setIdentity
  * @param {string} identity - _required_ - a string uniquely identifying the user – often a user ID or email address.
- * @param {function|null} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
+ * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
  *
  * **[Formerly `identify()`](CHANGELOG.md)**
  *
@@ -187,7 +187,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 
 /**
  * @function Branch.logout
- * @param {function|null} callback - _optional_
+ * @param {function(?Error)=} callback - _optional_
  *
  * Logs out the current session, replaces session IDs and identity IDs.
  *
@@ -219,7 +219,7 @@ Branch.prototype['logout'] = function(callback) {
 /*** NOT USED
  * This closes the active session, removing any relevant session account info stored in `sessionStorage`.
  *
- * @param {function|null} callback - Returns an error if unsuccessful
+ * @param {Function=} callback - Returns an error if unsuccessful
  *
  * ##### Usage
  * ```js
@@ -250,9 +250,9 @@ Branch.prototype['close'] = function(callback) {
 
 /**
  * @function Branch.track
- * @param {String} event - _required_ - name of the event to be tracked.
- * @param {Object|null} metadata - _optional_ - object of event metadata.
- * @param {function|null} callback - _optional_
+ * @param {string} event - _required_ - name of the event to be tracked.
+ * @param {Object=} metadata - _optional_ - object of event metadata.
+ * @param {Function=} callback - _optional_
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
  * The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -299,7 +299,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 /**
  * @function Branch.link
  * @param {Object} linkData - _required_ - link data and metadata.
- * @param {function|null} callback - _optional_ - returns a string of the Branch deep linking URL.
+ * @param {Function=} callback - _optional_ - returns a string of the Branch deep linking URL.
  *
  * **[Formerly `createLink()`](CHANGELOG.md)**
  *
@@ -310,7 +310,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * #### Usage
  * ```
  * branch.link(
- *     metadata,
+ *     linkData,
  *     callback (err, data)
  * );
  * ```
@@ -352,26 +352,24 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ## Sharing links via SMS
  *
  */
-Branch.prototype['link'] = function(obj, callback) {
+Branch.prototype['link'] = function(linkData, callback) {
 	callback = callback || function() { };
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	obj['source'] = 'web-sdk';
-	if (obj['data']['$desktop_url'] !== undefined) {
-		obj['data']['$desktop_url'] = obj['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
+	linkData['source'] = 'web-sdk';
+	if (linkData['data']['$desktop_url'] !== undefined) {
+		linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
-	obj['data'] = goog.json.serialize(obj['data']);
-	this._api(resources.link, obj, function(err, data) {
-		if (typeof callback == 'function') {
-			callback(err, data['url']);
-		}
+	linkData['data'] = goog.json.serialize(linkData['data']);
+	this._api(resources.link, linkData, function(err, data) {
+		callback(err, data && data['url']);
 	});
 };
 
 /***
  * Is there any reason we need to make this an external function?
  *
- * @param {String} url - _required_ - branch deep linking URL to register link click on.
- * @param {function|null} callback - _optional_ - returns an error if unsuccessful.
+ * @param {string} url - _required_ - branch deep linking URL to register link click on.
+ * @param {Function=} callback - _optional_ - returns an error if unsuccessful.
  */
 Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() { };
@@ -394,10 +392,10 @@ Branch.prototype['linkClick'] = function(url, callback) {
 
 /**
  * @function Branch.sendSMS
- * @param {String} phone - _required_ - phone number to send SMS to
+ * @param {string} phone - _required_ - phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
- * @param {Object|null} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
- * @param {function|null} callback - _optional_ - Returns an error if unsuccessful
+ * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+ * @param {Function=} callback - _optional_ - Returns an error if unsuccessful
  *
  * **[Formerly `SMSLink()`](CHANGELOG.md)**
  *
@@ -466,7 +464,7 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * ## Retrieve referrals list
  *
  */
-Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
+Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 	callback = callback || function() { };
 	options = options || { };
 	options['make_new_link'] = options['make_new_link'] || false;
@@ -477,7 +475,7 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
 		this["sendSMSExisting"](phone, callback);
 	}
 	else {
-		this["sendSMSNew"](phone, obj, callback);
+		this["sendSMSNew"](phone, linkData, callback);
 	}
 };
 
@@ -485,8 +483,9 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
  *
  * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
- * @param {Object} metadata - _required_ Object of all link data, requires phone number as `phone`
- * @param {function|null} callback - Returns an error if unsuccessful
+ * @param {string} phone
+ * @param {Object} linkData
+ * @param {Function=} callback
  *
  * #### Usage
  * ```js
@@ -498,13 +497,13 @@ Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
  *
  * ___
  */
-Branch.prototype["sendSMSNew"] = function(phone, obj, callback) {
+Branch.prototype["sendSMSNew"] = function(phone, linkData, callback) {
 	callback = callback || function() { };
 	var self = this;
 	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
 
-	if (obj['channel'] != 'app banner') { obj['channel'] = 'sms'; }
-	this["link"](obj, function(err, url) {
+	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
+	this["link"](linkData, function(err, url) {
 		if (err) { return callback(err); }
 		self["linkClick"](url, function(err) {
 			if (err) { return callback(err); }
@@ -518,8 +517,8 @@ Branch.prototype["sendSMSNew"] = function(phone, obj, callback) {
 /*** <--- Not in docs
  * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
  *
- * @param {String} phone - _required_ String of phone number the link should be sent to
- * @param {function|null} callback - Returns an error if unsuccessful
+ * @param {string} phone
+ * @param {Function=} callback
  *
  * #### Usage
  * ```js
@@ -546,7 +545,7 @@ Branch.prototype["sendSMSExisting"] = function(phone, callback) {
 
 /**
  * @function Branch.referrals
- * @param {function} callback - _required_ - returns an object with referral data.
+ * @param {Function} callback - _required_ - returns an object with referral data.
  *
  * **[Formerly `showReferrals()`](CHANGELOG.md)**
  *
@@ -584,7 +583,6 @@ Branch.prototype["sendSMSExisting"] = function(phone, callback) {
  *
  */
 Branch.prototype['referrals'] = function(callback) {
-	callback = callback || function() { };
 	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
@@ -595,7 +593,7 @@ Branch.prototype['referrals'] = function(callback) {
 
 /**
  * @function Branch.credits
- * @param {function} callback - _required_ - returns an object with credit data.
+ * @param {Function} callback - _required_ - returns an object with credit data.
  *
  * **[Formerly `showCredits()`](CHANGELOG.md)**
  *
@@ -623,7 +621,6 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	callback = callback || function() { };
 	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
@@ -634,9 +631,9 @@ Branch.prototype['credits'] = function(callback) {
 
 /**
  * @function Branch.redeem
- * @param {Int} amount - _required_ - an `amount` (int) of number of credits to redeem
- * @param {String} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
- * @param {function|null} callback - _optional_ - returns an error if unsuccessful
+ * @param {number} amount - _required_ - an `amount` (int) of number of credits to redeem
+ * @param {string} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
+ * @param {Function=} callback - _optional_ - returns an error if unsuccessful
  *
  * **[Formerly `redeemCredits()`](CHANGELOG.md)**
  *
@@ -656,8 +653,8 @@ Branch.prototype['credits'] = function(callback) {
  * branch.redeem(
  *     5,
  *     "Rubies",
- *     function(data) {
- *         console.log(data);
+ *     function(err) {
+ *         console.log(err);
  *     }
  * );
  * ```
@@ -676,12 +673,12 @@ Branch.prototype['credits'] = function(callback) {
  *
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
-	callback = callback || function() { };
+	callback = callback || function() {};
 	if (!this.initialized) {
 		return callback(utils.message(utils.messages.nonInit));
 	}
-	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err, data) {
-		callback(err, data);
+	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err) {
+		callback(err);
 	});
 };
 
