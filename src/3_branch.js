@@ -657,9 +657,9 @@ Branch.prototype['banner'] = function(options, linkData) {
 		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
 		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
-		disableHide: typeof options['disableHide'] == 'undefined' ? false : options['disableHide'],
-		forgetHide: typeof options['forgetHide'] == 'undefined' ? true : options['forgetHide'],
-		makeNewLink: typeof options['makeNewLink'] == 'undefined' ? false : options['makeNewLink']
+		disableHide: !!options['disableHide'],
+		forgetHide: !!options['forgetHide'],
+		makeNewLink: !!options['makeNewLink']
 	};
 
 	if (typeof options['showMobile'] != 'undefined') {
