@@ -7,6 +7,7 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
+goog.require('config');
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
@@ -122,9 +123,20 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document.getElementById('branch-banner');
 		if (banner_utils.mobileUserAgent()) {
-			branch["link"](linkData, options, function(err, url) {
-				doc.getElementById('branch-mobile-action').href = url;
-			});
+			if (utils.readKeyValue('click_id', storage) && !options['makeNewLink']) {
+				doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + utils.readKeyValue('click_id', storage);
+			}
+			else {
+				branch["link"](linkData, function(err, url) {
+					if (err) {
+						// Todo: figure out something good to do here. Maybe a
+						// long link? Or why not always a long link?
+					}
+					else {
+						doc.getElementById('branch-mobile-action').href = url;
+					}
+				});
+			}
 		}
 		else {
 			doc.getElementById('sms-form').addEventListener('submit', function(ev) {

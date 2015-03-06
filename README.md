@@ -35,7 +35,7 @@ _Be sure to replace `APP-KEY` with your actual app key found in your [account da
 
 ```html
 <script type="text/javascript">
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 branch.init('APP-KEY', function(err, data) {
     // callback to handle err or data
@@ -246,13 +246,11 @@ ___
 
 
 
-### link(linkData, options, callback) 
+### link(linkData, callback) 
 
 **Parameters**
 
 **linkData**: `Object`, _required_ - link data and metadata.
-
-**options**: `Object`, _optional_ - Options for making link, see example below
 
 **callback**: `function`, _optional_ - returns a string of the Branch deep linking URL.
 
@@ -267,7 +265,7 @@ object with optional data you would like to store, including Facebook
 branch.link(
     linkData,
     options,
-    callback (err, data)
+    callback (err, link)
 );
 ```
 
@@ -291,11 +289,8 @@ branch.link({
         '$og_description': 'My app\'s description.',
         '$og_image_url': 'http://myappwebsite.com/image.png'
     }
-},
-{
-    "makeNewLink": true    // Should a new link be created, even if one already exists?
-}, function(err, data) {
-    console.log(err, data);
+}, function(err, link) {
+    console.log(err, link);
 });
 ```
 

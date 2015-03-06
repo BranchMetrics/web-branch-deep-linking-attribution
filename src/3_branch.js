@@ -91,7 +91,7 @@ Branch.prototype._api = function(resource, obj, callback) {
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback|| function() { };
-	if (this.initialized) { return callback(utils.message(utils.messages.existingInit)); }
+	if (this.initialized) { return callback(new Error(utils.message(utils.messages.existingInit))); }
 	this.app_id = app_id;
 	var self = this, sessionData = utils.readStore(this._storage);
 
@@ -177,7 +177,7 @@ Branch.prototype['data'] = function(callback) {
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
 		callback(err, data);
 	});
@@ -208,49 +208,17 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  */
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	this._api(resources.logout, { }, function(err) {
 		callback(err);
 	});
 };
 
-/*** NOT USED
- * This closes the active session, removing any relevant session account info stored in `sessionStorage`.
- *
- * @param {Function=} callback - Returns an error if unsuccessful
- *
- * ##### Usage
- * ```js
- * branch.close(
- *     callback (err, data)
- * );
- * ```
- *
- * ##### Callback
- * ```js
- * callback("Error message");
- * ```
- *
- * ---
- */
- /*
-Branch.prototype['close'] = function(callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	var self = this;
-	this._api(resources.close, { }, function(err, data) {
-		sessionStorage.clear();
-		self.initialized = false;
-		callback(err, data);
-	});
-};
-*/
-
 /**
  * @function Branch.track
  * @param {string} event - _required_ - name of the event to be tracked.
  * @param {Object=} metadata - _optional_ - object of event metadata.
- * @param {Function=} callback - _optional_
+ * @param {function(?Error)=} callback - _optional_
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
  * The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -277,7 +245,7 @@ Branch.prototype['close'] = function(callback) {
  */
 Branch.prototype['track'] = function(event, metadata, callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	if (typeof metadata == 'function') {
 		callback = metadata;
 		metadata = { };
@@ -297,8 +265,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 /**
  * @function Branch.link
  * @param {Object} linkData - _required_ - link data and metadata.
- * @param {Object} options - _optional_ - Options for making link, see example below
- * @param {Function=} callback - _optional_ - returns a string of the Branch deep linking URL.
+ * @param {function(?Error,String=)=} callback - _optional_ - returns a string of the Branch deep linking URL.
  *
  * **[Formerly `createLink()`](CHANGELOG.md)**
  *
@@ -311,7 +278,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * branch.link(
  *     linkData,
  *     options,
- *     callback (err, data)
+ *     callback (err, link)
  * );
  * ```
  *
@@ -335,11 +302,8 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *         '$og_description': 'My app\'s description.',
  *         '$og_image_url': 'http://myappwebsite.com/image.png'
  *     }
- * },
- * {
- *     "makeNewLink": true    // Should a new link be created, even if one already exists?
- * }, function(err, data) {
- *     console.log(err, data);
+ * }, function(err, link) {
+ *     console.log(err, link);
  * });
  * ```
  *
@@ -355,64 +319,21 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ## Sharing links via SMS
  *
  */
-Branch.prototype['link'] = function(linkData, options, callback) {
+Branch.prototype['link'] = function(linkData, callback) {
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
+
 	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	options = options || { };
-	if (typeof options == 'function') {
-		callback = options;
-		options = { };
-	}
-	options['makeNewLink'] = options['makeNewLink'] || options['make_new_link'] || false;
+
 	var self = this;
 	linkData['source'] = 'web-sdk';
 	if (linkData['data']['$desktop_url'] !== undefined) {
 		linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
-	if (utils.readKeyValue('link_url', this._storage) && !options['makeNewLink']) {
-		callback(null, utils.readKeyValue('link_url', this._storage));
-	}
-	else {
-		linkData['data'] = goog.json.serialize(linkData['data']);
-		this._api(resources.link, linkData, function(err, data) {
-			utils.storeKeyValue('link_url', data['url'], self._storage);
-			callback(err, data && data['url']);
-		});
-	}
-};
 
-/***
- * Is there any reason we need to make this an external function?
- *
- * @param {string} url - _required_ - branch deep linking URL to register link click on.
- * @param {Function=} callback - _optional_ - returns an error if unsuccessful.
- */
-Branch.prototype['linkClick'] = function(url, options, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
-	}
-	options = options || { };
-	options['makeNewLink'] = options['makeNewLink'] || options['make_new_link'] || false;
-	if (typeof options == 'function') {
-		callback = options;
-		options = { };
-	}
-	var self = this;
-	if (utils.readKeyValue('click_id', this._storage) && !options['makeNewLink']) {
-		callback(null, utils.readKeyValue('click_id', this._storage));
-	}
-	else {
-		var urlArray = url.split('/');
-		var linkid = urlArray[urlArray.length - 1];
-		this._api(resources.linkClick, {
-			"link_url": '/l/' + linkid,
-			"click": "click"
-		}, function(err, data) {
-			utils.storeKeyValue('click_id', data['click_id'], self._storage);
-			if (err || data) { callback(err, data); }
-		});
-	}
+	linkData['data'] = goog.json.serialize(linkData['data']);
+	this._api(resources.link, linkData, function(err, data) {
+		callback(err, data && data['url']);
+	});
 };
 
 /**
@@ -420,7 +341,7 @@ Branch.prototype['linkClick'] = function(url, options, callback) {
  * @param {string} phone - _required_ - phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
  * @param {Object=} options - _optional_ - options: makeNewLink, which forces the creation of a new link even if one already exists
- * @param {Function=} callback - _optional_ - Returns an error if unsuccessful
+ * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
  *
  * **[Formerly `SMSLink()`](CHANGELOG.md)**
  *
@@ -490,29 +411,50 @@ Branch.prototype['linkClick'] = function(url, options, callback) {
  *
  */
 Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	options = options || { };
+	if (typeof options == 'function') {
+		callback = options;
+		options = {};
+	}
+	else if (typeof options == 'undefined') {
+		options = {};
+	}
+	callback = callback || function() {};
+
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	var self = this;
 
 	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
-	this["link"](linkData, options, function(err, url) {
-		if (err) { return callback(err); }
-		self["linkClick"](url, options, function(err) {
+
+	function sendSMS(click_id) {
+		self._api(resources.SMSLinkSend, {
+			"link_url": click_id,
+			"phone": phone
+		}, function(err) { callback(err); });
+	}
+
+	if (utils.readKeyValue('click_id', this._storage) && !options['makeNewLink']) {
+		sendSMS('/c/' + utils.readKeyValue('click_id', this._storage));
+	}
+	else {
+		this["link"](linkData, options || {}, function(err, url) {
 			if (err) { return callback(err); }
-			self._api(resources.SMSLinkSend, {
-				"link_url": utils.readKeyValue('click_id', self._storage),
-				"phone": phone
-			}, function(err) {
-				callback(err);
+
+			self._api(resources.linkClick, {
+				"link_url": '/l/' + url.split('/').pop(),
+				"click": "click"
+			}, function(err, data) {
+				if (err) { return callback(err); }
+
+				utils.storeKeyValue('click_id', data['click_id'], self._storage);
+				sendSMS(data['click_id']);
 			});
 		});
-	});
+	}
 };
 
 /**
  * @function Branch.referrals
- * @param {Function} callback - _required_ - returns an object with referral data.
+ * @param {function(?Error,Object=)=} callback - _required_ - returns an object with referral data.
  *
  * **[Formerly `showReferrals()`](CHANGELOG.md)**
  *
@@ -551,7 +493,7 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  */
 Branch.prototype['referrals'] = function(callback) {
 	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
+		return callback(new Error(utils.message(utils.messages.nonInit)));
 	}
 	this._api(resources.referrals, { }, function(err, data) {
 		callback(err, data);
@@ -560,7 +502,7 @@ Branch.prototype['referrals'] = function(callback) {
 
 /**
  * @function Branch.credits
- * @param {Function} callback - _required_ - returns an object with credit data.
+ * @param {function(?Error,Object=)=} callback - _required_ - returns an object with credit data.
  *
  * **[Formerly `showCredits()`](CHANGELOG.md)**
  *
@@ -588,7 +530,7 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	this._api(resources.credits, { }, function(err, data) {
 		callback(err, data);
 	});
@@ -598,7 +540,7 @@ Branch.prototype['credits'] = function(callback) {
  * @function Branch.redeem
  * @param {number} amount - _required_ - an `amount` (int) of number of credits to redeem
  * @param {string} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
- * @param {Function=} callback - _optional_ - returns an error if unsuccessful
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
  * **[Formerly `redeemCredits()`](CHANGELOG.md)**
  *
@@ -639,7 +581,7 @@ Branch.prototype['credits'] = function(callback) {
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
 	callback = callback || function() {};
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err) {
 		callback(err);
 	});
@@ -726,3 +668,4 @@ Branch.prototype['banner'] = function(options, linkData) {
 
 	banner(this, bannerOptions, linkData, this._storage);
 };
+
