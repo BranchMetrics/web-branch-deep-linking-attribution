@@ -18,8 +18,8 @@ read -p "Update 0_config.js? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	sed -e "s/version = '.*';$/version = \'$VERSION_NO_V\';/" src/0_config.js > a
-	mv a bower.json
+	sed -e "s/version = '.*';$/version = '$VERSION_NO_V';/" src/0_config.js > a
+	mv a src/0_config.js
 fi
 
 make version=$VERSION all
