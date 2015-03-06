@@ -12,6 +12,16 @@ echo "Releasing Branch Web SDK"
 
 echo "Building files"
 make clean
+
+
+read -p "Update 0_config.js? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	sed -e "s/version = '.*';$/version = \'$VERSION_NO_V\';/" src/0_config.js > a
+	mv a bower.json
+fi
+
 make version=$VERSION all
 
 read -p "Bump changelog version? " -n 1 -r
