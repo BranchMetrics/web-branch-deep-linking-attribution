@@ -5,6 +5,7 @@
 goog.provide('utils');
 /*jshint unused:false*/
 goog.require('goog.json');
+goog.require('Storage');
 
 
 /** @define {boolean} */
@@ -51,18 +52,6 @@ utils.message = function(message, param) {
 };
 
 /**
- * @returns {?utils.sessionData}
- */
-utils.readStore = function(sessionFallback) {
-	try {
-		return goog.json.parse(sessionFallback().getItem('branch_session') || { });
-	}
-	catch (e) {
-		return {};
-	}
-};
-
-/**
  * @param {Object} data
  */
 utils.whiteListSessionData = function(data) {
@@ -77,33 +66,52 @@ utils.whiteListSessionData = function(data) {
 };
 
 /**
- * @param {utils.sessionData}
+ * @param {BranchStorage} storage
+ * @return {?utils.sessionData}
  */
-utils.store = function(data, sessionFallback) {
-	sessionFallback().setItem('branch_session', goog.json.serialize(data));
-	sessionFallback().getItem('branch_session');
+utils.readStore = function(storage) {
+	try {
+		return goog.json.parse(storage.getItem('branch_session') || { });
+	}
+	catch (e) {
+		return {};
+	}
+};
+
+/**
+ * @param {utils.sessionData}
+ * @param {BranchStorage} storage
+ */
+utils.store = function(data, storage) {
+	storage.setItem('branch_session', goog.json.serialize(data));
+	storage.getItem('branch_session');
 };
 
 /**
  * @param {?string} key
  * @param {?string} value
+ * @param {BranchStorage} storage
  */
-utils.storeKeyValue = function(key, value, sessionFallback) {
-	var currentSession = utils.readStore(sessionFallback);
+utils.storeKeyValue = function(key, value, storage) {
+	var currentSession = utils.readStore(storage);
 	currentSession[key] = value;
-	utils.store(currentSession, sessionFallback);
+	utils.store(currentSession, storage);
 };
 
 /**
  * @param {?string} key
+ * @param {BranchStorage} storage
  */
-utils.readKeyValue = function(key, sessionFallback) {
-	var currentSession = utils.readStore(sessionFallback);
+utils.readKeyValue = function(key, storage) {
+	var currentSession = utils.readStore(storage);
 	return (currentSession && currentSession[key]) ? currentSession[key] : null;
 };
 
-utils.hasApp = function(sessionFallback) {
-	return utils.readKeyValue('has_app', sessionFallback);
+/**
+ * @param {BranchStorage} storage
+ */
+utils.hasApp = function(storage) {
+	return utils.readKeyValue('has_app', storage);
 };
 
 /**

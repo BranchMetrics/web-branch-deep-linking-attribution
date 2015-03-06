@@ -27,7 +27,7 @@ resources.resource;
  * @param {boolean} required
  * @param {validationTypes|RegExp} type
  * @throws {Error}
- * @returns {resources.validator}
+ * @return {resources.validator}
  */
 function validator(required, type) {
 	return function(endpoint, param, data) {

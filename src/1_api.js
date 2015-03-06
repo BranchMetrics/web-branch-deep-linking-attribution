@@ -5,8 +5,8 @@
 
 goog.provide('api');
 goog.require('utils');
-/*jshint unused:false*/
 goog.require('goog.json');
+goog.require('Storage'); // jshint unused:false
 
 var _jsonp_callback_index = 0;
 
@@ -120,9 +120,10 @@ var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback
  * @param {String} url
  * @param {Object} data
  * @param {String} method
+ * @param {BranchStorage} storage
  * @param {Function|null} callback
  */
-var XHRRequest = function(url, data, method, sessionFallback, callback) {
+var XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
@@ -147,7 +148,7 @@ var XHRRequest = function(url, data, method, sessionFallback, callback) {
 		req.send(data);
 	}
 	catch (e) {
-		sessionFallback().setItem('use_jsonp', true);
+		storage.setItem('use_jsonp', true);
 		jsonpMakeRequest(url, data, method, callback);
 	}
 };
@@ -155,9 +156,10 @@ var XHRRequest = function(url, data, method, sessionFallback, callback) {
 /**
  * @param {resources.resource} resource
  * @param {Object.<string, *>} data
+ * @param {BranchStorage} storage
  * @param {function(?new:Error,*)|null} callback
  */
-api = function(resource, data, sessionFallback, callback) {
+api = function(resource, data, storage, callback) {
 	// callback = utils.injectDequeue( callback || function() { } );
 
 	var u = getUrl(resource, data);
@@ -169,10 +171,10 @@ api = function(resource, data, sessionFallback, callback) {
 		url = u.url;
 		postData = u.data;
 	}
-	if (sessionFallback().getItem('use_jsonp') || resource.jsonp) {
+	if (storage.getItem('use_jsonp') || resource.jsonp) {
 		jsonpMakeRequest(url, data, resource.method, callback);
 	}
 	else {
-		XHRRequest(url, postData, resource.method, sessionFallback(), callback);
+		XHRRequest(url, postData, resource.method, storage, callback);
 	}
 };

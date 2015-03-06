@@ -742,13 +742,22 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  * ```
  */
 Branch.prototype['banner'] = function(options, linkData) {
-	options.showMobile = (options.showMobile === undefined) ? true : options.showMobile;
-	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
-	options.iframe = (options.iframe === undefined) ? true : options.iframe;
-	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && (!utils.readKeyValue('hideBanner', this._storage) || options.forgetHide)) {
-		banner.bannerMarkup(options);
-		banner.bannerStyles(options);
-		banner.bannerActions(this, options, linkData);
-		banner.triggerBannerAnimation(options);
+	var bannerOptions = {
+		icon: options['icon'] || '',
+		title: options['title'] || '',
+		description: options['description'] || '',
+		openAppButtonText: options['openAppButtonText'] || 'View in app',
+		downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+		iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
+		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
+		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
+		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
+		forgetHide: typeof options['forgetHide'] == 'undefined' ? true : options['forgetHide']
+	};
+
+	if (typeof options['showMobile'] != 'undefined') {
+		bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 	}
+
+	banner(this, bannerOptions, linkData, this._storage);
 };
