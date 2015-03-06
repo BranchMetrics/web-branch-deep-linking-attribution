@@ -715,7 +715,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
  *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     showMobile: true,                  // Should the banner be shown on mobile devices?
- *     showDesktop: true                  // Should the banner be shown on mobile devices?
+ *     showDesktop: true                  // Should the banner be shown on desktop devices?
  *     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
  * }, {
  *     phone: '9999999999',

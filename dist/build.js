@@ -813,7 +813,7 @@ utils.base64encode = function(a) {
   return b;
 };
 // Input 6
-var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", removeElement:function(a) {
+var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
 }, mobileUserAgent:function() {
   return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : "ios" : !1;
@@ -1001,7 +1001,7 @@ var sendSMS = function(a, b, c, d) {
     setTimeout(function() {
       f.style.background = "#FFFFFF";
       e.className = "";
-    }, 2E3);
+    }, banner_utils.error_timeout);
   };
   if (e) {
     var n = e.value;
@@ -1009,7 +1009,7 @@ var sendSMS = function(a, b, c, d) {
       a ? m() : (p(), setTimeout(function() {
         k.removeChild(h);
         l();
-      }, 3E3));
+      }, banner_utils.success_timeout));
     })) : m();
   }
 }, closeBanner = function(a, b) {

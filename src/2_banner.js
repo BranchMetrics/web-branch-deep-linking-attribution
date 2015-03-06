@@ -63,7 +63,7 @@ var sendSMS = function(doc, branch, options, linkData) {
 		setTimeout(function() {
 			sendButton.style.background = "#FFFFFF";
 			phone.className = '';
-		}, 2000);
+		}, banner_utils.error_timeout);
 	};
 
 	if (phone) {
@@ -79,7 +79,7 @@ var sendSMS = function(doc, branch, options, linkData) {
 					setTimeout(function() {
 						smsFormContainer.removeChild(checkmark);
 						enableForm();
-					}, 3000);
+					}, banner_utils.success_timeout);
 				}
 			 });
 		}

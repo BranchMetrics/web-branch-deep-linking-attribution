@@ -17,6 +17,14 @@ banner_utils.animationDelay = 20;
 /** @type {string} */
 banner_utils.bannerHeight = '76px';
 
+// How long to show red error state
+/** @type {number} */
+banner_utils.error_timeout = 2000;
+
+// How long to show success state before reloading SMS form
+/** @type {number} */
+banner_utils.success_timeout = 3000;
+
 /**
  * @param {Object} element
  */
