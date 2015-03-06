@@ -851,27 +851,23 @@ function getUrl(a, b) {
   }
   return{data:serializeObject(e, ""), url:d};
 }
-var jsonpRequest = function(a, b) {
-  var c = "branch_callback__" + _jsonp_callback_index++, d = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=", e = "POST" == b.method ? encodeURIComponent(utils.base64encode(goog.json.serialize(b.data))) : "", f = window.setTimeout(function() {
-    window[c] = function() {
+var jsonpRequest = function(a, b, c, d) {
+  var e = "branch_callback__" + _jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+  b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
+  var g = window.setTimeout(function() {
+    window[d] = function() {
     };
-    b.onTimeout();
-  }, 1E3 * (b.timeout || 10));
-  window[c] = function(a) {
-    window.clearTimeout(f);
-    b.onSuccess(a);
-  };
-  var g = document.createElement("script");
-  g.type = "text/javascript";
-  g.async = !0;
-  g.src = a + (0 > a.indexOf("?") ? "?" : "") + (e ? d + e : "") + "&callback=" + c + (0 <= a.indexOf("/c/") ? "&click=1" : "");
-  document.getElementsByTagName("head")[0].appendChild(g);
-}, jsonpMakeRequest = function(a, b, c, d) {
-  jsonpRequest(a, {onSuccess:function(a) {
-    d(null, a);
-  }, onTimeout:function() {
     d(Error(utils.messages.timeout));
-  }, timeout:10, data:b, method:c});
+  }, 1E4);
+  window[e] = function(a) {
+    window.clearTimeout(g);
+    d(null, a);
+  };
+  c = document.createElement("script");
+  c.type = "text/javascript";
+  c.async = !0;
+  c.src = a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + "&callback=" + e + (0 <= a.indexOf("/c/") ? "&click=1" : "");
+  document.getElementsByTagName("head")[0].appendChild(c);
 }, XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.onreadystatechange = function() {
@@ -888,12 +884,12 @@ var jsonpRequest = function(a, b) {
   try {
     f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    d.setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, e);
+    d.setItem("use_jsonp", !0), jsonpRequest(a, b, c, e);
   }
 }, api = function(a, b, c, d) {
   var e = getUrl(a, b), f, g = "";
   "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
-  c.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
+  c.getItem("use_jsonp") || a.jsonp ? jsonpRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, _validator;
