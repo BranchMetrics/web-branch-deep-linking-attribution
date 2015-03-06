@@ -546,7 +546,7 @@ branch.banner({
     showiOS: true,                     // Should the banner be shown on iOS devices?
     showAndroid: true,                 // Should the banner be shown on Android devices?
     showDesktop: true,                 // Should the banner be shown on desktop devices?
-    enableHide: true,                  // Should the user have the ability to hide the banner? (show's X on left side)
+    disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
 }, {
     phone: '9999999999',

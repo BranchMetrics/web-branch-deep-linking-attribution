@@ -717,7 +717,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     showiOS: true,                     // Should the banner be shown on iOS devices?
  *     showAndroid: true,                 // Should the banner be shown on Android devices?
  *     showDesktop: true,                 // Should the banner be shown on desktop devices?
- *     enableHide: true,                  // Should the user have the ability to hide the banner? (show's X on left side)
+ *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
  * }, {
  *     phone: '9999999999',
@@ -751,7 +751,7 @@ Branch.prototype['banner'] = function(options, linkData) {
 		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
 		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
-		enableHide: typeof options['enableHide'] == 'undefined' ? true : options['enableHide'],
+		disableHide: typeof options['disableHide'] == 'undefined' ? false : options['disableHide'],
 		forgetHide: typeof options['forgetHide'] == 'undefined' ? true : options['forgetHide']
 	};
 
