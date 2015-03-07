@@ -8,8 +8,6 @@ goog.require('utils');
 goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 
-var _jsonp_callback_index = 0;
-
 /**
  * @param {Object} obj
  * @param {string} prefix
@@ -63,6 +61,8 @@ function getUrl(resource, data) {
 	return { data: serializeObject(d, ''), url: url };
 }
 
+var jsonp_callback_index = 0;
+
 /**
  * @param {string} requestURL
  * @param {Object} requestData
@@ -70,13 +70,13 @@ function getUrl(resource, data) {
  * @param {function(?Error,*=)=} callback
  */
 var jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
-	var callbackString = 'branch_callback__' + (_jsonp_callback_index++);
+	var callbackString = 'branch_callback__' + (jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
 		postData = (requestMethod == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) : "";
 
 	var timeout_trigger = window.setTimeout(function() {
-		window[callback] = function() { };
+		window[callbackString] = function() { };
 		callback(new Error(utils.messages.timeout));
 	}, 10000);
 
@@ -108,7 +108,7 @@ var XHRRequest = function(url, data, method, storage, callback) {
 				callback(null, goog.json.parse(req.responseText));
 			}
 			catch (e) {
-				callback(null, { });
+				callback(null, {});
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {

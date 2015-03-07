@@ -821,7 +821,6 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
-var _jsonp_callback_index = 0;
 function serializeObject(a, b) {
   var c = [];
   if (a instanceof Array) {
@@ -851,11 +850,11 @@ function getUrl(a, b) {
   }
   return{data:serializeObject(e, ""), url:d};
 }
-var jsonpRequest = function(a, b, c, d) {
-  var e = "branch_callback__" + _jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
+  var e = "branch_callback__" + jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
   b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
-    window[d] = function() {
+    window[e] = function() {
     };
     d(Error(utils.messages.timeout));
   }, 1E4);

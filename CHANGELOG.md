@@ -10,7 +10,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Added **makeNewLink** option to banner. If set to true, forces the creation of a new link, even if one already exists.
 
 ### Fixed
-- ?
+- JSONP requests on white-labelled domain links (fixes app banner for apps with white-labelled domains in IE9/10).
 
 ## [v1.1.1] - 2015-03-05
 ### New Functionality
