@@ -64,54 +64,33 @@ function getUrl(resource, data) {
 }
 
 /**
- * @param {string} url
- * @param {{ onSuccess:Function, onTimeout:Function, timeout:number, data:Object, method:utils._httpMethod }} options
- */
-var jsonpRequest = function(url, options) {
-	var callback = 'branch_callback__' + (_jsonp_callback_index++);
-	// options.onSuccess = options.onSuccess || function() { };
-	// options.onTimeout = options.onTimeout || function() { };
-
-	var postPrefix = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=',
-		postData = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(options.data))) : "";
-	var timeout = options.timeout || 10; // sec
-
-	var timeout_trigger = window.setTimeout(function() {
-		window[callback] = function() { };
-		options.onTimeout();
-	}, timeout * 1000);
-
-	window[callback] = function(data) {
-		window.clearTimeout(timeout_trigger);
-		options.onSuccess(data);
-	};
-
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.async = true;
-	script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + '&callback=' + callback + (url.indexOf('/c/') >= 0 ? '&click=1' : '');
-
-	document.getElementsByTagName('head')[0].appendChild(script);
-};
-
-/**
  * @param {string} requestURL
  * @param {Object} requestData
  * @param {utils._httpMethod} requestMethod
  * @param {function(?Error,*=)=} callback
  */
-var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback) {
-	jsonpRequest(requestURL, {
-		onSuccess: function(json) {
-			callback(null, json);
-		},
-		onTimeout: function() {
-			callback(new Error(utils.messages.timeout));
-		},
-		timeout: 10,
-		data: requestData,
-		method: requestMethod
-	});
+var jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
+	var callbackString = 'branch_callback__' + (_jsonp_callback_index++);
+
+	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
+		postData = (requestMethod == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) : "";
+
+	var timeout_trigger = window.setTimeout(function() {
+		window[callback] = function() { };
+		callback(new Error(utils.messages.timeout));
+	}, 10000);
+
+	window[callbackString] = function(data) {
+		window.clearTimeout(timeout_trigger);
+		callback(null, data);
+	};
+
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.async = true;
+	script.src = requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + '&callback=' + callbackString + (requestURL.indexOf('/c/') >= 0 ? '&click=1' : '');
+
+	document.getElementsByTagName('head')[0].appendChild(script);
 };
 
 /**
@@ -147,7 +126,7 @@ var XHRRequest = function(url, data, method, storage, callback) {
 	}
 	catch (e) {
 		storage['setItem']('use_jsonp', true);
-		jsonpMakeRequest(url, data, method, callback);
+		jsonpRequest(url, data, method, callback);
 	}
 };
 
@@ -168,7 +147,7 @@ api = function(resource, data, storage, callback) {
 		postData = u.data;
 	}
 	if (storage['getItem']('use_jsonp') || resource.jsonp) {
-		jsonpMakeRequest(url, data, resource.method, callback);
+		jsonpRequest(url, data, resource.method, callback);
 	}
 	else {
 		XHRRequest(url, postData, resource.method, storage, callback);

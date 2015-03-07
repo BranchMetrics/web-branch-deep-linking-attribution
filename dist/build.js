@@ -851,27 +851,23 @@ function getUrl(a, b) {
   }
   return{data:serializeObject(e, ""), url:d};
 }
-var jsonpRequest = function(a, b) {
-  var c = "branch_callback__" + _jsonp_callback_index++, d = 0 <= a.indexOf("bnc.lt") ? "&post_data=" : "&data=", e = "POST" == b.method ? encodeURIComponent(utils.base64encode(goog.json.serialize(b.data))) : "", f = window.setTimeout(function() {
-    window[c] = function() {
+var jsonpRequest = function(a, b, c, d) {
+  var e = "branch_callback__" + _jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+  b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
+  var g = window.setTimeout(function() {
+    window[d] = function() {
     };
-    b.onTimeout();
-  }, 1E3 * (b.timeout || 10));
-  window[c] = function(a) {
-    window.clearTimeout(f);
-    b.onSuccess(a);
-  };
-  var g = document.createElement("script");
-  g.type = "text/javascript";
-  g.async = !0;
-  g.src = a + (0 > a.indexOf("?") ? "?" : "") + (e ? d + e : "") + "&callback=" + c + (0 <= a.indexOf("/c/") ? "&click=1" : "");
-  document.getElementsByTagName("head")[0].appendChild(g);
-}, jsonpMakeRequest = function(a, b, c, d) {
-  jsonpRequest(a, {onSuccess:function(a) {
-    d(null, a);
-  }, onTimeout:function() {
     d(Error(utils.messages.timeout));
-  }, timeout:10, data:b, method:c});
+  }, 1E4);
+  window[e] = function(a) {
+    window.clearTimeout(g);
+    d(null, a);
+  };
+  c = document.createElement("script");
+  c.type = "text/javascript";
+  c.async = !0;
+  c.src = a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + "&callback=" + e + (0 <= a.indexOf("/c/") ? "&click=1" : "");
+  document.getElementsByTagName("head")[0].appendChild(c);
 }, XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.onreadystatechange = function() {
@@ -888,12 +884,12 @@ var jsonpRequest = function(a, b) {
   try {
     f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    d.setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, e);
+    d.setItem("use_jsonp", !0), jsonpRequest(a, b, c, e);
   }
 }, api = function(a, b, c, d) {
   var e = getUrl(a, b), f, g = "";
   "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
-  c.getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
+  c.getItem("use_jsonp") || a.jsonp ? jsonpRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, _validator;
@@ -1028,8 +1024,8 @@ var sendSMS = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document.getElementById("branch-banner");
-    banner_utils.mobileUserAgent() ? a.link(c, b, function(a, b) {
-      f.getElementById("branch-mobile-action").href = b;
+    banner_utils.mobileUserAgent() ? utils.readKeyValue("click_id", d) && !b.makeNewLink ? f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + utils.readKeyValue("click_id", d) : a.link(c, function(a, b) {
+      a || (f.getElementById("branch-mobile-action").href = b);
     }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
       d.preventDefault();
       sendSMS(f, a, b, c);
@@ -1071,7 +1067,7 @@ Branch.prototype.init = function(a, b) {
   b = b || function() {
   };
   if (this.initialized) {
-    return b(utils.message(utils.messages.existingInit));
+    return b(Error(utils.message(utils.messages.existingInit)));
   }
   this.app_id = a;
   var c = this, d = utils.readStore(this._storage), e = function(a) {
@@ -1101,7 +1097,7 @@ Branch.prototype.setIdentity = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
+    return b(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.profile, {identity:a}, function(a, d) {
     b(a, d);
@@ -1111,7 +1107,7 @@ Branch.prototype.logout = function(a) {
   a = a || function() {
   };
   if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
+    return a(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.logout, {}, function(b) {
     a(b);
@@ -1121,71 +1117,57 @@ Branch.prototype.track = function(a, b, c) {
   c = c || function() {
   };
   if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
+    return c(Error(utils.message(utils.messages.nonInit)));
   }
   "function" == typeof b && (c = b, b = {});
   this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a) {
     c(a);
   });
 };
-Branch.prototype.link = function(a, b, c) {
-  c = c || function() {
-  };
+Branch.prototype.link = function(a, b) {
   if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
+    return b(Error(utils.message(utils.messages.nonInit)));
   }
-  b = b || {};
-  "function" == typeof b && (c = b, b = {});
-  b.makeNewLink = b.makeNewLink || b.make_new_link || !1;
-  var d = this;
+  b = b || function() {
+  };
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
-  utils.readKeyValue("link_url", this._storage) && !b.makeNewLink ? c(null, utils.readKeyValue("link_url", this._storage)) : (a.data = goog.json.serialize(a.data), this._api(resources.link, a, function(a, b) {
-    utils.storeKeyValue("link_url", b.url, d._storage);
-    c(a, b && b.url);
-  }));
-};
-Branch.prototype.linkClick = function(a, b, c) {
-  c = c || function() {
-  };
-  if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
-  }
-  b = b || {};
-  b.makeNewLink = b.makeNewLink || b.make_new_link || !1;
-  "function" == typeof b && (c = b, b = {});
-  var d = this;
-  utils.readKeyValue("click_id", this._storage) && !b.makeNewLink ? c(null, utils.readKeyValue("click_id", this._storage)) : (a = a.split("/"), this._api(resources.linkClick, {link_url:"/l/" + a[a.length - 1], click:"click"}, function(a, b) {
-    utils.storeKeyValue("click_id", b.click_id, d._storage);
-    (a || b) && c(a, b);
-  }));
+  a.data = goog.json.serialize(a.data);
+  this._api(resources.link, a, function(a, d) {
+    b(a, d && d.url);
+  });
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
+  function e(b) {
+    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, function(a) {
+      d(a);
+    });
+  }
+  "function" == typeof c ? (d = c, c = {}) : "undefined" == typeof c && (c = {});
   d = d || function() {
   };
+  c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
-    return d(utils.message(utils.messages.nonInit));
+    return d(Error(utils.message(utils.messages.nonInit)));
   }
-  c = c || {};
-  var e = this;
+  var f = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
-  this.link(b, c, function(b, g) {
-    if (b) {
-      return d(b);
+  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, function(a, b) {
+    if (a) {
+      return d(a);
     }
-    e.linkClick(g, c, function(b) {
-      if (b) {
-        return d(b);
+    f._api(resources.linkClick, {link_url:"l/" + b.split("/").pop(), click:"click"}, function(a, b) {
+      if (a) {
+        return d(a);
       }
-      e._api(resources.SMSLinkSend, {link_url:utils.readKeyValue("click_id", e._storage), phone:a}, function(a) {
-        d(a);
-      });
+      utils.storeKeyValue("click_id", b.click_id, f._storage);
+      e(b.click_id);
     });
   });
 };
 Branch.prototype.referrals = function(a) {
   if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
+    return a(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.referrals, {}, function(b, c) {
     a(b, c);
@@ -1193,7 +1175,7 @@ Branch.prototype.referrals = function(a) {
 };
 Branch.prototype.credits = function(a) {
   if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
+    return a(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.credits, {}, function(b, c) {
     a(b, c);
@@ -1203,15 +1185,15 @@ Branch.prototype.redeem = function(a, b, c) {
   c = c || function() {
   };
   if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
+    return c(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.redeem, {amount:a, bucket:b}, function(a) {
     c(a);
   });
 };
 Branch.prototype.banner = function(a, b) {
-  var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:"undefined" == typeof a.disableHide ? 
-  !1 : a.disableHide, forgetHide:"undefined" == typeof a.forgetHide ? !0 : a.forgetHide, makeNewLink:"undefined" == typeof a.makeNewLink ? !1 : a.makeNewLink};
+  var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
+  make_new_link:!!a.make_new_link};
   "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
   banner(this, c, b, this._storage);
 };

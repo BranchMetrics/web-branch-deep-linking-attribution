@@ -54,7 +54,6 @@
         <div class="group">
           <button id="track" class="btn btn-info">.track()</button>
           <button id="link" class="btn btn-info">.link()</button>
-          <button id="linkNew" class="btn btn-info">.link({ make_new_link': true })</button>
           <button id="banner" class="btn btn-info">.banner()</button>
         </div>
       </div>
@@ -167,13 +166,6 @@
     $('#link').click(function() {
       request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
       branch.link(sampleParams, function(err, link) {
-        response.html('<a href="' + link + '">' + link + '</a>');
-      });
-    });
-
-    $('#linkNew').click(function() {
-      request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
-      branch.link(sampleParams, { 'makeNewLink': true }, function(err, link) {
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
