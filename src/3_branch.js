@@ -340,7 +340,7 @@ Branch.prototype['link'] = function(linkData, callback) {
  * @function Branch.sendSMS
  * @param {string} phone - _required_ - phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
- * @param {Object=} options - _optional_ - options: makeNewLink, which forces the creation of a new link even if one already exists
+ * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
  * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
  *
  * **[Formerly `SMSLink()`](CHANGELOG.md)**
@@ -386,7 +386,7 @@ Branch.prototype['link'] = function(linkData, callback) {
  *             '$og_image_url': 'http://myappwebsite.com/image.png'
  *         }
  *     },
- *     { makeNewLink: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
+ *     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
  *     function(err) { console.log(err); }
  * });
  * ```
@@ -419,6 +419,7 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 		options = {};
 	}
 	callback = callback || function() {};
+	options["make_new_link"] = options["make_new_link"] || false;
 
 	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	var self = this;
@@ -432,15 +433,15 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 		}, function(err) { callback(err); });
 	}
 
-	if (utils.readKeyValue('click_id', this._storage) && !options['makeNewLink']) {
-		sendSMS('/c/' + utils.readKeyValue('click_id', this._storage));
+	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
+		sendSMS(utils.readKeyValue('click_id', this._storage));
 	}
 	else {
-		this["link"](linkData, options || {}, function(err, url) {
+		this["link"](linkData, function(err, url) {
 			if (err) { return callback(err); }
 
 			self._api(resources.linkClick, {
-				"link_url": '/l/' + url.split('/').pop(),
+				"link_url": 'l/' + url.split('/').pop(),
 				"click": "click"
 			}, function(err, data) {
 				if (err) { return callback(err); }
@@ -624,7 +625,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     showDesktop: true,                 // Should the banner be shown on desktop devices?
  *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
- *     makeNewLink: false                 // Should the banner create a new link, even if a link already exists?
+ *     make_new_link: false               // Should the banner create a new link, even if a link already exists?
  * }, {
  *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
@@ -659,7 +660,7 @@ Branch.prototype['banner'] = function(options, linkData) {
 		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 		disableHide: !!options['disableHide'],
 		forgetHide: !!options['forgetHide'],
-		makeNewLink: !!options['makeNewLink']
+		make_new_link: !!options['make_new_link']
 	};
 
 	if (typeof options['showMobile'] != 'undefined') {

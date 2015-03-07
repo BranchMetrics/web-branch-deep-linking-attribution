@@ -54,7 +54,6 @@
         <div class="group">
           <button id="track" class="btn btn-info">.track()</button>
           <button id="link" class="btn btn-info">.link()</button>
-          <button id="linkNew" class="btn btn-info">.link({ make_new_link': true })</button>
           <button id="banner" class="btn btn-info">.banner()</button>
         </div>
       </div>
@@ -80,7 +79,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
 
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 
 
@@ -167,13 +166,6 @@
     $('#link').click(function() {
       request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
       branch.link(sampleParams, function(err, link) {
-        response.html('<a href="' + link + '">' + link + '</a>');
-      });
-    });
-
-    $('#linkNew').click(function() {
-      request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
-      branch.link(sampleParams, { 'makeNewLink': true }, function(err, link) {
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });

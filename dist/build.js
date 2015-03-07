@@ -1146,16 +1146,17 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
   "function" == typeof c ? (d = c, c = {}) : "undefined" == typeof c && (c = {});
   d = d || function() {
   };
+  c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
     return d(Error(utils.message(utils.messages.nonInit)));
   }
   var f = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
-  utils.readKeyValue("click_id", this._storage) && !c.makeNewLink ? e("/c/" + utils.readKeyValue("click_id", this._storage)) : this.link(b, c || {}, function(a, b) {
+  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, function(a, b) {
     if (a) {
       return d(a);
     }
-    f._api(resources.linkClick, {link_url:"/l/" + b.split("/").pop(), click:"click"}, function(a, b) {
+    f._api(resources.linkClick, {link_url:"l/" + b.split("/").pop(), click:"click"}, function(a, b) {
       if (a) {
         return d(a);
       }
@@ -1192,7 +1193,7 @@ Branch.prototype.redeem = function(a, b, c) {
 };
 Branch.prototype.banner = function(a, b) {
   var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
-  makeNewLink:!!a.makeNewLink};
+  make_new_link:!!a.make_new_link};
   "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
   banner(this, c, b, this._storage);
 };

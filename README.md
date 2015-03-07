@@ -315,7 +315,7 @@ ___
 
 **linkData**: `Object`, _required_ - object of link data
 
-**options**: `Object`, _optional_ - options: makeNewLink, which forces the creation of a new link even if one already exists
+**options**: `Object`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
 
 **callback**: `function`, _optional_ - Returns an error if unsuccessful
 
@@ -362,7 +362,7 @@ branch.sendSMS(
             '$og_image_url': 'http://myappwebsite.com/image.png'
         }
     },
-    { makeNewLink: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
+    { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
     function(err) { console.log(err); }
 });
 ```
@@ -549,7 +549,7 @@ branch.banner({
     showDesktop: true,                 // Should the banner be shown on desktop devices?
     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
-    makeNewLink: false                 // Should the banner create a new link, even if a link already exists?
+    make_new_link: false               // Should the banner create a new link, even if a link already exists?
 }, {
     phone: '9999999999',
     tags: ['tag1', 'tag2'],
