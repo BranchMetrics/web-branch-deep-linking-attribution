@@ -2,7 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.2.0] - 2015-03-06
 ### New Functionality
 - Added **disableHide** option to banner, allows you to control if the banner lets the user disable (close) the banner.
 - Added **showiOS** option to banner, replaces **showMobile**, allows you to control if the banner shows on iOS devices.
