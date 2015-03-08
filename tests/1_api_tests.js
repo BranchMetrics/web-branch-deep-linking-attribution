@@ -17,12 +17,12 @@ var branchAPI;
 var setUp = function() {
 
 	// Maximum wait time for async tests (ms)
-	maxWaitTime = 15000;
+	maxWaitTime = 5000;
 
 	branchAPI = new BranchAPI();
 
 	// How often we should check for the finished state of an async test
-	asyncPollingInterval = 500;
+	asyncPollingInterval = 100;
 
 	// Standard set of dummy params
 	params = {
@@ -88,27 +88,38 @@ var runAsyncTest = function(testFunction, assertions, expectedError, expectedRes
  * Helper function for API Requests
  */
 
-var runAPITest = function(resource, extraParams, expectedRequest, expectedResponse, expectedError) {
+var runAPITest = function(resource, extraParams, expectedRequest, expectedError, expectedResponse) {
 	for (var i = 0; i < extraParams.length; i++) {
 		var key = Object.keys(extraParams[i])[0];
 		params[key] = extraParams[i][key];
 	}
 
 	runAsyncTest(function(callback) {
-		branchAPI.request(resources[resource],
-			params,
-			api_storage,
-			function(err, data, request) {
-				callback(err, utils.whiteListSessionData(data), request);
-			});
-	}, function(receivedData, sentRequest) {
-		if (expectedResponse) {
-			assertObjectEquals("should return expected response", receivedData, expectedResponse);
+		var callAPI = function() {
+			branchAPI.request(resources[resource],
+				params,
+				api_storage,
+				function(err, data, request) {
+					callback(err, utils.whiteListSessionData(data), request);
+				});
+		};
+		if (expectedError) {
+			recievedFired = true;
+			var err = assertThrows("should return error", callAPI);
+			assertEquals("should return expected error message", expectedError.message, err.message);
+			callback(err, null);
 		}
 		else {
-			// assert error
+			callAPI();
 		}
-		assertObjectEquals("should send expected request", sentRequest, expectedRequest);
+
+	}, function(receivedData, sentRequest) {
+		if (expectedRequest) {
+			assertObjectEquals("should send expected request", expectedRequest, sentRequest);
+		}
+		if (expectedResponse) {
+			assertObjectEquals("should return expected response", expectedResponse, receivedData);
+		}
 	},
 	expectedError,
 	expectedResponse);
@@ -127,7 +138,16 @@ var testOpen = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&is_referrable=1&browser_fingerprint_id=" + params.browser_fingerprint_id,
 			"method": "POST"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
+}
+
+var testOpenMissingIsReferrable = function() {
+	runAPITest(
+		'open',
+		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
+		null,
+		Error("API request /v1/open missing parameter is_referrable"),
 		null);
 }
 
@@ -144,7 +164,16 @@ var testProfile = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&identity=test_id",
 			"method": "POST"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
+}
+
+var testProfileMissingIdentity = function() {
+	runAPITest(
+		'profile',
+		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
+		null,
+		new Error("API request /v1/profile missing parameter identity"),
 		null);
 }
 
@@ -161,8 +190,8 @@ var testLogout = function() {
 			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id,
 			"method": "POST"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
@@ -178,8 +207,8 @@ var testReferrals = function() {
 			"postData": "",
 			"method": "GET"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
@@ -195,8 +224,8 @@ var testCredits = function() {
 			"postData": "",
 			"method": "GET"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
@@ -206,15 +235,23 @@ var testCredits = function() {
 var test_r = function() {
 	runAPITest(
 		'_r',
-		[ { "identity": "test_id" }, { "v": config.version } ],
+		[ { "v": config.version } ],
 		{
 			"url": "https://bnc.lt/_r?app_id=" + params.app_id + "&v=" + config.version,
 			"postData": params,
 			"method": "GET"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
 		null,
-		'should return session data object');
+		{ data: null, referring_identity: null, identity: null, has_app: null });
+}
+
+var test_rMissingV = function() {
+	runAPITest(
+		'_r',
+		[ { "identity": "test_id" } ],
+		null,
+		new Error("API request /_r missing parameter v"),
+		null);
 }
 
 // ===========================================================================================
@@ -230,8 +267,8 @@ var testRedeem = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&amount=1&bucket=testbucket",
 			"method": "POST"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
@@ -247,8 +284,8 @@ var testLink = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id,
 			"method": "POST"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
@@ -265,8 +302,8 @@ var testLinkClick = function() {
 			"postData": "",
 			"method": "GET"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
@@ -284,8 +321,8 @@ var testSMSLinkSend = function() {
 			"postData": "phone=" + testPhone,
 			"method": "POST"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
@@ -300,6 +337,7 @@ var testEvent = function() {
 		};
 	var metadataString = "&metadata.url=testurl&metadata.user_agent=test_agent&metadata.language=test_language";
 	var eventName = "test";
+
 	runAPITest(
 		'event',
 		[ { "identity": "test_id" },
@@ -310,8 +348,8 @@ var testEvent = function() {
 			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id + "&event=" + eventName + metadataString,
 			"method": "POST"
 		},
-		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null);
+		null,
+		{ data: null, referring_identity: null, identity: null, has_app: null });
 }
 
 // ===========================================================================================
