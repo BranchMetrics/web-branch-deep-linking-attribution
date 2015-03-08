@@ -136,7 +136,7 @@ resources.redeem =  {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(true, branch_id),
 		"amount": validator(true, validationTypes.num),
-		"bucket": validator(false, validationTypes.str)
+		"bucket": validator(true, validationTypes.str)
 	}
 };
 
