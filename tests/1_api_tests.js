@@ -45,28 +45,42 @@ var tearDown = function() {
  */
 var runAsyncTest = function(testFunction, assertions, expectedError, expectedResponse) {
 	var receivedData = { };
+	var sentRequest = { };
 	var recievedFired;
 
 	stubs.replace(branchAPI, 'XHRRequest', function(url, postData, method, storage, callback) {
-		callback(expectedError, expectedResponse);
+		callback(expectedError,
+			expectedResponse,
+			{
+				"url": url,
+				"postData": postData,
+				"method": method
+			});
 	});
 
-	stubs.replace(branchAPI, 'jsonpRequest', function(url, postData, method, storage, callback) {
-		callback(expectedError, expectedResponse);
+	stubs.replace(branchAPI, 'jsonpRequest', function(url, postData, method, callback) {
+		callback(expectedError,
+			expectedResponse,
+			{
+				"url": url,
+				"postData": postData,
+				"method": method
+			});
 	});
 
 	waitForCondition(
 		function() {
 			return recievedFired;
 		},
-		function() { assertions(receivedData) },
+		function() { assertions(receivedData, sentRequest) },
 		asyncPollingInterval,
 		maxWaitTime
 	);
 
-	testFunction(function(err, data) {
+	testFunction(function(err, data, request) {
 		recievedFired = true;
 		receivedData = err || data;
+		sentRequest = request;
 	});
 };
 
@@ -74,7 +88,7 @@ var runAsyncTest = function(testFunction, assertions, expectedError, expectedRes
  * Helper function for API Requests
  */
 
-var runAPITest = function(resource, extraParams, expectedRequest, expectedResponse, expectedError, assertText) {
+var runAPITest = function(resource, extraParams, expectedRequest, expectedResponse, expectedError) {
 	for (var i = 0; i < extraParams.length; i++) {
 		var key = Object.keys(extraParams[i])[0];
 		params[key] = extraParams[i][key];
@@ -84,11 +98,17 @@ var runAPITest = function(resource, extraParams, expectedRequest, expectedRespon
 		branchAPI.request(resources[resource],
 			params,
 			api_storage,
-			function(err, data) {
-				callback(err, utils.whiteListSessionData(data));
+			function(err, data, request) {
+				callback(err, utils.whiteListSessionData(data), request);
 			});
-	}, function(receivedData) {
-		assertObjectEquals(assertText, receivedData, expectedResponse);
+	}, function(receivedData, sentRequest) {
+		if (expectedResponse) {
+			assertObjectEquals("should return expected response", receivedData, expectedResponse);
+		}
+		else {
+			// assert error
+		}
+		assertObjectEquals("should send expected request", sentRequest, expectedRequest);
 	},
 	expectedError,
 	expectedResponse);
@@ -102,10 +122,13 @@ var testOpen = function() {
 	runAPITest(
 		'open',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
-		{ "url": "", "postData": "", "method": "" },
+		{
+			"url": "https://api.branch.io/v1/open",
+			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&is_referrable=1&browser_fingerprint_id=" + params.browser_fingerprint_id,
+			"method": "POST"
+		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -118,12 +141,11 @@ var testProfile = function() {
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "identity": "test_id" } ],
 		{
 			"url": "https://api.branch.io/v1/profile",
-			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id,
+			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&identity=test_id",
 			"method": "POST"
 		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -140,8 +162,7 @@ var testLogout = function() {
 			"method": "POST"
 		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -158,8 +179,7 @@ var testReferrals = function() {
 			"method": "GET"
 		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -176,15 +196,13 @@ var testCredits = function() {
 			"method": "GET"
 		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
 /**
  * _r Tests
  */
- /*
 var test_r = function() {
 	runAPITest(
 		'_r',
@@ -198,7 +216,7 @@ var test_r = function() {
 		null,
 		'should return session data object');
 }
-*/
+
 // ===========================================================================================
 /**
  * Redeem Tests
@@ -207,10 +225,13 @@ var testRedeem = function() {
 	runAPITest(
 		'redeem',
 		[ { "identity": "test_id" }, { "amount": 1 }, { "bucket": "testbucket" } ],
-		{},
+		{
+			"url": "https://api.branch.io/v1/redeem",
+			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&amount=1&bucket=testbucket",
+			"method": "POST"
+		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -227,8 +248,7 @@ var testLink = function() {
 			"method": "POST"
 		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -246,8 +266,7 @@ var testLinkClick = function() {
 			"method": "GET"
 		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -256,13 +275,17 @@ var testLinkClick = function() {
  */
 var testSMSLinkSend = function() {
 	var link = "3hpH54U-58";
+	var testPhone = "8009999999";
 	runAPITest(
 		'SMSLinkSend',
-		[ { "identity": "test_id" }, { "link_url": "l/" + link }, { "phone": "8009999999" } ],
-		{},
+		[ { "identity": "test_id" }, { "link_url": "l/" + link }, { "phone": testPhone } ],
+		{
+			"url": "https://bnc.lt/c/l/" + link,
+			"postData": "phone=" + testPhone,
+			"method": "POST"
+		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================
@@ -270,11 +293,12 @@ var testSMSLinkSend = function() {
  * Redeem Tests
  */
 var testEvent = function() {
-	var metadata = utils.merge({
-			"url": document.URL,
-			"user_agent": navigator.userAgent,
-			"language": navigator.language
-		}, { });
+	var metadata = {
+			"url": "testurl",
+			"user_agent": "test_agent",
+			"language": "test_language"
+		};
+	var metadataString = "&metadata.url=testurl&metadata.user_agent=test_agent&metadata.language=test_language";
 	var eventName = "test";
 	runAPITest(
 		'event',
@@ -283,12 +307,11 @@ var testEvent = function() {
 			{ "metadata": metadata } ],
 		 {
 			"url": "https://api.branch.io/v1/event",
-			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id + "&event=" + eventName + "&metadatas=" + branchAPI.serializeObject(metadata),
+			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id + "&event=" + eventName + metadataString,
 			"method": "POST"
 		},
 		{ data: null, referring_identity: null, identity: null, has_app: null },
-		null,
-		'should return session data object');
+		null);
 }
 
 // ===========================================================================================

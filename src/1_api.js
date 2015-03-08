@@ -14,7 +14,6 @@ goog.require('storage'); // jshint unused:false
  */
 var BranchAPI = function() {
 	this._branchAPI = { };
-	// this._branchAPI._jsonp_callback_index = 0;
 };
 
 BranchAPI.prototype._jsonp_callback_index = 0;
@@ -55,7 +54,7 @@ BranchAPI.prototype.getUrl = function(resource, data) {
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
-				resource.queryPart[k](resource.endpoint, k, data[k]); // validate -- will throw
+				resource.queryPart[k](resource.endpoint, k, data[k]);
 				url += '/' + data[k];
 			}
 		}
