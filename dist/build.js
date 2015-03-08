@@ -821,8 +821,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
-var _jsonp_callback_index = 0;
-function serializeObject(a, b) {
+var BranchAPI = function() {
+  this._branchAPI = {};
+};
+BranchAPI.prototype._jsonp_callback_index = 0;
+BranchAPI.prototype.serializeObject = function(a, b) {
   var c = [];
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
@@ -830,12 +833,12 @@ function serializeObject(a, b) {
     }
   } else {
     for (d in a) {
-      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" == typeof a[d] ? c.push(serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
+      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" == typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
     }
   }
   return c.join("&");
-}
-function getUrl(a, b) {
+};
+BranchAPI.prototype.getUrl = function(a, b) {
   var c, d = a.destination + a.endpoint;
   if (a.queryPart) {
     for (c in a.queryPart) {
@@ -849,10 +852,10 @@ function getUrl(a, b) {
       "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
     }
   }
-  return{data:serializeObject(e, ""), url:d};
-}
-var jsonpRequest = function(a, b, c, d) {
-  var e = "branch_callback__" + _jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+  return{data:this.serializeObject(e, ""), url:d};
+};
+BranchAPI.prototype.jsonpRequest = function(a, b, c, d) {
+  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
   b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
     window[d] = function() {
@@ -868,7 +871,8 @@ var jsonpRequest = function(a, b, c, d) {
   c.async = !0;
   c.src = a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + "&callback=" + e + (0 <= a.indexOf("/c/") ? "&click=1" : "");
   document.getElementsByTagName("head")[0].appendChild(c);
-}, XHRRequest = function(a, b, c, d, e) {
+};
+BranchAPI.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.onreadystatechange = function() {
     if (4 === f.readyState && 200 === f.status) {
@@ -884,12 +888,13 @@ var jsonpRequest = function(a, b, c, d) {
   try {
     f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    d.setItem("use_jsonp", !0), jsonpRequest(a, b, c, e);
+    d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
-}, api = function(a, b, c, d) {
-  var e = getUrl(a, b), f, g = "";
+};
+BranchAPI.prototype.request = function(a, b, c, d) {
+  var e = this.getUrl(a, b), f, g = "";
   "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
-  c.getItem("use_jsonp") || a.jsonp ? jsonpRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
+  c.getItem("use_jsonp") || a.jsonp ? this.jsonpRequest(f, b, a.method, d) : this.XHRRequest(f, g, a.method, c, d);
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, _validator;
@@ -1049,6 +1054,7 @@ var default_branch, Branch = function() {
   }
   this._queue = Queue();
   this._storage = storage();
+  this._branchAPI = new BranchAPI;
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1057,7 +1063,7 @@ Branch.prototype._api = function(a, b, c) {
     (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && d.app_id && (b.app_id = d.app_id);
     (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && d.session_id && (b.session_id = d.session_id);
     (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && d.identity_id && (b.identity_id = d.identity_id);
-    return api(a, b, d._storage, function(a, b) {
+    return d._branchAPI.request(a, b, d._storage, function(a, b) {
       e();
       c(a, b);
     });

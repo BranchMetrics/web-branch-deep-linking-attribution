@@ -5,7 +5,7 @@
 goog.provide('Branch');
 goog.require('utils');
 goog.require('resources');
-goog.require('api');
+goog.require('BranchAPI');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
@@ -26,6 +26,7 @@ Branch = function() {
 	}
 	this._queue = Queue();
 	this._storage = storage();
+	this._branchAPI = new BranchAPI();
 	this.initialized = false;
 };
 
@@ -40,7 +41,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
-		return api(resource, obj, self._storage, function(err, data) {
+		return self._branchAPI.request(resource, obj, self._storage, function(err, data) {
 			next();
 			callback(err, data);
 		});

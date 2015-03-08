@@ -1,5 +1,5 @@
 /*
- * This file defines the unit tests for the main function
+ * This file defines the unit tests for the Branch class
  */
 
 /**
@@ -54,11 +54,13 @@ var tearDown = function() {
  */
 var runAsyncTest = function(testFunction, assertions, expectedError, expectedResponse) {
 
-	var receivedData = {};
+	var receivedData = { };
 	var recievedFired;
 
 	stubs.replace(branch, '_api', function(resource, obj, callback) {
 		callback(expectedError, expectedResponse);
+
+		// add queue to this!
 	});
 
 	waitForCondition(
