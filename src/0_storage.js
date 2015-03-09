@@ -3,43 +3,57 @@
  * Note: this session does not persist after the user navigates away.
  */
 
- goog.provide('Storage');
+goog.provide('storage');
 
-/***
- * @class Storage
+/**
+ * @class BranchStorage
  * @constructor
  */
-Storage = function() {
-	var sessionStorageStructure = { };
+var BranchStorage = function() {
+	this._store = {};
+};
 
-	this.setItem = function(key, value) {
-		sessionStorageStructure[key] = value;
-	};
+/**
+ * @param {string} key
+ * @param {*} value
+ */
+BranchStorage.prototype['setItem'] = function(key, value) {
+	this._store[key] = value;
+};
 
-	this.getItem = function(key) {
-		if (typeof sessionStorageStructure[key] != 'undefined') {
-			return sessionStorageStructure[key];
-		}
-		else {
-			return null;
-		}
-	};
+/**
+ * @param {string} key
+ */
+BranchStorage.prototype['getItem'] = function(key) {
+	if (typeof this._store[key] != 'undefined') {
+		return this._store[key];
+	}
+	else {
+		return null;
+	}
+};
 
-	this.removeItem = function(key) {
-		delete sessionStorageStructure[key];
-	};
+/**
+ * @param {string} key
+ */
+BranchStorage.prototype['removeItem'] = function(key) {
+	delete this._store[key];
+};
 
-	this.clear = function() {
-		sessionStorageStructure = { };
-	};
-	return function() {
-		try {
-			sessionStorage.setItem("test", "");
-			sessionStorage.removeItem("test");
-			return sessionStorage;
-		}
-		catch (e) {
-			return this;
-		}
-	};
+BranchStorage.prototype['clear'] = function() {
+	this._store = {};
+};
+
+/**
+ * @return {BranchStorage}
+ */
+storage = function() {
+	try {
+		sessionStorage.setItem("test", "");
+		sessionStorage.removeItem("test");
+		return sessionStorage;
+	}
+	catch (e) {
+		return new BranchStorage();
+	}
 };

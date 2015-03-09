@@ -523,8 +523,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
-      g[h - 2] = arguments[h];
+    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
+      g[k - 2] = arguments[k];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -605,29 +605,29 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:1};
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.2.0"};
 // Input 2
-var Storage = function() {
-  var a = {};
-  this.setItem = function(b, c) {
-    a[b] = c;
-  };
-  this.getItem = function(b) {
-    return "undefined" != typeof a[b] ? a[b] : null;
-  };
-  this.removeItem = function(b) {
-    delete a[b];
-  };
-  this.clear = function() {
-    a = {};
-  };
-  return function() {
-    try {
-      return sessionStorage.setItem("test", ""), sessionStorage.removeItem("test"), sessionStorage;
-    } catch (a) {
-      return this;
-    }
-  };
+var BranchStorage = function() {
+  this._store = {};
+};
+BranchStorage.prototype.setItem = function(a, b) {
+  this._store[a] = b;
+};
+BranchStorage.prototype.getItem = function(a) {
+  return "undefined" != typeof this._store[a] ? this._store[a] : null;
+};
+BranchStorage.prototype.removeItem = function(a) {
+  delete this._store[a];
+};
+BranchStorage.prototype.clear = function() {
+  this._store = {};
+};
+var storage = function() {
+  try {
+    return sessionStorage.setItem("test", ""), sessionStorage.removeItem("test"), sessionStorage;
+  } catch (a) {
+    return new BranchStorage;
+  }
 };
 // Input 3
 var Queue = function() {
@@ -740,35 +740,31 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 5
-var utils = {}, DEBUG = !0;
-utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out"};
+var utils = {}, DEBUG = !0, message;
+utils.httpMethod = {POST:"POST", GET:"GET"};
+utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", missingUrl:"Required argument: URL, is missing"};
 utils.error = function(a, b) {
   throw Error(utils.message(a, b));
 };
 utils.message = function(a, b) {
   var c = a.replace(/\$(\d)/g, function(a, c) {
-    return b[parseInt(c) - 1];
+    return b[parseInt(c, 10) - 1];
   });
   DEBUG && console && console.log(c);
   return c;
 };
+utils.whiteListSessionData = function(a) {
+  return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null};
+};
 utils.readStore = function(a) {
   try {
-    return goog.json.parse(a().getItem("branch_session") || {});
+    return goog.json.parse(a.getItem("branch_session") || {});
   } catch (b) {
     return{};
   }
 };
-utils.whiteListSessionData = function(a) {
-  var b = ["data", "referring_identity", "identity", "has_app"], c = {}, d;
-  for (d in a) {
-    -1 < b.indexOf(d) && (c[d] = a[d]);
-  }
-  return c;
-};
 utils.store = function(a, b) {
-  b().setItem("branch_session", goog.json.serialize(a));
-  b().getItem("branch_session");
+  b.setItem("branch_session", goog.json.serialize(a));
 };
 utils.storeKeyValue = function(a, b, c) {
   var d = utils.readStore(c);
@@ -804,156 +800,29 @@ utils.urlValue = function(a) {
   return utils.getParamValue(a) || utils.hashValue(a);
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
-  d = void 0;
+  var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
     ;
   }
   return b;
 };
 // Input 6
-var banner = {}, animationSpeed = 250, animationDelay = 20, bannerHeight = "76px", bannerResources = {css:{banner:".branch-animation { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + animationSpeed / 
-1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; display: inline-block; line-height: 1.2em; vertical-align: top; }\n#branch-banner-close { font-weight: 400; cursor: pointer; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .details { top: 16px; }\n#branch-banner .details > * { display: block; }\n#branch-banner .right > div { float: right; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n', 
-desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 24px; top: 18px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .left, .right { width: 47%;  top: 0; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 125px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; position: absolute; margin-top: 3px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n", 
-nonie:"#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n", ie:"#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n", mobile:"#branch-banner { position: absolute; }\n#branch-banner .content .left { width: 60%; }\n#branch-banner .content .right { width: 35%; height: 24px; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-banner a { text-decoration: none; }\n#branch-mobile-action { top: 6px; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n", 
-ios:"#branch-banner a { color: #428bca; }\n", android:"#branch-banner-close { text-align: center; font-size: 15px; border-radius:14px; border:0; width:17px; height:17px; line-height:14px; color:#b1b1b3; background:#efefef; }\n#branch-mobile-action { text-decoration:none; border-bottom: 3px solid #b3c833; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #b3c833; border-radius: 5px; }\n#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n", 
-iframe:"body { -webkit-transition: all " + 1.5 * animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + bannerHeight + "; z-index: 99999; -webkit-transition: all " + animationSpeed / 1E3 + "s ease; transition: all 0" + animationSpeed / 1E3 + "s ease; }\n", inneriframe:"body { margin: 0; }\n", iframe_desktop:"#branch-banner-iframe { position: fixed; }\n", 
-iframe_mobile:"#branch-banner-iframe { position: absolute; }\n"}, html:{banner:function(a) {
-  return'<div class="content"><div class="left"><div id="branch-banner-close" class="branch-animation">&times;</div><div class="icon"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action"></div></div>';
-}, mobileAction:function(a) {
-  var b = a.openAppButtonText || "View in app";
-  a = a.downloadAppButtonText || "Download App";
-  return'<a id="branch-mobile-action" href="#" target="_parent">' + (utils.hasApp() ? b : a) + "</a>";
-}, desktopAction:'<div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999"><button type="submit" id="branch-sms-send" class="branch-animation" >Send Link</button></form></div><div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div>', appendiFrame:function(a) {
-  var b = document.createElement("iframe");
-  a = "<html><head></head><body>" + a.outerHTML + "</body></html>";
-  b.src = "about:blank";
-  b.style.overflow = "hidden";
-  b.scrolling = "no";
-  b.id = "branch-banner-iframe";
-  b.className = "branch-animation";
-  document.body.appendChild(b);
-  bannerResources.utils.branchiFrame().contentWindow.document.open();
-  bannerResources.utils.branchiFrame().contentWindow.document.write(a);
-  bannerResources.utils.branchiFrame().contentWindow.document.close();
-}, checkmark:function() {
-  return window.ActiveXObject ? '<span class="checkmark">&#x2713;</span>' : '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5" enable-background="new 0 0 98.5 98.5" xml:space="preserve"><path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10" d="M81.7,17.8C73.5,9.3,62,4,49.2,4C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/></svg>';
-}}, utils:{removeElement:function(a) {
+var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
 }, mobileUserAgent:function() {
   return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : "ios" : !1;
-}, shouldAppend:function(a) {
-  return a.showDesktop && !bannerResources.utils.mobileUserAgent() || a.showMobile && bannerResources.utils.mobileUserAgent();
-}, branchBanner:function() {
-  return document.getElementById("branch-banner") || bannerResources.utils.branchiFrame().contentWindow.document.getElementById("branch-banner");
-}, branchDocument:function() {
-  return document.getElementById("branch-banner") ? document : bannerResources.utils.branchiFrame().contentWindow.document;
-}, branchiFrame:function() {
-  return document.getElementById("branch-banner-iframe");
-}}, actions:{sendSMS:function(a, b, c) {
-  var d = bannerResources.utils.branchDocument().getElementById("branch-sms-phone"), e = bannerResources.utils.branchDocument().getElementById("branch-sms-send"), f = bannerResources.utils.branchDocument().getElementById("branch-loader-wrapper"), g = bannerResources.utils.branchDocument().getElementById("branch-sms-form-container"), h, k = function() {
-    e.removeAttribute("disabled");
-    d.removeAttribute("disabled");
-    e.style.opacity = "1";
-    d.style.opacity = "1";
-    f.style.opacity = "0";
-  }, n = function() {
-    h = bannerResources.utils.branchDocument().createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = bannerResources.html.checkmark();
-    e.style.opacity = "0";
-    d.style.opacity = "0";
-    f.style.opacity = "0";
-    g.appendChild(h);
-    setTimeout(function() {
-      h.style.opacity = "1";
-    }, animationDelay);
-    d.value = "";
-  }, l = function() {
-    k();
-    e.style.background = "#FFD4D4";
-    d.className = "error";
-    setTimeout(function() {
-      e.style.background = "#FFFFFF";
-      d.className = "";
-    }, 2E3);
-  };
-  if (d) {
-    var m = d.value;
-    /^\d{7,}$/.test(m.replace(/[\s()+\-\.]|ext/gi, "")) ? (e.setAttribute("disabled", ""), d.setAttribute("disabled", ""), e.style.opacity = ".4", d.style.opacity = ".4", f.style.opacity = "1", d.className = "", a.sendSMS(m, c, b, function(a) {
-      a ? l() : (n(), setTimeout(function() {
-        g.removeChild(h);
-        k();
-      }, 3E3));
-    })) : l();
-  }
-}, close:function(a) {
-  return function() {
-    setTimeout(function() {
-      bannerResources.utils.removeElement(bannerResources.utils.branchBanner());
-      bannerResources.utils.removeElement(bannerResources.utils.branchiFrame());
-      bannerResources.utils.removeElement(document.getElementById("branch-css"));
-    }, animationSpeed + animationDelay);
-    setTimeout(function() {
-      document.body.style.marginTop = "0px";
-    }, animationDelay);
-    bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = "-" + bannerHeight : bannerResources.utils.branchBanner().style.top = "-" + bannerHeight;
-    utils.storeKeyValue("hideBanner", !0, a._storage);
-  };
-}}};
-banner.bannerMarkup = function(a) {
-  if (bannerResources.utils.shouldAppend(a)) {
-    var b = document.createElement("div");
-    b.id = "branch-banner";
-    b.className = "branch-animation";
-    b.innerHTML = bannerResources.html.banner(a);
-    document.body.className = "branch-animation";
-    a.iframe ? bannerResources.html.appendiFrame(b) : document.body.appendChild(b);
-  }
-};
-banner.bannerStyles = function(a) {
-  if (bannerResources.utils.shouldAppend(a)) {
-    var b = document.createElement("style");
-    b.type = "text/css";
-    b.id = "branch-css";
-    b.innerHTML = bannerResources.css.banner;
-    var c = bannerResources.utils.mobileUserAgent();
-    "ios" == c && a.showMobile ? b.innerHTML += bannerResources.css.mobile + bannerResources.css.ios : "android" == c && a.showMobile ? b.innerHTML += bannerResources.css.mobile + bannerResources.css.android : a.showDesktop && (b.innerHTML += bannerResources.css.desktop, b.innerHTML = window.ActiveXObject ? b.innerHTML + bannerResources.css.ie : b.innerHTML + bannerResources.css.nonie);
-    a.iframe ? (a = document.createElement("style"), b.type = "text/css", b.id = "branch-iframe-css", b.innerHTML += bannerResources.css.inneriframe, a.innerHTML = bannerResources.css.iframe + (bannerResources.utils.mobileUserAgent() ? bannerResources.css.iframe_mobile : bannerResources.css.iframe_desktop), document.head.appendChild(a), bannerResources.utils.branchiFrame().contentWindow.document.head.appendChild(b), bannerResources.utils.branchiFrame().style.top = "-" + bannerHeight) : (document.head.appendChild(b), 
-    bannerResources.utils.branchBanner().style.top = "-" + bannerHeight);
-  }
-};
-banner.bannerActions = function(a, b, c) {
-  if (bannerResources.utils.shouldAppend(b) && bannerResources.utils.branchDocument()) {
-    var d = document.createElement("div");
-    d.id = "branch-sms-form-container";
-    bannerResources.utils.mobileUserAgent() ? (c.channel = "app banner", d.innerHTML = bannerResources.html.mobileAction(b), bannerResources.utils.branchDocument().getElementById("branch-banner-action").appendChild(d), a.link(c, function(a, b) {
-      bannerResources.utils.branchDocument().getElementById("branch-mobile-action").href = b;
-    })) : (d.innerHTML = bannerResources.html.desktopAction, bannerResources.utils.branchDocument().getElementById("branch-banner-action").appendChild(d), bannerResources.utils.branchDocument().getElementById("sms-form").addEventListener("submit", function(d) {
-      d.preventDefault();
-      bannerResources.actions.sendSMS(a, b, c);
-    }));
-    bannerResources.utils.branchDocument().getElementById("branch-banner-close").onclick = bannerResources.actions.close(a);
-  }
-};
-banner.triggerBannerAnimation = function(a) {
-  bannerResources.utils.shouldAppend(a) && (document.body.style.marginTop = bannerHeight, setTimeout(function() {
-    bannerResources.utils.branchiFrame() ? bannerResources.utils.branchiFrame().style.top = "0" : bannerResources.utils.branchBanner().style.top = "0";
-  }, animationDelay));
-};
+}, shouldAppend:function(a, b) {
+  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
+}};
 // Input 7
-var _jsonp_callback_index = 0;
 function serializeObject(a, b) {
   var c = [];
-  b = b || "";
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
       c.push(encodeURIComponent(b) + "[]=" + encodeURIComponent(a[d]));
@@ -979,35 +848,25 @@ function getUrl(a, b) {
       "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
     }
   }
-  return{data:serializeObject(e), url:d};
+  return{data:serializeObject(e, ""), url:d};
 }
-var jsonpRequest = function(a, b, c) {
-  c = c || "branch_callback__" + _jsonp_callback_index++;
-  b.onSuccess = b.onSuccess || function() {
-  };
-  b.onTimeout = b.onTimeout || function() {
-  };
-  b.data = "POST" == b.method ? encodeURIComponent(utils.base64encode(goog.json.serialize(b.data))) : "";
-  var d = 0 <= a.indexOf("bnc.lt") ? "&post_data=" : "&data=", e = window.setTimeout(function() {
-    window[c] = function() {
+var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
+  var e = "branch_callback__" + jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+  b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
+  var g = window.setTimeout(function() {
+    window[e] = function() {
     };
-    b.onTimeout();
-  }, 1E3 * (b.timeout || 10));
-  window[c] = function(a) {
-    window.clearTimeout(e);
-    b.onSuccess(a);
-  };
-  var f = document.createElement("script");
-  f.type = "text/javascript";
-  f.async = !0;
-  f.src = a + (0 > a.indexOf("?") ? "?" : "") + (b.data ? d + b.data : "") + "&callback=" + c + (0 <= a.indexOf("/c/") ? "&click=1" : "");
-  document.getElementsByTagName("head")[0].appendChild(f);
-}, jsonpMakeRequest = function(a, b, c, d) {
-  jsonpRequest(a, {onSuccess:function(a) {
+    d(Error(utils.messages.timeout));
+  }, 1E4);
+  window[e] = function(a) {
+    window.clearTimeout(g);
     d(null, a);
-  }, onTimeout:function() {
-    d(utils.error(utils.messages.timeout));
-  }, timeout:10, data:b, method:c});
+  };
+  c = document.createElement("script");
+  c.type = "text/javascript";
+  c.async = !0;
+  c.src = a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + "&callback=" + e + (0 <= a.indexOf("/c/") ? "&click=1" : "");
+  document.getElementsByTagName("head")[0].appendChild(c);
 }, XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.onreadystatechange = function() {
@@ -1018,21 +877,21 @@ var jsonpRequest = function(a, b, c) {
         e(null, {});
       }
     } else {
-      4 === f.readyState && 402 === f.status ? e("Not enough credits to redeem.") : 4 !== f.readyState || "4" != f.status.toString().substring(0, 1) && "5" != f.status.toString().substring(0, 1) || e("Error in API: " + f.status);
+      4 === f.readyState && 402 === f.status ? e(Error("Not enough credits to redeem.")) : 4 !== f.readyState || "4" != f.status.toString().substring(0, 1) && "5" != f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
     }
   };
   try {
     f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    d().setItem("use_jsonp", !0), jsonpMakeRequest(a, b, c, e);
+    d.setItem("use_jsonp", !0), jsonpRequest(a, b, c, e);
   }
 }, api = function(a, b, c, d) {
   var e = getUrl(a, b), f, g = "";
   "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
-  c().getItem("use_jsonp") || a.jsonp ? jsonpMakeRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c(), d);
+  c.getItem("use_jsonp") || a.jsonp ? jsonpRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
 };
 // Input 8
-var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, methods = {POST:"POST", GET:"GET"};
+var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
     e ? b == validationTypes.obj ? "object" != typeof e && utils.error(utils.messages.invalidType, [c, d, "an object"]) : b == validationTypes.arr ? e instanceof Array || utils.error(utils.messages.invalidType, [c, d, "an array"]) : b == validationTypes.str ? "string" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a string"]) : b == validationTypes.num ? "number" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a number"]) : b && (b.test(e) || utils.error(utils.messages.invalidType, 
@@ -1041,25 +900,154 @@ function validator(a, b) {
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
-resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}};
-resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}};
-resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
-resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
-resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:"GET", queryPart:{identity_id:validator(!0, branch_id)}};
-resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:"GET", queryPart:{identity_id:validator(!0, branch_id)}};
-resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:"GET", jsonp:!0, params:{app_id:validator(!0, branch_id)}};
-resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:"POST", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}};
-resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:"POST", ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
-resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:"GET", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
-resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:"POST", queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
-resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:"POST", params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
+resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}};
+resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}};
+resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
+resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}};
+resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}};
+resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}};
+resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{app_id:validator(!0, branch_id), v:validator(!0, validationTypes.str)}};
+resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}};
+resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
+resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
+resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
+resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
 // Input 9
+var banner_css = {};
+banner_css.banner = ".branch-animation { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
+1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; display: inline-block; line-height: 1.2em; vertical-align: top; }\n#branch-banner-close { font-weight: 400; cursor: pointer; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .details { top: 16px; }\n#branch-banner .details > * { display: block; }\n#branch-banner .right > div { float: right; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
+banner_css.desktop = "#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 24px; top: 14px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .left, .right { width: 47%;  top: 0; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 125px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; position: absolute; margin-top: 3px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n";
+banner_css.nonie = "#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n";
+banner_css.ie = "#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n";
+banner_css.mobile = "#branch-banner { position: absolute; }\n#branch-banner .content .left { width: 60%; }\n#branch-banner .content .right { width: 35%; height: 24px; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-banner a { text-decoration: none; }\n#branch-mobile-action { top: 6px; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n";
+banner_css.ios = "#branch-banner a { color: #428bca; }\n";
+banner_css.android = "#branch-banner-close { text-align: center; font-size: 15px; border-radius:14px; border:0; width:17px; height:17px; line-height:14px; color:#b1b1b3; background:#efefef; }\n#branch-mobile-action { text-decoration:none; border-bottom: 3px solid #b3c833; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #b3c833; border-radius: 5px; }\n#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n";
+banner_css.iframe = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + banner_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n";
+banner_css.inneriframe = "body { margin: 0; }\n";
+banner_css.iframe_desktop = "#branch-banner-iframe { position: fixed; }\n";
+banner_css.iframe_mobile = "#branch-banner-iframe { position: absolute; }\n";
+banner_css.css = function(a, b) {
+  var c = banner_css.banner, d = banner_utils.mobileUserAgent();
+  "ios" == d && a.showiOS ? c += banner_css.mobile + banner_css.ios : "android" == d && a.showAndroid ? c += banner_css.mobile + banner_css.android : (c += banner_css.desktop, c = window.ActiveXObject ? c + banner_css.ie : c + banner_css.nonie);
+  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_mobile : banner_css.iframe_desktop), document.head.appendChild(d));
+  d = document.createElement("style");
+  d.type = "text/css";
+  d.id = "branch-css";
+  d.innerHTML = c;
+  (a.iframe ? b.contentWindow.document : document).head.appendChild(d);
+  b.style.top = "-" + banner_utils.bannerHeight;
+};
+// Input 10
+var banner_html = {banner:function(a, b) {
+  return'<div class="content"><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action">' + b + "</div></div>";
+}, mobileAction:function(a, b) {
+  return'<a id="branch-mobile-action" href="#" target="_parent">' + (utils.hasApp(b) ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+}, desktopAction:'<div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999"><button type="submit" id="branch-sms-send" class="branch-animation" >Send Link</button></form></div><div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div>', checkmark:function() {
+  return window.ActiveXObject ? '<span class="checkmark">&#x2713;</span>' : '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5" enable-background="new 0 0 98.5 98.5" xml:space="preserve"><path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10" d="M81.7,17.8C73.5,9.3,62,4,49.2,4C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/></svg>';
+}, iframe:function(a, b) {
+  var c = document.createElement("iframe");
+  c.src = "about:blank";
+  c.style.overflow = "hidden";
+  c.scrolling = "no";
+  c.id = "branch-banner-iframe";
+  c.className = "branch-animation";
+  document.body.appendChild(c);
+  var d = '<html><head></head><body><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
+  c.contentWindow.document.open();
+  c.contentWindow.document.write(d);
+  c.contentWindow.document.close();
+  return c;
+}, div:function(a, b) {
+  var c = document.createElement("div");
+  c.id = "branch-banner";
+  c.className = "branch-animation";
+  c.innerHTML = banner_html.banner(a, b);
+  return c;
+}, markup:function(a, b) {
+  var c = '<div id="branch-sms-form-container">' + (banner_utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction) + "</div>";
+  return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
+}};
+// Input 11
+var sendSMS = function(a, b, c, d) {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+    f.removeAttribute("disabled");
+    e.removeAttribute("disabled");
+    f.style.opacity = "1";
+    e.style.opacity = "1";
+    g.style.opacity = "0";
+  }, p = function() {
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
+    f.style.opacity = "0";
+    e.style.opacity = "0";
+    g.style.opacity = "0";
+    setTimeout(function() {
+      h.style.opacity = "1";
+    }, banner_utils.animationDelay);
+    e.value = "";
+  }, m = function() {
+    l();
+    f.style.background = "#FFD4D4";
+    e.className = "error";
+    setTimeout(function() {
+      f.style.background = "#FFFFFF";
+      e.className = "";
+    }, banner_utils.error_timeout);
+  };
+  if (e) {
+    var n = e.value;
+    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
+      a ? m() : (p(), setTimeout(function() {
+        k.removeChild(h);
+        l();
+      }, banner_utils.success_timeout));
+    })) : m();
+  }
+}, closeBanner = function(a, b) {
+  setTimeout(function() {
+    banner_utils.removeElement(a);
+    banner_utils.removeElement(document.getElementById("branch-css"));
+  }, banner_utils.animationSpeed + banner_utils.animationDelay);
+  setTimeout(function() {
+    document.body.style.marginTop = "0px";
+  }, banner_utils.animationDelay);
+  a.style.top = "-" + banner_utils.bannerHeight;
+  utils.storeKeyValue("hideBanner", !0, b);
+}, banner = function(a, b, c, d) {
+  if (banner_utils.shouldAppend(d, b)) {
+    var e = banner_html.markup(b, d);
+    banner_css.css(b, e);
+    c.channel = c.channel || "app banner";
+    var f = b.iframe ? e.contentWindow.document : document.getElementById("branch-banner");
+    banner_utils.mobileUserAgent() ? utils.readKeyValue("click_id", d) && !b.makeNewLink ? f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + utils.readKeyValue("click_id", d) : a.link(c, function(a, b) {
+      a || (f.getElementById("branch-mobile-action").href = b);
+    }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(f, a, b, c);
+    });
+    var g = f.getElementById("branch-banner-close");
+    g && (g.onclick = function(a) {
+      a.preventDefault();
+      closeBanner(e, d);
+    });
+    document.body.className = "branch-animation";
+    document.body.style.marginTop = banner_utils.bannerHeight;
+    setTimeout(function() {
+      e.style.top = "0";
+    }, banner_utils.animationDelay);
+  }
+};
+// Input 12
 var default_branch, Branch = function() {
   if (!(this instanceof Branch)) {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
-  this._storage = Storage();
+  this._storage = storage();
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1078,7 +1066,7 @@ Branch.prototype.init = function(a, b) {
   b = b || function() {
   };
   if (this.initialized) {
-    return b(utils.message(utils.messages.existingInit));
+    return b(Error(utils.message(utils.messages.existingInit)));
   }
   this.app_id = a;
   var c = this, d = utils.readStore(this._storage), e = function(a) {
@@ -1087,8 +1075,8 @@ Branch.prototype.init = function(a, b) {
     c.sessionLink = a.link;
     c.initialized = !0;
   };
-  d && d.session_id ? (e(d), b(null, utils.whiteListSessionData(d))) : this._api(resources._r, {}, function(a, d) {
-    c._api(resources.open, {link_identifier:utils.urlValue("_branch_click_id"), is_referrable:1, browser_fingerprint_id:d}, function(a, d) {
+  d && d.session_id ? (e(d), b(null, utils.whiteListSessionData(d))) : this._api(resources._r, {v:config.version}, function(a, d) {
+    c._api(resources.open, {link_identifier:utils.urlValue("_branch_match_id"), is_referrable:1, browser_fingerprint_id:d}, function(a, d) {
       e(d);
       utils.store(d, c._storage);
       b(a, utils.whiteListSessionData(d));
@@ -1108,7 +1096,7 @@ Branch.prototype.setIdentity = function(a, b) {
   b = b || function() {
   };
   if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
+    return b(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.profile, {identity:a}, function(a, d) {
     b(a, d);
@@ -1118,7 +1106,7 @@ Branch.prototype.logout = function(a) {
   a = a || function() {
   };
   if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
+    return a(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.logout, {}, function(b) {
     a(b);
@@ -1128,7 +1116,7 @@ Branch.prototype.track = function(a, b, c) {
   c = c || function() {
   };
   if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
+    return c(Error(utils.message(utils.messages.nonInit)));
   }
   "function" == typeof b && (c = b, b = {});
   this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a) {
@@ -1136,90 +1124,57 @@ Branch.prototype.track = function(a, b, c) {
   });
 };
 Branch.prototype.link = function(a, b) {
+  if (!this.initialized) {
+    return b(Error(utils.message(utils.messages.nonInit)));
+  }
   b = b || function() {
   };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
   a.data = goog.json.serialize(a.data);
   this._api(resources.link, a, function(a, d) {
-    "function" == typeof b && b(a, d.url);
+    b(a, d && d.url);
   });
-};
-Branch.prototype.linkClick = function(a, b) {
-  b = b || function() {
-  };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
-  var c = this;
-  if (a) {
-    var d = a.split("/");
-    this._api(resources.linkClick, {link_url:"/l/" + d[d.length - 1], click:"click"}, function(a, d) {
-      utils.storeKeyValue("click_id", d.click_id, c._storage);
-      (a || d) && b(a, d);
-    });
-  }
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
+  function e(b) {
+    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, function(a) {
+      d(a);
+    });
+  }
+  "function" == typeof c ? (d = c, c = {}) : "undefined" == typeof c && (c = {});
   d = d || function() {
   };
-  c = c || {};
   c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
-    return d(utils.message(utils.messages.nonInit));
+    return d(Error(utils.message(utils.messages.nonInit)));
   }
-  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? this.sendSMSExisting(a, d) : this.sendSMSNew(a, b, d);
-};
-Branch.prototype.sendSMSNew = function(a, b, c) {
-  c = c || function() {
-  };
-  var d = this;
-  if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
-  }
-  "app banner" != b.channel && (b.channel = "sms");
-  this.link(b, function(b, f) {
-    if (b) {
-      return c(b);
+  var f = this;
+  b.channel && "app banner" != b.channel || (b.channel = "sms");
+  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, function(a, b) {
+    if (a) {
+      return d(a);
     }
-    d.linkClick(f, function(b) {
-      if (b) {
-        return c(b);
+    f._api(resources.linkClick, {link_url:"l/" + b.split("/").pop(), click:"click"}, function(a, b) {
+      if (a) {
+        return d(a);
       }
-      d.sendSMSExisting(a, function(a) {
-        c(a);
-      });
+      utils.storeKeyValue("click_id", b.click_id, f._storage);
+      e(b.click_id);
     });
-  });
-};
-Branch.prototype.sendSMSExisting = function(a, b) {
-  b = b || function() {
-  };
-  if (!this.initialized) {
-    return b(utils.message(utils.messages.nonInit));
-  }
-  this._api(resources.SMSLinkSend, {link_url:utils.readKeyValue("click_id", this._storage), phone:a}, function(a) {
-    b(a);
   });
 };
 Branch.prototype.referrals = function(a) {
-  a = a || function() {
-  };
   if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
+    return a(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.referrals, {}, function(b, c) {
     a(b, c);
   });
 };
 Branch.prototype.credits = function(a) {
-  a = a || function() {
-  };
   if (!this.initialized) {
-    return a(utils.message(utils.messages.nonInit));
+    return a(Error(utils.message(utils.messages.nonInit)));
   }
   this._api(resources.credits, {}, function(b, c) {
     a(b, c);
@@ -1229,19 +1184,19 @@ Branch.prototype.redeem = function(a, b, c) {
   c = c || function() {
   };
   if (!this.initialized) {
-    return c(utils.message(utils.messages.nonInit));
+    return c(Error(utils.message(utils.messages.nonInit)));
   }
-  this._api(resources.redeem, {amount:a, bucket:b}, function(a, b) {
-    c(a, b);
+  this._api(resources.redeem, {amount:a, bucket:b}, function(a) {
+    c(a);
   });
 };
 Branch.prototype.banner = function(a, b) {
-  a.showMobile = void 0 === a.showMobile ? !0 : a.showMobile;
-  a.showDesktop = void 0 === a.showDesktop ? !0 : a.showDesktop;
-  a.iframe = void 0 === a.iframe ? !0 : a.iframe;
-  document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") || utils.readKeyValue("hideBanner", this._storage) && !a.forgetHide || (banner.bannerMarkup(a), banner.bannerStyles(a), banner.bannerActions(this, a, b), banner.triggerBannerAnimation(a));
+  var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
+  make_new_link:!!a.make_new_link};
+  "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
+  banner(this, c, b, this._storage);
 };
-// Input 10
+// Input 13
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
@@ -1249,9 +1204,6 @@ if (window.branch && window.branch._q) {
     branch_instance[task[0]].apply(branch_instance, task[1]);
   }
 }
-;
-// Input 11
-var umd = {};
 "function" === typeof define && define.amd ? define("branch", function() {
   return branch_instance;
 }) : "object" === typeof exports && (module.exports = branch_instance);

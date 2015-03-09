@@ -35,7 +35,7 @@ _Be sure to replace `APP-KEY` with your actual app key found in your [account da
 
 ```html
 <script type="text/javascript">
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.1.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.2.0.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 branch.init('APP-KEY', function(err, data) {
     // callback to handle err or data
@@ -90,7 +90,7 @@ ___
 
 **app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
 
-**callback**: `function | null`, _optional_ - callback to read the session data.
+**callback**: `function`, _optional_ - callback to read the session data.
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -135,7 +135,7 @@ ___
 
 **Parameters**
 
-**callback**: `function | null`, _optional_ - callback to read the session data.
+**callback**: `function`, _optional_ - callback to read the session data.
 
 Returns the same session information and any referring data, as
 `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -153,7 +153,7 @@ ___
 
 **identity**: `string`, _required_ - a string uniquely identifying the user – often a user ID or email address.
 
-**callback**: `function | null`, _optional_ - callback that returns the user's Branch identity id and unique link.
+**callback**: `function`, _optional_ - callback that returns the user's Branch identity id and unique link.
 
 **[Formerly `identify()`](CHANGELOG.md)**
 
@@ -189,7 +189,7 @@ ___
 
 **Parameters**
 
-**callback**: `function | null`, _optional_
+**callback**: `function`, _optional_
 
 Logs out the current session, replaces session IDs and identity IDs.
 
@@ -216,11 +216,11 @@ ___
 
 **Parameters**
 
-**event**: `String`, _required_ - name of the event to be tracked.
+**event**: `string`, _required_ - name of the event to be tracked.
 
-**metadata**: `Object | null`, _optional_ - object of event metadata.
+**metadata**: `Object`, _optional_ - object of event metadata.
 
-**callback**: `function | null`, _optional_
+**callback**: `function`, _optional_
 
 This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -252,7 +252,7 @@ ___
 
 **linkData**: `Object`, _required_ - link data and metadata.
 
-**callback**: `function | null`, _optional_ - returns a string of the Branch deep linking URL.
+**callback**: `function`, _optional_ - returns a string of the Branch deep linking URL.
 
 **[Formerly `createLink()`](CHANGELOG.md)**
 
@@ -263,8 +263,9 @@ object with optional data you would like to store, including Facebook
 #### Usage
 ```
 branch.link(
-    metadata,
-    callback (err, data)
+    linkData,
+    options,
+    callback (err, link)
 );
 ```
 
@@ -288,8 +289,8 @@ branch.link({
         '$og_description': 'My app\'s description.',
         '$og_image_url': 'http://myappwebsite.com/image.png'
     }
-}, function(err, data) {
-    console.log(err, data);
+}, function(err, link) {
+    console.log(err, link);
 });
 ```
 
@@ -310,13 +311,13 @@ ___
 
 **Parameters**
 
-**phone**: `String`, _required_ - phone number to send SMS to
+**phone**: `string`, _required_ - phone number to send SMS to
 
 **linkData**: `Object`, _required_ - object of link data
 
-**options**: `Object | null`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+**options**: `Object`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
 
-**callback**: `function | null`, _optional_ - Returns an error if unsuccessful
+**callback**: `function`, _optional_ - Returns an error if unsuccessful
 
 **[Formerly `SMSLink()`](CHANGELOG.md)**
 
@@ -464,11 +465,11 @@ callback(
 
 **Parameters**
 
-**amount**: `Int`, _required_ - an `amount` (int) of number of credits to redeem
+**amount**: `number`, _required_ - an `amount` (int) of number of credits to redeem
 
-**bucket**: `String`, _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
+**bucket**: `string`, _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
 
-**callback**: `function | null`, _optional_ - returns an error if unsuccessful
+**callback**: `function`, _optional_ - returns an error if unsuccessful
 
 **[Formerly `redeemCredits()`](CHANGELOG.md)**
 
@@ -488,8 +489,8 @@ branch.redeem(
 branch.redeem(
     5,
     "Rubies",
-    function(data) {
-        console.log(data);
+    function(err) {
+        console.log(err);
     }
 );
 ```
@@ -528,7 +529,7 @@ Display a smart banner directing the user to your app through a Branch referral 
 
 ```js
 branch.banner(
-    options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, iframe, showMobile, showDesktop
+    options, // Banner options: See example for all available options
     linkData // Data for link, same as Branch.link()
 );
 ```
@@ -543,9 +544,12 @@ branch.banner({
     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
-    showMobile: true,                  // Should the banner be shown on mobile devices?
-    showDesktop: true                  // Should the banner be shown on mobile devices?
-    forgetHide: false                  // Should we remember or forget whether the user hid the banner?
+    showiOS: true,                     // Should the banner be shown on iOS devices?
+    showAndroid: true,                 // Should the banner be shown on Android devices?
+    showDesktop: true,                 // Should the banner be shown on desktop devices?
+    disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
+    forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+    make_new_link: false               // Should the banner create a new link, even if a link already exists?
 }, {
     phone: '9999999999',
     tags: ['tag1', 'tag2'],

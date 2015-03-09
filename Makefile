@@ -1,8 +1,8 @@
 COMPILER=java -jar compiler/compiler.jar
 COMPILER_LIBRARY=compiler/library/closure-library-master/closure
-SOURCES=src/0_config.js src/0_storage.js src/0_utils.js src/0_queue.js src/1_banner.js src/1_api.js src/1_resources.js src/2_branch.js src/3_branch_instance.js src/4_umd.js $(COMPILER_LIBRARY)/goog/**
+SOURCES=src/0_config.js src/0_storage.js src/0_utils.js src/0_queue.js src/0_banner_utils.js src/1_api.js src/1_resources.js src/1_banner_css.js src/1_banner_html.js src/2_banner.js src/3_branch.js src/4_initialization.js $(COMPILER_LIBRARY)/goog/**
 EXTERN=src/extern.js
-COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --only_closure_dependencies --closure_entry_point umd
+COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --only_closure_dependencies --closure_entry_point branch_instance
 
 .PHONY: clean
 
@@ -39,7 +39,7 @@ calcdeps.py: $(SOURCES) compiler/library
 
 docs/3_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
-	jsdox src/2_branch.js --output docs && mv docs/2_branch.md docs/3_branch.md
+	jsdox src/3_branch.js --output docs
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
 	@echo "\nMinifying debug js..."
@@ -47,6 +47,7 @@ dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	$(COMPILER) $(COMPILER_ARGS) \
 		--formatting=print_input_delimiter \
 		--formatting=pretty_print \
+		--warning_level=VERBOSE \
 		--define 'DEBUG=true' > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar

@@ -8,9 +8,10 @@ goog.require('resources');
 goog.require('api');
 goog.require('banner');
 goog.require('Queue');
-goog.require('Storage');
-/*jshint unused:false*/
-goog.require('goog.json');
+goog.require('storage');
+goog.require('config');
+
+goog.require('goog.json'); // jshint unused:false
 
 var default_branch;
 
@@ -24,14 +25,14 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = Storage();
+	this._storage = storage();
 	this.initialized = false;
 };
 
 /***
- * @param {resources.resource} resource
- * @param {Object.<string, *>} data
- * @param {function(?new:Error,*)|null} callback
+ * @param {utils.resource} resource
+ * @param {Object.<string, *>} obj
+ * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
@@ -49,7 +50,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 /**
  * @function Branch.init
  * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
- * @param {function|null} callback - _optional_ - callback to read the session data.
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -90,10 +91,7 @@ Branch.prototype._api = function(resource, obj, callback) {
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	callback = callback|| function() { };
-	if (this.initialized) {
-		return callback(utils.message(utils.messages.existingInit));
-	}
-
+	if (this.initialized) { return callback(new Error(utils.message(utils.messages.existingInit))); }
 	this.app_id = app_id;
 	var self = this, sessionData = utils.readStore(this._storage);
 
@@ -109,9 +107,9 @@ Branch.prototype['init'] = function(app_id, callback) {
 		callback(null, utils.whiteListSessionData(sessionData));
 	}
 	else {
-		this._api(resources._r, { }, function(err, browser_fingerprint_id) {
+		this._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
 			self._api(resources.open, {
-				"link_identifier": utils.urlValue('_branch_click_id'),
+				"link_identifier": utils.urlValue('_branch_match_id'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
 			}, function(err, data) {
@@ -125,7 +123,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 
 /**
  * @function Branch.data
- * @param {function|null} callback - _optional_ - callback to read the session data.
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * Returns the same session information and any referring data, as
  * `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -147,7 +145,7 @@ Branch.prototype['data'] = function(callback) {
 /**
  * @function Branch.setIdentity
  * @param {string} identity - _required_ - a string uniquely identifying the user – often a user ID or email address.
- * @param {function|null} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
+ * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
  *
  * **[Formerly `identify()`](CHANGELOG.md)**
  *
@@ -179,7 +177,7 @@ Branch.prototype['data'] = function(callback) {
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
 		callback(err, data);
 	});
@@ -187,7 +185,7 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 
 /**
  * @function Branch.logout
- * @param {function|null} callback - _optional_
+ * @param {function(?Error)=} callback - _optional_
  *
  * Logs out the current session, replaces session IDs and identity IDs.
  *
@@ -210,49 +208,17 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  */
 Branch.prototype['logout'] = function(callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	this._api(resources.logout, { }, function(err) {
 		callback(err);
 	});
 };
 
-/*** NOT USED
- * This closes the active session, removing any relevant session account info stored in `sessionStorage`.
- *
- * @param {function|null} callback - Returns an error if unsuccessful
- *
- * ##### Usage
- * ```js
- * branch.close(
- *     callback (err, data)
- * );
- * ```
- *
- * ##### Callback
- * ```js
- * callback("Error message");
- * ```
- *
- * ---
- */
- /*
-Branch.prototype['close'] = function(callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	var self = this;
-	this._api(resources.close, { }, function(err, data) {
-		sessionStorage.clear();
-		self.initialized = false;
-		callback(err, data);
-	});
-};
-*/
-
 /**
  * @function Branch.track
- * @param {String} event - _required_ - name of the event to be tracked.
- * @param {Object|null} metadata - _optional_ - object of event metadata.
- * @param {function|null} callback - _optional_
+ * @param {string} event - _required_ - name of the event to be tracked.
+ * @param {Object=} metadata - _optional_ - object of event metadata.
+ * @param {function(?Error)=} callback - _optional_
  *
  * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
  * The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
@@ -279,7 +245,7 @@ Branch.prototype['close'] = function(callback) {
  */
 Branch.prototype['track'] = function(event, metadata, callback) {
 	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	if (typeof metadata == 'function') {
 		callback = metadata;
 		metadata = { };
@@ -299,7 +265,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 /**
  * @function Branch.link
  * @param {Object} linkData - _required_ - link data and metadata.
- * @param {function|null} callback - _optional_ - returns a string of the Branch deep linking URL.
+ * @param {function(?Error,String=)=} callback - _optional_ - returns a string of the Branch deep linking URL.
  *
  * **[Formerly `createLink()`](CHANGELOG.md)**
  *
@@ -310,8 +276,9 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * #### Usage
  * ```
  * branch.link(
- *     metadata,
- *     callback (err, data)
+ *     linkData,
+ *     options,
+ *     callback (err, link)
  * );
  * ```
  *
@@ -335,8 +302,8 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *         '$og_description': 'My app\'s description.',
  *         '$og_image_url': 'http://myappwebsite.com/image.png'
  *     }
- * }, function(err, data) {
- *     console.log(err, data);
+ * }, function(err, link) {
+ *     console.log(err, link);
  * });
  * ```
  *
@@ -352,52 +319,29 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ## Sharing links via SMS
  *
  */
-Branch.prototype['link'] = function(obj, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-	obj['source'] = 'web-sdk';
-	if (obj['data']['$desktop_url'] !== undefined) {
-		obj['data']['$desktop_url'] = obj['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
-	}
-	obj['data'] = goog.json.serialize(obj['data']);
-	this._api(resources.link, obj, function(err, data) {
-		if (typeof callback == 'function') {
-			callback(err, data['url']);
-		}
-	});
-};
+Branch.prototype['link'] = function(linkData, callback) {
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 
-/***
- * Is there any reason we need to make this an external function?
- *
- * @param {String} url - _required_ - branch deep linking URL to register link click on.
- * @param {function|null} callback - _optional_ - returns an error if unsuccessful.
- */
-Branch.prototype['linkClick'] = function(url, callback) {
 	callback = callback || function() { };
-	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
-	}
+
 	var self = this;
-	if (url) {
-		var urlArray = url.split('/');
-		var linkid = urlArray[urlArray.length - 1];
-		this._api(resources.linkClick, {
-			"link_url": '/l/' + linkid,
-			"click": "click"
-		}, function(err, data) {
-			utils.storeKeyValue('click_id', data['click_id'], self._storage);
-			if (err || data) { callback(err, data); }
-		});
+	linkData['source'] = 'web-sdk';
+	if (linkData['data']['$desktop_url'] !== undefined) {
+		linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
+
+	linkData['data'] = goog.json.serialize(linkData['data']);
+	this._api(resources.link, linkData, function(err, data) {
+		callback(err, data && data['url']);
+	});
 };
 
 /**
  * @function Branch.sendSMS
- * @param {String} phone - _required_ - phone number to send SMS to
+ * @param {string} phone - _required_ - phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
- * @param {Object|null} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
- * @param {function|null} callback - _optional_ - Returns an error if unsuccessful
+ * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+ * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
  *
  * **[Formerly `SMSLink()`](CHANGELOG.md)**
  *
@@ -466,87 +410,52 @@ Branch.prototype['linkClick'] = function(url, callback) {
  * ## Retrieve referrals list
  *
  */
-Branch.prototype['sendSMS'] = function(phone, obj, options, callback) {
-	callback = callback || function() { };
-	options = options || { };
-	options['make_new_link'] = options['make_new_link'] || false;
+Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
+	if (typeof options == 'function') {
+		callback = options;
+		options = {};
+	}
+	else if (typeof options == 'undefined') {
+		options = {};
+	}
+	callback = callback || function() {};
+	options["make_new_link"] = options["make_new_link"] || false;
 
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
+	var self = this;
+
+	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
+
+	function sendSMS(click_id) {
+		self._api(resources.SMSLinkSend, {
+			"link_url": click_id,
+			"phone": phone
+		}, function(err) { callback(err); });
+	}
 
 	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
-		this["sendSMSExisting"](phone, callback);
+		sendSMS(utils.readKeyValue('click_id', this._storage));
 	}
 	else {
-		this["sendSMSNew"](phone, obj, callback);
-	}
-};
-
-/*** <--- Not in docs
- *
- * Forces the creation of a new link and stores it in `sessionStorage`, then registers a click event with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
- *
- * @param {Object} metadata - _required_ Object of all link data, requires phone number as `phone`
- * @param {function|null} callback - Returns an error if unsuccessful
- *
- * #### Usage
- * ```js
- * branch.sendSMSNew(
- *     metadata, // Metadata must include phone number as `phone`
- *     callback (err, data)
- * );
- * ```
- *
- * ___
- */
-Branch.prototype["sendSMSNew"] = function(phone, obj, callback) {
-	callback = callback || function() { };
-	var self = this;
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
-	if (obj['channel'] != 'app banner') { obj['channel'] = 'sms'; }
-	this["link"](obj, function(err, url) {
-		if (err) { return callback(err); }
-		self["linkClick"](url, function(err) {
+		this["link"](linkData, function(err, url) {
 			if (err) { return callback(err); }
-			self["sendSMSExisting"](phone, function(err) {
-				callback(err);
+
+			self._api(resources.linkClick, {
+				"link_url": 'l/' + url.split('/').pop(),
+				"click": "click"
+			}, function(err, data) {
+				if (err) { return callback(err); }
+
+				utils.storeKeyValue('click_id', data['click_id'], self._storage);
+				sendSMS(data['click_id']);
 			});
 		});
-	});
-};
-
-/*** <--- Not in docs
- * Registers a click event on the already created Branch link stored in `sessionStorage` with the `channel` pre-filled with `'sms'` and sends an SMS message to the provided `phone` parameter. **Supports international SMS**.
- *
- * @param {String} phone - _required_ String of phone number the link should be sent to
- * @param {function|null} callback - Returns an error if unsuccessful
- *
- * #### Usage
- * ```js
- * branch.sendSMSExisting(
- *     metadata, // Metadata must include phone number as `phone`
- *     callback (err, data)
- * );
- * ```
- * ___
- */
-Branch.prototype["sendSMSExisting"] = function(phone, callback) {
-	callback = callback || function() { };
-
-	if (!this.initialized) { return callback(utils.message(utils.messages.nonInit)); }
-
-	var self = this;
-	this._api(resources.SMSLinkSend, {
-		"link_url": utils.readKeyValue('click_id', self._storage),
-		"phone": phone
-	}, function(err) {
-		callback(err);
-	});
+	}
 };
 
 /**
  * @function Branch.referrals
- * @param {function} callback - _required_ - returns an object with referral data.
+ * @param {function(?Error,Object=)=} callback - _required_ - returns an object with referral data.
  *
  * **[Formerly `showReferrals()`](CHANGELOG.md)**
  *
@@ -584,9 +493,8 @@ Branch.prototype["sendSMSExisting"] = function(phone, callback) {
  *
  */
 Branch.prototype['referrals'] = function(callback) {
-	callback = callback || function() { };
 	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
+		return callback(new Error(utils.message(utils.messages.nonInit)));
 	}
 	this._api(resources.referrals, { }, function(err, data) {
 		callback(err, data);
@@ -595,7 +503,7 @@ Branch.prototype['referrals'] = function(callback) {
 
 /**
  * @function Branch.credits
- * @param {function} callback - _required_ - returns an object with credit data.
+ * @param {function(?Error,Object=)=} callback - _required_ - returns an object with credit data.
  *
  * **[Formerly `showCredits()`](CHANGELOG.md)**
  *
@@ -623,10 +531,7 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	callback = callback || function() { };
-	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
-	}
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	this._api(resources.credits, { }, function(err, data) {
 		callback(err, data);
 	});
@@ -634,9 +539,9 @@ Branch.prototype['credits'] = function(callback) {
 
 /**
  * @function Branch.redeem
- * @param {Int} amount - _required_ - an `amount` (int) of number of credits to redeem
- * @param {String} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
- * @param {function|null} callback - _optional_ - returns an error if unsuccessful
+ * @param {number} amount - _required_ - an `amount` (int) of number of credits to redeem
+ * @param {string} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
  * **[Formerly `redeemCredits()`](CHANGELOG.md)**
  *
@@ -656,8 +561,8 @@ Branch.prototype['credits'] = function(callback) {
  * branch.redeem(
  *     5,
  *     "Rubies",
- *     function(data) {
- *         console.log(data);
+ *     function(err) {
+ *         console.log(err);
  *     }
  * );
  * ```
@@ -676,12 +581,10 @@ Branch.prototype['credits'] = function(callback) {
  *
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) {
-		return callback(utils.message(utils.messages.nonInit));
-	}
-	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err, data) {
-		callback(err, data);
+	callback = callback || function() {};
+	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
+	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err) {
+		callback(err);
 	});
 };
 
@@ -702,7 +605,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *
  * ```js
  * branch.banner(
- *     options, // Banner options: icon, title, description, openAppButtonText, downloadAppButtonText, iframe, showMobile, showDesktop
+ *     options, // Banner options: See example for all available options
  *     linkData // Data for link, same as Branch.link()
  * );
  * ```
@@ -717,9 +620,12 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
  *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
  *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
- *     showMobile: true,                  // Should the banner be shown on mobile devices?
- *     showDesktop: true                  // Should the banner be shown on mobile devices?
- *     forgetHide: false                  // Should we remember or forget whether the user hid the banner?
+ *     showiOS: true,                     // Should the banner be shown on iOS devices?
+ *     showAndroid: true,                 // Should the banner be shown on Android devices?
+ *     showDesktop: true,                 // Should the banner be shown on desktop devices?
+ *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
+ *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+ *     make_new_link: false               // Should the banner create a new link, even if a link already exists?
  * }, {
  *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
@@ -742,13 +648,25 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  * ```
  */
 Branch.prototype['banner'] = function(options, linkData) {
-	options.showMobile = (options.showMobile === undefined) ? true : options.showMobile;
-	options.showDesktop = (options.showDesktop === undefined) ? true : options.showDesktop;
-	options.iframe = (options.iframe === undefined) ? true : options.iframe;
-	if ((!document.getElementById('branch-banner') || document.getElementById('branch-banner-iframe'))  && (!utils.readKeyValue('hideBanner', this._storage) || options.forgetHide)) {
-		banner.bannerMarkup(options);
-		banner.bannerStyles(options);
-		banner.bannerActions(this, options, linkData);
-		banner.triggerBannerAnimation(options);
+	var bannerOptions = {
+		icon: options['icon'] || '',
+		title: options['title'] || '',
+		description: options['description'] || '',
+		openAppButtonText: options['openAppButtonText'] || 'View in app',
+		downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+		iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
+		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
+		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
+		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
+		disableHide: !!options['disableHide'],
+		forgetHide: !!options['forgetHide'],
+		make_new_link: !!options['make_new_link']
+	};
+
+	if (typeof options['showMobile'] != 'undefined') {
+		bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 	}
+
+	banner(this, bannerOptions, linkData, this._storage);
 };
+

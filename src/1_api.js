@@ -5,18 +5,15 @@
 
 goog.provide('api');
 goog.require('utils');
-/*jshint unused:false*/
 goog.require('goog.json');
-
-var _jsonp_callback_index = 0;
+goog.require('storage'); // jshint unused:false
 
 /**
  * @param {Object} obj
- * @param {String} prefix
+ * @param {string} prefix
  */
 function serializeObject(obj, prefix) {
 	var pairs = [];
-	prefix = prefix || '';
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
 			pairs.push(encodeURIComponent(prefix) + '[]=' + encodeURIComponent(obj[i]));
@@ -38,8 +35,8 @@ function serializeObject(obj, prefix) {
 }
 
 /**
- * @param {resources.resource} resource
- * @param Object.<string, *>
+ * @param {utils.resource} resource
+ * @param {Object.<string, *>} data
  */
 function getUrl(resource, data) {
 	var k;
@@ -61,68 +58,49 @@ function getUrl(resource, data) {
 			}
 		}
 	}
-	return { data: serializeObject(d), url: url };
+	return { data: serializeObject(d, ''), url: url };
 }
 
-/**
- * @param {String} url
- * @param {Object} options
- * @param {Function|null} callback
- */
-var jsonpRequest = function(url, options, callback) {
-	callback = callback || 'branch_callback__' + (_jsonp_callback_index++);
-	options.onSuccess = options.onSuccess || function() { };
-	options.onTimeout = options.onTimeout || function() { };
-	options.data = (options.method == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(options.data))) : "";
+var jsonp_callback_index = 0;
 
-	var postDataString = (url.indexOf('bnc.lt') >= 0) ? '&post_data=' : '&data=';
-	var timeout = options.timeout || 10; // sec
+/**
+ * @param {string} requestURL
+ * @param {Object} requestData
+ * @param {utils._httpMethod} requestMethod
+ * @param {function(?Error,*=)=} callback
+ */
+var jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
+	var callbackString = 'branch_callback__' + (jsonp_callback_index++);
+
+	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
+		postData = (requestMethod == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) : "";
 
 	var timeout_trigger = window.setTimeout(function() {
-		window[callback] = function() { };
-		options.onTimeout();
-	}, timeout * 1000);
+		window[callbackString] = function() { };
+		callback(new Error(utils.messages.timeout));
+	}, 10000);
 
-	window[callback] = function(data) {
+	window[callbackString] = function(data) {
 		window.clearTimeout(timeout_trigger);
-		options.onSuccess(data);
+		callback(null, data);
 	};
 
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.async = true;
-	script.src = url + (url.indexOf('?') < 0 ? '?' : '') + (options.data ? postDataString + options.data : '') + '&callback=' + callback + (url.indexOf('/c/') >= 0 ? '&click=1' : '');
+	script.src = requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + '&callback=' + callbackString + (requestURL.indexOf('/c/') >= 0 ? '&click=1' : '');
 
 	document.getElementsByTagName('head')[0].appendChild(script);
 };
 
 /**
- * @param {String} requestURL
- * @param {Object} requestData
- * @param {String} requestMethod
- * @param {Function|null} callback
- */
-var jsonpMakeRequest = function(requestURL, requestData, requestMethod, callback) {
-	jsonpRequest(requestURL, {
-		onSuccess: function(json) {
-			callback(null, json);
-		},
-		onTimeout: function() {
-			callback(utils.error(utils.messages.timeout));
-		},
-		timeout: 10,
-		data: requestData,
-		method: requestMethod
-	});
-};
-
-/**
- * @param {String} url
+ * @param {string} url
  * @param {Object} data
- * @param {String} method
- * @param {Function|null} callback
+ * @param {utils._httpMethod} method
+ * @param {BranchStorage} storage
+ * @param {function(?Error,*=)=} callback
  */
-var XHRRequest = function(url, data, method, sessionFallback, callback) {
+var XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
@@ -130,14 +108,14 @@ var XHRRequest = function(url, data, method, sessionFallback, callback) {
 				callback(null, goog.json.parse(req.responseText));
 			}
 			catch (e) {
-				callback(null, { });
+				callback(null, {});
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {
-			callback('Not enough credits to redeem.');
+			callback(new Error('Not enough credits to redeem.'));
 		}
 		else if (req.readyState === 4 && (req.status.toString().substring(0, 1) == "4" || req.status.toString().substring(0, 1) == "5")) {
-			callback('Error in API: ' + req.status);
+			callback(new Error('Error in API: ' + req.status));
 		}
 	};
 
@@ -147,19 +125,18 @@ var XHRRequest = function(url, data, method, sessionFallback, callback) {
 		req.send(data);
 	}
 	catch (e) {
-		sessionFallback().setItem('use_jsonp', true);
-		jsonpMakeRequest(url, data, method, callback);
+		storage['setItem']('use_jsonp', true);
+		jsonpRequest(url, data, method, callback);
 	}
 };
 
 /**
- * @param {resources.resource} resource
+ * @param {utils.resource} resource
  * @param {Object.<string, *>} data
- * @param {function(?new:Error,*)|null} callback
+ * @param {BranchStorage} storage
+ * @param {function(?Error,*=)=} callback
  */
-api = function(resource, data, sessionFallback, callback) {
-	// callback = utils.injectDequeue( callback || function() { } );
-
+api = function(resource, data, storage, callback) {
 	var u = getUrl(resource, data);
 	var url, postData = '';
 	if (resource.method == 'GET') {
@@ -169,10 +146,10 @@ api = function(resource, data, sessionFallback, callback) {
 		url = u.url;
 		postData = u.data;
 	}
-	if (sessionFallback().getItem('use_jsonp') || resource.jsonp) {
-		jsonpMakeRequest(url, data, resource.method, callback);
+	if (storage['getItem']('use_jsonp') || resource.jsonp) {
+		jsonpRequest(url, data, resource.method, callback);
 	}
 	else {
-		XHRRequest(url, postData, resource.method, sessionFallback(), callback);
+		XHRRequest(url, postData, resource.method, storage, callback);
 	}
 };
