@@ -1,5 +1,5 @@
 /*
- * This file defines the unit tests for the api class
+ * This file defines the unit tests for the BranchAPI class
  * The actual requests are mocked by stubbing out XHRRequest and jsonpRequest
  */
 
@@ -18,11 +18,11 @@ var branchAPI;
 	// Maximum wait time for async tests (ms)
 	maxWaitTime = 5000;
 
-	branchAPI = new BranchAPI();
-
 	// How often we should check for the finished state of an async test
 	asyncPollingInterval = 100;
- };
+
+	branchAPI = new BranchAPI();
+};
 
 /**
  * Setup each API test
@@ -606,6 +606,66 @@ var testEventMissingSessionId = function() {
 			{ "event": eventName } ],
 		null,
 		Error("API request /v1/event missing parameter session_id"),
+		null);
+};
+
+// ===========================================================================================
+
+/**
+ * Some example format validation tests
+ */
+var testOpenWrongAppIdFormat = function() {
+	params["app_id"] = 'ahd7393j'; // Oops, we should *not* have letters here
+
+	runAPITest(
+		'open',
+		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
+		null,
+		Error("API request /v1/open, parameter app_id is not in the proper format"),
+		null);
+};
+
+var testOpenWrongStringFormat = function() {
+	runAPITest(
+		'open',
+		[ { "link_identifier":  45433 }, // Oops, link_identifier should be a string, not a number
+		{ "is_referrable": 1 } ],
+		null,
+		Error("API request /v1/open, parameter link_identifier is not a string"),
+		null);
+};
+
+var testOpenWrongNumberFormat = function() {
+	runAPITest(
+		'open',
+		[ { "link_identifier":  utils.urlValue('_branch_match_id') },
+		{ "is_referrable": "1" } ], // Oops, is_referrable should be a number, not a string
+		null,
+		Error("API request /v1/open, parameter is_referrable is not a number"),
+		null);
+};
+
+var testEventWrongObjectFormat = function() {
+	var metadata = "Hello, I'm not an object."; // Oops, metadata should be an object literal, not a string
+	var eventName = "test";
+
+	runAPITest(
+		'event',
+		[ { "identity": "test_id" },
+			{ "event": eventName },
+			{ "metadata": metadata } ],
+		null,
+		Error("API request /v1/event, parameter metadata is not an object"),
+		null);
+};
+
+var testLinkWrongArrayFormat = function() {
+	params["tags"] = "Hello, I'm not an array."; // Oops, params.tags should be an array, not a string
+	runAPITest(
+		'link',
+		[ { "identity": "test_id" } ],
+		null,
+		Error("API request /v1/url, parameter tags is not an array"),
 		null);
 };
 
