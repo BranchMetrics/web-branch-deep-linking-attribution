@@ -12,7 +12,7 @@ goog.require('config');
  * @const
  * @type {Object<*,utils.resource>}
  */
-var resources = {};
+var resources = { };
 
 /** @enum {number} */
 var validationTypes = { obj: 0, str: 1, num: 2, arr: 3 };
@@ -21,7 +21,6 @@ var validationTypes = { obj: 0, str: 1, num: 2, arr: 3 };
 
 /** @typedef {function(string, string, *)} */
 var _validator;
-
 
 /* jshint ignore:end */
 
