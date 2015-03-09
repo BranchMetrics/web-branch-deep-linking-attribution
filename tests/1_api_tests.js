@@ -47,28 +47,22 @@ var tearDown = function() {
 /**
  * Helper function for tests
  */
-var runAsyncTest = function(testFunction, assertions, expectedError) {
+var runAsyncTest = function(testFunction, assertions) {
 	var receivedError = { };
 	var sentRequest = { };
 	var recievedFired;
 
-	stubs.replace(branchAPI, 'XHRRequest', function(url, postData, method, storage, callback) {
-		callback(expectedError,
-			{
+	var requestStub = function(url, postData, method, storage, callback) {
+		callback = callback || storage;
+		callback({
 				"url": url,
 				"postData": postData,
 				"method": method
 			});
-	});
+	}
 
-	stubs.replace(branchAPI, 'jsonpRequest', function(url, postData, method, callback) {
-		callback(expectedError,
-			{
-				"url": url,
-				"postData": postData,
-				"method": method
-			});
-	});
+	stubs.replace(branchAPI, 'XHRRequest', requestStub);
+	stubs.replace(branchAPI, 'jsonpRequest', requestStub);
 
 	waitForCondition(
 		function() {
@@ -90,10 +84,7 @@ var runAsyncTest = function(testFunction, assertions, expectedError) {
  * Helper function for API Requests
  */
 var runAPITest = function(resource, extraParams, expectedRequest, expectedError) {
-	for (var i = 0; i < extraParams.length; i++) {
-		var key = Object.keys(extraParams[i])[0];
-		params[key] = extraParams[i][key];
-	}
+	params = utils.merge(params, extraParams);
 
 	runAsyncTest(function(callback) {
 		var callAPI = function() {
@@ -113,13 +104,11 @@ var runAPITest = function(resource, extraParams, expectedRequest, expectedError)
 		else {
 			callAPI();
 		}
-
-	}, function(receivedError, sentRequest) {
+	}, function(sentRequest) {
 		if (expectedRequest) {
 			assertObjectEquals("should send expected request", expectedRequest, sentRequest);
 		}
-	},
-	expectedError);
+	});
 };
 
 // ===========================================================================================
@@ -129,19 +118,23 @@ var runAPITest = function(resource, extraParams, expectedRequest, expectedError)
 var testOpen = function() {
 	runAPITest(
 		'open',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id'),
+			"is_referrable": 1
+		},
 		{
 			"url": "https://api.branch.io/v1/open",
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&is_referrable=1&browser_fingerprint_id=" + params.browser_fingerprint_id,
 			"method": "POST"
-		},
-		null);
+		});
 };
 
 var testOpenMissingIsReferrable = function() {
 	runAPITest(
 		'open',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id')
+		},
 		null,
 		Error("API request /v1/open missing parameter is_referrable"));
 };
@@ -150,7 +143,10 @@ var testOpenMissingAppId = function() {
 	delete params["app_id"];
 	runAPITest(
 		'open',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id'),
+			"is_referrable": 1
+		},
 		null,
 		Error("API request /v1/open missing parameter app_id"));
 };
@@ -159,7 +155,10 @@ var testOpenMissingBrowserFingerprintId = function() {
 	delete params["browser_fingerprint_id"];
 	runAPITest(
 		'open',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id'),
+			"is_referrable": 1
+		},
 		null,
 		Error("API request /v1/open missing parameter browser_fingerprint_id"));
 };
@@ -171,19 +170,23 @@ var testOpenMissingBrowserFingerprintId = function() {
 var testProfile = function() {
 	runAPITest(
 		'profile',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "identity": "test_id" } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id'),
+			"identity": "test_id"
+		},
 		{
 			"url": "https://api.branch.io/v1/profile",
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&identity=test_id",
 			"method": "POST"
-		},
-		null);
+		});
 };
 
 var testProfileMissingIdentity = function() {
 	runAPITest(
 		'profile',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id')
+		},
 		null,
 		Error("API request /v1/profile missing parameter identity"));
 };
@@ -192,7 +195,9 @@ var testProfileMissingAppId = function() {
 	delete params["app_id"];
 	runAPITest(
 		'profile',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id')
+		},
 		null,
 		Error("API request /v1/profile missing parameter app_id"));
 };
@@ -201,7 +206,9 @@ var testProfileMissingIdentityId = function() {
 	delete params["identity_id"];
 	runAPITest(
 		'profile',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id')
+		},
 		null,
 		Error("API request /v1/profile missing parameter identity_id"));
 };
@@ -213,20 +220,23 @@ var testProfileMissingIdentityId = function() {
 var testLogout = function() {
 	runAPITest(
 		'logout',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		{
 			"url": "https://api.branch.io/v1/logout",
 			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id,
 			"method": "POST"
-		},
-		null);
+		});
 };
 
 var testLogoutMissingAppId = function() {
 	delete params["app_id"];
 	runAPITest(
 		'logout',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /v1/logout missing parameter app_id"));
 };
@@ -235,7 +245,9 @@ var testLogoutMissingSessionId = function() {
 	delete params["session_id"];
 	runAPITest(
 		'logout',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /v1/logout missing parameter session_id"));
 };
@@ -247,20 +259,23 @@ var testLogoutMissingSessionId = function() {
 var testReferrals = function() {
 	runAPITest(
 		'referrals',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		{
 			"url": "https://api.branch.io/v1/referrals/" + params.identity_id + "?",
 			"postData": "",
 			"method": "GET"
-		},
-		null);
+		});
 };
 
 var testReferralsMissingIdentityId = function() {
 	delete params["identity_id"];
 	runAPITest(
 		'referrals',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /v1/referrals missing parameter identity_id"));
 };
@@ -272,20 +287,23 @@ var testReferralsMissingIdentityId = function() {
 var testCredits = function() {
 	runAPITest(
 		'credits',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		{
 			"url": "https://api.branch.io/v1/credits/" + params.identity_id + "?",
 			"postData": "",
 			"method": "GET"
-		},
-		null);
+		});
 };
 
 var testCreditsMissingIdentityId = function() {
 	delete params["identity_id"];
 	runAPITest(
 		'credits',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /v1/credits missing parameter identity_id"));
 };
@@ -297,19 +315,22 @@ var testCreditsMissingIdentityId = function() {
 var test_r = function() {
 	runAPITest(
 		'_r',
-		[ { "v": config.version } ],
+		{
+			"v": config.version
+		},
 		{
 			"url": "https://bnc.lt/_r?app_id=" + params.app_id + "&v=" + config.version,
 			"postData": params,
 			"method": "GET"
-		},
-		null);
+		});
 };
 
 var test_rMissingV = function() {
 	runAPITest(
 		'_r',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /_r missing parameter v"));
 };
@@ -318,7 +339,9 @@ var test_rMissingAppId = function() {
 	delete params["app_id"];
 	runAPITest(
 		'_r',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /_r missing parameter app_id"));
 };
@@ -330,20 +353,27 @@ var test_rMissingAppId = function() {
 var testRedeem = function() {
 	runAPITest(
 		'redeem',
-		[ { "identity": "test_id" }, { "amount": 1 }, { "bucket": "testbucket" } ],
+		{
+			"identity": "test_id",
+			"amount": 1,
+			"bucket": "testbucket"
+		},
 		{
 			"url": "https://api.branch.io/v1/redeem",
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&amount=1&bucket=testbucket",
 			"method": "POST"
-		},
-		null);
+		});
 };
 
 var testRedeemMissingAppId = function() {
 	delete params["app_id"];
 	runAPITest(
 		'redeem',
-		[ { "identity": "test_id" }, { "amount": 1 }, { "bucket": "testbucket" } ],
+		{
+			"identity": "test_id",
+			"amount": 1,
+			"bucket": "testbucket"
+		},
 		null,
 		Error("API request /v1/redeem missing parameter app_id"));
 };
@@ -352,7 +382,11 @@ var testRedeemMissingIdentityId = function() {
 	delete params["identity_id"];
 	runAPITest(
 		'redeem',
-		[ { "identity": "test_id" }, { "amount": 1 }, { "bucket": "testbucket" } ],
+		{
+			"identity": "test_id",
+			"amount": 1,
+			"bucket": "testbucket"
+		},
 		null,
 		Error("API request /v1/redeem missing parameter identity_id"));
 };
@@ -360,7 +394,10 @@ var testRedeemMissingIdentityId = function() {
 var testRedeemMissingAmount = function() {
 	runAPITest(
 		'redeem',
-		[ { "identity": "test_id" }, { "bucket": "testbucket" } ],
+		{
+			"identity": "test_id",
+			"bucket": "testbucket"
+		},
 		null,
 		Error("API request /v1/redeem missing parameter amount"));
 };
@@ -368,7 +405,10 @@ var testRedeemMissingAmount = function() {
 var testRedeemMissingBucket = function() {
 	runAPITest(
 		'redeem',
-		[ { "identity": "test_id" }, { "amount": 1 } ],
+		{
+			"identity": "test_id",
+			"amount": 1
+		},
 		null,
 		Error("API request /v1/redeem missing parameter bucket"));
 };
@@ -380,20 +420,23 @@ var testRedeemMissingBucket = function() {
 var testLink = function() {
 	runAPITest(
 		'link',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		{
 			"url": "https://api.branch.io/v1/url",
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id,
 			"method": "POST"
-		},
-		null);
+		});
 };
 
 var testLinkMissingIdentityId = function() {
 	delete params["identity_id"];
 	runAPITest(
 		'link',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /v1/url missing parameter identity_id"));
 };
@@ -402,7 +445,9 @@ var testLinkMissingAppId = function() {
 	delete params["app_id"];
 	runAPITest(
 		'link',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /v1/url missing parameter app_id"));
 };
@@ -415,19 +460,25 @@ var testLinkClick = function() {
 	var link = "3hpH54U-58";
 	runAPITest(
 		'linkClick',
-		[ { "identity": "test_id" }, { "link_url": "l/" + link }, { "click": "click" } ],
-		 {
+		{
+			"identity": "test_id",
+			"link_url": "l/" + link,
+			"click": "click"
+		},
+		{
 			"url": "https://bnc.lt/l/" + link + "?click=click",
 			"postData": "",
 			"method": "GET"
-		},
-		null);
+		});
 };
 
 var testLinkClickMissingLinkUrl = function() {
 	runAPITest(
 		'linkClick',
-		[ { "identity": "test_id" }, { "click": "click" } ],
+		{
+			"identity": "test_id",
+			"click": "click"
+		},
 		null,
 		Error("API request  missing parameter link_url"));
 };
@@ -436,7 +487,10 @@ var testLinkClickMissingClick = function() {
 	var link = "3hpH54U-58";
 	runAPITest(
 		'linkClick',
-		[ { "identity": "test_id" }, { "link_url": "l/" + link } ],
+		{
+			"identity": "test_id",
+			"link_url": "l/" + link
+		},
 		null,
 		Error("API request  missing parameter click"));
 };
@@ -450,20 +504,26 @@ var testSMSLinkSend = function() {
 	var testPhone = "8009999999";
 	runAPITest(
 		'SMSLinkSend',
-		[ { "identity": "test_id" }, { "link_url": "l/" + link }, { "phone": testPhone } ],
+		{
+			"identity": "test_id",
+			"link_url": "l/" + link,
+			"phone": testPhone
+		},
 		{
 			"url": "https://bnc.lt/c/l/" + link,
 			"postData": "phone=" + testPhone,
 			"method": "POST"
-		},
-		null);
+		});
 };
 
 var testSMSLinkSendMissingLinkUrl = function() {
 	var testPhone = "8009999999";
 	runAPITest(
 		'SMSLinkSend',
-		[ { "identity": "test_id" }, { "phone": testPhone } ],
+		{
+			"identity": "test_id",
+			"phone": testPhone
+		},
 		null,
 		Error("API request /c missing parameter link_url"));
 };
@@ -472,7 +532,10 @@ var testSMSLinkSendMissingPhone = function() {
 	var link = "3hpH54U-58";
 	runAPITest(
 		'SMSLinkSend',
-		[ { "identity": "test_id" }, { "link_url": "l/" + link } ],
+		{
+			"identity": "test_id",
+			"link_url": "l/" + link
+		},
 		null,
 		Error("API request /c missing parameter phone"));
 };
@@ -492,15 +555,16 @@ var testEvent = function() {
 
 	runAPITest(
 		'event',
-		[ { "identity": "test_id" },
-			{ "event": eventName },
-			{ "metadata": metadata } ],
+		{
+			"identity": "test_id",
+			"event": eventName,
+			"metadata": metadata
+		},
 		{
 			"url": "https://api.branch.io/v1/event",
 			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id + "&event=" + eventName + metadataString,
 			"method": "POST"
-		},
-		null);
+		});
 };
 
 var testEventMissingMetadata = function() {
@@ -508,8 +572,10 @@ var testEventMissingMetadata = function() {
 
 	runAPITest(
 		'event',
-		[ { "identity": "test_id" },
-			{ "event": eventName } ],
+		{
+			"identity": "test_id",
+			"event": eventName
+		},
 		null,
 		Error("API request /v1/event missing parameter metadata"));
 };
@@ -523,8 +589,10 @@ var testEventMissingEvent = function() {
 
 	runAPITest(
 		'event',
-		[ { "identity": "test_id" },
-			{ "metadata": metadata } ],
+		{
+			"identity": "test_id",
+			"metadata": metadata
+		},
 		null,
 		Error("API request /v1/event missing parameter event"));
 };
@@ -540,9 +608,11 @@ var testEventMissingAppId = function() {
 
 	runAPITest(
 		'event',
-		[ { "identity": "test_id" },
-			{ "metadata": metadata },
-			{ "event": eventName } ],
+		{
+			"identity": "test_id",
+			"metadata": metadata,
+			"event": eventName
+		},
 		null,
 		Error("API request /v1/event missing parameter app_id"));
 };
@@ -558,9 +628,11 @@ var testEventMissingSessionId = function() {
 
 	runAPITest(
 		'event',
-		[ { "identity": "test_id" },
-			{ "metadata": metadata },
-			{ "event": eventName } ],
+		{
+			"identity": "test_id",
+			"metadata": metadata,
+			"event": eventName
+		},
 		null,
 		Error("API request /v1/event missing parameter session_id"));
 };
@@ -575,7 +647,10 @@ var testOpenWrongAppIdFormat = function() {
 
 	runAPITest(
 		'open',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id'),
+			"is_referrable": 1
+		},
 		null,
 		Error("API request /v1/open, parameter app_id is not in the proper format"));
 };
@@ -583,8 +658,10 @@ var testOpenWrongAppIdFormat = function() {
 var testOpenWrongStringFormat = function() {
 	runAPITest(
 		'open',
-		[ { "link_identifier":  45433 }, // Oops, link_identifier should be a string, not a number
-		{ "is_referrable": 1 } ],
+		{
+			"link_identifier":  45433, // Oops, link_identifier should be a string, not a number
+			"is_referrable": 1
+		},
 		null,
 		Error("API request /v1/open, parameter link_identifier is not a string"));
 };
@@ -592,8 +669,10 @@ var testOpenWrongStringFormat = function() {
 var testOpenWrongNumberFormat = function() {
 	runAPITest(
 		'open',
-		[ { "link_identifier":  utils.urlValue('_branch_match_id') },
-		{ "is_referrable": "1" } ], // Oops, is_referrable should be a number, not a string
+		{
+			"link_identifier":  utils.urlValue('_branch_match_id'),
+			"is_referrable": "1"
+		}, // Oops, is_referrable should be a number, not a string
 		null,
 		Error("API request /v1/open, parameter is_referrable is not a number"));
 };
@@ -604,9 +683,11 @@ var testEventWrongObjectFormat = function() {
 
 	runAPITest(
 		'event',
-		[ { "identity": "test_id" },
-			{ "event": eventName },
-			{ "metadata": metadata } ],
+		{
+			"identity": "test_id",
+			"event": eventName,
+			"metadata": metadata
+		},
 		null,
 		Error("API request /v1/event, parameter metadata is not an object"));
 };
@@ -615,7 +696,9 @@ var testLinkWrongArrayFormat = function() {
 	params["tags"] = "Hello, I'm not an array."; // Oops, params.tags should be an array, not a string
 	runAPITest(
 		'link',
-		[ { "identity": "test_id" } ],
+		{
+			"identity": "test_id"
+		},
 		null,
 		Error("API request /v1/url, parameter tags is not an array"));
 };
