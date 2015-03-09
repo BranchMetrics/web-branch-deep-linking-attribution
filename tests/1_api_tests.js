@@ -47,14 +47,13 @@ var tearDown = function() {
 /**
  * Helper function for tests
  */
-var runAsyncTest = function(testFunction, assertions, expectedError, expectedResponse) {
-	var receivedData = { };
+var runAsyncTest = function(testFunction, assertions, expectedError) {
+	var receivedError = { };
 	var sentRequest = { };
 	var recievedFired;
 
 	stubs.replace(branchAPI, 'XHRRequest', function(url, postData, method, storage, callback) {
 		callback(expectedError,
-			expectedResponse,
 			{
 				"url": url,
 				"postData": postData,
@@ -64,7 +63,6 @@ var runAsyncTest = function(testFunction, assertions, expectedError, expectedRes
 
 	stubs.replace(branchAPI, 'jsonpRequest', function(url, postData, method, callback) {
 		callback(expectedError,
-			expectedResponse,
 			{
 				"url": url,
 				"postData": postData,
@@ -76,14 +74,14 @@ var runAsyncTest = function(testFunction, assertions, expectedError, expectedRes
 		function() {
 			return recievedFired;
 		},
-		function() { assertions(receivedData, sentRequest) },
+		function() { assertions(receivedError, sentRequest) },
 		asyncPollingInterval,
 		maxWaitTime
 	);
 
-	testFunction(function(err, data, request) {
+	testFunction(function(err, request) {
 		recievedFired = true;
-		receivedData = err || data;
+		receivedError = err;
 		sentRequest = request;
 	});
 };
@@ -91,8 +89,7 @@ var runAsyncTest = function(testFunction, assertions, expectedError, expectedRes
 /**
  * Helper function for API Requests
  */
-
-var runAPITest = function(resource, extraParams, expectedRequest, expectedError, expectedResponse) {
+var runAPITest = function(resource, extraParams, expectedRequest, expectedError) {
 	for (var i = 0; i < extraParams.length; i++) {
 		var key = Object.keys(extraParams[i])[0];
 		params[key] = extraParams[i][key];
@@ -103,8 +100,8 @@ var runAPITest = function(resource, extraParams, expectedRequest, expectedError,
 			branchAPI.request(resources[resource],
 				params,
 				api_storage,
-				function(err, data, request) {
-					callback(err, utils.whiteListSessionData(data), request);
+				function(err, request) {
+					callback(err, request);
 				});
 		};
 		if (expectedError) {
@@ -117,16 +114,12 @@ var runAPITest = function(resource, extraParams, expectedRequest, expectedError,
 			callAPI();
 		}
 
-	}, function(receivedData, sentRequest) {
+	}, function(receivedError, sentRequest) {
 		if (expectedRequest) {
 			assertObjectEquals("should send expected request", expectedRequest, sentRequest);
 		}
-		if (expectedResponse) {
-			assertObjectEquals("should return expected response", expectedResponse, receivedData);
-		}
 	},
-	expectedError,
-	expectedResponse);
+	expectedError);
 };
 
 // ===========================================================================================
@@ -142,8 +135,7 @@ var testOpen = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&is_referrable=1&browser_fingerprint_id=" + params.browser_fingerprint_id,
 			"method": "POST"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testOpenMissingIsReferrable = function() {
@@ -151,8 +143,7 @@ var testOpenMissingIsReferrable = function() {
 		'open',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
 		null,
-		Error("API request /v1/open missing parameter is_referrable"),
-		null);
+		Error("API request /v1/open missing parameter is_referrable"));
 };
 
 var testOpenMissingAppId = function() {
@@ -161,8 +152,7 @@ var testOpenMissingAppId = function() {
 		'open',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
 		null,
-		Error("API request /v1/open missing parameter app_id"),
-		null);
+		Error("API request /v1/open missing parameter app_id"));
 };
 
 var testOpenMissingBrowserFingerprintId = function() {
@@ -171,8 +161,7 @@ var testOpenMissingBrowserFingerprintId = function() {
 		'open',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
 		null,
-		Error("API request /v1/open missing parameter browser_fingerprint_id"),
-		null);
+		Error("API request /v1/open missing parameter browser_fingerprint_id"));
 };
 
 // ===========================================================================================
@@ -188,8 +177,7 @@ var testProfile = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&identity=test_id",
 			"method": "POST"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testProfileMissingIdentity = function() {
@@ -197,8 +185,7 @@ var testProfileMissingIdentity = function() {
 		'profile',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
 		null,
-		new Error("API request /v1/profile missing parameter identity"),
-		null);
+		Error("API request /v1/profile missing parameter identity"));
 };
 
 var testProfileMissingAppId = function() {
@@ -207,8 +194,7 @@ var testProfileMissingAppId = function() {
 		'profile',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
 		null,
-		Error("API request /v1/profile missing parameter app_id"),
-		null);
+		Error("API request /v1/profile missing parameter app_id"));
 };
 
 var testProfileMissingIdentityId = function() {
@@ -217,8 +203,7 @@ var testProfileMissingIdentityId = function() {
 		'profile',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') } ],
 		null,
-		Error("API request /v1/profile missing parameter identity_id"),
-		null);
+		Error("API request /v1/profile missing parameter identity_id"));
 };
 
 // ===========================================================================================
@@ -234,8 +219,7 @@ var testLogout = function() {
 			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id,
 			"method": "POST"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testLogoutMissingAppId = function() {
@@ -244,8 +228,7 @@ var testLogoutMissingAppId = function() {
 		'logout',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /v1/logout missing parameter app_id"),
-		null);
+		Error("API request /v1/logout missing parameter app_id"));
 };
 
 var testLogoutMissingSessionId = function() {
@@ -254,8 +237,7 @@ var testLogoutMissingSessionId = function() {
 		'logout',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /v1/logout missing parameter session_id"),
-		null);
+		Error("API request /v1/logout missing parameter session_id"));
 };
 
 // ===========================================================================================
@@ -271,8 +253,7 @@ var testReferrals = function() {
 			"postData": "",
 			"method": "GET"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testReferralsMissingIdentityId = function() {
@@ -281,8 +262,7 @@ var testReferralsMissingIdentityId = function() {
 		'referrals',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /v1/referrals missing parameter identity_id"),
-		null);
+		Error("API request /v1/referrals missing parameter identity_id"));
 };
 
 // ===========================================================================================
@@ -298,8 +278,7 @@ var testCredits = function() {
 			"postData": "",
 			"method": "GET"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testCreditsMissingIdentityId = function() {
@@ -308,8 +287,7 @@ var testCreditsMissingIdentityId = function() {
 		'credits',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /v1/credits missing parameter identity_id"),
-		null);
+		Error("API request /v1/credits missing parameter identity_id"));
 };
 
 // ===========================================================================================
@@ -325,8 +303,7 @@ var test_r = function() {
 			"postData": params,
 			"method": "GET"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var test_rMissingV = function() {
@@ -334,8 +311,7 @@ var test_rMissingV = function() {
 		'_r',
 		[ { "identity": "test_id" } ],
 		null,
-		new Error("API request /_r missing parameter v"),
-		null);
+		Error("API request /_r missing parameter v"));
 };
 
 var test_rMissingAppId = function() {
@@ -344,8 +320,7 @@ var test_rMissingAppId = function() {
 		'_r',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /_r missing parameter app_id"),
-		null);
+		Error("API request /_r missing parameter app_id"));
 };
 
 // ===========================================================================================
@@ -361,8 +336,7 @@ var testRedeem = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id + "&amount=1&bucket=testbucket",
 			"method": "POST"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testRedeemMissingAppId = function() {
@@ -371,8 +345,7 @@ var testRedeemMissingAppId = function() {
 		'redeem',
 		[ { "identity": "test_id" }, { "amount": 1 }, { "bucket": "testbucket" } ],
 		null,
-		Error("API request /v1/redeem missing parameter app_id"),
-		null);
+		Error("API request /v1/redeem missing parameter app_id"));
 };
 
 var testRedeemMissingIdentityId = function() {
@@ -381,8 +354,7 @@ var testRedeemMissingIdentityId = function() {
 		'redeem',
 		[ { "identity": "test_id" }, { "amount": 1 }, { "bucket": "testbucket" } ],
 		null,
-		Error("API request /v1/redeem missing parameter identity_id"),
-		null);
+		Error("API request /v1/redeem missing parameter identity_id"));
 };
 
 var testRedeemMissingAmount = function() {
@@ -390,8 +362,7 @@ var testRedeemMissingAmount = function() {
 		'redeem',
 		[ { "identity": "test_id" }, { "bucket": "testbucket" } ],
 		null,
-		Error("API request /v1/redeem missing parameter amount"),
-		null);
+		Error("API request /v1/redeem missing parameter amount"));
 };
 
 var testRedeemMissingBucket = function() {
@@ -399,8 +370,7 @@ var testRedeemMissingBucket = function() {
 		'redeem',
 		[ { "identity": "test_id" }, { "amount": 1 } ],
 		null,
-		Error("API request /v1/redeem missing parameter bucket"),
-		null);
+		Error("API request /v1/redeem missing parameter bucket"));
 };
 
 // ===========================================================================================
@@ -416,8 +386,7 @@ var testLink = function() {
 			"postData": "app_id=" + params.app_id + "&identity_id=" + params.identity_id,
 			"method": "POST"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testLinkMissingIdentityId = function() {
@@ -426,8 +395,7 @@ var testLinkMissingIdentityId = function() {
 		'link',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /v1/url missing parameter identity_id"),
-		null);
+		Error("API request /v1/url missing parameter identity_id"));
 };
 
 var testLinkMissingAppId = function() {
@@ -436,8 +404,7 @@ var testLinkMissingAppId = function() {
 		'link',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /v1/url missing parameter app_id"),
-		null);
+		Error("API request /v1/url missing parameter app_id"));
 };
 
 // ===========================================================================================
@@ -454,8 +421,7 @@ var testLinkClick = function() {
 			"postData": "",
 			"method": "GET"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testLinkClickMissingLinkUrl = function() {
@@ -463,8 +429,7 @@ var testLinkClickMissingLinkUrl = function() {
 		'linkClick',
 		[ { "identity": "test_id" }, { "click": "click" } ],
 		null,
-		Error("API request  missing parameter link_url"),
-		null);
+		Error("API request  missing parameter link_url"));
 };
 
 var testLinkClickMissingClick = function() {
@@ -473,8 +438,7 @@ var testLinkClickMissingClick = function() {
 		'linkClick',
 		[ { "identity": "test_id" }, { "link_url": "l/" + link } ],
 		null,
-		Error("API request  missing parameter click"),
-		null);
+		Error("API request  missing parameter click"));
 };
 
 // ===========================================================================================
@@ -492,8 +456,7 @@ var testSMSLinkSend = function() {
 			"postData": "phone=" + testPhone,
 			"method": "POST"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testSMSLinkSendMissingLinkUrl = function() {
@@ -502,8 +465,7 @@ var testSMSLinkSendMissingLinkUrl = function() {
 		'SMSLinkSend',
 		[ { "identity": "test_id" }, { "phone": testPhone } ],
 		null,
-		Error("API request /c missing parameter link_url"),
-		null);
+		Error("API request /c missing parameter link_url"));
 };
 
 var testSMSLinkSendMissingPhone = function() {
@@ -512,8 +474,7 @@ var testSMSLinkSendMissingPhone = function() {
 		'SMSLinkSend',
 		[ { "identity": "test_id" }, { "link_url": "l/" + link } ],
 		null,
-		Error("API request /c missing parameter phone"),
-		null);
+		Error("API request /c missing parameter phone"));
 };
 
 // ===========================================================================================
@@ -539,8 +500,7 @@ var testEvent = function() {
 			"postData": "app_id=" + params.app_id + "&session_id=" + params.session_id + "&event=" + eventName + metadataString,
 			"method": "POST"
 		},
-		null,
-		{ data: null, referring_identity: null, identity: null, has_app: null });
+		null);
 };
 
 var testEventMissingMetadata = function() {
@@ -551,8 +511,7 @@ var testEventMissingMetadata = function() {
 		[ { "identity": "test_id" },
 			{ "event": eventName } ],
 		null,
-		Error("API request /v1/event missing parameter metadata"),
-		null);
+		Error("API request /v1/event missing parameter metadata"));
 };
 
 var testEventMissingEvent = function() {
@@ -567,8 +526,7 @@ var testEventMissingEvent = function() {
 		[ { "identity": "test_id" },
 			{ "metadata": metadata } ],
 		null,
-		Error("API request /v1/event missing parameter event"),
-		null);
+		Error("API request /v1/event missing parameter event"));
 };
 
 var testEventMissingAppId = function() {
@@ -586,8 +544,7 @@ var testEventMissingAppId = function() {
 			{ "metadata": metadata },
 			{ "event": eventName } ],
 		null,
-		Error("API request /v1/event missing parameter app_id"),
-		null);
+		Error("API request /v1/event missing parameter app_id"));
 };
 
 var testEventMissingSessionId = function() {
@@ -605,8 +562,7 @@ var testEventMissingSessionId = function() {
 			{ "metadata": metadata },
 			{ "event": eventName } ],
 		null,
-		Error("API request /v1/event missing parameter session_id"),
-		null);
+		Error("API request /v1/event missing parameter session_id"));
 };
 
 // ===========================================================================================
@@ -621,8 +577,7 @@ var testOpenWrongAppIdFormat = function() {
 		'open',
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') }, { "is_referrable": 1 } ],
 		null,
-		Error("API request /v1/open, parameter app_id is not in the proper format"),
-		null);
+		Error("API request /v1/open, parameter app_id is not in the proper format"));
 };
 
 var testOpenWrongStringFormat = function() {
@@ -631,8 +586,7 @@ var testOpenWrongStringFormat = function() {
 		[ { "link_identifier":  45433 }, // Oops, link_identifier should be a string, not a number
 		{ "is_referrable": 1 } ],
 		null,
-		Error("API request /v1/open, parameter link_identifier is not a string"),
-		null);
+		Error("API request /v1/open, parameter link_identifier is not a string"));
 };
 
 var testOpenWrongNumberFormat = function() {
@@ -641,8 +595,7 @@ var testOpenWrongNumberFormat = function() {
 		[ { "link_identifier":  utils.urlValue('_branch_match_id') },
 		{ "is_referrable": "1" } ], // Oops, is_referrable should be a number, not a string
 		null,
-		Error("API request /v1/open, parameter is_referrable is not a number"),
-		null);
+		Error("API request /v1/open, parameter is_referrable is not a number"));
 };
 
 var testEventWrongObjectFormat = function() {
@@ -655,8 +608,7 @@ var testEventWrongObjectFormat = function() {
 			{ "event": eventName },
 			{ "metadata": metadata } ],
 		null,
-		Error("API request /v1/event, parameter metadata is not an object"),
-		null);
+		Error("API request /v1/event, parameter metadata is not an object"));
 };
 
 var testLinkWrongArrayFormat = function() {
@@ -665,8 +617,7 @@ var testLinkWrongArrayFormat = function() {
 		'link',
 		[ { "identity": "test_id" } ],
 		null,
-		Error("API request /v1/url, parameter tags is not an array"),
-		null);
+		Error("API request /v1/url, parameter tags is not an array"));
 };
 
 // ===========================================================================================
