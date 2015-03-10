@@ -43,15 +43,6 @@ utils.messages = {
 /**
  * @param {message} message
  * @param {Array.<*>=} params
- * @throws {Error}
- */
-utils.error = function(message, params) {
-	throw new Error(utils.message(message, params));
-};
-
-/**
- * @param {message} message
- * @param {Array.<*>=} params
  * @return {string}
  */
 utils.message = function(message, params) {
