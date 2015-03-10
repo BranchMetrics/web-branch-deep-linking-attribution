@@ -37,38 +37,38 @@ describe('Resources', function() {
 	beforeEach(function() {
 		storage().clear();
 		xhr = sinon.useFakeXMLHttpRequest();
-		jsonp = sinon.stub(server, "jsonpRequest", function(requestURL, requestData, requestMethod, callback) {
-			jsonp.url = requestURL;
-			jsonp.method = 'JSONP';
+		jsonp = sinon.stub(server, "createScript", function(src) {
+			jsonp.src = src;
+			console.log(src);
 			requests.push(jsonp);
 		});
 
 		requests = [];
 		xhr.onCreate = function(xhr) { requests.push(xhr); };
 	});
+
 	afterEach(function() {
 		xhr.restore();
-		server.jsonpRequest.restore();
+		server.createScript.restore();
 	});
 
 	describe('/v1/open', function() {
 		it('should pass in app_id and browser_fingerprint_id', function(done) {
 			server.request(resources.open, params({ "is_referrable": 1 }), storage(), done);
-
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
 			assert.equal(requests[0].method, 'POST', 'Method correct');
 			assert.equal(requests[0].requestBody, "app_id=" + app_id + "&identity_id=" + identity_id + "&is_referrable=1&browser_fingerprint_id=" + browser_fingerprint_id, 'Data correct');
-
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 		});
 
 		it('should pass as a jsonp request', function(done) {
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.open, params({ "is_referrable": 1 }), storage(), done);
+			var completeParams = params({ "is_referrable": 1 });
+			server.request(resources.open, completeParams, storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/open?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -136,10 +136,11 @@ describe('Resources', function() {
 
 		it('should pass as a jsonp request', function(done) {
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.profile, params({ "identity": "test_id" }), storage(), done);
+			var completeParams = params({ "identity": "test_id" });
+			server.request(resources.profile, completeParams, storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/profile', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/profile?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -182,10 +183,11 @@ describe('Resources', function() {
 
 		it('should pass as a jsonp request', function(done) {
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.logout, params({ }), storage(), done);
+			var completeParams = params({ });
+			server.request(resources.logout, completeParams, storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/logout', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/logout?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -221,8 +223,7 @@ describe('Resources', function() {
 			storage()['setItem']('use_jsonp', true);
 			server.request(resources.referrals, params({ }), storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/referrals/' + identity_id + '?', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/referrals/' + identity_id + '?&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -250,8 +251,7 @@ describe('Resources', function() {
 			storage()['setItem']('use_jsonp', true);
 			server.request(resources.credits, params({ }), storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/credits/' + identity_id + '?', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/credits/' + identity_id + '?&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -265,11 +265,10 @@ describe('Resources', function() {
 	});
 
 	describe('/_r', function() {
-		it('should pass in identity_id and v', function(done) {
+		it('should pass in app_id and v', function(done) {
 			server.request(resources._r, params({ "v": config.version }), storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://bnc.lt/_r?app_id=' + app_id + '&v=' + config.version, 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			assert.equal(requests[0].src, 'https://bnc.lt/_r?app_id=' + app_id + '&v=' + config.version + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -305,10 +304,11 @@ describe('Resources', function() {
 
 		it('should pass as a jsonp request', function(done) {
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.redeem, params({ "amount": 1, "bucket": "testbucket" }), storage(), done);
+			var completeParams = params({ "amount": 1, "bucket": "testbucket" });
+			server.request(resources.redeem, completeParams, storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/redeem', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/redeem?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -359,10 +359,10 @@ describe('Resources', function() {
 
 		it('should pass as a jsonp request', function(done) {
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.link, params({ "amount": 1, "bucket": "testbucket" }), storage(), done);
+			server.request(resources.link, params(), storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/url', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(params())));
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/url?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -407,8 +407,7 @@ describe('Resources', function() {
 			storage()['setItem']('use_jsonp', true);
 			server.request(resources.linkClick, params({ "link_url": "3hpH54U-58", "click": "click" }), storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://bnc.lt/3hpH54U-58?click=click', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			assert.equal(requests[0].src, 'https://bnc.lt/3hpH54U-58?click=click&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
@@ -450,10 +449,11 @@ describe('Resources', function() {
 
 		it('should pass as a jsonp request', function(done) {
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.event, params({ "event": "testevent", "metadata": metadata }), storage(), done);
+			var completeParams = params({ "event": "testevent", "metadata": metadata });
+			server.request(resources.event, completeParams, storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].url, 'https://api.branch.io/v1/event', 'Endpoint correct');
-			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
+			assert.equal(requests[0].src, 'https://api.branch.io/v1/event?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 			done();
 		});
 
