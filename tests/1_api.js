@@ -33,13 +33,22 @@ describe('Server helpers', function() {
 });
 
 describe('Resources', function() {
-	var server = new BranchAPI(), xhr, requests;
+	var server = new BranchAPI(), xhr, jsonp, requests;
 	beforeEach(function() {
 		xhr = sinon.useFakeXMLHttpRequest();
+		jsonp = sinon.stub(server, "jsonpRequest", function(requestURL, requestData, requestMethod, callback) {
+			jsonp.url = requestURL;
+			jsonp.method = requestMethod;
+			requests.push(jsonp);
+		});
+
 		requests = [];
 		xhr.onCreate = function(xhr) { requests.push(xhr); };
 	});
-	afterEach(function() { xhr.restore(); });
+	afterEach(function() {
+		xhr.restore();
+		server.jsonpRequest.restore();
+	});
 
 	describe('/v1/open', function() {
 		it('should pass in app_id and browser_fingerprint_id', function(done) {
@@ -209,28 +218,32 @@ describe('Resources', function() {
 		});
 	});
 
-	// need to stub jsonp, come back to this
-	/*
 	describe('/_r', function() {
 		it('should pass in identity_id and v', function(done) {
 			server.request(resources._r, params({ "v": config.version }), storage(), done);
-			console.log(requests[0].url);
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://bnc.lt/_r?app_id=' + app_id + '&v=' + config.version, 'Endpoint correct');
 			assert.equal(requests[0].method, 'GET', 'Method correct');
-
-			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
+			done();
 		});
 
-		it('should fail without identity_id', function(done) {
-			server.request(resources.credits, params({ }, [ 'identity_id' ]), storage(), function(err) {
-				assert.equal(err.message, "API request /v1/credits missing parameter identity_id");
+		it('should fail without app_id', function(done) {
+			server.request(resources._r, params({ "v": config.version }, [ 'app_id' ]), storage(), function(err) {
+				assert.equal(err.message, "API request /_r missing parameter app_id");
+				done();
+			});
+			assert.equal(requests.length, 0, 'No request made');
+		});
+
+		it('should fail without v', function(done) {
+			server.request(resources._r, params(), storage(), function(err) {
+				assert.equal(err.message, "API request /_r missing parameter v");
 				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 	});
-	*/
+
 
 	describe('/v1/redeem', function() {
 		it('should pass in app_id, identity_id, amount, and bucket', function(done) {
