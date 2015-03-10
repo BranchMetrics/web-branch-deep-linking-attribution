@@ -16,6 +16,49 @@ goog.require('goog.json');
 var default_branch;
 
 /***
+ * @param {function(?Error,?)=} callback
+ * @param {Error}
+ */
+function wrapError(callback, err) {
+	if (callback) { return callback(err); }
+	throw err;
+}
+
+/***
+ * @param {function(?Error,?)=} callback
+ * @param {function(?)=}
+ */
+function wrapErrorFunc(callback, func) {
+	return function(err, data) {
+		if (err && callback) { callback(err); }
+		else if (err) { throw err; }
+		else { func(data); }
+	};
+}
+
+/***
+ * @param {function(?Error)=} callback
+ * @returns {function(?Error,?=)}
+ */
+function wrapErrorCallback1(callback) {
+	return function(err) {
+		if (err && !callback) { throw err; }
+		callback(err);
+	};
+}
+
+/***
+ * @param {function(?Error,?)=} callback
+ * @returns {function(?Error,?)}
+ */
+function wrapErrorCallback2(callback) {
+	return function(err, data) {
+		if (err && !callback) { throw err; }
+		callback(err, data);
+	};
+}
+
+/***
  * @class Branch
  * @constructor
  */
@@ -91,34 +134,35 @@ Branch.prototype._api = function(resource, obj, callback) {
  * ___
  */
 Branch.prototype['init'] = function(app_id, callback) {
-	callback = callback|| function() { };
-	if (this.initialized) { return callback(new Error(utils.message(utils.messages.existingInit))); }
-	this.app_id = app_id;
-	var self = this, sessionData = utils.readStore(this._storage);
+	if (this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.existingInit))); }
 
-	var setBranchValues = function(data) {
+	this.app_id = app_id;
+	var self = this,
+		sessionData = utils.readStore(this._storage);
+
+	function setBranchValues(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
 		self.initialized = true;
-	};
+	}
 
 	if (sessionData  && sessionData['session_id']) {
 		setBranchValues(sessionData);
-		callback(null, utils.whiteListSessionData(sessionData));
+		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
 	}
 	else {
-		this._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
-			self._api(resources.open, {
+		this._api(resources._r, { "v": config.version }, wrapErrorFunc(callback, function(browser_fingerprint_id) {
+			self._api(callback, resources.open, {
 				"link_identifier": utils.urlValue('_branch_match_id'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
-			}, function(err, data) {
+			}, wrapErrorFunc(function(data) {
 				setBranchValues(data);
 				utils.store(data, self._storage);
-				callback(err, utils.whiteListSessionData(data));
-			});
-		});
+				callback(null, utils.whiteListSessionData(data));
+			}));
+		}));
 	}
 };
 
@@ -135,7 +179,8 @@ Branch.prototype['init'] = function(app_id, callback) {
  * ___
  */
 Branch.prototype['data'] = function(callback) {
-	callback = callback || function() { };
+	if (!callback) { return; }
+
 	var self = this;
 	this._queue(function(next) {
 		callback(null, utils.whiteListSessionData(utils.readStore(self._storage)));
@@ -177,11 +222,8 @@ Branch.prototype['data'] = function(callback) {
  * ___
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		callback(err, data);
-	});
+	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
+	this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
 };
 
 /**
@@ -208,11 +250,8 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * ## Tracking events
  */
 Branch.prototype['logout'] = function(callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.logout, { }, function(err) {
-		callback(err);
-	});
+	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
+	this._api(resources.logout, { }, wrapErrorCallback1(callback));
 };
 
 /**
@@ -245,22 +284,21 @@ Branch.prototype['logout'] = function(callback) {
  *
  */
 Branch.prototype['track'] = function(event, metadata, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
+	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
+
 	if (typeof metadata == 'function') {
 		callback = metadata;
 		metadata = { };
 	}
+
 	this._api(resources.event, {
 		"event": event,
 		"metadata": utils.merge({
 			"url": document.URL,
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
-		}, { })
-	}, function(err) {
-		callback(err);
-	});
+		}, metadata)
+	}, wrapErrorCallback1(callback));
 };
 
 /**
@@ -321,9 +359,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *
  */
 Branch.prototype['link'] = function(linkData, callback) {
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-
-	callback = callback || function() { };
+	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
 
 	var self = this;
 	linkData['source'] = 'web-sdk';
@@ -332,9 +368,9 @@ Branch.prototype['link'] = function(linkData, callback) {
 	}
 
 	linkData['data'] = goog.json.serialize(linkData['data']);
-	this._api(resources.link, linkData, function(err, data) {
-		callback(err, data && data['url']);
-	});
+	this._api(resources.link, linkData, wrapErrorFunc(callback, function(data) {
+		callback(null, data && data['url']);
+	}));
 };
 
 /**
@@ -419,10 +455,9 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 	else if (typeof options == 'undefined') {
 		options = {};
 	}
-	callback = callback || function() {};
 	options["make_new_link"] = options["make_new_link"] || false;
 
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
+	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
 	var self = this;
 
 	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
@@ -431,26 +466,22 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 		self._api(resources.SMSLinkSend, {
 			"link_url": click_id,
 			"phone": phone
-		}, function(err) { callback(err); });
+		}, wrapErrorCallback1(callback));
 	}
 
 	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
 		sendSMS(utils.readKeyValue('click_id', this._storage));
 	}
 	else {
-		this["link"](linkData, function(err, url) {
-			if (err) { return callback(err); }
-
+		this["link"](linkData, wrapErrorFunc(callback, function(url) {
 			self._api(resources.linkClick, {
 				"link_url": 'l/' + url.split('/').pop(),
 				"click": "click"
-			}, function(err, data) {
-				if (err) { return callback(err); }
-
+			}, wrapErrorFunc(callback, function(data) {
 				utils.storeKeyValue('click_id', data['click_id'], self._storage);
 				sendSMS(data['click_id']);
-			});
-		});
+			}));
+		}));
 	}
 };
 
@@ -495,11 +526,9 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  */
 Branch.prototype['referrals'] = function(callback) {
 	if (!this.initialized) {
-		return callback(new Error(utils.message(utils.messages.nonInit)));
+		return wrapError(callback, new Error(utils.message(utils.messages.nonInit)));
 	}
-	this._api(resources.referrals, { }, function(err, data) {
-		callback(err, data);
-	});
+	this._api(resources.referrals, { }, wrapErrorCallback2(callback));
 };
 
 /**
@@ -532,10 +561,10 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.credits, { }, function(err, data) {
-		callback(err, data);
-	});
+	if (!this.initialized) {
+		return wrapError(callback, new Error(utils.message(utils.messages.nonInit)));
+	}
+	this._api(resources.credits, { }, wrapErrorCallback2(callback));
 };
 
 /**
@@ -582,11 +611,8 @@ Branch.prototype['credits'] = function(callback) {
  *
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
-	callback = callback || function() {};
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err) {
-		callback(err);
-	});
+	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
+	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback));
 };
 
 /**

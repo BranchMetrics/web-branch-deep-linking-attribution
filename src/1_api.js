@@ -49,12 +49,14 @@ BranchAPI.prototype.serializeObject = function(obj, prefix) {
  * @param {Object.<string, *>} data
  */
 BranchAPI.prototype.getUrl = function(resource, data) {
-	var k;
+	var k, v, err;
 	var url = resource.destination + resource.endpoint;
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
-				resource.queryPart[k](resource.endpoint, k, data[k]);
+				err = resource.queryPart[k](resource.endpoint, k, data[k]);
+				if (err) { return { error: err }; }
+
 				url += '/' + data[k];
 			}
 		}
@@ -62,13 +64,29 @@ BranchAPI.prototype.getUrl = function(resource, data) {
 	var d = { };
 	for (k in resource.params) {
 		if (resource.params.hasOwnProperty(k)) {
-			var v = resource.params[k](resource.endpoint, k, data[k]);
+			err = resource.params[k](resource.endpoint, k, data[k]);
+			if (err) { return { error: err }; }
+
+			v = data[k];
 			if (!(typeof v == 'undefined' || v === '' || v === null)) {
 				d[k] = v;
 			}
 		}
 	}
 	return { data: this.serializeObject(d, ''), url: url };
+};
+
+/**
+ * This function is standalone for easy mocking.
+ * @param {string} src
+ */
+BranchAPI.prototype.createScript = function(src) {
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.async = true;
+	script.src = script;
+
+	document.getElementsByTagName('head')[0].appendChild(script);
 };
 
 /**
@@ -93,12 +111,7 @@ BranchAPI.prototype.jsonpRequest = function(requestURL, requestData, requestMeth
 		callback(null, data);
 	};
 
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.async = true;
-	script.src = requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + '&callback=' + callbackString + (requestURL.indexOf('/c/') >= 0 ? '&click=1' : '');
-
-	document.getElementsByTagName('head')[0].appendChild(script);
+	this.createScript(requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + (requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') + '&callback=' + callbackString);
 };
 
 /**
@@ -146,6 +159,8 @@ BranchAPI.prototype.XHRRequest = function(url, data, method, storage, callback) 
  */
 BranchAPI.prototype.request = function(resource, data, storage, callback) {
 	var u = this.getUrl(resource, data);
+	if (u.error) { return callback(new Error(u.error)); }
+
 	var url, postData = '';
 	if (resource.method == 'GET') {
 		url = u.url + '?' + u.data;
