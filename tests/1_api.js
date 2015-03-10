@@ -35,10 +35,11 @@ describe('Server helpers', function() {
 describe('Resources', function() {
 	var server = new BranchAPI(), xhr, jsonp, requests;
 	beforeEach(function() {
+		storage().clear();
 		xhr = sinon.useFakeXMLHttpRequest();
 		jsonp = sinon.stub(server, "jsonpRequest", function(requestURL, requestData, requestMethod, callback) {
 			jsonp.url = requestURL;
-			jsonp.method = requestMethod;
+			jsonp.method = 'JSONP';
 			requests.push(jsonp);
 		});
 
@@ -60,6 +61,15 @@ describe('Resources', function() {
 			assert.equal(requests[0].requestBody, "app_id=" + app_id + "&identity_id=" + identity_id + "&is_referrable=1&browser_fingerprint_id=" + browser_fingerprint_id, 'Data correct');
 
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
+		});
+
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.open, params({ "is_referrable": 1 }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
 		});
 
 		it('should fail without is_referrable', function(done) {
@@ -124,6 +134,15 @@ describe('Resources', function() {
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 		});
 
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.profile, params({ "identity": "test_id" }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/profile', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
+		});
+
 		it('should fail without identity', function(done) {
 			server.request(resources.profile, params(), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/profile missing parameter identity");
@@ -161,6 +180,15 @@ describe('Resources', function() {
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 		});
 
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.logout, params({ }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/logout', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
+		});
+
 		it('should fail without app_id', function(done) {
 			server.request(resources.logout, params({ }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/logout missing parameter app_id");
@@ -189,6 +217,15 @@ describe('Resources', function() {
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 		});
 
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.referrals, params({ }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/referrals/' + identity_id + '?', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
+		});
+
 		it('should fail without identity_id', function(done) {
 			server.request(resources.referrals, params({ }, [ 'identity_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/referrals missing parameter identity_id");
@@ -209,6 +246,15 @@ describe('Resources', function() {
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 		});
 
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.credits, params({ }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/credits/' + identity_id + '?', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
+		});
+
 		it('should fail without identity_id', function(done) {
 			server.request(resources.credits, params({ }, [ 'identity_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/credits missing parameter identity_id");
@@ -223,7 +269,7 @@ describe('Resources', function() {
 			server.request(resources._r, params({ "v": config.version }), storage(), done);
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://bnc.lt/_r?app_id=' + app_id + '&v=' + config.version, 'Endpoint correct');
-			assert.equal(requests[0].method, 'GET', 'Method correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
 			done();
 		});
 
@@ -255,6 +301,15 @@ describe('Resources', function() {
 			assert.equal(requests[0].requestBody, "app_id=" + app_id + "&identity_id=" + identity_id + "&amount=1&bucket=testbucket");
 
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
+		});
+
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.redeem, params({ "amount": 1, "bucket": "testbucket" }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/redeem', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
 		});
 
 		it('should fail without app_id', function(done) {
@@ -302,6 +357,15 @@ describe('Resources', function() {
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 		});
 
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.link, params({ "amount": 1, "bucket": "testbucket" }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/url', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
+		});
+
 		it('should fail without app_id', function(done) {
 			server.request(resources.link, params({ }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/url missing parameter app_id");
@@ -339,6 +403,15 @@ describe('Resources', function() {
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 		});
 
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.linkClick, params({ "link_url": "3hpH54U-58", "click": "click" }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://bnc.lt/3hpH54U-58?click=click', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
+		});
+
 		it('should fail without link_url', function(done) {
 			server.request(resources.linkClick, params({ "click": "click" }), storage(), function(err) {
 				assert.equal(err.message, "API request  missing parameter link_url");
@@ -373,6 +446,15 @@ describe('Resources', function() {
 			assert.equal(requests[0].requestBody, "app_id=" + app_id + "&session_id=" + session_id + "&event=testevent" + metadataString);
 
 			requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
+		});
+
+		it('should pass as a jsonp request', function(done) {
+			storage()['setItem']('use_jsonp', true);
+			server.request(resources.event, params({ "event": "testevent", "metadata": metadata }), storage(), done);
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].url, 'https://api.branch.io/v1/event', 'Endpoint correct');
+			assert.equal(requests[0].method, 'JSONP', 'Method correct');
+			done();
 		});
 
 		it('should fail without app_id', function(done) {
