@@ -9,21 +9,28 @@ var maxWaitTime;
 var asyncPollingInterval;
 var params;
 var branch;
+var app_id;
 
 /**
- * Setup the Branch Function
+ * Setup the Branch test page
  */
-var setUp = function() {
-
-	// Main Branch object
-	branch = new Branch();
-	branch.init('5680621892404085', function(err, data) { });
-
+var setUpPage = function() {
 	// Maximum wait time for async tests (ms)
-	maxWaitTime = 15000;
+	maxWaitTime = 5000;
 
 	// How often we should check for the finished state of an async test
-	asyncPollingInterval = 500;
+	asyncPollingInterval = 100;
+
+	app_id = '5680621892404085';
+};
+
+/**
+ * Setup each Branch tes
+ */
+var setUp = function() {
+	// Main Branch object
+	branch = new Branch();
+	branch.init(app_id, function(err, data) { });
 
 	// Standard set of dummy params
 	params = {
@@ -52,15 +59,12 @@ var tearDown = function() {
 /**
  * Helper function for tests
  */
-var runAsyncTest = function(testFunction, assertions, expectedError, expectedResponse) {
-
+var runAsyncTest = function(testFunction, assertions) {
 	var receivedData = { };
 	var recievedFired;
 
-	stubs.replace(branch, '_api', function(resource, obj, callback) {
-		callback(expectedError, expectedResponse);
-
-		// add queue to this!
+	stubs.replace(branch._branchAPI, 'request', function(resource, obj, storage, callback) {
+		callback(obj);
 	});
 
 	waitForCondition(
@@ -72,9 +76,9 @@ var runAsyncTest = function(testFunction, assertions, expectedError, expectedRes
 		maxWaitTime
 	);
 
-	testFunction(function(err, data) {
+	testFunction(function(data) {
 		recievedFired = true;
-		receivedData = err || data;
+		receivedData = data;
 	});
 };
 
@@ -82,7 +86,7 @@ var runAsyncTest = function(testFunction, assertions, expectedError, expectedRes
 /**
  * SMS Tests
  */
-
+/*
  // SMS sends with phone param
 var testSendSMS = function() {
 	runAsyncTest(function(callback) {
@@ -93,68 +97,80 @@ var testSendSMS = function() {
 	null,
 	undefined);
 }
-
+*/
 // ===========================================================================================
 /**
  * Track tests
  */
  // Track event with required params
- var testTrack = function() {
+var testTrack = function() {
+	var expectedRequest = {
+		"event": "test_event",
+		"metadata": utils.merge({
+			"url": document.URL,
+			"user_agent": navigator.userAgent,
+			"language": navigator.language
+		}, { }),
+		"app_id": app_id,
+		"session_id": branch.session_id
+	};
+
 	runAsyncTest(function(callback) {
-		branch.track('Tracked this click', function(err, data) { callback(err, data) });
+		branch.track(expectedRequest["event"], function(err, data) { callback(err, data) });
 	}, function(receivedData) {
-		assertUndefined("should return undefined", receivedData);
-	},
-	null,
-	undefined);
-}
+		assertObjectEquals("should send expected request to API", receivedData, expectedRequest);
+	});
+};
 
 // ===========================================================================================
 /**
  * Show Referrals tests
  */
 var testReferrals = function() {
+	var expectedRequest = {
+		"identity_id": branch.identity_id
+	};
+
 	runAsyncTest(function(callback) {
 		branch.referrals(function(err, data) { callback(err, data) });
 	}, function(receivedData) {
-		assertTrue("should return an object", (typeof receivedData && receivedData != null));
-	},
-	null,
-	{ });
-}
+		assertObjectEquals("should send expected request to API", receivedData, expectedRequest);
+	});
+};
+
 
 // ===========================================================================================
 /**
  * Show Credits tests
  */
 var testCredits = function() {
+	var expectedRequest = {
+		"identity_id": branch.identity_id
+	};
+
 	runAsyncTest(function(callback) {
 		branch.credits(function(err, data) { callback(err, data) });
 	}, function(receivedData) {
-		assertTrue("should return an object", (typeof receivedData && receivedData != null));
-	},
-	null,
-	{ });
-}
+		assertObjectEquals("should send expected request to API", receivedData, expectedRequest);
+	});
+};
 
 // ===========================================================================================
 /**
  * Identify tests
  */
 var testSetIdentity = function() {
-	var expectedData = {
-		"link": "https://bnc.lt/i/3T0CTu--23",
-		"referring_data": "awesome data"
+	var expectedRequest = {
+		"identity_id": branch.identity_id,
+		"app_id": branch.app_id,
+		"identity": "test_id"
 	};
 
 	runAsyncTest(function(callback) {
-		branch.setIdentity('Branch', function(err, data) { callback(err, data) });
+		branch.setIdentity(expectedRequest["identity"], function(err, data) { callback(err, data) });
 	}, function(receivedData) {
-			assertNonEmptyString("should return correct link", receivedData.link);
-			assertNonEmptyString("should return correct referring_data", receivedData.referring_data);
-	},
-	null,
-	expectedData);
+		assertObjectEquals("should send expected request to API", receivedData, expectedRequest);
+	});
 }
 
 // ===========================================================================================
@@ -162,18 +178,18 @@ var testSetIdentity = function() {
  * Redeem Credits tests
  */
 var testRedeem = function() {
-	var expectedError = new Error('Not enough credits to redeem.');
-
-    var amount = 5;
-    var bucket = 'default';
+	var expectedRequest = {
+		"identity_id": branch.identity_id,
+		"app_id": branch.app_id,
+		"amount": 5,
+		"bucket": "test_bucket"
+	};
 
 	runAsyncTest(function(callback) {
-		branch.redeem(amount, bucket, function(err, data) {
-			callback(err, data) });
+		branch.redeem(expectedRequest["amount"], expectedRequest["bucket"], function(err, data) { callback(err, data) });
 	}, function(receivedData) {
-		assertObjectEquals("should return error for not enough credits", expectedError, receivedData);
-	},
-	expectedError);
+		assertObjectEquals("should send expected request to API", receivedData, expectedRequest);
+	});
 }
 
 // ===========================================================================================
@@ -185,6 +201,7 @@ var testRedeem = function() {
 /**
  * Create link tests
  */
+ /*
 var testLink = function() {
 	runAsyncTest(function(callback) {
 		branch.link(params, function(err, data) { callback(err, data) });
@@ -197,11 +214,13 @@ var testLink = function() {
 	null,
 	'https://bnc.lt/l/3ffPbeE-_K');
 }
+*/
 
 // ===========================================================================================
 /**
  * Logout tests
  */
+ /*
 var testLogout = function() {
 	runAsyncTest(function(callback) {
 		branch.logout(function(err, data) { callback(err, data) });
@@ -211,6 +230,7 @@ var testLogout = function() {
 	null,
 	undefined);
 }
+*/
 
 // ===========================================================================================
 
