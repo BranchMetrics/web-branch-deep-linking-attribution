@@ -40,6 +40,17 @@ utils.messages = {
 	missingUrl: 'Required argument: URL, is missing'
 };
 
+/*
+ * Getters for location.search and location.hash, so that we can stub this for testing
+ */
+utils.getLocationSearch = function() {
+	return window.location.search;
+};
+
+utils.getLocationHash = function() {
+	return window.location.hash;
+};
+
 /**
  * @param {message} message
  * @param {Array.<*>=} params
@@ -130,7 +141,7 @@ utils.merge = function(to, from) {
  */
 utils.hashValue = function(key) {
 	try {
-		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
+		return utils.getLocationHash().match(new RegExp(key + ':([^&]*)'))[1];
 	}
 	catch (e) {
 		return undefined;
@@ -142,7 +153,7 @@ utils.hashValue = function(key) {
  */
 utils.getParamValue = function(key) {
 	try {
-		return window.location.search.substring(1).match(new RegExp(key + '=([^&]*)'))[1];
+		return utils.getLocationSearch().substring(1).match(new RegExp(key + '=([^&]*)'))[1];
 	}
 	catch (e) {
 		return undefined;

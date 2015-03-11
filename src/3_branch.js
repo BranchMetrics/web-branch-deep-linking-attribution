@@ -284,12 +284,12 @@ Branch.prototype['logout'] = function(callback) {
  *
  */
 Branch.prototype['track'] = function(event, metadata, callback) {
-	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
-
 	if (typeof metadata == 'function') {
 		callback = metadata;
 		metadata = { };
 	}
+
+	if (!this.initialized) { return wrapError(callback, new Error(utils.message(utils.messages.nonInit))); }
 
 	this._api(resources.event, {
 		"event": event,

@@ -17,6 +17,28 @@ function params(extra, without) {
 	return p;
 }
 
+// May not need this because I found assert.deepEqual, but going to leave it here just in case since I wrote it...
+function deepCompare(obj1, obj2) {
+	for (var key in obj1) {
+		try {
+			if (typeof obj1[key] == 'object') {
+				if (!deepCompare(obj1[key], obj2[key])) {
+					return false;
+				}
+			}
+			else {
+				if (obj1[key] != obj2[key]) {
+					return false;
+				}
+			}
+		}
+		catch (e) {
+			return false;
+		}
+		return true;
+	}
+}
+
 
 // ===================================================================================================
 // For whatever dumb reason, this is only available as a bower component, so I'm just pasting it here.

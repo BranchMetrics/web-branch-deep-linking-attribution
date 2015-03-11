@@ -743,6 +743,12 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", missingUrl:"Required argument: URL, is missing"};
+utils.getLocationSearch = function() {
+  return window.location.search;
+};
+utils.getLocationHash = function() {
+  return window.location.hash;
+};
 utils.message = function(a, b) {
   var c = a.replace(/\$(\d)/g, function(a, c) {
     return b[parseInt(c, 10) - 1];
@@ -783,13 +789,13 @@ utils.merge = function(a, b) {
 };
 utils.hashValue = function(a) {
   try {
-    return location.hash.match(new RegExp(a + ":([^&]*)"))[1];
+    return utils.getLocationHash().match(new RegExp(a + ":([^&]*)"))[1];
   } catch (b) {
   }
 };
 utils.getParamValue = function(a) {
   try {
-    return window.location.search.substring(1).match(new RegExp(a + "=([^&]*)"))[1];
+    return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
   } catch (b) {
   }
 };
@@ -860,11 +866,11 @@ BranchAPI.prototype.getUrl = function(a, b) {
   return{data:this.serializeObject(f, ""), url:e};
 };
 BranchAPI.prototype.createScript = function(a) {
-  a = document.createElement("script");
-  a.type = "text/javascript";
-  a.async = !0;
-  a.src = a;
-  document.getElementsByTagName("head")[0].appendChild(a);
+  var b = document.createElement("script");
+  b.type = "text/javascript";
+  b.async = !0;
+  b.src = a;
+  document.getElementsByTagName("head")[0].appendChild(b);
 };
 BranchAPI.prototype.jsonpRequest = function(a, b, c, d) {
   var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
@@ -1186,10 +1192,10 @@ Branch.prototype.logout = function(a) {
   this._api(resources.logout, {}, wrapErrorCallback1(a));
 };
 Branch.prototype.track = function(a, b, c) {
+  "function" == typeof b && (c = b, b = {});
   if (!this.initialized) {
     return wrapError(c, Error(utils.message(utils.messages.nonInit)));
   }
-  "function" == typeof b && (c = b, b = {});
   this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b)}, wrapErrorCallback1(c));
 };
 Branch.prototype.link = function(a, b) {
