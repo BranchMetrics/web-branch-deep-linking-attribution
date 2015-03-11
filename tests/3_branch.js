@@ -194,7 +194,6 @@ describe('Branch', function() {
 		});
 	});
 
-
 	describe('redeem', function() {
 		it('should call api with identity_id', function(done) {
 			branch.redeem(1, "testbucket", function() {

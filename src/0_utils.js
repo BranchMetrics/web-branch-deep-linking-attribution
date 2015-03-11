@@ -86,7 +86,7 @@ utils.readStore = function(storage) {
 		return goog.json.parse(storage['getItem']('branch_session') || { });
 	}
 	catch (e) {
-		return {};
+		return { };
 	}
 };
 

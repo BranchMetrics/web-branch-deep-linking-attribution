@@ -41,7 +41,7 @@ BranchStorage.prototype['removeItem'] = function(key) {
 };
 
 BranchStorage.prototype['clear'] = function() {
-	this._store = {};
+	this._store = { };
 };
 
 /**
