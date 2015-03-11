@@ -39,7 +39,6 @@ describe('Resources', function() {
 		xhr = sinon.useFakeXMLHttpRequest();
 		jsonp = sinon.stub(server, "createScript", function(src) {
 			jsonp.src = src;
-			console.log(src);
 			requests.push(jsonp);
 		});
 

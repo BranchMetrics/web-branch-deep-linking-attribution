@@ -42,7 +42,7 @@ calcdeps.py: $(SOURCES) compiler/library
 
 docs/3_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
-	jsdox src/3_branch.js --output docs2
+	jsdox src/3_branch.js --output docs
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
 	@echo "\nMinifying debug js..."
