@@ -16,12 +16,6 @@ describe('Branch', function() {
 	function initBranch(runInit) {
 		storage().clear();
 		var branch = new Branch();
-		if (runInit) {
-			branch.initialized = true;
-			branch.app_id = app_id;
-			branch.session_id = session_id;
-			branch.identity_id = identity_id;
-		}
 
 		sandbox.stub(branch._server, "request", function(resource, obj, storage, callback) {
 			requests.push({
@@ -30,6 +24,14 @@ describe('Branch', function() {
 				callback: callback
 			});
 		});
+
+		if (runInit) {
+			branch.init(app_id);
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+			requests = [];
+		}
+
 		return branch;
 	}
 
@@ -76,6 +78,17 @@ describe('Branch', function() {
 			}, 'Request to open params correct');
 
 			assert.equal(requests.length, 2, '2 requests made');
+		});
+
+		it('should support being called without a callback', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(1, done);
+
+			branch.init(app_id);
+
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+
+			assert(true, 'Succeeded');
 		});
 
 		it('should return invalid app id error', function(done) {

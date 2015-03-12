@@ -160,7 +160,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 			}, wrapErrorFunc(callback, function(data) {
 				setBranchValues(data);
 				utils.store(data, self._storage);
-				callback(null, utils.whiteListSessionData(data));
+				if (callback) { callback(null, utils.whiteListSessionData(data)); }
 			}));
 		}));
 	}
