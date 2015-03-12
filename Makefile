@@ -6,10 +6,10 @@ COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() 
 
 .PHONY: clean
 
-all: dist/build.js dist/build.min.js.gz README.md example.html
+all: dist/build.js dist/build.min.js.gz README.md example.html tests/branch-deps.js
 docs: README.md
 clean:
-	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md example.html
+	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md example.html tests/branch-deps.js
 
 
 # Kinda gross, but will download closure compiler if you don't have it.
@@ -27,7 +27,7 @@ compiler/library/closure-library-master/closure/goog/**:
 	unzip master.zip -d compiler/library && \
 	rm -f master.zip
 
-calcdeps.py: $(SOURCES) compiler/library
+tests/branch-deps.js: $(SOURCES) compiler/library
 	@echo "\nCalculating dependencies for compiler tests..."
 	python $(COMPILER_LIBRARY)/bin/calcdeps.py \
 	--dep $(COMPILER_LIBRARY)/goog \

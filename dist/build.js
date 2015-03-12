@@ -1093,20 +1093,20 @@ var sendSMS = function(a, b, c, d) {
 // Input 12
 var default_branch;
 function wrapError(a, b) {
-  if (a) {
-    return a(b);
+  if (b) {
+    return b(a);
   }
-  throw b;
+  throw a;
 }
 function wrapErrorFunc(a, b) {
   return function(c, d) {
-    if (c && a) {
-      a(c);
+    if (c && b) {
+      b(c);
     } else {
       if (c) {
         throw c;
       }
-      b && b(d);
+      a && a(d);
     }
   };
 }
@@ -1115,7 +1115,7 @@ function wrapErrorCallback1(a) {
     if (b && !a) {
       throw b;
     }
-    a(b);
+    a && a(b);
   };
 }
 function wrapErrorCallback2(a) {
@@ -1123,7 +1123,7 @@ function wrapErrorCallback2(a) {
     if (b && !a) {
       throw b;
     }
-    a(b, c);
+    a && a(b, c);
   };
 }
 var Branch = function() {
@@ -1155,17 +1155,17 @@ Branch.prototype.init = function(a, b) {
     d.initialized = !0;
   }
   if (this.initialized) {
-    return wrapError(b, Error(utils.message(utils.messages.existingInit)));
+    return wrapError(Error(utils.message(utils.messages.existingInit)), b);
   }
   this.app_id = a;
   var d = this, e = utils.readStore(this._storage);
-  e && e.session_id ? (c(e), b && b(null, utils.whiteListSessionData(e))) : this._api(resources._r, {v:config.version}, wrapErrorFunc(b, function(a) {
-    d._api(resources.open, {link_identifier:utils.getParamValue("_branch_match_id") || utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(b, function(a) {
+  e && e.session_id ? (c(e), b && b(null, utils.whiteListSessionData(e))) : this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
+    d._api(resources.open, {link_identifier:utils.getParamValue("_branch_match_id") || utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
       c(a);
       utils.store(a, d._storage);
       b && b(null, utils.whiteListSessionData(a));
-    }));
-  }));
+    }, b));
+  }, b));
 };
 Branch.prototype.data = function(a) {
   if (a) {
@@ -1178,33 +1178,33 @@ Branch.prototype.data = function(a) {
 };
 Branch.prototype.setIdentity = function(a, b) {
   if (!this.initialized) {
-    return wrapError(b, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
   }
   this._api(resources.profile, {identity:a}, wrapErrorCallback2(b));
 };
 Branch.prototype.logout = function(a) {
   if (!this.initialized) {
-    return wrapError(a, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
   }
   this._api(resources.logout, {}, wrapErrorCallback1(a));
 };
 Branch.prototype.track = function(a, b, c) {
   "function" == typeof b && (c = b, b = {});
   if (!this.initialized) {
-    return wrapError(c, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
   }
-  this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b)}, wrapErrorCallback1(c));
+  this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b || {})}, wrapErrorCallback1(c));
 };
 Branch.prototype.link = function(a, b) {
   if (!this.initialized) {
-    return wrapError(b, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
   }
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
   a.data = goog.json.serialize(a.data);
-  this._api(resources.link, a, wrapErrorFunc(b, function(a) {
+  this._api(resources.link, a, wrapErrorFunc(function(a) {
     b(null, a && a.url);
-  }));
+  }, b));
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
   function e(b) {
@@ -1213,32 +1213,32 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
   "function" == typeof c ? (d = c, c = {}) : "undefined" == typeof c && (c = {});
   c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
-    return wrapError(d, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), d);
   }
   var f = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
-  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, wrapErrorFunc(d, function(a) {
-    f._api(resources.linkClick, {link_url:"l/" + a.split("/").pop(), click:"click"}, wrapErrorFunc(d, function(a) {
+  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, wrapErrorFunc(function(a) {
+    f._api(resources.linkClick, {link_url:"l/" + a.split("/").pop(), click:"click"}, wrapErrorFunc(function(a) {
       utils.storeKeyValue("click_id", a.click_id, f._storage);
       e(a.click_id);
-    }));
-  }));
+    }, d));
+  }, d));
 };
 Branch.prototype.referrals = function(a) {
   if (!this.initialized) {
-    return wrapError(a, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
   }
   this._api(resources.referrals, {}, wrapErrorCallback2(a));
 };
 Branch.prototype.credits = function(a) {
   if (!this.initialized) {
-    return wrapError(a, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
   }
   this._api(resources.credits, {}, wrapErrorCallback2(a));
 };
 Branch.prototype.redeem = function(a, b, c) {
   if (!this.initialized) {
-    return wrapError(c, Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
   }
   this._api(resources.redeem, {amount:a, bucket:b}, wrapErrorCallback1(c));
 };

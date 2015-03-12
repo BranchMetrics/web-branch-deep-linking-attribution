@@ -252,7 +252,7 @@ ___
 
 **linkData**: `Object`, _required_ - link data and metadata.
 
-**callback**: `function`, _optional_ - returns a string of the Branch deep linking URL.
+**callback**: `function`, _required_ - returns a string of the Branch deep linking URL.
 
 **[Formerly `createLink()`](CHANGELOG.md)**
 
