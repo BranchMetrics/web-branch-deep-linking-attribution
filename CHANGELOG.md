@@ -3,6 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+### New Functionality
+- Added a ton of tests!
+- Much more consistent error handling - we always pass errors to callbacks, unless there is no callback specified, in which case we always throw them.
 
 ## [v1.2.0] - 2015-03-06
 ### New Functionality
