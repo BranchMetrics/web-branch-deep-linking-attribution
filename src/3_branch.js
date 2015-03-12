@@ -5,7 +5,7 @@
 goog.provide('Branch');
 goog.require('utils');
 goog.require('resources');
-goog.require('BranchAPI');
+goog.require('Server');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
@@ -25,14 +25,14 @@ function wrapError(callback, err) {
 }
 
 /***
- * @param {function(?Error,?)=} callback
- * @param {function(?)=}
+ * @param {function(?Error,?)} callback
+ * @param {function(?)}
  */
 function wrapErrorFunc(callback, func) {
 	return function(err, data) {
 		if (err && callback) { callback(err); }
 		else if (err) { throw err; }
-		else { func(data); }
+		else if (func) { func(data); }
 	};
 }
 
@@ -69,7 +69,7 @@ Branch = function() {
 	}
 	this._queue = Queue();
 	this._storage = storage();
-	this._branchAPI = new BranchAPI();
+	this._server = new Server();
 	this.initialized = false;
 };
 
@@ -84,7 +84,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
-		return self._branchAPI.request(resource, obj, self._storage, function(err, data) {
+		return self._server.request(resource, obj, self._storage, function(err, data) {
 			next();
 			callback(err, data);
 		});
@@ -153,11 +153,11 @@ Branch.prototype['init'] = function(app_id, callback) {
 	}
 	else {
 		this._api(resources._r, { "v": config.version }, wrapErrorFunc(callback, function(browser_fingerprint_id) {
-			self._api(callback, resources.open, {
+			self._api(resources.open, {
 				"link_identifier": utils.urlValue('_branch_match_id'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
-			}, wrapErrorFunc(function(data) {
+			}, wrapErrorFunc(callback, function(data) {
 				setBranchValues(data);
 				utils.store(data, self._storage);
 				callback(null, utils.whiteListSessionData(data));
@@ -316,7 +316,6 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ```
  * branch.link(
  *     linkData,
- *     options,
  *     callback (err, link)
  * );
  * ```

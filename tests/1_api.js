@@ -1,5 +1,5 @@
 goog.require('utils');
-goog.require('BranchAPI');
+goog.require('Server');
 goog.require('resources');
 goog.require('config');
 goog.require('storage');
@@ -7,7 +7,7 @@ goog.require('storage');
 var server;
 
 describe('Server helpers', function() {
-	var server = new BranchAPI();
+	var server = new Server();
 	it('serializeObject should work', function() {
 		// Test simple objects
 		assert.equal(server.serializeObject({ a: 'b' }), 'a=b');
@@ -33,7 +33,7 @@ describe('Server helpers', function() {
 });
 
 describe('Resources', function() {
-	var server = new BranchAPI(), xhr, jsonp, requests;
+	var server = new Server(), xhr, jsonp, requests;
 	beforeEach(function() {
 		storage().clear();
 		xhr = sinon.useFakeXMLHttpRequest();

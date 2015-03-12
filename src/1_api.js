@@ -3,26 +3,24 @@
  * a fancy wrapper around XHR/JSONP/etc.
  */
 
-goog.provide('BranchAPI');
+goog.provide('Server');
 goog.require('utils');
 goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 
 /**
- * @class Api
+ * @class Server
  * @constructor
  */
-var BranchAPI = function() {
-	this._branchAPI = { };
-};
+var Server = function() {};
 
-BranchAPI.prototype._jsonp_callback_index = 0;
+Server.prototype._jsonp_callback_index = 0;
 
 /**
  * @param {Object} obj
  * @param {string} prefix
  */
-BranchAPI.prototype.serializeObject = function(obj, prefix) {
+Server.prototype.serializeObject = function(obj, prefix) {
 	var pairs = [];
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
@@ -48,7 +46,7 @@ BranchAPI.prototype.serializeObject = function(obj, prefix) {
  * @param {utils.resource} resource
  * @param {Object.<string, *>} data
  */
-BranchAPI.prototype.getUrl = function(resource, data) {
+Server.prototype.getUrl = function(resource, data) {
 	var k, v, err;
 	var url = resource.destination + resource.endpoint;
 	if (resource.queryPart) {
@@ -80,7 +78,7 @@ BranchAPI.prototype.getUrl = function(resource, data) {
  * This function is standalone for easy mocking.
  * @param {string} src
  */
-BranchAPI.prototype.createScript = function(src) {
+Server.prototype.createScript = function(src) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.async = true;
@@ -97,7 +95,7 @@ var jsonp_callback_index = 0;
  * @param {utils._httpMethod} requestMethod
  * @param {function(?Error,*=)=} callback
  */
-BranchAPI.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
+Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
@@ -123,7 +121,7 @@ BranchAPI.prototype.jsonpRequest = function(requestURL, requestData, requestMeth
  * @param {BranchStorage} storage
  * @param {function(?Error,*=)=} callback
  */
-BranchAPI.prototype.XHRRequest = function(url, data, method, storage, callback) {
+Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
@@ -159,7 +157,7 @@ BranchAPI.prototype.XHRRequest = function(url, data, method, storage, callback) 
  * @param {BranchStorage} storage
  * @param {function(?Error,*=)=} callback
  */
-BranchAPI.prototype.request = function(resource, data, storage, callback) {
+Server.prototype.request = function(resource, data, storage, callback) {
 	var u = this.getUrl(resource, data);
 	if (u.error) { return callback(new Error(u.error)); }
 

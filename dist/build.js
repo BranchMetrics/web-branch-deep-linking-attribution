@@ -824,15 +824,10 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
-<<<<<<< HEAD
-var BranchAPI = function() {
-  this._branchAPI = {};
+var Server = function() {
 };
-BranchAPI.prototype._jsonp_callback_index = 0;
-BranchAPI.prototype.serializeObject = function(a, b) {
-=======
-function serializeObject(a, b) {
->>>>>>> master
+Server.prototype._jsonp_callback_index = 0;
+Server.prototype.serializeObject = function(a, b) {
   var c = [];
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
@@ -845,7 +840,7 @@ function serializeObject(a, b) {
   }
   return c.join("&");
 };
-BranchAPI.prototype.getUrl = function(a, b) {
+Server.prototype.getUrl = function(a, b) {
   var c, d, e = a.destination + a.endpoint;
   if (a.queryPart) {
     for (c in a.queryPart) {
@@ -867,24 +862,18 @@ BranchAPI.prototype.getUrl = function(a, b) {
       "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
     }
   }
-<<<<<<< HEAD
   return{data:this.serializeObject(f, ""), url:e};
 };
-BranchAPI.prototype.createScript = function(a) {
+Server.prototype.createScript = function(a) {
   var b = document.createElement("script");
   b.type = "text/javascript";
   b.async = !0;
   b.src = a;
   document.getElementsByTagName("head")[0].appendChild(b);
 };
-BranchAPI.prototype.jsonpRequest = function(a, b, c, d) {
+var jsonp_callback_index = 0;
+Server.prototype.jsonpRequest = function(a, b, c, d) {
   var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
-=======
-  return{data:serializeObject(e, ""), url:d};
-}
-var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
-  var e = "branch_callback__" + jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
->>>>>>> master
   b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
     window[e] = function() {
@@ -897,7 +886,7 @@ var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
   };
   this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
 };
-BranchAPI.prototype.XHRRequest = function(a, b, c, d, e) {
+Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.onreadystatechange = function() {
     if (4 === f.readyState && 200 === f.status) {
@@ -916,7 +905,7 @@ BranchAPI.prototype.XHRRequest = function(a, b, c, d, e) {
     d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
-BranchAPI.prototype.request = function(a, b, c, d) {
+Server.prototype.request = function(a, b, c, d) {
   var e = this.getUrl(a, b);
   if (e.error) {
     return d(Error(e.error));
@@ -1120,7 +1109,7 @@ function wrapErrorFunc(a, b) {
       if (c) {
         throw c;
       }
-      b(d);
+      b && b(d);
     }
   };
 }
@@ -1146,7 +1135,7 @@ var Branch = function() {
   }
   this._queue = Queue();
   this._storage = storage();
-  this._branchAPI = new BranchAPI;
+  this._server = new Server;
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1155,7 +1144,7 @@ Branch.prototype._api = function(a, b, c) {
     (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && d.app_id && (b.app_id = d.app_id);
     (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && d.session_id && (b.session_id = d.session_id);
     (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && d.identity_id && (b.identity_id = d.identity_id);
-    return d._branchAPI.request(a, b, d._storage, function(a, b) {
+    return d._server.request(a, b, d._storage, function(a, b) {
       e();
       c(a, b);
     });
@@ -1174,7 +1163,7 @@ Branch.prototype.init = function(a, b) {
   this.app_id = a;
   var d = this, e = utils.readStore(this._storage);
   e && e.session_id ? (c(e), b && b(null, utils.whiteListSessionData(e))) : this._api(resources._r, {v:config.version}, wrapErrorFunc(b, function(a) {
-    d._api(b, resources.open, {link_identifier:utils.urlValue("_branch_match_id"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
+    d._api(resources.open, {link_identifier:utils.urlValue("_branch_match_id"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(b, function(a) {
       c(a);
       utils.store(a, d._storage);
       b(null, utils.whiteListSessionData(a));
