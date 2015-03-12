@@ -174,7 +174,6 @@ resources.SMSLinkSend = {
 	params: {
 		"phone": validator(true, validationTypes.str)
 	}
-
 };
 
 resources.event = {

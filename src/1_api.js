@@ -89,6 +89,8 @@ BranchAPI.prototype.createScript = function(src) {
 	document.getElementsByTagName('head')[0].appendChild(script);
 };
 
+var jsonp_callback_index = 0;
+
 /**
  * @param {string} requestURL
  * @param {Object} requestData
@@ -102,7 +104,7 @@ BranchAPI.prototype.jsonpRequest = function(requestURL, requestData, requestMeth
 		postData = (requestMethod == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) : "";
 
 	var timeout_trigger = window.setTimeout(function() {
-		window[callback] = function() { };
+		window[callbackString] = function() { };
 		callback(new Error(utils.messages.timeout));
 	}, 10000);
 
@@ -129,7 +131,7 @@ BranchAPI.prototype.XHRRequest = function(url, data, method, storage, callback) 
 				callback(null, goog.json.parse(req.responseText));
 			}
 			catch (e) {
-				callback(null, { });
+				callback(null, {});
 			}
 		}
 		else if (req.readyState === 4 && req.status === 402) {

@@ -61,8 +61,8 @@
       <h4>SMS</h4>
         <div class="group">
           <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
-          <button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, { })</button>
-          <button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, { make_new_link: true })</button>
+          <button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, {})</button>
+          <button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, {make_new_link: true})</button>
         </div>
       </div>
       <div class="row col-lg-8 col-lg-offset-2">
@@ -79,7 +79,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
 
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.2.0.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 
 
@@ -219,13 +219,9 @@
         description: 'Branch Demo app!',
         openAppButtonText: 'Open',
         downloadAppButtonText: 'Download',
-        iframe: true,          // true by default, Show banner in an iframe if CSS on your page is conflicting
-        showiOS: true,         // true by default, Should the banner be shown on iOS devices?
-        showAndroid: true,     // true by default, Should the banner be shown on Android devices?
-        showDesktop: true,     // true by default, Should the banner be shown on desktop devices?
-        disableHide: false,    // false by default, Should the user have the ability to hide the banner? (show's X on left side)
-        forgetHide: true,      // true by default, Should we remember or forget whether the user hid the banner?
-        makeNewLink: false     // false by default, Should a new link be created, even if one already exists?
+        iframe: true,     // Show banner in an iframe if CSS on your page is conflicting
+        showMobile: true, // true by default, just set here for an example
+        showDesktop: true // true by default, just set here for an example
       },
       // Link data or string of link
       sampleParams);

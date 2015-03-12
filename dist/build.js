@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.1.1"};
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.2.0"};
 // Input 2
 var BranchStorage = function() {
   this._store = {};
@@ -824,11 +824,15 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
+<<<<<<< HEAD
 var BranchAPI = function() {
   this._branchAPI = {};
 };
 BranchAPI.prototype._jsonp_callback_index = 0;
 BranchAPI.prototype.serializeObject = function(a, b) {
+=======
+function serializeObject(a, b) {
+>>>>>>> master
   var c = [];
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
@@ -863,6 +867,7 @@ BranchAPI.prototype.getUrl = function(a, b) {
       "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
     }
   }
+<<<<<<< HEAD
   return{data:this.serializeObject(f, ""), url:e};
 };
 BranchAPI.prototype.createScript = function(a) {
@@ -874,9 +879,15 @@ BranchAPI.prototype.createScript = function(a) {
 };
 BranchAPI.prototype.jsonpRequest = function(a, b, c, d) {
   var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+=======
+  return{data:serializeObject(e, ""), url:d};
+}
+var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
+  var e = "branch_callback__" + jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+>>>>>>> master
   b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
-    window[d] = function() {
+    window[e] = function() {
     };
     d(Error(utils.messages.timeout));
   }, 1E4);

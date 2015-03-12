@@ -10,8 +10,8 @@ goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
 goog.require('config');
-/*jshint unused:false*/
-goog.require('goog.json');
+
+goog.require('goog.json'); // jshint unused:false
 
 var default_branch;
 
