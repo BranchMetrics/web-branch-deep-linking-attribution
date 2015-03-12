@@ -4,8 +4,6 @@ goog.require('resources');
 goog.require('config');
 goog.require('storage');
 
-var server;
-
 describe('Branch', function() {
 	var sandbox, requests;
 
@@ -86,6 +84,15 @@ describe('Branch', function() {
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(new Error('Invalid app id'));
+		});
+
+		it('should fail early on browser fingerprint error', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			branch.init(app_id, function(err) {
+				assert.equal(err.message, 'Browser fingerprint fetch failed');
+				assert.equal(requests.length, 1, 'Only 1 request made');
+			});
+			requests[0].callback(new Error('Browser fingerprint fetch failed'));
 		});
 	});
 
@@ -225,6 +232,41 @@ describe('Branch', function() {
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
 			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'session_id', 'browser_fingerprint_id' ]), 'All params sent');
+		});
+	});
+
+	describe.fail('Queueing used correctly', function() {
+		it('Should wait to call track after init', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.track('did something', function(err) { assert(!err, 'No error'); });
+		});
+
+		it('Should call requests in correct order', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(5, done);
+			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.track('did something else', function(err) { assert(!err, 'No error'); });
+
+			assert.equal(requests[0].resource.endpoint, '/_r');
+			requests[0].callback(null, browser_fingerprint_id);
+
+			assert.equal(requests[1].resource.endpoint, '/v1/open');
+			requests[1].callback(null, { "app_id": app_id, "link_identifier": undefined, "is_referrable": 1, "browser_fingerprint_id": browser_fingerprint_id });
+
+			assert.equal(requests[2].resource.endpoint, '/v1/track');
+			requests[2].callback(null, {});
+		});
+
+		it('If init fails, other calls should error', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(4, done);
+			branch.init(app_id, function(err) { assert(err, 'init errored'); });
+			branch.track('did another thing', function(err) {
+				assert(err, 'track errored');
+				assert.equal(requests.length, 1, 'No further requests made');
+			});
+
+			assert.equal(requests[0].resource.endpoint, '/_r')
+			requests[0].callback(new Error('Initting failed'));
 		});
 	});
 });

@@ -129,7 +129,7 @@ describe('Resources', function() {
 
 	describe('/v1/profile', function() {
 		it('should pass in app_id and identity', function(done) {
-			var assert = testUtils.plan(2, done);
+			var assert = testUtils.plan(5, done);
 			server.request(resources.profile, testUtils.params({ "identity": "test_id" }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
@@ -254,7 +254,7 @@ describe('Resources', function() {
 
 	describe('/v1/credits', function() {
 		it('should pass in identity_id', function(done) {
-			var assert = testUtils.plan(2, done);
+			var assert = testUtils.plan(4, done);
 			server.request(resources.credits, testUtils.params({ }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
@@ -265,7 +265,7 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
-			var assert = testUtils.plan(2, done);
+			var assert = testUtils.plan(3, done);
 			storage()['setItem']('use_jsonp', true);
 			server.request(resources.credits, testUtils.params({ }), storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
