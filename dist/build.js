@@ -799,9 +799,6 @@ utils.getParamValue = function(a) {
   } catch (b) {
   }
 };
-utils.urlValue = function(a) {
-  return utils.getParamValue(a) || utils.hashValue(a);
-};
 utils.base64encode = function(a) {
   var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
@@ -1163,10 +1160,10 @@ Branch.prototype.init = function(a, b) {
   this.app_id = a;
   var d = this, e = utils.readStore(this._storage);
   e && e.session_id ? (c(e), b && b(null, utils.whiteListSessionData(e))) : this._api(resources._r, {v:config.version}, wrapErrorFunc(b, function(a) {
-    d._api(resources.open, {link_identifier:utils.urlValue("_branch_match_id"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(b, function(a) {
+    d._api(resources.open, {link_identifier:utils.getParamValue("_branch_match_id") || utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(b, function(a) {
       c(a);
       utils.store(a, d._storage);
-      b(null, utils.whiteListSessionData(a));
+      b && b(null, utils.whiteListSessionData(a));
     }));
   }));
 };
