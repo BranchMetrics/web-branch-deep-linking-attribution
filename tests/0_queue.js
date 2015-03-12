@@ -5,6 +5,8 @@ describe('Queue', function() {
 	var clock = sinon.useFakeTimers();
 	var orderCalled = [];
 
+	var assert = testUtils.unplanned();
+
 	it('should queue a function and call it', function(done) {
 		queue(function(next) {
 			setTimeout(function() {

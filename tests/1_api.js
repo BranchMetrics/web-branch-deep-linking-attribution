@@ -8,6 +8,7 @@ var server;
 
 describe('Server helpers', function() {
 	var server = new Server();
+	var assert = testUtils.unplanned();
 	it('serializeObject should work', function() {
 		// Test simple objects
 		assert.equal(server.serializeObject({ a: 'b' }), 'a=b');
@@ -37,9 +38,8 @@ describe('Resources', function() {
 	beforeEach(function() {
 		storage().clear();
 		xhr = sinon.useFakeXMLHttpRequest();
-		jsonp = sinon.stub(server, "createScript", function(src) {
-			jsonp.src = src;
-			requests.push(jsonp);
+		sinon.stub(server, "createScript", function(src) {
+			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 		});
 
 		requests = [];
@@ -53,7 +53,8 @@ describe('Resources', function() {
 
 	describe('/v1/open', function() {
 		it('should pass in app_id and browser_fingerprint_id', function(done) {
-			server.request(resources.open, testUtils.params({ "is_referrable": 1 }), storage(), done);
+			var assert = testUtils.plan(5, done);
+			server.request(resources.open, testUtils.params({ "is_referrable": 1 }), storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
 			assert.equal(requests[0].method, 'POST', 'Method correct');
@@ -63,59 +64,64 @@ describe('Resources', function() {
 
 		it('should pass as a jsonp request', function(done) {
 			storage()['setItem']('use_jsonp', true);
+
+			var assert = testUtils.plan(3, done);
+
 			var completeParams = testUtils.params({ "is_referrable": 1 });
-			server.request(resources.open, completeParams, storage(), done);
+			server.request(resources.open, completeParams, storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
+
 			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/open?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+
+			requests[0].callback();
 		});
 
 		it('should fail without is_referrable', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.open, testUtils.params(), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/open missing parameter is_referrable");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without app_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.open, testUtils.params({ }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/open missing parameter app_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without browser_fingerprint_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.open, testUtils.params({ is_referrable: 1 }, [ 'browser_fingerprint_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/open missing parameter browser_fingerprint_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		// param format and type tests
 		it('should fail with incorrect app_id format', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.open, testUtils.params({ "app_id": "ahd7393j" }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/open, parameter app_id is not in the proper format");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail with link_identifier as number, not string', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.open, testUtils.params({ "link_identifier": 45433, "is_referrable": 1 }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/open, parameter link_identifier is not a string");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail with is_referrable as string, not number', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.open, testUtils.params({ "is_referrable": "1" }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/open, parameter is_referrable is not a number");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -123,7 +129,8 @@ describe('Resources', function() {
 
 	describe('/v1/profile', function() {
 		it('should pass in app_id and identity', function(done) {
-			server.request(resources.profile, testUtils.params({ "identity": "test_id" }), storage(), done);
+			var assert = testUtils.plan(2, done);
+			server.request(resources.profile, testUtils.params({ "identity": "test_id" }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/profile', 'Endpoint correct');
@@ -134,35 +141,39 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(3, done);
+
 			storage()['setItem']('use_jsonp', true);
 			var completeParams = testUtils.params({ "identity": "test_id" });
-			server.request(resources.profile, completeParams, storage(), done);
+			server.request(resources.profile, completeParams, storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
+
 			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/profile?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+
+			requests[0].callback();
 		});
 
 		it('should fail without identity', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.profile, testUtils.params(), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/profile missing parameter identity");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without app_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.profile, testUtils.params({ }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/profile missing parameter app_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without identity_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.profile, testUtils.params({ identity: 'foo' }, [ 'identity_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/profile missing parameter identity_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -170,7 +181,8 @@ describe('Resources', function() {
 
 	describe('/v1/logout', function() {
 		it('should pass in app_id and session_id', function(done) {
-			server.request(resources.logout, testUtils.params({ }), storage(), done);
+			var assert = testUtils.plan(5, done);
+			server.request(resources.logout, testUtils.params({ }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/logout', 'Endpoint correct');
@@ -181,27 +193,30 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(3, done);
 			storage()['setItem']('use_jsonp', true);
+
 			var completeParams = testUtils.params({ });
-			server.request(resources.logout, completeParams, storage(), done);
+			server.request(resources.logout, completeParams, storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
+
 			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/logout?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+			requests[0].callback();
 		});
 
 		it('should fail without app_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.logout, testUtils.params({ }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/logout missing parameter app_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without session_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.logout, testUtils.params({ }, [ 'session_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/logout missing parameter session_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -209,7 +224,8 @@ describe('Resources', function() {
 
 	describe('/v1/referrals', function() {
 		it('should pass in identity_id', function(done) {
-			server.request(resources.referrals, testUtils.params({ }), storage(), done);
+			var assert = testUtils.plan(4, done);
+			server.request(resources.referrals, testUtils.params({ }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/referrals/' + identity_id + '?', 'Endpoint correct');
@@ -219,17 +235,18 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(3, done);
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.referrals, testUtils.params({ }), storage(), done);
+			server.request(resources.referrals, testUtils.params({ }), storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/referrals/' + identity_id + '?&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+			requests[0].callback();
 		});
 
 		it('should fail without identity_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.referrals, testUtils.params({ }, [ 'identity_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/referrals missing parameter identity_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -237,7 +254,8 @@ describe('Resources', function() {
 
 	describe('/v1/credits', function() {
 		it('should pass in identity_id', function(done) {
-			server.request(resources.credits, testUtils.params({ }), storage(), done);
+			var assert = testUtils.plan(2, done);
+			server.request(resources.credits, testUtils.params({ }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/credits/' + identity_id + '?', 'Endpoint correct');
@@ -247,17 +265,18 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(2, done);
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.credits, testUtils.params({ }), storage(), done);
+			server.request(resources.credits, testUtils.params({ }), storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/credits/' + identity_id + '?&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+			requests[0].callback();
 		});
 
 		it('should fail without identity_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.credits, testUtils.params({ }, [ 'identity_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/credits missing parameter identity_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -265,24 +284,25 @@ describe('Resources', function() {
 
 	describe('/_r', function() {
 		it('should pass in app_id and v', function(done) {
-			server.request(resources._r, testUtils.params({ "v": config.version }), storage(), done);
+			var assert = testUtils.plan(3, done);
+			server.request(resources._r, testUtils.params({ "v": config.version }), storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].src, 'https://bnc.lt/_r?app_id=' + app_id + '&v=' + config.version + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+			requests[0].callback();
 		});
 
 		it('should fail without app_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources._r, testUtils.params({ "v": config.version }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /_r missing parameter app_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without v', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources._r, testUtils.params(), storage(), function(err) {
 				assert.equal(err.message, "API request /_r missing parameter v");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -291,7 +311,8 @@ describe('Resources', function() {
 
 	describe('/v1/redeem', function() {
 		it('should pass in app_id, identity_id, amount, and bucket', function(done) {
-			server.request(resources.redeem, testUtils.params({ "amount": 1, "bucket": "testbucket" }), storage(), done);
+			var assert = testUtils.plan(5, done);
+			server.request(resources.redeem, testUtils.params({ "amount": 1, "bucket": "testbucket" }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/redeem', 'Endpoint correct');
@@ -302,43 +323,48 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(3, done);
 			storage()['setItem']('use_jsonp', true);
+
 			var completeParams = testUtils.params({ "amount": 1, "bucket": "testbucket" });
-			server.request(resources.redeem, completeParams, storage(), done);
+			server.request(resources.redeem, completeParams, storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
+
 			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/redeem?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+
+			requests[0].callback();
 		});
 
 		it('should fail without app_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.redeem, testUtils.params({ }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/redeem missing parameter app_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without identity_id', function(done) {
+			var assert = testUtils.plan(2, done);
+
 			server.request(resources.redeem, testUtils.params({ }, [ 'identity_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/redeem missing parameter identity_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without amount', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.redeem, testUtils.params({ "bucket": "testbucket" }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/redeem missing parameter amount");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without bucket', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.redeem, testUtils.params({ "amount": 1 }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/redeem missing parameter bucket");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -346,7 +372,9 @@ describe('Resources', function() {
 
 	describe('/v1/link', function() {
 		it('should pass in app_id and identity_id', function(done) {
-			server.request(resources.link, testUtils.params(), storage(), done);
+			var assert = testUtils.plan(5, done);
+
+			server.request(resources.link, testUtils.params(), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/url', 'Endpoint correct');
@@ -357,35 +385,36 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(3, done);
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.link, testUtils.params(), storage(), done);
+			server.request(resources.link, testUtils.params(), storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
 			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(testUtils.params())));
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/url?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+			requests[0].callback();
 		});
 
 		it('should fail without app_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.link, testUtils.params({ }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/url missing parameter app_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without identity_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.link, testUtils.params({ }, [ 'identity_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/url missing parameter identity_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		// param format and type tests
 		it('should fail with tags as string, not array', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.link, testUtils.params({ "tags": "Hello, I'm not an array." }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/url, parameter tags is not an array");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -393,7 +422,8 @@ describe('Resources', function() {
 
 	describe('/l', function() {
 		it('should pass in link_url and click', function(done) {
-			server.request(resources.linkClick, testUtils.params({ "link_url": "3hpH54U-58", "click": "click" }), storage(), done);
+			var assert = testUtils.plan(4, done);
+			server.request(resources.linkClick, testUtils.params({ "link_url": "3hpH54U-58", "click": "click" }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://bnc.lt/3hpH54U-58?click=click', 'Endpoint correct');
@@ -403,25 +433,26 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(3, done);
 			storage()['setItem']('use_jsonp', true);
-			server.request(resources.linkClick, testUtils.params({ "link_url": "3hpH54U-58", "click": "click" }), storage(), done);
+			server.request(resources.linkClick, testUtils.params({ "link_url": "3hpH54U-58", "click": "click" }), storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].src, 'https://bnc.lt/3hpH54U-58?click=click&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+			requests[0].callback();
 		});
 
 		it('should fail without link_url', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.linkClick, testUtils.params({ "click": "click" }), storage(), function(err) {
 				assert.equal(err.message, "API request  missing parameter link_url");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without click', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.linkClick, testUtils.params({ "link_url": "3hpH54U-58" }), storage(), function(err) {
 				assert.equal(err.message, "API request  missing parameter click");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
@@ -436,7 +467,9 @@ describe('Resources', function() {
 		var metadataString = "&metadata.url=testurl&metadata.user_agent=test_agent&metadata.language=test_language";
 
 		it('should pass in app_id, session_id, event and metadata', function(done) {
-			server.request(resources.event, testUtils.params({ "event": "testevent", "metadata": metadata }), storage(), done);
+			var assert = testUtils.plan(5, done);
+
+			server.request(resources.event, testUtils.params({ "event": "testevent", "metadata": metadata }), storage(), assert.done);
 
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].url, 'https://api.branch.io/v1/event', 'Endpoint correct');
@@ -447,52 +480,55 @@ describe('Resources', function() {
 		});
 
 		it('should pass as a jsonp request', function(done) {
+			var assert = testUtils.plan(3, done);
 			storage()['setItem']('use_jsonp', true);
+
 			var completeParams = testUtils.params({ "event": "testevent", "metadata": metadata });
-			server.request(resources.event, completeParams, storage(), done);
+			server.request(resources.event, completeParams, storage(), assert.done);
 			assert.equal(requests.length, 1, 'Request made');
+
 			var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(completeParams)));
 			assert.equal(requests[0].src, 'https://api.branch.io/v1/event?&data=' + encodedData + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
-			done();
+			requests[0].callback();
 		});
 
 		it('should fail without app_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.event, testUtils.params({ "event": "testevent", "metadata": metadata }, [ 'app_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/event missing parameter app_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without session_id', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.event, testUtils.params({ "event": "testevent", "metadata": metadata }, [ 'session_id' ]), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/event missing parameter session_id");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without event', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.event, testUtils.params({ "metadata": metadata }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/event missing parameter event");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		it('should fail without metadata', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.event, testUtils.params({ "event": "testevent" }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/event missing parameter metadata");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});
 
 		// param format and type tests
 		it('should fail with metadata as string, not object', function(done) {
+			var assert = testUtils.plan(2, done);
 			server.request(resources.event, testUtils.params({ "metadata": "Hello, I'm not an object.", "event": "testevent" }), storage(), function(err) {
 				assert.equal(err.message, "API request /v1/event, parameter metadata is not an object");
-				done();
 			});
 			assert.equal(requests.length, 0, 'No request made');
 		});

@@ -161,13 +161,6 @@ utils.getParamValue = function(key) {
 };
 
 /**
- * @param {string} key
- */
-utils.urlValue = function(key) {
-	return utils.getParamValue(key) || utils.hashValue(key);
-};
-
-/**
  * Base64 encoding because ie9 does not have bota()
  *
  * @param {string} input

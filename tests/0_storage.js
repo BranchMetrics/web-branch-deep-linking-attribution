@@ -4,6 +4,7 @@ describe('storage', function() {
 	var storage = new BranchStorage(); // force custom implemented sessions storage
 	var itemKey = 'key';
 	var itemValue = 'value';
+	var assert = testUtils.unplanned();
 
 	it('should set an item', function(done) {
 		storage.setItem(itemKey, itemValue);

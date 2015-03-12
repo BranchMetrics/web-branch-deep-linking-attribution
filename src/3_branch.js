@@ -154,7 +154,7 @@ Branch.prototype['init'] = function(app_id, callback) {
 	else {
 		this._api(resources._r, { "v": config.version }, wrapErrorFunc(callback, function(browser_fingerprint_id) {
 			self._api(resources.open, {
-				"link_identifier": utils.urlValue('_branch_match_id'),
+				"link_identifier": utils.getParamValue('_branch_match_id') || utils.hashValue('r'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
 			}, wrapErrorFunc(callback, function(data) {
