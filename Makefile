@@ -37,7 +37,7 @@ calcdeps.py: $(SOURCES) compiler/library
 	--exclude tests/branch-deps.js \
 	> tests/branch-deps.js.tmp
 	echo "// jscs:disable" | cat - tests/branch-deps.js.tmp > tests/branch-deps.js && \
-	rm tests/branch-deps.js.tmp &&
+	rm tests/branch-deps.js.tmp
 
 docs/3_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
