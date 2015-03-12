@@ -3,7 +3,9 @@ var app_id = '5680621892404085',
 	identity_id = '98807509250212101',
 	browser_fingerprint_id = '79336952217731267';
 
-function params(extra, without) {
+testUtils = {};
+
+testUtils.params = function(extra, without) {
 	// Returns new object every time.
 	var p = utils.merge({
 		app_id: app_id,
@@ -15,7 +17,7 @@ function params(extra, without) {
 		delete p[without[k]];
 	}
 	return p;
-}
+};
 
 /*
 // May not need this because I found assert.deepEqual, but going to leave it here just in case since I wrote it...
@@ -41,17 +43,17 @@ function deepCompare(obj1, obj2) {
 }
 */
 
-function nulls(n) {
+testUtils.nulls = function(n) {
 	var p = [];
 	for (var k = 0; k < n; k++) { p.push(null); }
 	return p;
-}
-function after(n, done) {
+};
+testUtils.after = function(n, done) {
 	var remaining = n;
 	return function() {
 		if (!--remaining) { done(); }
 	};
-}
+};
 
 // ===================================================================================================
 // For whatever dumb reason, this is only available as a bower component, so I'm just pasting it here.
