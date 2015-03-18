@@ -264,7 +264,6 @@ object with optional data you would like to store, including Facebook
 ```
 branch.link(
     linkData,
-    options,
     callback (err, link)
 );
 ```
