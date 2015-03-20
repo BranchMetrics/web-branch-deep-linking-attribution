@@ -1,6 +1,6 @@
 {
   "name": "branch-sdk",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Branch Metrics Web SDK",
   "main": "index.js",
   "scripts": {
