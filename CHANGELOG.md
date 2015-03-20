@@ -5,6 +5,8 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ## [VERSION] - unreleased
 
 ## [v1.2.1] - 2015-03-19
+### Fixed
+- An issue with the app banner when `iframe: false`
 
 ## [v1.2.0] - 2015-03-06
 ### New Functionality
