@@ -121,7 +121,7 @@ banner = function(branch, options, linkData, storage) {
 		// Attach actions
 		linkData['channel'] = linkData['channel'] || 'app banner';
 
-		var doc = options.iframe ? element.contentWindow.document : document.getElementById('branch-banner');
+		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
 			if (utils.readKeyValue('click_id', storage) && !options['makeNewLink']) {
 				doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + utils.readKeyValue('click_id', storage);

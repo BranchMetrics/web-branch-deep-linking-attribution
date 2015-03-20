@@ -87,6 +87,8 @@ banner_html.div = function(options, action) {
 	banner.className = 'branch-animation';
 	banner.innerHTML = banner_html.banner(options, action);
 
+	document.body.appendChild(banner);
+
 	return banner;
 };
 

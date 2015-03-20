@@ -962,6 +962,7 @@ var banner_html = {banner:function(a, b) {
   c.id = "branch-banner";
   c.className = "branch-animation";
   c.innerHTML = banner_html.banner(a, b);
+  document.body.appendChild(c);
   return c;
 }, markup:function(a, b) {
   var c = '<div id="branch-sms-form-container">' + (banner_utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction) + "</div>";
@@ -1022,7 +1023,7 @@ var sendSMS = function(a, b, c, d) {
     var e = banner_html.markup(b, d);
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
-    var f = b.iframe ? e.contentWindow.document : document.getElementById("branch-banner");
+    var f = b.iframe ? e.contentWindow.document : document;
     banner_utils.mobileUserAgent() ? utils.readKeyValue("click_id", d) && !b.makeNewLink ? f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + utils.readKeyValue("click_id", d) : a.link(c, function(a, b) {
       a || (f.getElementById("branch-mobile-action").href = b);
     }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
