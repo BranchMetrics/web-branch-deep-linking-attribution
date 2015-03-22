@@ -153,7 +153,7 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		// Trigger animation
-		document.body.className = 'branch-animation';
+		document.body.className += ' branch-animation';
 		document.body.style.marginTop = banner_utils.bannerHeight;
 		setTimeout(function() {
 			element.style.top = '0';
