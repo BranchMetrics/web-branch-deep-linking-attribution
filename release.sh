@@ -87,6 +87,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	cat CHANGELOG.md | perl -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' > a
 	mv a CHANGELOG.md
+	make clean && make
 	git commit -am"Resetting to HEAD"
 fi
 
