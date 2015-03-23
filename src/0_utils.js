@@ -40,13 +40,15 @@ utils.messages = {
 	missingUrl: 'Required argument: URL, is missing'
 };
 
-/**
- * @param {message} message
- * @param {Array.<*>=} params
- * @throws {Error}
+/*
+ * Getters for location.search and location.hash, so that we can stub this for testing
  */
-utils.error = function(message, params) {
-	throw new Error(utils.message(message, params));
+utils.getLocationSearch = function() {
+	return window.location.search;
+};
+
+utils.getLocationHash = function() {
+	return window.location.hash;
 };
 
 /**
@@ -84,7 +86,7 @@ utils.readStore = function(storage) {
 		return goog.json.parse(storage['getItem']('branch_session') || { });
 	}
 	catch (e) {
-		return {};
+		return { };
 	}
 };
 
@@ -139,7 +141,7 @@ utils.merge = function(to, from) {
  */
 utils.hashValue = function(key) {
 	try {
-		return location.hash.match(new RegExp(key + ':([^&]*)'))[1];
+		return utils.getLocationHash().match(new RegExp(key + ':([^&]*)'))[1];
 	}
 	catch (e) {
 		return undefined;
@@ -151,18 +153,11 @@ utils.hashValue = function(key) {
  */
 utils.getParamValue = function(key) {
 	try {
-		return window.location.search.substring(1).match(new RegExp(key + '=([^&]*)'))[1];
+		return utils.getLocationSearch().substring(1).match(new RegExp(key + '=([^&]*)'))[1];
 	}
 	catch (e) {
 		return undefined;
 	}
-};
-
-/**
- * @param {string} key
- */
-utils.urlValue = function(key) {
-	return utils.getParamValue(key) || utils.hashValue(key);
 };
 
 /**

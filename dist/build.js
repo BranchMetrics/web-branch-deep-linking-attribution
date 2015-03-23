@@ -743,8 +743,11 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", missingUrl:"Required argument: URL, is missing"};
-utils.error = function(a, b) {
-  throw Error(utils.message(a, b));
+utils.getLocationSearch = function() {
+  return window.location.search;
+};
+utils.getLocationHash = function() {
+  return window.location.hash;
 };
 utils.message = function(a, b) {
   var c = a.replace(/\$(\d)/g, function(a, c) {
@@ -786,18 +789,15 @@ utils.merge = function(a, b) {
 };
 utils.hashValue = function(a) {
   try {
-    return location.hash.match(new RegExp(a + ":([^&]*)"))[1];
+    return utils.getLocationHash().match(new RegExp(a + ":([^&]*)"))[1];
   } catch (b) {
   }
 };
 utils.getParamValue = function(a) {
   try {
-    return window.location.search.substring(1).match(new RegExp(a + "=([^&]*)"))[1];
+    return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
   } catch (b) {
   }
-};
-utils.urlValue = function(a) {
-  return utils.getParamValue(a) || utils.hashValue(a);
 };
 utils.base64encode = function(a) {
   var b = "", c, d, e, f, g, k, h = 0;
@@ -821,7 +821,10 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
-function serializeObject(a, b) {
+var Server = function() {
+};
+Server.prototype._jsonp_callback_index = 0;
+Server.prototype.serializeObject = function(a, b) {
   var c = [];
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
@@ -829,29 +832,45 @@ function serializeObject(a, b) {
     }
   } else {
     for (d in a) {
-      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" == typeof a[d] ? c.push(serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
+      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" == typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
     }
   }
   return c.join("&");
-}
-function getUrl(a, b) {
-  var c, d = a.destination + a.endpoint;
+};
+Server.prototype.getUrl = function(a, b) {
+  var c, d, e = a.destination + a.endpoint;
   if (a.queryPart) {
     for (c in a.queryPart) {
-      a.queryPart.hasOwnProperty(c) && (a.queryPart[c](a.endpoint, c, b[c]), d += "/" + b[c]);
+      if (a.queryPart.hasOwnProperty(c)) {
+        if (d = a.queryPart[c](a.endpoint, c, b[c])) {
+          return{error:d};
+        }
+        e += "/" + b[c];
+      }
     }
   }
-  var e = {};
+  var f = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      var f = a.params[c](a.endpoint, c, b[c]);
-      "undefined" != typeof f && "" !== f && null !== f && (e[c] = f);
+      if (d = a.params[c](a.endpoint, c, b[c])) {
+        return{error:d};
+      }
+      d = b[c];
+      "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
     }
   }
-  return{data:serializeObject(e, ""), url:d};
-}
-var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
-  var e = "branch_callback__" + jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
+  return{data:this.serializeObject(f, ""), url:e};
+};
+Server.prototype.createScript = function(a) {
+  var b = document.createElement("script");
+  b.type = "text/javascript";
+  b.async = !0;
+  b.src = a;
+  document.getElementsByTagName("head")[0].appendChild(b);
+};
+var jsonp_callback_index = 0;
+Server.prototype.jsonpRequest = function(a, b, c, d) {
+  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
   b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
     window[e] = function() {
@@ -862,12 +881,9 @@ var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
     window.clearTimeout(g);
     d(null, a);
   };
-  c = document.createElement("script");
-  c.type = "text/javascript";
-  c.async = !0;
-  c.src = a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + "&callback=" + e + (0 <= a.indexOf("/c/") ? "&click=1" : "");
-  document.getElementsByTagName("head")[0].appendChild(c);
-}, XHRRequest = function(a, b, c, d, e) {
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
+};
+Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.onreadystatechange = function() {
     if (4 === f.readyState && 200 === f.status) {
@@ -883,20 +899,53 @@ var jsonp_callback_index = 0, jsonpRequest = function(a, b, c, d) {
   try {
     f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    d.setItem("use_jsonp", !0), jsonpRequest(a, b, c, e);
+    d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
-}, api = function(a, b, c, d) {
-  var e = getUrl(a, b), f, g = "";
+};
+Server.prototype.request = function(a, b, c, d) {
+  var e = this.getUrl(a, b);
+  if (e.error) {
+    return d(Error(e.error));
+  }
+  var f, g = "";
   "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
-  c.getItem("use_jsonp") || a.jsonp ? jsonpRequest(f, b, a.method, d) : XHRRequest(f, g, a.method, c, d);
+  c.getItem("use_jsonp") || a.jsonp ? this.jsonpRequest(f, b, a.method, d) : this.XHRRequest(f, g, a.method, c, d);
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
-    e ? b == validationTypes.obj ? "object" != typeof e && utils.error(utils.messages.invalidType, [c, d, "an object"]) : b == validationTypes.arr ? e instanceof Array || utils.error(utils.messages.invalidType, [c, d, "an array"]) : b == validationTypes.str ? "string" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a string"]) : b == validationTypes.num ? "number" != typeof e && utils.error(utils.messages.invalidType, [c, d, "a number"]) : b && (b.test(e) || utils.error(utils.messages.invalidType, 
-    [c, d, "in the proper format"])) : a && utils.error(utils.messages.missingParam, [c, d]);
-    return e;
+    if (e) {
+      if (b == validationTypes.obj) {
+        if ("object" != typeof e) {
+          return utils.message(utils.messages.invalidType, [c, d, "an object"]);
+        }
+      } else {
+        if (b == validationTypes.arr) {
+          if (!(e instanceof Array)) {
+            return utils.message(utils.messages.invalidType, [c, d, "an array"]);
+          }
+        } else {
+          if (b == validationTypes.num) {
+            if ("number" != typeof e) {
+              return utils.message(utils.messages.invalidType, [c, d, "a number"]);
+            }
+          } else {
+            if ("string" != typeof e) {
+              return utils.message(utils.messages.invalidType, [c, d, "a string"]);
+            }
+            if (b != validationTypes.str && !b.test(e)) {
+              return utils.message(utils.messages.invalidType, [c, d, "in the proper format"]);
+            }
+          }
+        }
+      }
+    } else {
+      if (a) {
+        return utils.message(utils.messages.missingParam, [c, d]);
+      }
+    }
+    return!1;
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
@@ -907,7 +956,7 @@ resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", meth
 resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}};
 resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}};
 resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{app_id:validator(!0, branch_id), v:validator(!0, validationTypes.str)}};
-resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}};
+resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!0, validationTypes.str)}};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}};
 resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}};
@@ -1035,7 +1084,7 @@ var sendSMS = function(a, b, c, d) {
       a.preventDefault();
       closeBanner(e, d);
     });
-    document.body.className = "branch-animation";
+    document.body.className += " branch-animation";
     document.body.style.marginTop = banner_utils.bannerHeight;
     setTimeout(function() {
       e.style.top = "0";
@@ -1043,12 +1092,48 @@ var sendSMS = function(a, b, c, d) {
   }
 };
 // Input 12
-var default_branch, Branch = function() {
+var default_branch;
+function wrapError(a, b) {
+  if (b) {
+    return b(a);
+  }
+  throw a;
+}
+function wrapErrorFunc(a, b) {
+  return function(c, d) {
+    if (c && b) {
+      b(c);
+    } else {
+      if (c) {
+        throw c;
+      }
+      a && a(d);
+    }
+  };
+}
+function wrapErrorCallback1(a) {
+  return function(b) {
+    if (b && !a) {
+      throw b;
+    }
+    a && a(b);
+  };
+}
+function wrapErrorCallback2(a) {
+  return function(b, c) {
+    if (b && !a) {
+      throw b;
+    }
+    a && a(b, c);
+  };
+}
+var Branch = function() {
   if (!(this instanceof Branch)) {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
   this._storage = storage();
+  this._server = new Server;
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1057,139 +1142,106 @@ Branch.prototype._api = function(a, b, c) {
     (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && d.app_id && (b.app_id = d.app_id);
     (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && d.session_id && (b.session_id = d.session_id);
     (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && d.identity_id && (b.identity_id = d.identity_id);
-    return api(a, b, d._storage, function(a, b) {
+    return d._server.request(a, b, d._storage, function(a, b) {
       e();
       c(a, b);
     });
   });
 };
 Branch.prototype.init = function(a, b) {
-  b = b || function() {
-  };
+  function c(a) {
+    d.session_id = a.session_id;
+    d.identity_id = a.identity_id;
+    d.sessionLink = a.link;
+    d.initialized = !0;
+  }
   if (this.initialized) {
-    return b(Error(utils.message(utils.messages.existingInit)));
+    return wrapError(Error(utils.message(utils.messages.existingInit)), b);
   }
   this.app_id = a;
-  var c = this, d = utils.readStore(this._storage), e = function(a) {
-    c.session_id = a.session_id;
-    c.identity_id = a.identity_id;
-    c.sessionLink = a.link;
-    c.initialized = !0;
-  };
-  d && d.session_id ? (e(d), b(null, utils.whiteListSessionData(d))) : this._api(resources._r, {v:config.version}, function(a, d) {
-    c._api(resources.open, {link_identifier:utils.urlValue("_branch_match_id"), is_referrable:1, browser_fingerprint_id:d}, function(a, d) {
-      e(d);
-      utils.store(d, c._storage);
-      b(a, utils.whiteListSessionData(d));
-    });
-  });
+  var d = this, e = utils.readStore(this._storage);
+  e && e.session_id ? (c(e), b && b(null, utils.whiteListSessionData(e))) : this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
+    d._api(resources.open, {link_identifier:utils.getParamValue("_branch_match_id") || utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
+      c(a);
+      utils.store(a, d._storage);
+      b && b(null, utils.whiteListSessionData(a));
+    }, b));
+  }, b));
 };
 Branch.prototype.data = function(a) {
-  a = a || function() {
-  };
-  var b = this;
-  this._queue(function(c) {
-    a(null, utils.whiteListSessionData(utils.readStore(b._storage)));
-    c();
-  });
+  if (a) {
+    var b = this;
+    this._queue(function(c) {
+      a(null, utils.whiteListSessionData(utils.readStore(b._storage)));
+      c();
+    });
+  }
 };
 Branch.prototype.setIdentity = function(a, b) {
-  b = b || function() {
-  };
   if (!this.initialized) {
-    return b(Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
   }
-  this._api(resources.profile, {identity:a}, function(a, d) {
-    b(a, d);
-  });
+  this._api(resources.profile, {identity:a}, wrapErrorCallback2(b));
 };
 Branch.prototype.logout = function(a) {
-  a = a || function() {
-  };
   if (!this.initialized) {
-    return a(Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
   }
-  this._api(resources.logout, {}, function(b) {
-    a(b);
-  });
+  this._api(resources.logout, {}, wrapErrorCallback1(a));
 };
 Branch.prototype.track = function(a, b, c) {
-  c = c || function() {
-  };
-  if (!this.initialized) {
-    return c(Error(utils.message(utils.messages.nonInit)));
-  }
   "function" == typeof b && (c = b, b = {});
-  this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, {})}, function(a) {
-    c(a);
-  });
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
+  }
+  this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b || {})}, wrapErrorCallback1(c));
 };
 Branch.prototype.link = function(a, b) {
   if (!this.initialized) {
-    return b(Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
   }
-  b = b || function() {
-  };
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
   a.data = goog.json.serialize(a.data);
-  this._api(resources.link, a, function(a, d) {
-    b(a, d && d.url);
-  });
+  this._api(resources.link, a, wrapErrorFunc(function(a) {
+    b(null, a && a.url);
+  }, b));
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
   function e(b) {
-    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, function(a) {
-      d(a);
-    });
+    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d));
   }
   "function" == typeof c ? (d = c, c = {}) : "undefined" == typeof c && (c = {});
-  d = d || function() {
-  };
   c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
-    return d(Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), d);
   }
   var f = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
-  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, function(a, b) {
-    if (a) {
-      return d(a);
-    }
-    f._api(resources.linkClick, {link_url:"l/" + b.split("/").pop(), click:"click"}, function(a, b) {
-      if (a) {
-        return d(a);
-      }
-      utils.storeKeyValue("click_id", b.click_id, f._storage);
-      e(b.click_id);
-    });
-  });
+  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, wrapErrorFunc(function(a) {
+    f._api(resources.linkClick, {link_url:"l/" + a.split("/").pop(), click:"click"}, wrapErrorFunc(function(a) {
+      utils.storeKeyValue("click_id", a.click_id, f._storage);
+      e(a.click_id);
+    }, d));
+  }, d));
 };
 Branch.prototype.referrals = function(a) {
   if (!this.initialized) {
-    return a(Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
   }
-  this._api(resources.referrals, {}, function(b, c) {
-    a(b, c);
-  });
+  this._api(resources.referrals, {}, wrapErrorCallback2(a));
 };
 Branch.prototype.credits = function(a) {
   if (!this.initialized) {
-    return a(Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
   }
-  this._api(resources.credits, {}, function(b, c) {
-    a(b, c);
-  });
+  this._api(resources.credits, {}, wrapErrorCallback2(a));
 };
 Branch.prototype.redeem = function(a, b, c) {
-  c = c || function() {
-  };
   if (!this.initialized) {
-    return c(Error(utils.message(utils.messages.nonInit)));
+    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
   }
-  this._api(resources.redeem, {amount:a, bucket:b}, function(a) {
-    c(a);
-  });
+  this._api(resources.redeem, {amount:a, bucket:b}, wrapErrorCallback1(c));
 };
 Branch.prototype.banner = function(a, b) {
   var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 

@@ -3,16 +3,24 @@
  * a fancy wrapper around XHR/JSONP/etc.
  */
 
-goog.provide('api');
+goog.provide('Server');
 goog.require('utils');
 goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 
 /**
+ * @class Server
+ * @constructor
+ */
+var Server = function() {};
+
+Server.prototype._jsonp_callback_index = 0;
+
+/**
  * @param {Object} obj
  * @param {string} prefix
  */
-function serializeObject(obj, prefix) {
+Server.prototype.serializeObject = function(obj, prefix) {
 	var pairs = [];
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
@@ -23,7 +31,7 @@ function serializeObject(obj, prefix) {
 		for (var prop in obj) {
 			if (obj.hasOwnProperty(prop)) {
 				if (obj[prop] instanceof Array || typeof obj[prop] == 'object') {
-					pairs.push(serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop));
+					pairs.push(this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop));
 				}
 				else {
 					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) + '=' + encodeURIComponent(obj[prop]));
@@ -32,19 +40,21 @@ function serializeObject(obj, prefix) {
 		}
 	}
 	return pairs.join('&');
-}
+};
 
 /**
  * @param {utils.resource} resource
  * @param {Object.<string, *>} data
  */
-function getUrl(resource, data) {
-	var k;
+Server.prototype.getUrl = function(resource, data) {
+	var k, v, err;
 	var url = resource.destination + resource.endpoint;
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
-				resource.queryPart[k](resource.endpoint, k, data[k]); // validate -- will throw
+				err = resource.queryPart[k](resource.endpoint, k, data[k]);
+				if (err) { return { error: err }; }
+
 				url += '/' + data[k];
 			}
 		}
@@ -52,14 +62,30 @@ function getUrl(resource, data) {
 	var d = { };
 	for (k in resource.params) {
 		if (resource.params.hasOwnProperty(k)) {
-			var v = resource.params[k](resource.endpoint, k, data[k]);
+			err = resource.params[k](resource.endpoint, k, data[k]);
+			if (err) { return { error: err }; }
+
+			v = data[k];
 			if (!(typeof v == 'undefined' || v === '' || v === null)) {
 				d[k] = v;
 			}
 		}
 	}
-	return { data: serializeObject(d, ''), url: url };
-}
+	return { data: this.serializeObject(d, ''), url: url };
+};
+
+/**
+ * This function is standalone for easy mocking.
+ * @param {string} src
+ */
+Server.prototype.createScript = function(src) {
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.async = true;
+	script.src = src;
+
+	document.getElementsByTagName('head')[0].appendChild(script);
+};
 
 var jsonp_callback_index = 0;
 
@@ -69,8 +95,8 @@ var jsonp_callback_index = 0;
  * @param {utils._httpMethod} requestMethod
  * @param {function(?Error,*=)=} callback
  */
-var jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
-	var callbackString = 'branch_callback__' + (jsonp_callback_index++);
+Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
+	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
 		postData = (requestMethod == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) : "";
@@ -85,12 +111,7 @@ var jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
 		callback(null, data);
 	};
 
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.async = true;
-	script.src = requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + '&callback=' + callbackString + (requestURL.indexOf('/c/') >= 0 ? '&click=1' : '');
-
-	document.getElementsByTagName('head')[0].appendChild(script);
+	this.createScript(requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + (requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') + '&callback=' + callbackString);
 };
 
 /**
@@ -100,7 +121,7 @@ var jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
  * @param {BranchStorage} storage
  * @param {function(?Error,*=)=} callback
  */
-var XHRRequest = function(url, data, method, storage, callback) {
+Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 	req.onreadystatechange = function() {
 		if (req.readyState === 4 && req.status === 200) {
@@ -126,7 +147,7 @@ var XHRRequest = function(url, data, method, storage, callback) {
 	}
 	catch (e) {
 		storage['setItem']('use_jsonp', true);
-		jsonpRequest(url, data, method, callback);
+		this.jsonpRequest(url, data, method, callback);
 	}
 };
 
@@ -136,8 +157,10 @@ var XHRRequest = function(url, data, method, storage, callback) {
  * @param {BranchStorage} storage
  * @param {function(?Error,*=)=} callback
  */
-api = function(resource, data, storage, callback) {
-	var u = getUrl(resource, data);
+Server.prototype.request = function(resource, data, storage, callback) {
+	var u = this.getUrl(resource, data);
+	if (u.error) { return callback(new Error(u.error)); }
+
 	var url, postData = '';
 	if (resource.method == 'GET') {
 		url = u.url + '?' + u.data;
@@ -147,9 +170,9 @@ api = function(resource, data, storage, callback) {
 		postData = u.data;
 	}
 	if (storage['getItem']('use_jsonp') || resource.jsonp) {
-		jsonpRequest(url, data, resource.method, callback);
+		this.jsonpRequest(url, data, resource.method, callback);
 	}
 	else {
-		XHRRequest(url, postData, resource.method, storage, callback);
+		this.XHRRequest(url, postData, resource.method, storage, callback);
 	}
 };

@@ -12,7 +12,7 @@ goog.require('config');
  * @const
  * @type {Object<*,utils.resource>}
  */
-var resources = {};
+var resources = { };
 
 /** @enum {number} */
 var validationTypes = { obj: 0, str: 1, num: 2, arr: 3 };
@@ -21,7 +21,6 @@ var validationTypes = { obj: 0, str: 1, num: 2, arr: 3 };
 
 /** @typedef {function(string, string, *)} */
 var _validator;
-
 
 /* jshint ignore:end */
 
@@ -34,26 +33,26 @@ var _validator;
 function validator(required, type) {
 	return function(endpoint, param, data) {
 		if (!data) {
-			if (required) { utils.error(utils.messages.missingParam, [ endpoint, param ]); }
+			if (required) { return utils.message(utils.messages.missingParam, [ endpoint, param ]); }
 		}
-		else {
-			if (type == validationTypes.obj) {
-				if (typeof data != 'object') { utils.error(utils.messages.invalidType, [ endpoint, param, 'an object' ]); }
-			}
-			else if (type == validationTypes.arr) {
-				if (!(data instanceof Array)) { utils.error(utils.messages.invalidType, [ endpoint, param, 'an array' ]); }
-			}
-			else if (type == validationTypes.str) {
-				if (typeof data != 'string') { utils.error(utils.messages.invalidType, [ endpoint, param, 'a string' ]); }
-			}
-			else if (type == validationTypes.num) {
-				if (typeof data != 'number') { utils.error(utils.messages.invalidType, [ endpoint, param, 'a number' ]); }
-			}
-			else if (type) {
-				if (!type.test(data)) { utils.error(utils.messages.invalidType, [ endpoint, param, 'in the proper format' ]); }
-			}
+		else if (type == validationTypes.obj) {
+			if (typeof data != 'object') { return utils.message(utils.messages.invalidType, [ endpoint, param, 'an object' ]); }
 		}
-		return data;
+		else if (type == validationTypes.arr) {
+			if (!(data instanceof Array)) { return utils.message(utils.messages.invalidType, [ endpoint, param, 'an array' ]); }
+		}
+		else if (type == validationTypes.num) {
+			if (typeof data != 'number') { return utils.message(utils.messages.invalidType, [ endpoint, param, 'a number' ]); }
+		}
+		// String or regex validator
+		else if (typeof data != 'string') {
+			return utils.message(utils.messages.invalidType, [ endpoint, param, 'a string' ]);
+		}
+		else if (type != validationTypes.str && !type.test(data)) {
+			return utils.message(utils.messages.invalidType, [ endpoint, param, 'in the proper format' ]);
+		}
+
+		return false;
 	};
 }
 
@@ -136,7 +135,7 @@ resources.redeem =  {
 		"app_id": validator(true, branch_id),
 		"identity_id": validator(true, branch_id),
 		"amount": validator(true, validationTypes.num),
-		"bucket": validator(false, validationTypes.str)
+		"bucket": validator(true, validationTypes.str)
 	}
 };
 

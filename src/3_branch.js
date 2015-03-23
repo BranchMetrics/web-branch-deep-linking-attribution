@@ -5,7 +5,7 @@
 goog.provide('Branch');
 goog.require('utils');
 goog.require('resources');
-goog.require('api');
+goog.require('Server');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
@@ -14,6 +14,51 @@ goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
 var default_branch;
+
+/***
+ * @param {Error} err
+ * @param {function(?Error,?=)=} callback
+ */
+function wrapError(err, callback) {
+	if (callback) { return callback(err); }
+	throw err;
+}
+
+/***
+ * @param {function(?)} func
+ * @param {function(?Error,?=)=} callback
+ */
+function wrapErrorFunc(func, callback) {
+	return function(err, data) {
+		if (err && callback) { callback(err); }
+		else if (err) { throw err; }
+		else if (func) { func(data); }
+	};
+}
+
+/***
+ * @param {function(?Error)=} callback
+ * @returns {function(?Error)}
+ */
+function wrapErrorCallback1(callback) {
+	return function(err) {
+		if (err && !callback) { throw err; }
+		if (callback) { callback(err); }
+	};
+}
+
+/***
+ * @param {function(?Error,?)=} callback
+ * @returns {function(?Error,?=)}
+ */
+function wrapErrorCallback2(callback) {
+	/*** @type {function(?Error,?=)} */
+	var r = function(err, data) {
+		if (err && !callback) { throw err; }
+		if (callback) { callback(err, data); }
+	};
+	return r;
+}
 
 /***
  * @class Branch
@@ -26,6 +71,7 @@ Branch = function() {
 	}
 	this._queue = Queue();
 	this._storage = storage();
+	this._server = new Server();
 	this.initialized = false;
 };
 
@@ -40,7 +86,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
-		return api(resource, obj, self._storage, function(err, data) {
+		return self._server.request(resource, obj, self._storage, function(err, data) {
 			next();
 			callback(err, data);
 		});
@@ -90,34 +136,35 @@ Branch.prototype._api = function(resource, obj, callback) {
  * ___
  */
 Branch.prototype['init'] = function(app_id, callback) {
-	callback = callback|| function() { };
-	if (this.initialized) { return callback(new Error(utils.message(utils.messages.existingInit))); }
-	this.app_id = app_id;
-	var self = this, sessionData = utils.readStore(this._storage);
+	if (this.initialized) { return wrapError(new Error(utils.message(utils.messages.existingInit)), callback); }
 
-	var setBranchValues = function(data) {
+	this.app_id = app_id;
+	var self = this,
+		sessionData = utils.readStore(this._storage);
+
+	function setBranchValues(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
 		self.initialized = true;
-	};
+	}
 
 	if (sessionData  && sessionData['session_id']) {
 		setBranchValues(sessionData);
-		callback(null, utils.whiteListSessionData(sessionData));
+		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
 	}
 	else {
-		this._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+		this._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
 			self._api(resources.open, {
-				"link_identifier": utils.urlValue('_branch_match_id'),
+				"link_identifier": utils.getParamValue('_branch_match_id') || utils.hashValue('r'),
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
-			}, function(err, data) {
+			}, wrapErrorFunc(function(data) {
 				setBranchValues(data);
 				utils.store(data, self._storage);
-				callback(err, utils.whiteListSessionData(data));
-			});
-		});
+				if (callback) { callback(null, utils.whiteListSessionData(data)); }
+			}, callback));
+		}, callback));
 	}
 };
 
@@ -134,7 +181,8 @@ Branch.prototype['init'] = function(app_id, callback) {
  * ___
  */
 Branch.prototype['data'] = function(callback) {
-	callback = callback || function() { };
+	if (!callback) { return; }
+
 	var self = this;
 	this._queue(function(next) {
 		callback(null, utils.whiteListSessionData(utils.readStore(self._storage)));
@@ -176,11 +224,8 @@ Branch.prototype['data'] = function(callback) {
  * ___
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		callback(err, data);
-	});
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
 };
 
 /**
@@ -207,11 +252,8 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * ## Tracking events
  */
 Branch.prototype['logout'] = function(callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.logout, { }, function(err) {
-		callback(err);
-	});
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	this._api(resources.logout, { }, wrapErrorCallback1(callback));
 };
 
 /**
@@ -244,28 +286,27 @@ Branch.prototype['logout'] = function(callback) {
  *
  */
 Branch.prototype['track'] = function(event, metadata, callback) {
-	callback = callback || function() { };
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 	if (typeof metadata == 'function') {
 		callback = metadata;
 		metadata = { };
 	}
+
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+
 	this._api(resources.event, {
 		"event": event,
 		"metadata": utils.merge({
 			"url": document.URL,
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
-		}, { })
-	}, function(err) {
-		callback(err);
-	});
+		}, metadata || {})
+	}, wrapErrorCallback1(callback));
 };
 
 /**
  * @function Branch.link
  * @param {Object} linkData - _required_ - link data and metadata.
- * @param {function(?Error,String=)=} callback - _optional_ - returns a string of the Branch deep linking URL.
+ * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep linking URL.
  *
  * **[Formerly `createLink()`](CHANGELOG.md)**
  *
@@ -277,7 +318,6 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ```
  * branch.link(
  *     linkData,
- *     options,
  *     callback (err, link)
  * );
  * ```
@@ -320,9 +360,7 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *
  */
 Branch.prototype['link'] = function(linkData, callback) {
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-
-	callback = callback || function() { };
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 
 	var self = this;
 	linkData['source'] = 'web-sdk';
@@ -331,9 +369,9 @@ Branch.prototype['link'] = function(linkData, callback) {
 	}
 
 	linkData['data'] = goog.json.serialize(linkData['data']);
-	this._api(resources.link, linkData, function(err, data) {
-		callback(err, data && data['url']);
-	});
+	this._api(resources.link, linkData, wrapErrorFunc(function(data) {
+		callback(null, data && data['url']);
+	}, callback));
 };
 
 /**
@@ -418,10 +456,9 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 	else if (typeof options == 'undefined') {
 		options = {};
 	}
-	callback = callback || function() {};
 	options["make_new_link"] = options["make_new_link"] || false;
 
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 	var self = this;
 
 	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
@@ -430,26 +467,22 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 		self._api(resources.SMSLinkSend, {
 			"link_url": click_id,
 			"phone": phone
-		}, function(err) { callback(err); });
+		}, wrapErrorCallback1(callback));
 	}
 
 	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
 		sendSMS(utils.readKeyValue('click_id', this._storage));
 	}
 	else {
-		this["link"](linkData, function(err, url) {
-			if (err) { return callback(err); }
-
+		this["link"](linkData, wrapErrorFunc(function(url) {
 			self._api(resources.linkClick, {
 				"link_url": 'l/' + url.split('/').pop(),
 				"click": "click"
-			}, function(err, data) {
-				if (err) { return callback(err); }
-
+			}, wrapErrorFunc(function(data) {
 				utils.storeKeyValue('click_id', data['click_id'], self._storage);
 				sendSMS(data['click_id']);
-			});
-		});
+			}, callback));
+		}, callback));
 	}
 };
 
@@ -494,11 +527,9 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  */
 Branch.prototype['referrals'] = function(callback) {
 	if (!this.initialized) {
-		return callback(new Error(utils.message(utils.messages.nonInit)));
+		return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
 	}
-	this._api(resources.referrals, { }, function(err, data) {
-		callback(err, data);
-	});
+	this._api(resources.referrals, { }, wrapErrorCallback2(callback));
 };
 
 /**
@@ -531,10 +562,10 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.credits, { }, function(err, data) {
-		callback(err, data);
-	});
+	if (!this.initialized) {
+		return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
+	}
+	this._api(resources.credits, { }, wrapErrorCallback2(callback));
 };
 
 /**
@@ -581,11 +612,8 @@ Branch.prototype['credits'] = function(callback) {
  *
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
-	callback = callback || function() {};
-	if (!this.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
-	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, function(err) {
-		callback(err);
-	});
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback));
 };
 
 /**
