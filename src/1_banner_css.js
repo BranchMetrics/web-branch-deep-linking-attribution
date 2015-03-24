@@ -4,9 +4,10 @@ goog.require('banner_utils');
 banner_css.banner =
 	'.branch-animation { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
 	'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n' +
-	'#branch-banner * { margin-right: 4px; position: relative; display: inline-block; line-height: 1.2em; vertical-align: top; }\n' +
-	'#branch-banner-close { font-weight: 400; cursor: pointer; }\n' +
+	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
+	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +
 	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n' +
+	'#branch-banner .icon { float: left; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
 	'#branch-banner .details { top: 16px; }\n' +
 	'#branch-banner .details > * { display: block; }\n' +
@@ -18,7 +19,7 @@ banner_css.desktop =
 	'#branch-banner { position: fixed; min-width: 600px; }\n' +
 	'#branch-banner-close { color: #aaa; font-size: 24px; top: 14px; }\n' +
 	'#branch-banner-close:hover { color: #000; }\n' +
-	'#branch-banner .left, .right { width: 47%;  top: 0; }\n' +
+	'#branch-banner .left, .right { width: 47%;  top: 0; float: left; }\n' +
 	'#branch-banner .title { font-size: 14px; }\n' +
 	'#branch-banner .description { font-size: 12px; font-weight: normal; }\n' +
 	'#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n' +
@@ -41,8 +42,8 @@ banner_css.ie = '#branch-banner .checkmark { color: #428bca; font-size: 22px; }\
 
 banner_css.mobile =
 	'#branch-banner { position: absolute; }\n' +
-	'#branch-banner .content .left { width: 60%; }\n' +
-	'#branch-banner .content .right { width: 35%; height: 24px; }\n' +
+	'#branch-banner .content .left { width: 60%; float: left; }\n' +
+	'#branch-banner .content .right { width: 35%; height: 24px; float: right; }\n' +
 	'#branch-banner .content .left .details .title { font-size: 12px; }\n' +
 	'#branch-banner a { text-decoration: none; }\n' +
 	'#branch-mobile-action { top: 6px; }\n' +

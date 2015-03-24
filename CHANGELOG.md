@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v1.3.1] - 2015-03-24
+### Fixed
+- Line break and wrap long app titles and descriptions in app banner
+
 ## [v1.3.0] - 2015-03-23
 ### New Functionality
 - Much more consistent error handling - we always pass errors to callbacks, unless there is no callback specified, in which case we always throw them.
