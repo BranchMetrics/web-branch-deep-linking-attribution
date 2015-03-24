@@ -2,7 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.3.1] - 2015-03-24
 
 ## [v1.3.1] - 2015-03-24
 ### Fixed
