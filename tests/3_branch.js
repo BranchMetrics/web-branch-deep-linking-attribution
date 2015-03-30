@@ -108,12 +108,14 @@ describe('Branch', function() {
 			requests[0].callback(new Error('Browser fingerprint fetch failed'));
 		});
 
-		it('should call open with link_identifier from hash', function(done) {
+		it('should store in session and call open with link_identifier from hash', function(done) {
 			window.location = window.location.href + "#r:12345";
 			var branch = initBranch(false), assert = testUtils.plan(6, done);
 
-			// Todo: assert the data actually passed back here.
-			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.init(app_id, function(err, data) {
+				assert.equal(utils.readStore(branch._storage).click_id, '12345', 'click_id from link_identifier hash stored in session_id');
+				assert(!err, 'No error');
+			});
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, { session_id: "1234", something: "else" });
@@ -132,12 +134,14 @@ describe('Branch', function() {
 			assert.equal(requests.length, 2, '2 requests made');
 		});
 
-		it('should call open with link_identifier from get param', function(done) {
+		it('should store in session and call open with link_identifier from get param', function(done) {
 			window.history.replaceState({ }, '', window.location.href + "?_branch_match_id=67890");
 			var branch = initBranch(false), assert = testUtils.plan(6, done);
 
-			// Todo: assert the data actually passed back here.
-			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.init(app_id, function(err, data) {
+				assert.equal(utils.readStore(branch._storage).click_id, '67890', 'click_id from link_identifier get param stored in session_id');
+				assert(!err, 'No error');
+			});
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, { session_id: "1234", something: "else" });
