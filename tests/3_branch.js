@@ -109,7 +109,7 @@ describe('Branch', function() {
 		});
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
-			testUtils.go("#r:12345")
+			testUtils.go("#r:12345");
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
 
 			branch.init(app_id, function(err, data) {
@@ -128,7 +128,7 @@ describe('Branch', function() {
 		});
 
 		it('should store in session and call open with link_identifier from get param', function(done) {
-			testUtils.go("?_branch_match_id=67890")
+			testUtils.go("?_branch_match_id=67890");
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
 
 			branch.init(app_id, function(err, data) {
