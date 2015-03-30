@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.3.1"};
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.3.2"};
 // Input 2
 var BranchStorage = function() {
   this._store = {};
@@ -1160,13 +1160,19 @@ Branch.prototype.init = function(a, b) {
   }
   this.app_id = a;
   var d = this, e = utils.readStore(this._storage);
-  e && e.session_id ? (c(e), b && b(null, utils.whiteListSessionData(e))) : this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
-    d._api(resources.open, {link_identifier:utils.getParamValue("_branch_match_id") || utils.hashValue("r"), is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
-      c(a);
-      utils.store(a, d._storage);
-      b && b(null, utils.whiteListSessionData(a));
+  if (e && e.session_id) {
+    c(e), b && b(null, utils.whiteListSessionData(e));
+  } else {
+    var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
+    this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
+      d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
+        c(a);
+        f && (a.click_id = f);
+        utils.store(a, d._storage);
+        b && b(null, utils.whiteListSessionData(a));
+      }, b));
     }, b));
-  }, b));
+  }
 };
 Branch.prototype.data = function(a) {
   if (a) {
