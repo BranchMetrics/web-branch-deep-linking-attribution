@@ -107,6 +107,54 @@ describe('Branch', function() {
 			});
 			requests[0].callback(new Error('Browser fingerprint fetch failed'));
 		});
+
+		it('should call open with link_identifier from hash', function(done) {
+			window.location = window.location.href + "#r:12345";
+			var branch = initBranch(false), assert = testUtils.plan(6, done);
+
+			// Todo: assert the data actually passed back here.
+			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(null, { session_id: "1234", something: "else" });
+
+			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
+			assert.deepEqual(requests[0].obj, { "v": config.version, app_id: app_id }, 'Request params to _r correct');
+
+			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
+			assert.deepEqual(requests[1].obj, {
+				"app_id": app_id,
+				"link_identifier": '12345',
+				"is_referrable": 1,
+				"browser_fingerprint_id": browser_fingerprint_id
+			}, 'Request to open params correct');
+
+			assert.equal(requests.length, 2, '2 requests made');
+		});
+
+		it('should call open with link_identifier from get param', function(done) {
+			window.history.replaceState({ }, '', window.location.href + "?_branch_match_id=67890");
+			var branch = initBranch(false), assert = testUtils.plan(6, done);
+
+			// Todo: assert the data actually passed back here.
+			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(null, { session_id: "1234", something: "else" });
+
+			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
+			assert.deepEqual(requests[0].obj, { "v": config.version, app_id: app_id }, 'Request params to _r correct');
+
+			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
+			assert.deepEqual(requests[1].obj, {
+				"app_id": app_id,
+				"link_identifier": '67890',
+				"is_referrable": 1,
+				"browser_fingerprint_id": browser_fingerprint_id
+			}, 'Request to open params correct');
+
+			assert.equal(requests.length, 2, '2 requests made');
+		});
 	});
 
 	describe('data', function() {
@@ -247,7 +295,7 @@ describe('Branch', function() {
 			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'session_id', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
-
+/*
 	describe.fail('Queueing used correctly', function() {
 		it('Should wait to call track after init', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
@@ -282,4 +330,6 @@ describe('Branch', function() {
 			requests[0].callback(new Error('Initting failed'));
 		});
 	});
+*/
 });
+
