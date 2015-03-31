@@ -172,7 +172,8 @@ resources.SMSLinkSend = {
 		"link_url": validator(true, validationTypes.str)
 	},
 	params: {
-		"phone": validator(true, validationTypes.str)
+		"phone": validator(true, validationTypes.str),
+		"app_id": validator(true, branch_id)
 	}
 };
 
