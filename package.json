@@ -25,6 +25,7 @@
     "jsdoc": "<=3.3.0",
     "jsdox": "0.4.9",
     "jshint": "^2.6.0",
+    "karma-sauce-launcher": "^0.2.10",
     "mocha": "^2.2.1",
     "precommit-hook": "^1.0.7",
     "sinon": "^1.13.0",

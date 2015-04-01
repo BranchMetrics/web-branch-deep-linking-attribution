@@ -2,7 +2,42 @@
 // Generated on Sun Mar 29 2015 15:10:04 GMT-0400 (EDT)
 
 module.exports = function(config) {
+  var customLaunchers = {
+    sl_chrome: {
+      base: 'SauceLabs',
+      browserName: 'chrome',
+      platform: 'Windows 7',
+      version: '35'
+    },
+    sl_firefox: {
+      base: 'SauceLabs',
+      browserName: 'firefox',
+      version: '30'
+    },
+    sl_ios_safari: {
+      base: 'SauceLabs',
+      browserName: 'iphone',
+      platform: 'OS X 10.9',
+      version: '7.1'
+    },
+    sl_ie_11: {
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: 'Windows 8.1',
+      version: '11'
+    }
+  };
+
   config.set({
+    // Sauce Labs
+    sauceLabs: {
+        testName: 'Web SDK Unit Tests',
+        username: 'branchmetrics',
+        accessKey: '4d5b5089-370b-44f5-87f4-7e312590b28f',
+        startConnect: true
+    },
+    customLaunchers: customLaunchers,
+    browsers: Object.keys(customLaunchers),
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: 'tests',
@@ -82,14 +117,8 @@ module.exports = function(config) {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
-
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
-
-
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   });
 };
