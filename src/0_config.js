@@ -5,4 +5,4 @@ goog.provide('config');
 
 config.link_service_endpoint = 'https://bnc.lt';
 config.api_endpoint = 'https://api.branch.io';
-config.version = '1.3.3';
+config.version = '1.0.0';  // Based on Web SDK 1.3.3

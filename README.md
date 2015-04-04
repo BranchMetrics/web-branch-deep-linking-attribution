@@ -35,8 +35,6 @@ _Be sure to replace `APP-KEY` with your actual app key found in your [account da
 
 ```html
 <script type="text/javascript">
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.3.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
-
 branch.init('APP-KEY', function(err, data) {
     // callback to handle err or data
 });
@@ -84,6 +82,21 @@ ___
 
 * * *
 
+### setDebug(debug) 
+
+**Parameters**
+
+**debug**: `boolean`, _required_ - Set the SDK debug flag.
+
+Setting the SDK debug flag will generate a new device ID each time the app is installed
+instead of possibly using the same device id.  This is useful when testing.
+
+This needs to be set before the Branch.init call!!!
+
+---
+
+
+
 ### init(app_id, callback) 
 
 **Parameters**
@@ -127,6 +140,7 @@ callback(
 ```
 
 **Note:** `Branch.init` must be called prior to calling any other Branch functions.
+
 ___
 
 
@@ -143,6 +157,24 @@ after `Branch.init` has been called if you need the session information at a
 later point.
 If the Branch session has already been initialized, the callback will return
 immediately, otherwise, it will return once Branch has been initialized.
+
+___
+
+
+
+### first(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_ - callback to read the session data.
+
+Returns the same session information and any referring data, as
+`Branch.init` did when the app was first installed. This is meant to be called
+after `Branch.init` has been called if you need the first session information at a
+later point.
+If the Branch session has already been initialized, the callback will return
+immediately, otherwise, it will return once Branch has been initialized.
+
 ___
 
 
@@ -196,6 +228,31 @@ Logs out the current session, replaces session IDs and identity IDs.
 ##### Usage
 ```js
 branch.logout(
+    callback (err)
+);
+```
+
+##### Callback Format
+```js
+callback(
+     "Error message"
+);
+```
+___
+
+
+
+### close(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_
+
+Close the current session.
+
+##### Usage
+```js
+branch.close(
     callback (err)
 );
 ```
@@ -302,76 +359,6 @@ callback(
 ```
 ___
 
-## Sharing links via SMS
-
-
-
-### sendSMS(phone, linkData, options, callback) 
-
-**Parameters**
-
-**phone**: `string`, _required_ - phone number to send SMS to
-
-**linkData**: `Object`, _required_ - object of link data
-
-**options**: `Object`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
-
-**callback**: `function`, _optional_ - Returns an error if unsuccessful
-
-**[Formerly `SMSLink()`](CHANGELOG.md)**
-
-A robust function to give your users the ability to share links via SMS. If
-the user navigated to this page via a Branch link, `sendSMS` will send that
-same link. Otherwise, it will create a new link with the data provided in
-the `metadata` argument. `sendSMS` also  registers a click event with the
-`channel` pre-filled with `'sms'` before sending an sms to the provided
-`phone` parameter. This way the entire link click event is recorded starting
-with the user sending an sms. **Supports international SMS**.
-
-#### Usage
-```js
-branch.sendSMS(
-    phone,
-    linkData,
-    options,
-    callback (err, data)
-);
-```
-
-##### Example
-```js
-branch.sendSMS(
-    phone: '9999999999',
-    {
-        tags: ['tag1', 'tag2'],
-        channel: 'facebook',
-        feature: 'dashboard',
-        stage: 'new user',
-        type: 1,
-        data: {
-            mydata: 'something',
-            foo: 'bar',
-            '$desktop_url': 'http://myappwebsite.com',
-            '$ios_url': 'http://myappwebsite.com/ios',
-            '$ipad_url': 'http://myappwebsite.com/ipad',
-            '$android_url': 'http://myappwebsite.com/android',
-            '$og_app_id': '12345',
-            '$og_title': 'My App',
-            '$og_description': 'My app\'s description.',
-            '$og_image_url': 'http://myappwebsite.com/image.png'
-        }
-    },
-    { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
-    function(err) { console.log(err); }
-});
-```
-
-##### Callback Format
-```js
-callback("Error message");
-```
-___
-
 # Referral system rewarding functionality
 In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
@@ -424,7 +411,152 @@ callback(
 );
 ```
 
-## Credit history
+---
+
+## Referral Codes
+
+
+
+### getCode(data, callback) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - contins options for referral code creation.
+
+**callback**: `function`, _optional_ - returns an error if unsuccessful
+
+Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
+The data can containt the following fields:
+"amount" - A required integer specifying the number of credits added when the code is applied.
+"bucket" - The optional bucket to apply the credits to.  Defaults to "default".
+"calculation_type" - A required integer.  1 for unlimited uses, 0 for one use.
+"location" - A required integer. Determines who get's the credits.  0 for the referree, 2 for the referring user or 3 for both.
+"prefix" - An optional string to be prepended to the code.
+"expiration" - An optional date string.  If present, determines the date on which the code expires.
+
+##### Usage
+
+branch.getCode(
+    data,
+    callback(err,data)
+);
+
+##### Example
+
+```js
+branch.getCode(
+    {
+      "amount":10,
+      "bucket":"party",
+      "calculation_type":1,
+      "location":2
+    }
+    callback (err)
+);
+```
+
+##### Callback Format
+```js
+callback(
+     "Error message",
+     {
+       "referral_code":"AB12CD"
+     } 
+);
+```
+___
+
+
+
+### validateCode(code, callback) 
+
+**Parameters**
+
+**code**: `string`, _required_ - the code string to validate.
+
+**callback**: `function`, _optional_ - returns an error if unsuccessful
+
+Validate a referral code before using.
+
+##### Usage
+
+```js
+branch.validateCode(
+    code, // The code to validate
+    callback (err)
+);
+```
+
+##### Example
+
+```js
+branch.validateCode(
+    "AB12CD",
+    function(err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Code is valid");
+        }
+    }
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message",
+    callback(err, data)
+);
+```
+___
+
+
+
+### applyCode(code, callback) 
+
+**Parameters**
+
+**code**: `string`, _required_ - the code string to apply.
+
+**callback**: `function`, _optional_ - returns an error if unsuccessful
+
+Apply a referral code.
+
+##### Usage
+
+```js
+branch.applyCode(
+    code, // The code to apply
+    callback (err)
+);
+```
+
+##### Example
+
+```js
+branch.applyCode(
+    "AB12CD",
+    function(err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Code applied");
+        }
+    }
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message",
+    callback(err, data)
+);
+```
+___
+
+## Credit Functions
 
 
 
@@ -456,6 +588,75 @@ callback(
 );
 ```
 
+---
+
+
+
+### creditHistory(data, callback) 
+
+**Parameters**
+
+**data**: `Object`, _optional_ - options controlling the returned history.
+
+**callback**: `function`, _required_ - returns an array with credit history data.
+
+This call will retrieve the entire history of credits and redemptions from the individual user.
+
+##### Usage
+
+```js
+branch.creditHistory(
+     data,
+     callback(err, data)
+);
+
+##### Example
+
+```js
+branch.creditHistory( 
+    {
+      "length":50,
+      "direction":0,
+      "begin_after_id:"123456789012345",
+      "bucket":"default"
+    }
+    callback (err, data)
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message",
+[
+    {
+        "transaction": {
+                           "date": "2014-10-14T01:54:40.425Z",
+                           "id": "50388077461373184",
+                           "bucket": "default",
+                           "type": 0,
+                           "amount": 5
+                       },
+        "referrer": "12345678",
+        "referree": null
+    },
+    {
+        "transaction": {
+                           "date": "2014-10-14T01:55:09.474Z",
+                           "id": "50388199301710081",
+                           "bucket": "default",
+                           "type": 2,
+                           "amount": -3
+                       },
+        "referrer": null,
+        "referree": "12345678"
+    }
+]
+);
+```
+
+---
+
 ## Credit redemption
 
 
@@ -473,6 +674,8 @@ callback(
 **[Formerly `redeemCredits()`](CHANGELOG.md)**
 
 Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
+
+##### Usage
 
 ```js
 branch.redeem(
@@ -499,76 +702,6 @@ branch.redeem(
 callback("Error message");
 ```
 ___
-
-# Smart App Sharing Banner
-
-The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
-Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
-**Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
-
-
-
-### banner(options, linkData) 
-
-**Parameters**
-
-**options**: `Object`, _required_ - object of all the options to setup the banner
-
-**linkData**: `Object`, _required_ - object of all link data, same as Branch.link()
-
-**[Formerly `appBanner()`](CHANGELOG.md)**
-
-Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
-
-| iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
-|------------------|----------------------|----------------------|
-| ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
-
-#### Usage
-
-```js
-branch.banner(
-    options, // Banner options: See example for all available options
-    linkData // Data for link, same as Branch.link()
-);
-```
-
-##### Example
-
-```js
-branch.banner({
-    icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-    title: 'Branch Demo App',
-    description: 'The Branch demo app!',
-    openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
-    downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
-    iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
-    showiOS: true,                     // Should the banner be shown on iOS devices?
-    showAndroid: true,                 // Should the banner be shown on Android devices?
-    showDesktop: true,                 // Should the banner be shown on desktop devices?
-    disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
-    forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
-    make_new_link: false               // Should the banner create a new link, even if a link already exists?
-}, {
-    phone: '9999999999',
-    tags: ['tag1', 'tag2'],
-    feature: 'dashboard',
-    stage: 'new user',
-    type: 1,
-    data: {
-        mydata: 'something',
-        foo: 'bar',
-        '$desktop_url': 'http://myappwebsite.com',
-        '$ios_url': 'http://myappwebsite.com/ios',
-        '$ipad_url': 'http://myappwebsite.com/ipad',
-        '$android_url': 'http://myappwebsite.com/android',
-        '$og_app_id': '12345',
-        '$og_title': 'My App',
-        '$og_description': 'My app\'s description.',
-        '$og_image_url': 'http://myappwebsite.com/image.png'
-    }
-});
-```
 
 
 

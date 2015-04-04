@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget android-versionCode="6" id="io.branch.sdk.testbed" ios-CFBundleShortVersionString="1.0.6" ios-CFBundleVersion="6" version="1.0.6" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <preference name="loglevel" value="DEBUG" />
+    <feature name="Device">
+        <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
+    <feature name="EmailComposer">
+        <param name="android-package" value="de.appplant.cordova.emailcomposer.EmailComposer" />
+    </feature>
+    <feature name="Echo">
+        <param name="android-package" value="io.branch.BranchDevice" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="BranchDevice">
+        <param name="android-package" value="io.branch.BranchDevice" />
+        <param name="onload" value="true" />
+    </feature>
+    <name>Branch-Cordova-SDK-Testbed</name>
+    <description>
+	Test app for the Branch Cordova SDK
+    </description>
+    <content src="index.html" />
+    <access origin="*" />
+    <access origin="https://api.branch.io" />
+</widget>

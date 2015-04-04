@@ -71,8 +71,12 @@ Branch = function() {
 	}
 	this._queue = Queue();
 	this._storage = storage();
+	this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and 
+										// the session params from the first install.
 	this._server = new Server();
+	this.sdk="cordova"+config.version;
 	this.initialized = false;
+	this.debug = false;
 };
 
 /***
@@ -83,14 +87,35 @@ Branch = function() {
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
 	this._queue(function(next) {
+		// This reflects additional fields needed by mobile apps...
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
+		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && self.device_fingerprint_id) { obj['device_fingerprint_id'] = self.device_fingerprint_id; }
+		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && self.link_click_id) { obj['link_click_id'] = self.link_click_id; }
+		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && self.sdk) { obj['sdk'] = self.sdk; }
 		return self._server.request(resource, obj, self._storage, function(err, data) {
 			next();
 			callback(err, data);
 		});
 	});
+};
+
+
+/**
+ * @function Branch.setDebug
+ * @param {boolean} debug - _required_ - Set the SDK debug flag.
+ * 
+ * Setting the SDK debug flag will generate a new device ID each time the app is installed
+ * instead of possibly using the same device id.  This is useful when testing.
+ * 
+ * This needs to be set before the Branch.init call!!!
+ * 
+ * ---
+ * 
+ */
+Branch.prototype['setDebug'] = function(debug) {
+	this.debug = debug;
 };
 
 /**
@@ -133,7 +158,9 @@ Branch.prototype._api = function(resource, obj, callback) {
  * ```
  *
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
+ * 
  * ___
+ * 
  */
 Branch.prototype['init'] = function(app_id, callback) {
 	if (this.initialized) { return wrapError(new Error(utils.message(utils.messages.existingInit)), callback); }
@@ -146,6 +173,8 @@ Branch.prototype['init'] = function(app_id, callback) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
+		self.device_fingerprint_id = data['device_fingerprint_id'];
+		self.link_click_id = data['link_click_id'];
 		self.initialized = true;
 	}
 
@@ -154,19 +183,33 @@ Branch.prototype['init'] = function(app_id, callback) {
 		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
 	}
 	else {
-		var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-		this._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
-			self._api(resources.open, {
-				"link_identifier": link_identifier,
-				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id
-			}, wrapErrorFunc(function(data) {
-				setBranchValues(data);
-				if (link_identifier) { data['click_id'] = link_identifier; }
-				utils.store(data, self._storage);
-				if (callback) { callback(null, utils.whiteListSessionData(data)); }
-			}, callback));
-		}, callback));
+		// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
+		if (utils.readKeyValue('identity_id', self._permStorage)) {
+			self.identity_id = utils.readKeyValue('identity_id', self._permStorage);
+			self.device_fingerprint_id = utils.readKeyValue('device_fingerprint_id', self._permStorage);
+			cordova.plugins.branch_device.getOpenData(self.debug, function(data) {
+				console.log("Sending open.");
+				self._api(resources.open, data, wrapErrorFunc(function(data) {
+					console.log("Open successful: " + data);
+					setBranchValues(data);
+					utils.storeKeyValue('identity_id', data.identity_id, self._permStorage)
+					utils.storeKeyValue('device_fingerprint_id', data.device_fingerprint_id, self._permStorage)
+					utils.store(data, self._storage);
+					if (callback) { callback(null, data); }
+				}, callback));
+			}, this);
+		} else {
+			cordova.plugins.branch_device.getInstallData(self.debug, function(data) {
+				console.log("Sending install.");
+				self._api(resources.install, data, wrapErrorFunc(function(data) {
+					console.log("Install successful: " + data);
+					setBranchValues(data);
+					utils.store(data, self._storage);
+					utils.store(data, self._permStorage);
+					if (callback) { callback(null, data); }
+				}, callback));
+			}, this);
+		}
 	}
 };
 
@@ -180,7 +223,9 @@ Branch.prototype['init'] = function(app_id, callback) {
  * later point.
  * If the Branch session has already been initialized, the callback will return
  * immediately, otherwise, it will return once Branch has been initialized.
+ * 
  * ___
+ * 
  */
 Branch.prototype['data'] = function(callback) {
 	if (!callback) { return; }
@@ -188,6 +233,30 @@ Branch.prototype['data'] = function(callback) {
 	var self = this;
 	this._queue(function(next) {
 		callback(null, utils.whiteListSessionData(utils.readStore(self._storage)));
+		next();
+	});
+};
+
+/**
+ * @function Branch.first
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ *
+ * Returns the same session information and any referring data, as
+ * `Branch.init` did when the app was first installed. This is meant to be called
+ * after `Branch.init` has been called if you need the first session information at a
+ * later point.
+ * If the Branch session has already been initialized, the callback will return
+ * immediately, otherwise, it will return once Branch has been initialized.
+ * 
+ * ___
+ * 
+ */
+Branch.prototype['first'] = function(callback) {
+	if (!callback) { return; }
+
+	var self = this;
+	this._queue(function(next) {
+		callback(null, utils.whiteListSessionData(utils.readStore(self._permStorage)));
 		next();
 	});
 };
@@ -224,10 +293,23 @@ Branch.prototype['data'] = function(callback) {
  * );
  * ```
  * ___
+ * 
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
+	
+	var self = this;
+	
+	function setBranchValues(data) {
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data['link'];
+		self.identity = data['identity'];
+	}
+	
+	this._api(resources.profile, { "identity": identity }, wrapErrorFunc(function(data) {
+		setBranchValues(data);
+		if (callback) { callback(null, data); }
+	}, callback));
 };
 
 /**
@@ -250,12 +332,68 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * );
  * ```
  * ___
- *
- * ## Tracking events
+ * 
  */
 Branch.prototype['logout'] = function(callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	this._api(resources.logout, { }, wrapErrorCallback1(callback));
+	
+	var self = this;
+	
+	function setBranchValues(data) {
+		self.session_id = data['session_id'];
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data['link'];
+		delete self.identity;
+	}
+	
+	this._api(resources.logout, { }, wrapErrorFunc(function(data) {
+		setBranchValues(data);
+		utils.clearStore(self._storage);
+		utils.clearStore(self._permStorage);
+		if (callback) { callback(null); }
+	}, callback));
+};
+
+/**
+ * @function Branch.close
+ * @param {function(?Error)=} callback - _optional_
+ *
+ * Close the current session.
+ *
+ * ##### Usage
+ * ```js
+ * branch.close(
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *      "Error message"
+ * );
+ * ```
+ * ___
+ *
+ * ## Tracking events
+ * 
+ */
+Branch.prototype['close'] = function(callback) {
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	
+	var self = this;
+	
+	function clearBranchValues() {
+		delete self.session_id;
+		delete self.sessionLink;
+		self.initialized = false;
+	}
+	
+	this._api(resources.close, { }, wrapErrorFunc(function(data) {
+		clearBranchValues();
+		utils.clearStore(self._storage);
+		if (callback) { callback(null); }
+	}, callback));
 };
 
 /**
@@ -358,85 +496,6 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  * ```
  * ___
  *
- * ## Sharing links via SMS
- *
- */
-Branch.prototype['link'] = function(linkData, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
-	linkData['source'] = 'web-sdk';
-	if (linkData['data']['$desktop_url'] !== undefined) {
-		linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
-	}
-
-	linkData['data'] = goog.json.serialize(linkData['data']);
-	this._api(resources.link, linkData, wrapErrorFunc(function(data) {
-		callback(null, data && data['url']);
-	}, callback));
-};
-
-/**
- * @function Branch.sendSMS
- * @param {string} phone - _required_ - phone number to send SMS to
- * @param {Object} linkData - _required_ - object of link data
- * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
- * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
- *
- * **[Formerly `SMSLink()`](CHANGELOG.md)**
- *
- * A robust function to give your users the ability to share links via SMS. If
- * the user navigated to this page via a Branch link, `sendSMS` will send that
- * same link. Otherwise, it will create a new link with the data provided in
- * the `metadata` argument. `sendSMS` also  registers a click event with the
- * `channel` pre-filled with `'sms'` before sending an sms to the provided
- * `phone` parameter. This way the entire link click event is recorded starting
- * with the user sending an sms. **Supports international SMS**.
- *
- * #### Usage
- * ```js
- * branch.sendSMS(
- *     phone,
- *     linkData,
- *     options,
- *     callback (err, data)
- * );
- * ```
- *
- * ##### Example
- * ```js
- * branch.sendSMS(
- *     phone: '9999999999',
- *     {
- *         tags: ['tag1', 'tag2'],
- *         channel: 'facebook',
- *         feature: 'dashboard',
- *         stage: 'new user',
- *         type: 1,
- *         data: {
- *             mydata: 'something',
- *             foo: 'bar',
- *             '$desktop_url': 'http://myappwebsite.com',
- *             '$ios_url': 'http://myappwebsite.com/ios',
- *             '$ipad_url': 'http://myappwebsite.com/ipad',
- *             '$android_url': 'http://myappwebsite.com/android',
- *             '$og_app_id': '12345',
- *             '$og_title': 'My App',
- *             '$og_description': 'My app\'s description.',
- *             '$og_image_url': 'http://myappwebsite.com/image.png'
- *         }
- *     },
- *     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
- *     function(err) { console.log(err); }
- * });
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback("Error message");
- * ```
- * ___
- *
  * # Referral system rewarding functionality
  * In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
  * 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
@@ -450,42 +509,14 @@ Branch.prototype['link'] = function(linkData, callback) {
  * ## Retrieve referrals list
  *
  */
-Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
-	if (typeof options == 'function') {
-		callback = options;
-		options = {};
-	}
-	else if (typeof options == 'undefined') {
-		options = {};
-	}
-	options["make_new_link"] = options["make_new_link"] || false;
-
+Branch.prototype['link'] = function(linkData, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+
 	var self = this;
-
-	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
-
-	function sendSMS(click_id) {
-		self._api(resources.SMSLinkSend, {
-			"link_url": click_id,
-			"phone": phone
-		}, wrapErrorCallback1(callback));
-	}
-
-	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
-		sendSMS(utils.readKeyValue('click_id', this._storage));
-	}
-	else {
-		this["link"](linkData, wrapErrorFunc(function(url) {
-			self._api(resources.linkClick, {
-				"link_url": 'l/' + url.split('/').pop(),
-				"click": "click"
-			}, wrapErrorFunc(function(data) {
-				utils.storeKeyValue('click_id', data['click_id'], self._storage);
-				sendSMS(data['click_id']);
-			}, callback));
-		}, callback));
-	}
+	linkData['data'] = goog.json.serialize(linkData['data']);
+	this._api(resources.link, linkData, wrapErrorFunc(function(data) {
+		callback(null, data && data['url']);
+	}, callback));
 };
 
 /**
@@ -524,8 +555,10 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  * );
  * ```
  *
- * ## Credit history
- *
+ * ---
+ * 
+ * ## Referral Codes
+ * 
  */
 Branch.prototype['referrals'] = function(callback) {
 	if (!this.initialized) {
@@ -533,6 +566,154 @@ Branch.prototype['referrals'] = function(callback) {
 	}
 	this._api(resources.referrals, { }, wrapErrorCallback2(callback));
 };
+
+/**
+ * @function Branch.getCode
+ * @param {Object} data - _required_ - contins options for referral code creation.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
+ * The data can containt the following fields:
+ * "amount" - A required integer specifying the number of credits added when the code is applied.
+ * "bucket" - The optional bucket to apply the credits to.  Defaults to "default".
+ * "calculation_type" - A required integer.  1 for unlimited uses, 0 for one use.
+ * "location" - A required integer. Determines who get's the credits.  0 for the referree, 2 for the referring user or 3 for both.
+ * "prefix" - An optional string to be prepended to the code.
+ * "expiration" - An optional date string.  If present, determines the date on which the code expires.
+ *
+ * ##### Usage
+ * 
+ * branch.getCode(
+ *     data,
+ *     callback(err,data)
+ * );
+ * 
+ * ##### Example
+ * 
+ * ```js
+ * branch.getCode(
+ *     {
+ *       "amount":10,
+ *       "bucket":"party",
+ *       "calculation_type":1,
+ *       "location":2
+ *     }
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *      "Error message",
+ *      {
+ *        "referral_code":"AB12CD"
+ *      } 
+ * );
+ * ```
+ * ___
+ *
+ */
+Branch.prototype['getCode'] = function(data, callback)  {
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	data.type = "credit";
+	data.creation_type = 2;
+	this._api(resources.getCode, data, wrapErrorCallback2(callback));
+}
+
+/**
+ * @function Branch.validateCode
+ * @param {string} code - _required_ - the code string to validate.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Validate a referral code before using.
+ *
+ * ##### Usage
+ * 
+ * ```js
+ * branch.validateCode(
+ *     code, // The code to validate
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Example
+ *
+ * ```js
+ * branch.validateCode(
+ *     "AB12CD",
+ *     function(err, data) {
+ *         if (err) {
+ *             console.log(err);
+ *         } else {
+ *             console.log("Code is valid");
+ *         }
+ *     }
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message",
+ *     callback(err, data)
+ * );
+ * ```
+ * ___
+ *
+ */
+Branch.prototype['validateCode'] = function(code, callback)  {
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	this._api(resources.validateCode, { "code": code }, wrapErrorCallback2(callback));
+}
+
+/**
+ * @function Branch.applyCode
+ * @param {string} code - _required_ - the code string to apply.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Apply a referral code.
+ *
+ * ##### Usage
+ * 
+ * ```js
+ * branch.applyCode(
+ *     code, // The code to apply
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Example
+ *
+ * ```js
+ * branch.applyCode(
+ *     "AB12CD",
+ *     function(err, data) {
+ *         if (err) {
+ *             console.log(err);
+ *         } else {
+ *             console.log("Code applied");
+ *         }
+ *     }
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message",
+ *     callback(err, data)
+ * );
+ * ```
+ * ___
+ *
+ * ## Credit Functions
+ * 
+ */
+Branch.prototype['applyCode'] = function(code, callback)  {
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	this._api(resources.applyCode, { "code": code }, wrapErrorCallback2(callback));
+}
 
 /**
  * @function Branch.credits
@@ -560,14 +741,86 @@ Branch.prototype['referrals'] = function(callback) {
  * );
  * ```
  *
- * ## Credit redemption
- *
+ * ---
+ * 
  */
 Branch.prototype['credits'] = function(callback) {
 	if (!this.initialized) {
 		return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
 	}
 	this._api(resources.credits, { }, wrapErrorCallback2(callback));
+};
+
+/**
+ * @function Branch.creditHistory
+ * @param {Object} data - _optional_ - options controlling the returned history.
+ * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history data.
+ *
+ * This call will retrieve the entire history of credits and redemptions from the individual user.
+ * 
+ * ##### Usage
+ * 
+ * ```js
+ * branch.creditHistory(
+ *      data,
+ *      callback(err, data)
+ * );
+ *
+ * ##### Example
+ * 
+ * ```js
+ * branch.creditHistory( 
+ *     {
+ *       "length":50,
+ *       "direction":0,
+ *       "begin_after_id:"123456789012345",
+ *       "bucket":"default"
+ *     }
+ *     callback (err, data)
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message",
+ * [
+ *     {
+ *         "transaction": {
+ *                            "date": "2014-10-14T01:54:40.425Z",
+ *                            "id": "50388077461373184",
+ *                            "bucket": "default",
+ *                            "type": 0,
+ *                            "amount": 5
+ *                        },
+ *         "referrer": "12345678",
+ *         "referree": null
+ *     },
+ *     {
+ *         "transaction": {
+ *                            "date": "2014-10-14T01:55:09.474Z",
+ *                            "id": "50388199301710081",
+ *                            "bucket": "default",
+ *                            "type": 2,
+ *                            "amount": -3
+ *                        },
+ *         "referrer": null,
+ *         "referree": "12345678"
+ *     }
+ * ]
+ * );
+ * ```
+ *
+ * ---
+ * 
+ * ## Credit redemption
+ *
+ */
+Branch.prototype['creditHistory'] = function(data, callback) {
+	if (!this.initialized) {
+		return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
+	}
+	this._api(resources.creditHistory, (data)?data:{}, wrapErrorCallback2(callback));
 };
 
 /**
@@ -580,6 +833,8 @@ Branch.prototype['credits'] = function(callback) {
  *
  * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
  *
+ * ##### Usage
+ * 
  * ```js
  * branch.redeem(
  *     amount, // amount of credits to be redeemed
@@ -606,97 +861,8 @@ Branch.prototype['credits'] = function(callback) {
  * ```
  * ___
  *
- * # Smart App Sharing Banner
- *
- * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
- * Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
- * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
- *
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback));
 };
-
-/**
- * @function Branch.banner
- * @param {Object} options - _required_ - object of all the options to setup the banner
- * @param {Object} linkData - _required_ - object of all link data, same as Branch.link()
- *
- * **[Formerly `appBanner()`](CHANGELOG.md)**
- *
- * Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
- *
- * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
- * |------------------|----------------------|----------------------|
- * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
- *
- * #### Usage
- *
- * ```js
- * branch.banner(
- *     options, // Banner options: See example for all available options
- *     linkData // Data for link, same as Branch.link()
- * );
- * ```
- *
- * ##### Example
- *
- * ```js
- * branch.banner({
- *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- *     title: 'Branch Demo App',
- *     description: 'The Branch demo app!',
- *     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
- *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
- *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
- *     showiOS: true,                     // Should the banner be shown on iOS devices?
- *     showAndroid: true,                 // Should the banner be shown on Android devices?
- *     showDesktop: true,                 // Should the banner be shown on desktop devices?
- *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
- *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
- *     make_new_link: false               // Should the banner create a new link, even if a link already exists?
- * }, {
- *     phone: '9999999999',
- *     tags: ['tag1', 'tag2'],
- *     feature: 'dashboard',
- *     stage: 'new user',
- *     type: 1,
- *     data: {
- *         mydata: 'something',
- *         foo: 'bar',
- *         '$desktop_url': 'http://myappwebsite.com',
- *         '$ios_url': 'http://myappwebsite.com/ios',
- *         '$ipad_url': 'http://myappwebsite.com/ipad',
- *         '$android_url': 'http://myappwebsite.com/android',
- *         '$og_app_id': '12345',
- *         '$og_title': 'My App',
- *         '$og_description': 'My app\'s description.',
- *         '$og_image_url': 'http://myappwebsite.com/image.png'
- *     }
- * });
- * ```
- */
-Branch.prototype['banner'] = function(options, linkData) {
-	var bannerOptions = {
-		icon: options['icon'] || '',
-		title: options['title'] || '',
-		description: options['description'] || '',
-		openAppButtonText: options['openAppButtonText'] || 'View in app',
-		downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
-		iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
-		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
-		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
-		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
-		disableHide: !!options['disableHide'],
-		forgetHide: !!options['forgetHide'],
-		make_new_link: !!options['make_new_link']
-	};
-
-	if (typeof options['showMobile'] != 'undefined') {
-		bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
-	}
-
-	banner(this, bannerOptions, linkData, this._storage);
-};
-

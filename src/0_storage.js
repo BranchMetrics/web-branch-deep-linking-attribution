@@ -47,11 +47,17 @@ BranchStorage.prototype['clear'] = function() {
 /**
  * @return {BranchStorage}
  */
-storage = function() {
+storage = function(local) {
 	try {
-		sessionStorage.setItem("test", "");
-		sessionStorage.removeItem("test");
-		return sessionStorage;
+		if (local) {
+			localStorage.setItem("test", "");
+			localStorage.removeItem("test");
+			return localStorage;
+		} else {
+			sessionStorage.setItem("test", "");
+			sessionStorage.removeItem("test");
+			return sessionStorage;
+		}
 	}
 	catch (e) {
 		return new BranchStorage();

@@ -71,7 +71,11 @@ Server.prototype.getUrl = function(resource, data) {
 			}
 		}
 	}
-	return { data: this.serializeObject(d, ''), url: url };
+	if (resource.method == 'GET') {
+		return { data: this.serializeObject(d, ''), url: url };
+	} else {
+		return { data: goog.json.serialize(d), url: url };
+	}
 };
 
 /**
@@ -142,7 +146,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 
 	try {
 		req.open(method, url, true);
-		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		req.setRequestHeader('Content-Type', 'application/json');
+//		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
 		req.send(data);
 	}
 	catch (e) {

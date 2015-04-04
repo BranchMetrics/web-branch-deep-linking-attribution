@@ -17,3 +17,5 @@ dist/build.min.js.gz
 docs/1_onpage.md
 docs/3_branch.md
 compiler-latest.zip
+testbed/platforms/android/bin
+testbed/platforms/ios/Branch-Cordova-SDK-Testbed.xcodeproj/xcuserdata
