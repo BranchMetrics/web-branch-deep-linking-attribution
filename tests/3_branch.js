@@ -239,6 +239,60 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('sendSMS', function() {
+		// basicTests('sendSMS', [ 3, 4 ]);
+
+		var linkData = testUtils.params({
+			tags: [ 'tag1', 'tag2' ],
+			channel: 'sample app',
+			feature: 'create link',
+			stage: 'created link',
+			type: 1,
+			data: {
+				mydata: 'bar',
+				'$desktop_url': 'https://cdn.branch.io/example.html',
+				'$og_title': 'Branch Metrics',
+				'$og_description': 'Branch Metrics',
+				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+			}
+		});
+
+		it('should call SMSLinkSend if a click_id already exists', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			sandbox.stub(utils, "readKeyValue", function(key, storage) {
+				return '12345';
+			});
+
+			var expectedRequest = {
+				"link_url": "12345",
+				"phone": "9999999999",
+				"app_id": app_id
+			};
+
+			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback();
+			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
+		});
+
+		it('should create new link if a click_id does not exist', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			sandbox.stub(utils, "readKeyValue", function(key, storage) {
+				return null;
+			});
+			sandbox.stub(branch, "link", function(linkData, callback) {
+				callback(null, "https://bnc.lt/l/4FPE0v-04H");
+			});
+
+			branch.sendSMS('9999999999', linkData, function(err, data) { assert(!err, 'No error'); });
+			assert.equal(requests.length, 1, 'Requests made');
+			requests[0].callback(null, { "click_id":"4FWepu-03S" });
+			assert.equal(requests.length, 2, 'Requests made');
+			requests[1].callback();
+		});
+	});
+
 	describe('referrals', function() {
 		basicTests('referrals', [ 0 ]);
 

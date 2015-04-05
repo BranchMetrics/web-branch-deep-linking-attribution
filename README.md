@@ -35,7 +35,7 @@ _Be sure to replace `APP-KEY` with your actual app key found in your [account da
 
 ```html
 <script type="text/javascript">
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.3.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 branch.init('APP-KEY', function(err, data) {
     // callback to handle err or data
@@ -326,7 +326,16 @@ same link. Otherwise, it will create a new link with the data provided in
 the `metadata` argument. `sendSMS` also  registers a click event with the
 `channel` pre-filled with `'sms'` before sending an sms to the provided
 `phone` parameter. This way the entire link click event is recorded starting
-with the user sending an sms. **Supports international SMS**.
+with the user sending an sms.
+
+**Note**: `sendSMS` will *automatically* send a previously generated link click,
+along with the `data` object in the original link. Therefore, it is unneccessary for the
+`data()` method to be called to check for an already existing link. If a link already
+exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link.
+If this behaivior is not desired, set `make_new_link: true` in the `options` object argument
+of `sendSMS`, and `sendSMS` will always make a new link.
+
+**Supports international SMS**.
 
 #### Usage
 ```js

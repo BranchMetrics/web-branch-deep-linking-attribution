@@ -1217,11 +1217,17 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
   function e(b) {
     f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d));
   }
-  "function" == typeof c ? (d = c, c = {}) : "undefined" == typeof c && (c = {});
-  c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
     return wrapError(Error(utils.message(utils.messages.nonInit)), d);
   }
+  if ("function" == typeof c) {
+    d = c, c = {};
+  } else {
+    if ("undefined" == typeof c || null == c) {
+      c = {};
+    }
+  }
+  c.make_new_link = c.make_new_link || !1;
   var f = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
   utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, wrapErrorFunc(function(a) {
