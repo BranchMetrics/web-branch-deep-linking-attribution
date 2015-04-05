@@ -148,15 +148,23 @@ describe('Branch', function() {
 	});
 
 	describe('data', function() {
-		it('should return session storage contents', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
-
+		it('should return whitelisted session storage data', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			var whitelistedData = {
+				'data': 'data',
+				'referring_identity': 'referring_user',
+				'identity': 'identity',
+				'has_app': false
+			};
+			sandbox.stub(utils, "whiteListSessionData", function(data) {
+				return data;
+			});
+			sandbox.stub(utils, "readStore", function(storage) {
+				return whitelistedData;
+			});
 			branch.data(function(err, data) {
-				// todo: this seems very bogus?
-				assert.equal(data.identity, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'identity matches');
-				assert.equal(data.has_app, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'has_app matches');
-				assert.equal(data.referring_identity, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'referring_identity matches');
-				assert.equal(data.data, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'data matches');
+				assert(!err, 'No error');
+				assert.deepEqual(data, whitelistedData, 'whitelisted data returned');
 			});
 		});
 	});
