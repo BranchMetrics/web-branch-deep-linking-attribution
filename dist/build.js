@@ -867,7 +867,7 @@ Server.prototype.getUrl = function(a, b) {
       "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
     }
   }
-  return "GET" == a.method ? {data:this.serializeObject(f, ""), url:e} : {data:goog.json.serialize(f), url:e};
+  return {data:this.serializeObject(f, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
   var b = document.createElement("script");
@@ -905,7 +905,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     }
   };
   try {
-    f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/json"), f.send(b);
+    f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
     d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
