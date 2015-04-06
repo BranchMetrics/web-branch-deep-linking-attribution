@@ -60,16 +60,24 @@ describe('Branch', function() {
 
 	describe('init', function() {
 		it('should call api with params and version', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(6, done);
+			var branch = initBranch(false), assert = testUtils.plan(7, done);
+			sandbox.stub(utils, "whiteListSessionData", function(data) {
+				return data;
+			});
+			var expectedResponse = {
+				"session_id": "113636235674656786",
+				"identity_id": "98807509250212101",
+				"identity": "Branch",
+				"has_app":true
+			};
 
-			// Todo: assert the data actually passed back here.
 			branch.init(app_id, function(err, res) {
-				console.log(res);
+				assert.deepEqual(res, expectedResponse, 'expected response returned');
 				assert(!err, 'No error');
 			});
 
 			requests[0].callback(null, browser_fingerprint_id);
-			requests[1].callback(null, { session_id: "1234", something: "else" });
+			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
 			assert.deepEqual(requests[0].obj, { "v": config.version, app_id: app_id }, 'Request params to _r correct');
@@ -266,54 +274,59 @@ describe('Branch', function() {
 	describe('link', function() {
 		basicTests('link', [ 1 ]);
 
-		var expectedRequest = testUtils.params({
-			tags: [ 'tag1', 'tag2' ],
-			channel: 'sample app',
-			feature: 'create link',
-			stage: 'created link',
-			type: 1,
-			data: {
-				mydata: "bar",
-				"$desktop_url": "https://cdn.branch.io/example.html",
-				"$og_title": "Branch Metrics",
-				"$og_description": "Branch Metrics",
-				"$og_image_url": "http://branch.io/img/logo_icon_white.png"
+		var expectedRequest = function(serialized, source, desktop_url_append) {
+				var val = testUtils.params({
+				tags: [ 'tag1', 'tag2' ],
+				channel: 'sample app',
+				feature: 'create link',
+				stage: 'created link',
+				type: 1,
+				data: {
+					mydata: 'bar',
+					'$desktop_url': 'https://cdn.branch.io/example.html',
+					'$og_title': 'Branch Metrics',
+					'$og_description': 'Branch Metrics',
+					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+				}
+			});
+			if (desktop_url_append) {
+				val['data']['$desktop_url'] += desktop_url_append;
 			}
-		});
+			if (serialized) {
+				val['data'] = JSON.stringify(val['data']);
+			}
+			if (source) {
+				val['source'] = 'web-sdk';
+			}
+			return val;
+		};
 
 		var expectedResponse = { "url": "https://bnc.lt/l/3HZMytU-BW" };
 
-		it('should call api with data and return link', function(done) {
+		it('should call api with serialized data and return link', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(4, done);
-
-			(function(expectedRequest) {
-				branch.link(expectedRequest, function(err, link) {
+			branch.link(expectedRequest(), function(err, link) {
 				assert(!err, 'No error');
 				assert.equal(link, expectedResponse["url"], 'link returned');
-			})})(expectedRequest);
-
+			});
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
+			assert.deepEqual(requests[0].obj, expectedRequest(true, true), 'All params sent');
 		});
 
 		it('should add source = "web-sdk" to link data', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(2, done);
-			(function(expectedRequest) { branch.link(expectedRequest); })(expectedRequest);
-
+			branch.link(expectedRequest());
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].obj['source'], 'web-sdk', 'web-sdk source set');
 		});
-		/*
+
 		it('should remove r hash from desktop_url', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(2, done);
-			expectedRequest['data']['$desktop_url'] += '#r:12345';
-			(function(expectedRequest) { branch.link(expectedRequest); })(expectedRequest);
+			branch.link(expectedRequest(false, false, '#r:12345'));
 			assert.equal(requests.length, 1, 'Request made');
-			console.log(requests[0].obj['data']);
-			assert.equal(requests[0].obj['data']['$desktop_url'].indexOf('#r:12345'), -1, 'web-sdk source set');
+			assert.equal(JSON.parse(requests[0].obj['data'])['$desktop_url'].indexOf('#r:12345'), -1, 'web-sdk source set');
 		});
-		*/
 	});
 
 	describe('sendSMS', function() {
