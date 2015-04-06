@@ -4,6 +4,8 @@ goog.require('resources');
 goog.require('config');
 goog.require('storage');
 
+goog.require('goog.json'); // jshint unused:false
+
 describe('Branch', function() {
 	var sandbox, requests;
 
@@ -61,7 +63,10 @@ describe('Branch', function() {
 			var branch = initBranch(false), assert = testUtils.plan(6, done);
 
 			// Todo: assert the data actually passed back here.
-			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.init(app_id, function(err, res) {
+				console.log(res);
+				assert(!err, 'No error');
+			});
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, { session_id: "1234", something: "else" });
@@ -162,9 +167,9 @@ describe('Branch', function() {
 			sandbox.stub(utils, "readStore", function(storage) {
 				return whitelistedData;
 			});
-			branch.data(function(err, data) {
+			branch.data(function(err, res) {
 				assert(!err, 'No error');
-				assert.deepEqual(data, whitelistedData, 'whitelisted data returned');
+				assert.deepEqual(res, whitelistedData, 'whitelisted data returned');
 			});
 		});
 	});
@@ -173,16 +178,22 @@ describe('Branch', function() {
 		basicTests('setIdentity', [ 1 ]);
 
 		var expectedRequest = testUtils.params({ "identity": "test_identity" }, [ 'session_id', 'browser_fingerprint_id' ]);
+		var expectedResponse = {
+			identity_id: '12345',
+			link: 'url',
+			referring_data: { },
+			referring_identity: '12345'
+		};
 		it('should call api with identity', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 
 			branch.setIdentity("test_identity", function(err, res) {
-				// todo: make some assertions about res
+				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
+			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
 	});
@@ -190,16 +201,50 @@ describe('Branch', function() {
 	describe('track', function() {
 		basicTests('track', [ 1, 2 ]);
 
-		it('should call api with event', function(done) {
+		it('should call api with event with no metadata', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 			branch.track("test_event", function(err) {
-				// todo: call back with something specific, make more assertions
 				assert(!err, 'No error');
 			});
+			var expectedRequest = {
+				"event": "test_event",
+				"metadata": {
+					"url": document.URL,
+					"user_agent": navigator.userAgent,
+					"language": navigator.language
+				},
+				"app_id": app_id,
+				"session_id": session_id
+			};
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
-			assert.equal(requests[0].obj["event"], "test_event", 'All params sent');
+			requests[0].callback(null);
+			assert.deepEqual(requests[0].obj, expectedRequest, 'Expected request sent');
+		});
+
+		it('should call api with event with metadata', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var metadata = {
+				"test": "meta_data"
+			};
+			branch.track("test_event", metadata, function(err) {
+				assert(!err, 'No error');
+			});
+			var expectedRequest = {
+				"event": "test_event",
+				"metadata": {
+					"url": document.URL,
+					"user_agent": navigator.userAgent,
+					"language": navigator.language,
+					"test": "meta_data"
+				},
+				"app_id": app_id,
+				"session_id": session_id
+			};
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null);
+			assert.deepEqual(requests[0].obj, expectedRequest, 'Expected request sent');
 		});
 	});
 
@@ -228,23 +273,47 @@ describe('Branch', function() {
 			stage: 'created link',
 			type: 1,
 			data: {
-				mydata: 'bar',
-				'$desktop_url': 'https://cdn.branch.io/example.html',
-				'$og_title': 'Branch Metrics',
-				'$og_description': 'Branch Metrics',
-				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+				mydata: "bar",
+				"$desktop_url": "https://cdn.branch.io/example.html",
+				"$og_title": "Branch Metrics",
+				"$og_description": "Branch Metrics",
+				"$og_image_url": "http://branch.io/img/logo_icon_white.png"
 			}
 		});
 
-		it('should call api with identity', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			branch.link(expectedRequest, function(err) { assert(!err, 'No error'); });
+		var expectedResponse = { "url": "https://bnc.lt/l/3HZMytU-BW" };
 
-			// todo: call back with something specific, make more assertions
+		it('should call api with data and return link', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			(function(expectedRequest) {
+				branch.link(expectedRequest, function(err, link) {
+				assert(!err, 'No error');
+				assert.equal(link, expectedResponse["url"], 'link returned');
+			})})(expectedRequest);
+
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
+			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
+
+		it('should add source = "web-sdk" to link data', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			(function(expectedRequest) { branch.link(expectedRequest); })(expectedRequest);
+
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].obj['source'], 'web-sdk', 'web-sdk source set');
+		});
+		/*
+		it('should remove r hash from desktop_url', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			expectedRequest['data']['$desktop_url'] += '#r:12345';
+			(function(expectedRequest) { branch.link(expectedRequest); })(expectedRequest);
+			assert.equal(requests.length, 1, 'Request made');
+			console.log(requests[0].obj['data']);
+			assert.equal(requests[0].obj['data']['$desktop_url'].indexOf('#r:12345'), -1, 'web-sdk source set');
+		});
+		*/
 	});
 
 	describe('sendSMS', function() {
@@ -293,7 +362,7 @@ describe('Branch', function() {
 				callback(null, "https://bnc.lt/l/4FPE0v-04H");
 			});
 
-			branch.sendSMS('9999999999', linkData, function(err, data) { assert(!err, 'No error'); });
+			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
 			assert.equal(requests.length, 1, 'Requests made');
 			requests[0].callback(null, { "click_id":"4FWepu-03S" });
 			assert.equal(requests.length, 2, 'Requests made');
@@ -305,14 +374,30 @@ describe('Branch', function() {
 		basicTests('referrals', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			var expectedResponse = {
+				"install": {
+					"total": 5,
+					"unique": 2
+				},
+				"open": {
+					"total": 4,
+					"unique": 3
+				},
+				"buy": {
+					"total": 7,
+					"unique": 3
+				}
+			};
+
 			branch.referrals(function(err, res) {
-				// todo: call back with something specific, make assertions on res
+				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
+			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'app_id', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
@@ -321,13 +406,20 @@ describe('Branch', function() {
 		basicTests('credits', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			branch.credits(function(err) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			var expectedResponse = {
+				"default": 15,
+				"other bucket": 9
+			}
+
+			branch.credits(function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
+			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'app_id', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
@@ -338,7 +430,6 @@ describe('Branch', function() {
 		it('should call api with identity_id', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 			branch.redeem(1, "testbucket", function(err) {
-				// todo: call back with something specific, make more assertions
 				assert(!err, 'No error');
 			});
 
