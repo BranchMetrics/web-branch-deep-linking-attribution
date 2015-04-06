@@ -886,14 +886,16 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.onreadystatechange = function() {
-    if (4 === f.readyState && 200 === f.status) {
-      try {
-        e(null, goog.json.parse(f.responseText));
-      } catch (a) {
-        e(null, {});
+    if (4 === f.readyState) {
+      if (200 === f.status) {
+        try {
+          e(null, goog.json.parse(f.responseText));
+        } catch (a) {
+          e(null, {});
+        }
+      } else {
+        402 === f.status ? e(Error("Not enough credits to redeem.")) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
       }
-    } else {
-      4 === f.readyState && 402 === f.status ? e(Error("Not enough credits to redeem.")) : 4 !== f.readyState || "4" != f.status.toString().substring(0, 1) && "5" != f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
     }
   };
   try {
@@ -1223,7 +1225,7 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
   if ("function" == typeof c) {
     d = c, c = {};
   } else {
-    if ("undefined" == typeof c || null == c) {
+    if ("undefined" === typeof c || null === c) {
       c = {};
     }
   }

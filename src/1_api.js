@@ -124,19 +124,21 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 	req.onreadystatechange = function() {
-		if (req.readyState === 4 && req.status === 200) {
-			try {
-				callback(null, goog.json.parse(req.responseText));
+		if (req.readyState === 4) {
+			if (req.status === 200) {
+				try {
+					callback(null, goog.json.parse(req.responseText));
+				}
+				catch (e) {
+					callback(null, { });
+				}
 			}
-			catch (e) {
-				callback(null, {});
+			else if (req.status === 402) {
+				callback(new Error('Not enough credits to redeem.'));
 			}
-		}
-		else if (req.readyState === 4 && req.status === 402) {
-			callback(new Error('Not enough credits to redeem.'));
-		}
-		else if (req.readyState === 4 && (req.status.toString().substring(0, 1) == "4" || req.status.toString().substring(0, 1) == "5")) {
-			callback(new Error('Error in API: ' + req.status));
+			else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
+				callback(new Error('Error in API: ' + req.status));
+			}
 		}
 	};
 
