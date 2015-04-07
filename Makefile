@@ -6,7 +6,7 @@ COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() 
 
 .PHONY: clean
 
-all: dist/build.js dist/build.min.js.gz README.md example.html tests/branch-deps.js
+all: dist/build.js dist/build.min.js.gz README.md example.html tests/branch-deps.js docs/1_onpage.md
 docs: README.md
 clean:
 	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md example.html tests/branch-deps.js
