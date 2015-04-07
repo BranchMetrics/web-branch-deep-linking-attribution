@@ -97,13 +97,15 @@ This needs to be set before the Branch.init call!!!
 
 
 
-### init(app_id, callback) 
+### init(app_id, callback, isReferrable) 
 
 **Parameters**
 
 **app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
 
 **callback**: `function`, _optional_ - callback to read the session data.
+
+**isReferrable**: `boolean`, _optional_ - Is this a referrable session.
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to

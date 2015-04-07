@@ -88,7 +88,6 @@ resources.install = {
 		"screen_height": validator(false, validationTypes.num),
 		"is_referrable": validator(false, validationTypes.num),
 		"update": validator(false, validationTypes.num),
-		"link_identifier": validator(false, validationTypes.str),
 		"add_tracking_enabled": validator(false, validationTypes.bool)
 	}
 };
@@ -109,8 +108,7 @@ resources.open = {
 		"os": validator(false, validationTypes.str),
 		"uri_scheme": validator(false, validationTypes.str),
 		"os_version": validator(false, validationTypes.str),
-		"is_referrable": validator(false, validationTypes.num),
-		"link_identifier": validator(false, validationTypes.str)
+		"is_referrable": validator(false, validationTypes.num)
 	}
 };
 

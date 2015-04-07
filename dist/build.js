@@ -836,7 +836,7 @@ Server.prototype.serializeObject = function(a, b) {
   var c = [];
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
-      c.push(encodeURIComponent(b) + "[]=" + encodeURIComponent(a[d]));
+      c.push(encodeURIComponent(b) + "=" + encodeURIComponent(a[d]));
     }
   } else {
     for (d in a) {
@@ -965,9 +965,9 @@ function validator(a, b) {
 var branch_id = /^[0-9]{15,20}$/;
 resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), bluetooth_version:validator(!1, 
 validationTypes.str), has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), is_referrable:validator(!1, 
-validationTypes.num), update:validator(!1, validationTypes.num), link_identifier:validator(!1, validationTypes.str), add_tracking_enabled:validator(!1, validationTypes.bool)}};
+validationTypes.num), update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}};
 resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), 
-uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), is_referrable:validator(!1, validationTypes.num), link_identifier:validator(!1, validationTypes.str)}};
+uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), is_referrable:validator(!1, validationTypes.num)}};
 resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), identity:validator(!0, validationTypes.str)}};
 resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id)}};
@@ -1181,40 +1181,40 @@ Branch.prototype._api = function(a, b, c) {
 Branch.prototype.setDebug = function(a) {
   this.debug = a;
 };
-Branch.prototype.init = function(a, b) {
-  function c(a) {
-    d.session_id = a.session_id;
-    d.identity_id = a.identity_id;
-    d.sessionLink = a.link;
-    d.device_fingerprint_id = a.device_fingerprint_id;
-    d.link_click_id = a.link_click_id;
-    d.initialized = !0;
+Branch.prototype.init = function(a, b, c) {
+  function d(a) {
+    e.session_id = a.session_id;
+    e.identity_id = a.identity_id;
+    e.sessionLink = a.link;
+    e.device_fingerprint_id = a.device_fingerprint_id;
+    e.link_click_id = a.link_click_id;
+    e.initialized = !0;
   }
   if (this.initialized) {
     return wrapError(Error(utils.message(utils.messages.existingInit)), b);
   }
   this.app_id = a;
-  var d = this, e = utils.readStore(this._storage);
-  e && e.session_id ? (c(e), b && b(null, utils.whiteListSessionData(e))) : utils.readKeyValue("identity_id", d._permStorage) ? (d.identity_id = utils.readKeyValue("identity_id", d._permStorage), d.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage), cordova.plugins.branch_device.getOpenData(d.debug, function(a) {
+  var e = this;
+  (a = utils.readStore(this._storage)) && a.session_id ? (d(a), b && b(null, utils.whiteListSessionData(a))) : utils.readKeyValue("identity_id", e._permStorage) ? (e.identity_id = utils.readKeyValue("identity_id", e._permStorage), e.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", e._permStorage), a = [], "undefined" !== typeof c && null != c && a.push(c ? 1 : 0), cordova.plugins.branch_device.getOpenData(a, function(a) {
     console.log("Sending open.");
-    d._api(resources.open, a, wrapErrorFunc(function(a) {
+    e._api(resources.open, a, wrapErrorFunc(function(a) {
       console.log("Open successful: " + a);
-      c(a);
-      utils.storeKeyValue("identity_id", a.identity_id, d._permStorage);
-      utils.storeKeyValue("device_fingerprint_id", a.device_fingerprint_id, d._permStorage);
-      utils.store(a, d._storage);
+      d(a);
+      utils.storeKeyValue("identity_id", a.identity_id, e._permStorage);
+      utils.storeKeyValue("device_fingerprint_id", a.device_fingerprint_id, e._permStorage);
+      utils.store(a, e._storage);
       b && b(null, a);
     }, b));
-  }, this)) : cordova.plugins.branch_device.getInstallData(d.debug, function(a) {
+  }, this)) : (a = [], a.push(e.debug), "undefined" !== typeof c && null != c && a.push(c ? 1 : 0), cordova.plugins.branch_device.getInstallData(a, function(a) {
     console.log("Sending install.");
-    d._api(resources.install, a, wrapErrorFunc(function(a) {
+    e._api(resources.install, a, wrapErrorFunc(function(a) {
       console.log("Install successful: " + a);
-      c(a);
-      utils.store(a, d._storage);
-      utils.store(a, d._permStorage);
+      d(a);
+      utils.store(a, e._storage);
+      utils.store(a, e._permStorage);
       b && b(null, a);
     }, b));
-  }, this);
+  }, this));
 };
 Branch.prototype.data = function(a) {
   if (a) {

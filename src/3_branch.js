@@ -122,6 +122,7 @@ Branch.prototype['setDebug'] = function(debug) {
  * @function Branch.init
  * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ * @param {boolean} isReferrable - _optional_ - Is this a referrable session.
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -162,7 +163,7 @@ Branch.prototype['setDebug'] = function(debug) {
  * ___
  * 
  */
-Branch.prototype['init'] = function(app_id, callback) {
+Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 	if (this.initialized) { return wrapError(new Error(utils.message(utils.messages.existingInit)), callback); }
 
 	this.app_id = app_id;
@@ -187,7 +188,11 @@ Branch.prototype['init'] = function(app_id, callback) {
 		if (utils.readKeyValue('identity_id', self._permStorage)) {
 			self.identity_id = utils.readKeyValue('identity_id', self._permStorage);
 			self.device_fingerprint_id = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-			cordova.plugins.branch_device.getOpenData(self.debug, function(data) {
+			var args = [];
+			if ((typeof isReferrable !== "undefined") && (isReferrable != null)) {
+				args.push((isReferrable)?1:0);
+			}
+			cordova.plugins.branch_device.getOpenData(args, function(data) {
 				console.log("Sending open.");
 				self._api(resources.open, data, wrapErrorFunc(function(data) {
 					console.log("Open successful: " + data);
@@ -199,7 +204,12 @@ Branch.prototype['init'] = function(app_id, callback) {
 				}, callback));
 			}, this);
 		} else {
-			cordova.plugins.branch_device.getInstallData(self.debug, function(data) {
+			var args = [];
+			args.push(self.debug);
+			if ((typeof isReferrable !== "undefined") && (isReferrable != null)) {
+				args.push((isReferrable)?1:0);
+			}
+			cordova.plugins.branch_device.getInstallData(args, function(data) {
 				console.log("Sending install.");
 				self._api(resources.install, data, wrapErrorFunc(function(data) {
 					console.log("Install successful: " + data);
