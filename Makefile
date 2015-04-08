@@ -3,13 +3,16 @@ COMPILER_LIBRARY=compiler/library/closure-library-master/closure
 SOURCES=src/0_config.js src/0_storage.js src/0_utils.js src/0_queue.js src/0_banner_utils.js src/1_api.js src/1_resources.js src/1_banner_css.js src/1_banner_html.js src/2_banner.js src/3_branch.js src/4_initialization.js $(COMPILER_LIBRARY)/goog/**
 EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --only_closure_dependencies --closure_entry_point branch_instance
+VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/$$1/')
+ONPAGE_VERSION=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="https://cdn.branch.io/branch-v$(VERSION).min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
+ONPAGE_BUILD=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="dist/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 
 .PHONY: clean
 
 all: dist/build.js dist/build.min.js.gz README.md example.html tests/branch-deps.js
 docs: README.md
 clean:
-	rm dist/build.js dist/build.min.js docs/1_onpage.md docs/3_branch.md dist/build.min.js.gz README.md example.html tests/branch-deps.js
+	rm dist/build.js dist/build.min.js docs/3_branch.md dist/build.min.js.gz README.md example.html tests/branch-deps.js
 
 
 # Kinda gross, but will download closure compiler if you don't have it.
@@ -43,7 +46,7 @@ docs/3_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
 	jsdox src/3_branch.js --output docs
 
-dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar 
+dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	@echo "\nMinifying debug js..."
 	mkdir -p dist
 	$(COMPILER) $(COMPILER_ARGS) \
@@ -63,16 +66,16 @@ dist/build.min.js.gz: dist/build.min.js
 	@echo "\nCompressing JS js..."
 	gzip -c dist/build.min.js > dist/build.min.js.gz
 
-docs/1_onpage.md: src/onpage.js compiler/compiler.jar
+example.html: src/example.template.html
+	@echo "\nMinifying on page build script into example.html"
+ifeq "$(release)" "true"
+	perl -pe 'BEGIN{$$a="$(ONPAGE_VERSION)"}; s#// INSERT INIT CODE#$$a#' src/example.template.html > example.html
+else
+	perl -pe 'BEGIN{$$a="$(ONPAGE_BUILD)"}; s#// INSERT INIT CODE#$$a#' src/example.template.html > example.html
+endif
+
+README.md: docs/0_intro.md docs/3_branch.md
+	@echo "\nConcatinating README"
+	cat docs/0_intro.md docs/3_branch.md docs/4_footer.md > README.md
 	@echo "\nMinifying on page script into README"
-	perl -pe 'BEGIN{$$sub="$(version)"?"https://cdn.branch.io/branch-$(version).min.js":"dist/build.js"};s#SCRIPT_URL_HERE#$$sub#' src/onpage.js | \
-		$(COMPILER) | \
-		node transform.js branch_sdk > docs/1_onpage.md
-
-example.html: src/example.template.html docs/1_onpage.md
-	perl -pe 'BEGIN{$$a=`cat docs/1_onpage.md`}; s#// INSERT INIT CODE#$$a#' src/example.template.html > example.html
-
-README.md: docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md
-	@echo "\nConcatinating readme"
-	cat docs/0_intro.md docs/1_onpage.md docs/2_intro.md docs/3_branch.md docs/4_footer.md > README.md
-
+	perl -i -pe 'BEGIN{$$a="$(ONPAGE_VERSION)"}; s#// INSERT INIT CODE#$$a#' README.md
