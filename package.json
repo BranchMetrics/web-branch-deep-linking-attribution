@@ -29,6 +29,7 @@
     "precommit-hook": "^1.0.7",
     "sinon": "^1.13.0",
     "through": "^2.3.6",
-    "karma": "0.12.31"
+    "karma": "0.12.31",
+    "karma-mocha": "~0.1"
   }
 }
