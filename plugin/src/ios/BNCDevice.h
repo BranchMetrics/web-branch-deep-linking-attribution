@@ -24,7 +24,7 @@
 + (NSString *)getOSVersion;
 + (NSNumber *)getScreenWidth;
 + (NSNumber *)getScreenHeight;
-+ (NSNumber *)getUpdateState;
++ (NSNumber *)getUpdateState:(BOOL)updateState;
 + (NSString *)getDeviceName;
 + (BOOL)isSimulator;
 + (BOOL)adTrackingSafe;

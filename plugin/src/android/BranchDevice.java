@@ -21,6 +21,8 @@ import android.app.ActivityManager.MemoryInfo;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -37,6 +39,10 @@ public class BranchDevice extends CordovaPlugin {
 	public static final String BLANK = "bnc_no_value";
 	private static boolean isRealHardwareId;
     private static String linkClickIdentifier;
+    
+	private static final int STATE_FRESH_INSTALL = 0;
+	private static final int STATE_UPDATE = 2;
+	private static final int STATE_NO_CHANGE = 1;
     
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -77,6 +83,9 @@ public class BranchDevice extends CordovaPlugin {
 		JSONObject installPost = new JSONObject();
 		try {
 			boolean debug = args.optBoolean(0);
+			Log.d("BranchDevice", "GetInstallData debug value is " + debug);
+			int isReferrable = args.optInt(1, -1);
+			Log.d("BranchDevice", "GetInstallData isReferrable value is " + isReferrable);
 			String idStr = getUniqueID(debug);
 			if (!idStr.equals(BLANK)) {
 				installPost.put("hardware_id", idStr);
@@ -108,8 +117,12 @@ public class BranchDevice extends CordovaPlugin {
 			installPost.put("screen_height", dMetrics.heightPixels);
 			installPost.put("screen_width", dMetrics.widthPixels);
 			installPost.put("wifi", getWifiConnected());
-			installPost.put("is_referrable", (1 - getUpdateState()));
-			installPost.put("update", getUpdateState());
+			if (isReferrable < 0) {
+				installPost.put("is_referrable", (getUpdateState(false) == 0)?1:0);
+			} else {
+				installPost.put("is_referrable",  isReferrable);
+			}
+			installPost.put("update", getUpdateState(true));
 			if (linkClickIdentifier != null) {
 				installPost.put("link_identifier", linkClickIdentifier);
 			}
@@ -124,8 +137,13 @@ public class BranchDevice extends CordovaPlugin {
     private void getOpenData(JSONArray args, CallbackContext callbackContext) {
 		JSONObject openPost = new JSONObject();
 		try {
-			boolean debug = args.optBoolean(0);
-			openPost.put("is_referrable", 0);
+			int isReferrable = args.optInt(0, -1);
+			Log.d("BranchDevice", "GetInstallData isReferrable value is " + isReferrable);
+			if (isReferrable < 0) {
+				openPost.put("is_referrable", 0);
+			} else {
+				openPost.put("is_referrable", isReferrable);
+			}
 			if (!getAppVersion().equals(BLANK))
 				openPost.put("app_version", getAppVersion());
 			openPost.put("os_version", getOSVersion());
@@ -137,7 +155,6 @@ public class BranchDevice extends CordovaPlugin {
 			if (linkClickIdentifier != null) {
 				openPost.put("link_identifier", linkClickIdentifier);
 			}
-			openPost.put("debug", debug);
 			callbackContext.success(openPost);
 		} catch (JSONException ex) {
 			Log.e("BranchDevice", "Exception creatin open data: " + ex.getMessage());
@@ -294,19 +311,41 @@ public class BranchDevice extends CordovaPlugin {
 	}
 	
 	@SuppressLint("NewApi")
-	public int getUpdateState() {
-		if (android.os.Build.VERSION.SDK_INT >= 9) {
-			try {
-				PackageInfo packageInfo = cordova.getActivity().getPackageManager().getPackageInfo(cordova.getActivity().getPackageName(), 0);
-				if (packageInfo.lastUpdateTime != packageInfo.firstInstallTime) {
-					return 1;
-				} else {
-					return 0;
-				}
-			} catch (NameNotFoundException ignored ) {
+	public int getUpdateState(boolean updatePrefs) {
+		Context context = cordova.getActivity().getApplicationContext();
+		SharedPreferences prefs = context.getSharedPreferences("cordova_prefs", Context.MODE_PRIVATE);
+		String currAppVersion = getAppVersion(); 
+		String storedAppVersion = prefs.getString("bnc_app_version", "");
+		if (storedAppVersion.isEmpty()) {
+			// if no app version is in storage, this must be the first time Branch is here
+			if (updatePrefs) {
+				Editor editor = prefs.edit();
+				editor.putString("bnc_app_version", currAppVersion);
+				editor.commit();
 			}
+			if (android.os.Build.VERSION.SDK_INT >= 9) {
+				// if we can access update/install time, use that to check if it's a fresh install or update
+				try {
+					PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+					if (packageInfo.lastUpdateTime != packageInfo.firstInstallTime) {
+						return STATE_UPDATE;
+					}
+					return STATE_FRESH_INSTALL;
+				} catch (NameNotFoundException ignored ) { }
+			}
+			// otherwise, just register an install
+			return STATE_FRESH_INSTALL;
+		} else if (!storedAppVersion.equals(currAppVersion)) {
+			// if the current app version doesn't match the stored, it's an update
+			if (updatePrefs) {
+				Editor editor = prefs.edit();
+				editor.putString("bnc_app_version", currAppVersion);
+				editor.commit();
+			}
+			return STATE_UPDATE;
 		}
-		return 0;
+		// otherwise it's an open
+		return STATE_NO_CHANGE;
 	}
 	
 	public boolean getWifiConnected() {

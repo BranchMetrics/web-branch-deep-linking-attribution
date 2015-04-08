@@ -46,7 +46,7 @@ var app = {
     	console.log("Sending init");
         branch.init('108978127408988217', function(err, data) {
         	app.initComplete(err, data);
-        });
+        }, true);
         var statusEle = document.getElementById("status");
         statusEle.innerHTML = "Ready..."
     },

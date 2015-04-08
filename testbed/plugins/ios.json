@@ -23,15 +23,15 @@
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"BranchDevice\"><param name=\"ios-package\" value=\"BNCDevice\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"Console\"><param name=\"ios-package\" value=\"CDVLogger\" /></feature>",
                             "count": 1
                         },
                         {
                             "xml": "<feature name=\"Device\"><param name=\"ios-package\" value=\"CDVDevice\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"BranchDevice\"><param name=\"ios-package\" value=\"BNCDevice\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
                         }
                     ]
@@ -43,13 +43,13 @@
         "de.appplant.cordova.plugin.email-composer": {
             "PACKAGE_NAME": "io.branch.sdk.testbed"
         },
-        "io.branch.device": {
-            "PACKAGE_NAME": "io.branch.sdk.testbed"
-        },
         "org.apache.cordova.console": {
             "PACKAGE_NAME": "io.branch.sdk.testbed"
         },
         "org.apache.cordova.device": {
+            "PACKAGE_NAME": "io.branch.sdk.testbed"
+        },
+        "io.branch.device": {
             "PACKAGE_NAME": "io.branch.sdk.testbed"
         }
     },

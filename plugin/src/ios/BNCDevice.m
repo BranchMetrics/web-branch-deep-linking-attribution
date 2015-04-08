@@ -38,6 +38,7 @@ static NSString *link_click_identifier = nil;
 
 - (void)getInstallData:(CDVInvokedUrlCommand *)command {
     BOOL debug = [[command argumentAtIndex:0 withDefault:[NSNumber numberWithBool:NO]] boolValue];
+    int isReferrable = [[command argumentAtIndex:0 withDefault:[NSNumber numberWithInt:-1]] intValue];
     
     NSMutableDictionary *post = [[NSMutableDictionary alloc] init];
     BOOL isRealHardwareId;
@@ -62,20 +63,24 @@ static NSString *link_click_identifier = nil;
     if (screenHeight) [post setObject:screenHeight forKey:@"screen_height"];
     NSString *uriScheme = [BNCDevice getURIScheme];
     if (uriScheme) [post setObject:uriScheme forKey:@"uri_scheme"];
-    NSNumber *updateState = [BNCDevice getUpdateState];
+    NSNumber *updateState = [BNCDevice getUpdateState:YES];
     if (updateState) {
         [post setObject:updateState forKeyedSubscript:@"update"];
     }
     if (link_click_identifier) [post setObject:link_click_identifier forKey:@"link_identifier"];
     [post setObject:[NSNumber numberWithBool:[BNCDevice adTrackingSafe]] forKey:@"ad_tracking_enabled"];
-    [post setObject:[NSNumber numberWithInteger:(updateState == nil)?1:0] forKey:@"is_referrable"];
+    if (isReferrable < 0) {
+        [post setObject:[NSNumber numberWithInteger:(updateState == nil)?1:0] forKey:@"is_referrable"];
+    } else {
+        [post setObject:[NSNumber numberWithInt:isReferrable] forKey:@"is_referrable"];
+    }
     
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:post];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void)getOpenData:(CDVInvokedUrlCommand *)command {
-    BOOL debug = [[command argumentAtIndex:0 withDefault:[NSNumber numberWithBool:NO]] boolValue];
+    int isReferrable = [[command argumentAtIndex:0 withDefault:[NSNumber numberWithInt:-1]] intValue];
     
     NSMutableDictionary *post = [[NSMutableDictionary alloc] init];
     
@@ -87,7 +92,11 @@ static NSString *link_click_identifier = nil;
     NSString *uriScheme = [BNCDevice getURIScheme];
     if (uriScheme) [post setObject:uriScheme forKey:@"uri_scheme"];
     [post setObject:[NSNumber numberWithBool:[BNCDevice adTrackingSafe]] forKey:@"ad_tracking_enabled"];
-    [post setObject:[NSNumber numberWithInteger:0] forKey:@"is_referrable"];
+    if (isReferrable < 0) {
+        [post setObject:[NSNumber numberWithInteger:0] forKey:@"is_referrable"];
+    } else {
+        [post setObject:[NSNumber numberWithInt:isReferrable] forKey:@"is_referrable"];
+    }
     if (link_click_identifier) [post setObject:link_click_identifier forKey:@"link_identifier"];
     
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:post];
@@ -199,7 +208,7 @@ static NSString *link_click_identifier = nil;
     }
 }
 
-+ (NSNumber *)getUpdateState {
++ (NSNumber *)getUpdateState:(BOOL)updateState {
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     NSString *storedAppVersion = [defs objectForKey:@"bnc_app_version"];
     NSString *currentAppVersion = [BNCDevice getAppVersion];
@@ -216,13 +225,17 @@ static NSString *link_click_identifier = nil;
     int appModificationDay = (int)([[bundleAttributes fileModificationDate] timeIntervalSince1970]/(60*60*24));
     
     if (!storedAppVersion) {
-        [defs setValue:currentAppVersion forKey:@"bnc_app_version"];
+        if (updateState) {
+            [defs setValue:currentAppVersion forKey:@"bnc_app_version"];
+        }
         if ([documentsDirAttributes fileCreationDate] && [bundleAttributes fileModificationDate] && (appCreationDay != appModificationDay)) {
             return [NSNumber numberWithInt:2];
         }
         return nil;
     } else if (![storedAppVersion isEqualToString:currentAppVersion]) {
-        [defs setValue:currentAppVersion forKey:@"bnc_app_version"];
+        if (updateState) {
+            [defs setValue:currentAppVersion forKey:@"bnc_app_version"];
+        }
         return [NSNumber numberWithInt:2];
     } else {
         return [NSNumber numberWithInt:1];

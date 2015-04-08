@@ -1,15 +1,15 @@
 cordova.define("io.branch.device.branch_device", function(require, exports, module) { var exec = require("cordova/exec");
 
-exports.getInstallData = function(debug, callback) {
+exports.getInstallData = function(args, callback) {
     exec(callback, function() {
         callback({});
-    }, "BranchDevice", "getInstallData", [debug]);
+    }, "BranchDevice", "getInstallData", args);
 };
 
-exports.getOpenData = function(debug, callback) {
+exports.getOpenData = function(args, callback) {
     exec(callback, function() {
         callback({});
-    }, "BranchDevice", "getOpenData", [debug]);
+    }, "BranchDevice", "getOpenData", args);
 };
 
 });
