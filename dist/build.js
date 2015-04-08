@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.3.3"};
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"http://localhost:1337", version:"1.3.3"};
 // Input 2
 var BranchStorage = function() {
   this._store = {};
@@ -876,7 +876,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window[e] = function() {
     };
     d(Error(utils.messages.timeout));
-  }, 1E4);
+  }, 5E3);
   window[e] = function(a) {
     window.clearTimeout(g);
     d(null, a);
@@ -885,6 +885,10 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  f.timeout = 5E3;
+  f.ontimeout = function() {
+    e(Error(utils.messages.timeout));
+  };
   f.onreadystatechange = function() {
     if (4 === f.readyState) {
       if (200 === f.status) {
