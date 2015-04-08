@@ -2,6 +2,9 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+- Fixes bug that caused errors to not be thrown
+
 ## [v1.3.3] - 2015-03-31
 ### Fixed
 - Add app id to sms sending
