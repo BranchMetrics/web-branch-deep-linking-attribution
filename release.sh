@@ -22,7 +22,15 @@ then
 	mv a src/0_config.js
 fi
 
-make version=$VERSION all
+read -p "Update package.json? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	sed -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json > a
+	mv a package.json
+fi
+
+make release=true all
 
 read -p "Bump changelog version? " -n 1 -r
 echo
@@ -31,14 +39,6 @@ then
 	# this is dumb, dunno why  it does this
 	sed -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md > a
 	mv a CHANGELOG.md
-fi
-
-read -p "Update package.json? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	sed -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json > a
-	mv a package.json
 fi
 
 read -p "Update bower.json? " -n 1 -r
