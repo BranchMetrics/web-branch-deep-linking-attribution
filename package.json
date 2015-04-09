@@ -17,15 +17,11 @@
   },
   "homepage": "https://github.com/BranchMetrics/Web-SDK",
   "devDependencies": {
-    "falafel": "^1.0.1",
-    "jsdoc": "<=3.3.0",
+    "falafel": "1.0.1",
+    "jsdoc": "3.3.0",
     "jsdox": "0.4.9",
-    "jshint": "^2.6.0",
-    "mocha": "^2.2.1",
-    "precommit-hook": "^1.0.7",
-    "sinon": "^1.13.0"
-  },
-  "dependencies": {
-    "jscs": "^1.12.0"
+    "mocha": "2.2.1",
+    "precommit-hook": "1.0.7",
+    "sinon": "1.13.0"
   }
 }
