@@ -4,7 +4,7 @@
   "description": "Branch Metrics Web SDK",
   "main": "dist/build.js",
   "scripts": {
-    "lint": "gulp check"
+    "lint": "./lint.sh"
   },
   "repository": {
     "type": "git",
@@ -18,16 +18,14 @@
   "homepage": "https://github.com/BranchMetrics/Web-SDK",
   "devDependencies": {
     "falafel": "^1.0.1",
-    "gulp": "^3.8.10",
-    "gulp-jscs": "^1.4.0",
-    "gulp-jshint": "^1.9.0",
-    "gulp-util": "^3.0.4",
     "jsdoc": "<=3.3.0",
     "jsdox": "0.4.9",
     "jshint": "^2.6.0",
     "mocha": "^2.2.1",
     "precommit-hook": "^1.0.7",
-    "sinon": "^1.13.0",
-    "through": "^2.3.6"
+    "sinon": "^1.13.0"
+  },
+  "dependencies": {
+    "jscs": "^1.12.0"
   }
 }
