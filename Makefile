@@ -5,14 +5,14 @@ EXTERN=src/extern.js
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --only_closure_dependencies --closure_entry_point branch_instance
 VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/$$1/')
 ONPAGE_VERSION=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="https://cdn.branch.io/branch-v$(VERSION).min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
-ONPAGE_BUILD=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="dist/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
+ONPAGE_BUILD=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="dist/web/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 
 .PHONY: clean
 
-all: dist/build.js dist/build.min.js.gz README.md example.html tests/branch-deps.js
+all: dist/web/build.js dist/web/build.min.js.gz README.md testbeds/web/example.html tests/branch-deps.js
 docs: README.md
 clean:
-	rm dist/build.js dist/build.min.js docs/3_branch.md dist/build.min.js.gz README.md example.html tests/branch-deps.js
+	rm dist/web/build.js dist/web/build.min.js docs/3_branch.md dist/web/build.min.js.gz README.md testbeds/web/example.html tests/branch-deps.js
 
 
 # Kinda gross, but will download closure compiler if you don't have it.
@@ -46,32 +46,32 @@ docs/3_branch.md: $(SOURCES)
 	@echo "\nGenerating docs..."
 	jsdox src/3_branch.js --output docs
 
-dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+dist/web/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	@echo "\nMinifying debug js..."
-	mkdir -p dist
+	mkdir -p dist/web
 	$(COMPILER) $(COMPILER_ARGS) \
 		--formatting=print_input_delimiter \
 		--formatting=pretty_print \
 		--warning_level=VERBOSE \
-		--define 'DEBUG=true' > dist/build.js
+		--define 'DEBUG=true' > dist/web/build.js
 
-dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+dist/web/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	@echo "\nMinifying compressed js..."
-	mkdir -p dist
+	mkdir -p dist/web
 	$(COMPILER) $(COMPILER_ARGS) \
 		--compilation_level ADVANCED_OPTIMIZATIONS \
-		--define 'DEBUG=false' > dist/build.min.js
+		--define 'DEBUG=false' > dist/web/build.min.js
 
-dist/build.min.js.gz: dist/build.min.js
+dist/web/build.min.js.gz: dist/web/build.min.js
 	@echo "\nCompressing JS js..."
-	gzip -c dist/build.min.js > dist/build.min.js.gz
+	gzip -c dist/web/build.min.js > dist/web/build.min.js.gz
 
-example.html: src/example.template.html
-	@echo "\nMinifying on page build script into example.html"
+testbeds/web/example.html: src/web/example.template.html
+	@echo "\nMinifying on page build script into testbeds/web/example.html"
 ifeq "$(release)" "true"
-	perl -pe 'BEGIN{$$a="$(ONPAGE_VERSION)"}; s#// INSERT INIT CODE#$$a#' src/example.template.html > example.html
+	perl -pe 'BEGIN{$$a="$(ONPAGE_VERSION)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
 else
-	perl -pe 'BEGIN{$$a="$(ONPAGE_BUILD)"}; s#// INSERT INIT CODE#$$a#' src/example.template.html > example.html
+	perl -pe 'BEGIN{$$a="$(ONPAGE_BUILD)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
 endif
 
 README.md: docs/0_intro.md docs/3_branch.md
