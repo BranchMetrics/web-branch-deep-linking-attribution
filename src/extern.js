@@ -16,3 +16,6 @@ var module = { exports: {} };
 // var console = { log: function() {}, error: function() {} };
 
 var sessionStorage = { getItem: function() {}, setItem: function() {}, clear: function() {} };
+
+// Used in Cordova
+var require = function(module) {};

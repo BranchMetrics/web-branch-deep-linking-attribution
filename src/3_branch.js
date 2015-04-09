@@ -10,8 +10,9 @@ goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
 goog.require('config');
-
 goog.require('goog.json'); // jshint unused:false
+
+if (utils.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint ignore:line
 
 var default_branch;
 

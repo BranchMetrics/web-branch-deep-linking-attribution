@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="io.branch.sdk" version="1.0.0">
+	<name>BranchDevice</name>
+	<description>Branch Device Plugin</description>
+	<license>Apache 2.0</license>
+	<keywords>branch</keywords>
+	<js-module src="dist/cordova/build.js" name="branch">
+		<clobbers target="branch" />
+		<clobbers target="Branch" />
+	</js-module>
+	<platform name="ios">
+		<config-file target="config.xml" parent="/*">
+			<feature name="BranchDevice">
+				<param name="ios-package" value="BNCDevice" />
+				<param name="onload" value="true" />
+			</feature>
+		</config-file>
+		<header-file src="src/cordova/ios/BNCDevice.h" />
+		<source-file src="src/cordova/ios/BNCDevice.m" />
+	</platform>
+	<platform name="android">
+		<config-file target="config.xml" parent="/*">
+			<feature name="BranchDevice">
+				<param name="android-package" value="io.branch.BranchDevice"/>
+				<param name="onload" value="true" />
+			</feature>
+		</config-file>
+		<source-file src="src/cordova/android/BranchDevice.java" target-dir="src/io/branch" />
+	</platform>
+</plugin>

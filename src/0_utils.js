@@ -11,7 +11,10 @@ goog.require('storage');
 var DEBUG = true;
 
 /** @define {boolean} */
-var WEB_BUILD = true;
+utils.WEB_BUILD = false;
+
+/** @define {boolean} */
+utils.CORDOVA_BUILD = false;
 
 /* jshint ignore:start */
 /** @typedef {string} */
