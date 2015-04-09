@@ -32,7 +32,8 @@
 	<!-- just add others here -->
 
 	<script type="text/javascript">
-		mocha.run();
+		if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+		else { mocha.run(); }
 	</script>
 </body>
 </html>

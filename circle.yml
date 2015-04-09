@@ -16,5 +16,5 @@ dependencies:
 test:
   override:
     # - karma start
-    - npm install -g mocha-phantomjs@2.0.0
+    - npm install -g mocha-phantomjs
     - mocha-phantomjs tests/test.html
