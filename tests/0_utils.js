@@ -55,7 +55,6 @@ describe('utils', function() {
 				"referring_identity": "12345",
 				"identity": "67890"
 			};
-			var whiteListedData = utils.whiteListSessionData(data);
 			assert.equal(null, data["has_app"], 'Make has_app null');
 		});
 	});

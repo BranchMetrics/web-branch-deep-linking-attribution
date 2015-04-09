@@ -41,15 +41,18 @@ describe('Branch', function() {
 		it('should fail if branch not initialized', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(params.length * 2, done);
 
-			for (var i = 0; i < params.length; i++) {
-				var p = testUtils.nulls(params[i]);
-
+			function basicTest(param) {
+				var p = testUtils.nulls(param);
 				branch[call].apply(branch, p.concat(function(err) {
 					assert.equal(err.message, 'Branch SDK not initialized');
 				}));
 				assert.throws(function() {
 					branch[call].apply(branch, p);
 				}, 'Branch SDK not initialized');
+			}
+
+			for (var i = 0; i < params.length; i++) {
+				basicTest(params[i]);
 			}
 		});
 	}
@@ -424,7 +427,7 @@ describe('Branch', function() {
 			var expectedResponse = {
 				"default": 15,
 				"other bucket": 9
-			}
+			};
 
 			branch.credits(function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');

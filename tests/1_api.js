@@ -4,8 +4,6 @@ goog.require('resources');
 goog.require('config');
 goog.require('storage');
 
-var server;
-
 describe('Server helpers', function() {
 	var server = new Server();
 	var assert = testUtils.unplanned();
@@ -33,7 +31,7 @@ describe('Server helpers', function() {
 });
 
 describe('Server', function() {
-	var server = new Server(), xhr, jsonp, requests, clock;
+	var server = new Server(), xhr, requests, clock;
 	beforeEach(function() {
 		storage().clear();
 		xhr = sinon.useFakeXMLHttpRequest();
@@ -89,7 +87,7 @@ describe('Server', function() {
 		it('should error on a status=500', function(done) {
 			var assert = testUtils.plan(1, done);
 			var responseText = 'response';
-			server.XHRRequest(resources.profile, testUtils.params({ "identity": "test_id" }), 'POST', storage(), function(err, data) {
+			server.XHRRequest(resources.profile, testUtils.params({ "identity": "test_id" }), 'POST', storage(), function(err) {
 				assert.equal(err.message, 'Error in API: ' + requests[0].status, 'correct error message');
 			});
 			requests[0].status = 500;
@@ -101,7 +99,7 @@ describe('Server', function() {
 		it('should error on a status=400', function(done) {
 			var assert = testUtils.plan(1, done);
 			var responseText = 'response';
-			server.XHRRequest(resources.profile, testUtils.params({ "identity": "test_id" }), 'POST', storage(), function(err, data) {
+			server.XHRRequest(resources.profile, testUtils.params({ "identity": "test_id" }), 'POST', storage(), function(err) {
 				assert.equal(err.message, 'Error in API: ' + requests[0].status, 'correct error message');
 			});
 			requests[0].status = 400;
@@ -113,7 +111,7 @@ describe('Server', function() {
 		it('should error not enough credits on a status=402', function(done) {
 			var assert = testUtils.plan(1, done);
 			var responseText = 'response';
-			server.XHRRequest(resources.profile, testUtils.params({ "identity": "test_id" }), 'POST', storage(), function(err, data) {
+			server.XHRRequest(resources.profile, testUtils.params({ "identity": "test_id" }), 'POST', storage(), function(err) {
 				assert.equal(err.message, 'Not enough credits to redeem.', 'correct error message');
 			});
 			requests[0].status = 402;
