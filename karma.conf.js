@@ -32,8 +32,8 @@ module.exports = function(config) {
 		// Sauce Labs
 		sauceLabs: {
 			testName: 'Web SDK Unit Tests',
-			username: 'branchmetrics',
-			accessKey: '4d5b5089-370b-44f5-87f4-7e312590b28f',
+			username: process.env.SAUCE_USERNAME,
+			accessKey: process.env.SAUCE_ACCESS_KEY,
 			startConnect: true
 		},
 		customLaunchers: customLaunchers,

@@ -5,7 +5,7 @@ dependencies:
     - mkdir -p compiler
     - wget http://dl.google.com/closure-compiler/compiler-latest.zip
     - unzip compiler-latest.zip -d compiler
-    # Closrue compiler library
+    # Closure compiler library
     - mkdir -p compiler/library
     - wget https://github.com/google/closure-library/archive/master.zip
     - unzip master.zip -d compiler/library
