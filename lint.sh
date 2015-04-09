@@ -16,9 +16,8 @@ for file in $( find src tests | grep '\d_' ); do
     BAD=1
   fi;
 
-  ERRORS=$(jscs -c .jscsrc $file | grep -e '\d code style errors found' | wc -l | tr -d ' \t')
-  if [ "$ERRORS" != 0 ]; then
-    jscs -c .jscsrc $file
+  ERRORS=$( jscs -c .jscsrc $file | grep -v 'No code style errors' | tee >(cat - >&5) )
+  if [ "$ERRORS" != "" ]; then
     BAD=1
   fi;
 done
