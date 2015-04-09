@@ -1,13 +1,12 @@
 #!/bin/bash
 
 BAD=0
-JSHINT
 
 exec 5>&1
 
-for file in $( find src tests | grep '\d_' ); do
+for file in $( find src test | grep '\d_' ); do
   jshintrc=".jshintrc"
-  if [[ $file == tests* ]]; then
+  if [[ $file == test* ]]; then
     jshintrc=".jshintrc-test"
   fi
 

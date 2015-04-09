@@ -7,9 +7,11 @@ goog.provide('utils');
 goog.require('goog.json');
 goog.require('storage');
 
-
 /** @define {boolean} */
 var DEBUG = true;
+
+/** @define {boolean} */
+var WEB_BUILD = true;
 
 /* jshint ignore:start */
 /** @typedef {string} */
