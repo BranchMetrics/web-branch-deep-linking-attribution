@@ -18,16 +18,14 @@ read -p "Update 0_config.js? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	sed -e "s/version = '.*';$/version = '$VERSION_NO_V';/" src/0_config.js > a
-	mv a src/0_config.js
+	sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" src/0_config.js
 fi
 
 read -p "Update package.json? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	sed -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json > a
-	mv a package.json
+	sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json
 fi
 
 make release=true all
@@ -37,16 +35,14 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	# this is dumb, dunno why  it does this
-	sed -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md > a
-	mv a CHANGELOG.md
+	sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
 fi
 
 read -p "Update bower.json? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	sed -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" bower.json > a
-	mv a bower.json
+	sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" bower.json
 fi
 
 read -p "Commit? " -n 1 -r
@@ -85,8 +81,7 @@ read -p "Reset? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	cat CHANGELOG.md | perl -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' > a
-	mv a CHANGELOG.md
+	cat CHANGELOG.md | perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4'
 	make clean && make
 	git commit -am"Resetting to HEAD"
 fi
