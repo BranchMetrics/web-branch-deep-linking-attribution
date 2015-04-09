@@ -84,7 +84,7 @@ ___
 
 * * *
 
-### init(app_id, callback) 
+### init(app_id, callback)
 
 **Parameters**
 
@@ -131,7 +131,7 @@ ___
 
 
 
-### data(callback) 
+### data(callback)
 
 **Parameters**
 
@@ -147,7 +147,7 @@ ___
 
 
 
-### setIdentity(identity, callback) 
+### setIdentity(identity, callback)
 
 **Parameters**
 
@@ -185,7 +185,7 @@ ___
 
 
 
-### logout(callback) 
+### logout(callback)
 
 **Parameters**
 
@@ -212,7 +212,7 @@ ___
 
 
 
-### track(event, metadata, callback) 
+### track(event, metadata, callback)
 
 **Parameters**
 
@@ -246,7 +246,7 @@ ___
 
 
 
-### link(linkData, callback) 
+### link(linkData, callback)
 
 **Parameters**
 
@@ -306,7 +306,7 @@ ___
 
 
 
-### sendSMS(phone, linkData, options, callback) 
+### sendSMS(phone, linkData, options, callback)
 
 **Parameters**
 
@@ -326,7 +326,16 @@ same link. Otherwise, it will create a new link with the data provided in
 the `metadata` argument. `sendSMS` also  registers a click event with the
 `channel` pre-filled with `'sms'` before sending an sms to the provided
 `phone` parameter. This way the entire link click event is recorded starting
-with the user sending an sms. **Supports international SMS**.
+with the user sending an sms.
+
+**Note**: `sendSMS` will *automatically* send a previously generated link click,
+along with the `data` object in the original link. Therefore, it is unneccessary for the
+`data()` method to be called to check for an already existing link. If a link already
+exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link.
+If this behaivior is not desired, set `make_new_link: true` in the `options` object argument
+of `sendSMS`, and `sendSMS` will always make a new link.
+
+**Supports international SMS**.
 
 #### Usage
 ```js
@@ -386,7 +395,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### referrals(callback) 
+### referrals(callback)
 
 **Parameters**
 
@@ -428,7 +437,7 @@ callback(
 
 
 
-### credits(callback) 
+### credits(callback)
 
 **Parameters**
 
@@ -460,7 +469,7 @@ callback(
 
 
 
-### redeem(amount, bucket, callback) 
+### redeem(amount, bucket, callback)
 
 **Parameters**
 
@@ -508,7 +517,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### banner(options, linkData) 
+### banner(options, linkData)
 
 **Parameters**
 
@@ -586,5 +595,4 @@ branch.banner({
 
 ## Bugs / Help / Support
 
-Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs
-please send to [dmitri@branch.io](mailto:dmitri@branch.io).
+Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs please send to [dmitri@branch.io](mailto:dmitri@branch.io).

@@ -1,7 +1,9 @@
-goog.require('storage');
+goog.require('storage'); // jshint ignore:line
 
 describe('storage', function() {
-	var storage = new BranchStorage(); // force custom implemented sessions storage
+	// force custom implemented sessions storage
+	var storage = new BranchStorage(); // jshint ignore:line
+
 	var itemKey = 'key';
 	var itemValue = 'value';
 	var assert = testUtils.unplanned();
@@ -9,7 +11,7 @@ describe('storage', function() {
 	it('should set an item', function() {
 		storage.setItem(itemKey, itemValue);
 		assert.equal(storage._store[itemKey], itemValue, 'key / vaue stored');
-	})
+	});
 
 	it('shold get stored item with key', function() {
 		var item = storage.getItem(itemKey);

@@ -13,6 +13,6 @@
 	"unused": true,
 	"latedef": true,
 	"scripturl": true,
-	"mocha": "true",
-	"predef": [ "console", "module", "goog", "define", "ActiveXObject" ]
+	"mocha": true,
+	"predef": [ "console", "module", "goog", "define", "ActiveXObject", "testUtils", "app_id", "session_id", "identity_id", "browser_fingerprint_id", "sinon" ]
 }

@@ -876,7 +876,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window[e] = function() {
     };
     d(Error(utils.messages.timeout));
-  }, 1E4);
+  }, 5E3);
   window[e] = function(a) {
     window.clearTimeout(g);
     d(null, a);
@@ -885,15 +885,21 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  f.timeout = 5E3;
+  f.ontimeout = function() {
+    e(Error(utils.messages.timeout));
+  };
   f.onreadystatechange = function() {
-    if (4 === f.readyState && 200 === f.status) {
-      try {
-        e(null, goog.json.parse(f.responseText));
-      } catch (a) {
-        e(null, {});
+    if (4 === f.readyState) {
+      if (200 === f.status) {
+        try {
+          e(null, goog.json.parse(f.responseText));
+        } catch (a) {
+          e(null, {});
+        }
+      } else {
+        402 === f.status ? e(Error("Not enough credits to redeem.")) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
       }
-    } else {
-      4 === f.readyState && 402 === f.status ? e(Error("Not enough credits to redeem.")) : 4 !== f.readyState || "4" != f.status.toString().substring(0, 1) && "5" != f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
     }
   };
   try {
@@ -1217,11 +1223,17 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
   function e(b) {
     f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d));
   }
-  "function" == typeof c ? (d = c, c = {}) : "undefined" == typeof c && (c = {});
-  c.make_new_link = c.make_new_link || !1;
   if (!this.initialized) {
     return wrapError(Error(utils.message(utils.messages.nonInit)), d);
   }
+  if ("function" == typeof c) {
+    d = c, c = {};
+  } else {
+    if ("undefined" === typeof c || null === c) {
+      c = {};
+    }
+  }
+  c.make_new_link = c.make_new_link || !1;
   var f = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
   utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, wrapErrorFunc(function(a) {
