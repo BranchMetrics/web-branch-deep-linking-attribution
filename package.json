@@ -25,7 +25,6 @@
     "sinon": "1.13.0",
     "mocha": "^2.2.1",
     "karma": "0.12.31",
-    "phantomjs": "1.9.11",
     "karma-mocha": "~0.1",
     "karma-sauce-launcher": "0.2.10"
   }
