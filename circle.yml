@@ -2,12 +2,12 @@
 dependencies:
   post:
     # Closure COmpiler
-    - mkdir -p compiler && \
-    - wget http://dl.google.com/closure-compiler/compiler-latest.zip && \
+    - mkdir -p compiler
+    - wget http://dl.google.com/closure-compiler/compiler-latest.zip
     - unzip compiler-latest.zip -d compiler
     # Closrue compiler library
-    - mkdir -p compiler/library && \
-    - wget https://github.com/google/closure-library/archive/master.zip && \
+    - mkdir -p compiler/library
+    - wget https://github.com/google/closure-library/archive/master.zip
     - unzip master.zip -d compiler/library
     # Sauceyness
     - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
