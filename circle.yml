@@ -10,8 +10,6 @@ dependencies:
     - wget https://github.com/google/closure-library/archive/master.zip
     - unzip master.zip -d compiler/library
     # Sauceyness
-    - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
-    - tar -xzf sc-latest-linux.tar.gz
     - npm install -g karma-cli
     - npm install
 
