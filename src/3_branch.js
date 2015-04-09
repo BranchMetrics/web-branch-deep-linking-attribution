@@ -82,7 +82,7 @@ Branch = function() {
  */
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
-	this._queue(function(next) {
+		this._queue(function(next) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
@@ -391,7 +391,16 @@ Branch.prototype['link'] = function(linkData, callback) {
  * the `metadata` argument. `sendSMS` also  registers a click event with the
  * `channel` pre-filled with `'sms'` before sending an sms to the provided
  * `phone` parameter. This way the entire link click event is recorded starting
- * with the user sending an sms. **Supports international SMS**.
+ * with the user sending an sms.
+ *
+ * **Note**: `sendSMS` will *automatically* send a previously generated link click,
+ * along with the `data` object in the original link. Therefore, it is unneccessary for the
+ * `data()` method to be called to check for an already existing link. If a link already
+ * exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link.
+ * If this behaivior is not desired, set `make_new_link: true` in the `options` object argument
+ * of `sendSMS`, and `sendSMS` will always make a new link.
+ *
+ * **Supports international SMS**.
  *
  * #### Usage
  * ```js
@@ -451,18 +460,16 @@ Branch.prototype['link'] = function(linkData, callback) {
  *
  */
 Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 	if (typeof options == 'function') {
 		callback = options;
-		options = {};
+		options = { };
 	}
-	else if (typeof options == 'undefined') {
-		options = {};
+	else if (typeof options === 'undefined' || options === null) {
+		options = { };
 	}
 	options["make_new_link"] = options["make_new_link"] || false;
-
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 	var self = this;
-
 	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
 
 	function sendSMS(click_id) {
@@ -528,9 +535,7 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  *
  */
 Branch.prototype['referrals'] = function(callback) {
-	if (!this.initialized) {
-		return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
-	}
+	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 	this._api(resources.referrals, { }, wrapErrorCallback2(callback));
 };
 

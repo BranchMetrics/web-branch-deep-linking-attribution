@@ -4,6 +4,8 @@ goog.require('resources');
 goog.require('config');
 goog.require('storage');
 
+goog.require('goog.json'); // jshint unused:false
+
 describe('Branch', function() {
 	var sandbox, requests;
 
@@ -58,13 +60,24 @@ describe('Branch', function() {
 
 	describe('init', function() {
 		it('should call api with params and version', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(6, done);
+			var branch = initBranch(false), assert = testUtils.plan(7, done);
+			sandbox.stub(utils, "whiteListSessionData", function(data) {
+				return data;
+			});
+			var expectedResponse = {
+				"session_id": "113636235674656786",
+				"identity_id": "98807509250212101",
+				"identity": "Branch",
+				"has_app":true
+			};
 
-			// Todo: assert the data actually passed back here.
-			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.init(app_id, function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'expected response returned');
+				assert(!err, 'No error');
+			});
 
 			requests[0].callback(null, browser_fingerprint_id);
-			requests[1].callback(null, { session_id: "1234", something: "else" });
+			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
 			assert.deepEqual(requests[0].obj, { "v": config.version, app_id: app_id }, 'Request params to _r correct');
@@ -148,15 +161,23 @@ describe('Branch', function() {
 	});
 
 	describe('data', function() {
-		it('should return session storage contents', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
-
-			branch.data(function(err, data) {
-				// todo: this seems very bogus?
-				assert.equal(data.identity, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'identity matches');
-				assert.equal(data.has_app, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'has_app matches');
-				assert.equal(data.referring_identity, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'referring_identity matches');
-				assert.equal(data.data, utils.whiteListSessionData(utils.readStore(branch._storage)).identity_id, 'data matches');
+		it('should return whitelisted session storage data', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			var whitelistedData = {
+				'data': 'data',
+				'referring_identity': 'referring_user',
+				'identity': 'identity',
+				'has_app': false
+			};
+			sandbox.stub(utils, "whiteListSessionData", function(data) {
+				return data;
+			});
+			sandbox.stub(utils, "readStore", function(storage) {
+				return whitelistedData;
+			});
+			branch.data(function(err, res) {
+				assert(!err, 'No error');
+				assert.deepEqual(res, whitelistedData, 'whitelisted data returned');
 			});
 		});
 	});
@@ -165,16 +186,22 @@ describe('Branch', function() {
 		basicTests('setIdentity', [ 1 ]);
 
 		var expectedRequest = testUtils.params({ "identity": "test_identity" }, [ 'session_id', 'browser_fingerprint_id' ]);
+		var expectedResponse = {
+			identity_id: '12345',
+			link: 'url',
+			referring_data: { },
+			referring_identity: '12345'
+		};
 		it('should call api with identity', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 
 			branch.setIdentity("test_identity", function(err, res) {
-				// todo: make some assertions about res
+				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
+			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
 	});
@@ -182,16 +209,50 @@ describe('Branch', function() {
 	describe('track', function() {
 		basicTests('track', [ 1, 2 ]);
 
-		it('should call api with event', function(done) {
+		it('should call api with event with no metadata', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 			branch.track("test_event", function(err) {
-				// todo: call back with something specific, make more assertions
 				assert(!err, 'No error');
 			});
+			var expectedRequest = {
+				"event": "test_event",
+				"metadata": {
+					"url": document.URL,
+					"user_agent": navigator.userAgent,
+					"language": navigator.language
+				},
+				"app_id": app_id,
+				"session_id": session_id
+			};
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
-			assert.equal(requests[0].obj["event"], "test_event", 'All params sent');
+			requests[0].callback(null);
+			assert.deepEqual(requests[0].obj, expectedRequest, 'Expected request sent');
+		});
+
+		it('should call api with event with metadata', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var metadata = {
+				"test": "meta_data"
+			};
+			branch.track("test_event", metadata, function(err) {
+				assert(!err, 'No error');
+			});
+			var expectedRequest = {
+				"event": "test_event",
+				"metadata": {
+					"url": document.URL,
+					"user_agent": navigator.userAgent,
+					"language": navigator.language,
+					"test": "meta_data"
+				},
+				"app_id": app_id,
+				"session_id": session_id
+			};
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null);
+			assert.deepEqual(requests[0].obj, expectedRequest, 'Expected request sent');
 		});
 	});
 
@@ -213,7 +274,65 @@ describe('Branch', function() {
 	describe('link', function() {
 		basicTests('link', [ 1 ]);
 
-		var expectedRequest = testUtils.params({
+		var expectedRequest = function(serialized, source, desktop_url_append) {
+				var val = testUtils.params({
+				tags: [ 'tag1', 'tag2' ],
+				channel: 'sample app',
+				feature: 'create link',
+				stage: 'created link',
+				type: 1,
+				data: {
+					mydata: 'bar',
+					'$desktop_url': 'https://cdn.branch.io/example.html',
+					'$og_title': 'Branch Metrics',
+					'$og_description': 'Branch Metrics',
+					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+				}
+			});
+			if (desktop_url_append) {
+				val['data']['$desktop_url'] += desktop_url_append;
+			}
+			if (serialized) {
+				val['data'] = JSON.stringify(val['data']);
+			}
+			if (source) {
+				val['source'] = 'web-sdk';
+			}
+			return val;
+		};
+
+		var expectedResponse = { "url": "https://bnc.lt/l/3HZMytU-BW" };
+
+		it('should call api with serialized data and return link', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			branch.link(expectedRequest(), function(err, link) {
+				assert(!err, 'No error');
+				assert.equal(link, expectedResponse["url"], 'link returned');
+			});
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null, expectedResponse);
+			assert.deepEqual(requests[0].obj, expectedRequest(true, true), 'All params sent');
+		});
+
+		it('should add source = "web-sdk" to link data', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			branch.link(expectedRequest());
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(requests[0].obj['source'], 'web-sdk', 'web-sdk source set');
+		});
+
+		it('should remove r hash from desktop_url', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			branch.link(expectedRequest(false, false, '#r:12345'));
+			assert.equal(requests.length, 1, 'Request made');
+			assert.equal(JSON.parse(requests[0].obj['data'])['$desktop_url'].indexOf('#r:12345'), -1, 'web-sdk source set');
+		});
+	});
+
+	describe('sendSMS', function() {
+		// basicTests('sendSMS', [ 3, 4 ]);
+
+		var linkData = testUtils.params({
 			tags: [ 'tag1', 'tag2' ],
 			channel: 'sample app',
 			feature: 'create link',
@@ -228,14 +347,39 @@ describe('Branch', function() {
 			}
 		});
 
-		it('should call api with identity', function(done) {
+		it('should call SMSLinkSend if a click_id already exists', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			branch.link(expectedRequest, function(err) { assert(!err, 'No error'); });
+			sandbox.stub(utils, "readKeyValue", function(key, storage) {
+				return '12345';
+			});
 
-			// todo: call back with something specific, make more assertions
+			var expectedRequest = {
+				"link_url": "12345",
+				"phone": "9999999999",
+				"app_id": app_id
+			};
+
+			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
+
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
 			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
+		});
+
+		it('should create new link if a click_id does not exist', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			sandbox.stub(utils, "readKeyValue", function(key, storage) {
+				return null;
+			});
+			sandbox.stub(branch, "link", function(linkData, callback) {
+				callback(null, "https://bnc.lt/l/4FPE0v-04H");
+			});
+
+			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
+			assert.equal(requests.length, 1, 'Requests made');
+			requests[0].callback(null, { "click_id":"4FWepu-03S" });
+			assert.equal(requests.length, 2, 'Requests made');
+			requests[1].callback();
 		});
 	});
 
@@ -243,14 +387,30 @@ describe('Branch', function() {
 		basicTests('referrals', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			var expectedResponse = {
+				"install": {
+					"total": 5,
+					"unique": 2
+				},
+				"open": {
+					"total": 4,
+					"unique": 3
+				},
+				"buy": {
+					"total": 7,
+					"unique": 3
+				}
+			};
+
 			branch.referrals(function(err, res) {
-				// todo: call back with something specific, make assertions on res
+				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
+			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'app_id', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
@@ -259,13 +419,20 @@ describe('Branch', function() {
 		basicTests('credits', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			branch.credits(function(err) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			var expectedResponse = {
+				"default": 15,
+				"other bucket": 9
+			}
+
+			branch.credits(function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
 
 			assert.equal(requests.length, 1, 'Request made');
-			requests[0].callback();
+			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'app_id', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
@@ -276,7 +443,6 @@ describe('Branch', function() {
 		it('should call api with identity_id', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 			branch.redeem(1, "testbucket", function(err) {
-				// todo: call back with something specific, make more assertions
 				assert(!err, 'No error');
 			});
 
