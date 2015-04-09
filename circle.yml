@@ -9,7 +9,7 @@ dependencies:
     - mkdir -p compiler/library
     - wget https://github.com/google/closure-library/archive/master.zip
     - unzip master.zip -d compiler/library
-    # Sauceyness
+    # node modules
     - npm install -g karma-cli
     - npm install
 
