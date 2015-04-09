@@ -10,11 +10,11 @@ dependencies:
     - wget https://github.com/google/closure-library/archive/master.zip
     - unzip master.zip -d compiler/library
     # node modules
-    - npm install -g karma-cli
+    # - npm install -g karma-cli
     - npm install
 
 test:
   override:
     # - karma start
-    npm install -g mocha-phantomjs
-    mocha-phantomjs tests/test.html
+    - npm install -g mocha-phantomjs
+    - mocha-phantomjs tests/test.html
