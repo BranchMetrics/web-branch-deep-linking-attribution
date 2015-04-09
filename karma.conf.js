@@ -15,36 +15,38 @@ module.exports = function(config) {
 			version: '30'
 		},
 		// iOS
-		sl_ios_safari: {
+		sl_ios_safari_8: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
 			platform: 'OS X 10.9',
 			version: '8.2'
 		},
-		sl_ios_safari: {
+		sl_ios_safari_7: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
 			platform: 'OS X 10.9',
 			version: '7.1'
 		},
-		sl_ios_safari: {
+		sl_ios_safari_6: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
 			platform: 'OS X 10.9',
 			version: '6.1'
 		},
-		sl_ios_safari: {
+		sl_ios_safari_5: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
 			platform: 'OS X 10.9',
 			version: '5.1'
 		},
-		sl_ios_safari: {
+		sl_ios_safari_4: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
 			platform: 'OS X 10.9',
 			version: '4.3'
 		},
+		// Android
+
 		// internet exploder
 		sl_ie_11: {
 			base: 'SauceLabs',
@@ -52,19 +54,19 @@ module.exports = function(config) {
 			platform: 'Windows 8.1',
 			version: '11'
 		},
-		sl_ie_11: {
+		sl_ie_10: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
 			platform: 'Windows 8',
 			version: '10'
 		},
-		sl_ie_11: {
+		sl_ie_9: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
 			platform: 'Windows XP',
 			version: '9'
 		},
-		sl_ie_11: {
+		sl_ie_8: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
 			platform: 'Windows XP',
