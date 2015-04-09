@@ -14,6 +14,7 @@ compiler
 *.sublime-project
 *.sublime-workspace
 dist/web/build.min.js.gz
+dist/web/build.js
 docs/1_onpage.md
 docs/3_branch.md
 compiler-latest.zip

@@ -11,8 +11,6 @@ DATE=$(date "+%Y-%m-%d")
 echo "Releasing Branch Web SDK"
 
 echo "Building files"
-make clean
-
 
 read -p "Update 0_config.js? " -n 1 -r
 echo
@@ -30,7 +28,7 @@ then
 	mv a package.json
 fi
 
-make release=true all
+make version=$VERSION release
 
 read -p "Bump changelog version? " -n 1 -r
 echo
@@ -67,7 +65,6 @@ read -p "Copy to S3? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	aws s3 cp --content-type="text/javascript" dist/web/build.js s3://branch-web-sdk/branch-$VERSION.js --acl public-read
 	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/web/build.min.js.gz s3://branch-web-sdk/branch-$VERSION.min.js  --acl public-read
 	aws s3 cp testbeds/web/example.html s3://branch-web-sdk/example.html --acl public-read
 fi
