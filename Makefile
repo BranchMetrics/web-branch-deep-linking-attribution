@@ -15,9 +15,9 @@ ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../../dist/web/build.js"}
 
 .PHONY: clean
 
-all: dist/web/build.min.js README.md testbeds/web/example.html tests/branch-deps.js
+all: dist/web/build.min.js README.md testbeds/web/example.html test/branch-deps.js
 clean:
-	rm -f dist/web/build.js dist/web/build.min.js docs/3_branch.md dist/web/build.min.js.gz README.md testbeds/web/example.html tests/branch-deps.js
+	rm -f dist/web/build.js dist/web/build.min.js docs/3_branch.md dist/web/build.min.js.gz README.md testbeds/web/example.html test/branch-deps.js
 release: clean all dist/web/build.min.js.gz
 	@echo "released"
 
@@ -35,15 +35,15 @@ compiler/library/closure-library-master/closure/goog/**:
 		unzip master.zip -d compiler/library && \
 		rm -f master.zip
 
-tests/branch-deps.js: $(SOURCES) compiler/library
+test/branch-deps.js: $(SOURCES) compiler/library
 	python $(COMPILER_LIBRARY)/bin/calcdeps.py \
 		--dep $(COMPILER_LIBRARY)/goog \
 		--path src \
-		--path tests \
+		--path test \
 		--output_mode deps \
-		--exclude tests/branch-deps.js > tests/branch-deps.js.tmp
-	echo "// jscs:disable" | cat - tests/branch-deps.js.tmp > tests/branch-deps.js && \
-		rm tests/branch-deps.js.tmp
+		--exclude test/branch-deps.js > test/branch-deps.js.tmp
+	echo "// jscs:disable" | cat - test/branch-deps.js.tmp > test/branch-deps.js && \
+		rm test/branch-deps.js.tmp
 
 docs/3_branch.md: $(SOURCES)
 	jsdox src/3_branch.js --output docs
@@ -58,8 +58,7 @@ dist/web/build.min.js.gz: dist/web/build.min.js
 	gzip -c dist/web/build.min.js > dist/web/build.min.js.gz
 
 testbeds/web/example.html: src/web/example.template.html
-	@echo "\nMinifying on page build script into testbeds/web/example.html"
-ifdef version
+ifeq ($(MAKECMDGOALS), release)
 	perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
 else
 	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
@@ -67,4 +66,4 @@ endif
 
 README.md: docs/0_intro.md docs/3_branch.md
 	cat docs/0_intro.md docs/3_branch.md docs/4_footer.md | \
-		perl -i -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
+		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md

@@ -14,10 +14,10 @@ goog.addDependency("../../../../../src/3_branch.js", ['Branch'], ['utils', 'reso
 goog.addDependency("../../../../../src/4_initialization.js", ['branch_instance'], ['Branch']);
 goog.addDependency("../../../../../src/extern.js", [], []);
 goog.addDependency("../../../../../src/onpage.js", [], []);
-goog.addDependency("../../../../../tests/0_queue.js", [], ['Queue']);
-goog.addDependency("../../../../../tests/0_storage.js", [], ['storage']);
-goog.addDependency("../../../../../tests/0_utils.js", [], ['utils']);
-goog.addDependency("../../../../../tests/1_api.js", [], ['utils', 'Server', 'resources', 'config', 'storage']);
-goog.addDependency("../../../../../tests/3_branch.js", [], ['utils', 'Branch', 'resources', 'config', 'storage', 'goog.json']);
-goog.addDependency("../../../../../tests/4_integration.js", [], []);
-goog.addDependency("../../../../../tests/test-utils.js", [], []);
+goog.addDependency("../../../../../test/0_queue.js", [], ['Queue']);
+goog.addDependency("../../../../../test/0_storage.js", [], ['storage']);
+goog.addDependency("../../../../../test/0_utils.js", [], ['utils']);
+goog.addDependency("../../../../../test/1_api.js", [], ['utils', 'Server', 'resources', 'config', 'storage']);
+goog.addDependency("../../../../../test/3_branch.js", [], ['utils', 'Branch', 'resources', 'config', 'storage', 'goog.json']);
+goog.addDependency("../../../../../test/4_integration.js", [], []);
+goog.addDependency("../../../../../test/test-utils.js", [], []);

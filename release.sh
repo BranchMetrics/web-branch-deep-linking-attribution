@@ -28,7 +28,7 @@ then
 	mv a package.json
 fi
 
-make version=$VERSION release
+make release
 
 read -p "Bump changelog version? " -n 1 -r
 echo
