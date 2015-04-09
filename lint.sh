@@ -1,7 +1,6 @@
 #!/bin/bash
 
 BAD=0
-JSHINT
 
 exec 5>&1
 
