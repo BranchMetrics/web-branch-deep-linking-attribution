@@ -72,7 +72,6 @@ describe('Server', function() {
 			assert.equal(requests[0].requestHeaders['Content-Type'], 'application/x-www-form-urlencoded;charset=utf-8');
 			requests[0].ontimeout();
 			assert(spyCallback.calledOnce);
-			assert.done();
 		});
 
 		it('should succeed on a status=200', function(done) {
@@ -85,7 +84,6 @@ describe('Server', function() {
 			requests[0].readyState = 4;
 			requests[0].responseText = responseText;
 			requests[0].onreadystatechange();
-			assert.done();
 		});
 
 		it('should error on a status=500', function(done) {
@@ -98,7 +96,6 @@ describe('Server', function() {
 			requests[0].readyState = 4;
 			requests[0].responseText = responseText;
 			requests[0].onreadystatechange();
-			assert.done();
 		});
 
 		it('should error on a status=400', function(done) {
@@ -111,7 +108,6 @@ describe('Server', function() {
 			requests[0].readyState = 4;
 			requests[0].responseText = responseText;
 			requests[0].onreadystatechange();
-			assert.done();
 		});
 
 		it('should error not enough credits on a status=402', function(done) {
@@ -124,7 +120,6 @@ describe('Server', function() {
 			requests[0].readyState = 4;
 			requests[0].responseText = responseText;
 			requests[0].onreadystatechange();
-			assert.done();
 		});
 	});
 
