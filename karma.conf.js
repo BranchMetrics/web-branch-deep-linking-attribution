@@ -3,18 +3,71 @@
 
 module.exports = function(config) {
 	var customLaunchers = {
-		sl_chrome: {
+		// Chrome
+		/*
+		sl_chrome_d: {
 			base: 'SauceLabs',
 			browserName: 'chrome',
-			platform: 'Windows 7',
-			version: '35'
+			version: 'd'
 		},
-		sl_firefox: {
+		sl_chrome_b: {
+			base: 'SauceLabs',
+			browserName: 'chrome',
+			version: 'b'
+		},
+		sl_chrome_41: {
+			base: 'SauceLabs',
+			browserName: 'chrome',
+			version: '41'
+		},
+		sl_chrome_40: {
+			base: 'SauceLabs',
+			browserName: 'chrome',
+			version: '40'
+		},
+		sl_chrome_39: {
+			base: 'SauceLabs',
+			browserName: 'chrome',
+			version: '39'
+		},
+		sl_chrome_38: {
+			base: 'SauceLabs',
+			browserName: 'chrome',
+			version: '38'
+		},
+		*/
+
+		// Firefox
+		/*
+		sl_firefox_d: {
 			base: 'SauceLabs',
 			browserName: 'firefox',
-			version: '30'
+			version: 'd'
 		},
+		sl_firefox_b: {
+			base: 'SauceLabs',
+			browserName: 'firefox',
+			version: 'b'
+		},
+		sl_firefox_36: {
+			base: 'SauceLabs',
+			browserName: 'firefox',
+			version: '36'
+		},
+		sl_firefox_35: {
+			base: 'SauceLabs',
+			browserName: 'firefox',
+			version: '35'
+		},
+		sl_firefox_34: {
+			base: 'SauceLabs',
+			browserName: 'firefox',
+			version: '34'
+		},
+		*/
+
 		// iOS
+		/*
 		sl_ios_safari_8: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
@@ -45,32 +98,69 @@ module.exports = function(config) {
 			platform: 'OS X 10.9',
 			version: '4.3'
 		},
+		*/
+
 		// Android
+		/*
+		sl_android_50: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			version: '5.0'
+		},
+		sl_android_44: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			version: '4.4'
+		},
+		sl_android_43: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			version: '4.3'
+		},
+		sl_android_42: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			version: '4.2'
+		},
+		sl_android_41: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			version: '4.1'
+		},
+		*/
+		sl_android_40: {
+			base: 'SauceLabs',
+			platform: 'Linux',
+			browserName: 'android',
+			deviceName: 'Android Emulator',
+			deviceOrientation: 'portrait',
+			version: '4.0'
+		},
 
 		// internet exploder
 		sl_ie_11: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
-			platform: 'Windows 8.1',
-			version: '11'
+			platform: 'Windows 7',
+			version: '11.0'
 		},
 		sl_ie_10: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
-			platform: 'Windows 8',
-			version: '10'
+			platform: 'Windows 7',
+			version: '10.0'
 		},
 		sl_ie_9: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
-			platform: 'Windows XP',
-			version: '9'
+			platform: 'Windows 7',
+			version: '9.0'
 		},
 		sl_ie_8: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
-			platform: 'Windows XP',
-			version: '8'
+			platform: 'Windows 7',
+			version: '8.0'
 		}
 	};
 
@@ -132,7 +222,7 @@ module.exports = function(config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['progress'],
+		reporters: ['progress', 'saucelabs'],
 
 		// web server port
 		port: 9876,
