@@ -84,11 +84,13 @@ ___
 
 * * *
 
-### init(app_id, callback)
+### init(app_id, options, callback) 
 
 **Parameters**
 
 **app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
+
+**options**: `Object`, _optional_ - options: launch_banner, An object literal of the link data, and options object for an app sharing banner that automatically opens when init returns.
 
 **callback**: `function`, _optional_ - callback to read the session data.
 
@@ -109,8 +111,50 @@ the link the user was referred by.
 ```js
 branch.init(
     app_id,
+    options,
     callback (err, data)
 );
+```
+
+#### Example
+```js
+branch.init('1234567890',
+ {
+    launch_banner: {
+         link_data: {
+              phone: 9999999999,
+              tags: [ 'tag1', 'tag2' ],
+              channel: 'facebook',
+              feature: 'dashboard',
+              stage: 'new user',
+              type: 1,
+              data: {
+                  mydata: 'something',
+                  foo: 'bar',
+                  '$desktop_url': 'http://myappwebsite.com',
+                  '$ios_url': 'http://myappwebsite.com/ios',
+                  '$ipad_url': 'http://myappwebsite.com/ipad',
+                  '$android_url': 'http://myappwebsite.com/android',
+                  '$og_app_id': '12345',
+                  '$og_title': 'My App',
+                  '$og_description': 'My app\'s description.',
+                  '$og_image_url': 'http://myappwebsite.com/image.png'
+              }
+         },
+         options: {
+              icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+              title: 'Demo App',
+              description: 'Branch Demo app!',
+              openAppButtonText: 'Open',
+              downloadAppButtonText: 'Download',
+              iframe: true,
+              showMobile: true,
+              showDesktop: true
+         }
+    }
+}, function(err, link) {
+    console.log(err, link);
+});
 ```
 
 ##### Callback Format
@@ -131,7 +175,7 @@ ___
 
 
 
-### data(callback)
+### data(callback) 
 
 **Parameters**
 
@@ -147,7 +191,7 @@ ___
 
 
 
-### setIdentity(identity, callback)
+### setIdentity(identity, callback) 
 
 **Parameters**
 
@@ -185,7 +229,7 @@ ___
 
 
 
-### logout(callback)
+### logout(callback) 
 
 **Parameters**
 
@@ -212,7 +256,7 @@ ___
 
 
 
-### track(event, metadata, callback)
+### track(event, metadata, callback) 
 
 **Parameters**
 
@@ -246,7 +290,7 @@ ___
 
 
 
-### link(linkData, callback)
+### link(linkData, callback) 
 
 **Parameters**
 
@@ -306,7 +350,7 @@ ___
 
 
 
-### sendSMS(phone, linkData, options, callback)
+### sendSMS(phone, linkData, options, callback) 
 
 **Parameters**
 
@@ -395,7 +439,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### referrals(callback)
+### referrals(callback) 
 
 **Parameters**
 
@@ -437,7 +481,7 @@ callback(
 
 
 
-### credits(callback)
+### credits(callback) 
 
 **Parameters**
 
@@ -469,7 +513,7 @@ callback(
 
 
 
-### redeem(amount, bucket, callback)
+### redeem(amount, bucket, callback) 
 
 **Parameters**
 
@@ -517,7 +561,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### banner(options, linkData)
+### banner(options, linkData) 
 
 **Parameters**
 
@@ -595,4 +639,5 @@ branch.banner({
 
 ## Bugs / Help / Support
 
-Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs please send to [dmitri@branch.io](mailto:dmitri@branch.io).
+Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs
+please send to [dmitri@branch.io](mailto:dmitri@branch.io).

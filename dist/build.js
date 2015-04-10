@@ -1154,30 +1154,33 @@ Branch.prototype._api = function(a, b, c) {
     });
   });
 };
-Branch.prototype.init = function(a, b) {
-  function c(a) {
+Branch.prototype.init = function(a, b, c) {
+  "function" == typeof b && (c = b, b = {});
+  if (this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.existingInit)), c);
+  }
+  this.app_id = a;
+  var d = this;
+  a = utils.readStore(this._storage);
+  var e = function(a) {
     d.session_id = a.session_id;
     d.identity_id = a.identity_id;
     d.sessionLink = a.link;
     d.initialized = !0;
-  }
-  if (this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.existingInit)), b);
-  }
-  this.app_id = a;
-  var d = this, e = utils.readStore(this._storage);
-  if (e && e.session_id) {
-    c(e), b && b(null, utils.whiteListSessionData(e));
+    b.launch_banner && d.banner(b.launch_banner.options, b.launch_banner.link_data);
+    c && c(null, utils.whiteListSessionData(a));
+  };
+  if (a && a.session_id) {
+    e(a);
   } else {
     var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
     this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
       d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
-        c(a);
         f && (a.click_id = f);
         utils.store(a, d._storage);
-        b && b(null, utils.whiteListSessionData(a));
-      }, b));
-    }, b));
+        e(a);
+      }, c));
+    }, c));
   }
 };
 Branch.prototype.data = function(a) {
@@ -1266,6 +1269,8 @@ Branch.prototype.banner = function(a, b) {
   make_new_link:!!a.make_new_link};
   "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
   banner(this, c, b, this._storage);
+};
+Branch.prototype.closeBanner = function() {
 };
 // Input 13
 var branch_instance = new Branch;

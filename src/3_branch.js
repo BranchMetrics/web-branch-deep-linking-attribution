@@ -82,7 +82,7 @@ Branch = function() {
  */
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
-		this._queue(function(next) {
+	this._queue(function(next) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
@@ -96,6 +96,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 /**
  * @function Branch.init
  * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
+ * @param {Object} options - _optional_ - options: launch_banner, An object literal of the link data, and options object for an app sharing banner that automatically opens when init returns.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * Adding the Branch script to your page automatically creates a window.branch
@@ -115,8 +116,50 @@ Branch.prototype._api = function(resource, obj, callback) {
  * ```js
  * branch.init(
  *     app_id,
+ *     options,
  *     callback (err, data)
  * );
+ * ```
+ *
+ * #### Example
+ * ```js
+ * branch.init('1234567890',
+ *  {
+ *     launch_banner: {
+ *          link_data: {
+ *               phone: 9999999999,
+ *               tags: [ 'tag1', 'tag2' ],
+ *               channel: 'facebook',
+ *               feature: 'dashboard',
+ *               stage: 'new user',
+ *               type: 1,
+ *               data: {
+ *                   mydata: 'something',
+ *                   foo: 'bar',
+ *                   '$desktop_url': 'http://myappwebsite.com',
+ *                   '$ios_url': 'http://myappwebsite.com/ios',
+ *                   '$ipad_url': 'http://myappwebsite.com/ipad',
+ *                   '$android_url': 'http://myappwebsite.com/android',
+ *                   '$og_app_id': '12345',
+ *                   '$og_title': 'My App',
+ *                   '$og_description': 'My app\'s description.',
+ *                   '$og_image_url': 'http://myappwebsite.com/image.png'
+ *               }
+ *          },
+ *          options: {
+ *               icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *               title: 'Demo App',
+ *               description: 'Branch Demo app!',
+ *               openAppButtonText: 'Open',
+ *               downloadAppButtonText: 'Download',
+ *               iframe: true,
+ *               showMobile: true,
+ *               showDesktop: true
+ *          }
+ *     }
+ * }, function(err, link) {
+ *     console.log(err, link);
+ * });
  * ```
  *
  * ##### Callback Format
@@ -135,23 +178,34 @@ Branch.prototype._api = function(resource, obj, callback) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = function(app_id, callback) {
+Branch.prototype['init'] = function(app_id, options, callback) {
+	if (typeof options == 'function') {
+		callback = options;
+		options = { };
+	}
 	if (this.initialized) { return wrapError(new Error(utils.message(utils.messages.existingInit)), callback); }
 
 	this.app_id = app_id;
 	var self = this,
 		sessionData = utils.readStore(this._storage);
 
-	function setBranchValues(data) {
+	var setBranchValues = function(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
 		self.initialized = true;
-	}
+	};
+
+	var finishInit = function(data) {
+		setBranchValues(data);
+		if (options['launch_banner']) {
+			self['banner'](options['launch_banner']['options'], options['launch_banner']['link_data']);
+		}
+		if (callback) { callback(null, utils.whiteListSessionData(data)); }
+	};
 
 	if (sessionData  && sessionData['session_id']) {
-		setBranchValues(sessionData);
-		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
+		finishInit(sessionData);
 	}
 	else {
 		var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
@@ -161,10 +215,9 @@ Branch.prototype['init'] = function(app_id, callback) {
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
 			}, wrapErrorFunc(function(data) {
-				setBranchValues(data);
 				if (link_identifier) { data['click_id'] = link_identifier; }
 				utils.store(data, self._storage);
-				if (callback) { callback(null, utils.whiteListSessionData(data)); }
+				finishInit(data);
 			}, callback));
 		}, callback));
 	}
@@ -705,3 +758,6 @@ Branch.prototype['banner'] = function(options, linkData) {
 	banner(this, bannerOptions, linkData, this._storage);
 };
 
+Branch.prototype['closeBanner'] = function() {
+
+};
