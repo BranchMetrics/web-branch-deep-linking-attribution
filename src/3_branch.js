@@ -736,6 +736,18 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  * ```
  * ___
  *
+ * ### closeBanner()
+ *
+ * #### Closing the App Banner Programmatically
+ *
+ * The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
+ * other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
+ *
+ * ##### Usage
+ * ```js
+ * branch.closeBanner();
+ * ```
+ *
  */
 Branch.prototype['banner'] = function(options, linkData) {
 	var bannerOptions = {
@@ -760,21 +772,6 @@ Branch.prototype['banner'] = function(options, linkData) {
 	banner(this, bannerOptions, linkData, this._storage);
 };
 
-/**
- * @function Branch.closeBanner
- *
- * #### Closing the App Banner Programmatically
- *
- * The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
- * other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
- *
- * ##### Usage
- * ```js
- * branch.closeBanner();
- * ```
- * ___
- *
- */
 Branch.prototype['closeBanner'] = function() {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit))); }
 	banner.close();

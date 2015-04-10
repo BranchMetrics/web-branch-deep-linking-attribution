@@ -624,9 +624,7 @@ branch.banner({
 ```
 ___
 
-
-
-### Branch.closeBanner
+### closeBanner()
 
 #### Closing the App Banner Programmatically
 
@@ -637,7 +635,6 @@ other user interaction with your web app. In this case, closing the banner is ve
 ```js
 branch.closeBanner();
 ```
-___() 
 
 
 
