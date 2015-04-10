@@ -19,5 +19,5 @@ goog.addDependency("../../../../../tests/0_storage.js", [], ['storage']);
 goog.addDependency("../../../../../tests/0_utils.js", [], ['utils']);
 goog.addDependency("../../../../../tests/1_api.js", [], ['utils', 'Server', 'resources', 'config', 'storage']);
 goog.addDependency("../../../../../tests/3_branch.js", [], ['utils', 'Branch', 'resources', 'config', 'storage', 'goog.json']);
-goog.addDependency("../../../../../tests/4_integration.js", [], []);
+goog.addDependency("../../../../../tests/4_integration.js", [], ['utils', 'Server', 'Queue', 'Branch', 'resources', 'config', 'storage', 'goog.json']);
 goog.addDependency("../../../../../tests/test-utils.js", [], []);

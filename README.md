@@ -36,7 +36,7 @@ _Be sure to replace `APP-KEY` with your actual app key found in your [account da
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.3.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.4.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 	branch.init('APP-KEY', function(err, data) {
     	// callback to handle err or data
@@ -84,7 +84,7 @@ ___
 
 * * *
 
-### init(app_id, callback)
+### init(app_id, callback) 
 
 **Parameters**
 
@@ -131,7 +131,7 @@ ___
 
 
 
-### data(callback)
+### data(callback) 
 
 **Parameters**
 
@@ -147,7 +147,7 @@ ___
 
 
 
-### setIdentity(identity, callback)
+### setIdentity(identity, callback) 
 
 **Parameters**
 
@@ -185,7 +185,7 @@ ___
 
 
 
-### logout(callback)
+### logout(callback) 
 
 **Parameters**
 
@@ -212,7 +212,7 @@ ___
 
 
 
-### track(event, metadata, callback)
+### track(event, metadata, callback) 
 
 **Parameters**
 
@@ -246,7 +246,7 @@ ___
 
 
 
-### link(linkData, callback)
+### link(linkData, callback) 
 
 **Parameters**
 
@@ -306,7 +306,7 @@ ___
 
 
 
-### sendSMS(phone, linkData, options, callback)
+### sendSMS(phone, linkData, options, callback) 
 
 **Parameters**
 
@@ -395,7 +395,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### referrals(callback)
+### referrals(callback) 
 
 **Parameters**
 
@@ -437,7 +437,7 @@ callback(
 
 
 
-### credits(callback)
+### credits(callback) 
 
 **Parameters**
 
@@ -469,7 +469,7 @@ callback(
 
 
 
-### redeem(amount, bucket, callback)
+### redeem(amount, bucket, callback) 
 
 **Parameters**
 
@@ -517,7 +517,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### banner(options, linkData)
+### banner(options, linkData) 
 
 **Parameters**
 
@@ -595,4 +595,5 @@ branch.banner({
 
 ## Bugs / Help / Support
 
-Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs please send to [dmitri@branch.io](mailto:dmitri@branch.io).
+Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs
+please send to [dmitri@branch.io](mailto:dmitri@branch.io).
