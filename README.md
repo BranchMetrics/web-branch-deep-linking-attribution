@@ -628,7 +628,7 @@ ___
 
 ### Branch.closeBanner
 
-## Closing the App Banner Programmatically
+#### Closing the App Banner Programmatically
 
 The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
 other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
