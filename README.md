@@ -624,21 +624,20 @@ branch.banner({
 ```
 ___
 
-# Closing the App Banner Programmatically
-
-The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
-other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
-
 
 
 ### Branch.closeBanner
 
-Logs out the current session, replaces session IDs and identity IDs.
+## Closing the App Banner Programmatically
+
+The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
+other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
 
 ##### Usage
 ```js
 branch.closeBanner();
-```() 
+```
+___() 
 
 
 
