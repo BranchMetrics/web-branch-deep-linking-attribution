@@ -18,10 +18,14 @@
   "homepage": "https://github.com/BranchMetrics/Web-SDK",
   "devDependencies": {
     "falafel": "1.0.1",
-    "jsdoc": "3.3.0",
+    "jsdoc": "<=3.3.0",
     "jsdox": "0.4.9",
     "mocha": "2.2.1",
     "precommit-hook": "1.0.7",
-    "sinon": "1.13.0"
+    "sinon": "1.13.0",
+    "mocha": "^2.2.1",
+    "karma": "0.12.31",
+    "karma-mocha": "~0.1",
+    "karma-sauce-launcher": "0.2.10"
   }
 }
