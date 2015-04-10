@@ -144,11 +144,15 @@ banner = function(branch, options, linkData, storage) {
 				sendSMS(doc, branch, options, linkData);
 			});
 		}
+
 		var closeButton = doc.getElementById('branch-banner-close');
+		banner.close = function() {
+			closeBanner(element, storage);
+		};
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
-				closeBanner(element, storage);
+				branch.close();
 			};
 		}
 

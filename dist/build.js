@@ -1086,9 +1086,12 @@ var sendSMS = function(a, b, c, d) {
       sendSMS(f, a, b, c);
     });
     var g = f.getElementById("branch-banner-close");
-    g && (g.onclick = function(a) {
-      a.preventDefault();
+    banner.close = function() {
       closeBanner(e, d);
+    };
+    g && (g.onclick = function(b) {
+      b.preventDefault();
+      a.close();
     });
     document.body.className += " branch-animation";
     document.body.style.marginTop = banner_utils.bannerHeight;
@@ -1271,6 +1274,10 @@ Branch.prototype.banner = function(a, b) {
   banner(this, c, b, this._storage);
 };
 Branch.prototype.closeBanner = function() {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)));
+  }
+  banner.close();
 };
 // Input 13
 var branch_instance = new Branch;
