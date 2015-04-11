@@ -79,12 +79,9 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
 
-(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.4.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
   branch.init('5680621892404085', function(err, data) {
-    if (err) {
-      return document.getElementsByClassName('info')[0].innerHTML = err.message;
-    }
     document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
   });
 
@@ -94,69 +91,80 @@
     var request = $('.request');
     var response = $('.response');
 
-    var printMessage = function(err, data, link) {
-      if (err) {
-        return response.html(err.message);
-      }
-      link ? response.html('<a href="' + data + '">' + data + '</a>') : response.html(JSON.stringify(data || 'undefined'));
-    };
-
     var sampleParams = {
-      tags: [ 'tag1', 'tag2' ],
-      channel: 'sample app',
-      feature: 'create link',
-      stage: 'created link',
-      type: 1,
-      data: {
-        mydata: 'bar',
-        '$desktop_url': 'https://cdn.branch.io/example.html',
-        '$og_title': 'Branch Metrics',
-        '$og_description': 'Branch Metrics',
-        '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
-      }
-    };
+        tags: [ 'tag1', 'tag2' ],
+        channel: 'sample app',
+        feature: 'create link',
+        stage: 'created link',
+        type: 1,
+        data: {
+          mydata: 'bar',
+          '$desktop_url': 'https://cdn.branch.io/example.html',
+          '$og_title': 'Branch Metrics',
+          '$og_description': 'Branch Metrics',
+          '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+        }
+      };
 
-    var phoneNumber = function() {
-      var phoneNumberID = $('#SMSNumber');
-      if (phoneNumberID.val() == '') {
-        phoneNumberID.parent().addClass('has-error');
-        return false;
+      var phoneNumber = function() {
+        var phoneNumberID = $('#SMSNumber');
+        if (phoneNumberID.val() == '') {
+          phoneNumberID.parent().addClass('has-error');
+          return false;
+        }
+        else {
+          phoneNumberID.parent().removeClass('has-error');
+        }
+        return phoneNumberID.val();
       }
-      else {
-        phoneNumberID.parent().removeClass('has-error');
-      }
-      return phoneNumberID.val();
-    }
 
     $('#init').click(function() {
       request.html('branch.init();');
-      branch.init('5680621892404085', printMessage);
+      branch.init('5680621892404085', function(err, data) {
+        response.html(JSON.stringify(err || data));
+      });
     });
 
     $('#data').click(function() {
       request.html("branch.data();");
-      branch.data(printMessage);
+      branch.data(function(err, data) {
+        response.html(JSON.stringify(err || data));
+      });
     });
 
     $('#setIdentity').click(function() {
       request.html("branch.setIdentity('Branch');");
-      branch.setIdentity('Branch', printMessage);
+      branch.setIdentity('Branch', function(err, data) {
+        response.html(JSON.stringify(err || data));
+      });
     });
 
     $('#logout').click(function() {
       request.html('branch.logout();');
-      branch.logout(printMessage);
+      branch.logout(function(err, data) {
+        response.html(JSON.stringify(err || "undefined"));
+      });
     });
-
+    /*
+    $('#close').click(function() {
+      alert('You will need to call .init() reinitialize the Branch SDK.');
+      request.html('branch.close();');
+      branch.close(function(err, data) {
+        response.html(JSON.stringify(data));
+      });
+    });
+  */
     $('#track').click(function() {
       request.html('branch.track(\'Tracked this event\');');
-      branch.track('Tracked this event', printMessage);
+      branch.track('Tracked this event', function(err, data) {
+        response.html(JSON.stringify(err || data || 'undefined'));
+      });
     });
 
     $('#link').click(function() {
       request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
-      branch.link(sampleParams, function(err, data) {
-        printMessage(err, data, true)
+      branch.link(sampleParams, function(err, link) {
+        response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
 
@@ -164,29 +172,39 @@
       var smsOptions = {};
       var phone = phoneNumber();
       request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
-      branch.sendSMS(phone, sampleParams, smsOptions, printMessage);
+      branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
+        response.html(JSON.stringify(err || data || 'undefined'));
+      });
     });
 
     $('#sendSMSNew').click(function() {
       var smsOptions = { make_new_link: true };
       var phone = phoneNumber();
       request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
-      branch.sendSMS(phone, sampleParams, smsOptions, printMessage);
+      branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
+        response.html(JSON.stringify(err || data || 'undefined'));
+      });
     });
 
     $('#referrals').click(function() {
       request.html('branch.referrals();');
-      branch.referrals(printMessage);
+      branch.referrals(function(err, data) {
+        response.html(JSON.stringify(err || data));
+      });
     });
 
     $('#credits').click(function() {
       request.html('branch.credits();');
-      branch.credits(printMessage);
+      branch.credits(function(err, data) {
+        response.html(JSON.stringify(err || data));
+      });
     });
 
     $('#redeem').click(function() {
       request.html('branch.redeem({amount: 5, bucket: \'default\'});');
-      branch.redeem(5, 'default', printMessage);
+      branch.redeem(5, 'default', function(err, data) {
+        response.html(JSON.stringify(err || data));
+      });
     });
 
     $('#banner').click(function() {
