@@ -1079,7 +1079,7 @@ var sendSMS = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document;
-    banner_utils.mobileUserAgent() ? utils.readKeyValue("click_id", d) && !b.make_new_link ? f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + utils.readKeyValue("click_id", d) : a.link(c, function(a, b) {
+    banner_utils.mobileUserAgent() ? utils.readKeyValue("click_id", d) && !b.makeNewLink ? f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + utils.readKeyValue("click_id", d) : a.link(c, function(a, b) {
       a || (f.getElementById("branch-mobile-action").href = b);
     }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
       d.preventDefault();
