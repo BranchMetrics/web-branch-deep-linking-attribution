@@ -73,6 +73,14 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage();
 	this._server = new Server();
+	
+	if (utils.CORDOVA_BUILD) {
+		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and 
+											// the session params from the first install.
+		this.sdk="cordova"+config.version;  // For mobile apps, we send the SDK version string that generated the request.
+		this.debug = false;					// A debug install session will get a unique device id.
+	}
+	
 	this.initialized = false;
 };
 
@@ -87,6 +95,14 @@ Branch.prototype._api = function(resource, obj, callback) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
+		
+		// These three are sent from mobile apps
+		if (utils.CORDOVA_BUILD) {
+			if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && self.device_fingerprint_id) { obj['device_fingerprint_id'] = self.device_fingerprint_id; }
+			if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && self.link_click_id) { obj['link_click_id'] = self.link_click_id; }
+			if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && self.sdk) { obj['sdk'] = self.sdk; }
+		}
+		
 		return self._server.request(resource, obj, self._storage, function(err, data) {
 			next();
 			callback(err, data);
@@ -94,10 +110,33 @@ Branch.prototype._api = function(resource, obj, callback) {
 	});
 };
 
+if (utils.CORDOVA_BUILD) {
+/**
+ * @function Branch.setDebug
+ * @param {boolean} debug - _required_ - Set the SDK debug flag.
+ * 
+ * Setting the SDK debug flag will generate a new device ID each time the app is installed
+ * instead of possibly using the same device id.  This is useful when testing.
+ * 
+ * This needs to be set before the Branch.init call!!!
+ * 
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
+ * ---
+ * 
+ */
+	Branch.prototype['setDebug'] = function(debug) {
+		this.debug = debug;
+	};
+}
+
 /**
  * @function Branch.init
  * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ * @param {boolean} isReferrable - _optional_ - Is this a referrable session.
+ *
+ * THE "isReferrable" PARAM IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -116,7 +155,8 @@ Branch.prototype._api = function(resource, obj, callback) {
  * ```js
  * branch.init(
  *     app_id,
- *     callback (err, data)
+ *     callback (err, data),
+ *     is_referrable
  * );
  * ```
  *
@@ -136,14 +176,23 @@ Branch.prototype._api = function(resource, obj, callback) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = function(app_id, callback) {
+Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 	if (this.initialized) { return wrapError(new Error(utils.message(utils.messages.existingInit)), callback); }
 
 	this.app_id = app_id;
 	var self = this,
 		sessionData = utils.readStore(this._storage);
 
-	function setBranchValues(data) {
+	function setBranchValuesCordova(data) {
+		self.session_id = data['session_id'];
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data['link'];
+		self.device_fingerprint_id = data['device_fingerprint_id'];
+		self.link_click_id = data['link_click_id'];
+		self.initialized = true;
+	}
+	
+	function setBranchValuesWeb(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
@@ -151,23 +200,81 @@ Branch.prototype['init'] = function(app_id, callback) {
 	}
 
 	if (sessionData  && sessionData['session_id']) {
-		setBranchValues(sessionData);
+		if (utils.CORDOVA_BUILD) {
+			setBranchValuesCordova(sessionData);
+		}
+		
+		if (utils.WEB_BUILD) {
+			setBranchValuesWeb(sessionData);
+		}
+		
 		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
 	}
 	else {
-		var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-		this._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
-			self._api(resources.open, {
-				"link_identifier": link_identifier,
-				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id
-			}, wrapErrorFunc(function(data) {
-				setBranchValues(data);
-				if (link_identifier) { data['click_id'] = link_identifier; }
-				utils.store(data, self._storage);
-				if (callback) { callback(null, utils.whiteListSessionData(data)); }
+		if (utils.CORDOVA_BUILD) {
+			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
+			if (utils.readKeyValue('identity_id', self._permStorage)) {
+				self.identity_id = utils.readKeyValue('identity_id', self._permStorage);
+				self.device_fingerprint_id = utils.readKeyValue('device_fingerprint_id', self._permStorage);
+				var args = [];
+				if ((typeof isReferrable !== "undefined") && (isReferrable != null)) {
+					args.push((isReferrable)?1:0);
+				}
+				exec(function(data) {
+					console.log("Sending open with: " + goog.json.serialize(data));
+					self._api(resources.open, data, wrapErrorFunc(function(data) {
+						console.log("Open successful: " + data);
+						setBranchValuesCordova(data);
+						utils.storeKeyValue('identity_id', data.identity_id, self._permStorage)
+						utils.storeKeyValue('device_fingerprint_id', data.device_fingerprint_id, self._permStorage)
+						utils.store(data, self._storage);
+						if (callback) { callback(null, data); }
+					}, callback));
+				},
+				function() {
+					if (callback) {
+						callback(new Error("Error getting device data!"));
+					}
+				},  "BranchDevice", "getOpenData", args);
+			} else {
+				var args = [];
+				args.push(self.debug);
+				if ((typeof isReferrable !== "undefined") && (isReferrable != null)) {
+					args.push((isReferrable)?1:0);
+				}
+				exec(function(data) {
+					console.log("Sending install with: " + goog.json.serialize(data));
+					self._api(resources.install, data, wrapErrorFunc(function(data) {
+						console.log("Install successful: " + data);
+						setBranchValuesCordova(data);
+						utils.store(data, self._storage);
+						utils.store(data, self._permStorage);
+						if (callback) { callback(null, data); }
+					}, callback));
+				},
+				function() {
+					if (callback) {
+						callback(new Error("Error getting device data!"));
+					}
+				},  "BranchDevice", "getInstallData", args);
+			}
+		}
+		
+		if (utils.WEB_BUILD) {
+			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
+			this._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
+				self._api(resources.open, {
+					"link_identifier": link_identifier,
+					"is_referrable": 1,
+					"browser_fingerprint_id": browser_fingerprint_id
+				}, wrapErrorFunc(function(data) {
+					setBranchValuesWeb(data);
+					if (link_identifier) { data['click_id'] = link_identifier; }
+					utils.store(data, self._storage);
+					if (callback) { callback(null, utils.whiteListSessionData(data)); }
+				}, callback));
 			}, callback));
-		}, callback));
+		}
 	}
 };
 
@@ -192,6 +299,34 @@ Branch.prototype['data'] = function(callback) {
 		next();
 	});
 };
+
+if (utils.CORDOVA_BUILD) {
+/**
+ * @function Branch.first
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ *
+ * Returns the same session information and any referring data, as
+ * `Branch.init` did when the app was first installed. This is meant to be called
+ * after `Branch.init` has been called if you need the first session information at a
+ * later point.
+ * If the Branch session has already been initialized, the callback will return
+ * immediately, otherwise, it will return once Branch has been initialized.
+ * 
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
+ * ___
+ * 
+ */
+	Branch.prototype['first'] = function(callback) {
+		if (!callback) { return; }
+
+		var self = this;
+		this._queue(function(next) {
+			callback(null, utils.whiteListSessionData(utils.readStore(self._permStorage)));
+			next();
+		});
+	};
+}
 
 /**
  * @function Branch.setIdentity
@@ -228,7 +363,25 @@ Branch.prototype['data'] = function(callback) {
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
+	
+	function setBranchValues(data) {
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data['link'];
+		self.identity = data['identity'];
+	}
+	
+	if (utils.CORDOVA_BUILD) {
+		var self = this;
+		
+		this._api(resources.profile, { "identity": identity }, wrapErrorFunc(function(data) {
+			setBranchValues(data);
+			if (callback) { callback(null, data); }
+		}, callback));
+	}
+	
+	if (utils.WEB_BUILD) {
+		this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
+	}
 };
 
 /**
@@ -252,12 +405,58 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * ```
  * ___
  *
- * ## Tracking events
  */
 Branch.prototype['logout'] = function(callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 	this._api(resources.logout, { }, wrapErrorCallback1(callback));
 };
+
+if (utils.CORDOVA_BUILD) {
+/**
+ * @function Branch.close
+ * @param {function(?Error)=} callback - _optional_
+ *
+ * Close the current session.
+ *
+ * ##### Usage
+ * ```js
+ * branch.close(
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *      "Error message"
+ * );
+ * ```
+ * 
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
+ * ___
+ *
+ * ## Tracking events
+ * 
+ */
+	Branch.prototype['close'] = function(callback) {
+		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+		
+		var self = this;
+		
+		function clearBranchValues() {
+			delete self.session_id;
+			delete self.sessionLink;
+			self.initialized = false;
+		}
+		
+		this._api(resources.close, { }, wrapErrorFunc(function(data) {
+			clearBranchValues();
+			utils.clearStore(self._storage);
+			if (callback) { callback(null); }
+		}, callback));
+	};
+}
 
 /**
  * @function Branch.track
@@ -366,9 +565,12 @@ Branch.prototype['link'] = function(linkData, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 
 	var self = this;
-	linkData['source'] = 'web-sdk';
-	if (linkData['data']['$desktop_url'] !== undefined) {
-		linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
+	
+	if (utils.WEB_BUILD) {
+		linkData['source'] = 'web-sdk';
+		if (linkData['data']['$desktop_url'] !== undefined) {
+			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
+		}
 	}
 
 	linkData['data'] = goog.json.serialize(linkData['data']);
@@ -445,6 +647,9 @@ Branch.prototype['link'] = function(linkData, callback) {
  * ```js
  * callback("Error message");
  * ```
+ * 
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
+ * 
  * ___
  *
  * # Referral system rewarding functionality
@@ -532,13 +737,177 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  * );
  * ```
  *
- * ## Credit history
+ * ## Referral Codes
  *
  */
 Branch.prototype['referrals'] = function(callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 	this._api(resources.referrals, { }, wrapErrorCallback2(callback));
 };
+
+
+if (utils.CORDOVA_BUILD) {
+/**
+ * @function Branch.getCode
+ * @param {Object} data - _required_ - contins options for referral code creation.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
+ * The data can containt the following fields:
+ * "amount" - A required integer specifying the number of credits added when the code is applied.
+ * "bucket" - The optional bucket to apply the credits to.  Defaults to "default".
+ * "calculation_type" - A required integer.  1 for unlimited uses, 0 for one use.
+ * "location" - A required integer. Determines who get's the credits.  0 for the referree, 2 for the referring user or 3 for both.
+ * "prefix" - An optional string to be prepended to the code.
+ * "expiration" - An optional date string.  If present, determines the date on which the code expires.
+ *
+ * ##### Usage
+ * 
+ * branch.getCode(
+ *     data,
+ *     callback(err,data)
+ * );
+ * 
+ * ##### Example
+ * 
+ * ```js
+ * branch.getCode(
+ *     {
+ *       "amount":10,
+ *       "bucket":"party",
+ *       "calculation_type":1,
+ *       "location":2
+ *     }
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *      "Error message",
+ *      {
+ *        "referral_code":"AB12CD"
+ *      } 
+ * );
+ * ```
+ * 
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
+ * ___
+ *
+ */
+	Branch.prototype['getCode'] = function(data, callback)  {
+		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+		data.type = "credit";
+		data.creation_type = 2;
+		this._api(resources.getCode, data, wrapErrorCallback2(callback));
+	}
+}
+
+if (utils.CORDOVA_BUILD) {
+/**
+ * @function Branch.validateCode
+ * @param {string} code - _required_ - the code string to validate.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Validate a referral code before using.
+ *
+ * ##### Usage
+ * 
+ * ```js
+ * branch.validateCode(
+ *     code, // The code to validate
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Example
+ *
+ * ```js
+ * branch.validateCode(
+ *     "AB12CD",
+ *     function(err, data) {
+ *         if (err) {
+ *             console.log(err);
+ *         } else {
+ *             console.log("Code is valid");
+ *         }
+ *     }
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message",
+ *     callback(err, data)
+ * );
+ * ```
+ * 
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
+ * ___
+ *
+ */
+	Branch.prototype['validateCode'] = function(code, callback)  {
+		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+		this._api(resources.validateCode, { "code": code }, wrapErrorCallback2(callback));
+	}
+}
+
+if (utils.CORDOVA_BUILD) {
+/**
+ * @function Branch.applyCode
+ * @param {string} code - _required_ - the code string to apply.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Apply a referral code.
+ *
+ * ##### Usage
+ * 
+ * ```js
+ * branch.applyCode(
+ *     code, // The code to apply
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Example
+ *
+ * ```js
+ * branch.applyCode(
+ *     "AB12CD",
+ *     function(err, data) {
+ *         if (err) {
+ *             console.log(err);
+ *         } else {
+ *             console.log("Code applied");
+ *         }
+ *     }
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message",
+ *     callback(err, data)
+ * );
+ * ```
+ * 
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
+ * ___
+ *
+ * ## Credit Functions
+ * 
+ */
+	Branch.prototype['applyCode'] = function(code, callback)  {
+		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+		this._api(resources.applyCode, { "code": code }, wrapErrorCallback2(callback));
+	}
+}
 
 /**
  * @function Branch.credits
@@ -566,8 +935,6 @@ Branch.prototype['referrals'] = function(callback) {
  * );
  * ```
  *
- * ## Credit redemption
- *
  */
 Branch.prototype['credits'] = function(callback) {
 	if (!this.initialized) {
@@ -575,6 +942,83 @@ Branch.prototype['credits'] = function(callback) {
 	}
 	this._api(resources.credits, { }, wrapErrorCallback2(callback));
 };
+
+
+if (utils.CORDOVA_BUILD) {
+/**
+ * @function Branch.creditHistory
+ * @param {Object} data - _optional_ - options controlling the returned history.
+ * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history data.
+ *
+ * This call will retrieve the entire history of credits and redemptions from the individual user.
+ * 
+ * ##### Usage
+ * 
+ * ```js
+ * branch.creditHistory(
+ *      data,
+ *      callback(err, data)
+ * );
+ *
+ * ##### Example
+ * 
+ * ```js
+ * branch.creditHistory( 
+ *     {
+ *       "length":50,
+ *       "direction":0,
+ *       "begin_after_id:"123456789012345",
+ *       "bucket":"default"
+ *     }
+ *     callback (err, data)
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message",
+ * [
+ *     {
+ *         "transaction": {
+ *                            "date": "2014-10-14T01:54:40.425Z",
+ *                            "id": "50388077461373184",
+ *                            "bucket": "default",
+ *                            "type": 0,
+ *                            "amount": 5
+ *                        },
+ *         "referrer": "12345678",
+ *         "referree": null
+ *     },
+ *     {
+ *         "transaction": {
+ *                            "date": "2014-10-14T01:55:09.474Z",
+ *                            "id": "50388199301710081",
+ *                            "bucket": "default",
+ *                            "type": 2,
+ *                            "amount": -3
+ *                        },
+ *         "referrer": null,
+ *         "referree": "12345678"
+ *     }
+ * ]
+ * );
+ * ```
+ *
+ * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
+ * ---
+ * 
+ * ## Credit redemption
+ *
+ */
+	Branch.prototype['creditHistory'] = function(data, callback) {
+		if (!this.initialized) {
+			return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
+		}
+		this._api(resources.creditHistory, (data)?data:{}, wrapErrorCallback2(callback));
+	};
+}
 
 /**
  * @function Branch.redeem
@@ -624,6 +1068,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback));
 };
 
+if (utils.WEB_BUILD) {
 /**
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
@@ -637,6 +1082,8 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  * |------------------|----------------------|----------------------|
  * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
  *
+ * THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
+ * 
  * #### Usage
  *
  * ```js
@@ -683,26 +1130,26 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  * });
  * ```
  */
-Branch.prototype['banner'] = function(options, linkData) {
-	var bannerOptions = {
-		icon: options['icon'] || '',
-		title: options['title'] || '',
-		description: options['description'] || '',
-		openAppButtonText: options['openAppButtonText'] || 'View in app',
-		downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
-		iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
-		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
-		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
-		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
-		disableHide: !!options['disableHide'],
-		forgetHide: !!options['forgetHide'],
-		make_new_link: !!options['make_new_link']
+	Branch.prototype['banner'] = function(options, linkData) {
+		var bannerOptions = {
+			icon: options['icon'] || '',
+			title: options['title'] || '',
+			description: options['description'] || '',
+			openAppButtonText: options['openAppButtonText'] || 'View in app',
+			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+			iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
+			showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
+			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
+			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
+			disableHide: !!options['disableHide'],
+			forgetHide: !!options['forgetHide'],
+			make_new_link: !!options['make_new_link']
+		};
+
+		if (typeof options['showMobile'] != 'undefined') {
+			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
+		}
+
+		banner(this, bannerOptions, linkData, this._storage);
 	};
-
-	if (typeof options['showMobile'] != 'undefined') {
-		bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
-	}
-
-	banner(this, bannerOptions, linkData, this._storage);
-};
-
+}

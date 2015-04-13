@@ -1,0 +1,1 @@
+../../../../../../../src/cordova/ios/BNCDevice.m

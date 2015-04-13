@@ -1,0 +1,25 @@
+{
+    "version": "0.8.2",
+    "name": "de.appplant.cordova.plugin.email-composer",
+    "cordova_name": "EmailComposer",
+    "description": "\n        Provides access to the standard interface that manages\n        the editing and sending an email message\n    ",
+    "license": "Apache 2.0",
+    "repo": "\n        https://github.com/katzer/cordova-plugin-email-composer.git\n    ",
+    "keywords": [
+        "\n        appplant",
+        " email\n    "
+    ],
+    "platforms": [
+        "ios",
+        "android",
+        "amazon-fireos",
+        "wp8",
+        "windows"
+    ],
+    "engines": [
+        {
+            "name": "cordova",
+            "version": ">=3.0.0"
+        }
+    ]
+}

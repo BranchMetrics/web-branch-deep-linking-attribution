@@ -1,0 +1,26 @@
+{
+    "org.apache.cordova.device": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.device"
+        }
+    },
+    "org.apache.cordova.console": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.console"
+        }
+    },
+    "de.appplant.cordova.plugin.email-composer": {
+        "source": {
+            "type": "registry",
+            "id": "de.appplant.cordova.plugin.email-composer"
+        }
+    },
+    "io.branch.sdk": {
+        "source": {
+            "type": "local",
+            "path": "../.."
+        }
+    }
+}

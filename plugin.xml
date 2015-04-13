@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="io.branch.sdk" version="1.0.0">
-	<name>BranchDevice</name>
-	<description>Branch Device Plugin</description>
+	<name>BranchSDK</name>
+	<description>Branch SDK Plugin</description>
 	<license>Apache 2.0</license>
 	<keywords>branch</keywords>
 	<js-module src="dist/cordova/build.js" name="branch">

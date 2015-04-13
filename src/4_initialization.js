@@ -30,3 +30,11 @@ else if (typeof exports === 'object') {
 }
 // Always make a global.
 if (window) { window['branch'] = branch_instance; }
+
+// Ensue close is allways called on a pause in mobile apps
+if (utils.CORDOVA_BUILD) {
+    document.addEventListener('pause', function() {
+    	console.log("Closing branch section on pause event.");
+    	branch_instance.close(function() {});
+    }, false);
+}

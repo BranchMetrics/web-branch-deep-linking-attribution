@@ -27,7 +27,7 @@ This SDK requires native browser Javascript and has been tested in all modern br
 
 You will need to create a [Branch Metrics app](http://branch.io) to obtain your app_key.
 
-### Quick Install
+### Quick Install (Web SDK)
 
 #### Manual installation
 
@@ -36,7 +36,7 @@ _Be sure to replace `APP-KEY` with your actual app key found in your [account da
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.3.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+	
 
 	branch.init('APP-KEY', function(err, data) {
     	// callback to handle err or data
@@ -52,6 +52,27 @@ If you use Bower or npm, you can run `bower install branch-sdk` or `npm install 
 
 In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
 
+### Quick Install (Cordova/Phonegap)
+
+This Web SDK can also be used for Cordova/Phonegap applications.  It is provided as a plugin and can be installed with cordova plugin or the plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
+
+```sh
+cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
+```
+
+Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
+
+#### Initialization and Event Handling
+
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below.  You will need your app id from the Branch dashboard.
+
+```js
+        branch.init(‘YOUR APP KEY HERE’, function(err, data) {
+        	app.initComplete(err, data);
+        });
+```
+
+The session close will be sent automatically on any ‘pause’ event.
 
 ## API Reference
 
@@ -84,13 +105,34 @@ ___
 
 * * *
 
-### init(app_id, callback) 
+### setDebug(debug) 
+
+**Parameters**
+
+**debug**: `boolean`, _required_ - Set the SDK debug flag.
+
+Setting the SDK debug flag will generate a new device ID each time the app is installed
+instead of possibly using the same device id.  This is useful when testing.
+
+This needs to be set before the Branch.init call!!!
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+
+---
+
+
+
+### init(app_id, callback, isReferrable) 
 
 **Parameters**
 
 **app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
 
 **callback**: `function`, _optional_ - callback to read the session data.
+
+**isReferrable**: `boolean`, _optional_ - Is this a referrable session.
+
+THE "isReferrable" PARAM IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -109,7 +151,8 @@ the link the user was referred by.
 ```js
 branch.init(
     app_id,
-    callback (err, data)
+    callback (err, data),
+    is_referrable
 );
 ```
 
@@ -143,6 +186,25 @@ after `Branch.init` has been called if you need the session information at a
 later point.
 If the Branch session has already been initialized, the callback will return
 immediately, otherwise, it will return once Branch has been initialized.
+___
+
+
+
+### first(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_ - callback to read the session data.
+
+Returns the same session information and any referring data, as
+`Branch.init` did when the app was first installed. This is meant to be called
+after `Branch.init` has been called if you need the first session information at a
+later point.
+If the Branch session has already been initialized, the callback will return
+immediately, otherwise, it will return once Branch has been initialized.
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+
 ___
 
 
@@ -206,6 +268,34 @@ callback(
      "Error message"
 );
 ```
+___
+
+
+
+### close(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_
+
+Close the current session.
+
+##### Usage
+```js
+branch.close(
+    callback (err)
+);
+```
+
+##### Callback Format
+```js
+callback(
+     "Error message"
+);
+```
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+
 ___
 
 ## Tracking events
@@ -379,6 +469,9 @@ branch.sendSMS(
 ```js
 callback("Error message");
 ```
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
+
 ___
 
 # Referral system rewarding functionality
@@ -433,7 +526,159 @@ callback(
 );
 ```
 
-## Credit history
+## Referral Codes
+
+
+
+### getCode(data, callback) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - contins options for referral code creation.
+
+**callback**: `function`, _optional_ - returns an error if unsuccessful
+
+Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
+The data can containt the following fields:
+"amount" - A required integer specifying the number of credits added when the code is applied.
+"bucket" - The optional bucket to apply the credits to.  Defaults to "default".
+"calculation_type" - A required integer.  1 for unlimited uses, 0 for one use.
+"location" - A required integer. Determines who get's the credits.  0 for the referree, 2 for the referring user or 3 for both.
+"prefix" - An optional string to be prepended to the code.
+"expiration" - An optional date string.  If present, determines the date on which the code expires.
+
+##### Usage
+
+branch.getCode(
+    data,
+    callback(err,data)
+);
+
+##### Example
+
+```js
+branch.getCode(
+    {
+      "amount":10,
+      "bucket":"party",
+      "calculation_type":1,
+      "location":2
+    }
+    callback (err)
+);
+```
+
+##### Callback Format
+```js
+callback(
+     "Error message",
+     {
+       "referral_code":"AB12CD"
+     } 
+);
+```
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+
+___
+
+
+
+### validateCode(code, callback) 
+
+**Parameters**
+
+**code**: `string`, _required_ - the code string to validate.
+
+**callback**: `function`, _optional_ - returns an error if unsuccessful
+
+Validate a referral code before using.
+
+##### Usage
+
+```js
+branch.validateCode(
+    code, // The code to validate
+    callback (err)
+);
+```
+
+##### Example
+
+```js
+branch.validateCode(
+    "AB12CD",
+    function(err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Code is valid");
+        }
+    }
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message",
+    callback(err, data)
+);
+```
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+
+___
+
+
+
+### applyCode(code, callback) 
+
+**Parameters**
+
+**code**: `string`, _required_ - the code string to apply.
+
+**callback**: `function`, _optional_ - returns an error if unsuccessful
+
+Apply a referral code.
+
+##### Usage
+
+```js
+branch.applyCode(
+    code, // The code to apply
+    callback (err)
+);
+```
+
+##### Example
+
+```js
+branch.applyCode(
+    "AB12CD",
+    function(err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Code applied");
+        }
+    }
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message",
+    callback(err, data)
+);
+```
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+
+___
+
+## Credit Functions
 
 
 
@@ -464,6 +709,75 @@ callback(
     }
 );
 ```
+
+
+
+### creditHistory(data, callback) 
+
+**Parameters**
+
+**data**: `Object`, _optional_ - options controlling the returned history.
+
+**callback**: `function`, _required_ - returns an array with credit history data.
+
+This call will retrieve the entire history of credits and redemptions from the individual user.
+
+##### Usage
+
+```js
+branch.creditHistory(
+     data,
+     callback(err, data)
+);
+
+##### Example
+
+```js
+branch.creditHistory( 
+    {
+      "length":50,
+      "direction":0,
+      "begin_after_id:"123456789012345",
+      "bucket":"default"
+    }
+    callback (err, data)
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message",
+[
+    {
+        "transaction": {
+                           "date": "2014-10-14T01:54:40.425Z",
+                           "id": "50388077461373184",
+                           "bucket": "default",
+                           "type": 0,
+                           "amount": 5
+                       },
+        "referrer": "12345678",
+        "referree": null
+    },
+    {
+        "transaction": {
+                           "date": "2014-10-14T01:55:09.474Z",
+                           "id": "50388199301710081",
+                           "bucket": "default",
+                           "type": 2,
+                           "amount": -3
+                       },
+        "referrer": null,
+        "referree": "12345678"
+    }
+]
+);
+```
+
+THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+
+---
 
 ## Credit redemption
 
@@ -532,6 +846,8 @@ Display a smart banner directing the user to your app through a Branch referral 
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
 | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
+
+THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
 
 #### Usage
 
