@@ -71,16 +71,16 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = storage();
+	this._storage = storage(false);
 	this._server = new Server();
-	
+
 	if (utils.CORDOVA_BUILD) {
-		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and 
+		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
 											// the session params from the first install.
-		this.sdk="cordova"+config.version;  // For mobile apps, we send the SDK version string that generated the request.
+		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
 		this.debug = false;					// A debug install session will get a unique device id.
 	}
-	
+
 	this.initialized = false;
 };
 
@@ -95,14 +95,14 @@ Branch.prototype._api = function(resource, obj, callback) {
 		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
 		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
-		
+
 		// These three are sent from mobile apps
 		if (utils.CORDOVA_BUILD) {
 			if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && self.device_fingerprint_id) { obj['device_fingerprint_id'] = self.device_fingerprint_id; }
 			if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && self.link_click_id) { obj['link_click_id'] = self.link_click_id; }
 			if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && self.sdk) { obj['sdk'] = self.sdk; }
 		}
-		
+
 		return self._server.request(resource, obj, self._storage, function(err, data) {
 			next();
 			callback(err, data);
@@ -114,16 +114,16 @@ if (utils.CORDOVA_BUILD) {
 /**
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
- * 
+ *
  * Setting the SDK debug flag will generate a new device ID each time the app is installed
  * instead of possibly using the same device id.  This is useful when testing.
- * 
+ *
  * This needs to be set before the Branch.init call!!!
- * 
+ *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ---
- * 
+ *
  */
 	Branch.prototype['setDebug'] = function(debug) {
 		this.debug = debug;
@@ -191,7 +191,6 @@ Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 		self.link_click_id = data['link_click_id'];
 		self.initialized = true;
 	}
-	
 	function setBranchValuesWeb(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
@@ -203,30 +202,28 @@ Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 		if (utils.CORDOVA_BUILD) {
 			setBranchValuesCordova(sessionData);
 		}
-		
 		if (utils.WEB_BUILD) {
 			setBranchValuesWeb(sessionData);
 		}
-		
 		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
 	}
 	else {
 		if (utils.CORDOVA_BUILD) {
+			var args = [];
 			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
 			if (utils.readKeyValue('identity_id', self._permStorage)) {
 				self.identity_id = utils.readKeyValue('identity_id', self._permStorage);
 				self.device_fingerprint_id = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-				var args = [];
-				if ((typeof isReferrable !== "undefined") && (isReferrable != null)) {
-					args.push((isReferrable)?1:0);
+				if (typeof isReferrable !== "undefined" && isReferrable !== null) {
+					args.push(isReferrable ? 1 : 0);
 				}
 				exec(function(data) {
 					console.log("Sending open with: " + goog.json.serialize(data));
 					self._api(resources.open, data, wrapErrorFunc(function(data) {
 						console.log("Open successful: " + data);
 						setBranchValuesCordova(data);
-						utils.storeKeyValue('identity_id', data.identity_id, self._permStorage)
-						utils.storeKeyValue('device_fingerprint_id', data.device_fingerprint_id, self._permStorage)
+						utils.storeKeyValue('identity_id', data.identity_id, self._permStorage);
+						utils.storeKeyValue('device_fingerprint_id', data.device_fingerprint_id, self._permStorage);
 						utils.store(data, self._storage);
 						if (callback) { callback(null, data); }
 					}, callback));
@@ -236,11 +233,11 @@ Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 						callback(new Error("Error getting device data!"));
 					}
 				},  "BranchDevice", "getOpenData", args);
-			} else {
-				var args = [];
+			}
+			else {
 				args.push(self.debug);
-				if ((typeof isReferrable !== "undefined") && (isReferrable != null)) {
-					args.push((isReferrable)?1:0);
+				if ((typeof isReferrable !== "undefined") && (isReferrable !== null)) {
+					args.push(isReferrable ? 1 : 0);
 				}
 				exec(function(data) {
 					console.log("Sending install with: " + goog.json.serialize(data));
@@ -259,7 +256,7 @@ Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 				},  "BranchDevice", "getInstallData", args);
 			}
 		}
-		
+
 		if (utils.WEB_BUILD) {
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			this._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
@@ -311,11 +308,11 @@ if (utils.CORDOVA_BUILD) {
  * later point.
  * If the Branch session has already been initialized, the callback will return
  * immediately, otherwise, it will return once Branch has been initialized.
- * 
+ *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ___
- * 
+ *
  */
 	Branch.prototype['first'] = function(callback) {
 		if (!callback) { return; }
@@ -363,22 +360,22 @@ if (utils.CORDOVA_BUILD) {
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	
+
 	function setBranchValues(data) {
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
 		self.identity = data['identity'];
 	}
-	
+
 	if (utils.CORDOVA_BUILD) {
 		var self = this;
-		
+
 		this._api(resources.profile, { "identity": identity }, wrapErrorFunc(function(data) {
 			setBranchValues(data);
 			if (callback) { callback(null, data); }
 		}, callback));
 	}
-	
+
 	if (utils.WEB_BUILD) {
 		this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
 	}
@@ -431,25 +428,25 @@ if (utils.CORDOVA_BUILD) {
  *      "Error message"
  * );
  * ```
- * 
+ *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ___
  *
  * ## Tracking events
- * 
+ *
  */
 	Branch.prototype['close'] = function(callback) {
 		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-		
+
 		var self = this;
-		
+
 		function clearBranchValues() {
 			delete self.session_id;
 			delete self.sessionLink;
 			self.initialized = false;
 		}
-		
+
 		this._api(resources.close, { }, wrapErrorFunc(function(data) {
 			clearBranchValues();
 			utils.clearStore(self._storage);
@@ -565,7 +562,7 @@ Branch.prototype['link'] = function(linkData, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 
 	var self = this;
-	
+
 	if (utils.WEB_BUILD) {
 		linkData['source'] = 'web-sdk';
 		if (linkData['data']['$desktop_url'] !== undefined) {
@@ -647,9 +644,9 @@ Branch.prototype['link'] = function(linkData, callback) {
  * ```js
  * callback("Error message");
  * ```
- * 
+ *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ___
  *
  * # Referral system rewarding functionality
@@ -762,14 +759,14 @@ if (utils.CORDOVA_BUILD) {
  * "expiration" - An optional date string.  If present, determines the date on which the code expires.
  *
  * ##### Usage
- * 
+ *
  * branch.getCode(
  *     data,
  *     callback(err,data)
  * );
- * 
+ *
  * ##### Example
- * 
+ *
  * ```js
  * branch.getCode(
  *     {
@@ -788,21 +785,21 @@ if (utils.CORDOVA_BUILD) {
  *      "Error message",
  *      {
  *        "referral_code":"AB12CD"
- *      } 
+ *      }
  * );
  * ```
- * 
+ *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ___
  *
  */
-	Branch.prototype['getCode'] = function(data, callback)  {
+	Branch.prototype['getCode'] = function(data, callback) {
 		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 		data.type = "credit";
 		data.creation_type = 2;
 		this._api(resources.getCode, data, wrapErrorCallback2(callback));
-	}
+	};
 }
 
 if (utils.CORDOVA_BUILD) {
@@ -814,7 +811,7 @@ if (utils.CORDOVA_BUILD) {
  * Validate a referral code before using.
  *
  * ##### Usage
- * 
+ *
  * ```js
  * branch.validateCode(
  *     code, // The code to validate
@@ -844,16 +841,16 @@ if (utils.CORDOVA_BUILD) {
  *     callback(err, data)
  * );
  * ```
- * 
+ *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ___
  *
  */
-	Branch.prototype['validateCode'] = function(code, callback)  {
+	Branch.prototype['validateCode'] = function(code, callback) {
 		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 		this._api(resources.validateCode, { "code": code }, wrapErrorCallback2(callback));
-	}
+	};
 }
 
 if (utils.CORDOVA_BUILD) {
@@ -865,7 +862,7 @@ if (utils.CORDOVA_BUILD) {
  * Apply a referral code.
  *
  * ##### Usage
- * 
+ *
  * ```js
  * branch.applyCode(
  *     code, // The code to apply
@@ -895,18 +892,18 @@ if (utils.CORDOVA_BUILD) {
  *     callback(err, data)
  * );
  * ```
- * 
+ *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ___
  *
  * ## Credit Functions
- * 
+ *
  */
-	Branch.prototype['applyCode'] = function(code, callback)  {
+	Branch.prototype['applyCode'] = function(code, callback) {
 		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 		this._api(resources.applyCode, { "code": code }, wrapErrorCallback2(callback));
-	}
+	};
 }
 
 /**
@@ -951,9 +948,9 @@ if (utils.CORDOVA_BUILD) {
  * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history data.
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
- * 
+ *
  * ##### Usage
- * 
+ *
  * ```js
  * branch.creditHistory(
  *      data,
@@ -961,9 +958,9 @@ if (utils.CORDOVA_BUILD) {
  * );
  *
  * ##### Example
- * 
+ *
  * ```js
- * branch.creditHistory( 
+ * branch.creditHistory(
  *     {
  *       "length":50,
  *       "direction":0,
@@ -1006,9 +1003,9 @@ if (utils.CORDOVA_BUILD) {
  * ```
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * ---
- * 
+ *
  * ## Credit redemption
  *
  */
@@ -1016,7 +1013,7 @@ if (utils.CORDOVA_BUILD) {
 		if (!this.initialized) {
 			return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
 		}
-		this._api(resources.creditHistory, (data)?data:{}, wrapErrorCallback2(callback));
+		this._api(resources.creditHistory, data ? data : {}, wrapErrorCallback2(callback));
 	};
 }
 
@@ -1083,7 +1080,7 @@ if (utils.WEB_BUILD) {
  * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
  *
  * THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
- * 
+ *
  * #### Usage
  *
  * ```js

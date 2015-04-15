@@ -342,7 +342,7 @@ if (utils.CORDOVA_BUILD) {
 				"type": validator(true, validationTypes.str),
 				"bucket": validator(false, validationTypes.str)
 			}
-		}
+		};
 
 		resources.validateCode = {
 				destination: config.api_endpoint,
@@ -356,7 +356,7 @@ if (utils.CORDOVA_BUILD) {
 					"device_fingerprint_id": validator(true, branch_id),
 					"sdk": validator(false, validationTypes.str)
 				}
-		}
+		};
 
 		resources.applyCode = {
 				destination: config.api_endpoint,
@@ -370,7 +370,7 @@ if (utils.CORDOVA_BUILD) {
 					"device_fingerprint_id": validator(true, branch_id),
 					"sdk": validator(false, validationTypes.str)
 				}
-		}
+		};
 
 		resources.redeem =  {
 			destination: config.api_endpoint,

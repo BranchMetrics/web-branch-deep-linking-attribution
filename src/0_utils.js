@@ -108,7 +108,7 @@ utils.store = function(data, storage) {
  */
 utils.clearStore = function(storage) {
 	storage['removeItem']('branch_session');
-}
+};
 
 /**
  * @param {string} key
