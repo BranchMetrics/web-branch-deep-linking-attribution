@@ -62,7 +62,7 @@ function validator(required, type) {
 
 var branch_id = /^[0-9]{15,20}$/;
 
-if (utils.WEB_BUILD) {
+if (config.WEB_BUILD) {
 	resources.open = {
 			destination: config.api_endpoint,
 			endpoint: "/v1/open",
@@ -195,7 +195,7 @@ if (utils.WEB_BUILD) {
 		};
 }
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 	resources.install = {
 			destination: config.api_endpoint,
 			endpoint: "/v1/install",

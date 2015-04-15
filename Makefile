@@ -42,26 +42,26 @@ test/branch-deps.js: $(SOURCES) compiler/library
 		--path test \
 		--output_mode deps \
 		--exclude test/branch-deps.js > test/branch-deps.js.tmp
-	echo "// jscs:disable" | cat - test/branch-deps.js.tmp > test/branch-deps.js && \
+	echo "// jscs:disable" | cat - test/branch-deps.js.tmp | sed -e 's#src/0_config.js#test/web-config.js#' > test/branch-deps.js && \
 		rm test/branch-deps.js.tmp
 
 docs/3_branch.md: $(SOURCES)
 	jsdox src/3_branch.js --output docs
 
 dist/web/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'utils.WEB_BUILD=true' > dist/web/build.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'config.WEB_BUILD=true' > dist/web/build.js
 
 dist/web/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'utils.WEB_BUILD=true' > dist/web/build.min.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'config.WEB_BUILD=true' > dist/web/build.min.js
 
 dist/web/build.min.js.gz: dist/web/build.min.js
 	gzip -c dist/web/build.min.js > dist/web/build.min.js.gz
 
 dist/cordova/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'utils.CORDOVA_BUILD=true' > dist/cordova/build.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'config.CORDOVA_BUILD=true' > dist/cordova/build.js
 
 dist/cordova/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'utils.CORDOVA_BUILD=true' > dist/cordova/build.min.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'config.CORDOVA_BUILD=true' > dist/cordova/build.min.js
 
 testbeds/web/example.html: src/web/example.template.html
 ifeq ($(MAKECMDGOALS), release)

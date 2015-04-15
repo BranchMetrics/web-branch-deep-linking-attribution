@@ -12,7 +12,7 @@ goog.require('storage');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-if (utils.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint ignore:line
+if (config.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint ignore:line
 
 var default_branch;
 
@@ -74,7 +74,7 @@ Branch = function() {
 	this._storage = storage(false);
 	this._server = new Server();
 
-	if (utils.CORDOVA_BUILD) {
+	if (config.CORDOVA_BUILD) {
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
 											// the session params from the first install.
 		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
@@ -97,7 +97,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
 
 		// These three are sent from mobile apps
-		if (utils.CORDOVA_BUILD) {
+		if (config.CORDOVA_BUILD) {
 			if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && self.device_fingerprint_id) { obj['device_fingerprint_id'] = self.device_fingerprint_id; }
 			if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && self.link_click_id) { obj['link_click_id'] = self.link_click_id; }
 			if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && self.sdk) { obj['sdk'] = self.sdk; }
@@ -110,7 +110,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 	});
 };
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 /**
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
@@ -195,7 +195,7 @@ Branch.prototype['init'] = function(app_id, options, callback) {
 		self.sessionLink = data['link'];
 		self.initialized = true;
 
-		if (utils.CORDOVA_BUILD) {
+		if (config.CORDOVA_BUILD) {
 			self.device_fingerprint_id = data['device_fingerprint_id'];
 			self.link_click_id = data['link_click_id'];
 		}
@@ -206,7 +206,7 @@ Branch.prototype['init'] = function(app_id, options, callback) {
 		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
 	}
 	else {
-		if (utils.CORDOVA_BUILD) {
+		if (config.CORDOVA_BUILD) {
 			var args = [];
 			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
 			if (utils.readKeyValue('identity_id', self._permStorage)) {
@@ -255,7 +255,7 @@ Branch.prototype['init'] = function(app_id, options, callback) {
 			}
 		}
 
-		if (utils.WEB_BUILD) {
+		if (config.WEB_BUILD) {
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			this._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
 				self._api(resources.open, {
@@ -295,7 +295,7 @@ Branch.prototype['data'] = function(callback) {
 	});
 };
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 /**
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
@@ -366,14 +366,14 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 		self.identity = data['identity'];
 	}
 
-	if (utils.CORDOVA_BUILD) {
+	if (config.CORDOVA_BUILD) {
 		this._api(resources.profile, { "identity": identity }, wrapErrorFunc(function(data) {
 			setBranchValues(data);
 			if (callback) { callback(null, data); }
 		}, callback));
 	}
 
-	if (utils.WEB_BUILD) {
+	if (config.WEB_BUILD) {
 		this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
 	}
 };
@@ -405,7 +405,7 @@ Branch.prototype['logout'] = function(callback) {
 	this._api(resources.logout, { }, wrapErrorCallback1(callback));
 };
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 /**
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
@@ -560,7 +560,7 @@ Branch.prototype['link'] = function(linkData, callback) {
 
 	var self = this;
 
-	if (utils.WEB_BUILD) {
+	if (config.WEB_BUILD) {
 		linkData['source'] = 'web-sdk';
 		if (linkData['data']['$desktop_url'] !== undefined) {
 			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
@@ -740,7 +740,7 @@ Branch.prototype['referrals'] = function(callback) {
 };
 
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 /**
  * @function Branch.getCode
  * @param {Object} data - _required_ - contins options for referral code creation.
@@ -799,7 +799,7 @@ if (utils.CORDOVA_BUILD) {
 	};
 }
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 /**
  * @function Branch.validateCode
  * @param {string} code - _required_ - the code string to validate.
@@ -850,7 +850,7 @@ if (utils.CORDOVA_BUILD) {
 	};
 }
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 /**
  * @function Branch.applyCode
  * @param {string} code - _required_ - the code string to apply.
@@ -938,7 +938,7 @@ Branch.prototype['credits'] = function(callback) {
 };
 
 
-if (utils.CORDOVA_BUILD) {
+if (config.CORDOVA_BUILD) {
 /**
  * @function Branch.creditHistory
  * @param {Object} data - _optional_ - options controlling the returned history.
@@ -1062,7 +1062,7 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback));
 };
 
-if (utils.WEB_BUILD) {
+if (config.WEB_BUILD) {
 /**
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
