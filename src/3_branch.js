@@ -133,10 +133,10 @@ if (utils.CORDOVA_BUILD) {
 /**
  * @function Branch.init
  * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
+ * @param {{isReferrable:?boolean}=} options - _optional_ - options: isReferrable: Is this a referrable session.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
- * @param {boolean} isReferrable - _optional_ - Is this a referrable session.
  *
- * THE "isReferrable" PARAM IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
+ * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -176,35 +176,33 @@ if (utils.CORDOVA_BUILD) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = function(app_id, callback, isReferrable) {
+Branch.prototype['init'] = function(app_id, options, callback) {
+	if (options && typeof options == 'function') {
+		callback = options;
+		options = { isReferrable: null };
+	}
+
 	if (this.initialized) { return wrapError(new Error(utils.message(utils.messages.existingInit)), callback); }
+	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
 
 	this.app_id = app_id;
 	var self = this,
 		sessionData = utils.readStore(this._storage);
 
-	function setBranchValuesCordova(data) {
-		self.session_id = data['session_id'];
-		self.identity_id = data['identity_id'];
-		self.sessionLink = data['link'];
-		self.device_fingerprint_id = data['device_fingerprint_id'];
-		self.link_click_id = data['link_click_id'];
-		self.initialized = true;
-	}
-	function setBranchValuesWeb(data) {
+	function setBranchValues(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
 		self.initialized = true;
+
+		if (utils.CORDOVA_BUILD) {
+			self.device_fingerprint_id = data['device_fingerprint_id'];
+			self.link_click_id = data['link_click_id'];
+		}
 	}
 
 	if (sessionData  && sessionData['session_id']) {
-		if (utils.CORDOVA_BUILD) {
-			setBranchValuesCordova(sessionData);
-		}
-		if (utils.WEB_BUILD) {
-			setBranchValuesWeb(sessionData);
-		}
+		setBranchValues(sessionData);
 		if (callback) { callback(null, utils.whiteListSessionData(sessionData)); }
 	}
 	else {
@@ -214,14 +212,14 @@ Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 			if (utils.readKeyValue('identity_id', self._permStorage)) {
 				self.identity_id = utils.readKeyValue('identity_id', self._permStorage);
 				self.device_fingerprint_id = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-				if (typeof isReferrable !== "undefined" && isReferrable !== null) {
+				if (isReferrable !== null) {
 					args.push(isReferrable ? 1 : 0);
 				}
 				exec(function(data) {
 					console.log("Sending open with: " + goog.json.serialize(data));
 					self._api(resources.open, data, wrapErrorFunc(function(data) {
 						console.log("Open successful: " + data);
-						setBranchValuesCordova(data);
+						setBranchValues(data);
 						utils.storeKeyValue('identity_id', data.identity_id, self._permStorage);
 						utils.storeKeyValue('device_fingerprint_id', data.device_fingerprint_id, self._permStorage);
 						utils.store(data, self._storage);
@@ -236,14 +234,14 @@ Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 			}
 			else {
 				args.push(self.debug);
-				if ((typeof isReferrable !== "undefined") && (isReferrable !== null)) {
+				if (isReferrable !== null) {
 					args.push(isReferrable ? 1 : 0);
 				}
 				exec(function(data) {
 					console.log("Sending install with: " + goog.json.serialize(data));
 					self._api(resources.install, data, wrapErrorFunc(function(data) {
 						console.log("Install successful: " + data);
-						setBranchValuesCordova(data);
+						setBranchValues(data);
 						utils.store(data, self._storage);
 						utils.store(data, self._permStorage);
 						if (callback) { callback(null, data); }
@@ -265,7 +263,7 @@ Branch.prototype['init'] = function(app_id, callback, isReferrable) {
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, wrapErrorFunc(function(data) {
-					setBranchValuesWeb(data);
+					setBranchValues(data);
 					if (link_identifier) { data['click_id'] = link_identifier; }
 					utils.store(data, self._storage);
 					if (callback) { callback(null, utils.whiteListSessionData(data)); }
@@ -361,6 +359,7 @@ if (utils.CORDOVA_BUILD) {
 Branch.prototype['setIdentity'] = function(identity, callback) {
 	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 
+	var self = this;
 	function setBranchValues(data) {
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
@@ -368,8 +367,6 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
 	}
 
 	if (utils.CORDOVA_BUILD) {
-		var self = this;
-
 		this._api(resources.profile, { "identity": identity }, wrapErrorFunc(function(data) {
 			setBranchValues(data);
 			if (callback) { callback(null, data); }
@@ -1140,7 +1137,7 @@ if (utils.WEB_BUILD) {
 			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 			disableHide: !!options['disableHide'],
 			forgetHide: !!options['forgetHide'],
-			make_new_link: !!options['make_new_link']
+			makeNewLink: !!options['make_new_link']
 		};
 
 		if (typeof options['showMobile'] != 'undefined') {

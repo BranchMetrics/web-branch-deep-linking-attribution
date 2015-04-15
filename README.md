@@ -122,17 +122,17 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 
 
-### init(app_id, callback, isReferrable) 
+### init(app_id, options, callback) 
 
 **Parameters**
 
 **app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
 
+**options**: `Object`, _optional_ - options: isReferrable: Is this a referrable session.
+
 **callback**: `function`, _optional_ - callback to read the session data.
 
-**isReferrable**: `boolean`, _optional_ - Is this a referrable session.
-
-THE "isReferrable" PARAM IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
+THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to

@@ -1188,60 +1188,55 @@ utils.CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
 });
 Branch.prototype.init = function(a, b, c) {
   function d(a) {
-    f.session_id = a.session_id;
-    f.identity_id = a.identity_id;
-    f.sessionLink = a.link;
-    f.device_fingerprint_id = a.device_fingerprint_id;
-    f.link_click_id = a.link_click_id;
-    f.initialized = !0;
+    e.session_id = a.session_id;
+    e.identity_id = a.identity_id;
+    e.sessionLink = a.link;
+    e.initialized = !0;
+    utils.CORDOVA_BUILD && (e.device_fingerprint_id = a.device_fingerprint_id, e.link_click_id = a.link_click_id);
   }
-  function e(a) {
-    f.session_id = a.session_id;
-    f.identity_id = a.identity_id;
-    f.sessionLink = a.link;
-    f.initialized = !0;
-  }
+  b && "function" == typeof b && (c = b, b = {isReferrable:null});
   if (this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.existingInit)), b);
+    return wrapError(Error(utils.message(utils.messages.existingInit)), c);
   }
+  b = b && "undefined" != typeof b.isReferrable && null !== b.isReferrable ? b.isReferrable : null;
   this.app_id = a;
-  var f = this;
+  var e = this;
   if ((a = utils.readStore(this._storage)) && a.session_id) {
-    utils.CORDOVA_BUILD && d(a), utils.WEB_BUILD && e(a), b && b(null, utils.whiteListSessionData(a));
+    d(a), c && c(null, utils.whiteListSessionData(a));
   } else {
-    if (utils.CORDOVA_BUILD && (a = [], utils.readKeyValue("identity_id", f._permStorage) ? (f.identity_id = utils.readKeyValue("identity_id", f._permStorage), f.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", f._permStorage), "undefined" !== typeof c && null !== c && a.push(c ? 1 : 0), exec(function(a) {
+    if (utils.CORDOVA_BUILD && (a = [], utils.readKeyValue("identity_id", e._permStorage) ? (e.identity_id = utils.readKeyValue("identity_id", e._permStorage), e.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", e._permStorage), null !== b && a.push(b ? 1 : 0), exec(function(a) {
       console.log("Sending open with: " + goog.json.serialize(a));
-      f._api(resources.open, a, wrapErrorFunc(function(a) {
+      e._api(resources.open, a, wrapErrorFunc(function(a) {
         console.log("Open successful: " + a);
         d(a);
-        utils.storeKeyValue("identity_id", a.identity_id, f._permStorage);
-        utils.storeKeyValue("device_fingerprint_id", a.device_fingerprint_id, f._permStorage);
-        utils.store(a, f._storage);
-        b && b(null, a);
-      }, b));
+        utils.storeKeyValue("identity_id", a.identity_id, e._permStorage);
+        utils.storeKeyValue("device_fingerprint_id", a.device_fingerprint_id, e._permStorage);
+        utils.store(a, e._storage);
+        c && c(null, a);
+      }, c));
     }, function() {
-      b && b(Error("Error getting device data!"));
-    }, "BranchDevice", "getOpenData", a)) : (a.push(f.debug), "undefined" !== typeof c && null !== c && a.push(c ? 1 : 0), exec(function(a) {
+      c && c(Error("Error getting device data!"));
+    }, "BranchDevice", "getOpenData", a)) : (a.push(e.debug), null !== b && a.push(b ? 1 : 0), exec(function(a) {
       console.log("Sending install with: " + goog.json.serialize(a));
-      f._api(resources.install, a, wrapErrorFunc(function(a) {
+      e._api(resources.install, a, wrapErrorFunc(function(a) {
         console.log("Install successful: " + a);
         d(a);
-        utils.store(a, f._storage);
-        utils.store(a, f._permStorage);
-        b && b(null, a);
-      }, b));
+        utils.store(a, e._storage);
+        utils.store(a, e._permStorage);
+        c && c(null, a);
+      }, c));
     }, function() {
-      b && b(Error("Error getting device data!"));
+      c && c(Error("Error getting device data!"));
     }, "BranchDevice", "getInstallData", a))), utils.WEB_BUILD) {
-      var g = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
+      var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
       this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
-        f._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
-          e(a);
-          g && (a.click_id = g);
-          utils.store(a, f._storage);
-          b && b(null, utils.whiteListSessionData(a));
-        }, b));
-      }, b));
+        e._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
+          d(a);
+          f && (a.click_id = f);
+          utils.store(a, e._storage);
+          c && c(null, utils.whiteListSessionData(a));
+        }, c));
+      }, c));
     }
   }
 };
@@ -1267,15 +1262,13 @@ Branch.prototype.setIdentity = function(a, b) {
   if (!this.initialized) {
     return wrapError(Error(utils.message(utils.messages.nonInit)), b);
   }
-  if (utils.CORDOVA_BUILD) {
-    var c = this;
-    this._api(resources.profile, {identity:a}, wrapErrorFunc(function(a) {
-      c.identity_id = a.identity_id;
-      c.sessionLink = a.link;
-      c.identity = a.identity;
-      b && b(null, a);
-    }, b));
-  }
+  var c = this;
+  utils.CORDOVA_BUILD && this._api(resources.profile, {identity:a}, wrapErrorFunc(function(a) {
+    c.identity_id = a.identity_id;
+    c.sessionLink = a.link;
+    c.identity = a.identity;
+    b && b(null, a);
+  }, b));
   utils.WEB_BUILD && this._api(resources.profile, {identity:a}, wrapErrorCallback2(b));
 };
 Branch.prototype.logout = function(a) {
@@ -1384,7 +1377,7 @@ Branch.prototype.redeem = function(a, b, c) {
 };
 utils.WEB_BUILD && (Branch.prototype.banner = function(a, b) {
   var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
-  make_new_link:!!a.make_new_link};
+  makeNewLink:!!a.make_new_link};
   "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
   banner(this, c, b, this._storage);
 });

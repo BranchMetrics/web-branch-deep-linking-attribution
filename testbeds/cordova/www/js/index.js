@@ -41,9 +41,9 @@ var app = {
         console.log("Device ready");
         branch.setDebug(true);
     	console.log("Sending init");
-        branch.init('YOUR APP ID HERE', function(err, data) {
+        branch.init('YOUR APP ID HERE', { isReferrable: true }, function(err, data) {
         	app.initComplete(err, data);
-        }, true);
+        });
         var statusEle = document.getElementById("status");
         statusEle.innerHTML = "Ready..."
     },
@@ -66,9 +66,9 @@ var app = {
     // resume Event Handler
     onResume: function() {
     	console.log("Sending init");
-        branch.init('YOUR APP ID HERE', function(err, data) {
+        branch.init('YOUR APP ID HERE', { isReferrable: true }, function(err, data) {
         	app.initComplete(err, data);
-        }, true);
+        });
     },
     
     initComplete: function(err, data) {
