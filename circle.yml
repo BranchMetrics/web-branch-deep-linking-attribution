@@ -1,4 +1,8 @@
 ---
+machine:
+  node:
+    version: 0.10.31
+
 dependencies:
   post:
     # Closure COmpiler
