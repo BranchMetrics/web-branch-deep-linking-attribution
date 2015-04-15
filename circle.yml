@@ -15,12 +15,13 @@ dependencies:
 
     - npm install
     - mocha-phantomjs -v || npm install -g mocha-phantomjs
+    - jscs -v || npm install -g jscs
+    - jshint -v || npm install -g jshint
   cache_directories:
     - "~/nvm/v0.10.31"
     - compiler
 
 test:
   override:
-    # - karma start
-    - npm install -g mocha-phantomjs
+    - ./lint.sh
     - mocha-phantomjs test/test.html
