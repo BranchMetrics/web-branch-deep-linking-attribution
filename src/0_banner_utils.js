@@ -2,7 +2,7 @@ goog.provide('banner_utils');
 goog.require('utils');
 goog.require('storage'); // jshint unused:false
 
-/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean}} */
+/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, makeNewLink:boolean}} */
 banner_utils.options; // jshint ignore:line
 
 // UI Animation transition speed in ms.
