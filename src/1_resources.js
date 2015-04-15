@@ -69,7 +69,8 @@ function defaults(obj) {
 			"app_id": validator(true, branch_id),
 			"browser_fingerprint_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id)
+			"identity_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.str)
 		};
 	}
 	if (config.CORDOVA_BUILD) {
@@ -78,7 +79,7 @@ function defaults(obj) {
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str)
+			"sdk": validator(true, validationTypes.str)
 		};
 	}
 	return utils.merge(obj, def);
@@ -105,7 +106,7 @@ if (config.WEB_BUILD) {
 		jsonp: true,
 		params: {
 			"app_id": validator(true, branch_id),
-			"v": validator(true, validationTypes.str)
+			"sdk": validator(true, validationTypes.str)
 		}
 	};
 

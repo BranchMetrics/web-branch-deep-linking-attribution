@@ -968,15 +968,15 @@ function validator(a, b) {
     return!1;
   };
 }
+var branch_id = /^[0-9]{15,20}$/;
 function defaults(a) {
   var b = {};
-  config.WEB_BUILD && (b = {app_id:validator(!0, branch_id), browser_fingerprint_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id)});
-  config.CORDOVA_BUILD && (b = {app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)});
+  config.WEB_BUILD && (b = {app_id:validator(!0, branch_id), browser_fingerprint_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.str)});
+  config.CORDOVA_BUILD && (b = {app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.str)});
   return utils.merge(a, b);
 }
-var branch_id = /^[0-9]{15,20}$/;
 config.WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{app_id:validator(!0, branch_id), 
-v:validator(!0, validationTypes.str)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str), app_id:validator(!0, branch_id)}});
+sdk:validator(!0, validationTypes.str)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str), app_id:validator(!0, branch_id)}});
 config.CORDOVA_BUILD && (resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), 
 bluetooth_version:validator(!1, validationTypes.str), has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), 
 is_referrable:validator(!1, validationTypes.num), update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), 
@@ -1169,7 +1169,11 @@ var Branch = function() {
   this._queue = Queue();
   this._storage = storage(!1);
   this._server = new Server;
-  config.CORDOVA_BUILD && (this._permStorage = storage(!0), this.sdk = "cordova" + config.version, this.debug = !1);
+  var a;
+  config.CORDOVA_BUILD && (a = "cordova");
+  config.WEB_BUILD && (a = "web");
+  this.sdk = a + config.version;
+  config.CORDOVA_BUILD && (this._permStorage = storage(!0), this.debug = !1);
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1178,7 +1182,8 @@ Branch.prototype._api = function(a, b, c) {
     (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && d.app_id && (b.app_id = d.app_id);
     (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && d.session_id && (b.session_id = d.session_id);
     (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && d.identity_id && (b.identity_id = d.identity_id);
-    config.CORDOVA_BUILD && ((a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && d.device_fingerprint_id && (b.device_fingerprint_id = d.device_fingerprint_id), (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && d.link_click_id && (b.link_click_id = d.link_click_id), (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && d.sdk && (b.sdk = d.sdk));
+    (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && d.sdk && (b.sdk = d.sdk);
+    config.CORDOVA_BUILD && ((a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && d.device_fingerprint_id && (b.device_fingerprint_id = d.device_fingerprint_id), (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && d.link_click_id && (b.link_click_id = d.link_click_id));
     return d._server.request(a, b, d._storage, function(a, b) {
       e();
       c(a, b);
@@ -1231,7 +1236,7 @@ Branch.prototype.init = function(a, b, c) {
       c && c(Error("Error getting device data!"));
     }, "BranchDevice", "getInstallData", a))), config.WEB_BUILD) {
       var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
-      this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
+      this._api(resources._r, {}, wrapErrorFunc(function(a) {
         e._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
           d(a);
           f && (a.click_id = f);
