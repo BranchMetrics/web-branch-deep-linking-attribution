@@ -15,9 +15,9 @@ ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../../dist/web/build.js"}
 
 .PHONY: clean
 
-all: dist/web/build.min.js README.md testbeds/web/example.html test/branch-deps.js
+all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js
 clean:
-	rm -f dist/web/build.js dist/web/build.min.js docs/3_branch.md dist/web/build.min.js.gz README.md testbeds/web/example.html test/branch-deps.js
+	rm -f dist/web/** dist/cordova/** docs/3_branch.md README.md testbeds/web/example.html test/branch-deps.js
 release: clean all dist/web/build.min.js.gz
 	@echo "released"
 
@@ -49,13 +49,19 @@ docs/3_branch.md: $(SOURCES)
 	jsdox src/3_branch.js --output docs
 
 dist/web/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'WEB_BUILD=true' > dist/web/build.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'utils.WEB_BUILD=true' > dist/web/build.js
 
 dist/web/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'WEB_BUILD=true' > dist/web/build.min.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'utils.WEB_BUILD=true' > dist/web/build.min.js
 
 dist/web/build.min.js.gz: dist/web/build.min.js
 	gzip -c dist/web/build.min.js > dist/web/build.min.js.gz
+
+dist/cordova/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'utils.CORDOVA_BUILD=true' > dist/cordova/build.js
+
+dist/cordova/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'utils.CORDOVA_BUILD=true' > dist/cordova/build.min.js
 
 testbeds/web/example.html: src/web/example.template.html
 ifeq ($(MAKECMDGOALS), release)

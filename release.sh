@@ -26,8 +26,6 @@ then
 	sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json
 fi
 
-make release
-
 read -p "Bump changelog version? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -42,6 +40,15 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" bower.json
 fi
+
+read -p "Update plugin.xml? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	sed -i -e "s/\"version\"=\".*\"$/\"version\"=\"$VERSION_NO_V\",/" plugin.xml
+fi
+
+make release
 
 read -p "Commit? " -n 1 -r
 echo

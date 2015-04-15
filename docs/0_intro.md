@@ -27,7 +27,7 @@ This SDK requires native browser Javascript and has been tested in all modern br
 
 You will need to create a [Branch Metrics app](http://branch.io) to obtain your app_key.
 
-### Quick Install
+### Quick Install (Web SDK)
 
 #### Manual installation
 
@@ -52,6 +52,27 @@ If you use Bower or npm, you can run `bower install branch-sdk` or `npm install 
 
 In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
 
+### Quick Install (Cordova/Phonegap)
+
+This Web SDK can also be used for Cordova/Phonegap applications.  It is provided as a plugin and can be installed with cordova plugin or the plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
+
+```sh
+cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
+```
+
+Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
+
+#### Initialization and Event Handling
+
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below.  You will need your app id from the Branch dashboard.
+
+```js
+        branch.init(‘YOUR APP KEY HERE’, function(err, data) {
+        	app.initComplete(err, data);
+        });
+```
+
+The session close will be sent automatically on any ‘pause’ event.
 
 ## API Reference
 

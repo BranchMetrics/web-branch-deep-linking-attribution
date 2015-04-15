@@ -24,7 +24,7 @@ Server.prototype.serializeObject = function(obj, prefix) {
 	var pairs = [];
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
-			pairs.push(encodeURIComponent(prefix) + '[]=' + encodeURIComponent(obj[i]));
+			pairs.push(encodeURIComponent(prefix) + '=' + encodeURIComponent(obj[i]));
 		}
 	}
 	else {

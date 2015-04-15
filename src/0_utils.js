@@ -11,7 +11,10 @@ goog.require('storage');
 var DEBUG = true;
 
 /** @define {boolean} */
-var WEB_BUILD = true;
+utils.WEB_BUILD = false;
+
+/** @define {boolean} */
+utils.CORDOVA_BUILD = false;
 
 /* jshint ignore:start */
 /** @typedef {string} */
@@ -98,6 +101,13 @@ utils.readStore = function(storage) {
  */
 utils.store = function(data, storage) {
 	storage['setItem']('branch_session', goog.json.serialize(data));
+};
+
+/**
+ * @param {BranchStorage} storage
+ */
+utils.clearStore = function(storage) {
+	storage['removeItem']('branch_session');
 };
 
 /**

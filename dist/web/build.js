@@ -746,8 +746,8 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 };
 // Input 5
 var utils = {}, DEBUG = !0;
-utils.WEB_BUILD = !1;
-utils.CORDOVA_BUILD = !0;
+utils.WEB_BUILD = !0;
+utils.CORDOVA_BUILD = !1;
 var message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", missingUrl:"Required argument: URL, is missing"};
