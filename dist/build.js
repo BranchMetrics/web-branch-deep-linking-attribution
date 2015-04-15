@@ -1263,7 +1263,7 @@ Branch.prototype.redeem = function(a, b, c) {
 };
 Branch.prototype.banner = function(a, b) {
   var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
-  make_new_link:!!a.make_new_link};
+  makeNewLink:!!a.make_new_link};
   "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
   banner(this, c, b, this._storage);
 };
