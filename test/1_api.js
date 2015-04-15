@@ -19,10 +19,10 @@ describe('Server helpers', function() {
 		assert.equal(server.serializeObject({ a: { b: 'c', d: { e: 'f', g: 'h' } } }), 'a.b=c&a.d.e=f&a.d.g=h');
 
 		// Test arrays
-		assert.equal(server.serializeObject({ a: [ 'b', 'c' ] }), 'a[]=b&a[]=c');
+		assert.equal(server.serializeObject({ a: [ 'b', 'c' ] }), 'a=b&a=c');
 
 		// Test arrays in objects
-		assert.equal(server.serializeObject({ a: { b: [ 'c', 'd' ] } }), 'a.b[]=c&a.b[]=d');
+		assert.equal(server.serializeObject({ a: { b: [ 'c', 'd' ] } }), 'a.b=c&a.b=d');
 	});
 
 	describe('getUrl', function() {
