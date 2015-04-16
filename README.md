@@ -27,11 +27,15 @@ This SDK requires native browser Javascript and has been tested in all modern br
 
 You will need to create a [Branch Metrics app](http://branch.io) to obtain your app_key.
 
+See the screenshot for the location of the App Key (_soon to be deprecated but will always be supported_):
+
+![app key](resources/app_id.png)
+
 ### Quick Install (Web SDK)
 
 #### Manual installation
 
-_Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+_Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings). See the screenshot above!_
 
 ```html
 <script type="text/javascript">
