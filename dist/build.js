@@ -1089,9 +1089,9 @@ var sendSMS = function(a, b, c, d) {
     banner.close = function() {
       closeBanner(e, d);
     };
-    g && (g.onclick = function(b) {
-      b.preventDefault();
-      a.close();
+    g && (g.onclick = function(a) {
+      a.preventDefault();
+      banner.close();
     });
     document.body.className += " branch-animation";
     document.body.style.marginTop = banner_utils.bannerHeight;
@@ -1120,20 +1120,22 @@ function wrapErrorFunc(a, b) {
     }
   };
 }
-function wrapErrorCallback1(a) {
-  return function(b) {
-    if (b && !a) {
-      throw b;
+function wrapErrorCallback1(a, b) {
+  return function(c) {
+    b();
+    if (c && !a) {
+      throw c;
     }
-    a && a(b);
+    a && a(c);
   };
 }
-function wrapErrorCallback2(a) {
-  return function(b, c) {
-    if (b && !a) {
-      throw b;
+function wrapErrorCallback2(a, b) {
+  return function(c, d) {
+    b();
+    if (c && !a) {
+      throw c;
     }
-    a && a(b, c);
+    a && a(c, d);
   };
 }
 var Branch = function() {
@@ -1146,45 +1148,38 @@ var Branch = function() {
   this.initialized = !1;
 };
 Branch.prototype._api = function(a, b, c) {
-  var d = this;
-  this._queue(function(e) {
-    (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && d.app_id && (b.app_id = d.app_id);
-    (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && d.session_id && (b.session_id = d.session_id);
-    (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && d.identity_id && (b.identity_id = d.identity_id);
-    return d._server.request(a, b, d._storage, function(a, b) {
-      e();
-      c(a, b);
-    });
+  (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && this.app_id && (b.app_id = this.app_id);
+  (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && this.session_id && (b.session_id = this.session_id);
+  (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && this.identity_id && (b.identity_id = this.identity_id);
+  return this._server.request(a, b, this._storage, function(a, b) {
+    c(a, b);
   });
 };
-Branch.prototype.init = function(a, b, c) {
-  "function" == typeof b && (c = b, b = {});
-  if (this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.existingInit)), c);
-  }
-  this.app_id = a;
-  var d = this;
-  a = utils.readStore(this._storage);
-  var e = function(a) {
-    d.session_id = a.session_id;
-    d.identity_id = a.identity_id;
-    d.sessionLink = a.link;
-    d.initialized = !0;
-    b.launch_banner && d.banner(b.launch_banner.options, b.launch_banner.link_data);
-    c && c(null, utils.whiteListSessionData(a));
-  };
-  if (a && a.session_id) {
-    e(a);
-  } else {
-    var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
-    this._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
-      d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
-        f && (a.click_id = f);
-        utils.store(a, d._storage);
-        e(a);
-      }, c));
-    }, c));
-  }
+Branch.prototype.init = function(a, b) {
+  var c = this;
+  c.app_id = a;
+  this._queue(function(a) {
+    var e = utils.readStore(this._storage), f = function(e) {
+      c.session_id = e.session_id;
+      c.identity_id = e.identity_id;
+      c.sessionLink = e.link;
+      c.initialized = !0;
+      a();
+      b && b(null, utils.whiteListSessionData(e));
+    };
+    if (e && e.session_id) {
+      f(e);
+    } else {
+      var g = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
+      c._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
+        c._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
+          g && (a.click_id = g);
+          utils.store(a, c._storage);
+          f(a);
+        }, b));
+      }, b));
+    }
+  });
 };
 Branch.prototype.data = function(a) {
   if (a) {
@@ -1196,42 +1191,43 @@ Branch.prototype.data = function(a) {
   }
 };
 Branch.prototype.setIdentity = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
-  this._api(resources.profile, {identity:a}, wrapErrorCallback2(b));
+  var c = this;
+  this._queue(function(d) {
+    c._api(resources.profile, {identity:a}, wrapErrorCallback2(b, d));
+  });
 };
 Branch.prototype.logout = function(a) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-  }
-  this._api(resources.logout, {}, wrapErrorCallback1(a));
+  var b = this;
+  this._queue(function(c) {
+    b._api(resources.logout, {}, wrapErrorCallback1(a, c));
+  });
 };
 Branch.prototype.track = function(a, b, c) {
   "function" == typeof b && (c = b, b = {});
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
-  }
-  this._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b || {})}, wrapErrorCallback1(c));
+  var d = this;
+  this._queue(function(e) {
+    d._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b || {})}, wrapErrorCallback1(c, e));
+  });
 };
 Branch.prototype.link = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
+  var c = this;
   a.source = "web-sdk";
   void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, ""));
-  a.data = goog.json.serialize(a.data);
-  this._api(resources.link, a, wrapErrorFunc(function(a) {
-    b(null, a && a.url);
-  }, b));
+  this._queue(function(d) {
+    a.data = goog.json.serialize(a.data);
+    c._api(resources.link, a, wrapErrorFunc(function(a) {
+      d();
+      b(null, a && a.url);
+    }, b));
+  });
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
-  function e(b) {
-    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d));
+  function e(b, c) {
+    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, function(a, b) {
+      wrapErrorCallback1(d, c);
+    });
   }
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), d);
-  }
+  var f = this;
   if ("function" == typeof c) {
     d = c, c = {};
   } else {
@@ -1240,44 +1236,51 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
     }
   }
   c.make_new_link = c.make_new_link || !1;
-  var f = this;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
-  utils.readKeyValue("click_id", this._storage) && !c.make_new_link ? e(utils.readKeyValue("click_id", this._storage)) : this.link(b, wrapErrorFunc(function(a) {
-    f._api(resources.linkClick, {link_url:"l/" + a.split("/").pop(), click:"click"}, wrapErrorFunc(function(a) {
-      utils.storeKeyValue("click_id", a.click_id, f._storage);
-      e(a.click_id);
-    }, d));
+  utils.readKeyValue("click_id", f._storage) && !c.make_new_link ? f._queue(function(a) {
+    e(utils.readKeyValue("click_id", f._storage), a);
+  }) : f.link(b, wrapErrorFunc(function(a) {
+    f._queue(function(b) {
+      f._api(resources.linkClick, {link_url:"l/" + a.split("/").pop(), click:"click"}, wrapErrorFunc(function(a) {
+        utils.storeKeyValue("click_id", a.click_id, f._storage);
+        e(a.click_id, b);
+      }, d));
+    });
   }, d));
 };
 Branch.prototype.referrals = function(a) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-  }
-  this._api(resources.referrals, {}, wrapErrorCallback2(a));
+  var b = this;
+  this._queue(function(c) {
+    b._api(resources.referrals, {}, wrapErrorCallback2(a, c));
+  });
 };
 Branch.prototype.credits = function(a) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-  }
-  this._api(resources.credits, {}, wrapErrorCallback2(a));
+  var b = this;
+  this._queue(function(c) {
+    b._api(resources.credits, {}, wrapErrorCallback2(a, c));
+  });
 };
 Branch.prototype.redeem = function(a, b, c) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
-  }
-  this._api(resources.redeem, {amount:a, bucket:b}, wrapErrorCallback1(c));
+  var d = this;
+  this._queue(function(e) {
+    d._api(resources.redeem, {amount:a, bucket:b}, wrapErrorCallback1(c, e));
+  });
 };
 Branch.prototype.banner = function(a, b) {
-  var c = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
-  make_new_link:!!a.make_new_link};
-  "undefined" != typeof a.showMobile && (c.showiOS = c.showAndroid = a.showMobile);
-  banner(this, c, b, this._storage);
+  var c = this;
+  this._queue(function(d) {
+    var e = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
+    make_new_link:!!a.make_new_link};
+    "undefined" != typeof a.showMobile && (e.showiOS = e.showAndroid = a.showMobile);
+    banner(c, e, b, c._storage);
+    d();
+  });
 };
 Branch.prototype.closeBanner = function() {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)));
-  }
-  banner.close();
+  this._queue(function(a) {
+    banner.close();
+    a();
+  });
 };
 // Input 13
 var branch_instance = new Branch;

@@ -152,7 +152,7 @@ banner = function(branch, options, linkData, storage) {
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
-				branch.close();
+				banner.close();
 			};
 		}
 

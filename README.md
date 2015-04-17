@@ -36,7 +36,7 @@ _Be sure to replace `APP-KEY` with your actual app key found in your [account da
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.4.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.4.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
 	branch.init('APP-KEY', function(err, data) {
     	// callback to handle err or data
@@ -84,13 +84,11 @@ ___
 
 * * *
 
-### init(app_id, options, callback) 
+### init(app_id, callback) 
 
 **Parameters**
 
 **app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
-
-**options**: `Object`, _optional_ - options: launch_banner, An object literal of the link data, and options object for an app sharing banner that automatically opens when init returns.
 
 **callback**: `function`, _optional_ - callback to read the session data.
 
@@ -111,50 +109,8 @@ the link the user was referred by.
 ```js
 branch.init(
     app_id,
-    options,
     callback (err, data)
 );
-```
-
-#### Example
-```js
-branch.init('1234567890',
- {
-    launch_banner: {
-         link_data: {
-              phone: 9999999999,
-              tags: [ 'tag1', 'tag2' ],
-              channel: 'facebook',
-              feature: 'dashboard',
-              stage: 'new user',
-              type: 1,
-              data: {
-                  mydata: 'something',
-                  foo: 'bar',
-                  '$desktop_url': 'http://myappwebsite.com',
-                  '$ios_url': 'http://myappwebsite.com/ios',
-                  '$ipad_url': 'http://myappwebsite.com/ipad',
-                  '$android_url': 'http://myappwebsite.com/android',
-                  '$og_app_id': '12345',
-                  '$og_title': 'My App',
-                  '$og_description': 'My app\'s description.',
-                  '$og_image_url': 'http://myappwebsite.com/image.png'
-              }
-         },
-         options: {
-              icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-              title: 'Demo App',
-              description: 'Branch Demo app!',
-              openAppButtonText: 'Open',
-              downloadAppButtonText: 'Download',
-              iframe: true,
-              showMobile: true,
-              showDesktop: true
-         }
-    }
-}, function(err, link) {
-    console.log(err, link);
-});
 ```
 
 ##### Callback Format

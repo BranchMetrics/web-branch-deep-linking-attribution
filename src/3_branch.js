@@ -38,10 +38,12 @@ function wrapErrorFunc(func, callback) {
 
 /***
  * @param {function(?Error)=} callback
+ * @param {function()=} next
  * @returns {function(?Error)}
  */
-function wrapErrorCallback1(callback) {
+function wrapErrorCallback1(callback, next) {
 	return function(err) {
+		next();
 		if (err && !callback) { throw err; }
 		if (callback) { callback(err); }
 	};
@@ -49,13 +51,15 @@ function wrapErrorCallback1(callback) {
 
 /***
  * @param {function(?Error,?)=} callback
+ * @param {function()=} next
  * @returns {function(?Error,?=)}
  */
-function wrapErrorCallback2(callback) {
+function wrapErrorCallback2(callback, next) {
 	/*** @type {function(?Error,?=)} */
 	var r = function(err, data) {
+		next();
 		if (err && !callback) { throw err; }
-		if (callback) { callback(err, data); }
+		if (callback) {	callback(err, data); }
 	};
 	return r;
 }
@@ -82,14 +86,11 @@ Branch = function() {
  */
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
-	this._queue(function(next) {
-		if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
-		if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
-		if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
-		return self._server.request(resource, obj, self._storage, function(err, data) {
-			next();
-			callback(err, data);
-		});
+	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
+	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
+	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
+	return self._server.request(resource, obj, self._storage, function(err, data) {
+		callback(err, data);
 	});
 };
 
@@ -119,8 +120,6 @@ Branch.prototype._api = function(resource, obj, callback) {
  * );
  * ```
  *
- * ```
- *
  * ##### Callback Format
  * ```js
  * callback(
@@ -138,41 +137,42 @@ Branch.prototype._api = function(resource, obj, callback) {
  * ___
  */
 Branch.prototype['init'] = function(app_id, callback) {
-	if (this.initialized) { return wrapError(new Error(utils.message(utils.messages.existingInit)), callback); }
+	var self = this;
+	self.app_id = app_id;
+	this._queue(function(next) {
+		var sessionData = utils.readStore(this._storage);
 
-	this.app_id = app_id;
-	var self = this,
-		sessionData = utils.readStore(this._storage);
+		var setBranchValues = function(data) {
+			self.session_id = data['session_id'];
+			self.identity_id = data['identity_id'];
+			self.sessionLink = data['link'];
+			self.initialized = true;
+		};
 
-	var setBranchValues = function(data) {
-		self.session_id = data['session_id'];
-		self.identity_id = data['identity_id'];
-		self.sessionLink = data['link'];
-		self.initialized = true;
-	};
+		var finishInit = function(data) {
+			setBranchValues(data);
+			next();
+			if (callback) { callback(null, utils.whiteListSessionData(data)); }
+		};
 
-	var finishInit = function(data) {
-		setBranchValues(data);
-		if (callback) { callback(null, utils.whiteListSessionData(data)); }
-	};
-
-	if (sessionData  && sessionData['session_id']) {
-		finishInit(sessionData);
-	}
-	else {
-		var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-		this._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
-			self._api(resources.open, {
-				"link_identifier": link_identifier,
-				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id
-			}, wrapErrorFunc(function(data) {
-				if (link_identifier) { data['click_id'] = link_identifier; }
-				utils.store(data, self._storage);
-				finishInit(data);
+		if (sessionData  && sessionData['session_id']) {
+			finishInit(sessionData);
+		}
+		else {
+			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
+			self._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
+				self._api(resources.open, {
+					"link_identifier": link_identifier,
+					"is_referrable": 1,
+					"browser_fingerprint_id": browser_fingerprint_id
+				}, wrapErrorFunc(function(data) {
+					if (link_identifier) { data['click_id'] = link_identifier; }
+					utils.store(data, self._storage);
+					finishInit(data);
+				}, callback));
 			}, callback));
-		}, callback));
-	}
+		}
+	});
 };
 
 /**
@@ -189,7 +189,6 @@ Branch.prototype['init'] = function(app_id, callback) {
  */
 Branch.prototype['data'] = function(callback) {
 	if (!callback) { return; }
-
 	var self = this;
 	this._queue(function(next) {
 		callback(null, utils.whiteListSessionData(utils.readStore(self._storage)));
@@ -231,8 +230,10 @@ Branch.prototype['data'] = function(callback) {
  * ___
  */
 Branch.prototype['setIdentity'] = function(identity, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	this._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback));
+	var self = this;
+	this._queue(function(next) {
+		self._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback, next));
+	});
 };
 
 /**
@@ -259,8 +260,10 @@ Branch.prototype['setIdentity'] = function(identity, callback) {
  * ## Tracking events
  */
 Branch.prototype['logout'] = function(callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	this._api(resources.logout, { }, wrapErrorCallback1(callback));
+	var self = this;
+	this._queue(function(next) {
+		self._api(resources.logout, { }, wrapErrorCallback1(callback, next));
+	});
 };
 
 /**
@@ -298,16 +301,17 @@ Branch.prototype['track'] = function(event, metadata, callback) {
 		metadata = { };
 	}
 
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	this._api(resources.event, {
-		"event": event,
-		"metadata": utils.merge({
-			"url": document.URL,
-			"user_agent": navigator.userAgent,
-			"language": navigator.language
-		}, metadata || {})
-	}, wrapErrorCallback1(callback));
+	var self = this;
+	this._queue(function(next) {
+		self._api(resources.event, {
+			"event": event,
+			"metadata": utils.merge({
+				"url": document.URL,
+				"user_agent": navigator.userAgent,
+				"language": navigator.language
+			}, metadata || {})
+		}, wrapErrorCallback1(callback, next));
+	});
 };
 
 /**
@@ -367,18 +371,18 @@ Branch.prototype['track'] = function(event, metadata, callback) {
  *
  */
 Branch.prototype['link'] = function(linkData, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
 	var self = this;
 	linkData['source'] = 'web-sdk';
 	if (linkData['data']['$desktop_url'] !== undefined) {
 		linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 	}
-
-	linkData['data'] = goog.json.serialize(linkData['data']);
-	this._api(resources.link, linkData, wrapErrorFunc(function(data) {
-		callback(null, data && data['url']);
-	}, callback));
+	this._queue(function(next) {
+		linkData['data'] = goog.json.serialize(linkData['data']);
+		self._api(resources.link, linkData, wrapErrorFunc(function(data) {
+			next();
+			callback(null, data && data['url']);
+		}, callback));
+	});
 };
 
 /**
@@ -465,7 +469,7 @@ Branch.prototype['link'] = function(linkData, callback) {
  *
  */
 Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+	var self = this;
 	if (typeof options == 'function') {
 		callback = options;
 		options = { };
@@ -474,28 +478,34 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 		options = { };
 	}
 	options["make_new_link"] = options["make_new_link"] || false;
-	var self = this;
+
 	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
 
-	function sendSMS(click_id) {
+	function sendSMS(click_id, next) {
 		self._api(resources.SMSLinkSend, {
 			"link_url": click_id,
 			"phone": phone
-		}, wrapErrorCallback1(callback));
+		}, function(err, data) {
+			wrapErrorCallback1(callback, next);
+		});
 	}
 
-	if (utils.readKeyValue('click_id', this._storage) && !options['make_new_link']) {
-		sendSMS(utils.readKeyValue('click_id', this._storage));
+	if (utils.readKeyValue('click_id', self._storage) && !options['make_new_link']) {
+		self._queue(function(next) {
+			sendSMS(utils.readKeyValue('click_id', self._storage), next);
+		});
 	}
 	else {
-		this["link"](linkData, wrapErrorFunc(function(url) {
-			self._api(resources.linkClick, {
-				"link_url": 'l/' + url.split('/').pop(),
-				"click": "click"
-			}, wrapErrorFunc(function(data) {
-				utils.storeKeyValue('click_id', data['click_id'], self._storage);
-				sendSMS(data['click_id']);
-			}, callback));
+		self["link"](linkData, wrapErrorFunc(function(url) {
+			self._queue(function(next) {
+				self._api(resources.linkClick, {
+					"link_url": 'l/' + url.split('/').pop(),
+					"click": "click"
+				}, wrapErrorFunc(function(data) {
+					utils.storeKeyValue('click_id', data['click_id'], self._storage);
+					sendSMS(data['click_id'], next);
+				}, callback));
+			});
 		}, callback));
 	}
 };
@@ -540,8 +550,10 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  *
  */
 Branch.prototype['referrals'] = function(callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	this._api(resources.referrals, { }, wrapErrorCallback2(callback));
+	var self = this;
+	this._queue(function(next) {
+		self._api(resources.referrals, { }, wrapErrorCallback2(callback, next));
+	});
 };
 
 /**
@@ -574,10 +586,10 @@ Branch.prototype['referrals'] = function(callback) {
  *
  */
 Branch.prototype['credits'] = function(callback) {
-	if (!this.initialized) {
-		return wrapError(new Error(utils.message(utils.messages.nonInit)), callback);
-	}
-	this._api(resources.credits, { }, wrapErrorCallback2(callback));
+	var self = this;
+	this._queue(function(next) {
+		self._api(resources.credits, { }, wrapErrorCallback2(callback, next));
+	});
 };
 
 /**
@@ -624,8 +636,10 @@ Branch.prototype['credits'] = function(callback) {
  *
  */
 Branch.prototype['redeem'] = function(amount, bucket, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback));
+	var self = this;
+	this._queue(function(next) {
+		self._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback, next));
+	});
 };
 
 /**
@@ -702,29 +716,35 @@ Branch.prototype['redeem'] = function(amount, bucket, callback) {
  *
  */
 Branch.prototype['banner'] = function(options, linkData) {
-	var bannerOptions = {
-		icon: options['icon'] || '',
-		title: options['title'] || '',
-		description: options['description'] || '',
-		openAppButtonText: options['openAppButtonText'] || 'View in app',
-		downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
-		iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
-		showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
-		showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
-		showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
-		disableHide: !!options['disableHide'],
-		forgetHide: !!options['forgetHide'],
-		make_new_link: !!options['make_new_link']
-	};
+	var self = this;
+	this._queue(function(next) {
+		var bannerOptions = {
+			icon: options['icon'] || '',
+			title: options['title'] || '',
+			description: options['description'] || '',
+			openAppButtonText: options['openAppButtonText'] || 'View in app',
+			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+			iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
+			showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
+			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
+			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
+			disableHide: !!options['disableHide'],
+			forgetHide: !!options['forgetHide'],
+			make_new_link: !!options['make_new_link']
+		};
 
-	if (typeof options['showMobile'] != 'undefined') {
-		bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
-	}
+		if (typeof options['showMobile'] != 'undefined') {
+			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
+		}
 
-	banner(this, bannerOptions, linkData, this._storage);
+		banner(self, bannerOptions, linkData, self._storage);
+		next();
+	});
 };
 
 Branch.prototype['closeBanner'] = function() {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit))); }
-	banner.close();
+	this._queue(function(next) {
+		banner.close();
+		next();
+	});
 };
