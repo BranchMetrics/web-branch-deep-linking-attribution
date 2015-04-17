@@ -485,9 +485,7 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 		self._api(resources.SMSLinkSend, {
 			"link_url": click_id,
 			"phone": phone
-		}, function(err, data) {
-			wrapErrorCallback1(callback, next);
-		});
+		}, wrapErrorCallback1(callback, next));
 	}
 
 	if (utils.readKeyValue('click_id', self._storage) && !options['make_new_link']) {

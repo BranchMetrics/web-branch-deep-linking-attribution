@@ -1223,9 +1223,7 @@ Branch.prototype.link = function(a, b) {
 };
 Branch.prototype.sendSMS = function(a, b, c, d) {
   function e(b, c) {
-    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, function(a, b) {
-      wrapErrorCallback1(d, c);
-    });
+    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d, c));
   }
   var f = this;
   if ("function" == typeof c) {
