@@ -7,7 +7,6 @@ goog.provide('utils');
 goog.require('goog.json');
 goog.require('storage');
 
-
 /** @define {boolean} */
 var DEBUG = true;
 
@@ -96,6 +95,13 @@ utils.readStore = function(storage) {
  */
 utils.store = function(data, storage) {
 	storage['setItem']('branch_session', goog.json.serialize(data));
+};
+
+/**
+ * @param {BranchStorage} storage
+ */
+utils.clearStore = function(storage) {
+	storage['removeItem']('branch_session');
 };
 
 /**

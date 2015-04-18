@@ -1,20 +1,27 @@
 ---
+machine:
+  node:
+    version: 0.10.31
+
 dependencies:
   post:
     # Closure COmpiler
     - mkdir -p compiler
-    - wget http://dl.google.com/closure-compiler/compiler-latest.zip
-    - unzip compiler-latest.zip -d compiler
+    - stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-latest.zip && unzip compiler-latest.zip -d compiler)
+
     # Closure compiler library
     - mkdir -p compiler/library
-    - wget https://github.com/google/closure-library/archive/master.zip
-    - unzip master.zip -d compiler/library
-    # node modules
-    # - npm install -g karma-cli
+    - stat compiler/library/closure-library-master || (wget https://github.com/google/closure-library/archive/master.zip && unzip master.zip -d compiler/library)
+
     - npm install
+    - mocha-phantomjs -v || npm install -g mocha-phantomjs
+    - jscs -v || npm install -g jscs
+    - jshint -v || npm install -g jshint
+  cache_directories:
+    - "~/nvm/v0.10.31"
+    - compiler
 
 test:
   override:
-    # - karma start
-    - npm install -g mocha-phantomjs
-    - mocha-phantomjs tests/test.html
+    - ./lint.sh
+    - mocha-phantomjs test/test.html

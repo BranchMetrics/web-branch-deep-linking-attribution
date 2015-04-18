@@ -45,13 +45,22 @@ BranchStorage.prototype['clear'] = function() {
 };
 
 /**
+ * @function storage
+ * @param {boolean} permanent - If true, create an object based on localStorage instead of sessionStorage.
  * @return {BranchStorage}
  */
-storage = function() {
+storage = function(permanent) {
 	try {
-		sessionStorage.setItem("test", "");
-		sessionStorage.removeItem("test");
-		return sessionStorage;
+		if (permanent) {
+			localStorage.setItem("test", "");
+			localStorage.removeItem("test");
+			return localStorage;
+		}
+		else {
+			sessionStorage.setItem("test", "");
+			sessionStorage.removeItem("test");
+			return sessionStorage;
+		}
 	}
 	catch (e) {
 		return new BranchStorage();

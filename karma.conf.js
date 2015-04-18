@@ -176,7 +176,7 @@ module.exports = function(config) {
 		browsers: Object.keys(customLaunchers),
 
 		// base path that will be used to resolve all patterns (eg. files, exclude)
-		basePath: 'tests',
+		basePath: 'test',
 
 		// frameworks to use
 		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter

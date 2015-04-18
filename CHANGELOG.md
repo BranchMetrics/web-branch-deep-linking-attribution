@@ -2,6 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+
 ## [v1.3.4] - 2015-04-10
 - Fixes bug that caused errors to not be thrown
 - Adds PhantomJS tests on CircleCI

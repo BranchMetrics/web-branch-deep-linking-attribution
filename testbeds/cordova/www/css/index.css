@@ -1,0 +1,55 @@
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+body {
+    background-color: white;
+    font-family:'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+    font-size:12pt;
+    height:100%;
+    width:100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+h1 {
+    font-size:18pt;
+    text-align:center;
+}
+
+div.container {
+    border: 1pt solid black;
+    margin: 5pt;
+    padding: 5pt;
+}
+
+p.title {
+    font-size:15pt;
+    color: black;
+}
+
+p.label {
+    font-size: 12pt;
+    color: blue;
+}
+
+p.json_label {
+    font-size: 12pt;
+    color: blue;
+    word-wrap: break-word;
+}
+
+input {
+    font-size: 15pt;
+    margin: 5pt;
+}
+
+select {
+    font-size: 15pt;
+    margin: 5pt;
+}
+
+button {
+    font-size: 15pt;
+    margin: 5pt;
+}

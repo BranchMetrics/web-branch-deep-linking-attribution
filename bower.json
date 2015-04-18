@@ -17,7 +17,7 @@
 		"compiler",
 		"docs",
 		"src/**",
-		"dist/build.min.js.gzip",
+		"dist/web/build.min.js.gz",
 		"externs",
 		"node_modules",
 		"tests",
@@ -29,10 +29,11 @@
 		"Makefile",
 		"build.sh",
 		"README.md",
-		"example.html",
-		"gulpfile.js",
+		"lint.sh",
 		"package.json",
 		"transform.js",
+		"dist/cordova/**",
+		"testbeds/**",
 		".gitignore"
 	]
 }
