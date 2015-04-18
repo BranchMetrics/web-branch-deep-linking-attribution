@@ -789,7 +789,7 @@ if (config.CORDOVA_BUILD) {
  *       "calculation_type":1,
  *       "location":2
  *     }
- *     callback (err)
+ *     callback (err, data)
  * );
  * ```
  *
@@ -840,7 +840,7 @@ if (config.CORDOVA_BUILD) {
  * ```js
  * branch.validateCode(
  *     "AB12CD",
- *     function(err, data) {
+ *     function(err) {
  *         if (err) {
  *             console.log(err);
  *         } else {
@@ -854,7 +854,7 @@ if (config.CORDOVA_BUILD) {
  * ```js
  * callback(
  *     "Error message",
- *     callback(err, data)
+ *     callback(err)
  * );
  * ```
  *
@@ -893,7 +893,7 @@ if (config.CORDOVA_BUILD) {
  * ```js
  * branch.applyCode(
  *     "AB12CD",
- *     function(err, data) {
+ *     function(err) {
  *         if (err) {
  *             console.log(err);
  *         } else {
@@ -907,7 +907,7 @@ if (config.CORDOVA_BUILD) {
  * ```js
  * callback(
  *     "Error message",
- *     callback(err, data)
+ *     callback(err)
  * );
  * ```
  *
@@ -1049,7 +1049,7 @@ if (config.CORDOVA_BUILD) {
  *
  * ```js
  * branch.redeem(
- *     amount, // amount of credits to be redeemed
+ *     amount, // Amount of credits to be redeemed
  *     bucket,  // String of bucket name to redeem credits from
  *     callback (err)
  * );
