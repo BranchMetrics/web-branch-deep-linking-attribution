@@ -15,7 +15,7 @@ ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../../dist/web/build.js"}
 
 .PHONY: clean
 
-all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js
+all: dist/web/build.min.js dist/web/build.js README.md CORDOVA_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js
 clean:
 	rm -f dist/web/** dist/cordova/** docs/3_branch.md README.md testbeds/web/example.html test/branch-deps.js
 release: clean all dist/web/build.min.js.gz
@@ -73,3 +73,6 @@ endif
 README.md: docs/0_intro.md docs/3_branch.md
 	cat docs/0_intro.md docs/3_branch.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
+
+CORDOVA_GUIDE.md: docs/CORDOVA_GUIDE.template.md
+	perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' docs/CORDOVA_GUIDE.template.md > CORDOVA_GUIDE.md

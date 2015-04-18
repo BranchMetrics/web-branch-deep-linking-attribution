@@ -60,6 +60,8 @@ This Web SDK can also be used for Cordova/Phonegap applications.  It is provided
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
 ```
 
+**For a full walktrough specific to integrating the Web SDK with a Cordova app, see the [Cordova Guide](CORDOVA_GUIDE.md).**
+
 Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
 
 #### Initialization and Event Handling
@@ -67,9 +69,9 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below.  You will need your app id from the Branch dashboard.
 
 ```js
-        branch.init(‘YOUR APP KEY HERE’, function(err, data) {
-        	app.initComplete(err, data);
-        });
+  branch.init(‘YOUR APP KEY HERE’, function(err, data) {
+  	app.initComplete(err, data);
+  });
 ```
 
 The session close will be sent automatically on any ‘pause’ event.
@@ -413,7 +415,7 @@ ___
 A robust function to give your users the ability to share links via SMS. If
 the user navigated to this page via a Branch link, `sendSMS` will send that
 same link. Otherwise, it will create a new link with the data provided in
-the `metadata` argument. `sendSMS` also  registers a click event with the
+the `params` argument. `sendSMS` also  registers a click event with the
 `channel` pre-filled with `'sms'` before sending an sms to the provided
 `phone` parameter. This way the entire link click event is recorded starting
 with the user sending an sms.
@@ -564,7 +566,7 @@ branch.getCode(
       "calculation_type":1,
       "location":2
     }
-    callback (err)
+    callback (err, data)
 );
 ```
 
@@ -608,7 +610,7 @@ branch.validateCode(
 ```js
 branch.validateCode(
     "AB12CD",
-    function(err, data) {
+    function(err) {
         if (err) {
             console.log(err);
         } else {
@@ -622,7 +624,7 @@ branch.validateCode(
 ```js
 callback(
     "Error message",
-    callback(err, data)
+    callback(err)
 );
 ```
 
@@ -656,7 +658,7 @@ branch.applyCode(
 ```js
 branch.applyCode(
     "AB12CD",
-    function(err, data) {
+    function(err) {
         if (err) {
             console.log(err);
         } else {
@@ -670,7 +672,7 @@ branch.applyCode(
 ```js
 callback(
     "Error message",
-    callback(err, data)
+    callback(err)
 );
 ```
 
@@ -799,7 +801,7 @@ Credits are stored in `buckets`, which you can define as points, currency, whate
 
 ```js
 branch.redeem(
-    amount, // amount of credits to be redeemed
+    amount, // Amount of credits to be redeemed
     bucket,  // String of bucket name to redeem credits from
     callback (err)
 );

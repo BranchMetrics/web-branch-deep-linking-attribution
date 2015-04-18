@@ -60,6 +60,8 @@ This Web SDK can also be used for Cordova/Phonegap applications.  It is provided
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
 ```
 
+**For a full walktrough specific to integrating the Web SDK with a Cordova app, see the [Cordova Guide](CORDOVA_GUIDE.md).**
+
 Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
 
 #### Initialization and Event Handling
@@ -67,9 +69,9 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below.  You will need your app id from the Branch dashboard.
 
 ```js
-        branch.init(‘YOUR APP KEY HERE’, function(err, data) {
-        	app.initComplete(err, data);
-        });
+  branch.init(‘YOUR APP KEY HERE’, function(err, data) {
+  	app.initComplete(err, data);
+  });
 ```
 
 The session close will be sent automatically on any ‘pause’ event.
