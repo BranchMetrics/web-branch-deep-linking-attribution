@@ -268,17 +268,17 @@ branch.referrals(function(err, data) {
 The response will return an object in the following format:
 ```json
 {
-  'install': {
-    total: 5,
-    unique: 2
+  "install": {
+    "total": 5,
+    "unique": 2
   },
-  'open': {
-    total: 4,
-    unique: 3
+  "open": {
+    "total": 4,
+    "unique": 3
   },
-  'buy': {
-    total: 7,
-    unique: 3
+  "buy": {
+    "total": 7,
+    "unique": 3
   }
 }
 ```
@@ -304,10 +304,10 @@ The entire credit history of a user could return a *lot* of results, so an optio
 
 ```js
 var data = {
-  "length":50,
-  "direction":0,
-  "begin_after_id:"123456789012345",
-  "bucket":"default"
+  "length": 50,
+  "direction": 0,
+  "begin_after_id": "123456789012345",
+  "bucket": "default"
 };
 
 branch.creditHistory(data, function(err, data) {
@@ -374,10 +374,10 @@ The data can containt the following fields:
 
 ```js
 var data = {
-  "amount":10,
-  "bucket":"party",
-  "calculation_type":1,
-  "location":2
+  "amount": 10,
+  "bucket": "party",
+  "calculation_type": 1,
+  "location": 2
 };
 
 branch.getCode(data, function(err, data) {
