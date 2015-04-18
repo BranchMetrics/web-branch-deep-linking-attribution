@@ -459,7 +459,7 @@ if (config.CORDOVA_BUILD) {
 				if (callback) { callback(null); }
 			}, callback));
 		});
-	}
+	};
 }
 
 /**
