@@ -22,16 +22,18 @@ Our linking infrastructure will support anything you want to build. If it doesn'
 
 ### Initialize SDK And Register Deep Link Routing Function
 
-Called when app first initializes a session, ideally in the app delegate. If you created a custom link with your own custom dictionary data, you probably want to know when the user session init finishes, so you can check that data. Think of this callback as your "deep link router". If your app opens with some data, you want to route the user depending on the data you passed in. Otherwise, send them to a generic install flow.
+Called when an app first initializes a session, ideally in the app delegate. If you created a custom link with your own custom dictionary data, you probably want to know when the user session init finishes, so you can check that data. Think of this callback as your "deep link router." If your app opens with some data, you want to route the user depending on the data you passed in. Otherwise, send them to a generic install flow.
 
 This deep link routing callback is called 100% of the time on init, with your link params or an empty dictionary if none present.
 
 ```js
 // adds an instance of branch to the window object
+// NOTE: Be sure to grab the most recent version of this from the README
+// TODO: Add a command in the Makefile to update this during make, duh.
 (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.4.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
 
 // Arguments
-// arg1: Your app key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
+// arg1: Your app id can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
 // arg2: the callback to notify you that the instance has instantiated
 branch.init("APP-ID", function(err, data) {
   if (err) { return console.log(err); } // Error message if init is not successful
@@ -51,7 +53,7 @@ Close sesion must be called whenever the app goes into the background, as it tel
 
 ```js
 // Arguments
-// arg1: the callback to notify you that there was an error closing the session
+// arg1: the callback to notify you if there was an error
 
 branch.close(function(err) {
   if (err) { console.log(err); } // Error message if not successful
@@ -160,6 +162,10 @@ var params = {
   }
 };
 
+// Arguments
+// arg1: The params object above, which specifies the link data
+// arg2: A callback to catch any error returned, or if no error, to accept the URL generated.
+
 branch.link(params, function(err, url) {
   if (err) { return console.log(err); } // Error message if not successful
   console.log(url); // URL for the user to share
@@ -212,6 +218,43 @@ In a standard referral system, you have 2 parties: the original user and the inv
 These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
 
 Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+
+
+### Send a link via SMS
+
+A robust function to give your users the ability to share links via SMS. If the user navigated to this page via a Branch link, `sendSMS` will send that same link. Otherwise, it will create a new link with the data provided in the `params` argument. `sendSMS` also  registers a click event with the `channel` pre-filled with `'sms'` before sending an sms to the provided `phone` parameter. This way the entire link click event is recorded starting with the user sending an sms.
+
+**Note**: `sendSMS` will *automatically* send a previously generated link click, along with the `data` object in the original link. Therefore, it is unneccessary for the `data()` method to be called to check for an already existing link. If a link already exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link. If this behaivior is not desired, set `make_new_link: true` in the `options` object argument of `sendSMS`, and `sendSMS` will always make a new link.
+
+```js
+// Note this is the same as the params object used for branch.link, above, minus the channel parameter. The channel is automatically set as 'sms'.
+
+var params = {
+  tags: [ 'tag1', 'tag2' ],
+  feature: 'create link',
+  stage: 'created link',
+  type: 1,
+  data: {
+    mydata: 'bar',
+    '$desktop_url': 'https://cdn.branch.io/example.html',
+    '$og_title': 'Branch Metrics',
+    '$og_description': 'Branch Metrics',
+    '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+  }
+};
+
+var smsOptions = { make_new_link: true };
+
+// Arguments
+// arg1: The phone number to txt the link
+// arg2: The params object above, which specifies the link data
+// arg3: An options object, currently only support the property "make_new_link" - which forces the creation of a new link to send via SMS, even if a link has already been created in the session
+// arg4: A callback to catch any error returned
+
+branch.sendSMS("9999999999", params, smsOptions, function(err) {
+  if (err) { console.log(err); } // Error message if not successful
+});
+```
 
 ### Get reward balance
 
