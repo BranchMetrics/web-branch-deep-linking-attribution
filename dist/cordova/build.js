@@ -1242,6 +1242,9 @@ Branch.prototype.init = function(a, b, c) {
 };
 Branch.prototype.data = function(a) {
   if (a) {
+    if (!this.initialized) {
+      return wrapError(Error(utils.message(utils.messages.nonInit)), a);
+    }
     var b = this;
     this._queue(function(c) {
       a(null, utils.whiteListSessionData(utils.readStore(b._storage)));
@@ -1251,6 +1254,9 @@ Branch.prototype.data = function(a) {
 };
 config.CORDOVA_BUILD && (Branch.prototype.first = function(a) {
   if (a) {
+    if (!this.initialized) {
+      return wrapError(Error(utils.message(utils.messages.nonInit)), a);
+    }
     var b = this;
     this._queue(function(c) {
       a(null, utils.whiteListSessionData(utils.readStore(b._permStorage)));
@@ -1259,6 +1265,9 @@ config.CORDOVA_BUILD && (Branch.prototype.first = function(a) {
   }
 });
 Branch.prototype.setIdentity = function(a, b) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
+  }
   var c = this;
   this._queue(function(d) {
     config.CORDOVA_BUILD && c._api(resources.profile, {identity:a}, wrapErrorFunc(function(a) {
@@ -1272,12 +1281,18 @@ Branch.prototype.setIdentity = function(a, b) {
   });
 };
 Branch.prototype.logout = function(a) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
+  }
   var b = this;
   this._queue(function(c) {
     b._api(resources.logout, {}, wrapErrorCallback1(a, c));
   });
 };
 config.CORDOVA_BUILD && (Branch.prototype.close = function(a) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
+  }
   var b = this;
   this._queue(function(c) {
     b._api(resources.close, {}, wrapErrorFunc(function(d) {
@@ -1292,12 +1307,18 @@ config.CORDOVA_BUILD && (Branch.prototype.close = function(a) {
 });
 Branch.prototype.track = function(a, b, c) {
   "function" == typeof b && (c = b, b = {});
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
+  }
   var d = this;
   this._queue(function(e) {
     d._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b || {})}, wrapErrorCallback1(c, e));
   });
 };
 Branch.prototype.link = function(a, b) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
+  }
   var c = this;
   config.WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "")));
   this._queue(function(d) {
@@ -1313,12 +1334,12 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
     f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d, c));
   }
   var f = this;
-  if ("function" == typeof c) {
-    d = c, c = {};
-  } else {
-    if ("undefined" === typeof c || null === c) {
-      c = {};
-    }
+  "function" == typeof c && (d = c, c = {});
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), d);
+  }
+  if ("undefined" === typeof c || null === c) {
+    c = {};
   }
   c.make_new_link = c.make_new_link || !1;
   b.channel && "app banner" != b.channel || (b.channel = "sms");
@@ -1334,12 +1355,18 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
   }, d));
 };
 Branch.prototype.referrals = function(a) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
+  }
   var b = this;
   this._queue(function(c) {
     b._api(resources.referrals, {}, wrapErrorCallback2(a, c));
   });
 };
 config.CORDOVA_BUILD && (Branch.prototype.getCode = function(a, b) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
+  }
   var c = this;
   this._queue(function(d) {
     a.type = "credit";
@@ -1348,30 +1375,45 @@ config.CORDOVA_BUILD && (Branch.prototype.getCode = function(a, b) {
   });
 });
 config.CORDOVA_BUILD && (Branch.prototype.validateCode = function(a, b) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
+  }
   var c = this;
   this._queue(function(d) {
     c._api(resources.validateCode, {code:a}, wrapErrorCallback2(b, d));
   });
 });
 config.CORDOVA_BUILD && (Branch.prototype.applyCode = function(a, b) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
+  }
   var c = this;
   this._queue(function(d) {
     c._api(resources.applyCode, {code:a}, wrapErrorCallback2(b, d));
   });
 });
 Branch.prototype.credits = function(a) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
+  }
   var b = this;
   this._queue(function(c) {
     b._api(resources.credits, {}, wrapErrorCallback2(a, c));
   });
 };
 config.CORDOVA_BUILD && (Branch.prototype.creditHistory = function(a, b) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
+  }
   var c = this;
   this._queue(function(d) {
     c._api(resources.creditHistory, a ? a : {}, wrapErrorCallback2(b, d));
   });
 });
 Branch.prototype.redeem = function(a, b, c) {
+  if (!this.initialized) {
+    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
+  }
   var d = this;
   this._queue(function(e) {
     d._api(resources.redeem, {amount:a, bucket:b}, wrapErrorCallback1(c, e));
