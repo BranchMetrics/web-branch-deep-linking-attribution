@@ -76,3 +76,6 @@ README.md: docs/0_intro.md docs/3_branch.md
 
 CORDOVA_GUIDE.md: docs/CORDOVA_GUIDE.template.md
 	perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' docs/CORDOVA_GUIDE.template.md > CORDOVA_GUIDE.md
+
+CORDOVA_UPGRADE_GUIDE.md: docs/CORDOVA_UPGRADE_GUIDE.template.md
+	perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' docs/CORDOVA_UPGRADE_GUIDE.template.md > CORDOVA_UPGRADE_GUIDE.md

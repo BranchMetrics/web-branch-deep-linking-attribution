@@ -26,6 +26,9 @@ Called when an app first initializes a session, ideally in the app delegate. If 
 
 This deep link routing callback is called 100% of the time on init, with your link params or an empty dictionary if none present.
 
+**[Formerly `getInstance() and initSession()`](CORDOVA_UPGRADE_GUIDE.md)**
+
+
 ```js
 // adds an instance of branch to the window object
 // INSERT INIT CODE
@@ -49,6 +52,8 @@ Here is the location of the app id that you will need for the `branch.init` call
 
 Close sesion must be called whenever the app goes into the background, as it tells the native library that on the next app open, it should check if a new link had been clicked. If you don't call it, you'll notice that the deep link parameters will not be delivered reliably.
 
+**[Formerly `closeSession()`](CORDOVA_UPGRADE_GUIDE.md)**
+
 ```js
 // Arguments
 // arg1: the callback to notify you if there was an error
@@ -61,6 +66,9 @@ branch.close(function(err) {
 #### Retrieve session data (install or open) parameters
 
 This method returns the same data object as branch.init, and can be called at any point after branch is instantiated. These session parameters will be available at any point later on with this command. If no params, the dictionary will be empty. This refreshes with every new session (app installs AND app opens)
+
+**[Formerly `getLatestReferringParams()`](CORDOVA_UPGRADE_GUIDE.md)**
+
 ```js
 branch.data(function(err, data) {
   if (err) { return console.log(err); } // Error message if not successful
@@ -71,6 +79,9 @@ branch.data(function(err, data) {
 #### Retrieve install (install only) parameters
 
 If you ever want to access the original session params (the parameters passed in for the first install event only), you can use this line. This is useful if you only want to reward users who newly installed the app from a referral link or something.
+
+**[Formerly `getFirstReferringParams()`](CORDOVA_UPGRADE_GUIDE.md)**
+
 ```js
 branch.first(function(err, data) {
   if (err) { return console.log(err); } // Error message if not successful
@@ -108,6 +119,8 @@ branch.logout(function(err) {
 
 ### Register custom events
 
+**[Formerly `userCompletedAction()`](CORDOVA_UPGRADE_GUIDE.md)**
+
 ```js
 branch.track("your_custom_event", function(err) {
   if (err) { console.log(err); } // Error message if not successful
@@ -137,6 +150,8 @@ Some example events you might want to track:
 There are a bunch of options for creating these links. You can tag them for analytics in the dashboard, or you can even pass data to the new installs or opens that come from the link click. How awesome is that? You need to pass a callback for when you link is prepared (which should return very quickly, ~ 50 ms to process).
 
 For more details on how to create links, see the [Branch link creation guide](https://github.com/BranchMetrics/Branch-Integration-Guides/blob/master/url-creation-guide.md)
+
+**[Formerly `getShortUrl()`](CORDOVA_UPGRADE_GUIDE.md)**
 
 ```js
 // Associate data with a link
@@ -258,6 +273,8 @@ branch.sendSMS("9999999999", params, smsOptions, function(err) {
 
 Retrieves a complete summary of the referrals the current user has made.
 
+**[Formerly `loadRewards()`](CORDOVA_UPGRADE_GUIDE.md)**
+
 ```js
 branch.referrals(function(err, data) {
   if (err) { return console.log(err); } // Error message if not successful
@@ -287,6 +304,8 @@ The response will return an object in the following format:
 
 We will store how many of the rewards have been deployed so that you don't have to track it on your end. In order to save that you gave the credits to the user, you can call redeem. Redemptions will reduce the balance of outstanding credits permanently.
 
+**[Formerly `redeemRewards()`](CORDOVA_UPGRADE_GUIDE.md)**
+
 ```js
 // Arguments
 // arg1: Amount of credits to be redeemed
@@ -301,6 +320,8 @@ branch.redeem(5, "default", function(err) {
 
 This call will retrieve the entire history of credits and redemptions from the individual user.
 The entire credit history of a user could return a *lot* of results, so an optional data object can be provided as the first argument.
+
+**[Formerly `getCreditHistory()`](CORDOVA_UPGRADE_GUIDE.md)**
 
 ```js
 var data = {
