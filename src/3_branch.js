@@ -178,13 +178,13 @@ if (config.CORDOVA_BUILD) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = function(key_or_id, options, callback) {
+Branch.prototype['init'] = function(branch_key, options, callback) {
 	var self = this;
-	if (utils.isKey(key_or_id)) {
-		self.branch_key = key_or_id;
+	if (utils.isKey(branch_key)) {
+		self.branch_key = branch_key;
 	}
 	else {
-		self.app_id = key_or_id;
+		self.app_id = branch_key;
 	}
 	this._queue(function(next) {
 
