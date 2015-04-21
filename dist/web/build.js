@@ -808,7 +808,7 @@ utils.getParamValue = function(a) {
   }
 };
 utils.isKey = function(a) {
-  return-1 < a.indexOf("key_live_");
+  return-1 < a.indexOf("key_");
 };
 utils.base64encode = function(a) {
   var b = "", c, d, e, f, g, h, k = 0;
