@@ -23,22 +23,24 @@ This SDK requires native browser Javascript and has been tested in all modern br
 | ------ | ------- | ------ | ---------- |
 |    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
 
-### API Key
+### API Key (formerly App ID)
 
-You will need to create a [Branch Metrics app](http://branch.io) to obtain your app_key.
+You will need to create a [Branch Metrics app](http://branch.io) to obtain your API key (you will have the option to toggle between live and test modes).
 
 ### Quick Install (Web SDK)
 
 #### Manual installation
 
-_Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+_Be sure to replace `API-KEY` with your actual API key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+
+**[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test API keys.
 
 ```html
 <script type="text/javascript">
 
 	// INSERT INIT CODE
 
-	branch.init('APP-KEY', function(err, data) {
+	branch.init('API-KEY', function(err, data) {
     	// callback to handle err or data
 	});
 </script>
@@ -66,10 +68,10 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 
 #### Initialization and Event Handling
 
-You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below.  You will need your app id from the Branch dashboard.
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your API key from the Branch dashboard.
 
 ```js
-  branch.init(‘YOUR APP KEY HERE’, function(err, data) {
+  branch.init(‘YOUR API KEY HERE’, function(err, data) {
   	app.initComplete(err, data);
   });
 ```
