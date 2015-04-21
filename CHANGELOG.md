@@ -7,6 +7,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Correctly implements queue
 - Updates Cordova guide and adds upgrade guide
 - Switches Web SDK to using API key rather than App ID
+- Adds `closeBanner()` method
 
 ## [v1.3.4] - 2015-04-10
 - Fixes bug that caused errors to not be thrown
