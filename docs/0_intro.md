@@ -8,7 +8,7 @@ Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.ht
 
 The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~7K gzipped.
 
-To use the Web SDK, you'll need to first initialize it with your API key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
+To use the Web SDK, you'll need to first initialize it with your Branch Key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
 
 Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
 
@@ -23,15 +23,15 @@ This SDK requires native browser Javascript and has been tested in all modern br
 | ------ | ------- | ------ | ---------- |
 |    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
 
-### API Key (formerly App ID)
+### Branch Key (formerly App ID)
 
-You will need to create a [Branch Metrics app](http://branch.io) to obtain your API key (you will have the option to toggle between live and test modes).
+You will need to create a [Branch Metrics app](http://branch.io) to obtain your Branch Key (you will have the option to toggle between live and test modes).
 
 ### Quick Install (Web SDK)
 
 #### Manual installation
 
-_Be sure to replace `API-KEY` with your actual API key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+_Be sure to replace `API-KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
 **[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test API keys.
 
@@ -68,10 +68,10 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 
 #### Initialization and Event Handling
 
-You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your API key from the Branch dashboard.
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
-  branch.init(‘YOUR API KEY HERE’, function(err, data) {
+  branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
   	app.initComplete(err, data);
   });
 ```

@@ -8,7 +8,7 @@ Branch is available through [Cordova](http://plugins.cordova.io/#/package/io.bra
 
 ### Register you app
 
-You can sign up for your own API key at [https://dashboard.branch.io](https://dashboard.branch.io)
+You can sign up for your own Branch Key at [https://dashboard.branch.io](https://dashboard.branch.io)
 
 ## Configuration (for tracking)
 
@@ -31,7 +31,7 @@ This deep link routing callback is called 100% of the time on init, with your li
 
 ```js
 // Arguments
-// arg1: Your API key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
+// arg1: Your Branch Key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
 // arg2: the callback to notify you that the instance has instantiated
 branch.init("API-KEY", function(err, data) {
   if (err) { return console.log(err); } // Error message if init is not successful
@@ -40,7 +40,7 @@ branch.init("API-KEY", function(err, data) {
 
 ```
 
-Here is the location of the API key that you will need for the `branch.init` call above (_formerly app id, which is now depreciated_):
+Here is the location of the Branch Key that you will need for the `branch.init` call above (_formerly app id, which is now depreciated_):
 
 ![app id](resources/app_id.png)
 
