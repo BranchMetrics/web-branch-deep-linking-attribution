@@ -27,17 +27,13 @@ var _validator;
 /**
  * @param {boolean} required
  * @param {validationTypes|RegExp} type
- * @param {string=} fallback
- * @param {validationTypes|RegExp=} fallbackType
  * @throws {Error}
  */
-function validator(required, type, fallback, fallbackType) {
-	return function(endpoint, param, data, allData) {
+function validator(required, type) {
+	return function(endpoint, param, data) {
 		// Must ensure data is not a number before doing a !data otherwise the number can't be 0.
 		if ((typeof data != 'number') && !data) {
-			if (required && ((fallback && (typeof allData[fallback] != 'number') && !allData[fallback]) || !fallback)) {
-				return utils.message(utils.messages.missingParam, [ endpoint, param ]);
-			}
+			if (required) { return utils.message(utils.messages.missingParam, [ endpoint, param ]); }
 		}
 		else if (type == validationTypes.obj) {
 			if (typeof data != 'object') { return utils.message(utils.messages.invalidType, [ endpoint, param, 'an object' ]); }
@@ -56,9 +52,7 @@ function validator(required, type, fallback, fallbackType) {
 			return utils.message(utils.messages.invalidType, [ endpoint, param, 'a string' ]);
 		}
 		else if (type != validationTypes.str && !type.test(data)) {
-			if ((fallback && fallbackType != validationTypes.str && !fallbackType.test(data)) || !fallback) {
-				return utils.message(utils.messages.invalidType, [ endpoint, param, 'in the proper format' ]);
-			}
+			return utils.message(utils.messages.invalidType, [ endpoint, param, 'in the proper format' ]);
 		}
 
 		return false;
@@ -66,7 +60,6 @@ function validator(required, type, fallback, fallbackType) {
 }
 
 var branch_id = /^[0-9]{15,20}$/;
-var branch_key = /((?:[a-z][a-z]*[0-9]+[a-z0-9]*))/;
 
 if (config.WEB_BUILD) {
 	resources.open = {
@@ -74,8 +67,6 @@ if (config.WEB_BUILD) {
 			endpoint: "/v1/open",
 			method:	 utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(false, branch_id),
 				"link_identifier": validator(false, validationTypes.str),
 				"is_referrable": validator(true, validationTypes.num),
@@ -88,8 +79,6 @@ if (config.WEB_BUILD) {
 			endpoint: "/v1/profile",
 			method:	 utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"identity": validator(true, validationTypes.str)
 			}
@@ -100,8 +89,6 @@ if (config.WEB_BUILD) {
 			endpoint: "/v1/close",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"session_id": validator(true, branch_id)
 			}
 		};
@@ -111,8 +98,6 @@ if (config.WEB_BUILD) {
 			endpoint: "/v1/logout",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"session_id": validator(true, branch_id)
 			}
 		};
@@ -137,8 +122,6 @@ if (config.WEB_BUILD) {
 			method: utils.httpMethod.GET,
 			jsonp: true,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"v": validator(true, validationTypes.str)
 			}
 		};
@@ -148,8 +131,6 @@ if (config.WEB_BUILD) {
 			endpoint: "/v1/redeem",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"amount": validator(true, validationTypes.num),
 				"bucket": validator(true, validationTypes.str)
@@ -162,8 +143,6 @@ if (config.WEB_BUILD) {
 			method: utils.httpMethod.POST,
 			ref: "obj",
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"data": validator(false, validationTypes.str),
 				"tags": validator(false, validationTypes.arr),
@@ -190,9 +169,7 @@ if (config.WEB_BUILD) {
 				"link_url": validator(true, validationTypes.str)
 			},
 			params: {
-				"phone": validator(true, validationTypes.str),
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id)
+				"phone": validator(true, validationTypes.str)
 			}
 		};
 
@@ -201,8 +178,6 @@ if (config.WEB_BUILD) {
 			endpoint: "/v1/event",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"session_id": validator(true, branch_id),
 				"event": validator(true, validationTypes.str),
 				"metadata": validator(true, validationTypes.obj)
@@ -216,8 +191,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/install",
 			method:	 utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"link_identifier": validator(false, validationTypes.str),
 				"sdk": validator(false, validationTypes.str),
 				"hardware_id": validator(false, validationTypes.str),
@@ -247,8 +220,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/open",
 			method:	 utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"link_identifier": validator(false, validationTypes.str),
 				"device_fingerprint_id": validator(true, branch_id),
@@ -268,8 +239,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/profile",
 			method:	 utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"session_id": validator(true, branch_id),
 				"link_click_id": validator(false, branch_id),
@@ -284,8 +253,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/close",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"session_id": validator(true, branch_id),
 				"link_click_id": validator(false, branch_id),
@@ -299,8 +266,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/logout",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"session_id": validator(true, branch_id),
 				"link_click_id": validator(false, branch_id),
@@ -330,8 +295,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/credithistory",
 			method: utils.httpMethod.GET,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"session_id": validator(true, branch_id),
 				"link_click_id": validator(false, branch_id),
@@ -349,8 +312,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/referralcode",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"session_id": validator(true, branch_id),
 				"identity_id": validator(true, branch_id),
 				"device_fingerprint_id": validator(true, branch_id),
@@ -372,8 +333,6 @@ if (config.CORDOVA_BUILD) {
 				method: utils.httpMethod.POST,
 				queryPart: { "code": validator(true, validationTypes.str) },
 				params: {
-					"branch_key": validator(true, branch_key, "app_id", branch_id),
-					"app_id": validator(true, branch_key, "branch_key", branch_id),
 					"session_id": validator(true, branch_id),
 					"identity_id": validator(true, branch_id),
 					"device_fingerprint_id": validator(true, branch_id),
@@ -387,8 +346,6 @@ if (config.CORDOVA_BUILD) {
 				method: utils.httpMethod.POST,
 				queryPart: { "code": validator(true, validationTypes.str) },
 				params: {
-					"branch_key": validator(true, branch_key, "app_id", branch_id),
-					"app_id": validator(true, branch_key, "branch_key", branch_id),
 					"session_id": validator(true, branch_id),
 					"identity_id": validator(true, branch_id),
 					"device_fingerprint_id": validator(true, branch_id),
@@ -401,8 +358,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/redeem",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"session_id": validator(true, branch_id),
 				"identity_id": validator(true, branch_id),
 				"device_fingerprint_id": validator(true, branch_id),
@@ -418,8 +373,6 @@ if (config.CORDOVA_BUILD) {
 			method: utils.httpMethod.POST,
 			ref: "obj",
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"identity_id": validator(true, branch_id),
 				"sdk": validator(false, validationTypes.str),
 				"data": validator(false, validationTypes.str),
@@ -437,8 +390,6 @@ if (config.CORDOVA_BUILD) {
 			endpoint: "/v1/event",
 			method: utils.httpMethod.POST,
 			params: {
-				"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
 				"session_id": validator(true, branch_id),
 				"identity_id": validator(true, branch_id),
 				"device_fingerprint_id": validator(true, branch_id),

@@ -95,8 +95,8 @@ Branch = function() {
  */
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
-	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
-	if (((resource.params && resource.params['branch_key']) || (resource.queryPart && resource.queryPart['branch_key'])) && self.branch_key) { obj['branch_key'] = self.branch_key; }
+	if (self.app_id) { obj['app_id'] = self.app_id; }
+	if (self.branch_key) { obj['branch_key'] = self.branch_key; }
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
 
