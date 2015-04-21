@@ -167,6 +167,13 @@ utils.getParamValue = function(key) {
 };
 
 /**
+ * @param {string} ker_or_id
+ */
+utils.isKey = function(key_or_id) {
+	return key_or_id.indexOf("key_live_") > -1;
+};
+
+/**
  * Base64 encoding because ie9 does not have bota()
  *
  * @param {string} input

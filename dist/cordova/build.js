@@ -807,6 +807,9 @@ utils.getParamValue = function(a) {
   } catch (b) {
   }
 };
+utils.isKey = function(a) {
+  return-1 < a.indexOf("key_live_");
+};
 utils.base64encode = function(a) {
   var b = "", c, d, e, f, g, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
@@ -860,7 +863,7 @@ Server.prototype.getUrl = function(a, b) {
   var f = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      if (d = a.params[c](a.endpoint, c, b[c])) {
+      if (d = a.params[c](a.endpoint, c, b[c], b)) {
         return{error:d};
       }
       d = b[c];
@@ -927,67 +930,71 @@ Server.prototype.request = function(a, b, c, d) {
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
-function validator(a, b) {
-  return function(c, d, e) {
-    if ("number" == typeof e || e) {
+function validator(a, b, c, d) {
+  return function(e, f, g, h) {
+    if ("number" == typeof g || g) {
       if (b == validationTypes.obj) {
-        if ("object" != typeof e) {
-          return utils.message(utils.messages.invalidType, [c, d, "an object"]);
+        if ("object" != typeof g) {
+          return utils.message(utils.messages.invalidType, [e, f, "an object"]);
         }
       } else {
         if (b == validationTypes.arr) {
-          if (!(e instanceof Array)) {
-            return utils.message(utils.messages.invalidType, [c, d, "an array"]);
+          if (!(g instanceof Array)) {
+            return utils.message(utils.messages.invalidType, [e, f, "an array"]);
           }
         } else {
           if (b == validationTypes.num) {
-            if ("number" != typeof e) {
-              return utils.message(utils.messages.invalidType, [c, d, "a number"]);
+            if ("number" != typeof g) {
+              return utils.message(utils.messages.invalidType, [e, f, "a number"]);
             }
           } else {
             if (b == validationTypes.bool) {
-              if ("boolean" != typeof e) {
-                return utils.message(utils.messages.invalidType, [c, d, "a boolean"]);
+              if ("boolean" != typeof g) {
+                return utils.message(utils.messages.invalidType, [e, f, "a boolean"]);
               }
             } else {
-              if ("string" != typeof e) {
-                return utils.message(utils.messages.invalidType, [c, d, "a string"]);
+              if ("string" != typeof g) {
+                return utils.message(utils.messages.invalidType, [e, f, "a string"]);
               }
-              if (b != validationTypes.str && !b.test(e)) {
-                return utils.message(utils.messages.invalidType, [c, d, "in the proper format"]);
+              if (b != validationTypes.str && !b.test(g) && (c && d != validationTypes.str && !d.test(g) || !c)) {
+                return utils.message(utils.messages.invalidType, [e, f, "in the proper format"]);
               }
             }
           }
         }
       }
     } else {
-      if (a) {
-        return utils.message(utils.messages.missingParam, [c, d]);
+      if (a && (c && "number" != typeof h[c] && !h[c] || !c)) {
+        return utils.message(utils.messages.missingParam, [e, f]);
       }
     }
     return!1;
   };
 }
-var branch_id = /^[0-9]{15,20}$/;
-config.WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}}, resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), 
-identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}}, resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, 
-endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}}, resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{app_id:validator(!0, branch_id), v:validator(!0, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, 
-endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!0, validationTypes.str)}}, resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, 
-validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, 
-validationTypes.str)}, params:{phone:validator(!0, validationTypes.str), app_id:validator(!0, branch_id)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}});
-config.CORDOVA_BUILD && (resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), 
-bluetooth_version:validator(!1, validationTypes.str), has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), 
-is_referrable:validator(!1, validationTypes.num), update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), 
-is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), is_referrable:validator(!1, validationTypes.num)}}, resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, 
-branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), identity:validator(!0, validationTypes.str)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, 
-validationTypes.str)}}, resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, 
-branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), 
-link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), length:validator(!1, validationTypes.num), direction:validator(!1, validationTypes.num), begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.str)}}, resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, 
-branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), prefix:validator(!1, validationTypes.str), amount:validator(!0, validationTypes.num), expiration:validator(!1, validationTypes.str), calculation_type:validator(!0, validationTypes.num), location:validator(!0, validationTypes.num), creation_type:validator(!0, validationTypes.num), type:validator(!0, validationTypes.str), bucket:validator(!1, validationTypes.str)}}, resources.validateCode = {destination:config.api_endpoint, 
-endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.str)}, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.str)}, params:{app_id:validator(!0, 
-branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), amount:validator(!0, 
-validationTypes.num), bucket:validator(!1, validationTypes.str)}}, resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{app_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), data:validator(!1, validationTypes.str), alias:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), 
-stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{app_id:validator(!0, branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}});
+var branch_id = /^[0-9]{15,20}$/, branch_key = /((?:[a-z][a-z]*[0-9]+[a-z0-9]*))/;
+config.WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}}, resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", 
+method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id)}}, 
+resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}}, resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", 
+method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), v:validator(!0, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, 
+"app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!0, validationTypes.str)}}, resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), data:validator(!1, 
+validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, 
+endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str), app_id:validator(!0, branch_id)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, 
+validationTypes.obj)}});
+config.CORDOVA_BUILD && (resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), 
+carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), bluetooth_version:validator(!1, validationTypes.str), has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), 
+screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), is_referrable:validator(!1, validationTypes.num), update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, 
+branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), is_referrable:validator(!1, validationTypes.num)}}, resources.profile = 
+{destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), identity:validator(!0, validationTypes.str)}}, resources.close = {destination:config.api_endpoint, 
+endpoint:"/v1/close", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{branch_key:validator(!0, 
+branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, 
+resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), session_id:validator(!0, 
+branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), length:validator(!1, validationTypes.num), direction:validator(!1, validationTypes.num), begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.str)}}, resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, 
+branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), prefix:validator(!1, validationTypes.str), amount:validator(!0, validationTypes.num), expiration:validator(!1, validationTypes.str), calculation_type:validator(!0, validationTypes.num), location:validator(!0, validationTypes.num), creation_type:validator(!0, validationTypes.num), type:validator(!0, 
+validationTypes.str), bucket:validator(!1, validationTypes.str)}}, resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.str)}, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, 
+validationTypes.str)}}, resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.str)}, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, 
+endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}}, resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", 
+method:utils.httpMethod.POST, ref:"obj", params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), identity_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), data:validator(!1, validationTypes.str), alias:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, 
+validationTypes.num)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{branch_key:validator(!0, branch_key, "app_id", branch_id), app_id:validator(!0, branch_key, "branch_key", branch_id), session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}});
 // Input 9
 var banner_css = {};
 banner_css.banner = ".branch-animation { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
@@ -1174,6 +1181,7 @@ var Branch = function() {
 };
 Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.app_id || a.queryPart && a.queryPart.app_id) && this.app_id && (b.app_id = this.app_id);
+  (a.params && a.params.branch_key || a.queryPart && a.queryPart.branch_key) && this.branch_key && (b.branch_key = this.branch_key);
   (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && this.session_id && (b.session_id = this.session_id);
   (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && this.identity_id && (b.identity_id = this.identity_id);
   config.CORDOVA_BUILD && ((a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id), (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id), (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk));
@@ -1186,7 +1194,7 @@ config.CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
 });
 Branch.prototype.init = function(a, b, c) {
   var d = this;
-  d.app_id = a;
+  utils.isKey(a) ? d.branch_key = a : d.app_id = a;
   this._queue(function(a) {
     function f(a) {
       d.session_id = a.session_id;

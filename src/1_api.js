@@ -62,7 +62,7 @@ Server.prototype.getUrl = function(resource, data) {
 	var d = { };
 	for (k in resource.params) {
 		if (resource.params.hasOwnProperty(k)) {
-			err = resource.params[k](resource.endpoint, k, data[k]);
+			err = resource.params[k](resource.endpoint, k, data[k], data);
 			if (err) { return { error: err }; }
 
 			v = data[k];

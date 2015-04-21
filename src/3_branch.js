@@ -96,6 +96,7 @@ Branch = function() {
 Branch.prototype._api = function(resource, obj, callback) {
 	var self = this;
 	if (((resource.params && resource.params['app_id']) || (resource.queryPart && resource.queryPart['app_id'])) && self.app_id) { obj['app_id'] = self.app_id; }
+	if (((resource.params && resource.params['branch_key']) || (resource.queryPart && resource.queryPart['branch_key'])) && self.branch_key) { obj['branch_key'] = self.branch_key; }
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
 
@@ -133,7 +134,7 @@ if (config.CORDOVA_BUILD) {
 
 /**
  * @function Branch.init
- * @param {string} app_id - _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
+ * @param {string} key_or_id - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
  * @param {{isReferrable:?boolean}=} options - _optional_ - options: isReferrable: Is this a referrable session.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -155,7 +156,7 @@ if (config.CORDOVA_BUILD) {
  * ##### Usage
  * ```js
  * branch.init(
- *     app_id,
+ *     key_or_id,
  *     callback (err, data),
  *     is_referrable
  * );
@@ -177,9 +178,14 @@ if (config.CORDOVA_BUILD) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = function(app_id, options, callback) {
+Branch.prototype['init'] = function(key_or_id, options, callback) {
 	var self = this;
-	self.app_id = app_id;
+	if (utils.isKey(key_or_id)) {
+		self.branch_key = key_or_id;
+	}
+	else {
+		self.app_id = key_or_id;
+	}
 	this._queue(function(next) {
 
 		if (options && typeof options == 'function') {
