@@ -166,6 +166,13 @@ describe('Server', function() {
 				assert.equal(requests.length, 0, 'No request made');
 			});
 
+			it('should pass without branch_key but with app_id', function(done) {
+				var assert = testUtils.plan(2, done);
+				server.request(resources.open, testUtils.params({ "app_id": "5680621892404085", "is_referrable": 1 }, [ 'branch_key' ]), storage(), assert.done);
+				assert.equal(requests.length, 1, 'Request made');
+				assert.equal(requests[0].requestBody, "app_id=" + "5680621892404085" + "&identity_id=" + identity_id + "&is_referrable=1&browser_fingerprint_id=" + browser_fingerprint_id, 'Data correct');
+			});
+
 			it('should fail without browser_fingerprint_id', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(resources.open, testUtils.params({ is_referrable: 1 }, [ 'browser_fingerprint_id' ]), storage(), function(err) {
