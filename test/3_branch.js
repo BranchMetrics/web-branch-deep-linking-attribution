@@ -6,6 +6,8 @@ goog.require('storage');
 
 goog.require('goog.json'); // jshint unused:false
 
+/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
+
 describe('Branch', function() {
 	var sandbox, requests;
 
@@ -28,7 +30,7 @@ describe('Branch', function() {
 		});
 
 		if (runInit) {
-			branch.init(app_id);
+			branch.init(branch_sample_key);
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
 			requests = [];
@@ -74,7 +76,7 @@ describe('Branch', function() {
 				"has_app":true
 			};
 
-			branch.init(app_id, function(err, res) {
+			branch.init(branch_sample_key, function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'expected response returned');
 				assert(!err, 'No error');
 			});
@@ -83,11 +85,11 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "v": config.version, app_id: app_id }, 'Request params to _r correct');
+			assert.deepEqual(requests[0].obj, { "v": config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
-				"app_id": app_id,
+				"branch_key": branch_sample_key,
 				"link_identifier": undefined,
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
@@ -99,7 +101,7 @@ describe('Branch', function() {
 		it('should support being called without a callback', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(1, done);
 
-			branch.init(app_id);
+			branch.init(branch_sample_key);
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
@@ -109,7 +111,7 @@ describe('Branch', function() {
 
 		it('should return invalid app id error', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(1, done);
-			branch.init(app_id, function(err) { assert.equal(err.message, 'Invalid app id'); });
+			branch.init(branch_sample_key, function(err) { assert.equal(err.message, 'Invalid app id'); });
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(new Error('Invalid app id'));
@@ -117,7 +119,7 @@ describe('Branch', function() {
 
 		it('should fail early on browser fingerprint error', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
-			branch.init(app_id, function(err) {
+			branch.init(branch_sample_key, function(err) {
 				assert.equal(err.message, 'Browser fingerprint fetch failed');
 				assert.equal(requests.length, 1, 'Only 1 request made');
 			});
@@ -128,7 +130,7 @@ describe('Branch', function() {
 			testUtils.go("#r:12345");
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
 
-			branch.init(app_id, function(err, data) {
+			branch.init(branch_sample_key, function(err, data) {
 				assert.equal(utils.readStore(branch._storage).click_id, '12345', 'click_id from link_identifier hash stored in session_id');
 			});
 
@@ -136,7 +138,7 @@ describe('Branch', function() {
 			requests[1].callback(null, { session_id: "1234", something: "else" });
 
 			assert.deepEqual(requests[1].obj, {
-				"app_id": app_id,
+				"branch_key": branch_sample_key,
 				"link_identifier": '12345',
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
@@ -147,7 +149,7 @@ describe('Branch', function() {
 			testUtils.go("?_branch_match_id=67890");
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
 
-			branch.init(app_id, function(err, data) {
+			branch.init(branch_sample_key, function(err, data) {
 				assert.equal(utils.readStore(branch._storage).click_id, '67890', 'click_id from link_identifier get param stored in session_id');
 			});
 
@@ -155,7 +157,7 @@ describe('Branch', function() {
 			requests[1].callback(null, { session_id: "1234", something: "else" });
 
 			assert.deepEqual(requests[1].obj, {
-				"app_id": app_id,
+				"branch_key": branch_sample_key,
 				"link_identifier": '67890',
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id
@@ -224,7 +226,7 @@ describe('Branch', function() {
 					"user_agent": navigator.userAgent,
 					"language": navigator.language
 				},
-				"app_id": app_id,
+				"branch_key": branch_sample_key,
 				"session_id": session_id
 			};
 
@@ -249,7 +251,7 @@ describe('Branch', function() {
 					"language": navigator.language,
 					"test": "meta_data"
 				},
-				"app_id": app_id,
+				"branch_key": branch_sample_key,
 				"session_id": session_id
 			};
 
@@ -262,7 +264,7 @@ describe('Branch', function() {
 	describe('logout', function() {
 		basicTests('logout', [ 0 ]);
 
-		it('should call api with app_id and session_id', function(done) {
+		it('should call api with branch_key and session_id', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 			branch.logout(function(err) {
 				assert(!err, 'No error');
@@ -359,7 +361,7 @@ describe('Branch', function() {
 			var expectedRequest = {
 				"link_url": "12345",
 				"phone": "9999999999",
-				"app_id": app_id
+				"branch_key": branch_sample_key
 			};
 
 			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
@@ -414,7 +416,7 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'app_id', 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'branch_key', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 
@@ -436,7 +438,7 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'app_id', 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'branch_key', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 
@@ -458,20 +460,20 @@ describe('Branch', function() {
 	describe.fail('Queueing used correctly', function() {
 		it('Should wait to call track after init', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
-			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.init(branch_key, function(err) { assert(!err, 'No error'); });
 			branch.track('did something', function(err) { assert(!err, 'No error'); });
 		});
 
 		it('Should call requests in correct order', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(5, done);
-			branch.init(app_id, function(err) { assert(!err, 'No error'); });
+			branch.init(branch_key, function(err) { assert(!err, 'No error'); });
 			branch.track('did something else', function(err) { assert(!err, 'No error'); });
 
 			assert.equal(requests[0].resource.endpoint, '/_r');
 			requests[0].callback(null, browser_fingerprint_id);
 
 			assert.equal(requests[1].resource.endpoint, '/v1/open');
-			requests[1].callback(null, { "app_id": app_id, "link_identifier": undefined, "is_referrable": 1, "browser_fingerprint_id": browser_fingerprint_id });
+			requests[1].callback(null, { "branch_key": branch_sample_key, "link_identifier": undefined, "is_referrable": 1, "browser_fingerprint_id": browser_fingerprint_id });
 
 			assert.equal(requests[2].resource.endpoint, '/v1/track');
 			requests[2].callback(null, {});
@@ -479,7 +481,7 @@ describe('Branch', function() {
 
 		it('If init fails, other calls should error', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(4, done);
-			branch.init(app_id, function(err) { assert(err, 'init errored'); });
+			branch.init(branch_key, function(err) { assert(err, 'init errored'); });
 			branch.track('did another thing', function(err) {
 				assert(err, 'track errored');
 				assert.equal(requests.length, 1, 'No further requests made');
