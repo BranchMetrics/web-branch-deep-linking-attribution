@@ -19,7 +19,7 @@ var validationTypes = { obj: 0, str: 1, num: 2, arr: 3, bool: 4 };  // now inclu
 
 /* jshint ignore:start */
 
-/** @typedef {function(string, string, *)} */
+/** @typedef {function(string, string, *, (Object|null)=)} */
 var _validator;
 
 /* jshint ignore:end */
@@ -27,10 +27,9 @@ var _validator;
 /**
  * @param {boolean} required
  * @param {validationTypes|RegExp} type
- * @param {string} optional fallback
- * @param {validationTypes|RegExp} fallback type
+ * @param {string=} fallback
+ * @param {validationTypes|RegExp=} fallbackType
  * @throws {Error}
- * @return {_validator}
  */
 function validator(required, type, fallback, fallbackType) {
 	return function(endpoint, param, data, allData) {
@@ -374,7 +373,7 @@ if (config.CORDOVA_BUILD) {
 				queryPart: { "code": validator(true, validationTypes.str) },
 				params: {
 					"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
+					"app_id": validator(true, branch_key, "branch_key", branch_id),
 					"session_id": validator(true, branch_id),
 					"identity_id": validator(true, branch_id),
 					"device_fingerprint_id": validator(true, branch_id),
@@ -389,7 +388,7 @@ if (config.CORDOVA_BUILD) {
 				queryPart: { "code": validator(true, validationTypes.str) },
 				params: {
 					"branch_key": validator(true, branch_key, "app_id", branch_id),
-				"app_id": validator(true, branch_key, "branch_key", branch_id),
+					"app_id": validator(true, branch_key, "branch_key", branch_id),
 					"session_id": validator(true, branch_id),
 					"identity_id": validator(true, branch_id),
 					"device_fingerprint_id": validator(true, branch_id),

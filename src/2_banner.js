@@ -123,7 +123,7 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
-			if (utils.readKeyValue('click_id', storage) && !options.makeNewLink) {
+			if (utils.readKeyValue('click_id', storage) && !options.make_new_link) {
 				doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + utils.readKeyValue('click_id', storage);
 			}
 			else {
