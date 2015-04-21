@@ -134,7 +134,7 @@ if (config.CORDOVA_BUILD) {
 
 /**
  * @function Branch.init
- * @param {string} key_or_id - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
+ * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
  * @param {{isReferrable:?boolean}=} options - _optional_ - options: isReferrable: Is this a referrable session.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -156,7 +156,7 @@ if (config.CORDOVA_BUILD) {
  * ##### Usage
  * ```js
  * branch.init(
- *     key_or_id,
+ *     branch_key,
  *     callback (err, data),
  *     is_referrable
  * );
@@ -1218,15 +1218,18 @@ if (config.WEB_BUILD) {
 				bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 			}
 
-			banner(self, bannerOptions, linkData, self._storage);
+			self.closeBannerPointer = banner(self, bannerOptions, linkData, self._storage);
 			next();
 		});
 	};
 
 	Branch.prototype['closeBanner'] = function() {
-		this._queue(function(next) {
-			banner.close();
-			next();
-		});
+		var self = this;
+		if (this.closeBannerPointer) {
+			this._queue(function(next) {
+				self.closeBannerPointer();
+				next();
+			});
+		}
 	};
 }

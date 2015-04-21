@@ -134,11 +134,11 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 
 
-### init(key_or_id, options, callback) 
+### init(branch_key, options, callback) 
 
 **Parameters**
 
-**key_or_id**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
+**branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
 
 **options**: `Object`, _optional_ - options: isReferrable: Is this a referrable session.
 
@@ -162,7 +162,7 @@ the link the user was referred by.
 ##### Usage
 ```js
 branch.init(
-    key_or_id,
+    branch_key,
     callback (err, data),
     is_referrable
 );

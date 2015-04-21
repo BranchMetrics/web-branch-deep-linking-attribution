@@ -1100,16 +1100,6 @@ var sendSMS = function(a, b, c, d) {
       }, banner_utils.success_timeout));
     })) : m();
   }
-}, closeBanner = function(a, b) {
-  setTimeout(function() {
-    banner_utils.removeElement(a);
-    banner_utils.removeElement(document.getElementById("branch-css"));
-  }, banner_utils.animationSpeed + banner_utils.animationDelay);
-  setTimeout(function() {
-    document.body.style.marginTop = "0px";
-  }, banner_utils.animationDelay);
-  a.style.top = "-" + banner_utils.bannerHeight;
-  utils.storeKeyValue("hideBanner", !0, b);
 }, banner = function(a, b, c, d) {
   if (banner_utils.shouldAppend(d, b)) {
     var e = banner_html.markup(b, d);
@@ -1122,19 +1112,27 @@ var sendSMS = function(a, b, c, d) {
       d.preventDefault();
       sendSMS(f, a, b, c);
     });
-    var g = f.getElementById("branch-banner-close");
-    banner.close = function() {
-      closeBanner(e, d);
+    var g = f.getElementById("branch-banner-close"), h = function() {
+      setTimeout(function() {
+        banner_utils.removeElement(e);
+        banner_utils.removeElement(document.getElementById("branch-css"));
+      }, banner_utils.animationSpeed + banner_utils.animationDelay);
+      setTimeout(function() {
+        document.body.style.marginTop = "0px";
+      }, banner_utils.animationDelay);
+      e.style.top = "-" + banner_utils.bannerHeight;
+      utils.storeKeyValue("hideBanner", !0, d);
     };
     g && (g.onclick = function(a) {
       a.preventDefault();
-      banner.close();
+      h();
     });
     document.body.className += " branch-animation";
     document.body.style.marginTop = banner_utils.bannerHeight;
     setTimeout(function() {
       e.style.top = "0";
     }, banner_utils.animationDelay);
+    return h;
   }
 };
 // Input 12
@@ -1442,13 +1440,14 @@ config.WEB_BUILD && (Branch.prototype.banner = function(a, b) {
     var e = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
     make_new_link:!!a.make_new_link};
     "undefined" != typeof a.showMobile && (e.showiOS = e.showAndroid = a.showMobile);
-    banner(c, e, b, c._storage);
+    c.closeBannerPointer = banner(c, e, b, c._storage);
     d();
   });
 }, Branch.prototype.closeBanner = function() {
-  this._queue(function(a) {
-    banner.close();
-    a();
+  var a = this;
+  this.closeBannerPointer && this._queue(function(b) {
+    a.closeBannerPointer();
+    b();
   });
 });
 // Input 13

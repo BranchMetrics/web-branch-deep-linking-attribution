@@ -90,20 +90,6 @@ var sendSMS = function(doc, branch, options, linkData) {
 	}
 };
 
-var closeBanner = function(element, storage) {
-	setTimeout(function() {
-		banner_utils.removeElement(element);
-		banner_utils.removeElement(document.getElementById('branch-css'));
-	}, banner_utils.animationSpeed + banner_utils.animationDelay);
-
-	setTimeout(function() {
-		document.body.style.marginTop = '0px';
-	}, banner_utils.animationDelay);
-	element.style.top = '-' + banner_utils.bannerHeight;
-
-	utils.storeKeyValue('hideBanner', true, storage);
-};
-
 /**
  * @param {Object} branch
  * @param {banner_utils.options} options
@@ -146,13 +132,23 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		var closeButton = doc.getElementById('branch-banner-close');
-		banner.close = function() {
-			closeBanner(element, storage);
+		var closeBanner = function() {
+			setTimeout(function() {
+				banner_utils.removeElement(element);
+				banner_utils.removeElement(document.getElementById('branch-css'));
+			}, banner_utils.animationSpeed + banner_utils.animationDelay);
+
+			setTimeout(function() {
+				document.body.style.marginTop = '0px';
+			}, banner_utils.animationDelay);
+			element.style.top = '-' + banner_utils.bannerHeight;
+
+			utils.storeKeyValue('hideBanner', true, storage);
 		};
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
-				banner.close();
+				closeBanner();
 			};
 		}
 
@@ -162,5 +158,7 @@ banner = function(branch, options, linkData, storage) {
 		setTimeout(function() {
 			element.style.top = '0';
 		}, banner_utils.animationDelay);
+
+		return closeBanner;
 	}
 };
