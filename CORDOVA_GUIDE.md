@@ -8,7 +8,7 @@ Branch is available through [Cordova](http://plugins.cordova.io/#/package/io.bra
 
 ### Register you app
 
-You can sign up for your own app id at [https://dashboard.branch.io](https://dashboard.branch.io)
+You can sign up for your own API key at [https://dashboard.branch.io](https://dashboard.branch.io)
 
 ## Configuration (for tracking)
 
@@ -34,16 +34,16 @@ This deep link routing callback is called 100% of the time on init, with your li
 (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.4.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
 // Arguments
-// arg1: Your app id can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
+// arg1: Your API key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
 // arg2: the callback to notify you that the instance has instantiated
-branch.init("APP-ID", function(err, data) {
+branch.init("API-KEY", function(err, data) {
   if (err) { return console.log(err); } // Error message if init is not successful
   console.log(JSON.stringify(data)); // object containing: data from referring link, referring identity, identity of user, and boolean indicating if user has the app installed on any device
 });
 
 ```
 
-Here is the location of the app id that you will need for the `branch.init` call above (_soon to be deprecated but will always be supported_):
+Here is the location of the API key that you will need for the `branch.init` call above (_formerly app id, which is now depreciated_):
 
 ![app id](resources/app_id.png)
 

@@ -26,16 +26,16 @@ branch.getInstance("Your app key here", function() {
     });
 });
 ```
-
+First note, that we have depreciated authenticating API calls with the Web SDK via the app id, and have replaced it with an API key. Authenticating with the app id will still work, but it is highly recomended that you switch to using the API key.
 This has been simplified to an onpage embed code, and a single call to `branch.init()`, which requires the app id, and returns the launch data of the referring link:
 ```js
 // adds an instance of branch to the window object
 // INSERT INIT CODE
 
 // Arguments
-// arg1: Your app id can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
+// arg1: Your API key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
 // arg2: the callback to notify you that the instance has instantiated
-branch.init("APP-ID", function(err, data) {
+branch.init("API-KEY", function(err, data) {
   if (err) { return console.log(err); } // Error message if init is not successful
   console.log(JSON.stringify(data)); // object containing: data from referring link, referring identity, identity of user, and boolean indicating if user has the app installed on any device
 });
