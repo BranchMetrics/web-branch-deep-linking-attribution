@@ -192,7 +192,8 @@ if (config.WEB_BUILD) {
 			},
 			params: {
 				"phone": validator(true, validationTypes.str),
-				"app_id": validator(true, branch_id)
+				"branch_key": validator(true, branch_key, "app_id", branch_id),
+				"app_id": validator(true, branch_key, "branch_key", branch_id)
 			}
 		};
 
