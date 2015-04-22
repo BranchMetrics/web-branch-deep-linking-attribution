@@ -16,6 +16,10 @@ if (config.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint igno
 
 var default_branch;
 
+var NO_CALLBACK = 0;
+var CALLBACK_ERR = 1;
+var CALLBACK_ERR_DATA = 2;
+
 /***
  * @param {Error} err
  * @param {function(?Error,?=)=} callback
@@ -35,6 +39,36 @@ function wrapErrorFunc(func, callback) {
 		else if (err) { throw err; }
 		else if (func) { func(data); }
 	};
+}
+
+function wrap(parameters, func) {
+	var r = function(args) {
+		var self = this;
+		var callback = arguments[arguments.length];
+		args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+		if (parameters === NO_CALLBACK || typeof callback != "function") {
+			callback = function(err) {
+				console.log(err);
+			};
+		}
+		self._queue(function(next) { // need to get a ref to branch
+			if (!self.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+
+			var done = function(err, data) {
+				if (err) { throw err; }
+				if (parameters === CALLBACK_ERR) {
+					callback(err);
+				}
+				else if (parameters === CALLBACK_ERR_DATA) {
+					callback(err, data);
+				}
+				next();
+			};
+			args.unshift(done);
+			func.apply(self, args);
+		});
+	};
+	return r;
 }
 
 /***
@@ -506,25 +540,20 @@ if (config.CORDOVA_BUILD) {
  * ## Creating a deep linking link
  *
  */
-Branch.prototype['track'] = function(event, metadata, callback) {
-	if (typeof metadata == 'function') {
-		callback = metadata;
+Branch.prototype['track'] = wrap(CALLBACK_ERR, function(done, event, metadata) {
+	if (!metadata) {
 		metadata = { };
 	}
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 
-	var self = this;
-	this._queue(function(next) {
-		self._api(resources.event, {
-			"event": event,
-			"metadata": utils.merge({
-				"url": document.URL,
-				"user_agent": navigator.userAgent,
-				"language": navigator.language
-			}, metadata || {})
-		}, wrapErrorCallback1(callback, next));
-	});
-};
+	this._api(resources.event, {
+		"event": event,
+		"metadata": utils.merge({
+			"url": document.URL,
+			"user_agent": navigator.userAgent,
+			"language": navigator.language
+		}, metadata || {})
+	}, done);
+});
 
 /**
  * @function Branch.link

@@ -1139,7 +1139,7 @@ var sendSMS = function(a, b, c, d) {
 if (config.CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
-var default_branch;
+var default_branch, NO_CALLBACK = 0, CALLBACK_ERR = 1, CALLBACK_ERR_DATA = 2;
 function wrapError(a, b) {
   if (b) {
     return b(a);
@@ -1156,6 +1156,30 @@ function wrapErrorFunc(a, b) {
       }
       a && a(d);
     }
+  };
+}
+function wrap(a, b) {
+  return function(c) {
+    var d = this, e = arguments[arguments.length];
+    c = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+    if (a === NO_CALLBACK || "function" != typeof e) {
+      e = function(a) {
+        console.log(a);
+      };
+    }
+    d._queue(function(f) {
+      if (!d.initialized) {
+        return wrapError(Error(utils.message(utils.messages.nonInit)), e);
+      }
+      c.unshift(function(b, c) {
+        if (b) {
+          throw b;
+        }
+        a === CALLBACK_ERR ? e(b) : a === CALLBACK_ERR_DATA && e(b, c);
+        f();
+      });
+      b.apply(d, c);
+    });
   };
 }
 function wrapErrorCallback1(a, b) {
@@ -1320,16 +1344,10 @@ config.CORDOVA_BUILD && (Branch.prototype.close = function(a) {
     }, a));
   });
 });
-Branch.prototype.track = function(a, b, c) {
-  "function" == typeof b && (c = b, b = {});
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
-  }
-  var d = this;
-  this._queue(function(e) {
-    d._api(resources.event, {event:a, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, b || {})}, wrapErrorCallback1(c, e));
-  });
-};
+Branch.prototype.track = wrap(CALLBACK_ERR, function(a, b, c) {
+  c || (c = {});
+  this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
+});
 Branch.prototype.link = function(a, b) {
   if (!this.initialized) {
     return wrapError(Error(utils.message(utils.messages.nonInit)), b);
