@@ -68,8 +68,8 @@ read -p "Copy to S3? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/web/build.min.js.gz s3://branch-web-sdk/branch-$VERSION.min.js  --acl public-read
-	aws s3 cp testbeds/web/example.html s3://branch-web-sdk/example.html --acl public-read
+	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/web/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js  --acl public-read
+	aws s3 cp testbeds/web/example.html s3://branch-cdn/example.html --acl public-read
 fi
 
 read -p "Publish to NPM? " -n 1 -r
