@@ -428,14 +428,9 @@ Branch.prototype['setIdentity'] = wrap(2, function(done, identity) {
  * ___
  *
  */
-Branch.prototype['logout'] = function(callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
-	this._queue(function(next) {
-		self._api(resources.logout, { }, wrapErrorCallback1(callback, next));
-	});
-};
+Branch.prototype['logout'] = wrap(1, function(done) {
+	this._api(resources.logout, { }, done);
+});
 
 if (config.CORDOVA_BUILD) {
 /**
@@ -465,26 +460,16 @@ if (config.CORDOVA_BUILD) {
  * ## Tracking events
  *
  */
-	Branch.prototype['close'] = function(callback) {
-		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
+	Branch.prototype['close'] = wrap(1, function(done) {
 		var self = this;
-		this._queue(function(next) {
-
-			function clearBranchValues() {
-				delete self.session_id;
-				delete self.sessionLink;
-				self.initialized = false;
-			}
-
-			self._api(resources.close, { }, wrapErrorFunc(function(data) {
-				clearBranchValues();
-				utils.clearStore(self._storage);
-				next();
-				if (callback) { callback(null); }
-			}, callback));
+		this._api(resources.close, { }, function(err, data) {
+			delete self.session_id;
+			delete self.sessionLink;
+			self.initialized = false;
+			utils.clearStore(self._storage);
+			done(null);
 		});
-	};
+	});
 }
 
 /**
@@ -767,14 +752,9 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
  * ## Referral Codes
  *
  */
-Branch.prototype['referrals'] = function(callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
-	this._queue(function(next) {
-		self._api(resources.referrals, { }, wrapErrorCallback2(callback, next));
-	});
-};
+Branch.prototype['referrals'] = wrap(2, function(done) {
+	this._api(resources.referrals, { }, done);
+});
 
 
 if (config.CORDOVA_BUILD) {

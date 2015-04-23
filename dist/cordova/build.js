@@ -1294,31 +1294,19 @@ Branch.prototype.setIdentity = wrap(2, function(a, b) {
     a(null, d);
   });
 });
-Branch.prototype.logout = function(a) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-  }
-  var b = this;
-  this._queue(function(c) {
-    b._api(resources.logout, {}, wrapErrorCallback1(a, c));
-  });
-};
-config.CORDOVA_BUILD && (Branch.prototype.close = function(a) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-  }
-  var b = this;
-  this._queue(function(c) {
-    b._api(resources.close, {}, wrapErrorFunc(function(d) {
-      delete b.session_id;
-      delete b.sessionLink;
-      b.initialized = !1;
-      utils.clearStore(b._storage);
-      c();
-      a && a(null);
-    }, a));
-  });
+Branch.prototype.logout = wrap(1, function(a) {
+  this._api(resources.logout, {}, a);
 });
+config.CORDOVA_BUILD && (Branch.prototype.close = wrap(1, function(a) {
+  var b = this;
+  this._api(resources.close, {}, function(c, d) {
+    delete b.session_id;
+    delete b.sessionLink;
+    b.initialized = !1;
+    utils.clearStore(b._storage);
+    a(null);
+  });
+}));
 Branch.prototype.track = wrap(1, function(a, b, c) {
   c || (c = {});
   this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
@@ -1355,15 +1343,9 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
     });
   }, d));
 };
-Branch.prototype.referrals = function(a) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-  }
-  var b = this;
-  this._queue(function(c) {
-    b._api(resources.referrals, {}, wrapErrorCallback2(a, c));
-  });
-};
+Branch.prototype.referrals = wrap(2, function(a) {
+  this._api(resources.referrals, {}, a);
+});
 config.CORDOVA_BUILD && (Branch.prototype.getCode = function(a, b) {
   if (!this.initialized) {
     return wrapError(Error(utils.message(utils.messages.nonInit)), b);
