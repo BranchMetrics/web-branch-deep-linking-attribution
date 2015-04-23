@@ -1160,24 +1160,23 @@ function wrapErrorFunc(a, b) {
 }
 function wrap(a, b) {
   return function() {
-    var c = this, d = arguments[arguments.length - 1], e = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
-    if (0 === a || "function" != typeof d) {
-      d = function(a) {
-        console.log(a);
-      };
-    }
+    var c = this, d, e, f = arguments[arguments.length - 1];
+    0 === a || "function" != typeof f ? (e = function(a) {
+      console.log(a);
+      throw a;
+    }, d = arguments) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1), e = f);
     c._queue(function(f) {
-      if (!c.initialized) {
-        return wrapError(Error(utils.message(utils.messages.nonInit)), d);
+      if (!b.init && !c.initialized) {
+        return wrapError(Error(utils.message(utils.messages.nonInit)), e);
       }
-      e.unshift(function(b, c) {
+      d.unshift(function(b, c) {
         if (b) {
           throw b;
         }
-        1 === a ? d(b) : 2 === a && d(b, c);
+        1 === a ? e(b) : 2 === a && e(b, c);
         f();
       });
-      b.apply(c, e);
+      b.apply(c, d);
     });
   };
 }
@@ -1222,62 +1221,65 @@ Branch.prototype._api = function(a, b, c) {
 config.CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
   this.debug = a;
 });
-Branch.prototype.init = function(a, b, c) {
-  var d = this;
-  utils.isKey(a) ? d.branch_key = a : d.app_id = a;
-  this._queue(function(a) {
-    function f(a) {
-      d.session_id = a.session_id;
-      d.identity_id = a.identity_id;
-      d.sessionLink = a.link;
-      d.initialized = !0;
-      config.CORDOVA_BUILD && (d.device_fingerprint_id = a.device_fingerprint_id, d.link_click_id = a.link_click_id);
+Branch.prototype.init = wrap(2, function() {
+  var a = function(a, c, d) {
+    function e(a) {
+      f.session_id = a.session_id;
+      f.identity_id = a.identity_id;
+      f.sessionLink = a.link;
+      f.initialized = !0;
+      config.CORDOVA_BUILD && (f.device_fingerprint_id = a.device_fingerprint_id, f.link_click_id = a.link_click_id);
     }
-    b && "function" == typeof b && (c = b, b = {isReferrable:null});
-    var g = b && "undefined" != typeof b.isReferrable && null !== b.isReferrable ? b.isReferrable : null, h = utils.readStore(d._storage), k = function(b) {
-      f(b);
-      a();
-      c && c(null, utils.whiteListSessionData(b));
+    var f = this;
+    utils.isKey(c) ? f.branch_key = c : f.app_id = c;
+    d && "function" == typeof d && (d = {isReferrable:null});
+    c = d && "undefined" != typeof d.isReferrable && null !== d.isReferrable ? d.isReferrable : null;
+    d = utils.readStore(f._storage);
+    var g = function(c) {
+      e(c);
+      a(null, utils.whiteListSessionData(c));
     };
-    if (h && h.session_id) {
-      k(h);
+    if (d && d.session_id) {
+      g(d);
     } else {
-      if (config.CORDOVA_BUILD && (h = [], utils.readKeyValue("identity_id", d._permStorage) ? (d.identity_id = utils.readKeyValue("identity_id", d._permStorage), d.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage), null !== g && h.push(g ? 1 : 0), exec(function(a) {
-        console.log("Sending open with: " + goog.json.serialize(a));
-        d._api(resources.open, a, wrapErrorFunc(function(a) {
-          console.log("Open successful: " + a);
-          f(a);
-          utils.storeKeyValue("identity_id", a.identity_id, d._permStorage);
-          utils.storeKeyValue("device_fingerprint_id", a.device_fingerprint_id, d._permStorage);
-          utils.store(a, d._storage);
-          c && c(null, a);
-        }, c));
+      if (config.CORDOVA_BUILD && (d = [], utils.readKeyValue("identity_id", f._permStorage) ? (f.identity_id = utils.readKeyValue("identity_id", f._permStorage), f.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", f._permStorage), null !== c && d.push(c ? 1 : 0), exec(function(c) {
+        console.log("Sending open with: " + goog.json.serialize(c));
+        f._api(resources.open, c, function(c) {
+          console.log("Open successful: " + c);
+          e(c);
+          utils.storeKeyValue("identity_id", c.identity_id, f._permStorage);
+          utils.storeKeyValue("device_fingerprint_id", c.device_fingerprint_id, f._permStorage);
+          utils.store(c, f._storage);
+          a(null, c);
+        });
       }, function() {
-        c && c(Error("Error getting device data!"));
-      }, "BranchDevice", "getOpenData", h)) : (h.push(d.debug), null !== g && h.push(g ? 1 : 0), exec(function(a) {
-        console.log("Sending install with: " + goog.json.serialize(a));
-        d._api(resources.install, a, wrapErrorFunc(function(a) {
-          console.log("Install successful: " + a);
-          f(a);
-          utils.store(a, d._storage);
-          utils.store(a, d._permStorage);
-          c && c(null, a);
-        }, c));
+        a(Error("Error getting device data!"));
+      }, "BranchDevice", "getOpenData", d)) : (d.push(f.debug), null !== c && d.push(c ? 1 : 0), exec(function(c) {
+        console.log("Sending install with: " + goog.json.serialize(c));
+        f._api(resources.install, c, function(c) {
+          console.log("Install successful: " + c);
+          e(c);
+          utils.store(c, f._storage);
+          utils.store(c, f._permStorage);
+          a(null, c);
+        });
       }, function() {
-        c && c(Error("Error getting device data!"));
-      }, "BranchDevice", "getInstallData", h))), config.WEB_BUILD) {
-        var l = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
-        d._api(resources._r, {v:config.version}, wrapErrorFunc(function(a) {
-          d._api(resources.open, {link_identifier:l, is_referrable:1, browser_fingerprint_id:a}, wrapErrorFunc(function(a) {
-            l && (a.click_id = l);
-            utils.store(a, d._storage);
-            k(a);
-          }, c));
-        }, c));
+        a("Error getting device data!");
+      }, "BranchDevice", "getInstallData", d))), config.WEB_BUILD) {
+        var h = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
+        f._api(resources._r, {v:config.version}, function(a, b) {
+          f._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+            h && (b.click_id = h);
+            utils.store(b, f._storage);
+            g(b);
+          });
+        });
       }
     }
-  });
-};
+  };
+  a.init = !0;
+  return a;
+}.apply(this, arguments));
 Branch.prototype.data = function(a) {
   if (a) {
     if (!this.initialized) {

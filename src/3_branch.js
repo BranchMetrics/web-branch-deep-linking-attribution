@@ -52,16 +52,21 @@ function wrap(parameters, func) {
 	  CALLBACK_ERR_DATA: 2
 	};
 	var r = function() {
-		var self = this,
-		callback = arguments[arguments.length - 1],
-		args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
-		if (parameters === callback_params.NO_CALLBACK || typeof callback != "function") {
+		var self = this, args, callback,
+		lastArg = arguments[arguments.length - 1];
+		if (parameters === callback_params.NO_CALLBACK || typeof lastArg != "function") {
 			callback = function(err) {
 				console.log(err);
+				throw(err);
 			};
+			args = arguments;
+		}
+		else {
+			args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+			callback = lastArg;
 		}
 		self._queue(function(next) {
-			if (!self.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+			if (!func.init && !self.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
 			var done = function(err, data) {
 				if (err) { throw err; }
 				else if (parameters === callback_params.CALLBACK_ERR) {
@@ -136,20 +141,19 @@ Branch = function() {
  * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
-	var self = this;
-	if (self.app_id) { obj['app_id'] = self.app_id; }
-	if (self.branch_key) { obj['branch_key'] = self.branch_key; }
-	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && self.session_id) { obj['session_id'] = self.session_id; }
-	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && self.identity_id) { obj['identity_id'] = self.identity_id; }
+	if (this.app_id) { obj['app_id'] = this.app_id; }
+	if (this.branch_key) { obj['branch_key'] = this.branch_key; }
+	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
+	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
 
 	// These three are sent from mobile apps
 	if (config.CORDOVA_BUILD) {
-		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && self.device_fingerprint_id) { obj['device_fingerprint_id'] = self.device_fingerprint_id; }
-		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && self.link_click_id) { obj['link_click_id'] = self.link_click_id; }
-		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && self.sdk) { obj['sdk'] = self.sdk; }
+		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
+		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
+		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 	}
 
-	return self._server.request(resource, obj, self._storage, function(err, data) {
+	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
 };
@@ -220,23 +224,19 @@ if (config.CORDOVA_BUILD) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = function(branch_key, options, callback) {
-	var self = this;
-	if (utils.isKey(branch_key)) {
-		self.branch_key = branch_key;
-	}
-	else {
-		self.app_id = branch_key;
-	}
-	this._queue(function(next) {
-
+Branch.prototype['init'] = wrap(2, (function() {
+	var initialization = function(done, branch_key, options) {
+		var self = this;
+		if (utils.isKey(branch_key)) {
+			self.branch_key = branch_key;
+		}
+		else {
+			self.app_id = branch_key;
+		}
 		if (options && typeof options == 'function') {
-			callback = options;
 			options = { isReferrable: null };
 		}
-
 		var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-
 		var sessionData = utils.readStore(self._storage);
 
 		function setBranchValues(data) {
@@ -253,14 +253,14 @@ Branch.prototype['init'] = function(branch_key, options, callback) {
 
 		var finishInit = function(data) {
 			setBranchValues(data);
-			next();
-			if (callback) { callback(null, utils.whiteListSessionData(data)); }
+			done(null, utils.whiteListSessionData(data));
 		};
 
 		if (sessionData  && sessionData['session_id']) {
 			finishInit(sessionData);
 		}
 		else {
+			// THIS needs to be cleaned up
 			if (config.CORDOVA_BUILD) {
 				var args = [];
 				// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
@@ -272,19 +272,17 @@ Branch.prototype['init'] = function(branch_key, options, callback) {
 					}
 					exec(function(data) {
 						console.log("Sending open with: " + goog.json.serialize(data));
-						self._api(resources.open, data, wrapErrorFunc(function(data) {
+						self._api(resources.open, data, function(data) {
 							console.log("Open successful: " + data);
 							setBranchValues(data);
 							utils.storeKeyValue('identity_id', data.identity_id, self._permStorage);
 							utils.storeKeyValue('device_fingerprint_id', data.device_fingerprint_id, self._permStorage);
 							utils.store(data, self._storage);
-							if (callback) { callback(null, data); }
-						}, callback));
+							done(null, data);
+						});
 					},
 					function() {
-						if (callback) {
-							callback(new Error("Error getting device data!"));
-						}
+						done(new Error("Error getting device data!"));
 					},  "BranchDevice", "getOpenData", args);
 				}
 				else {
@@ -294,39 +292,39 @@ Branch.prototype['init'] = function(branch_key, options, callback) {
 					}
 					exec(function(data) {
 						console.log("Sending install with: " + goog.json.serialize(data));
-						self._api(resources.install, data, wrapErrorFunc(function(data) {
+						self._api(resources.install, data, function(data) {
 							console.log("Install successful: " + data);
 							setBranchValues(data);
 							utils.store(data, self._storage);
 							utils.store(data, self._permStorage);
-							if (callback) { callback(null, data); }
-						}, callback));
+							done(null, data);
+						});
 					},
 					function() {
-						if (callback) {
-							callback(new Error("Error getting device data!"));
-						}
+						done("Error getting device data!");
 					},  "BranchDevice", "getInstallData", args);
 				}
 			}
 
 			if (config.WEB_BUILD) {
 				var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-				self._api(resources._r, { "v": config.version }, wrapErrorFunc(function(browser_fingerprint_id) {
+				self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
 					self._api(resources.open, {
 						"link_identifier": link_identifier,
 						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id
-					}, wrapErrorFunc(function(data) {
+					}, function(err, data) {
 						if (link_identifier) { data['click_id'] = link_identifier; }
 						utils.store(data, self._storage);
 						finishInit(data);
-					}, callback));
-				}, callback));
+					});
+				});
 			}
 		}
-	});
-};
+	};
+	initialization.init = true;
+	return initialization;
+}.apply(this, arguments)));
 
 /**
  * @function Branch.data
