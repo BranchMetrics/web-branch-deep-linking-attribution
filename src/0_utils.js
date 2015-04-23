@@ -76,6 +76,17 @@ utils.whiteListSessionData = function(data) {
 	};
 };
 
+utils.cleanLinkData = function(linkData, config) {
+	if (config.WEB_BUILD) {
+		linkData['source'] = 'web-sdk';
+		if (linkData['data']['$desktop_url'] !== undefined) {
+			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
+		}
+	}
+	linkData['data'] = goog.json.serialize(linkData['data']);
+	return linkData;
+};
+
 /**
  * @param {BranchStorage} storage
  * @return {Object}

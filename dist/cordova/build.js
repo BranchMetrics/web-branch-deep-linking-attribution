@@ -764,6 +764,11 @@ utils.message = function(a, b) {
 utils.whiteListSessionData = function(a) {
   return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null};
 };
+utils.cleanLinkData = function(a, b) {
+  b.WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "")));
+  a.data = goog.json.serialize(a.data);
+  return a;
+};
 utils.readStore = function(a) {
   try {
     return goog.json.parse(a.getItem("branch_session") || {});
@@ -1162,7 +1167,6 @@ function wrap(a, b) {
   return function() {
     var c = this, d, e, f = arguments[arguments.length - 1];
     0 === a || "function" != typeof f ? (e = function(a) {
-      console.log(a);
       throw a;
     }, d = Array.prototype.slice.call(arguments)) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], e = f);
     c._queue(function(f) {
@@ -1303,37 +1307,37 @@ Branch.prototype.track = wrap(1, function(a, b, c) {
   this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(2, function(a, b) {
-  config.WEB_BUILD && (b.source = "web-sdk", void 0 !== b.data.$desktop_url && (b.data.$desktop_url = b.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "")));
-  b.data = goog.json.serialize(b.data);
-  this._api(resources.link, b, function(b, d) {
+  this._api(resources.link, utils.cleanLinkData(b, config), function(b, d) {
     a(b, d && d.url);
   });
 });
-Branch.prototype.sendSMS = function(a, b, c, d) {
-  function e(b, c) {
-    f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d, c));
+Branch.prototype.sendSMS = wrap(1, function(a, b, c, d) {
+  function e(c) {
+    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
   }
   var f = this;
-  "function" == typeof c && (d = c, c = {});
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), d);
+  if ("function" == typeof d) {
+    d = {};
+  } else {
+    if ("undefined" === typeof d || null === d) {
+      d = {};
+    }
   }
-  if ("undefined" === typeof c || null === c) {
-    c = {};
-  }
-  c.make_new_link = c.make_new_link || !1;
-  b.channel && "app banner" != b.channel || (b.channel = "sms");
-  utils.readKeyValue("click_id", f._storage) && !c.make_new_link ? f._queue(function(a) {
-    e(utils.readKeyValue("click_id", f._storage), a);
-  }) : f.link(b, wrapErrorFunc(function(a) {
-    f._queue(function(b) {
-      f._api(resources.linkClick, {link_url:"l/" + a.split("/").pop(), click:"click"}, wrapErrorFunc(function(a) {
-        utils.storeKeyValue("click_id", a.click_id, f._storage);
-        e(a.click_id, b);
-      }, d));
+  d.make_new_link = d.make_new_link || !1;
+  c.channel && "app banner" != c.channel || (c.channel = "sms");
+  utils.readKeyValue("click_id", f._storage) && !d.make_new_link ? e(utils.readKeyValue("click_id", f._storage)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
+    if (b) {
+      return a(b);
+    }
+    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+      if (b) {
+        return a(b);
+      }
+      utils.storeKeyValue("click_id", c.click_id, f._storage);
+      e(c.click_id);
     });
-  }, d));
-};
+  });
+});
 Branch.prototype.referrals = wrap(2, function(a) {
   this._api(resources.referrals, {}, a);
 });

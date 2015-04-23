@@ -52,11 +52,11 @@ function wrap(parameters, func) {
 	  CALLBACK_ERR_DATA: 2
 	};
 	var r = function() {
+		var noqueue = false;
 		var self = this, args, callback,
 		lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg != "function") {
 			callback = function(err) {
-				console.log(err);
 				throw(err);
 			};
 			args = Array.prototype.slice.call(arguments);
@@ -558,17 +558,11 @@ Branch.prototype['track'] = wrap(1, function(done, event, metadata) {
  *
  */
 Branch.prototype['link'] = wrap(2, function(done, linkData) {
-	if (config.WEB_BUILD) {
-		linkData['source'] = 'web-sdk';
-		if (linkData['data']['$desktop_url'] !== undefined) {
-			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
-		}
-	}
-	linkData['data'] = goog.json.serialize(linkData['data']);
-	this._api(resources.link, linkData, function(err, data) {
+	this._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
 		done(err, data && data['url']);
 	});
 });
+
 
 /**
  * @function Branch.sendSMS
@@ -656,14 +650,11 @@ Branch.prototype['link'] = wrap(2, function(done, linkData) {
  * ## Retrieve referrals list
  *
  */
-Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
+Branch.prototype['sendSMS'] = wrap(1, function(done, phone, linkData, options) {
 	var self = this;
 	if (typeof options == 'function') {
-		callback = options;
 		options = { };
 	}
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
 	else if (typeof options === 'undefined' || options === null) {
 		options = { };
 	}
@@ -671,32 +662,31 @@ Branch.prototype['sendSMS'] = function(phone, linkData, options, callback) {
 
 	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
 
-	function sendSMS(click_id, next) {
+	function sendSMS(click_id) {
 		self._api(resources.SMSLinkSend, {
 			"link_url": click_id,
 			"phone": phone
-		}, wrapErrorCallback1(callback, next));
+		}, done);
 	}
 
 	if (utils.readKeyValue('click_id', self._storage) && !options['make_new_link']) {
-		self._queue(function(next) {
-			sendSMS(utils.readKeyValue('click_id', self._storage), next);
-		});
+		sendSMS(utils.readKeyValue('click_id', self._storage));
 	}
 	else {
-		self["link"](linkData, wrapErrorFunc(function(url) {
-			self._queue(function(next) {
-				self._api(resources.linkClick, {
-					"link_url": 'l/' + url.split('/').pop(),
-					"click": "click"
-				}, wrapErrorFunc(function(data) {
-					utils.storeKeyValue('click_id', data['click_id'], self._storage);
-					sendSMS(data['click_id'], next);
-				}, callback));
+		self._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
+			if (err) { return done(err); }
+			var url = data['url'];
+			self._api(resources.linkClick, {
+				"link_url": 'l/' + url.split('/').pop(),
+				"click": "click"
+			}, function(err, data) {
+				if (err) { return done(err); }
+				utils.storeKeyValue('click_id', data['click_id'], self._storage);
+				sendSMS(data['click_id']);
 			});
-		}, callback));
+		});
 	}
-};
+});
 
 /**
  * @function Branch.referrals
