@@ -59,10 +59,10 @@ function wrap(parameters, func) {
 				console.log(err);
 				throw(err);
 			};
-			args = arguments;
+			args = Array.prototype.slice.call(arguments);
 		}
 		else {
-			args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+			args = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [];
 			callback = lastArg;
 		}
 		self._queue(function(next) {
@@ -70,7 +70,7 @@ function wrap(parameters, func) {
 			var done = function(err, data) {
 				if (err) { throw err; }
 				else if (parameters === callback_params.CALLBACK_ERR) {
-				callback(err);
+					callback(err);
 				}
 				else if (parameters === callback_params.CALLBACK_ERR_DATA) {
 					callback(err, data);
@@ -95,21 +95,6 @@ function wrapErrorCallback1(callback, next) {
 		if (err && !callback) { throw err; }
 		if (callback) { callback(err); }
 	};
-}
-
-/***
- * @param {function(?Error,?)=} callback
- * @param {function()=} next
- * @returns {function(?Error,?=)}
- */
-function wrapErrorCallback2(callback, next) {
-	/*** @type {function(?Error,?=)} */
-	var r = function(err, data) {
-		next();
-		if (err && !callback) { throw err; }
-		if (callback) {	callback(err, data); }
-	};
-	return r;
 }
 
 /***
@@ -944,14 +929,9 @@ if (config.CORDOVA_BUILD) {
  * ```
  *
  */
-Branch.prototype['credits'] = function(callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
-	this._queue(function(next) {
-		self._api(resources.credits, { }, wrapErrorCallback2(callback, next));
-	});
-};
+Branch.prototype['credits'] = wrap(2, function(done) {
+	this._api(resources.credits, { }, done);
+});
 
 
 if (config.CORDOVA_BUILD) {
@@ -1022,14 +1002,9 @@ if (config.CORDOVA_BUILD) {
  * ## Credit redemption
  *
  */
-	Branch.prototype['creditHistory'] = function(data, callback) {
-		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-		var self = this;
-		this._queue(function(next) {
-			self._api(resources.creditHistory, data ? data : {}, wrapErrorCallback2(callback, next));
-		});
-	};
+	Branch.prototype['creditHistory'] = wrap(2, function(done, data) {
+		this._api(resources.creditHistory, data ? data : {}, done);
+	});
 }
 
 /**
@@ -1075,14 +1050,9 @@ if (config.CORDOVA_BUILD) {
  * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
  *
  */
-Branch.prototype['redeem'] = function(amount, bucket, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
-	this._queue(function(next) {
-		self._api(resources.redeem, { "amount": amount, "bucket": bucket }, wrapErrorCallback1(callback, next));
-	});
-};
+Branch.prototype['redeem'] = wrap(1, function(done, amount, bucket) {
+	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
+});
 
 if (config.WEB_BUILD) {
 /**
@@ -1160,40 +1130,32 @@ if (config.WEB_BUILD) {
  * ```
  *
  */
-	Branch.prototype['banner'] = function(options, linkData) {
-		var self = this;
-		this._queue(function(next) {
-			var bannerOptions = {
-				icon: options['icon'] || '',
-				title: options['title'] || '',
-				description: options['description'] || '',
-				openAppButtonText: options['openAppButtonText'] || 'View in app',
-				downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
-				iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
-				showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
-				showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
-				showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
-				disableHide: !!options['disableHide'],
-				forgetHide: !!options['forgetHide'],
-				make_new_link: !!options['make_new_link']
-			};
-
-			if (typeof options['showMobile'] != 'undefined') {
-				bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
-			}
-
-			self.closeBannerPointer = banner(self, bannerOptions, linkData, self._storage);
-			next();
-		});
-	};
-
-	Branch.prototype['closeBanner'] = function() {
-		var self = this;
-		if (this.closeBannerPointer) {
-			this._queue(function(next) {
-				self.closeBannerPointer();
-				next();
-			});
+	Branch.prototype['banner'] = wrap(0, function(done, options, linkData) {
+		var bannerOptions = {
+			icon: options['icon'] || '',
+			title: options['title'] || '',
+			description: options['description'] || '',
+			openAppButtonText: options['openAppButtonText'] || 'View in app',
+			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+			iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
+			showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
+			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
+			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
+			disableHide: !!options['disableHide'],
+			forgetHide: !!options['forgetHide'],
+			make_new_link: !!options['make_new_link']
+		};
+		if (typeof options['showMobile'] != 'undefined') {
+			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 		}
-	};
+		this.closeBannerPointer = banner(this, bannerOptions, linkData, this._storage);
+		done();
+	});
+
+	Branch.prototype['closeBanner'] = wrap(0, function(done) {
+		if (this.closeBannerPointer) {
+			this.closeBannerPointer();
+		}
+		done();
+	});
 }

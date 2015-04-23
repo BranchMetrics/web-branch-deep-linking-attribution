@@ -1164,7 +1164,7 @@ function wrap(a, b) {
     0 === a || "function" != typeof f ? (e = function(a) {
       console.log(a);
       throw a;
-    }, d = arguments) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1), e = f);
+    }, d = Array.prototype.slice.call(arguments)) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], e = f);
     c._queue(function(f) {
       if (!b.init && !c.initialized) {
         return wrapError(Error(utils.message(utils.messages.nonInit)), e);
@@ -1187,15 +1187,6 @@ function wrapErrorCallback1(a, b) {
       throw c;
     }
     a && a(c);
-  };
-}
-function wrapErrorCallback2(a, b) {
-  return function(c, d) {
-    b();
-    if (c && !a) {
-      throw c;
-    }
-    a && a(c, d);
   };
 }
 var Branch = function() {
@@ -1357,49 +1348,25 @@ config.CORDOVA_BUILD && (Branch.prototype.validateCode = wrap(1, function(a, b) 
 config.CORDOVA_BUILD && (Branch.prototype.applyCode = wrap(1, function(a, b) {
   this._api(resources.applyCode, {code:b}, a);
 }));
-Branch.prototype.credits = function(a) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-  }
-  var b = this;
-  this._queue(function(c) {
-    b._api(resources.credits, {}, wrapErrorCallback2(a, c));
-  });
-};
-config.CORDOVA_BUILD && (Branch.prototype.creditHistory = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
-  var c = this;
-  this._queue(function(d) {
-    c._api(resources.creditHistory, a ? a : {}, wrapErrorCallback2(b, d));
-  });
+Branch.prototype.credits = wrap(2, function(a) {
+  this._api(resources.credits, {}, a);
 });
-Branch.prototype.redeem = function(a, b, c) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), c);
-  }
-  var d = this;
-  this._queue(function(e) {
-    d._api(resources.redeem, {amount:a, bucket:b}, wrapErrorCallback1(c, e));
-  });
-};
-config.WEB_BUILD && (Branch.prototype.banner = function(a, b) {
-  var c = this;
-  this._queue(function(d) {
-    var e = {icon:a.icon || "", title:a.title || "", description:a.description || "", openAppButtonText:a.openAppButtonText || "View in app", downloadAppButtonText:a.downloadAppButtonText || "Download App", iframe:"undefined" == typeof a.iframe ? !0 : a.iframe, showiOS:"undefined" == typeof a.showiOS ? !0 : a.showiOS, showAndroid:"undefined" == typeof a.showAndroid ? !0 : a.showAndroid, showDesktop:"undefined" == typeof a.showDesktop ? !0 : a.showDesktop, disableHide:!!a.disableHide, forgetHide:!!a.forgetHide, 
-    make_new_link:!!a.make_new_link};
-    "undefined" != typeof a.showMobile && (e.showiOS = e.showAndroid = a.showMobile);
-    c.closeBannerPointer = banner(c, e, b, c._storage);
-    d();
-  });
-}, Branch.prototype.closeBanner = function() {
-  var a = this;
-  this.closeBannerPointer && this._queue(function(b) {
-    a.closeBannerPointer();
-    b();
-  });
+config.CORDOVA_BUILD && (Branch.prototype.creditHistory = wrap(2, function(a, b) {
+  this._api(resources.creditHistory, b ? b : {}, a);
+}));
+Branch.prototype.redeem = wrap(1, function(a, b, c) {
+  this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
+config.WEB_BUILD && (Branch.prototype.banner = wrap(0, function(a, b, c) {
+  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showAndroid:"undefined" == typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:!!b.forgetHide, 
+  make_new_link:!!b.make_new_link};
+  "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
+  this.closeBannerPointer = banner(this, d, c, this._storage);
+  a();
+}), Branch.prototype.closeBanner = wrap(0, function(a) {
+  this.closeBannerPointer && this.closeBannerPointer();
+  a();
+}));
 // Input 13
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
