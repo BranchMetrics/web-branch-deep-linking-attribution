@@ -16,10 +16,6 @@ if (config.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint igno
 
 var default_branch;
 
-var NO_CALLBACK = 0;
-var CALLBACK_ERR = 1;
-var CALLBACK_ERR_DATA = 2;
-
 /***
  * @param {Error} err
  * @param {function(?Error,?=)=} callback
@@ -41,25 +37,37 @@ function wrapErrorFunc(func, callback) {
 	};
 }
 
+/***
+ * @param {object} parameters
+ * @param {function(*)} func
+ */
 function wrap(parameters, func) {
-	var r = function(args) {
-		var self = this;
-		var callback = arguments[arguments.length];
+	/**
+	 * Enum for what parameters are in a wrapped Branch method
+	 * @enum {number}
+	 */
+	var callback_params = {
+	  NO_CALLBACK: 0,
+	  CALLBACK_ERR: 1,
+	  CALLBACK_ERR_DATA: 2
+	};
+	var r = function() {
+		var self = this,
+		callback = arguments[arguments.length - 1],
 		args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
-		if (parameters === NO_CALLBACK || typeof callback != "function") {
+		if (parameters === callback_params.NO_CALLBACK || typeof callback != "function") {
 			callback = function(err) {
 				console.log(err);
 			};
 		}
-		self._queue(function(next) { // need to get a ref to branch
+		self._queue(function(next) {
 			if (!self.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
 			var done = function(err, data) {
 				if (err) { throw err; }
-				if (parameters === CALLBACK_ERR) {
-					callback(err);
+				else if (parameters === callback_params.CALLBACK_ERR) {
+				callback(err);
 				}
-				else if (parameters === CALLBACK_ERR_DATA) {
+				else if (parameters === callback_params.CALLBACK_ERR_DATA) {
 					callback(err, data);
 				}
 				next();
@@ -540,7 +548,7 @@ if (config.CORDOVA_BUILD) {
  * ## Creating a deep linking link
  *
  */
-Branch.prototype['track'] = wrap(CALLBACK_ERR, function(done, event, metadata) {
+Branch.prototype['track'] = wrap(1, function(done, event, metadata) {
 	if (!metadata) {
 		metadata = { };
 	}
@@ -611,24 +619,18 @@ Branch.prototype['track'] = wrap(CALLBACK_ERR, function(done, event, metadata) {
  * ## Sharing links via SMS
  *
  */
-Branch.prototype['link'] = function(linkData, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
+Branch.prototype['link'] = wrap(2, function(done, linkData) {
 	if (config.WEB_BUILD) {
 		linkData['source'] = 'web-sdk';
 		if (linkData['data']['$desktop_url'] !== undefined) {
 			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '');
 		}
 	}
-	this._queue(function(next) {
-		linkData['data'] = goog.json.serialize(linkData['data']);
-		self._api(resources.link, linkData, wrapErrorFunc(function(data) {
-			next();
-			callback(null, data && data['url']);
-		}, callback));
+	linkData['data'] = goog.json.serialize(linkData['data']);
+	this._api(resources.link, linkData, function(err, data) {
+		done(err, data && data['url']);
 	});
-};
+});
 
 /**
  * @function Branch.sendSMS

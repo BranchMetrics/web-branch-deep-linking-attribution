@@ -1139,7 +1139,7 @@ var sendSMS = function(a, b, c, d) {
 if (config.CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
-var default_branch, NO_CALLBACK = 0, CALLBACK_ERR = 1, CALLBACK_ERR_DATA = 2;
+var default_branch;
 function wrapError(a, b) {
   if (b) {
     return b(a);
@@ -1159,26 +1159,25 @@ function wrapErrorFunc(a, b) {
   };
 }
 function wrap(a, b) {
-  return function(c) {
-    var d = this, e = arguments[arguments.length];
-    c = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
-    if (a === NO_CALLBACK || "function" != typeof e) {
-      e = function(a) {
+  return function() {
+    var c = this, d = arguments[arguments.length - 1], e = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+    if (0 === a || "function" != typeof d) {
+      d = function(a) {
         console.log(a);
       };
     }
-    d._queue(function(f) {
-      if (!d.initialized) {
-        return wrapError(Error(utils.message(utils.messages.nonInit)), e);
+    c._queue(function(f) {
+      if (!c.initialized) {
+        return wrapError(Error(utils.message(utils.messages.nonInit)), d);
       }
-      c.unshift(function(b, c) {
+      e.unshift(function(b, c) {
         if (b) {
           throw b;
         }
-        a === CALLBACK_ERR ? e(b) : a === CALLBACK_ERR_DATA && e(b, c);
+        1 === a ? d(b) : 2 === a && d(b, c);
         f();
       });
-      b.apply(d, c);
+      b.apply(c, e);
     });
   };
 }
@@ -1344,24 +1343,17 @@ config.CORDOVA_BUILD && (Branch.prototype.close = function(a) {
     }, a));
   });
 });
-Branch.prototype.track = wrap(CALLBACK_ERR, function(a, b, c) {
+Branch.prototype.track = wrap(1, function(a, b, c) {
   c || (c = {});
   this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
-Branch.prototype.link = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
-  var c = this;
-  config.WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "")));
-  this._queue(function(d) {
-    a.data = goog.json.serialize(a.data);
-    c._api(resources.link, a, wrapErrorFunc(function(a) {
-      d();
-      b(null, a && a.url);
-    }, b));
+Branch.prototype.link = wrap(2, function(a, b) {
+  config.WEB_BUILD && (b.source = "web-sdk", void 0 !== b.data.$desktop_url && (b.data.$desktop_url = b.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "")));
+  b.data = goog.json.serialize(b.data);
+  this._api(resources.link, b, function(b, d) {
+    a(b, d && d.url);
   });
-};
+});
 Branch.prototype.sendSMS = function(a, b, c, d) {
   function e(b, c) {
     f._api(resources.SMSLinkSend, {link_url:b, phone:a}, wrapErrorCallback1(d, c));
