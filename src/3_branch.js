@@ -16,31 +16,6 @@ if (config.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint igno
 
 var default_branch;
 
-/***
- * @param {Error} err
- * @param {function(?Error,?=)=} callback
- */
-function wrapError(err, callback) {
-	if (callback) { return callback(err); }
-	throw err;
-}
-
-/***
- * @param {function(?)} func
- * @param {function(?Error,?=)=} callback
- */
-function wrapErrorFunc(func, callback) {
-	return function(err, data) {
-		if (err && callback) { callback(err); }
-		else if (err) { throw err; }
-		else if (func) { func(data); }
-	};
-}
-
-/***
- * @param {object} parameters
- * @param {function(*)} func
- */
 function wrap(parameters, func) {
 	/**
 	 * Enum for what parameters are in a wrapped Branch method
@@ -51,6 +26,16 @@ function wrap(parameters, func) {
 	  CALLBACK_ERR: 1,
 	  CALLBACK_ERR_DATA: 2
 	};
+
+	/***
+	 * @param {Error} err
+	 * @param {function(?Error,?=)=} callback
+	 */
+	function wrapError(err, callback) {
+		if (callback) { return callback(err); }
+		throw err;
+	}
+
 	var r = function() {
 		var noqueue = false;
 		var self = this, args, callback,
@@ -82,19 +67,6 @@ function wrap(parameters, func) {
 		});
 	};
 	return r;
-}
-
-/***
- * @param {function(?Error)=} callback
- * @param {function()=} next
- * @returns {function(?Error)}
- */
-function wrapErrorCallback1(callback, next) {
-	return function(err) {
-		next();
-		if (err && !callback) { throw err; }
-		if (callback) { callback(err); }
-	};
 }
 
 /***
@@ -237,6 +209,10 @@ Branch.prototype['init'] = wrap(2, (function() {
 		}
 
 		var finishInit = function(data) {
+			if (config.CORDOVA_BUILD) {
+				utils.store(data, self._permStorage);
+			}
+			utils.store(data, self._storage);
 			setBranchValues(data);
 			done(null, utils.whiteListSessionData(data));
 		};
@@ -245,49 +221,35 @@ Branch.prototype['init'] = wrap(2, (function() {
 			finishInit(sessionData);
 		}
 		else {
-			// THIS needs to be cleaned up
 			if (config.CORDOVA_BUILD) {
-				var args = [];
+				var args = [], execFunc;
+				args.push(self.debug);
+				if (isReferrable !== null) {
+					args.push(isReferrable ? 1 : 0);
+				}
+				var cordovaError = function() {
+					done("Error getting device data!");
+				};
 				// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
 				if (utils.readKeyValue('identity_id', self._permStorage)) {
-					self.identity_id = utils.readKeyValue('identity_id', self._permStorage);
-					self.device_fingerprint_id = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-					if (isReferrable !== null) {
-						args.push(isReferrable ? 1 : 0);
-					}
 					exec(function(data) {
 						console.log("Sending open with: " + goog.json.serialize(data));
 						self._api(resources.open, data, function(data) {
+							data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
+							data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
 							console.log("Open successful: " + data);
-							setBranchValues(data);
-							utils.storeKeyValue('identity_id', data.identity_id, self._permStorage);
-							utils.storeKeyValue('device_fingerprint_id', data.device_fingerprint_id, self._permStorage);
-							utils.store(data, self._storage);
-							done(null, data);
+							finishInit(data);
 						});
-					},
-					function() {
-						done(new Error("Error getting device data!"));
-					},  "BranchDevice", "getOpenData", args);
+					}, cordovaError,  "BranchDevice", "getOpenData", args);
 				}
 				else {
-					args.push(self.debug);
-					if (isReferrable !== null) {
-						args.push(isReferrable ? 1 : 0);
-					}
 					exec(function(data) {
 						console.log("Sending install with: " + goog.json.serialize(data));
 						self._api(resources.install, data, function(data) {
 							console.log("Install successful: " + data);
-							setBranchValues(data);
-							utils.store(data, self._storage);
-							utils.store(data, self._permStorage);
-							done(null, data);
+							finishInit(data);
 						});
-					},
-					function() {
-						done("Error getting device data!");
-					},  "BranchDevice", "getInstallData", args);
+					}, cordovaError,  "BranchDevice", "getInstallData", args);
 				}
 			}
 
@@ -300,7 +262,6 @@ Branch.prototype['init'] = wrap(2, (function() {
 						"browser_fingerprint_id": browser_fingerprint_id
 					}, function(err, data) {
 						if (link_identifier) { data['click_id'] = link_identifier; }
-						utils.store(data, self._storage);
 						finishInit(data);
 					});
 				});
@@ -324,7 +285,7 @@ Branch.prototype['init'] = wrap(2, (function() {
  * ___
  */
 Branch.prototype['data'] = wrap(2, function(done) {
-	done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+	if (typeof done == "function") { done(null, utils.whiteListSessionData(utils.readStore(this._storage))); }
 });
 
 if (config.CORDOVA_BUILD) {
@@ -345,7 +306,7 @@ if (config.CORDOVA_BUILD) {
  *
  */
 	Branch.prototype['first'] = wrap(2, function(done) {
-		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+		if (typeof done == "function") { done(null, utils.whiteListSessionData(utils.readStore(this._storage))); }
 	});
 }
 
@@ -387,7 +348,7 @@ Branch.prototype['setIdentity'] = wrap(2, function(done, identity) {
 		this.identity_id = data['identity_id'];
 		this.sessionLink = data['link'];
 		this.identity = data['identity'];
-		done(null, data);
+		if (typeof done == "function") { done(null, data); }
 	});
 });
 
@@ -452,7 +413,7 @@ if (config.CORDOVA_BUILD) {
 			delete self.sessionLink;
 			self.initialized = false;
 			utils.clearStore(self._storage);
-			done(null);
+			if (typeof done == "function") { done(null); }
 		});
 	});
 }
@@ -559,7 +520,7 @@ Branch.prototype['track'] = wrap(1, function(done, event, metadata) {
  */
 Branch.prototype['link'] = wrap(2, function(done, linkData) {
 	this._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
-		done(err, data && data['url']);
+		if (typeof done == "function") { done(err, data && data['url']); }
 	});
 });
 
@@ -1139,13 +1100,13 @@ if (config.WEB_BUILD) {
 			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 		}
 		this.closeBannerPointer = banner(this, bannerOptions, linkData, this._storage);
-		done();
+		if (typeof done == "function") { done(); }
 	});
 
 	Branch.prototype['closeBanner'] = wrap(0, function(done) {
 		if (this.closeBannerPointer) {
 			this.closeBannerPointer();
 		}
-		done();
+		if (typeof done == "function") { done(); }
 	});
 }

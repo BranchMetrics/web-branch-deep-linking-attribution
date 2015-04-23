@@ -1145,52 +1145,31 @@ if (config.CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
 var default_branch;
-function wrapError(a, b) {
-  if (b) {
-    return b(a);
-  }
-  throw a;
-}
-function wrapErrorFunc(a, b) {
-  return function(c, d) {
-    if (c && b) {
-      b(c);
-    } else {
-      if (c) {
-        throw c;
-      }
-      a && a(d);
-    }
-  };
-}
 function wrap(a, b) {
+  function c(a, b) {
+    if (b) {
+      return b(a);
+    }
+    throw a;
+  }
   return function() {
-    var c = this, d, e, f = arguments[arguments.length - 1];
-    0 === a || "function" != typeof f ? (e = function(a) {
+    var d = this, e, f, g = arguments[arguments.length - 1];
+    0 === a || "function" != typeof g ? (f = function(a) {
       throw a;
-    }, d = Array.prototype.slice.call(arguments)) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], e = f);
-    c._queue(function(f) {
-      if (!b.init && !c.initialized) {
-        return wrapError(Error(utils.message(utils.messages.nonInit)), e);
+    }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
+    d._queue(function(g) {
+      if (!b.init && !d.initialized) {
+        return c(Error(utils.message(utils.messages.nonInit)), f);
       }
-      d.unshift(function(b, c) {
+      e.unshift(function(b, c) {
         if (b) {
           throw b;
         }
-        1 === a ? e(b) : 2 === a && e(b, c);
-        f();
+        1 === a ? f(b) : 2 === a && f(b, c);
+        g();
       });
-      b.apply(c, d);
+      b.apply(d, e);
     });
-  };
-}
-function wrapErrorCallback1(a, b) {
-  return function(c) {
-    b();
-    if (c && !a) {
-      throw c;
-    }
-    a && a(c);
   };
 }
 var Branch = function() {
@@ -1218,55 +1197,46 @@ config.CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
 });
 Branch.prototype.init = wrap(2, function() {
   var a = function(a, c, d) {
-    function e(a) {
-      f.session_id = a.session_id;
-      f.identity_id = a.identity_id;
-      f.sessionLink = a.link;
-      f.initialized = !0;
-      config.CORDOVA_BUILD && (f.device_fingerprint_id = a.device_fingerprint_id, f.link_click_id = a.link_click_id);
-    }
-    var f = this;
-    utils.isKey(c) ? f.branch_key = c : f.app_id = c;
+    var e = this;
+    utils.isKey(c) ? e.branch_key = c : e.app_id = c;
     d && "function" == typeof d && (d = {isReferrable:null});
     c = d && "undefined" != typeof d.isReferrable && null !== d.isReferrable ? d.isReferrable : null;
-    d = utils.readStore(f._storage);
-    var g = function(c) {
-      e(c);
+    d = utils.readStore(e._storage);
+    var f = function(c) {
+      config.CORDOVA_BUILD && utils.store(c, e._permStorage);
+      utils.store(c, e._storage);
+      e.session_id = c.session_id;
+      e.identity_id = c.identity_id;
+      e.sessionLink = c.link;
+      e.initialized = !0;
+      config.CORDOVA_BUILD && (e.device_fingerprint_id = c.device_fingerprint_id, e.link_click_id = c.link_click_id);
       a(null, utils.whiteListSessionData(c));
     };
     if (d && d.session_id) {
-      g(d);
+      f(d);
     } else {
-      if (config.CORDOVA_BUILD && (d = [], utils.readKeyValue("identity_id", f._permStorage) ? (f.identity_id = utils.readKeyValue("identity_id", f._permStorage), f.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", f._permStorage), null !== c && d.push(c ? 1 : 0), exec(function(c) {
-        console.log("Sending open with: " + goog.json.serialize(c));
-        f._api(resources.open, c, function(c) {
-          console.log("Open successful: " + c);
-          e(c);
-          utils.storeKeyValue("identity_id", c.identity_id, f._permStorage);
-          utils.storeKeyValue("device_fingerprint_id", c.device_fingerprint_id, f._permStorage);
-          utils.store(c, f._storage);
-          a(null, c);
-        });
-      }, function() {
-        a(Error("Error getting device data!"));
-      }, "BranchDevice", "getOpenData", d)) : (d.push(f.debug), null !== c && d.push(c ? 1 : 0), exec(function(c) {
-        console.log("Sending install with: " + goog.json.serialize(c));
-        f._api(resources.install, c, function(c) {
-          console.log("Install successful: " + c);
-          e(c);
-          utils.store(c, f._storage);
-          utils.store(c, f._permStorage);
-          a(null, c);
-        });
-      }, function() {
+      if (config.CORDOVA_BUILD && (d = [], d.push(e.debug), null !== c && d.push(c ? 1 : 0), c = function() {
         a("Error getting device data!");
-      }, "BranchDevice", "getInstallData", d))), config.WEB_BUILD) {
-        var h = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
-        f._api(resources._r, {v:config.version}, function(a, b) {
-          f._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-            h && (b.click_id = h);
-            utils.store(b, f._storage);
-            g(b);
+      }, utils.readKeyValue("identity_id", e._permStorage) ? exec(function(a) {
+        console.log("Sending open with: " + goog.json.serialize(a));
+        e._api(resources.open, a, function(a) {
+          a.identity_id = utils.readKeyValue("identity_id", e._permStorage);
+          a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", e._permStorage);
+          console.log("Open successful: " + a);
+          f(a);
+        });
+      }, c, "BranchDevice", "getOpenData", d) : exec(function(a) {
+        console.log("Sending install with: " + goog.json.serialize(a));
+        e._api(resources.install, a, function(a) {
+          console.log("Install successful: " + a);
+          f(a);
+        });
+      }, c, "BranchDevice", "getInstallData", d)), config.WEB_BUILD) {
+        var g = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
+        e._api(resources._r, {v:config.version}, function(a, b) {
+          e._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+            g && (b.click_id = g);
+            f(b);
           });
         });
       }
@@ -1276,17 +1246,17 @@ Branch.prototype.init = wrap(2, function() {
   return a;
 }.apply(this, arguments));
 Branch.prototype.data = wrap(2, function(a) {
-  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+  "function" == typeof a && a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
 config.CORDOVA_BUILD && (Branch.prototype.first = wrap(2, function(a) {
-  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+  "function" == typeof a && a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 }));
 Branch.prototype.setIdentity = wrap(2, function(a, b) {
   this._api(resources.profile, {identity:b}, function(b, d) {
     this.identity_id = d.identity_id;
     this.sessionLink = d.link;
     this.identity = d.identity;
-    a(null, d);
+    "function" == typeof a && a(null, d);
   });
 });
 Branch.prototype.logout = wrap(1, function(a) {
@@ -1299,7 +1269,7 @@ config.CORDOVA_BUILD && (Branch.prototype.close = wrap(1, function(a) {
     delete b.sessionLink;
     b.initialized = !1;
     utils.clearStore(b._storage);
-    a(null);
+    "function" == typeof a && a(null);
   });
 }));
 Branch.prototype.track = wrap(1, function(a, b, c) {
@@ -1308,7 +1278,7 @@ Branch.prototype.track = wrap(1, function(a, b, c) {
 });
 Branch.prototype.link = wrap(2, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b, config), function(b, d) {
-    a(b, d && d.url);
+    "function" == typeof a && a(b, d && d.url);
   });
 });
 Branch.prototype.sendSMS = wrap(1, function(a, b, c, d) {
@@ -1366,10 +1336,10 @@ config.WEB_BUILD && (Branch.prototype.banner = wrap(0, function(a, b, c) {
   make_new_link:!!b.make_new_link};
   "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
-  a();
+  "function" == typeof a && a();
 }), Branch.prototype.closeBanner = wrap(0, function(a) {
   this.closeBannerPointer && this.closeBannerPointer();
-  a();
+  "function" == typeof a && a();
 }));
 // Input 13
 var branch_instance = new Branch;
