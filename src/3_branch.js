@@ -808,16 +808,11 @@ if (config.CORDOVA_BUILD) {
  * ___
  *
  */
-	Branch.prototype['getCode'] = function(data, callback) {
-		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-		var self = this;
-		this._queue(function(next) {
-			data.type = "credit";
-			data.creation_type = 2;
-			self._api(resources.getCode, data, wrapErrorCallback2(callback, next));
-		});
-	};
+	Branch.prototype['getCode'] = wrap(2, function(done, data) {
+		data.type = "credit";
+		data.creation_type = 2;
+		this._api(resources.getCode, data, done);
+	});
 }
 
 if (config.CORDOVA_BUILD) {
@@ -865,14 +860,9 @@ if (config.CORDOVA_BUILD) {
  * ___
  *
  */
-	Branch.prototype['validateCode'] = function(code, callback) {
-		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-		var self = this;
-		this._queue(function(next) {
-			self._api(resources.validateCode, { "code": code }, wrapErrorCallback2(callback, next));
-		});
-	};
+	Branch.prototype['validateCode'] = wrap(1, function(done, code) {
+		this._api(resources.validateCode, { "code": code }, done);
+	});
 }
 
 if (config.CORDOVA_BUILD) {
@@ -922,14 +912,9 @@ if (config.CORDOVA_BUILD) {
  * ## Credit Functions
  *
  */
-	Branch.prototype['applyCode'] = function(code, callback) {
-		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-		var self = this;
-		this._queue(function(next) {
-			self._api(resources.applyCode, { "code": code }, wrapErrorCallback2(callback, next));
-		});
-	};
+	Branch.prototype['applyCode'] = wrap(1, function(done, code) {
+		this._api(resources.applyCode, { "code": code }, done);
+	});
 }
 
 /**

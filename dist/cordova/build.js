@@ -1346,35 +1346,17 @@ Branch.prototype.sendSMS = function(a, b, c, d) {
 Branch.prototype.referrals = wrap(2, function(a) {
   this._api(resources.referrals, {}, a);
 });
-config.CORDOVA_BUILD && (Branch.prototype.getCode = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
-  var c = this;
-  this._queue(function(d) {
-    a.type = "credit";
-    a.creation_type = 2;
-    c._api(resources.getCode, a, wrapErrorCallback2(b, d));
-  });
-});
-config.CORDOVA_BUILD && (Branch.prototype.validateCode = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
-  var c = this;
-  this._queue(function(d) {
-    c._api(resources.validateCode, {code:a}, wrapErrorCallback2(b, d));
-  });
-});
-config.CORDOVA_BUILD && (Branch.prototype.applyCode = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
-  var c = this;
-  this._queue(function(d) {
-    c._api(resources.applyCode, {code:a}, wrapErrorCallback2(b, d));
-  });
-});
+config.CORDOVA_BUILD && (Branch.prototype.getCode = wrap(2, function(a, b) {
+  b.type = "credit";
+  b.creation_type = 2;
+  this._api(resources.getCode, b, a);
+}));
+config.CORDOVA_BUILD && (Branch.prototype.validateCode = wrap(1, function(a, b) {
+  this._api(resources.validateCode, {code:b}, a);
+}));
+config.CORDOVA_BUILD && (Branch.prototype.applyCode = wrap(1, function(a, b) {
+  this._api(resources.applyCode, {code:b}, a);
+}));
 Branch.prototype.credits = function(a) {
   if (!this.initialized) {
     return wrapError(Error(utils.message(utils.messages.nonInit)), a);
