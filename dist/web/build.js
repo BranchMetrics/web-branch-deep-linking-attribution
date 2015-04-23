@@ -1280,46 +1280,20 @@ Branch.prototype.init = wrap(2, function() {
   a.init = !0;
   return a;
 }.apply(this, arguments));
-Branch.prototype.data = function(a) {
-  if (a) {
-    if (!this.initialized) {
-      return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-    }
-    var b = this;
-    this._queue(function(c) {
-      a(null, utils.whiteListSessionData(utils.readStore(b._storage)));
-      c();
-    });
-  }
-};
-config.CORDOVA_BUILD && (Branch.prototype.first = function(a) {
-  if (a) {
-    if (!this.initialized) {
-      return wrapError(Error(utils.message(utils.messages.nonInit)), a);
-    }
-    var b = this;
-    this._queue(function(c) {
-      a(null, utils.whiteListSessionData(utils.readStore(b._permStorage)));
-      c();
-    });
-  }
+Branch.prototype.data = wrap(2, function(a) {
+  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
-Branch.prototype.setIdentity = function(a, b) {
-  if (!this.initialized) {
-    return wrapError(Error(utils.message(utils.messages.nonInit)), b);
-  }
-  var c = this;
-  this._queue(function(d) {
-    config.CORDOVA_BUILD && c._api(resources.profile, {identity:a}, wrapErrorFunc(function(a) {
-      c.identity_id = a.identity_id;
-      c.sessionLink = a.link;
-      c.identity = a.identity;
-      d();
-      b && b(null, a);
-    }, b));
-    config.WEB_BUILD && c._api(resources.profile, {identity:a}, wrapErrorCallback2(b, d));
+config.CORDOVA_BUILD && (Branch.prototype.first = wrap(2, function(a) {
+  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+}));
+Branch.prototype.setIdentity = wrap(2, function(a, b) {
+  this._api(resources.profile, {identity:b}, function(b, d) {
+    this.identity_id = d.identity_id;
+    this.sessionLink = d.link;
+    this.identity = d.identity;
+    a(null, d);
   });
-};
+});
 Branch.prototype.logout = function(a) {
   if (!this.initialized) {
     return wrapError(Error(utils.message(utils.messages.nonInit)), a);

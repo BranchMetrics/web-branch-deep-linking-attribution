@@ -338,16 +338,9 @@ Branch.prototype['init'] = wrap(2, (function() {
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
-Branch.prototype['data'] = function(callback) {
-	if (!callback) { return; }
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
-	this._queue(function(next) {
-		callback(null, utils.whiteListSessionData(utils.readStore(self._storage)));
-		next();
-	});
-};
+Branch.prototype['data'] = wrap(2, function(done) {
+	done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+});
 
 if (config.CORDOVA_BUILD) {
 /**
@@ -366,16 +359,9 @@ if (config.CORDOVA_BUILD) {
  * ___
  *
  */
-	Branch.prototype['first'] = function(callback) {
-		if (!callback) { return; }
-		if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-		var self = this;
-		this._queue(function(next) {
-			callback(null, utils.whiteListSessionData(utils.readStore(self._permStorage)));
-			next();
-		});
-	};
+	Branch.prototype['first'] = wrap(2, function(done) {
+		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+	});
 }
 
 /**
@@ -411,30 +397,14 @@ if (config.CORDOVA_BUILD) {
  * ```
  * ___
  */
-Branch.prototype['setIdentity'] = function(identity, callback) {
-	if (!this.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
-
-	var self = this;
-	this._queue(function(next) {
-		function setBranchValues(data) {
-			self.identity_id = data['identity_id'];
-			self.sessionLink = data['link'];
-			self.identity = data['identity'];
-		}
-
-		if (config.CORDOVA_BUILD) {
-			self._api(resources.profile, { "identity": identity }, wrapErrorFunc(function(data) {
-				setBranchValues(data);
-				next();
-				if (callback) { callback(null, data); }
-			}, callback));
-		}
-
-		if (config.WEB_BUILD) {
-			self._api(resources.profile, { "identity": identity }, wrapErrorCallback2(callback, next));
-		}
+Branch.prototype['setIdentity'] = wrap(2, function(done, identity) {
+	this._api(resources.profile, { "identity": identity }, function(err, data) {
+		this.identity_id = data['identity_id'];
+		this.sessionLink = data['link'];
+		this.identity = data['identity'];
+		done(null, data);
 	});
-};
+});
 
 /**
  * @function Branch.logout
