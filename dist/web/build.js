@@ -1146,29 +1146,25 @@ if (config.CORDOVA_BUILD) {
 }
 var default_branch;
 function wrap(a, b) {
-  function c(a, b) {
-    if (b) {
-      return b(a);
-    }
-    throw a;
-  }
   return function() {
-    var d = this, e, f, g = arguments[arguments.length - 1];
-    0 === a || "function" != typeof g ? (f = function(a) {
-      throw a;
-    }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
-    d._queue(function(g) {
-      if (!b.init && !d.initialized) {
-        return c(Error(utils.message(utils.messages.nonInit)), f);
+    var c = this, d, e, f = arguments[arguments.length - 1];
+    0 === a || "function" != typeof f ? (e = function(a) {
+      if (a) {
+        throw a;
       }
-      e.unshift(function(b, c) {
-        if (b) {
+    }, d = Array.prototype.slice.call(arguments)) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], e = f);
+    c._queue(function(f) {
+      if (!b.init && !c.initialized) {
+        return e(Error(utils.message(utils.messages.nonInit)));
+      }
+      d.unshift(function(b, c) {
+        if (b && 0 === a) {
           throw b;
         }
-        1 === a ? f(b) : 2 === a && f(b, c);
-        g();
+        1 === a ? e(b) : 2 === a && e(b, c);
+        f();
       });
-      b.apply(d, e);
+      b.apply(c, d);
     });
   };
 }
@@ -1202,18 +1198,12 @@ Branch.prototype.init = wrap(2, function() {
     d && "function" == typeof d && (d = {isReferrable:null});
     c = d && "undefined" != typeof d.isReferrable && null !== d.isReferrable ? d.isReferrable : null;
     d = utils.readStore(e._storage);
-    var f = function(c) {
-      config.CORDOVA_BUILD && utils.store(c, e._permStorage);
-      utils.store(c, e._storage);
-      e.session_id = c.session_id;
-      e.identity_id = c.identity_id;
-      e.sessionLink = c.link;
-      e.initialized = !0;
-      config.CORDOVA_BUILD && (e.device_fingerprint_id = c.device_fingerprint_id, e.link_click_id = c.link_click_id);
-      a(null, utils.whiteListSessionData(c));
+    var f = function(c, d) {
+      d && (config.CORDOVA_BUILD && utils.store(d, e._permStorage), utils.store(d, e._storage), e.session_id = d.session_id, e.identity_id = d.identity_id, e.sessionLink = d.link, e.initialized = !0, config.CORDOVA_BUILD && (e.device_fingerprint_id = d.device_fingerprint_id, e.link_click_id = d.link_click_id));
+      a(c, d && utils.whiteListSessionData(d));
     };
     if (d && d.session_id) {
-      f(d);
+      f(null, d);
     } else {
       if (config.CORDOVA_BUILD && (d = [], d.push(e.debug), null !== c && d.push(c ? 1 : 0), c = function() {
         a("Error getting device data!");
@@ -1223,20 +1213,21 @@ Branch.prototype.init = wrap(2, function() {
           a.identity_id = utils.readKeyValue("identity_id", e._permStorage);
           a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", e._permStorage);
           console.log("Open successful: " + a);
-          f(a);
+          f(null, a);
         });
       }, c, "BranchDevice", "getOpenData", d) : exec(function(a) {
         console.log("Sending install with: " + goog.json.serialize(a));
         e._api(resources.install, a, function(a) {
           console.log("Install successful: " + a);
-          f(a);
+          f(null, a);
         });
       }, c, "BranchDevice", "getInstallData", d)), config.WEB_BUILD) {
         var g = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
         e._api(resources._r, {v:config.version}, function(a, b) {
+          a && f(a, null);
           e._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
             g && (b.click_id = g);
-            f(b);
+            f(a, b);
           });
         });
       }
@@ -1244,7 +1235,7 @@ Branch.prototype.init = wrap(2, function() {
   };
   a.init = !0;
   return a;
-}.apply(this, arguments));
+}());
 Branch.prototype.data = wrap(2, function(a) {
   "function" == typeof a && a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });

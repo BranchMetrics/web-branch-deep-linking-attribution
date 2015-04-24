@@ -37,12 +37,11 @@ function wrap(parameters, func) {
 	}
 
 	var r = function() {
-		var noqueue = false;
 		var self = this, args, callback,
 		lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg != "function") {
 			callback = function(err) {
-				throw(err);
+				if (err) { throw(err); }
 			};
 			args = Array.prototype.slice.call(arguments);
 		}
@@ -51,9 +50,9 @@ function wrap(parameters, func) {
 			callback = lastArg;
 		}
 		self._queue(function(next) {
-			if (!func.init && !self.initialized) { return wrapError(new Error(utils.message(utils.messages.nonInit)), callback); }
+			if (!func.init && !self.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 			var done = function(err, data) {
-				if (err) { throw err; }
+				if (err && parameters === callback_params.NO_CALLBACK) { throw err; }
 				else if (parameters === callback_params.CALLBACK_ERR) {
 					callback(err);
 				}
@@ -208,17 +207,19 @@ Branch.prototype['init'] = wrap(2, (function() {
 			}
 		}
 
-		var finishInit = function(data) {
-			if (config.CORDOVA_BUILD) {
-				utils.store(data, self._permStorage);
+		var finishInit = function(err, data) {
+			if (data) {
+				if (config.CORDOVA_BUILD) {
+					utils.store(data, self._permStorage);
+				}
+				utils.store(data, self._storage);
+				setBranchValues(data);
 			}
-			utils.store(data, self._storage);
-			setBranchValues(data);
-			done(null, utils.whiteListSessionData(data));
+			done(err, data && utils.whiteListSessionData(data));
 		};
 
 		if (sessionData  && sessionData['session_id']) {
-			finishInit(sessionData);
+			finishInit(null, sessionData);
 		}
 		else {
 			if (config.CORDOVA_BUILD) {
@@ -238,7 +239,7 @@ Branch.prototype['init'] = wrap(2, (function() {
 							data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
 							data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
 							console.log("Open successful: " + data);
-							finishInit(data);
+							finishInit(null, data);
 						});
 					}, cordovaError,  "BranchDevice", "getOpenData", args);
 				}
@@ -247,7 +248,7 @@ Branch.prototype['init'] = wrap(2, (function() {
 						console.log("Sending install with: " + goog.json.serialize(data));
 						self._api(resources.install, data, function(data) {
 							console.log("Install successful: " + data);
-							finishInit(data);
+							finishInit(null, data);
 						});
 					}, cordovaError,  "BranchDevice", "getInstallData", args);
 				}
@@ -256,13 +257,14 @@ Branch.prototype['init'] = wrap(2, (function() {
 			if (config.WEB_BUILD) {
 				var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 				self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+					if (err) { finishInit(err, null); }
 					self._api(resources.open, {
 						"link_identifier": link_identifier,
 						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id
 					}, function(err, data) {
 						if (link_identifier) { data['click_id'] = link_identifier; }
-						finishInit(data);
+						finishInit(err, data);
 					});
 				});
 			}
@@ -270,7 +272,7 @@ Branch.prototype['init'] = wrap(2, (function() {
 	};
 	initialization.init = true;
 	return initialization;
-}.apply(this, arguments)));
+}()));
 
 /**
  * @function Branch.data
