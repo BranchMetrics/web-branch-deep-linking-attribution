@@ -523,8 +523,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
-      g[h - 2] = arguments[h];
+    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
+      g[k - 2] = arguments[k];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -816,14 +816,14 @@ utils.isKey = function(a) {
   return-1 < a.indexOf("key_");
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
     ;
   }
   return b;
@@ -1067,24 +1067,24 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 11
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
   }, p = function() {
-    k = a.createElement("div");
-    k.className = "branch-icon-wrapper";
-    k.id = "branch-checkmark";
-    k.style = "opacity: 0;";
-    k.innerHTML = banner_html.checkmark();
-    h.appendChild(k);
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      k.style.opacity = "1";
+      h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, m = function() {
@@ -1100,7 +1100,7 @@ var sendSMS = function(a, b, c, d) {
     var n = e.value;
     /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
       a ? m() : (p(), setTimeout(function() {
-        h.removeChild(k);
+        k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
     })) : m();
@@ -1117,7 +1117,7 @@ var sendSMS = function(a, b, c, d) {
       d.preventDefault();
       sendSMS(f, a, b, c);
     });
-    var g = f.getElementById("branch-banner-close"), h = function() {
+    var g = f.getElementById("branch-banner-close"), k = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1130,14 +1130,14 @@ var sendSMS = function(a, b, c, d) {
     };
     g && (g.onclick = function(a) {
       a.preventDefault();
-      h();
+      k();
     });
     document.body.className += " branch-animation";
     document.body.style.marginTop = banner_utils.bannerHeight;
     setTimeout(function() {
       e.style.top = "0";
     }, banner_utils.animationDelay);
-    return h;
+    return k;
   }
 };
 // Input 12
@@ -1145,27 +1145,27 @@ if (config.CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2};
-function wrap(a, b) {
+function wrap(a, b, c) {
   return function() {
-    var c = this, d, e, f = arguments[arguments.length - 1];
-    a === callback_params.NO_CALLBACK || "function" != typeof f ? (e = function(a) {
+    var d = this, e, f, g = arguments[arguments.length - 1];
+    a === callback_params.NO_CALLBACK || "function" != typeof g ? (f = function(a) {
       if (a) {
         throw a;
       }
-    }, d = Array.prototype.slice.call(arguments)) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], e = f);
-    c._queue(function(f) {
+    }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
+    d._queue(function(g) {
       var h = function(b, c) {
         if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
-        a === callback_params.CALLBACK_ERR ? e(b) : a === callback_params.CALLBACK_ERR_DATA && e(b, c);
-        f();
+        a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+        g();
       };
-      if (!b.init && !c.initialized) {
+      if (!c && !d.initialized) {
         return h(Error(utils.message(utils.messages.nonInit)), null);
       }
-      d.unshift(h);
-      b.apply(c, d);
+      e.unshift(h);
+      b.apply(d, e);
     });
   };
 }
@@ -1192,51 +1192,47 @@ Branch.prototype._api = function(a, b, c) {
 config.CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
   this.debug = a;
 });
-Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function() {
-  var a = function(a, c, d) {
-    var e = this;
-    utils.isKey(c) ? e.branch_key = c : e.app_id = c;
-    d && "function" == typeof d && (d = {isReferrable:null});
-    c = d && "undefined" != typeof d.isReferrable && null !== d.isReferrable ? d.isReferrable : null;
-    d = utils.readStore(e._storage);
-    var f = function(c, d) {
-      d && (config.CORDOVA_BUILD && utils.store(d, e._permStorage), utils.store(d, e._storage), e.session_id = d.session_id, e.identity_id = d.identity_id, e.sessionLink = d.link, e.initialized = !0, config.CORDOVA_BUILD && (e.device_fingerprint_id = d.device_fingerprint_id, e.link_click_id = d.link_click_id));
-      a(c, d && utils.whiteListSessionData(d));
-    };
-    if (d && d.session_id) {
-      f(null, d);
-    } else {
-      if (config.CORDOVA_BUILD && (d = [], d.push(e.debug), null !== c && d.push(c ? 1 : 0), c = function() {
-        a("Error getting device data!");
-      }, utils.readKeyValue("identity_id", e._permStorage) ? exec(function(a) {
-        console.log("Sending open with: " + goog.json.serialize(a));
-        e._api(resources.open, a, function(a) {
-          a.identity_id = utils.readKeyValue("identity_id", e._permStorage);
-          a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", e._permStorage);
-          console.log("Open successful: " + a);
-          f(null, a);
-        });
-      }, c, "BranchDevice", "getOpenData", d) : exec(function(a) {
-        console.log("Sending install with: " + goog.json.serialize(a));
-        e._api(resources.install, a, function(a) {
-          console.log("Install successful: " + a);
-          f(null, a);
-        });
-      }, c, "BranchDevice", "getInstallData", d)), config.WEB_BUILD) {
-        var g = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
-        e._api(resources._r, {v:config.version}, function(a, b) {
-          a && f(a, null);
-          e._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-            g && (b.click_id = g);
-            f(a, b);
-          });
-        });
-      }
-    }
+Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
+  var d = this;
+  utils.isKey(b) ? d.branch_key = b : d.app_id = b;
+  c && "function" == typeof c && (c = {isReferrable:null});
+  b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
+  c = utils.readStore(d._storage);
+  var e = function(b, c) {
+    c && (config.CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id, d.identity_id = c.identity_id, d.sessionLink = c.link, d.initialized = !0, config.CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id));
+    a(b, c && utils.whiteListSessionData(c));
   };
-  a.init = !0;
-  return a;
-}());
+  if (c && c.session_id) {
+    e(null, c);
+  } else {
+    if (config.CORDOVA_BUILD && (c = [], c.push(d.debug), null !== b && c.push(b ? 1 : 0), b = function() {
+      a("Error getting device data!");
+    }, utils.readKeyValue("identity_id", d._permStorage) ? exec(function(a) {
+      console.log("Sending open with: " + goog.json.serialize(a));
+      d._api(resources.open, a, function(a) {
+        a.identity_id = utils.readKeyValue("identity_id", d._permStorage);
+        a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
+        console.log("Open successful: " + a);
+        e(null, a);
+      });
+    }, b, "BranchDevice", "getOpenData", c) : exec(function(a) {
+      console.log("Sending install with: " + goog.json.serialize(a));
+      d._api(resources.install, a, function(a) {
+        console.log("Install successful: " + a);
+        e(null, a);
+      });
+    }, b, "BranchDevice", "getInstallData", c)), config.WEB_BUILD) {
+      var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
+      d._api(resources._r, {v:config.version}, function(a, b) {
+        a && e(a, null);
+        d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+          f && (b.click_id = f);
+          e(a, b);
+        });
+      });
+    }
+  }
+}, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });

@@ -25,8 +25,12 @@ var callback_params = {
   CALLBACK_ERR: 1,
   CALLBACK_ERR_DATA: 2
 };
-
-function wrap(parameters, func) {
+/***
+ * @param {number} parameters
+ * @param {function} func
+ * @param {boolean=} init
+ **/
+function wrap(parameters, func, init) {
 	var r = function() {
 		var self = this, args, callback,
 		lastArg = arguments[arguments.length - 1];
@@ -51,7 +55,7 @@ function wrap(parameters, func) {
 				}
 				next();
 			};
-			if (!func.init && !self.initialized) { return done(new Error(utils.message(utils.messages.nonInit)), null); }
+			if (!init && !self.initialized) { return done(new Error(utils.message(utils.messages.nonInit)), null); }
 			args.unshift(done);
 			func.apply(self, args);
 		});
@@ -171,99 +175,95 @@ if (config.CORDOVA_BUILD) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, (function() {
-	var initialization = function(done, branch_key, options) {
-		var self = this;
-		if (utils.isKey(branch_key)) {
-			self.branch_key = branch_key;
-		}
-		else {
-			self.app_id = branch_key;
-		}
-		if (options && typeof options == 'function') {
-			options = { isReferrable: null };
-		}
-		var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-		var sessionData = utils.readStore(self._storage);
+Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
+	var self = this;
+	if (utils.isKey(branch_key)) {
+		self.branch_key = branch_key;
+	}
+	else {
+		self.app_id = branch_key;
+	}
+	if (options && typeof options == 'function') {
+		options = { isReferrable: null };
+	}
+	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var sessionData = utils.readStore(self._storage);
 
-		function setBranchValues(data) {
-			self.session_id = data['session_id'];
-			self.identity_id = data['identity_id'];
-			self.sessionLink = data['link'];
-			self.initialized = true;
+	function setBranchValues(data) {
+		self.session_id = data['session_id'];
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data['link'];
+		self.initialized = true;
 
+		if (config.CORDOVA_BUILD) {
+			self.device_fingerprint_id = data['device_fingerprint_id'];
+			self.link_click_id = data['link_click_id'];
+		}
+	}
+
+	var finishInit = function(err, data) {
+		if (data) {
 			if (config.CORDOVA_BUILD) {
-				self.device_fingerprint_id = data['device_fingerprint_id'];
-				self.link_click_id = data['link_click_id'];
+				utils.store(data, self._permStorage);
 			}
+			utils.store(data, self._storage);
+			setBranchValues(data);
 		}
-
-		var finishInit = function(err, data) {
-			if (data) {
-				if (config.CORDOVA_BUILD) {
-					utils.store(data, self._permStorage);
-				}
-				utils.store(data, self._storage);
-				setBranchValues(data);
-			}
-			done(err, data && utils.whiteListSessionData(data));
-		};
-
-		if (sessionData  && sessionData['session_id']) {
-			finishInit(null, sessionData);
-		}
-		else {
-			if (config.CORDOVA_BUILD) {
-				var args = [], execFunc;
-				args.push(self.debug);
-				if (isReferrable !== null) {
-					args.push(isReferrable ? 1 : 0);
-				}
-				var cordovaError = function() {
-					done("Error getting device data!");
-				};
-				// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
-				if (utils.readKeyValue('identity_id', self._permStorage)) {
-					exec(function(data) {
-						console.log("Sending open with: " + goog.json.serialize(data));
-						self._api(resources.open, data, function(data) {
-							data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
-							data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-							console.log("Open successful: " + data);
-							finishInit(null, data);
-						});
-					}, cordovaError,  "BranchDevice", "getOpenData", args);
-				}
-				else {
-					exec(function(data) {
-						console.log("Sending install with: " + goog.json.serialize(data));
-						self._api(resources.install, data, function(data) {
-							console.log("Install successful: " + data);
-							finishInit(null, data);
-						});
-					}, cordovaError,  "BranchDevice", "getInstallData", args);
-				}
-			}
-
-			if (config.WEB_BUILD) {
-				var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-				self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
-					if (err) { finishInit(err, null); }
-					self._api(resources.open, {
-						"link_identifier": link_identifier,
-						"is_referrable": 1,
-						"browser_fingerprint_id": browser_fingerprint_id
-					}, function(err, data) {
-						if (link_identifier) { data['click_id'] = link_identifier; }
-						finishInit(err, data);
-					});
-				});
-			}
-		}
+		done(err, data && utils.whiteListSessionData(data));
 	};
-	initialization.init = true;
-	return initialization;
-}()));
+
+	if (sessionData  && sessionData['session_id']) {
+		finishInit(null, sessionData);
+	}
+	else {
+		if (config.CORDOVA_BUILD) {
+			var args = [], execFunc;
+			args.push(self.debug);
+			if (isReferrable !== null) {
+				args.push(isReferrable ? 1 : 0);
+			}
+			var cordovaError = function() {
+				done("Error getting device data!");
+			};
+			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
+			if (utils.readKeyValue('identity_id', self._permStorage)) {
+				exec(function(data) {
+					console.log("Sending open with: " + goog.json.serialize(data));
+					self._api(resources.open, data, function(data) {
+						data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
+						data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
+						console.log("Open successful: " + data);
+						finishInit(null, data);
+					});
+				}, cordovaError,  "BranchDevice", "getOpenData", args);
+			}
+			else {
+				exec(function(data) {
+					console.log("Sending install with: " + goog.json.serialize(data));
+					self._api(resources.install, data, function(data) {
+						console.log("Install successful: " + data);
+						finishInit(null, data);
+					});
+				}, cordovaError,  "BranchDevice", "getInstallData", args);
+			}
+		}
+
+		if (config.WEB_BUILD) {
+			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
+			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+				if (err) { finishInit(err, null); }
+				self._api(resources.open, {
+					"link_identifier": link_identifier,
+					"is_referrable": 1,
+					"browser_fingerprint_id": browser_fingerprint_id
+				}, function(err, data) {
+					if (link_identifier) { data['click_id'] = link_identifier; }
+					finishInit(err, data);
+				});
+			});
+		}
+	}
+}, true);
 
 /**
  * @function Branch.data
