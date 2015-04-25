@@ -8,7 +8,7 @@ Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.ht
 
 The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~7K gzipped.
 
-To use the Web SDK, you'll need to first initialize it with your API key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
+To use the Web SDK, you'll need to first initialize it with your Branch Key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
 
 Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
 
@@ -23,22 +23,24 @@ This SDK requires native browser Javascript and has been tested in all modern br
 | ------ | ------- | ------ | ---------- |
 |    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
 
-### API Key
+### Branch Key (formerly App ID)
 
-You will need to create a [Branch Metrics app](http://branch.io) to obtain your app_key.
+You will need to create a [Branch Metrics app](http://branch.io) to obtain your Branch Key (you will have the option to toggle between live and test modes).
 
 ### Quick Install (Web SDK)
 
 #### Manual installation
 
-_Be sure to replace `APP-KEY` with your actual app key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+_Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+
+**[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test API keys.
 
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.3.4.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.4.0.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
-	branch.init('APP-KEY', function(err, data) {
+	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
 	});
 </script>
@@ -60,19 +62,29 @@ This Web SDK can also be used for Cordova/Phonegap applications.  It is provided
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
 ```
 
+**For a full walktrough specific to integrating the Web SDK with a Cordova app, see the [Cordova Guide](CORDOVA_GUIDE.md).**
+
 Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
 
 #### Initialization and Event Handling
 
-You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below.  You will need your app id from the Branch dashboard.
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
-        branch.init(‘YOUR APP KEY HERE’, function(err, data) {
-        	app.initComplete(err, data);
-        });
+  branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
+  	app.initComplete(err, data);
+  });
 ```
 
 The session close will be sent automatically on any ‘pause’ event.
+
+### SDK Method Queue
+
+Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
+```js
+branch.init(...);
+branch.banner(...);
+```
 
 ## API Reference
 
@@ -105,6 +117,10 @@ ___
 
 * * *
 
+### done() 
+
+
+
 ### setDebug(debug) 
 
 **Parameters**
@@ -122,11 +138,11 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 
 
-### init(app_id, options, callback) 
+### init(branch_key, options, callback) 
 
 **Parameters**
 
-**app_id**: `string`, _required_ - Your Branch [app key](http://dashboard.branch.io/settings).
+**branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
 
 **options**: `Object`, _optional_ - options: isReferrable: Is this a referrable session.
 
@@ -150,7 +166,7 @@ the link the user was referred by.
 ##### Usage
 ```js
 branch.init(
-    app_id,
+    branch_key,
     callback (err, data),
     is_referrable
 );
@@ -413,7 +429,7 @@ ___
 A robust function to give your users the ability to share links via SMS. If
 the user navigated to this page via a Branch link, `sendSMS` will send that
 same link. Otherwise, it will create a new link with the data provided in
-the `metadata` argument. `sendSMS` also  registers a click event with the
+the `params` argument. `sendSMS` also  registers a click event with the
 `channel` pre-filled with `'sms'` before sending an sms to the provided
 `phone` parameter. This way the entire link click event is recorded starting
 with the user sending an sms.
@@ -564,7 +580,7 @@ branch.getCode(
       "calculation_type":1,
       "location":2
     }
-    callback (err)
+    callback (err, data)
 );
 ```
 
@@ -608,7 +624,7 @@ branch.validateCode(
 ```js
 branch.validateCode(
     "AB12CD",
-    function(err, data) {
+    function(err) {
         if (err) {
             console.log(err);
         } else {
@@ -622,7 +638,7 @@ branch.validateCode(
 ```js
 callback(
     "Error message",
-    callback(err, data)
+    callback(err)
 );
 ```
 
@@ -656,7 +672,7 @@ branch.applyCode(
 ```js
 branch.applyCode(
     "AB12CD",
-    function(err, data) {
+    function(err) {
         if (err) {
             console.log(err);
         } else {
@@ -670,7 +686,7 @@ branch.applyCode(
 ```js
 callback(
     "Error message",
-    callback(err, data)
+    callback(err)
 );
 ```
 
@@ -799,7 +815,7 @@ Credits are stored in `buckets`, which you can define as points, currency, whate
 
 ```js
 branch.redeem(
-    amount, // amount of credits to be redeemed
+    amount, // Amount of credits to be redeemed
     bucket,  // String of bucket name to redeem credits from
     callback (err)
 );
@@ -893,6 +909,19 @@ branch.banner({
         '$og_image_url': 'http://myappwebsite.com/image.png'
     }
 });
+```
+___
+
+### closeBanner()
+
+#### Closing the App Banner Programmatically
+
+The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
+other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
+
+##### Usage
+```js
+branch.closeBanner();
 ```
 
 

@@ -2,8 +2,6 @@
 
 [ $# -eq 0 ] && { echo "Usage: $0 v1.0.0"; exit 1; }
 
-gulp check
-
 VERSION=$1
 VERSION_NO_V=$(echo $VERSION | tr -d "\nv")
 DATE=$(date "+%Y-%m-%d")
@@ -45,7 +43,7 @@ read -p "Update plugin.xml? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	sed -i -e "s/\"version\"=\".*\"$/\"version\"=\"$VERSION_NO_V\",/" plugin.xml
+	sed -i -e "s/version=\".*\"/version=\"$VERSION_NO_V\"/" plugin.xml
 fi
 
 make release
@@ -68,8 +66,9 @@ read -p "Copy to S3? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/web/build.min.js.gz s3://branch-web-sdk/branch-$VERSION.min.js  --acl public-read
-	aws s3 cp testbeds/web/example.html s3://branch-web-sdk/example.html --acl public-read
+	make dist/web/build.min.js.gz
+	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/web/build.min.js.gz s3://branch-cdn/branch-v$VERSION.min.js  --acl public-read
+	aws s3 cp testbeds/web/example.html s3://branch-cdn/example.html --acl public-read
 fi
 
 read -p "Publish to NPM? " -n 1 -r
@@ -83,7 +82,7 @@ read -p "Reset? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	cat CHANGELOG.md | perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4'
+	perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
 	make clean && make
 	git commit -am"Resetting to HEAD"
 fi

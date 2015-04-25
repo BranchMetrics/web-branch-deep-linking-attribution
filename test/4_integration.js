@@ -8,6 +8,9 @@ goog.require('storage');
 
 goog.require('goog.json'); // jshint unused:false
 
+
+/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
+
 describe('Integration tests', function() {
 	// TODO: would be great to write some tests here which call the Branch API
 	// functions but stub out XHR.
@@ -37,7 +40,7 @@ describe('Integration tests', function() {
 		});
 
 		if (runInit) {
-			branch.init(app_id);
+			branch.init(branch_sample_key);
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
 			requests = [];
@@ -80,7 +83,7 @@ describe('Integration tests', function() {
 				"referring_identity": null
 			};
 
-			branch.init(app_id, function(err, res) {
+			branch.init(branch_sample_key, function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'expected response returned');
 				assert(!err, 'No error');
 			});
@@ -89,11 +92,11 @@ describe('Integration tests', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "v": config.version, app_id: app_id }, 'Request params to _r correct');
+			assert.deepEqual(requests[0].obj, { "v": config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
-				"app_id": app_id,
+				"branch_key": branch_sample_key,
 				"link_identifier": undefined,
 				"is_referrable": 1,
 				"browser_fingerprint_id": browser_fingerprint_id

@@ -187,7 +187,7 @@ assert.ifError = function(err) { if (err) { throw err; } };
 // ===================================================================================================
 
 
-window.app_id = '5680621892404085',
+window.branch_sample_key = 'key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS',
 window.session_id = '98807509250212101',
 window.identity_id = '98807509250212101',
 window.browser_fingerprint_id = '79336952217731267';
@@ -197,7 +197,7 @@ window.testUtils = testUtils = {};
 testUtils.params = function(extra, without) {
 	// Returns new object every time.
 	var p = utils.merge({
-		app_id: app_id,
+		branch_key: branch_sample_key,
 		session_id: session_id,
 		identity_id: identity_id,
 		browser_fingerprint_id: browser_fingerprint_id

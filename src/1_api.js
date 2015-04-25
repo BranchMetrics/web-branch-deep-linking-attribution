@@ -71,6 +71,22 @@ Server.prototype.getUrl = function(resource, data) {
 			}
 		}
 	}
+	// check for branch_key then app_id here
+	var branch_id = /^[0-9]{15,20}$/;
+	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
+
+	if (resource.method === "POST") {
+		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
+			d['branch_key'] = data['branch_key'];
+		}
+		else if (data['app_id'] && branch_id.test(data['app_id'])) {
+			d['app_id'] = data['app_id'];
+		}
+		else {
+			return { error: utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]) };
+		}
+	}
+
 	return { data: this.serializeObject(d, ''), url: url };
 };
 

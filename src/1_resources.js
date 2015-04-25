@@ -85,27 +85,28 @@ function defaults(obj) {
 	return utils.merge(obj, def);
 }
 
+
+
+
+
 if (config.WEB_BUILD) {
 	resources.open = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/open",
 		method:	 utils.httpMethod.POST,
 		params: {
-			"app_id": validator(true, branch_id),
 			"identity_id": validator(false, branch_id),
 			"link_identifier": validator(false, validationTypes.str),
 			"is_referrable": validator(true, validationTypes.num),
 			"browser_fingerprint_id": validator(true, branch_id)
 		}
 	};
-
 	resources._r = {
 		destination: config.link_service_endpoint,
 		endpoint: "/_r",
 		method: utils.httpMethod.GET,
 		jsonp: true,
 		params: {
-			"app_id": validator(true, branch_id),
 			"sdk": validator(true, validationTypes.str)
 		}
 	};
@@ -126,11 +127,9 @@ if (config.WEB_BUILD) {
 			"link_url": validator(true, validationTypes.str)
 		},
 		params: {
-			"phone": validator(true, validationTypes.str),
-			"app_id": validator(true, branch_id)
+			"phone": validator(true, validationTypes.str)
 		}
 	};
-
 }
 
 if (config.CORDOVA_BUILD) {
@@ -139,7 +138,6 @@ if (config.CORDOVA_BUILD) {
 		endpoint: "/v1/install",
 		method:	 utils.httpMethod.POST,
 		params: {
-			"app_id": validator(true, branch_id),
 			"link_identifier": validator(false, validationTypes.str),
 			"sdk": validator(false, validationTypes.str),
 			"hardware_id": validator(false, validationTypes.str),
@@ -169,7 +167,6 @@ if (config.CORDOVA_BUILD) {
 		endpoint: "/v1/open",
 		method:	 utils.httpMethod.POST,
 		params: {
-			"app_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"link_identifier": validator(false, validationTypes.str),
 			"device_fingerprint_id": validator(true, branch_id),
@@ -189,7 +186,6 @@ if (config.CORDOVA_BUILD) {
 		endpoint: "/v1/close",
 		method: utils.httpMethod.POST,
 		params: {
-			"app_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
 			"link_click_id": validator(false, branch_id),
@@ -203,7 +199,6 @@ if (config.CORDOVA_BUILD) {
 		endpoint: "/v1/credithistory",
 		method: utils.httpMethod.GET,
 		params: {
-			"app_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
 			"link_click_id": validator(false, branch_id),
@@ -221,7 +216,6 @@ if (config.CORDOVA_BUILD) {
 		endpoint: "/v1/referralcode",
 		method: utils.httpMethod.POST,
 		params: {
-			"app_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
@@ -243,7 +237,6 @@ if (config.CORDOVA_BUILD) {
 		method: utils.httpMethod.POST,
 		queryPart: { "code": validator(true, validationTypes.str) },
 		params: {
-			"app_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
@@ -257,7 +250,6 @@ if (config.CORDOVA_BUILD) {
 		method: utils.httpMethod.POST,
 		queryPart: { "code": validator(true, validationTypes.str) },
 		params: {
-			"app_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
