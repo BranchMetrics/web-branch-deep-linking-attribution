@@ -3,9 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+- Add Cordova version of SDK! Add Cordova guide and add upgrade guide
 - Fixes bug with app banner that caused the SMS waiting indicator to be misplaced
-- Correctly implements queue
-- Updates Cordova guide and adds upgrade guide
+- Correctly implement queue
 - Switches Web SDK to using Branch Key rather than App ID
 - Adds `closeBanner()` method
 
