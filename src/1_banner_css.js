@@ -23,12 +23,13 @@ banner_css.desktop =
 	'#branch-banner .title { font-size: 14px; }\n' +
 	'#branch-banner .description { font-size: 12px; font-weight: normal; }\n' +
 	'#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n' +
+	'#branch-sms-block { display: inline-block; }\n' +
 	'#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 125px; font-size: 14px; }\n' +
 	'#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n' +
 	'#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n' +
 	'#branch-sms-phone:focus, button:focus { outline: none; }\n' +
 	'#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n' +
-	'#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; position: absolute; margin-top: 3px; }\n' +
+	'#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; display: inline-block; margin-top: -18px; }\n' +
 	'@keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n' +
 	'@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n' +
 	'#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n';

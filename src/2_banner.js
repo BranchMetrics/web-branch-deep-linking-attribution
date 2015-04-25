@@ -90,20 +90,6 @@ var sendSMS = function(doc, branch, options, linkData) {
 	}
 };
 
-var closeBanner = function(element, storage) {
-	setTimeout(function() {
-		banner_utils.removeElement(element);
-		banner_utils.removeElement(document.getElementById('branch-css'));
-	}, banner_utils.animationSpeed + banner_utils.animationDelay);
-
-	setTimeout(function() {
-		document.body.style.marginTop = '0px';
-	}, banner_utils.animationDelay);
-	element.style.top = '-' + banner_utils.bannerHeight;
-
-	utils.storeKeyValue('hideBanner', true, storage);
-};
-
 /**
  * @param {Object} branch
  * @param {banner_utils.options} options
@@ -123,7 +109,7 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
-			if (utils.readKeyValue('click_id', storage) && !options.makeNewLink) {
+			if (utils.readKeyValue('click_id', storage) && !options.make_new_link) {
 				doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + utils.readKeyValue('click_id', storage);
 			}
 			else {
@@ -144,11 +130,25 @@ banner = function(branch, options, linkData, storage) {
 				sendSMS(doc, branch, options, linkData);
 			});
 		}
+
 		var closeButton = doc.getElementById('branch-banner-close');
+		var closeBanner = function() {
+			setTimeout(function() {
+				banner_utils.removeElement(element);
+				banner_utils.removeElement(document.getElementById('branch-css'));
+			}, banner_utils.animationSpeed + banner_utils.animationDelay);
+
+			setTimeout(function() {
+				document.body.style.marginTop = '0px';
+			}, banner_utils.animationDelay);
+			element.style.top = '-' + banner_utils.bannerHeight;
+
+			utils.storeKeyValue('hideBanner', true, storage);
+		};
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
-				closeBanner(element, storage);
+				closeBanner();
 			};
 		}
 
@@ -158,5 +158,7 @@ banner = function(branch, options, linkData, storage) {
 		setTimeout(function() {
 			element.style.top = '0';
 		}, banner_utils.animationDelay);
+
+		return closeBanner;
 	}
 };

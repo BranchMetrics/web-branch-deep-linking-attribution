@@ -1,3 +1,4 @@
+
 // Intercept form submission.
 function dummy() {
 }
@@ -7,7 +8,7 @@ var app = {
     initialize: function() {
         this.bindEvents();
     },
-    
+
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
@@ -16,19 +17,19 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
         document.addEventListener('resume', this.onResume, false);
     },
-    
+
     // deviceready Event Handler
     onDeviceReady: function() {
         console.log("Device ready");
         branch.setDebug(true);
     	console.log("Sending init");
-        branch.init('YOUR APP ID HERE', { isReferrable: true }, function(err, data) {
+        branch.init('5680621892404085', { isReferrable: true }, function(err, data) {
         	app.initComplete(err, data);
         });
         var statusEle = document.getElementById("status");
         statusEle.innerHTML = "Ready..."
     },
-    
+
     // pause Event Handler
     onPause: function() {
     	console.log("Sending close.");
@@ -43,7 +44,7 @@ var app = {
         	}
    		});
     },
-    
+
     // resume Event Handler
     onResume: function() {
     	console.log("Sending init");
@@ -51,7 +52,7 @@ var app = {
         	app.initComplete(err, data);
         });
     },
-    
+
     initComplete: function(err, data) {
         var statusEle = document.getElementById("status");
         var firstEle = document.getElementById("first");
@@ -78,7 +79,7 @@ var app = {
             });
     	}
     },
-    
+
     createUrl: function() {
         console.log("Create URL clicked");
         var aliasEle = document.getElementById("alias");
@@ -134,7 +135,7 @@ var app = {
             }
         });
     },
-    
+
     login: function() {
     	console.log("Sending login");
     	var nameEle = document.getElementById("name");
@@ -155,7 +156,7 @@ var app = {
     		});
     	}
     },
-    
+
     logout: function() {
     	console.log("Sending logout");
 		branch.logout(function (err) {
@@ -171,7 +172,7 @@ var app = {
 			}
 		});
     },
-    
+
     sendEmail: function() {
         var urlEle = document.getElementById("url_label");
         var message = "Follow this link to the new app! " + urlEle.innerHTML;
@@ -181,7 +182,7 @@ var app = {
                 body: message
             });
     },
-    
+
     completeAction: function() {
     	var eventEle = document.getElementById("event");
     	var statusEle = document.getElementById("status");
@@ -201,7 +202,7 @@ var app = {
             });
     	}
     },
-    
+
     loadActions: function() {
     	var actionsEle = document.getElementById("actions");
     	var statusEle = document.getElementById("status");
@@ -221,7 +222,7 @@ var app = {
         	}
         });
     },
-    
+
     createCode: function() {
     	var prefixEle = document.getElementById("prefix");
     	var amountEle = document.getElementById("amount");
@@ -231,7 +232,7 @@ var app = {
     	var expirationEle = document.getElementById("exp");
     	var codeEle = document.getElementById("code_label");
     	var statusEle = document.getElementById("status");
-    	
+
     	var val = {};
     	if (prefixEle.value) {
     		val.prefix = prefixEle.value;
@@ -251,7 +252,7 @@ var app = {
     	}
     	val.calculation_type = parseInt(typeEle.value);
     	val.location = parseInt(locationEle.value);
-    	
+
     	console.log("Sending get code: " + JSON.stringify(val));
     	branch.getCode(val, function(err, data) {
     		if (err) {
@@ -265,7 +266,7 @@ var app = {
     		}
     	});
     },
-    
+
     validateCode: function() {
     	var codeEle = document.getElementById("av_code");
     	var codeStatusEle = document.getElementById("code_status_label");
@@ -287,7 +288,7 @@ var app = {
     		}
     	});
     },
-    
+
     applyCode: function() {
     	var codeEle = document.getElementById("av_code");
     	var codeStatusEle = document.getElementById("code_status_label");
@@ -309,8 +310,8 @@ var app = {
     		}
     	});
     },
-    
-    
+
+
     redeemRewards: function() {
     	var amountEle = document.getElementById("rewards_amount");
     	var bucketEle = document.getElementById("rewards_bucket");
@@ -329,8 +330,8 @@ var app = {
     		}
     	});
     },
-    
-    
+
+
     getCredits: function() {
     	var amountEle = document.getElementById("rewards_amount");
     	var bucketEle = document.getElementById("rewards_bucket");
@@ -349,8 +350,8 @@ var app = {
     		}
     	});
     },
-    
-    
+
+
     getCreditHistory: function() {
     	var amountEle = document.getElementById("rewards_amount");
     	var bucketEle = document.getElementById("rewards_bucket");

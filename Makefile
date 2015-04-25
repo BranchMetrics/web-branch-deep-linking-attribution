@@ -73,3 +73,4 @@ endif
 README.md: docs/0_intro.md docs/3_branch.md
 	cat docs/0_intro.md docs/3_branch.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
+

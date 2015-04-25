@@ -36,14 +36,14 @@ banner_html.mobileAction = function(options, storage) {
 };
 
 banner_html.desktopAction =
+	'<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;">' +
+		'<div id="branch-spinner"></div>' +
+	'</div>' +
 	'<div id="branch-sms-block">' +
 		'<form id="sms-form">' +
 			'<input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="(999) 999-9999">' +
 			'<button type="submit" id="branch-sms-send" class="branch-animation" >Send Link</button>' +
 		'</form>' +
-	'</div>' +
-	'<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;">' +
-		'<div id="branch-spinner"></div>' +
 	'</div>';
 
 banner_html.checkmark = function() {
