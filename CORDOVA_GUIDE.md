@@ -33,7 +33,7 @@ This deep link routing callback is called 100% of the time on init, with your li
 // Arguments
 // arg1: Your Branch Key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard
 // arg2: the callback to notify you that the instance has instantiated
-branch.init("API-KEY", function(err, data) {
+branch.init("BRANCH KEY", function(err, data) {
   if (err) { return console.log(err); } // Error message if init is not successful
   console.log(JSON.stringify(data)); // object containing: data from referring link, referring identity, identity of user, and boolean indicating if user has the app installed on any device
 });

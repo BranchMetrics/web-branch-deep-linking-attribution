@@ -27,7 +27,7 @@ var callback_params = {
 };
 /***
  * @param {number} parameters
- * @param {function} func
+ * @param {function(...?): undefined} func
  * @param {boolean=} init
  **/
 function wrap(parameters, func, init) {
@@ -45,6 +45,9 @@ function wrap(parameters, func, init) {
 			callback = lastArg;
 		}
 		self._queue(function(next) {
+			/**
+			 * @type {function(?Error,?): undefined}
+			 */
 			var done = function(err, data) {
 				if (err && parameters === callback_params.NO_CALLBACK) { throw err; }
 				else if (parameters === callback_params.CALLBACK_ERR) {

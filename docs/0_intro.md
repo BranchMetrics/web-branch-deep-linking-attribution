@@ -31,7 +31,7 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 
 #### Manual installation
 
-_Be sure to replace `API-KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+_Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
 **[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test API keys.
 
@@ -40,7 +40,7 @@ _Be sure to replace `API-KEY` with your actual Branch Key found in your [account
 
 	// INSERT INIT CODE
 
-	branch.init('API-KEY', function(err, data) {
+	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
 	});
 </script>
