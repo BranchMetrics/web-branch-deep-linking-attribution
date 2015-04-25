@@ -80,7 +80,7 @@ utils.cleanLinkData = function(linkData, config) {
 	if (config.WEB_BUILD) {
 		linkData['source'] = 'web-sdk';
 		if (linkData['data']['$desktop_url'] !== undefined) {
-			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/([\?\&]_branch_match_id=\d+)/, '');
+			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '').replace(/([\?\&]_branch_match_id=\d+)/, '');
 		}
 	}
 	linkData['data'] = goog.json.serialize(linkData['data']);

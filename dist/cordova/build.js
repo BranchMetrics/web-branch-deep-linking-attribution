@@ -765,7 +765,7 @@ utils.whiteListSessionData = function(a) {
   return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null};
 };
 utils.cleanLinkData = function(a, b) {
-  b.WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/([\?\&]_branch_match_id=\d+)/, "")));
+  b.WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
   a.data = goog.json.serialize(a.data);
   return a;
 };
