@@ -287,7 +287,7 @@ Branch.prototype['init'] = wrap(2, (function() {
  * ___
  */
 Branch.prototype['data'] = wrap(2, function(done) {
-	if (typeof done == "function") { done(null, utils.whiteListSessionData(utils.readStore(this._storage))); }
+	done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
 
 if (config.CORDOVA_BUILD) {
@@ -308,7 +308,7 @@ if (config.CORDOVA_BUILD) {
  *
  */
 	Branch.prototype['first'] = wrap(2, function(done) {
-		if (typeof done == "function") { done(null, utils.whiteListSessionData(utils.readStore(this._storage))); }
+		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 	});
 }
 
@@ -350,7 +350,7 @@ Branch.prototype['setIdentity'] = wrap(2, function(done, identity) {
 		this.identity_id = data['identity_id'];
 		this.sessionLink = data['link'];
 		this.identity = data['identity'];
-		if (typeof done == "function") { done(null, data); }
+		done(null, data);
 	});
 });
 
@@ -415,7 +415,7 @@ if (config.CORDOVA_BUILD) {
 			delete self.sessionLink;
 			self.initialized = false;
 			utils.clearStore(self._storage);
-			if (typeof done == "function") { done(null); }
+			done(null);
 		});
 	});
 }
@@ -522,7 +522,7 @@ Branch.prototype['track'] = wrap(1, function(done, event, metadata) {
  */
 Branch.prototype['link'] = wrap(2, function(done, linkData) {
 	this._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
-		if (typeof done == "function") { done(err, data && data['url']); }
+		done(err, data && data['url']);
 	});
 });
 
@@ -1102,13 +1102,13 @@ if (config.WEB_BUILD) {
 			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 		}
 		this.closeBannerPointer = banner(this, bannerOptions, linkData, this._storage);
-		if (typeof done == "function") { done(); }
+		done();
 	});
 
 	Branch.prototype['closeBanner'] = wrap(0, function(done) {
 		if (this.closeBannerPointer) {
 			this.closeBannerPointer();
 		}
-		if (typeof done == "function") { done(); }
+		done();
 	});
 }
