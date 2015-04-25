@@ -765,7 +765,7 @@ utils.whiteListSessionData = function(a) {
   return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null};
 };
 utils.cleanLinkData = function(a, b) {
-  b.WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "")));
+  b.WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/([\?\&]_branch_match_id=\d+)/, "")));
   a.data = goog.json.serialize(a.data);
   return a;
 };
@@ -876,7 +876,7 @@ Server.prototype.getUrl = function(a, b) {
     }
   }
   c = /^[0-9]{15,20}$/;
-  d = /((?:[a-z][a-z]*[0-9]+[a-z0-9]*))/;
+  d = /key_(live|test)_[A-Za-z0-9]{32}/;
   if ("POST" === a.method) {
     if (b.branch_key && d.test(b.branch_key)) {
       f.branch_key = b.branch_key;
@@ -1144,26 +1144,27 @@ var sendSMS = function(a, b, c, d) {
 if (config.CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
-var default_branch;
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2};
 function wrap(a, b) {
   return function() {
     var c = this, d, e, f = arguments[arguments.length - 1];
-    0 === a || "function" != typeof f ? (e = function(a) {
+    a === callback_params.NO_CALLBACK || "function" != typeof f ? (e = function(a) {
       if (a) {
         throw a;
       }
     }, d = Array.prototype.slice.call(arguments)) : (d = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], e = f);
     c._queue(function(f) {
-      if (!b.init && !c.initialized) {
-        return e(Error(utils.message(utils.messages.nonInit)));
-      }
-      d.unshift(function(b, c) {
-        if (b && 0 === a) {
+      var h = function(b, c) {
+        if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
-        1 === a ? e(b) : 2 === a && e(b, c);
+        a === callback_params.CALLBACK_ERR ? e(b) : a === callback_params.CALLBACK_ERR_DATA && e(b, c);
         f();
-      });
+      };
+      if (!b.init && !c.initialized) {
+        return h(Error(utils.message(utils.messages.nonInit)), null);
+      }
+      d.unshift(h);
       b.apply(c, d);
     });
   };
@@ -1191,7 +1192,7 @@ Branch.prototype._api = function(a, b, c) {
 config.CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
   this.debug = a;
 });
-Branch.prototype.init = wrap(2, function() {
+Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function() {
   var a = function(a, c, d) {
     var e = this;
     utils.isKey(c) ? e.branch_key = c : e.app_id = c;
@@ -1236,43 +1237,43 @@ Branch.prototype.init = wrap(2, function() {
   a.init = !0;
   return a;
 }());
-Branch.prototype.data = wrap(2, function(a) {
-  "function" == typeof a && a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
-config.CORDOVA_BUILD && (Branch.prototype.first = wrap(2, function(a) {
-  "function" == typeof a && a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+config.CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 }));
-Branch.prototype.setIdentity = wrap(2, function(a, b) {
+Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.profile, {identity:b}, function(b, d) {
     this.identity_id = d.identity_id;
     this.sessionLink = d.link;
     this.identity = d.identity;
-    "function" == typeof a && a(null, d);
+    a(null, d);
   });
 });
-Branch.prototype.logout = wrap(1, function(a) {
+Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, a);
 });
-config.CORDOVA_BUILD && (Branch.prototype.close = wrap(1, function(a) {
+config.CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
   var b = this;
   this._api(resources.close, {}, function(c, d) {
     delete b.session_id;
     delete b.sessionLink;
     b.initialized = !1;
     utils.clearStore(b._storage);
-    "function" == typeof a && a(null);
+    a(null);
   });
 }));
-Branch.prototype.track = wrap(1, function(a, b, c) {
+Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   c || (c = {});
   this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
-Branch.prototype.link = wrap(2, function(a, b) {
+Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b, config), function(b, d) {
-    "function" == typeof a && a(b, d && d.url);
+    a(b, d && d.url);
   });
 });
-Branch.prototype.sendSMS = wrap(1, function(a, b, c, d) {
+Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
     f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
   }
@@ -1299,38 +1300,38 @@ Branch.prototype.sendSMS = wrap(1, function(a, b, c, d) {
     });
   });
 });
-Branch.prototype.referrals = wrap(2, function(a) {
+Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);
 });
-config.CORDOVA_BUILD && (Branch.prototype.getCode = wrap(2, function(a, b) {
+config.CORDOVA_BUILD && (Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   b.type = "credit";
   b.creation_type = 2;
   this._api(resources.getCode, b, a);
 }));
-config.CORDOVA_BUILD && (Branch.prototype.validateCode = wrap(1, function(a, b) {
+config.CORDOVA_BUILD && (Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
   this._api(resources.validateCode, {code:b}, a);
 }));
-config.CORDOVA_BUILD && (Branch.prototype.applyCode = wrap(1, function(a, b) {
+config.CORDOVA_BUILD && (Branch.prototype.applyCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
   this._api(resources.applyCode, {code:b}, a);
 }));
-Branch.prototype.credits = wrap(2, function(a) {
+Branch.prototype.credits = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.credits, {}, a);
 });
-config.CORDOVA_BUILD && (Branch.prototype.creditHistory = wrap(2, function(a, b) {
+config.CORDOVA_BUILD && (Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.creditHistory, b ? b : {}, a);
 }));
-Branch.prototype.redeem = wrap(1, function(a, b, c) {
+Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
-config.WEB_BUILD && (Branch.prototype.banner = wrap(0, function(a, b, c) {
+config.WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showAndroid:"undefined" == typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:!!b.forgetHide, 
   make_new_link:!!b.make_new_link};
   "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
-  "function" == typeof a && a();
+  a();
 }), Branch.prototype.closeBanner = wrap(0, function(a) {
   this.closeBannerPointer && this.closeBannerPointer();
-  "function" == typeof a && a();
+  a();
 }));
 // Input 13
 var branch_instance = new Branch;

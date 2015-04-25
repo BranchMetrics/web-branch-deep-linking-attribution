@@ -16,26 +16,17 @@ if (config.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint igno
 
 var default_branch;
 
+/**
+ * Enum for what parameters are in a wrapped Branch method
+ * @enum {number}
+ */
+var callback_params = {
+  NO_CALLBACK: 0,
+  CALLBACK_ERR: 1,
+  CALLBACK_ERR_DATA: 2
+};
+
 function wrap(parameters, func) {
-	/**
-	 * Enum for what parameters are in a wrapped Branch method
-	 * @enum {number}
-	 */
-	var callback_params = {
-	  NO_CALLBACK: 0,
-	  CALLBACK_ERR: 1,
-	  CALLBACK_ERR_DATA: 2
-	};
-
-	/***
-	 * @param {Error} err
-	 * @param {function(?Error,?=)=} callback
-	 */
-	function wrapError(err, callback) {
-		if (callback) { return callback(err); }
-		throw err;
-	}
-
 	var r = function() {
 		var self = this, args, callback,
 		lastArg = arguments[arguments.length - 1];
@@ -50,7 +41,6 @@ function wrap(parameters, func) {
 			callback = lastArg;
 		}
 		self._queue(function(next) {
-			if (!func.init && !self.initialized) { return callback(new Error(utils.message(utils.messages.nonInit))); }
 			var done = function(err, data) {
 				if (err && parameters === callback_params.NO_CALLBACK) { throw err; }
 				else if (parameters === callback_params.CALLBACK_ERR) {
@@ -61,6 +51,7 @@ function wrap(parameters, func) {
 				}
 				next();
 			};
+			if (!func.init && !self.initialized) { return done(new Error(utils.message(utils.messages.nonInit)), null); }
 			args.unshift(done);
 			func.apply(self, args);
 		});
@@ -180,7 +171,7 @@ if (config.CORDOVA_BUILD) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = wrap(2, (function() {
+Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, (function() {
 	var initialization = function(done, branch_key, options) {
 		var self = this;
 		if (utils.isKey(branch_key)) {
@@ -286,7 +277,7 @@ Branch.prototype['init'] = wrap(2, (function() {
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
-Branch.prototype['data'] = wrap(2, function(done) {
+Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
 
@@ -307,7 +298,7 @@ if (config.CORDOVA_BUILD) {
  * ___
  *
  */
-	Branch.prototype['first'] = wrap(2, function(done) {
+	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 	});
 }
@@ -345,7 +336,7 @@ if (config.CORDOVA_BUILD) {
  * ```
  * ___
  */
-Branch.prototype['setIdentity'] = wrap(2, function(done, identity) {
+Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
 		this.identity_id = data['identity_id'];
 		this.sessionLink = data['link'];
@@ -376,7 +367,7 @@ Branch.prototype['setIdentity'] = wrap(2, function(done, identity) {
  * ___
  *
  */
-Branch.prototype['logout'] = wrap(1, function(done) {
+Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
 
@@ -408,7 +399,7 @@ if (config.CORDOVA_BUILD) {
  * ## Tracking events
  *
  */
-	Branch.prototype['close'] = wrap(1, function(done) {
+	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
 		this._api(resources.close, { }, function(err, data) {
 			delete self.session_id;
@@ -449,7 +440,7 @@ if (config.CORDOVA_BUILD) {
  * ## Creating a deep linking link
  *
  */
-Branch.prototype['track'] = wrap(1, function(done, event, metadata) {
+Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
 	if (!metadata) {
 		metadata = { };
 	}
@@ -520,7 +511,7 @@ Branch.prototype['track'] = wrap(1, function(done, event, metadata) {
  * ## Sharing links via SMS
  *
  */
-Branch.prototype['link'] = wrap(2, function(done, linkData) {
+Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, linkData) {
 	this._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
 		done(err, data && data['url']);
 	});
@@ -613,7 +604,7 @@ Branch.prototype['link'] = wrap(2, function(done, linkData) {
  * ## Retrieve referrals list
  *
  */
-Branch.prototype['sendSMS'] = wrap(1, function(done, phone, linkData, options) {
+Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, phone, linkData, options) {
 	var self = this;
 	if (typeof options == 'function') {
 		options = { };
@@ -690,7 +681,7 @@ Branch.prototype['sendSMS'] = wrap(1, function(done, phone, linkData, options) {
  * ## Referral Codes
  *
  */
-Branch.prototype['referrals'] = wrap(2, function(done) {
+Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.referrals, { }, done);
 });
 
@@ -746,7 +737,7 @@ if (config.CORDOVA_BUILD) {
  * ___
  *
  */
-	Branch.prototype['getCode'] = wrap(2, function(done, data) {
+	Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 		data.type = "credit";
 		data.creation_type = 2;
 		this._api(resources.getCode, data, done);
@@ -798,7 +789,7 @@ if (config.CORDOVA_BUILD) {
  * ___
  *
  */
-	Branch.prototype['validateCode'] = wrap(1, function(done, code) {
+	Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 		this._api(resources.validateCode, { "code": code }, done);
 	});
 }
@@ -850,7 +841,7 @@ if (config.CORDOVA_BUILD) {
  * ## Credit Functions
  *
  */
-	Branch.prototype['applyCode'] = wrap(1, function(done, code) {
+	Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 		this._api(resources.applyCode, { "code": code }, done);
 	});
 }
@@ -882,7 +873,7 @@ if (config.CORDOVA_BUILD) {
  * ```
  *
  */
-Branch.prototype['credits'] = wrap(2, function(done) {
+Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.credits, { }, done);
 });
 
@@ -955,7 +946,7 @@ if (config.CORDOVA_BUILD) {
  * ## Credit redemption
  *
  */
-	Branch.prototype['creditHistory'] = wrap(2, function(done, data) {
+	Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 		this._api(resources.creditHistory, data ? data : {}, done);
 	});
 }
@@ -1003,7 +994,7 @@ if (config.CORDOVA_BUILD) {
  * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
  *
  */
-Branch.prototype['redeem'] = wrap(1, function(done, amount, bucket) {
+Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
 
@@ -1083,7 +1074,7 @@ if (config.WEB_BUILD) {
  * ```
  *
  */
-	Branch.prototype['banner'] = wrap(0, function(done, options, linkData) {
+	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, linkData) {
 		var bannerOptions = {
 			icon: options['icon'] || '',
 			title: options['title'] || '',

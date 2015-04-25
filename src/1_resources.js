@@ -19,7 +19,7 @@ var validationTypes = { obj: 0, str: 1, num: 2, arr: 3, bool: 4 };  // now inclu
 
 /* jshint ignore:start */
 
-/** @typedef {function(string, string, *, (Object|null)=)} */
+/** @typedef {function(string, string, *)} */
 var _validator;
 
 /* jshint ignore:end */
@@ -28,6 +28,7 @@ var _validator;
  * @param {boolean} required
  * @param {validationTypes|RegExp} type
  * @throws {Error}
+ * @return {_validator}
  */
 function validator(required, type) {
 	return function(endpoint, param, data) {

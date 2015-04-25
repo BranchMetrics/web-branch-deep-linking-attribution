@@ -114,9 +114,6 @@ ___
 
 
 
-**Members:**
-
-+ callback_params
 
 * * *
 

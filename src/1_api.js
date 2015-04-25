@@ -73,7 +73,7 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 	// check for branch_key then app_id here
 	var branch_id = /^[0-9]{15,20}$/;
-	var branch_key = /((?:[a-z][a-z]*[0-9]+[a-z0-9]*))/;
+	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
 	if (resource.method === "POST") {
 		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
