@@ -45,7 +45,7 @@ function wrap(parameters, func, init) {
 			callback = lastArg;
 		}
 		self._queue(function(next) {
-			/**
+			/***
 			 * @type {function(?Error,?): undefined}
 			 */
 			var done = function(err, data) {

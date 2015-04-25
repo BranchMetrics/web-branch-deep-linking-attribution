@@ -117,10 +117,6 @@ ___
 
 * * *
 
-### done() 
-
-
-
 ### setDebug(debug) 
 
 **Parameters**
