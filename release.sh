@@ -2,8 +2,6 @@
 
 [ $# -eq 0 ] && { echo "Usage: $0 v1.0.0"; exit 1; }
 
-gulp check
-
 VERSION=$1
 VERSION_NO_V=$(echo $VERSION | tr -d "\nv")
 DATE=$(date "+%Y-%m-%d")
@@ -45,7 +43,7 @@ read -p "Update plugin.xml? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	sed -i -e "s/\"version\"=\".*\"$/\"version\"=\"$VERSION_NO_V\",/" plugin.xml
+	sed -i -e "s/version=\".*\"/version=\"$VERSION_NO_V\"/" plugin.xml
 fi
 
 make release
