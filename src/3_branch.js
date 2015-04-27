@@ -78,12 +78,17 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage(false);
 	this._server = new Server();
+	var sdk;
+	if (config.CORDOVA_BUILD) { sdk = 'cordova'; }
+	if (config.WEB_BUILD) { sdk = 'web'; }
+	this.sdk = sdk + config.version;
 
 	if (config.CORDOVA_BUILD) {
-		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
-											// the session params from the first install.
-		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
-		this.debug = false;					// A debug install session will get a unique device id.
+		// For storing data we need from run to run such as device_fingerprint_id and
+		// the session params from the first install.
+		this._permStorage = storage(true);
+		// A debug install session will get a unique device id.
+		this.debug = false;
 	}
 
 	this.initialized = false;
@@ -99,12 +104,12 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (this.branch_key) { obj['branch_key'] = this.branch_key; }
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
+	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
 	// These three are sent from mobile apps
 	if (config.CORDOVA_BUILD) {
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
 		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
-		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
@@ -253,8 +258,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 		if (config.WEB_BUILD) {
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+
+			self._api(resources._r, {}, function(err, browser_fingerprint_id) {
 				if (err) { finishInit(err, null); }
+
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
 					"is_referrable": 1,
