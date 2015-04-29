@@ -97,7 +97,7 @@ Even prior to calling `branch.init()`, the Branch object that is attached to `wi
 	INIT_SUCCEEDED: 3
 }
 ```
-The Branch Web SDK uses this property internally, as part of it's initializaing and queue (as described above), however you are free to check this property if the initialization state is of interest. For example, if `branch.init_state` is equal to 1, you know that the `init()` method is in progress.
+The Branch Web SDK uses this property internally, as part of it's initialization and queue (as described above), however you are free to check this property if the initialization state is of interest. For example, if `branch.init_state` is equal to 1, you know that the `init()` method is in progress.
 
 ## API Reference
 
