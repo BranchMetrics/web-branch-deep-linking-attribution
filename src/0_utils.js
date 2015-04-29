@@ -33,6 +33,8 @@ utils.messages = {
 	missingParam: 'API request $1 missing parameter $2',
 	invalidType: 'API request $1, parameter $2 is not $3',
 	nonInit: 'Branch SDK not initialized',
+	initPending: 'Branch SDK initialization pending and a Branch method was called outside of the queue order',
+	initFailed: 'Branch SDK initialization failed, so further methods cannot be called',
 	existingInit: 'Branch SDK already initilized',
 	missingAppId: 'Missing Branch app ID',
 	callBranchInitFirst: 'Branch.init must be called first',

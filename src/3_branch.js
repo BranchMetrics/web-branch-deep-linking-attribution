@@ -28,6 +28,17 @@ var callback_params = {
   CALLBACK_ERR_DATA: 2
 };
 
+/**
+ * Enum for the initialization state of the Branch Object
+ * @enum {number}
+ */
+var init_states = {
+  NO_INIT: 0,
+  INIT_PENDING: 1,
+  INIT_FAILED: 2,
+  INIT_SUCCEEDED: 3
+};
+
 /***
  * @param {number} parameters
  * @param {function(...?): undefined} func
@@ -61,7 +72,17 @@ function wrap(parameters, func, init) {
 				}
 				next();
 			};
-			if (!init && !self.initialized) { return done(new Error(utils.message(utils.messages.nonInit)), null); }
+			if (!init) {
+				if (self.init_state == init_states.INIT_PENDING) {
+					return done(new Error(utils.message(utils.messages.initPending)), null);
+				}
+				else if (self.init_state == init_states.INIT_FAILED) {
+					return done(new Error(utils.message(utils.messages.initFailed)), null);
+				}
+				else if (self.init_state == init_states.NO_INIT || !self.init_state) {
+					return done(new Error(utils.message(utils.messages.nonInit)), null);
+				}
+			}
 			args.unshift(done);
 			func.apply(self, args);
 		});
@@ -89,7 +110,7 @@ Branch = function() {
 		this.debug = false;					// A debug install session will get a unique device id.
 	}
 
-	this.initialized = false;
+	this.init_state = init_states.NO_INIT;
 };
 
 /***
@@ -183,6 +204,8 @@ if (CORDOVA_BUILD) { // jshint undef:false
  */
 Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
 	var self = this;
+	self.init_state = init_states.INIT_PENDING;
+
 	if (utils.isKey(branch_key)) {
 		self.branch_key = branch_key;
 	}
@@ -199,8 +222,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
-		self.initialized = true;
-
 		if (CORDOVA_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
 			self.link_click_id = data['link_click_id'];
@@ -214,6 +235,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			}
 			utils.store(data, self._storage);
 			setBranchValues(data);
+			self.init_state = init_states.INIT_SUCCEEDED;
+		}
+		if (err) {
+			self.init_state = init_states.INIT_FAILED;
 		}
 		done(err, data && utils.whiteListSessionData(data));
 	};
@@ -235,10 +260,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			if (utils.readKeyValue('identity_id', self._permStorage)) {
 				exec(function(data) {
 					console.log("Sending open with: " + goog.json.serialize(data));
-					self._api(resources.open, data, function(data) {
+					self._api(resources.open, data, function(err, data) {
+						if (err) { return finishInit(err, null); }
 						data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
 						data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-						console.log("Open successful: " + data);
 						finishInit(null, data);
 					});
 				}, cordovaError,  "BranchDevice", "getOpenData", args);
@@ -246,8 +271,8 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			else {
 				exec(function(data) {
 					console.log("Sending install with: " + goog.json.serialize(data));
-					self._api(resources.install, data, function(data) {
-						console.log("Install successful: " + data);
+					self._api(resources.install, data, function(err, data) {
+						if (err) { return finishInit(err, null); }
 						finishInit(null, data);
 					});
 				}, cordovaError,  "BranchDevice", "getInstallData", args);
@@ -257,12 +282,13 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
-				if (err) { finishInit(err, null); }
+				if (err) { return finishInit(err, null); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
+					if (err) { return finishInit(err, null); }
 					if (link_identifier) { data['click_id'] = link_identifier; }
 					finishInit(err, data);
 				});
@@ -343,10 +369,11 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ___
  */
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
+	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		this.identity_id = data['identity_id'];
-		this.sessionLink = data['link'];
-		this.identity = data['identity'];
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data['link'];
+		self.identity = data['identity'];
 		done(null, data);
 	});
 });
@@ -410,7 +437,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 		this._api(resources.close, { }, function(err, data) {
 			delete self.session_id;
 			delete self.sessionLink;
-			self.initialized = false;
+			self.init_state = init_states.NO_INIT;
 			utils.clearStore(self._storage);
 			done(null);
 		});

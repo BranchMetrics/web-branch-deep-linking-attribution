@@ -747,7 +747,8 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 // Input 5
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
-utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", missingUrl:"Required argument: URL, is missing"};
+utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
+missingUrl:"Required argument: URL, is missing"};
 utils.getLocationSearch = function() {
   return window.location.search;
 };
@@ -991,11 +992,11 @@ function validator(a, b) {
 }
 var branch_id = /^[0-9]{15,20}$/;
 WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), browser_fingerprint_id:validator(!0, branch_id)}}, resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.str)}}, 
-resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id)}}, resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}}, resources.credits = {destination:config.api_endpoint, 
-endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{v:validator(!0, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!0, validationTypes.str)}}, 
-resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, 
-queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), 
-metadata:validator(!0, validationTypes.obj)}});
+resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id)}}, resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id), app_id:validator(!0, validationTypes.str)}}, 
+resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{v:validator(!0, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), 
+bucket:validator(!0, validationTypes.str)}}, resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.linkClick = {destination:config.link_service_endpoint, 
+endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{session_id:validator(!0, 
+branch_id), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}});
 CORDOVA_BUILD && (resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), bluetooth_version:validator(!1, 
 validationTypes.str), has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), is_referrable:validator(!1, 
 validationTypes.num), update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), 
@@ -1144,7 +1145,7 @@ var sendSMS = function(a, b, c, d) {
 if (CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
-var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2};
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3};
 function wrap(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
@@ -1161,8 +1162,16 @@ function wrap(a, b, c) {
         a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
         g();
       };
-      if (!c && !d.initialized) {
-        return h(Error(utils.message(utils.messages.nonInit)), null);
+      if (!c) {
+        if (d.init_state == init_states.INIT_PENDING) {
+          return h(Error(utils.message(utils.messages.initPending)), null);
+        }
+        if (d.init_state == init_states.INIT_FAILED) {
+          return h(Error(utils.message(utils.messages.initFailed)), null);
+        }
+        if (d.init_state == init_states.NO_INIT || !d.init_state) {
+          return h(Error(utils.message(utils.messages.nonInit)), null);
+        }
       }
       e.unshift(h);
       b.apply(d, e);
@@ -1177,7 +1186,7 @@ var Branch = function() {
   this._storage = storage(!1);
   this._server = new Server;
   CORDOVA_BUILD && (this._permStorage = storage(!0), this.sdk = "cordova" + config.version, this.debug = !1);
-  this.initialized = !1;
+  this.init_state = init_states.NO_INIT;
 };
 Branch.prototype._api = function(a, b, c) {
   this.app_id && (b.app_id = this.app_id);
@@ -1194,12 +1203,14 @@ CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
 });
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
   var d = this;
+  d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   c = utils.readStore(d._storage);
   var e = function(b, c) {
-    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id, d.identity_id = c.identity_id, d.sessionLink = c.link, d.initialized = !0, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id));
+    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id, d.identity_id = c.identity_id, d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED);
+    b && (d.init_state = init_states.INIT_FAILED);
     a(b, c && utils.whiteListSessionData(c));
   };
   if (c && c.session_id) {
@@ -1209,23 +1220,32 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       a("Error getting device data!");
     }, utils.readKeyValue("identity_id", d._permStorage) ? exec(function(a) {
       console.log("Sending open with: " + goog.json.serialize(a));
-      d._api(resources.open, a, function(a) {
-        a.identity_id = utils.readKeyValue("identity_id", d._permStorage);
-        a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
-        console.log("Open successful: " + a);
-        e(null, a);
+      d._api(resources.open, a, function(a, b) {
+        if (a) {
+          return e(a, null);
+        }
+        b.identity_id = utils.readKeyValue("identity_id", d._permStorage);
+        b.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
+        e(null, b);
       });
     }, b, "BranchDevice", "getOpenData", c) : exec(function(a) {
       console.log("Sending install with: " + goog.json.serialize(a));
-      d._api(resources.install, a, function(a) {
-        console.log("Install successful: " + a);
-        e(null, a);
+      d._api(resources.install, a, function(a, b) {
+        if (a) {
+          return e(a, null);
+        }
+        e(null, b);
       });
     }, b, "BranchDevice", "getInstallData", c)), WEB_BUILD) {
       var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
       d._api(resources._r, {v:config.version}, function(a, b) {
-        a && e(a, null);
+        if (a) {
+          return e(a, null);
+        }
         d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+          if (a) {
+            return e(a, null);
+          }
           f && (b.click_id = f);
           e(a, b);
         });
@@ -1240,11 +1260,12 @@ CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DAT
   a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 }));
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  this._api(resources.profile, {identity:b}, function(b, d) {
-    this.identity_id = d.identity_id;
-    this.sessionLink = d.link;
-    this.identity = d.identity;
-    a(null, d);
+  var c = this;
+  this._api(resources.profile, {identity:b}, function(b, e) {
+    c.identity_id = e.identity_id;
+    c.sessionLink = e.link;
+    c.identity = e.identity;
+    a(null, e);
   });
 });
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
@@ -1255,7 +1276,7 @@ CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, fu
   this._api(resources.close, {}, function(c, d) {
     delete b.session_id;
     delete b.sessionLink;
-    b.initialized = !1;
+    b.init_state = init_states.NO_INIT;
     utils.clearStore(b._storage);
     a(null);
   });
