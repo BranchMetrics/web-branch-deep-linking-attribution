@@ -86,6 +86,19 @@ branch.init(...);
 branch.banner(...);
 ```
 
+### SDK Initialization State
+
+Even prior to calling `branch.init()`, the Branch object that is attached to `window` by the on page embed script attaches an `init_state` property to the Branch object. This property will always have one of four values, as described by an Enum:
+```js
+{
+	NO_INIT: 0,
+	INIT_PENDING: 1,
+	INIT_FAILED: 2,
+	INIT_SUCCEEDED: 3
+}
+```
+The Branch Web SDK uses this property internally, as part of it's initializaing and queue (as described above), however you are free to check this property if the initialization state is of interest. For example, if `branch.init_state` is equal to 1, you know that the `init()` method is in progress.
+
 ## API Reference
 
 1. Branch Session
