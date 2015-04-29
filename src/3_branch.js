@@ -72,12 +72,15 @@ function wrap(parameters, func, init) {
 				}
 				next();
 			};
-			if (!init && self.init_state) {
+			if (!init) {
 				if (self.init_state == init_states.INIT_PENDING) {
 					return done(new Error(utils.message(utils.messages.initPending)), null);
 				}
 				else if (self.init_state == init_states.INIT_FAILED) {
 					return done(new Error(utils.message(utils.messages.initFailed)), null);
+				}
+				else if (self.init_state == init_states.NO_INIT || !self.init_state) {
+					return done(new Error(utils.message(utils.messages.nonInit)), null);
 				}
 			}
 			args.unshift(done);
@@ -366,10 +369,11 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ___
  */
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
+	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		this.identity_id = data['identity_id'];
-		this.sessionLink = data['link'];
-		this.identity = data['identity'];
+		self.identity_id = data['identity_id'];
+		self.sessionLink = data['link'];
+		self.identity = data['identity'];
 		done(null, data);
 	});
 });

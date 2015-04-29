@@ -1162,12 +1162,15 @@ function wrap(a, b, c) {
         a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
         g();
       };
-      if (!c && d.init_state) {
+      if (!c) {
         if (d.init_state == init_states.INIT_PENDING) {
           return h(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state == init_states.INIT_FAILED) {
           return h(Error(utils.message(utils.messages.initFailed)), null);
+        }
+        if (d.init_state == init_states.NO_INIT || !d.init_state) {
+          return h(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
       e.unshift(h);
@@ -1257,11 +1260,12 @@ CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DAT
   a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 }));
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  this._api(resources.profile, {identity:b}, function(b, d) {
-    this.identity_id = d.identity_id;
-    this.sessionLink = d.link;
-    this.identity = d.identity;
-    a(null, d);
+  var c = this;
+  this._api(resources.profile, {identity:b}, function(b, e) {
+    c.identity_id = e.identity_id;
+    c.sessionLink = e.link;
+    c.identity = e.identity;
+    a(null, e);
   });
 });
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
