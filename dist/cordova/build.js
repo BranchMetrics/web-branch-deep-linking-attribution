@@ -1144,7 +1144,7 @@ var sendSMS = function(a, b, c, d) {
 if (CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
-var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2};
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3};
 function wrap(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
@@ -1161,7 +1161,7 @@ function wrap(a, b, c) {
         a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
         g();
       };
-      if (!c && !d.initialized) {
+      if (!c && d.init_state != init_states.INIT_SUCCEEDED) {
         return h(Error(utils.message(utils.messages.nonInit)), null);
       }
       e.unshift(h);
@@ -1177,7 +1177,7 @@ var Branch = function() {
   this._storage = storage(!1);
   this._server = new Server;
   CORDOVA_BUILD && (this._permStorage = storage(!0), this.sdk = "cordova" + config.version, this.debug = !1);
-  this.initialized = !1;
+  this.init_state = init_states.NO_INIT;
 };
 Branch.prototype._api = function(a, b, c) {
   this.app_id && (b.app_id = this.app_id);
@@ -1194,12 +1194,14 @@ CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
 });
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
   var d = this;
+  d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   c = utils.readStore(d._storage);
   var e = function(b, c) {
-    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id, d.identity_id = c.identity_id, d.sessionLink = c.link, d.initialized = !0, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id));
+    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id, d.identity_id = c.identity_id, d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED);
+    b && (d.init_state = init_states.INIT_FAILED);
     a(b, c && utils.whiteListSessionData(c));
   };
   if (c && c.session_id) {
@@ -1209,23 +1211,32 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       a("Error getting device data!");
     }, utils.readKeyValue("identity_id", d._permStorage) ? exec(function(a) {
       console.log("Sending open with: " + goog.json.serialize(a));
-      d._api(resources.open, a, function(a) {
-        a.identity_id = utils.readKeyValue("identity_id", d._permStorage);
-        a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
-        console.log("Open successful: " + a);
-        e(null, a);
+      d._api(resources.open, a, function(a, b) {
+        if (a) {
+          return e(a, null);
+        }
+        b.identity_id = utils.readKeyValue("identity_id", d._permStorage);
+        b.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
+        e(null, b);
       });
     }, b, "BranchDevice", "getOpenData", c) : exec(function(a) {
       console.log("Sending install with: " + goog.json.serialize(a));
-      d._api(resources.install, a, function(a) {
-        console.log("Install successful: " + a);
-        e(null, a);
+      d._api(resources.install, a, function(a, b) {
+        if (a) {
+          return e(a, null);
+        }
+        e(null, b);
       });
     }, b, "BranchDevice", "getInstallData", c)), WEB_BUILD) {
       var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
       d._api(resources._r, {v:config.version}, function(a, b) {
-        a && e(a, null);
+        if (a) {
+          return e(a, null);
+        }
         d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+          if (a) {
+            return e(a, null);
+          }
           f && (b.click_id = f);
           e(a, b);
         });
@@ -1255,7 +1266,7 @@ CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, fu
   this._api(resources.close, {}, function(c, d) {
     delete b.session_id;
     delete b.sessionLink;
-    b.initialized = !1;
+    b.init_state = init_states.NO_INIT;
     utils.clearStore(b._storage);
     a(null);
   });
