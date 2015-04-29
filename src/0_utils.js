@@ -6,6 +6,7 @@ goog.provide('utils');
 /*jshint unused:false*/
 goog.require('goog.json');
 goog.require('storage');
+goog.require('config');
 
 /** @define {boolean} */
 var DEBUG = true;
@@ -77,7 +78,9 @@ utils.whiteListSessionData = function(data) {
 };
 
 utils.cleanLinkData = function(linkData, config) {
-	if (config.WEB_BUILD) {
+	/* jshint undef:false */
+	if (WEB_BUILD) { // WTF, I don't know why I can't just do undef:false for the line.
+	/* jshint undef:true */
 		linkData['source'] = 'web-sdk';
 		if (linkData['data']['$desktop_url'] !== undefined) {
 			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '').replace(/([\?\&]_branch_match_id=\d+)/, '');

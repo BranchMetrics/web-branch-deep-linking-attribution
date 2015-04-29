@@ -12,7 +12,9 @@ goog.require('storage');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-if (config.CORDOVA_BUILD) { var exec = require("cordova/exec"); } // jshint ignore:line
+if (CORDOVA_BUILD) {  // jshint undef:false
+	var exec = require("cordova/exec");
+}
 
 var default_branch;
 
@@ -25,11 +27,12 @@ var callback_params = {
   CALLBACK_ERR: 1,
   CALLBACK_ERR_DATA: 2
 };
+
 /***
  * @param {number} parameters
  * @param {function(...?): undefined} func
  * @param {boolean=} init
- **/
+ */
 function wrap(parameters, func, init) {
 	var r = function() {
 		var self = this, args, callback,
@@ -79,7 +82,7 @@ Branch = function() {
 	this._storage = storage(false);
 	this._server = new Server();
 
-	if (config.CORDOVA_BUILD) {
+	if (CORDOVA_BUILD) { // jshint undef:false
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
 											// the session params from the first install.
 		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
@@ -101,7 +104,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
 
 	// These three are sent from mobile apps
-	if (config.CORDOVA_BUILD) {
+	if (CORDOVA_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
 		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
@@ -112,7 +115,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 	});
 };
 
-if (config.CORDOVA_BUILD) {
+if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
@@ -198,7 +201,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		self.sessionLink = data['link'];
 		self.initialized = true;
 
-		if (config.CORDOVA_BUILD) {
+		if (CORDOVA_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
 			self.link_click_id = data['link_click_id'];
 		}
@@ -206,7 +209,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 	var finishInit = function(err, data) {
 		if (data) {
-			if (config.CORDOVA_BUILD) {
+			if (CORDOVA_BUILD) { // jshint undef:false
 				utils.store(data, self._permStorage);
 			}
 			utils.store(data, self._storage);
@@ -219,7 +222,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		finishInit(null, sessionData);
 	}
 	else {
-		if (config.CORDOVA_BUILD) {
+		if (CORDOVA_BUILD) { // jshint undef:false
 			var args = [], execFunc;
 			args.push(self.debug);
 			if (isReferrable !== null) {
@@ -251,7 +254,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			}
 		}
 
-		if (config.WEB_BUILD) {
+		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
 				if (err) { finishInit(err, null); }
@@ -284,7 +287,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
 
-if (config.CORDOVA_BUILD) {
+if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
@@ -374,7 +377,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
 
-if (config.CORDOVA_BUILD) {
+if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
@@ -689,7 +692,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 });
 
 
-if (config.CORDOVA_BUILD) {
+if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.getCode
  * @param {Object} data - _required_ - contins options for referral code creation.
@@ -747,7 +750,7 @@ if (config.CORDOVA_BUILD) {
 	});
 }
 
-if (config.CORDOVA_BUILD) {
+if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.validateCode
  * @param {string} code - _required_ - the code string to validate.
@@ -797,7 +800,7 @@ if (config.CORDOVA_BUILD) {
 	});
 }
 
-if (config.CORDOVA_BUILD) {
+if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.applyCode
  * @param {string} code - _required_ - the code string to apply.
@@ -881,7 +884,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
 });
 
 
-if (config.CORDOVA_BUILD) {
+if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.creditHistory
  * @param {Object} data - _optional_ - options controlling the returned history.
@@ -1001,7 +1004,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
 
-if (config.WEB_BUILD) {
+if (WEB_BUILD) { // jshint undef:false
 /**
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
