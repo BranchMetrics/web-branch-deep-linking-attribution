@@ -8,7 +8,7 @@ config.api_endpoint = 'https://api.branch.io';
 config.version = '0.0.0';
 
 /** @define {boolean} */
-config.WEB_BUILD = true;
+window.WEB_BUILD = true;
 
 /** @define {boolean} */
-config.CORDOVA_BUILD = false;
+window.CORDOVA_BUILD = false;
