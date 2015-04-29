@@ -747,7 +747,8 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 // Input 5
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
-utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", missingUrl:"Required argument: URL, is missing"};
+utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
+missingUrl:"Required argument: URL, is missing"};
 utils.getLocationSearch = function() {
   return window.location.search;
 };
@@ -1161,8 +1162,13 @@ function wrap(a, b, c) {
         a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
         g();
       };
-      if (!c && d.init_state != init_states.INIT_SUCCEEDED) {
-        return h(Error(utils.message(utils.messages.nonInit)), null);
+      if (!c && d.init_state) {
+        if (d.init_state == init_states.INIT_PENDING) {
+          return h(Error(utils.message(utils.messages.initPending)), null);
+        }
+        if (d.init_state == init_states.INIT_FAILED) {
+          return h(Error(utils.message(utils.messages.initFailed)), null);
+        }
       }
       e.unshift(h);
       b.apply(d, e);

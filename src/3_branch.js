@@ -72,7 +72,14 @@ function wrap(parameters, func, init) {
 				}
 				next();
 			};
-			if (!init && self.init_state != init_states.INIT_SUCCEEDED) { return done(new Error(utils.message(utils.messages.nonInit)), null); }
+			if (!init && self.init_state) {
+				if (self.init_state == init_states.INIT_PENDING) {
+					return done(new Error(utils.message(utils.messages.initPending)), null);
+				}
+				else if (self.init_state == init_states.INIT_FAILED) {
+					return done(new Error(utils.message(utils.messages.initFailed)), null);
+				}
+			}
 			args.unshift(done);
 			func.apply(self, args);
 		});
