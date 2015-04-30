@@ -12,12 +12,13 @@ VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/
 
 ONPAGE_RELEASE=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="https://cdn.branch.io/branch-v$(VERSION).min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../../dist/web/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
+ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/web/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 
 .PHONY: clean
 
-all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz
+all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz test/integration-test.html
 clean:
-	rm -f dist/web/** dist/cordova/** docs/3_branch.md README.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz
+	rm -f dist/web/** dist/cordova/** docs/3_branch.md README.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
 release: clean all dist/web/build.min.js.gz
 	@echo "released"
 
@@ -74,3 +75,5 @@ README.md: docs/0_intro.md docs/3_branch.md
 	cat docs/0_intro.md docs/3_branch.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
+test/integration-test.html: test/integration-test.template.html
+	perl -pe 'BEGIN{$$a="$(ONPAGE_TEST)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html
