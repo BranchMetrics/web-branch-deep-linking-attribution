@@ -5,6 +5,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ## [VERSION] - unreleased
 
 ## [1.4.1] - 2015-04-29
+- Fixes bug with dead-code elimination
 
 ## [1.4.0] - 2015-04-25
 - Add Cordova version of SDK! Add Cordova guide and add upgrade guide
