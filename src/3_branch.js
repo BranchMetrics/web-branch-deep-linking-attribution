@@ -1065,6 +1065,7 @@ if (WEB_BUILD) { // jshint undef:false
  *     description: 'The Branch demo app!',
  *     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
  *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
+ *     phonePreviewText: '+44 9999-9999'  // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
  *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     showiOS: true,                     // Should the banner be shown on iOS devices?
  *     showAndroid: true,                 // Should the banner be shown on Android devices?
@@ -1114,6 +1115,7 @@ if (WEB_BUILD) { // jshint undef:false
 			description: options['description'] || '',
 			openAppButtonText: options['openAppButtonText'] || 'View in app',
 			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
 			iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
 			showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
 			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],

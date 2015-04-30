@@ -24,7 +24,7 @@ banner_css.desktop =
 	'#branch-banner .description { font-size: 12px; font-weight: normal; }\n' +
 	'#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n' +
 	'#branch-sms-block { display: inline-block; }\n' +
-	'#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 125px; font-size: 14px; }\n' +
+	'#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 145px; font-size: 14px; }\n' +
 	'#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n' +
 	'#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n' +
 	'#branch-sms-phone:focus, button:focus { outline: none; }\n' +
