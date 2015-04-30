@@ -48,11 +48,9 @@ describe('Branch', function() {
 				branch[call].apply(branch, p.concat(function(err) {
 					assert.equal(err.message, 'Branch SDK not initialized');
 				}));
-				/*
 				assert.throws(function() {
 					branch[call].apply(branch, p);
 				}, 'Branch SDK not initialized');
-				*/
 			}
 
 			for (var i = 0; i < params.length; i++) {
