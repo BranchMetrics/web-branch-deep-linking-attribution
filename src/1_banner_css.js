@@ -44,7 +44,7 @@ banner_css.ie = '#branch-banner .checkmark { color: #428bca; font-size: 22px; }\
 banner_css.mobile =
 	'#branch-banner { position: absolute; }\n' +
 	'#branch-banner .content .left { width: 60%; float: left; }\n' +
-	'#branch-banner .content .right { width: 35%; height: 24px; float: right; }\n' +
+	'#branch-banner .content .right { height: 24px; float: right; }\n' +
 	'#branch-banner .content .left .details .title { font-size: 12px; }\n' +
 	'#branch-banner a { text-decoration: none; }\n' +
 	'#branch-mobile-action { top: 6px; }\n' +
