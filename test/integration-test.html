@@ -8,6 +8,11 @@
 	<div id="mocha"></div>
 	<link rel="stylesheet" type="text/css" href="../node_modules/mocha/mocha.css" />
 	<script src="../compiler/library/closure-library-master/closure/goog/base.js"></script>
+	<script>
+		goog.addDependency("../../../../../src/0_config.js", ['config'], []);
+		goog.addDependency("../../../../../src/0_utils.js", ['utils'], []);
+		goog.addDependency("../../../../../src/0_storage.js", ['storage'], []);
+	</script>
 	<script src="../node_modules/mocha/mocha.js"></script>
 	<script src="../node_modules/sinon/pkg/sinon-1.13.0.js"></script>
 	<script src="test-utils.js"></script>
