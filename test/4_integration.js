@@ -32,6 +32,31 @@ describe('Integration tests', function() {
 		branch._server.createScript.restore();
 		requests = [];
 	});
+
+	var sampleParams = {
+		tags: [ 'tag1', 'tag2' ],
+		channel: 'sample app',
+		feature: 'create link',
+		stage: 'created link',
+		type: 1,
+		data: {
+			mydata: 'bar',
+			'$desktop_url': 'https://cdn.branch.io/example.html',
+			'$og_title': 'Branch Metrics',
+			'$og_description': 'Branch Metrics',
+			'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+		}
+	};
+
+	var branchInit = function(init, assert) {
+		if (init) { branch.init(browser_fingerprint_id); }
+		if (assert) { assert.equal(requests.length, 1); }
+		requests[0].callback(browser_fingerprint_id);
+		if (assert) { assert.equal(requests.length, 2); }
+		requests[1].respond(200,
+				{ "Content-Type": "application/json" },
+				'{ "session_id":"123088518049178533", "identity_id":"114720603218387056", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
+	};
 /*
 	function basicTests(call, params) {
 		it('should fail if branch not initialized', function(done) {
@@ -67,27 +92,15 @@ describe('Integration tests', function() {
 					},
 					'Expected response returned');
 			});
-
-			assert.equal(requests.length, 1);
+			branchInit(false, assert);
 			assert.equal(requests[0].src, 'https://bnc.lt/_r?v=' + config.version + '&callback=branch_callback__' + 0, 'Endpoint correct');
-			requests[0].callback(browser_fingerprint_id);
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
-				{ "Content-Type": "application/json" },
-				'{ "session_id":"123088518049178533", "identity_id":"114720603218387056", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
 		});
 
 		it('should support being called without a callback', function(done) {
 			var assert = testUtils.plan(3, done);
 			branch.init(browser_fingerprint_id);
-
-			assert.equal(requests.length, 1);
+			branchInit(false, assert);
 			assert.equal(requests[0].src, 'https://bnc.lt/_r?v=' + config.version + '&callback=branch_callback__' + 1, 'Endpoint correct');
-			requests[0].callback(browser_fingerprint_id);
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
-				{ "Content-Type": "application/json" },
-				'{ "session_id":"123088518049178533", "identity_id":"114720603218387056", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
 		});
 
 		it('should return error to callback', function(done) {
@@ -100,24 +113,40 @@ describe('Integration tests', function() {
 		});
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
-			testUtils.go("#r:12345");
 			var assert = testUtils.plan(1, done);
+			testUtils.go("#r:12345");
 
 			branch.init(branch_sample_key, function(err, data) {
 				assert.equal(utils.readStore(branch._storage).click_id, '12345', 'click_id from link_identifier hash stored in session_id');
 			});
-
-			requests[0].callback(browser_fingerprint_id);
-			requests[1].respond(200,
-				{ "Content-Type": "application/json" },
-				'{ "branch_key": branch_sample_key, "link_identifier": "12345", "is_referrable": 1, "browser_fingerprint_id": browser_fingerprint_id }');
+			branchInit();
 		});
 	});
-	/*
-	describe('data', function() {
-		it('should return ', function(done) {
+
+	describe('setIdentity', function() {
+		it('make three requests to init and set identity, and return expected data', function(done) {
 			var assert = testUtils.plan(1, done);
-			branch.init(browser_fingerprint_id);
+			branchInit(true);
+			branch.setIdentity('identity', function(err, data) {
+				assert.deepEqual(data,
+					{
+						"identity_id":"114720603218387056",
+						"link_click_id":"114750153298026746",
+						"link":"https://bnc.lt/i/4LYQTXE0_k"
+					},
+					'Expected response returned'
+				);
+			});
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				'{ "identity_id":"114720603218387056", "link_click_id":"114750153298026746", "link":"https://bnc.lt/i/4LYQTXE0_k" }');
+		});
+	});
+
+	describe('data', function() {
+		it('should make two requests and return session data', function(done) {
+			var assert = testUtils.plan(2, done);
+			branchInit(true);
 			branch.data(function(err, data) {
 				assert.deepEqual(data,
 					{
@@ -125,32 +154,79 @@ describe('Integration tests', function() {
 						referring_identity: null,
 						identity: "Branch",
 						has_app: true
-					},
-					'Expected response returned'
-				);
+					});
 			});
+			assert.equal(requests.length, 2);
+		});
+	});
+/*
+	describe('logout', function() {
+		it('should make three requests and return session data', function(done) {
+			var assert = testUtils.plan(2, done);
+			branchInit(true);
+			branch.logout(function(err) {
+				console.log(err);
+				assert.deepEqual(err, { });
+			});
+			assert.equal(requests.length, 3);
+		});
+	});
+*/
+	describe('track', function() {
+		it('should make three requests and return undefined', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(true, assert);
+			branch.track('track', { }, function(err, data) {
+				assert.equal(data, undefined);
+			});
+			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				'{ }');
 		});
 	});
 
-
-	describe('setIdentity', function() {
-		it('should do this one thing', function(done) {
-			var assert = testUtils.plan(1, done);
-			branch.init(browser_fingerprint_id);
-			branch.setIdentity('identity', function(err, data) {
-				console.log(data);
-				assert.equals(true, true);
-				assert.deepEqual(data,
-					{
-						data: null,
-						referring_identity: null,
-						identity: "Branch",
-						has_app: true
-					},
-					'Expected response returned'
-				);
+	describe('link', function() {
+		it('should make three requests and return short link', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(true, assert);
+			branch.link(sampleParams, function(err, data) {
+				assert.equal(data, "https://bnc.lt/l/4manXlk0AJ");
 			});
+			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				'{"url":"https://bnc.lt/l/4manXlk0AJ"}');
 		});
 	});
-	*/
+
+	describe('referrals', function() {
+		it('should make three requests and return referral data', function(done) {
+			var assert = testUtils.plan(4, done);
+			var expectedResponse = { "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } };
+			branchInit(true, assert);
+			branch.referrals(function(err, data) {
+				assert.deepEqual(data, expectedResponse);
+			});
+			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				'{ "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } }');
+		});
+	});
+
+	describe('credits', function() {
+		it('should make three requests and return referral data', function(done) {
+			var assert = testUtils.plan(4, done);
+			var expectedResponse = { "default":"0" };
+			branchInit(true, assert);
+			branch.credits(function(err, data) {
+				assert.deepEqual(data, expectedResponse);
+			});
+			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				'{"default":"0"}');
+		});
+	});
 });
