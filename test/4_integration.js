@@ -159,19 +159,21 @@ describe('Integration tests', function() {
 			assert.equal(requests.length, 2);
 		});
 	});
-/*
+
 	describe('logout', function() {
-		it('should make three requests and return session data', function(done) {
-			var assert = testUtils.plan(2, done);
-			branchInit(true);
+		it('should make three requests and logout session', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(true, assert);
 			branch.logout(function(err) {
-				console.log(err);
-				assert.deepEqual(err, { });
+				assert.equal(err, null);
 			});
 			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				'{"session_id":"124235352855552203","identity_id":"124235352826192073","link":"https://bnc.lt/i/4tLqIdk017"}');
 		});
 	});
-*/
+
 	describe('track', function() {
 		it('should make three requests and return undefined', function(done) {
 			var assert = testUtils.plan(4, done);
@@ -216,7 +218,7 @@ describe('Integration tests', function() {
 	});
 
 	describe('credits', function() {
-		it('should make three requests and return referral data', function(done) {
+		it('should make three requests and return credits', function(done) {
 			var assert = testUtils.plan(4, done);
 			var expectedResponse = { "default":"0" };
 			branchInit(true, assert);

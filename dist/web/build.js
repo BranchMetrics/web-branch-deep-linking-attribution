@@ -1268,7 +1268,7 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
     a(null, e);
   });
 });
-Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
+Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.logout, {}, a);
 });
 CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
