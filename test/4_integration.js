@@ -198,7 +198,7 @@ describe('Integration tests', function() {
 			assert.equal(requests.length, 3);
 			requests[2].respond(200,
 				{ "Content-Type": "application/json" },
-				'{"url":"https://bnc.lt/l/4manXlk0AJ"}');
+				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }');
 		});
 	});
 
@@ -228,7 +228,32 @@ describe('Integration tests', function() {
 			assert.equal(requests.length, 3);
 			requests[2].respond(200,
 				{ "Content-Type": "application/json" },
-				'{"default":"0"}');
+				'{ "default":"0" }');
+		});
+	});
+
+	describe('sendSMS', function() {
+		it('should make five requests and return an empty object', function(done) {
+			var assert = testUtils.plan(6, done);
+			branchInit(true, assert);
+			branch.sendSMS('9999999999',
+				sampleParams,
+				{ },
+				function(err, data) {
+					assert.equal(data, undefined);
+			});
+			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }');
+			assert.equal(requests.length, 4);
+			requests[3].respond(200,
+				{ "Content-Type": "application/json" },
+				'{ "click_id":"4uImgLU00t" }');
+			assert.equal(requests.length, 5);
+			requests[4].respond(200,
+				{ "Content-Type": "text/html" },
+				'<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="/static/styles.css" /></head><body><div class="container"><h2>Sent!</h2></div></body></html>');
 		});
 	});
 });
