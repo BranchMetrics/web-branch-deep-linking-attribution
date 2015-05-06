@@ -881,6 +881,7 @@ branch.banner({
     description: 'The Branch demo app!',
     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
+    sendLinkText: 'Send Link',         // Text to show on desktop button to allow users to text themselves the app
     phonePreviewText: '+44 9999-9999', // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
     showiOS: true,                     // Should the banner be shown on iOS devices?

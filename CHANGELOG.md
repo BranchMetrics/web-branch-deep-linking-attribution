@@ -4,6 +4,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 - Fixes bug in link creation without data
+- Adds option to customize "Send Link" text in banner
 
 ## [1.4.1] - 2015-04-29
 - Fixes bug with dead-code elimination
