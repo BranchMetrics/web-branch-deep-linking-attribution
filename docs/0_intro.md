@@ -19,9 +19,10 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
 
 ### Browser Specific Support
-| Chrome | Firefox | Safari |     IE     |
-| ------ | ------- | ------ | ---------- |
-|    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
+
+| Chrome | Firefox | Safari | IE |
+|:--------:|:-------:|:--------:|:--------:|
+| &#10004; |&#10004; | &#10004; | 9, 10, 11 |
 
 ### Branch Key (formerly App ID)
 
@@ -35,7 +36,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 
 **[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test API keys.
 
-```html
+~~~ html
 <script type="text/javascript">
 
 	// INSERT INIT CODE
@@ -44,7 +45,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
     	// callback to handle err or data
 	});
 </script>
-```
+~~~
 
 #### Bower or npm installation
 
@@ -58,9 +59,9 @@ In addition to working as a standalone library, the Branch SDK works great in Co
 
 This Web SDK can also be used for Cordova/Phonegap applications.  It is provided as a plugin and can be installed with cordova plugin or the plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
 
-```sh
+~~~ sh
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
-```
+~~~
 
 **For a full walktrough specific to integrating the Web SDK with a Cordova app, see the [Cordova Guide](CORDOVA_GUIDE.md).**
 
@@ -70,21 +71,21 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 
 You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
-```js
+~~~ js
   branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
   	app.initComplete(err, data);
   });
-```
+~~~
 
 The session close will be sent automatically on any ‘pause’ event.
 
 ### SDK Method Queue
 
 Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
-```js
+~~~ js
 branch.init(...);
 branch.banner(...);
-```
+~~~
 
 If `branch.init()` fails, all subsequent branch methods will fail.
 
