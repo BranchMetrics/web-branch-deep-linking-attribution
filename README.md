@@ -35,16 +35,16 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 
 **[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test API keys.
 
-```html
+~~~ html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.4.2.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
+  (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.4.2.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
-	branch.init('BRANCH KEY', function(err, data) {
-    	// callback to handle err or data
-	});
+  branch.init('BRANCH KEY', function(err, data) {
+      // callback to handle err or data
+  });
 </script>
-```
+~~~
 
 #### Bower or npm installation
 
@@ -58,9 +58,9 @@ In addition to working as a standalone library, the Branch SDK works great in Co
 
 This Web SDK can also be used for Cordova/Phonegap applications.  It is provided as a plugin and can be installed with cordova plugin or the plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
 
-```sh
+~~~ sh
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
-```
+~~~
 
 **For a full walktrough specific to integrating the Web SDK with a Cordova app, see the [Cordova Guide](CORDOVA_GUIDE.md).**
 
@@ -70,21 +70,21 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 
 You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
-```js
+~~~ js
   branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
-  	app.initComplete(err, data);
+    app.initComplete(err, data);
   });
-```
+~~~
 
 The session close will be sent automatically on any ‘pause’ event.
 
 ### SDK Method Queue
 
 Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
-```js
+~~~ js
 branch.init(...);
 branch.banner(...);
-```
+~~~
 
 If `branch.init()` fails, all subsequent branch methods will fail.
 
@@ -119,7 +119,7 @@ ___
 
 * * *
 
-### setDebug(debug) 
+### setDebug(debug)
 
 **Parameters**
 
@@ -136,7 +136,7 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 
 
-### init(branch_key, options, callback) 
+### init(branch_key, options, callback)
 
 **Parameters**
 
@@ -162,16 +162,16 @@ creates a new user session, if it doesn't already exist, in
 the link the user was referred by.
 
 ##### Usage
-```js
+~~~ js
 branch.init(
     branch_key,
     callback (err, data),
     is_referrable
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
      "Error message",
      {
@@ -181,14 +181,14 @@ callback(
           identity:       'BranchUser' // Unique string that identifies the user
      }
 );
-```
+~~~
 
 **Note:** `Branch.init` must be called prior to calling any other Branch functions.
 ___
 
 
 
-### data(callback) 
+### data(callback)
 
 **Parameters**
 
@@ -204,7 +204,7 @@ ___
 
 
 
-### first(callback) 
+### first(callback)
 
 **Parameters**
 
@@ -223,7 +223,7 @@ ___
 
 
 
-### setIdentity(identity, callback) 
+### setIdentity(identity, callback)
 
 **Parameters**
 
@@ -238,15 +238,15 @@ a unique string that identifies the user - this could be an email address,
 UUID, Facebook ID, etc.
 
 ##### Usage
-```js
+~~~ js
 branch.setIdentity(
     identity,
     callback (err, data)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
      "Error message",
      {
@@ -256,12 +256,12 @@ callback(
           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
      }
 );
-```
+~~~
 ___
 
 
 
-### logout(callback) 
+### logout(callback)
 
 **Parameters**
 
@@ -270,23 +270,23 @@ ___
 Logs out the current session, replaces session IDs and identity IDs.
 
 ##### Usage
-```js
+~~~ js
 branch.logout(
     callback (err)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
      "Error message"
 );
-```
+~~~
 ___
 
 
 
-### close(callback) 
+### close(callback)
 
 **Parameters**
 
@@ -295,18 +295,18 @@ ___
 Close the current session.
 
 ##### Usage
-```js
+~~~ js
 branch.close(
     callback (err)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
      "Error message"
 );
-```
+~~~
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
@@ -316,7 +316,7 @@ ___
 
 
 
-### track(event, metadata, callback) 
+### track(event, metadata, callback)
 
 **Parameters**
 
@@ -330,18 +330,18 @@ This function allows you to track any event with supporting metadata. Use the ev
 The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
 
 ##### Usage
-```js
+~~~ js
 branch.event(
     event,
     metadata,
     callback (err)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback("Error message");
-```
+~~~
 ___
 
 # Deeplinking Methods
@@ -350,7 +350,7 @@ ___
 
 
 
-### link(linkData, callback) 
+### link(linkData, callback)
 
 **Parameters**
 
@@ -365,15 +365,15 @@ object with optional data you would like to store, including Facebook
 [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
 #### Usage
-```
+~~~
 branch.link(
     linkData,
     callback (err, link)
 );
-```
+~~~
 
 #### Example
-```js
+~~~ js
 branch.link({
     tags: [ 'tag1', 'tag2' ],
     channel: 'facebook',
@@ -395,22 +395,22 @@ branch.link({
 }, function(err, link) {
     console.log(err, link);
 });
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
     "Error message",
     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
 );
-```
+~~~
 ___
 
 ## Sharing links via SMS
 
 
 
-### sendSMS(phone, linkData, options, callback) 
+### sendSMS(phone, linkData, options, callback)
 
 **Parameters**
 
@@ -442,17 +442,17 @@ of `sendSMS`, and `sendSMS` will always make a new link.
 **Supports international SMS**.
 
 #### Usage
-```js
+~~~ js
 branch.sendSMS(
     phone,
     linkData,
     options,
     callback (err, data)
 );
-```
+~~~
 
 ##### Example
-```js
+~~~ js
 branch.sendSMS(
     phone: '9999999999',
     {
@@ -477,12 +477,12 @@ branch.sendSMS(
     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
     function(err) { console.log(err); }
 });
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback("Error message");
-```
+~~~
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
 
@@ -502,7 +502,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### referrals(callback) 
+### referrals(callback)
 
 **Parameters**
 
@@ -513,14 +513,14 @@ Warning: For a referral program, you should not use unique awards for custom eve
 Retrieves a complete summary of the referrals the current user has made.
 
 ##### Usage
-```js
+~~~ js
 branch.referrals(
     callback (err, data)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
     "Error message",
     {
@@ -538,13 +538,13 @@ callback(
         }
     }
 );
-```
+~~~
 
 ## Referral Codes
 
 
 
-### getCode(data, callback) 
+### getCode(data, callback)
 
 **Parameters**
 
@@ -570,7 +570,7 @@ branch.getCode(
 
 ##### Example
 
-```js
+~~~ js
 branch.getCode(
     {
       "amount":10,
@@ -580,17 +580,17 @@ branch.getCode(
     }
     callback (err, data)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
      "Error message",
      {
        "referral_code":"AB12CD"
      }
 );
-```
+~~~
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
@@ -598,7 +598,7 @@ ___
 
 
 
-### validateCode(code, callback) 
+### validateCode(code, callback)
 
 **Parameters**
 
@@ -610,16 +610,16 @@ Validate a referral code before using.
 
 ##### Usage
 
-```js
+~~~ js
 branch.validateCode(
     code, // The code to validate
     callback (err)
 );
-```
+~~~
 
 ##### Example
 
-```js
+~~~ js
 branch.validateCode(
     "AB12CD",
     function(err) {
@@ -630,15 +630,15 @@ branch.validateCode(
         }
     }
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
     "Error message",
     callback(err)
 );
-```
+~~~
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
@@ -646,7 +646,7 @@ ___
 
 
 
-### applyCode(code, callback) 
+### applyCode(code, callback)
 
 **Parameters**
 
@@ -658,16 +658,16 @@ Apply a referral code.
 
 ##### Usage
 
-```js
+~~~ js
 branch.applyCode(
     code, // The code to apply
     callback (err)
 );
-```
+~~~
 
 ##### Example
 
-```js
+~~~ js
 branch.applyCode(
     "AB12CD",
     function(err) {
@@ -678,15 +678,15 @@ branch.applyCode(
         }
     }
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
     "Error message",
     callback(err)
 );
-```
+~~~
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
@@ -696,7 +696,7 @@ ___
 
 
 
-### credits(callback) 
+### credits(callback)
 
 **Parameters**
 
@@ -707,14 +707,14 @@ ___
 This call will retrieve the entire history of credits and redemptions from the individual user.
 
 ##### Usage
-```js
+~~~ js
 branch.credits(
     callback (err, data)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
     "Error message",
     {
@@ -722,11 +722,11 @@ callback(
         'other bucket': 9
     }
 );
-```
+~~~
 
 
 
-### creditHistory(data, callback) 
+### creditHistory(data, callback)
 
 **Parameters**
 
@@ -738,16 +738,16 @@ This call will retrieve the entire history of credits and redemptions from the i
 
 ##### Usage
 
-```js
+~~~ js
 branch.creditHistory(
      data,
      callback(err, data)
 );
-```
+~~~
 
 ##### Example
 
-```js
+~~~ js
 branch.creditHistory(
     {
       "length":50,
@@ -757,10 +757,10 @@ branch.creditHistory(
     }
     callback (err, data)
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback(
     "Error message",
 [
@@ -788,7 +788,7 @@ callback(
     }
 ]
 );
-```
+~~~
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
@@ -798,7 +798,7 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 
 
-### redeem(amount, bucket, callback) 
+### redeem(amount, bucket, callback)
 
 **Parameters**
 
@@ -812,17 +812,17 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
 
-```js
+~~~ js
 branch.redeem(
     amount, // Amount of credits to be redeemed
     bucket,  // String of bucket name to redeem credits from
     callback (err)
 );
-```
+~~~
 
 ##### Example
 
-```js
+~~~ js
 branch.redeem(
     5,
     "Rubies",
@@ -830,12 +830,12 @@ branch.redeem(
         console.log(err);
     }
 );
-```
+~~~
 
 ##### Callback Format
-```js
+~~~ js
 callback("Error message");
-```
+~~~
 ___
 
 # Smart App Sharing Banner
@@ -846,7 +846,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 
 
-### banner(options, linkData) 
+### banner(options, linkData)
 
 **Parameters**
 
@@ -866,16 +866,16 @@ THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
 
 #### Usage
 
-```js
+~~~ js
 branch.banner(
     options, // Banner options: See example for all available options
     linkData // Data for link, same as Branch.link()
 );
-```
+~~~
 
 ##### Example
 
-```js
+~~~ js
 branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
@@ -910,7 +910,7 @@ branch.banner({
         '$og_image_url': 'http://myappwebsite.com/image.png'
     }
 });
-```
+~~~
 ___
 
 ### closeBanner()
@@ -921,9 +921,9 @@ The App Banner includes a close button the user can click, but you may want to c
 other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
 
 ##### Usage
-```js
+~~~ js
 branch.closeBanner();
-```
+~~~
 
 
 
