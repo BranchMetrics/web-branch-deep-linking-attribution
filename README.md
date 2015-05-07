@@ -19,8 +19,9 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
 
 ### Browser Specific Support
-| Chrome | Firefox | Safari |IE |
-| ------ | ------- | ------ | ---------- |
+
+| Chrome | Firefox | Safari | IE |
+|:--------:|:-------:|:--------:|:--------:|
 | &#10004; |&#10004; | &#10004; | 9, 10, 11 |
 
 ### Branch Key (formerly App ID)
