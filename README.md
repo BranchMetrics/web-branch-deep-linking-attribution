@@ -743,6 +743,7 @@ branch.creditHistory(
      data,
      callback(err, data)
 );
+```
 
 ##### Example
 
