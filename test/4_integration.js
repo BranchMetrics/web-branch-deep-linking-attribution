@@ -5,14 +5,6 @@ goog.require('goog.json'); // jshint unused:false
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
 
 describe('Integration tests', function() {
-	// TODO: would be great to write some tests here which call the Branch API
-	// functions but stub out XHR.
-
-	// With the above, we can actually run these tests against the *minified*
-	// version of the SDK, so we can make sure that we didn't do anything to
-	// screw up the Closure Compiler.
-	// We *may* not be able to use the minified build because we have to grab createScript method to catch jsonp requests :-/
-
 	var requests = [], xhr, clock;
 
 	beforeEach(function() {
@@ -57,27 +49,6 @@ describe('Integration tests', function() {
 				{ "Content-Type": "application/json" },
 				'{ "session_id":"123088518049178533", "identity_id":"114720603218387056", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
 	};
-/*
-	function basicTests(call, params) {
-		it('should fail if branch not initialized', function(done) {
-			var assert = testUtils.plan(params.length * 2, done);
-
-			function basicTest(param) {
-				var p = testUtils.nulls(param);
-				branch[call].apply(branch, p.concat(function(err) {
-					assert.equal(err.message, 'Branch SDK not initialized');
-				}));
-				assert.throws(function() {
-					branch[call].apply(branch, p);
-				}, 'Branch SDK not initialized');
-			}
-
-			for (var i = 0; i < params.length; i++) {
-				basicTest(params[i]);
-			}
-		});
-	}
-*/
 
 	describe('init', function() {
 		it('should call api with params and version', function(done) {
@@ -115,7 +86,6 @@ describe('Integration tests', function() {
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			var assert = testUtils.plan(1, done);
 			testUtils.go("#r:12345");
-
 			branch.init(branch_sample_key, function(err, data) {
 				assert.equal(utils.readStore(branch._storage).click_id, '12345', 'click_id from link_identifier hash stored in session_id');
 			});
@@ -175,7 +145,7 @@ describe('Integration tests', function() {
 	});
 
 	describe('track', function() {
-		it('should make three requests and return undefined', function(done) {
+		it('should make three requests and return undefined, no metadata', function(done) {
 			var assert = testUtils.plan(4, done);
 			branchInit(true, assert);
 			branch.track('track', { }, function(err, data) {
@@ -185,6 +155,19 @@ describe('Integration tests', function() {
 			requests[2].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ }');
+		});
+
+		it('should make three requests and return undefined, with metadata', function(done) {
+			var assert = testUtils.plan(4, done);
+			var testMetadata = { "test": "meta_data" };
+			branchInit(true, assert);
+			branch.track('track', testMetadata, function(err, data) {
+				assert.equal(data, undefined);
+			});
+			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				JSON.stringify(testMetadata));
 		});
 	});
 
