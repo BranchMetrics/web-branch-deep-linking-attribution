@@ -926,6 +926,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *      data,
  *      callback(err, data)
  * );
+ * ```
  *
  * ##### Example
  *
