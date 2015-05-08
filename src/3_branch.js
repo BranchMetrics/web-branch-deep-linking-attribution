@@ -1074,6 +1074,7 @@ if (WEB_BUILD) { // jshint undef:false
  *     showDesktop: true,                 // Should the banner be shown on desktop devices?
  *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+ *     showOnBottom: false,               // If true, the banner will show on the top of the screen, rather than the bottom (default).
  *     make_new_link: false               // Should the banner create a new link, even if a link already exists?
  * }, {
  *     phone: '9999999999',
