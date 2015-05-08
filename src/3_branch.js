@@ -236,11 +236,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			utils.store(data, self._storage);
 			setBranchValues(data);
 			self.init_state = init_states.INIT_SUCCEEDED;
+			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
 		if (err) {
 			self.init_state = init_states.INIT_FAILED;
 		}
-		data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
@@ -372,6 +372,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
+		data = data || { };
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
 		self.identity = data['identity'];

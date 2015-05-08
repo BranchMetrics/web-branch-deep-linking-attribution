@@ -194,7 +194,7 @@ describe('Branch', function() {
 		var expectedResponse = {
 			identity_id: '12345',
 			link: 'url',
-			referring_data: { },
+			referring_data: '{ }',
 			referring_identity: '12345'
 		};
 		it('should call api with identity', function(done) {
