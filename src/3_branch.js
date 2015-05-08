@@ -159,7 +159,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
- * @param {{isReferrable:?boolean,parse:?boolean}=} options - _optional_ - options: isReferrable: Is this a referrable session, parse: automatically parse the `data` property.
+ * @param {{isReferrable:?boolean,parse:?boolean}=} options - _optional_ - { *isReferrable*: _Is this a referrable session_, *parse*: _automatically parse the `data` property_ }.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN

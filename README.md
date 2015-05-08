@@ -144,7 +144,7 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 **branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
 
-**options**: `Object`, _optional_ - options: isReferrable: Is this a referrable session, parse: automatically parse the `data` property.
+**options**: `Object`, _optional_ - { *isReferrable*: _Is this a referrable session_, *parse*: _automatically parse the `data` property_ }.
 
 **callback**: `function`, _optional_ - callback to read the session data.
 
