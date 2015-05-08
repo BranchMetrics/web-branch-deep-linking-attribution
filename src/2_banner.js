@@ -139,9 +139,11 @@ banner = function(branch, options, linkData, storage) {
 			}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 			setTimeout(function() {
-				document.body.style.marginTop = '0px';
+				if (options.showOnBottom) { document.body.style.marginBottom = '0px'; }
+				else { document.body.style.marginTop = '0px'; }
 			}, banner_utils.animationDelay);
-			element.style.top = '-' + banner_utils.bannerHeight;
+			if (options.showOnBottom) { element.style.bottom = '-' + banner_utils.bannerHeight; }
+			else { element.style.top = '-' + banner_utils.bannerHeight; }
 
 			utils.storeKeyValue('hideBanner', true, storage);
 		};
@@ -154,9 +156,11 @@ banner = function(branch, options, linkData, storage) {
 
 		// Trigger animation
 		document.body.className += ' branch-animation';
-		document.body.style.marginTop = banner_utils.bannerHeight;
+		if (options.showOnBottom) { document.body.style.marginBottom = banner_utils.bannerHeight; }
+		else { document.body.style.marginTop = banner_utils.bannerHeight; }
 		setTimeout(function() {
-			element.style.top = '0';
+			if (options.showOnBottom) { element.style.bottom = '0'; }
+			else { element.style.top = '0'; }
 		}, banner_utils.animationDelay);
 
 		return closeBanner;

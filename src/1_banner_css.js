@@ -66,8 +66,10 @@ banner_css.inneriframe = 'body { margin: 0; }\n';
 
 banner_css.iframe_desktop = '#branch-banner-iframe { position: fixed; }\n';
 
-banner_css.iframe_mobile = '#branch-banner-iframe { position: absolute; }\n';
-
+banner_css.iframe_mobile = function(options) {
+	if (options.showOnBottom) { return '#branch-banner-iframe { position: fixed; }\n'; }
+	else { return '#branch-banner-iframe { position: absolute; }\n'; }
+};
 
 /**
  * @param {banner_utils.options} options
@@ -101,7 +103,7 @@ banner_css.css = function(options, element) {
 		var iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
-		iFrameCSS.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_mobile : banner_css.iframe_desktop);
+		iFrameCSS.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_mobile(options) : banner_css.iframe_desktop);
 		document.head.appendChild(iFrameCSS);
 	}
 
@@ -112,5 +114,6 @@ banner_css.css = function(options, element) {
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
 	doc.head.appendChild(css);
-	element.style.top = '-' + banner_utils.bannerHeight;
+	if (options.showOnBottom) { element.style.bottom = '-' + banner_utils.bannerHeight; }
+	else { element.style.top = '-' + banner_utils.bannerHeight; }
 };

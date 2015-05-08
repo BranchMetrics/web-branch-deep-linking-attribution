@@ -1125,6 +1125,7 @@ if (WEB_BUILD) { // jshint undef:false
 			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 			disableHide: !!options['disableHide'],
 			forgetHide: !!options['forgetHide'],
+			showOnBottom: !!options['showOnBottom'],
 			make_new_link: !!options['make_new_link']
 		};
 		if (typeof options['showMobile'] != 'undefined') {

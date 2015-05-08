@@ -1023,17 +1023,19 @@ banner_css.android = "#branch-banner-close { text-align: center; font-size: 15px
 banner_css.iframe = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + banner_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n";
 banner_css.inneriframe = "body { margin: 0; }\n";
 banner_css.iframe_desktop = "#branch-banner-iframe { position: fixed; }\n";
-banner_css.iframe_mobile = "#branch-banner-iframe { position: absolute; }\n";
+banner_css.iframe_mobile = function(a) {
+  return a.showOnBottom ? "#branch-banner-iframe { position: fixed; }\n" : "#branch-banner-iframe { position: absolute; }\n";
+};
 banner_css.css = function(a, b) {
   var c = banner_css.banner, d = banner_utils.mobileUserAgent();
   "ios" == d && a.showiOS ? c += banner_css.mobile + banner_css.ios : "android" == d && a.showAndroid ? c += banner_css.mobile + banner_css.android : (c += banner_css.desktop, c = window.ActiveXObject ? c + banner_css.ie : c + banner_css.nonie);
-  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_mobile : banner_css.iframe_desktop), document.head.appendChild(d));
+  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_mobile(a) : banner_css.iframe_desktop), document.head.appendChild(d));
   d = document.createElement("style");
   d.type = "text/css";
   d.id = "branch-css";
   d.innerHTML = c;
   (a.iframe ? b.contentWindow.document : document).head.appendChild(d);
-  b.style.top = "-" + banner_utils.bannerHeight;
+  a.showOnBottom ? b.style.bottom = "-" + banner_utils.bannerHeight : b.style.top = "-" + banner_utils.bannerHeight;
 };
 // Input 10
 var banner_html = {banner:function(a, b) {
@@ -1126,9 +1128,9 @@ var sendSMS = function(a, b, c, d) {
         banner_utils.removeElement(document.getElementById("branch-css"));
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
-        document.body.style.marginTop = "0px";
+        b.showOnBottom ? document.body.style.marginBottom = "0px" : document.body.style.marginTop = "0px";
       }, banner_utils.animationDelay);
-      e.style.top = "-" + banner_utils.bannerHeight;
+      b.showOnBottom ? e.style.bottom = "-" + banner_utils.bannerHeight : e.style.top = "-" + banner_utils.bannerHeight;
       utils.storeKeyValue("hideBanner", !0, d);
     };
     g && (g.onclick = function(a) {
@@ -1136,9 +1138,9 @@ var sendSMS = function(a, b, c, d) {
       k();
     });
     document.body.className += " branch-animation";
-    document.body.style.marginTop = banner_utils.bannerHeight;
+    b.showOnBottom ? document.body.style.marginBottom = banner_utils.bannerHeight : document.body.style.marginTop = banner_utils.bannerHeight;
     setTimeout(function() {
-      e.style.top = "0";
+      b.showOnBottom ? e.style.bottom = "0" : e.style.top = "0";
     }, banner_utils.animationDelay);
     return k;
   }
@@ -1344,7 +1346,7 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
 });
 WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showAndroid:"undefined" == typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == 
-  typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:!!b.forgetHide, make_new_link:!!b.make_new_link};
+  typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:!!b.forgetHide, showOnBottom:!!b.showOnBottom, make_new_link:!!b.make_new_link};
   "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
