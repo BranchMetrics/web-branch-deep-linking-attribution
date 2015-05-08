@@ -134,7 +134,7 @@
 
     $('#setIdentity').click(function() {
       request.html("branch.setIdentity('Branch');");
-      branch.setIdentity('Branch', true, function(err, data) {
+      branch.setIdentity('Branch', function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });

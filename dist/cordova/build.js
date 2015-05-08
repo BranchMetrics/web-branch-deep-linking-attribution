@@ -1209,16 +1209,15 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var e = c && "undefined" != typeof c.parse && null !== c.parse ? c.isReferrable : null;
   c = utils.readStore(d._storage);
-  var f = function(b, c) {
+  var e = function(b, c) {
     c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id, d.identity_id = c.identity_id, d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED);
     b && (d.init_state = init_states.INIT_FAILED);
-    c.data = e ? goog.json.parse(c.data) : c.data;
+    c.data_parsed = c.data ? goog.json.parse(c.data) : null;
     a(b, c && utils.whiteListSessionData(c));
   };
   if (c && c.session_id) {
-    f(null, c);
+    e(null, c);
   } else {
     if (CORDOVA_BUILD && (c = [], c.push(d.debug), null !== b && c.push(b ? 1 : 0), b = function() {
       a("Error getting device data!");
@@ -1226,32 +1225,32 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       console.log("Sending open with: " + goog.json.serialize(a));
       d._api(resources.open, a, function(a, b) {
         if (a) {
-          return f(a, null);
+          return e(a, null);
         }
         b.identity_id = utils.readKeyValue("identity_id", d._permStorage);
         b.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
-        f(null, b);
+        e(null, b);
       });
     }, b, "BranchDevice", "getOpenData", c) : exec(function(a) {
       console.log("Sending install with: " + goog.json.serialize(a));
       d._api(resources.install, a, function(a, b) {
         if (a) {
-          return f(a, null);
+          return e(a, null);
         }
-        f(null, b);
+        e(null, b);
       });
     }, b, "BranchDevice", "getInstallData", c)), WEB_BUILD) {
-      var g = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
+      var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
       d._api(resources._r, {v:config.version}, function(a, b) {
         if (a) {
-          return f(a, null);
+          return e(a, null);
         }
-        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+        d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
           if (a) {
-            return f(a, null);
+            return e(a, null);
           }
-          g && (b.click_id = g);
-          f(a, b);
+          f && (b.click_id = f);
+          e(a, b);
         });
       });
     }
@@ -1263,14 +1262,14 @@ Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
 CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 }));
-Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
-  var d = this;
-  this._api(resources.profile, {identity:b}, function(b, f) {
-    d.identity_id = f.identity_id;
-    d.sessionLink = f.link;
-    d.identity = f.identity;
-    f.referring_data = c ? goog.json.parse(f.referring_data) : f.referring_data;
-    a(null, f);
+Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
+  var c = this;
+  this._api(resources.profile, {identity:b}, function(b, e) {
+    c.identity_id = e.identity_id;
+    c.sessionLink = e.link;
+    c.identity = e.identity;
+    e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
+    a(null, e);
   });
 });
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
