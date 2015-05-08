@@ -1,12 +1,12 @@
 goog.provide('banner_css');
 goog.require('banner_utils');
 
-banner_css.banner =
-	'.branch-animation { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
+banner_css.banner = function(options) {
+	return '.branch-animation { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
 	'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
 	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +
-	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n' +
+	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; ' + (options.showOnBottom ? 'border-top' : 'border-bottom') + ': 1px solid #ddd; padding: 6px; }\n' +
 	'#branch-banner .icon { float: left; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
 	'#branch-banner .details { top: 16px; }\n' +
@@ -14,6 +14,7 @@ banner_css.banner =
 	'#branch-banner .right > div { float: right; }\n' +
 	'#branch-banner-action { top: 17px; }\n' +
 	'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
+};
 
 banner_css.desktop =
 	'#branch-banner { position: fixed; min-width: 600px; }\n' +
@@ -77,7 +78,7 @@ banner_css.iframe_mobile = function(options) {
  */
 banner_css.css = function(options, element) {
 	// Construct Banner CSS
-	var style = banner_css.banner;
+	var style = banner_css.banner(options);
 
 	// User agent specific styles
 	var userAgent = banner_utils.mobileUserAgent();
