@@ -500,7 +500,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * [Open Graph data](https://developers.facebook.com/docs/opengraph).
  *
  * #### Usage
- * ```
+ * ```js
  * branch.link(
  *     linkData,
  *     callback (err, link)
