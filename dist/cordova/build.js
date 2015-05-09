@@ -1209,7 +1209,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   c = utils.readStore(d._storage);
   var e = function(b, c) {
-    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id.toString(), d.identity_id = c.identity_id.toString(), d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED);
+    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), c.identity_id && (d.session_id = c.session_id.toString()), c.identity_id && (d.identity_id = c.identity_id.toString()), d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED);
     b && (d.init_state = init_states.INIT_FAILED);
     a(b, c && utils.whiteListSessionData(c));
   };
