@@ -3,6 +3,8 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+### New Functionality
+- Adds smart banner position option, with possible values: 'top', or 'bottom'
 
 ## [1.4.2] - 2015-05-06
 - Fixes bug in link creation without data
