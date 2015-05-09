@@ -1,5 +1,4 @@
 goog.require('config');
-goog.require('utils');
 goog.require('goog.json'); // jshint unused:false
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
@@ -86,10 +85,8 @@ describe('Integration tests', function() {
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			var assert = testUtils.plan(1, done);
 			testUtils.go("#r:12345");
-			branch.init(branch_sample_key, function(err, data) {
-				assert.equal(utils.readStore(branch._storage).click_id, '12345', 'click_id from link_identifier hash stored in session_id');
-			});
-			branchInit();
+			branchInit(true);
+			assert.equal(true, requests[1].requestBody.indexOf('link_identifier=12345') > 0);
 		});
 	});
 
