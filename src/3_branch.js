@@ -159,7 +159,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
- * @param {{isReferrable:?boolean}=} options - _optional_ - options: isReferrable: Is this a referrable session.
+ * @param {{isReferrable:?boolean}=} options - _optional_ - { *isReferrable*: _Is this a referrable session_ }.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
@@ -182,7 +182,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * branch.init(
  *     branch_key,
  *     callback (err, data),
- *     is_referrable
+ *     options
  * );
  * ```
  *
@@ -191,10 +191,10 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * callback(
  *      "Error message",
  *      {
- *           data:               { },      // If the user was referred from a link, and the link has associated data, the data is passed in here.
- *           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
- *           has_app:            true,    // Does the user have the app installed already?
- *           identity:       'BranchUser' // Unique string that identifies the user
+ *           data_parsed:        { },         // If the user was referred from a link, and the link has associated data, the data is passed in here.
+ *           referring_identity: '12345',     // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+ *           has_app:            true,        // Does the user have the app installed already?
+ *           identity:           'BranchUser' // Unique string that identifies the user
  *      }
  * );
  * ```
@@ -236,6 +236,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			utils.store(data, self._storage);
 			setBranchValues(data);
 			self.init_state = init_states.INIT_SUCCEEDED;
+			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
 		if (err) {
 			self.init_state = init_states.INIT_FAILED;
@@ -359,10 +360,10 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * callback(
  *      "Error message",
  *      {
- *           identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
- *           link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
- *           referring_data:     { },      // Returns the initial referring data for this identity, if exists.
- *           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+ *           identity_id:             '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+ *           link:                    'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+ *           referring_data_parsed:    { },      // Returns the initial referring data for this identity, if exists, as a parsed object.
+ *           referring_identity:      '12345'  // Returns the initial referring identity for this identity, if exists.
  *      }
  * );
  * ```
@@ -371,9 +372,11 @@ if (CORDOVA_BUILD) { // jshint undef:false
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
+		data = data || { };
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
 		self.identity = data['identity'];
+		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
 		done(null, data);
 	});
 });

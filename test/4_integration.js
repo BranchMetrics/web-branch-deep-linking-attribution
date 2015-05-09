@@ -84,6 +84,7 @@ describe('Integration tests', function() {
 			};
 
 			branch.init(branch_sample_key, function(err, res) {
+				res['data_parsed'] = null;
 				assert.deepEqual(res, expectedResponse, 'expected response returned');
 				assert(!err, 'No error');
 			});

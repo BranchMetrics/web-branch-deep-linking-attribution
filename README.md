@@ -144,7 +144,7 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 **branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
 
-**options**: `Object`, _optional_ - options: isReferrable: Is this a referrable session.
+**options**: `Object`, _optional_ - { *isReferrable*: _Is this a referrable session_ }.
 
 **callback**: `function`, _optional_ - callback to read the session data.
 
@@ -168,7 +168,7 @@ the link the user was referred by.
 branch.init(
     branch_key,
     callback (err, data),
-    is_referrable
+    options
 );
 ```
 
@@ -177,10 +177,10 @@ branch.init(
 callback(
      "Error message",
      {
-          data:               { },      // If the user was referred from a link, and the link has associated data, the data is passed in here.
-          referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
-          has_app:            true,    // Does the user have the app installed already?
-          identity:       'BranchUser' // Unique string that identifies the user
+          data_parsed:        { },         // If the user was referred from a link, and the link has associated data, the data is passed in here.
+          referring_identity: '12345',     // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+          has_app:            true,        // Does the user have the app installed already?
+          identity:           'BranchUser' // Unique string that identifies the user
      }
 );
 ```
@@ -252,10 +252,10 @@ branch.setIdentity(
 callback(
      "Error message",
      {
-          identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
-          link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
-          referring_data:     { },      // Returns the initial referring data for this identity, if exists.
-          referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+          identity_id:             '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+          link:                    'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+          referring_data_parsed:    { },      // Returns the initial referring data for this identity, if exists, as a parsed object.
+          referring_identity:      '12345'  // Returns the initial referring identity for this identity, if exists.
      }
 );
 ```
