@@ -6,7 +6,7 @@ banner_css.banner = function(options) {
 	'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
 	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +
-	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; ' + (options.showOnBottom ? 'border-top' : 'border-bottom') + ': 1px solid #ddd; padding: 6px; }\n' +
+	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; ' + (options.position == 'top' ? 'border-bottom' : 'border-top') + ': 1px solid #ddd; padding: 6px; }\n' +
 	'#branch-banner .icon { float: left; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
 	'#branch-banner .details { top: 16px; }\n' +
@@ -68,8 +68,8 @@ banner_css.inneriframe = 'body { margin: 0; }\n';
 banner_css.iframe_desktop = '#branch-banner-iframe { position: fixed; }\n';
 
 banner_css.iframe_mobile = function(options) {
-	if (options.showOnBottom) { return '#branch-banner-iframe { position: fixed; }\n'; }
-	else { return '#branch-banner-iframe { position: absolute; }\n'; }
+	if (options.position == 'top') { return '#branch-banner-iframe { position: absolute; }\n'; }
+	else if (options.position == 'bottom') { return '#branch-banner-iframe { position: fixed; }\n'; }
 };
 
 /**
@@ -115,6 +115,6 @@ banner_css.css = function(options, element) {
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
 	doc.head.appendChild(css);
-	if (options.showOnBottom) { element.style.bottom = '-' + banner_utils.bannerHeight; }
-	else { element.style.top = '-' + banner_utils.bannerHeight; }
+	if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+	else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 };
