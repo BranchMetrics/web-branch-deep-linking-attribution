@@ -71,8 +71,8 @@ else
 	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
 endif
 
-README.md: docs/0_intro.md docs/3_branch.md
-	cat docs/0_intro.md docs/3_branch.md docs/4_footer.md | \
+README.md: docs/0_notice.md docs/1_intro.md docs/3_branch.md
+	cat docs/0_notice.md docs/1_intro.md docs/3_branch.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
 test/integration-test.html: test/integration-test.template.html
