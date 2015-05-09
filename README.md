@@ -367,7 +367,7 @@ object with optional data you would like to store, including Facebook
 [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
 #### Usage
-```
+```js
 branch.link(
     linkData,
     callback (err, link)
@@ -745,6 +745,7 @@ branch.creditHistory(
      data,
      callback(err, data)
 );
+```
 
 ##### Example
 
