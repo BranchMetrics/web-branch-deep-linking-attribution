@@ -167,8 +167,8 @@ the link the user was referred by.
 ```js
 branch.init(
     branch_key,
-    callback (err, data),
     options
+    callback (err, data),
 );
 ```
 
@@ -892,6 +892,7 @@ branch.banner({
     showDesktop: true,                 // Should the banner be shown on desktop devices?
     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+    position: 'top',                   // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
     make_new_link: false               // Should the banner create a new link, even if a link already exists?
 }, {
     phone: '9999999999',
