@@ -93,7 +93,25 @@ describe('Integration tests', function() {
 			assert.equal(true, requests[1].requestBody.indexOf('link_identifier=12345') > -1);
 		});
 	});
+	/*
+	describe('init', function() {
+		it('should call api with params and version', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			var expectedResponse = {
+				"data": null,
+				"has_app": true,
+				"identity": "Branch",
+				"referring_identity": null
+			};
 
+			branch.init(branch_sample_key, function(err, res) {
+				res['data_parsed'] = null;
+				assert.deepEqual(res, expectedResponse, 'expected response returned');
+				assert(!err, 'No error');
+			});
+		});
+	});
+	*/
 	describe('setIdentity', function() {
 		it('make three requests to init and set identity, and return expected data', function(done) {
 			var assert = testUtils.plan(2, done);
@@ -112,7 +130,6 @@ describe('Integration tests', function() {
 			requests[2].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ "identity_id":' + identity_id + ', "link_click_id":"114750153298026746", "link":"https://bnc.lt/i/4LYQTXE0_k" }');
-
 		});
 	});
 

@@ -19,9 +19,10 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
 
 ### Browser Specific Support
-| Chrome | Firefox | Safari |     IE     |
-| ------ | ------- | ------ | ---------- |
-|    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
+
+| Chrome | Firefox | Safari | IE |
+|:--------:|:-------:|:--------:|:--------:|
+| &#10004; |&#10004; | &#10004; | 9, 10, 11 |
 
 ### Branch Key (formerly App ID)
 
@@ -71,7 +72,7 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
-  branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
+  branch.init("YOUR BRANCH KEY HERE", function(err, data) {
   	app.initComplete(err, data);
   });
 ```
@@ -81,6 +82,7 @@ The session close will be sent automatically on any ‘pause’ event.
 ### SDK Method Queue
 
 Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
+
 ```js
 branch.init(...);
 branch.banner(...);

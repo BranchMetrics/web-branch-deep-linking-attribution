@@ -159,7 +159,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
- * @param {{isReferrable:?boolean}=} options - _optional_ - options: isReferrable: Is this a referrable session.
+ * @param {{isReferrable:?boolean}=} options - _optional_ - { *isReferrable*: _Is this a referrable session_ }.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
@@ -181,8 +181,8 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```js
  * branch.init(
  *     branch_key,
+ *     options
  *     callback (err, data),
- *     is_referrable
  * );
  * ```
  *
@@ -191,10 +191,10 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * callback(
  *      "Error message",
  *      {
- *           data:               { },      // If the user was referred from a link, and the link has associated data, the data is passed in here.
- *           referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
- *           has_app:            true,    // Does the user have the app installed already?
- *           identity:       'BranchUser' // Unique string that identifies the user
+ *           data_parsed:        { },         // If the user was referred from a link, and the link has associated data, the data is passed in here.
+ *           referring_identity: '12345',     // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+ *           has_app:            true,        // Does the user have the app installed already?
+ *           identity:           'BranchUser' // Unique string that identifies the user
  *      }
  * );
  * ```
@@ -236,6 +236,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			utils.store(data, self._storage);
 			setBranchValues(data);
 			self.init_state = init_states.INIT_SUCCEEDED;
+			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
 		if (err) {
 			self.init_state = init_states.INIT_FAILED;
@@ -359,10 +360,10 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * callback(
  *      "Error message",
  *      {
- *           identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
- *           link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
- *           referring_data:     { },      // Returns the initial referring data for this identity, if exists.
- *           referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+ *           identity_id:             '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+ *           link:                    'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+ *           referring_data_parsed:    { },      // Returns the initial referring data for this identity, if exists, as a parsed object.
+ *           referring_identity:      '12345'  // Returns the initial referring identity for this identity, if exists.
  *      }
  * );
  * ```
@@ -371,9 +372,11 @@ if (CORDOVA_BUILD) { // jshint undef:false
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
+		data = data || { };
 		self.identity_id = data['identity_id'].toString();
 		self.sessionLink = data['link'];
 		self.identity = data['identity'];
+		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
 		done(null, data);
 	});
 });
@@ -500,7 +503,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * [Open Graph data](https://developers.facebook.com/docs/opengraph).
  *
  * #### Usage
- * ```
+ * ```js
  * branch.link(
  *     linkData,
  *     callback (err, link)
@@ -926,6 +929,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *      data,
  *      callback(err, data)
  * );
+ * ```
  *
  * ##### Example
  *
@@ -1065,12 +1069,15 @@ if (WEB_BUILD) { // jshint undef:false
  *     description: 'The Branch demo app!',
  *     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
  *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
+ *     sendLinkText: 'Send Link',         // Text to show on desktop button to allow users to text themselves the app
+ *     phonePreviewText: '+44 9999-9999', // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
  *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     showiOS: true,                     // Should the banner be shown on iOS devices?
  *     showAndroid: true,                 // Should the banner be shown on Android devices?
  *     showDesktop: true,                 // Should the banner be shown on desktop devices?
  *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+ *     position: 'top',                   // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
  *     make_new_link: false               // Should the banner create a new link, even if a link already exists?
  * }, {
  *     phone: '9999999999',
@@ -1114,12 +1121,15 @@ if (WEB_BUILD) { // jshint undef:false
 			description: options['description'] || '',
 			openAppButtonText: options['openAppButtonText'] || 'View in app',
 			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+			sendLinkText: options['sendLinkText'] || 'Send Link',
+			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
 			iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
 			showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
 			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 			disableHide: !!options['disableHide'],
 			forgetHide: !!options['forgetHide'],
+			position: options['position'] || 'top',
 			make_new_link: !!options['make_new_link']
 		};
 		if (typeof options['showMobile'] != 'undefined') {

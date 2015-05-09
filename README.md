@@ -20,9 +20,10 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
 
 ### Browser Specific Support
-| Chrome | Firefox | Safari |     IE     |
-| ------ | ------- | ------ | ---------- |
-|    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
+
+| Chrome | Firefox | Safari | IE |
+|:--------:|:-------:|:--------:|:--------:|
+| &#10004; |&#10004; | &#10004; | 9, 10, 11 |
 
 ### Branch Key (formerly App ID)
 
@@ -39,7 +40,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.4.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.4.2.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -72,7 +73,7 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
-  branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
+  branch.init("YOUR BRANCH KEY HERE", function(err, data) {
   	app.initComplete(err, data);
   });
 ```
@@ -82,6 +83,7 @@ The session close will be sent automatically on any ‘pause’ event.
 ### SDK Method Queue
 
 Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
+
 ```js
 branch.init(...);
 branch.banner(...);
@@ -143,7 +145,7 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 **branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
 
-**options**: `Object`, _optional_ - options: isReferrable: Is this a referrable session.
+**options**: `Object`, _optional_ - { *isReferrable*: _Is this a referrable session_ }.
 
 **callback**: `function`, _optional_ - callback to read the session data.
 
@@ -166,8 +168,8 @@ the link the user was referred by.
 ```js
 branch.init(
     branch_key,
+    options
     callback (err, data),
-    is_referrable
 );
 ```
 
@@ -176,10 +178,10 @@ branch.init(
 callback(
      "Error message",
      {
-          data:               { },      // If the user was referred from a link, and the link has associated data, the data is passed in here.
-          referring_identity: '12345', // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
-          has_app:            true,    // Does the user have the app installed already?
-          identity:       'BranchUser' // Unique string that identifies the user
+          data_parsed:        { },         // If the user was referred from a link, and the link has associated data, the data is passed in here.
+          referring_identity: '12345',     // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+          has_app:            true,        // Does the user have the app installed already?
+          identity:           'BranchUser' // Unique string that identifies the user
      }
 );
 ```
@@ -251,10 +253,10 @@ branch.setIdentity(
 callback(
      "Error message",
      {
-          identity_id:        '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
-          link:               'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
-          referring_data:     { },      // Returns the initial referring data for this identity, if exists.
-          referring_identity: '12345'  // Returns the initial referring identity for this identity, if exists.
+          identity_id:             '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
+          link:                    'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
+          referring_data_parsed:    { },      // Returns the initial referring data for this identity, if exists, as a parsed object.
+          referring_identity:      '12345'  // Returns the initial referring identity for this identity, if exists.
      }
 );
 ```
@@ -366,7 +368,7 @@ object with optional data you would like to store, including Facebook
 [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
 #### Usage
-```
+```js
 branch.link(
     linkData,
     callback (err, link)
@@ -744,6 +746,7 @@ branch.creditHistory(
      data,
      callback(err, data)
 );
+```
 
 ##### Example
 
@@ -882,12 +885,15 @@ branch.banner({
     description: 'The Branch demo app!',
     openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
+    sendLinkText: 'Send Link',         // Text to show on desktop button to allow users to text themselves the app
+    phonePreviewText: '+44 9999-9999', // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
     showiOS: true,                     // Should the banner be shown on iOS devices?
     showAndroid: true,                 // Should the banner be shown on Android devices?
     showDesktop: true,                 // Should the banner be shown on desktop devices?
     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+    position: 'top',                   // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
     make_new_link: false               // Should the banner create a new link, even if a link already exists?
 }, {
     phone: '9999999999',

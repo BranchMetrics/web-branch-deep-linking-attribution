@@ -3,9 +3,17 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+### New Functionality
 - Integration tests
+- Adds smart banner position option, with possible values: 'top', or 'bottom'
+- Adds data_parsed to branch.init() and referring_data_parsed to branch.setIdentity()
+
+## [1.4.2] - 2015-05-06
+- Fixes bug in link creation without data
+- Adds option to customize "Send Link" text in banner
 
 ## [1.4.1] - 2015-04-29
+- Fixes bug with dead-code elimination
 
 ## [1.4.0] - 2015-04-25
 - Add Cordova version of SDK! Add Cordova guide and add upgrade guide

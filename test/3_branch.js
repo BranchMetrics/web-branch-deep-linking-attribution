@@ -48,11 +48,9 @@ describe('Branch', function() {
 				branch[call].apply(branch, p.concat(function(err) {
 					assert.equal(err.message, 'Branch SDK not initialized');
 				}));
-				/*
 				assert.throws(function() {
 					branch[call].apply(branch, p);
 				}, 'Branch SDK not initialized');
-				*/
 			}
 
 			for (var i = 0; i < params.length; i++) {
@@ -196,7 +194,7 @@ describe('Branch', function() {
 		var expectedResponse = {
 			identity_id: '12345',
 			link: 'url',
-			referring_data: { },
+			referring_data: '{ }',
 			referring_identity: '12345'
 		};
 		it('should call api with identity', function(done) {
