@@ -25,3 +25,4 @@ test:
   override:
     - ./lint.sh
     - mocha-phantomjs test/test.html
+    - mocha-phantomjs test/integration-test.html
