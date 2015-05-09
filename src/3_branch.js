@@ -219,8 +219,8 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	var sessionData = utils.readStore(self._storage);
 
 	function setBranchValues(data) {
-		self.session_id = data['session_id'];
-		self.identity_id = data['identity_id'];
+		self.session_id = data['session_id'].toString();
+		self.identity_id = data['identity_id'].toString();
 		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
@@ -371,7 +371,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		self.identity_id = data['identity_id'];
+		self.identity_id = data['identity_id'].toString();
 		self.sessionLink = data['link'];
 		self.identity = data['identity'];
 		done(null, data);
