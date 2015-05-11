@@ -219,7 +219,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	var sessionData = utils.readStore(self._storage);
 
 	function setBranchValues(data) {
-		if (data['identity_id']) { self.session_id = data['session_id'].toString(); }
+		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
 		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD) { // jshint undef:false
