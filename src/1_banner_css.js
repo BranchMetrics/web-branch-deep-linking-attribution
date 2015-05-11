@@ -2,7 +2,7 @@ goog.provide('banner_css');
 goog.require('banner_utils');
 
 banner_css.banner = function(options) {
-	return '.branch-animation { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
+	return '.branch-banner-is-active { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
 	'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
 	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +

@@ -90,6 +90,21 @@ var sendSMS = function(doc, branch, options, linkData) {
 	}
 };
 
+var hasClass = function(element, className) {
+	return !!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+};
+
+var addClass = function(element, className) {
+	if (!hasClass(element, className)) { element.className += " " + className; }
+};
+
+var removeClass = function(element, className) {
+	if (hasClass(element, className)) {
+		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+		element.className = element.className.replace(reg, ' ');
+	}
+};
+
 /**
  * @param {Object} branch
  * @param {banner_utils.options} options
@@ -141,6 +156,7 @@ banner = function(branch, options, linkData, storage) {
 			setTimeout(function() {
 				if (options.position == 'top') { document.body.style.marginTop = '0px'; }
 				else if (options.position == 'bottom') { document.body.style.marginBottom = '0px'; }
+				removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
 			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
@@ -155,7 +171,7 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		// Trigger animation
-		document.body.className += ' branch-animation';
+		addClass(document.body, 'branch-banner-is-active');
 		if (options.position == 'top') { document.body.style.marginTop = banner_utils.bannerHeight; }
 		else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.bannerHeight; }
 		setTimeout(function() {
