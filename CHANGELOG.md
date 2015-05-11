@@ -8,6 +8,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Adds smart banner position option, with possible values: 'top', or 'bottom'
 - Adds data_parsed to branch.init() and referring_data_parsed to branch.setIdentity()
 - Adds a `branch-banner-is-active` class to the body element when the smart banner is open, and removes it when the banner is closed
+- Fixes issue with Cordova open method
 
 ## [1.4.2] - 2015-05-06
 - Fixes bug in link creation without data
