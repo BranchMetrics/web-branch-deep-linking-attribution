@@ -260,11 +260,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
 			if (utils.readKeyValue('identity_id', self._permStorage)) {
 				exec(function(data) {
+					data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
+					data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
 					console.log("Sending open with: " + goog.json.serialize(data));
 					self._api(resources.open, data, function(err, data) {
 						if (err) { return finishInit(err, null); }
-						data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
-						data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
 						finishInit(null, data);
 					});
 				}, cordovaError,  "BranchDevice", "getOpenData", args);
