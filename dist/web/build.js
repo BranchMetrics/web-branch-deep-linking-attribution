@@ -1222,7 +1222,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   c = utils.readStore(d._storage);
   var e = function(b, c) {
-    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), c.identity_id && (d.session_id = c.session_id.toString()), c.identity_id && (d.identity_id = c.identity_id.toString()), d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), c.session_id && (d.session_id = c.session_id.toString()), c.identity_id && (d.identity_id = c.identity_id.toString()), d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     a(b, c && utils.whiteListSessionData(c));
   };
@@ -1232,13 +1232,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     if (CORDOVA_BUILD && (c = [], c.push(d.debug), null !== b && c.push(b ? 1 : 0), b = function() {
       a("Error getting device data!");
     }, utils.readKeyValue("identity_id", d._permStorage) ? exec(function(a) {
+      a.identity_id = utils.readKeyValue("identity_id", d._permStorage);
+      a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
       console.log("Sending open with: " + goog.json.serialize(a));
       d._api(resources.open, a, function(a, b) {
         if (a) {
           return e(a, null);
         }
-        b.identity_id = utils.readKeyValue("identity_id", d._permStorage);
-        b.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
         e(null, b);
       });
     }, b, "BranchDevice", "getOpenData", c) : exec(function(a) {
