@@ -968,7 +968,7 @@ branch.banner(
          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
          title: 'Branch Demo App',
          description: 'The Branch demo app!',
-         // Display preferences
+         // Link preferences
          make_new_link: true
     },
     {... link data ...}
