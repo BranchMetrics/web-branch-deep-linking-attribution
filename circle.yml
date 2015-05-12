@@ -14,7 +14,7 @@ dependencies:
     - stat compiler/library/closure-library-master || (wget https://github.com/google/closure-library/archive/master.zip && unzip master.zip -d compiler/library)
 
     - npm install
-    - npm install karma
+    - npm install -g karma
     - npm install -g karma-sauce-launcher
     - jscs --help || npm install -g jscs
     - jshint -v || npm install -g jshint
