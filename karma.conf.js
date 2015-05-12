@@ -3,138 +3,152 @@
 
 module.exports = function(config) {
 	var customLaunchers = {
-		// Chrome
-		/*
-		sl_chrome_d: {
+		// Safari
+		sl_safari_8: {
 			base: 'SauceLabs',
-			browserName: 'chrome',
-			version: 'd'
+			browserName: 'safari',
+			platform: 'OS X 10.10',
+			version: '8.0'
 		},
-		sl_chrome_b: {
+		sl_safari_7: {
+			base: 'SauceLabs',
+			browserName: 'safari',
+			platform: 'OS X 10.9',
+			version: '7.0'
+		},
+
+		// Chrome
+		sl_chrome_42: {
 			base: 'SauceLabs',
 			browserName: 'chrome',
-			version: 'b'
+			platform: 'OS X 10.10',
+			version: '42.0'
 		},
 		sl_chrome_41: {
 			base: 'SauceLabs',
 			browserName: 'chrome',
-			version: '41'
+			platform: 'OS X 10.10',
+			version: '41.0'
 		},
 		sl_chrome_40: {
 			base: 'SauceLabs',
 			browserName: 'chrome',
-			version: '40'
+			platform: 'OS X 10.10',
+			version: '40.0'
 		},
 		sl_chrome_39: {
 			base: 'SauceLabs',
 			browserName: 'chrome',
-			version: '39'
+			platform: 'OS X 10.10',
+			version: '39.0'
 		},
 		sl_chrome_38: {
 			base: 'SauceLabs',
 			browserName: 'chrome',
-			version: '38'
+			platform: 'OS X 10.10',
+			version: '38.0'
 		},
-		*/
 
 		// Firefox
-		/*
-		sl_firefox_d: {
+		sl_firefox_37: {
 			base: 'SauceLabs',
 			browserName: 'firefox',
-			version: 'd'
-		},
-		sl_firefox_b: {
-			base: 'SauceLabs',
-			browserName: 'firefox',
-			version: 'b'
+			platform: 'OS X 10.10',
+			version: '37'
 		},
 		sl_firefox_36: {
 			base: 'SauceLabs',
 			browserName: 'firefox',
+			platform: 'OS X 10.10',
 			version: '36'
 		},
 		sl_firefox_35: {
 			base: 'SauceLabs',
 			browserName: 'firefox',
+			platform: 'OS X 10.10',
 			version: '35'
 		},
 		sl_firefox_34: {
 			base: 'SauceLabs',
 			browserName: 'firefox',
+			platform: 'OS X 10.10',
 			version: '34'
 		},
-		*/
 
 		// iOS
-		/*
-		sl_ios_safari_8: {
+		sl_ios_safari_82: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
-			platform: 'OS X 10.9',
+			platform: 'OS X 10.10',
 			version: '8.2'
 		},
-		sl_ios_safari_7: {
+		sl_ios_safari_81: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
-			platform: 'OS X 10.9',
+			platform: 'OS X 10.10',
+			version: '8.1'
+		},
+		sl_ios_safari_71: {
+			base: 'SauceLabs',
+			browserName: 'iphone',
+			platform: 'OS X 10.10',
 			version: '7.1'
 		},
-		sl_ios_safari_6: {
+		sl_ios_safari_70: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
-			platform: 'OS X 10.9',
+			platform: 'OS X 10.10',
+			version: '7.0'
+		},
+		sl_ios_safari_61: {
+			base: 'SauceLabs',
+			browserName: 'iphone',
+			platform: 'OS X 10.10',
 			version: '6.1'
 		},
-		sl_ios_safari_5: {
+		sl_ios_safari_60: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
-			platform: 'OS X 10.9',
-			version: '5.1'
+			platform: 'OS X 10.10',
+			version: '6.0'
 		},
-		sl_ios_safari_4: {
-			base: 'SauceLabs',
-			browserName: 'iphone',
-			platform: 'OS X 10.9',
-			version: '4.3'
-		},
-		*/
 
 		// Android
-		/*
+		sl_android_51: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			platform: 'Linux',
+			version: '5.1'
+		},
 		sl_android_50: {
 			base: 'SauceLabs',
 			browserName: 'android',
+			platform: 'Linux',
 			version: '5.0'
 		},
 		sl_android_44: {
 			base: 'SauceLabs',
 			browserName: 'android',
+			platform: 'Linux',
 			version: '4.4'
 		},
 		sl_android_43: {
 			base: 'SauceLabs',
 			browserName: 'android',
+			platform: 'Linux',
 			version: '4.3'
 		},
 		sl_android_42: {
 			base: 'SauceLabs',
 			browserName: 'android',
+			platform: 'Linux',
 			version: '4.2'
 		},
 		sl_android_41: {
 			base: 'SauceLabs',
 			browserName: 'android',
-			version: '4.1'
-		},
-		*/
-		sl_android_40: {
-			base: 'SauceLabs',
 			platform: 'Linux',
-			browserName: 'android',
-			deviceName: 'Android Emulator',
-			deviceOrientation: 'portrait',
-			version: '4.0'
+			version: '4.1'
 		},
 
 		// internet exploder
