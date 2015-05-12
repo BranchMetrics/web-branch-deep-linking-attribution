@@ -885,7 +885,7 @@ Otherwise, a button is shown that either says an "open" app phrase, or a "downlo
 
 The app sharing banner includes a number of ways to easily customize it by specifying properties in the `options` object, which is the first argument of the banner.
 
-## Your App's Information _required_
+### Your App's Information _required_
 You can set the icon, title, and description for your app with the properties: `icon`, `title`, and `description`. For example, an app banner with these three properties set:
 ```js
 branch.banner(
@@ -898,7 +898,7 @@ branch.banner(
 );
 ```
 
-## The Call To Action Text _optional_
+### The Call To Action Text _optional_
 On mobile devices, the app banner show's an option either to download the app if they do not have it installed, or open the app if they have already installed it. Both of these can be customized from their respective defaults of Download app, and View in app.
 When the banner is opened on a desktop devide, a simpel form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
 ```js
@@ -918,7 +918,7 @@ branch.banner(
 );
 ```
 
-## Enabed Platforms _optional_
+### Enabed Platforms _optional_
 The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
 ```js
 branch.banner(
@@ -934,8 +934,9 @@ branch.banner(
     },
     {... link data ...}
 );
+```
 
-## Display Preferences _optional_
+### Display Preferences _optional_
 By default, the app banner displays inside of an iFrame (isolates the app banner css from your page), at the top of the page, shows a close button to the user, and will never show again once closed by the user. All of this functionality can be customized.
 The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
 The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
@@ -956,8 +957,9 @@ branch.banner(
     },
     {... link data ...}
 );
+```
 
-## Link Preferences _optional_
+### Link Preferences _optional_
 By default, tthe app banner will reusue a link that has most recently been created. If this is not desired, and you wish an enitrley new link to be created and overwrite the previous link, you can set `make_new_link` to true.
 ```js
 branch.banner(
@@ -971,6 +973,7 @@ branch.banner(
     },
     {... link data ...}
 );
+```
 
 
 
