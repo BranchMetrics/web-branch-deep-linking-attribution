@@ -1064,6 +1064,97 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
  * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
  *
+ * # Customizing the App Sharing Banner
+ *
+ * The app sharing banner includes a number of ways to easily customize it by specifying properties in the `options` object, which is the first argument of the banner.
+ *
+ * ## Your App's Information _required_
+ * You can set the icon, title, and description for your app with the properties: `icon`, `title`, and `description`. For example, an app banner with these three properties set:
+ * ```js
+ * branch.banner(
+ *     {
+ *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *          title: 'Branch Demo App',
+ *          description: 'The Branch demo app!'
+ *     },
+ *     {... link data ...}
+ * );
+ * ```
+ *
+ * ## The Call To Action Text _optional_
+ * On mobile devices, the app banner show's an option either to download the app if they do not have it installed, or open the app if they have already installed it. Both of these can be customized from their respective defaults of Download app, and View in app.
+ * When the banner is opened on a desktop devide, a simpel form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
+ * ```js
+ * branch.banner(
+ *     {
+ *          // required app info properties
+ *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *          title: 'Branch Demo App',
+ *          description: 'The Branch demo app!',
+ *          // Call to action customization
+ *          openAppButtonText: 'Open',
+ *          downloadAppButtonText: 'Install',
+ *          phonePreviewText: '+44 9999-9999',
+ *          sendLinkText: 'Txt me!'
+ *     },
+ *     {... link data ...}
+ * );
+ * ```
+ *
+ * ## Enabed Platforms _optional_
+ * The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
+ * ```js
+ * branch.banner(
+ *     {
+ *          // required app info properties
+ *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *          title: 'Branch Demo App',
+ *          description: 'The Branch demo app!',
+ *          // Platforms customization
+ *          showDesktop: false,
+ *          showiOS: true,
+ *          showAndroid: true
+ *     },
+ *     {... link data ...}
+ * );
+ *
+ * ## Display Preferences _optional_
+ * By default, the app banner displays inside of an iFrame (isolates the app banner css from your page), at the top of the page, shows a close button to the user, and will never show again once closed by the user. All of this functionality can be customized.
+ * The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
+ * The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
+ * The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past.
+ * The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
+ * ```js
+ * branch.banner(
+ *     {
+ *          // required app info properties
+ *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *          title: 'Branch Demo App',
+ *          description: 'The Branch demo app!',
+ *          // Display preferences
+ *          iframe: false,
+ *          disableHide: true,
+ *          forgetHide: true,
+ *          position: 'bottom'
+ *     },
+ *     {... link data ...}
+ * );
+ *
+ * ## Link Preferences _optional_
+ * By default, tthe app banner will reusue a link that has most recently been created. If this is not desired, and you wish an enitrley new link to be created and overwrite the previous link, you can set `make_new_link` to true.
+ * ```js
+ * branch.banner(
+ *     {
+ *          // required app info properties
+ *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *          title: 'Branch Demo App',
+ *          description: 'The Branch demo app!',
+ *          // Display preferences
+ *          make_new_link: true
+ *     },
+ *     {... link data ...}
+ * );
+ *
  */
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
@@ -1073,11 +1164,11 @@ if (WEB_BUILD) { // jshint undef:false
 /**
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
- * @param {Object} linkData - _required_ - object of all link data, same as Branch.link()
+ * @param {Object} data - _required_ - object of all link data, same as Branch.link()
  *
  * **[Formerly `appBanner()`](CHANGELOG.md)**
  *
- * Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
+ * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
  *
  * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
  * |------------------|----------------------|----------------------|
@@ -1090,7 +1181,7 @@ if (WEB_BUILD) { // jshint undef:false
  * ```js
  * branch.banner(
  *     options, // Banner options: See example for all available options
- *     linkData // Data for link, same as Branch.link()
+ *     data // Data for link, same as Branch.link()
  * );
  * ```
  *
@@ -1105,16 +1196,15 @@ if (WEB_BUILD) { // jshint undef:false
  *     downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
  *     sendLinkText: 'Send Link',         // Text to show on desktop button to allow users to text themselves the app
  *     phonePreviewText: '+44 9999-9999', // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
- *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     showiOS: true,                     // Should the banner be shown on iOS devices?
  *     showAndroid: true,                 // Should the banner be shown on Android devices?
  *     showDesktop: true,                 // Should the banner be shown on desktop devices?
+ *     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
  *     position: 'top',                   // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
  *     make_new_link: false               // Should the banner create a new link, even if a link already exists?
  * }, {
- *     phone: '9999999999',
  *     tags: ['tag1', 'tag2'],
  *     feature: 'dashboard',
  *     stage: 'new user',
@@ -1148,7 +1238,7 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  */
-	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, linkData) {
+	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		var bannerOptions = {
 			icon: options['icon'] || '',
 			title: options['title'] || '',
@@ -1169,7 +1259,7 @@ if (WEB_BUILD) { // jshint undef:false
 		if (typeof options['showMobile'] != 'undefined') {
 			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 		}
-		this.closeBannerPointer = banner(this, bannerOptions, linkData, this._storage);
+		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
 		done();
 	});
 
