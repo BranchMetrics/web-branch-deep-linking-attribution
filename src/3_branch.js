@@ -1158,6 +1158,15 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
+ * ### Playing nicely with other positon fixed "sticky" banners
+ * Do you already have a "sticky" element on the top of your website, such as a navigation bar? If so, the Branch app banner will likely interfere with it. Fortunatley, we have a solution!
+ * Without any configuration, the Web SDK adds a class called `branch-banner-is-active` to the body element of your website when the banner opens, and removes it when the banner closes.
+ * As an example, let's say you had an element on your website with a class of `header` that was `position: fixed;`. You could then add the following to your stylesheet:
+ * ```css
+ * body.branch-banner-is-active .header { top: 76px; }
+ * ```
+ * This will add exactly the space required to show the app banner above your navigation header!
+ *
  */
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
