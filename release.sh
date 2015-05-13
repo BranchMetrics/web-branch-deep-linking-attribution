@@ -2,8 +2,8 @@
 
 [ $# -eq 0 ] && { echo "Usage: $0 v1.0.0"; exit 1; }
 
-VERSION=$1
-VERSION_NO_V=$(echo $VERSION | tr -d "\nv")
+VERSION_NO_V=$(echo $1 | tr -d "\nv")
+VERSION="v"$VERSION_NO_V
 DATE=$(date "+%Y-%m-%d")
 
 echo "Releasing Branch Web SDK"
