@@ -5,6 +5,10 @@ This README outlines the functionality of the Branch Metrics Web SDK, and how to
 
 Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
 
+## [New documentation portal](https://dev.branch.io)
+
+Check it out!
+
 ## Overview
 
 The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~7K gzipped.
