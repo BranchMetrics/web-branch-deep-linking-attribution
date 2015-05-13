@@ -5,10 +5,6 @@ This README outlines the functionality of the Branch Metrics Web SDK, and how to
 
 Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
 
-## [New documentation portal](https://dev.branch.io)
-
-Check it out!
-
 ## Overview
 
 The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~7K gzipped.
@@ -44,7 +40,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.0.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
