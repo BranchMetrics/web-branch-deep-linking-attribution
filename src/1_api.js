@@ -139,7 +139,6 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-	req.timeout = 5000;
 	req.ontimeout = function() {
 		callback(new Error(utils.messages.timeout));
 	};
@@ -164,6 +163,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 
 	try {
 		req.open(method, url, true);
+		req.timeout = 5000;
 		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		req.send(data);
 	}
