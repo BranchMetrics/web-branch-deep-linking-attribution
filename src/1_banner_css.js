@@ -65,8 +65,8 @@ banner_css.iframe =
 
 banner_css.inneriframe = 'body { margin: 0; }\n';
 
-banner_css.iframe_position = function(sticky) {
-	return '#branch-banner-iframe { position: ' + (sticky ? 'fixed' : 'absolute') + '; }\n';
+banner_css.iframe_position = function(sticky, position) {
+	return '#branch-banner-iframe { position: ' + (position == 'top' ? (sticky ? 'fixed' : 'absolute') : 'fixed') + '; }\n';
 };
 
 /**
@@ -101,7 +101,7 @@ banner_css.css = function(options, element) {
 		var iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
-		iFrameCSS.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_position(options.mobileSticky) : banner_css.iframe_position(options.desktopSticky));
+		iFrameCSS.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_position(options.mobileSticky, options.position) : banner_css.iframe_position(options.desktopSticky, options.position));
 		document.head.appendChild(iFrameCSS);
 	}
 
