@@ -1258,7 +1258,7 @@ if (WEB_BUILD) { // jshint undef:false
 			icon: options['icon'] || '',
 			title: options['title'] || '',
 			description: options['description'] || '',
-			openAppButtonText: options['openAppButtsonText'] || 'View in app',
+			openAppButtonText: options['openAppButtonText'] || 'View in app',
 			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
 			sendLinkText: options['sendLinkText'] || 'Send Link',
 			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
