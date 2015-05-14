@@ -93,7 +93,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 ## API Reference
 
 1. Branch Session
-  + [.init()](#initapp_id-callback)
+  + [.init()](#initbranch_key-options)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
 
@@ -101,7 +101,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.track()](#trackevent-metadata-callback)
 
 1. Deeplinking Methods
-   + [.link()](#linkmetadata-callback)
+   + [.link()](#linkdata-callback)
    + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
 
 1. Referral Methods
@@ -110,6 +110,6 @@ If `branch.init()` fails, all subsequent branch methods will fail.
    + [.redeem()](#redeemamount-bucket-callback)
 
 1. Smart Banner
-   + [.banner()](#banneroptions-linkdata)
+   + [.banner()](#smart-app-sharing-banner)
 
 ___
