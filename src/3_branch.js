@@ -1125,6 +1125,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
  * The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past.
  * The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
+ * The `customCSS` allows you to style the banner, even if it is isolated within an iframe. To assist you with device specific styles, the body element of the banner has one of three classes: `branch-banner-android`, `branch-banner-ios`, or `branch-banner-desktop`.
  * ```js
  * branch.banner(
  *     {
@@ -1136,7 +1137,8 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *          iframe: false,
  *          disableHide: true,
  *          forgetHide: true,
- *          position: 'bottom'
+ *          position: 'bottom',
+ *          customCSS: '.title { color: #F00; }'
  *     },
  *     {... link data ...}
  * );
@@ -1215,7 +1217,7 @@ if (WEB_BUILD) { // jshint undef:false
  *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false,                      // Should we remember or forget whether the user hid the banner?
  *     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
- *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iFrame
+ *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
  *     make_new_link: false                    // Should the banner create a new link, even if a link already exists?
  * }, {
  *     tags: ['tag1', 'tag2'],

@@ -1056,7 +1056,7 @@ var banner_html = {banner:function(a, b) {
   c.id = "branch-banner-iframe";
   c.className = "branch-animation";
   document.body.appendChild(c);
-  var d = '<html><head></head><body><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
+  var d = banner_utils.mobileUserAgent(), d = '<html><head></head><body class="' + ("ios" == d ? "branch-banner-ios" : "android" == d ? "branch-banner-android" : "branch-banner-desktop") + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
   c.contentWindow.document.open();
   c.contentWindow.document.write(d);
   c.contentWindow.document.close();
