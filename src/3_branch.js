@@ -1266,7 +1266,9 @@ if (WEB_BUILD) { // jshint undef:false
 			disableHide: !!options['disableHide'],
 			forgetHide: !!options['forgetHide'],
 			position: options['position'] || 'top',
-			make_new_link: !!options['make_new_link']
+			make_new_link: !!options['make_new_link'],
+			mobileSticky: typeof options['mobileSticky'] == 'undefined' ? false : options['mobileSticky'],
+			desktopSticky: typeof options['desktopSticky'] == 'undefined' ? true : options['desktopSticky']
 		};
 		if (typeof options['showMobile'] != 'undefined') {
 			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
