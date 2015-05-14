@@ -1264,7 +1264,7 @@ if (WEB_BUILD) { // jshint undef:false
 			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 			disableHide: !!options['disableHide'],
-			forgetHide: !!options['forgetHide'],
+			forgetHide: typeof options['forgetHide'] == 'number' ? options['forgetHide'] : !!options['forgetHide'],
 			position: options['position'] || 'top',
 			make_new_link: !!options['make_new_link']
 		};
