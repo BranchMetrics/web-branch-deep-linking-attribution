@@ -2,7 +2,7 @@ goog.provide('banner_utils');
 goog.require('utils');
 goog.require('storage'); // jshint unused:false
 
-/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean, make_new_link:boolean}} */
+/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, showAgain:boolean, disableHide:boolean, make_new_link:boolean}} */
 banner_utils.options; // jshint ignore:line
 
 // UI Animation transition speed in ms.
@@ -55,12 +55,12 @@ banner_utils.shouldAppend = function(storage, options) {
 	}
 	else { hideBanner = !hideBanner; }
 
-	var forgetHide = options.forgetHide;
-	if (typeof forgetHide == 'number') { forgetHide = false; }
+	var showAgain = options.showAgain;
+	if (typeof showAgain == 'number') { showAgain = false; }
 
 	return !document.getElementById('branch-banner') &&
 		!document.getElementById('branch-banner-iframe') &&
-		(hideBanner || forgetHide) &&
+		(hideBanner || showAgain) &&
 		(
 			(options.showDesktop && !banner_utils.mobileUserAgent()) ||
 			(options.showAndroid && banner_utils.mobileUserAgent() == 'android') ||

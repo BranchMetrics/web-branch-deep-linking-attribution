@@ -940,7 +940,7 @@ branch.banner(
 By default, the app banner displays inside of an iFrame (isolates the app banner css from your page), at the top of the page, shows a close button to the user, and will never show again once closed by the user. All of this functionality can be customized.
 The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
 The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
-The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past.
+The `showAgain` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past.
 The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
 ```js
 branch.banner(
@@ -952,7 +952,7 @@ branch.banner(
          // Display preferences
          iframe: false,
          disableHide: true,
-         forgetHide: true,
+         showAgain: true, // Can also be set to an integer, for example: 10, would show the banner again after 10 days
          position: 'bottom'
     },
     {... link data ...}
@@ -1029,7 +1029,7 @@ branch.banner({
     showDesktop: true,                 // Should the banner be shown on desktop devices?
     iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
-    forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
+    showAgain: false,                  // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
     position: 'top',                   // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
     make_new_link: false               // Should the banner create a new link, even if a link already exists?
 }, {

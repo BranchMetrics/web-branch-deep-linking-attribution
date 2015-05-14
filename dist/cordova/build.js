@@ -838,7 +838,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   var b = new Date;
   return b.setDate(b.getDate() + a);
 }, shouldAppend:function(a, b) {
-  var c = utils.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
+  var c = utils.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.showAgain;
   "number" == typeof d && (d = !1);
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
@@ -1144,7 +1144,7 @@ var sendSMS = function(a, b, c, d) {
         removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-      "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
+      "number" == typeof b.showAgain ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.showAgain), d) : utils.storeKeyValue("hideBanner", !0, d);
     };
     g && (g.onclick = function(a) {
       a.preventDefault();
@@ -1360,8 +1360,9 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
 WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+  "undefined" == typeof b.showAgain && "undefined" != typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showAndroid:"undefined" == typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == 
-  typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" == typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", make_new_link:!!b.make_new_link};
+  typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, showAgain:"number" == typeof b.showAgain ? b.showAgain : !!b.showAgain, position:b.position || "top", make_new_link:!!b.make_new_link};
   "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();

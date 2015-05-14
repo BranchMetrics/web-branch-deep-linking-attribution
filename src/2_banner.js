@@ -161,7 +161,7 @@ banner = function(branch, options, linkData, storage) {
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
 			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-			if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
+			if (typeof options.showAgain == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.showAgain), storage); }
 			else { utils.storeKeyValue('hideBanner', true, storage); }
 		};
 		if (closeButton) {
