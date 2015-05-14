@@ -1124,7 +1124,9 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
  * The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
  * The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past.
- * The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
+ * The `position` property defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
+ * The `mobileSticky` property defaults to false, but can be set to true if you want the user to continue to see the app banner as they scroll.
+ * The `desktopSticky` property defaults to true, but can be set to false if you want the user to only see the app banner when they are scrolled to the top of the page.
  * ```js
  * branch.banner(
  *     {
@@ -1136,7 +1138,9 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *          iframe: false,
  *          disableHide: true,
  *          forgetHide: true,
- *          position: 'bottom'
+ *          position: 'bottom',
+ *          mobileSticky: true,
+ *          desktopSticky: true
  *     },
  *     {... link data ...}
  * );
@@ -1215,6 +1219,8 @@ if (WEB_BUILD) { // jshint undef:false
  *     disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
  *     position: 'top',                   // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
+ *     mobileSticky: false,               // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
+ *     desktopSticky: true,               // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
  *     make_new_link: false               // Should the banner create a new link, even if a link already exists?
  * }, {
  *     tags: ['tag1', 'tag2'],
