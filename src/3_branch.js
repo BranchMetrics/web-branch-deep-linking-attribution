@@ -1251,7 +1251,7 @@ if (WEB_BUILD) { // jshint undef:false
  *
  */
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
-		if (typeof options['forgetHideforgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHideforgetHide'] = options['forgetHide']; }
+		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }
 		var bannerOptions = {
 			icon: options['icon'] || '',
 			title: options['title'] || '',
@@ -1265,7 +1265,7 @@ if (WEB_BUILD) { // jshint undef:false
 			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 			disableHide: !!options['disableHide'],
-			forgetHide: typeof options['forgetHideforgetHide'] == 'number' ? options['forgetHideforgetHide'] : !!options['forgetHideforgetHide'],
+			forgetHide: typeof options['forgetHide'] == 'number' ? options['forgetHide'] : !!options['forgetHide'],
 			position: options['position'] || 'top',
 			make_new_link: !!options['make_new_link']
 		};
