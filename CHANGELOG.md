@@ -4,6 +4,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 ### New Functionality
+- Specify whether the app banner is "sticky" (position: fixed) on desktop and mobile
 - Set the app banner to either never show a second time, or wait a specified number of days before showing again
 - Adds `customCSS` property to banner to allow custom styles
 
