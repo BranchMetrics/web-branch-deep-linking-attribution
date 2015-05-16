@@ -97,6 +97,7 @@ banner_css.css = function(options, element) {
 			style += banner_css.nonie;
 		}
 	}
+	style += options.customCSS;
 
 	if (options.iframe) {
 		style += banner_css.inneriframe;

@@ -5,6 +5,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ## [VERSION] - unreleased
 ### New Functionality
 - Set the app banner to either never show a second time, or wait a specified number of days before showing again
+- Adds `customCSS` property to banner to allow custom styles
 
 ## [v1.5.1] - 2015-05-13
 - Fixes IE11 bug with XHRRequests that caused an InvalidState error
