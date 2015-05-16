@@ -71,7 +71,19 @@ banner_html.iframe = function(options, action) {
 	iframe.className = 'branch-animation';
 	document.body.appendChild(iframe);
 
-	var iframeHTML = '<html><head></head><body><div id="branch-banner" class="branch-animation">' + banner_html.banner(options, action) + '</body></html>';
+	var bodyClass,
+	    userAgent = banner_utils.mobileUserAgent();
+	if (userAgent == 'ios') {
+		bodyClass = 'branch-banner-ios';
+	}
+	else if (userAgent == 'android') {
+		bodyClass = 'branch-banner-android';
+	}
+	else {
+		bodyClass = 'branch-banner-desktop';
+	}
+
+	var iframeHTML = '<html><head></head><body class="' + bodyClass + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(options, action) + '</body></html>';
 	iframe.contentWindow.document.open();
 	iframe.contentWindow.document.write(iframeHTML);
 	iframe.contentWindow.document.close();
@@ -87,7 +99,6 @@ banner_html.div = function(options, action) {
 	banner.id = 'branch-banner';
 	banner.className = 'branch-animation';
 	banner.innerHTML = banner_html.banner(options, action);
-
 	document.body.appendChild(banner);
 
 	return banner;

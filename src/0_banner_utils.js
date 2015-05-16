@@ -38,15 +38,29 @@ banner_utils.mobileUserAgent = function() {
 	return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? (navigator.userAgent.match(/android/i) ? 'android' : 'ios') : false;
 };
 
+banner_utils.getDate = function(days) {
+	var currentDate = new Date();
+	return currentDate.setDate(currentDate.getDate() + days);
+};
+
 /**
  * @param {BranchStorage} storage
  * @param {banner_utils.options} options
  * @return {boolean}
  */
 banner_utils.shouldAppend = function(storage, options) {
+	var hideBanner = utils.readKeyValue('hideBanner', storage);
+	if (typeof hideBanner == 'number') {
+		hideBanner = new Date() >= new Date(hideBanner);
+	}
+	else { hideBanner = !hideBanner; }
+
+	var forgetHide = options.forgetHide;
+	if (typeof forgetHide == 'number') { forgetHide = false; }
+
 	return !document.getElementById('branch-banner') &&
 		!document.getElementById('branch-banner-iframe') &&
-		(!utils.readKeyValue('hideBanner', storage) || options.forgetHide) &&
+		(hideBanner || forgetHide) &&
 		(
 			(options.showDesktop && !banner_utils.mobileUserAgent()) ||
 			(options.showAndroid && banner_utils.mobileUserAgent() == 'android') ||
