@@ -1123,7 +1123,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * By default, the app banner displays inside of an iFrame (isolates the app banner css from your page), at the top of the page, shows a close button to the user, and will never show again once closed by the user. All of this functionality can be customized.
  * The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
  * The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
- * The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past.
+ * The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past. It can also be set to an integer, in which case, it would forget that the user has previously hid the banner after X days.
  * The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
  * The `customCSS` property allows you to style the banner, even if it is isolated within an iframe. To assist you with device specific styles, the body element of the banner has one of three classes: `branch-banner-android`, `branch-banner-ios`, or `branch-banner-desktop`.
  * ```js
@@ -1136,7 +1136,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *          // Display preferences
  *          iframe: false,
  *          disableHide: true,
- *          forgetHide: true,
+ *          forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
  *          position: 'bottom',
  *          customCSS: '.title { color: #F00; }'
  *     },
@@ -1215,7 +1215,7 @@ if (WEB_BUILD) { // jshint undef:false
  *     showDesktop: true,                      // Should the banner be shown on desktop devices?
  *     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
  *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
- *     forgetHide: false,                      // Should we remember or forget whether the user hid the banner?
+ *     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
  *     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
  *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
  *     make_new_link: false                    // Should the banner create a new link, even if a link already exists?
@@ -1254,6 +1254,7 @@ if (WEB_BUILD) { // jshint undef:false
  *
  */
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
+		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }
 		var bannerOptions = {
 			icon: options['icon'] || '',
 			title: options['title'] || '',
@@ -1267,7 +1268,7 @@ if (WEB_BUILD) { // jshint undef:false
 			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 			disableHide: !!options['disableHide'],
-			forgetHide: !!options['forgetHide'],
+			forgetHide: typeof options['forgetHide'] == 'number' ? options['forgetHide'] : !!options['forgetHide'],
 			position: options['position'] || 'top',
 			customCSS: options['customCSS'] || '',
 			make_new_link: !!options['make_new_link']

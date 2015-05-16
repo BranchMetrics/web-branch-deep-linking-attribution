@@ -834,8 +834,13 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   a && a.parentNode.removeChild(a);
 }, mobileUserAgent:function() {
   return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : "ios" : !1;
+}, getDate:function(a) {
+  var b = new Date;
+  return b.setDate(b.getDate() + a);
 }, shouldAppend:function(a, b) {
-  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
+  var c = utils.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
+  "number" == typeof d && (d = !1);
+  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
 var Server = function() {
@@ -1140,7 +1145,7 @@ var sendSMS = function(a, b, c, d) {
         removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-      utils.storeKeyValue("hideBanner", !0, d);
+      "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
     };
     g && (g.onclick = function(a) {
       a.preventDefault();
@@ -1356,8 +1361,9 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
 WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
-  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtsonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showAndroid:"undefined" == typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == 
-  typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:!!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", make_new_link:!!b.make_new_link};
+  "undefined" == typeof b.forgetHide && "undefined" != typeof b.forgetHide && (b.forgetHide = b.forgetHide);
+  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showAndroid:"undefined" == typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == 
+  typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" == typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", make_new_link:!!b.make_new_link};
   "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
