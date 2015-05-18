@@ -2,6 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+
 ## [v1.5.2] - 2015-05-18
 ### New Functionality
 - Specify whether the app banner is "sticky" (position: fixed) on desktop and mobile
