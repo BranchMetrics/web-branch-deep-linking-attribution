@@ -180,6 +180,9 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
  * @param {function(?Error,*=)=} callback
  */
 Server.prototype.request = function(resource, data, storage, callback) {
+	var self = this;
+
+
 	var u = this.getUrl(resource, data);
 	if (u.error) { return callback(new Error(u.error)); }
 
@@ -191,10 +194,31 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		url = u.url;
 		postData = u.data;
 	}
-	if (storage['getItem']('use_jsonp') || resource.jsonp) {
-		this.jsonpRequest(url, data, resource.method, callback);
-	}
-	else {
-		this.XHRRequest(url, postData, resource.method, storage, callback);
-	}
+
+	// How many times to retry the request if the initial attempt fails
+	var retries = 2;
+	// If request fails, retry after X miliseconds
+	/***
+	 * @type {function(?Error,*=): ?undefined}
+	 */
+	var done = function(err, data) {
+		if (err && retries > 0) {
+			retries--;
+			window.setTimeout(function() {
+				makeRequest();
+			}, 200);
+		}
+		else {
+			callback(err, data);
+		}
+	};
+	var makeRequest = function() {
+		if (storage['getItem']('use_jsonp') || resource.jsonp) {
+			self.jsonpRequest(url, data, resource.method, done);
+		}
+		else {
+			self.XHRRequest(url, postData, resource.method, storage, done);
+		}
+	};
+	makeRequest();
 };

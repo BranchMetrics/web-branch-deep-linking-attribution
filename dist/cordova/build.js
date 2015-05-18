@@ -943,13 +943,20 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
   }
 };
 Server.prototype.request = function(a, b, c, d) {
-  var e = this.getUrl(a, b);
-  if (e.error) {
-    return d(Error(e.error));
+  var e = this, f = this.getUrl(a, b);
+  if (f.error) {
+    return d(Error(f.error));
   }
-  var f, g = "";
-  "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
-  c.getItem("use_jsonp") || a.jsonp ? this.jsonpRequest(f, b, a.method, d) : this.XHRRequest(f, g, a.method, c, d);
+  var g, k = "";
+  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
+  var h = 2, l = function(a, b) {
+    a && 0 < h ? (h--, window.setTimeout(function() {
+      m();
+    }, 200)) : d(a, b);
+  }, m = function() {
+    c.getItem("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
+  };
+  m();
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
@@ -1079,7 +1086,7 @@ var sendSMS = function(a, b, c, d) {
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, p = function() {
+  }, m = function() {
     h = a.createElement("div");
     h.className = "branch-icon-wrapper";
     h.id = "branch-checkmark";
@@ -1093,7 +1100,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, m = function() {
+  }, n = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1103,13 +1110,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var n = e.value;
-    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
-      a ? m() : (p(), setTimeout(function() {
+    var p = e.value;
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? n() : (m(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : m();
+    })) : n();
   }
 }, hasClass = function(a, b) {
   return!!a.className.match(new RegExp("(\\s|^)" + b + "(\\s|$)"));
