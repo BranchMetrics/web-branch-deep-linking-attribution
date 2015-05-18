@@ -618,7 +618,18 @@ describe('Server', function() {
 		});
 
 		describe('/v1/creditHistory', function() {
+			it('should pass in branch_key and session_id', function(done) {
+				var assert = testUtils.plan(4, done);
 
+				server.request(resources.creditHistory, testUtils.params(), storage(), assert.done);
+
+				assert.equal(requests.length, 1, 'Request made');
+				assert.equal(requests[0].url, 'https://api.branch.io/v1/credithistory', 'Endpoint correct');
+				assert.equal(requests[0].method, 'POST', 'Method correct');
+				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&session_id=" + session_id + "&branch_key=" + branch_sample_key);
+
+				requests[0].respond(200, { "Content-Type": "application/json" }, '[{"transaction":{"id":"63317099967152399","bucket":"default","type":0,"amount":5,"date":"2014-11-18T18:09:59.600Z"},"event":{"name":"web session start","metadata":{}},"referrer":"Branch","referree":null}]');
+			});
 		});
 	});
 });
