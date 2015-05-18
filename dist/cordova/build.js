@@ -1135,7 +1135,7 @@ var sendSMS = function(a, b, c, d) {
         banner_utils.removeElement(document.getElementById("branch-css"));
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
-        "top" == b.position ? document.body.style.marginTop = "0px" : "bottom" == b.position && (document.body.style.marginBottom = "0px");
+        "top" == b.position ? document.body.style.paddingTop = "0px" : "bottom" == b.position && (document.body.style.marginBottom = "0px");
         removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
@@ -1146,7 +1146,7 @@ var sendSMS = function(a, b, c, d) {
       k();
     });
     addClass(document.body, "branch-banner-is-active");
-    "top" == b.position ? document.body.style.marginTop = banner_utils.bannerHeight : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.bannerHeight);
+    "top" == b.position ? document.body.style.paddingTop = banner_utils.bannerHeight : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.bannerHeight);
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
     }, banner_utils.animationDelay);
