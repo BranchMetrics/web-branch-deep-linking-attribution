@@ -154,8 +154,11 @@ banner = function(branch, options, linkData, storage) {
 			}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 			setTimeout(function() {
-				if (options.position == 'top') { document.body.style.paddingTop = '0px'; }
-				else if (options.position == 'bottom') { document.body.style.marginBottom = '0px'; }
+				if (options.position == 'top') {
+					document.body.style.paddingTop = '0px';
+					document.body.style['backgroundPositionY'] = '0px';
+				}
+				else if (options.position == 'bottom') { document.body.style.paddingBottom = '0px'; }
 				removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
@@ -173,8 +176,11 @@ banner = function(branch, options, linkData, storage) {
 
 		// Trigger animation
 		addClass(document.body, 'branch-banner-is-active');
-		if (options.position == 'top') { document.body.style.paddingTop = banner_utils.bannerHeight; }
-		else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.bannerHeight; }
+		if (options.position == 'top') {
+			document.body.style.paddingTop = banner_utils.bannerHeight;
+			document.body.style['backgroundPositionY'] = banner_utils.bannerHeight;
+		}
+		else if (options.position == 'bottom') { document.body.style.paddingBottom = banner_utils.bannerHeight; }
 		setTimeout(function() {
 			if (options.position == 'top') { element.style.top = '0'; }
 			else if (options.position == 'bottom') { element.style.bottom = '0'; }
