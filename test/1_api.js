@@ -616,5 +616,9 @@ describe('Server', function() {
 				assert.equal(requests.length, 0, 'No request made');
 			});
 		});
+
+		describe('/v1/creditHistory', function() {
+
+		});
 	});
 });
