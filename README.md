@@ -789,7 +789,7 @@ branch.creditHistory(
     {
       "length":50,
       "direction":0,
-      "begin_after_id:"123456789012345",
+      "begin_after_id":"123456789012345",
       "bucket":"default"
     }
     callback (err, data)
@@ -826,8 +826,6 @@ callback(
 ]
 );
 ```
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 ---
 

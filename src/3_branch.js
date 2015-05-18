@@ -221,6 +221,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
+		if (data['identity_id']) { self.link_click_id = data['link_click_id']; }
 		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
@@ -947,14 +948,13 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
 	this._api(resources.credits, { }, done);
 });
 
-
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.creditHistory
  * @param {Object} data - _optional_ - options controlling the returned history.
  * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history data.
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
+ * // wtf is "direction"?
  *
  * ##### Usage
  *
@@ -972,7 +972,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *     {
  *       "length":50,
  *       "direction":0,
- *       "begin_after_id:"123456789012345",
+ *       "begin_after_id":"123456789012345",
  *       "bucket":"default"
  *     }
  *     callback (err, data)
@@ -1010,17 +1010,14 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ---
  *
  * ## Credit redemption
  *
  */
-	Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-		this._api(resources.creditHistory, data ? data : {}, done);
-	});
-}
+Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+	this._api(resources.creditHistory, data ? data : { }, done);
+});
 
 /**
  * @function Branch.redeem
