@@ -756,8 +756,6 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 	this._api(resources.referrals, { }, done);
 });
 
-
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.getCode
  * @param {Object} data - _required_ - contins options for referral code creation.
@@ -788,7 +786,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *       "bucket":"party",
  *       "calculation_type":1,
  *       "location":2
- *     }
+ *     },
  *     callback (err, data)
  * );
  * ```
@@ -803,19 +801,15 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
-	Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-		data.type = "credit";
-		data.creation_type = 2;
-		this._api(resources.getCode, data, done);
-	});
-}
+Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+	data.type = "credit";
+	data.creation_type = 2;
+	this._api(resources.getCode, data, done);
+});
 
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.validateCode
  * @param {string} code - _required_ - the code string to validate.
@@ -855,17 +849,13 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
-	Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-		this._api(resources.validateCode, { "code": code }, done);
-	});
-}
+Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+	this._api(resources.validateCode, { "code": code }, done);
+});
 
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.applyCode
  * @param {string} code - _required_ - the code string to apply.
@@ -904,18 +894,14 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *     callback(err)
  * );
  * ```
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * ## Credit Functions
  *
  */
-	Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-		this._api(resources.applyCode, { "code": code }, done);
-	});
-}
+Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+	this._api(resources.applyCode, { "code": code }, done);
+});
 
 /**
  * @function Branch.credits

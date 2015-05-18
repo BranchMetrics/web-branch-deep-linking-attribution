@@ -199,6 +199,46 @@ if (WEB_BUILD) { // jshint undef:false
 			"bucket": validator(false, validationTypes.str)
 		}
 	};
+
+	resources.getCode = {
+		destination: config.api_endpoint,
+		endpoint: "/v1/referralcode",
+		method: utils.httpMethod.POST,
+		params: {
+			"session_id": validator(true, branch_id),
+			"identity_id": validator(true, branch_id),
+			"prefix": validator(false, validationTypes.str),
+			"amount": validator(true, validationTypes.num),
+			"expiration": validator(false, validationTypes.str),
+			"calculation_type": validator(true, validationTypes.num),
+			"location": validator(true, validationTypes.num),
+			"creation_type": validator(true, validationTypes.num),
+			"type": validator(true, validationTypes.str),
+			"bucket": validator(false, validationTypes.str)
+		}
+	};
+
+	resources.validateCode = {
+			destination: config.api_endpoint,
+			endpoint: "/v1/referralcode",
+			method: utils.httpMethod.POST,
+			queryPart: { "code": validator(true, validationTypes.str) },
+			params: {
+				"session_id": validator(true, branch_id),
+				"identity_id": validator(true, branch_id)
+			}
+	};
+
+	resources.applyCode = {
+			destination: config.api_endpoint,
+			endpoint: "/v1/applycode",
+			method: utils.httpMethod.POST,
+			queryPart: { "code": validator(true, validationTypes.str) },
+			params: {
+				"session_id": validator(true, branch_id),
+				"identity_id": validator(true, branch_id)
+			}
+	};
 }
 
 if (CORDOVA_BUILD) { // jshint undef:false

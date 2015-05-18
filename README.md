@@ -614,7 +614,7 @@ branch.getCode(
       "bucket":"party",
       "calculation_type":1,
       "location":2
-    }
+    },
     callback (err, data)
 );
 ```
@@ -628,8 +628,6 @@ callback(
      }
 );
 ```
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 ___
 
@@ -677,8 +675,6 @@ callback(
 );
 ```
 
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
 ___
 
 
@@ -724,9 +720,6 @@ callback(
     callback(err)
 );
 ```
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
 ___
 
 ## Credit Functions
@@ -772,6 +765,7 @@ callback(
 **callback**: `function`, _required_ - returns an array with credit history data.
 
 This call will retrieve the entire history of credits and redemptions from the individual user.
+// wtf is "direction"?
 
 ##### Usage
 
