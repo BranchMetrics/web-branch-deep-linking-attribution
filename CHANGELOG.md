@@ -7,6 +7,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Specify whether the app banner is "sticky" (position: fixed) on desktop and mobile
 - Set the app banner to either never show a second time, or wait a specified number of days before showing again
 - Adds `customCSS` property to banner to allow custom styles
+### Fixed
+- Fixes body element position when banner is shown with `body { position: relative; }` or `body { position: absolute; }
+- Fixes body background image position when banner is shown
 
 ## [v1.5.1] - 2015-05-13
 - Fixes IE11 bug with XHRRequests that caused an InvalidState error
