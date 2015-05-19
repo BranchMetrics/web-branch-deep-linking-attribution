@@ -910,7 +910,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   var g = window.setTimeout(function() {
     window[e] = function() {
     };
-    d(Error(utils.messages.timeout));
+    d(Error(utils.messages.timeout), null, 504);
   }, TIMEOUT);
   window[e] = function(a) {
     window.clearTimeout(g);
@@ -921,18 +921,18 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.ontimeout = function() {
-    e(Error(utils.messages.timeout));
+    e(Error(utils.messages.timeout), null, 504);
   };
   f.onreadystatechange = function() {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
-          e(null, goog.json.parse(f.responseText));
+          e(null, goog.json.parse(f.responseText), f.status);
         } catch (a) {
-          e(null, {});
+          e(null, {}, f.status);
         }
       } else {
-        402 === f.status ? e(Error("Not enough credits to redeem.")) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
+        402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
   };
@@ -949,8 +949,8 @@ Server.prototype.request = function(a, b, c, d) {
   }
   var g, k = "";
   "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
-  var h = RETRIES, l = function(a, b) {
-    a && 0 < h ? (h--, window.setTimeout(function() {
+  var h = RETRIES, l = function(a, b, c) {
+    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
       m();
     }, RETRY_DELAY)) : d(a, b);
   }, m = function() {

@@ -113,7 +113,7 @@ var jsonp_callback_index = 0;
  * @param {string} requestURL
  * @param {Object} requestData
  * @param {utils._httpMethod} requestMethod
- * @param {function(?Error,*=)=} callback
+ * @param {function(?Error,*=,?=)=} callback
  */
 Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
@@ -123,7 +123,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 
 	var timeout_trigger = window.setTimeout(function() {
 		window[callbackString] = function() { };
-		callback(new Error(utils.messages.timeout));
+		callback(new Error(utils.messages.timeout), null, 504);
 	}, TIMEOUT);
 
 	window[callbackString] = function(data) {
@@ -139,28 +139,28 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {Object} data
  * @param {utils._httpMethod} method
  * @param {BranchStorage} storage
- * @param {function(?Error,*=)=} callback
+ * @param {function(?Error,*=,?=)=} callback
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 	req.ontimeout = function() {
-		callback(new Error(utils.messages.timeout));
+		callback(new Error(utils.messages.timeout), null, 504);
 	};
 	req.onreadystatechange = function() {
 		if (req.readyState === 4) {
 			if (req.status === 200) {
 				try {
-					callback(null, goog.json.parse(req.responseText));
+					callback(null, goog.json.parse(req.responseText), req.status);
 				}
 				catch (e) {
-					callback(null, { });
+					callback(null, { }, req.status);
 				}
 			}
 			else if (req.status === 402) {
-				callback(new Error('Not enough credits to redeem.'));
+				callback(new Error('Not enough credits to redeem.'), null, req.status);
 			}
 			else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
-				callback(new Error('Error in API: ' + req.status));
+				callback(new Error('Error in API: ' + req.status), null, req.status);
 			}
 		}
 	};
@@ -205,8 +205,8 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	/***
 	 * @type {function(?Error,*=): ?undefined}
 	 */
-	var done = function(err, data) {
-		if (err && retries > 0) {
+	var done = function(err, data, status) {
+		if (err && retries > 0 && status.toString().substring(0, 1) === "5") {
 			retries--;
 			window.setTimeout(function() {
 				makeRequest();
