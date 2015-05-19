@@ -843,7 +843,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
-var Server = function() {
+var RETRIES = 2, RETRY_DELAY = 200, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
 Server.prototype.serializeObject = function(a, b) {
@@ -949,10 +949,10 @@ Server.prototype.request = function(a, b, c, d) {
   }
   var g, k = "";
   "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
-  var h = 2, l = function(a, b) {
+  var h = RETRIES, l = function(a, b) {
     a && 0 < h ? (h--, window.setTimeout(function() {
       m();
-    }, 200)) : d(a, b);
+    }, RETRY_DELAY)) : d(a, b);
   }, m = function() {
     c.getItem("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
   };

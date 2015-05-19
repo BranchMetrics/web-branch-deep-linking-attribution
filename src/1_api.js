@@ -8,6 +8,9 @@ goog.require('utils');
 goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 
+var RETRIES = 2,
+	RETRY_DELAY = 200;
+
 /**
  * @class Server
  * @constructor
@@ -196,7 +199,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	}
 
 	// How many times to retry the request if the initial attempt fails
-	var retries = 2;
+	var retries = RETRIES;
 	// If request fails, retry after X miliseconds
 	/***
 	 * @type {function(?Error,*=): ?undefined}
@@ -206,7 +209,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 			retries--;
 			window.setTimeout(function() {
 				makeRequest();
-			}, 200);
+			}, RETRY_DELAY);
 		}
 		else {
 			callback(err, data);
