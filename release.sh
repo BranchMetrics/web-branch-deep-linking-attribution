@@ -2,8 +2,8 @@
 
 [ $# -eq 0 ] && { echo "Usage: $0 v1.0.0"; exit 1; }
 
-VERSION=$1
-VERSION_NO_V=$(echo $VERSION | tr -d "\nv")
+VERSION_NO_V=$(echo $1 | tr -d "\nv")
+VERSION="v"$VERSION_NO_V
 DATE=$(date "+%Y-%m-%d")
 
 echo "Releasing Branch Web SDK"
@@ -67,7 +67,7 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	make dist/web/build.min.js.gz
-	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/web/build.min.js.gz s3://branch-cdn/branch-v$VERSION.min.js  --acl public-read
+	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/web/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js  --acl public-read
 	aws s3 cp testbeds/web/example.html s3://branch-cdn/example.html --acl public-read
 fi
 

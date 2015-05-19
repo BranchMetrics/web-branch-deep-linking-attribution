@@ -40,7 +40,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.0.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.2.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -94,7 +94,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 ## API Reference
 
 1. Branch Session
-  + [.init()](#initapp_id-callback)
+  + [.init()](#initbranch_key-options)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
 
@@ -102,7 +102,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.track()](#trackevent-metadata-callback)
 
 1. Deeplinking Methods
-   + [.link()](#linkmetadata-callback)
+   + [.link()](#linkdata-callback)
    + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
 
 1. Referral Methods
@@ -111,7 +111,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
    + [.redeem()](#redeemamount-bucket-callback)
 
 1. Smart Banner
-   + [.banner()](#banneroptions-linkdata)
+   + [.banner()](#smart-app-sharing-banner)
 
 ___
 # Global
@@ -353,11 +353,11 @@ ___
 
 
 
-### link(linkData, callback) 
+### link(data, callback) 
 
 **Parameters**
 
-**linkData**: `Object`, _required_ - link data and metadata.
+**data**: `Object`, _required_ - link data and metadata.
 
 **callback**: `function`, _required_ - returns a string of the Branch deep linking URL.
 
@@ -367,10 +367,44 @@ Creates and returns a deep linking URL.  The `data` parameter can include an
 object with optional data you would like to store, including Facebook
 [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
+**data** The dictionary to embed with the link. Accessed as session or install parameters from the SDK.
+
+**Note**
+You can customize the Facebook OG tags of each URL if you want to dynamically share content by using the following optional keys in the data dictionary. Please use this [Facebook tool](https://developers.facebook.com/tools/debug/og/object) to debug your OG tags!
+
+| Key | Value
+| --- | ---
+| "$og_title" | The title you'd like to appear for the link in social media
+| "$og_description" | The description you'd like to appear for the link in social media
+| "$og_image_url" | The URL for the image you'd like to appear for the link in social media
+| "$og_video" | The URL for the video
+| "$og_url" | The URL you'd like to appear
+| "$og_redirect" | If you want to bypass our OG tags and use your own, use this key with the URL that contains your site's metadata.
+
+Also, you can set custom redirection by inserting the following optional keys in the dictionary:
+
+| Key | Value
+| --- | ---
+| "$desktop_url" | Where to send the user on a desktop or laptop. By default it is the Branch-hosted text-me service
+| "$android_url" | The replacement URL for the Play Store to send the user if they don't have the app. _Only necessary if you want a mobile web splash_
+| "$ios_url" | The replacement URL for the App Store to send the user if they don't have the app. _Only necessary if you want a mobile web splash_
+| "$ipad_url" | Same as above but for iPad Store
+| "$fire_url" | Same as above but for Amazon Fire Store
+| "$blackberry_url" | Same as above but for Blackberry Store
+| "$windows_phone_url" | Same as above but for Windows Store
+| "$after_click_url" | When a user returns to the browser after going to the app, take them to this URL. _iOS only; Android coming soon_
+
+You have the ability to control the direct deep linking of each link as well:
+
+| Key | Value
+| --- | ---
+| "$deeplink_path" | The value of the deep link path that you'd like us to append to your URI. For example, you could specify "$deeplink_path": "radio/station/456" and we'll open the app with the URI "yourapp://radio/station/456?link_click_id=branch-identifier". This is primarily for supporting legacy deep linking infrastructure.
+| "$always_deeplink" | true or false. (default is not to deep link first) This key can be specified to have our linking service force try to open the app, even if we're not sure the user has the app installed. If the app is not installed, we fall back to the respective app store or $platform_url key. By default, we only open the app if we've seen a user initiate a session in your app from a Branch link (has been cookied and deep linked by Branch).
+
 #### Usage
 ```js
 branch.link(
-    linkData,
+    data,
     callback (err, link)
 );
 ```
@@ -847,19 +881,128 @@ The Branch Web SDK has a built in sharing banner, that automatically displays a 
 Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
 **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
 
+# Customizing the App Sharing Banner
+
+The app sharing banner includes a number of ways to easily customize it by specifying properties in the `options` object, which is the first argument of the banner.
+
+### Your App's Information _required_
+You can set the icon, title, and description for your app with the properties: `icon`, `title`, and `description`. For example, an app banner with these three properties set:
+```js
+branch.banner(
+    {
+         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+         title: 'Branch Demo App',
+         description: 'The Branch demo app!'
+    },
+    {... link data ...}
+);
+```
+
+### The Call To Action Text _optional_
+On mobile devices, the app banner show's an option either to download the app if they do not have it installed, or open the app if they have already installed it. Both of these can be customized from their respective defaults of Download app, and View in app.
+When the banner is opened on a desktop devide, a simpel form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
+```js
+branch.banner(
+    {
+         // required app info properties
+         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+         title: 'Branch Demo App',
+         description: 'The Branch demo app!',
+         // Call to action customization
+         openAppButtonText: 'Open',
+         downloadAppButtonText: 'Install',
+         phonePreviewText: '+44 9999-9999',
+         sendLinkText: 'Txt me!'
+    },
+    {... link data ...}
+);
+```
+
+### Enabed Platforms _optional_
+The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
+```js
+branch.banner(
+    {
+         // required app info properties
+         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+         title: 'Branch Demo App',
+         description: 'The Branch demo app!',
+         // Platforms customization
+         showDesktop: false,
+         showiOS: true,
+         showAndroid: true
+    },
+    {... link data ...}
+);
+```
+
+### Display Preferences _optional_
+By default, the app banner displays inside of an iFrame (isolates the app banner css from your page), at the top of the page, shows a close button to the user, and will never show again once closed by the user. All of this functionality can be customized.
+The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
+The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
+The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past. It can also be set to an integer, in which case, it would forget that the user has previously hid the banner after X days.
+The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
+The `customCSS` property allows you to style the banner, even if it is isolated within an iframe. To assist you with device specific styles, the body element of the banner has one of three classes: `branch-banner-android`, `branch-banner-ios`, or `branch-banner-desktop`.
+The `mobileSticky` property defaults to false, but can be set to true if you want the user to continue to see the app banner as they scroll.
+The `desktopSticky` property defaults to true, but can be set to false if you want the user to only see the app banner when they are scrolled to the top of the page.
+```js
+branch.banner(
+    {
+         // required app info properties
+         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+         title: 'Branch Demo App',
+         description: 'The Branch demo app!',
+         // Display preferences
+         iframe: false,
+         disableHide: true,
+         forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
+         position: 'bottom',
+         mobileSticky: true,
+         desktopSticky: true,
+         customCSS: '.title { color: #F00; }'
+    },
+    {... link data ...}
+);
+```
+
+### Link Preferences _optional_
+By default, tthe app banner will reusue a link that has most recently been created. If this is not desired, and you wish an enitrley new link to be created and overwrite the previous link, you can set `make_new_link` to true.
+```js
+branch.banner(
+    {
+         // required app info properties
+         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+         title: 'Branch Demo App',
+         description: 'The Branch demo app!',
+         // Link preferences
+         make_new_link: true
+    },
+    {... link data ...}
+);
+```
+
+### Playing nicely with other positon fixed "sticky" banners
+Do you already have a "sticky" element on the top of your website, such as a navigation bar? If so, the Branch app banner will likely interfere with it. Fortunatley, we have a solution!
+Without any configuration, the Web SDK adds a class called `branch-banner-is-active` to the body element of your website when the banner opens, and removes it when the banner closes.
+As an example, let's say you had an element on your website with a class of `header` that was `position: fixed;`. You could then add the following to your stylesheet:
+```css
+body.branch-banner-is-active .header { top: 76px; }
+```
+This will add exactly the space required to show the app banner above your navigation header!
 
 
-### banner(options, linkData) 
+
+### banner(options, data) 
 
 **Parameters**
 
 **options**: `Object`, _required_ - object of all the options to setup the banner
 
-**linkData**: `Object`, _required_ - object of all link data, same as Branch.link()
+**data**: `Object`, _required_ - object of all link data, same as Branch.link()
 
 **[Formerly `appBanner()`](CHANGELOG.md)**
 
-Display a smart banner directing the user to your app through a Branch referral link.  The `linkData` param is the exact same as in `branch.link()`.
+Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
 
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
@@ -872,7 +1015,7 @@ THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
 ```js
 branch.banner(
     options, // Banner options: See example for all available options
-    linkData // Data for link, same as Branch.link()
+    data // Data for link, same as Branch.link()
 );
 ```
 
@@ -883,20 +1026,22 @@ branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
     description: 'The Branch demo app!',
-    openAppButtonText: 'Open',         // Text to show on button if the user has the app installed
-    downloadAppButtonText: 'Download', // Text to show on button if the user does not have the app installed
-    sendLinkText: 'Send Link',         // Text to show on desktop button to allow users to text themselves the app
-    phonePreviewText: '+44 9999-9999', // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-    iframe: true,                      // Show banner in an iframe, recomended to isolate Branch banner CSS
-    showiOS: true,                     // Should the banner be shown on iOS devices?
-    showAndroid: true,                 // Should the banner be shown on Android devices?
-    showDesktop: true,                 // Should the banner be shown on desktop devices?
-    disableHide: false,                // Should the user have the ability to hide the banner? (show's X on left side)
-    forgetHide: false,                 // Should we remember or forget whether the user hid the banner?
-    position: 'top',                   // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
-    make_new_link: false               // Should the banner create a new link, even if a link already exists?
+    openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
+    downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
+    sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
+    phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
+    showiOS: true,                          // Should the banner be shown on iOS devices?
+    showAndroid: true,                      // Should the banner be shown on Android devices?
+    showDesktop: true,                      // Should the banner be shown on desktop devices?
+    iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
+    disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
+    forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
+    position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
+    mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
+    desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
+    customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
+    make_new_link: false                    // Should the banner create a new link, even if a link already exists?
 }, {
-    phone: '9999999999',
     tags: ['tag1', 'tag2'],
     feature: 'dashboard',
     stage: 'new user',
@@ -946,4 +1091,4 @@ branch.closeBanner();
 ## Bugs / Help / Support
 
 Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs
-please send to [dmitri@branch.io](mailto:dmitri@branch.io).
+please send to [support@branch.io](mailto:support@branch.io).
