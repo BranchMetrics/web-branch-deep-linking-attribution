@@ -84,10 +84,6 @@ describe('Integration tests', function() {
 			});
 			requests[0].callback(browser_fingerprint_id);
 			requests[1].respond(400);
-			clock.tick(250);
-			requests[2].respond(400);
-			clock.tick(250);
-			requests[3].respond(400);
 		});
 
 		it('should attempt 5xx error three times total', function(done) {
