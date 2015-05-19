@@ -62,7 +62,30 @@ function validator(required, type) {
 
 var branch_id = /^[0-9]{15,20}$/;
 
-if (WEB_BUILD) { // jshint undef:false
+function defaults(obj) {
+	var def = {};
+	if (config.WEB_BUILD) {
+		def = {
+			"app_id": validator(true, branch_id),
+			"browser_fingerprint_id": validator(true, branch_id),
+			"session_id": validator(true, branch_id),
+			"identity_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.str)
+		};
+	}
+	if (config.CORDOVA_BUILD) {
+		def = {
+			"app_id": validator(true, branch_id),
+			"session_id": validator(true, branch_id),
+			"identity_id": validator(true, branch_id),
+			"device_fingerprint_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.str)
+		};
+	}
+	return utils.merge(obj, def);
+}
+
+if (WEB_BUILD) {
 	resources.open = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/open",
@@ -75,82 +98,13 @@ if (WEB_BUILD) { // jshint undef:false
 		}
 	};
 
-	resources.profile = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/profile",
-		method:	 utils.httpMethod.POST,
-		params: {
-			"identity_id": validator(true, branch_id),
-			"identity": validator(true, validationTypes.str)
-		}
-	};
-
-	resources.close = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/close",
-		method: utils.httpMethod.POST,
-		params: {
-			"session_id": validator(true, branch_id)
-		}
-	};
-
-	resources.logout = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/logout",
-		method: utils.httpMethod.POST,
-		params: {
-			"session_id": validator(true, branch_id)
-		}
-	};
-
-	resources.referrals = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/referrals",
-		method: utils.httpMethod.GET,
-		queryPart: { "identity_id": validator(true, branch_id) }
-	};
-
-	resources.credits = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/credits",
-		method: utils.httpMethod.GET,
-		queryPart: { "identity_id": validator(true, branch_id) }
-	};
-
 	resources._r = {
 		destination: config.link_service_endpoint,
 		endpoint: "/_r",
 		method: utils.httpMethod.GET,
 		jsonp: true,
 		params: {
-			"v": validator(true, validationTypes.str)
-		}
-	};
-
-	resources.redeem =  {
-		destination: config.api_endpoint,
-		endpoint: "/v1/redeem",
-		method: utils.httpMethod.POST,
-		params: {
-			"identity_id": validator(true, branch_id),
-			"amount": validator(true, validationTypes.num),
-			"bucket": validator(true, validationTypes.str)
-		}
-	};
-
-	resources.link = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/url",
-		method: utils.httpMethod.POST,
-		ref: "obj",
-		params: {
-			"identity_id": validator(true, branch_id),
-			"data": validator(false, validationTypes.str),
-			"tags": validator(false, validationTypes.arr),
-			"feature": validator(false, validationTypes.str),
-			"channel": validator(false, validationTypes.str),
-			"stage": validator(false, validationTypes.str),
-			"type": validator(false, validationTypes.num)
+			"sdk": validator(true, validationTypes.str)
 		}
 	};
 
@@ -172,72 +126,6 @@ if (WEB_BUILD) { // jshint undef:false
 		params: {
 			"phone": validator(true, validationTypes.str)
 		}
-	};
-
-	resources.event = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/event",
-		method: utils.httpMethod.POST,
-		params: {
-			"session_id": validator(true, branch_id),
-			"event": validator(true, validationTypes.str),
-			"metadata": validator(true, validationTypes.obj)
-		}
-	};
-
-	resources.creditHistory = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/credithistory",
-		method: utils.httpMethod.POST,
-		params: {
-			"identity_id": validator(true, branch_id),
-			"session_id": validator(true, branch_id),
-			"link_click_id": validator(false, branch_id),
-			"length": validator(false, validationTypes.num),
-			"direction": validator(false, validationTypes.num),
-			"begin_after_id": validator(false, branch_id),
-			"bucket": validator(false, validationTypes.str)
-		}
-	};
-
-	resources.getCode = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/referralcode",
-		method: utils.httpMethod.POST,
-		params: {
-			"session_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
-			"prefix": validator(false, validationTypes.str),
-			"amount": validator(true, validationTypes.num),
-			"expiration": validator(false, validationTypes.str),
-			"calculation_type": validator(true, validationTypes.num),
-			"location": validator(true, validationTypes.num),
-			"creation_type": validator(true, validationTypes.num),
-			"type": validator(true, validationTypes.str),
-			"bucket": validator(false, validationTypes.str)
-		}
-	};
-
-	resources.validateCode = {
-			destination: config.api_endpoint,
-			endpoint: "/v1/referralcode",
-			method: utils.httpMethod.POST,
-			queryPart: { "code": validator(true, validationTypes.str) },
-			params: {
-				"session_id": validator(true, branch_id),
-				"identity_id": validator(true, branch_id)
-			}
-	};
-
-	resources.applyCode = {
-			destination: config.api_endpoint,
-			endpoint: "/v1/applycode",
-			method: utils.httpMethod.POST,
-			queryPart: { "code": validator(true, validationTypes.str) },
-			params: {
-				"session_id": validator(true, branch_id),
-				"identity_id": validator(true, branch_id)
-			}
 	};
 }
 
@@ -290,20 +178,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
 		}
 	};
 
-	resources.profile = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/profile",
-		method:	 utils.httpMethod.POST,
-		params: {
-			"identity_id": validator(true, branch_id),
-			"session_id": validator(true, branch_id),
-			"link_click_id": validator(false, branch_id),
-			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str),
-			"identity": validator(true, validationTypes.str)
-		}
-	};
-
 	resources.close = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/close",
@@ -314,112 +188,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
 			"link_click_id": validator(false, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
 			"sdk": validator(false, validationTypes.str)
-		}
-	};
-
-	resources.logout = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/logout",
-		method: utils.httpMethod.POST,
-		params: {
-			"identity_id": validator(true, branch_id),
-			"session_id": validator(true, branch_id),
-			"link_click_id": validator(false, branch_id),
-			"sdk": validator(false, validationTypes.str),
-			"device_fingerprint_id": validator(true, branch_id)
-		}
-	};
-
-	resources.referrals = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/referrals",
-		method: utils.httpMethod.GET,
-		queryPart: { "identity_id": validator(true, branch_id) },
-		params: { "sdk": validator(false, validationTypes.str) }
-	};
-
-	resources.credits = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/credits",
-		method: utils.httpMethod.GET,
-		queryPart: { "identity_id": validator(true, branch_id) },
-		params: { "sdk": validator(false, validationTypes.str) }
-	};
-
-	resources.creditHistory = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/credithistory",
-		method: utils.httpMethod.GET, // Does this work as GET? Because the SDK won't send the key or app id if it's GET
-		params: {
-			"identity_id": validator(true, branch_id),
-			"session_id": validator(true, branch_id),
-			"link_click_id": validator(false, branch_id),
-			"sdk": validator(false, validationTypes.str),
-			"device_fingerprint_id": validator(true, branch_id),
-			"length": validator(false, validationTypes.num),
-			"direction": validator(false, validationTypes.num),
-			"begin_after_id": validator(false, branch_id),
-			"bucket": validator(false, validationTypes.str)
-		}
-	};
-
-	resources.getCode = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/referralcode",
-		method: utils.httpMethod.POST,
-		params: {
-			"session_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
-			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str),
-			"prefix": validator(false, validationTypes.str),
-			"amount": validator(true, validationTypes.num),
-			"expiration": validator(false, validationTypes.str),
-			"calculation_type": validator(true, validationTypes.num),
-			"location": validator(true, validationTypes.num),
-			"creation_type": validator(true, validationTypes.num),
-			"type": validator(true, validationTypes.str),
-			"bucket": validator(false, validationTypes.str)
-		}
-	};
-
-	resources.validateCode = {
-			destination: config.api_endpoint,
-			endpoint: "/v1/referralcode",
-			method: utils.httpMethod.POST,
-			queryPart: { "code": validator(true, validationTypes.str) },
-			params: {
-				"session_id": validator(true, branch_id),
-				"identity_id": validator(true, branch_id),
-				"device_fingerprint_id": validator(true, branch_id),
-				"sdk": validator(false, validationTypes.str)
-			}
-	};
-
-	resources.applyCode = {
-			destination: config.api_endpoint,
-			endpoint: "/v1/applycode",
-			method: utils.httpMethod.POST,
-			queryPart: { "code": validator(true, validationTypes.str) },
-			params: {
-				"session_id": validator(true, branch_id),
-				"identity_id": validator(true, branch_id),
-				"device_fingerprint_id": validator(true, branch_id),
-				"sdk": validator(false, validationTypes.str)
-			}
-	};
-
-	resources.redeem =  {
-		destination: config.api_endpoint,
-		endpoint: "/v1/redeem",
-		method: utils.httpMethod.POST,
-		params: {
-			"session_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
-			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str),
-			"amount": validator(true, validationTypes.num),
-			"bucket": validator(false, validationTypes.str)
 		}
 	};
 
@@ -440,18 +208,120 @@ if (CORDOVA_BUILD) { // jshint undef:false
 			"type": validator(false, validationTypes.num)
 		}
 	};
-
-	resources.event = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/event",
-		method: utils.httpMethod.POST,
-		params: {
-			"session_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
-			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str),
-			"event": validator(true, validationTypes.str),
-			"metadata": validator(true, validationTypes.obj)
-		}
-	};
 }
+
+resources.getCode = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/referralcode",
+	method: utils.httpMethod.POST,
+	params: defaults({
+		"prefix": validator(false, validationTypes.str),
+		"amount": validator(true, validationTypes.num),
+		"expiration": validator(false, validationTypes.str),
+		"calculation_type": validator(true, validationTypes.num),
+		"location": validator(true, validationTypes.num),
+		"creation_type": validator(true, validationTypes.num),
+		"type": validator(true, validationTypes.str),
+		"bucket": validator(false, validationTypes.str)
+	})
+};
+
+resources.validateCode = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/referralcode",
+	method: utils.httpMethod.POST,
+	queryPart: { "code": validator(true, validationTypes.str) },
+	params: defaults({ })
+};
+
+resources.applyCode = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/applycode",
+	method: utils.httpMethod.POST,
+	queryPart: { "code": validator(true, validationTypes.str) },
+	params: defaults({ })
+};
+
+resources.logout = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/logout",
+	method: utils.httpMethod.POST,
+	params: defaults({ })
+};
+
+resources.profile = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/profile",
+	method:	 utils.httpMethod.POST,
+	params: defaults({
+		"identity": validator(true, validationTypes.str)
+	})
+};
+
+resources.referrals = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/referrals",
+	method: utils.httpMethod.GET,
+	queryPart: { "identity_id": validator(true, branch_id) },
+	params: defaults({ })
+};
+
+resources.creditHistory = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/credithistory",
+	method: utils.httpMethod.GET,
+	params: defaults({
+		"link_click_id": validator(false, branch_id),
+		"length": validator(false, validationTypes.num),
+		"direction": validator(false, validationTypes.num),
+		"begin_after_id": validator(false, branch_id),
+		"bucket": validator(false, validationTypes.str)
+	})
+};
+
+resources.credits = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/credits",
+	method: utils.httpMethod.GET,
+	queryPart: { "identity_id": validator(true, branch_id) },
+	params: {
+		"app_id": validator(true, branch_id),
+		"sdk": validator(false, validationTypes.str)
+	}
+};
+
+resources.redeem =  {
+	destination: config.api_endpoint,
+	endpoint: "/v1/redeem",
+	method: utils.httpMethod.POST,
+	params: defaults({
+		"amount": validator(true, validationTypes.num),
+		"bucket": validator(false, validationTypes.str)
+	})
+};
+
+resources.link = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/url",
+	method: utils.httpMethod.POST,
+	ref: "obj",
+	params: defaults({
+		"data": validator(false, validationTypes.str),
+		"alias": validator(false, validationTypes.str),
+		"tags": validator(false, validationTypes.arr),
+		"feature": validator(false, validationTypes.str),
+		"channel": validator(false, validationTypes.str),
+		"stage": validator(false, validationTypes.str),
+		"type": validator(false, validationTypes.num)
+	})
+};
+
+resources.event = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/event",
+	method: utils.httpMethod.POST,
+	params: defaults({
+		"event": validator(true, validationTypes.str),
+		"metadata": validator(true, validationTypes.obj)
+	})
+};

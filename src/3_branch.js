@@ -102,6 +102,10 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage(false);
 	this._server = new Server();
+	var sdk;
+	if (CORDOVA_BUILD) { sdk = 'cordova'; }
+	if (WEB_BUILD) { sdk = 'web'; }
+	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD) { // jshint undef:false
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
@@ -124,11 +128,11 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
 	if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
+	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
 	// These three are sent from mobile apps
 	if (CORDOVA_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
-		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
@@ -282,7 +286,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
 				if (err) { return finishInit(err, null); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
