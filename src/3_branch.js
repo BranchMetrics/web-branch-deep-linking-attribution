@@ -221,10 +221,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
+		if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
 		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
-			self.link_click_id = data['link_click_id'];
 		}
 	}
 
