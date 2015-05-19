@@ -9,7 +9,8 @@ goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 
 var RETRIES = 2,
-	RETRY_DELAY = 200;
+	RETRY_DELAY = 200,
+	TIMEOUT = 5000;
 
 /**
  * @class Server
@@ -123,7 +124,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 	var timeout_trigger = window.setTimeout(function() {
 		window[callbackString] = function() { };
 		callback(new Error(utils.messages.timeout));
-	}, 5000);
+	}, TIMEOUT);
 
 	window[callbackString] = function(data) {
 		window.clearTimeout(timeout_trigger);
@@ -166,7 +167,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 
 	try {
 		req.open(method, url, true);
-		req.timeout = 5000;
+		req.timeout = TIMEOUT;
 		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		req.send(data);
 	}

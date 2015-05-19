@@ -843,7 +843,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
-var RETRIES = 2, RETRY_DELAY = 200, Server = function() {
+var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
 Server.prototype.serializeObject = function(a, b) {
@@ -911,7 +911,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window[e] = function() {
     };
     d(Error(utils.messages.timeout));
-  }, 5E3);
+  }, TIMEOUT);
   window[e] = function(a) {
     window.clearTimeout(g);
     d(null, a);
@@ -937,7 +937,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     }
   };
   try {
-    f.open(c, a, !0), f.timeout = 5E3, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
+    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
     d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
