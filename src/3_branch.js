@@ -140,10 +140,10 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var click_url = utils.readKeyValue('click_url', this._storage),
+	var referring_link = utils.readKeyValue('referring_link', this._storage),
 		click_id = utils.readKeyValue('click_id', this._storage);
 
-	if (click_url) { return click_url; }
+	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
 	else { return null; }
 };
@@ -181,7 +181,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * Branch methods are stored in a queue, so even if the SDK is not fully
  * instantiated, calls made to it will be queued in the order they were
  * originally called.
- * If the session was opened from a referring link, `data()` will also return the referring link click as `click_url`, which gives you the ability to continue the click flow.
+ * If the session was opened from a referring link, `data()` will also return the referring link click as `referring_link`, which gives you the ability to continue the click flow.
  *
  * The init function on the Branch object initiates the Branch session and
  * creates a new user session, if it doesn't already exist, in
@@ -208,7 +208,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  *           has_app:            true,                         // Does the user have the app installed already?
  *           identity:           'BranchUser',                 // Unique string that identifies the user
- *           click_url:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+ *           referring_link:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
  *      }
  * );
  * ```
@@ -235,11 +235,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
-		if (data['click_url']) {
-			data['click_url'] = data['click_url'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['click_url'] : data['click_url'];
+		if (data['referring_link']) {
+			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
-		else if (!data['click_id'] && data['click_url']) {
-			data['click_id'] = data['click_url'].substring(data['click_url'].lastIndexOf('/') + 1, data['click_url'].length);
+		else if (!data['click_id'] && data['referring_link']) {
+			data['click_id'] = data['referring_link'].substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
 		}
 		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD) { // jshint undef:false
@@ -334,7 +334,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  */
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(utils.readStore(this._storage));
-	data['click_url'] = this._referringLink();
+	data['referring_link'] = this._referringLink();
 	done(null, data);
 });
 
@@ -713,9 +713,9 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 		}, done);
 	}
 
-	var click_url = self._referringLink();
-	if (click_url && !options['make_new_link']) {
-		sendSMS(click_url.substring(click_url.lastIndexOf('/') + 1, click_url.length));
+	var referring_link = self._referringLink();
+	if (referring_link && !options['make_new_link']) {
+		sendSMS(referring_link.substring(referring_link.lastIndexOf('/') + 1, referring_link.length));
 	}
 	else {
 		self._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {

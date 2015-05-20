@@ -157,7 +157,7 @@ object with all the external methods described below. All calls made to
 Branch methods are stored in a queue, so even if the SDK is not fully
 instantiated, calls made to it will be queued in the order they were
 originally called.
-If the session was opened from a referring link, `data()` will also return the referring link click as `click_url`, which gives you the ability to continue the click flow.
+If the session was opened from a referring link, `data()` will also return the referring link click as `referring_link`, which gives you the ability to continue the click flow.
 
 The init function on the Branch object initiates the Branch session and
 creates a new user session, if it doesn't already exist, in
@@ -184,7 +184,7 @@ callback(
           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
           has_app:            true,                         // Does the user have the app installed already?
           identity:           'BranchUser',                 // Unique string that identifies the user
-          click_url:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+          referring_link:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
      }
 );
 ```

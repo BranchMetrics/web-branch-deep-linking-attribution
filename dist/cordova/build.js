@@ -1216,7 +1216,7 @@ Branch.prototype._api = function(a, b, c) {
   });
 };
 Branch.prototype._referringLink = function() {
-  var a = utils.readKeyValue("click_url", this._storage), b = utils.readKeyValue("click_id", this._storage);
+  var a = utils.readKeyValue("referring_link", this._storage), b = utils.readKeyValue("click_id", this._storage);
   return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
 };
 CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
@@ -1234,7 +1234,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       var e = c;
       e.session_id && (d.session_id = e.session_id.toString());
       e.identity_id && (d.identity_id = e.identity_id.toString());
-      e.click_url ? e.click_url = "http" != e.click_url.substring(0, 4) ? "https://bnc.lt" + e.click_url : e.click_url : !e.click_id && e.click_url && (e.click_id = e.click_url.substring(e.click_url.lastIndexOf("/") + 1, e.click_url.length));
+      e.referring_link ? e.referring_link = "http" != e.referring_link.substring(0, 4) ? "https://bnc.lt" + e.referring_link : e.referring_link : !e.click_id && e.referring_link && (e.click_id = e.referring_link.substring(e.referring_link.lastIndexOf("/") + 1, e.referring_link.length));
       d.sessionLink = e.link;
       CORDOVA_BUILD && (d.device_fingerprint_id = e.device_fingerprint_id, e.link_click_id && (d.link_click_id = e.link_click_id));
       c = e;
@@ -1288,7 +1288,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(utils.readStore(this._storage));
-  b.click_url = this._referringLink();
+  b.referring_link = this._referringLink();
   a(null, b);
 });
 CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
