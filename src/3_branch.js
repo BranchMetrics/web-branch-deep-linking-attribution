@@ -109,6 +109,9 @@ Branch = function() {
 		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
 		this.debug = false;					// A debug install session will get a unique device id.
 	}
+	else if (WEB_BUILD) {
+		this.sdk = "web" + config.version;
+	}
 
 	this.init_state = init_states.NO_INIT;
 };
@@ -123,12 +126,12 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (this.branch_key) { obj['branch_key'] = this.branch_key; }
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
+	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
 	// These three are sent from mobile apps
 	if (CORDOVA_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
 		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
-		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {

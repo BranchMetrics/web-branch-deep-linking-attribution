@@ -71,6 +71,7 @@ if (WEB_BUILD) { // jshint undef:false
 				"identity_id": validator(false, branch_id),
 				"link_identifier": validator(false, validationTypes.str),
 				"is_referrable": validator(true, validationTypes.num),
+				"sdk": validator(false, validationTypes.str),
 				"browser_fingerprint_id": validator(true, branch_id)
 			}
 		};
@@ -81,6 +82,7 @@ if (WEB_BUILD) { // jshint undef:false
 			method:	 utils.httpMethod.POST,
 			params: {
 				"identity_id": validator(true, branch_id),
+				"sdk": validator(false, validationTypes.str),
 				"identity": validator(true, validationTypes.str)
 			}
 		};
@@ -90,6 +92,7 @@ if (WEB_BUILD) { // jshint undef:false
 			endpoint: "/v1/close",
 			method: utils.httpMethod.POST,
 			params: {
+				"sdk": validator(false, validationTypes.str),
 				"session_id": validator(true, branch_id)
 			}
 		};
@@ -99,6 +102,7 @@ if (WEB_BUILD) { // jshint undef:false
 			endpoint: "/v1/logout",
 			method: utils.httpMethod.POST,
 			params: {
+				"sdk": validator(false, validationTypes.str),
 				"session_id": validator(true, branch_id)
 			}
 		};
@@ -134,6 +138,7 @@ if (WEB_BUILD) { // jshint undef:false
 			params: {
 				"identity_id": validator(true, branch_id),
 				"amount": validator(true, validationTypes.num),
+				"sdk": validator(false, validationTypes.str),
 				"bucket": validator(true, validationTypes.str)
 			}
 		};
@@ -150,7 +155,9 @@ if (WEB_BUILD) { // jshint undef:false
 				"feature": validator(false, validationTypes.str),
 				"channel": validator(false, validationTypes.str),
 				"stage": validator(false, validationTypes.str),
-				"type": validator(false, validationTypes.num)
+				"type": validator(false, validationTypes.num),
+				"alias": validator(false, validationTypes.str),
+				"sdk": validator(false, validationTypes.str)
 			}
 		};
 
@@ -181,6 +188,7 @@ if (WEB_BUILD) { // jshint undef:false
 			params: {
 				"session_id": validator(true, branch_id),
 				"event": validator(true, validationTypes.str),
+				"sdk": validator(false, validationTypes.str),
 				"metadata": validator(true, validationTypes.obj)
 			}
 		};
