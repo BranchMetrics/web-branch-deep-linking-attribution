@@ -40,7 +40,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link getReferringLink sendSMS referrals credits redeem banner closeBanner".split(" "),0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -444,6 +444,31 @@ callback(
 ___
 
 ## Sharing links via SMS
+
+
+
+### link(data, callback) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - link data and metadata.
+
+**callback**: `function`, _required_ - returns a string of the Branch deep linking URL.
+
+If the session was opened from a referring link, this method will return the referring link click, which gives you the ability to continue the click flow.
+
+#### Example
+```js
+branch.getReferringLink(function(err, data) {
+    console.log(err, link);
+});
+```
+##### Callback Format
+```js
+callback(
+    null,
+    'https://bnc.lt/c/3HZMytU-BW' // Branch referring link click URL
+);
 
 
 

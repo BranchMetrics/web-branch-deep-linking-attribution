@@ -221,20 +221,28 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
-		if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
+		if (data['click_url']) {
+			data['click_url'] = data['click_url'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['click_url'] : data['click_url'];
+		}
+		else if (!data['click_id'] && data['click_url']) {
+			data['click_id'] = data['click_url'].substring(data['click_url'].lastIndexOf('/') + 1, data['click_url'].length);
+		}
 		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
+			if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
 		}
+		return data;
 	}
 
 	var finishInit = function(err, data) {
 		if (data) {
+			data = setBranchValues(data);
 			if (CORDOVA_BUILD) { // jshint undef:false
 				utils.store(data, self._permStorage);
 			}
 			utils.store(data, self._storage);
-			setBranchValues(data);
+
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
@@ -587,6 +595,36 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	});
 });
 
+/**
+ * @function Branch.link
+ * @param {Object} data - _required_ - link data and metadata.
+ * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep linking URL.
+ *
+ * If the session was opened from a referring link, this method will return the referring link click, which gives you the ability to continue the click flow.
+ *
+ * #### Example
+ * ```js
+ * branch.getReferringLink(function(err, data) {
+ *     console.log(err, link);
+ * });
+ * ```
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     null,
+ *     'https://bnc.lt/c/3HZMytU-BW' // Branch referring link click URL
+ * );
+ *
+ */
+Branch.prototype['getReferringLink'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	var click_url = utils.readKeyValue('click_url', this._storage),
+		click_id = utils.readKeyValue('click_id', this._storage);
+
+	if (click_url) { done(null, click_url); }
+	else if (click_id) { done(null, config.link_service_endpoint + '/c/' + click_id); }
+	else { done(null, null); }
+});
+
 
 /**
  * @function Branch.sendSMS
@@ -693,8 +731,11 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 		}, done);
 	}
 
-	if (utils.readKeyValue('click_id', self._storage) && !options['make_new_link']) {
-		sendSMS(utils.readKeyValue('click_id', self._storage));
+	var click_url = utils.readKeyValue('click_url', self._storage),
+		click_id = utils.readKeyValue('click_id', self._storage);
+	if ((click_url || click_id) && !options['make_new_link']) {
+		if (click_url) { click_id = click_url.substring(click_url.lastIndexOf('/') + 1, click_url.length); }
+		sendSMS(click_id);
 	}
 	else {
 		self._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {

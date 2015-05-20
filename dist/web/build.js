@@ -1123,13 +1123,18 @@ var sendSMS = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document;
-    banner_utils.mobileUserAgent() ? utils.readKeyValue("click_id", d) && !b.make_new_link ? f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + utils.readKeyValue("click_id", d) : a.link(c, function(a, b) {
-      a || (f.getElementById("branch-mobile-action").href = b);
-    }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
-      d.preventDefault();
-      sendSMS(f, a, b, c);
-    });
-    var g = f.getElementById("branch-banner-close"), k = function() {
+    if (banner_utils.mobileUserAgent()) {
+      var g = utils.readKeyValue("click_url", d), k = utils.readKeyValue("click_id", d);
+      !g && !k || b.make_new_link ? a.link(c, function(a, b) {
+        a || (f.getElementById("branch-mobile-action").href = b);
+      }) : g ? f.getElementById("branch-mobile-action").href = g : f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + k;
+    } else {
+      f.getElementById("sms-form").addEventListener("submit", function(d) {
+        d.preventDefault();
+        sendSMS(f, a, b, c);
+      });
+    }
+    var g = f.getElementById("branch-banner-close"), h = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1143,14 +1148,14 @@ var sendSMS = function(a, b, c, d) {
     };
     g && (g.onclick = function(a) {
       a.preventDefault();
-      k();
+      h();
     });
     addClass(document.body, "branch-banner-is-active");
     "top" == b.position ? document.body.style.marginTop = banner_utils.bannerHeight : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.bannerHeight);
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
     }, banner_utils.animationDelay);
-    return k;
+    return h;
   }
 };
 // Input 12
@@ -1221,7 +1226,19 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   c = utils.readStore(d._storage);
   var e = function(b, c) {
-    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), c.session_id && (d.session_id = c.session_id.toString()), c.identity_id && (d.identity_id = c.identity_id.toString()), c.link_click_id && (d.link_click_id = c.link_click_id), d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    if (c) {
+      var e = c;
+      e.session_id && (d.session_id = e.session_id.toString());
+      e.identity_id && (d.identity_id = e.identity_id.toString());
+      e.click_url ? e.click_url = "http" != e.click_url.substring(0, 4) ? "https://bnc.lt" + e.click_url : e.click_url : !e.click_id && e.click_url && (e.click_id = e.click_url.substring(e.click_url.lastIndexOf("/") + 1, e.click_url.length));
+      d.sessionLink = e.link;
+      CORDOVA_BUILD && (d.device_fingerprint_id = e.device_fingerprint_id, e.link_click_id && (d.link_click_id = e.link_click_id));
+      c = e;
+      CORDOVA_BUILD && utils.store(c, d._permStorage);
+      utils.store(c, d._storage);
+      d.init_state = init_states.INIT_SUCCEEDED;
+      c.data_parsed = c.data ? goog.json.parse(c.data) : null;
+    }
     b && (d.init_state = init_states.INIT_FAILED);
     a(b, c && utils.whiteListSessionData(c));
   };
@@ -1304,6 +1321,10 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
     a(b, d && d.url);
   });
 });
+Branch.prototype.getReferringLink = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  var b = utils.readKeyValue("click_url", this._storage), c = utils.readKeyValue("click_id", this._storage);
+  b ? a(null, b) : c ? a(null, config.link_service_endpoint + "/c/" + c) : a(null, null);
+});
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
     f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
@@ -1318,7 +1339,8 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
   }
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" != c.channel || (c.channel = "sms");
-  utils.readKeyValue("click_id", f._storage) && !d.make_new_link ? e(utils.readKeyValue("click_id", f._storage)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
+  var g = utils.readKeyValue("click_url", f._storage), k = utils.readKeyValue("click_id", f._storage);
+  !g && !k || d.make_new_link ? f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
     if (b) {
       return a(b);
     }
@@ -1329,7 +1351,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
       utils.storeKeyValue("click_id", c.click_id, f._storage);
       e(c.click_id);
     });
-  });
+  }) : (g && (k = g.substring(g.lastIndexOf("/") + 1, g.length)), e(k));
 });
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);

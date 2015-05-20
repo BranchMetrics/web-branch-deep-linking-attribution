@@ -124,8 +124,11 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
-			if (utils.readKeyValue('click_id', storage) && !options.make_new_link) {
-				doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + utils.readKeyValue('click_id', storage);
+			var click_url = utils.readKeyValue('click_url', storage),
+				click_id = utils.readKeyValue('click_id', storage);
+			if ((click_url || click_id) && !options.make_new_link) {
+				if (click_url) { doc.getElementById('branch-mobile-action').href = click_url; }
+				else { doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + click_id; }
 			}
 			else {
 				branch["link"](linkData, function(err, url) {
