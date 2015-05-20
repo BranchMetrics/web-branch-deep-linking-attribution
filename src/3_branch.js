@@ -605,12 +605,14 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *     console.log(err, link);
  * });
  * ```
+ *
  * ##### Callback Format
  * ```js
  * callback(
  *     null,
  *     'https://bnc.lt/c/3HZMytU-BW' // Branch referring link click URL
  * );
+ * ```
  *
  * ___
  *
