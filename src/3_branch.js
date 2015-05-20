@@ -596,7 +596,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 });
 
 /**
- * @function Branch.link
+ * @function Branch.getReferringLink
  * @param {Object} data - _required_ - link data and metadata.
  * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep linking URL.
  *

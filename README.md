@@ -447,7 +447,7 @@ ___
 
 
 
-### link(data, callback) 
+### getReferringLink(data, callback) 
 
 **Parameters**
 
