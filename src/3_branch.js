@@ -610,7 +610,7 @@ Branch.prototype._getReferringLinkNoWrap = function(done) {
  * @param {Object} data - _required_ - link data and metadata.
  * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep linking URL.
  *
- * If the session was opened from a referring link, this method will return the referring link click, which gives you the ability to continue the click flow.
+ * If the session was opened from a referring link, this method will return the referring link click, which gives you the ability to continue the click flow. if `getReferringLink()` returns null, then there is no referring link and you can create a link by calling `link()`.
  *
  * #### Example
  * ```js
