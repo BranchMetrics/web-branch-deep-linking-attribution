@@ -157,6 +157,7 @@ object with all the external methods described below. All calls made to
 Branch methods are stored in a queue, so even if the SDK is not fully
 instantiated, calls made to it will be queued in the order they were
 originally called.
+If the session was opened from a referring link, `data()` will also return the referring link click as `click_url`, which gives you the ability to continue the click flow.
 
 The init function on the Branch object initiates the Branch session and
 creates a new user session, if it doesn't already exist, in
@@ -179,10 +180,11 @@ branch.init(
 callback(
      "Error message",
      {
-          data_parsed:        { },         // If the user was referred from a link, and the link has associated data, the data is passed in here.
-          referring_identity: '12345',     // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
-          has_app:            true,        // Does the user have the app installed already?
-          identity:           'BranchUser' // Unique string that identifies the user
+          data_parsed:        { },                          // If the user was referred from a link, and the link has associated data, the data is passed in here.
+          referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+          has_app:            true,                         // Does the user have the app installed already?
+          identity:           'BranchUser',                 // Unique string that identifies the user
+          click_url:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
      }
 );
 ```
@@ -442,37 +444,6 @@ callback(
     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
 );
 ```
-
-
-
-### getReferringLink(data, callback) 
-
-**Parameters**
-
-**data**: `Object`, _required_ - link data and metadata.
-
-**callback**: `function`, _required_ - returns a string of the Branch deep linking URL.
-
-If the session was opened from a referring link, this method will return the referring link click, which gives you the ability to continue the click flow. if `getReferringLink()` returns null, then there is no referring link and you can create a link by calling `link()`.
-
-#### Example
-```js
-branch.getReferringLink(function(err, data) {
-    console.log(err, link);
-});
-```
-
-##### Callback Format
-```js
-callback(
-    null,
-    'https://bnc.lt/c/3HZMytU-BW' // Branch referring link click URL
-);
-```
-
-___
-
-## Sharing links via SMS
 
 
 

@@ -123,22 +123,21 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
-			branch["getReferringLink"](function(err, click_url) {
-				if (click_url && !options['make_new_link']) {
-					doc.getElementById('branch-mobile-action').href = click_url;
-				}
-				else {
-					branch["link"](linkData, function(err, url) {
-						if (err) {
-							// Todo: figure out something good to do here. Maybe a
-							// long link? Or why not always a long link?
-						}
-						else {
-							doc.getElementById('branch-mobile-action').href = url;
-						}
-					});
-				}
-			});
+			var click_url = branch["_referringLink"]();
+			if (click_url && !options['make_new_link']) {
+				doc.getElementById('branch-mobile-action').href = click_url;
+			}
+			else {
+				branch["link"](linkData, function(err, url) {
+					if (err) {
+						// Todo: figure out something good to do here. Maybe a
+						// long link? Or why not always a long link?
+					}
+					else {
+						doc.getElementById('branch-mobile-action').href = url;
+					}
+				});
+			}
 		}
 		else {
 			doc.getElementById('sms-form').addEventListener('submit', function(ev) {
