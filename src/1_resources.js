@@ -127,6 +127,7 @@ if (WEB_BUILD) { // jshint undef:false
 			method: utils.httpMethod.GET,
 			jsonp: true,
 			params: {
+				"sdk": validator(false, validationTypes.str),
 				"v": validator(true, validationTypes.str)
 			}
 		};
@@ -177,6 +178,7 @@ if (WEB_BUILD) { // jshint undef:false
 				"link_url": validator(true, validationTypes.str)
 			},
 			params: {
+				"sdk": validator(false, validationTypes.str),
 				"phone": validator(true, validationTypes.str)
 			}
 		};
