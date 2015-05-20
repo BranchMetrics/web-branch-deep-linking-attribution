@@ -103,6 +103,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 
 1. Deeplinking Methods
    + [.link()](#linkdata-callback)
+   + [.getReferringLink()](#getreferringlinkdata-callback)
    + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
 
 1. Referral Methods
@@ -441,9 +442,6 @@ callback(
     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
 );
 ```
-___
-
-## Sharing links via SMS
 
 
 
@@ -469,6 +467,10 @@ callback(
     null,
     'https://bnc.lt/c/3HZMytU-BW' // Branch referring link click URL
 );
+
+___
+
+## Sharing links via SMS
 
 
 

@@ -584,9 +584,6 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
  * );
  * ```
- * ___
- *
- * ## Sharing links via SMS
  *
  */
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
@@ -615,6 +612,9 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *     'https://bnc.lt/c/3HZMytU-BW' // Branch referring link click URL
  * );
  *
+ * ___
+ *
+ * ## Sharing links via SMS
  */
 Branch.prototype['getReferringLink'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var click_url = utils.readKeyValue('click_url', this._storage),
