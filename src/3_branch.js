@@ -592,6 +592,19 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	});
 });
 
+/***
+ * @function Branch._getReferringLinkNoWrap
+ * @param {function(...?): undefined} done
+ */
+Branch.prototype._getReferringLinkNoWrap = function(done) {
+	var click_url = utils.readKeyValue('click_url', this._storage),
+		click_id = utils.readKeyValue('click_id', this._storage);
+
+	if (click_url) { done(null, click_url); }
+	else if (click_id) { done(null, config.link_service_endpoint + '/c/' + click_id); }
+	else { done(null, null); }
+};
+
 /**
  * @function Branch.getReferringLink
  * @param {Object} data - _required_ - link data and metadata.
@@ -619,14 +632,8 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ## Sharing links via SMS
  */
 Branch.prototype['getReferringLink'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var click_url = utils.readKeyValue('click_url', this._storage),
-		click_id = utils.readKeyValue('click_id', this._storage);
-
-	if (click_url) { done(null, click_url); }
-	else if (click_id) { done(null, config.link_service_endpoint + '/c/' + click_id); }
-	else { done(null, null); }
+	this._getReferringLinkNoWrap(done);
 });
-
 
 /**
  * @function Branch.sendSMS
@@ -733,26 +740,26 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 		}, done);
 	}
 
-	var click_url = utils.readKeyValue('click_url', self._storage),
-		click_id = utils.readKeyValue('click_id', self._storage);
-	if ((click_url || click_id) && !options['make_new_link']) {
-		if (click_url) { click_id = click_url.substring(click_url.lastIndexOf('/') + 1, click_url.length); }
-		sendSMS(click_id);
-	}
-	else {
-		self._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
-			if (err) { return done(err); }
-			var url = data['url'];
-			self._api(resources.linkClick, {
-				"link_url": 'l/' + url.split('/').pop(),
-				"click": "click"
-			}, function(err, data) {
+	self._getReferringLinkNoWrap(function(err, click_url) { // don't queue this
+		if (click_url && !options['make_new_link']) {
+			sendSMS(click_url.substring(click_url.lastIndexOf('/') + 1, click_url.length));
+		}
+		else {
+			self._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
 				if (err) { return done(err); }
-				utils.storeKeyValue('click_id', data['click_id'], self._storage);
-				sendSMS(data['click_id']);
+				var url = data['url'];
+				self._api(resources.linkClick, {
+					"link_url": 'l/' + url.split('/').pop(),
+					"click": "click"
+				}, function(err, data) {
+					if (err) { return done(err); }
+					utils.storeKeyValue('click_id', data['click_id'], self._storage);
+					sendSMS(data['click_id']);
+				});
 			});
-		});
-	}
+		}
+	});
+
 });
 
 /**

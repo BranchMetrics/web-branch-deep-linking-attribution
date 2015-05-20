@@ -523,8 +523,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
-      g[k - 2] = arguments[k];
+    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
+      g[h - 2] = arguments[h];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -817,14 +817,14 @@ utils.isKey = function(a) {
   return-1 < a.indexOf("key_");
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, k, h = 0;
+  var b = "", c, d, e, f, g, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -1073,24 +1073,24 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 11
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
   }, p = function() {
-    h = a.createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = banner_html.checkmark();
-    k.appendChild(h);
+    k = a.createElement("div");
+    k.className = "branch-icon-wrapper";
+    k.id = "branch-checkmark";
+    k.style = "opacity: 0;";
+    k.innerHTML = banner_html.checkmark();
+    h.appendChild(k);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      h.style.opacity = "1";
+      k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, m = function() {
@@ -1106,7 +1106,7 @@ var sendSMS = function(a, b, c, d) {
     var n = e.value;
     /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
       a ? m() : (p(), setTimeout(function() {
-        k.removeChild(h);
+        h.removeChild(k);
         l();
       }, banner_utils.success_timeout));
     })) : m();
@@ -1123,17 +1123,14 @@ var sendSMS = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document;
-    if (banner_utils.mobileUserAgent()) {
-      var g = utils.readKeyValue("click_url", d), k = utils.readKeyValue("click_id", d);
-      !g && !k || b.make_new_link ? a.link(c, function(a, b) {
+    banner_utils.mobileUserAgent() ? a.getReferringLink(function(d, e) {
+      e && !b.make_new_link ? f.getElementById("branch-mobile-action").href = e : a.link(c, function(a, b) {
         a || (f.getElementById("branch-mobile-action").href = b);
-      }) : g ? f.getElementById("branch-mobile-action").href = g : f.getElementById("branch-mobile-action").href = config.link_service_endpoint + "/c/" + k;
-    } else {
-      f.getElementById("sms-form").addEventListener("submit", function(d) {
-        d.preventDefault();
-        sendSMS(f, a, b, c);
       });
-    }
+    }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(f, a, b, c);
+    });
     var g = f.getElementById("branch-banner-close"), h = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
@@ -1172,7 +1169,7 @@ function wrap(a, b, c) {
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
@@ -1181,16 +1178,16 @@ function wrap(a, b, c) {
       };
       if (!c) {
         if (d.init_state == init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state == init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed)), null);
+          return k(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state == init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -1321,9 +1318,12 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
     a(b, d && d.url);
   });
 });
-Branch.prototype.getReferringLink = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+Branch.prototype._getReferringLinkNoWrap = function(a) {
   var b = utils.readKeyValue("click_url", this._storage), c = utils.readKeyValue("click_id", this._storage);
   b ? a(null, b) : c ? a(null, config.link_service_endpoint + "/c/" + c) : a(null, null);
+};
+Branch.prototype.getReferringLink = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  this._getReferringLinkNoWrap(a);
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
@@ -1339,19 +1339,20 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
   }
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" != c.channel || (c.channel = "sms");
-  var g = utils.readKeyValue("click_url", f._storage), k = utils.readKeyValue("click_id", f._storage);
-  !g && !k || d.make_new_link ? f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
-    if (b) {
-      return a(b);
-    }
-    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+  f._getReferringLinkNoWrap(function(b, h) {
+    h && !d.make_new_link ? e(h.substring(h.lastIndexOf("/") + 1, h.length)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
       if (b) {
         return a(b);
       }
-      utils.storeKeyValue("click_id", c.click_id, f._storage);
-      e(c.click_id);
+      f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+        if (b) {
+          return a(b);
+        }
+        utils.storeKeyValue("click_id", c.click_id, f._storage);
+        e(c.click_id);
+      });
     });
-  }) : (g && (k = g.substring(g.lastIndexOf("/") + 1, g.length)), e(k));
+  });
 });
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);

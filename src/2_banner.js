@@ -7,7 +7,6 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
-goog.require('config');
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
@@ -124,23 +123,22 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
-			var click_url = utils.readKeyValue('click_url', storage),
-				click_id = utils.readKeyValue('click_id', storage);
-			if ((click_url || click_id) && !options.make_new_link) {
-				if (click_url) { doc.getElementById('branch-mobile-action').href = click_url; }
-				else { doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + click_id; }
-			}
-			else {
-				branch["link"](linkData, function(err, url) {
-					if (err) {
-						// Todo: figure out something good to do here. Maybe a
-						// long link? Or why not always a long link?
-					}
-					else {
-						doc.getElementById('branch-mobile-action').href = url;
-					}
-				});
-			}
+			branch["getReferringLink"](function(err, click_url) {
+				if (click_url && !options['make_new_link']) {
+					doc.getElementById('branch-mobile-action').href = click_url;
+				}
+				else {
+					branch["link"](linkData, function(err, url) {
+						if (err) {
+							// Todo: figure out something good to do here. Maybe a
+							// long link? Or why not always a long link?
+						}
+						else {
+							doc.getElementById('branch-mobile-action').href = url;
+						}
+					});
+				}
+			});
 		}
 		else {
 			doc.getElementById('sms-form').addEventListener('submit', function(ev) {
