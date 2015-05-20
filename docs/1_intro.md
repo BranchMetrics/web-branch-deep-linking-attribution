@@ -102,7 +102,6 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 
 1. Deeplinking Methods
    + [.link()](#linkdata-callback)
-   + [.getReferringLink()](#getreferringlinkdata-callback)
    + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
 
 1. Referral Methods
