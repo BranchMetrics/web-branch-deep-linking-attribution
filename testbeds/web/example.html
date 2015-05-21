@@ -148,7 +148,7 @@
       };
 
     $('#init').click(function() {
-      request.html('branch.init();');
+      request.html("branch.init();");
       branch.init('5680621892404085', showResponse);
     });
 
@@ -168,7 +168,7 @@
     });
 
     $('#track').click(function() {
-      request.html('branch.track(\'Tracked this event\');');
+      request.html("branch.track('Tracked this event');");
       branch.track('Tracked this event', showResponse);
     });
 
@@ -202,12 +202,12 @@
     });
 
     $('#redeem').click(function() {
-      request.html('branch.redeem({amount: 5, bucket: \'default\'});');
+      request.html("branch.redeem({amount: 5, bucket: 'default'});");
       branch.redeem(5, 'default', showResponse);
     });
 
     $('#creditHistory').click(function() {
-      request.html('branch.creditHistory({length: 5, bucket: \'default\'});');
+      request.html("branch.creditHistory({length: 5, bucket: 'default'});");
       branch.creditHistory({ "length": 5, "bucket":"default"}, showResponse);
     });
 
@@ -227,7 +227,7 @@
     });
 
     $('#banner').click(function() {
-      request.html('branch.banner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
+      request.html("branch.banner({icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',title: 'Branch Demo App',description: 'The Branch demo app!',data: {foo: 'bar'}});");
       branch.banner(
         // Banner Options
       {
