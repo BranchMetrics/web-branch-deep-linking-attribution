@@ -40,7 +40,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "),0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -581,27 +581,29 @@ callback(
 
 
 
-### getCode(data, callback) 
+### getCode(options, callback) 
 
 **Parameters**
 
-**data**: `Object`, _required_ - contins options for referral code creation.
+**options**: `Object`, _required_ - contins options for referral code creation.
 
 **callback**: `function`, _optional_ - returns an error if unsuccessful
 
 Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
-The data can containt the following fields:
-"amount" - A required integer specifying the number of credits added when the code is applied.
-"bucket" - The optional bucket to apply the credits to.  Defaults to "default".
-"calculation_type" - A required integer.  1 for unlimited uses, 0 for one use.
-"location" - A required integer. Determines who get's the credits.  0 for the referree, 2 for the referring user or 3 for both.
-"prefix" - An optional string to be prepended to the code.
-"expiration" - An optional date string.  If present, determines the date on which the code expires.
+The `options` object can containt the following properties:
+| Key | Value
+| --- | ---
+| amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
+| bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
+| calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
+| location | *required* - An integer that etermines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
+| prefix | *optional* - A string to be prepended to the code.
+| expiration | *optional* - A date string that if present, determines the date on which the code expires.
 
 ##### Usage
 
 branch.getCode(
-    data,
+    options,
     callback(err,data)
 );
 
@@ -756,22 +758,28 @@ callback(
 
 
 
-### creditHistory(data, callback) 
+### creditHistory(options, callback) 
 
 **Parameters**
 
-**data**: `Object`, _optional_ - options controlling the returned history.
+**options**: `Object`, _optional_ - options controlling the returned history.
 
 **callback**: `function`, _required_ - returns an array with credit history data.
 
 This call will retrieve the entire history of credits and redemptions from the individual user.
-// wtf is "direction"?
+Properties available in the `options` object:
+| Key | Value
+| --- | ---
+| bucket | *optional (max 63 characters)* - The bucket from which to retrieve credit transactions.
+| begin_after_id | *optional* - The credit transaction id of the last item in the previous retrieval. Retrieval will start from the transaction next to it. If none is specified, retrieval starts from the very beginning in the transaction history, depending on the order.
+| length | *optional* - The number of credit transactions to retrieve. If none is specified, up to 100 credit transactions will be retrieved.
+| direction | *optional* - The order of credit transactions to retrieve. If direction is `1`, retrieval is in least recent first order; If direction is `0`, or if none is specified, retrieval is in most recent first order.
 
 ##### Usage
 
 ```js
 branch.creditHistory(
-     data,
+     options,
      callback(err, data)
 );
 ```
