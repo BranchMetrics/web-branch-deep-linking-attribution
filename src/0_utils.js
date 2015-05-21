@@ -76,7 +76,7 @@ utils.whiteListSessionData = function(data) {
 		'referring_identity': data['referring_identity'] || null,
 		'identity': data['identity'] || null,
 		'has_app': data['has_app'] || null,
-		'click_url': data['click_url'] || null
+		'referring_link': data['referring_link'] || null
 	};
 };
 

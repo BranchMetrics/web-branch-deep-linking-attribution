@@ -73,7 +73,8 @@ describe('Branch', function() {
 				"session_id": "113636235674656786",
 				"identity_id": "98807509250212101",
 				"identity": "Branch",
-				"has_app":true
+				"has_app":true,
+				"referred_link": null
 			};
 
 			branch.init(branch_sample_key, function(err, res) {
@@ -85,14 +86,15 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "v": config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
+			assert.deepEqual(requests[0].obj, { "v": config.version, branch_key: branch_sample_key, "sdk": "web" + config.version }, 'Request params to _r correct');
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
 				"branch_key": branch_sample_key,
 				"link_identifier": undefined,
 				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id
+				"browser_fingerprint_id": browser_fingerprint_id,
+				"sdk": "web" + config.version
 			}, 'Request to open params correct');
 
 			assert.equal(requests.length, 2, '2 requests made');
@@ -141,7 +143,8 @@ describe('Branch', function() {
 				"branch_key": branch_sample_key,
 				"link_identifier": '12345',
 				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id
+				"browser_fingerprint_id": browser_fingerprint_id,
+				"sdk": "web" + config.version
 			}, 'Request to open params correct');
 		});
 
@@ -160,7 +163,8 @@ describe('Branch', function() {
 				"branch_key": branch_sample_key,
 				"link_identifier": '67890',
 				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id
+				"browser_fingerprint_id": browser_fingerprint_id,
+				"sdk": "web" + config.version
 			}, 'Request to open params correct');
 		});
 	});
@@ -190,7 +194,7 @@ describe('Branch', function() {
 	describe('setIdentity', function() {
 		basicTests('setIdentity', [ 1 ]);
 
-		var expectedRequest = testUtils.params({ "identity": "test_identity" }, [ 'session_id', 'browser_fingerprint_id' ]);
+		var expectedRequest = testUtils.params({ "identity": "test_identity", "sdk": "web" + config.version }, [ 'session_id', 'browser_fingerprint_id' ]);
 		var expectedResponse = {
 			identity_id: '12345',
 			link: 'url',
@@ -227,7 +231,8 @@ describe('Branch', function() {
 					"language": navigator.language
 				},
 				"branch_key": branch_sample_key,
-				"session_id": session_id
+				"session_id": session_id,
+				"sdk": "web" + config.version
 			};
 
 			assert.equal(requests.length, 1, 'Request made');
@@ -252,7 +257,8 @@ describe('Branch', function() {
 					"test": "meta_data"
 				},
 				"branch_key": branch_sample_key,
-				"session_id": session_id
+				"session_id": session_id,
+				"sdk": "web" + config.version
 			};
 
 			assert.equal(requests.length, 1, 'Request made');
@@ -272,7 +278,7 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'identity_id', 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ "sdk": "web" + config.version }, [ 'identity_id', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 
@@ -292,7 +298,8 @@ describe('Branch', function() {
 					'$og_title': 'Branch Metrics',
 					'$og_description': 'Branch Metrics',
 					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
-				}
+				},
+				"sdk": "web" + config.version
 			});
 			if (desktop_url_append) {
 				val['data']['$desktop_url'] += desktop_url_append;
@@ -361,7 +368,8 @@ describe('Branch', function() {
 			var expectedRequest = {
 				"link_url": "12345",
 				"phone": "9999999999",
-				"branch_key": branch_sample_key
+				"branch_key": branch_sample_key,
+				"sdk": "web" + config.version
 			};
 
 			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
@@ -453,7 +461,7 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
-			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'session_id', 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket", "sdk": "web" + config.version }, [ 'session_id', 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 /*

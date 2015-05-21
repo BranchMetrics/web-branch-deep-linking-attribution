@@ -126,10 +126,7 @@ if (WEB_BUILD) { // jshint undef:false
 			endpoint: "/_r",
 			method: utils.httpMethod.GET,
 			jsonp: true,
-			params: {
-				"sdk": validator(false, validationTypes.str),
-				"v": validator(true, validationTypes.str)
-			}
+			params: { "v": validator(true, validationTypes.str) }
 		};
 
 		resources.redeem =  {

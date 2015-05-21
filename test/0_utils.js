@@ -40,7 +40,8 @@ describe('utils', function() {
 				"referring_identity": "12345",
 				"identity": "67890",
 				"has_app": true,
-				"unwanted": "param"
+				"unwanted": "param",
+				"referring_link": null
 			};
 			var whiteListedData = utils.whiteListSessionData(data);
 			delete data["unwanted"];
