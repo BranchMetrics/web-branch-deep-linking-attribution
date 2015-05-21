@@ -53,7 +53,7 @@ describe('Integration tests', function() {
 				'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
 		if (assert) {
 			assert.equal(requests.length, 2);
-			assert.equal(requests[1].requestBody, 'identity_id=' + identity_id + '&is_referrable=1&browser_fingerprint_id=' + browser_fingerprint_id + '&app_id=' + browser_fingerprint_id);
+			assert.equal(requests[1].requestBody, 'identity_id=' + identity_id + '&is_referrable=1&sdk=web' + config.version + '&browser_fingerprint_id=' + browser_fingerprint_id + '&app_id=' + browser_fingerprint_id);
 		}
 	};
 
@@ -66,7 +66,8 @@ describe('Integration tests', function() {
 						data: null,
 						referring_identity: null,
 						identity: "Branch",
-						has_app: true
+						has_app: true,
+						referring_link: null
 					},
 					'Expected response returned');
 			});
@@ -139,7 +140,8 @@ describe('Integration tests', function() {
 						data: null,
 						referring_identity: null,
 						identity: "Branch",
-						has_app: true
+						has_app: true,
+						referring_link: null
 					});
 			});
 			assert.equal(requests.length, 2);

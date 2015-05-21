@@ -3,6 +3,13 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+- Fixes bug with iOS and Android app banner not opening
+### Improvements
+- Behind the scenes improvement to retry all XHR and JSONP requests 3 timesif they fail or timeout
+
+## [v1.5.3] - 2015-05-21
+### New Functionality
+- Adds `referring_link` property to both `init()` and `data()` methods that returns the referring link, if available.
 
 ## [v1.5.2] - 2015-05-18
 ### New Functionality
