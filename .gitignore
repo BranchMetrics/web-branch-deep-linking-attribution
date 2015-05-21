@@ -19,3 +19,5 @@ docs/3_branch.md
 compiler-latest.zip
 testbeds/cordova/platforms
 testbeds/cordova/plugins
+src/titanium/BranchSDK/android/build
+src/titanium/BranchSDK/iphone/build

@@ -22,6 +22,7 @@ goog.LOCALE = "en";
 goog.TRUSTED_SITE = !0;
 goog.STRICT_MODE_COMPATIBLE = !1;
 goog.DISALLOW_TEST_ONLY_CODE = COMPILED && !goog.DEBUG;
+goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING = !1;
 goog.provide = function(a) {
   if (!COMPILED && goog.isProvided_(a)) {
     throw Error('Namespace "' + a + '" already declared.');
@@ -145,9 +146,6 @@ goog.require = function(a) {
 goog.basePath = "";
 goog.nullFunction = function() {
 };
-goog.identityFunction = function(a, b) {
-  return a;
-};
 goog.abstractMethod = function() {
   throw Error("unimplemented abstract method");
 };
@@ -173,7 +171,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
     goog.basePath = goog.global.CLOSURE_BASE_PATH;
   } else {
     if (goog.inHtmlDocument_()) {
-      for (var a = goog.global.document.getElementsByTagName("script"), b = a.length - 1;0 <= b;--b) {
+      for (var a = goog.global.document.getElementsByTagName("SCRIPT"), b = a.length - 1;0 <= b;--b) {
         var c = a[b].src, d = c.lastIndexOf("?"), d = -1 == d ? c.length : d;
         if ("base.js" == c.substr(d - 7, 7)) {
           goog.basePath = c.substr(0, d - 7);
@@ -200,16 +198,16 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
 }, goog.maybeProcessDeferredDep_ = function(a) {
   goog.isDeferredModule_(a) && goog.allDepsAreAvailable_(a) && (a = goog.getPathFromDeps_(a), goog.maybeProcessDeferredPath_(goog.basePath + a));
 }, goog.isDeferredModule_ = function(a) {
-  return(a = goog.getPathFromDeps_(a)) && goog.dependencies_.pathIsModule[a] ? goog.basePath + a in goog.dependencies_.deferred : !1;
+  return (a = goog.getPathFromDeps_(a)) && goog.dependencies_.pathIsModule[a] ? goog.basePath + a in goog.dependencies_.deferred : !1;
 }, goog.allDepsAreAvailable_ = function(a) {
   if ((a = goog.getPathFromDeps_(a)) && a in goog.dependencies_.requires) {
     for (var b in goog.dependencies_.requires[a]) {
       if (!goog.isProvided_(b) && !goog.isDeferredModule_(b)) {
-        return!1;
+        return !1;
       }
     }
   }
-  return!0;
+  return !0;
 }, goog.maybeProcessDeferredPath_ = function(a) {
   if (a in goog.dependencies_.deferred) {
     var b = goog.dependencies_.deferred[a];
@@ -248,24 +246,33 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   }
 }, goog.loadModuleFromSource_ = function(a) {
   eval(a);
-  return{};
+  return {};
+}, goog.writeScriptSrcNode_ = function(a) {
+  goog.global.document.write('<script type="text/javascript" src="' + a + '">\x3c/script>');
+}, goog.appendScriptSrcNode_ = function(a) {
+  var b = goog.global.document, c = b.createElement("script");
+  c.type = "text/javascript";
+  c.src = a;
+  c.defer = !1;
+  c.async = !1;
+  b.head.appendChild(c);
 }, goog.writeScriptTag_ = function(a, b) {
   if (goog.inHtmlDocument_()) {
     var c = goog.global.document;
-    if ("complete" == c.readyState) {
+    if (!goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING && "complete" == c.readyState) {
       if (/\bdeps.js$/.test(a)) {
-        return!1;
+        return !1;
       }
       throw Error('Cannot write "' + a + '" after document load');
     }
     var d = goog.IS_OLD_IE_;
-    void 0 === b ? d ? (d = " onreadystatechange='goog.onScriptLoad_(this, " + ++goog.lastNonModuleScriptIndex_ + ")' ", c.write('<script type="text/javascript" src="' + a + '"' + d + ">\x3c/script>")) : c.write('<script type="text/javascript" src="' + a + '">\x3c/script>') : c.write('<script type="text/javascript">' + b + "\x3c/script>");
-    return!0;
+    void 0 === b ? d ? (d = " onreadystatechange='goog.onScriptLoad_(this, " + ++goog.lastNonModuleScriptIndex_ + ")' ", c.write('<script type="text/javascript" src="' + a + '"' + d + ">\x3c/script>")) : goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING ? goog.appendScriptSrcNode_(a) : goog.writeScriptSrcNode_(a) : c.write('<script type="text/javascript">' + b + "\x3c/script>");
+    return !0;
   }
-  return!1;
+  return !1;
 }, goog.lastNonModuleScriptIndex_ = 0, goog.onScriptLoad_ = function(a, b) {
   "complete" == a.readyState && goog.lastNonModuleScriptIndex_ == b && goog.loadQueuedModules_();
-  return!0;
+  return !0;
 }, goog.writeScripts_ = function() {
   function a(e) {
     if (!(e in d.written)) {
@@ -310,19 +317,22 @@ goog.normalizePath_ = function(a) {
   }
   return a.join("/");
 };
+goog.loadFileSync_ = function(a) {
+  if (goog.global.CLOSURE_LOAD_FILE_SYNC) {
+    return goog.global.CLOSURE_LOAD_FILE_SYNC(a);
+  }
+  var b = new goog.global.XMLHttpRequest;
+  b.open("get", a, !1);
+  b.send();
+  return b.responseText;
+};
 goog.retrieveAndExecModule_ = function(a) {
   if (!COMPILED) {
     var b = a;
     a = goog.normalizePath_(a);
-    var c = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_, d = null, e = new goog.global.XMLHttpRequest;
-    e.onload = function() {
-      d = this.responseText;
-    };
-    e.open("get", a, !1);
-    e.send();
-    d = e.responseText;
+    var c = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_, d = goog.loadFileSync_(a);
     if (null != d) {
-      e = goog.wrapModule_(a, d), goog.IS_OLD_IE_ ? (goog.dependencies_.deferred[b] = e, goog.queuedModules_.push(b)) : c(a, e);
+      d = goog.wrapModule_(a, d), goog.IS_OLD_IE_ ? (goog.dependencies_.deferred[b] = d, goog.queuedModules_.push(b)) : c(a, d);
     } else {
       throw Error("load of " + a + "failed");
     }
@@ -394,7 +404,7 @@ goog.getUid = function(a) {
   return a[goog.UID_PROPERTY_] || (a[goog.UID_PROPERTY_] = ++goog.uidCounter_);
 };
 goog.hasUid = function(a) {
-  return!!a[goog.UID_PROPERTY_];
+  return !!a[goog.UID_PROPERTY_];
 };
 goog.removeUid = function(a) {
   "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
@@ -458,7 +468,7 @@ goog.mixin = function(a, b) {
   }
 };
 goog.now = goog.TRUSTED_SITE && Date.now || function() {
-  return+new Date;
+  return +new Date;
 };
 goog.globalEval = function(a) {
   if (goog.global.execScript) {
@@ -468,7 +478,7 @@ goog.globalEval = function(a) {
       if (null == goog.evalWorksForGlobals_ && (goog.global.eval("var _et_ = 1;"), "undefined" != typeof goog.global._et_ ? (delete goog.global._et_, goog.evalWorksForGlobals_ = !0) : goog.evalWorksForGlobals_ = !1), goog.evalWorksForGlobals_) {
         goog.global.eval(a);
       } else {
-        var b = goog.global.document, c = b.createElement("script");
+        var b = goog.global.document, c = b.createElement("SCRIPT");
         c.type = "text/javascript";
         c.defer = !1;
         c.appendChild(b.createTextNode(a));
@@ -523,8 +533,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
-      g[k - 2] = arguments[k];
+    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
+      g[h - 2] = arguments[h];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -605,7 +615,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.4.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.4.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
 // Input 2
 var BranchStorage = function() {
   this._store = {};
@@ -622,6 +632,26 @@ BranchStorage.prototype.removeItem = function(a) {
 BranchStorage.prototype.clear = function() {
   this._store = {};
 };
+var TitaniumStorage = function() {
+  this._store = JSON.parse(Ti.App.Properties.getString("localData", "{}"));
+};
+TitaniumStorage.prototype = new BranchStorage;
+TitaniumStorage.prototype.constructor = TitaniumStorage;
+TitaniumStorage.prototype.setItem = function(a, b) {
+  this._store[a] = b;
+  Ti.App.Properties.setString("localData", JSON.stringify(this._store));
+};
+TitaniumStorage.prototype.getItem = function(a) {
+  return "undefined" != typeof this._store[a] ? this._store[a] : null;
+};
+TitaniumStorage.prototype.removeItem = function(a) {
+  delete this._store[a];
+  Ti.App.Properties.setString("localData", JSON.stringify(this._store));
+};
+TitaniumStorage.prototype.clear = function() {
+  this._store = {};
+  Ti.App.Properties.setString("localData", JSON.stringify(this._store));
+};
 var storage = function(a) {
   try {
     if (a) {
@@ -631,7 +661,7 @@ var storage = function(a) {
     sessionStorage.removeItem("test");
     return sessionStorage;
   } catch (b) {
-    return new BranchStorage;
+    return TITANIUM_BUILD && a ? new TitaniumStorage : new BranchStorage;
   }
 };
 // Input 3
@@ -653,7 +683,7 @@ var Queue = function() {
 goog.json = {};
 goog.json.USE_NATIVE_JSON = !1;
 goog.json.isValid = function(a) {
-  return/^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
+  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
 };
 goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
   a = String(a);
@@ -669,7 +699,7 @@ goog.json.unsafeParse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : fun
   return eval("(" + a + ")");
 };
 goog.json.serialize = goog.json.USE_NATIVE_JSON ? goog.global.JSON.stringify : function(a, b) {
-  return(new goog.json.Serializer(b)).serialize(a);
+  return (new goog.json.Serializer(b)).serialize(a);
 };
 goog.json.Serializer = function(a) {
   this.replacer_ = a;
@@ -680,46 +710,45 @@ goog.json.Serializer.prototype.serialize = function(a) {
   return b.join("");
 };
 goog.json.Serializer.prototype.serializeInternal = function(a, b) {
-  switch(typeof a) {
-    case "string":
-      this.serializeString_(a, b);
-      break;
-    case "number":
-      this.serializeNumber_(a, b);
-      break;
-    case "boolean":
-      b.push(a);
-      break;
-    case "undefined":
-      b.push("null");
-      break;
-    case "object":
-      if (null == a) {
-        b.push("null");
-        break;
-      }
+  if (null == a) {
+    b.push("null");
+  } else {
+    if ("object" == typeof a) {
       if (goog.isArray(a)) {
         this.serializeArray(a, b);
-        break;
+        return;
       }
-      this.serializeObject_(a, b);
-      break;
-    case "function":
-      break;
-    default:
-      throw Error("Unknown type: " + typeof a);;
+      if (a instanceof String || a instanceof Number || a instanceof Boolean) {
+        a = a.valueOf();
+      } else {
+        this.serializeObject_(a, b);
+        return;
+      }
+    }
+    switch(typeof a) {
+      case "string":
+        this.serializeString_(a, b);
+        break;
+      case "number":
+        this.serializeNumber_(a, b);
+        break;
+      case "boolean":
+        b.push(a);
+        break;
+      case "function":
+        break;
+      default:
+        throw Error("Unknown type: " + typeof a);;
+    }
   }
 };
 goog.json.Serializer.charToJsonCharCache_ = {'"':'\\"', "\\":"\\\\", "/":"\\/", "\b":"\\b", "\f":"\\f", "\n":"\\n", "\r":"\\r", "\t":"\\t", "\x0B":"\\u000b"};
 goog.json.Serializer.charsToReplace_ = /\uffff/.test("\uffff") ? /[\\\"\x00-\x1f\x7f-\uffff]/g : /[\\\"\x00-\x1f\x7f-\xff]/g;
 goog.json.Serializer.prototype.serializeString_ = function(a, b) {
   b.push('"', a.replace(goog.json.Serializer.charsToReplace_, function(a) {
-    if (a in goog.json.Serializer.charToJsonCharCache_) {
-      return goog.json.Serializer.charToJsonCharCache_[a];
-    }
-    var b = a.charCodeAt(0), e = "\\u";
-    16 > b ? e += "000" : 256 > b ? e += "00" : 4096 > b && (e += "0");
-    return goog.json.Serializer.charToJsonCharCache_[a] = e + b.toString(16);
+    var b = goog.json.Serializer.charToJsonCharCache_[a];
+    b || (b = "\\u" + (a.charCodeAt(0) | 65536).toString(16).substr(1), goog.json.Serializer.charToJsonCharCache_[a] = b);
+    return b;
   }), '"');
 };
 goog.json.Serializer.prototype.serializeNumber_ = function(a, b) {
@@ -763,7 +792,7 @@ utils.message = function(a, b) {
   return c;
 };
 utils.whiteListSessionData = function(a) {
-  return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null};
+  return {data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null};
 };
 utils.cleanLinkData = function(a, b) {
   WEB_BUILD && (a.source = "web-sdk", void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
@@ -774,7 +803,7 @@ utils.readStore = function(a) {
   try {
     return goog.json.parse(a.getItem("branch_session") || {});
   } catch (b) {
-    return{};
+    return {};
   }
 };
 utils.store = function(a, b) {
@@ -814,17 +843,17 @@ utils.getParamValue = function(a) {
   }
 };
 utils.isKey = function(a) {
-  return-1 < a.indexOf("key_");
+  return -1 < a.indexOf("key_");
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, k, h = 0;
+  var b = "", c, d, e, f, g, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -835,7 +864,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, mobileUserAgent:function() {
   return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : "ios" : !1;
 }, shouldAppend:function(a, b) {
-  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
+  return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (!utils.readKeyValue("hideBanner", a) || b.forgetHide) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
 var Server = function() {
@@ -860,7 +889,7 @@ Server.prototype.getUrl = function(a, b) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
         if (d = a.queryPart[c](a.endpoint, c, b[c])) {
-          return{error:d};
+          return {error:d};
         }
         e += "/" + b[c];
       }
@@ -870,7 +899,7 @@ Server.prototype.getUrl = function(a, b) {
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
       if (d = a.params[c](a.endpoint, c, b[c])) {
-        return{error:d};
+        return {error:d};
       }
       d = b[c];
       "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
@@ -878,18 +907,16 @@ Server.prototype.getUrl = function(a, b) {
   }
   c = /^[0-9]{15,20}$/;
   d = /key_(live|test)_[A-Za-z0-9]{32}/;
-  if ("POST" === a.method) {
-    if (b.branch_key && d.test(b.branch_key)) {
-      f.branch_key = b.branch_key;
+  if (b.branch_key && d.test(b.branch_key)) {
+    f.branch_key = b.branch_key;
+  } else {
+    if (b.app_id && c.test(b.app_id)) {
+      f.app_id = b.app_id;
     } else {
-      if (b.app_id && c.test(b.app_id)) {
-        f.app_id = b.app_id;
-      } else {
-        return{error:utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"])};
-      }
+      return {error:utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"])};
     }
   }
-  return{data:this.serializeObject(f, ""), url:e};
+  return (CORDOVA_BUILD || TITANIUM_BUILD) && "GET" !== a.method ? {data:goog.json.serialize(f), url:e} : {data:this.serializeObject(f, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
   var b = document.createElement("script");
@@ -914,12 +941,30 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
-  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  var f;
+  f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.timeout = 5E3;
   f.ontimeout = function() {
     e(Error(utils.messages.timeout));
   };
-  f.onreadystatechange = function() {
+  TITANIUM_BUILD ? (f.onerror = function(a) {
+    console.log("onerror: " + goog.json.serialize(a));
+    402 === f.status ? e(Error("Not enough credits to redeem.")) : a.error ? e(Error(a.error)) : e(Error("Error in API: " + f.status));
+  }, f.onload = function() {
+    console.log("onload!");
+    console.log("Status: " + f.status);
+    console.log("Text: " + f.responseText);
+    if (200 === f.status) {
+      try {
+        e(null, goog.json.parse(f.responseText));
+      } catch (a) {
+        e(null, {});
+      }
+    } else {
+      402 === f.status ? e(Error("Not enough credits to redeem.")) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
+    }
+  }) : f.onreadystatechange = function() {
+    console.log("Ready State: " + f.readyState);
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
@@ -933,7 +978,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     }
   };
   try {
-    f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
+    f.open(c, a, !0), CORDOVA_BUILD || TITANIUM_BUILD ? "GET" === c ? f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded") : f.setRequestHeader("Content-Type", "application/json") : f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
     d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
@@ -987,7 +1032,7 @@ function validator(a, b) {
         return utils.message(utils.messages.missingParam, [c, d]);
       }
     }
-    return!1;
+    return !1;
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
@@ -997,19 +1042,21 @@ endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:vali
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, 
 queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{phone:validator(!0, validationTypes.str)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), event:validator(!0, validationTypes.str), 
 metadata:validator(!0, validationTypes.obj)}});
-CORDOVA_BUILD && (resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), bluetooth_version:validator(!1, 
-validationTypes.str), has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), is_referrable:validator(!1, 
-validationTypes.num), update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), 
-app_version:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), is_referrable:validator(!1, validationTypes.num)}}, resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), 
-sdk:validator(!1, validationTypes.str), identity:validator(!0, validationTypes.str)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, 
-params:{identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", 
-method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:{identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), length:validator(!1, validationTypes.num), 
-direction:validator(!1, validationTypes.num), begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.str)}}, resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), prefix:validator(!1, validationTypes.str), amount:validator(!0, validationTypes.num), 
-expiration:validator(!1, validationTypes.str), calculation_type:validator(!0, validationTypes.num), location:validator(!0, validationTypes.num), creation_type:validator(!0, validationTypes.num), type:validator(!0, validationTypes.str), bucket:validator(!1, validationTypes.str)}}, resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.str)}, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, 
-branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.str)}, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", 
-method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}}, resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{identity_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), data:validator(!1, 
-validationTypes.str), alias:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, 
-branch_id), sdk:validator(!1, validationTypes.str), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}});
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), bluetooth_version:validator(!1, validationTypes.str), 
+  has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), is_referrable:validator(!1, validationTypes.num), 
+  update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, 
+  validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), is_referrable:validator(!1, validationTypes.num)}}, resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, 
+  validationTypes.str), identity:validator(!0, validationTypes.str)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:{identity_id:validator(!0, 
+  branch_id), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id)}}, resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, 
+  branch_id)}, params:{sdk:validator(!1, validationTypes.str)}}, resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:{sdk:validator(!1, validationTypes.str), identity_id:validator(!0, branch_id), length:validator(!1, validationTypes.num), direction:validator(!1, validationTypes.num), begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.str)}}, resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", 
+  method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), prefix:validator(!1, validationTypes.str), amount:validator(!0, validationTypes.num), expiration:validator(!1, validationTypes.str), calculation_type:validator(!0, validationTypes.num), location:validator(!0, validationTypes.num), creation_type:validator(!0, validationTypes.num), type:validator(!0, 
+  validationTypes.str), bucket:validator(!1, validationTypes.str)}}, resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.str)}, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, 
+  queryPart:{code:validator(!0, validationTypes.str)}, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str)}}, resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), 
+  amount:validator(!0, validationTypes.num), bucket:validator(!1, validationTypes.str)}}, resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:{identity_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), data:validator(!1, validationTypes.str), alias:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, 
+  validationTypes.str), type:validator(!1, validationTypes.num)}}, resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:{session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)}};
+}
+;
 // Input 9
 var banner_css = {};
 banner_css.banner = ".branch-animation { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
@@ -1037,11 +1084,11 @@ banner_css.css = function(a, b) {
 };
 // Input 10
 var banner_html = {banner:function(a, b) {
-  return'<div class="content"><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action">' + b + "</div></div>";
+  return '<div class="content"><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action">' + b + "</div></div>";
 }, mobileAction:function(a, b) {
-  return'<a id="branch-mobile-action" href="#" target="_parent">' + (utils.hasApp(b) ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+  return '<a id="branch-mobile-action" href="#" target="_parent">' + (utils.hasApp(b) ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
-  return'<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation" >Send Link</button></form></div>';
+  return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation" >Send Link</button></form></div>';
 }, checkmark:function() {
   return window.ActiveXObject ? '<span class="checkmark">&#x2713;</span>' : '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5" enable-background="new 0 0 98.5 98.5" xml:space="preserve"><path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10" d="M81.7,17.8C73.5,9.3,62,4,49.2,4C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/></svg>';
 }, iframe:function(a, b) {
@@ -1070,24 +1117,24 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 11
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
   }, p = function() {
-    h = a.createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = banner_html.checkmark();
-    k.appendChild(h);
+    k = a.createElement("div");
+    k.className = "branch-icon-wrapper";
+    k.id = "branch-checkmark";
+    k.style = "opacity: 0;";
+    k.innerHTML = banner_html.checkmark();
+    h.appendChild(k);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      h.style.opacity = "1";
+      k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, m = function() {
@@ -1103,7 +1150,7 @@ var sendSMS = function(a, b, c, d) {
     var n = e.value;
     /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
       a ? m() : (p(), setTimeout(function() {
-        k.removeChild(h);
+        h.removeChild(k);
         l();
       }, banner_utils.success_timeout));
     })) : m();
@@ -1120,7 +1167,7 @@ var sendSMS = function(a, b, c, d) {
       d.preventDefault();
       sendSMS(f, a, b, c);
     });
-    var g = f.getElementById("branch-banner-close"), k = function() {
+    var g = f.getElementById("branch-banner-close"), h = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1133,14 +1180,14 @@ var sendSMS = function(a, b, c, d) {
     };
     g && (g.onclick = function(a) {
       a.preventDefault();
-      k();
+      h();
     });
     document.body.className += " branch-animation";
     document.body.style.marginTop = banner_utils.bannerHeight;
     setTimeout(function() {
       e.style.top = "0";
     }, banner_utils.animationDelay);
-    return k;
+    return h;
   }
 };
 // Input 12
@@ -1157,7 +1204,7 @@ function wrap(a, b, c) {
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
@@ -1166,16 +1213,16 @@ function wrap(a, b, c) {
       };
       if (!c) {
         if (d.init_state == init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state == init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed)), null);
+          return k(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state == init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -1187,7 +1234,9 @@ var Branch = function() {
   this._queue = Queue();
   this._storage = storage(!1);
   this._server = new Server;
-  CORDOVA_BUILD && (this._permStorage = storage(!0), this.sdk = "cordova" + config.version, this.debug = !1);
+  if (CORDOVA_BUILD || TITANIUM_BUILD) {
+    this._permStorage = storage(!0), CORDOVA_BUILD ? this.sdk = "cordova" + config.version : TITANIUM_BUILD && (this.sdk = "titanium" + config.version), this.debug = !1;
+  }
   this.init_state = init_states.NO_INIT;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1195,72 +1244,131 @@ Branch.prototype._api = function(a, b, c) {
   this.branch_key && (b.branch_key = this.branch_key);
   (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && this.session_id && (b.session_id = this.session_id);
   (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && this.identity_id && (b.identity_id = this.identity_id);
-  CORDOVA_BUILD && ((a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id), (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id), (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk));
+  if (CORDOVA_BUILD || TITANIUM_BUILD) {
+    (a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id), (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id), (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
+  }
+  console.log("_api request with obj: " + goog.json.serialize(b));
   return this._server.request(a, b, this._storage, function(a, b) {
+    console.log("Request returned");
+    a && console.log("Error: " + goog.json.serialize(a));
+    b && console.log("Data: " + goog.json.serialize(b));
     c(a, b);
   });
 };
-CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
-  this.debug = a;
-});
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  Branch.prototype.setDebug = function(a) {
+    this.debug = a;
+  };
+}
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
+  console.log("Options: " + JSON.stringify(c));
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  c = utils.readStore(d._storage);
-  var e = function(b, c) {
-    c && (CORDOVA_BUILD && utils.store(c, d._permStorage), utils.store(c, d._storage), d.session_id = c.session_id, d.identity_id = c.identity_id, d.sessionLink = c.link, CORDOVA_BUILD && (d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id), d.init_state = init_states.INIT_SUCCEEDED);
+  var e = utils.readStore(d._storage), f = function(b, c, e) {
+    if (c) {
+      if (CORDOVA_BUILD || TITANIUM_BUILD) {
+        var f = utils.readStore(d._permStorage);
+        console.log("First is: " + goog.json.serialize(f));
+        utils.store(c, d._permStorage);
+        e || (f.data ? utils.storeKeyValue("data", f.data, d._permStorage) : utils.storeKeyValue("data", null, d._permStorage));
+      }
+      utils.store(c, d._storage);
+      d.session_id = c.session_id;
+      d.identity_id = c.identity_id;
+      d.sessionLink = c.link;
+      if (CORDOVA_BUILD || TITANIUM_BUILD) {
+        d.device_fingerprint_id = c.device_fingerprint_id, d.link_click_id = c.link_click_id;
+      }
+      d.init_state = init_states.INIT_SUCCEEDED;
+    }
     b && (d.init_state = init_states.INIT_FAILED);
     a(b, c && utils.whiteListSessionData(c));
   };
-  if (c && c.session_id) {
-    e(null, c);
+  if (e && e.session_id) {
+    f(null, e, !1);
   } else {
-    if (CORDOVA_BUILD && (c = [], c.push(d.debug), null !== b && c.push(b ? 1 : 0), b = function() {
-      a("Error getting device data!");
-    }, utils.readKeyValue("identity_id", d._permStorage) ? exec(function(a) {
-      console.log("Sending open with: " + goog.json.serialize(a));
-      d._api(resources.open, a, function(a, b) {
+    if (CORDOVA_BUILD) {
+      if (e = function() {
+        a("Error getting device data!");
+      }, utils.readKeyValue("identity_id", d._permStorage)) {
+        var g = [];
+        null !== b && g.push(b ? 1 : 0);
+        exec(function(a) {
+          var b = utils.readStore(d._permStorage);
+          a.identity_id = b.identity_id;
+          a.device_fingerprint_id = b.device_fingerprint_id;
+          console.log("Sending open with: " + goog.json.serialize(a));
+          d._api(resources.open, a, function(a, b) {
+            if (a) {
+              return f(a, null, !1);
+            }
+            b.identity_id = utils.readKeyValue("identity_id", d._permStorage);
+            b.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
+            f(null, b, !1);
+          });
+        }, e, "BranchDevice", "getOpenData", g);
+      } else {
+        g = [], g.push(d.debug), null !== b && g.push(b ? 1 : 0), exec(function(a) {
+          console.log("Sending install with: " + goog.json.serialize(a));
+          d._api(resources.install, a, function(a, b) {
+            if (a) {
+              return f(a, null, !0);
+            }
+            f(null, b, !0);
+          });
+        }, e, "BranchDevice", "getInstallData", g);
+      }
+    }
+    if (TITANIUM_BUILD) {
+      c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
+      var h;
+      if (c && (c = c.split("?"), 2 == c.length && (c = c[1].split("&"), 0 < c.length))) {
+        for (e = 0;e < c.length;e++) {
+          if (g = c[e].split("="), 2 == g.length && "link_click_id" === g[0]) {
+            h = g[1];
+            break;
+          }
+        }
+      }
+      utils.readKeyValue("identity_id", d._permStorage) ? (c = require("io.branch.sdk"), console.log("Getting data"), b = null == b ? c.getOpenData(-1) : c.getOpenData(b ? 1 : 0), h && (b.link_identifier = h), c = utils.readStore(d._permStorage), b.identity_id = c.identity_id, b.device_fingerprint_id = c.device_fingerprint_id, d._api(resources.open, b, function(a, b) {
         if (a) {
-          return e(a, null);
+          return f(a, null, !1);
         }
         b.identity_id = utils.readKeyValue("identity_id", d._permStorage);
         b.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
-        e(null, b);
-      });
-    }, b, "BranchDevice", "getOpenData", c) : exec(function(a) {
-      console.log("Sending install with: " + goog.json.serialize(a));
-      d._api(resources.install, a, function(a, b) {
+        f(null, b, !1);
+      })) : (c = require("io.branch.sdk"), b = null == b ? c.getInstallData(d.debug, -1) : c.getInstallData(d.debug, b ? 1 : 0), h && (b.link_identifier = h), console.log("Sending install with: " + goog.json.serialize(b)), d._api(resources.install, b, function(a, b) {
         if (a) {
-          return e(a, null);
+          return f(a, null, !0);
         }
-        e(null, b);
-      });
-    }, b, "BranchDevice", "getInstallData", c)), WEB_BUILD) {
-      var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r");
-      d._api(resources._r, {v:config.version}, function(a, b) {
-        if (a) {
-          return e(a, null);
-        }
-        d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-          if (a) {
-            return e(a, null);
-          }
-          f && (b.click_id = f);
-          e(a, b);
-        });
-      });
+        f(null, b, !0);
+      }));
     }
+    WEB_BUILD && (h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), d._api(resources._r, {v:config.version}, function(a, b) {
+      if (a) {
+        return f(a, null, !1);
+      }
+      d._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+        if (a) {
+          return f(a, null, !1);
+        }
+        h && (b.click_id = h);
+        f(a, b, !1);
+      });
+    }));
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
-CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
-}));
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+    a(null, utils.whiteListSessionData(utils.readStore(this._permStorage)));
+  });
+}
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = this;
   this._api(resources.profile, {identity:b}, function(b, e) {
@@ -1273,19 +1381,21 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, a);
 });
-CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
-  var b = this;
-  this._api(resources.close, {}, function(c, d) {
-    delete b.session_id;
-    delete b.sessionLink;
-    b.init_state = init_states.NO_INIT;
-    utils.clearStore(b._storage);
-    a(null);
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
+    var b = this;
+    this._api(resources.close, {}, function(c, d) {
+      delete b.session_id;
+      delete b.sessionLink;
+      b.init_state = init_states.NO_INIT;
+      utils.clearStore(b._storage);
+      a(null);
+    });
   });
-}));
+}
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   c || (c = {});
-  this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
+  TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b, config), function(b, d) {
@@ -1322,23 +1432,31 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);
 });
-CORDOVA_BUILD && (Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  b.type = "credit";
-  b.creation_type = 2;
-  this._api(resources.getCode, b, a);
-}));
-CORDOVA_BUILD && (Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
-  this._api(resources.validateCode, {code:b}, a);
-}));
-CORDOVA_BUILD && (Branch.prototype.applyCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
-  this._api(resources.applyCode, {code:b}, a);
-}));
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
+    b.type = "credit";
+    b.creation_type = 2;
+    this._api(resources.getCode, b, a);
+  });
+}
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
+    this._api(resources.validateCode, {code:b}, a);
+  });
+}
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  Branch.prototype.applyCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
+    this._api(resources.applyCode, {code:b}, a);
+  });
+}
 Branch.prototype.credits = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.credits, {}, a);
 });
-CORDOVA_BUILD && (Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  this._api(resources.creditHistory, b ? b : {}, a);
-}));
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
+  Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
+    this._api(resources.creditHistory, b ? b : {}, a);
+  });
+}
 Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
@@ -1354,7 +1472,7 @@ WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, functi
 }));
 // Input 13
 var branch_instance = new Branch;
-if (window.branch && window.branch._q) {
+if (!TITANIUM_BUILD && window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
     var task = queue[i];
     branch_instance[task[0]].apply(branch_instance, task[1]);
@@ -1363,7 +1481,7 @@ if (window.branch && window.branch._q) {
 "function" === typeof define && define.amd ? define("branch", function() {
   return branch_instance;
 }) : "object" === typeof exports && (module.exports = branch_instance);
-window && (window.branch = branch_instance);
+TITANIUM_BUILD || window && (window.branch = branch_instance);
 CORDOVA_BUILD && document.addEventListener("pause", function() {
   console.log("Closing branch section on pause event.");
   branch_instance.close(function() {

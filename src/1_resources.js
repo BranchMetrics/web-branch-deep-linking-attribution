@@ -186,7 +186,7 @@ if (WEB_BUILD) { // jshint undef:false
 		};
 }
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 	resources.install = {
 			destination: config.api_endpoint,
 			endpoint: "/v1/install",
@@ -295,13 +295,9 @@ if (CORDOVA_BUILD) { // jshint undef:false
 			destination: config.api_endpoint,
 			endpoint: "/v1/credithistory",
 			method: utils.httpMethod.GET,
-			params: {
-				"identity_id": validator(true, branch_id),
-				"session_id": validator(true, branch_id),
-				"link_click_id": validator(false, branch_id),
-				"sdk": validator(false, validationTypes.str),
-				"device_fingerprint_id": validator(true, branch_id),
-				"length": validator(false, validationTypes.num),
+			params: { "sdk": validator(false, validationTypes.str),
+ 				"identity_id": validator(true, branch_id),
+ 				"length": validator(false, validationTypes.num),
 				"direction": validator(false, validationTypes.num),
 				"begin_after_id": validator(false, branch_id),
 				"bucket": validator(false, validationTypes.str)

@@ -75,7 +75,7 @@ Server.prototype.getUrl = function(resource, data) {
 	var branch_id = /^[0-9]{15,20}$/;
 	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
-	if (resource.method === "POST") {
+//	if (resource.method === "POST") {
 		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
 			d['branch_key'] = data['branch_key'];
 		}
@@ -85,7 +85,7 @@ Server.prototype.getUrl = function(resource, data) {
 		else {
 			return { error: utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]) };
 		}
-	}
+//	}
 
 	return { data: this.serializeObject(d, ''), url: url };
 };
@@ -138,13 +138,27 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {function(?Error,*=)=} callback
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
-	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+	var req;
+	if (TITANIUM_BUILD) {
+		req = Ti.Network.createHTTPClient();
+	} else { // Cordova or Web
+		req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+	}
 	req.timeout = 5000;
 	req.ontimeout = function() {
 		callback(new Error(utils.messages.timeout));
 	};
-	req.onreadystatechange = function() {
-		if (req.readyState === 4) {
+	if (TITANIUM_BUILD) {
+		req.onerror = function(e) {
+			if (req.status === 402) {
+				callback(new Error('Not enough credits to redeem.'));
+			} else if (e.error) {
+				callback(new Error(e.error));
+			} else {
+				callback(new Error("Error in API: " + req.status));
+			}
+		};
+		req.onload = function() {
 			if (req.status === 200) {
 				try {
 					callback(null, goog.json.parse(req.responseText));
@@ -160,7 +174,26 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 				callback(new Error('Error in API: ' + req.status));
 			}
 		}
-	};
+	} else {
+		req.onreadystatechange = function() {
+			if (req.readyState === 4) {
+				if (req.status === 200) {
+					try {
+						callback(null, goog.json.parse(req.responseText));
+					}
+					catch (e) {
+						callback(null, { });
+					}
+				}
+				else if (req.status === 402) {
+					callback(new Error('Not enough credits to redeem.'));
+				}
+				else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
+					callback(new Error('Error in API: ' + req.status));
+				}
+			}
+		};
+	}
 
 	try {
 		req.open(method, url, true);

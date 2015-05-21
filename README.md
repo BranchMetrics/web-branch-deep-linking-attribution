@@ -38,7 +38,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.4.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits redeem banner closeBanner".split(" "),0);
+	
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -131,6 +131,7 @@ instead of possibly using the same device id.  This is useful when testing.
 This needs to be set before the Branch.init call!!!
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 ---
 
@@ -147,6 +148,7 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 **callback**: `function`, _optional_ - callback to read the session data.
 
 THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -218,6 +220,7 @@ If the Branch session has already been initialized, the callback will return
 immediately, otherwise, it will return once Branch has been initialized.
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 ___
 
@@ -309,6 +312,7 @@ callback(
 ```
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 ___
 
@@ -485,6 +489,7 @@ callback("Error message");
 ```
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
+OR THE TITANIUM MODULE
 
 ___
 
@@ -593,6 +598,7 @@ callback(
 ```
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 ___
 
@@ -641,6 +647,7 @@ callback(
 ```
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 ___
 
@@ -689,6 +696,7 @@ callback(
 ```
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 ___
 
@@ -790,6 +798,7 @@ callback(
 ```
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 ---
 
@@ -862,6 +871,7 @@ Display a smart banner directing the user to your app through a Branch referral 
 | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
 
 THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
+OR THE TITANIUM MODULE
 
 #### Usage
 

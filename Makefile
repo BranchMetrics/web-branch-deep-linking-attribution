@@ -15,9 +15,9 @@ ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../../dist/web/build.js"}
 
 .PHONY: clean
 
-all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz
+all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/titanium/build.js dist/titanium/build.min.js dist/web/build.min.js.gz
 clean:
-	rm -f dist/web/** dist/cordova/** docs/3_branch.md README.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz
+	rm -f dist/web/** dist/cordova/** dist/titanium/** docs/3_branch.md README.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz
 release: clean all dist/web/build.min.js.gz
 	@echo "released"
 
@@ -62,6 +62,12 @@ dist/cordova/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 
 dist/cordova/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'CORDOVA_BUILD=true' > dist/cordova/build.min.js
+
+dist/titanium/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'TITANIUM_BUILD=true' > dist/titanium/build.js
+
+dist/titanium/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'TITANIUM_BUILD=true' > dist/titanium/build.min.js
 
 testbeds/web/example.html: src/web/example.template.html
 ifeq ($(MAKECMDGOALS), release)

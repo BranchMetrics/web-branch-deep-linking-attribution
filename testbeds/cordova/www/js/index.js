@@ -23,7 +23,7 @@ var app = {
         console.log("Device ready");
         branch.setDebug(true);
     	console.log("Sending init");
-        branch.init('5680621892404085', { isReferrable: true }, function(err, data) {
+        branch.init('key_live_hohBTjb6eJS9jou8Tl1kIhddokjfbXJF', { isReferrable: true }, function(err, data) {
         	app.initComplete(err, data);
         });
         var statusEle = document.getElementById("status");
@@ -48,7 +48,7 @@ var app = {
     // resume Event Handler
     onResume: function() {
     	console.log("Sending init");
-        branch.init('YOUR APP ID HERE', { isReferrable: true }, function(err, data) {
+        branch.init('key_live_hohBTjb6eJS9jou8Tl1kIhddokjfbXJF', { isReferrable: true }, function(err, data) {
         	app.initComplete(err, data);
         });
     },

@@ -103,10 +103,14 @@ Branch = function() {
 	this._storage = storage(false);
 	this._server = new Server();
 
-	if (CORDOVA_BUILD) { // jshint undef:false
+	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
 											// the session params from the first install.
-		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
+		if (CORDOVA_BUILD) {
+			this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
+		} else if (TITANIUM_BUILD) {
+			this.sdk = "titanium" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
+		}
 		this.debug = false;					// A debug install session will get a unique device id.
 	}
 
@@ -125,18 +129,20 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
 
 	// These three are sent from mobile apps
-	if (CORDOVA_BUILD) { // jshint undef:false
+	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
 		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
+		if (err) console.log("Error: " + goog.json.serialize(err));
+		if (data) console.log("Data: " + goog.json.serialize(data));
 		callback(err, data);
 	});
 };
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /**
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
@@ -147,6 +153,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * This needs to be set before the Branch.init call!!!
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * ---
  *
@@ -163,6 +170,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -215,23 +223,34 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	if (options && typeof options == 'function') {
 		options = { isReferrable: null };
 	}
-	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var isReferrable = (options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null) ? options.isReferrable : null;
 	var sessionData = utils.readStore(self._storage);
 
 	function setBranchValues(data) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.sessionLink = data['link'];
-		if (CORDOVA_BUILD) { // jshint undef:false
+		if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
 			self.link_click_id = data['link_click_id'];
 		}
 	}
 
-	var finishInit = function(err, data) {
+	var finishInit = function(err, data, install) {
 		if (data) {
-			if (CORDOVA_BUILD) { // jshint undef:false
+			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+				// Need to remember the first value if this isn't an install...
+				var first = utils.readStore(self._permStorage);
 				utils.store(data, self._permStorage);
+				if (!install) {
+					// The data member we store needs to be the first metadata we received, not the current 
+					// metadata so we replace it here.
+					if (first.data) {
+						utils.storeKeyValue("data", first.data, self._permStorage);
+					} else {
+						utils.storeKeyValue("data", null, self._permStorage);
+					}
+				}
 			}
 			utils.store(data, self._storage);
 			setBranchValues(data);
@@ -244,53 +263,125 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	};
 
 	if (sessionData  && sessionData['session_id']) {
-		finishInit(null, sessionData);
+		finishInit(null, sessionData, false);
 	}
 	else {
 		if (CORDOVA_BUILD) { // jshint undef:false
-			var args = [], execFunc;
-			args.push(self.debug);
-			if (isReferrable !== null) {
-				args.push(isReferrable ? 1 : 0);
-			}
 			var cordovaError = function() {
 				done("Error getting device data!");
 			};
 			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
 			if (utils.readKeyValue('identity_id', self._permStorage)) {
+				var args = [], execFunc;
+				if (isReferrable !== null) {
+					args.push(isReferrable ? 1 : 0);
+				}
 				exec(function(data) {
+					var storedValues = utils.readStore(self._permStorage);
+					data['identity_id'] = storedValues['identity_id'];
+					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
 					console.log("Sending open with: " + goog.json.serialize(data));
 					self._api(resources.open, data, function(err, data) {
-						if (err) { return finishInit(err, null); }
+						if (err) { return finishInit(err, null, false); }
 						data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
 						data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-						finishInit(null, data);
+						finishInit(null, data, false);
 					});
 				}, cordovaError,  "BranchDevice", "getOpenData", args);
 			}
 			else {
+				var args = [], execFunc;
+				args.push(self.debug);
+				if (isReferrable !== null) {
+					args.push(isReferrable ? 1 : 0);
+				}
 				exec(function(data) {
 					console.log("Sending install with: " + goog.json.serialize(data));
 					self._api(resources.install, data, function(err, data) {
-						if (err) { return finishInit(err, null); }
-						finishInit(null, data);
+						if (err) { return finishInit(err, null, true); }
+						finishInit(null, data, true);
 					});
 				}, cordovaError,  "BranchDevice", "getInstallData", args);
+			}
+		}
+		
+		if (TITANIUM_BUILD) { // jshint undef:false
+			// Titanium will be passing us the URL which opened the app.  We need to parse it and get a
+			// value to add to the data as link_identifier.
+			var url = (options && typeof options.url != 'undefined' && options.url != null) ? options.url : null;
+			var link_identifier;
+			if (url) {
+				var parts = url.split('?');
+				if (parts.length == 2) {
+					var queries = parts[1].split('&');
+					if (queries.length > 0) {
+						for (var i = 0; i < queries.length; i++) {
+							var pieces = queries[i].split('=');
+							if (pieces.length == 2 && pieces[0] === 'link_click_id') {
+								link_identifier = pieces[1];
+								break;
+							}
+						}
+					}
+				}
+			}
+			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
+			if (utils.readKeyValue('identity_id', self._permStorage)) {
+				var sdk = require('io.branch.sdk');
+				var data;
+				console.log("Getting data");
+				if (isReferrable == null) {
+					data = sdk.getOpenData(-1);
+				} else {
+					data = sdk.getOpenData(isReferrable?1:0);
+				}
+				if (link_identifier) {
+					data['link_identifier'] = link_identifier;
+				}
+//				console.log("Data is: " + JSON.stringify(data));
+				var storedValues = utils.readStore(self._permStorage);
+//				console.log("Stored values: " + JSON.stringify(storedValues));
+				data['identity_id'] = storedValues['identity_id'];
+				data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+//				console.log("Sending open with: " + goog.json.serialize(data));
+				self._api(resources.open, data, function(err, data) {
+					if (err) { return finishInit(err, null, false); }
+					data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
+					data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
+					finishInit(null, data, false);
+				});
+			}
+			else {
+				var sdk = require('io.branch.sdk');
+				var data;
+				if (isReferrable == null) {
+					data = sdk.getInstallData(self.debug, -1);
+				} else {
+					data = sdk.getInstallData(self.debug, isReferrable?1:0);
+				}
+				if (link_identifier) {
+					data['link_identifier'] = link_identifier;
+				}
+				console.log("Sending install with: " + goog.json.serialize(data));
+				self._api(resources.install, data, function(err, data) {
+					if (err) { return finishInit(err, null, true); }
+					finishInit(null, data, true);
+				});
 			}
 		}
 
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
-				if (err) { return finishInit(err, null); }
+				if (err) { return finishInit(err, null, false); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
-					if (err) { return finishInit(err, null); }
+					if (err) { return finishInit(err, null, false); }
 					if (link_identifier) { data['click_id'] = link_identifier; }
-					finishInit(err, data);
+					finishInit(err, data, false);
 				});
 			});
 		}
@@ -313,7 +404,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 });
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /**
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
@@ -326,12 +417,13 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * immediately, otherwise, it will return once Branch has been initialized.
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * ___
  *
  */
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+		done(null, utils.whiteListSessionData(utils.readStore(this._permStorage)));
 	});
 }
 
@@ -404,7 +496,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /**
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
@@ -426,6 +518,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * ___
  *
@@ -478,14 +571,21 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		metadata = { };
 	}
 
-	this._api(resources.event, {
-		"event": event,
-		"metadata": utils.merge({
-			"url": document.URL,
-			"user_agent": navigator.userAgent,
-			"language": navigator.language
-		}, metadata || {})
-	}, done);
+	if (!TITANIUM_BUILD) {
+		this._api(resources.event, {
+			"event": event,
+			"metadata": utils.merge({
+				"url": document.URL,
+				"user_agent": navigator.userAgent,
+				"language": navigator.language
+			}, metadata || {})
+		}, done);
+	} else {
+		this._api(resources.event, {
+			"event": event,
+			"metadata": metadata || {}
+		}, done);
+	}
 });
 
 /**
@@ -621,6 +721,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ```
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
+ * OR THE TITANIUM MODULE
  *
  * ___
  *
@@ -719,7 +820,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 });
 
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /**
  * @function Branch.getCode
  * @param {Object} data - _required_ - contins options for referral code creation.
@@ -766,6 +867,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * ___
  *
@@ -777,7 +879,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 	});
 }
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /**
  * @function Branch.validateCode
  * @param {string} code - _required_ - the code string to validate.
@@ -818,6 +920,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * ___
  *
@@ -827,7 +930,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 	});
 }
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /**
  * @function Branch.applyCode
  * @param {string} code - _required_ - the code string to apply.
@@ -868,6 +971,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * ___
  *
@@ -911,7 +1015,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
 });
 
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /**
  * @function Branch.creditHistory
  * @param {Object} data - _optional_ - options controlling the returned history.
@@ -973,6 +1077,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  *
  * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * ---
  *
@@ -1046,6 +1151,7 @@ if (WEB_BUILD) { // jshint undef:false
  * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
  *
  * THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
+ * OR THE TITANIUM MODULE
  *
  * #### Usage
  *

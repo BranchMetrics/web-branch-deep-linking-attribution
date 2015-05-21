@@ -12,3 +12,6 @@ var WEB_BUILD = false; // jshint unused:false
 
 /** @define {boolean} */
 var CORDOVA_BUILD = false; // jshint unused:false
+
+/** @define {boolean} */
+var TITANIUM_BUILD = false; // jshint unused:false
