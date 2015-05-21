@@ -762,12 +762,13 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  *
  * Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
  * The `options` object can containt the following properties:
+ *
  * | Key | Value
  * | --- | ---
  * | amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
- * | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
  * | calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
  * | location | *required* - An integer that etermines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
+ * | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
  * | prefix | *optional* - A string to be prepended to the code.
  * | expiration | *optional* - A date string that if present, determines the date on which the code expires.
  *
@@ -942,6 +943,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
  * Properties available in the `options` object:
+ *
  * | Key | Value
  * | --- | ---
  * | bucket | *optional (max 63 characters)* - The bucket from which to retrieve credit transactions.
