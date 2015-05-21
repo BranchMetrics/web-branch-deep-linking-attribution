@@ -1123,17 +1123,15 @@ var sendSMS = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document;
-    if (banner_utils.mobileUserAgent()) {
-      var g = a._referringLink();
+    banner_utils.mobileUserAgent() ? a.data(function(d, e) {
+      var g = e.referring_link;
       g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
         a || (f.getElementById("branch-mobile-action").href = b);
       });
-    } else {
-      f.getElementById("sms-form").addEventListener("submit", function(d) {
-        d.preventDefault();
-        sendSMS(f, a, b, c);
-      });
-    }
+    }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(f, a, b, c);
+    });
     var g = f.getElementById("branch-banner-close"), k = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
