@@ -102,6 +102,10 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage(false);
 	this._server = new Server();
+	var sdk;
+	if (CORDOVA_BUILD) { sdk = 'cordova'; }
+	if (WEB_BUILD) { sdk = 'web'; }
+	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD) { // jshint undef:false
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
@@ -307,7 +311,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
 				if (err) { return finishInit(err, null); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
