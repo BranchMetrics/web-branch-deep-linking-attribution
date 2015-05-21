@@ -2,7 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.5.4] - 2015-05-21
 - Fixes bug with iOS and Android app banner not opening
 ### Improvements
 - Behind the scenes improvement to retry all XHR and JSONP requests 3 times if they fail or timeout
