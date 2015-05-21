@@ -109,6 +109,9 @@ Branch = function() {
 		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
 		this.debug = false;					// A debug install session will get a unique device id.
 	}
+	else if (WEB_BUILD) {
+		this.sdk = "web" + config.version;
+	}
 
 	this.init_state = init_states.NO_INIT;
 };
@@ -124,16 +127,27 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
 	if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
+	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
-	// These three are sent from mobile apps
 	if (CORDOVA_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
-		if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
+};
+
+/***
+ * @function Branch._referringLink
+ */
+Branch.prototype._referringLink = function() {
+	var referring_link = utils.readKeyValue('referring_link', this._storage),
+		click_id = utils.readKeyValue('click_id', this._storage);
+
+	if (referring_link) { return referring_link; }
+	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
+	else { return null; }
 };
 
 if (CORDOVA_BUILD) { // jshint undef:false
@@ -169,6 +183,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * Branch methods are stored in a queue, so even if the SDK is not fully
  * instantiated, calls made to it will be queued in the order they were
  * originally called.
+ * If the session was opened from a referring link, `data()` will also return the referring link click as `referring_link`, which gives you the ability to continue the click flow.
  *
  * The init function on the Branch object initiates the Branch session and
  * creates a new user session, if it doesn't already exist, in
@@ -191,10 +206,11 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * callback(
  *      "Error message",
  *      {
- *           data_parsed:        { },         // If the user was referred from a link, and the link has associated data, the data is passed in here.
- *           referring_identity: '12345',     // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
- *           has_app:            true,        // Does the user have the app installed already?
- *           identity:           'BranchUser' // Unique string that identifies the user
+ *           data_parsed:        { },                          // If the user was referred from a link, and the link has associated data, the data is passed in here.
+ *           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+ *           has_app:            true,                         // Does the user have the app installed already?
+ *           identity:           'BranchUser',                 // Unique string that identifies the user
+ *           referring_link:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
  *      }
  * );
  * ```
@@ -221,20 +237,29 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
-		if (data['identity_id']) { self.link_click_id = data['link_click_id']; }
+		self.sessionLink = data['link'];
+		if (data['referring_link']) {
+			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
+		}
+		else if (!data['click_id'] && data['referring_link']) {
+			data['click_id'] = data['referring_link'].substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
+		}
 		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
+			if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
 		}
+		return data;
 	}
 
 	var finishInit = function(err, data) {
 		if (data) {
+			data = setBranchValues(data);
 			if (CORDOVA_BUILD) { // jshint undef:false
 				utils.store(data, self._permStorage);
 			}
 			utils.store(data, self._storage);
-			setBranchValues(data);
+
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
@@ -311,7 +336,9 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ___
  */
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+	var data = utils.whiteListSessionData(utils.readStore(this._storage));
+	data['referring_link'] = this._referringLink();
+	done(null, data);
 });
 
 if (CORDOVA_BUILD) { // jshint undef:false
@@ -576,9 +603,6 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *     'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
  * );
  * ```
- * ___
- *
- * ## Sharing links via SMS
  *
  */
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
@@ -692,8 +716,9 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 		}, done);
 	}
 
-	if (utils.readKeyValue('click_id', self._storage) && !options['make_new_link']) {
-		sendSMS(utils.readKeyValue('click_id', self._storage));
+	var referring_link = self._referringLink();
+	if (referring_link && !options['make_new_link']) {
+		sendSMS(referring_link.substring(referring_link.lastIndexOf('/') + 1, referring_link.length));
 	}
 	else {
 		self._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {

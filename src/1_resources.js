@@ -71,6 +71,7 @@ if (WEB_BUILD) { // jshint undef:false
 			"identity_id": validator(false, branch_id),
 			"link_identifier": validator(false, validationTypes.str),
 			"is_referrable": validator(true, validationTypes.num),
+			"sdk": validator(false, validationTypes.str),
 			"browser_fingerprint_id": validator(true, branch_id)
 		}
 	};
@@ -81,6 +82,7 @@ if (WEB_BUILD) { // jshint undef:false
 		method:	 utils.httpMethod.POST,
 		params: {
 			"identity_id": validator(true, branch_id),
+			"sdk": validator(false, validationTypes.str),
 			"identity": validator(true, validationTypes.str)
 		}
 	};
@@ -90,6 +92,7 @@ if (WEB_BUILD) { // jshint undef:false
 		endpoint: "/v1/close",
 		method: utils.httpMethod.POST,
 		params: {
+			"sdk": validator(false, validationTypes.str),
 			"session_id": validator(true, branch_id)
 		}
 	};
@@ -99,6 +102,7 @@ if (WEB_BUILD) { // jshint undef:false
 		endpoint: "/v1/logout",
 		method: utils.httpMethod.POST,
 		params: {
+			"sdk": validator(false, validationTypes.str),
 			"session_id": validator(true, branch_id)
 		}
 	};
@@ -124,6 +128,18 @@ if (WEB_BUILD) { // jshint undef:false
 		jsonp: true,
 		params: {
 			"v": validator(true, validationTypes.str)
+		}
+	};
+
+	resources.redeem =  {
+		destination: config.api_endpoint,
+		endpoint: "/v1/redeem",
+		method: utils.httpMethod.POST,
+		params: {
+			"identity_id": validator(true, branch_id),
+			"amount": validator(true, validationTypes.num),
+			"sdk": validator(false, validationTypes.str),
+			"bucket": validator(true, validationTypes.str)
 		}
 	};
 
@@ -219,25 +235,56 @@ if (WEB_BUILD) { // jshint undef:false
 	};
 
 	resources.validateCode = {
-			destination: config.api_endpoint,
-			endpoint: "/v1/referralcode",
-			method: utils.httpMethod.POST,
-			queryPart: { "code": validator(true, validationTypes.str) },
-			params: {
-				"session_id": validator(true, branch_id),
-				"identity_id": validator(true, branch_id)
-			}
+		destination: config.api_endpoint,
+		endpoint: "/v1/referralcode",
+		method: utils.httpMethod.POST,
+		ref: "obj",
+		params: {
+			"identity_id": validator(true, branch_id),
+			"data": validator(false, validationTypes.str),
+			"tags": validator(false, validationTypes.arr),
+			"feature": validator(false, validationTypes.str),
+			"channel": validator(false, validationTypes.str),
+			"stage": validator(false, validationTypes.str),
+			"type": validator(false, validationTypes.num),
+			"alias": validator(false, validationTypes.str),
+			"sdk": validator(false, validationTypes.str)
+		}
+	};
+
+	resources.linkClick = {
+		destination: config.link_service_endpoint,
+		endpoint: "",
+		method: utils.httpMethod.GET,
+		queryPart: { "link_url": validator(true, validationTypes.str) },
+		params: { "click": validator(true, validationTypes.str) }
+	};
+
+	resources.SMSLinkSend = {
+		destination: config.link_service_endpoint,
+		endpoint: "/c",
+		method: utils.httpMethod.POST,
+		queryPart: { "code": validator(true, validationTypes.str) },
+		params: {
+			"session_id": validator(true, branch_id),
+			"identity_id": validator(true, branch_id),
+			"sdk": validator(false, validationTypes.str),
+			"phone": validator(true, validationTypes.str)
+		}
 	};
 
 	resources.applyCode = {
-			destination: config.api_endpoint,
-			endpoint: "/v1/applycode",
-			method: utils.httpMethod.POST,
-			queryPart: { "code": validator(true, validationTypes.str) },
-			params: {
-				"session_id": validator(true, branch_id),
-				"identity_id": validator(true, branch_id)
-			}
+		destination: config.api_endpoint,
+		endpoint: "/v1/applycode",
+		method: utils.httpMethod.POST,
+		queryPart: { "code": validator(true, validationTypes.str) },
+		params: {
+			"session_id": validator(true, branch_id),
+			"identity_id": validator(true, branch_id),
+			"event": validator(true, validationTypes.str),
+			"sdk": validator(false, validationTypes.str),
+			"metadata": validator(true, validationTypes.obj)
+		}
 	};
 }
 

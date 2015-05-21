@@ -7,7 +7,6 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
-goog.require('config');
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
@@ -124,8 +123,9 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
-			if (utils.readKeyValue('click_id', storage) && !options.make_new_link) {
-				doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + utils.readKeyValue('click_id', storage);
+			var referring_link = branch._referringLink();
+			if (referring_link && !options['make_new_link']) {
+				doc.getElementById('branch-mobile-action').href = referring_link;
 			}
 			else {
 				branch["link"](linkData, function(err, url) {
