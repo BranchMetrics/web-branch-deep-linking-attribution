@@ -74,7 +74,43 @@ describe('Branch', function() {
 				"identity_id": "98807509250212101",
 				"identity": "Branch",
 				"has_app":true,
-				"referred_link": null
+				"referring_link": null
+			};
+
+			branch.init(branch_sample_key, function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'expected response returned');
+				assert(!err, 'No error');
+			});
+
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(null, expectedResponse);
+
+			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
+			assert.deepEqual(requests[0].obj, { "v": config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
+
+			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
+			assert.deepEqual(requests[1].obj, {
+				"branch_key": branch_sample_key,
+				"link_identifier": undefined,
+				"is_referrable": 1,
+				"browser_fingerprint_id": browser_fingerprint_id,
+				"sdk": "web" + config.version
+			}, 'Request to open params correct');
+
+			assert.equal(requests.length, 2, '2 requests made');
+		});
+
+		it('should not whitelist referring_link', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(7, done);
+			sandbox.stub(utils, "whiteListSessionData", function(data) {
+				return data;
+			});
+			var expectedResponse = {
+				"session_id": "113636235674656786",
+				"identity_id": "98807509250212101",
+				"identity": "Branch",
+				"has_app":true,
+				"referring_link": '/c/ngJf86-h'
 			};
 
 			branch.init(branch_sample_key, function(err, res) {
@@ -176,7 +212,8 @@ describe('Branch', function() {
 				'data': 'data',
 				'referring_identity': 'referring_user',
 				'identity': 'identity',
-				'has_app': false
+				'has_app': false,
+				'referring_link':  '/c/ngJf86-h'
 			};
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;
