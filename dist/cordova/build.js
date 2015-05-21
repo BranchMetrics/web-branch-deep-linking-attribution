@@ -843,7 +843,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
 // Input 7
-var Server = function() {
+var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
 Server.prototype.serializeObject = function(a, b) {
@@ -910,8 +910,8 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   var g = window.setTimeout(function() {
     window[e] = function() {
     };
-    d(Error(utils.messages.timeout));
-  }, 5E3);
+    d(Error(utils.messages.timeout), null, 504);
+  }, TIMEOUT);
   window[e] = function(a) {
     window.clearTimeout(g);
     d(null, a);
@@ -921,35 +921,42 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.ontimeout = function() {
-    e(Error(utils.messages.timeout));
+    e(Error(utils.messages.timeout), null, 504);
   };
   f.onreadystatechange = function() {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
-          e(null, goog.json.parse(f.responseText));
+          e(null, goog.json.parse(f.responseText), f.status);
         } catch (a) {
-          e(null, {});
+          e(null, {}, f.status);
         }
       } else {
-        402 === f.status ? e(Error("Not enough credits to redeem.")) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
+        402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
   };
   try {
-    f.open(c, a, !0), f.timeout = 5E3, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
+    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
     d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
 Server.prototype.request = function(a, b, c, d) {
-  var e = this.getUrl(a, b);
-  if (e.error) {
-    return d(Error(e.error));
+  var e = this, f = this.getUrl(a, b);
+  if (f.error) {
+    return d(Error(f.error));
   }
-  var f, g = "";
-  "GET" == a.method ? f = e.url + "?" + e.data : (f = e.url, g = e.data);
-  c.getItem("use_jsonp") || a.jsonp ? this.jsonpRequest(f, b, a.method, d) : this.XHRRequest(f, g, a.method, c, d);
+  var g, k = "";
+  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
+  var h = RETRIES, l = function(a, b, c) {
+    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+      m();
+    }, RETRY_DELAY)) : d(a, b);
+  }, m = function() {
+    c.getItem("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
+  };
+  m();
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
@@ -1079,7 +1086,7 @@ var sendSMS = function(a, b, c, d) {
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, p = function() {
+  }, m = function() {
     h = a.createElement("div");
     h.className = "branch-icon-wrapper";
     h.id = "branch-checkmark";
@@ -1093,7 +1100,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, m = function() {
+  }, n = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1103,13 +1110,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var n = e.value;
-    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
-      a ? m() : (p(), setTimeout(function() {
+    var p = e.value;
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? n() : (m(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : m();
+    })) : n();
   }
 }, hasClass = function(a, b) {
   return!!a.className.match(new RegExp("(\\s|^)" + b + "(\\s|$)"));

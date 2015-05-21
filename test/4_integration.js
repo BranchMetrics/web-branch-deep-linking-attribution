@@ -87,6 +87,19 @@ describe('Integration tests', function() {
 			requests[1].respond(400);
 		});
 
+		it('should attempt 5xx error three times total', function(done) {
+			var assert = testUtils.plan(1, done);
+			branch.init(browser_fingerprint_id, function(err) {
+				 assert.equal(err.message, 'Error in API: 500');
+			});
+			requests[0].callback(browser_fingerprint_id);
+			requests[1].respond(500);
+			clock.tick(250);
+			requests[2].respond(500);
+			clock.tick(250);
+			requests[3].respond(500);
+		});
+
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			var assert = testUtils.plan(1, done);
 			testUtils.go("#r:12345");
