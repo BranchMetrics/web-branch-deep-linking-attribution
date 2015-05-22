@@ -466,6 +466,31 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('getCode', function() {
+		basicTests('referrals', [ 0 ]);
+		it('should call api with required params and options', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			var options = {
+				"amount":10,
+				"bucket":"party",
+				"calculation_type":1,
+				"location":2
+			};
+
+			var expectedResponse = 'AB12CD';
+
+			branch.getCode(options, function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'response returned');
+				assert(!err, 'No error');
+			});
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null, expectedResponse);
+			assert.deepEqual(requests[0].obj, testUtils.params(options, [ 'browser_fingerprint_id' ]), 'All params sent');
+		});
+	});
+
 	describe('credits', function() {
 		basicTests('credits', [ 0 ]);
 
