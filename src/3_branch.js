@@ -109,12 +109,7 @@ Branch = function() {
 
 	if (CORDOVA_BUILD) { // jshint undef:false
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
-											// the session params from the first install.
-		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
 		this.debug = false;					// A debug install session will get a unique device id.
-	}
-	else if (WEB_BUILD) {
-		this.sdk = "web" + config.version;
 	}
 
 	this.init_state = init_states.NO_INIT;

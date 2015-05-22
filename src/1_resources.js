@@ -66,7 +66,6 @@ function defaults(obj) {
 	var def = {};
 	if (WEB_BUILD) {
 		def = {
-			"app_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"sdk": validator(true, validationTypes.str)
@@ -74,7 +73,6 @@ function defaults(obj) {
 	}
 	if (CORDOVA_BUILD) {
 		def = {
-			"app_id": validator(true, branch_id),
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
@@ -183,10 +181,10 @@ if (CORDOVA_BUILD) { // jshint undef:false
 		method: utils.httpMethod.POST,
 		params: {
 			"identity_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.str),
 			"session_id": validator(true, branch_id),
 			"link_click_id": validator(false, branch_id),
-			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str)
+			"device_fingerprint_id": validator(true, branch_id)
 		}
 	};
 
@@ -197,7 +195,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 		ref: "obj",
 		params: {
 			"identity_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str),
+			"sdk": validator(true, validationTypes.str),
 			"data": validator(false, validationTypes.str),
 			"alias": validator(false, validationTypes.str),
 			"tags": validator(false, validationTypes.arr),
@@ -245,21 +243,17 @@ resources.logout = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/logout",
 	method: utils.httpMethod.POST,
-	params: {
-		"sdk": validator(false, validationTypes.str),
-		"session_id": validator(true, branch_id)
-	}
+	params: defaults({ "session_id": validator(true, branch_id) })
 };
 
 resources.profile = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/profile",
 	method:	 utils.httpMethod.POST,
-	params: {
+	params: defaults({
 		"identity_id": validator(true, branch_id),
-		"sdk": validator(false, validationTypes.str),
 		"identity": validator(true, validationTypes.str)
-	}
+	})
 };
 
 resources.referrals = {
@@ -288,10 +282,7 @@ resources.credits = {
 	endpoint: "/v1/credits",
 	method: utils.httpMethod.GET,
 	queryPart: { "identity_id": validator(true, branch_id) },
-	params: {
-		"app_id": validator(true, branch_id),
-		"sdk": validator(false, validationTypes.str)
-	}
+	params: defaults({ })
 };
 
 resources.redeem =  {
@@ -300,7 +291,6 @@ resources.redeem =  {
 	method: utils.httpMethod.POST,
 	params: defaults({
 		"identity_id": validator(true, branch_id),
-		"sdk": validator(false, validationTypes.str),
 		"amount": validator(true, validationTypes.num),
 		"bucket": validator(false, validationTypes.str)
 	})
@@ -319,8 +309,7 @@ resources.link = {
 		"channel": validator(false, validationTypes.str),
 		"stage": validator(false, validationTypes.str),
 		"type": validator(false, validationTypes.num),
-		"alias": validator(false, validationTypes.str),
-		"sdk": validator(false, validationTypes.str)
+		"alias": validator(false, validationTypes.str)
 	})
 };
 

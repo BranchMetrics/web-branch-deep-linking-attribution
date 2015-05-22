@@ -200,7 +200,8 @@ testUtils.params = function(extra, without) {
 		branch_key: branch_sample_key,
 		session_id: session_id,
 		identity_id: identity_id,
-		browser_fingerprint_id: browser_fingerprint_id
+		browser_fingerprint_id: browser_fingerprint_id,
+		sdk: 'web0.0.0'
 	}, extra || {});
 	for (var k = 0; k < (without || []).length; k++) {
 		delete p[without[k]];

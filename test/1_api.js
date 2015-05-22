@@ -304,7 +304,7 @@ describe('Server', function() {
 
 		describe('/v1/referrals', function() {
 			it('should pass in identity_id', function(done) {
-				var assert = testUtils.plan(4, done);
+				var assert = testUtils.plan(3, done);
 				server.request(resources.referrals, testUtils.params({ }), storage(), assert.done);
 
 				assert.equal(requests.length, 1, 'Request made');
