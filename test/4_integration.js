@@ -45,7 +45,7 @@ describe('Integration tests', function() {
 		branch.init(browser_fingerprint_id, callback);
 		if (assert) {
 			assert.equal(requests.length, 1);
-			assert.equal(requests[0].src, 'https://bnc.lt/_r?v=' + config.version + '&callback=branch_callback__' + jsonpCallback.toString());
+			assert.equal(requests[0].src, 'https://bnc.lt/_r?sdk=web' + config.version + '&callback=branch_callback__' + jsonpCallback.toString());
 		}
 		requests[0].callback(browser_fingerprint_id);
 		requests[1].respond(200,
