@@ -1141,13 +1141,16 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var g = f.getElementById("branch-banner-close"), k = function() {
+    var k = parseInt(document.body.style.marginTop || "0", 10), h = parseInt(document.body.style.backgroundPositionY || "0", 10), l = parseInt(document.body.style.paddingBottom || "0", 10);
+    console.log(document);
+    console.log(k);
+    var g = f.getElementById("branch-banner-close"), m = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
-        "top" == b.position ? (document.body.style.paddingTop = "0px", document.body.style.backgroundPositionY = "0px") : "bottom" == b.position && (document.body.style.paddingBottom = "0px");
+        "top" == b.position ? (document.body.style.marginTop = k.toString() + "px", document.body.style.backgroundPositionY = h.toString() + "px") : "bottom" == b.position && (document.body.style.paddingBottom = l.toString() + "px");
         removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
@@ -1155,14 +1158,14 @@ var sendSMS = function(a, b, c, d) {
     };
     g && (g.onclick = function(a) {
       a.preventDefault();
-      k();
+      m();
     });
     addClass(document.body, "branch-banner-is-active");
-    "top" == b.position ? (document.body.style.paddingTop = banner_utils.bannerHeight, document.body.style.backgroundPositionY = banner_utils.bannerHeight) : "bottom" == b.position && (document.body.style.paddingBottom = banner_utils.bannerHeight);
+    "top" == b.position ? (document.body.style.marginTop = (parseInt(banner_utils.bannerHeight || "0", 10) + k).toString() + "px", document.body.style.backgroundPositionY = (parseInt(banner_utils.bannerHeight || "0", 10) + h).toString() + "px") : "bottom" == b.position && (document.body.style.paddingBottom = (parseInt(banner_utils.bannerHeight || "0", 10) + l).toString() + "px");
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
     }, banner_utils.animationDelay);
-    return k;
+    return m;
   }
 };
 // Input 12

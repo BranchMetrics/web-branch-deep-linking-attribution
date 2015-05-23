@@ -146,6 +146,12 @@ banner = function(branch, options, linkData, storage) {
 			});
 		}
 
+		var bodyMargin = parseInt(document.body.style.marginTop || "0", 10);
+		var backgroundPositionY = parseInt(document.body.style['backgroundPositionY'] || "0", 10);
+		var bodyPaddingBottom = parseInt(document.body.style.paddingBottom || "0", 10);
+
+		console.log(bodyMargin);
+
 		var closeButton = doc.getElementById('branch-banner-close');
 		var closeBanner = function() {
 			setTimeout(function() {
@@ -155,10 +161,11 @@ banner = function(branch, options, linkData, storage) {
 
 			setTimeout(function() {
 				if (options.position == 'top') {
-					document.body.style.paddingTop = '0px';
-					document.body.style['backgroundPositionY'] = '0px';
+					document.body.style.marginTop = bodyMargin.toString() + 'px';
+					document.body.style['backgroundPositionY'] = backgroundPositionY.toString() + 'px';
 				}
-				else if (options.position == 'bottom') { document.body.style.paddingBottom = '0px'; }
+				else if (options.position == 'bottom') { document.body.style.paddingBottom = bodyPaddingBottom.toString() + 'px'; }
+
 				removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
@@ -167,6 +174,7 @@ banner = function(branch, options, linkData, storage) {
 			if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
 			else { utils.storeKeyValue('hideBanner', true, storage); }
 		};
+
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
@@ -177,10 +185,13 @@ banner = function(branch, options, linkData, storage) {
 		// Trigger animation
 		addClass(document.body, 'branch-banner-is-active');
 		if (options.position == 'top') {
-			document.body.style.paddingTop = banner_utils.bannerHeight;
-			document.body.style['backgroundPositionY'] = banner_utils.bannerHeight;
+			document.body.style.marginTop = (parseInt(banner_utils.bannerHeight || "0", 10) + bodyMargin).toString() + 'px';
+			document.body.style['backgroundPositionY'] = (parseInt(banner_utils.bannerHeight || "0", 10) + backgroundPositionY).toString() + 'px';
 		}
-		else if (options.position == 'bottom') { document.body.style.paddingBottom = banner_utils.bannerHeight; }
+
+		// Need to fix this still
+		else if (options.position == 'bottom') { document.body.style.paddingBottom = (parseInt(banner_utils.bannerHeight || "0", 10) + bodyPaddingBottom).toString() + 'px'; }
+
 		setTimeout(function() {
 			if (options.position == 'top') { element.style.top = '0'; }
 			else if (options.position == 'bottom') { element.style.bottom = '0'; }
