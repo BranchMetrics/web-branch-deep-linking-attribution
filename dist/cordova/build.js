@@ -1392,7 +1392,7 @@ Branch.prototype.credits = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.credits, {}, a);
 });
 Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  this._api(resources.creditHistory, b ? b : {}, a);
+  this._api(resources.creditHistory, b || {}, a);
 });
 Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);

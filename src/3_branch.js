@@ -1034,7 +1034,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *
  */
 Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, options) {
-	this._api(resources.creditHistory, options ? options : { }, done);
+	this._api(resources.creditHistory, options || { }, done);
 });
 
 /**
