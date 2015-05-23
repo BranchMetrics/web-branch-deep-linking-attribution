@@ -837,6 +837,25 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, getDate:function(a) {
   var b = new Date;
   return b.setDate(b.getDate() + a);
+}, addCSSLengths:function(a, b) {
+  return(banner_utils.convertToUnitlessPixels(a) + banner_utils.convertToUnitlessPixels(b)).toString() + "px";
+}, convertToUnitlessPixels:function(a) {
+  var b = a.replace(/[0-9]/g, "");
+  a = a.match(/\d+/g);
+  a = parseFloat(0 < a.length ? a[0] : "0");
+  return{px:function(a) {
+    return a;
+  }, em:function(a) {
+    return a * parseFloat(window.getComputedStyle(document.body).fontSize);
+  }, ch:function(a) {
+  }, rem:function(a) {
+    return a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+  }, vw:function(a) {
+  }, vh:function(a) {
+  }, vmin:function(a) {
+  }, vmax:function(a) {
+  }, "%":function() {
+  }}[b](a);
 }, shouldAppend:function(a, b) {
   var c = utils.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
   "number" == typeof d && (d = !1);
@@ -1141,8 +1160,7 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var k = parseInt(document.body.style.marginTop || "0", 10), h = parseInt(document.body.style.backgroundPositionY || "0", 10), l = parseInt(document.body.style.paddingBottom || "0", 10);
-    console.log(document);
+    var k = document.body.style.marginTop, h = document.body.style.backgroundPositionY, l = document.body.style.paddingBottom;
     console.log(k);
     var g = f.getElementById("branch-banner-close"), m = function() {
       setTimeout(function() {
@@ -1150,7 +1168,7 @@ var sendSMS = function(a, b, c, d) {
         banner_utils.removeElement(document.getElementById("branch-css"));
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
-        "top" == b.position ? (document.body.style.marginTop = k.toString() + "px", document.body.style.backgroundPositionY = h.toString() + "px") : "bottom" == b.position && (document.body.style.paddingBottom = l.toString() + "px");
+        "top" == b.position ? (document.body.style.marginTop = k, document.body.style.backgroundPositionY = h) : "bottom" == b.position && (document.body.style.paddingBottom = l);
         removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
@@ -1161,7 +1179,7 @@ var sendSMS = function(a, b, c, d) {
       m();
     });
     addClass(document.body, "branch-banner-is-active");
-    "top" == b.position ? (document.body.style.marginTop = (parseInt(banner_utils.bannerHeight || "0", 10) + k).toString() + "px", document.body.style.backgroundPositionY = (parseInt(banner_utils.bannerHeight || "0", 10) + h).toString() + "px") : "bottom" == b.position && (document.body.style.paddingBottom = (parseInt(banner_utils.bannerHeight || "0", 10) + l).toString() + "px");
+    "top" == b.position ? (document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, k), document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, h)) : "bottom" == b.position && (document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
     }, banner_utils.animationDelay);

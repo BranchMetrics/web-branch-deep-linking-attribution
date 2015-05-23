@@ -43,6 +43,48 @@ banner_utils.getDate = function(days) {
 	return currentDate.setDate(currentDate.getDate() + days);
 };
 
+banner_utils.addCSSLengths = function(length1, length2) {
+	return (banner_utils.convertToUnitlessPixels(length1) + banner_utils.convertToUnitlessPixels(length2)).toString() + 'px';
+};
+
+banner_utils.convertToUnitlessPixels = function(input) {
+	var unit = input.replace(/[0-9]/g, '');
+	var inputArray = input.match(/\d+/g);
+	var value = parseFloat(inputArray.length > 0 ? inputArray[0] : '0');
+
+	var convert = {
+		'px': function(value) {
+			return value;
+		},
+		'em': function(value) {
+			return value * parseFloat(window.getComputedStyle(document.body).fontSize);
+		},
+		'ch': function(value) {
+			// Need this!!!
+		},
+		'rem': function(value) {
+			return value * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+		},
+		'vw': function(value) {
+			// Need this!!!
+		},
+		'vh': function(value) {
+			// Need this!!!
+		},
+		'vmin': function(value) {
+			// Need this!!!
+		},
+		'vmax': function(value) {
+			// Need this!!!
+		},
+		'%': function() {
+			// Need this!!!
+		}
+	};
+
+	return convert[unit](value);
+};
+
 /**
  * @param {BranchStorage} storage
  * @param {banner_utils.options} options
