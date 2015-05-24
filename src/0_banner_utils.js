@@ -69,9 +69,6 @@ banner_utils.convertToUnitlessPixels = function(input) {
 		'em': function(value) {
 			return value * parseFloat(window.getComputedStyle(document.body).fontSize);
 		},
-		'ch': function(value) {
-			// Need this!!!
-		},
 		'rem': function(value) {
 			return value * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
 		},
@@ -88,7 +85,7 @@ banner_utils.convertToUnitlessPixels = function(input) {
 			return value * Math.max(vh(), vw());
 		},
 		'%': function() {
-			// This is gonna suck, peeps probably should not be usin' % with padding and shit, but they gonna so it newaysz.
+
 		}
 	};
 

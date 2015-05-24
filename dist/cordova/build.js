@@ -852,7 +852,6 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     return a;
   }, em:function(a) {
     return a * parseFloat(window.getComputedStyle(document.body).fontSize);
-  }, ch:function(a) {
   }, rem:function(a) {
     return a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
   }, vw:function(a) {
