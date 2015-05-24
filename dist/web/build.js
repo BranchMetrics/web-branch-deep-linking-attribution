@@ -843,6 +843,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   var b = a.replace(/[0-9]/g, "");
   a = a.match(/\d+/g);
   a = parseFloat(0 < a.length ? a[0] : "0");
+  var c = function() {
+    return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
+  }, d = function() {
+    return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
+  };
   return{px:function(a) {
     return a;
   }, em:function(a) {
@@ -851,9 +856,13 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   }, rem:function(a) {
     return a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
   }, vw:function(a) {
+    return a * c();
   }, vh:function(a) {
+    return a * d();
   }, vmin:function(a) {
+    return a * Math.min(d(), c());
   }, vmax:function(a) {
+    return a * Math.max(d(), c());
   }, "%":function() {
   }}[b](a);
 }, shouldAppend:function(a, b) {

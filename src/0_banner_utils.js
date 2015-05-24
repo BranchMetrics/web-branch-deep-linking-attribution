@@ -52,6 +52,16 @@ banner_utils.convertToUnitlessPixels = function(input) {
 	var inputArray = input.match(/\d+/g);
 	var value = parseFloat(inputArray.length > 0 ? inputArray[0] : '0');
 
+	var vw = function() {
+		var viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+		return viewportWidth / 100;
+	};
+
+	var vh = function() {
+		var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+		return viewportHeight / 100;
+	};
+
 	var convert = {
 		'px': function(value) {
 			return value;
@@ -66,19 +76,19 @@ banner_utils.convertToUnitlessPixels = function(input) {
 			return value * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
 		},
 		'vw': function(value) {
-			// Need this!!!
+			return value * vw();
 		},
 		'vh': function(value) {
-			// Need this!!!
+			return value * vh();
 		},
 		'vmin': function(value) {
-			// Need this!!!
+			return value * Math.min(vh(), vw());
 		},
 		'vmax': function(value) {
-			// Need this!!!
+			return value * Math.max(vh(), vw());
 		},
 		'%': function() {
-			// Need this!!!
+			// This is gonna suck, peeps probably should not be usin' % with padding and shit, but they gonna so it newaysz.
 		}
 	};
 
