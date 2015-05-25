@@ -43,14 +43,21 @@ banner_utils.getDate = function(days) {
 	return currentDate.setDate(currentDate.getDate() + days);
 };
 
+banner_utils.getBodyStyle = function(style) {
+	var body = document.getElementsByTagName('body')[0],
+		bodyStyle = (body.currentStyle && body.currentStyle[utils.snakeToCamel(style)]) || window.getComputedStyle(body);
+	return bodyStyle.getPropertyValue(style);
+};
+
 banner_utils.addCSSLengths = function(length1, length2) {
 	return (banner_utils.convertToUnitlessPixels(length1) + banner_utils.convertToUnitlessPixels(length2)).toString() + 'px';
 };
 
 banner_utils.convertToUnitlessPixels = function(input) {
-	var unit = input.replace(/[0-9]/g, '');
+	if (!input) { return 0; }
+	var unit = input.replace(/[0-9,\.]/g, '');
 	var inputArray = input.match(/\d+/g);
-	var value = parseFloat(inputArray.length > 0 ? inputArray[0] : '0');
+	var value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10);
 
 	var vw = function() {
 		var viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -62,34 +69,32 @@ banner_utils.convertToUnitlessPixels = function(input) {
 		return viewportHeight / 100;
 	};
 
-	var convert = {
-		'px': function(value) {
+	return {
+		"px": function(value) {
 			return value;
 		},
-		'em': function(value) {
+		"em": function(value) {
 			return value * parseFloat(window.getComputedStyle(document.body).fontSize);
 		},
-		'rem': function(value) {
+		"rem": function(value) {
 			return value * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
 		},
-		'vw': function(value) {
+		"vw": function(value) {
 			return value * vw();
 		},
-		'vh': function(value) {
+		"vh": function(value) {
 			return value * vh();
 		},
-		'vmin': function(value) {
+		"vmin": function(value) {
 			return value * Math.min(vh(), vw());
 		},
-		'vmax': function(value) {
+		"vmax": function(value) {
 			return value * Math.max(vh(), vw());
 		},
-		'%': function() {
-
+		"%": function() {
+			return (document.body.clientWidth / 100) * value;
 		}
-	};
-
-	return convert[unit](value);
+	}[unit](value);
 };
 
 /**

@@ -146,11 +146,14 @@ banner = function(branch, options, linkData, storage) {
 			});
 		}
 
-		var bodyMargin = document.body.style.marginTop;
-		var backgroundPositionY = document.body.style['backgroundPositionY'];
-		var bodyPaddingBottom = document.body.style.paddingBottom;
+		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
+		var bodyMarginTopInline = document.body.style.marginTop;
 
-		console.log(bodyMargin);
+		var backgroundPositionYComputed = banner_utils.getBodyStyle('background-position-y');
+		var backgroundPositionYInline = document.body.style.backgroundPositionY;
+
+		var bodyPaddingBottomComputed = banner_utils.getBodyStyle('padding-bottom');
+		var bodyPaddingBottomInline = document.body.style.paddingBottom;
 
 		var closeButton = doc.getElementById('branch-banner-close');
 		var closeBanner = function() {
@@ -161,10 +164,10 @@ banner = function(branch, options, linkData, storage) {
 
 			setTimeout(function() {
 				if (options.position == 'top') {
-					document.body.style.marginTop = bodyMargin;
-					document.body.style['backgroundPositionY'] = backgroundPositionY;
+					document.body.style.marginTop = bodyMarginTopInline;
+					document.body.style['backgroundPositionY'] = backgroundPositionYInline;
 				}
-				else if (options.position == 'bottom') { document.body.style.paddingBottom = bodyPaddingBottom; }
+				else if (options.position == 'bottom') { document.body.style.paddingBottom = bodyPaddingBottomInline; }
 
 				removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
@@ -185,12 +188,12 @@ banner = function(branch, options, linkData, storage) {
 		// Trigger animation
 		addClass(document.body, 'branch-banner-is-active');
 		if (options.position == 'top') {
-			document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMargin);
-			document.body.style['backgroundPositionY'] = banner_utils.addCSSLengths(banner_utils.bannerHeight, backgroundPositionY);
+			document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
+			document.body.style['backgroundPositionY'] = banner_utils.addCSSLengths(banner_utils.bannerHeight, backgroundPositionYComputed);
 		}
 
 		// Need to fix this still
-		else if (options.position == 'bottom') { document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyPaddingBottom); }
+		else if (options.position == 'bottom') { document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyPaddingBottomComputed); }
 
 		setTimeout(function() {
 			if (options.position == 'top') { element.style.top = '0'; }

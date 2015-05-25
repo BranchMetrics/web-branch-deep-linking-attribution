@@ -816,6 +816,11 @@ utils.getParamValue = function(a) {
 utils.isKey = function(a) {
   return-1 < a.indexOf("key_");
 };
+utils.snakeToCamel = function(a) {
+  return a.replace(/(\-\w)/g, function(a) {
+    return a[1].toUpperCase();
+  });
+};
 utils.base64encode = function(a) {
   var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
@@ -837,15 +842,20 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, getDate:function(a) {
   var b = new Date;
   return b.setDate(b.getDate() + a);
+}, getBodyStyle:function(a) {
+  var b = document.getElementsByTagName("body")[0];
+  return(b.currentStyle && b.currentStyle[utils.snakeToCamel(a)] || window.getComputedStyle(b)).getPropertyValue(a);
 }, addCSSLengths:function(a, b) {
   return(banner_utils.convertToUnitlessPixels(a) + banner_utils.convertToUnitlessPixels(b)).toString() + "px";
 }, convertToUnitlessPixels:function(a) {
-  var b = a.replace(/[0-9]/g, "");
+  if (!a) {
+    return 0;
+  }
+  var b = a.replace(/[0-9,\.]/g, "");
   a = a.match(/\d+/g);
-  a = parseFloat(0 < a.length ? a[0] : "0");
-  var c = function() {
+  var c = parseInt(0 < a.length ? a[0] : "0", 10), d = function() {
     return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-  }, d = function() {
+  }, e = function() {
     return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
   };
   return{px:function(a) {
@@ -855,15 +865,16 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   }, rem:function(a) {
     return a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
   }, vw:function(a) {
-    return a * c();
-  }, vh:function(a) {
     return a * d();
+  }, vh:function(a) {
+    return a * e();
   }, vmin:function(a) {
-    return a * Math.min(d(), c());
+    return a * Math.min(e(), d());
   }, vmax:function(a) {
-    return a * Math.max(d(), c());
+    return a * Math.max(e(), d());
   }, "%":function() {
-  }}[b](a);
+    return document.body.clientWidth / 100 * c;
+  }}[b](c);
 }, shouldAppend:function(a, b) {
   var c = utils.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
   "number" == typeof d && (d = !1);
@@ -1127,7 +1138,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, n = function() {
+  }, p = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1137,13 +1148,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? n() : (m(), setTimeout(function() {
+    var n = e.value;
+    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
+      a ? p() : (m(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : n();
+    })) : p();
   }
 }, hasClass = function(a, b) {
   return!!a.className.match(new RegExp("(\\s|^)" + b + "(\\s|$)"));
@@ -1168,30 +1179,28 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var k = document.body.style.marginTop, h = document.body.style.backgroundPositionY, l = document.body.style.paddingBottom;
-    console.log(k);
-    var g = f.getElementById("branch-banner-close"), m = function() {
+    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("background-position-y"), l = document.body.style.backgroundPositionY, m = banner_utils.getBodyStyle("padding-bottom"), p = document.body.style.paddingBottom, n = f.getElementById("branch-banner-close"), q = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
-        "top" == b.position ? (document.body.style.marginTop = k, document.body.style.backgroundPositionY = h) : "bottom" == b.position && (document.body.style.paddingBottom = l);
+        "top" == b.position ? (document.body.style.marginTop = k, document.body.style.backgroundPositionY = l) : "bottom" == b.position && (document.body.style.paddingBottom = p);
         removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
       "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
     };
-    g && (g.onclick = function(a) {
+    n && (n.onclick = function(a) {
       a.preventDefault();
-      m();
+      q();
     });
     addClass(document.body, "branch-banner-is-active");
-    "top" == b.position ? (document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, k), document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, h)) : "bottom" == b.position && (document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
+    "top" == b.position ? (document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g), document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, h)) : "bottom" == b.position && (document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, m));
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
     }, banner_utils.animationDelay);
-    return m;
+    return q;
   }
 };
 // Input 12
