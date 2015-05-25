@@ -843,8 +843,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   var b = new Date;
   return b.setDate(b.getDate() + a);
 }, getBodyStyle:function(a) {
-  var b = document.getElementsByTagName("body")[0];
-  return b.currentStyle ? b.currentStyle[utils.snakeToCamel(a)] : window.getComputedStyle(b).getPropertyValue(a);
+  return document.body.currentStyle ? document.body.currentStyle[utils.snakeToCamel(a)] : window.getComputedStyle(document.body).getPropertyValue(a);
 }, addCSSLengths:function(a, b) {
   var c = function(a) {
     if (!a) {
@@ -852,7 +851,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }
     var b = a.replace(/[0-9,\.]/g, "");
     a = a.match(/\d+/g);
-    var c = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
+    var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
     }, k = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
@@ -860,9 +859,9 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     return{px:function(a) {
       return a;
     }, em:function(a) {
-      return a * parseFloat(window.getComputedStyle(document.body).fontSize);
+      return document.body.currentStyle ? a * c(document.body.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.body).fontSize);
     }, rem:function(a) {
-      return a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+      return document.documentElement.currentStyle ? a * c(document.documentElement.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
@@ -872,8 +871,8 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vmax:function(a) {
       return a * Math.max(k(), g());
     }, "%":function() {
-      return document.body.clientWidth / 100 * c;
-    }}[b](c);
+      return document.body.clientWidth / 100 * f;
+    }}[b](f);
   };
   return(c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
