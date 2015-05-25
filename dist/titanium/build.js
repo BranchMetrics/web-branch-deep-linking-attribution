@@ -916,7 +916,7 @@ Server.prototype.getUrl = function(a, b) {
       return {error:utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"])};
     }
   }
-  return (CORDOVA_BUILD || TITANIUM_BUILD) && "GET" !== a.method ? {data:goog.json.serialize(f), url:e} : {data:this.serializeObject(f, ""), url:e};
+  return {data:this.serializeObject(f, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
   var b = document.createElement("script");
@@ -948,12 +948,8 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     e(Error(utils.messages.timeout));
   };
   TITANIUM_BUILD ? (f.onerror = function(a) {
-    console.log("onerror: " + goog.json.serialize(a));
     402 === f.status ? e(Error("Not enough credits to redeem.")) : a.error ? e(Error(a.error)) : e(Error("Error in API: " + f.status));
   }, f.onload = function() {
-    console.log("onload!");
-    console.log("Status: " + f.status);
-    console.log("Text: " + f.responseText);
     if (200 === f.status) {
       try {
         e(null, goog.json.parse(f.responseText));
@@ -964,7 +960,6 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
       402 === f.status ? e(Error("Not enough credits to redeem.")) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
     }
   }) : f.onreadystatechange = function() {
-    console.log("Ready State: " + f.readyState);
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
@@ -978,7 +973,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     }
   };
   try {
-    f.open(c, a, !0), CORDOVA_BUILD || TITANIUM_BUILD ? "GET" === c ? f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded") : f.setRequestHeader("Content-Type", "application/json") : f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
+    f.open(c, a, !0), f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
     d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
@@ -1237,6 +1232,7 @@ var Branch = function() {
   if (CORDOVA_BUILD || TITANIUM_BUILD) {
     this._permStorage = storage(!0), CORDOVA_BUILD ? this.sdk = "cordova" + config.version : TITANIUM_BUILD && (this.sdk = "titanium" + config.version), this.debug = !1;
   }
+  TITANIUM_BUILD && (this.keepAlive = !1);
   this.init_state = init_states.NO_INIT;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1247,9 +1243,7 @@ Branch.prototype._api = function(a, b, c) {
   if (CORDOVA_BUILD || TITANIUM_BUILD) {
     (a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id), (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id), (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
   }
-  console.log("_api request with obj: " + goog.json.serialize(b));
   return this._server.request(a, b, this._storage, function(a, b) {
-    console.log("Request returned");
     a && console.log("Error: " + goog.json.serialize(a));
     b && console.log("Data: " + goog.json.serialize(b));
     c(a, b);
@@ -1265,13 +1259,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
-  console.log("Options: " + JSON.stringify(c));
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var e = utils.readStore(d._storage), f = function(b, c, e) {
     if (c) {
       if (CORDOVA_BUILD || TITANIUM_BUILD) {
         var f = utils.readStore(d._permStorage);
-        console.log("First is: " + goog.json.serialize(f));
         utils.store(c, d._permStorage);
         e || (f.data ? utils.storeKeyValue("data", f.data, d._permStorage) : utils.storeKeyValue("data", null, d._permStorage));
       }
@@ -1287,6 +1279,10 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     b && (d.init_state = init_states.INIT_FAILED);
     a(b, c && utils.whiteListSessionData(c));
   };
+  TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0, setTimeout(function() {
+    d.keepAlive = !1;
+    console.log("keep alive cleared!");
+  }, 2E3));
   if (e && e.session_id) {
     f(null, e, !1);
   } else {
@@ -1384,7 +1380,7 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
     var b = this;
-    this._api(resources.close, {}, function(c, d) {
+    this.keepAlive ? a(null) : this._api(resources.close, {}, function(c, d) {
       delete b.session_id;
       delete b.sessionLink;
       b.init_state = init_states.NO_INIT;

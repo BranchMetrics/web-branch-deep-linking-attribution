@@ -39,6 +39,9 @@ var Ti = {
 	},
 	Network: {
 		createHTTPClient: function() {}
+	},
+	Platform: {
+		osname: ""
 	}
 };
 

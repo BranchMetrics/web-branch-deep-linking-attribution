@@ -2,7 +2,7 @@
 <ti:app xmlns:ti="http://ti.appcelerator.org">
     <id>io.branch.sdk</id>
     <name>Branch-SDK-Testbed</name>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <publisher>not specified</publisher>
     <url>http://branch.io</url>
     <description>not specified</description>
@@ -50,7 +50,7 @@
         </plist>
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
-        <manifest android:versionCode="4" android:versionName="1.0.4" package="io.branch.sdk">
+        <manifest android:versionCode="6" android:versionName="1.0.6" package="io.branch.sdk">
             <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="22"/>
             <application android:debuggable="false"
                 android:icon="@drawable/appicon"
@@ -95,8 +95,8 @@
         <theme>default</theme>
     </mobileweb>
     <modules>
+        <module platform="android" version="1.0.1">io.branch.sdk</module>
         <module platform="iphone" version="1.0.1">io.branch.sdk</module>
-        <module platform="android" version="1.0.0">io.branch.sdk</module>
     </modules>
     <deployment-targets>
         <target device="android">true</target>
@@ -104,7 +104,7 @@
         <target device="iphone">true</target>
         <target device="mobileweb">false</target>
     </deployment-targets>
-    <sdk-version>4.0.0.RC4</sdk-version>
+    <sdk-version>4.0.0.GA</sdk-version>
     <plugins>
         <plugin version="1.0">ti.alloy</plugin>
     </plugins>

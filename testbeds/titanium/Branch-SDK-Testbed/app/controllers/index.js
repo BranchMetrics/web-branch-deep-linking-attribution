@@ -2,6 +2,37 @@ console.log("Starting index.js");
 
 var branch = require('build');
 
+if (Ti.Platform.osname === "android") {
+	// In Android, we start the branch session in onStart and close it
+	// in onStop.  This should be done in every Window used in the app
+	// since a Window corresponds to an Android Activity.  The 
+	// SDK will "smartly" handle the case where we are transitioning from
+	// one activity to another and not send excess inits or close the session
+	// accidentally.
+	$.index.activity.onStart = function() {
+		branch.init('BRANCH_KEY',
+		{ "isReferrable" : true, "url": Alloy.Globals.open_url },
+		function(err, data) {
+			if (err != null) {
+				console.log("Init error: " + JSON.stringify(err));
+				Alloy.Globals.status = err.message;
+			} else {
+				console.log("Init sucessful: " + JSON.stringify(data));
+				Alloy.Globals.status = "Ok";
+			}
+			Ti.App.fireEvent("branch_init");
+		});
+	};
+
+	$.index.activity.onStop = function() {
+		branch.close(function(err) {
+			if (err) {
+				console.log("Error on close: " + err);
+			}
+		});
+	};
+}
+
 var loggedIn = false;
 
 function sendEmail() {

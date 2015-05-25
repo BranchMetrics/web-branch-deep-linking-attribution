@@ -26,8 +26,8 @@
 		24DD6CFA1134B3F500162E58 /* IoBranchSdkModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DD6CF81134B3F500162E58 /* IoBranchSdkModule.m */; };
 		AA747D9F0F9514B9006C5449 /* IoBranchSdk_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = AA747D9E0F9514B9006C5449 /* IoBranchSdk_Prefix.pch */; };
 		AACBBE4A0F95108600F1A2B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AACBBE490F95108600F1A2B1 /* Foundation.framework */; };
-		CF3D55981AFC3ACA00B387E7 /* BNCDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3D55961AFC3ACA00B387E7 /* BNCDevice.h */; };
-		CF3D55991AFC3ACA00B387E7 /* BNCDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = CF3D55971AFC3ACA00B387E7 /* BNCDevice.m */; };
+		CF2577951B0FA70000C9FEFC /* BNCDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = CF2577931B0FA70000C9FEFC /* BNCDevice.h */; };
+		CF2577961B0FA70000C9FEFC /* BNCDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = CF2577941B0FA70000C9FEFC /* BNCDevice.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,8 +46,8 @@
 		24DD6D1B1134B66800162E58 /* titanium.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = titanium.xcconfig; sourceTree = "<group>"; };
 		AA747D9E0F9514B9006C5449 /* IoBranchSdk_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IoBranchSdk_Prefix.pch; sourceTree = SOURCE_ROOT; };
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		CF3D55961AFC3ACA00B387E7 /* BNCDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BNCDevice.h; sourceTree = "<group>"; };
-		CF3D55971AFC3ACA00B387E7 /* BNCDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BNCDevice.m; sourceTree = "<group>"; };
+		CF2577931B0FA70000C9FEFC /* BNCDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BNCDevice.h; path = Classes/BNCDevice.h; sourceTree = "<group>"; };
+		CF2577941B0FA70000C9FEFC /* BNCDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BNCDevice.m; path = Classes/BNCDevice.m; sourceTree = "<group>"; };
 		D2AAC07E0554694100DB518D /* libIoBranchSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIoBranchSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -93,10 +93,10 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				CF2577931B0FA70000C9FEFC /* BNCDevice.h */,
+				CF2577941B0FA70000C9FEFC /* BNCDevice.m */,
 				24DD6CF71134B3F500162E58 /* IoBranchSdkModule.h */,
 				24DD6CF81134B3F500162E58 /* IoBranchSdkModule.m */,
-				CF3D55961AFC3ACA00B387E7 /* BNCDevice.h */,
-				CF3D55971AFC3ACA00B387E7 /* BNCDevice.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -118,7 +118,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA747D9F0F9514B9006C5449 /* IoBranchSdk_Prefix.pch in Headers */,
-				CF3D55981AFC3ACA00B387E7 /* BNCDevice.h in Headers */,
+				CF2577951B0FA70000C9FEFC /* BNCDevice.h in Headers */,
 				24DD6CF91134B3F500162E58 /* IoBranchSdkModule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -194,7 +194,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24DD6CFA1134B3F500162E58 /* IoBranchSdkModule.m in Sources */,
-				CF3D55991AFC3ACA00B387E7 /* BNCDevice.m in Sources */,
+				CF2577961B0FA70000C9FEFC /* BNCDevice.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

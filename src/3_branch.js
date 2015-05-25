@@ -113,6 +113,15 @@ Branch = function() {
 		}
 		this.debug = false;					// A debug install session will get a unique device id.
 	}
+	
+	if (TITANIUM_BUILD) {
+		// This is used to inhibit a close too soon after an init.
+		// This is needed on Android to ensure that the Activity
+		// transition doesn't accidentally close the session.
+		
+		// This will be set to true in init and then cleared with a timer.
+		this.keepAlive = false;
+	}
 
 	this.init_state = init_states.NO_INIT;
 };
@@ -261,6 +270,17 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		}
 		done(err, data && utils.whiteListSessionData(data));
 	};
+	
+	// For Titanium, we need to inhibit a close right after on init on Android.
+	// This will happen when init is called from onStart for an Activity and
+	// close is called in onStop.
+	if (TITANIUM_BUILD && Ti.Platform.osname === "android") {
+		self.keepAlive = true;
+		setTimeout(function() {
+			self.keepAlive = false;
+			console.log("keep alive cleared!");
+		}, 2000);
+	}
 
 	if (sessionData  && sessionData['session_id']) {
 		finishInit(null, sessionData, false);
@@ -527,6 +547,12 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
  */
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
+		
+		if (this.keepAlive) {
+			done(null);
+			return;
+		}
+		
 		this._api(resources.close, { }, function(err, data) {
 			delete self.session_id;
 			delete self.sessionLink;

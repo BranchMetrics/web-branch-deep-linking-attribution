@@ -14,6 +14,12 @@ goog.addDependency("../../../../../src/3_branch.js", ['Branch'], ['utils', 'reso
 goog.addDependency("../../../../../src/4_initialization.js", ['branch_instance'], ['Branch', 'config']);
 goog.addDependency("../../../../../src/extern.js", [], []);
 goog.addDependency("../../../../../src/onpage.js", [], []);
+goog.addDependency("../../../../../src/titanium/BranchSDK/android/build/generated/bootstrap.js", [], []);
+goog.addDependency("../../../../../src/titanium/BranchSDK/android/example/app.js", [], []);
+goog.addDependency("../../../../../src/titanium/BranchSDK/bin/android/build/generated/bootstrap.js", [], []);
+goog.addDependency("../../../../../src/titanium/BranchSDK/bin/android/example/app.js", [], []);
+goog.addDependency("../../../../../src/titanium/BranchSDK/bin/example/app.js", [], []);
+goog.addDependency("../../../../../src/titanium/BranchSDK/example/app.js", [], []);
 goog.addDependency("../../../../../test/0_queue.js", [], ['Queue']);
 goog.addDependency("../../../../../test/0_storage.js", [], ['storage']);
 goog.addDependency("../../../../../test/0_utils.js", [], ['utils']);

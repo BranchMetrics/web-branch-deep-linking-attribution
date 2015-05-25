@@ -18,9 +18,9 @@
 				<TextField class="entry" id="channel_text" hintText="Channel for the link" />
 				<Label class="header" text="Stage:" />
 				<TextField class="entry" id="stage_text" hintText="Stage for the link" />
-				<Label class="header" text="Tags (comma seperate multiple tags):" />
+				<Label class="header" text="Tags (comma separate multiple tags):" />
 				<TextField class="entry" id="tags_text" hintText="Tags for the link" />
-				<Label class="header" text="Params (comma seperate multiple params):" />
+				<Label class="header" text="Params (comma separate multiple params):" />
 				<TextField class="entry" id="params_text" hintText="Tags for the link" />
 				<Label class="header" text="Type:" />
 				<Picker color="black" left="10" id="type_picker" >

@@ -4,13 +4,13 @@
 // OF YOUR TITANIUM SDK YOU'RE BUILDING FOR
 //
 //
-TITANIUM_SDK_VERSION = 4.0.0.RC2
+TITANIUM_SDK_VERSION = 4.0.0.GA
 
 
 //
 // THESE SHOULD BE OK GENERALLY AS-IS
 //
-TITANIUM_SDK = /Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.RC2
+TITANIUM_SDK = /Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.GA
 TITANIUM_BASE_SDK = "$(TITANIUM_SDK)/iphone/include"
 TITANIUM_BASE_SDK2 = "$(TITANIUM_SDK)/iphone/include/TiCore"
 TITANIUM_BASE_SDK3 = "$(TITANIUM_SDK)/iphone/include/JavaScriptCore"

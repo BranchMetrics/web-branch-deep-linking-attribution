@@ -10,6 +10,7 @@ package io.branch.sdk;
 
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.TiApplication;
 
 import org.appcelerator.kroll.common.Log;
 
@@ -52,10 +53,8 @@ public class BranchSDKModule extends KrollModule
 		super();
 	}
 	
-	@Kroll.method
-	public Object testProxyCall(Boolean arg1, Integer arg2) {
-		Log.i("TEST", "In proxy test function." + arg1 + " " + arg2);
-		return "Test Complete";
+	@Kroll.onAppCreate
+	public static void onAppCreate(TiApplication app) {
 	}
     
 	@Kroll.method

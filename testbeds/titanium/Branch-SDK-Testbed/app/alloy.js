@@ -33,37 +33,39 @@ var initDone = function(err, data) {
 };
 
 branch.setDebug(true);
-var url;
 if (Ti.Platform.osname === "android") {
-	url = Ti.Android.currentActivity.intent.data;
+	// In the Android case, we get the URL used to open the app here
+	// but we wait for the Titanium Window, which corresponds to an
+	// activity, to open to start the session.
+	Alloy.Globals.open_url = Ti.Android.currentActivity.intent.data;
 } else {
+	// If this is not Android, we want to initialize the branch session
+	// at app startup.  Close it when we go into the background and
+	// open it again when the app comes back to the foreground.
+	var url;
 	url = Ti.App.getArguments().url;
-}
-if (url == null) {
-	console.log("URL is null");
-} else {
-	console.log("URL: " + url);
-}
-branch.init('key_live_hbpBUqBdc1AtDHIzKDWtdfkmDrf03srM',
-	{ "isReferrable" : true, "url": url },
-	initDone);
-
-Ti.App.addEventListener('resume', function(e) {
-	console.log("Resume");
-	branch.init('key_live_hbpBUqBdc1AtDHIzKDWtdfkmDrf03srM',
-		{ isReferrable : true },
+		
+	branch.init('BRANCH_KEY',
+		{ "isReferrable" : true, "url": url },
 		initDone);
-});
 
-Ti.App.addEventListener('pause', function(e) {
-	console.log("Pause");
-	branch.close(function(err) {
-		if (err != null) {
-			console.log("Error with close: " + err.message);
-		} else {
-			console.log("Close complete");
-		}
+	Ti.App.addEventListener('resume', function(e) {
+		console.log("Resume");
+		branch.init('BRANCH_KEY',
+			{ isReferrable : true },
+			initDone);
 	});
-});
+
+	Ti.App.addEventListener('pause', function(e) {
+		console.log("Pause");
+		branch.close(function(err) {
+			if (err != null) {
+				console.log("Error with close: " + err.message);
+			} else {
+				console.log("Close complete");
+			}
+		});
+	});
+}
 
 console.log("Done alloy.js");

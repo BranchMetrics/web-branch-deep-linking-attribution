@@ -5,8 +5,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/rpetit/Library/android-sdk-macosx/platforms/android-16/android.jar"/>
 	<classpathentry kind="lib" path="/Users/rpetit/Library/android-sdk-macosx/add-ons/addon-google_apis-google-16/libs/maps.jar"/>
-	<classpathentry kind="lib" path="/Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.RC2/android/titanium.jar"/>
-	<classpathentry kind="lib" path="/Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.RC2/android/kroll-common.jar"/>
-	<classpathentry kind="lib" path="/Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.RC2/android/kroll-apt.jar"/>
+	<classpathentry kind="lib" path="/Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.GA/android/titanium.jar"/>
+	<classpathentry kind="lib" path="/Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.GA/android/kroll-common.jar"/>
+	<classpathentry kind="lib" path="/Users/rpetit/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.GA/android/kroll-apt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

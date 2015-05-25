@@ -78,6 +78,27 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
 
 The session close will be sent automatically on any ‘pause’ event.
 
+### Quick Install (Titanium)
+
+This Web SDK can also be used for Titanium applications.  There are two pieces which you need for using this SDK in your titanium application.
+
+#### Install the Titanium Modules
+
+The Branch Titanium modules have platform specific native code which is used by the SDK to obtain some device specific information when opening a session.  The modules are located in the dist/titanium folder.  They can be installed by going to Help->Install Mobile Module in the Appcelerator Studio.  Right now there is an iPhone module and an Android module.  Check [here](https://docs.appcelerator.com/platform/latest/#!/guide/Using_a_Module) for more information on installing modules.
+
+The actual SDK javascript code is compiled in the build.js file which is a CommonJS module in the same dist/titanium folder.  Copy this file to your app/lib folder.
+
+You can access the Branch functions by using require to load the CommonJS module.
+
+```js
+	var branch = require('build');
+	branch.init('YOUR BRANCH KEY HERE', function(err, data) {
+		// Do post init work here...
+	});
+```
+
+See the TITANIUM_GUIDE for more details and the Titanium testbed app for an example.
+
 ### SDK Method Queue
 
 Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
