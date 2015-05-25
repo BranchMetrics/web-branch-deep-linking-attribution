@@ -133,8 +133,8 @@ banner = function(branch, options, linkData, storage) {
 
 		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
 			bodyMarginTopInline = document.body.style.marginTop,
-			bodyPaddingBottomComputed = banner_utils.getBodyStyle('padding-bottom'),
-			bodyPaddingBottomInline = document.body.style.paddingBottom,
+			bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom'),
+			bodyMarginBottomInline = document.body.style.marginBottom,
 
 			closeButton = doc.getElementById('branch-banner-close'),
 			closeBanner = function() {
@@ -145,8 +145,7 @@ banner = function(branch, options, linkData, storage) {
 
 			setTimeout(function() {
 				if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
-				else if (options.position == 'bottom') { document.body.style.paddingBottom = bodyPaddingBottomInline; }
-
+				else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
 				banner_utils.removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
@@ -166,7 +165,7 @@ banner = function(branch, options, linkData, storage) {
 		// Trigger animation
 		banner_utils.addClass(document.body, 'branch-banner-is-active');
 		if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
-		else if (options.position == 'bottom') { document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyPaddingBottomComputed); }
+		else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
 
 		setTimeout(function() {
 			if (options.position == 'top') { element.style.top = '0'; }
