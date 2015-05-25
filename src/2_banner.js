@@ -165,7 +165,7 @@ banner = function(branch, options, linkData, storage) {
 			setTimeout(function() {
 				if (options.position == 'top') {
 					document.body.style.marginTop = bodyMarginTopInline;
-					document.body.style['backgroundPositionY'] = backgroundPositionYInline;
+					document.body.style.backgroundPositionY = backgroundPositionYInline;
 				}
 				else if (options.position == 'bottom') { document.body.style.paddingBottom = bodyPaddingBottomInline; }
 

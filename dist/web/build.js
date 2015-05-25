@@ -846,35 +846,36 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   var b = document.getElementsByTagName("body")[0];
   return(b.currentStyle && b.currentStyle[utils.snakeToCamel(a)] || window.getComputedStyle(b)).getPropertyValue(a);
 }, addCSSLengths:function(a, b) {
-  return(banner_utils.convertToUnitlessPixels(a) + banner_utils.convertToUnitlessPixels(b)).toString() + "px";
-}, convertToUnitlessPixels:function(a) {
-  if (!a) {
-    return 0;
-  }
-  var b = a.replace(/[0-9,\.]/g, "");
-  a = a.match(/\d+/g);
-  var c = parseInt(0 < a.length ? a[0] : "0", 10), d = function() {
-    return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-  }, e = function() {
-    return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
+  var c = function(a) {
+    if (!a) {
+      return 0;
+    }
+    var b = a.replace(/[0-9,\.]/g, "");
+    a = a.match(/\d+/g);
+    var c = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
+      return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
+    }, k = function() {
+      return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
+    };
+    return{px:function(a) {
+      return a;
+    }, em:function(a) {
+      return a * parseFloat(window.getComputedStyle(document.body).fontSize);
+    }, rem:function(a) {
+      return a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+    }, vw:function(a) {
+      return a * g();
+    }, vh:function(a) {
+      return a * k();
+    }, vmin:function(a) {
+      return a * Math.min(k(), g());
+    }, vmax:function(a) {
+      return a * Math.max(k(), g());
+    }, "%":function() {
+      return document.body.clientWidth / 100 * c;
+    }}[b](c);
   };
-  return{px:function(a) {
-    return a;
-  }, em:function(a) {
-    return a * parseFloat(window.getComputedStyle(document.body).fontSize);
-  }, rem:function(a) {
-    return a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-  }, vw:function(a) {
-    return a * d();
-  }, vh:function(a) {
-    return a * e();
-  }, vmin:function(a) {
-    return a * Math.min(e(), d());
-  }, vmax:function(a) {
-    return a * Math.max(e(), d());
-  }, "%":function() {
-    return document.body.clientWidth / 100 * c;
-  }}[b](c);
+  return(c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
   var c = utils.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
   "number" == typeof d && (d = !1);
