@@ -131,17 +131,15 @@ banner = function(branch, options, linkData, storage) {
 			});
 		}
 
-		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
-		var bodyMarginTopInline = document.body.style.marginTop;
+		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
+			bodyMarginTopInline = document.body.style.marginTop,
+			backgroundPositionYComputed = banner_utils.getBodyStyle('background-position-y'),
+			backgroundPositionYInline = document.body.style.backgroundPositionY,
+			bodyPaddingBottomComputed = banner_utils.getBodyStyle('padding-bottom'),
+			bodyPaddingBottomInline = document.body.style.paddingBottom,
 
-		var backgroundPositionYComputed = banner_utils.getBodyStyle('background-position-y');
-		var backgroundPositionYInline = document.body.style.backgroundPositionY;
-
-		var bodyPaddingBottomComputed = banner_utils.getBodyStyle('padding-bottom');
-		var bodyPaddingBottomInline = document.body.style.paddingBottom;
-
-		var closeButton = doc.getElementById('branch-banner-close');
-		var closeBanner = function() {
+			closeButton = doc.getElementById('branch-banner-close'),
+			closeBanner = function() {
 			setTimeout(function() {
 				banner_utils.removeElement(element);
 				banner_utils.removeElement(document.getElementById('branch-css'));

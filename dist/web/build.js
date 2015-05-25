@@ -837,6 +837,12 @@ utils.base64encode = function(a) {
 // Input 6
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
+}, hasClass:function(a, b) {
+  return!!a.className.match(new RegExp("(\\s|^)" + b + "(\\s|$)"));
+}, addClass:function(a, b) {
+  banner_utils.hasClass(a, b) || (a.className += " " + b);
+}, removeClass:function(a, b) {
+  banner_utils.hasClass(a, b) && (a.className = a.className.replace(new RegExp("(\\s|^)" + b + "(\\s|$)"), " "));
 }, mobileUserAgent:function() {
   return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : "ios" : !1;
 }, getDate:function(a) {
@@ -1156,12 +1162,6 @@ var sendSMS = function(a, b, c, d) {
       }, banner_utils.success_timeout));
     })) : p();
   }
-}, hasClass = function(a, b) {
-  return!!a.className.match(new RegExp("(\\s|^)" + b + "(\\s|$)"));
-}, addClass = function(a, b) {
-  hasClass(a, b) || (a.className += " " + b);
-}, removeClass = function(a, b) {
-  hasClass(a, b) && (a.className = a.className.replace(new RegExp("(\\s|^)" + b + "(\\s|$)"), " "));
 }, banner = function(a, b, c, d) {
   if (banner_utils.shouldAppend(d, b)) {
     var e = banner_html.markup(b, d);
@@ -1186,7 +1186,7 @@ var sendSMS = function(a, b, c, d) {
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
         "top" == b.position ? (document.body.style.marginTop = k, document.body.style.backgroundPositionY = l) : "bottom" == b.position && (document.body.style.paddingBottom = p);
-        removeClass(document.body, "branch-banner-is-active");
+        banner_utils.removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
       "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
@@ -1195,7 +1195,7 @@ var sendSMS = function(a, b, c, d) {
       a.preventDefault();
       q();
     });
-    addClass(document.body, "branch-banner-is-active");
+    banner_utils.addClass(document.body, "branch-banner-is-active");
     "top" == b.position ? (document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g), document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, h)) : "bottom" == b.position && (document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, m));
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
