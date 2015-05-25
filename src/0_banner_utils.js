@@ -34,6 +34,22 @@ banner_utils.removeElement = function(element) {
 	}
 };
 
+
+banner_utils.hasClass = function(element, className) {
+	return !!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+};
+
+banner_utils.addClass = function(element, className) {
+	if (!banner_utils.hasClass(element, className)) { element.className += " " + className; }
+};
+
+banner_utils.removeClass = function(element, className) {
+	if (banner_utils.hasClass(element, className)) {
+		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+		element.className = element.className.replace(reg, ' ');
+	}
+};
+
 banner_utils.mobileUserAgent = function() {
 	return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? (navigator.userAgent.match(/android/i) ? 'android' : 'ios') : false;
 };

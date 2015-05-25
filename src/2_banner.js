@@ -89,21 +89,6 @@ var sendSMS = function(doc, branch, options, linkData) {
 	}
 };
 
-var hasClass = function(element, className) {
-	return !!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-};
-
-var addClass = function(element, className) {
-	if (!hasClass(element, className)) { element.className += " " + className; }
-};
-
-var removeClass = function(element, className) {
-	if (hasClass(element, className)) {
-		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-		element.className = element.className.replace(reg, ' ');
-	}
-};
-
 /**
  * @param {Object} branch
  * @param {banner_utils.options} options
@@ -169,7 +154,7 @@ banner = function(branch, options, linkData, storage) {
 				}
 				else if (options.position == 'bottom') { document.body.style.paddingBottom = bodyPaddingBottomInline; }
 
-				removeClass(document.body, 'branch-banner-is-active');
+				banner_utils.removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
 			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
@@ -186,7 +171,7 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		// Trigger animation
-		addClass(document.body, 'branch-banner-is-active');
+		banner_utils.addClass(document.body, 'branch-banner-is-active');
 		if (options.position == 'top') {
 			document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
 			document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, backgroundPositionYComputed);
