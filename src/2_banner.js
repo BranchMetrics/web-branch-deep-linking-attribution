@@ -133,8 +133,6 @@ banner = function(branch, options, linkData, storage) {
 
 		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
 			bodyMarginTopInline = document.body.style.marginTop,
-			backgroundPositionYComputed = banner_utils.getBodyStyle('background-position-y'),
-			backgroundPositionYInline = document.body.style.backgroundPositionY,
 			bodyPaddingBottomComputed = banner_utils.getBodyStyle('padding-bottom'),
 			bodyPaddingBottomInline = document.body.style.paddingBottom,
 
@@ -146,10 +144,7 @@ banner = function(branch, options, linkData, storage) {
 			}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 			setTimeout(function() {
-				if (options.position == 'top') {
-					document.body.style.marginTop = bodyMarginTopInline;
-					document.body.style.backgroundPositionY = backgroundPositionYInline;
-				}
+				if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
 				else if (options.position == 'bottom') { document.body.style.paddingBottom = bodyPaddingBottomInline; }
 
 				banner_utils.removeClass(document.body, 'branch-banner-is-active');
@@ -170,10 +165,7 @@ banner = function(branch, options, linkData, storage) {
 
 		// Trigger animation
 		banner_utils.addClass(document.body, 'branch-banner-is-active');
-		if (options.position == 'top') {
-			document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
-			document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, backgroundPositionYComputed);
-		}
+		if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
 		else if (options.position == 'bottom') { document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyPaddingBottomComputed); }
 
 		setTimeout(function() {
