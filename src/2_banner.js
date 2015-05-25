@@ -189,7 +189,7 @@ banner = function(branch, options, linkData, storage) {
 		addClass(document.body, 'branch-banner-is-active');
 		if (options.position == 'top') {
 			document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
-			document.body.style['backgroundPositionY'] = banner_utils.addCSSLengths(banner_utils.bannerHeight, backgroundPositionYComputed);
+			document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, backgroundPositionYComputed);
 		}
 
 		// Need to fix this still
