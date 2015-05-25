@@ -862,7 +862,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, k = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
-    return{px:function(a) {
+    return parseInt({px:function(a) {
       return a;
     }, em:function(a) {
       return document.body.currentStyle ? a * c(document.body.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.body).fontSize);
@@ -878,7 +878,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
       return a * Math.max(k(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * f;
-    }}[b](f);
+    }}[b](f), 10);
   };
   return(c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
