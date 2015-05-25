@@ -176,8 +176,6 @@ banner = function(branch, options, linkData, storage) {
 			document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
 			document.body.style.backgroundPositionY = banner_utils.addCSSLengths(banner_utils.bannerHeight, backgroundPositionYComputed);
 		}
-
-		// Need to fix this still
 		else if (options.position == 'bottom') { document.body.style.paddingBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyPaddingBottomComputed); }
 
 		setTimeout(function() {
