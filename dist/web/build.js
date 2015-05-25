@@ -844,7 +844,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return b.setDate(b.getDate() + a);
 }, getBodyStyle:function(a) {
   var b = document.getElementsByTagName("body")[0];
-  return(b.currentStyle && b.currentStyle[utils.snakeToCamel(a)] || window.getComputedStyle(b)).getPropertyValue(a);
+  return b.currentStyle ? b.currentStyle[utils.snakeToCamel(a)] : window.getComputedStyle(b).getPropertyValue(a);
 }, addCSSLengths:function(a, b) {
   var c = function(a) {
     if (!a) {

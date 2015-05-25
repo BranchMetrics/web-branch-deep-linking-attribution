@@ -44,9 +44,13 @@ banner_utils.getDate = function(days) {
 };
 
 banner_utils.getBodyStyle = function(style) {
-	var body = document.getElementsByTagName('body')[0],
-		bodyStyle = (body.currentStyle && body.currentStyle[utils.snakeToCamel(style)]) || window.getComputedStyle(body);
-	return bodyStyle.getPropertyValue(style);
+	var body = document.getElementsByTagName('body')[0];
+	if (body.currentStyle) {
+		return body.currentStyle[utils.snakeToCamel(style)];
+	}
+	else {
+		return window.getComputedStyle(body).getPropertyValue(style);
+	}
 };
 
 banner_utils.addCSSLengths = function(length1, length2) {
