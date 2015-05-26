@@ -2,7 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.5.5] - 2015-05-26
 ### New Functionality
 - Adds previously Cordova only functions to Web: `creditHistory()`, `getCode()`, `validateCode()`, and `applyCode()`
 
