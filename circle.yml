@@ -27,3 +27,4 @@ dependencies:
 test:
   override:
     - ./lint.sh
+    - grunt test

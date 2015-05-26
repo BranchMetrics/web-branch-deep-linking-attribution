@@ -6,20 +6,14 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'],
+					urls: ['http://127.0.0.1:9999/test/test.html'/*, 'http://127.0.0.1:9999/test/integration-test.html'*/],
 					tunnelTimeout: 5,
-					throttled: 3,
+					throttled: 6,
 					maxRetries: 3,
 					testname: 'Web SDK Tests',
 
 					browsers: [
-						{
-							browserName: "firefox",
-							version: "19",
-							platform: "XP"
-						}
 						// Safari
-						/*
 						{
 							browserName: 'safari',
 							platform: 'OS X 10.10',
@@ -56,28 +50,7 @@ module.exports = function(grunt) {
 							browserName: 'chrome',
 							platform: 'OS X 10.10',
 							version: '38.0'
-						}
-
-						{
-							browserName: 'internet explorer',
-							platform: 'Windows 7',
-							version: '11.0'
 						},
-						{
-							browserName: 'internet explorer',
-							platform: 'Windows 7',
-							version: '10.0'
-						},
-						{
-							browserName: 'internet explorer',
-							platform: 'Windows 7',
-							version: '9.0'
-						},
-						{
-							browserName: 'internet explorer',
-							platform: 'Windows 7',
-							version: '8.0'
-						}
 
 						// Firefox
 						{
@@ -180,13 +153,7 @@ module.exports = function(grunt) {
 							browserName: 'internet explorer',
 							platform: 'Windows 7',
 							version: '9.0'
-						},
-						{
-							browserName: 'internet explorer',
-							platform: 'Windows 7',
-							version: '8.0'
 						}
-						*/
 					]
 				}
 			}
