@@ -106,7 +106,11 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 
 1. Referral Methods
    + [.referrals()](#referralscallback)
+   + [.getCode()](#getcodeoptions-callback)
+   + [.validateCode()](##validatecodecode-callback)
+   + [.applyCode()](#applycodecode-callback)
    + [.credits()](#creditscallback)
+   + [.creditHistory()](#credithistoryoptions-callback)
    + [.redeem()](#redeemamount-bucket-callback)
 
 1. Smart Banner

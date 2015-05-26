@@ -679,8 +679,6 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * callback("Error message");
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * # Referral system rewarding functionality
