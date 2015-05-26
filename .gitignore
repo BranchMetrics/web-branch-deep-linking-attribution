@@ -19,3 +19,4 @@ docs/3_branch.md
 compiler-latest.zip
 testbeds/cordova/platforms
 testbeds/cordova/plugins
+aws_access_keys.sh
