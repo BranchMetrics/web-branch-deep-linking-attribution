@@ -14,8 +14,10 @@ dependencies:
     - stat compiler/library/closure-library-master || (wget https://github.com/google/closure-library/archive/master.zip && unzip master.zip -d compiler/library)
 
     - npm install
-    - karma --help || (npm install -g karma && npm install -g karma-cli && npm install -g karma-sauce-launcher)
-    - npm install -g karma-sauce-launcher
+    # - karma --help || (npm install -g karma && npm install -g karma-cli && npm install -g karma-sauce-launcher)
+    # - npm install -g karma-sauce-launcher
+    - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
+    - tar -xzf sc-latest-linux.tar.gz
     - jscs --help || npm install -g jscs
     - jshint -v || npm install -g jshint
   cache_directories:
@@ -25,9 +27,3 @@ dependencies:
 test:
   override:
     - ./lint.sh
-    - karma start karma-ie.conf.js
-    # - karma start karma-ios.conf.js
-    - karma start karma-android.conf.js
-    - karma start karma-firefox.conf.js
-    - karma start karma-safari.conf.js
-    - karma start karma-chrome.conf.js
