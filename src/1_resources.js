@@ -187,24 +187,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
 			"device_fingerprint_id": validator(true, branch_id)
 		}
 	};
-
-	resources.link = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/url",
-		method: utils.httpMethod.POST,
-		ref: "obj",
-		params: {
-			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.str),
-			"data": validator(false, validationTypes.str),
-			"alias": validator(false, validationTypes.str),
-			"tags": validator(false, validationTypes.arr),
-			"feature": validator(false, validationTypes.str),
-			"channel": validator(false, validationTypes.str),
-			"stage": validator(false, validationTypes.str),
-			"type": validator(false, validationTypes.num)
-		}
-	};
 }
 
 resources.getCode = {
