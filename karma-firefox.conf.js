@@ -10,6 +10,7 @@ module.exports = function(config) {
 			platform: 'OS X 10.10',
 			version: '37'
 		},
+		/*
 		sl_firefox_36: {
 			base: 'SauceLabs',
 			browserName: 'firefox',
@@ -22,6 +23,7 @@ module.exports = function(config) {
 			platform: 'OS X 10.10',
 			version: '35'
 		},
+		*/
 		sl_firefox_34: {
 			base: 'SauceLabs',
 			browserName: 'firefox',

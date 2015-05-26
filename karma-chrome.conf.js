@@ -10,6 +10,7 @@ module.exports = function(config) {
 			platform: 'OS X 10.10',
 			version: '42.0'
 		},
+		/*
 		sl_chrome_41: {
 			base: 'SauceLabs',
 			browserName: 'chrome',
@@ -28,6 +29,7 @@ module.exports = function(config) {
 			platform: 'OS X 10.10',
 			version: '39.0'
 		},
+		*/
 		sl_chrome_38: {
 			base: 'SauceLabs',
 			browserName: 'chrome',

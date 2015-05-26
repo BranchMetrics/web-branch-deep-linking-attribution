@@ -10,6 +10,7 @@ module.exports = function(config) {
 			platform: 'Linux',
 			version: '5.1'
 		},
+		/*
 		sl_android_50: {
 			base: 'SauceLabs',
 			browserName: 'android',
@@ -34,6 +35,7 @@ module.exports = function(config) {
 			platform: 'Linux',
 			version: '4.2'
 		},
+		*/
 		sl_android_41: {
 			base: 'SauceLabs',
 			browserName: 'android',
