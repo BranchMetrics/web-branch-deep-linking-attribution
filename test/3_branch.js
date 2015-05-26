@@ -86,7 +86,7 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "v": config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
+			assert.deepEqual(requests[0].obj, { "sdk": "web0.0.0", branch_key: branch_sample_key }, 'Request params to _r correct');
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
@@ -122,7 +122,7 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "v": config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
+			assert.deepEqual(requests[0].obj, { "sdk": "web0.0.0", branch_key: branch_sample_key }, 'Request params to _r correct');
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
@@ -231,7 +231,7 @@ describe('Branch', function() {
 	describe('setIdentity', function() {
 		basicTests('setIdentity', [ 1 ]);
 
-		var expectedRequest = testUtils.params({ "identity": "test_identity", "sdk": "web" + config.version }, [ 'session_id', 'browser_fingerprint_id' ]);
+		var expectedRequest = testUtils.params({ "identity": "test_identity" }, [ 'browser_fingerprint_id' ]);
 		var expectedResponse = {
 			identity_id: '12345',
 			link: 'url',
@@ -269,8 +269,9 @@ describe('Branch', function() {
 				},
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
-				"sdk": "web" + config.version
+				"sdk": "web0.0.0"
 			};
+			expectedRequest.identity_id = identity_id;
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null);
@@ -295,8 +296,9 @@ describe('Branch', function() {
 				},
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
-				"sdk": "web" + config.version
+				"sdk": "web0.0.0"
 			};
+			expectedRequest.identity_id = identity_id;
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null);
@@ -315,7 +317,7 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
-			assert.deepEqual(requests[0].obj, testUtils.params({ "sdk": "web" + config.version }, [ 'identity_id', 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 
@@ -336,7 +338,7 @@ describe('Branch', function() {
 					'$og_description': 'Branch Metrics',
 					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 				},
-				"sdk": "web" + config.version
+				"sdk": "web0.0.0"
 			});
 			if (desktop_url_append) {
 				val['data']['$desktop_url'] += desktop_url_append;
@@ -460,8 +462,68 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			var thing = testUtils.params({ }, [ 'session_id', 'browser_fingerprint_id' ]);
-			assert.deepEqual(requests[0].obj, thing, 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
+		});
+	});
+
+	describe('getCode', function() {
+		basicTests('getCode', [ 0 ]);
+		it('should call api with required params and options', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			var options = {
+				"amount":10,
+				"bucket":"party",
+				"calculation_type":1,
+				"location":2
+			};
+
+			var expectedResponse = 'AB12CD';
+
+			branch.getCode(options, function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'response returned');
+				assert(!err, 'No error');
+			});
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null, expectedResponse);
+			assert.deepEqual(requests[0].obj, testUtils.params(options, [ 'browser_fingerprint_id' ]), 'All params sent');
+		});
+	});
+
+	describe('validateCode', function() {
+		basicTests('referrals', [ 0 ]);
+		it('should call api with required params and options', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(3, done);
+
+			var expectedResponse = 'AB12CD';
+
+			branch.validateCode(expectedResponse, function(err, res) {
+				assert.deepEqual(res, null, 'null returned');
+				assert(!err, 'No error');
+			});
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null, expectedResponse);
+			assert.deepEqual(requests[0].obj, testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]), 'All params sent');
+		});
+	});
+
+	describe('applyCode', function() {
+		basicTests('referrals', [ 0 ]);
+		it('should call api with required params and options', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(3, done);
+
+			var expectedResponse = 'AB12CD';
+
+			branch.applyCode(expectedResponse, function(err, res) {
+				assert.deepEqual(res, null, 'null returned');
+				assert(!err, 'No error');
+			});
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null, expectedResponse);
+			assert.deepEqual(requests[0].obj, testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 
@@ -483,7 +545,47 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'session_id', 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
+		});
+	});
+
+	describe('creditHistory', function() {
+		basicTests('credits', [ 0 ]);
+
+		it('should call api with identity_id', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			var options = {
+				"length":50,
+				"direction":0,
+				"begin_after_id":"123456789012345",
+				"bucket":"default"
+			};
+
+			var expectedResponse = [ {
+				"transaction": {
+					"id":"65301496270422583",
+					"bucket":"default",
+					"type":2,
+					"amount":-5,
+					"date":"2014-11-24T05:35:16.547Z"
+				},
+				"event": {
+					"name":null,
+					"metadata":null
+				},
+				"referrer":null,
+				"referree":null
+			} ];
+
+			branch.creditHistory(options, function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'response returned');
+				assert(!err, 'No error');
+			});
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null, expectedResponse);
+			assert.deepEqual(requests[0].obj, testUtils.params(options, [ 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 
@@ -498,7 +600,7 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
-			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket", "sdk": "web" + config.version }, [ 'session_id', 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
 /*
