@@ -25,4 +25,9 @@ dependencies:
 test:
   override:
     - ./lint.sh
-    - karma start
+    - karma start karma-ie.conf.js
+    - karma start karma-ios.conf.js
+    - karma start karma-android.conf.js
+    - karma start karma-firefox.conf.js
+    - karma start karma-safari.conf.js
+    - karma start karma-chrome.conf.js
