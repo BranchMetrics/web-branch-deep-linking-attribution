@@ -102,15 +102,14 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage(false);
 	this._server = new Server();
+	var sdk;
+	if (CORDOVA_BUILD) { sdk = 'cordova'; }
+	if (WEB_BUILD) { sdk = 'web'; }
+	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD) { // jshint undef:false
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
-											// the session params from the first install.
-		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
 		this.debug = false;					// A debug install session will get a unique device id.
-	}
-	else if (WEB_BUILD) {
-		this.sdk = "web" + config.version;
 	}
 
 	this.init_state = init_states.NO_INIT;
@@ -126,12 +125,11 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (this.branch_key) { obj['branch_key'] = this.branch_key; }
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
+	if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
-	// These three are sent from mobile apps
 	if (CORDOVA_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
-		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
@@ -238,6 +236,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
+		self.sessionLink = data['link'];
 		if (data['referring_link']) {
 			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
@@ -307,7 +306,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
 				if (err) { return finishInit(err, null); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
@@ -680,8 +679,6 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * callback("Error message");
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * # Referral system rewarding functionality
@@ -779,26 +776,27 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 	this._api(resources.referrals, { }, done);
 });
 
-
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.getCode
- * @param {Object} data - _required_ - contins options for referral code creation.
+ * @param {Object} options - _required_ - contins options for referral code creation.
  * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
  * Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
- * The data can containt the following fields:
- * "amount" - A required integer specifying the number of credits added when the code is applied.
- * "bucket" - The optional bucket to apply the credits to.  Defaults to "default".
- * "calculation_type" - A required integer.  1 for unlimited uses, 0 for one use.
- * "location" - A required integer. Determines who get's the credits.  0 for the referree, 2 for the referring user or 3 for both.
- * "prefix" - An optional string to be prepended to the code.
- * "expiration" - An optional date string.  If present, determines the date on which the code expires.
+ * The `options` object can containt the following properties:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
+ * | calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
+ * | location | *required* - An integer that etermines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
+ * | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
+ * | prefix | *optional* - A string to be prepended to the code.
+ * | expiration | *optional* - A date string that if present, determines the date on which the code expires.
  *
  * ##### Usage
  *
  * branch.getCode(
- *     data,
+ *     options,
  *     callback(err,data)
  * );
  *
@@ -811,7 +809,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *       "bucket":"party",
  *       "calculation_type":1,
  *       "location":2
- *     }
+ *     },
  *     callback (err, data)
  * );
  * ```
@@ -826,19 +824,15 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
-	Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-		data.type = "credit";
-		data.creation_type = 2;
-		this._api(resources.getCode, data, done);
-	});
-}
+Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+	data.type = "credit";
+	data.creation_type = 2;
+	this._api(resources.getCode, data, done);
+});
 
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.validateCode
  * @param {string} code - _required_ - the code string to validate.
@@ -878,17 +872,13 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
-	Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-		this._api(resources.validateCode, { "code": code }, done);
-	});
-}
+Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+	this._api(resources.validateCode, { "code": code }, done);
+});
 
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.applyCode
  * @param {string} code - _required_ - the code string to apply.
@@ -927,18 +917,14 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *     callback(err)
  * );
  * ```
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * ## Credit Functions
  *
  */
-	Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-		this._api(resources.applyCode, { "code": code }, done);
-	});
-}
+Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+	this._api(resources.applyCode, { "code": code }, done);
+});
 
 /**
  * @function Branch.credits
@@ -971,20 +957,26 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
 	this._api(resources.credits, { }, done);
 });
 
-
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.creditHistory
- * @param {Object} data - _optional_ - options controlling the returned history.
+ * @param {Object} options - _optional_ - options controlling the returned history.
  * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history data.
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
+ * Properties available in the `options` object:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | bucket | *optional (max 63 characters)* - The bucket from which to retrieve credit transactions.
+ * | begin_after_id | *optional* - The credit transaction id of the last item in the previous retrieval. Retrieval will start from the transaction next to it. If none is specified, retrieval starts from the very beginning in the transaction history, depending on the order.
+ * | length | *optional* - The number of credit transactions to retrieve. If none is specified, up to 100 credit transactions will be retrieved.
+ * | direction | *optional* - The order of credit transactions to retrieve. If direction is `1`, retrieval is in least recent first order; If direction is `0`, or if none is specified, retrieval is in most recent first order.
  *
  * ##### Usage
  *
  * ```js
  * branch.creditHistory(
- *      data,
+ *      options,
  *      callback(err, data)
  * );
  * ```
@@ -996,7 +988,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *     {
  *       "length":50,
  *       "direction":0,
- *       "begin_after_id:"123456789012345",
+ *       "begin_after_id":"123456789012345",
  *       "bucket":"default"
  *     }
  *     callback (err, data)
@@ -1034,17 +1026,14 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ---
  *
  * ## Credit redemption
  *
  */
-	Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-		this._api(resources.creditHistory, data ? data : {}, done);
-	});
-}
+Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, options) {
+	this._api(resources.creditHistory, options || { }, done);
+});
 
 /**
  * @function Branch.redeem
