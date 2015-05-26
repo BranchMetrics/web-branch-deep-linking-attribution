@@ -19,7 +19,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Set the app banner to either never show a second time, or wait a specified number of days before showing again
 - Adds `customCSS` property to banner to allow custom styles
 ### Fixed
-- Fixes body element position when banner is shown with `body { position: relative; }` or `body { position: absolute; }
+- Fixes body element position when banner is shown with `body { position: relative; }` or `body { position: absolute; }`
 - Fixes body background image position when banner is shown
 
 ## [v1.5.1] - 2015-05-13
