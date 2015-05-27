@@ -5,7 +5,7 @@ machine:
 
 dependencies:
   post:
-    # Closure COmpiler
+    # Closure Compiler
     - mkdir -p compiler
     - stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-latest.zip && unzip compiler-latest.zip -d compiler)
 
@@ -13,9 +13,8 @@ dependencies:
     - mkdir -p compiler/library
     - stat compiler/library/closure-library-master || (wget https://github.com/google/closure-library/archive/master.zip && unzip master.zip -d compiler/library)
 
+    # Node, Sauce, and JSlint deps
     - npm install
-    # - karma --help || (npm install -g karma && npm install -g karma-cli && npm install -g karma-sauce-launcher)
-    # - npm install -g karma-sauce-launcher
     - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
     - tar -xzf sc-latest-linux.tar.gz
     - jscs --help || npm install -g jscs
