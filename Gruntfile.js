@@ -10,6 +10,11 @@ var safari_browsers = [
 			browserName: 'safari',
 			platform: 'OS X 10.9',
 			version: '7.0'
+		},
+		{
+			browserName: 'safari',
+			platform: 'OS X 10.8',
+			version: '6.0'
 		}
 	],
 
@@ -38,6 +43,11 @@ var safari_browsers = [
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '38.0'
+		},
+		{
+			browserName: 'chrome',
+			platform: 'OS X 10.10',
+			version: '37.0'
 		}
 	],
 
@@ -61,6 +71,16 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '34'
+		},
+		{
+			browserName: 'firefox',
+			platform: 'OS X 10.10',
+			version: '33'
+		},
+		{
+			browserName: 'firefox',
+			platform: 'OS X 10.10',
+			version: '32'
 		}
 	],
 
@@ -74,6 +94,11 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '8.1'
+		},
+		{
+			browserName: 'iphone',
+			platform: 'OS X 10.10',
+			version: '8.0'
 		},
 		{
 			browserName: 'iphone',
@@ -94,6 +119,11 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '6.0'
+		},
+		{
+			browserName: 'iphone',
+			platform: 'OS X 10.10',
+			version: '5.1'
 		}
 	],
 
@@ -127,6 +157,11 @@ var safari_browsers = [
 			browserName: 'android',
 			platform: 'Linux',
 			version: '4.1'
+		},
+		{
+			browserName: 'android',
+			platform: 'Linux',
+			version: '4.0'
 		}
 	],
 
@@ -157,7 +192,7 @@ module.exports = function(grunt) {
 					username: 'branchmetrics',
 					urls: ['http://127.0.0.1:9999/test/test.html'/*, 'http://127.0.0.1:9999/test/integration-test.html'*/],
 					tunnelTimeout: 5,
-					throttled: 6,
+					throttled: 10,
 					maxRetries: 3,
 					testname: 'Web SDK Tests',
 					browsers: safari_browsers.concat(chrome_browsers,
