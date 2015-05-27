@@ -22,8 +22,17 @@
 		goog.require('Branch');
 		goog.require('resources');
 		goog.require('storage');
+	</script>
 
-		// Sauce labs magic, don't worry about it
+	<script type="text/javascript" src="1_api.js"></script>
+	<script type="text/javascript" src="3_branch.js"></script>
+	<script type="text/javascript" src="0_utils.js"></script>
+	<script type="text/javascript" src="0_queue.js"></script>
+	<script type="text/javascript" src="0_storage.js"></script>
+	<!-- just add others here -->
+
+	<script type="text/javascript">
+			// Sauce labs magic, don't worry about it
 		onload = function(){
 			var runner = mocha.run();
 
@@ -50,13 +59,6 @@
 			};
 		};
 	</script>
-
-	<script type="text/javascript" src="1_api.js"></script>
-	<script type="text/javascript" src="3_branch.js"></script>
-	<script type="text/javascript" src="0_utils.js"></script>
-	<script type="text/javascript" src="0_queue.js"></script>
-	<script type="text/javascript" src="0_storage.js"></script>
-	<!-- just add others here -->
 
 	<script type="text/javascript">
 		if (window.mochaPhantomJS) { mochaPhantomJS.run(); }

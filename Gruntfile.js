@@ -175,13 +175,12 @@ var safari_browsers = [
 			browserName: 'internet explorer',
 			platform: 'Windows 7',
 			version: '10.0'
-		}/*,
+		},
 		{
 			browserName: 'internet explorer',
 			platform: 'Windows 7',
 			version: '9.0'
 		}
-		*/
 	];
 
 module.exports = function(grunt) {
@@ -194,6 +193,9 @@ module.exports = function(grunt) {
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
+					pollInterval: 4000,        // Note: pollInterval * statusCheckAttempts should = 'max-duration'
+					statusCheckAttempts: 90,   // So if you change one of these, adjust 'max-duration' accordingly
+					'max-duration': 360,
 					testname: 'Web SDK Tests',
 					browsers: safari_browsers.concat(chrome_browsers,
 						firefox_browsers,
