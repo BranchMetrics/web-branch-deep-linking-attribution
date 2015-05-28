@@ -203,8 +203,8 @@ describe('Branch', function() {
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version
 				}, 'Request to open params correct');
-			});
-		} else { done(); }
+			} else { done(); }
+		});
 	});
 
 	describe('data', function() {

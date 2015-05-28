@@ -32,8 +32,8 @@
 	<!-- just add others here -->
 
 	<script type="text/javascript">
-			// Sauce labs magic, don't worry about it
-		onload = function(){
+		// Sauce labs magic, don't worry about it
+		var onload = function() {
 			var runner = mocha.run();
 
 			var failedTests = [];
@@ -43,8 +43,7 @@
 			});
 
 			runner.on('fail', logFailure);
-
-			function logFailure(test, err) {
+			var logFailure = function(test, err) {
 
 				var flattenTitles = function(test) {
 					var titles = [];
@@ -55,7 +54,11 @@
 					return titles.reverse();
 				};
 
-				failedTests.push({name: test.title, result: false, message: err.message, stack: err.stack, titles: flattenTitles(test) });
+				failedTests.push({ name: test.title,
+					result: false,
+					message: err.message,
+					stack: err.stack,
+					titles: flattenTitles(test) });
 			};
 		};
 	</script>

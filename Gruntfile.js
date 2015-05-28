@@ -193,9 +193,9 @@ module.exports = function(grunt) {
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
-					pollInterval: 4000,        // Note: pollInterval * statusCheckAttempts should = 'max-duration'
-					statusCheckAttempts: 90,   // So if you change one of these, adjust 'max-duration' accordingly
-					'max-duration': 360,
+					pollInterval: 2000,         // (ms) Note: pollInterval * statusCheckAttempts should = 'max-duration'
+					statusCheckAttempts: 180,   // So if you change one of these, adjust 'max-duration' accordingly
+					'max-duration': 360,        // (s)
 					testname: 'Web SDK Tests',
 					browsers: safari_browsers.concat(chrome_browsers,
 						firefox_browsers,
