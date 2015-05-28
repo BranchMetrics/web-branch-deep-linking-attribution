@@ -184,7 +184,7 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'], // Testing integration with phantom
+					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'],
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
@@ -225,5 +225,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-saucelabs');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-build-number');
-	grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
+	grunt.registerTask('test', ['buildnumber', 'connect', 'saucelabs-mocha']);
 };

@@ -30,4 +30,3 @@ test:
     - ./lint.sh
     - grunt buildnumber
     - grunt test
-    - mocha-phantomjs test/integration-test.html

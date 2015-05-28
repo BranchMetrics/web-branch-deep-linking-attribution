@@ -39,6 +39,13 @@ then
 	sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" bower.json
 fi
 
+read -p "Bump build number? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	grunt buildnumber
+fi
+
 read -p "Update plugin.xml? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
