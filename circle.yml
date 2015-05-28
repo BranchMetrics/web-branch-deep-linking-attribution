@@ -13,8 +13,9 @@ dependencies:
     - mkdir -p compiler/library
     - stat compiler/library/closure-library-master || (wget https://github.com/google/closure-library/archive/master.zip && unzip master.zip -d compiler/library)
 
-    # Node, Sauce, and JSlint deps
+    # Node, Sauce, Phantom, and JSlint deps
     - npm install
+    - mocha-phantomjs --help || npm install -g mocha-phantomjs
     - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
     - tar -xzf sc-latest-linux.tar.gz
     - jscs --help || npm install -g jscs
@@ -28,3 +29,4 @@ test:
   override:
     - ./lint.sh
     - grunt test
+    - mocha-phantomjs test/integration-test.html

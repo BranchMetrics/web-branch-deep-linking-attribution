@@ -189,7 +189,7 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					urls: ['http://127.0.0.1:9999/test/test.html'/*, 'http://127.0.0.1:9999/test/integration-test.html'*/],
+					urls: ['http://127.0.0.1:9999/test/test.html'/*, 'http://127.0.0.1:9999/test/integration-test.html'*/], // Testing integration with phantom
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
