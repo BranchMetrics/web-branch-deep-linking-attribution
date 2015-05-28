@@ -188,6 +188,7 @@ module.exports = function(grunt) {
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
+					build: grunt.file.readJSON('package.json')["build"],
 					pollInterval: 2000,         // (ms) Note: pollInterval * statusCheckAttempts should = 'max-duration'
 					statusCheckAttempts: 180,   // So if you change one of these, adjust 'max-duration' accordingly
 					'max-duration': 360,        // (s)
@@ -207,6 +208,12 @@ module.exports = function(grunt) {
 					base: ''
 				}
 			}
+		},
+		buildnumber: {
+			options: {
+				field: 'build'
+			},
+			files: ['package.json', 'bower.json']
 		}
 	});
 
@@ -217,5 +224,6 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-saucelabs');
 	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-build-number');
 	grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
 };
