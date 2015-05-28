@@ -87,7 +87,8 @@ describe('Integration tests', function() {
 		it('should return error to callback', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				 assert.equal(err.message, 'Error in API: 400');
+				jsonpCallback--;
+				assert.equal(err.message, 'Error in API: 400');
 			});
 			requests[0].callback(browser_fingerprint_id);
 			requests[1].respond(400);
@@ -96,7 +97,7 @@ describe('Integration tests', function() {
 		it('should attempt 5xx error three times total', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				 assert.equal(err.message, 'Error in API: 500');
+				assert.equal(err.message, 'Error in API: 500');
 			});
 			requests[0].callback(browser_fingerprint_id);
 			requests[1].respond(500);
