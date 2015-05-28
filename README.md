@@ -25,6 +25,10 @@ This SDK requires native browser Javascript and has been tested in all modern br
 |:--------:|:-------:|:--------:|:--------:|
 | &#10004; |&#10004; | &#10004; | 9, 10, 11 |
 
+#### Specific Browser Support Status
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/branchmetrics.svg)](https://saucelabs.com/u/branchmetrics)
+
 ### Branch Key (formerly App ID)
 
 You will need to create a [Branch Metrics app](http://branch.io) to obtain your Branch Key (you will have the option to toggle between live and test modes).
