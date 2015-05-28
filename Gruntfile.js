@@ -10,11 +10,6 @@ var safari_browsers = [
 			browserName: 'safari',
 			platform: 'OS X 10.9',
 			version: '7.0'
-		},
-		{
-			browserName: 'safari',
-			platform: 'OS X 10.8',
-			version: '6.0'
 		}
 	],
 
