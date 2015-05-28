@@ -33,5 +33,5 @@
   "dependencies": {
     "request": "^2.55.0"
   },
-  "build": "5"
+  "build": "6"
 }
