@@ -1,29 +1,35 @@
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
+/* globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
 
 describe('Integration tests', function() {
 	var requests = [], xhr, clock, jsonpCallback = 0;
 
-	beforeEach(function() {
-		sessionStorage.clear();
-		testUtils.go('');
+	before(function() {
 		xhr = sinon.useFakeXMLHttpRequest();
 		clock = sinon.useFakeTimers();
 		xhr.onCreate = function(xhr) { requests.push(xhr); };
 		sinon.stub(branch._server, "createScript", function(src) {
 			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 		});
+	});
+
+	beforeEach(function() {
+		sessionStorage.clear();
+		testUtils.go('');
 		branch.identity_id = identity_id.toString();
 	});
 
 	afterEach(function() {
 		jsonpCallback++;
+		requests = [];
+	});
+
+	after(function() {
+		branch._server.createScript.restore();
 		xhr.restore();
 		clock.restore();
-		branch._server.createScript.restore();
-		requests = [];
 	});
 
 	var sampleParams = {
@@ -81,7 +87,8 @@ describe('Integration tests', function() {
 		it('should return error to callback', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				 assert.equal(err.message, 'Error in API: 400');
+				jsonpCallback--;
+				assert.equal(err.message, 'Error in API: 400');
 			});
 			requests[0].callback(browser_fingerprint_id);
 			requests[1].respond(400);
@@ -90,7 +97,7 @@ describe('Integration tests', function() {
 		it('should attempt 5xx error three times total', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				 assert.equal(err.message, 'Error in API: 500');
+				assert.equal(err.message, 'Error in API: 500');
 			});
 			requests[0].callback(browser_fingerprint_id);
 			requests[1].respond(500);
@@ -102,9 +109,11 @@ describe('Integration tests', function() {
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			var assert = testUtils.plan(1, done);
-			testUtils.go("#r:12345");
-			branchInit();
-			assert.equal(true, requests[1].requestBody.indexOf('link_identifier=12345') > -1);
+			if (testUtils.go("#r:12345")) {
+				branchInit();
+				assert.equal(true, requests[1].requestBody.indexOf('link_identifier=12345') > -1);
+			} else { done(); }
+
 		});
 	});
 

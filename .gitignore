@@ -20,3 +20,4 @@ compiler-latest.zip
 testbeds/cordova/platforms
 testbeds/cordova/plugins
 aws_access_keys.sh
+sauce_access_keys.sh
