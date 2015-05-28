@@ -18,7 +18,7 @@ ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/web/build.js"};s
 
 all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz test/integration-test.html
 clean:
-	rm -f dist/web/** dist/cordova/** docs/3_branch.md README.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
+	rm -f dist/web/** dist/cordova/** docs/web/3_branch.md README.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
 release: clean all dist/web/build.min.js.gz
 	@echo "released"
 
@@ -46,8 +46,8 @@ test/branch-deps.js: $(SOURCES) compiler/library
 	echo "// jscs:disable" | cat - test/branch-deps.js.tmp | sed -e 's#src/0_config.js#test/web-config.js#' > test/branch-deps.js && \
 		rm test/branch-deps.js.tmp
 
-docs/3_branch.md: $(SOURCES)
-	jsdox src/3_branch.js --output docs
+docs/web/3_branch.md: $(SOURCES)
+	jsdox src/3_branch.js --output docs/web
 
 dist/web/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'WEB_BUILD=true' > dist/web/build.js
@@ -71,8 +71,8 @@ else
 	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
 endif
 
-README.md: docs/0_notice.md docs/1_intro.md docs/3_branch.md
-	cat docs/0_notice.md docs/1_intro.md docs/3_branch.md docs/4_footer.md | \
+README.md: docs/web/0_notice.md docs/web/1_intro.md docs/web/3_branch.md
+	cat docs/web/0_notice.md docs/web/1_intro.md docs/web/3_branch.md docs/web/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
 test/integration-test.html: test/integration-test.template.html

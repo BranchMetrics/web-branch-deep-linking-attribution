@@ -16,7 +16,7 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 
 ### Requirements
 
-This SDK requires native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as is it 100% native Javascript.
+This SDK requires only native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as it is 100% native Javascript.
 
 ### Browser Specific Support
 
