@@ -1,12 +1,8 @@
 # Branch Metrics Cordova SDK
 
-This README outlines the functionality of the Branch Metrics Cordova SDK, and how to easily incorporate it into a Cordova app. The Cordova SDK is a sliht modification of the Branch Web SDK, and includes all of the same API methods.
+This README outlines the functionality of the Branch Metrics Cordova SDK, and how to easily incorporate it into a Cordova app. The Cordova SDK is a slight modification of the Branch Web SDK, and includes all of the same API methods.
 
 Live demo of the Web SDK: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
-
-## Overview
-
-The Branch Cordova SDK provides an easy way to interact with the Branch API within your Cordova app. It requires no frameworks besides Cordova itself, and is only ~7K gzipped.
 
 To use the Cordova SDK, you'll need to first initialize it with your Branch Key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
 
