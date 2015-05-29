@@ -17,7 +17,7 @@ Once initialized, the Branch Web SDK allows you to create and share links with a
 Getting started with either a Web or Cordova integration is simple, and begins with obtaining a Branch Key. You can sign up for your own Branch Key at [https://dashboard.branch.io](https://dashboard.branch.io)
 
 ## Web Based Integration
-### [Complete Documentation for the Web SDK](WEB_GUIDE.md)
+### [Full Documentation for the Web SDK](WEB_GUIDE.md)
 
 Adding the Branch Web SDK source code to your project can be done manually, or by using Bower or npm: `bower install branch-sdk` or `npm install branch-sdk` respectively.
 
@@ -37,7 +37,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```
 
 ## Cordova/PhoneGap
-### [Complete Documentation for the Cordova Web SDK](CORDOVA_GUIDE.md)
+### [Full Documentation for the Cordova Web SDK](CORDOVA_GUIDE.md)
 
 The Web SDK is provided as a plugin for Cordova and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
 
