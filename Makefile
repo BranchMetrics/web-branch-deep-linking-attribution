@@ -16,9 +16,9 @@ ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/web/build.js"};s
 
 .PHONY: clean
 
-all: dist/web/build.min.js dist/web/build.js README.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz test/integration-test.html
+all: dist/web/build.min.js dist/web/build.js README.md CORDOVA_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz test/integration-test.html
 clean:
-	rm -f dist/web/** dist/cordova/** docs/web/3_branch.md README.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
+	rm -f dist/web/** dist/cordova/** docs/web/3_branch_web.md docs/cordova/3_branch_cordova.md README.md CORDOVA_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
 release: clean all dist/web/build.min.js.gz
 	@echo "released"
 
@@ -46,8 +46,15 @@ test/branch-deps.js: $(SOURCES) compiler/library
 	echo "// jscs:disable" | cat - test/branch-deps.js.tmp | sed -e 's#src/0_config.js#test/web-config.js#' > test/branch-deps.js && \
 		rm test/branch-deps.js.tmp
 
-docs/web/3_branch.md: $(SOURCES)
-	jsdox src/3_branch.js --output docs/web
+docs/cordova/3_branch_cordova.md: $(SOURCES)
+	perl -pe 's/\/\*\*\ =WEB/\/\*\*\*/gx' src/3_branch.js > src/3_branch_cordova.js
+	jsdox src/3_branch_cordova.js --output docs/cordova
+	rm src/3_branch_cordova.js
+
+docs/web/3_branch_web.md: $(SOURCES)
+	perl -pe 's/\/\*\*\ =CORDOVA/\/\*\*\*/gx' src/3_branch.js > src/3_branch_web.js
+	jsdox src/3_branch_web.js --output docs/web
+	rm src/3_branch_web.js
 
 dist/web/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
 	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'WEB_BUILD=true' > dist/web/build.js
@@ -71,9 +78,13 @@ else
 	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
 endif
 
-README.md: docs/web/0_notice.md docs/web/1_intro.md docs/web/3_branch.md
-	cat docs/web/0_notice.md docs/web/1_intro.md docs/web/3_branch.md docs/web/4_footer.md | \
+README.md: docs/0_notice.md docs/web/1_intro.md docs/web/3_branch_web.md docs/4_footer.md
+	cat docs/0_notice.md docs/web/1_intro.md docs/web/3_branch_web.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
+
+CORDOVA_GUIDE.md: docs/0_notice.md docs/cordova/1_intro.md docs/cordova/3_branch_cordova.md docs/4_footer.md
+	cat docs/0_notice.md docs/cordova/1_intro.md docs/cordova/3_branch_cordova.md docs/4_footer.md | \
+		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > CORDOVA_GUIDE.md
 
 test/integration-test.html: test/integration-test.template.html
 	perl -pe 'BEGIN{$$a="$(ONPAGE_TEST)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html

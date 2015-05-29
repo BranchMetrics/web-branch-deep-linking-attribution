@@ -150,7 +150,7 @@ Branch.prototype._referringLink = function() {
 };
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
  *
@@ -158,8 +158,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * instead of possibly using the same device id.  This is useful when testing.
  *
  * This needs to be set before the Branch.init call!!!
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
  *
  * ---
  *
@@ -341,7 +339,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 });
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -351,9 +349,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * later point.
  * If the Branch session has already been initialized, the callback will return
  * immediately, otherwise, it will return once Branch has been initialized.
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
@@ -434,7 +429,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 });
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
  *
@@ -453,9 +448,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *      "Error message"
  * );
  * ```
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * ## Tracking events
@@ -823,7 +815,6 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  *      }
  * );
  * ```
- *
  * ___
  *
  */
@@ -1192,7 +1183,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 });
 
 if (WEB_BUILD) { // jshint undef:false
-/**
+/** =WEB
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
  * @param {Object} data - _required_ - object of all link data, same as Branch.link()

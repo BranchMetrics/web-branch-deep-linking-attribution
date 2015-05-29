@@ -6,23 +6,6 @@
 
 * * *
 
-### setDebug(debug) 
-
-**Parameters**
-
-**debug**: `boolean`, _required_ - Set the SDK debug flag.
-
-Setting the SDK debug flag will generate a new device ID each time the app is installed
-instead of possibly using the same device id.  This is useful when testing.
-
-This needs to be set before the Branch.init call!!!
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
----
-
-
-
 ### init(branch_key, options, callback) 
 
 **Parameters**
@@ -93,25 +76,6 @@ ___
 
 
 
-### first(callback) 
-
-**Parameters**
-
-**callback**: `function`, _optional_ - callback to read the session data.
-
-Returns the same session information and any referring data, as
-`Branch.init` did when the app was first installed. This is meant to be called
-after `Branch.init` has been called if you need the first session information at a
-later point.
-If the Branch session has already been initialized, the callback will return
-immediately, otherwise, it will return once Branch has been initialized.
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
-___
-
-
-
 ### setIdentity(identity, callback) 
 
 **Parameters**
@@ -172,36 +136,6 @@ callback(
 );
 ```
 ___
-
-
-
-### close(callback) 
-
-**Parameters**
-
-**callback**: `function`, _optional_
-
-Close the current session.
-
-##### Usage
-```js
-branch.close(
-    callback (err)
-);
-```
-
-##### Callback Format
-```js
-callback(
-     "Error message"
-);
-```
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
-___
-
-## Tracking events
 
 
 
@@ -876,6 +810,8 @@ This will add exactly the space required to show the app banner above your navig
 
 
 ### banner(options, data) 
+
+=WEB
 
 **Parameters**
 
