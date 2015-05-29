@@ -1,6 +1,6 @@
-# Branch Metrics Cordova SDK
+# Full Documentation for Cordova SDK
 
-This README outlines the functionality of the Branch Metrics Cordova SDK, and how to easily incorporate it into a Cordova app. The Cordova SDK is a slight modification of the Branch Web SDK, and includes all of the same API methods.
+This documentation outlines the functionality of the Branch Metrics Cordova SDK, and how to easily incorporate it into a Cordova app. The Cordova SDK shares the same code base as the Branch Web SDK, and includes functions to call all of the same API endpoints.
 
 Live demo of the Web SDK: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
 
@@ -26,7 +26,7 @@ This Web SDK can also be used for Cordova/Phonegap applications.  It is provided
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
 ```
 
-Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
+Note that this SDK is meant for use with full Cordova/PhoneGap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
 
 #### Initialization and Event Handling
 
@@ -56,27 +56,3 @@ branch.banner(...);
 
 If `branch.init()` fails, all subsequent branch methods will fail.
 
-## API Reference
-
-1. Branch Session
-  + [.init()](#initbranch_key-options)
-  + [.setIdentity()](#setidentityidentity-callback)
-  + [.logout()](#logoutcallback)
-
-1. Event Tracking Methods
-  + [.track()](#trackevent-metadata-callback)
-
-1. Deeplinking Methods
-   + [.link()](#linkdata-callback)
-   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
-
-1. Referral Methods
-   + [.referrals()](#referralscallback)
-   + [.getCode()](#getcodeoptions-callback)
-   + [.validateCode()](##validatecodecode-callback)
-   + [.applyCode()](#applycodecode-callback)
-   + [.credits()](#creditscallback)
-   + [.creditHistory()](#credithistoryoptions-callback)
-   + [.redeem()](#redeemamount-bucket-callback)
-
-___

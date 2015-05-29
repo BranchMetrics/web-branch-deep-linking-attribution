@@ -1,6 +1,6 @@
-# Branch Metrics Web SDK
+# Full Documentation for Web SDK
 
-This README outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a web app.
+This documentation outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a web app.
 
 Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
 
@@ -73,31 +73,3 @@ branch.banner(...);
 ```
 
 If `branch.init()` fails, all subsequent branch methods will fail.
-
-## API Reference
-
-1. Branch Session
-  + [.init()](#initbranch_key-options)
-  + [.setIdentity()](#setidentityidentity-callback)
-  + [.logout()](#logoutcallback)
-
-1. Event Tracking Methods
-  + [.track()](#trackevent-metadata-callback)
-
-1. Deeplinking Methods
-   + [.link()](#linkdata-callback)
-   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
-
-1. Referral Methods
-   + [.referrals()](#referralscallback)
-   + [.getCode()](#getcodeoptions-callback)
-   + [.validateCode()](##validatecodecode-callback)
-   + [.applyCode()](#applycodecode-callback)
-   + [.credits()](#creditscallback)
-   + [.creditHistory()](#credithistoryoptions-callback)
-   + [.redeem()](#redeemamount-bucket-callback)
-
-1. Smart Banner
-   + [.banner()](#smart-app-sharing-banner)
-
-___
