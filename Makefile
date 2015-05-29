@@ -69,13 +69,13 @@ endif
 
 docs/cordova/3_branch_cordova.md: $(SOURCES)
 	perl -pe 's/\/\*\*\ =WEB/\/\*\*\*/gx' src/3_branch.js > src/3_branch_cordova.js
-	perl -pe -i 's/=CORDOVA//gx' src/3_branch_cordova.js > src/3_branch_cordova.js
+	perl -p -i -e 's/=CORDOVA//gx' src/3_branch_cordova.js
 	jsdox src/3_branch_cordova.js --output docs/cordova
 	rm src/3_branch_cordova.js
 
 docs/web/3_branch_web.md: $(SOURCES)
 	perl -pe 's/\/\*\*\ =CORDOVA/\/\*\*\*/gx' src/3_branch.js > src/3_branch_web.js
-	perl -pe -i 's/=WEB//gx' src/3_branch_web.js > src/3_branch_web.js
+	perl -p -i -e 's/=WEB//gx' src/3_branch_web.js
 	jsdox src/3_branch_web.js --output docs/web
 	rm src/3_branch_web.js
 
