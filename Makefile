@@ -67,6 +67,8 @@ else
 	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > testbeds/web/example.html
 endif
 
+# Documentation
+
 docs/cordova/3_branch_cordova.md: $(SOURCES)
 	perl -pe 's/\/\*\*\ =WEB/\/\*\*\*/gx' src/3_branch.js > src/3_branch_cordova.js
 	perl -p -i -e 's/=CORDOVA//gx' src/3_branch_cordova.js
@@ -80,7 +82,8 @@ docs/web/3_branch_web.md: $(SOURCES)
 	rm src/3_branch_web.js
 
 README.md: docs/0_notice.md docs/readme/1_intro.md docs/4_footer.md
-	cat docs/0_notice.md docs/readme/1_intro.md docs/4_footer.md > README.md
+	cat docs/0_notice.md docs/readme/1_intro.md docs/4_footer.md | \
+		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
 WEB_GUIDE.md: docs/0_notice.md docs/web/1_intro.md docs/web/3_branch_web.md docs/4_footer.md
 	cat docs/0_notice.md docs/web/1_intro.md docs/2_table_of_contents.md docs/web/3_branch_web.md docs/4_footer.md | \

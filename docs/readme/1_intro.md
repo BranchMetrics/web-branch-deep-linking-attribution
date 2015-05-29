@@ -1,6 +1,6 @@
 # Branch Metrics Web SDK
 
-This README outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a Web or PhoneGap/Cordova app.
+This README outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a [Web](WEB_GUIDE.md#linkdata-callback) or [Cordova/PhoneGap](CORDOVA_GUIDE.md#linkdata-callback) app.
 
 Live demo of a web based implementation: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
 
@@ -10,7 +10,45 @@ The Branch Web SDK provides an easy way to interact with the Branch API on your 
 
 To use the Web SDK, you'll need to first initialize it with your Branch Key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
 
-Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
+Once initialized, the Branch Web SDK allows you to create and share links with a banner (web only), over SMS, or your own methods by generating deep links. It also offers event tracking, access to referrals, and management of credits.
+
+## Register you app
+
+Getting started with either a Web or Cordova integration is simple, and begins with obtaining a Branch Key. You can sign up for your own Branch Key at [https://dashboard.branch.io](https://dashboard.branch.io)
+
+## Web Based Integration
+Adding the Branch Web SDK source code to your project can be done manually, or by using Bower or npm: `bower install branch-sdk` or `npm install branch-sdk` respectively.
+
+_Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+
+**[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test Branch Keys.
+
+```html
+<script type="text/javascript">
+
+	// INSERT INIT CODE
+
+	branch.init('BRANCH KEY', function(err, data) {
+    	// callback to handle err or data
+	});
+</script>
+```
+
+## Cordova/PhoneGap
+
+The Web SDK is provided as a plugin for Cordova and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
+
+```sh
+cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
+```
+
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+
+```js
+  branch.init("YOUR BRANCH KEY HERE", function(err, data) {
+  	app.initComplete(err, data);
+  });
+```
 
 ## Commonly Used Features
 

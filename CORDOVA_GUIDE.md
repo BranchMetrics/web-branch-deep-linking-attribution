@@ -21,7 +21,7 @@ This deep link routing callback is called 100% of the time on init, with your li
 
 ### Quick Install of Cordova/Phonegap SDK
 
-This Web SDK can also be used for Cordova/Phonegap applications.  It is provided as a plugin and can be installed with cordova plugin or the plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
+This Web SDK can also be used for Cordova/Phonegap applications.  It is provided as a plugin and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
 
 ```sh
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
