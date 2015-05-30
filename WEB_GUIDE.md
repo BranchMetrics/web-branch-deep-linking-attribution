@@ -103,7 +103,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.banner()](#smart-app-sharing-banner)
 
 ___
-# Global
+
 
 
 

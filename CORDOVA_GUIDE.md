@@ -167,7 +167,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.redeem()](#redeemamount-bucket-callback)
 
 ___
-# Global
+
 
 
 

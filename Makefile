@@ -89,11 +89,13 @@ WEB_GUIDE.md: docs/0_notice.md docs/web/1_intro.md docs/web/3_branch_web.md docs
 	perl build_utils/toc_generator.pl src/3_branch.js docs/web/2_table_of_contents.md WEB
 	cat docs/0_notice.md docs/web/1_intro.md docs/web/2_table_of_contents.md docs/web/3_branch_web.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > WEB_GUIDE.md
+	perl -p -i -e 's/# Global//' WEB_GUIDE.md
 
 CORDOVA_GUIDE.md: docs/0_notice.md docs/cordova/1_intro.md docs/cordova/3_branch_cordova.md docs/4_footer.md
 	perl build_utils/toc_generator.pl src/3_branch.js docs/cordova/2_table_of_contents.md CORDOVA
 	cat docs/0_notice.md docs/cordova/1_intro.md docs/cordova/2_table_of_contents.md docs/cordova/3_branch_cordova.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > CORDOVA_GUIDE.md
+	perl -p -i -e 's/# Global//' CORDOVA_GUIDE.md
 
 test/integration-test.html: test/integration-test.template.html
 	perl -pe 'BEGIN{$$a="$(ONPAGE_TEST)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html
