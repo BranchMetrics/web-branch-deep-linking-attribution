@@ -6,9 +6,10 @@
 # Documenting this here so some poor soul doesn't come along X years in the future wondering what the hell this does.
 #
 # Using this thing is pretty simple.
-# There are two arguments:
-# (1) *Required* the file you want it to read,
-# (2) *Required* The target you'rr emaking the Table of contents for: WEB, CORDOVA, etc.
+# There are three arguments:
+# (1) *Required* the file you want it to read from.
+# (2) *Required* the file you want it to write the results to.
+# (3) *Required* The target you'rr emaking the Table of contents for: WEB, CORDOVA, etc.
 #
 # Example:
 # $ perl toc_generator.pl YOUR_SWEET_FILE.js TARGET
@@ -32,14 +33,16 @@
 #
 # That's all!
 
-my $file = @ARGV[0];
-my $target = @ARGV[1] || "WEB";
+my $read_file = @ARGV[0];
+my $write_file = @ARGV[1];
+my $target = @ARGV[2] || "WEB";
 my @file_array;
 my @toc_output;
 my $heading_count = 1;
+my $export_string;
 
 # Read the file in the first argument
-open(my $fh, "<", $file) or die "Sorry Hommie: $!\n";
+open(my $fh, "<", $read_file) or die "Sorry Hommie: $!\n";
 while(<$fh>) {
     chomp;
     push @file_array, $_;
@@ -54,16 +57,22 @@ my $item_regex = '\\/\\*\\*\\* \\+TOC_ITEM (#.*?) &([\w\s.,_\(\)]+?)& \\^(.*?) \
 foreach $file_line (@file_array) {
 	my @heading_matches = $file_line =~ m/$heading_regex/g;
 	if ($#heading_matches > 0 && (@heading_matches[1] eq $target || @heading_matches[1] eq "ALL")) {
-		if ($heading_count != 1) { print "\n"; } # Extra new line between headings
-		print $heading_count.". ".@heading_matches[0]."\n";
+		if ($heading_count != 1) { $export_string .= "\n"; } # Extra new line between headings
+		$export_string .= $heading_count.". ".@heading_matches[0]."\n";
 		$heading_count++;
 	}
 	my @item_matches = $file_line =~ m/$item_regex/g;
 	if ($#item_matches > 0 && (@item_matches[2] eq $target || @item_matches[2] eq "ALL")) {
-		#print @item_matches[2]."\n";
-		print '  + ['.@item_matches[1].']('.@item_matches[0].")\n";
+		$export_string .= '  + ['.@item_matches[1].']('.@item_matches[0].")\n";
 	}
 }
 # Visual horizontal rule seperator for documentation
-print "\n___\n";
+$export_string .= "\n___\n";
 
+open(my $fh, '>', $write_file) or die "Sorry Hommie: $!";
+print $fh $export_string;
+close $fh;
+
+print "Done generating table of contents\n";
+print "Target: $target\n";
+print "Written to: $write_file\n";
