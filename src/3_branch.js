@@ -215,6 +215,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
+/*** +TOC_HEADING &Branch Session& ^ALL ***/
 /*** +TOC_ITEM #initbranch_key-options &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
 	var self = this;
@@ -500,6 +501,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ## Creating a deep linking link
  *
  */
+/*** +TOC_HEADING &Event Tracking& ^ALL ***/
 /*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
 	if (!metadata) {
@@ -603,6 +605,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * ```
  *
  */
+/*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	this._api(resources.link, utils.cleanLinkData(data, config), function(err, data) {
@@ -773,6 +776,7 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
  * ## Referral Codes
  *
  */
+/*** +TOC_HEADING &Referrals and Credits& ^ALL ***/
 /*** +TOC_ITEM #referralscallback &.referrals()& ^ALL ***/
 Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.referrals, { }, done);
@@ -1281,6 +1285,7 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  */
+ 	/*** +TOC_HEADING &Smart Banner& ^ALL ***/
  	/*** +TOC_ITEM #smart-app-sharing-banner &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }

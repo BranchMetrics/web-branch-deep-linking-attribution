@@ -17,6 +17,8 @@
 # 1. TOC headings:     /*** +TOC_HEADING &Name of heading& ^TARGET ***/
 # 2. TOC items:        /*** +TOC_ITEM #anchor-link-on-github &.nameOfMethod()&  ^TARGET ***/
 #
+# HOT TIP OF THE DAY: We use /*** and not /** to comment the lines out because then JSDoc will ignore it :-P
+#
 # The file is read from top to bottom, and the TOC headings and items are written
 # to the table of contents in the order they are matched in the file, in this format:
 # 1. Branch Session
@@ -33,6 +35,7 @@ my $file = @ARGV[0];
 my $target = @ARGV[1];
 my @file_array;
 my @toc_output;
+my $heading_count = 1;
 
 # Read the file in the first argument
 open(my $fh, "<", $file) or die "Sorry Hommie: $!\n";
@@ -48,17 +51,18 @@ my $heading_regex = '\\/\\*\\*\\* \\+TOC_HEADING &([\w\s.,_\(\)]+?)& \\^(.*?) \\
 
 # Look for matches
 foreach $file_line (@file_array) {
-	my @heading_matches = $file_line =~ m/$item_regex/g;
+	my @heading_matches = $file_line =~ m/$heading_regex/g;
+	if ($#heading_matches > 0) {
+		if ($heading_count != 1) {
+			print "\n";
+		}
+		print $heading_count.". ".@heading_matches[0]."\n";
+		$heading_count++;
+	}
 	my @item_matches = $file_line =~ m/$item_regex/g;
 	if ($#item_matches > 0) {
-		print @item_matches[2]."\n";
-		print '  + ['.@item_matches[1].']('.@item_matches[0].")\n\n";
+		#print @item_matches[2]."\n";
+		print '  + ['.@item_matches[1].']('.@item_matches[0].")\n";
 	}
 }
 
-#@item_matches = $file_string =~ m/$item_regex/g;
-
-# fuck this, makes more sense to loop by lines and build up an array that way
-# foreach $match (@item_matches) {
-#	print "$match\n";
-# }
