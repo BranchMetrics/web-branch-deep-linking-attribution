@@ -8,7 +8,7 @@
 # Using this thing is pretty simple.
 # There are two arguments:
 # (1) *Required* the file you want it to read,
-# (2) *Required* The you'r emaking the Table of contents for: WEB, CORDOVA, etc.
+# (2) *Required* The target you'rr emaking the Table of contents for: WEB, CORDOVA, etc.
 #
 # Example:
 # $ perl toc_generator.pl YOUR_SWEET_FILE.js TARGET
@@ -26,7 +26,7 @@
 #  + [.init()](#initbranch_key-options)
 #  + [.setIdentity()](#setidentityidentity-callback)
 #
-# Motivation for doing this: I kept forgetting to add new links at the top to new methods,
+# Motivation for doing this: I kept forgetting to add new links at the top of the documentation for new methods,
 # and to update the links if I changed the name of the method or the arguments. Plus, it just
 # made sense to have all this in-line with the source code, since the rest of the documentation was that way.
 #
