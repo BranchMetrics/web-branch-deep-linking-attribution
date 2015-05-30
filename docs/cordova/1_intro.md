@@ -45,7 +45,10 @@ Here is the location of the Branch Key that you will need for the `branch.init` 
 
 The session close will be sent automatically on any ‘pause’ event.
 
-### Add your branch key to your project
+_____
+
+### Android Manifest
+#### Add your branch key to your project
 
 After you register your app, your branch key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard. Now you need to add it (them, if you want to do it for both your live and test apps) to your project.
 
@@ -62,7 +65,7 @@ Edit your manifest file by adding the following new meta-data:
 </application>
 ```
 
-### Register an activity for direct deep linking (optional but recommended)
+#### Register an activity for direct deep linking (optional but recommended)
 
 In your project's manifest file, you can register your app to respond to direct deep links (yourapp:// in a mobile browser) by adding the second intent filter block. Also, make sure to change **yourapp** to a unique string that represents your app name.
 
@@ -91,6 +94,39 @@ Typically, you would register some sort of splash activitiy that handles routing
 	</intent-filter>
 </activity>
 ```
+_____
+
+### iOS plist
+
+#### Add your Branch Key to your project
+
+After you register your app, your Branch Key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard. Now you need to add it to YourProject-Info.plist (Info.plist for Swift).
+
+1. In plist file, mouse hover "Information Property List" which is the root item under the Key column.
+1. After about half a second, you will see a "+" sign appear. Click it.
+1. In the newly added row, fill in "branch_key" for its key, leave type as String, and enter your app's Branch Key obtained in above steps in the value column.
+1. Save the plist file.
+
+#### Register a URI scheme direct deep linking (optional but recommended)
+
+You can register your app to respond to direct deep links (yourapp:// in a mobile browser) by adding a URI scheme in the YourProject-Info.plist file. Make sure to change **yourapp** to a unique string that represents your app name.
+
+1. In Xcode, click on YourProject-Info.plist on the left.
+1. Find URL Types and click the right arrow. (If it doesn't exist, right click anywhere and choose Add Row. Scroll down and choose URL Types)
+1. Add "yourapp", where yourapp is a unique string for your app, as an item in URL Schemes as below:
+
+![URL Scheme Demo](https://s3-us-west-1.amazonaws.com/branchhost/urlScheme.png)
+
+Alternatively, you can add the URI scheme in your project's Info page.
+
+1. In Xcode, click your project in the Navigator (on the left side).
+1. Select the "Info" tab.
+1. Expand the "URL Types" section at the bottom.
+1. Click the "+" sign to add a new URI Scheme, as below:
+
+![URL Scheme Demo](https://s3-us-west-1.amazonaws.com/branchhost/urlType.png)
+
+_____
 
 ### SDK Method Queue
 
