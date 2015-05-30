@@ -1,5 +1,3 @@
-## API Reference
-
 1. Branch Session
   + [.init()](#initbranch_key-options)
   + [.setIdentity()](#setidentityidentity-callback)

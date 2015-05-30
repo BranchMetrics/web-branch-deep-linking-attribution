@@ -73,3 +73,6 @@ branch.banner(...);
 ```
 
 If `branch.init()` fails, all subsequent branch methods will fail.
+
+## API Reference
+

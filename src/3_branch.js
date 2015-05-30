@@ -1285,7 +1285,7 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  */
- 	/*** +TOC_HEADING &Smart Banner& ^ALL ***/
+ 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
  	/*** +TOC_ITEM #smart-app-sharing-banner &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }

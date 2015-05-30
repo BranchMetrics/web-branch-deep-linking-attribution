@@ -8,10 +8,11 @@
 # Using this thing is pretty simple.
 # There are two arguments:
 # (1) *Required* the file you want it to read,
-# (2) *Required* The you'r emaking the Table of contents for: ALL, WEB, CORDOVA, etc.
+# (2) *Required* The you'r emaking the Table of contents for: WEB, CORDOVA, etc.
 #
 # Example:
 # $ perl toc_generator.pl YOUR_SWEET_FILE.js TARGET
+# *Note* The default for TARGET is 'WEB', if left blank.
 #
 # TOC Generator will read the entire contents of the file, and look for two matches, in this format:
 # 1. TOC headings:     /*** +TOC_HEADING &Name of heading& ^TARGET ***/
@@ -32,7 +33,7 @@
 # That's all!
 
 my $file = @ARGV[0];
-my $target = @ARGV[1];
+my $target = @ARGV[1] || "WEB";
 my @file_array;
 my @toc_output;
 my $heading_count = 1;
@@ -46,23 +47,23 @@ while(<$fh>) {
 close $fh;
 
 # All the regex's
-my $item_regex = '\\/\\*\\*\\* \\+TOC_ITEM (#.*?) &([\w\s.,_\(\)]+?)& \\^(.*?) \\*\\*\\*\\/';
 my $heading_regex = '\\/\\*\\*\\* \\+TOC_HEADING &([\w\s.,_\(\)]+?)& \\^(.*?) \\*\\*\\*\\/';
+my $item_regex = '\\/\\*\\*\\* \\+TOC_ITEM (#.*?) &([\w\s.,_\(\)]+?)& \\^(.*?) \\*\\*\\*\\/';
 
 # Look for matches
 foreach $file_line (@file_array) {
 	my @heading_matches = $file_line =~ m/$heading_regex/g;
-	if ($#heading_matches > 0) {
-		if ($heading_count != 1) {
-			print "\n";
-		}
+	if ($#heading_matches > 0 && (@heading_matches[1] eq $target || @heading_matches[1] eq "ALL")) {
+		if ($heading_count != 1) { print "\n"; } # Extra new line between headings
 		print $heading_count.". ".@heading_matches[0]."\n";
 		$heading_count++;
 	}
 	my @item_matches = $file_line =~ m/$item_regex/g;
-	if ($#item_matches > 0) {
+	if ($#item_matches > 0 && (@item_matches[2] eq $target || @item_matches[2] eq "ALL")) {
 		#print @item_matches[2]."\n";
 		print '  + ['.@item_matches[1].']('.@item_matches[0].")\n";
 	}
 }
+# Visual horizontal rule seperator for documentation
+print "\n___\n";
 
