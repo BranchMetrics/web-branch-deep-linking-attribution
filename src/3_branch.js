@@ -1061,7 +1061,9 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * callback("Error message");
  * ```
  * ___
- *
+ */
+
+/** =WEB
  * # Smart App Sharing Banner
  *
  * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
@@ -1105,7 +1107,7 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * );
  * ```
  *
- * ### Enabed Platforms _optional_
+ * ### Enabled Platforms _optional_
  * The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
  * ```js
  * branch.banner(
