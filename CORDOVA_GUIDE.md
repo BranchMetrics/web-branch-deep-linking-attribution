@@ -4,7 +4,7 @@
 
 Branch is available through [Cordova](http://plugins.cordova.io/#/package/io.branchmetrics.branchreferral), to install it simply execute the following line in terminal, while in your project directory:
 
-    cordova plugin add io.branchmetrics.branchreferral
+    cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
 
 ### Register you app
 
