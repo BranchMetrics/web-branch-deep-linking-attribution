@@ -215,6 +215,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
+/*** +TOC_ITEM #initbranch_key-options &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
 	var self = this;
 	self.init_state = init_states.INIT_PENDING;
@@ -332,6 +333,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
+/*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(utils.readStore(this._storage));
 	data['referring_link'] = this._referringLink();
@@ -352,6 +354,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ___
  *
  */
+ 	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 	});
@@ -390,6 +393,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  * ___
  */
+/*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
@@ -424,6 +428,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
  * ___
  *
  */
+/*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
@@ -453,6 +458,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ## Tracking events
  *
  */
+	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
 		this._api(resources.close, { }, function(err, data) {
@@ -494,6 +500,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ## Creating a deep linking link
  *
  */
+/*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
 	if (!metadata) {
 		metadata = { };
@@ -596,6 +603,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * ```
  *
  */
+/*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	this._api(resources.link, utils.cleanLinkData(data, config), function(err, data) {
 		done(err, data && data['url']);
@@ -686,6 +694,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ## Retrieve referrals list
  *
  */
+/*** +TOC_ITEM #sendsmsphone-linkdata-options-callback &.sendSMS()& ^ALL ***/
 Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, phone, linkData, options) {
 	var self = this;
 	if (typeof options == 'function') {
@@ -764,6 +773,7 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
  * ## Referral Codes
  *
  */
+/*** +TOC_ITEM #referralscallback &.referrals()& ^ALL ***/
 Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.referrals, { }, done);
 });
@@ -818,6 +828,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  * ___
  *
  */
+/*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
 Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	data.type = "credit";
 	data.creation_type = 2;
@@ -866,6 +877,7 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  * ___
  *
  */
+/*** +TOC_ITEM #validatecodecode-callback &.validateCode()& ^ALL ***/
 Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(resources.validateCode, { "code": code }, done);
 });
@@ -913,6 +925,7 @@ Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(d
  * ## Credit Functions
  *
  */
+/*** +TOC_ITEM #applycodecode-callback &.applyCode()& ^ALL ***/
 Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(resources.applyCode, { "code": code }, done);
 });
@@ -944,6 +957,7 @@ Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done
  * ```
  *
  */
+/*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
 Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.credits, { }, done);
 });
@@ -1022,6 +1036,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  * ## Credit redemption
  *
  */
+/*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
 Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, options) {
 	this._api(resources.creditHistory, options || { }, done);
 });
@@ -1180,6 +1195,7 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * This will add exactly the space required to show the app banner above your navigation header!
  *
  */
+ /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
@@ -1265,6 +1281,7 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  */
+ 	/*** +TOC_ITEM #smart-app-sharing-banner &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }
 		var bannerOptions = {
