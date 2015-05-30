@@ -150,7 +150,7 @@ Branch.prototype._referringLink = function() {
 };
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
  *
@@ -158,8 +158,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * instead of possibly using the same device id.  This is useful when testing.
  *
  * This needs to be set before the Branch.init call!!!
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
  *
  * ---
  *
@@ -217,6 +215,8 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
+/*** +TOC_HEADING &Branch Session& ^ALL ***/
+/*** +TOC_ITEM #initbranch_key-options &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
 	var self = this;
 	self.init_state = init_states.INIT_PENDING;
@@ -334,6 +334,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
+/*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(utils.readStore(this._storage));
 	data['referring_link'] = this._referringLink();
@@ -341,7 +342,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 });
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -351,12 +352,10 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * later point.
  * If the Branch session has already been initialized, the callback will return
  * immediately, otherwise, it will return once Branch has been initialized.
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
+ 	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 	});
@@ -395,6 +394,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  * ___
  */
+/*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
@@ -429,12 +429,13 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
  * ___
  *
  */
+/*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
  *
@@ -453,14 +454,12 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *      "Error message"
  * );
  * ```
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * ## Tracking events
  *
  */
+	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
 		this._api(resources.close, { }, function(err, data) {
@@ -502,6 +501,8 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ## Creating a deep linking link
  *
  */
+/*** +TOC_HEADING &Event Tracking& ^ALL ***/
+/*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
 	if (!metadata) {
 		metadata = { };
@@ -604,6 +605,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * ```
  *
  */
+/*** +TOC_HEADING &Deep Linking& ^ALL ***/
+/*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	this._api(resources.link, utils.cleanLinkData(data, config), function(err, data) {
 		done(err, data && data['url']);
@@ -694,6 +697,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ## Retrieve referrals list
  *
  */
+/*** +TOC_ITEM #sendsmsphone-linkdata-options-callback &.sendSMS()& ^ALL ***/
 Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, phone, linkData, options) {
 	var self = this;
 	if (typeof options == 'function') {
@@ -772,6 +776,8 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
  * ## Referral Codes
  *
  */
+/*** +TOC_HEADING &Referrals and Credits& ^ALL ***/
+/*** +TOC_ITEM #referralscallback &.referrals()& ^ALL ***/
 Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.referrals, { }, done);
 });
@@ -823,10 +829,10 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  *      }
  * );
  * ```
- *
  * ___
  *
  */
+/*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
 Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	data.type = "credit";
 	data.creation_type = 2;
@@ -875,6 +881,7 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  * ___
  *
  */
+/*** +TOC_ITEM #validatecodecode-callback &.validateCode()& ^ALL ***/
 Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(resources.validateCode, { "code": code }, done);
 });
@@ -922,6 +929,7 @@ Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(d
  * ## Credit Functions
  *
  */
+/*** +TOC_ITEM #applycodecode-callback &.applyCode()& ^ALL ***/
 Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(resources.applyCode, { "code": code }, done);
 });
@@ -953,6 +961,7 @@ Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done
  * ```
  *
  */
+/*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
 Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.credits, { }, done);
 });
@@ -1031,6 +1040,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  * ## Credit redemption
  *
  */
+/*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
 Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, options) {
 	this._api(resources.creditHistory, options || { }, done);
 });
@@ -1070,7 +1080,9 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * callback("Error message");
  * ```
  * ___
- *
+ */
+
+/** =WEB
  * # Smart App Sharing Banner
  *
  * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
@@ -1114,7 +1126,7 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * );
  * ```
  *
- * ### Enabed Platforms _optional_
+ * ### Enabled Platforms _optional_
  * The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
  * ```js
  * branch.banner(
@@ -1187,12 +1199,13 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * This will add exactly the space required to show the app banner above your navigation header!
  *
  */
+ /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
 
 if (WEB_BUILD) { // jshint undef:false
-/**
+/** =WEB
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
  * @param {Object} data - _required_ - object of all link data, same as Branch.link()
@@ -1272,6 +1285,8 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  */
+ 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
+ 	/*** +TOC_ITEM #smart-app-sharing-banner &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }
 		var bannerOptions = {
