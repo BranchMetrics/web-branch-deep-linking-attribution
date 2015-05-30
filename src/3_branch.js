@@ -1115,7 +1115,7 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * ```
  *
  * ### Enabed Platforms _optional_
- * The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
+ * The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. *Note*: `showiPad` overrides `showiOS`, so that if `showiOS: false` and `showiPad: true`, the banner will still be shown on iPads. You can easily customize which platforms see the app banner as follows:
  * ```js
  * branch.banner(
  *     {
@@ -1126,6 +1126,7 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  *          // Platforms customization
  *          showDesktop: false,
  *          showiOS: true,
+ *          showiPad: true,
  *          showAndroid: true
  *     },
  *     {... link data ...}
@@ -1227,7 +1228,8 @@ if (WEB_BUILD) { // jshint undef:false
  *     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
  *     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
  *     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
- *     showiOS: true,                          // Should the banner be shown on iOS devices?
+ *     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
+ *     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
  *     showAndroid: true,                      // Should the banner be shown on Android devices?
  *     showDesktop: true,                      // Should the banner be shown on desktop devices?
  *     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
@@ -1284,6 +1286,7 @@ if (WEB_BUILD) { // jshint undef:false
 			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
 			iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
 			showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
+			showiPad: typeof options['showiPad'] == 'undefined' ? true : options['showiPad'],
 			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
 			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
 			disableHide: !!options['disableHide'],

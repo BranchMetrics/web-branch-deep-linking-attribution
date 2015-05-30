@@ -73,7 +73,7 @@ banner_html.iframe = function(options, action) {
 
 	var bodyClass,
 	    userAgent = banner_utils.mobileUserAgent();
-	if (userAgent == 'ios') {
+	if (userAgent == 'ios' || userAgent == 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}
 	else if (userAgent == 'android') {
