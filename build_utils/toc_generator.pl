@@ -42,7 +42,7 @@ my $heading_count = 1;
 my $export_string;
 
 # Read the file in the first argument
-open(my $fh, "<", $read_file) or die "Sorry Hommie: $!\n";
+open(my $fh, "<", $read_file) or die "Sorry homie: $!\n";
 while(<$fh>) {
     chomp;
     push @file_array, $_;
@@ -69,7 +69,7 @@ foreach $file_line (@file_array) {
 # Visual horizontal rule seperator for documentation
 $export_string .= "\n___\n";
 
-open(my $fh, '>', $write_file) or die "Sorry Hommie: $!";
+open(my $fh, '>', $write_file) or die "Sorry homie: $!";
 print $fh $export_string;
 close $fh;
 
