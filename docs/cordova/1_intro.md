@@ -45,6 +45,53 @@ Here is the location of the Branch Key that you will need for the `branch.init` 
 
 The session close will be sent automatically on any ‘pause’ event.
 
+### Add your branch key to your project
+
+After you register your app, your branch key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard. Now you need to add it (them, if you want to do it for both your live and test apps) to your project.
+
+Edit your manifest file by adding the following new meta-data:
+```xml
+<application>
+    <!-- Other existing entries -->
+
+    <!-- Add this meta-data below, and change "key_live_xxxxxxx" to your actual live branch key -->
+    <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_xxxxxxx" />
+
+    <!-- For your test app, if you have one; Again, use your actual test branch key -->
+    <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_test_yyyyyyy" />
+</application>
+```
+
+### Register an activity for direct deep linking (optional but recommended)
+
+In your project's manifest file, you can register your app to respond to direct deep links (yourapp:// in a mobile browser) by adding the second intent filter block. Also, make sure to change **yourapp** to a unique string that represents your app name.
+
+Secondly, make sure that this activity is launched as a singleTask. This is important to handle proper deep linking from other apps like Facebook.
+
+Typically, you would register some sort of splash activitiy that handles routing for your app.
+
+```xml
+<activity
+	android:name="com.yourapp.SplashActivity"
+	android:label="@string/app_name"
+	<!-- Make sure the activity is launched as "singleTask" -->
+	android:launchMode="singleTask"
+	 >
+	<intent-filter>
+		<action android:name="android.intent.action.MAIN" />
+		<category android:name="android.intent.category.LAUNCHER" />
+	</intent-filter>
+
+	<!-- Add this intent filter below, and change yourapp to your app name -->
+	<intent-filter>
+		<data android:scheme="yourapp" android:host="open" />
+		<action android:name="android.intent.action.VIEW" />
+		<category android:name="android.intent.category.DEFAULT" />
+		<category android:name="android.intent.category.BROWSABLE" />
+	</intent-filter>
+</activity>
+```
+
 ### SDK Method Queue
 
 Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
