@@ -172,7 +172,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		req.send(data);
 	}
 	catch (e) {
-		storage['setItem']('use_jsonp', true);
+		storage['setTempItem']('use_jsonp', true);
 		this.jsonpRequest(url, data, method, callback);
 	}
 };
