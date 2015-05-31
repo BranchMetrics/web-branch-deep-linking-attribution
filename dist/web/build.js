@@ -645,10 +645,14 @@ var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
   }
 };
 BranchStorage.prototype.setPermItem = function(a, b) {
-  this._localStoreAvailable ? localStorage.setItem(a, b) : navigator.cookiesEnabled ? setCookie(a, b, COOKIE_DAYS) : this._store[a] = b;
+  this._localStoreAvailable && localStorage.setItem(a, b);
+  navigator.cookieEnabled && setCookie(a, b, COOKIE_DAYS);
+  this._store[a] = b;
 };
 BranchStorage.prototype.setTempItem = function(a, b) {
-  this._sessionStoreAvailable ? sessionStorage.setItem(a, b) : navigator.cookiesEnabled ? setCookie(a, b) : this._store[a] = b;
+  this._sessionStoreAvailable && sessionStorage.setItem(a, b);
+  navigator.cookieEnabled && setCookie(a, b);
+  this._store[a] = b;
 };
 BranchStorage.prototype.getItem = function(a) {
   var b = this._localStoreAvailable ? localStorage.getItem(a) : null, c = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null, d = readCookie(a);
@@ -658,23 +662,23 @@ BranchStorage.prototype.getItem = function(a) {
 BranchStorage.prototype.removeItem = function(a) {
   this._localStoreAvailable && localStorage.removeItem(a);
   this._sessionStoreAvailable && sessionStorage.removeItem(a);
-  navigator.cookiesEnabled && clearCookie(a);
+  navigator.cookieEnabled && clearCookie(a);
   delete this._store[a];
 };
 BranchStorage.prototype.clear = function() {
   this._store = {};
   this._sessionStoreAvailable && sessionStorage.clear();
   this._localStoreAvailable && localStorage.clear();
-  navigator.cookiesEnabled && clearAllCookies();
+  navigator.cookieEnabled && clearAllCookies();
 };
 BranchStorage.prototype.clearTemp = function() {
   sessionStorage.clear();
-  navigator.cookiesEnabled && clearAllCookies();
+  navigator.cookieEnabled && clearAllCookies();
   this._store = {};
 };
 BranchStorage.prototype.clearPerm = function() {
   localStorage.clear();
-  navigator.cookiesEnabled && clearAllCookies();
+  navigator.cookieEnabled && clearAllCookies();
 };
 // Input 3
 var Queue = function() {
@@ -796,7 +800,7 @@ var session = {read:function(a) {
 }, store:function(a, b, c) {
   c ? b.setPermItem("branch_session", goog.json.serialize(a)) : b.setTempItem("branch_session", goog.json.serialize(a));
 }, clear:function(a) {
-  a.removeItem("branch_session");
+  a.clear();
 }, storeKeyValue:function(a, b, c) {
   var d = session.read(c);
   d[a] = b;
@@ -1092,7 +1096,8 @@ function defaults(a) {
   return utils.merge(a, b);
 }
 WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.str), is_referrable:validator(!0, validationTypes.num), sdk:validator(!1, validationTypes.str), browser_fingerprint_id:validator(!0, branch_id)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.str)}}, 
-resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{sdk:validator(!1, validationTypes.str), phone:validator(!0, validationTypes.str)}});
+resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{click:validator(!0, validationTypes.str)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.str)}, params:{sdk:validator(!1, validationTypes.str), phone:validator(!0, validationTypes.str)}}, resources.close = {destination:config.api_endpoint, 
+endpoint:"/v1/close", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.str), session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id)}});
 CORDOVA_BUILD && (resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{link_identifier:validator(!1, validationTypes.str), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), app_version:validator(!1, validationTypes.str), carrier:validator(!1, validationTypes.str), bluetooth:validator(!1, validationTypes.bool), bluetooth_version:validator(!1, 
 validationTypes.str), has_nfc:validator(!1, validationTypes.bool), has_telephone:validator(!1, validationTypes.bool), brand:validator(!1, validationTypes.str), model:validator(!1, validationTypes.str), os:validator(!1, validationTypes.str), uri_scheme:validator(!1, validationTypes.str), os_version:validator(!1, validationTypes.str), screen_dpi:validator(!1, validationTypes.num), screen_width:validator(!1, validationTypes.num), screen_height:validator(!1, validationTypes.num), is_referrable:validator(!1, 
 validationTypes.num), update:validator(!1, validationTypes.num), add_tracking_enabled:validator(!1, validationTypes.bool)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.str), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.str), hardware_id:validator(!1, validationTypes.str), is_hardware_id_real:validator(!1, validationTypes.bool), 
@@ -1403,7 +1408,7 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, a);
 });
-CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
+Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
   var b = this;
   this._api(resources.close, {}, function(c, d) {
     delete b.session_id;
@@ -1412,7 +1417,7 @@ CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, fu
     session.clear(b._storage);
     a(null);
   });
-}));
+});
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   c || (c = {});
   this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);

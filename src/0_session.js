@@ -33,7 +33,7 @@ session.store = function(data, storage, perm) {
  * @param {BranchStorage} storage
  */
 session.clear = function(storage) {
-	storage['removeItem']('branch_session');
+	storage['clear']();
 };
 
 /**

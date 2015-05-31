@@ -124,6 +124,19 @@ if (WEB_BUILD) {
 			"phone": validator(true, validationTypes.str)
 		}
 	};
+
+	resources.close = {
+		destination: config.api_endpoint,
+		endpoint: "/v1/close",
+		method: utils.httpMethod.POST,
+		params: {
+			"identity_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.str),
+			"session_id": validator(true, branch_id),
+			"link_click_id": validator(false, branch_id),
+			"device_fingerprint_id": validator(true, branch_id)
+		}
+	};
 }
 
 if (CORDOVA_BUILD) { // jshint undef:false
