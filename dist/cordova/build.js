@@ -608,31 +608,49 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.5.5"}, WEB_BUILD = !1, CORDOVA_BUILD = !0;
 // Input 2
 var BranchStorage = function() {
+  try {
+    localStorage.setItem("test", ""), localStorage.removeItem("test"), this._localStoreAvailable = !0;
+  } catch (a) {
+    this._localStoreAvailable = !1;
+  }
+  try {
+    sessionStorage.setItem("test", ""), sessionStorage.removeItem("test"), this._sessionStoreAvailable = !0;
+  } catch (b) {
+    this._sessionStoreAvailable = !1;
+  }
   this._store = {};
+  this._tempStore = this._sessionStoreAvailable ? sessionStorage : this._store;
+  this._permStore = this._localStoreAvailable ? localStorage : this._store;
 };
-BranchStorage.prototype.setItem = function(a, b) {
-  this._store[a] = b;
+BranchStorage.prototype.setPermItem = function(a, b) {
+  this._permStore[a] = b;
+};
+BranchStorage.prototype.setTempItem = function(a, b) {
+  this._tempStore[a] = b;
 };
 BranchStorage.prototype.getItem = function(a) {
-  return "undefined" != typeof this._store[a] ? this._store[a] : null;
+  var b = this._tempStore.getItem(a), c = this._permStore.getItem(a);
+  a = "undefined" != typeof this._store[a] ? this._store[a] : null;
+  return b || c || a;
 };
 BranchStorage.prototype.removeItem = function(a) {
+  this._tempStore.removeItem(a);
+  this._permStore.removeItem(a);
   delete this._store[a];
 };
 BranchStorage.prototype.clear = function() {
   this._store = {};
+  this._tempStore.clear();
+  this._permStore.clear();
 };
-var storage = function(a) {
-  try {
-    if (a) {
-      return localStorage.setItem("test", ""), localStorage.removeItem("test"), localStorage;
-    }
-    sessionStorage.setItem("test", "");
-    sessionStorage.removeItem("test");
-    return sessionStorage;
-  } catch (b) {
-    return new BranchStorage;
-  }
+BranchStorage.prototype.clearTemp = function() {
+  this._tempStore.clear();
+};
+BranchStorage.prototype.clearPerm = function() {
+  this._permStore.clear();
+};
+var storage = function() {
+  return new BranchStorage;
 };
 // Input 3
 var Queue = function() {
@@ -778,7 +796,7 @@ utils.readStore = function(a) {
   }
 };
 utils.store = function(a, b) {
-  b.setItem("branch_session", goog.json.serialize(a));
+  b.setPermItem("branch_session", goog.json.serialize(a));
 };
 utils.clearStore = function(a) {
   a.removeItem("branch_session");

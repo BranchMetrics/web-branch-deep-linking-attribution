@@ -111,7 +111,7 @@ utils.readStore = function(storage) {
  * @param {BranchStorage} storage
  */
 utils.store = function(data, storage) {
-	storage['setItem']('branch_session', goog.json.serialize(data));
+	storage['setPermItem']('branch_session', goog.json.serialize(data));
 };
 
 /**
