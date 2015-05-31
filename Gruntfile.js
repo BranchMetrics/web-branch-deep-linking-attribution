@@ -184,10 +184,11 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'], // Testing integration with phantom
+					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'],
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
+					build: grunt.file.readJSON('package.json')["build"],
 					pollInterval: 2000,         // (ms) Note: pollInterval * statusCheckAttempts should = 'max-duration'
 					statusCheckAttempts: 180,   // So if you change one of these, adjust 'max-duration' accordingly
 					'max-duration': 360,        // (s)
@@ -207,6 +208,12 @@ module.exports = function(grunt) {
 					base: ''
 				}
 			}
+		},
+		buildnumber: {
+			options: {
+				field: 'build'
+			},
+			files: ['package.json', 'bower.json']
 		}
 	});
 
@@ -217,5 +224,6 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-saucelabs');
 	grunt.loadNpmTasks('grunt-contrib-connect');
-	grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
+	grunt.loadNpmTasks('grunt-build-number');
+	grunt.registerTask('test', ['buildnumber', 'connect', 'saucelabs-mocha']);
 };

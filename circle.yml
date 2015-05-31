@@ -28,5 +28,5 @@ dependencies:
 test:
   override:
     - ./lint.sh
+    - grunt buildnumber
     - grunt test
-    - mocha-phantomjs test/integration-test.html
