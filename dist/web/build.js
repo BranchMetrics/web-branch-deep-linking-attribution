@@ -607,7 +607,7 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.5.5"}, WEB_BUILD = !0, CORDOVA_BUILD = !1;
 // Input 2
-var storage = {}, BranchStorage = function() {
+var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
   try {
     localStorage.setItem("test", ""), localStorage.removeItem("test"), this._localStoreAvailable = !0;
   } catch (a) {
@@ -622,10 +622,9 @@ var storage = {}, BranchStorage = function() {
 }, setCookie = function(a, b, c) {
   var d = "";
   c && (d = new Date, d.setTime(d.getTime() + 864E5 * c), d = "; expires=" + d.toGMTString());
-  document.cookie = a + "=" + b + d + "; path=/";
-};
-function readCookie(a) {
-  a += "=";
+  document.cookie = "BRANCH_WEBSDK_COOKIE" + a + "=" + b + d + "; path=/";
+}, readCookie = function(a) {
+  a = "BRANCH_WEBSDK_COOKIE" + a + "=";
   for (var b = document.cookie.split(";"), c = 0;c < b.length;c++) {
     for (var d = b[c];" " == d.charAt(0);) {
       d = d.substring(1, d.length);
@@ -635,37 +634,47 @@ function readCookie(a) {
     }
   }
   return null;
-}
-function clearCookie(a) {
-  setCookie(a, "", -1);
-}
+}, clearCookie = function(a) {
+  setCookie("BRANCH_WEBSDK_COOKIE" + a, "", -1);
+}, clearAllCookies = function() {
+  for (var a = document.cookie.split(";"), b = 0;b < a.length;b++) {
+    for (var c = a[b];" " == c.charAt(0);) {
+      c = c.substring(1, c.length);
+    }
+    0 == c.indexOf("BRANCH_WEBSDK_COOKIE") && (document.cookie = c.substring(0, c.indexOf("=")) + "=;expires=-1;path=/");
+  }
+};
 BranchStorage.prototype.setPermItem = function(a, b) {
-  this._localStoreAvailable ? localStorage.setItem(a, b) : this._store[a] = b;
+  this._localStoreAvailable ? localStorage.setItem(a, b) : navigator.cookiesEnabled ? setCookie(a, b, COOKIE_DAYS) : this._store[a] = b;
 };
 BranchStorage.prototype.setTempItem = function(a, b) {
-  this._sessionStoreAvailable ? sessionStorage.setItem(a, b) : this._store[a] = b;
+  this._sessionStoreAvailable ? sessionStorage.setItem(a, b) : navigator.cookiesEnabled ? setCookie(a, b) : this._store[a] = b;
 };
 BranchStorage.prototype.getItem = function(a) {
-  var b = this._localStoreAvailable ? localStorage.getItem(a) : null, c = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null;
+  var b = this._localStoreAvailable ? localStorage.getItem(a) : null, c = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null, d = readCookie(a);
   a = "undefined" != typeof this._store[a] ? this._store[a] : null;
-  return b || c || a;
+  return b || c || d || a;
 };
 BranchStorage.prototype.removeItem = function(a) {
   this._localStoreAvailable && localStorage.removeItem(a);
   this._sessionStoreAvailable && sessionStorage.removeItem(a);
+  navigator.cookiesEnabled && clearCookie(a);
   delete this._store[a];
 };
 BranchStorage.prototype.clear = function() {
   this._store = {};
   this._sessionStoreAvailable && sessionStorage.clear();
   this._localStoreAvailable && localStorage.clear();
+  navigator.cookiesEnabled && clearAllCookies();
 };
 BranchStorage.prototype.clearTemp = function() {
   sessionStorage.clear();
+  navigator.cookiesEnabled && clearAllCookies();
   this._store = {};
 };
 BranchStorage.prototype.clearPerm = function() {
   localStorage.clear();
+  navigator.cookiesEnabled && clearAllCookies();
 };
 // Input 3
 var Queue = function() {
