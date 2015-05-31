@@ -6,11 +6,19 @@
 goog.provide('storage');
 
 var COOKIE_DAYS = 365;
+
+// Not going to use IndexedDB atm
+// var INDEXED_DB_VERSION = 1; // unsigned long long
+// var INDEXED_DB_NAME = "BRANCH_DB";
+
 /**
  * @class BranchStorage
  * @constructor
+ *
+ * This function checks for all available storage methods available
  */
 var BranchStorage = function() {
+	// Local and session storage
 	try {
 		localStorage.setItem("test", "");
 		localStorage.removeItem("test");
@@ -27,8 +35,37 @@ var BranchStorage = function() {
 	catch(e) {
 		this._sessionStoreAvailable = false;
 	}
+
+	// AH! I don't think we should use IndexedDB: The first time we write to it, the browser will ask the user for permission!
+	// That's way to much and will spook people.
+	// Commenting out for the time being
+	// IndexedDB
+	/*
+	this.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+	if (this.indexedDB) { this._indexedDBAvailable = true; }
+	else { this._indexedDBAvailable = true; }
+	*/
+
+	// As a last resort, we store the data in a JS object that is lost when the user closes the window
 	this._store = { };
 };
+
+/*
+indexedDBObjectStore = function() {
+	var request = this.indexedDB.open(INDEXED_DB_NAME);
+
+	request.onerror = function(event) {
+		alert("Uh oh");
+		// don't need to do anything here. Just leaving this alert here for now to debug
+	};
+	request.onsuccess = function(event) {
+		this._db = event.target.result;
+		var objectStore = db.createObjectStore("branch", keyPath: "id", autoIncrement: true);
+		objectStore.createIndex("key", "key", { unique: true });
+		// success
+	};
+};
+*/
 
 /**
  * @param {string} key

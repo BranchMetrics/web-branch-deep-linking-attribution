@@ -187,19 +187,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
 			"is_referrable": validator(false, validationTypes.num)
 		}
 	};
-
-	resources.close = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/close",
-		method: utils.httpMethod.POST,
-		params: {
-			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.str),
-			"session_id": validator(true, branch_id),
-			"link_click_id": validator(false, branch_id),
-			"device_fingerprint_id": validator(true, branch_id)
-		}
-	};
 }
 
 resources.getCode = {

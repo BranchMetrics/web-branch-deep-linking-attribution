@@ -431,7 +431,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
 
-//if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD) { // jshint undef:false
 /** =CORDOVA
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
@@ -467,7 +467,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			done(null);
 		});
 	});
-//}
+}
 
 /**
  * @function Branch.track
