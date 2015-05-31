@@ -89,21 +89,6 @@ var sendSMS = function(doc, branch, options, linkData) {
 	}
 };
 
-var hasClass = function(element, className) {
-	return !!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-};
-
-var addClass = function(element, className) {
-	if (!hasClass(element, className)) { element.className += " " + className; }
-};
-
-var removeClass = function(element, className) {
-	if (hasClass(element, className)) {
-		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-		element.className = element.className.replace(reg, ' ');
-	}
-};
-
 /**
  * @param {Object} branch
  * @param {banner_utils.options} options
@@ -146,17 +131,22 @@ banner = function(branch, options, linkData, storage) {
 			});
 		}
 
-		var closeButton = doc.getElementById('branch-banner-close');
-		var closeBanner = function() {
+		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
+			bodyMarginTopInline = document.body.style.marginTop,
+			bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom'),
+			bodyMarginBottomInline = document.body.style.marginBottom,
+
+			closeButton = doc.getElementById('branch-banner-close'),
+			closeBanner = function() {
 			setTimeout(function() {
 				banner_utils.removeElement(element);
 				banner_utils.removeElement(document.getElementById('branch-css'));
 			}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 			setTimeout(function() {
-				if (options.position == 'top') { document.body.style.marginTop = '0px'; }
-				else if (options.position == 'bottom') { document.body.style.marginBottom = '0px'; }
-				removeClass(document.body, 'branch-banner-is-active');
+				if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
+				else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
+				banner_utils.removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
 			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
@@ -164,6 +154,7 @@ banner = function(branch, options, linkData, storage) {
 			if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
 			else { utils.storeKeyValue('hideBanner', true, storage); }
 		};
+
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
@@ -172,9 +163,10 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		// Trigger animation
-		addClass(document.body, 'branch-banner-is-active');
-		if (options.position == 'top') { document.body.style.marginTop = banner_utils.bannerHeight; }
-		else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.bannerHeight; }
+		banner_utils.addClass(document.body, 'branch-banner-is-active');
+		if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
+		else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
+
 		setTimeout(function() {
 			if (options.position == 'top') { element.style.top = '0'; }
 			else if (options.position == 'bottom') { element.style.bottom = '0'; }

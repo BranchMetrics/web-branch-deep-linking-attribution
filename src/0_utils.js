@@ -191,6 +191,17 @@ utils.isKey = function(key_or_id) {
 };
 
 /**
+ * @param {string} string
+ */
+utils.snakeToCamel = function(string) {
+	var find = /(\-\w)/g,
+		convert =  function(matches) {
+		    return matches[1].toUpperCase();
+		};
+	return string.replace(find, convert);
+};
+
+/**
  * Base64 encoding because ie9 does not have bota()
  *
  * @param {string} input

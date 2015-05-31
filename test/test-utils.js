@@ -192,6 +192,9 @@ window.session_id = '98807509250212101',
 window.identity_id = '98807509250212101',
 window.browser_fingerprint_id = '79336952217731267';
 
+// Fix for IE 9
+window.console = window.console || { log: function() { return arguments; } };
+
 window.testUtils = testUtils = {};
 
 testUtils.params = function(extra, without) {
@@ -200,7 +203,8 @@ testUtils.params = function(extra, without) {
 		branch_key: branch_sample_key,
 		session_id: session_id,
 		identity_id: identity_id,
-		browser_fingerprint_id: browser_fingerprint_id
+		browser_fingerprint_id: browser_fingerprint_id,
+		sdk: 'web0.0.0'
 	}, extra || {});
 	for (var k = 0; k < (without || []).length; k++) {
 		delete p[without[k]];
@@ -246,11 +250,10 @@ testUtils.plan = function(n, done) {
 testUtils.unplanned = function() { return assert; };
 
 testUtils.go = function(suffix) {
-	var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
-	if (new_location != window.location.toString()) {
-		window.history.pushState({}, '', new_location);
-	}
-};
-
-
+	if (!window.history.pushState) { return false; }
+		var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
+		if (new_location != window.location.toString()) {
+			return window.history.pushState && window.history.pushState({}, '', new_location); // Simply not possible in IE 9
+		}
+	};
 })();

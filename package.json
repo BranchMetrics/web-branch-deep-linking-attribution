@@ -1,10 +1,10 @@
 {
   "name": "branch-sdk",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "Branch Metrics Web SDK",
   "main": "dist/web/build.min.js",
   "scripts": {
-    "lint": "./lint.sh"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
@@ -20,12 +20,16 @@
     "falafel": "1.0.1",
     "jsdoc": "3.2.2",
     "jsdox": "0.4.9",
-    "mocha": "2.2.1",
+    "mocha": "^2.2.1",
     "precommit-hook": "1.0.7",
     "sinon": "1.13.0",
-    "mocha": "^2.2.1",
-    "karma": "0.12.31",
-    "karma-mocha": "~0.1",
-    "karma-sauce-launcher": "0.2.10"
+    "grunt": "~0.4.0",
+    "grunt-cli": "~0.1.6",
+    "grunt-saucelabs": "~8.6.1",
+    "grunt-contrib-connect": "~0.9.0",
+    "grunt-contrib-watch": "~0.6.1"
+  },
+  "dependencies": {
+    "request": "^2.55.0"
   }
 }

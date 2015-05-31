@@ -102,15 +102,14 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage(false);
 	this._server = new Server();
+	var sdk;
+	if (CORDOVA_BUILD) { sdk = 'cordova'; }
+	if (WEB_BUILD) { sdk = 'web'; }
+	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD) { // jshint undef:false
 		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
-											// the session params from the first install.
-		this.sdk = "cordova" + config.version;  // For mobile apps, we send the SDK version string that generated the request.
 		this.debug = false;					// A debug install session will get a unique device id.
-	}
-	else if (WEB_BUILD) {
-		this.sdk = "web" + config.version;
 	}
 
 	this.init_state = init_states.NO_INIT;
@@ -126,12 +125,11 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (this.branch_key) { obj['branch_key'] = this.branch_key; }
 	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
 	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
+	if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
-	// These three are sent from mobile apps
 	if (CORDOVA_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
-		if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
@@ -152,7 +150,7 @@ Branch.prototype._referringLink = function() {
 };
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
  *
@@ -160,8 +158,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * instead of possibly using the same device id.  This is useful when testing.
  *
  * This needs to be set before the Branch.init call!!!
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
  *
  * ---
  *
@@ -219,6 +215,8 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
+/*** +TOC_HEADING &Branch Session& ^ALL ***/
+/*** +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
 	var self = this;
 	self.init_state = init_states.INIT_PENDING;
@@ -238,6 +236,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
+		self.sessionLink = data['link'];
 		if (data['referring_link']) {
 			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
@@ -307,7 +306,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
-			self._api(resources._r, { "v": config.version }, function(err, browser_fingerprint_id) {
+			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
 				if (err) { return finishInit(err, null); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
@@ -335,6 +334,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
+/*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(utils.readStore(this._storage));
 	data['referring_link'] = this._referringLink();
@@ -342,7 +342,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 });
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -352,12 +352,10 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * later point.
  * If the Branch session has already been initialized, the callback will return
  * immediately, otherwise, it will return once Branch has been initialized.
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
+ 	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
 	});
@@ -396,6 +394,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  * ___
  */
+/*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
@@ -430,12 +429,13 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
  * ___
  *
  */
+/*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
 
 if (CORDOVA_BUILD) { // jshint undef:false
-/**
+/** =CORDOVA
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
  *
@@ -454,14 +454,12 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *      "Error message"
  * );
  * ```
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * ## Tracking events
  *
  */
+	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
 		this._api(resources.close, { }, function(err, data) {
@@ -503,6 +501,8 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ## Creating a deep linking link
  *
  */
+/*** +TOC_HEADING &Event Tracking& ^ALL ***/
+/*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
 	if (!metadata) {
 		metadata = { };
@@ -605,6 +605,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * ```
  *
  */
+/*** +TOC_HEADING &Deep Linking& ^ALL ***/
+/*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	this._api(resources.link, utils.cleanLinkData(data, config), function(err, data) {
 		done(err, data && data['url']);
@@ -680,8 +682,6 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * callback("Error message");
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE WEB SDK NOT THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * # Referral system rewarding functionality
@@ -697,6 +697,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ## Retrieve referrals list
  *
  */
+/*** +TOC_ITEM #sendsmsphone-linkdata-options-callback &.sendSMS()& ^ALL ***/
 Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, phone, linkData, options) {
 	var self = this;
 	if (typeof options == 'function') {
@@ -775,30 +776,33 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
  * ## Referral Codes
  *
  */
+/*** +TOC_HEADING &Referrals and Credits& ^ALL ***/
+/*** +TOC_ITEM #referralscallback &.referrals()& ^ALL ***/
 Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.referrals, { }, done);
 });
 
-
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.getCode
- * @param {Object} data - _required_ - contins options for referral code creation.
+ * @param {Object} options - _required_ - contins options for referral code creation.
  * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
  * Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
- * The data can containt the following fields:
- * "amount" - A required integer specifying the number of credits added when the code is applied.
- * "bucket" - The optional bucket to apply the credits to.  Defaults to "default".
- * "calculation_type" - A required integer.  1 for unlimited uses, 0 for one use.
- * "location" - A required integer. Determines who get's the credits.  0 for the referree, 2 for the referring user or 3 for both.
- * "prefix" - An optional string to be prepended to the code.
- * "expiration" - An optional date string.  If present, determines the date on which the code expires.
+ * The `options` object can containt the following properties:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
+ * | calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
+ * | location | *required* - An integer that etermines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
+ * | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
+ * | prefix | *optional* - A string to be prepended to the code.
+ * | expiration | *optional* - A date string that if present, determines the date on which the code expires.
  *
  * ##### Usage
  *
  * branch.getCode(
- *     data,
+ *     options,
  *     callback(err,data)
  * );
  *
@@ -811,7 +815,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *       "bucket":"party",
  *       "calculation_type":1,
  *       "location":2
- *     }
+ *     },
  *     callback (err, data)
  * );
  * ```
@@ -825,20 +829,16 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *      }
  * );
  * ```
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
-	Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-		data.type = "credit";
-		data.creation_type = 2;
-		this._api(resources.getCode, data, done);
-	});
-}
+/*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
+Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+	data.type = "credit";
+	data.creation_type = 2;
+	this._api(resources.getCode, data, done);
+});
 
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.validateCode
  * @param {string} code - _required_ - the code string to validate.
@@ -878,17 +878,14 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  */
-	Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-		this._api(resources.validateCode, { "code": code }, done);
-	});
-}
+/*** +TOC_ITEM #validatecodecode-callback &.validateCode()& ^ALL ***/
+Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+	this._api(resources.validateCode, { "code": code }, done);
+});
 
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.applyCode
  * @param {string} code - _required_ - the code string to apply.
@@ -927,18 +924,15 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *     callback(err)
  * );
  * ```
- *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ___
  *
  * ## Credit Functions
  *
  */
-	Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-		this._api(resources.applyCode, { "code": code }, done);
-	});
-}
+/*** +TOC_ITEM #applycodecode-callback &.applyCode()& ^ALL ***/
+Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+	this._api(resources.applyCode, { "code": code }, done);
+});
 
 /**
  * @function Branch.credits
@@ -967,24 +961,31 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * ```
  *
  */
+/*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
 Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.credits, { }, done);
 });
 
-
-if (CORDOVA_BUILD) { // jshint undef:false
 /**
  * @function Branch.creditHistory
- * @param {Object} data - _optional_ - options controlling the returned history.
+ * @param {Object} options - _optional_ - options controlling the returned history.
  * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history data.
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
+ * Properties available in the `options` object:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | bucket | *optional (max 63 characters)* - The bucket from which to retrieve credit transactions.
+ * | begin_after_id | *optional* - The credit transaction id of the last item in the previous retrieval. Retrieval will start from the transaction next to it. If none is specified, retrieval starts from the very beginning in the transaction history, depending on the order.
+ * | length | *optional* - The number of credit transactions to retrieve. If none is specified, up to 100 credit transactions will be retrieved.
+ * | direction | *optional* - The order of credit transactions to retrieve. If direction is `1`, retrieval is in least recent first order; If direction is `0`, or if none is specified, retrieval is in most recent first order.
  *
  * ##### Usage
  *
  * ```js
  * branch.creditHistory(
- *      data,
+ *      options,
  *      callback(err, data)
  * );
  * ```
@@ -996,7 +997,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *     {
  *       "length":50,
  *       "direction":0,
- *       "begin_after_id:"123456789012345",
+ *       "begin_after_id":"123456789012345",
  *       "bucket":"default"
  *     }
  *     callback (err, data)
@@ -1034,17 +1035,15 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * );
  * ```
  *
- * THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
- *
  * ---
  *
  * ## Credit redemption
  *
  */
-	Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-		this._api(resources.creditHistory, data ? data : {}, done);
-	});
-}
+/*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
+Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, options) {
+	this._api(resources.creditHistory, options || { }, done);
+});
 
 /**
  * @function Branch.redeem
@@ -1081,129 +1080,14 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * callback("Error message");
  * ```
  * ___
- *
- * # Smart App Sharing Banner
- *
- * The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
- * Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
- * **Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
- *
- * # Customizing the App Sharing Banner
- *
- * The app sharing banner includes a number of ways to easily customize it by specifying properties in the `options` object, which is the first argument of the banner.
- *
- * ### Your App's Information _required_
- * You can set the icon, title, and description for your app with the properties: `icon`, `title`, and `description`. For example, an app banner with these three properties set:
- * ```js
- * branch.banner(
- *     {
- *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- *          title: 'Branch Demo App',
- *          description: 'The Branch demo app!'
- *     },
- *     {... link data ...}
- * );
- * ```
- *
- * ### The Call To Action Text _optional_
- * On mobile devices, the app banner show's an option either to download the app if they do not have it installed, or open the app if they have already installed it. Both of these can be customized from their respective defaults of Download app, and View in app.
- * When the banner is opened on a desktop devide, a simpel form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
- * ```js
- * branch.banner(
- *     {
- *          // required app info properties
- *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- *          title: 'Branch Demo App',
- *          description: 'The Branch demo app!',
- *          // Call to action customization
- *          openAppButtonText: 'Open',
- *          downloadAppButtonText: 'Install',
- *          phonePreviewText: '+44 9999-9999',
- *          sendLinkText: 'Txt me!'
- *     },
- *     {... link data ...}
- * );
- * ```
- *
- * ### Enabed Platforms _optional_
- * The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
- * ```js
- * branch.banner(
- *     {
- *          // required app info properties
- *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- *          title: 'Branch Demo App',
- *          description: 'The Branch demo app!',
- *          // Platforms customization
- *          showDesktop: false,
- *          showiOS: true,
- *          showAndroid: true
- *     },
- *     {... link data ...}
- * );
- * ```
- *
- * ### Display Preferences _optional_
- * By default, the app banner displays inside of an iFrame (isolates the app banner css from your page), at the top of the page, shows a close button to the user, and will never show again once closed by the user. All of this functionality can be customized.
- * The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
- * The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
- * The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past. It can also be set to an integer, in which case, it would forget that the user has previously hid the banner after X days.
- * The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
- * The `customCSS` property allows you to style the banner, even if it is isolated within an iframe. To assist you with device specific styles, the body element of the banner has one of three classes: `branch-banner-android`, `branch-banner-ios`, or `branch-banner-desktop`.
- * The `mobileSticky` property defaults to false, but can be set to true if you want the user to continue to see the app banner as they scroll.
- * The `desktopSticky` property defaults to true, but can be set to false if you want the user to only see the app banner when they are scrolled to the top of the page.
- * ```js
- * branch.banner(
- *     {
- *          // required app info properties
- *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- *          title: 'Branch Demo App',
- *          description: 'The Branch demo app!',
- *          // Display preferences
- *          iframe: false,
- *          disableHide: true,
- *          forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
- *          position: 'bottom',
- *          mobileSticky: true,
- *          desktopSticky: true,
- *          customCSS: '.title { color: #F00; }'
- *     },
- *     {... link data ...}
- * );
- * ```
- *
- * ### Link Preferences _optional_
- * By default, tthe app banner will reusue a link that has most recently been created. If this is not desired, and you wish an enitrley new link to be created and overwrite the previous link, you can set `make_new_link` to true.
- * ```js
- * branch.banner(
- *     {
- *          // required app info properties
- *          icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- *          title: 'Branch Demo App',
- *          description: 'The Branch demo app!',
- *          // Link preferences
- *          make_new_link: true
- *     },
- *     {... link data ...}
- * );
- * ```
- *
- * ### Playing nicely with other positon fixed "sticky" banners
- * Do you already have a "sticky" element on the top of your website, such as a navigation bar? If so, the Branch app banner will likely interfere with it. Fortunatley, we have a solution!
- * Without any configuration, the Web SDK adds a class called `branch-banner-is-active` to the body element of your website when the banner opens, and removes it when the banner closes.
- * As an example, let's say you had an element on your website with a class of `header` that was `position: fixed;`. You could then add the following to your stylesheet:
- * ```css
- * body.branch-banner-is-active .header { top: 76px; }
- * ```
- * This will add exactly the space required to show the app banner above your navigation header!
- *
  */
+ /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
 
 if (WEB_BUILD) { // jshint undef:false
-/**
+/** =WEB
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
  * @param {Object} data - _required_ - object of all link data, same as Branch.link()
@@ -1212,11 +1096,11 @@ if (WEB_BUILD) { // jshint undef:false
  *
  * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
  *
+ * *Be sure to checkout the [Smart Banner Guide](docs/web/smart_banner_guide.md) for a full explanation of everything you can do!*
+ *
  * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
  * |------------------|----------------------|----------------------|
  * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
- *
- * THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
  *
  * #### Usage
  *
@@ -1283,6 +1167,8 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  */
+ 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
+ 	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }
 		var bannerOptions = {

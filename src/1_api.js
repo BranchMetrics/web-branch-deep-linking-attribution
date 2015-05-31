@@ -79,7 +79,7 @@ Server.prototype.getUrl = function(resource, data) {
 	var branch_id = /^[0-9]{15,20}$/;
 	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
-	if (resource.method === "POST") {
+	if (resource.method === "POST" || resource.endpoint === "/v1/credithistory") {
 		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
 			d['branch_key'] = data['branch_key'];
 		}
