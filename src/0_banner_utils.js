@@ -1,5 +1,5 @@
 goog.provide('banner_utils');
-goog.require('utils');
+goog.require('session');
 goog.require('storage'); // jshint unused:false
 
 /** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean, make_new_link:boolean}} */
@@ -98,7 +98,7 @@ banner_utils.addCSSLengths  = function(length1, length2) {
  * @return {boolean}
  */
 banner_utils.shouldAppend = function(storage, options) {
-	var hideBanner = utils.readKeyValue('hideBanner', storage);
+	var hideBanner = session.readKeyValue('hideBanner', storage);
 	if (typeof hideBanner == 'number') {
 		hideBanner = new Date() >= new Date(hideBanner);
 	}

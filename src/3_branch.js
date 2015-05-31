@@ -9,6 +9,7 @@ goog.require('Server');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
+goog.require('session');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
@@ -140,8 +141,8 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = utils.readKeyValue('referring_link', this._storage),
-		click_id = utils.readKeyValue('click_id', this._storage);
+	var referring_link = session.readKeyValue('referring_link', this._storage),
+		click_id = session.readKeyValue('click_id', this._storage);
 
 	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
@@ -230,7 +231,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		options = { isReferrable: null };
 	}
 	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-	var sessionData = utils.readStore(self._storage);
+	var sessionData = session.read(self._storage);
 
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
@@ -253,7 +254,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	var finishInit = function(err, data) {
 		if (data) {
 			data = setBranchValues(data);
-			utils.store(data, self._storage); // Need to make sure this is stored PERM for Cordova
+			session.store(data, self._storage); // Need to make sure this is stored PERM for Cordova
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
@@ -278,10 +279,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				done("Error getting device data!");
 			};
 			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
-			if (utils.readKeyValue('identity_id', self._storage)) {
+			if (session.readKeyValue('identity_id', self._storage)) {
 				exec(function(data) {
-					data['identity_id'] = utils.readKeyValue('identity_id', self._storage);
-					data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._storage);
+					data['identity_id'] = session.readKeyValue('identity_id', self._storage);
+					data['device_fingerprint_id'] = session.readKeyValue('device_fingerprint_id', self._storage);
 					console.log("Sending open with: " + goog.json.serialize(data));
 					self._api(resources.open, data, function(err, data) {
 						if (err) { return finishInit(err, null); }
@@ -332,7 +333,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  */
 /*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var data = utils.whiteListSessionData(utils.readStore(this._storage));
+	var data = utils.whiteListSessionData(session.read(this._storage));
 	data['referring_link'] = this._referringLink();
 	done(null, data);
 });
@@ -353,7 +354,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  */
  	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+		done(null, utils.whiteListSessionData(session.read(this._storage)));
 	});
 }
 
@@ -462,7 +463,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
 			delete self.session_id;
 			delete self.sessionLink;
 			self.init_state = init_states.NO_INIT;
-			utils.clearStore(self._storage);
+			session.clear(self._storage);
 			done(null);
 		});
 	});
@@ -726,7 +727,7 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 				"click": "click"
 			}, function(err, data) {
 				if (err) { return done(err); }
-				utils.storeKeyValue('click_id', data['click_id'], self._storage);
+				session.storeKeyValue('click_id', data['click_id'], self._storage);
 				sendSMS(data['click_id']);
 			});
 		});

@@ -619,35 +619,53 @@ var storage = {}, BranchStorage = function() {
     this._sessionStoreAvailable = !1;
   }
   this._store = {};
-  this._tempStore = this._sessionStoreAvailable ? sessionStorage : this._store;
-  this._permStore = this._localStoreAvailable ? localStorage : this._store;
+}, setCookie = function(a, b, c) {
+  var d = "";
+  c && (d = new Date, d.setTime(d.getTime() + 864E5 * c), d = "; expires=" + d.toGMTString());
+  document.cookie = a + "=" + b + d + "; path=/";
 };
+function readCookie(a) {
+  a += "=";
+  for (var b = document.cookie.split(";"), c = 0;c < b.length;c++) {
+    for (var d = b[c];" " == d.charAt(0);) {
+      d = d.substring(1, d.length);
+    }
+    if (0 == d.indexOf(a)) {
+      return d.substring(a.length, d.length);
+    }
+  }
+  return null;
+}
+function clearCookie(a) {
+  setCookie(a, "", -1);
+}
 BranchStorage.prototype.setPermItem = function(a, b) {
-  this._permStore[a] = b;
+  this._localStoreAvailable ? localStorage.setItem(a, b) : this._store[a] = b;
 };
 BranchStorage.prototype.setTempItem = function(a, b) {
-  this._tempStore[a] = b;
+  this._sessionStoreAvailable ? sessionStorage.setItem(a, b) : this._store[a] = b;
 };
 BranchStorage.prototype.getItem = function(a) {
-  var b = this._tempStore.getItem(a), c = this._permStore.getItem(a);
+  var b = this._localStoreAvailable ? localStorage.getItem(a) : null, c = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null;
   a = "undefined" != typeof this._store[a] ? this._store[a] : null;
   return b || c || a;
 };
 BranchStorage.prototype.removeItem = function(a) {
-  this._tempStore.removeItem(a);
-  this._permStore.removeItem(a);
+  this._localStoreAvailable && localStorage.removeItem(a);
+  this._sessionStoreAvailable && sessionStorage.removeItem(a);
   delete this._store[a];
 };
 BranchStorage.prototype.clear = function() {
   this._store = {};
-  this._tempStore.clear();
-  this._permStore.clear();
+  this._sessionStoreAvailable && sessionStorage.clear();
+  this._localStoreAvailable && localStorage.clear();
 };
 BranchStorage.prototype.clearTemp = function() {
-  this._tempStore.clear();
+  sessionStorage.clear();
+  this._store = {};
 };
 BranchStorage.prototype.clearPerm = function() {
-  this._permStore.clear();
+  localStorage.clear();
 };
 // Input 3
 var Queue = function() {
@@ -760,6 +778,25 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 5
+var session = {read:function(a) {
+  try {
+    return goog.json.parse(a.getItem("branch_session") || {});
+  } catch (b) {
+    return{};
+  }
+}, store:function(a, b) {
+  b.setPermItem("branch_session", goog.json.serialize(a));
+}, clear:function(a) {
+  a.removeItem("branch_session");
+}, storeKeyValue:function(a, b, c) {
+  var d = session.read(c);
+  d[a] = b;
+  session.store(d, c);
+}, readKeyValue:function(a, b) {
+  var c = session.read(b);
+  return c && c[a] ? c[a] : null;
+}};
+// Input 6
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
@@ -785,30 +822,8 @@ utils.cleanLinkData = function(a, b) {
   a.data = goog.json.serialize(a.data || {});
   return a;
 };
-utils.readStore = function(a) {
-  try {
-    return goog.json.parse(a.getItem("branch_session") || {});
-  } catch (b) {
-    return{};
-  }
-};
-utils.store = function(a, b) {
-  b.setPermItem("branch_session", goog.json.serialize(a));
-};
-utils.clearStore = function(a) {
-  a.removeItem("branch_session");
-};
-utils.storeKeyValue = function(a, b, c) {
-  var d = utils.readStore(c);
-  d[a] = b;
-  utils.store(d, c);
-};
-utils.readKeyValue = function(a, b) {
-  var c = utils.readStore(b);
-  return c && c[a] ? c[a] : null;
-};
 utils.hasApp = function(a) {
-  return utils.readKeyValue("has_app", a);
+  return session.readKeyValue("has_app", a);
 };
 utils.merge = function(a, b) {
   for (var c in b) {
@@ -849,7 +864,7 @@ utils.base64encode = function(a) {
   }
   return b;
 };
-// Input 6
+// Input 7
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
 }, hasClass:function(a, b) {
@@ -897,11 +912,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   };
   return(c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
-  var c = utils.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
+  var c = session.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
   "number" == typeof d && (d = !1);
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
-// Input 7
+// Input 8
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
@@ -1017,7 +1032,7 @@ Server.prototype.request = function(a, b, c, d) {
   };
   l();
 };
-// Input 8
+// Input 9
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
@@ -1085,7 +1100,7 @@ resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", me
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!0, validationTypes.str)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num), alias:validator(!1, validationTypes.str)})};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)})};
-// Input 9
+// Input 10
 var banner_css = {banner:function(a) {
   return ".branch-banner-is-active { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
   1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + "; background: rgba(255, 255, 255, 0.95); color: #333; " + ("top" == a.position ? "border-bottom" : "border-top") + ': 1px solid #ddd; padding: 6px; }\n#branch-banner .icon { float: left; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .details { top: 16px; }\n#branch-banner .details > * { display: block; }\n#branch-banner .right > div { float: right; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
@@ -1109,7 +1124,7 @@ banner_css.css = function(a, b) {
   (a.iframe ? b.contentWindow.document : document).head.appendChild(d);
   "top" == a.position ? b.style.top = "-" + banner_utils.bannerHeight : "bottom" == a.position && (b.style.bottom = "-" + banner_utils.bannerHeight);
 };
-// Input 10
+// Input 11
 var banner_html = {banner:function(a, b) {
   return'<div class="content"><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action">' + b + "</div></div>";
 }, mobileAction:function(a, b) {
@@ -1142,7 +1157,7 @@ var banner_html = {banner:function(a, b) {
   var c = '<div id="branch-sms-form-container">' + (banner_utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
 }};
-// Input 11
+// Input 12
 var sendSMS = function(a, b, c, d) {
   var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, m = function() {
     f.removeAttribute("disabled");
@@ -1209,7 +1224,7 @@ var sendSMS = function(a, b, c, d) {
         banner_utils.removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-      "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
+      "number" == typeof b.forgetHide ? session.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : session.storeKeyValue("hideBanner", !0, d);
     };
     l && (l.onclick = function(a) {
       a.preventDefault();
@@ -1223,7 +1238,7 @@ var sendSMS = function(a, b, c, d) {
     return n;
   }
 };
-// Input 12
+// Input 13
 if (CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
@@ -1287,7 +1302,7 @@ Branch.prototype._api = function(a, b, c) {
   });
 };
 Branch.prototype._referringLink = function() {
-  var a = utils.readKeyValue("referring_link", this._storage), b = utils.readKeyValue("click_id", this._storage);
+  var a = session.readKeyValue("referring_link", this._storage), b = session.readKeyValue("click_id", this._storage);
   return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
 };
 CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
@@ -1299,7 +1314,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  c = utils.readStore(d._storage);
+  c = session.read(d._storage);
   var e = function(b, c) {
     if (c) {
       var e = c;
@@ -1310,7 +1325,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       d.sessionLink = e.link;
       CORDOVA_BUILD && (d.device_fingerprint_id = e.device_fingerprint_id, e.link_click_id && (d.link_click_id = e.link_click_id));
       c = e;
-      utils.store(c, d._storage);
+      session.store(c, d._storage);
       d.init_state = init_states.INIT_SUCCEEDED;
       c.data_parsed = c.data ? goog.json.parse(c.data) : null;
     }
@@ -1322,9 +1337,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   } else {
     if (CORDOVA_BUILD && (c = [], c.push(d.debug), null !== b && c.push(b ? 1 : 0), b = function() {
       a("Error getting device data!");
-    }, utils.readKeyValue("identity_id", d._storage) ? exec(function(a) {
-      a.identity_id = utils.readKeyValue("identity_id", d._storage);
-      a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._storage);
+    }, session.readKeyValue("identity_id", d._storage) ? exec(function(a) {
+      a.identity_id = session.readKeyValue("identity_id", d._storage);
+      a.device_fingerprint_id = session.readKeyValue("device_fingerprint_id", d._storage);
       console.log("Sending open with: " + goog.json.serialize(a));
       d._api(resources.open, a, function(a, b) {
         if (a) {
@@ -1358,12 +1373,12 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  var b = utils.whiteListSessionData(utils.readStore(this._storage));
+  var b = utils.whiteListSessionData(session.read(this._storage));
   b.referring_link = this._referringLink();
   a(null, b);
 });
 CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  a(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+  a(null, utils.whiteListSessionData(session.read(this._storage)));
 }));
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = this;
@@ -1385,7 +1400,7 @@ CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, fu
     delete b.session_id;
     delete b.sessionLink;
     b.init_state = init_states.NO_INIT;
-    utils.clearStore(b._storage);
+    session.clear(b._storage);
     a(null);
   });
 }));
@@ -1421,7 +1436,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
       if (b) {
         return a(b);
       }
-      utils.storeKeyValue("click_id", c.click_id, f._storage);
+      session.storeKeyValue("click_id", c.click_id, f._storage);
       e(c.click_id);
     });
   });
@@ -1460,7 +1475,7 @@ WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, functi
   this.closeBannerPointer && this.closeBannerPointer();
   a();
 }));
-// Input 13
+// Input 14
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
