@@ -206,4 +206,3 @@ utils.base64encode = function(input) {
 	}
 	return output;
 };
-

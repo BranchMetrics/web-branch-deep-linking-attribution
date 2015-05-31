@@ -621,7 +621,7 @@ var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
   this._store = {};
 }, setCookie = function(a, b, c) {
   var d = "";
-  c && (d = new Date, d.setTime(d.getTime() + 864E5 * c), d = "; expires=" + d.toGMTString());
+  c && (d = new Date, d.setTime(d.getTime() + 864E5 * c), d = "branch_expiration_date=" + d.toGMTString() + "; expires=" + d.toGMTString());
   document.cookie = "BRANCH_WEBSDK_COOKIE" + a + "=" + b + d + "; path=/";
 }, readCookie = function(a) {
   a = "BRANCH_WEBSDK_COOKIE" + a + "=";
@@ -637,11 +637,19 @@ var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
 }, clearCookie = function(a) {
   setCookie("BRANCH_WEBSDK_COOKIE" + a, "", -1);
 }, clearAllCookies = function() {
-  for (var a = document.cookie.split(";"), b = 0;b < a.length;b++) {
-    for (var c = a[b];" " == c.charAt(0);) {
-      c = c.substring(1, c.length);
+  clearCookies(!0, !0);
+}, clearTempCookies = function() {
+  clearCookies(!0);
+}, clearPermCookies = function() {
+  clearCookies(!1, !0);
+}, clearCookies = function(a, b) {
+  for (var c = function(a) {
+    document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
+  }, d = document.cookie.split(";"), e = 0;e < d.length;e++) {
+    for (var f = d[e];" " == f.charAt(0);) {
+      f = f.substring(1, f.length);
     }
-    0 == c.indexOf("BRANCH_WEBSDK_COOKIE") && (document.cookie = c.substring(0, c.indexOf("=")) + "=;expires=-1;path=/");
+    0 == f.indexOf("BRANCH_WEBSDK_COOKIE") && (a && -1 == f.indexOf("branch_expiration_date=") ? c(f) : b && 0 < f.indexOf("branch_expiration_date=") && c(f));
   }
 };
 BranchStorage.prototype.setPermItem = function(a, b) {
@@ -673,12 +681,12 @@ BranchStorage.prototype.clear = function() {
 };
 BranchStorage.prototype.clearTemp = function() {
   sessionStorage.clear();
-  navigator.cookieEnabled && clearAllCookies();
+  navigator.cookieEnabled && clearTempCookies();
   this._store = {};
 };
 BranchStorage.prototype.clearPerm = function() {
   localStorage.clear();
-  navigator.cookieEnabled && clearAllCookies();
+  navigator.cookieEnabled && clearPermCookies();
 };
 // Input 3
 var Queue = function() {

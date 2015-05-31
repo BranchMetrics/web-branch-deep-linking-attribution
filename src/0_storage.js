@@ -43,7 +43,8 @@ var setCookie = function(key, value, days) {
     if (days) {
         var date = new Date();
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
+        // we have to save the expiration date in the cookie string itself, otherwise there is no way to retrieve it
+        expires = "branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
     }
     document.cookie = "BRANCH_WEBSDK_COOKIE" + key + "=" + value + expires + "; path=/";
 };
@@ -64,19 +65,37 @@ var readCookie = function(key) {
 
 /**
  * @param {string} key
+ *
+ * This will clear any cookie, whether it is a session cookie, or one with an expiration date
  */
 var clearCookie = function(key) {
     setCookie("BRANCH_WEBSDK_COOKIE" + key, "", -1);
 };
 
-// Add argument as to clear perm or temp cookies too, for use in clearTemp, and clearPerm
-var clearAllCookies = function() {
+// Convenience functions for better readability
+var clearAllCookies = function() { clearCookies(true, true); };
+
+var clearTempCookies = function() { clearCookies(true); };
+
+var clearPermCookies = function() { clearCookies(false, true); };
+
+/**
+ * @param {boolean=} temp
+ * @param {boolean=} perm
+ */
+var clearCookies = function(temp, perm) {
+	var deleteCookie = function(cookie) {
+		document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/";
+	};
 	var cookieArray = document.cookie.split(';');
 	for (var i = 0; i < cookieArray.length; i++) {
 		var cookie = cookieArray[i];
-        while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
-        if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") == 0) { document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/"; }
-    }
+		while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
+		if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") == 0) {
+			if (temp && cookie.indexOf("branch_expiration_date=") == -1) { deleteCookie(cookie); }
+			else if (perm && cookie.indexOf("branch_expiration_date=") > 0) { deleteCookie(cookie); }
+		}
+	}
 };
 
 /**
@@ -120,6 +139,7 @@ BranchStorage.prototype['removeItem'] = function(key) {
 	delete this._store[key];
 };
 
+// Clears all storage methods, temporary and permanent
 BranchStorage.prototype['clear'] = function() {
 	this._store = { };
 	if (this._sessionStoreAvailable) { sessionStorage.clear(); }
@@ -127,13 +147,15 @@ BranchStorage.prototype['clear'] = function() {
 	if (navigator.cookieEnabled) { clearAllCookies(); }
 };
 
+// Clears only temporary storage methods
 BranchStorage.prototype['clearTemp'] = function() {
 	sessionStorage.clear();
-	if (navigator.cookieEnabled) { clearAllCookies(); }
+	if (navigator.cookieEnabled) { clearTempCookies(); }
 	this._store = { };
 };
 
+// Clears only permanent storage methods
 BranchStorage.prototype['clearPerm'] = function() {
 	localStorage.clear();
-	if (navigator.cookieEnabled) { clearAllCookies(); }
+	if (navigator.cookieEnabled) { clearPermCookies(); }
 };
