@@ -47,8 +47,6 @@ BranchStorage.prototype['setTempItem'] = function(key, value) {
 	this._tempStore[key] = value;
 };
 
-
-// FIX THIS
 /**
  * @param {string} key
  */
@@ -59,8 +57,6 @@ BranchStorage.prototype['getItem'] = function(key) {
 	return tempValue || permValue || storeValue;
 };
 
-
-// FIX THIS
 /**
  * @param {string} key
  */
@@ -82,12 +78,4 @@ BranchStorage.prototype['clearTemp'] = function() {
 
 BranchStorage.prototype['clearPerm'] = function() {
 	this._permStore.clear();
-};
-
-/**
- * @function storage
- * @return {BranchStorage}
- */
-var storage = function() {
-	return new BranchStorage();
 };

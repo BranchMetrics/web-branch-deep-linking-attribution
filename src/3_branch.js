@@ -100,7 +100,7 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = storage(false);
+	this._storage = new BranchStorage();
 	this._server = new Server();
 	var sdk;
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
@@ -108,7 +108,6 @@ Branch = function() {
 	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD) { // jshint undef:false
-		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
 		this.debug = false;					// A debug install session will get a unique device id.
 	}
 
@@ -254,10 +253,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	var finishInit = function(err, data) {
 		if (data) {
 			data = setBranchValues(data);
-			if (CORDOVA_BUILD) { // jshint undef:false
-				utils.store(data, self._permStorage);
-			}
-			utils.store(data, self._storage);
+			utils.store(data, self._storage); // Need to make sure this is stored PERM for Cordova
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
@@ -282,10 +278,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				done("Error getting device data!");
 			};
 			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
-			if (utils.readKeyValue('identity_id', self._permStorage)) {
+			if (utils.readKeyValue('identity_id', self._storage)) {
 				exec(function(data) {
-					data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
-					data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
+					data['identity_id'] = utils.readKeyValue('identity_id', self._storage);
+					data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._storage);
 					console.log("Sending open with: " + goog.json.serialize(data));
 					self._api(resources.open, data, function(err, data) {
 						if (err) { return finishInit(err, null); }

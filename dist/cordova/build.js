@@ -607,7 +607,7 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.5.5"}, WEB_BUILD = !1, CORDOVA_BUILD = !0;
 // Input 2
-var BranchStorage = function() {
+var storage = {}, BranchStorage = function() {
   try {
     localStorage.setItem("test", ""), localStorage.removeItem("test"), this._localStoreAvailable = !0;
   } catch (a) {
@@ -648,9 +648,6 @@ BranchStorage.prototype.clearTemp = function() {
 };
 BranchStorage.prototype.clearPerm = function() {
   this._permStore.clear();
-};
-var storage = function() {
-  return new BranchStorage;
 };
 // Input 3
 var Queue = function() {
@@ -1268,13 +1265,13 @@ var Branch = function() {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
-  this._storage = storage(!1);
+  this._storage = new BranchStorage;
   this._server = new Server;
   var a;
   CORDOVA_BUILD && (a = "cordova");
   WEB_BUILD && (a = "web");
   this.sdk = a + config.version;
-  CORDOVA_BUILD && (this._permStorage = storage(!0), this.debug = !1);
+  CORDOVA_BUILD && (this.debug = !1);
   this.init_state = init_states.NO_INIT;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1313,7 +1310,6 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       d.sessionLink = e.link;
       CORDOVA_BUILD && (d.device_fingerprint_id = e.device_fingerprint_id, e.link_click_id && (d.link_click_id = e.link_click_id));
       c = e;
-      CORDOVA_BUILD && utils.store(c, d._permStorage);
       utils.store(c, d._storage);
       d.init_state = init_states.INIT_SUCCEEDED;
       c.data_parsed = c.data ? goog.json.parse(c.data) : null;
@@ -1326,9 +1322,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   } else {
     if (CORDOVA_BUILD && (c = [], c.push(d.debug), null !== b && c.push(b ? 1 : 0), b = function() {
       a("Error getting device data!");
-    }, utils.readKeyValue("identity_id", d._permStorage) ? exec(function(a) {
-      a.identity_id = utils.readKeyValue("identity_id", d._permStorage);
-      a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
+    }, utils.readKeyValue("identity_id", d._storage) ? exec(function(a) {
+      a.identity_id = utils.readKeyValue("identity_id", d._storage);
+      a.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._storage);
       console.log("Sending open with: " + goog.json.serialize(a));
       d._api(resources.open, a, function(a, b) {
         if (a) {
