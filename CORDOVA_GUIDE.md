@@ -143,7 +143,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 ## API Reference
 
 1. Branch Session
-  + [.init()](#initbranch_key-options)
+  + [.init()](#initbranch_key-options-callback)
   + [.data()](#datacallback)
   + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)

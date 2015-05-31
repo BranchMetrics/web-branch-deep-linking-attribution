@@ -1,5 +1,5 @@
 1. Branch Session
-  + [.init()](#initbranch_key-options)
+  + [.init()](#initbranch_key-options-callback)
   + [.data()](#datacallback)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
@@ -21,6 +21,6 @@
   + [.redeem()](#redeemamount-bucket-callback)
 
 5. Smart Banner
-  + [.banner()](#smart-app-sharing-banner)
+  + [.banner()](#banneroptions-data)
 
 ___

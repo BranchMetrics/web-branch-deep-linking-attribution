@@ -1,5 +1,5 @@
 1. Branch Session
-  + [.init()](#initbranch_key-options)
+  + [.init()](#initbranch_key-options-callback)
   + [.data()](#datacallback)
   + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)

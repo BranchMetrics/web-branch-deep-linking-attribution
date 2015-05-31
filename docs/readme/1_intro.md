@@ -60,6 +60,8 @@ While only available for websites and web apps (not Cordova), the app smart bann
 
 Get Started Installing the App Smart Banner for Web [Here](WEB_GUIDE.md#smart-app-sharing-banner)
 
+For an in-depth explanation of everything the App Smart Banner can do, see the [Smart Banner Guide](smart_banner_guide.md)!
+
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
 | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |

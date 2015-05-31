@@ -78,7 +78,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 ## API Reference
 
 1. Branch Session
-  + [.init()](#initbranch_key-options)
+  + [.init()](#initbranch_key-options-callback)
   + [.data()](#datacallback)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
@@ -100,7 +100,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.redeem()](#redeemamount-bucket-callback)
 
 5. Smart Banner
-  + [.banner()](#smart-app-sharing-banner)
+  + [.banner()](#banneroptions-data)
 
 ___
 
@@ -810,11 +810,11 @@ ___
 
 Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
 
+*Be sure to checkout the [Smart Banner Guide](smart_banner_guide.md) for a full explanation of everything you can do!*
+
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
 | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
-
-THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
 
 #### Usage
 
