@@ -784,8 +784,8 @@ var session = {read:function(a) {
   } catch (b) {
     return{};
   }
-}, store:function(a, b) {
-  b.setPermItem("branch_session", goog.json.serialize(a));
+}, store:function(a, b, c) {
+  c ? b.setPermItem("branch_session", goog.json.serialize(a)) : b.setTempItem("branch_session", goog.json.serialize(a));
 }, clear:function(a) {
   a.removeItem("branch_session");
 }, storeKeyValue:function(a, b, c) {
@@ -1013,7 +1013,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
   try {
     f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    d.setItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
+    d.setTempItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
 Server.prototype.request = function(a, b, c, d) {

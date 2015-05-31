@@ -22,9 +22,11 @@ session.read = function(storage) {
 /**
  * @param {Object} data
  * @param {BranchStorage} storage
+ * @param {boolean=} perm
  */
-session.store = function(data, storage) {
-	storage['setPermItem']('branch_session', goog.json.serialize(data));
+session.store = function(data, storage, perm) {
+	if (perm) { storage['setPermItem']('branch_session', goog.json.serialize(data)); }
+	else { storage['setTempItem']('branch_session', goog.json.serialize(data)); }
 };
 
 /**
