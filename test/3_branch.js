@@ -3,13 +3,16 @@ goog.require('Branch');
 goog.require('resources');
 goog.require('config');
 goog.require('storage');
+goog.require('session');
 
 goog.require('goog.json'); // jshint unused:false
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
 describe('Branch', function() {
-	var sandbox, requests;
+	var storage = new BranchStorage(),
+		sandbox,
+		requests;
 
 	beforeEach(function() {
 		testUtils.go('');
@@ -18,7 +21,7 @@ describe('Branch', function() {
 	});
 
 	function initBranch(runInit) {
-		storage().clear();
+		storage.clear();
 		var branch = new Branch();
 
 		sandbox.stub(branch._server, "request", function(resource, obj, storage, callback) {
@@ -220,7 +223,7 @@ describe('Branch', function() {
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;
 			});
-			sandbox.stub(utils, "readStore", function(storage) {
+			sandbox.stub(session, "read", function(storage) {
 				return whitelistedData;
 			});
 			branch.data(function(err, res) {
@@ -402,7 +405,7 @@ describe('Branch', function() {
 
 		it('should call SMSLinkSend if a click_id already exists', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			sandbox.stub(utils, "readKeyValue", function(key, storage) {
+			sandbox.stub(session, "readKeyValue", function(key, storage) {
 				return '12345';
 			});
 
@@ -422,7 +425,7 @@ describe('Branch', function() {
 
 		it('should create new link if a click_id does not exist', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			sandbox.stub(utils, "readKeyValue", function(key, storage) {
+			sandbox.stub(session, "readKeyValue", function(key, storage) {
 				return null;
 			});
 
