@@ -1096,7 +1096,7 @@ if (WEB_BUILD) { // jshint undef:false
  *
  * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
  *
- * *Be sure to checkout the [Smart Banner Guide](smart_banner_guide.md) for a full explanation of everything you can do!*
+ * *Be sure to checkout the [Smart Banner Guide](docs/web/smart_banner_guide.md) for a full explanation of everything you can do!*
  *
  * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
  * |------------------|----------------------|----------------------|
