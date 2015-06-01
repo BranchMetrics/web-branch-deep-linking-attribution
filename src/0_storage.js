@@ -47,7 +47,12 @@ var BranchStorage = function() {
 	*/
 
 	// As a last resort, we store the data in a JS object that is lost when the user closes the window
-	this._store = { };
+	// Even though this is not  permanent object, we still separate temporary and "permanent" storage into
+	// two objects, so that we can clear temp and permanent values seperatley.
+	this._store = {
+		"TEMP": { },
+		"PERM": { }
+	};
 };
 
 /*
@@ -142,7 +147,7 @@ var clearCookies = function(temp, perm) {
 BranchStorage.prototype['setPermItem'] = function(key, value) {
 	if (this._localStoreAvailable) { localStorage.setItem(key, value); }
 	if (navigator.cookieEnabled) { setCookie(key, value, COOKIE_DAYS); }
-	this._store[key] = value;
+	this._store["PERM"][key] = value;
 };
 
 /**
@@ -152,7 +157,7 @@ BranchStorage.prototype['setPermItem'] = function(key, value) {
 BranchStorage.prototype['setTempItem'] = function(key, value) {
 	if (this._sessionStoreAvailable) { sessionStorage.setItem(key, value); }
 	if (navigator.cookieEnabled) { setCookie(key, value); }
-	this._store[key] = value;
+	this._store["TEMP"][key] = value;
 };
 
 /**
@@ -162,8 +167,9 @@ BranchStorage.prototype['getItem'] = function(key) {
 	var tempValue = this._localStoreAvailable ? localStorage.getItem(key) : null;
 	var permValue = this._sessionStoreAvailable ? sessionStorage.getItem(key) : null;
 	var cookieValue = readCookie(key);
-	var storeValue = typeof this._store[key] != 'undefined' ? this._store[key] : null;
-	return tempValue || permValue || cookieValue || storeValue;
+	var storeTempValue = typeof this._store["TEMP"][key] != 'undefined' ? this._store["TEMP"][key] : null;
+	var storePermValue = typeof this._store["PERM"][key] != 'undefined' ? this._store["PERM"][key] : null;
+	return tempValue || permValue || cookieValue || storeTempValue || storePermValue;
 };
 
 /**
@@ -173,12 +179,16 @@ BranchStorage.prototype['removeItem'] = function(key) {
 	if (this._localStoreAvailable) { localStorage.removeItem(key); }
 	if (this._sessionStoreAvailable) { sessionStorage.removeItem(key); }
 	if (navigator.cookieEnabled) { clearCookie(key); }
-	delete this._store[key];
+	delete this._store["TEMP"][key];
+	delete this._store["PERM"][key];
 };
 
 // Clears all storage methods, temporary and permanent
 BranchStorage.prototype['clear'] = function() {
-	this._store = { };
+	this._store = {
+		"TEMP": { },
+		"PERM": { }
+	};
 	if (this._sessionStoreAvailable) { sessionStorage.clear(); }
 	if (this._localStoreAvailable) { localStorage.clear(); }
 	if (navigator.cookieEnabled) { clearAllCookies(); }
@@ -188,11 +198,12 @@ BranchStorage.prototype['clear'] = function() {
 BranchStorage.prototype['clearTemp'] = function() {
 	sessionStorage.clear();
 	if (navigator.cookieEnabled) { clearTempCookies(); }
-	this._store = { };
+	this._store["TEMP"] = { };
 };
 
 // Clears only permanent storage methods
 BranchStorage.prototype['clearPerm'] = function() {
 	localStorage.clear();
 	if (navigator.cookieEnabled) { clearPermCookies(); }
+	this._store["PERM"] = { };
 };

@@ -618,7 +618,7 @@ var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
   } catch (b) {
     this._sessionStoreAvailable = !1;
   }
-  this._store = {};
+  this._store = {TEMP:{}, PERM:{}};
 }, setCookie = function(a, b, c) {
   var d = "";
   c && (d = new Date, d.setTime(d.getTime() + 864E5 * c), d = "branch_expiration_date=" + d.toGMTString() + "; expires=" + d.toGMTString());
@@ -655,26 +655,27 @@ var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
 BranchStorage.prototype.setPermItem = function(a, b) {
   this._localStoreAvailable && localStorage.setItem(a, b);
   navigator.cookieEnabled && setCookie(a, b, COOKIE_DAYS);
-  this._store[a] = b;
+  this._store.PERM[a] = b;
 };
 BranchStorage.prototype.setTempItem = function(a, b) {
   this._sessionStoreAvailable && sessionStorage.setItem(a, b);
   navigator.cookieEnabled && setCookie(a, b);
-  this._store[a] = b;
+  this._store.TEMP[a] = b;
 };
 BranchStorage.prototype.getItem = function(a) {
-  var b = this._localStoreAvailable ? localStorage.getItem(a) : null, c = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null, d = readCookie(a);
-  a = "undefined" != typeof this._store[a] ? this._store[a] : null;
-  return b || c || d || a;
+  var b = this._localStoreAvailable ? localStorage.getItem(a) : null, c = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null, d = readCookie(a), e = "undefined" != typeof this._store.TEMP[a] ? this._store.TEMP[a] : null;
+  a = "undefined" != typeof this._store.PERM[a] ? this._store.PERM[a] : null;
+  return b || c || d || e || a;
 };
 BranchStorage.prototype.removeItem = function(a) {
   this._localStoreAvailable && localStorage.removeItem(a);
   this._sessionStoreAvailable && sessionStorage.removeItem(a);
   navigator.cookieEnabled && clearCookie(a);
-  delete this._store[a];
+  delete this._store.TEMP[a];
+  delete this._store.PERM[a];
 };
 BranchStorage.prototype.clear = function() {
-  this._store = {};
+  this._store = {TEMP:{}, PERM:{}};
   this._sessionStoreAvailable && sessionStorage.clear();
   this._localStoreAvailable && localStorage.clear();
   navigator.cookieEnabled && clearAllCookies();
@@ -682,11 +683,12 @@ BranchStorage.prototype.clear = function() {
 BranchStorage.prototype.clearTemp = function() {
   sessionStorage.clear();
   navigator.cookieEnabled && clearTempCookies();
-  this._store = {};
+  this._store.TEMP = {};
 };
 BranchStorage.prototype.clearPerm = function() {
   localStorage.clear();
   navigator.cookieEnabled && clearPermCookies();
+  this._store.PERM = {};
 };
 // Input 3
 var Queue = function() {
