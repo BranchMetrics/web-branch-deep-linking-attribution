@@ -17,6 +17,7 @@ describe('Integration tests', function() {
 
 	beforeEach(function() {
 		sessionStorage.clear();
+		localStorage.clear();
 		testUtils.go('');
 		branch.identity_id = identity_id.toString();
 	});
