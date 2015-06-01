@@ -2,6 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+
 ## [v1.5.6] - 2015-06-01
 ### New Functionality
 - Adds Smart Banner Option to specifiy if the banner will show on an iPad
