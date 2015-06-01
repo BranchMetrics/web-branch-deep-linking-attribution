@@ -36,6 +36,7 @@ The entire process for releasing new versions of the Branch SDK, and geenrating 
 + `CHANGELOG.md` - **Note**: The changelog should only be edited directly under the unreleased version: `## [VERSION] - unreleased`
 + `RELEASE_DOCUMENTATION.md` (this file)
 + `CORDOVA_UPGRADE_GUIDE.md`
++ `SMART_BANNER_GUIDE.md` - An in-depth guide explaining every feature of the smart app sharing banner
 
 #### Editing the main README (`README.md`)
 The markdown files concatenated together to make the main README, can be seen in the `README.md` target of the Makefile. In summary, the files consist of:
