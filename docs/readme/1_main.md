@@ -60,7 +60,7 @@ While only available for websites and web apps (not Cordova), the app smart bann
 
 Get Started Installing the App Smart Banner for Web [Here](WEB_GUIDE.md#smart-app-sharing-banner)
 
-For an in-depth explanation of everything the App Smart Banner can do, see the [Smart Banner Guide](docs/web/smart_banner_guide.md)!
+For an in-depth explanation of everything the App Smart Banner can do, see the [Smart Banner Guide](SMART_BANNER_GUIDE.md)!
 
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
@@ -70,6 +70,15 @@ For an in-depth explanation of everything the App Smart Banner can do, see the [
 Powerful, customizeable, and easy-to-create deeplinks are what Branch does best. The Web SDK delivers on this promise of providing a simple and powerful function for generating short deep links asynchronously: `link()`. The method has all of the same options and parameters available on the public API `POST /v1/url` endpoint, and is called from a robust queueing mechanism and XHRRequest implementation with JSONP fallback that is well tested down to IE9, and every major browser.
 
 Get Started Generating Short Deep Links for [Web](WEB_GUIDE.md#linkdata-callback) or [Cordova](CORDOVA_GUIDE.md#linkdata-callback)
+
+* * *
+
+## Contributing
+Whether you are an avid engineer, a partner, or a Branch employee, we activley welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
+
+To build the Web SDK, you'll need to run `npm install` to grab the necessary packages, be sure you have [make](http://www.gnu.org/software/make/), [python](https://www.python.org/downloads/) (comes with Mac OSX), [perl](http://learn.perl.org/installing/osx.html), and the [Google Closure Compiler](https://developers.google.com/closure/compiler/) (Closure compiler is automatically installed when you run `make` the first time.)
+
+For an in-depth guide to working with developing for the Web SDK, refer to the [release documentation](RELEASE_DOCUMENTATION.md).
 
 * * *
 
