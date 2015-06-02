@@ -234,10 +234,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		options = { isReferrable: null };
 	}
 
-	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var isReferrable = (options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null) ? options.isReferrable : null;
 	var sessionData = utils.readStore(self._storage);
 
-	function setBranchValues(data) {
+	var setBranchValues = function(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
 		if (data['link']) { self.sessionLink = data['link']; }
@@ -288,106 +288,52 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		finishInit(null, sessionData, false);
 	}
 	else {
+		var storedValues = utils.readStore(self._permStorage);
+		var freshInstall = !storedValues['identity_id'];
+
+		var appendOpenData = function(data) {
+			if (!freshInstall) {
+				data['identity_id'] = storedValues['identity_id'];
+				data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+			}
+			return data;
+		};
+
 		if (CORDOVA_BUILD) { // jshint undef:false
 			var args = [];
 			if (isReferrable !== null) {
 				args.push(isReferrable ? 1 : 0);
 			}
-			var storedValues = utils.readStore(self._permStorage);
-			var install = !!storedValues['identity_id'];
 			cordovaExec(function(data) {
-				if (install) {
-					data['identity_id'] = storedValues['identity_id'];
-					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
-				}
-				self._api(install ? resources.install : resources.open, data, function(err, data) {
-					finishInit(err, data || null, install);
+				data = appendOpenData(data);
+				self._api(freshInstall ? resources.install : resources.open, data, function(err, data) {
+					finishInit(err, data, freshInstall);
 				});
 			}, function() {
 				done("Error getting device data!");
-			},  "BranchDevice", install ? "getInstallData" : "getOpenData", args);
+			},  "BranchDevice", freshInstall ? "getInstallData" : "getOpenData", args);
 		}
 
-
-
-
-
-
-
-
-
-
-
-
 		if (TITANIUM_BUILD) { // jshint undef:false
-			// Titanium will be passing us the URL which opened the app.  We need to parse it and get a
-			// value to add to the data as link_identifier.
-			var url = (options && typeof options.url != 'undefined' && options.url != null) ? options.url : null;
-			var link_identifier;
-			if (url) {
-				var parts = url.split('?');
-				if (parts.length == 2) {
-					var queries = parts[1].split('&');
-					if (queries.length > 0) {
-						for (var i = 0; i < queries.length; i++) {
-							var pieces = queries[i].split('=');
-							if (pieces.length == 2 && pieces[0] === 'link_click_id') {
-								link_identifier = pieces[1];
-								break;
-							}
-						}
-					}
-				}
-			}
-			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
-			if (utils.readKeyValue('identity_id', self._permStorage)) {
-				var sdk = require('io.branch.sdk');
-				var data;
-				console.log("Getting data");
-				if (isReferrable == null) {
-					data = sdk.getOpenData(-1);
-				} else {
-					data = sdk.getOpenData(isReferrable ? 1 : 0);
-				}
-				if (link_identifier) {
-					data['link_identifier'] = link_identifier;
-				}
-				// console.log("Data is: " + JSON.stringify(data));
-				var storedValues = utils.readStore(self._permStorage);
-				// console.log("Stored values: " + JSON.stringify(storedValues));
-				data['identity_id'] = storedValues['identity_id'];
-				data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
-				// console.log("Sending open with: " + goog.json.serialize(data));
+			var branchTitaniumSDK = require('io.branch.sdk');
+			var link_identifier, data, url =
+				(options && typeof options.url != 'undefined' && options.url != null) ? options.url : null;
+			if (url) { link_identifier = utils.getParamValue(url); }
+			if (data && link_identifier) { data['link_identifier'] = link_identifier; }
+			if (freshInstall) {
+				data = (isReferrable == null) ? branchTitaniumSDK.getOpenData(-1) : branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
+				data = appendOpenData(data);
 				self._api(resources.open, data, function(err, data) {
-					if (err) { return finishInit(err, null, false); }
-					data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
-					data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-					finishInit(null, data, false);
+					finishInit(err, data, false);
 				});
 			}
 			else {
-				var sdk = require('io.branch.sdk');
-				var data;
-				if (isReferrable == null) {
-					data = sdk.getInstallData(self.debug, -1);
-				} else {
-					data = sdk.getInstallData(self.debug, isReferrable?1:0);
-				}
-				if (link_identifier) {
-					data['link_identifier'] = link_identifier;
-				}
-				console.log("Sending install with: " + goog.json.serialize(data));
+				data = (isReferrable == null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
 				self._api(resources.install, data, function(err, data) {
-					if (err) { return finishInit(err, null, true); }
-					finishInit(null, data, true);
+					finishInit(err, data, true);
 				});
 			}
 		}
-
-
-
-
-
 
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
@@ -398,8 +344,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
-					if (err) { return finishInit(err, null, false); }
-					if (link_identifier) { data['click_id'] = link_identifier; }
+					if (data && link_identifier) { data['click_id'] = link_identifier; }
 					finishInit(err, data, false);
 				});
 			});
