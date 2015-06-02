@@ -13,7 +13,7 @@ goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
 if (CORDOVA_BUILD) {  // jshint undef:false
-	var exec = require("cordova/exec");
+	var cordovaExec = require("cordova/exec");
 }
 
 var default_branch;
@@ -229,6 +229,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	else {
 		self.app_id = branch_key;
 	}
+
 	if (options && typeof options == 'function') {
 		options = { isReferrable: null };
 	}
@@ -288,28 +289,23 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	}
 	else {
 		if (CORDOVA_BUILD) { // jshint undef:false
-			var args = [], execFunc;
+			var args = [];
 			if (isReferrable !== null) {
 				args.push(isReferrable ? 1 : 0);
 			}
-
-			var cordovaExec = function(resource, data, install) {
-				exec(function(data) {
-					self._api(resource, data, function(err, data) {
-						finishInit(err, data || null, install);
-					});
-				}, function() {
-					done("Error getting device data!");
-				},  "BranchDevice", install ? "getInstallData" : "getOpenData", args);
-			};
-
-			if (utils.readKeyValue('identity_id', self._permStorage)) {
-				var storedValues = utils.readStore(self._permStorage);
-				data['identity_id'] = storedValues['identity_id'];
-				data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
-				cordovaExec(resources.open, data, false);
-			}
-			else { cordovaExec(resources.install, data, true); }
+			var storedValues = utils.readStore(self._permStorage);
+			var install = !!storedValues['identity_id'];
+			cordovaExec(function(data) {
+				if (install) {
+					data['identity_id'] = storedValues['identity_id'];
+					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+				}
+				self._api(install ? resources.install : resources.open, data, function(err, data) {
+					finishInit(err, data || null, install);
+				});
+			}, function() {
+				done("Error getting device data!");
+			},  "BranchDevice", install ? "getInstallData" : "getOpenData", args);
 		}
 
 
@@ -393,9 +389,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 
 
-
-
-
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
@@ -411,14 +404,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				});
 			});
 		}
-
-
-
-
-
-
-
-
 	}
 }, true);
 
