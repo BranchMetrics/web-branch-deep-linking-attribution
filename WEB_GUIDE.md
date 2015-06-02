@@ -36,7 +36,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.5.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.6.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "),0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -810,7 +810,7 @@ ___
 
 Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
 
-*Be sure to checkout the [Smart Banner Guide](docs/web/smart_banner_guide.md) for a full explanation of everything you can do!*
+*Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation of everything you can do!*
 
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
@@ -836,7 +836,8 @@ branch.banner({
     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-    showiOS: true,                          // Should the banner be shown on iOS devices?
+    showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
+    showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
     showAndroid: true,                      // Should the banner be shown on Android devices?
     showDesktop: true,                      // Should the banner be shown on desktop devices?
     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS

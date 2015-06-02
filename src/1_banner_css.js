@@ -79,7 +79,7 @@ banner_css.css = function(options, element) {
 
 	// User agent specific styles
 	var userAgent = banner_utils.mobileUserAgent();
-	if (userAgent == 'ios' && options.showiOS) {
+	if ((userAgent == 'ios' || userAgent == 'ipad') && options.showiOS) {
 		style += banner_css.mobile + banner_css.ios;
 	}
 	else if (userAgent == 'android' && options.showAndroid) {

@@ -51,7 +51,11 @@ banner_utils.removeClass = function(element, className) {
 };
 
 banner_utils.mobileUserAgent = function() {
-	return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? (navigator.userAgent.match(/android/i) ? 'android' : 'ios') : false;
+	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
+		if (navigator.userAgent.match(/android/i)) { return 'android'; }
+		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
+		else { return 'ios'; }
+	} else { return false; }
 };
 
 banner_utils.getDate = function(days) {
@@ -113,6 +117,7 @@ banner_utils.shouldAppend = function(storage, options) {
 		(
 			(options.showDesktop && !banner_utils.mobileUserAgent()) ||
 			(options.showAndroid && banner_utils.mobileUserAgent() == 'android') ||
-			(options.showiOS && banner_utils.mobileUserAgent() == 'ios')
+			(options.showiPad && banner_utils.mobileUserAgent() == 'ipad') ||
+			(banner_utils.mobileUserAgent() != 'ipad' && options.showiOS && banner_utils.mobileUserAgent() == 'ios')
 		);
 };
