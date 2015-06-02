@@ -1,12 +1,12 @@
 goog.provide('banner_css');
 goog.require('banner_utils');
 
-banner_css.banner =
-	'.branch-animation { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
+banner_css.banner = function(options) {
+	return '.branch-banner-is-active { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
 	'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
 	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +
-	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; padding: 6px; }\n' +
+	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; ' + (options.position == 'top' ? 'border-bottom' : 'border-top') + ': 1px solid #ddd; padding: 6px; }\n' +
 	'#branch-banner .icon { float: left; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
 	'#branch-banner .details { top: 16px; }\n' +
@@ -14,6 +14,7 @@ banner_css.banner =
 	'#branch-banner .right > div { float: right; }\n' +
 	'#branch-banner-action { top: 17px; }\n' +
 	'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
+};
 
 banner_css.desktop =
 	'#branch-banner { position: fixed; min-width: 600px; }\n' +
@@ -64,10 +65,9 @@ banner_css.iframe =
 
 banner_css.inneriframe = 'body { margin: 0; }\n';
 
-banner_css.iframe_desktop = '#branch-banner-iframe { position: fixed; }\n';
-
-banner_css.iframe_mobile = '#branch-banner-iframe { position: absolute; }\n';
-
+banner_css.iframe_position = function(sticky, position) {
+	return '#branch-banner-iframe { position: ' + (position == 'top' ? (sticky ? 'fixed' : 'absolute') : 'fixed') + '; }\n';
+};
 
 /**
  * @param {banner_utils.options} options
@@ -75,11 +75,11 @@ banner_css.iframe_mobile = '#branch-banner-iframe { position: absolute; }\n';
  */
 banner_css.css = function(options, element) {
 	// Construct Banner CSS
-	var style = banner_css.banner;
+	var style = banner_css.banner(options);
 
 	// User agent specific styles
 	var userAgent = banner_utils.mobileUserAgent();
-	if (userAgent == 'ios' && options.showiOS) {
+	if ((userAgent == 'ios' || userAgent == 'ipad') && options.showiOS) {
 		style += banner_css.mobile + banner_css.ios;
 	}
 	else if (userAgent == 'android' && options.showAndroid) {
@@ -94,6 +94,7 @@ banner_css.css = function(options, element) {
 			style += banner_css.nonie;
 		}
 	}
+	style += options.customCSS;
 
 	if (options.iframe) {
 		style += banner_css.inneriframe;
@@ -101,7 +102,7 @@ banner_css.css = function(options, element) {
 		var iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
-		iFrameCSS.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_mobile : banner_css.iframe_desktop);
+		iFrameCSS.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_position(options.mobileSticky, options.position) : banner_css.iframe_position(options.desktopSticky, options.position));
 		document.head.appendChild(iFrameCSS);
 	}
 
@@ -112,5 +113,6 @@ banner_css.css = function(options, element) {
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
 	doc.head.appendChild(css);
-	element.style.top = '-' + banner_utils.bannerHeight;
+	if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+	else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 };

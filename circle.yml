@@ -5,7 +5,7 @@ machine:
 
 dependencies:
   post:
-    # Closure COmpiler
+    # Closure Compiler
     - mkdir -p compiler
     - stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-latest.zip && unzip compiler-latest.zip -d compiler)
 
@@ -13,10 +13,14 @@ dependencies:
     - mkdir -p compiler/library
     - stat compiler/library/closure-library-master || (wget https://github.com/google/closure-library/archive/master.zip && unzip master.zip -d compiler/library)
 
+    # Node, Sauce, Phantom, and JSlint deps
     - npm install
-    - mocha-phantomjs -v || npm install -g mocha-phantomjs
-    - jscs -v || npm install -g jscs
+    - mocha-phantomjs --help || npm install -g mocha-phantomjs
+    - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
+    - tar -xzf sc-latest-linux.tar.gz
+    - jscs --help || npm install -g jscs
     - jshint -v || npm install -g jshint
+    - grunt -v || npm install -g grunt-cli
   cache_directories:
     - "~/nvm/v0.10.31"
     - compiler
@@ -24,4 +28,5 @@ dependencies:
 test:
   override:
     - ./lint.sh
-    - mocha-phantomjs test/test.html
+    - grunt test
+    - mocha-phantomjs test/integration-test.html

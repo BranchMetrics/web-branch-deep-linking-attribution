@@ -40,7 +40,8 @@ describe('utils', function() {
 				"referring_identity": "12345",
 				"identity": "67890",
 				"has_app": true,
-				"unwanted": "param"
+				"unwanted": "param",
+				"referring_link": null
 			};
 			var whiteListedData = utils.whiteListSessionData(data);
 			delete data["unwanted"];
@@ -103,29 +104,33 @@ describe('utils', function() {
 
 	describe("getParamValue", function() {
 		it('should return search param value', function() {
-			testUtils.go('?test=testsearch');
-			var value = utils.getParamValue('test');
-			assert.equal('testsearch', value, 'Returns search param');
+			if (testUtils.go('?test=testsearch')) {
+				var value = utils.getParamValue('test');
+				assert.equal('testsearch', value, 'Returns search param');
+			}
 		});
 
 		it('should return undefined if not set', function() {
-			testUtils.go('');
-			var value = utils.getParamValue('test');
-			assert.equal(undefined, value, 'returns undefined');
+			if (testUtils.go('')) {
+				var value = utils.getParamValue('test');
+				assert.equal(undefined, value, 'returns undefined');
+			}
 		});
 	});
 
 	describe("hashValue", function() {
 		it('should return hash param value', function() {
-			testUtils.go('#test:testhash');
-			var value = utils.hashValue('test');
-			assert.equal('testhash', value, 'Returns hash param');
+			if (testUtils.go('#test:testhash')) {
+				var value = utils.hashValue('test');
+				assert.equal('testhash', value, 'Returns hash param');
+			}
 		});
 
 		it('should return undefined if not set', function() {
-			testUtils.go('');
-			var value = utils.hashValue('test');
-			assert.equal(undefined, value, 'returns undefined');
+			if (testUtils.go('')) {
+				var value = utils.hashValue('test');
+				assert.equal(undefined, value, 'returns undefined');
+			}
 		});
 	});
 });

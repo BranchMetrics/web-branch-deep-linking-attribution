@@ -4,6 +4,47 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v1.5.6] - 2015-06-01
+### New Functionality
+- Adds Smart Banner Option to specifiy if the banner will show on an iPad
+
+## [v1.5.5] - 2015-05-26
+### New Functionality
+- Adds previously Cordova only functions to Web: `creditHistory()`, `getCode()`, `validateCode()`, and `applyCode()`
+
+## [v1.5.4] - 2015-05-21
+- Fixes bug with iOS and Android app banner not opening
+### Improvements
+- Behind the scenes improvement to retry all XHR and JSONP requests 3 times if they fail or timeout
+
+## [v1.5.3] - 2015-05-21
+### New Functionality
+- Adds `referring_link` property to both `init()` and `data()` methods that returns the referring link, if available.
+
+## [v1.5.2] - 2015-05-18
+### New Functionality
+- Specify whether the app banner is "sticky" (position: fixed) on desktop and mobile
+- Set the app banner to either never show a second time, or wait a specified number of days before showing again
+- Adds `customCSS` property to banner to allow custom styles
+### Fixed
+- Fixes body element position when banner is shown with `body { position: relative; }` or `body { position: absolute; }`
+- Fixes body background image position when banner is shown
+
+## [v1.5.1] - 2015-05-13
+- Fixes IE11 bug with XHRRequests that caused an InvalidState error
+
+## [v1.5.0] - 2015-05-11
+### New Functionality
+- Integration tests
+- Adds smart banner position option, with possible values: 'top', or 'bottom'
+- Adds data_parsed to branch.init() and referring_data_parsed to branch.setIdentity()
+- Adds a `branch-banner-is-active` class to the body element when the smart banner is open, and removes it when the banner is closed
+- Fixes issue with Cordova open method
+
+## [1.4.2] - 2015-05-06
+- Fixes bug in link creation without data
+- Adds option to customize "Send Link" text in banner
+
 ## [1.4.1] - 2015-04-29
 - Fixes bug with dead-code elimination
 

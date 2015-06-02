@@ -75,7 +75,8 @@ utils.whiteListSessionData = function(data) {
 		'data': data['data'] || null,
 		'referring_identity': data['referring_identity'] || null,
 		'identity': data['identity'] || null,
-		'has_app': data['has_app'] || null
+		'has_app': data['has_app'] || null,
+		'referring_link': data['referring_link'] || null
 	};
 };
 
@@ -84,11 +85,11 @@ utils.cleanLinkData = function(linkData, config) {
 	if (WEB_BUILD) { // WTF, I don't know why I can't just do undef:false for the line.
 	/* jshint undef:true */
 		linkData['source'] = 'web-sdk';
-		if (linkData['data']['$desktop_url'] !== undefined) {
+		if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
 			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '').replace(/([\?\&]_branch_match_id=\d+)/, '');
 		}
 	}
-	linkData['data'] = goog.json.serialize(linkData['data']);
+	linkData['data'] = goog.json.serialize(linkData['data'] || {});
 	return linkData;
 };
 
@@ -187,6 +188,17 @@ utils.getParamValue = function(key) {
  */
 utils.isKey = function(key_or_id) {
 	return key_or_id.indexOf("key_") > -1;
+};
+
+/**
+ * @param {string} string
+ */
+utils.snakeToCamel = function(string) {
+	var find = /(\-\w)/g,
+		convert =  function(matches) {
+		    return matches[1].toUpperCase();
+		};
+	return string.replace(find, convert);
 };
 
 /**

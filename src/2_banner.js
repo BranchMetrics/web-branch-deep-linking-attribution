@@ -7,7 +7,6 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
-goog.require('config');
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
@@ -109,8 +108,9 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		if (banner_utils.mobileUserAgent()) {
-			if (utils.readKeyValue('click_id', storage) && !options.make_new_link) {
-				doc.getElementById('branch-mobile-action').href = config.link_service_endpoint + '/c/' + utils.readKeyValue('click_id', storage);
+			var referring_link = branch._referringLink();
+			if (referring_link && !options['make_new_link']) {
+				doc.getElementById('branch-mobile-action').href = referring_link;
 			}
 			else {
 				branch["link"](linkData, function(err, url) {
@@ -131,20 +131,30 @@ banner = function(branch, options, linkData, storage) {
 			});
 		}
 
-		var closeButton = doc.getElementById('branch-banner-close');
-		var closeBanner = function() {
+		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
+			bodyMarginTopInline = document.body.style.marginTop,
+			bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom'),
+			bodyMarginBottomInline = document.body.style.marginBottom,
+
+			closeButton = doc.getElementById('branch-banner-close'),
+			closeBanner = function() {
 			setTimeout(function() {
 				banner_utils.removeElement(element);
 				banner_utils.removeElement(document.getElementById('branch-css'));
 			}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 			setTimeout(function() {
-				document.body.style.marginTop = '0px';
+				if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
+				else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
+				banner_utils.removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
-			element.style.top = '-' + banner_utils.bannerHeight;
+			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-			utils.storeKeyValue('hideBanner', true, storage);
+			if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
+			else { utils.storeKeyValue('hideBanner', true, storage); }
 		};
+
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
@@ -153,10 +163,13 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		// Trigger animation
-		document.body.className += ' branch-animation';
-		document.body.style.marginTop = banner_utils.bannerHeight;
+		banner_utils.addClass(document.body, 'branch-banner-is-active');
+		if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
+		else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
+
 		setTimeout(function() {
-			element.style.top = '0';
+			if (options.position == 'top') { element.style.top = '0'; }
+			else if (options.position == 'bottom') { element.style.bottom = '0'; }
 		}, banner_utils.animationDelay);
 
 		return closeBanner;

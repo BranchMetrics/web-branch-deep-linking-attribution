@@ -22,3 +22,5 @@ testbeds/cordova/plugins
 src/titanium/BranchSDK/android/build
 src/titanium/BranchSDK/iphone/build
 src/titanium/BranchSDK/bin
+aws_access_keys.sh
+sauce_access_keys.sh

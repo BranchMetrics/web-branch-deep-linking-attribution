@@ -26,4 +26,4 @@
 		branch._q.push([ name, arguments ]);
 	};
 }, { _q: [], _v: 1 }, // _q: the "queue" of calls, _v: the "version" of the embed script
-'init;data;setIdentity;logout;track;link;sendSMS;referrals;credits;redeem;banner;closeBanner'.split(';'), 0);
+'init;data;setIdentity;logout;track;link;sendSMS;referrals;credits;creditHistory;applyCode;validateCode;getCode;redeem;banner;closeBanner'.split(';'), 0);
