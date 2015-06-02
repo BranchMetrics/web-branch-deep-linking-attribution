@@ -523,8 +523,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
-      g[k - 2] = arguments[k];
+    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
+      g[h - 2] = arguments[h];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -842,14 +842,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, k, h = 0;
+  var b = "", c, d, e, f, g, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -879,7 +879,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, k = function() {
+    }, h = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -891,11 +891,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * k();
+      return a * h();
     }, vmin:function(a) {
-      return a * Math.min(k(), g());
+      return a * Math.min(h(), g());
     }, vmax:function(a) {
-      return a * Math.max(k(), g());
+      return a * Math.max(h(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * f;
     }}[b](f), 10);
@@ -1024,16 +1024,16 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(f.error));
   }
-  var g, k = "";
-  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
-  var h = RETRIES, l = function(a, b, c) {
-    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
-      m();
+  var g, h = "";
+  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
+  var k = RETRIES, m = function(a, b, c) {
+    a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
+      l();
     }, RETRY_DELAY)) : d(a, b);
-  }, m = function() {
-    c.getItem("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
+  }, l = function() {
+    c.getItem("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, m) : e.XHRRequest(g, h, a.method, c, m);
   };
-  m();
+  l();
 };
 // Input 8
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
@@ -1166,28 +1166,28 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 11
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, m = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, m = function() {
-    h = a.createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = banner_html.checkmark();
-    k.appendChild(h);
+  }, l = function() {
+    k = a.createElement("div");
+    k.className = "branch-icon-wrapper";
+    k.id = "branch-checkmark";
+    k.style = "opacity: 0;";
+    k.innerHTML = banner_html.checkmark();
+    h.appendChild(k);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      h.style.opacity = "1";
+      k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
-    l();
+    m();
     f.style.background = "#FFD4D4";
     e.className = "error";
     setTimeout(function() {
@@ -1198,9 +1198,9 @@ var sendSMS = function(a, b, c, d) {
   if (e) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? n() : (m(), setTimeout(function() {
-        k.removeChild(h);
-        l();
+      a ? n() : (l(), setTimeout(function() {
+        h.removeChild(k);
+        m();
       }, banner_utils.success_timeout));
     })) : n();
   }
@@ -1221,24 +1221,24 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function() {
+    var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, l = f.getElementById("branch-banner-close"), n = function() {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
-        "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = l);
+        "top" == b.position ? document.body.style.marginTop = h : "bottom" == b.position && (document.body.style.marginBottom = m);
         banner_utils.removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
       "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
     };
-    m && (m.onclick = function(a) {
+    l && (l.onclick = function(a) {
       a.preventDefault();
       n();
     });
     banner_utils.addClass(document.body, "branch-banner-is-active");
-    "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
+    "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
     }, banner_utils.animationDelay);
@@ -1259,7 +1259,7 @@ function wrap(a, b, c) {
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
@@ -1268,16 +1268,16 @@ function wrap(a, b, c) {
       };
       if (!c) {
         if (d.init_state == init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state == init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed)), null);
+          return k(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state == init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -1324,56 +1324,61 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
-  c && "function" == typeof c && (c = {isReferrable:null});
-  TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0, setTimeout(function() {
-    d.keepAlive = !1;
-  }, 2E3));
-  b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var e = utils.readStore(d._storage), f = function(b, c, e) {
+  c = c && "function" == typeof c ? {isReferrable:null} : c;
+  TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
+  b = utils.readStore(d._storage);
+  var e = function(a) {
+    a.session_id && (d.session_id = a.session_id.toString());
+    a.identity_id && (d.identity_id = a.identity_id.toString());
+    a.link && (d.sessionLink = a.link);
+    a.referring_link && (a.referring_link = "http" != a.referring_link.substring(0, 4) ? "https://bnc.lt" + a.referring_link : a.referring_link);
+    !a.click_id && a.referring_link && (a.click_id = a.referring_link.substring(a.referring_link.lastIndexOf("/") + 1, a.referring_link.length));
+    if (CORDOVA_BUILD || TITANIUM_BUILD) {
+      d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
+    }
+    return a;
+  }, f = function(b, c, f) {
     if (c) {
-      c.session_id && (d.session_id = c.session_id.toString());
-      c.identity_id && (d.identity_id = c.identity_id.toString());
-      c.link && (d.sessionLink = c.link);
-      c.referring_link && (c.referring_link = "http" != c.referring_link.substring(0, 4) ? "https://bnc.lt" + c.referring_link : c.referring_link);
-      !c.click_id && c.referring_link && (c.click_id = c.referring_link.substring(c.referring_link.lastIndexOf("/") + 1, c.referring_link.length));
+      c = e(c);
       if (CORDOVA_BUILD || TITANIUM_BUILD) {
-        d.device_fingerprint_id = c.device_fingerprint_id, c.link_click_id && (d.link_click_id = c.link_click_id);
-      }
-      if (CORDOVA_BUILD || TITANIUM_BUILD) {
-        var f = utils.readStore(d._permStorage);
-        e || utils.storeKeyValue("data", f.data || null, d._permStorage);
+        var g = utils.readStore(d._permStorage);
+        !f && g && utils.storeKeyValue("data", g.data, d._permStorage);
       }
       utils.store(c, d._storage);
       d.init_state = init_states.INIT_SUCCEEDED;
       c.data_parsed = c.data ? goog.json.parse(c.data) : null;
     }
     b && (d.init_state = init_states.INIT_FAILED);
+    d.keepAlive && setTimeout(function() {
+      d.keepAlive = !1;
+    }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
   };
-  if (e && e.session_id) {
-    f(null, e, !1);
+  if (b && b.session_id) {
+    f(null, b, !1);
   } else {
-    var g = utils.readStore(d._permStorage), k = !g.identity_id;
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      e = function(a) {
-        k || (a.identity_id = g.identity_id, a.device_fingerprint_id = g.device_fingerprint_id);
-        d._api(k ? resources.install : resources.open, a, function(a, b) {
-          f(a, b, k);
+      var g = utils.readStore(d._permStorage), h = !g.identity_id;
+      b = c.isReferrable = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
+      var k = function(a) {
+        h || (a.identity_id = g.identity_id, a.device_fingerprint_id = g.device_fingerprint_id);
+        d._api(h ? resources.install : resources.open, a, function(a, b) {
+          f(a, b, h);
         });
       };
       if (CORDOVA_BUILD) {
-        var h = [];
-        null !== b && h.push(b ? 1 : 0);
-        cordovaExec(e, function() {
+        var m = [];
+        null !== b && m.push(b ? 1 : 0);
+        cordovaExec(k, function() {
           a("Error getting device data!");
-        }, "BranchDevice", k ? "getInstallData" : "getOpenData", h);
+        }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
       }
       if (TITANIUM_BUILD) {
-        var h = require("io.branch.sdk"), l, m;
+        var m = require("io.branch.sdk"), l, n;
         (c = c && "undefined" != typeof c.url && null != c.url ? c.url : null) && (l = utils.getParamValue(c));
-        m && l && (m.link_identifier = l);
-        m = k ? null == b ? h.getInstallData(d.debug, -1) : h.getInstallData(d.debug, b ? 1 : 0) : null == b ? h.getOpenData(-1) : h.getOpenData(b ? 1 : 0);
-        e(m);
+        n && l && (n.link_identifier = l);
+        n = h ? null == b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null == b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
+        k(n);
       }
     }
     WEB_BUILD && (l = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), d._api(resources._r, {sdk:config.version}, function(a, b) {
@@ -1414,7 +1419,10 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
     var b = this;
-    this.keepAlive ? a(null) : this._api(resources.close, {}, function(c, d) {
+    if (this.keepAlive) {
+      return a(null);
+    }
+    this._api(resources.close, {}, function(c, d) {
       delete b.session_id;
       delete b.sessionLink;
       b.init_state = init_states.NO_INIT;

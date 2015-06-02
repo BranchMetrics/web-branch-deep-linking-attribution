@@ -230,17 +230,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		self.app_id = branch_key;
 	}
 
-	if (options && typeof options == 'function') {
-		options = { isReferrable: null };
-	}
-
+	options = (options && typeof options == 'function') ? { "isReferrable": null } : options;
 
 	if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
 		self.keepAlive = true;
-		setTimeout(function() { self.keepAlive = false; }, 2000); // this seems really shitty. What if init takes more than 2000ms?
 	}
 
-	var isReferrable = (options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null) ? options.isReferrable : null;
 	var sessionData = utils.readStore(self._storage);
 
 	var setBranchValues = function(data) {
@@ -252,6 +247,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data['referring_link']) {
 			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
+		// used to be an `else if` that would have never been called
 		if (!data['click_id'] && data['referring_link']) {
 			data['click_id'] = data['referring_link'].substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
 		}
@@ -268,17 +264,16 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			data = setBranchValues(data);
 			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 				var first = utils.readStore(self._permStorage);
-				if (!install) {
-					utils.storeKeyValue("data", first.data || null, self._permStorage);
-				}
+				if (!install && first) { utils.storeKeyValue("data", first.data, self._permStorage); }
 			}
 			utils.store(data, self._storage);
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
-		if (err) {
-			self.init_state = init_states.INIT_FAILED;
-		}
+		if (err) { self.init_state = init_states.INIT_FAILED; }
+
+		// Keep android titanium from calling close
+		if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
@@ -286,10 +281,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		finishInit(null, sessionData, false);
 	}
 	else {
-		var storedValues = utils.readStore(self._permStorage);
-		var freshInstall = !storedValues['identity_id'];
-
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
+			var storedValues = utils.readStore(self._permStorage);
+			var freshInstall = !storedValues['identity_id'];
+			var isReferrable = options.isReferrable = (options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null) ? options.isReferrable : null;
+
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
 					data['identity_id'] = storedValues['identity_id'];
@@ -484,12 +480,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
-
-		if (this.keepAlive) {
-			done(null);
-			return;
-		}
-
+		if (this.keepAlive) { return done(null); }
 		this._api(resources.close, { }, function(err, data) {
 			delete self.session_id;
 			delete self.sessionLink;
