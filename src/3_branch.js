@@ -234,6 +234,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		options = { isReferrable: null };
 	}
 
+
+	if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
+		self.keepAlive = true;
+		setTimeout(function() { self.keepAlive = false; }, 2000); // this seems really shitty. What if init takes more than 2000ms?
+	}
+
 	var isReferrable = (options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null) ? options.isReferrable : null;
 	var sessionData = utils.readStore(self._storage);
 
@@ -276,14 +282,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
-	if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
-		self.keepAlive = true;
-		setTimeout(function() {
-			self.keepAlive = false;
-			console.log("keep alive cleared!");
-		}, 2000);
-	}
-
 	if (sessionData  && sessionData['session_id']) {
 		finishInit(null, sessionData, false);
 	}
@@ -291,47 +289,39 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		var storedValues = utils.readStore(self._permStorage);
 		var freshInstall = !storedValues['identity_id'];
 
-		var appendOpenData = function(data) {
-			if (!freshInstall) {
-				data['identity_id'] = storedValues['identity_id'];
-				data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
-			}
-			return data;
-		};
-
-		if (CORDOVA_BUILD) { // jshint undef:false
-			var args = [];
-			if (isReferrable !== null) {
-				args.push(isReferrable ? 1 : 0);
-			}
-			cordovaExec(function(data) {
-				data = appendOpenData(data);
+		if (CORDOVA_BUILD || TITANIUM_BUILD) {
+			var apiCordovaTitanium = function(data) {
+				if (!freshInstall) {
+					data['identity_id'] = storedValues['identity_id'];
+					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+				}
 				self._api(freshInstall ? resources.install : resources.open, data, function(err, data) {
 					finishInit(err, data, freshInstall);
 				});
-			}, function() {
-				done("Error getting device data!");
-			},  "BranchDevice", freshInstall ? "getInstallData" : "getOpenData", args);
-		}
-
-		if (TITANIUM_BUILD) { // jshint undef:false
-			var branchTitaniumSDK = require('io.branch.sdk');
-			var link_identifier, data, url =
-				(options && typeof options.url != 'undefined' && options.url != null) ? options.url : null;
-			if (url) { link_identifier = utils.getParamValue(url); }
-			if (data && link_identifier) { data['link_identifier'] = link_identifier; }
-			if (freshInstall) {
-				data = (isReferrable == null) ? branchTitaniumSDK.getOpenData(-1) : branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
-				data = appendOpenData(data);
-				self._api(resources.open, data, function(err, data) {
-					finishInit(err, data, false);
-				});
+			};
+			if (CORDOVA_BUILD) { // jshint undef:false
+				var args = [];
+				if (isReferrable !== null) {
+					args.push(isReferrable ? 1 : 0);
+				}
+				cordovaExec(apiCordovaTitanium,
+					function() { done("Error getting device data!") },
+					"BranchDevice",
+					freshInstall ? "getInstallData" : "getOpenData", args);
 			}
-			else {
-				data = (isReferrable == null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
-				self._api(resources.install, data, function(err, data) {
-					finishInit(err, data, true);
-				});
+			if (TITANIUM_BUILD) { // jshint undef:false
+				var branchTitaniumSDK = require('io.branch.sdk');
+				var link_identifier, data, url =
+					(options && typeof options.url != 'undefined' && options.url != null) ? options.url : null;
+				if (url) { link_identifier = utils.getParamValue(url); }
+				if (data && link_identifier) { data['link_identifier'] = link_identifier; }
+				if (freshInstall) {
+					data = (isReferrable == null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
+				}
+				else {
+					data = (isReferrable == null) ? branchTitaniumSDK.getOpenData(-1) : branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
+				}
+				apiCordovaTitanium(data);
 			}
 		}
 
