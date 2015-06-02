@@ -109,20 +109,9 @@ Branch = function() {
 	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
-											// the session params from the first install.
-		this.debug = false;					// A debug install session will get a unique device id.
+		this._permStorage = storage(true);
+		this.debug = false;
 	}
-
-	if (TITANIUM_BUILD) {
-		// This is used to inhibit a close too soon after an init.
-		// This is needed on Android to ensure that the Activity
-		// transition doesn't accidentally close the session.
-
-		// This will be set to true in init and then cleared with a timer.
-		this.keepAlive = false;
-	}
-
 	this.init_state = init_states.NO_INIT;
 };
 
@@ -250,18 +239,16 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	function setBranchValues(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
-		self.sessionLink = data['link'];
+		if (data['link']) { self.sessionLink = data['link']; }
 
-		// This doesn't make any sense
+		// Double check that this works, second conditional would have never been called as an `else if`
 		if (data['referring_link']) {
 			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
-		else if (!data['click_id'] && data['referring_link']) {
+		if (!data['click_id'] && data['referring_link']) {
 			data['click_id'] = data['referring_link'].substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
 		}
 
-
-		self.sessionLink = data['link'];
 		if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
 			if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
@@ -273,16 +260,9 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data) {
 			data = setBranchValues(data);
 			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-				// Need to remember the first value if this isn't an install...
 				var first = utils.readStore(self._permStorage);
 				if (!install) {
-					// The data member we store needs to be the first metadata we received, not the current
-					// metadata so we replace it here.
-					if (first.data) {
-						utils.storeKeyValue("data", first.data, self._permStorage);
-					} else {
-						utils.storeKeyValue("data", null, self._permStorage);
-					}
+					utils.storeKeyValue("data", first.data || null, self._permStorage);
 				}
 			}
 			utils.store(data, self._storage);
@@ -295,10 +275,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
-	// For Titanium, we need to inhibit a close right after on init on Android.
-	// This will happen when init is called from onStart for an Activity and
-	// close is called in onStop.
-	if (TITANIUM_BUILD && Ti.Platform.osname === "android") {
+	if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
 		self.keepAlive = true;
 		setTimeout(function() {
 			self.keepAlive = false;
@@ -315,36 +292,36 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			if (isReferrable !== null) {
 				args.push(isReferrable ? 1 : 0);
 			}
-			var cordovaError = function() {
-				done("Error getting device data!");
+
+			var cordovaExec = function(resource, data, install) {
+				exec(function(data) {
+					self._api(resource, data, function(err, data) {
+						finishInit(err, data || null, install);
+					});
+				}, function() {
+					done("Error getting device data!");
+				},  "BranchDevice", install ? "getInstallData" : "getOpenData", args);
 			};
-			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
+
 			if (utils.readKeyValue('identity_id', self._permStorage)) {
-				exec(function(data) {
-					var storedValues = utils.readStore(self._permStorage);
-					data['identity_id'] = storedValues['identity_id'];
-					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
-					console.log("Sending open with: " + goog.json.serialize(data));
-					self._api(resources.open, data, function(err, data) {
-						if (err) { return finishInit(err, null, false); }
-						finishInit(null, data, false);
-					});
-				}, cordovaError,  "BranchDevice", "getOpenData", args);
+				var storedValues = utils.readStore(self._permStorage);
+				data['identity_id'] = storedValues['identity_id'];
+				data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+				cordovaExec(resources.open, data, false);
 			}
-			else {
-				args.push(self.debug);
-				if (isReferrable !== null) {
-					args.push(isReferrable ? 1 : 0);
-				}
-				exec(function(data) {
-					console.log("Sending install with: " + goog.json.serialize(data));
-					self._api(resources.install, data, function(err, data) {
-						if (err) { return finishInit(err, null, true); }
-						finishInit(null, data, true);
-					});
-				}, cordovaError,  "BranchDevice", "getInstallData", args);
-			}
+			else { cordovaExec(resources.install, data, true); }
 		}
+
+
+
+
+
+
+
+
+
+
+
 
 		if (TITANIUM_BUILD) { // jshint undef:false
 			// Titanium will be passing us the URL which opened the app.  We need to parse it and get a
@@ -411,6 +388,14 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			}
 		}
 
+
+
+
+
+
+
+
+
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
@@ -426,6 +411,14 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				});
 			});
 		}
+
+
+
+
+
+
+
+
 	}
 }, true);
 

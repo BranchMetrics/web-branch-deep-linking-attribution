@@ -1297,7 +1297,6 @@ var Branch = function() {
   if (CORDOVA_BUILD || TITANIUM_BUILD) {
     this._permStorage = storage(!0), this.debug = !1;
   }
-  TITANIUM_BUILD && (this.keepAlive = !1);
   this.init_state = init_states.NO_INIT;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1326,20 +1325,20 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
-  b = utils.readStore(d._storage);
-  var e = function(b, c, e) {
+  b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
+  var e = utils.readStore(d._storage), f = function(b, c, e) {
     if (c) {
       c.session_id && (d.session_id = c.session_id.toString());
       c.identity_id && (d.identity_id = c.identity_id.toString());
-      d.sessionLink = c.link;
-      c.referring_link ? c.referring_link = "http" != c.referring_link.substring(0, 4) ? "https://bnc.lt" + c.referring_link : c.referring_link : !c.click_id && c.referring_link && (c.click_id = c.referring_link.substring(c.referring_link.lastIndexOf("/") + 1, c.referring_link.length));
-      d.sessionLink = c.link;
+      c.link && (d.sessionLink = c.link);
+      c.referring_link && (c.referring_link = "http" != c.referring_link.substring(0, 4) ? "https://bnc.lt" + c.referring_link : c.referring_link);
+      !c.click_id && c.referring_link && (c.click_id = c.referring_link.substring(c.referring_link.lastIndexOf("/") + 1, c.referring_link.length));
       if (CORDOVA_BUILD || TITANIUM_BUILD) {
         d.device_fingerprint_id = c.device_fingerprint_id, c.link_click_id && (d.link_click_id = c.link_click_id);
       }
       if (CORDOVA_BUILD || TITANIUM_BUILD) {
         var f = utils.readStore(d._permStorage);
-        e || (f.data ? utils.storeKeyValue("data", f.data, d._permStorage) : utils.storeKeyValue("data", null, d._permStorage));
+        e || utils.storeKeyValue("data", f.data || null, d._permStorage);
       }
       utils.store(c, d._storage);
       d.init_state = init_states.INIT_SUCCEEDED;
@@ -1352,13 +1351,12 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     d.keepAlive = !1;
     console.log("keep alive cleared!");
   }, 2E3));
-  if (b && b.session_id) {
-    e(null, b, !1);
+  if (e && e.session_id) {
+    f(null, e, !1);
   } else {
-    b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
     if (CORDOVA_BUILD) {
-      var f = [];
-      null !== b && f.push(b ? 1 : 0);
+      e = [];
+      null !== b && e.push(b ? 1 : 0);
       var g = function() {
         a("Error getting device data!");
       };
@@ -1369,26 +1367,26 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         console.log("Sending open with: " + goog.json.serialize(a));
         d._api(resources.open, a, function(a, b) {
           if (a) {
-            return e(a, null, !1);
+            return f(a, null, !1);
           }
-          e(null, b, !1);
+          f(null, b, !1);
         });
-      }, g, "BranchDevice", "getOpenData", f) : (f.push(d.debug), null !== b && f.push(b ? 1 : 0), exec(function(a) {
+      }, g, "BranchDevice", "getOpenData", e) : (e.push(d.debug), null !== b && e.push(b ? 1 : 0), exec(function(a) {
         console.log("Sending install with: " + goog.json.serialize(a));
         d._api(resources.install, a, function(a, b) {
           if (a) {
-            return e(a, null, !0);
+            return f(a, null, !0);
           }
-          e(null, b, !0);
+          f(null, b, !0);
         });
-      }, g, "BranchDevice", "getInstallData", f));
+      }, g, "BranchDevice", "getInstallData", e));
     }
     if (TITANIUM_BUILD) {
       c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
       var h;
       if (c && (c = c.split("?"), 2 == c.length && (c = c[1].split("&"), 0 < c.length))) {
-        for (f = 0;f < c.length;f++) {
-          if (g = c[f].split("="), 2 == g.length && "link_click_id" === g[0]) {
+        for (e = 0;e < c.length;e++) {
+          if (g = c[e].split("="), 2 == g.length && "link_click_id" === g[0]) {
             h = g[1];
             break;
           }
@@ -1396,28 +1394,28 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       }
       utils.readKeyValue("identity_id", d._permStorage) ? (c = require("io.branch.sdk"), console.log("Getting data"), b = null == b ? c.getOpenData(-1) : c.getOpenData(b ? 1 : 0), h && (b.link_identifier = h), c = utils.readStore(d._permStorage), b.identity_id = c.identity_id, b.device_fingerprint_id = c.device_fingerprint_id, d._api(resources.open, b, function(a, b) {
         if (a) {
-          return e(a, null, !1);
+          return f(a, null, !1);
         }
         b.identity_id = utils.readKeyValue("identity_id", d._permStorage);
         b.device_fingerprint_id = utils.readKeyValue("device_fingerprint_id", d._permStorage);
-        e(null, b, !1);
+        f(null, b, !1);
       })) : (c = require("io.branch.sdk"), b = null == b ? c.getInstallData(d.debug, -1) : c.getInstallData(d.debug, b ? 1 : 0), h && (b.link_identifier = h), console.log("Sending install with: " + goog.json.serialize(b)), d._api(resources.install, b, function(a, b) {
         if (a) {
-          return e(a, null, !0);
+          return f(a, null, !0);
         }
-        e(null, b, !0);
+        f(null, b, !0);
       }));
     }
     WEB_BUILD && (h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), d._api(resources._r, {sdk:config.version}, function(a, b) {
       if (a) {
-        return e(a, null, !1);
+        return f(a, null, !1);
       }
       d._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
         if (a) {
-          return e(a, null, !1);
+          return f(a, null, !1);
         }
         h && (b.click_id = h);
-        e(a, b, !1);
+        f(a, b, !1);
       });
     }));
   }
