@@ -1,16 +1,16 @@
 /*
- * Branch Session
+ * Branch Web Session
  */
 
 /*jshint unused:false*/
 goog.require('goog.json');
-goog.provide('session');
+goog.provide('web_session');
 
  /**
  * @param {BranchStorage} storage
  * @return {Object}
  */
-session.read = function(storage) {
+web_session.read = function(storage) {
 	try {
 		return goog.json.parse(storage['getItem']('branch_session') || { });
 	}
@@ -24,34 +24,35 @@ session.read = function(storage) {
  * @param {BranchStorage} storage
  * @param {boolean=} perm
  */
-session.store = function(data, storage, perm) {
-	if (perm) { storage['setPermItem']('branch_session', goog.json.serialize(data)); }
-	else { storage['setTempItem']('branch_session', goog.json.serialize(data)); }
+web_session.store = function(data, storage, perm) {
+	storage['setItem']('branch_session', goog.json.serialize(data), perm ? "local" : "session");
 };
 
 /**
  * @param {BranchStorage} storage
+ * @param {string=} perm
  */
-session.clear = function(storage) {
-	storage['clear']();
+web_session.clear = function(storage, perm) {
+	storage['clear'](perm ? "local" : "session");
 };
 
 /**
  * @param {string} key
  * @param {*} value
  * @param {BranchStorage} storage
+ * @param {boolean=} perm
  */
-session.storeKeyValue = function(key, value, storage) {
-	var currentSession = session.read(storage);
+web_session.storeKeyValue = function(key, value, storage, perm) {
+	var currentSession = web_session.read(storage);
 	currentSession[key] = value;
-	session.store(currentSession, storage);
+	web_session.store(currentSession, storage, perm);
 };
 
 /**
  * @param {string} key
  * @param {BranchStorage} storage
  */
-session.readKeyValue = function(key, storage) {
-	var currentSession = session.read(storage);
+web_session.readKeyValue = function(key, storage) {
+	var currentSession = web_session.read(storage);
 	return (currentSession && currentSession[key]) ? currentSession[key] : null;
 };

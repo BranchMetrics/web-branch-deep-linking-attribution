@@ -7,18 +7,13 @@ goog.provide('storage');
 
 var COOKIE_DAYS = 365;
 
-// Not going to use IndexedDB atm
-// var INDEXED_DB_VERSION = 1; // unsigned long long
-// var INDEXED_DB_NAME = "BRANCH_DB";
-
 /**
  * @class BranchStorage
  * @constructor
  *
- * This function checks for all available storage methods available
+ * This function checks for all storage methods available
  */
 var BranchStorage = function() {
-	// Local and session storage
 	try {
 		localStorage.setItem("test", "");
 		localStorage.removeItem("test");
@@ -35,42 +30,8 @@ var BranchStorage = function() {
 	catch(e) {
 		this._sessionStoreAvailable = false;
 	}
-
-	// AH! I don't think we should use IndexedDB: The first time we write to it, the browser will ask the user for permission!
-	// That's way to much and will spook people.
-	// Commenting out for the time being
-	// IndexedDB
-	/*
-	this.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-	if (this.indexedDB) { this._indexedDBAvailable = true; }
-	else { this._indexedDBAvailable = true; }
-	*/
-
-	// As a last resort, we store the data in a JS object that is lost when the user closes the window
-	// Even though this is not  permanent object, we still separate temporary and "permanent" storage into
-	// two objects, so that we can clear temp and permanent values seperatley.
-	this._store = {
-		"TEMP": { },
-		"PERM": { }
-	};
+	this._store = { };
 };
-
-/*
-indexedDBObjectStore = function() {
-	var request = this.indexedDB.open(INDEXED_DB_NAME);
-
-	request.onerror = function(event) {
-		alert("Uh oh");
-		// don't need to do anything here. Just leaving this alert here for now to debug
-	};
-	request.onsuccess = function(event) {
-		this._db = event.target.result;
-		var objectStore = db.createObjectStore("branch", keyPath: "id", autoIncrement: true);
-		objectStore.createIndex("key", "key", { unique: true });
-		// success
-	};
-};
-*/
 
 /**
  * @param {string} key
@@ -114,7 +75,7 @@ var clearCookie = function(key) {
     setCookie("BRANCH_WEBSDK_COOKIE" + key, "", -1);
 };
 
-// Convenience functions for better readability
+// Convenience cookie functions
 var clearAllCookies = function() { clearCookies(true, true); };
 
 var clearTempCookies = function() { clearCookies(true); };
@@ -143,33 +104,24 @@ var clearCookies = function(temp, perm) {
 /**
  * @param {string} key
  * @param {*} value
+ * @param {string} storage - Possible values: 'local', 'session', 'cookie', 'pojo'
  */
-BranchStorage.prototype['setPermItem'] = function(key, value) {
-	if (this._localStoreAvailable) { localStorage.setItem(key, value); }
-	if (navigator.cookieEnabled) { setCookie(key, value, COOKIE_DAYS); }
-	this._store["PERM"][key] = value;
-};
-
-/**
- * @param {string} key
- * @param {*} value
- */
-BranchStorage.prototype['setTempItem'] = function(key, value) {
-	if (this._sessionStoreAvailable) { sessionStorage.setItem(key, value); }
-	if (navigator.cookieEnabled) { setCookie(key, value); }
-	this._store["TEMP"][key] = value;
+BranchStorage.prototype['setItem'] = function(key, value, storage) {
+	if (this._localStoreAvailable && storage == "local") { localStorage.setItem(key, value); }
+	else if (this._sessionStoreAvailable && storage == "session") { sessionStorage.setItem(key, value); }
+	else if (navigator.cookieEnabled && storage == "cookie") { setCookie(key, value, (storage = "local") ? COOKIE_DAYS : undefined); }
+	else { this._store[key] = value; }
 };
 
 /**
  * @param {string} key
  */
 BranchStorage.prototype['getItem'] = function(key) {
-	var tempValue = this._localStoreAvailable ? localStorage.getItem(key) : null;
-	var permValue = this._sessionStoreAvailable ? sessionStorage.getItem(key) : null;
+	var tempValue = this._sessionStoreAvailable ? sessionStorage.getItem(key) : null;
+	var permValue = this._localStoreAvailable ? localStorage.getItem(key) : null;
 	var cookieValue = readCookie(key);
-	var storeTempValue = typeof this._store["TEMP"][key] != 'undefined' ? this._store["TEMP"][key] : null;
-	var storePermValue = typeof this._store["PERM"][key] != 'undefined' ? this._store["PERM"][key] : null;
-	return tempValue || permValue || cookieValue || storeTempValue || storePermValue;
+	var storeValue = typeof this._store[key] != 'undefined' ? this._store[key] : null;
+	return tempValue || permValue || cookieValue || storeValue;
 };
 
 /**
@@ -179,31 +131,15 @@ BranchStorage.prototype['removeItem'] = function(key) {
 	if (this._localStoreAvailable) { localStorage.removeItem(key); }
 	if (this._sessionStoreAvailable) { sessionStorage.removeItem(key); }
 	if (navigator.cookieEnabled) { clearCookie(key); }
-	delete this._store["TEMP"][key];
-	delete this._store["PERM"][key];
+	delete this._store[key];
 };
 
-// Clears all storage methods, temporary and permanent
-BranchStorage.prototype['clear'] = function() {
-	this._store = {
-		"TEMP": { },
-		"PERM": { }
-	};
-	if (this._sessionStoreAvailable) { sessionStorage.clear(); }
-	if (this._localStoreAvailable) { localStorage.clear(); }
-	if (navigator.cookieEnabled) { clearAllCookies(); }
-};
-
-// Clears only temporary storage methods
-BranchStorage.prototype['clearTemp'] = function() {
-	sessionStorage.clear();
-	if (navigator.cookieEnabled) { clearTempCookies(); }
-	this._store["TEMP"] = { };
-};
-
-// Clears only permanent storage methods
-BranchStorage.prototype['clearPerm'] = function() {
-	localStorage.clear();
-	if (navigator.cookieEnabled) { clearPermCookies(); }
-	this._store["PERM"] = { };
+/**
+ * @param {string=} storage - *optional* possible values: 'local', 'session', 'cookie', 'pojo'
+ */
+BranchStorage.prototype['clear'] = function(storage) {
+	if (this._localStoreAvailable && (!storage || storage == "local")) { localStorage.clear(); }
+	if (this._sessionStoreAvailable && (!storage || storage == "session")) { sessionStorage.clear(); }
+	if (navigator.cookieEnabled && (!storage || storage == "cookie")) { clearTempCookies(); }
+	if (!storage || storage == "pojo") { this._store = { }; }
 };

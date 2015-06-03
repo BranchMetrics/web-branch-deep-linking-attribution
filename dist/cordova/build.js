@@ -618,7 +618,7 @@ var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
   } catch (b) {
     this._sessionStoreAvailable = !1;
   }
-  this._store = {TEMP:{}, PERM:{}};
+  this._store = {};
 }, setCookie = function(a, b, c) {
   var d = "";
   c && (d = new Date, d.setTime(d.getTime() + 864E5 * c), d = "branch_expiration_date=" + d.toGMTString() + "; expires=" + d.toGMTString());
@@ -652,43 +652,25 @@ var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
     0 == f.indexOf("BRANCH_WEBSDK_COOKIE") && (a && -1 == f.indexOf("branch_expiration_date=") ? c(f) : b && 0 < f.indexOf("branch_expiration_date=") && c(f));
   }
 };
-BranchStorage.prototype.setPermItem = function(a, b) {
-  this._localStoreAvailable && localStorage.setItem(a, b);
-  navigator.cookieEnabled && setCookie(a, b, COOKIE_DAYS);
-  this._store.PERM[a] = b;
-};
-BranchStorage.prototype.setTempItem = function(a, b) {
-  this._sessionStoreAvailable && sessionStorage.setItem(a, b);
-  navigator.cookieEnabled && setCookie(a, b);
-  this._store.TEMP[a] = b;
+BranchStorage.prototype.setItem = function(a, b, c) {
+  this._localStoreAvailable && "local" == c ? localStorage.setItem(a, b) : this._sessionStoreAvailable && "session" == c ? sessionStorage.setItem(a, b) : navigator.cookieEnabled && "cookie" == c ? setCookie(a, b, COOKIE_DAYS) : this._store[a] = b;
 };
 BranchStorage.prototype.getItem = function(a) {
-  var b = this._localStoreAvailable ? localStorage.getItem(a) : null, c = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null, d = readCookie(a), e = "undefined" != typeof this._store.TEMP[a] ? this._store.TEMP[a] : null;
-  a = "undefined" != typeof this._store.PERM[a] ? this._store.PERM[a] : null;
-  return b || c || d || e || a;
+  var b = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null, c = this._localStoreAvailable ? localStorage.getItem(a) : null, d = readCookie(a);
+  a = "undefined" != typeof this._store[a] ? this._store[a] : null;
+  return b || c || d || a;
 };
 BranchStorage.prototype.removeItem = function(a) {
   this._localStoreAvailable && localStorage.removeItem(a);
   this._sessionStoreAvailable && sessionStorage.removeItem(a);
   navigator.cookieEnabled && clearCookie(a);
-  delete this._store.TEMP[a];
-  delete this._store.PERM[a];
+  delete this._store[a];
 };
-BranchStorage.prototype.clear = function() {
-  this._store = {TEMP:{}, PERM:{}};
-  this._sessionStoreAvailable && sessionStorage.clear();
-  this._localStoreAvailable && localStorage.clear();
-  navigator.cookieEnabled && clearAllCookies();
-};
-BranchStorage.prototype.clearTemp = function() {
-  sessionStorage.clear();
-  navigator.cookieEnabled && clearTempCookies();
-  this._store.TEMP = {};
-};
-BranchStorage.prototype.clearPerm = function() {
-  localStorage.clear();
-  navigator.cookieEnabled && clearPermCookies();
-  this._store.PERM = {};
+BranchStorage.prototype.clear = function(a) {
+  !this._localStoreAvailable || a && "local" != a || localStorage.clear();
+  !this._sessionStoreAvailable || a && "session" != a || sessionStorage.clear();
+  !navigator.cookieEnabled || a && "cookie" != a || clearTempCookies();
+  a && "pojo" != a || (this._store = {});
 };
 // Input 3
 var Queue = function() {
@@ -801,22 +783,22 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 5
-var session = {read:function(a) {
+var web_session = {read:function(a) {
   try {
     return goog.json.parse(a.getItem("branch_session") || {});
   } catch (b) {
     return{};
   }
 }, store:function(a, b, c) {
-  c ? b.setPermItem("branch_session", goog.json.serialize(a)) : b.setTempItem("branch_session", goog.json.serialize(a));
-}, clear:function(a) {
-  a.clear();
-}, storeKeyValue:function(a, b, c) {
-  var d = session.read(c);
-  d[a] = b;
-  session.store(d, c);
+  b.setItem("branch_session", goog.json.serialize(a), c ? "local" : "session");
+}, clear:function(a, b) {
+  a.clear(b ? "local" : "session");
+}, storeKeyValue:function(a, b, c, d) {
+  var e = web_session.read(c);
+  e[a] = b;
+  web_session.store(e, c, d);
 }, readKeyValue:function(a, b) {
-  var c = session.read(b);
+  var c = web_session.read(b);
   return c && c[a] ? c[a] : null;
 }};
 // Input 6
@@ -846,7 +828,7 @@ utils.cleanLinkData = function(a, b) {
   return a;
 };
 utils.hasApp = function(a) {
-  return session.readKeyValue("has_app", a);
+  return web_session.readKeyValue("has_app", a);
 };
 utils.merge = function(a, b) {
   for (var c in b) {
@@ -935,7 +917,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   };
   return(c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
-  var c = session.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
+  var c = web_session.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
   "number" == typeof d && (d = !1);
   return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiPad && "ipad" == banner_utils.mobileUserAgent() || "ipad" != banner_utils.mobileUserAgent() && b.showiOS && "ios" == banner_utils.mobileUserAgent());
 }};
@@ -1247,7 +1229,7 @@ var sendSMS = function(a, b, c, d) {
         banner_utils.removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-      "number" == typeof b.forgetHide ? session.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : session.storeKeyValue("hideBanner", !0, d);
+      "number" == typeof b.forgetHide ? web_session.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : web_session.storeKeyValue("hideBanner", !0, d);
     };
     l && (l.onclick = function(a) {
       a.preventDefault();
@@ -1325,7 +1307,7 @@ Branch.prototype._api = function(a, b, c) {
   });
 };
 Branch.prototype._referringLink = function() {
-  var a = session.readKeyValue("referring_link", this._storage), b = session.readKeyValue("click_id", this._storage);
+  var a = web_session.readKeyValue("referring_link", this._storage), b = web_session.readKeyValue("click_id", this._storage);
   return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
 };
 CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
@@ -1337,7 +1319,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c && "function" == typeof c && (c = {isReferrable:null});
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  c = session.read(d._storage);
+  c = web_session.read(d._storage);
   var e = function(b, c) {
     if (c) {
       var e = c;
@@ -1348,7 +1330,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       d.sessionLink = e.link;
       CORDOVA_BUILD && (d.device_fingerprint_id = e.device_fingerprint_id, e.link_click_id && (d.link_click_id = e.link_click_id));
       c = e;
-      session.store(c, d._storage);
+      web_session.store(c, d._storage);
       d.init_state = init_states.INIT_SUCCEEDED;
       c.data_parsed = c.data ? goog.json.parse(c.data) : null;
     }
@@ -1360,9 +1342,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   } else {
     if (CORDOVA_BUILD && (c = [], c.push(d.debug), null !== b && c.push(b ? 1 : 0), b = function() {
       a("Error getting device data!");
-    }, session.readKeyValue("identity_id", d._storage) ? exec(function(a) {
-      a.identity_id = session.readKeyValue("identity_id", d._storage);
-      a.device_fingerprint_id = session.readKeyValue("device_fingerprint_id", d._storage);
+    }, web_session.readKeyValue("identity_id", d._storage) ? exec(function(a) {
+      a.identity_id = web_session.readKeyValue("identity_id", d._storage);
+      a.device_fingerprint_id = web_session.readKeyValue("device_fingerprint_id", d._storage);
       console.log("Sending open with: " + goog.json.serialize(a));
       d._api(resources.open, a, function(a, b) {
         if (a) {
@@ -1396,12 +1378,12 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  var b = utils.whiteListSessionData(session.read(this._storage));
+  var b = utils.whiteListSessionData(web_session.read(this._storage));
   b.referring_link = this._referringLink();
   a(null, b);
 });
 CORDOVA_BUILD && (Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  a(null, utils.whiteListSessionData(session.read(this._storage)));
+  a(null, utils.whiteListSessionData(web_session.read(this._storage)));
 }));
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = this;
@@ -1423,7 +1405,7 @@ CORDOVA_BUILD && (Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, fu
     delete b.session_id;
     delete b.sessionLink;
     b.init_state = init_states.NO_INIT;
-    session.clear(b._storage);
+    web_session.clear(b._storage);
     a(null);
   });
 }));
@@ -1459,7 +1441,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
       if (b) {
         return a(b);
       }
-      session.storeKeyValue("click_id", c.click_id, f._storage);
+      web_session.storeKeyValue("click_id", c.click_id, f._storage);
       e(c.click_id);
     });
   });
