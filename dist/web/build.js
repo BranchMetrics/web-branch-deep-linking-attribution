@@ -607,71 +607,87 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.5.6"}, WEB_BUILD = !0, CORDOVA_BUILD = !1;
 // Input 2
-var storage = {}, COOKIE_DAYS = 365, BranchStorage = function() {
-  try {
-    localStorage.setItem("test", ""), localStorage.removeItem("test"), this._localStoreAvailable = !0;
-  } catch (a) {
-    this._localStoreAvailable = !1;
-  }
-  try {
-    sessionStorage.setItem("test", ""), sessionStorage.removeItem("test"), this._sessionStoreAvailable = !0;
-  } catch (b) {
-    this._sessionStoreAvailable = !1;
-  }
+var COOKIE_DAYS = 365, storage, BranchStorage = function() {
   this._store = {};
-}, setCookie = function(a, b, c) {
-  var d = "";
-  c && (d = new Date, d.setTime(d.getTime() + 864E5 * c), d = "branch_expiration_date=" + d.toGMTString() + "; expires=" + d.toGMTString());
-  document.cookie = "BRANCH_WEBSDK_COOKIE" + a + "=" + b + d + "; path=/";
-}, readCookie = function(a) {
-  a = "BRANCH_WEBSDK_COOKIE" + a + "=";
-  for (var b = document.cookie.split(";"), c = 0;c < b.length;c++) {
-    for (var d = b[c];" " == d.charAt(0);) {
-      d = d.substring(1, d.length);
-    }
-    if (0 == d.indexOf(a)) {
-      return d.substring(a.length, d.length);
-    }
+};
+BranchStorage.prototype.local = {get:function(a, b) {
+  localStorage.setItem(a, b);
+}, set:function(a, b) {
+  localStorage.getItem(a, b);
+}, remove:function(a) {
+  localStorage.removeItem(a);
+}, clear:function() {
+  localStorage.clear();
+}, isEnabled:function() {
+  try {
+    return localStorage.setItem("test", ""), localStorage.removeItem("test"), !0;
+  } catch (a) {
+    return!1;
   }
-  return null;
-}, clearCookie = function(a) {
-  setCookie("BRANCH_WEBSDK_COOKIE" + a, "", -1);
-}, clearAllCookies = function() {
-  clearCookies(!0, !0);
-}, clearTempCookies = function() {
-  clearCookies(!0);
-}, clearPermCookies = function() {
-  clearCookies(!1, !0);
-}, clearCookies = function(a, b) {
-  for (var c = function(a) {
-    document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
-  }, d = document.cookie.split(";"), e = 0;e < d.length;e++) {
-    for (var f = d[e];" " == f.charAt(0);) {
-      f = f.substring(1, f.length);
-    }
-    0 == f.indexOf("BRANCH_WEBSDK_COOKIE") && (a && -1 == f.indexOf("branch_expiration_date=") ? c(f) : b && 0 < f.indexOf("branch_expiration_date=") && c(f));
+}};
+BranchStorage.prototype.session = {get:function(a, b) {
+  sessionStorage.getItem(a);
+}, set:function(a, b) {
+  sessionStorage.setItem(a, b);
+}, remove:function(a) {
+  sessionStorage.removeItem(a);
+}, clear:function() {
+  sessionStorage.clear();
+}, isEnabled:function() {
+  try {
+    return sessionStorage.setItem("test", ""), sessionStorage.removeItem("test"), !0;
+  } catch (a) {
+    return!1;
   }
+}};
+BranchStorage.prototype.cookie = function(a) {
+  return{get:function(a) {
+    a = "BRANCH_WEBSDK_COOKIE" + a + "=";
+    for (var c = document.cookie.split(";"), d = 0;d < c.length;d++) {
+      for (var e = c[d];" " == e.charAt(0);) {
+        e = e.substring(1, e.length);
+      }
+      if (0 == e.indexOf(a)) {
+        return e.substring(a.length, e.length);
+      }
+    }
+    return null;
+  }, set:function(b, c) {
+    var d = "";
+    a && (d = new Date, d.setTime(d.getTime() + 864E5 * COOKIE_DAYS), d = "branch_expiration_date=" + d.toGMTString() + "; expires=" + d.toGMTString());
+    document.cookie = "BRANCH_WEBSDK_COOKIE" + b + "=" + c + d + "; path=/";
+  }, remove:function(a) {
+    this.cookie.set("BRANCH_WEBSDK_COOKIE" + a, "", -1);
+  }, clear:function() {
+    for (var b = function(a) {
+      document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
+    }, c = document.cookie.split(";"), d = 0;d < c.length;d++) {
+      for (var e = c[d];" " == e.charAt(0);) {
+        e = e.substring(1, e.length);
+      }
+      0 == e.indexOf("BRANCH_WEBSDK_COOKIE") && (a || -1 != e.indexOf("branch_expiration_date=") ? a && 0 < e.indexOf("branch_expiration_date=") && b(e) : b(e));
+    }
+  }, isEnabled:function() {
+    return navigator.cookieEnabled;
+  }};
 };
-BranchStorage.prototype.setItem = function(a, b, c) {
-  this._localStoreAvailable && "local" == c ? localStorage.setItem(a, b) : this._sessionStoreAvailable && "session" == c ? sessionStorage.setItem(a, b) : navigator.cookieEnabled && "cookie" == c ? setCookie(a, b, COOKIE_DAYS) : this._store[a] = b;
-};
-BranchStorage.prototype.getItem = function(a) {
-  var b = this._sessionStoreAvailable ? sessionStorage.getItem(a) : null, c = this._localStoreAvailable ? localStorage.getItem(a) : null, d = readCookie(a);
-  a = "undefined" != typeof this._store[a] ? this._store[a] : null;
-  return b || c || d || a;
-};
-BranchStorage.prototype.removeItem = function(a) {
-  this._localStoreAvailable && localStorage.removeItem(a);
-  this._sessionStoreAvailable && sessionStorage.removeItem(a);
-  navigator.cookieEnabled && clearCookie(a);
+BranchStorage.prototype.pojo = {get:function(a) {
+  return "undefined" != typeof this._store[a] ? this._store[a] : null;
+}, set:function(a, b) {
+  this._store[a] = b;
+}, remove:function(a) {
   delete this._store[a];
-};
-BranchStorage.prototype.clear = function(a) {
-  !this._localStoreAvailable || a && "local" != a || localStorage.clear();
-  !this._sessionStoreAvailable || a && "session" != a || sessionStorage.clear();
-  !navigator.cookieEnabled || a && "cookie" != a || clearTempCookies();
-  a && "pojo" != a || (this._store = {});
-};
+}, clear:function() {
+  this._store = {};
+}, isEnabled:function() {
+  return!0;
+}};
+BranchStorage.prototype.titanium = {get:function() {
+}, set:function() {
+}, remove:function() {
+}, clear:function() {
+}, isEnabled:function() {
+}};
 // Input 3
 var Queue = function() {
   var a = [], b = function() {
