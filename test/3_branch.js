@@ -3,7 +3,7 @@ goog.require('Branch');
 goog.require('resources');
 goog.require('config');
 goog.require('storage');
-goog.require('session');
+goog.require('web_session');
 
 goog.require('goog.json'); // jshint unused:false
 
@@ -223,7 +223,7 @@ describe('Branch', function() {
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;
 			});
-			sandbox.stub(session, "read", function(storage) {
+			sandbox.stub(web_session, "read", function(storage) {
 				return whitelistedData;
 			});
 			branch.data(function(err, res) {
@@ -405,7 +405,7 @@ describe('Branch', function() {
 
 		it('should call SMSLinkSend if a click_id already exists', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			sandbox.stub(session, "readKeyValue", function(key, storage) {
+			sandbox.stub(web_session, "readKeyValue", function(key, storage) {
 				return '12345';
 			});
 
@@ -425,7 +425,7 @@ describe('Branch', function() {
 
 		it('should create new link if a click_id does not exist', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			sandbox.stub(session, "readKeyValue", function(key, storage) {
+			sandbox.stub(web_session, "readKeyValue", function(key, storage) {
 				return null;
 			});
 

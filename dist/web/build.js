@@ -1018,7 +1018,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
   try {
     f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    d.setTempItem("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
+    d.setItem("use_jsonp", !0, "session"), this.jsonpRequest(a, b, c, e);
   }
 };
 Server.prototype.request = function(a, b, c, d) {
