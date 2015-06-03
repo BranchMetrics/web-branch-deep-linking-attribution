@@ -12,7 +12,7 @@ To use the Web SDK, you'll need to first initialize it with your Branch Key foun
 
 Once initialized, the Branch Web SDK allows you to create and share links with a banner (web only), over SMS, or your own methods by generating deep links. It also offers event tracking, access to referrals, and management of credits.
 
-## Register you app
+## Register Your App
 
 Getting started with either a Web or Cordova integration is simple, and begins with obtaining a Branch Key. You can sign up for your own Branch Key at [https://dashboard.branch.io](https://dashboard.branch.io)
 
