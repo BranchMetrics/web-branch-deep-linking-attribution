@@ -7,6 +7,108 @@ goog.provide('storage');
 
 var COOKIE_DAYS = 365;
 
+/** @typedef {{get:}} */
+var storage;
+
+/** @type storage */
+localStorage = {
+	get: function(key, value) { localSession.setItem(key, value); },
+	set: function(key, value) { localSession.getItem(key, value); },
+	remove: function(key) { localSession.removeItem(key); },
+	clear: function() { localSession.clear(); },
+	isEnabled: function () {
+		try {
+			localStorage.setItem("test", "");
+			localStorage.removeItem("test");
+			return true;
+		}
+		catch {
+			return false;
+		}
+	}
+};
+
+sessionStorage = {
+	get: function(key, value) { sessionStorage.getItem(key); },
+	set: function(key, value) { sessionStorage.setItem(key, value); },
+	remove: function(key) { sessionStorage.removeItem(key); },
+	clear: function() { sessionStorage.clear(); },
+	isEnabled: function() {
+		try {
+			sessionStorage.setItem("test", "");
+			sessionStorage.removeItem("test");
+			return true;
+		}
+		catch {
+			return false;
+		}
+	}
+};
+
+// cookie object goes in function to specify perm or temp
+cookieStorage = function(perm) {
+	return {
+		get: function(key) {
+			var keyEQ = "BRANCH_WEBSDK_COOKIE" + key + "=";
+		    var cookieArray = document.cookie.split(';');
+		    for (var i = 0; i < cookieArray.length; i++) {
+		        var cookie = cookieArray[i];
+		        while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
+		        if (cookie.indexOf(keyEQ) == 0) { return cookie.substring(keyEQ.length, cookie.length); }
+		    }
+		    return null;
+		},
+		set: function(key, value) {
+			var expires = "";
+		    if (perm) {
+		        var date = new Date();
+		        date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
+		        // we have to save the expiration date in the cookie string itself, otherwise there is no way to retrieve it
+		        expires = "branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
+		    }
+		    document.cookie = "BRANCH_WEBSDK_COOKIE" + key + "=" + value + expires + "; path=/";
+		},
+		remove: function(key) { cookieStorage.set("BRANCH_WEBSDK_COOKIE" + key, "", -1); },
+		clear: function() {
+			var deleteCookie = function(cookie) {
+				document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/";
+			};
+			var cookieArray = document.cookie.split(';');
+			for (var i = 0; i < cookieArray.length; i++) {
+				var cookie = cookieArray[i];
+				while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
+				if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") == 0) {
+					if (temp && cookie.indexOf("branch_expiration_date=") == -1) { deleteCookie(cookie); }
+					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) { deleteCookie(cookie); }
+				}
+			}
+		},
+		isEnabled: function() { return navigator.cookieEnabled; }
+	}
+};
+
+pojoStorage = {
+	get: function(key) { return typeof this._store[key] != 'undefined' ? this._store[key] : null; },
+	set: function(key, value) { this._store[key] = value; },
+	remove: function(key) { delete this._store[key]; },
+	clear: function() { this._store = { }; },
+	isEnabled: function() { return true; }
+};
+
+titaniumStorage = {
+	// stackoverflow this
+};
+
+// call it like this
+/*
+branch.init
+	this.permStorage = getFirstEnabled([ local, cookie(true), pojo ])
+
+	this.permStorage.get()
+
+	this.tempStorage = getFirstEnabled([ session, cookie(false), pojo])
+*/
+
 /**
  * @class BranchStorage
  * @constructor
@@ -56,14 +158,7 @@ var setCookie = function(key, value, days) {
  * @param {string} key
  */
 var readCookie = function(key) {
-    var keyEQ = "BRANCH_WEBSDK_COOKIE" + key + "=";
-    var cookieArray = document.cookie.split(';');
-    for (var i = 0; i < cookieArray.length; i++) {
-        var cookie = cookieArray[i];
-        while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
-        if (cookie.indexOf(keyEQ) == 0) { return cookie.substring(keyEQ.length, cookie.length); }
-    }
-    return null;
+
 };
 
 /**
@@ -87,18 +182,7 @@ var clearPermCookies = function() { clearCookies(false, true); };
  * @param {boolean=} perm
  */
 var clearCookies = function(temp, perm) {
-	var deleteCookie = function(cookie) {
-		document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/";
-	};
-	var cookieArray = document.cookie.split(';');
-	for (var i = 0; i < cookieArray.length; i++) {
-		var cookie = cookieArray[i];
-		while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
-		if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") == 0) {
-			if (temp && cookie.indexOf("branch_expiration_date=") == -1) { deleteCookie(cookie); }
-			else if (perm && cookie.indexOf("branch_expiration_date=") > 0) { deleteCookie(cookie); }
-		}
-	}
+
 };
 
 /**
@@ -107,7 +191,7 @@ var clearCookies = function(temp, perm) {
  * @param {string} storage - Possible values: 'local', 'session', 'cookie', 'pojo'
  */
 BranchStorage.prototype['setItem'] = function(key, value, storage) {
-	if (this._localStoreAvailable && storage == "local") { localStorage.setItem(key, value); }
+	if (this._localStoreAvailable && storage == "local") {  }
 	else if (this._sessionStoreAvailable && storage == "session") { sessionStorage.setItem(key, value); }
 	else if (navigator.cookieEnabled && storage == "cookie") { setCookie(key, value, (storage = "local") ? COOKIE_DAYS : undefined); }
 	else { this._store[key] = value; }
