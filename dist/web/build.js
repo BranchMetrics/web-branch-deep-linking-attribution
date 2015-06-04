@@ -609,7 +609,7 @@ var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.
 // Input 2
 var COOKIE_DAYS = 365, storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
-    var c = this[a[b]];
+    var c = this[a[b]], c = "function" == typeof c ? c() : c;
     if (c.isEnabled()) {
       return c._store = {}, c;
     }
@@ -645,7 +645,7 @@ BranchStorage.prototype.session = {get:function(a) {
     return!1;
   }
 }};
-BranchStorage.prototype.cookie = function(a) {
+var cookies = function(a) {
   return{get:function(a) {
     a = "BRANCH_WEBSDK_COOKIE" + a + "=";
     for (var c = document.cookie.split(";"), d = 0;d < c.length;d++) {
@@ -659,10 +659,11 @@ BranchStorage.prototype.cookie = function(a) {
     return null;
   }, set:function(b, c) {
     var d = "";
-    a && (d = new Date, d.setTime(d.getTime() + 864E5 * COOKIE_DAYS), d = "branch_expiration_date=" + d.toGMTString() + "; expires=" + d.toGMTString());
+    a && (d = new Date, console.log(d), d.setTime(d.getTime() + 864E5 * COOKIE_DAYS), d = "; branch_expiration_date=" + d.toGMTString() + "; expires=" + d.toGMTString());
+    console.log("BRANCH_WEBSDK_COOKIE" + b + "=" + c + d + "; path=/");
     document.cookie = "BRANCH_WEBSDK_COOKIE" + b + "=" + c + d + "; path=/";
   }, remove:function(a) {
-    this.cookie.set("BRANCH_WEBSDK_COOKIE" + a, "", -1);
+    document.cookie = "BRANCH_WEBSDK_COOKIE" + a + "=; expires=; path=/";
   }, clear:function() {
     for (var b = function(a) {
       document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
@@ -676,8 +677,11 @@ BranchStorage.prototype.cookie = function(a) {
     return navigator.cookieEnabled;
   }};
 };
+BranchStorage.prototype.cookie = function() {
+  return cookies(!1);
+};
 BranchStorage.prototype.permcookie = function() {
-  return this.cookie(!0);
+  return cookies(!0);
 };
 BranchStorage.prototype.pojo = {get:function(a) {
   return "undefined" != typeof this._store[a] ? this._store[a] : null;

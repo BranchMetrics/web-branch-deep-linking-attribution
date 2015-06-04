@@ -10,6 +10,9 @@ var COOKIE_DAYS = 365;
 /** @typedef {{get:function({string}), set:function({string}, {string}), remove:function({string}), clear:function(), isEnabled:function()}} */
 var storage;
 
+/** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
+	Ti.App.Properties;
+
 /**
  * @class BranchStorage
  * @constructor
@@ -17,9 +20,10 @@ var storage;
  var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
+		storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
 			storageMethod._store = { };
-			return storageMethod;
+			return  storageMethod;
 		}
 	}
 };
@@ -60,8 +64,7 @@ BranchStorage.prototype['session'] = {
 	}
 };
 
-// cookie object goes in function to specify perm or temp
-BranchStorage.prototype['cookie'] = function(perm) {
+var cookies = function(perm) {
 	return {
 		get: function(key) {
 			var keyEQ = "BRANCH_WEBSDK_COOKIE" + key + "=";
@@ -77,13 +80,19 @@ BranchStorage.prototype['cookie'] = function(perm) {
 			var expires = "";
 		    if (perm) {
 		        var date = new Date();
+		        console.log(date);
 		        date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
 		        // we have to save the expiration date in the cookie string itself, otherwise there is no way to retrieve it
-		        expires = "branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
+		        expires = "; branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
 		    }
+		    console.log("BRANCH_WEBSDK_COOKIE" + key + "=" + value + expires + "; path=/");
 		    document.cookie = "BRANCH_WEBSDK_COOKIE" + key + "=" + value + expires + "; path=/";
 		},
-		remove: function(key) { this.cookie.set("BRANCH_WEBSDK_COOKIE" + key, "", -1); },
+		remove: function(key) {
+			var expires = "";
+			document.cookie = "BRANCH_WEBSDK_COOKIE" + key + "=; expires="  + expires + "; path=/";
+			// this.cookie.set("BRANCH_WEBSDK_COOKIE" + key, "", -1);
+		},
 		clear: function() {
 			var deleteCookie = function(cookie) {
 				document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/";
@@ -102,8 +111,13 @@ BranchStorage.prototype['cookie'] = function(perm) {
 	}
 };
 
+// cookie object goes in function to specify perm or temp
+BranchStorage.prototype['cookie'] = function() {
+	return cookies(false);
+};
+
 BranchStorage.prototype['permcookie'] = function() {
-	return this.cookie(true);
+	return cookies(true);
 };
 
 /** @type storage */
@@ -121,7 +135,7 @@ BranchStorage.prototype['titanium'] = {
 	set: function(key, value) { Ti.App.Properties.setString("BRANCH_TITANIUM_PROPERTY" + key, value); },
 	remove: function(key) { Ti.App.Properties.setString("BRANCH_TITANIUM_PROPERTY" + key, ""); },
 	clear: function() {
-		/** @type {{Ti.App.Properties.listProperties:function()}} */
+		/** @lends {Array} */
 		var props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
 			if (props[i].indexOf("BRANCH_TITANIUM_PROPERTY") == 0) {
