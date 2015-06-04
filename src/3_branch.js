@@ -101,7 +101,7 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = new BranchStorage();
+	this._storage = new BranchStorage(['session', 'pojo']);
 	this._server = new Server();
 	var sdk;
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }

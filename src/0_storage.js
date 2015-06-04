@@ -7,20 +7,26 @@ goog.provide('storage');
 
 var COOKIE_DAYS = 365;
 
-/** @typedef {{get:function(), set:function(), remove:function(), clear:function(), isEnabled:function()}} */
+/** @typedef {{get:function({string}), set:function({string}, {string}), remove:function({string}), clear:function(), isEnabled:function()}} */
 var storage;
 
 /**
  * @class BranchStorage
  * @constructor
  */
- var BranchStorage = function() {
+ var BranchStorage = function(storageMethods) {
 	this._store = { };
+	for (var i = 0; i < storageMethods.length; i++) {
+		var storageMethod = this[storageMethods[i]];
+		if (storageMethod.isEnabled()) {
+			return storageMethod;
+		}
+	}
 };
 
 /** @type storage */
 BranchStorage.prototype['local'] = {
-	get: function(key, value) { localStorage.setItem(key, value); },
+	get: function(key) { localStorage.getItem(key); },
 	set: function(key, value) { localStorage.getItem(key, value); },
 	remove: function(key) { localStorage.removeItem(key); },
 	clear: function() { localStorage.clear(); },
@@ -36,8 +42,9 @@ BranchStorage.prototype['local'] = {
 	}
 };
 
+/** @type storage */
 BranchStorage.prototype['session'] = {
-	get: function(key, value) { sessionStorage.getItem(key); },
+	get: function(key) { sessionStorage.getItem(key); },
 	set: function(key, value) { sessionStorage.setItem(key, value); },
 	remove: function(key) { sessionStorage.removeItem(key); },
 	clear: function() { sessionStorage.clear(); },

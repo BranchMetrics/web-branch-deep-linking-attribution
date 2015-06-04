@@ -12,7 +12,7 @@ goog.provide('web_session');
  */
 web_session.read = function(storage) {
 	try {
-		return goog.json.parse(storage['getItem']('branch_session') || { });
+		return goog.json.parse(storage['get']('branch_session') || { });
 	}
 	catch (e) {
 		return { };
@@ -22,30 +22,27 @@ web_session.read = function(storage) {
 /**
  * @param {Object} data
  * @param {BranchStorage} storage
- * @param {boolean=} perm
  */
-web_session.store = function(data, storage, perm) {
-	storage['setItem']('branch_session', goog.json.serialize(data), perm ? "local" : "session");
+web_session.store = function(data, storage) {
+	storage['set']('branch_session', goog.json.serialize(data));
 };
 
 /**
  * @param {BranchStorage} storage
- * @param {string=} perm
  */
-web_session.clear = function(storage, perm) {
-	storage['clear'](perm ? "local" : "session");
+web_session.clear = function(storage) {
+	storage['clear']();
 };
 
 /**
  * @param {string} key
  * @param {*} value
  * @param {BranchStorage} storage
- * @param {boolean=} perm
  */
-web_session.storeKeyValue = function(key, value, storage, perm) {
+web_session.storeKeyValue = function(key, value, storage) {
 	var currentSession = web_session.read(storage);
 	currentSession[key] = value;
-	web_session.store(currentSession, storage, perm);
+	web_session.store(currentSession, storage);
 };
 
 /**

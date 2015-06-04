@@ -607,11 +607,17 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.5.6"}, WEB_BUILD = !0, CORDOVA_BUILD = !1;
 // Input 2
-var COOKIE_DAYS = 365, storage, BranchStorage = function() {
+var COOKIE_DAYS = 365, storage, BranchStorage = function(a) {
   this._store = {};
+  for (var b = 0;b < a.length;b++) {
+    var c = this[a[b]];
+    if (c.isEnabled()) {
+      return c;
+    }
+  }
 };
-BranchStorage.prototype.local = {get:function(a, b) {
-  localStorage.setItem(a, b);
+BranchStorage.prototype.local = {get:function(a) {
+  localStorage.getItem(a);
 }, set:function(a, b) {
   localStorage.getItem(a, b);
 }, remove:function(a) {
@@ -625,7 +631,7 @@ BranchStorage.prototype.local = {get:function(a, b) {
     return!1;
   }
 }};
-BranchStorage.prototype.session = {get:function(a, b) {
+BranchStorage.prototype.session = {get:function(a) {
   sessionStorage.getItem(a);
 }, set:function(a, b) {
   sessionStorage.setItem(a, b);
@@ -801,18 +807,18 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 // Input 5
 var web_session = {read:function(a) {
   try {
-    return goog.json.parse(a.getItem("branch_session") || {});
+    return goog.json.parse(a.get("branch_session") || {});
   } catch (b) {
     return{};
   }
-}, store:function(a, b, c) {
-  b.setItem("branch_session", goog.json.serialize(a), c ? "local" : "session");
-}, clear:function(a, b) {
-  a.clear(b ? "local" : "session");
-}, storeKeyValue:function(a, b, c, d) {
-  var e = web_session.read(c);
-  e[a] = b;
-  web_session.store(e, c, d);
+}, store:function(a, b) {
+  b.set("branch_session", goog.json.serialize(a));
+}, clear:function(a) {
+  a.clear();
+}, storeKeyValue:function(a, b, c) {
+  var d = web_session.read(c);
+  d[a] = b;
+  web_session.store(d, c);
 }, readKeyValue:function(a, b) {
   var c = web_session.read(b);
   return c && c[a] ? c[a] : null;
@@ -1049,7 +1055,7 @@ Server.prototype.request = function(a, b, c, d) {
       l();
     }, RETRY_DELAY)) : d(a, b);
   }, l = function() {
-    c.getItem("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, m) : e.XHRRequest(g, k, a.method, c, m);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, m) : e.XHRRequest(g, k, a.method, c, m);
   };
   l();
 };
@@ -1301,7 +1307,7 @@ var Branch = function() {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
-  this._storage = new BranchStorage;
+  this._storage = new BranchStorage(["session", "pojo"]);
   this._server = new Server;
   var a;
   CORDOVA_BUILD && (a = "cordova");
