@@ -9,6 +9,8 @@ goog.require('banner_html');
 
 goog.require('web_session');
 
+goog.require('utils');
+
 var sendSMS = function(doc, branch, options, linkData) {
 	var phone = doc.getElementById('branch-sms-phone');
 	var sendButton  = doc.getElementById('branch-sms-send');
@@ -107,7 +109,7 @@ banner = function(branch, options, linkData, storage) {
 		linkData['channel'] = linkData['channel'] || 'app banner';
 
 		var doc = options.iframe ? element.contentWindow.document : document;
-		if (banner_utils.mobileUserAgent()) {
+		if (utils.mobileUserAgent()) {
 			var referring_link = branch._referringLink();
 			if (referring_link && !options['make_new_link']) {
 				doc.getElementById('branch-mobile-action').href = referring_link;

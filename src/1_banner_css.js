@@ -1,5 +1,6 @@
 goog.provide('banner_css');
 goog.require('banner_utils');
+goog.require('utils');
 
 banner_css.banner = function(options) {
 	return '.branch-banner-is-active { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
@@ -78,7 +79,7 @@ banner_css.css = function(options, element) {
 	var style = banner_css.banner(options);
 
 	// User agent specific styles
-	var userAgent = banner_utils.mobileUserAgent();
+	var userAgent = utils.mobileUserAgent();
 	if ((userAgent == 'ios' || userAgent == 'ipad') && options.showiOS) {
 		style += banner_css.mobile + banner_css.ios;
 	}
@@ -102,7 +103,7 @@ banner_css.css = function(options, element) {
 		var iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
-		iFrameCSS.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_position(options.mobileSticky, options.position) : banner_css.iframe_position(options.desktopSticky, options.position));
+		iFrameCSS.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(options.mobileSticky, options.position) : banner_css.iframe_position(options.desktopSticky, options.position));
 		document.head.appendChild(iFrameCSS);
 	}
 

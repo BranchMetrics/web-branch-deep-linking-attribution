@@ -124,6 +124,14 @@ utils.hashValue = function(key) {
 	}
 };
 
+utils.mobileUserAgent = function() {
+	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
+		if (navigator.userAgent.match(/android/i)) { return 'android'; }
+		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
+		else { return 'ios'; }
+	} else { return false; }
+};
+
 /**
  * @param {string} key
  */

@@ -864,6 +864,9 @@ utils.hashValue = function(a) {
   } catch (b) {
   }
 };
+utils.mobileUserAgent = function() {
+  return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : navigator.userAgent.match(/ipad/i) ? "ipad" : "ios" : !1;
+};
 utils.getParamValue = function(a) {
   try {
     return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
@@ -900,8 +903,6 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   banner_utils.hasClass(a, b) || (a.className += " " + b);
 }, removeClass:function(a, b) {
   banner_utils.hasClass(a, b) && (a.className = a.className.replace(new RegExp("(\\s|^)" + b + "(\\s|$)"), " "));
-}, mobileUserAgent:function() {
-  return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : navigator.userAgent.match(/ipad/i) ? "ipad" : "ios" : !1;
 }, getDate:function(a) {
   var b = new Date;
   return b.setDate(b.getDate() + a);
@@ -941,7 +942,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, shouldAppend:function(a, b) {
   var c = web_session.readKeyValue("hideBanner", a), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
   "number" == typeof d && (d = !1);
-  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !banner_utils.mobileUserAgent() || b.showAndroid && "android" == banner_utils.mobileUserAgent() || b.showiPad && "ipad" == banner_utils.mobileUserAgent() || "ipad" != banner_utils.mobileUserAgent() && b.showiOS && "ios" == banner_utils.mobileUserAgent());
+  return!document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" == utils.mobileUserAgent() || b.showiPad && "ipad" == utils.mobileUserAgent() || "ipad" != utils.mobileUserAgent() && b.showiOS && "ios" == utils.mobileUserAgent());
 }};
 // Input 8
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
@@ -1140,10 +1141,10 @@ banner_css.iframe_position = function(a, b) {
   return "#branch-banner-iframe { position: " + ("top" == b ? a ? "fixed" : "absolute" : "fixed") + "; }\n";
 };
 banner_css.css = function(a, b) {
-  var c = banner_css.banner(a), d = banner_utils.mobileUserAgent();
+  var c = banner_css.banner(a), d = utils.mobileUserAgent();
   "ios" != d && "ipad" != d || !a.showiOS ? "android" == d && a.showAndroid ? c += banner_css.mobile + banner_css.android : (c += banner_css.desktop, c = window.ActiveXObject ? c + banner_css.ie : c + banner_css.nonie) : c += banner_css.mobile + banner_css.ios;
   c += a.customCSS;
-  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (banner_utils.mobileUserAgent() ? banner_css.iframe_position(a.mobileSticky, a.position) : banner_css.iframe_position(a.desktopSticky, a.position)), document.head.appendChild(d));
+  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(a.mobileSticky, a.position) : banner_css.iframe_position(a.desktopSticky, a.position)), document.head.appendChild(d));
   d = document.createElement("style");
   d.type = "text/css";
   d.id = "branch-css";
@@ -1168,7 +1169,7 @@ var banner_html = {banner:function(a, b) {
   c.id = "branch-banner-iframe";
   c.className = "branch-animation";
   document.body.appendChild(c);
-  var d = banner_utils.mobileUserAgent(), d = '<html><head></head><body class="' + ("ios" == d || "ipad" == d ? "branch-banner-ios" : "android" == d ? "branch-banner-android" : "branch-banner-desktop") + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
+  var d = utils.mobileUserAgent(), d = '<html><head></head><body class="' + ("ios" == d || "ipad" == d ? "branch-banner-ios" : "android" == d ? "branch-banner-android" : "branch-banner-desktop") + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
   c.contentWindow.document.open();
   c.contentWindow.document.write(d);
   c.contentWindow.document.close();
@@ -1181,7 +1182,7 @@ var banner_html = {banner:function(a, b) {
   document.body.appendChild(c);
   return c;
 }, markup:function(a, b) {
-  var c = '<div id="branch-sms-form-container">' + (banner_utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
+  var c = '<div id="branch-sms-form-container">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
 }};
 // Input 12
@@ -1230,7 +1231,7 @@ var sendSMS = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document;
-    if (banner_utils.mobileUserAgent()) {
+    if (utils.mobileUserAgent()) {
       var g = a._referringLink();
       g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
         a || (f.getElementById("branch-mobile-action").href = b);
@@ -1307,12 +1308,16 @@ var Branch = function() {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
-  this._storage = new BranchStorage(["session", "pojo"]);
+  var a = "session";
+  if (CORDOVA_BUILD || utils.mobileUserAgent()) {
+    a = "local";
+  }
+  this._storage = new BranchStorage([a, "pojo"]);
   this._server = new Server;
-  var a;
-  CORDOVA_BUILD && (a = "cordova");
-  WEB_BUILD && (a = "web");
-  this.sdk = a + config.version;
+  var b;
+  CORDOVA_BUILD && (b = "cordova");
+  WEB_BUILD && (b = "web");
+  this.sdk = b + config.version;
   CORDOVA_BUILD && (this.debug = !1);
   this.init_state = init_states.NO_INIT;
 };

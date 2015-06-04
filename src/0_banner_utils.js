@@ -1,6 +1,7 @@
 goog.provide('banner_utils');
 goog.require('web_session');
 goog.require('storage'); // jshint unused:false
+goog.require('utils');
 
 /** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean, make_new_link:boolean}} */
 banner_utils.options; // jshint ignore:line
@@ -48,14 +49,6 @@ banner_utils.removeClass = function(element, className) {
 		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
 		element.className = element.className.replace(reg, ' ');
 	}
-};
-
-banner_utils.mobileUserAgent = function() {
-	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
-		if (navigator.userAgent.match(/android/i)) { return 'android'; }
-		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
-		else { return 'ios'; }
-	} else { return false; }
 };
 
 banner_utils.getDate = function(days) {
@@ -115,9 +108,9 @@ banner_utils.shouldAppend = function(storage, options) {
 		!document.getElementById('branch-banner-iframe') &&
 		(hideBanner || forgetHide) &&
 		(
-			(options.showDesktop && !banner_utils.mobileUserAgent()) ||
-			(options.showAndroid && banner_utils.mobileUserAgent() == 'android') ||
-			(options.showiPad && banner_utils.mobileUserAgent() == 'ipad') ||
-			(banner_utils.mobileUserAgent() != 'ipad' && options.showiOS && banner_utils.mobileUserAgent() == 'ios')
+			(options.showDesktop && !utils.mobileUserAgent()) ||
+			(options.showAndroid && utils.mobileUserAgent() == 'android') ||
+			(options.showiPad && utils.mobileUserAgent() == 'ipad') ||
+			(utils.mobileUserAgent() != 'ipad' && options.showiOS && utils.mobileUserAgent() == 'ios')
 		);
 };

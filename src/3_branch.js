@@ -101,7 +101,11 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = new BranchStorage(['session', 'pojo']);
+
+	var primaryStorage = 'session';
+	if (CORDOVA_BUILD || utils.mobileUserAgent()) { primaryStorage = 'local'; }
+	this._storage = new BranchStorage([primaryStorage, 'pojo']);
+
 	this._server = new Server();
 	var sdk;
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
