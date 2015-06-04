@@ -102,6 +102,10 @@ BranchStorage.prototype['cookie'] = function(perm) {
 	}
 };
 
+BranchStorage.prototype['permcookie'] = function() {
+	return this.cookie(true);
+};
+
 /** @type storage */
 BranchStorage.prototype['pojo'] = {
 	get: function(key) { return typeof this._store[key] != 'undefined' ? this._store[key] : null; },

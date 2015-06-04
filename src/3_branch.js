@@ -102,11 +102,15 @@ Branch = function() {
 	}
 	this._queue = Queue();
 
-	var primaryStorage = 'session';
-	// need to add cookie storage to this
-	if (CORDOVA_BUILD || utils.mobileUserAgent()) { primaryStorage = 'local'; }
-	else if (TITANIUM_BUILD) { primaryStorage = 'titanium'; }
-	this._storage = new BranchStorage([primaryStorage, 'pojo']);
+	var storageMethods = [ ];
+	if (CORDOVA_BUILD) { storageMethods = ['local']; }
+	else if (TITANIUM_BUILD) { storageMethods = ['titanium']; }
+	else if (WEB_BUILD) {
+		if (utils.mobileUserAgent()) { storageMethods = ['local', 'permcookie']; }
+		else { storageMethods = ['session', 'cookie']; }
+	}
+	storageMethods.push('pojo');
+	this._storage = new BranchStorage(storageMethods);
 
 	this._server = new Server();
 

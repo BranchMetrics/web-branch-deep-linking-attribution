@@ -676,6 +676,9 @@ BranchStorage.prototype.cookie = function(a) {
     return navigator.cookieEnabled;
   }};
 };
+BranchStorage.prototype.permcookie = function() {
+  return this.cookie(!0);
+};
 BranchStorage.prototype.pojo = {get:function(a) {
   return "undefined" != typeof this._store[a] ? this._store[a] : null;
 }, set:function(a, b) {
@@ -1335,9 +1338,10 @@ var Branch = function() {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
-  var a = "session";
-  CORDOVA_BUILD || utils.mobileUserAgent() ? a = "local" : TITANIUM_BUILD && (a = "titanium");
-  this._storage = new BranchStorage([a, "pojo"]);
+  var a = [];
+  CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && (a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"]);
+  a.push("pojo");
+  this._storage = new BranchStorage(a);
   this._server = new Server;
   a = "web";
   CORDOVA_BUILD && (a = "cordova");
