@@ -7,6 +7,8 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
+goog.require('web_session');
+
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
@@ -107,7 +109,7 @@ banner = function(branch, options, linkData, storage) {
 		linkData['channel'] = linkData['channel'] || 'app banner';
 
 		var doc = options.iframe ? element.contentWindow.document : document;
-		if (banner_utils.mobileUserAgent()) {
+		if (utils.mobileUserAgent()) {
 			var referring_link = branch._referringLink();
 			if (referring_link && !options['make_new_link']) {
 				doc.getElementById('branch-mobile-action').href = referring_link;
@@ -151,8 +153,8 @@ banner = function(branch, options, linkData, storage) {
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
 			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-			if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
-			else { utils.storeKeyValue('hideBanner', true, storage); }
+			if (typeof options.forgetHide == 'number') { web_session.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
+			else { web_session.storeKeyValue('hideBanner', true, storage); }
 		};
 
 		if (closeButton) {

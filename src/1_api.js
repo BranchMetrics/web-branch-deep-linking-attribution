@@ -200,7 +200,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		req.send(data);
 	}
 	catch (e) {
-		storage['setItem']('use_jsonp', true);
+		storage['setItem']('use_jsonp', true, "session");
 		this.jsonpRequest(url, data, method, callback);
 	}
 };
@@ -244,7 +244,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		}
 	};
 	var makeRequest = function() {
-		if (storage['getItem']('use_jsonp') || resource.jsonp) {
+		if (storage['get']('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);
 		}
 		else {

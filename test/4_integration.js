@@ -6,6 +6,30 @@ goog.require('goog.json'); // jshint unused:false
 describe('Integration tests', function() {
 	var requests = [], xhr, clock, jsonpCallback = 0;
 
+	var clearBranchStorage = function() {
+		sessionStorage.clear();
+		localStorage.clear();
+		var clearCookies = function(temp, perm) {
+			var deleteCookie = function(cookie) {
+				document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/";
+			};
+			var cookieArray = document.cookie.split(';');
+			for (var i = 0; i < cookieArray.length; i++) {
+				var cookie = cookieArray[i];
+				while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
+				if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") == 0) {
+					if (temp && cookie.indexOf("branch_expiration_date=") == -1) { deleteCookie(cookie); }
+					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) { deleteCookie(cookie); }
+				}
+			}
+		};
+		clearCookies(true, true);
+		branch._storage._store = {
+			"TEMP": { },
+			"PERM": { }
+		};
+	};
+
 	before(function() {
 		xhr = sinon.useFakeXMLHttpRequest();
 		clock = sinon.useFakeTimers();
@@ -16,7 +40,7 @@ describe('Integration tests', function() {
 	});
 
 	beforeEach(function() {
-		sessionStorage.clear();
+		clearBranchStorage();
 		testUtils.go('');
 		branch.identity_id = identity_id.toString();
 	});

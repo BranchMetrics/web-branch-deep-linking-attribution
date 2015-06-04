@@ -72,7 +72,7 @@ banner_html.iframe = function(options, action) {
 	document.body.appendChild(iframe);
 
 	var bodyClass,
-	    userAgent = banner_utils.mobileUserAgent();
+	    userAgent = utils.mobileUserAgent();
 	if (userAgent == 'ios' || userAgent == 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}
@@ -110,7 +110,7 @@ banner_html.div = function(options, action) {
  */
 banner_html.markup = function(options, storage) {
 	var action = '<div id="branch-sms-form-container">' +
-		(banner_utils.mobileUserAgent() ? banner_html.mobileAction(options, storage) : banner_html.desktopAction(options)) +
+		(utils.mobileUserAgent() ? banner_html.mobileAction(options, storage) : banner_html.desktopAction(options)) +
 	'</div>';
 
 	if (options.iframe) {

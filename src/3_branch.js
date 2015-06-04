@@ -9,6 +9,7 @@ goog.require('Server');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
+goog.require('web_session');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
@@ -100,16 +101,20 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = storage(false);
+
+	var primaryStorage = 'session';
+	if (CORDOVA_BUILD || utils.mobileUserAgent()) { primaryStorage = 'local'; }
+	else if (TITANIUM_BUILD) { primaryStorage = 'titanium'; }
+	this._storage = new BranchStorage([primaryStorage, 'pojo']);
+
 	this._server = new Server();
-	var sdk;
+
+	var sdk = 'web';
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
 	if (TITANIUM_BUILD) { sdk = 'titanium'; }
-	if (WEB_BUILD) { sdk = 'web'; }
 	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-		this._permStorage = storage(true);
 		this.debug = false;
 	}
 	this.init_state = init_states.NO_INIT;
@@ -142,8 +147,8 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = utils.readKeyValue('referring_link', this._storage),
-		click_id = utils.readKeyValue('click_id', this._storage);
+	var referring_link = web_session.readKeyValue('referring_link', this._storage),
+		click_id = web_session.readKeyValue('click_id', this._storage);
 
 	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
@@ -236,7 +241,8 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		self.keepAlive = true;
 	}
 
-	var sessionData = utils.readStore(self._storage);
+	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var sessionData = web_session.read(self._storage);
 
 	var setBranchValues = function(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
@@ -263,10 +269,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data) {
 			data = setBranchValues(data);
 			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-				var first = utils.readStore(self._permStorage);
-				if (!install && first) { utils.storeKeyValue("data", first.data, self._permStorage); }
+				var first = web_session.read(self._storage);
+				if (!install && first) { web_session.storeKeyValue("data", first.data, self._storage); }
 			}
-			utils.store(data, self._storage);
+			web_session.store(data, self._storage); // Need to make sure this is stored PERM for Cordova
+
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
@@ -282,9 +289,8 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-			var storedValues = utils.readStore(self._permStorage);
+			var storedValues = web_session.read(self._storage);
 			var freshInstall = !storedValues['identity_id'];
-			var isReferrable = options.isReferrable = (options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null) ? options.isReferrable : null;
 
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
@@ -352,7 +358,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  */
 /*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var data = utils.whiteListSessionData(utils.readStore(this._storage));
+	var data = utils.whiteListSessionData(web_session.read(this._storage));
 	data['referring_link'] = this._referringLink();
 	done(null, data);
 });
@@ -374,7 +380,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
  */
  	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-		done(null, utils.whiteListSessionData(utils.readStore(this._permStorage)));
+		done(null, utils.whiteListSessionData(web_session.read(this._storage)));
 	});
 }
 
@@ -485,7 +491,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 			delete self.session_id;
 			delete self.sessionLink;
 			self.init_state = init_states.NO_INIT;
-			utils.clearStore(self._storage);
+			web_session.clear(self._storage);
 			done(null);
 		});
 	});
@@ -756,7 +762,7 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 				"click": "click"
 			}, function(err, data) {
 				if (err) { return done(err); }
-				utils.storeKeyValue('click_id', data['click_id'], self._storage);
+				web_session.storeKeyValue('click_id', data['click_id'], self._storage);
 				sendSMS(data['click_id']);
 			});
 		});
