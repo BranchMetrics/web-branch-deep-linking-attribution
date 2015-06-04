@@ -617,9 +617,9 @@ var COOKIE_DAYS = 365, storage, BranchStorage = function(a) {
   }
 };
 BranchStorage.prototype.local = {get:function(a) {
-  localStorage.getItem(a);
+  return localStorage.getItem(a);
 }, set:function(a, b) {
-  localStorage.getItem(a, b);
+  localStorage.setItem(a, b);
 }, remove:function(a) {
   localStorage.removeItem(a);
 }, clear:function() {
@@ -632,7 +632,7 @@ BranchStorage.prototype.local = {get:function(a) {
   }
 }};
 BranchStorage.prototype.session = {get:function(a) {
-  sessionStorage.getItem(a);
+  return sessionStorage.getItem(a);
 }, set:function(a, b) {
   sessionStorage.setItem(a, b);
 }, remove:function(a) {

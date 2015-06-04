@@ -26,8 +26,8 @@ var storage;
 
 /** @type storage */
 BranchStorage.prototype['local'] = {
-	get: function(key) { localStorage.getItem(key); },
-	set: function(key, value) { localStorage.getItem(key, value); },
+	get: function(key) { return localStorage.getItem(key); },
+	set: function(key, value) { localStorage.setItem(key, value); },
 	remove: function(key) { localStorage.removeItem(key); },
 	clear: function() { localStorage.clear(); },
 	isEnabled: function () {
@@ -44,7 +44,7 @@ BranchStorage.prototype['local'] = {
 
 /** @type storage */
 BranchStorage.prototype['session'] = {
-	get: function(key) { sessionStorage.getItem(key); },
+	get: function(key) { return sessionStorage.getItem(key); },
 	set: function(key, value) { sessionStorage.setItem(key, value); },
 	remove: function(key) { sessionStorage.removeItem(key); },
 	clear: function() { sessionStorage.clear(); },
@@ -102,6 +102,7 @@ BranchStorage.prototype['cookie'] = function(perm) {
 	}
 };
 
+/** @type storage */
 BranchStorage.prototype['pojo'] = {
 	get: function(key) { return typeof this._store[key] != 'undefined' ? this._store[key] : null; },
 	set: function(key, value) { this._store[key] = value; },
@@ -110,6 +111,7 @@ BranchStorage.prototype['pojo'] = {
 	isEnabled: function() { return true; }
 };
 
+/** @type storage */
 BranchStorage.prototype['titanium'] = {
 	get: function() { },
 	set: function() { },
@@ -117,13 +119,3 @@ BranchStorage.prototype['titanium'] = {
 	clear: function() { },
 	isEnabled: function() { }
 };
-
-// call it like this
-/*
-branch.init
-	this.permStorage = getFirstEnabled([ local, cookie(true), pojo ])
-
-	this.permStorage.get()
-
-	this.tempStorage = getFirstEnabled([ session, cookie(false), pojo])
-*/
