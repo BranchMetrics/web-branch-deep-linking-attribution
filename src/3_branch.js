@@ -103,6 +103,7 @@ Branch = function() {
 	this._queue = Queue();
 
 	var primaryStorage = 'session';
+	// need to add cookie storage to this
 	if (CORDOVA_BUILD || utils.mobileUserAgent()) { primaryStorage = 'local'; }
 	else if (TITANIUM_BUILD) { primaryStorage = 'titanium'; }
 	this._storage = new BranchStorage([primaryStorage, 'pojo']);

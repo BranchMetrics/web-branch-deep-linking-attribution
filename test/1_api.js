@@ -33,7 +33,7 @@ describe('Server helpers', function() {
 
 describe('Server', function() {
 	var server = new Server(),
-		storage = new BranchStorage(),
+		storage = new BranchStorage(['session', 'pojo']),
 		xhr,
 		requests,
 		clock;
@@ -139,7 +139,7 @@ describe('Server', function() {
 			});
 
 			it('should pass as a jsonp request', function(done) {
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 
 				var assert = testUtils.plan(3, done);
 
@@ -226,7 +226,7 @@ describe('Server', function() {
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
 
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 				var completeParams = testUtils.params({ "identity": "test_id" });
 				server.request(resources.profile, completeParams, storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
@@ -277,7 +277,7 @@ describe('Server', function() {
 
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 
 				var completeParams = testUtils.params({ });
 				server.request(resources.logout, completeParams, storage, assert.done);
@@ -319,7 +319,7 @@ describe('Server', function() {
 
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 				server.request(resources.referrals, testUtils.params({ }), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].src, 'https://api.branch.io/v1/referrals/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web0.0.0&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
@@ -349,7 +349,7 @@ describe('Server', function() {
 
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 				server.request(resources.credits, testUtils.params({ }), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].src, 'https://api.branch.io/v1/credits/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web0.0.0&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
@@ -401,7 +401,7 @@ describe('Server', function() {
 
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 
 				var completeParams = testUtils.params({ "amount": 1, "bucket": "testbucket" });
 				server.request(resources.redeem, completeParams, storage, assert.done);
@@ -463,7 +463,7 @@ describe('Server', function() {
 
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 				server.request(resources.link, testUtils.params(), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
 				var encodedData = encodeURIComponent(utils.base64encode(goog.json.serialize(testUtils.params())));
@@ -511,7 +511,7 @@ describe('Server', function() {
 
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 				server.request(resources.linkClick, testUtils.params({ "link_url": "3hpH54U-58", "click": "click" }), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].src, 'https://bnc.lt/3hpH54U-58?click=click&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
@@ -558,7 +558,7 @@ describe('Server', function() {
 
 			it('should pass as a jsonp request', function(done) {
 				var assert = testUtils.plan(3, done);
-				storage['setItem']('use_jsonp', true, "session");
+				storage['set']('use_jsonp', true, "session");
 
 				var completeParams = testUtils.params({ "event": "testevent", "metadata": metadata });
 				server.request(resources.event, completeParams, storage, assert.done);
