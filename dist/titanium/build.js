@@ -608,11 +608,10 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.5.6"}, WEB_BUILD = !1, CORDOVA_BUILD = !1, TITANIUM_BUILD = !0;
 // Input 2
 var COOKIE_DAYS = 365, storage, BranchStorage = function(a) {
-  this._store = {};
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]];
     if (c.isEnabled()) {
-      return c;
+      return c._store = {}, c;
     }
   }
 };

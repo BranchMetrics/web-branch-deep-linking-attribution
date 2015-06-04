@@ -15,10 +15,10 @@ var storage;
  * @constructor
  */
  var BranchStorage = function(storageMethods) {
-	this._store = { };
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
 		if (storageMethod.isEnabled()) {
+			storageMethod._store = { };
 			return storageMethod;
 		}
 	}
