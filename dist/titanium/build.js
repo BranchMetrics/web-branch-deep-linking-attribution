@@ -854,14 +854,6 @@ var web_session = {deprecated_read:function(a) {
   } catch (b) {
     return null;
   }
-}, store:function(a, b) {
-  b.setObject(a);
-}, clear:function(a) {
-  a.clear();
-}, storeKeyValue:function(a, b, c) {
-  c.set(a, b);
-}, readKeyValue:function(a, b) {
-  b.get(a);
 }};
 // Input 6
 var utils = {}, DEBUG = !0, message;
@@ -1309,7 +1301,7 @@ var sendSMS = function(a, b, c, d) {
         banner_utils.removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-      "number" == typeof b.forgetHide ? web_session.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : web_session.storeKeyValue("hideBanner", !0, d);
+      "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
     };
     l && (l.onclick = function(a) {
       a.preventDefault();
@@ -1421,9 +1413,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       c = e(c);
       if (CORDOVA_BUILD || TITANIUM_BUILD) {
         var g = d._storage.getAll();
-        !f && g && web_session.storeKeyValue("data", g.data, d._storage);
+        !f && g && d._storage.set("data", g.data);
       }
-      web_session.store(c, d._storage);
+      d._storage.setObject(c);
       d.init_state = init_states.INIT_SUCCEEDED;
       c.data_parsed = c.data ? goog.json.parse(c.data) : null;
     }
@@ -1505,7 +1497,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
       delete b.session_id;
       delete b.sessionLink;
       b.init_state = init_states.NO_INIT;
-      web_session.clear(b._storage);
+      b._storage.clear();
       a(null);
     });
   });
@@ -1542,7 +1534,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
       if (b) {
         return a(b);
       }
-      web_session.storeKeyValue("click_id", c.click_id, f._storage);
+      f._storage.set("click_id", c.click_id);
       e(c.click_id);
     });
   });

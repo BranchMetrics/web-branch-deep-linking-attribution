@@ -154,10 +154,6 @@ Branch.prototype._api = function(resource, obj, callback) {
 Branch.prototype._referringLink = function() {
 	var referring_link = this._storage.get('referring_link'),
 		click_id = this._storage.get('click_id');
-	/*
-	var referring_link = web_session.readKeyValue('referring_link', this._storage),
-		click_id = web_session.readKeyValue('click_id', this._storage);
-	*/
 
 	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
@@ -276,9 +272,9 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			data = setBranchValues(data);
 			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 				var first = self._storage.getAll();
-				if (!install && first) { web_session.storeKeyValue("data", first.data, self._storage); }
+				if (!install && first) { self._storage.set("data", first.data); }
 			}
-			web_session.store(data, self._storage);
+			self._storage.setObject(data);
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
@@ -500,7 +496,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 			delete self.session_id;
 			delete self.sessionLink;
 			self.init_state = init_states.NO_INIT;
-			web_session.clear(self._storage);
+			self._storage.clear();
 			done(null);
 		});
 	});
@@ -771,7 +767,7 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 				"click": "click"
 			}, function(err, data) {
 				if (err) { return done(err); }
-				web_session.storeKeyValue('click_id', data['click_id'], self._storage);
+				self._storage.set('click_id', data['click_id']);
 				sendSMS(data['click_id']);
 			});
 		});

@@ -99,7 +99,6 @@ utils.cleanLinkData = function(linkData, config) {
  */
 utils.hasApp = function(storage) {
 	return storage.get('has_app');
-	// return web_session.readKeyValue('has_app', storage);
 };
 
 /**

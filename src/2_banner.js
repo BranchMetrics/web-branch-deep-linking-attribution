@@ -153,8 +153,8 @@ banner = function(branch, options, linkData, storage) {
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
 			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-			if (typeof options.forgetHide == 'number') { web_session.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
-			else { web_session.storeKeyValue('hideBanner', true, storage); }
+			if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
+			else { storage.set('hideBanner', true); }
 		};
 
 		if (closeButton) {

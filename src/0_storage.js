@@ -14,7 +14,7 @@ var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 var storage;
 
 /** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
-	Ti.App.Properties;
+Ti.App.Properties;
 
 /**
  * @class BranchStorage
@@ -84,7 +84,6 @@ var cookies = function(perm) {
 	        var date = new Date();
 	        console.log(date);
 	        date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
-	        // we have to save the expiration date in the cookie string itself, otherwise there is no way to retrieve it
 	        expires = "; branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
 	    }
 	    document.cookie = key + "=" + value + expires + "; path=/";
