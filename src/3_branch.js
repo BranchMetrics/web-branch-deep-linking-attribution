@@ -107,7 +107,7 @@ Branch = function() {
 	else if (TITANIUM_BUILD) { storageMethods = ['titanium']; }
 	else if (WEB_BUILD) {
 		if (utils.mobileUserAgent()) { storageMethods = ['local', 'permcookie']; }
-		//else { storageMethods = ['session', 'cookie']; }
+		else { storageMethods = ['session', 'cookie']; }
 	}
 	storageMethods.push('pojo');
 	this._storage = new BranchStorage(storageMethods);

@@ -1357,7 +1357,7 @@ var Branch = function() {
   }
   this._queue = Queue();
   var a = [];
-  CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && utils.mobileUserAgent() && (a = ["local", "permcookie"]);
+  CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && (a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"]);
   a.push("pojo");
   this._storage = new BranchStorage(a);
   this._server = new Server;
