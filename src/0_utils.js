@@ -5,8 +5,6 @@
 goog.provide('utils');
 /*jshint unused:false*/
 goog.require('goog.json');
-goog.require('storage');
-goog.require('web_session');
 goog.require('config');
 
 /** @define {boolean} */
@@ -92,13 +90,6 @@ utils.cleanLinkData = function(linkData, config) {
 	}
 	linkData['data'] = goog.json.serialize(linkData['data'] || {});
 	return linkData;
-};
-
-/**
- * @param {BranchStorage} storage
- */
-utils.hasApp = function(storage) {
-	return storage.get('has_app');
 };
 
 /**

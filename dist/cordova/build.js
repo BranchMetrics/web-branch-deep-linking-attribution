@@ -717,6 +717,82 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 4
+var web_session = {deprecated_read:function(a) {
+  try {
+    return goog.json.parse(a.get("branch_session")) || null;
+  } catch (b) {
+    return null;
+  }
+}};
+// Input 5
+var utils = {}, DEBUG = !0, message;
+utils.httpMethod = {POST:"POST", GET:"GET"};
+utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
+missingUrl:"Required argument: URL, is missing"};
+utils.getLocationSearch = function() {
+  return window.location.search;
+};
+utils.getLocationHash = function() {
+  return window.location.hash;
+};
+utils.message = function(a, b) {
+  var c = a.replace(/\$(\d)/g, function(a, c) {
+    return b[parseInt(c, 10) - 1];
+  });
+  DEBUG && console && console.log(c);
+  return c;
+};
+utils.whiteListSessionData = function(a) {
+  return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null, referring_link:a.referring_link || null};
+};
+utils.cleanLinkData = function(a, b) {
+  WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
+  a.data = goog.json.serialize(a.data || {});
+  return a;
+};
+utils.merge = function(a, b) {
+  for (var c in b) {
+    b.hasOwnProperty(c) && (a[c] = b[c]);
+  }
+  return a;
+};
+utils.hashValue = function(a) {
+  try {
+    return utils.getLocationHash().match(new RegExp(a + ":([^&]*)"))[1];
+  } catch (b) {
+  }
+};
+utils.mobileUserAgent = function() {
+  return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : navigator.userAgent.match(/ipad/i) ? "ipad" : "ios" : !1;
+};
+utils.getParamValue = function(a) {
+  try {
+    return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
+  } catch (b) {
+  }
+};
+utils.isKey = function(a) {
+  return-1 < a.indexOf("key_");
+};
+utils.snakeToCamel = function(a) {
+  return a.replace(/(\-\w)/g, function(a) {
+    return a[1].toUpperCase();
+  });
+};
+utils.base64encode = function(a) {
+  var b = "", c, d, e, f, g, k, h = 0;
+  a = a.replace(/\r\n/g, "\n");
+  d = "";
+  for (e = 0;e < a.length;e++) {
+    f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
+  }
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+    ;
+  }
+  return b;
+};
+// Input 6
 var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]], c = "function" == typeof c ? c() : c;
@@ -818,6 +894,8 @@ BranchStorage.prototype.pojo = {getAll:function() {
   return a;
 }, get:function(a) {
   return "undefined" != typeof this._store[a] ? this._store[a] : null;
+}, setObject:function(a) {
+  this._store = utils.merge(this._store, a);
 }, set:function(a, b) {
   this._store[a] = b;
 }, remove:function(a) {
@@ -847,85 +925,6 @@ BranchStorage.prototype.titanium = {getAll:function() {
     return!1;
   }
 }};
-// Input 5
-var web_session = {deprecated_read:function(a) {
-  try {
-    return goog.json.parse(a.get("branch_session")) || null;
-  } catch (b) {
-    return null;
-  }
-}};
-// Input 6
-var utils = {}, DEBUG = !0, message;
-utils.httpMethod = {POST:"POST", GET:"GET"};
-utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
-missingUrl:"Required argument: URL, is missing"};
-utils.getLocationSearch = function() {
-  return window.location.search;
-};
-utils.getLocationHash = function() {
-  return window.location.hash;
-};
-utils.message = function(a, b) {
-  var c = a.replace(/\$(\d)/g, function(a, c) {
-    return b[parseInt(c, 10) - 1];
-  });
-  DEBUG && console && console.log(c);
-  return c;
-};
-utils.whiteListSessionData = function(a) {
-  return{data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null, referring_link:a.referring_link || null};
-};
-utils.cleanLinkData = function(a, b) {
-  WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
-  a.data = goog.json.serialize(a.data || {});
-  return a;
-};
-utils.hasApp = function(a) {
-  return a.get("has_app");
-};
-utils.merge = function(a, b) {
-  for (var c in b) {
-    b.hasOwnProperty(c) && (a[c] = b[c]);
-  }
-  return a;
-};
-utils.hashValue = function(a) {
-  try {
-    return utils.getLocationHash().match(new RegExp(a + ":([^&]*)"))[1];
-  } catch (b) {
-  }
-};
-utils.mobileUserAgent = function() {
-  return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : navigator.userAgent.match(/ipad/i) ? "ipad" : "ios" : !1;
-};
-utils.getParamValue = function(a) {
-  try {
-    return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
-  } catch (b) {
-  }
-};
-utils.isKey = function(a) {
-  return-1 < a.indexOf("key_");
-};
-utils.snakeToCamel = function(a) {
-  return a.replace(/(\-\w)/g, function(a) {
-    return a[1].toUpperCase();
-  });
-};
-utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, k, h = 0;
-  a = a.replace(/\r\n/g, "\n");
-  d = "";
-  for (e = 0;e < a.length;e++) {
-    f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
-  }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
-    ;
-  }
-  return b;
-};
 // Input 7
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
@@ -1205,7 +1204,7 @@ banner_css.css = function(a, b) {
 var banner_html = {banner:function(a, b) {
   return'<div class="content"><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details"><span class="title">' + a.title + '</span><span class="description">' + a.description + '</span></div></div><div class="right" id="branch-banner-action">' + b + "</div></div>";
 }, mobileAction:function(a, b) {
-  return'<a id="branch-mobile-action" href="#" target="_parent">' + (utils.hasApp(b) ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+  return'<a id="branch-mobile-action" href="#" target="_parent">' + (b.get("has_app") ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
   return'<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
@@ -1358,7 +1357,7 @@ var Branch = function() {
   }
   this._queue = Queue();
   var a = [];
-  CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && (a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"]);
+  CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && utils.mobileUserAgent() && (a = ["local", "permcookie"]);
   a.push("pojo");
   this._storage = new BranchStorage(a);
   this._server = new Server;

@@ -6,6 +6,7 @@
 goog.provide('storage');
 /*jshint unused:false*/
 goog.require('goog.json');
+goog.require('utils');
 
 var COOKIE_DAYS = 365;
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
@@ -160,6 +161,9 @@ BranchStorage.prototype['pojo'] = {
 		return allKeyValues;
 	},
 	get: function(key) { return typeof this._store[key] != 'undefined' ? this._store[key] : null; },
+	setObject: function(object) {
+		this._store = utils.merge(this._store, object);
+	},
 	set: function(key, value) { this._store[key] = value; },
 	remove: function(key) { delete this._store[key]; },
 	clear: function() { this._store = { }; },
