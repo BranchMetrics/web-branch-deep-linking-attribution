@@ -152,8 +152,12 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
+	var referring_link = this._storage.get('referring_link'),
+		click_id = this._storage.get('click_id');
+	/*
 	var referring_link = web_session.readKeyValue('referring_link', this._storage),
 		click_id = web_session.readKeyValue('click_id', this._storage);
+	*/
 
 	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
@@ -246,9 +250,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		self.keepAlive = true;
 	}
 
-	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-	var sessionData = web_session.read(self._storage);
-
 	var setBranchValues = function(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
@@ -274,10 +275,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data) {
 			data = setBranchValues(data);
 			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-				var first = web_session.read(self._storage);
+				var first = self._storage.getAll();
 				if (!install && first) { web_session.storeKeyValue("data", first.data, self._storage); }
 			}
-			web_session.store(data, self._storage); // Need to make sure this is stored PERM for Cordova
+			web_session.store(data, self._storage);
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
@@ -289,12 +290,15 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
+	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var sessionData = web_session.deprecated_read(self._storage) || self._storage.getAll();
+
 	if (sessionData  && sessionData['session_id']) {
 		finishInit(null, sessionData, false);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-			var storedValues = web_session.read(self._storage);
+			var storedValues = self._storage.getAll();
 			var freshInstall = !storedValues['identity_id'];
 
 			var apiCordovaTitanium = function(data) {
@@ -363,7 +367,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  */
 /*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var data = utils.whiteListSessionData(web_session.read(this._storage));
+	var data = utils.whiteListSessionData(this._storage.getAll());
 	data['referring_link'] = this._referringLink();
 	done(null, data);
 });
@@ -385,7 +389,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
  */
  	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-		done(null, utils.whiteListSessionData(web_session.read(this._storage)));
+		done(null, utils.whiteListSessionData(this._storage.getAll()));
 	});
 }
 

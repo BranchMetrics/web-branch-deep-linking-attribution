@@ -95,7 +95,8 @@ banner_utils.addCSSLengths  = function(length1, length2) {
  * @return {boolean}
  */
 banner_utils.shouldAppend = function(storage, options) {
-	var hideBanner = web_session.readKeyValue('hideBanner', storage);
+	var hideBanner = storage.get('hideBanner');
+	//var hideBanner = web_session.readKeyValue('hideBanner', storage);
 	if (typeof hideBanner == 'number') {
 		hideBanner = new Date() >= new Date(hideBanner);
 	}

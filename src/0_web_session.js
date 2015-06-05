@@ -1,5 +1,6 @@
 /*
  * Branch Web Session
+ * NOTE: This is only included for backwards compatibility with prior Branch sessions
  */
 
 /*jshint unused:false*/
@@ -10,12 +11,12 @@ goog.provide('web_session');
  * @param {BranchStorage} storage
  * @return {Object}
  */
-web_session.read = function(storage) {
+web_session.deprecated_read = function(storage) {
 	try {
-		return goog.json.parse(storage['get']('branch_session') || { });
+		return goog.json.parse(storage['get']('branch_session')) || null;
 	}
 	catch (e) {
-		return { };
+		return null;
 	}
 };
 
@@ -24,7 +25,7 @@ web_session.read = function(storage) {
  * @param {BranchStorage} storage
  */
 web_session.store = function(data, storage) {
-	storage['set']('branch_session', goog.json.serialize(data));
+	storage['setObject'](data);
 };
 
 /**
@@ -40,9 +41,12 @@ web_session.clear = function(storage) {
  * @param {BranchStorage} storage
  */
 web_session.storeKeyValue = function(key, value, storage) {
+	storage['set'](key, value);
+	/*
 	var currentSession = web_session.read(storage);
 	currentSession[key] = value;
 	web_session.store(currentSession, storage);
+	*/
 };
 
 /**
@@ -50,6 +54,9 @@ web_session.storeKeyValue = function(key, value, storage) {
  * @param {BranchStorage} storage
  */
 web_session.readKeyValue = function(key, storage) {
+	storage['get'](key);
+	/*
 	var currentSession = web_session.read(storage);
 	return (currentSession && currentSession[key]) ? currentSession[key] : null;
+	*/
 };

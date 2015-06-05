@@ -98,7 +98,8 @@ utils.cleanLinkData = function(linkData, config) {
  * @param {BranchStorage} storage
  */
 utils.hasApp = function(storage) {
-	return web_session.readKeyValue('has_app', storage);
+	return storage.get('has_app');
+	// return web_session.readKeyValue('has_app', storage);
 };
 
 /**

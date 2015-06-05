@@ -3,7 +3,7 @@
 goog.addDependency("../../../../../src/0_banner_utils.js", ['banner_utils'], ['web_session', 'storage', 'utils']);
 goog.addDependency("../../../../../test/web-config.js", ['config'], []);
 goog.addDependency("../../../../../src/0_queue.js", ['Queue'], []);
-goog.addDependency("../../../../../src/0_storage.js", ['storage'], []);
+goog.addDependency("../../../../../src/0_storage.js", ['storage'], ['goog.json']);
 goog.addDependency("../../../../../src/0_utils.js", ['utils'], ['goog.json', 'storage', 'web_session', 'config']);
 goog.addDependency("../../../../../src/0_web_session.js", ['web_session'], ['goog.json']);
 goog.addDependency("../../../../../src/1_api.js", ['Server'], ['utils', 'goog.json', 'storage']);
