@@ -90,7 +90,7 @@ banner_utils.addCSSLengths  = function(length1, length2) {
 };
 
 /**
- * @param {BranchStorage} storage
+ * @param {storage} storage
  * @param {banner_utils.options} options
  * @return {boolean}
  */

@@ -11,7 +11,7 @@ goog.require('utils');
 var COOKIE_DAYS = 365;
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
-/** @typedef {{get:function({string}), set:function({string}, {string}), remove:function({string}), clear:function(), isEnabled:function()}} */
+/** @typedef {{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
 
 /** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
@@ -20,6 +20,7 @@ Ti.App.Properties;
 /**
  * @class BranchStorage
  * @constructor
+ * @returns storage
  */
  var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
@@ -153,13 +154,7 @@ BranchStorage.prototype['permcookie'] = function() {
 
 /** @type storage */
 BranchStorage.prototype['pojo'] = {
-	getAll: function() {
-		var allKeyValues = { };
-		for (var key in this._store) {
-			if (key.indexOf(BRANCH_KEY_PREFIX) != -1) { allKeyValues[trimPrefix(key)] = this._store.getItem(key); }
-		}
-		return allKeyValues;
-	},
+	getAll: function() { return this._store; },
 	get: function(key) { return typeof this._store[key] != 'undefined' ? this._store[key] : null; },
 	setObject: function(object) {
 		this._store = utils.merge(this._store, object);

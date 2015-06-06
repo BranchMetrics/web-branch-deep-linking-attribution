@@ -29,7 +29,7 @@ banner_html.banner = function(options, action) {
 
 /**
  * @param {banner_utils.options} options
- * @param {BranchStorage} storage
+ * @param {storage} storage
  */
 banner_html.mobileAction = function(options, storage) {
 	return '<a id="branch-mobile-action" href="#" target="_parent">' + (storage.get('has_app') ? options.openAppButtonText : options.downloadAppButtonText) + '</a>';
@@ -106,7 +106,7 @@ banner_html.div = function(options, action) {
 
 /**
  * @param {banner_utils.options} options
- * @param {BranchStorage} storage
+ * @param {storage} storage
  */
 banner_html.markup = function(options, storage) {
 	var action = '<div id="branch-sms-form-container">' +

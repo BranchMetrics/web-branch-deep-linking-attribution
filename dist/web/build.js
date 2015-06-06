@@ -887,11 +887,7 @@ BranchStorage.prototype.permcookie = function() {
   return cookies(!0);
 };
 BranchStorage.prototype.pojo = {getAll:function() {
-  var a = {}, b;
-  for (b in this._store) {
-    -1 != b.indexOf(BRANCH_KEY_PREFIX) && (a[trimPrefix(b)] = this._store.getItem(b));
-  }
-  return a;
+  return this._store;
 }, get:function(a) {
   return "undefined" != typeof this._store[a] ? this._store[a] : null;
 }, setObject:function(a) {

@@ -95,7 +95,7 @@ var sendSMS = function(doc, branch, options, linkData) {
  * @param {Object} branch
  * @param {banner_utils.options} options
  * @param {Object} linkData
- * @param {BranchStorage} storage
+ * @param {storage} storage
  */
 banner = function(branch, options, linkData, storage) {
 	if (banner_utils.shouldAppend(storage, options)) {

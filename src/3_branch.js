@@ -110,6 +110,7 @@ Branch = function() {
 		else { storageMethods = ['session', 'cookie']; }
 	}
 	storageMethods.push('pojo');
+
 	this._storage = new BranchStorage(storageMethods);
 
 	this._server = new Server();
@@ -138,7 +139,6 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
-	// These three are sent from mobile apps
 	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
 	}
