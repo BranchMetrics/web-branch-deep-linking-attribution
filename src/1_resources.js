@@ -288,6 +288,7 @@ resources.link = {
 		"data": validator(false, validationTypes.str),
 		"tags": validator(false, validationTypes.arr),
 		"feature": validator(false, validationTypes.str),
+		"campaign": validator(false, validationTypes.str),
 		"channel": validator(false, validationTypes.str),
 		"stage": validator(false, validationTypes.str),
 		"type": validator(false, validationTypes.num),
