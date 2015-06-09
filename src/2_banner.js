@@ -137,28 +137,32 @@ banner = function(branch, options, linkData, storage) {
 			bodyMarginBottomInline = document.body.style.marginBottom,
 
 			closeButton = doc.getElementById('branch-banner-close'),
-			closeBanner = function() {
-			setTimeout(function() {
-				banner_utils.removeElement(element);
-				banner_utils.removeElement(document.getElementById('branch-css'));
-			}, banner_utils.animationSpeed + banner_utils.animationDelay);
+			closeBanner = function(callback) {
+				setTimeout(function() {
+					banner_utils.removeElement(element);
+					banner_utils.removeElement(document.getElementById('branch-css'));
+					callback();
+				}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
-			setTimeout(function() {
-				if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
-				else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
-				banner_utils.removeClass(document.body, 'branch-banner-is-active');
-			}, banner_utils.animationDelay);
-			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
-			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
+				setTimeout(function() {
+					if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
+					else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
+					banner_utils.removeClass(document.body, 'branch-banner-is-active');
+				}, banner_utils.animationDelay);
+				if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+				else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-			if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
-			else { utils.storeKeyValue('hideBanner', true, storage); }
-		};
+				if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
+				else { utils.storeKeyValue('hideBanner', true, storage); }
+			};
 
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
-				closeBanner();
+				branch._publishEvent("willCloseBanner", "banner");
+				closeBanner(function() {
+					branch._publishEvent("didCloseBanner", "banner");
+				});
 			};
 		}
 

@@ -75,6 +75,14 @@ ___
 
 
 
+### subscribe() 
+
+
+
+### unsubscribe() 
+
+
+
 ### data(callback) 
 
 **Parameters**

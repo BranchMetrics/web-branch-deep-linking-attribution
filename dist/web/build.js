@@ -1068,7 +1068,7 @@ resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals"
 resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:defaults({link_click_id:validator(!1, branch_id), length:validator(!1, validationTypes.num), direction:validator(!1, validationTypes.num), begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.str)})};
 resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:defaults({})};
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!0, validationTypes.str)})};
-resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num), alias:validator(!1, validationTypes.str)})};
+resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), campaign:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num), alias:validator(!1, validationTypes.str)})};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)})};
 // Input 9
 var banner_css = {banner:function(a) {
@@ -1184,10 +1184,11 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, l = f.getElementById("branch-banner-close"), n = function() {
+    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, l = f.getElementById("branch-banner-close"), n = function(a) {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
+        a();
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
         "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = m);
@@ -1196,9 +1197,12 @@ var sendSMS = function(a, b, c, d) {
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
       "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
     };
-    l && (l.onclick = function(a) {
-      a.preventDefault();
-      n();
+    l && (l.onclick = function(b) {
+      b.preventDefault();
+      a._publishEvent("willCloseBanner", "banner");
+      n(function() {
+        a._publishEvent("didCloseBanner", "banner");
+      });
     });
     banner_utils.addClass(document.body, "branch-banner-is-active");
     "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
@@ -1212,8 +1216,7 @@ var sendSMS = function(a, b, c, d) {
 if (CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
-var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3};
-function wrap(a, b, c) {
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
     a === callback_params.NO_CALLBACK || "function" != typeof g ? (f = function(a) {
@@ -1244,14 +1247,14 @@ function wrap(a, b, c) {
       b.apply(d, e);
     });
   };
-}
-var Branch = function() {
+}, Branch = function() {
   if (!(this instanceof Branch)) {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
   this._storage = storage(!1);
   this._server = new Server;
+  this._observers = [];
   var a;
   CORDOVA_BUILD && (a = "cordova");
   WEB_BUILD && (a = "web");
@@ -1274,6 +1277,11 @@ Branch.prototype._api = function(a, b, c) {
 Branch.prototype._referringLink = function() {
   var a = utils.readKeyValue("referring_link", this._storage), b = utils.readKeyValue("click_id", this._storage);
   return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
+};
+Branch.prototype._publishEvent = function(a, b) {
+  this._observers.forEach(function(c) {
+    (c.subject && c.subject == b || !c.subject) && c.handler(a);
+  });
 };
 CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
   this.debug = a;
@@ -1343,6 +1351,18 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }
   }
 }, !0);
+Branch.prototype.subscribe = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+  b && this._observers.push({handler:b, subject:c});
+  a();
+});
+Branch.prototype.unsubscribe = wrap(callback_params.NO_CALLBACK, function(a, b) {
+  b && (this._observers = this._observers.filter(function(a) {
+    if (a.handler !== b) {
+      return a;
+    }
+  }));
+  a();
+});
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(utils.readStore(this._storage));
   b.referring_link = this._referringLink();
@@ -1443,7 +1463,13 @@ WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, functi
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
 }), Branch.prototype.closeBanner = wrap(0, function(a) {
-  this.closeBannerPointer && this.closeBannerPointer();
+  if (this.closeBannerPointer) {
+    var b = this;
+    this._publishEvent("willCloseBanner", "banner");
+    this.closeBannerPointer(function() {
+      b._publishEvent("didCloseBanner", "banner");
+    });
+  }
   a();
 }));
 // Input 13

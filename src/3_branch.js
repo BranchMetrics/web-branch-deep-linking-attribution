@@ -44,7 +44,7 @@ var init_states = {
  * @param {function(...?): undefined} func
  * @param {boolean=} init
  */
-function wrap(parameters, func, init) {
+var wrap =function(parameters, func, init) {
 	var r = function() {
 		var self = this, args, callback,
 		lastArg = arguments[arguments.length - 1];
@@ -102,6 +102,7 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage(false);
 	this._server = new Server();
+	this._observers = [ ];
 	var sdk;
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
 	if (WEB_BUILD) { sdk = 'web'; }
@@ -147,6 +148,19 @@ Branch.prototype._referringLink = function() {
 	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
 	else { return null; }
+};
+
+/***
+ * @function Branch._publishEvent
+ * @param {string} event
+ * @param {string} subject
+ */
+Branch.prototype._publishEvent = function(event, subject) {
+	this._observers.forEach(function(subscription) {
+		if ((subscription.subject && subscription.subject == subject) || !subscription.subject) {
+			subscription.handler(event);
+		}
+	});
 };
 
 if (CORDOVA_BUILD) { // jshint undef:false
@@ -231,6 +245,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		options = { isReferrable: null };
 	}
 	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+
 	var sessionData = utils.readStore(self._storage);
 
 	function setBranchValues(data) {
@@ -321,6 +336,33 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		}
 	}
 }, true);
+
+/**
+ * @function Branch.subscribe
+ *
+ */
+Branch.prototype['subscribe'] = wrap(callback_params.NO_CALLBACK, function(done, observer, subject) {
+	if (observer) {
+		this._observers.push({
+			"handler": observer,
+			"subject": subject
+		});
+	}
+	done();
+});
+
+/**
+ * @function Branch.unsubscribe
+ *
+ */
+Branch.prototype['unsubscribe'] = wrap(callback_params.NO_CALLBACK, function(done, observer) {
+	if (observer) {
+		this._observers = this._observers.filter(function(subscription) {
+			if (subscription.handler !== observer) { return subscription; }
+		});
+	}
+	done();
+});
 
 /**
  * @function Branch.data
@@ -1193,16 +1235,22 @@ if (WEB_BUILD) { // jshint undef:false
 			desktopSticky: typeof options['desktopSticky'] == 'undefined' ? true : options['desktopSticky'],
 			make_new_link: !!options['make_new_link']
 		};
+
 		if (typeof options['showMobile'] != 'undefined') {
 			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 		}
+
 		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
 		done();
 	});
 
 	Branch.prototype['closeBanner'] = wrap(0, function(done) {
 		if (this.closeBannerPointer) {
-			this.closeBannerPointer();
+			var self = this;
+			this._publishEvent("willCloseBanner", "banner");
+			this.closeBannerPointer(function() {
+				self._publishEvent("didCloseBanner", "banner");
+			});
 		}
 		done();
 	});
