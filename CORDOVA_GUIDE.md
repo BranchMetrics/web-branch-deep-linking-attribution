@@ -373,7 +373,7 @@ The `metadata` parameter is a formatted JSON object that can contain any data an
 
 ##### Usage
 ```js
-branch.event(
+branch.track(
     event,
     metadata,
     callback (err)
