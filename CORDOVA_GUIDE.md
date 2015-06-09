@@ -236,7 +236,7 @@ ___
 
 
 
-### subscribe(observer, subject) 
+### addListener(observer, subject) 
 
 **Parameters**
 
@@ -246,7 +246,7 @@ ___
 
 
 
-### unsubscribe(observer) 
+### removeListener(observer) 
 
 **Parameters**
 

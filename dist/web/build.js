@@ -1354,11 +1354,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }
   }
 }, !0);
-Branch.prototype.subscribe = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+Branch.prototype.addListener = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   b && this._observers.push({handler:b, subject:c});
   a();
 });
-Branch.prototype.unsubscribe = wrap(callback_params.NO_CALLBACK, function(a, b) {
+Branch.prototype.removeListener = wrap(callback_params.NO_CALLBACK, function(a, b) {
   b && (this._observers = this._observers.filter(function(a) {
     if (a.handler !== b) {
       return a;

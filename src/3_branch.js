@@ -338,12 +338,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 }, true);
 
 /**
- * @function Branch.subscribe
+ * @function Branch.addListener
  * @param {function(String)} observer - _required_ - Observing function that will recieves a string as the events.
  * @param {String} subject - _optional_ - Optionally specify which subjects you would like to observe. If left empty, the observer will recieve all events. Currently, the only Branch subject that publishes events is the banner.
  *
  */
-Branch.prototype['subscribe'] = wrap(callback_params.NO_CALLBACK, function(done, observer, subject) {
+Branch.prototype['addListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer, subject) {
 	if (observer) {
 		this._observers.push({
 			"handler": observer,
@@ -354,11 +354,11 @@ Branch.prototype['subscribe'] = wrap(callback_params.NO_CALLBACK, function(done,
 });
 
 /**
- * @function Branch.unsubscribe
+ * @function Branch.removeListener
  * @param {function(String)} observer - _required_ - Reference to the observing function you would like to remove. *note*: this must be the same reference that was passed to `branch.subscribe()`, not an identical clone of the function.
  *
  */
-Branch.prototype['unsubscribe'] = wrap(callback_params.NO_CALLBACK, function(done, observer) {
+Branch.prototype['removeListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer) {
 	if (observer) {
 		this._observers = this._observers.filter(function(subscription) {
 			if (subscription.handler !== observer) { return subscription; }
