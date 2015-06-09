@@ -1160,8 +1160,8 @@ var sendSMS = function(a, b, c, d) {
   };
   if (e) {
     var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? n() : (l(), setTimeout(function() {
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendSMS", "banner"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendSMSError", "banner"), n()) : (b._publishEvent("didSendSMS", "banner"), l(), setTimeout(function() {
         k.removeChild(h);
         m();
       }, banner_utils.success_timeout));
@@ -1169,6 +1169,7 @@ var sendSMS = function(a, b, c, d) {
   }
 }, banner = function(a, b, c, d) {
   if (banner_utils.shouldAppend(d, b)) {
+    a._publishEvent("willShowBanner", "banner");
     var e = banner_html.markup(b, d);
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
@@ -1208,9 +1209,11 @@ var sendSMS = function(a, b, c, d) {
     "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
+      a._publishEvent("didShowBanner", "banner");
     }, banner_utils.animationDelay);
     return n;
   }
+  a._publishEvent("willNotShowBanner", "banner");
 };
 // Input 12
 if (CORDOVA_BUILD) {

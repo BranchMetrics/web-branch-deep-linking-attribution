@@ -69,12 +69,15 @@ var sendSMS = function(doc, branch, options, linkData) {
 	if (phone) {
 		var phone_val = phone.value;
 		if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
+			branch._publishEvent("willSendSMS", "banner");
 			disableForm();
 			branch["sendSMS"](phone_val, linkData, options, function(err) {
 				if (err) {
+					branch._publishEvent("sendSMSError", "banner");
 					errorForm();
 				}
 				else {
+					branch._publishEvent("didSendSMS", "banner");
 					hideFormShowSuccess();
 					setTimeout(function() {
 						smsFormContainer.removeChild(checkmark);
@@ -97,6 +100,8 @@ var sendSMS = function(doc, branch, options, linkData) {
  */
 banner = function(branch, options, linkData, storage) {
 	if (banner_utils.shouldAppend(storage, options)) {
+		branch._publishEvent("willShowBanner", "banner");
+
 		// Create markup
 		var element = banner_html.markup(options, storage);
 
@@ -174,8 +179,10 @@ banner = function(branch, options, linkData, storage) {
 		setTimeout(function() {
 			if (options.position == 'top') { element.style.top = '0'; }
 			else if (options.position == 'bottom') { element.style.bottom = '0'; }
+			branch._publishEvent("didShowBanner", "banner");
 		}, banner_utils.animationDelay);
 
 		return closeBanner;
 	}
+	else { branch._publishEvent("willNotShowBanner", "banner"); }
 };
