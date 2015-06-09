@@ -1160,8 +1160,8 @@ var sendSMS = function(a, b, c, d) {
   };
   if (e) {
     var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendSMS", "banner"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? (b._publishEvent("sendSMSError", "banner"), n()) : (b._publishEvent("didSendSMS", "banner"), l(), setTimeout(function() {
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS", "banner"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError", "banner"), n()) : (b._publishEvent("didSendBannerSMS", "banner"), l(), setTimeout(function() {
         k.removeChild(h);
         m();
       }, banner_utils.success_timeout));

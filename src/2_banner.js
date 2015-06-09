@@ -69,15 +69,15 @@ var sendSMS = function(doc, branch, options, linkData) {
 	if (phone) {
 		var phone_val = phone.value;
 		if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
-			branch._publishEvent("willSendSMS", "banner");
+			branch._publishEvent("willSendBannerSMS", "banner");
 			disableForm();
 			branch["sendSMS"](phone_val, linkData, options, function(err) {
 				if (err) {
-					branch._publishEvent("sendSMSError", "banner");
+					branch._publishEvent("sendBannerSMSError", "banner");
 					errorForm();
 				}
 				else {
-					branch._publishEvent("didSendSMS", "banner");
+					branch._publishEvent("didSendBannerSMS", "banner");
 					hideFormShowSuccess();
 					setTimeout(function() {
 						smsFormContainer.removeChild(checkmark);
