@@ -805,6 +805,12 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
   return BRANCH_KEY_PREFIX + a;
 }, trimPrefix = function(a) {
   return a.replace(BRANCH_KEY_PREFIX, "");
+}, attemptJSON = function(a) {
+  try {
+    return "object" == typeof a ? goog.json.parse(a) || null : null;
+  } catch (b) {
+    return null;
+  }
 }, webStorage = function(a) {
   var b = a ? localStorage : sessionStorage;
   return{getAll:function() {
@@ -904,11 +910,11 @@ BranchStorage.prototype.pojo = {getAll:function() {
 }};
 BranchStorage.prototype.titanium = {getAll:function() {
   for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
-    -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = Ti.App.Properties.getString(b[c]));
+    -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = attemptJSON(Ti.App.Properties.getString(b[c])));
   }
   return a;
 }, get:function(a) {
-  Ti.App.Properties.getString(prefix(a));
+  attemptJSON(Ti.App.Properties.getString(prefix(a)));
 }, setObject:function(a) {
   for (var b in a) {
     var c = "object" == typeof a[b] ? goog.json.serialize(a[b]) : a[b];

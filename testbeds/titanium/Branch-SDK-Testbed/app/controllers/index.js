@@ -5,7 +5,7 @@ var branch = require('build');
 if (Ti.Platform.osname === "android") {
 	// In Android, we start the branch session in onStart and close it
 	// in onStop.  This should be done in every Window used in the app
-	// since a Window corresponds to an Android Activity.  The 
+	// since a Window corresponds to an Android Activity.  The
 	// SDK will "smartly" handle the case where we are transitioning from
 	// one activity to another and not send excess inits or close the session
 	// accidentally.
@@ -188,7 +188,7 @@ function expDateClicked(e) {
 
 function createCode(e) {
    	var val = {};
-   	
+
    	if ($.prefix_text.value) {
    		val.prefix = $.prefix_text.value;
    	}
@@ -257,7 +257,7 @@ function applyCode() {
    		});
 	}
 };
-    
+
 function redeem(e) {
    	console.log("Sending redeem rewards");
    	branch.redeem(parseInt($.cr_amount_text.value), $.cr_bucket_text.value, function(err, data) {
@@ -314,14 +314,10 @@ Ti.App.addEventListener("branch_init", function(e) {
 	console.log("branch_init fired");
 	$.status_text.text = Alloy.Globals.status;
 	branch.first(function(err, data) {
-		if (data.data) {
-			$.first_text.text = JSON.stringify(data.data);
-		}
+		$.first_text.text = data ? JSON.stringify(data) : "null";
 	});
 	branch.data(function(err, data) {
-		if (data.data) {
-			$.latest_text.text = JSON.stringify(data.data);
-		}
+		$.latest_text.text = data ? JSON.stringify(data) : "null";
 	});
 });
 

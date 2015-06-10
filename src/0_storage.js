@@ -36,6 +36,18 @@ Ti.App.Properties;
 var prefix = function(key) { return BRANCH_KEY_PREFIX + key; }
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
 
+var attemptJSON = function(data) {
+	try {
+		if (typeof data == "object") {
+			return goog.json.parse(data) || null;
+		}
+		else { return null; }
+	}
+	catch (e) {
+		return null;
+	}
+};
+
 var webStorage = function(perm) {
 	var storageMethod = perm ? localStorage : sessionStorage;
 	return {
@@ -172,12 +184,12 @@ BranchStorage.prototype['titanium'] = {
 			props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
 			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
-			    returnObject[props[i]] = Ti.App.Properties.getString(props[i]);
+			    returnObject[props[i]] = attemptJSON(Ti.App.Properties.getString(props[i]));
 			}
 		}
 		return returnObject;
 	},
-	get: function(key) { Ti.App.Properties.getString(prefix(key)); },
+	get: function(key) { attemptJSON(Ti.App.Properties.getString(prefix(key))); },
 	setObject:function(data) {
 		for (var key in data) {
 			var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
