@@ -14,7 +14,7 @@ var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 /** @typedef {{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
 
-// Try catch so tests pass
+// Try catch to prevent error on unit tests
 try {
 	/** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
 	Ti.App.Properties;
@@ -39,26 +39,12 @@ try {
 var prefix = function(key) { return BRANCH_KEY_PREFIX + key; }
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
 
-var testJSON = function(value) {
-	try {
-		if (typeof value == "object") {
-			return goog.json.parse(value) || value;
-		}
-		else { return value; }
-	}
-	catch (e) {
-		return value;
-	}
-};
-
-var testBoolean = function(value) {
+var retrieveValue = function(value) {
+	try { return goog.json.parse(value) || value; }
+	catch (e) { }
 	if (value == "true") { return true; }
-	else if (value == false) { return false; }
-	return value
-};
-
-var testValue = function(value) {
-	return testBoolean(testJSON(value));
+	else if (value == "false") { return false; }
+	return value;
 }
 
 var webStorage = function(perm) {
@@ -67,11 +53,11 @@ var webStorage = function(perm) {
 		getAll: function() {
 			var allKeyValues = { };
 			for (var key in storageMethod) {
-				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) { allKeyValues[trimPrefix(key)] = testValue(storageMethod.getItem(key)); }
+				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) { allKeyValues[trimPrefix(key)] = retrieveValue(storageMethod.getItem(key)); }
 			}
 			return allKeyValues;
 		},
-		get: function(key) { return testValue(storageMethod.getItem(prefix(key))); },
+		get: function(key) { return retrieveValue(storageMethod.getItem(prefix(key))); },
 		setObject:function(data) {
 			for (var key in data) {
 				var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
@@ -124,7 +110,7 @@ var cookies = function(perm) {
 				cookie = cookie.substring(0, cookie.length);
 				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
 					var splitCookie = cookie.split('=');
-					returnCookieObject[trimPrefix(splitCookie[0])] = testValue(splitCookie[1]);
+					returnCookieObject[trimPrefix(splitCookie[0])] = retrieveValue(splitCookie[1]);
 				}
 			}
 			return returnCookieObject;
@@ -135,7 +121,7 @@ var cookies = function(perm) {
 		    for (var i = 0; i < cookieArray.length; i++) {
 		        var cookie = cookieArray[i];
 		        cookie = cookie.substring(1, cookie.length);
-		        if (cookie.indexOf(keyEQ) == 0) { return testValue(cookie.substring(keyEQ.length, cookie.length)); }
+		        if (cookie.indexOf(keyEQ) == 0) { return retrieveValue(cookie.substring(keyEQ.length, cookie.length)); }
 		    }
 		    return null;
 		},
@@ -196,12 +182,12 @@ BranchStorage.prototype['titanium'] = {
 			props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
 			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
-			    returnObject[props[i]] = testValue(Ti.App.Properties.getString(props[i]));
+			    returnObject[props[i]] = retrieveValue(Ti.App.Properties.getString(props[i]));
 			}
 		}
 		return returnObject;
 	},
-	get: function(key) { testValue(Ti.App.Properties.getString(prefix(key))); },
+	get: function(key) { retrieveValue(Ti.App.Properties.getString(prefix(key))); },
 	setObject:function(data) {
 		for (var key in data) {
 			var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
