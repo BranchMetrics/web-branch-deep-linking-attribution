@@ -21,7 +21,8 @@ branch.setDebug(true);
 
 if (Ti.Platform.osname === "android") {
 	Alloy.Globals.open_url = Ti.Android.currentActivity.intent.data;
-} else if (Ti.Platform.osname.match(/i(os|p(hone|od|ad))/i)) {
+}
+else if (Ti.Platform.osname.match(/i(os|p(hone|od|ad))/i)) {
 	var url = Ti.App.getArguments().url;
 	branch.init(BranchKey, { "isReferrable" : true, "url": url }, initDone);
 

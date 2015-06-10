@@ -16,7 +16,7 @@ ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/web/build.js"};s
 
 .PHONY: clean
 
-all: dist/web/build.min.js dist/web/build.js README.md CORDOVA_GUIDE.md WEB_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz dist/titanium/build.js dist/titanium/build.min.js dist/web/build.min.js.gz test/integration-test.html
+all: dist/web/build.min.js dist/web/build.js README.md CORDOVA_GUIDE.md TITANIUM_GUIDE.md WEB_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz dist/titanium/build.js dist/titanium/build.min.js dist/web/build.min.js.gz test/integration-test.html
 clean:
 	rm -f dist/web/** dist/cordova/** dist/titanium/** docs/web/3_branch_web.md docs/cordova/3_branch_cordova.md README.md CORDOVA_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
 release: clean all dist/web/build.min.js.gz
@@ -87,6 +87,12 @@ docs/web/3_branch_web.md: $(SOURCES)
 	jsdox src/3_branch_web.js --output docs/web
 	rm src/3_branch_web.js
 
+docs/titanium/3_branch_titanium.md: $(SOURCES)
+	perl -pe 's/\/\*\*\ =WEB/\/\*\*\*/gx' src/3_branch.js > src/3_branch_titanium.js
+	perl -p -i -e 's/=CORDOVA//gx' src/3_branch_titanium.js
+	jsdox src/3_branch_titanium.js --output docs/web
+	rm src/3_branch_titanium.js
+
 README.md: docs/0_notice.md docs/readme/1_main.md docs/4_footer.md
 	cat docs/0_notice.md docs/readme/1_main.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
@@ -102,6 +108,12 @@ CORDOVA_GUIDE.md: docs/0_notice.md docs/cordova/1_intro.md docs/cordova/3_branch
 	cat docs/0_notice.md docs/cordova/1_intro.md docs/cordova/2_table_of_contents.md docs/cordova/3_branch_cordova.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > CORDOVA_GUIDE.md
 	perl -p -i -e 's/# Global//' CORDOVA_GUIDE.md
+
+TITANIUM_GUIDE.md: docs/0_notice.md docs/titanium/1_intro.md docs/titanium/3_branch_titanium.md docs/4_footer.md
+	perl build_utils/toc_generator.pl src/3_branch.js docs/cordova/2_table_of_contents.md TITANIUM
+	cat docs/0_notice.md docs/titanium/1_intro.md docs/titanium/2_table_of_contents.md docs/titanium/3_branch_titanium.md docs/4_footer.md | \
+		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > TITANIUM_GUIDE.md
+	perl -p -i -e 's/# Global//' TITANIUM_GUIDE.md
 
 test/integration-test.html: test/integration-test.template.html
 	perl -pe 'BEGIN{$$a="$(ONPAGE_TEST)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html
