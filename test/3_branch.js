@@ -494,7 +494,7 @@ describe('Branch', function() {
 	});
 
 	describe('validateCode', function() {
-		basicTests('referrals', [ 0 ]);
+		basicTests('validateCode', [ 0 ]);
 		it('should call api with required params and options', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 
@@ -512,7 +512,7 @@ describe('Branch', function() {
 	});
 
 	describe('applyCode', function() {
-		basicTests('referrals', [ 0 ]);
+		basicTests('applyCode', [ 0 ]);
 		it('should call api with required params and options', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
 
@@ -552,7 +552,7 @@ describe('Branch', function() {
 	});
 
 	describe('creditHistory', function() {
-		basicTests('credits', [ 0 ]);
+		basicTests('creditHistory', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(4, done);
@@ -605,6 +605,28 @@ describe('Branch', function() {
 			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'browser_fingerprint_id' ]), 'All params sent');
 		});
 	});
+
+	describe('addListener', function() {
+		it('should add and remove an event listener to the branch object and fire', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(5, done);
+			var observerFired = 0;
+			var observer = function(event) {
+				assert.equal('event', event, 'recieved event equals triggered event');
+				observerFired++;
+			};
+			branch.addListener(observer, 'test_subject');
+			branch._publishEvent('event', 'test_subject');
+			assert.equal(branch._observers.length, 1, 'one observer listening');
+			assert.equal(observerFired, 1, 'observer fired once');
+
+			branch.removeListener(observer);
+			assert.equal(branch._observers.length, 0, 'no observers listening');
+
+			branch._publishEvent('event', 'test_subject');
+			assert.equal(observerFired, 1, 'observer not fired again');
+		});
+	});
+
 /*
 	describe.fail('Queueing used correctly', function() {
 		it('Should wait to call track after init', function(done) {
