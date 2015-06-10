@@ -149,11 +149,11 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 	if (TITANIUM_BUILD) {
 		req.onerror = function(e) {
 			if (req.status === 402) {
-				callback(new Error('Not enough credits to redeem.'));
+				callback(new Error('Not enough credits to redeem.'), null, req.status);
 			} else if (e.error) {
-				callback(new Error(e.error));
+				callback(new Error(e.error), null, req.status);
 			} else {
-				callback(new Error("Error in API: " + req.status));
+				callback(new Error("Error in API: " + req.status), null, req.status);
 			}
 		};
 		req.onload = function() {
@@ -177,17 +177,17 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
 					try {
-						callback(null, goog.json.parse(req.responseText));
+						callback(null, goog.json.parse(req.responseText), req.status);
 					}
 					catch (e) {
-						callback(null, { });
+						callback(null, { }, req.status);
 					}
 				}
 				else if (req.status === 402) {
-					callback(new Error('Not enough credits to redeem.'));
+					callback(new Error('Not enough credits to redeem.'), null, req.status);
 				}
 				else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
-					callback(new Error('Error in API: ' + req.status));
+					callback(new Error('Error in API: ' + req.status), null, req.status);
 				}
 			}
 		};

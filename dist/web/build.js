@@ -719,8 +719,9 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 // Input 4
 var web_session = {deprecated_read:function(a) {
   try {
-    return goog.json.parse(a.get("branch_session")) || null;
-  } catch (b) {
+    var b = a.get("branch_session");
+    return "object" == typeof b ? goog.json.parse(b) || null : null;
+  } catch (c) {
     return null;
   }
 }};
@@ -902,10 +903,17 @@ BranchStorage.prototype.pojo = {getAll:function() {
   return!0;
 }};
 BranchStorage.prototype.titanium = {getAll:function() {
-  for (var a = Ti.App.Properties.listProperties(), b = 0;b < a.length;b++) {
+  for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
+    -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = Ti.App.Properties.getString(b[c]));
   }
+  return a;
 }, get:function(a) {
   Ti.App.Properties.getString(prefix(a));
+}, setObject:function(a) {
+  for (var b in a) {
+    var c = "object" == typeof a[b] ? goog.json.serialize(a[b]) : a[b];
+    Ti.App.Properties.setString(prefix(b), c);
+  }
 }, set:function(a, b) {
   Ti.App.Properties.setString(prefix(a), b);
 }, remove:function(a) {
@@ -1054,7 +1062,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     e(Error(utils.messages.timeout), null, 504);
   };
   TITANIUM_BUILD ? (f.onerror = function(a) {
-    402 === f.status ? e(Error("Not enough credits to redeem.")) : a.error ? e(Error(a.error)) : e(Error("Error in API: " + f.status));
+    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : a.error ? e(Error(a.error), null, f.status) : e(Error("Error in API: " + f.status), null, f.status);
   }, f.onload = function() {
     if (200 === f.status) {
       try {
@@ -1069,12 +1077,12 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
-          e(null, goog.json.parse(f.responseText));
+          e(null, goog.json.parse(f.responseText), f.status);
         } catch (a) {
-          e(null, {});
+          e(null, {}, f.status);
         }
       } else {
-        402 === f.status ? e(Error("Not enough credits to redeem.")) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status));
+        402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
   };
@@ -1426,7 +1434,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     f(null, g, !1);
   } else {
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      var k = d._storage.getAll(), h = !k.identity_id, g = function(a) {
+      var k = d._storage.getAll(), h = !k || !k.identity_id, g = function(a) {
         h || (a.identity_id = k.identity_id, a.device_fingerprint_id = k.device_fingerprint_id);
         d._api(h ? resources.install : resources.open, a, function(a, b) {
           f(a, b, h);

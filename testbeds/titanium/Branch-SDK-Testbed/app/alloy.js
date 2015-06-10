@@ -44,14 +44,14 @@ if (Ti.Platform.osname === "android") {
 	// open it again when the app comes back to the foreground.
 	var url;
 	url = Ti.App.getArguments().url;
-		
-	branch.init('BRANCH_KEY',
+
+	branch.init('5680621892404085',
 		{ "isReferrable" : true, "url": url },
 		initDone);
 
 	Ti.App.addEventListener('resume', function(e) {
 		console.log("Resume");
-		branch.init('BRANCH_KEY',
+		branch.init('5680621892404085',
 			{ isReferrable : true },
 			initDone);
 	});

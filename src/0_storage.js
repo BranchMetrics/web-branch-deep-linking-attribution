@@ -171,10 +171,19 @@ BranchStorage.prototype['titanium'] = {
 		var returnObject = { },
 			props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
-			// not sure what this array looks like yet
+			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
+			    returnObject[props[i]] = Ti.App.Properties.getString(props[i]);
+			}
 		}
+		return returnObject;
 	},
 	get: function(key) { Ti.App.Properties.getString(prefix(key)); },
+	setObject:function(data) {
+		for (var key in data) {
+			var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
+			Ti.App.Properties.setString(prefix(key), value);
+		}
+	},
 	set: function(key, value) { Ti.App.Properties.setString(prefix(key), value); },
 	remove: function(key) { Ti.App.Properties.setString(prefix(key), ""); },
 	clear: function() {

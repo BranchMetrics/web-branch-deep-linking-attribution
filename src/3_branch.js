@@ -295,7 +295,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
 			var storedValues = self._storage.getAll();
-			var freshInstall = !storedValues['identity_id'];
+			var freshInstall = !storedValues || !storedValues['identity_id'];
 
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
