@@ -338,36 +338,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 }, true);
 
 /**
- * @function Branch.addListener
- * @param {function(String)} observer - _required_ - Observing function that will recieves a string as the events.
- * @param {String} subject - _optional_ - Optionally specify which subjects you would like to observe. If left empty, the observer will recieve all events. Currently, the only Branch subject that publishes events is the banner.
- *
- */
-Branch.prototype['addListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer, subject) {
-	if (observer) {
-		this._observers.push({
-			"handler": observer,
-			"subject": subject
-		});
-	}
-	done();
-});
-
-/**
- * @function Branch.removeListener
- * @param {function(String)} observer - _required_ - Reference to the observing function you would like to remove. *note*: this must be the same reference that was passed to `branch.subscribe()`, not an identical clone of the function.
- *
- */
-Branch.prototype['removeListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer) {
-	if (observer) {
-		this._observers = this._observers.filter(function(subscription) {
-			if (subscription.handler !== observer) { return subscription; }
-		});
-	}
-	done();
-});
-
-/**
  * @function Branch.data
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -1132,6 +1102,55 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 });
 
 if (WEB_BUILD) { // jshint undef:false
+
+/** =WEB
+ * @function Branch.addListener
+ * @param {function(String)} observer - _required_ - Observing function that will recieves a string as the events.
+ * @param {String} subject - _optional_ - Optionally specify which subjects you would like to observe. If left empty, the observer will recieve all events. Currently, the only Branch subject that publishes events is the banner.
+ *
+ * The Branch Web SDK includes a simple event listener, that currently allows you to subscribe to `Branch.banner()` related events.
+ * Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+ *
+ * #### Available `Branch.banner()` Events:
+ * - willShowBanner
+ * - willNotShowBanner
+ * - didShowBanner
+ * - willCloseBanner
+ * - didCloseBanner
+ * - willSendBannerSMS
+ * - sendBannerSMSError
+ * - didSendBannerSMS
+ *
+ */
+/*** +TOC_HEADING &Event Listener& ^WEB ***/
+/*** +TOC_ITEM #addlistener &.addListener()& ^WEB ***/
+	Branch.prototype['addListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer, subject) {
+		if (observer) {
+			this._observers.push({
+				"handler": observer,
+				"subject": subject
+			});
+		}
+		done();
+	});
+
+/** =WEB
+ * @function Branch.removeListener
+ * @param {function(String)} observer - _required_ - Reference to the observing function you would like to remove. *note*: this must be the same reference that was passed to `branch.subscribe()`, not an identical clone of the function.
+ *
+ * Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
+ *
+ */
+/*** +TOC_ITEM #removelistener &.removeListener()& ^WEB ***/
+	Branch.prototype['removeListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer) {
+		if (observer) {
+			this._observers = this._observers.filter(function(subscription) {
+				if (subscription.handler !== observer) { return subscription; }
+			});
+		}
+		done();
+	});
+
 /** =WEB
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner

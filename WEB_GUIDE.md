@@ -99,7 +99,11 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.creditHistory()](#credithistoryoptions-callback)
   + [.redeem()](#redeemamount-bucket-callback)
 
-5. Smart Banner
+5. Event Listener
+  + [.addListener()](#addlistener)
+  + [.removeListener()](#removelistener)
+
+6. Smart Banner
   + [.banner()](#banneroptions-data)
 
 ___
@@ -162,24 +166,6 @@ callback(
 
 **Note:** `Branch.init` must be called prior to calling any other Branch functions.
 ___
-
-
-
-### addListener(observer, subject) 
-
-**Parameters**
-
-**observer**: `function`, _required_ - Observing function that will recieves a string as the events.
-
-**subject**: `String`, _optional_ - Optionally specify which subjects you would like to observe. If left empty, the observer will recieve all events. Currently, the only Branch subject that publishes events is the banner.
-
-
-
-### removeListener(observer) 
-
-**Parameters**
-
-**observer**: `function`, _required_ - Reference to the observing function you would like to remove. *note*: this must be the same reference that was passed to `branch.subscribe()`, not an identical clone of the function.
 
 
 
@@ -813,6 +799,39 @@ branch.redeem(
 callback("Error message");
 ```
 ___
+
+
+
+### addListener(observer, subject) 
+
+**Parameters**
+
+**observer**: `function`, _required_ - Observing function that will recieves a string as the events.
+
+**subject**: `String`, _optional_ - Optionally specify which subjects you would like to observe. If left empty, the observer will recieve all events. Currently, the only Branch subject that publishes events is the banner.
+
+The Branch Web SDK includes a simple event listener, that currently allows you to subscribe to `Branch.banner()` related events.
+Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+
+#### Available `Branch.banner()` Events:
+- willShowBanner
+- willNotShowBanner
+- didShowBanner
+- willCloseBanner
+- didCloseBanner
+- willSendBannerSMS
+- sendBannerSMSError
+- didSendBannerSMS
+
+
+
+### removeListener(observer) 
+
+**Parameters**
+
+**observer**: `function`, _required_ - Reference to the observing function you would like to remove. *note*: this must be the same reference that was passed to `branch.subscribe()`, not an identical clone of the function.
+
+Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
 
 
 
