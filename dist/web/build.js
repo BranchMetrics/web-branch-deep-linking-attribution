@@ -805,22 +805,26 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
   return BRANCH_KEY_PREFIX + a;
 }, trimPrefix = function(a) {
   return a.replace(BRANCH_KEY_PREFIX, "");
-}, attemptJSON = function(a) {
+}, testJSON = function(a) {
   try {
-    return "object" == typeof a ? goog.json.parse(a) || null : null;
+    return "object" == typeof a ? goog.json.parse(a) || a : a;
   } catch (b) {
-    return null;
+    return a;
   }
+}, testBoolean = function(a) {
+  return "true" == a ? !0 : 0 == a ? !1 : a;
+}, testValue = function(a) {
+  return testBoolean(testJSON(a));
 }, webStorage = function(a) {
   var b = a ? localStorage : sessionStorage;
   return{getAll:function() {
     var a = {}, d;
     for (d in b) {
-      0 == d.indexOf(BRANCH_KEY_PREFIX) && (a[trimPrefix(d)] = b.getItem(d));
+      0 == d.indexOf(BRANCH_KEY_PREFIX) && (a[trimPrefix(d)] = testValue(b.getItem(d)));
     }
     return a;
   }, get:function(a) {
-    return b.getItem(prefix(a));
+    return testValue(b.getItem(prefix(a)));
   }, setObject:function(a) {
     for (var d in a) {
       var e = "object" == typeof a[d] ? goog.json.serialize(a[d]) : a[d];
@@ -855,7 +859,7 @@ var cookies = function(a) {
   return{getAll:function() {
     for (var a = document.cookie.split(";"), b = {}, e = 0;e < a.length;e++) {
       var f = a[e].replace(" ", ""), f = f.substring(0, f.length);
-      -1 != f.indexOf(BRANCH_KEY_PREFIX) && (f = f.split("="), b[trimPrefix(f[0])] = f[1]);
+      -1 != f.indexOf(BRANCH_KEY_PREFIX) && (f = f.split("="), b[trimPrefix(f[0])] = testValue(f[1]));
     }
     return b;
   }, get:function(a) {
@@ -863,7 +867,7 @@ var cookies = function(a) {
     for (var b = document.cookie.split(";"), e = 0;e < b.length;e++) {
       var f = b[e], f = f.substring(1, f.length);
       if (0 == f.indexOf(a)) {
-        return f.substring(a.length, f.length);
+        return testValue(f.substring(a.length, f.length));
       }
     }
     return null;
@@ -910,11 +914,11 @@ BranchStorage.prototype.pojo = {getAll:function() {
 }};
 BranchStorage.prototype.titanium = {getAll:function() {
   for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
-    -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = attemptJSON(Ti.App.Properties.getString(b[c])));
+    -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = testValue(Ti.App.Properties.getString(b[c])));
   }
   return a;
 }, get:function(a) {
-  attemptJSON(Ti.App.Properties.getString(prefix(a)));
+  testValue(Ti.App.Properties.getString(prefix(a)));
 }, setObject:function(a) {
   for (var b in a) {
     var c = "object" == typeof a[b] ? goog.json.serialize(a[b]) : a[b];

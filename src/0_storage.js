@@ -39,17 +39,27 @@ try {
 var prefix = function(key) { return BRANCH_KEY_PREFIX + key; }
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
 
-var attemptJSON = function(data) {
+var testJSON = function(value) {
 	try {
-		if (typeof data == "object") {
-			return goog.json.parse(data) || null;
+		if (typeof value == "object") {
+			return goog.json.parse(value) || value;
 		}
-		else { return null; }
+		else { return value; }
 	}
 	catch (e) {
-		return null;
+		return value;
 	}
 };
+
+var testBoolean = function(value) {
+	if (value == "true") { return true; }
+	else if (value == false) { return false; }
+	return value
+};
+
+var testValue = function(value) {
+	return testBoolean(testJSON(value));
+}
 
 var webStorage = function(perm) {
 	var storageMethod = perm ? localStorage : sessionStorage;
@@ -57,11 +67,11 @@ var webStorage = function(perm) {
 		getAll: function() {
 			var allKeyValues = { };
 			for (var key in storageMethod) {
-				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) { allKeyValues[trimPrefix(key)] = storageMethod.getItem(key); }
+				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) { allKeyValues[trimPrefix(key)] = testValue(storageMethod.getItem(key)); }
 			}
 			return allKeyValues;
 		},
-		get: function(key) { return storageMethod.getItem(prefix(key)); },
+		get: function(key) { return testValue(storageMethod.getItem(prefix(key))); },
 		setObject:function(data) {
 			for (var key in data) {
 				var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
@@ -114,7 +124,7 @@ var cookies = function(perm) {
 				cookie = cookie.substring(0, cookie.length);
 				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
 					var splitCookie = cookie.split('=');
-					returnCookieObject[trimPrefix(splitCookie[0])] = splitCookie[1];
+					returnCookieObject[trimPrefix(splitCookie[0])] = testValue(splitCookie[1]);
 				}
 			}
 			return returnCookieObject;
@@ -125,7 +135,7 @@ var cookies = function(perm) {
 		    for (var i = 0; i < cookieArray.length; i++) {
 		        var cookie = cookieArray[i];
 		        cookie = cookie.substring(1, cookie.length);
-		        if (cookie.indexOf(keyEQ) == 0) { return cookie.substring(keyEQ.length, cookie.length); }
+		        if (cookie.indexOf(keyEQ) == 0) { return testValue(cookie.substring(keyEQ.length, cookie.length)); }
 		    }
 		    return null;
 		},
@@ -139,7 +149,6 @@ var cookies = function(perm) {
 		remove: function(key) {
 			var expires = "";
 			document.cookie = prefix(key) + "=; expires="  + expires + "; path=/";
-			// this.cookie.set("BRANCH_WEBSDK_COOKIE" + key, "", -1);
 		},
 		clear: function() {
 			var deleteCookie = function(cookie) {
@@ -187,12 +196,12 @@ BranchStorage.prototype['titanium'] = {
 			props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
 			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
-			    returnObject[props[i]] = attemptJSON(Ti.App.Properties.getString(props[i]));
+			    returnObject[props[i]] = testValue(Ti.App.Properties.getString(props[i]));
 			}
 		}
 		return returnObject;
 	},
-	get: function(key) { attemptJSON(Ti.App.Properties.getString(prefix(key))); },
+	get: function(key) { testValue(Ti.App.Properties.getString(prefix(key))); },
 	setObject:function(data) {
 		for (var key in data) {
 			var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
