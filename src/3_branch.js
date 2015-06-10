@@ -1124,15 +1124,14 @@ if (WEB_BUILD) { // jshint undef:false
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistener &.addListener()& ^WEB ***/
-	Branch.prototype['addListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer, subject) {
+	Branch.prototype['addListener'] = function(observer, subject) {
 		if (observer) {
 			this._observers.push({
 				"handler": observer,
 				"subject": subject
 			});
 		}
-		done();
-	});
+	};
 
 /** =WEB
  * @function Branch.removeListener
@@ -1142,14 +1141,13 @@ if (WEB_BUILD) { // jshint undef:false
  *
  */
 /*** +TOC_ITEM #removelistener &.removeListener()& ^WEB ***/
-	Branch.prototype['removeListener'] = wrap(callback_params.NO_CALLBACK, function(done, observer) {
+	Branch.prototype['removeListener'] = function(observer) {
 		if (observer) {
 			this._observers = this._observers.filter(function(subscription) {
 				if (subscription.handler !== observer) { return subscription; }
 			});
 		}
-		done();
-	});
+	};
 
 /** =WEB
  * @function Branch.banner

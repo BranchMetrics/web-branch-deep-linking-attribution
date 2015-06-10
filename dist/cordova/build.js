@@ -1446,17 +1446,15 @@ Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, functio
 Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
-WEB_BUILD && (Branch.prototype.addListener = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
-  b && this._observers.push({handler:b, subject:c});
-  a();
-}), Branch.prototype.removeListener = wrap(callback_params.NO_CALLBACK, function(a, b) {
-  b && (this._observers = this._observers.filter(function(a) {
-    if (a.handler !== b) {
-      return a;
+WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
+  a && this._observers.push({handler:a, subject:b});
+}, Branch.prototype.removeListener = function(a) {
+  a && (this._observers = this._observers.filter(function(b) {
+    if (b.handler !== a) {
+      return b;
     }
   }));
-  a();
-}), Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+}, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" == typeof b.forgetHide && "undefined" != typeof b.forgetHide && (b.forgetHide = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" == typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" == 
   typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" == typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" == typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" == typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};
