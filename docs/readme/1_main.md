@@ -18,13 +18,13 @@ Getting started with either a Web or Cordova integration is simple, and begins w
 
 ## Web Based Integration
 
-### [Full Documentation for the Web SDK](WEB_GUIDE.md)
+### [Full Documentation for the Web SDK](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md)
 
 Adding the Branch Web SDK source code to your project can be done manually, or by using Bower or npm: `bower install branch-sdk` or `npm install branch-sdk` respectively.
 
 __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings).__
 
-**[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test Branch Keys.
+**[Formerly App ID](https://github.com/BranchMetrics/Web-SDK/blob/master/CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test Branch Keys.
 
 ```html
 <script type="text/javascript">
@@ -39,7 +39,7 @@ __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acc
 
 ## Cordova/PhoneGap
 
-### [Full Documentation for the Cordova Web SDK](CORDOVA_GUIDE.md)
+### [Full Documentation for the Cordova Web SDK](https://github.com/BranchMetrics/Web-SDK/blob/master/CORDOVA_GUIDE.md)
 
 The Web SDK is provided as a plugin for Cordova and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
 
