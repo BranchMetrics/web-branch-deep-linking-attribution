@@ -3,6 +3,10 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+### New Functionality
+- Adds Appcelerator Titanium Module
+### Improvements
+- Refactors session storage to make use of sessionStorage, localStorage, cookies, JavaScript objects, and Titanium properties
 
 ## [v1.5.6] - 2015-06-01
 ### New Functionality

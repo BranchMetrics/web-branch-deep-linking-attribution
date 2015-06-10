@@ -19,7 +19,5 @@ web_session.deprecated_read = function(storage) {
 		}
 		else { return null; }
 	}
-	catch (e) {
-		return null;
-	}
+	catch (e) { return null; }
 };

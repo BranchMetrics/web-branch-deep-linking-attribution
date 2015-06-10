@@ -223,7 +223,7 @@ describe('Branch', function() {
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;
 			});
-			sandbox.stub(web_session, "read", function(storage) {
+			sandbox.stub(branch._storage, "getAll", function(storage) {
 				return whitelistedData;
 			});
 			branch.data(function(err, res) {
@@ -405,7 +405,7 @@ describe('Branch', function() {
 
 		it('should call SMSLinkSend if a click_id already exists', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			sandbox.stub(web_session, "readKeyValue", function(key, storage) {
+			sandbox.stub(branch._storage, "get", function(key, storage) {
 				return '12345';
 			});
 
@@ -425,7 +425,7 @@ describe('Branch', function() {
 
 		it('should create new link if a click_id does not exist', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(3, done);
-			sandbox.stub(web_session, "readKeyValue", function(key, storage) {
+			sandbox.stub(branch._storage, "get", function(key, storage) {
 				return null;
 			});
 
