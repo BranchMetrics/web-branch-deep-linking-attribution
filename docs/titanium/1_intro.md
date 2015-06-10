@@ -10,10 +10,7 @@ You can sign up for your own Branch Key at [https://dashboard.branch.io](https:/
 
 ### Initialize SDK And Register Deep Link Routing Function
 
-Called when an app first initializes a session, ideally in the app delegate. If you created a custom link with your own custom dictionary data, you probably want to know when the user session init finishes, so you can check that data. Think of this callback as your "deep link router." If your app opens with some data, you want to route the user depending on the data you passed in. Otherwise, send them to a generic install flow.
-
-This deep link routing callback is called 100% of the time on init, with your link params or an empty dictionary if none present.
-
+The SDK can be initialized by calling `branch.init()`, just as with the Web SDK. A sample app can be found in `testbeds/Titanium`, that demonstrates this.
 
 ```js
 branch.init('BRANCH KEY', function(err, data) {
@@ -106,70 +103,6 @@ if (Ti.Platform.osname === "android") {
 }
 
 ```
-
-_____
-
-
-#### Register an activity for direct deep linking (optional but recommended)
-
-In your project's manifest file, you can register your app to respond to direct deep links (yourapp:// in a mobile browser) by adding the second intent filter block. Also, make sure to change **yourapp** to a unique string that represents your app name.
-
-Secondly, make sure that this activity is launched as a singleTask. This is important to handle proper deep linking from other apps like Facebook.
-
-Typically, you would register some sort of splash activitiy that handles routing for your app.
-
-```xml
-<activity
-	android:name="com.yourapp.SplashActivity"
-	android:label="@string/app_name"
-	<!-- Make sure the activity is launched as "singleTask" -->
-	android:launchMode="singleTask"
-	 >
-	<intent-filter>
-		<action android:name="android.intent.action.MAIN" />
-		<category android:name="android.intent.category.LAUNCHER" />
-	</intent-filter>
-
-	<!-- Add this intent filter below, and change yourapp to your app name -->
-	<intent-filter>
-		<data android:scheme="yourapp" android:host="open" />
-		<action android:name="android.intent.action.VIEW" />
-		<category android:name="android.intent.category.DEFAULT" />
-		<category android:name="android.intent.category.BROWSABLE" />
-	</intent-filter>
-</activity>
-```
-_____
-
-### iOS plist
-
-#### Add your Branch Key to your project
-
-After you register your app, your Branch Key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard. Now you need to add it to YourProject-Info.plist (Info.plist for Swift).
-
-1. In plist file, mouse hover "Information Property List" which is the root item under the Key column.
-1. After about half a second, you will see a "+" sign appear. Click it.
-1. In the newly added row, fill in "branch_key" for its key, leave type as String, and enter your app's Branch Key obtained in above steps in the value column.
-1. Save the plist file.
-
-#### Register a URI scheme direct deep linking (optional but recommended)
-
-You can register your app to respond to direct deep links (yourapp:// in a mobile browser) by adding a URI scheme in the YourProject-Info.plist file. Make sure to change **yourapp** to a unique string that represents your app name.
-
-1. In Xcode, click on YourProject-Info.plist on the left.
-1. Find URL Types and click the right arrow. (If it doesn't exist, right click anywhere and choose Add Row. Scroll down and choose URL Types)
-1. Add "yourapp", where yourapp is a unique string for your app, as an item in URL Schemes as below:
-
-![URL Scheme Demo](https://s3-us-west-1.amazonaws.com/branchhost/urlScheme.png)
-
-Alternatively, you can add the URI scheme in your project's Info page.
-
-1. In Xcode, click your project in the Navigator (on the left side).
-1. Select the "Info" tab.
-1. Expand the "URL Types" section at the bottom.
-1. Click the "+" sign to add a new URI Scheme, as below:
-
-![URL Scheme Demo](https://s3-us-west-1.amazonaws.com/branchhost/urlType.png)
 
 _____
 
