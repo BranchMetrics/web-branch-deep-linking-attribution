@@ -1105,11 +1105,23 @@ if (WEB_BUILD) { // jshint undef:false
 
 /** =WEB
  * @function Branch.addListener
- * @param {function(String)} observer - _required_ - Observing function that will recieves a string as the events.
- * @param {String} subject - _optional_ - Optionally specify which subjects you would like to observe. If left empty, the observer will recieve all events. Currently, the only Branch subject that publishes events is the banner.
+ * @param {String} event - _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
+ * @param {function(String)} listener - _required_ - Listeneing function that will recieves an event as a string.
  *
- * The Branch Web SDK includes a simple event listener, that currently allows you to subscribe to `Branch.banner()` related events.
+ * The Branch Web SDK includes a simple event listener, that currently only publishes events for `Branch.banner()` events.
  * Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+ *
+ * ##### Example
+ *
+ * ```
+ * var listener = function(event) { console.log(event); }
+ *
+ * // Specify an event
+ * branch.addListener('willShowBanner', listener);
+ *
+ * // Listen to all events
+ *  * branch.addListener(listener);
+ * ```
  *
  * #### Available `Branch.banner()` Events:
  * - willShowBanner
@@ -1125,10 +1137,11 @@ if (WEB_BUILD) { // jshint undef:false
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
+		if (typeof event == "function" && listener == undefined) { listener = event; }
 		if (listener) {
 			this._listeners.push({
 				"listener": listener,
-				"event": event
+				"event": event || null
 			});
 		}
 	};
