@@ -624,6 +624,11 @@ describe('Branch', function() {
 
 			branch._publishEvent('test_event2');
 			assert.equal(listenerFired, 1, '_listener not fired again');
+
+			branch.addListener(listener);
+			branch._publishEvent('test_event');
+			assert.equal(branch._listeners.length, 1, 'one listener listening with no event specified');
+			assert.equal(listenerFired, 1, 'observer fired once');
 		});
 	});
 
