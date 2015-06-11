@@ -498,7 +498,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  *
  * ##### Usage
  * ```js
- * branch.event(
+ * branch.track(
  *     event,
  *     metadata,
  *     callback (err)
