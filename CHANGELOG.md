@@ -3,6 +3,8 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+### New Functionality
+- Adds a simple event listener, with events for `branch.banner()`
 
 ## [v1.5.6] - 2015-06-01
 ### New Functionality

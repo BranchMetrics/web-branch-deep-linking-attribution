@@ -1116,11 +1116,11 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  * var listener = function(event) { console.log(event); }
  *
- * // Specify an event
+ * // Specify an event to listen for
  * branch.addListener('willShowBanner', listener);
  *
- * // Listen to all events
- *  * branch.addListener(listener);
+ * // Listen for all events
+ * branch.addListener(listener);
  * ```
  *
  * #### Available `Branch.banner()` Events:
@@ -1148,7 +1148,7 @@ if (WEB_BUILD) { // jshint undef:false
 
 /** =WEB
  * @function Branch.removeListener
- * @param {function(String)} observer - _required_ - Reference to the observing function you would like to remove. *note*: this must be the same reference that was passed to `branch.subscribe()`, not an identical clone of the function.
+ * @param {function(String)} listener - _required_ - Reference to the listening function you would like to remove. *note*: this must be the same reference that was passed to `branch.addListener()`, not an identical clone of the function.
  *
  * Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
  *
