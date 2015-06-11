@@ -609,21 +609,21 @@ describe('Branch', function() {
 	describe('addListener', function() {
 		it('should add and remove an event listener to the branch object and fire', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(5, done);
-			var observerFired = 0;
-			var observer = function(event) {
-				assert.equal('event', event, 'recieved event equals triggered event');
-				observerFired++;
+			var listenerFired = 0;
+			var listener = function(event) {
+				assert.equal('test_event', event, 'recieved event equals triggered event');
+				listenerFired++;
 			};
-			branch.addListener(observer, 'test_subject');
-			branch._publishEvent('event', 'test_subject');
-			assert.equal(branch._observers.length, 1, 'one observer listening');
-			assert.equal(observerFired, 1, 'observer fired once');
+			branch.addListener('test_event', listener);
+			branch._publishEvent('test_event');
+			assert.equal(branch._listeners.length, 1, 'one listener listening');
+			assert.equal(listenerFired, 1, 'observer fired once');
 
-			branch.removeListener(observer);
-			assert.equal(branch._observers.length, 0, 'no observers listening');
+			branch.removeListener(listener);
+			assert.equal(branch._listeners.length, 0, 'no listeners listening');
 
-			branch._publishEvent('event', 'test_subject');
-			assert.equal(observerFired, 1, 'observer not fired again');
+			branch._publishEvent('test_event2');
+			assert.equal(listenerFired, 1, '_listener not fired again');
 		});
 	});
 

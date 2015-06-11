@@ -1257,7 +1257,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
   this._queue = Queue();
   this._storage = storage(!1);
   this._server = new Server;
-  this._observers = [];
+  this._listeners = [];
   var a;
   CORDOVA_BUILD && (a = "cordova");
   WEB_BUILD && (a = "web");
@@ -1281,9 +1281,9 @@ Branch.prototype._referringLink = function() {
   var a = utils.readKeyValue("referring_link", this._storage), b = utils.readKeyValue("click_id", this._storage);
   return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
 };
-Branch.prototype._publishEvent = function(a, b) {
-  this._observers.forEach(function(c) {
-    (c.subject && c.subject == b || !c.subject) && c.handler(a);
+Branch.prototype._publishEvent = function(a) {
+  this._listeners.forEach(function(b) {
+    (b.event && b.event == a || !b.event) && b.listener(a);
   });
 };
 CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
@@ -1447,10 +1447,10 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
-  a && this._observers.push({handler:a, subject:b});
+  b && this._listeners.push({listener:b, event:a});
 }, Branch.prototype.removeListener = function(a) {
-  a && (this._observers = this._observers.filter(function(b) {
-    if (b.handler !== a) {
+  a && (this._listeners = this._listeners.filter(function(b) {
+    if (b.listener !== a) {
       return b;
     }
   }));

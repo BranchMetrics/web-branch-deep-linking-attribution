@@ -102,7 +102,7 @@ Branch = function() {
 	this._queue = Queue();
 	this._storage = storage(false);
 	this._server = new Server();
-	this._observers = [ ];
+	this._listeners = [ ];
 	var sdk;
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
 	if (WEB_BUILD) { sdk = 'web'; }
@@ -155,10 +155,10 @@ Branch.prototype._referringLink = function() {
  * @param {string} event
  * @param {string} subject
  */
-Branch.prototype._publishEvent = function(event, subject) {
-	this._observers.forEach(function(subscription) {
-		if ((subscription.subject && subscription.subject == subject) || !subscription.subject) {
-			subscription.handler(event);
+Branch.prototype._publishEvent = function(event) {
+	this._listeners.forEach(function(subscription) {
+		if ((subscription.event && subscription.event == event) || !subscription.event) {
+			subscription.listener(event);
 		}
 	});
 };
@@ -1124,11 +1124,11 @@ if (WEB_BUILD) { // jshint undef:false
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistener &.addListener()& ^WEB ***/
-	Branch.prototype['addListener'] = function(observer, subject) {
-		if (observer) {
-			this._observers.push({
-				"handler": observer,
-				"subject": subject
+	Branch.prototype['addListener'] = function(event, listener) {
+		if (listener) {
+			this._listeners.push({
+				"listener": listener,
+				"event": event
 			});
 		}
 	};
@@ -1141,10 +1141,10 @@ if (WEB_BUILD) { // jshint undef:false
  *
  */
 /*** +TOC_ITEM #removelistener &.removeListener()& ^WEB ***/
-	Branch.prototype['removeListener'] = function(observer) {
-		if (observer) {
-			this._observers = this._observers.filter(function(subscription) {
-				if (subscription.handler !== observer) { return subscription; }
+	Branch.prototype['removeListener'] = function(listener) {
+		if (listener) {
+			this._listeners = this._listeners.filter(function(subscription) {
+				if (subscription.listener !== listener) { return subscription; }
 			});
 		}
 	};
