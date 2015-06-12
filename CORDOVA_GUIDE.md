@@ -40,24 +40,6 @@ The session close will be sent automatically on any ‘pause’ event.
 
 _____
 
-### Android Manifest
-#### Add your branch key to your project
-
-After you register your app, your branch key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard. Now you need to add it (them, if you want to do it for both your live and test apps) to your project.
-
-Edit your manifest file by adding the following new meta-data:
-```xml
-<application>
-    <!-- Other existing entries -->
-
-    <!-- Add this meta-data below, and change "key_live_xxxxxxx" to your actual live branch key -->
-    <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_xxxxxxx" />
-
-    <!-- For your test app, if you have one; Again, use your actual test branch key -->
-    <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_test_yyyyyyy" />
-</application>
-```
-
 #### Register an activity for direct deep linking (optional but recommended)
 
 In your project's manifest file, you can register your app to respond to direct deep links (yourapp:// in a mobile browser) by adding the second intent filter block. Also, make sure to change **yourapp** to a unique string that represents your app name.
