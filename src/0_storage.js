@@ -14,11 +14,10 @@ var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 /** @typedef {{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
 
-// Try catch to prevent error on unit tests
-try {
+if (TITANIUM_BUILD) {
 	/** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
 	Ti.App.Properties;
-} catch(e) {}
+}
 
 /**
  * @class BranchStorage
