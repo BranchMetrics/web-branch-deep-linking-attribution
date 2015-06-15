@@ -11,14 +11,6 @@ To use the Cordova SDK, you'll need to first initialize it with your Branch Key 
 
 You can sign up for your own Branch Key at [https://dashboard.branch.io](https://dashboard.branch.io)
 
-### Initialize SDK And Register Deep Link Routing Function
-
-Called when an app first initializes a session, ideally in the app delegate. If you created a custom link with your own custom dictionary data, you probably want to know when the user session init finishes, so you can check that data. Think of this callback as your "deep link router." If your app opens with some data, you want to route the user depending on the data you passed in. Otherwise, send them to a generic install flow.
-
-This deep link routing callback is called 100% of the time on init, with your link params or an empty dictionary if none present.
-
-**[Formerly `getInstance() and initSession()`](CORDOVA_UPGRADE_GUIDE.md)**
-
 ### Quick Install of Cordova/Phonegap SDK
 
 This Web SDK can also be used for Cordova/Phonegap applications.  It is provided as a plugin and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
@@ -47,24 +39,6 @@ Here is the location of the Branch Key that you will need for the `branch.init` 
 The session close will be sent automatically on any ‘pause’ event.
 
 _____
-
-### Android Manifest
-#### Add your branch key to your project
-
-After you register your app, your branch key can be retrieved on the [Settings](https://dashboard.branch.io/#/settings) page of the dashboard. Now you need to add it (them, if you want to do it for both your live and test apps) to your project.
-
-Edit your manifest file by adding the following new meta-data:
-```xml
-<application>
-    <!-- Other existing entries -->
-
-    <!-- Add this meta-data below, and change "key_live_xxxxxxx" to your actual live branch key -->
-    <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_xxxxxxx" />
-
-    <!-- For your test app, if you have one; Again, use your actual test branch key -->
-    <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_test_yyyyyyy" />
-</application>
-```
 
 #### Register an activity for direct deep linking (optional but recommended)
 
@@ -381,7 +355,7 @@ The `metadata` parameter is a formatted JSON object that can contain any data an
 
 ##### Usage
 ```js
-branch.event(
+branch.track(
     event,
     metadata,
     callback (err)

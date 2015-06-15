@@ -16,8 +16,8 @@ banner_html.banner = function(options, action) {
 				'<img src="' + options.icon + '">' +
 			'</div>' +
 			'<div class="details">' +
-				'<span class="title">' + options.title + '</span>' +
-				'<span class="description">' + options.description + '</span>' +
+				'<div class="title">' + options.title + '</div>' +
+				'<div class="description">' + options.description + '</div>' +
 			'</div>' +
 		'</div>' +
 		'<div class="right" id="branch-banner-action">' +
@@ -73,7 +73,7 @@ banner_html.iframe = function(options, action) {
 
 	var bodyClass,
 	    userAgent = banner_utils.mobileUserAgent();
-	if (userAgent == 'ios') {
+	if (userAgent == 'ios' || userAgent == 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}
 	else if (userAgent == 'android') {
