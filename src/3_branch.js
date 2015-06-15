@@ -1280,9 +1280,9 @@ if (WEB_BUILD) { // jshint undef:false
 	Branch.prototype['closeBanner'] = wrap(0, function(done) {
 		if (this.closeBannerPointer) {
 			var self = this;
-			this._publishEvent("willCloseBanner", "banner");
+			this._publishEvent("willCloseBanner");
 			this.closeBannerPointer(function() {
-				self._publishEvent("didCloseBanner", "banner");
+				self._publishEvent("didCloseBanner");
 			});
 		}
 		done();
