@@ -55,7 +55,8 @@ banner_utils.mobileUserAgent = function() {
 		if (navigator.userAgent.match(/android/i)) { return 'android'; }
 		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
 		else { return 'ios'; }
-	} else { return false; }
+	}
+	else { return false; }
 };
 
 banner_utils.getDate = function(days) {
@@ -64,7 +65,7 @@ banner_utils.getDate = function(days) {
 };
 
 banner_utils.getBodyStyle = function(style) {
-	if (document.body.currentStyle) { return document.body.currentStyle[utils.snakeToCamel(style)]; }
+	if (document.body.currentStyle) { return document.body.currentStyle[ utils.snakeToCamel(style) ]; }
 	else { return window.getComputedStyle(document.body).getPropertyValue(style); }
 };
 

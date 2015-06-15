@@ -38,5 +38,6 @@
 	"disallowYodaConditions": true,
 	"requireSpaceAfterLineComment": true,
 	"disallowNewlineBeforeBlockStatements": true,
-	"requireSpacesInsideArrayBrackets": "all"
+	"requireSpacesInsideArrayBrackets": "all",
+	"requireSpacesInsideObjectBrackets": "all"
 }

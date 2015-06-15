@@ -7,10 +7,10 @@ goog.provide('Queue');
  * @returns {function(function(function()))}
  */
 Queue = function() {
-	var queue = [],
+	var queue = [ ],
 	next = function() {
 		if (queue.length) {
-			queue[0](function() { queue.shift(); next(); });
+			queue[ 0 ](function() { queue.shift(); next(); });
 		}
 	};
 	return function(task) {
