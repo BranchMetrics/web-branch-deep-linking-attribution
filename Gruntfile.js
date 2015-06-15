@@ -84,7 +84,7 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '8.2'
-		},
+		},/*
 		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
@@ -94,12 +94,12 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '8.0'
-		},
+		},*/
 		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '7.1'
-		},
+		}/*,
 		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
@@ -120,14 +120,14 @@ var safari_browsers = [
 			platform: 'OS X 10.10',
 			version: '5.1'
 		}
-	],
+	*/],
 
 	android_browsers = [
 		{
 			browserName: 'android',
 			platform: 'Linux',
 			version: '5.1'
-		},
+		},/*
 		{
 			browserName: 'android',
 			platform: 'Linux',
@@ -152,7 +152,7 @@ var safari_browsers = [
 			browserName: 'android',
 			platform: 'Linux',
 			version: '4.1'
-		},
+		},*/
 		{
 			browserName: 'android',
 			platform: 'Linux',
@@ -184,10 +184,11 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'], // Testing integration with phantom
+					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'],
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
+					build: grunt.file.readJSON('package.json')["build"],
 					pollInterval: 2000,         // (ms) Note: pollInterval * statusCheckAttempts should = 'max-duration'
 					statusCheckAttempts: 180,   // So if you change one of these, adjust 'max-duration' accordingly
 					'max-duration': 360,        // (s)

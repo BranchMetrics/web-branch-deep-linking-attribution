@@ -35,5 +35,6 @@
 		"dist/cordova/**",
 		"testbeds/**",
 		".gitignore"
-	]
+	],
+  "build": "1.5.6"
 }

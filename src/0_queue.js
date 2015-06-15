@@ -6,7 +6,7 @@ goog.provide('Queue');
 /**
  * @returns {function(function(function()))}
  */
-Queue = function() {
+var Queue = function() {
 	var queue = [],
 	next = function() {
 		if (queue.length) {
