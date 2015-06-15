@@ -1160,8 +1160,8 @@ var sendSMS = function(a, b, c, d) {
   };
   if (e) {
     var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? n() : (l(), setTimeout(function() {
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS", "banner"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError", "banner"), n()) : (b._publishEvent("didSendBannerSMS", "banner"), l(), setTimeout(function() {
         k.removeChild(h);
         m();
       }, banner_utils.success_timeout));
@@ -1169,6 +1169,7 @@ var sendSMS = function(a, b, c, d) {
   }
 }, banner = function(a, b, c, d) {
   if (banner_utils.shouldAppend(d, b)) {
+    a._publishEvent("willShowBanner", "banner");
     var e = banner_html.markup(b, d);
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
@@ -1184,10 +1185,11 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, l = f.getElementById("branch-banner-close"), n = function() {
+    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, l = f.getElementById("branch-banner-close"), n = function(a) {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
+        a();
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
         "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = m);
@@ -1196,24 +1198,28 @@ var sendSMS = function(a, b, c, d) {
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
       "number" == typeof b.forgetHide ? utils.storeKeyValue("hideBanner", banner_utils.getDate(b.forgetHide), d) : utils.storeKeyValue("hideBanner", !0, d);
     };
-    l && (l.onclick = function(a) {
-      a.preventDefault();
-      n();
+    l && (l.onclick = function(b) {
+      b.preventDefault();
+      a._publishEvent("willCloseBanner", "banner");
+      n(function() {
+        a._publishEvent("didCloseBanner", "banner");
+      });
     });
     banner_utils.addClass(document.body, "branch-banner-is-active");
     "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
+      a._publishEvent("didShowBanner", "banner");
     }, banner_utils.animationDelay);
     return n;
   }
+  a._publishEvent("willNotShowBanner", "banner");
 };
 // Input 12
 if (CORDOVA_BUILD) {
   var exec = require("cordova/exec")
 }
-var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3};
-function wrap(a, b, c) {
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
     a === callback_params.NO_CALLBACK || "function" != typeof g ? (f = function(a) {
@@ -1244,14 +1250,14 @@ function wrap(a, b, c) {
       b.apply(d, e);
     });
   };
-}
-var Branch = function() {
+}, Branch = function() {
   if (!(this instanceof Branch)) {
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
   this._storage = storage(!1);
   this._server = new Server;
+  this._listeners = [];
   var a;
   CORDOVA_BUILD && (a = "cordova");
   WEB_BUILD && (a = "web");
@@ -1274,6 +1280,11 @@ Branch.prototype._api = function(a, b, c) {
 Branch.prototype._referringLink = function() {
   var a = utils.readKeyValue("referring_link", this._storage), b = utils.readKeyValue("click_id", this._storage);
   return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
+};
+Branch.prototype._publishEvent = function(a) {
+  this._listeners.forEach(function(b) {
+    (b.event && b.event == a || !b.event) && b.listener(a);
+  });
 };
 CORDOVA_BUILD && (Branch.prototype.setDebug = function(a) {
   this.debug = a;
@@ -1435,7 +1446,16 @@ Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, functio
 Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
-WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
+  "function" == typeof a && void 0 == b && (b = a);
+  b && this._listeners.push({listener:b, event:a || null});
+}, Branch.prototype.removeListener = function(a) {
+  a && (this._listeners = this._listeners.filter(function(b) {
+    if (b.listener !== a) {
+      return b;
+    }
+  }));
+}, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" == typeof b.forgetHide && "undefined" != typeof b.forgetHide && (b.forgetHide = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" == typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" == 
   typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" == typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" == typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" == typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};
@@ -1443,7 +1463,13 @@ WEB_BUILD && (Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, functi
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
 }), Branch.prototype.closeBanner = wrap(0, function(a) {
-  this.closeBannerPointer && this.closeBannerPointer();
+  if (this.closeBannerPointer) {
+    var b = this;
+    this._publishEvent("willCloseBanner", "banner");
+    this.closeBannerPointer(function() {
+      b._publishEvent("didCloseBanner", "banner");
+    });
+  }
   a();
 }));
 // Input 13

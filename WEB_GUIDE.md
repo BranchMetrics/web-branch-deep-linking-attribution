@@ -36,7 +36,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.6.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "),0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.5.6.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data addListener removeListener setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -99,7 +99,11 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.creditHistory()](#credithistoryoptions-callback)
   + [.redeem()](#redeemamount-bucket-callback)
 
-5. Smart Banner
+5. Event Listener
+  + [.addListener()](#addlistener)
+  + [.removeListener()](#removelistener)
+
+6. Smart Banner
   + [.banner()](#banneroptions-data)
 
 ___
@@ -795,6 +799,51 @@ branch.redeem(
 callback("Error message");
 ```
 ___
+
+
+
+### addListener(event, listener) 
+
+**Parameters**
+
+**event**: `String`, _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
+
+**listener**: `function`, _required_ - Listeneing function that will recieves an event as a string.
+
+The Branch Web SDK includes a simple event listener, that currently only publishes events for `Branch.banner()` events.
+Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+
+##### Example
+
+```
+var listener = function(event) { console.log(event); }
+
+// Specify an event to listen for
+branch.addListener('willShowBanner', listener);
+
+// Listen for all events
+branch.addListener(listener);
+```
+
+#### Available `Branch.banner()` Events:
+- willShowBanner
+- willNotShowBanner
+- didShowBanner
+- willCloseBanner
+- didCloseBanner
+- willSendBannerSMS
+- sendBannerSMSError
+- didSendBannerSMS
+
+
+
+### removeListener(listener) 
+
+**Parameters**
+
+**listener**: `function`, _required_ - Reference to the listening function you would like to remove. *note*: this must be the same reference that was passed to `branch.addListener()`, not an identical clone of the function.
+
+Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
 
 
 
