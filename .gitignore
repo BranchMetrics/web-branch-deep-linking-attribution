@@ -1,3 +1,4 @@
+.DS_Store
 logs
 *.log
 pids
@@ -21,3 +22,12 @@ testbeds/cordova/platforms
 testbeds/cordova/plugins
 aws_access_keys.sh
 sauce_access_keys.sh
+.settings
+.project
+Resources
+build.log
+build
+npm-debug.log
+tmp
+.map
+Thumbs.db
