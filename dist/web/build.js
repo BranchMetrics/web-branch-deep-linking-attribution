@@ -1454,7 +1454,7 @@ if (window.branch && window.branch._q) {
     branch_instance[task[0]].apply(branch_instance, task[1]);
   }
 }
-"function" === typeof define && define.amd ? define("branch", function() {
+"function" === typeof define && define.amd ? define(["branch"], function() {
   return branch_instance;
 }) : "object" === typeof exports && (module.exports = branch_instance);
 window && (window.branch = branch_instance);

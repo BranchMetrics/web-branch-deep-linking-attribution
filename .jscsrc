@@ -37,5 +37,6 @@
 	"safeContextKeyword": [ "self" ],
 	"disallowYodaConditions": true,
 	"requireSpaceAfterLineComment": true,
-	"disallowNewlineBeforeBlockStatements": true
+	"disallowNewlineBeforeBlockStatements": true,
+	"requireSpacesInsideArrayBrackets": "all"
 }
