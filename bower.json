@@ -36,5 +36,5 @@
     "testbeds/**",
     ".gitignore"
   ],
-  "build": "6"
+  "build": "16"
 }
