@@ -43,7 +43,8 @@ read -p "Bump build number? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	grunt buildnumber
+	sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION_NO_V\"/" bower.json
+	sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION_NO_V\"/" package.json
 fi
 
 read -p "Update plugin.xml? " -n 1 -r

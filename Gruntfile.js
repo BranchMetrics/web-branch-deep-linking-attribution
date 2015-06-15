@@ -208,12 +208,6 @@ module.exports = function(grunt) {
 					base: ''
 				}
 			}
-		},
-		buildnumber: {
-			options: {
-				field: 'build'
-			},
-			files: ['package.json', 'bower.json']
 		}
 	});
 
@@ -224,6 +218,5 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-saucelabs');
 	grunt.loadNpmTasks('grunt-contrib-connect');
-	grunt.loadNpmTasks('grunt-build-number');
-	grunt.registerTask('test', ['buildnumber', 'connect', 'saucelabs-mocha']);
+	grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
 };
