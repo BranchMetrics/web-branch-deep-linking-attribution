@@ -32,3 +32,5 @@ tmp
 .map
 Thumbs.db
 *.*-e
+src/titanium/BranchSDK/android/dist/branchsdk.jar
+src/titanium/BranchSDK/android/libs/*
