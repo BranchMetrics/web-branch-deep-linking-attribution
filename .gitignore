@@ -32,6 +32,12 @@ tmp
 .map
 Thumbs.db
 *.*-e
+
 src/titanium/BranchSDK/android/dist/branchsdk.jar
 src/titanium/BranchSDK/android/libs/*
 src/titanium/BranchSDK/iphone/BranchSDK.xcodeproj/xcuserdata/*
+testbeds/titanium/Branch-SDK-Testbed/modules/*
+testbeds/titanium/Branch-SDK-Testbed/app/assets/*
+testbeds/titanium/Branch-SDK-Testbed/MarketplaceArtwork.png
+testbeds/titanium/Branch-SDK-Testbed/iTunesConnect.png
+testbeds/titanium/Branch-SDK-Testbed/platform/*
