@@ -20,7 +20,11 @@
   + [.creditHistory()](#credithistoryoptions-callback)
   + [.redeem()](#redeemamount-bucket-callback)
 
-5. Smart Banner
+5. Event Listener
+  + [.addListener()](#addlistener)
+  + [.removeListener()](#removelistener)
+
+6. Smart Banner
   + [.banner()](#banneroptions-data)
 
 ___

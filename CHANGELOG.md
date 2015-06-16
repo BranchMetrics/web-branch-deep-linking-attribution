@@ -5,6 +5,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ## [VERSION] - unreleased
 ### New Functionality
 - Adds Appcelerator Titanium Module
+- Adds a simple event listener, with events for `branch.banner()`
 ### Improvements
 - Refactors session storage to make use of sessionStorage, localStorage, cookies, JavaScript objects, and Titanium properties
 

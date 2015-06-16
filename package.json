@@ -31,5 +31,6 @@
   },
   "dependencies": {
     "request": "^2.55.0"
-  }
+  },
+  "build": "1.5.6"
 }

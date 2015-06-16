@@ -31,3 +31,4 @@ npm-debug.log
 tmp
 .map
 Thumbs.db
+*.*-e

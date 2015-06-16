@@ -11,7 +11,7 @@ goog.require('utils');
 var COOKIE_DAYS = 365;
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
-/** @typedef {{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
+/** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
 
 if (TITANIUM_BUILD) {
@@ -22,15 +22,12 @@ if (TITANIUM_BUILD) {
 /**
  * @class BranchStorage
  * @constructor
- * @returns storage
  */
  var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
-		var storageMethod = this[storageMethods[i]];
-		storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
+		var storageMethod = typeof storageMethods[i] == 'function' ? storageMethods[i]() : storageMethod;
 		if (storageMethod.isEnabled()) {
-			storageMethod._store = { };
-			return  storageMethod;
+			return storageMethod;
 		}
 	}
 };
@@ -75,7 +72,8 @@ var webStorage = function(perm) {
 			catch(err) {
 				return false;
 			}
-		}
+		},
+		_storage: { }
 	}
 };
 
@@ -149,7 +147,8 @@ var cookies = function(perm) {
 				}
 			}
 		},
-		isEnabled: function() { return navigator.cookieEnabled; }
+		isEnabled: function() { return navigator.cookieEnabled; },
+		_storage: { }
 	}
 };
 
@@ -171,7 +170,8 @@ BranchStorage.prototype['pojo'] = {
 	set: function(key, value) { this._store[key] = value; },
 	remove: function(key) { delete this._store[key]; },
 	clear: function() { this._store = { }; },
-	isEnabled: function() { return true; }
+	isEnabled: function() { return true; },
+	_storage: { }
 };
 
 /** @type storage */
@@ -213,5 +213,6 @@ BranchStorage.prototype['titanium'] = {
 		catch(err) {
 			return false;
 		}
-	}
+	},
+	_storage: { }
 };

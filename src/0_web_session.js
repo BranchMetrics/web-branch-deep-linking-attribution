@@ -13,7 +13,7 @@ goog.provide('web_session');
  */
 web_session.deprecated_read = function(storage) {
 	try {
-		var branch_session = storage['get']('branch_session');
+		var branch_session = storage.get('branch_session');
 		if (typeof branch_session == "object") {
 			return goog.json.parse(branch_session) || null;
 		}

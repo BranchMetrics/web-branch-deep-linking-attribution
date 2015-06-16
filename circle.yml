@@ -29,4 +29,3 @@ test:
   override:
     - ./lint.sh
     - grunt test
-    - mocha-phantomjs test/integration-test.html

@@ -71,12 +71,15 @@ var sendSMS = function(doc, branch, options, linkData) {
 	if (phone) {
 		var phone_val = phone.value;
 		if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
+			branch._publishEvent("willSendBannerSMS");
 			disableForm();
 			branch["sendSMS"](phone_val, linkData, options, function(err) {
 				if (err) {
+					branch._publishEvent("sendBannerSMSError");
 					errorForm();
 				}
 				else {
+					branch._publishEvent("didSendBannerSMS");
 					hideFormShowSuccess();
 					setTimeout(function() {
 						smsFormContainer.removeChild(checkmark);
@@ -99,6 +102,8 @@ var sendSMS = function(doc, branch, options, linkData) {
  */
 banner = function(branch, options, linkData, storage) {
 	if (banner_utils.shouldAppend(storage, options)) {
+		branch._publishEvent("willShowBanner");
+
 		// Create markup
 		var element = banner_html.markup(options, storage);
 
@@ -139,28 +144,33 @@ banner = function(branch, options, linkData, storage) {
 			bodyMarginBottomInline = document.body.style.marginBottom,
 
 			closeButton = doc.getElementById('branch-banner-close'),
-			closeBanner = function() {
-			setTimeout(function() {
-				banner_utils.removeElement(element);
-				banner_utils.removeElement(document.getElementById('branch-css'));
-			}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
-			setTimeout(function() {
-				if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
-				else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
-				banner_utils.removeClass(document.body, 'branch-banner-is-active');
-			}, banner_utils.animationDelay);
-			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
-			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
+			closeBanner = function(callback) {
+				setTimeout(function() {
+					banner_utils.removeElement(element);
+					banner_utils.removeElement(document.getElementById('branch-css'));
+					callback();
+				}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
-			if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
-			else { storage.set('hideBanner', true); }
-		};
+				setTimeout(function() {
+					if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
+					else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
+					banner_utils.removeClass(document.body, 'branch-banner-is-active');
+				}, banner_utils.animationDelay);
+				if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+				else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
+
+				if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
+				else { storage.set('hideBanner', true); }
+			};
 
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
 				ev.preventDefault();
-				closeBanner();
+				branch._publishEvent("willCloseBanner");
+				closeBanner(function() {
+					branch._publishEvent("didCloseBanner");
+				});
 			};
 		}
 
@@ -172,8 +182,10 @@ banner = function(branch, options, linkData, storage) {
 		setTimeout(function() {
 			if (options.position == 'top') { element.style.top = '0'; }
 			else if (options.position == 'bottom') { element.style.bottom = '0'; }
+			branch._publishEvent("didShowBanner");
 		}, banner_utils.animationDelay);
 
 		return closeBanner;
 	}
+	else { branch._publishEvent("willNotShowBanner"); }
 };

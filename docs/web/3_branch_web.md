@@ -693,6 +693,51 @@ ___
 
 
 
+### addListener(event, listener) 
+
+**Parameters**
+
+**event**: `String`, _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
+
+**listener**: `function`, _required_ - Listeneing function that will recieves an event as a string.
+
+The Branch Web SDK includes a simple event listener, that currently only publishes events for `Branch.banner()` events.
+Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+
+##### Example
+
+```
+var listener = function(event) { console.log(event); }
+
+// Specify an event to listen for
+branch.addListener('willShowBanner', listener);
+
+// Listen for all events
+branch.addListener(listener);
+```
+
+#### Available `Branch.banner()` Events:
+- willShowBanner
+- willNotShowBanner
+- didShowBanner
+- willCloseBanner
+- didCloseBanner
+- willSendBannerSMS
+- sendBannerSMSError
+- didSendBannerSMS
+
+
+
+### removeListener(listener) 
+
+**Parameters**
+
+**listener**: `function`, _required_ - Reference to the listening function you would like to remove. *note*: this must be the same reference that was passed to `branch.addListener()`, not an identical clone of the function.
+
+Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
+
+
+
 ### banner(options, data) 
 
 **Parameters**

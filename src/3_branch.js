@@ -45,7 +45,7 @@ var init_states = {
  * @param {function(...?): undefined} func
  * @param {boolean=} init
  */
-function wrap(parameters, func, init) {
+var wrap = function(parameters, func, init) {
 	var r = function() {
 		var self = this, args, callback,
 		lastArg = arguments[arguments.length - 1];
@@ -116,6 +116,7 @@ Branch = function() {
 	this._server = new Server();
 
 	var sdk = 'web';
+	this._listeners = [ ];
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
 	if (TITANIUM_BUILD) { sdk = 'titanium'; }
 	this.sdk = sdk + config.version;
@@ -158,6 +159,18 @@ Branch.prototype._referringLink = function() {
 	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
 	else { return null; }
+};
+
+/***
+ * @function Branch._publishEvent
+ * @param {string} event
+ */
+Branch.prototype._publishEvent = function(event) {
+	this._listeners.forEach(function(subscription) {
+		if ((subscription.event && subscription.event == event) || !subscription.event) {
+			subscription.listener(event);
+		}
+	});
 };
 
 if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
@@ -1123,6 +1136,66 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 });
 
 if (WEB_BUILD) { // jshint undef:false
+
+/** =WEB
+ * @function Branch.addListener
+ * @param {String} event - _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
+ * @param {function(String)} listener - _required_ - Listeneing function that will recieves an event as a string.
+ *
+ * The Branch Web SDK includes a simple event listener, that currently only publishes events for `Branch.banner()` events.
+ * Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+ *
+ * ##### Example
+ *
+ * ```
+ * var listener = function(event) { console.log(event); }
+ *
+ * // Specify an event to listen for
+ * branch.addListener('willShowBanner', listener);
+ *
+ * // Listen for all events
+ * branch.addListener(listener);
+ * ```
+ *
+ * #### Available `Branch.banner()` Events:
+ * - willShowBanner
+ * - willNotShowBanner
+ * - didShowBanner
+ * - willCloseBanner
+ * - didCloseBanner
+ * - willSendBannerSMS
+ * - sendBannerSMSError
+ * - didSendBannerSMS
+ *
+ */
+/*** +TOC_HEADING &Event Listener& ^WEB ***/
+/*** +TOC_ITEM #addlistener &.addListener()& ^WEB ***/
+	Branch.prototype['addListener'] = function(event, listener) {
+		if (typeof event == "function" && listener == undefined) { listener = event; }
+		if (listener) {
+			this._listeners.push({
+				"listener": listener,
+				"event": event || null
+			});
+		}
+	};
+
+/** =WEB
+ * @function Branch.removeListener
+ * @param {function(String)} listener - _required_ - Reference to the listening function you would like to remove. *note*: this must be the same reference that was passed to `branch.addListener()`, not an identical clone of the function.
+ *
+ * Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
+ *
+ */
+/*** +TOC_ITEM #removelistener &.removeListener()& ^WEB ***/
+	Branch.prototype['removeListener'] = function(listener) {
+		if (listener) {
+			this._listeners = this._listeners.filter(function(subscription) {
+				if (subscription.listener !== listener) { return subscription; }
+			});
+		}
+	};
+
 /** =WEB
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
@@ -1229,16 +1302,22 @@ if (WEB_BUILD) { // jshint undef:false
 			desktopSticky: typeof options['desktopSticky'] == 'undefined' ? true : options['desktopSticky'],
 			make_new_link: !!options['make_new_link']
 		};
+
 		if (typeof options['showMobile'] != 'undefined') {
 			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
 		}
+
 		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
 		done();
 	});
 
 	Branch.prototype['closeBanner'] = wrap(0, function(done) {
 		if (this.closeBannerPointer) {
-			this.closeBannerPointer();
+			var self = this;
+			this._publishEvent("willCloseBanner");
+			this.closeBannerPointer(function() {
+				self._publishEvent("didCloseBanner");
+			});
 		}
 		done();
 	});
