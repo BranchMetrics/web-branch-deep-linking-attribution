@@ -25,8 +25,10 @@ if (TITANIUM_BUILD) {
  */
  var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
-		var storageMethod = typeof storageMethods[i] == 'function' ? storageMethods[i]() : storageMethod;
+		var storageMethod = this[storageMethods[i]];
+			storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
+			storageMethod._storage = { };
 			return storageMethod;
 		}
 	}
@@ -72,8 +74,7 @@ var webStorage = function(perm) {
 			catch(err) {
 				return false;
 			}
-		},
-		_storage: { }
+		}
 	}
 };
 
@@ -147,8 +148,7 @@ var cookies = function(perm) {
 				}
 			}
 		},
-		isEnabled: function() { return navigator.cookieEnabled; },
-		_storage: { }
+		isEnabled: function() { return navigator.cookieEnabled; }
 	}
 };
 
@@ -170,8 +170,7 @@ BranchStorage.prototype['pojo'] = {
 	set: function(key, value) { this._store[key] = value; },
 	remove: function(key) { delete this._store[key]; },
 	clear: function() { this._store = { }; },
-	isEnabled: function() { return true; },
-	_storage: { }
+	isEnabled: function() { return true; }
 };
 
 /** @type storage */
@@ -213,6 +212,5 @@ BranchStorage.prototype['titanium'] = {
 		catch(err) {
 			return false;
 		}
-	},
-	_storage: { }
+	}
 };

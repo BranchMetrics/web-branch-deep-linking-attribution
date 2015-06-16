@@ -796,9 +796,9 @@ utils.base64encode = function(a) {
 // Input 6
 var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
-    var c = "function" == typeof a[b] ? a[b]() : c;
+    var c = this[a[b]], c = "function" == typeof c ? c() : c;
     if (c.isEnabled()) {
-      return c;
+      return c._storage = {}, c;
     }
   }
 }, prefix = function(a) {
@@ -838,7 +838,7 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
     } catch (a) {
       return!1;
     }
-  }, _storage:{}};
+  }};
 };
 BranchStorage.prototype.local = function() {
   return webStorage(!0);
@@ -885,7 +885,7 @@ var cookies = function(a) {
     }
   }, isEnabled:function() {
     return navigator.cookieEnabled;
-  }, _storage:{}};
+  }};
 };
 BranchStorage.prototype.cookie = function() {
   return cookies(!1);
@@ -907,7 +907,7 @@ BranchStorage.prototype.pojo = {getAll:function() {
   this._store = {};
 }, isEnabled:function() {
   return!0;
-}, _storage:{}};
+}};
 BranchStorage.prototype.titanium = {getAll:function() {
   for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
     -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = retrieveValue(Ti.App.Properties.getString(b[c])));
@@ -934,7 +934,7 @@ BranchStorage.prototype.titanium = {getAll:function() {
   } catch (a) {
     return!1;
   }
-}, _storage:{}};
+}};
 // Input 7
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
