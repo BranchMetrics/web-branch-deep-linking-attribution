@@ -6,9 +6,9 @@ version: 1.0.1
 apiversion: 2
 architectures: armv7 arm64 i386 x86_64
 description: BranchSDK
-author: Your Name
-license: Specify your license
-copyright: Copyright (c) 2015 by Your Company
+author: Rob Petit
+license: github.com/BranchMetrics/Web-SDK/blob/master/LICENSE
+copyright: Copyright (c) 2015 Pawprint Labs Inc
 
 # these should not be edited
 name: BranchSDK
