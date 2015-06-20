@@ -104,6 +104,16 @@ if (Ti.Platform.osname === "android") {
 
 ```
 
+## Building the iOS and Android Branch SDK Modules in Appcelerator Studio
+
+**This tutorial assumes you are already familiar with the Titanium API, and Titanum modules**
+
+The iOS and Android Branch SDK Titanium modules can be built from their respective `src/` directories:
+`src/titanium/BranchSDK/iphone`
+`src/titanium/BranchSDK/android`
+
+To build the modules in Appcelerator Studio, they must first be improted into your project, or into a new project. To do this, open the App Explorer view on the left and click
+
 _____
 
 ### SDK Method Queue

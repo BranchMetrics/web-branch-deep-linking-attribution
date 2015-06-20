@@ -33,9 +33,11 @@ tmp
 Thumbs.db
 *.*-e
 
+src/titanium/BranchSDK/build/*
 src/titanium/BranchSDK/android/dist/branchsdk.jar
 src/titanium/BranchSDK/android/libs/*
 src/titanium/BranchSDK/iphone/BranchSDK.xcodeproj/xcuserdata/*
+src/titanium/BranchSDK/iphone/build/*
 testbeds/titanium/Branch-SDK-Testbed/modules/*
 testbeds/titanium/Branch-SDK-Testbed/app/assets/*
 testbeds/titanium/Branch-SDK-Testbed/MarketplaceArtwork.png
