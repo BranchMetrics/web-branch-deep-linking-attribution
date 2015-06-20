@@ -112,7 +112,16 @@ The iOS and Android Branch SDK Titanium modules can be built from their respecti
 `src/titanium/BranchSDK/iphone`
 `src/titanium/BranchSDK/android`
 
-To build the modules in Appcelerator Studio, they must first be improted into your project, or into a new project. To do this, open the App Explorer view on the left and click
+To build the modules in Appcelerator Studio, they must first be improted into your project, or into a new project.
+
+1. Open the App Explorer view on the left (Window -> Show View -> App Explorer), then click "Import Project".
+1. Appcelerator Studio will show a variety of import options. Open the "General" folder, and select "Existing Folder as New Project".
+1. Select the Branch Titanium SDK folder by clicking "Browse", and choose `src/titanium/BranchSDK/`, then click "Finish".
+1. Select the desired module (iOS or Android) in top left of the Appcelerator Studio, above the App Explorer, and click the green play button.
+1. Titanium modules can be built to 3 different output locations. The first option (Titanum SDK), publishes the module to your specific Titanium SDK location. Eitherwise, you can publish the module to an existing Mobile App project, or a specific location. Publishing the module to a specific location will produce a .zip file.
+
+## Installing the iOS and Android Branch SDK Modules
+
 
 _____
 
