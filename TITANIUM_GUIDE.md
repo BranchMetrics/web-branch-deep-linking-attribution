@@ -105,6 +105,31 @@ if (Ti.Platform.osname === "android") {
 
 ```
 
+## Building the iOS and Android Branch SDK Modules in Appcelerator Studio
+
+**This tutorial assumes you are already familiar with the Titanium API, and Titanum modules**
+
+The iOS and Android Branch SDK Titanium modules can be built from their respective `src/` directories:
+`src/titanium/BranchSDK/iphone`
+`src/titanium/BranchSDK/android`
+
+To build the modules in Appcelerator Studio, they must first be improted into your project, or into a new project.
+
+1. Open the App Explorer view on the left (Window -> Show View -> App Explorer), then click "Import Project".
+1. Appcelerator Studio will show a variety of import options. Open the "General" folder, and select "Existing Folder as New Project".
+1. Select the Branch Titanium SDK folder by clicking "Browse", and choose `src/titanium/BranchSDK/`, then click "Finish".
+1. Select the desired module (iOS or Android) in top left of the Appcelerator Studio, above the App Explorer, and click the green play button.
+1. Titanium modules can be built to 3 different output locations. The first option (Titanum SDK), publishes the module to your specific Titanium SDK location. Eitherwise, you can publish the module to an existing Mobile App project, or a specific location. Publishing the module to a specific location will produce a .zip file.
+
+## Installing the iOS and Android Branch SDK Modules
+
+1. The Branch Titanium testbed: `testbeds/titanium/Branch-Sdk-Testbed/`, requires the built Branch SDK modules prior to running. If you would like to add these to the testbed app, simply chose the testbed app or your local Titanum SDK as the output location (see above for building instuctions).
+1. Once you have built the Branch Titanium SDK, import the testbed app as an existing mobile project: File -> Import, then in the dialog open the "Appcelerator" folder and chose "Existing Mobile Project".
+1. Browse to the testbed app directory: `testbeds/titanium/Branch-Sdk-Testbed/`, leave the default settings, and chose "Finish".
+1. To launch the testbed app simply slect the Android or iOS simulator in the top left of Appcelerator studio, above the App Explorer, then click the green play button.
+
+This will build and launch the testbed app in the respective simulator, and log output to the Appcelerator console.
+
 _____
 
 ### SDK Method Queue
