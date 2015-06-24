@@ -90,7 +90,7 @@ docs/web/3_branch_web.md: $(SOURCES)
 docs/titanium/3_branch_titanium.md: $(SOURCES)
 	perl -pe 's/\/\*\*\ =WEB/\/\*\*\*/gx' src/3_branch.js > src/3_branch_titanium.js
 	perl -p -i -e 's/=CORDOVA//gx' src/3_branch_titanium.js
-	jsdox src/3_branch_titanium.js --output docs/web
+	jsdox src/3_branch_titanium.js --output docs/titanium
 	rm src/3_branch_titanium.js
 
 README.md: docs/0_notice.md docs/readme/1_main.md docs/4_footer.md
