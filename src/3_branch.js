@@ -9,11 +9,12 @@ goog.require('Server');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
+goog.require('web_session');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
 if (CORDOVA_BUILD) {  // jshint undef:false
-	var exec = require("cordova/exec");
+	var cordovaExec = require("cordova/exec");
 }
 
 var default_branch;
@@ -44,7 +45,7 @@ var init_states = {
  * @param {function(...?): undefined} func
  * @param {boolean=} init
  */
-var wrap =function(parameters, func, init) {
+var wrap = function(parameters, func, init) {
 	var r = function() {
 		var self = this, args, callback,
 		lastArg = arguments[arguments.length - 1];
@@ -100,19 +101,29 @@ Branch = function() {
 		return default_branch;
 	}
 	this._queue = Queue();
-	this._storage = storage(false);
+
+	var storageMethods = [ ];
+	if (CORDOVA_BUILD) { storageMethods = ['local']; }
+	else if (TITANIUM_BUILD) { storageMethods = ['titanium']; }
+	else if (WEB_BUILD) {
+		if (utils.mobileUserAgent()) { storageMethods = ['local', 'permcookie']; }
+		else { storageMethods = ['session', 'cookie']; }
+	}
+	storageMethods.push('pojo');
+
+	this._storage = new BranchStorage(storageMethods);
+
 	this._server = new Server();
+
+	var sdk = 'web';
 	this._listeners = [ ];
-	var sdk;
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
-	if (WEB_BUILD) { sdk = 'web'; }
+	if (TITANIUM_BUILD) { sdk = 'titanium'; }
 	this.sdk = sdk + config.version;
 
-	if (CORDOVA_BUILD) { // jshint undef:false
-		this._permStorage = storage(true);  // For storing data we need from run to run such as device_fingerprint_id and
-		this.debug = false;					// A debug install session will get a unique device id.
+	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+		this.debug = false;
 	}
-
 	this.init_state = init_states.NO_INIT;
 };
 
@@ -129,7 +140,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
 	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
 
-	if (CORDOVA_BUILD) { // jshint undef:false
+	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
 	}
 
@@ -142,8 +153,8 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = utils.readKeyValue('referring_link', this._storage),
-		click_id = utils.readKeyValue('click_id', this._storage);
+	var referring_link = this._storage.get('referring_link'),
+		click_id = this._storage.get('click_id');
 
 	if (referring_link) { return referring_link; }
 	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
@@ -153,7 +164,6 @@ Branch.prototype._referringLink = function() {
 /***
  * @function Branch._publishEvent
  * @param {string} event
- * @param {string} subject
  */
 Branch.prototype._publishEvent = function(event) {
 	this._listeners.forEach(function(subscription) {
@@ -163,7 +173,7 @@ Branch.prototype._publishEvent = function(event) {
 	});
 };
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /** =CORDOVA
  * @function Branch.setDebug
  * @param {boolean} debug - _required_ - Set the SDK debug flag.
@@ -188,6 +198,7 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
  * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
+ * AND THE TITANIUM MODULE
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -241,96 +252,110 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	else {
 		self.app_id = branch_key;
 	}
-	if (options && typeof options == 'function') {
-		options = { isReferrable: null };
+
+	options = (options && typeof options == 'function') ? { "isReferrable": null } : options;
+
+	if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
+		self.keepAlive = true;
 	}
-	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
 
-	var sessionData = utils.readStore(self._storage);
-
-	function setBranchValues(data) {
+	var setBranchValues = function(data) {
 		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
-		self.sessionLink = data['link'];
+		if (data['link']) { self.sessionLink = data['link']; }
+
+		// Double check that this works, second conditional would have never been called as an `else if`
 		if (data['referring_link']) {
 			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
-		else if (!data['click_id'] && data['referring_link']) {
+		// used to be an `else if` that would have never been called
+		if (!data['click_id'] && data['referring_link']) {
 			data['click_id'] = data['referring_link'].substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
 		}
-		self.sessionLink = data['link'];
-		if (CORDOVA_BUILD) { // jshint undef:false
+
+		if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 			self.device_fingerprint_id = data['device_fingerprint_id'];
 			if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
 		}
 		return data;
 	}
 
-	var finishInit = function(err, data) {
+	var finishInit = function(err, data, install) {
 		if (data) {
 			data = setBranchValues(data);
-			if (CORDOVA_BUILD) { // jshint undef:false
-				utils.store(data, self._permStorage);
+			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+				var first = self._storage.getAll();
+				if (!install && first) { self._storage.set("data", first.data); }
 			}
-			utils.store(data, self._storage);
+			self._storage.setObject(data);
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 		}
-		if (err) {
-			self.init_state = init_states.INIT_FAILED;
-		}
+		if (err) { self.init_state = init_states.INIT_FAILED; }
+
+		// Keep android titanium from calling close
+		if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
+	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var sessionData = web_session.deprecated_read(self._storage) || self._storage.getAll();
+
 	if (sessionData  && sessionData['session_id']) {
-		finishInit(null, sessionData);
+		finishInit(null, sessionData, false);
 	}
 	else {
-		if (CORDOVA_BUILD) { // jshint undef:false
-			var args = [], execFunc;
-			args.push(self.debug);
-			if (isReferrable !== null) {
-				args.push(isReferrable ? 1 : 0);
-			}
-			var cordovaError = function() {
-				done("Error getting device data!");
+		if (CORDOVA_BUILD || TITANIUM_BUILD) {
+			var storedValues = self._storage.getAll();
+			var freshInstall = !storedValues || !storedValues['identity_id'];
+
+			var apiCordovaTitanium = function(data) {
+				if (!freshInstall) {
+					data['identity_id'] = storedValues['identity_id'];
+					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+				}
+				self._api(freshInstall ? resources.install : resources.open, data, function(err, data) {
+					finishInit(err, data, freshInstall);
+				});
 			};
-			// If we have a stored identity_id this is not a new install so call open.  Otherwise call install.
-			if (utils.readKeyValue('identity_id', self._permStorage)) {
-				exec(function(data) {
-					data['identity_id'] = utils.readKeyValue('identity_id', self._permStorage);
-					data['device_fingerprint_id'] = utils.readKeyValue('device_fingerprint_id', self._permStorage);
-					console.log("Sending open with: " + goog.json.serialize(data));
-					self._api(resources.open, data, function(err, data) {
-						if (err) { return finishInit(err, null); }
-						finishInit(null, data);
-					});
-				}, cordovaError,  "BranchDevice", "getOpenData", args);
+			if (CORDOVA_BUILD) { // jshint undef:false
+				var args = [];
+				if (isReferrable !== null) {
+					args.push(isReferrable ? 1 : 0);
+				}
+				cordovaExec(apiCordovaTitanium,
+					function() { done("Error getting device data!") },
+					"BranchDevice",
+					freshInstall ? "getInstallData" : "getOpenData", args);
 			}
-			else {
-				exec(function(data) {
-					console.log("Sending install with: " + goog.json.serialize(data));
-					self._api(resources.install, data, function(err, data) {
-						if (err) { return finishInit(err, null); }
-						finishInit(null, data);
-					});
-				}, cordovaError,  "BranchDevice", "getInstallData", args);
+			if (TITANIUM_BUILD) { // jshint undef:false
+				var branchTitaniumSDK = require('io.branch.sdk');
+				var link_identifier, data, url =
+					(options && typeof options.url != 'undefined' && options.url != null) ? options.url : null;
+				if (url) { link_identifier = utils.getParamValue(url); }
+				if (data && link_identifier) { data['link_identifier'] = link_identifier; }
+				if (freshInstall) {
+					data = (isReferrable == null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
+				}
+				else {
+					data = (isReferrable == null) ? branchTitaniumSDK.getOpenData(-1) : branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
+				}
+				apiCordovaTitanium(data);
 			}
 		}
 
 		if (WEB_BUILD) { // jshint undef:false
 			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
-				if (err) { return finishInit(err, null); }
+				if (err) { return finishInit(err, null, false); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
-					if (err) { return finishInit(err, null); }
-					if (link_identifier) { data['click_id'] = link_identifier; }
-					finishInit(err, data);
+					if (data && link_identifier) { data['click_id'] = link_identifier; }
+					finishInit(err, data, false);
 				});
 			});
 		}
@@ -351,12 +376,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  */
 /*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var data = utils.whiteListSessionData(utils.readStore(this._storage));
+	var data = utils.whiteListSessionData(this._storage.getAll());
 	data['referring_link'] = this._referringLink();
 	done(null, data);
 });
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /** =CORDOVA
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
@@ -367,12 +392,13 @@ if (CORDOVA_BUILD) { // jshint undef:false
  * later point.
  * If the Branch session has already been initialized, the callback will return
  * immediately, otherwise, it will return once Branch has been initialized.
+ *
  * ___
  *
  */
  	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-		done(null, utils.whiteListSessionData(utils.readStore(this._storage)));
+		done(null, utils.whiteListSessionData(this._storage.getAll()));
 	});
 }
 
@@ -449,7 +475,8 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, done);
 });
 
-if (CORDOVA_BUILD) { // jshint undef:false
+
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /** =CORDOVA
  * @function Branch.close
  * @param {function(?Error)=} callback - _optional_
@@ -477,11 +504,12 @@ if (CORDOVA_BUILD) { // jshint undef:false
 	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
+		if (this.keepAlive) { return done(null); }
 		this._api(resources.close, { }, function(err, data) {
 			delete self.session_id;
 			delete self.sessionLink;
 			self.init_state = init_states.NO_INIT;
-			utils.clearStore(self._storage);
+			self._storage.clear();
 			done(null);
 		});
 	});
@@ -523,14 +551,21 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		metadata = { };
 	}
 
-	this._api(resources.event, {
-		"event": event,
-		"metadata": utils.merge({
-			"url": document.URL,
-			"user_agent": navigator.userAgent,
-			"language": navigator.language
-		}, metadata || {})
-	}, done);
+	if (!TITANIUM_BUILD) {
+		this._api(resources.event, {
+			"event": event,
+			"metadata": utils.merge({
+				"url": document.URL,
+				"user_agent": navigator.userAgent,
+				"language": navigator.language
+			}, metadata || {})
+		}, done);
+	} else {
+		this._api(resources.event, {
+			"event": event,
+			"metadata": metadata || {}
+		}, done);
+	}
 });
 
 /**
@@ -745,7 +780,7 @@ Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, 
 				"click": "click"
 			}, function(err, data) {
 				if (err) { return done(err); }
-				utils.storeKeyValue('click_id', data['click_id'], self._storage);
+				self._storage.set('click_id', data['click_id']);
 				sendSMS(data['click_id']);
 			});
 		});
@@ -892,7 +927,6 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *     callback(err)
  * );
  * ```
- *
  * ___
  *
  */

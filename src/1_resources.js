@@ -71,7 +71,7 @@ function defaults(obj) {
 			"sdk": validator(true, validationTypes.str)
 		};
 	}
-	if (CORDOVA_BUILD) {
+	if (CORDOVA_BUILD || TITANIUM_BUILD) {
 		def = {
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
@@ -124,9 +124,22 @@ if (WEB_BUILD) {
 			"phone": validator(true, validationTypes.str)
 		}
 	};
+
+	resources.close = {
+		destination: config.api_endpoint,
+		endpoint: "/v1/close",
+		method: utils.httpMethod.POST,
+		params: {
+			"identity_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.str),
+			"session_id": validator(true, branch_id),
+			"link_click_id": validator(false, branch_id),
+			"device_fingerprint_id": validator(true, branch_id)
+		}
+	};
 }
 
-if (CORDOVA_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 	resources.install = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/install",
@@ -172,19 +185,6 @@ if (CORDOVA_BUILD) { // jshint undef:false
 			"uri_scheme": validator(false, validationTypes.str),
 			"os_version": validator(false, validationTypes.str),
 			"is_referrable": validator(false, validationTypes.num)
-		}
-	};
-
-	resources.close = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/close",
-		method: utils.httpMethod.POST,
-		params: {
-			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.str),
-			"session_id": validator(true, branch_id),
-			"link_click_id": validator(false, branch_id),
-			"device_fingerprint_id": validator(true, branch_id)
 		}
 	};
 }

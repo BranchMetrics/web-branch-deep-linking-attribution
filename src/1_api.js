@@ -16,7 +16,7 @@ var RETRIES = 2,
  * @class Server
  * @constructor
  */
-var Server = function() {};
+var Server = function() { };
 
 Server.prototype._jsonp_callback_index = 0;
 
@@ -25,7 +25,7 @@ Server.prototype._jsonp_callback_index = 0;
  * @param {string} prefix
  */
 Server.prototype.serializeObject = function(obj, prefix) {
-	var pairs = [];
+	var pairs = [ ];
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
 			pairs.push(encodeURIComponent(prefix) + '=' + encodeURIComponent(obj[i]));
@@ -58,7 +58,6 @@ Server.prototype.getUrl = function(resource, data) {
 			if (resource.queryPart.hasOwnProperty(k)) {
 				err = resource.queryPart[k](resource.endpoint, k, data[k]);
 				if (err) { return { error: err }; }
-
 				url += '/' + data[k];
 			}
 		}
@@ -142,12 +141,22 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {function(?Error,*=,?=)=} callback
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
-	var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+	var req = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+	req.timeout = 5000;
 	req.ontimeout = function() {
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
-	req.onreadystatechange = function() {
-		if (req.readyState === 4) {
+	if (TITANIUM_BUILD) {
+		req.onerror = function(e) {
+			if (req.status === 402) {
+				callback(new Error('Not enough credits to redeem.'), null, req.status);
+			} else if (e.error) {
+				callback(new Error(e.error), null, req.status);
+			} else {
+				callback(new Error("Error in API: " + req.status), null, req.status);
+			}
+		};
+		req.onload = function() {
 			if (req.status === 200) {
 				try {
 					callback(null, goog.json.parse(req.responseText), req.status);
@@ -162,8 +171,27 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 			else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
 				callback(new Error('Error in API: ' + req.status), null, req.status);
 			}
-		}
-	};
+		};
+	} else {
+		req.onreadystatechange = function() {
+			if (req.readyState === 4) {
+				if (req.status === 200) {
+					try {
+						callback(null, goog.json.parse(req.responseText), req.status);
+					}
+					catch (e) {
+						callback(null, { }, req.status);
+					}
+				}
+				else if (req.status === 402) {
+					callback(new Error('Not enough credits to redeem.'), null, req.status);
+				}
+				else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
+					callback(new Error('Error in API: ' + req.status), null, req.status);
+				}
+			}
+		};
+	}
 
 	try {
 		req.open(method, url, true);
@@ -172,7 +200,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		req.send(data);
 	}
 	catch (e) {
-		storage['setItem']('use_jsonp', true);
+		storage.set('use_jsonp', true);
 		this.jsonpRequest(url, data, method, callback);
 	}
 };
@@ -185,7 +213,6 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
  */
 Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
-
 
 	var u = this.getUrl(resource, data);
 	if (u.error) { return callback(new Error(u.error)); }
@@ -217,7 +244,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		}
 	};
 	var makeRequest = function() {
-		if (storage['getItem']('use_jsonp') || resource.jsonp) {
+		if (storage.get('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);
 		}
 		else {

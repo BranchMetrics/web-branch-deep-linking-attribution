@@ -5,7 +5,6 @@
 goog.provide('utils');
 /*jshint unused:false*/
 goog.require('goog.json');
-goog.require('storage');
 goog.require('config');
 
 /** @define {boolean} */
@@ -94,61 +93,6 @@ utils.cleanLinkData = function(linkData, config) {
 };
 
 /**
- * @param {BranchStorage} storage
- * @return {Object}
- */
-utils.readStore = function(storage) {
-	try {
-		return goog.json.parse(storage['getItem']('branch_session') || { });
-	}
-	catch (e) {
-		return { };
-	}
-};
-
-/**
- * @param {Object} data
- * @param {BranchStorage} storage
- */
-utils.store = function(data, storage) {
-	storage['setItem']('branch_session', goog.json.serialize(data));
-};
-
-/**
- * @param {BranchStorage} storage
- */
-utils.clearStore = function(storage) {
-	storage['removeItem']('branch_session');
-};
-
-/**
- * @param {string} key
- * @param {*} value
- * @param {BranchStorage} storage
- */
-utils.storeKeyValue = function(key, value, storage) {
-	var currentSession = utils.readStore(storage);
-	currentSession[key] = value;
-	utils.store(currentSession, storage);
-};
-
-/**
- * @param {string} key
- * @param {BranchStorage} storage
- */
-utils.readKeyValue = function(key, storage) {
-	var currentSession = utils.readStore(storage);
-	return (currentSession && currentSession[key]) ? currentSession[key] : null;
-};
-
-/**
- * @param {BranchStorage} storage
- */
-utils.hasApp = function(storage) {
-	return utils.readKeyValue('has_app', storage);
-};
-
-/**
  * @param {Object} to
  * @param {Object} from
  */
@@ -169,6 +113,14 @@ utils.hashValue = function(key) {
 	catch (e) {
 		return undefined;
 	}
+};
+
+utils.mobileUserAgent = function() {
+	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
+		if (navigator.userAgent.match(/android/i)) { return 'android'; }
+		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
+		else { return 'ios'; }
+	} else { return false; }
 };
 
 /**
@@ -253,4 +205,3 @@ utils.base64encode = function(input) {
 	}
 	return output;
 };
-

@@ -1,0 +1,96 @@
+<Alloy>
+	<Window class="container">
+		<ScrollView scrollType="vertical" layout="vertical" >
+			<View class="section" top="30" left="10" right="10" layout="vertical" height="Ti.UI.SIZE" >
+				<Label class="header" text="Status:" />
+				<Label class="value" id="status_text" text="None" />
+				<Label class="header" text="First Params:" />
+				<Label class="value" id="first_text" text="None" />
+				<Label class="header" text="Latest Params:" />
+				<Label class="value" id="latest_text" text="None" />
+				<Label class="header" text="Logged In As:" />
+				<Label class="value" id="name_text" text="Not Logged In" />
+			</View>
+			<View class="section" top="10" left="10" right="10" layout="vertical" height="Ti.UI.SIZE" >
+				<Label class="header" text="Alias:" />
+				<TextField class="entry" id="alias_text" hintText="Alias for the link" />
+				<Label class="header" text="Channel:" />
+				<TextField class="entry" id="channel_text" hintText="Channel for the link" />
+				<Label class="header" text="Stage:" />
+				<TextField class="entry" id="stage_text" hintText="Stage for the link" />
+				<Label class="header" text="Tags (comma separate multiple tags):" />
+				<TextField class="entry" id="tags_text" hintText="Tags for the link" />
+				<Label class="header" text="Params (comma separate multiple params):" />
+				<TextField class="entry" id="params_text" hintText="Tags for the link" />
+				<Label class="header" text="Type:" />
+				<Picker color="black" left="10" id="type_picker" >
+					<PickerRow title="Unlimited" value="0" />
+					<PickerRow title="Single User" value="1" />
+				</Picker>
+				<Label class="header" text="Feature:" />
+				<Picker color="black" left="10" id="feature_picker" >
+					<PickerRow title="None" value="none" />
+					<PickerRow title="Referral" value="referral" />
+					<PickerRow title="Invite" value="invite" />
+					<PickerRow title="Deal" value="deal" />
+					<PickerRow title="Gift" value="gift" />
+				</Picker>
+				<Button onClick="getUrl" id="get_url" title="Get Url" />
+				<Label class="value" id="link_text" text="Press button to get URL" />
+				<Button onClick="sendEmail" id="send_email" title="Send Url as email" />
+			</View>
+			<View class="section" top="10" left="10" right="10" layout="vertical" height="Ti.UI.SIZE" >
+				<Label class="header" text="Name:" />
+				<TextField class="entry" id="login_text" hintText="Enter a name to login as" />
+				<Button onClick="login" title="Login" />
+				<Button onClick="logout" title="Logout" />
+			</View>
+			<View class="section" top="10" left="10" right="10" layout="vertical" height="Ti.UI.SIZE" >
+				<Label class="header" text="Action:" />
+				<TextField class="entry" id="action_text" hintText="Enter an action" />
+				<Button onClick="doAction" title="User Completed Action" />
+				<Button onClick="loadActions" title="Load Actions" />
+				<Label class="value" id="actions_text" text="Press load actions to see values" />
+			</View>
+			<View class="section" top="10" left="10" right="10" layout="vertical" height="Ti.UI.SIZE" >
+				<Label class="header" text="Prefix:" />
+				<TextField class="entry" id="prefix_text" hintText="Enter a prefix" />
+				<Label class="header" text="Amount:" />
+				<TextField class="entry" id="code_amount_text" hintText="Enter an amount" />
+				<Label class="header" text="Bucket:" />
+				<TextField class="entry" id="code_bucket_text" hintText="Enter a bucket" />
+				<Label class="header" text="Calculation Type:" />
+				<Picker left="10" id="calc_type_picker" >
+					<PickerRow title="Unlimited" value="1" />
+					<PickerRow title="Unique" value="0" />
+				</Picker>
+				<Label class="header" text="Location:" />
+				<Picker left="10" id="location_picker" >
+					<PickerRow title="Referring User" value="2" />
+					<PickerRow title="Referree" value="0" />
+					<PickerRow title="Both" value="3" />
+				</Picker>
+				<Label class="header" text="Expiration Date:" />
+				<Picker platform="ios" left="10" id="exp_picker" type="Ti.UI.PICKER_TYPE_DATE" onChange="expDateChanged" />
+				<Label platform="android" class="value" id="exp_text" text="Click to set an expiration date" onClick="expDateClicked" />
+				<Button onClick="createCode" title="GetReferral Code" />
+				<Label class="value" id="code_text" text="Press button to get referral code." />
+				<Label class="header" text="Apply or Validate:" />
+				<TextField class="entry" id="code_entry" hintText="Enter a code" />
+				<Button onClick="validateCode" title="Validate Code" />
+				<Button onClick="applyCode" title="Apply Code" />
+				<Label class="value" id="code_status_text" text="Validate/apply results will be here." />
+			</View>
+			<View class="section" bottom="20" top="10" left="10" right="10" layout="vertical" height="Ti.UI.SIZE" >
+				<Label class="header" text="Amount:" />
+				<TextField class="entry" id="cr_amount_text" hintText="Enter an amount (required)" />
+				<Label class="header" text="Bucket:" />
+				<TextField class="entry" id="cr_bucket_text" hintText="Enter a bucket (optional)" />
+				<Button onClick="redeem" title="Redeem Rewards" />
+				<Button onClick="getCreditCounts" title="Get Credit Counts" />
+				<Button onClick="getCreditHistory" title="Get Credit Count History" />
+				<Label class="value" id="credit_text" text="Counts or history shown here" />
+			</View>
+		</ScrollView>
+	</Window>
+</Alloy>

@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.1
+apiversion: 2
+architectures: armeabi armeabi-v7a x86
+description: BranchSDK
+author: Your Name
+license: Specify your license
+copyright: Copyright (c) 2015 by Your Company
+
+# these should not be edited
+name: BranchSDK
+moduleid: io.branch.sdk
+guid: 82839bd3-8a58-460d-80cf-dd7c2faa11e3
+platform: android
+minsdk: 4.0.0.GA

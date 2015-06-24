@@ -55,6 +55,20 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
   });
 ```
 
+## Appcelerator Titanum
+
+### [Full Documentation for the Titanium Web SDK](https://github.com/BranchMetrics/Web-SDK/blob/master/TITANIUM_GUIDE.md)
+
+The Web SDK is provided as a module for Titanium.
+
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+
+```js
+  branch.init("YOUR BRANCH KEY HERE", function(err, data) {
+  	app.initComplete(err, data);
+  });
+```
+
 ## Commonly Used Features
 
 #### App Smart Banner

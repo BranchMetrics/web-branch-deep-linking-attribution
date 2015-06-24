@@ -29,10 +29,10 @@ banner_html.banner = function(options, action) {
 
 /**
  * @param {banner_utils.options} options
- * @param {BranchStorage} storage
+ * @param {storage} storage
  */
 banner_html.mobileAction = function(options, storage) {
-	return '<a id="branch-mobile-action" href="#" target="_parent">' + (utils.hasApp(storage) ? options.openAppButtonText : options.downloadAppButtonText) + '</a>';
+	return '<a id="branch-mobile-action" href="#" target="_parent">' + (storage.get('has_app') ? options.openAppButtonText : options.downloadAppButtonText) + '</a>';
 };
 
 banner_html.desktopAction = function(options) {
@@ -72,7 +72,7 @@ banner_html.iframe = function(options, action) {
 	document.body.appendChild(iframe);
 
 	var bodyClass,
-	    userAgent = banner_utils.mobileUserAgent();
+	    userAgent = utils.mobileUserAgent();
 	if (userAgent == 'ios' || userAgent == 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}
@@ -106,11 +106,11 @@ banner_html.div = function(options, action) {
 
 /**
  * @param {banner_utils.options} options
- * @param {BranchStorage} storage
+ * @param {storage} storage
  */
 banner_html.markup = function(options, storage) {
 	var action = '<div id="branch-sms-form-container">' +
-		(banner_utils.mobileUserAgent() ? banner_html.mobileAction(options, storage) : banner_html.desktopAction(options)) +
+		(utils.mobileUserAgent() ? banner_html.mobileAction(options, storage) : banner_html.desktopAction(options)) +
 	'</div>';
 
 	if (options.iframe) {

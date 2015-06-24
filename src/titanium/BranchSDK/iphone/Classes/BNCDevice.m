@@ -1,0 +1,177 @@
+//
+//  BNCDevice.m
+//  BranchSDK
+//
+//  Created by Robert Petit on 5/7/15.
+//
+//
+
+#import "BNCDevice.h"
+#import <UIKit/UIDevice.h>
+#import <UIKit/UIScreen.h>
+#import <SystemConfiguration/SystemConfiguration.h>
+#import "sys/utsname.h"
+
+@implementation BNCDevice
++ (NSString *)getUniqueHardwareId:(BOOL *)isReal andIsDebug:(BOOL)debug {
+    NSString *uid = nil;
+    *isReal = YES;
+    
+    Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
+    if (ASIdentifierManagerClass && !debug) {
+        SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
+        id sharedManager = ((id (*)(id, SEL))[ASIdentifierManagerClass methodForSelector:sharedManagerSelector])(ASIdentifierManagerClass, sharedManagerSelector);
+        SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
+        NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
+        uid = [uuid UUIDString];
+    }
+    
+    if (!uid && NSClassFromString(@"UIDevice")) {
+        uid = [[UIDevice currentDevice].identifierForVendor UUIDString];
+    }
+    
+    if (!uid) {
+        uid = [[NSUUID UUID] UUIDString];
+        *isReal = NO;
+    }
+    
+    return uid;
+}
+
++ (BOOL)adTrackingSafe {
+    Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
+    if (ASIdentifierManagerClass) {
+        SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
+        id sharedManager = ((id (*)(id, SEL))[ASIdentifierManagerClass methodForSelector:sharedManagerSelector])(ASIdentifierManagerClass, sharedManagerSelector);
+        SEL advertisingEnabledSelector = NSSelectorFromString(@"isAdvertisingTrackingEnabled");
+        BOOL enabled = ((BOOL (*)(id, SEL))[sharedManager methodForSelector:advertisingEnabledSelector])(sharedManager, advertisingEnabledSelector);
+        return enabled;
+    }
+    return YES;
+}
+
++ (NSString *)getURIScheme {
+    NSArray *urlTypes = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleURLTypes"];
+    if (urlTypes) {
+        for (NSDictionary *urlType in urlTypes) {
+            NSArray *urlSchemes = [urlType objectForKey:@"CFBundleURLSchemes"];
+            if (urlSchemes) {
+                for (NSString *urlScheme in urlSchemes) {
+                    if (![[urlScheme substringWithRange:NSMakeRange(0, 2)] isEqualToString:@"fb"] &&
+                        ![[urlScheme substringWithRange:NSMakeRange(0, 2)] isEqualToString:@"db"] &&
+                        ![[urlScheme substringWithRange:NSMakeRange(0, 3)] isEqualToString:@"pin"]) {
+                        return urlScheme;
+                    }
+                }
+            }
+        }
+    }
+    return nil;
+}
+
++ (NSString *)getAppVersion {
+    return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+}
+
++ (NSString *)getCarrier {
+    NSString *carrierName = nil;
+    
+    Class CTTelephonyNetworkInfoClass = NSClassFromString(@"CTTelephonyNetworkInfo");
+    if (CTTelephonyNetworkInfoClass) {
+        id networkInfo = [[CTTelephonyNetworkInfoClass alloc] init];
+        SEL subscriberCellularProviderSelector = NSSelectorFromString(@"subscriberCellularProvider");
+        
+        id carrier = ((id (*)(id, SEL))[networkInfo methodForSelector:subscriberCellularProviderSelector])(networkInfo, subscriberCellularProviderSelector);
+        if (carrier) {
+            SEL carrierNameSelector = NSSelectorFromString(@"carrierName");
+            carrierName = ((NSString* (*)(id, SEL))[carrier methodForSelector:carrierNameSelector])(carrier, carrierNameSelector);
+        }
+    }
+    
+    return carrierName;
+}
+
++ (NSString *)getBrand {
+    return @"Apple";
+}
+
++ (NSString *)getModel {
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    
+    return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+}
+
++ (BOOL)isSimulator {
+    UIDevice *currentDevice = [UIDevice currentDevice];
+    return [currentDevice.model rangeOfString:@"Simulator"].location != NSNotFound;
+}
+
++ (NSString *)getDeviceName {
+    if ([BNCDevice isSimulator]) {
+        struct utsname name;
+        uname(&name);
+        return [NSString stringWithFormat:@"%@ %s", [[UIDevice currentDevice] name], name.nodename];
+    } else {
+        return [[UIDevice currentDevice] name];
+    }
+}
+
++ (NSNumber *)getUpdateState:(BOOL)updateState {
+    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+    NSString *storedAppVersion = [defs objectForKey:@"bnc_app_version"];
+    NSString *currentAppVersion = [BNCDevice getAppVersion];
+    NSFileManager *manager = [NSFileManager defaultManager];
+    
+    // for creation date
+    NSURL *documentsDirRoot = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+    NSDictionary *documentsDirAttributes = [manager attributesOfItemAtPath:documentsDirRoot.path error:nil];
+    int appCreationDay = (int)([[documentsDirAttributes fileCreationDate] timeIntervalSince1970]/(60*60*24));
+    
+    // for modification date
+    NSString *bundleRoot = [[NSBundle mainBundle] bundlePath];
+    NSDictionary *bundleAttributes = [manager attributesOfItemAtPath:bundleRoot error:nil];
+    int appModificationDay = (int)([[bundleAttributes fileModificationDate] timeIntervalSince1970]/(60*60*24));
+    
+    if (!storedAppVersion) {
+        if (updateState) {
+            [defs setValue:currentAppVersion forKey:@"bnc_app_version"];
+        }
+        if ([documentsDirAttributes fileCreationDate] && [bundleAttributes fileModificationDate] && (appCreationDay != appModificationDay)) {
+            return [NSNumber numberWithInt:2];
+        }
+        return nil;
+    } else if (![storedAppVersion isEqualToString:currentAppVersion]) {
+        if (updateState) {
+            [defs setValue:currentAppVersion forKey:@"bnc_app_version"];
+        }
+        return [NSNumber numberWithInt:2];
+    } else {
+        return [NSNumber numberWithInt:1];
+    }
+}
+
++ (NSString *)getOS {
+    return @"iOS";
+}
+
++ (NSString *)getOSVersion {
+    UIDevice *device = [UIDevice currentDevice];
+    return [device systemVersion];
+}
+
++ (NSNumber *)getScreenWidth {
+    UIScreen *mainScreen = [UIScreen mainScreen];
+    float scaleFactor = mainScreen.scale;
+    CGFloat width = mainScreen.bounds.size.width * scaleFactor;
+    return [NSNumber numberWithInteger:(NSInteger)width];
+}
+
++ (NSNumber *)getScreenHeight {
+    UIScreen *mainScreen = [UIScreen mainScreen];
+    float scaleFactor = mainScreen.scale;
+    CGFloat height = mainScreen.bounds.size.height * scaleFactor;
+    return [NSNumber numberWithInteger:(NSInteger)height];
+}
+
+@end
