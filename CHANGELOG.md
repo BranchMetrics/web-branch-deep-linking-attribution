@@ -2,6 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+
 ## [v1.5.7] - 2015-06-24
 ### New Functionality
 - Adds Appcelerator Titanium Module
