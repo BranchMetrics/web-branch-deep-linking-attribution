@@ -19,7 +19,7 @@ This Web SDK can also be used for Cordova/Phonegap applications.  It is provided
 cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
 ```
 
-Note that this SDK is meant for use with full Cordova/PhoneGap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into javascript if needed.
+Note that this SDK is meant for use with full Cordova/PhoneGap apps.  If you are building a hybrid app using an embedded web view and you want to access the Branch API from native code you will want to use the platform specific SDKs and pass data into Javascript if needed.
 
 #### Initialization and Event Handling
 
@@ -46,7 +46,7 @@ In your project's manifest file, you can register your app to respond to direct 
 
 Secondly, make sure that this activity is launched as a singleTask. This is important to handle proper deep linking from other apps like Facebook.
 
-Typically, you would register some sort of splash activitiy that handles routing for your app.
+Typically, you would register some sort of splash activity that handles routing for your app.
 
 ```xml
 <activity
@@ -94,7 +94,7 @@ You can register your app to respond to direct deep links (yourapp:// in a mobil
 
 Alternatively, you can add the URI scheme in your project's Info page.
 
-1. In Xcode, click your project in the Navigator (on the left side).
+1. In XCode, click your project in the Navigator (on the left side).
 1. Select the "Info" tab.
 1. Expand the "URL Types" section at the bottom.
 1. Click the "+" sign to add a new URI Scheme, as below:
