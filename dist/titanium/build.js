@@ -798,7 +798,7 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]], c = "function" == typeof c ? c() : c;
     if (c.isEnabled()) {
-      return c._storage = {}, c;
+      return c._store = {}, c;
     }
   }
 }, prefix = function(a) {

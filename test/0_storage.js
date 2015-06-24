@@ -111,6 +111,8 @@ describe('cookie storage', function() {
 describe('pojo storage', function() {
 	var storage = new BranchStorage(['pojo']); // jshint ignore:line
 
+	console.log(storage);
+
 	var itemKey = 'key';
 	var itemValue = 'value';
 	var assert = testUtils.unplanned();

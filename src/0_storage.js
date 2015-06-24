@@ -28,7 +28,7 @@ if (TITANIUM_BUILD) {
 		var storageMethod = this[storageMethods[i]];
 			storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
-			storageMethod._storage = { };
+			storageMethod._store = { };
 			return storageMethod;
 		}
 	}
