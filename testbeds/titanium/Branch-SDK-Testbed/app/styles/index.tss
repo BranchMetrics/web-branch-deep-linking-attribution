@@ -1,0 +1,76 @@
+".container": {
+	backgroundColor:"white"
+},
+
+".header": {
+	color:"black",
+	left:5,
+	top:10,
+	textAlign:"left",
+	font: {
+		fontSize: 24
+	}
+},
+
+".value": {
+	color:"blue",
+	left:10,
+	top:10,
+	textAlign:"left",
+	font: {
+		fontSize: 20
+	}
+},
+
+".entry": {
+	left:10,
+	right:10,
+	top:10,
+	borderColor:"black",
+	borderWidth:1,
+	borderRadius:10,
+	textAlign:"left",
+	font: {
+		fontSize: 20
+	}
+},
+
+".section[platform=android]": {
+	borderColor:"black",
+	borderRadius:0,
+	borderWidth:1 
+},
+
+".section[platform=ios]": {
+	borderColor:"black",
+	borderRadius:10,
+	borderWidth:1 
+},
+
+"Button": {
+	top:10,
+	borderColor:"black",
+	borderRadius:10,
+	borderWidth:2,
+	backgroundColor:"#AFAFAF",
+	backgroundSelectedImage:"#4F4F4F",
+	textAlign:"center",
+	layout:"center",
+	width:250,
+	color:"white",
+	font: {
+		fontSize:20
+	}
+},
+
+"TextField[platform=android]":
+{
+	backgroundColor:"black"
+},
+
+"Picker[platform=android]": {
+	backgroundColor:"black",
+	font: {
+		fontSize: 20
+	}
+}

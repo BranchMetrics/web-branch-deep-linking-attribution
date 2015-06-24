@@ -7,6 +7,8 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
+goog.require('web_session');
+
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
@@ -96,7 +98,7 @@ var sendSMS = function(doc, branch, options, linkData) {
  * @param {Object} branch
  * @param {banner_utils.options} options
  * @param {Object} linkData
- * @param {BranchStorage} storage
+ * @param {storage} storage
  */
 banner = function(branch, options, linkData, storage) {
 	if (banner_utils.shouldAppend(storage, options)) {
@@ -112,7 +114,7 @@ banner = function(branch, options, linkData, storage) {
 		linkData['channel'] = linkData['channel'] || 'app banner';
 
 		var doc = options.iframe ? element.contentWindow.document : document;
-		if (banner_utils.mobileUserAgent()) {
+		if (utils.mobileUserAgent()) {
 			var referring_link = branch._referringLink();
 			if (referring_link && !options['make_new_link']) {
 				doc.getElementById('branch-mobile-action').href = referring_link;
@@ -142,6 +144,7 @@ banner = function(branch, options, linkData, storage) {
 			bodyMarginBottomInline = document.body.style.marginBottom,
 
 			closeButton = doc.getElementById('branch-banner-close'),
+
 			closeBanner = function(callback) {
 				setTimeout(function() {
 					banner_utils.removeElement(element);
@@ -157,8 +160,8 @@ banner = function(branch, options, linkData, storage) {
 				if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
 				else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-				if (typeof options.forgetHide == 'number') { utils.storeKeyValue('hideBanner', banner_utils.getDate(options.forgetHide), storage); }
-				else { utils.storeKeyValue('hideBanner', true, storage); }
+				if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
+				else { storage.set('hideBanner', true); }
 			};
 
 		if (closeButton) {

@@ -17,6 +17,7 @@
 **callback**: `function`, _optional_ - callback to read the session data.
 
 THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -491,7 +492,6 @@ callback(
     callback(err)
 );
 ```
-
 ___
 
 

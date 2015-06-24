@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.branch.sdk.testbed" version="1.0.8" ios-CFBundleShortVersionString="1.0.8" ios-CFBundleVersion="8" android-versionCode="8" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="io.branch.sdk.testbed" version="1.0.9" ios-CFBundleShortVersionString="1.0.9" ios-CFBundleVersion="9" android-versionCode="9" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Branch-Cordova-SDK-Testbed</name>
     <description>
 	Test app for the Branch Cordova SDK

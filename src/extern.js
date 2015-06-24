@@ -25,3 +25,23 @@ var localStorage = { getItem: function() {}, setItem: function() {}, removeItem:
 
 // Handle the cordova calls, in particular the cordova.plugin.getInstallData and cordova.plugin.getOpenData used in init.
 var cordova = { plugins: { branch_device: { getInstallData: function() {}, getOpenData: function() {} } } };
+
+// Titanium calls
+var getOpenData = function() {};
+var getInstallData = function() {};
+
+var Ti = {
+	App: {
+		Properties: {
+			getString: function() {},
+			setString: function() {}
+		}
+	},
+	Network: {
+		createHTTPClient: function() {}
+	},
+	Platform: {
+		osname: ""
+	}
+};
+

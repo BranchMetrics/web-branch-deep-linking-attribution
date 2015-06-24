@@ -10,11 +10,13 @@ goog.require('config'); // jshint unused:false
 
 branch_instance = new Branch();
 
-if (window['branch'] && window['branch']['_q']) {
-	var queue = window['branch']['_q'];
-	for (var i = 0; i < queue.length; i++) {
-		var task = queue[i];
-		branch_instance[task[0]].apply(branch_instance, task[1]);
+if (!TITANIUM_BUILD) {
+	if (window['branch'] && window['branch']['_q']) {
+		var queue = window['branch']['_q'];
+		for (var i = 0; i < queue.length; i++) {
+			var task = queue[i];
+			branch_instance[task[0]].apply(branch_instance, task[1]);
+		}
 	}
 }
 
@@ -29,8 +31,11 @@ if (typeof define === 'function' && define.amd) {
 else if (typeof exports === 'object') {
 	module.exports = branch_instance;
 }
-// Always make a global.
-if (window) { window['branch'] = branch_instance; }
+
+if (!TITANIUM_BUILD) {
+	// Always make a global.
+	if (window) { window['branch'] = branch_instance; }
+}
 
 // Ensue close is allways called on a pause in mobile apps
 if (CORDOVA_BUILD) { // jshint undef:false
