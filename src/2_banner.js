@@ -7,8 +7,6 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
-goog.require('web_session');
-
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {

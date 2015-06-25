@@ -5,7 +5,7 @@ COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() 
 COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --define 'DEBUG=false'
 COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE --define 'DEBUG=true'
 
-SOURCES=src/0_config.js src/0_storage.js src/0_web_session.js src/0_utils.js src/0_queue.js src/0_banner_utils.js src/1_api.js src/1_resources.js src/1_banner_css.js src/1_banner_html.js src/2_banner.js src/3_branch.js src/4_initialization.js $(COMPILER_LIBRARY)/goog/**
+SOURCES=src/0_config.js src/0_storage.js src/0_session.js src/0_utils.js src/0_queue.js src/0_banner_utils.js src/1_api.js src/1_resources.js src/1_banner_css.js src/1_banner_html.js src/2_banner.js src/3_branch.js src/4_initialization.js $(COMPILER_LIBRARY)/goog/**
 EXTERN=src/extern.js
 
 VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/$$1/')
