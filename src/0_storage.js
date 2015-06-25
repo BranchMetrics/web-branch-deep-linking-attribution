@@ -9,6 +9,7 @@ goog.require('goog.json');
 goog.require('utils');
 
 var COOKIE_DAYS = 365;
+
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 /** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
@@ -34,7 +35,9 @@ if (TITANIUM_BUILD) {
 	}
 };
 
-var prefix = function(key) { return BRANCH_KEY_PREFIX + key; }
+var prefix = function(key) {
+	return key = "branch_session" ? key : BRANCH_KEY_PREFIX + key;
+}
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
 
 var retrieveValue = function(value) {
