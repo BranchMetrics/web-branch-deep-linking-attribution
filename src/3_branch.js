@@ -9,7 +9,7 @@ goog.require('Server');
 goog.require('banner');
 goog.require('Queue');
 goog.require('storage');
-goog.require('web_session');
+goog.require('session');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
@@ -287,7 +287,8 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				var first = self._storage.getAll();
 				if (!install && first) { self._storage.set("data", first.data); }
 			}
-			self._storage.setObject(data);
+
+			session.set(self._storage, data);
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
@@ -300,7 +301,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	};
 
 	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-	var sessionData = web_session.deprecated_read(self._storage) || self._storage.getAll();
+	var sessionData = session.get(self._storage);
 
 	if (sessionData  && sessionData['session_id']) {
 		finishInit(null, sessionData, false);
@@ -376,7 +377,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  */
 /*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var data = utils.whiteListSessionData(this._storage.getAll());
+	var data = utils.whiteListSessionData(session.get(this._storage));
 	data['referring_link'] = this._referringLink();
 	done(null, data);
 });
@@ -398,7 +399,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
  */
  	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
 	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-		done(null, utils.whiteListSessionData(this._storage.getAll()));
+		done(null, utils.whiteListSessionData(session.get(this._storage)));
 	});
 }
 

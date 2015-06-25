@@ -1,5 +1,4 @@
 goog.provide('banner_utils');
-goog.require('web_session');
 goog.require('storage'); // jshint unused:false
 goog.require('utils');
 

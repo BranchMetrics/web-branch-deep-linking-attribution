@@ -717,13 +717,14 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 4
-var web_session = {deprecated_read:function(a) {
+var session = {get:function(a) {
   try {
-    var b = a.get("branch_session");
-    return "object" == typeof b ? goog.json.parse(b) || null : null;
-  } catch (c) {
+    return goog.json.parse(a.get("branch_session")) || null;
+  } catch (b) {
     return null;
   }
+}, set:function(a, b) {
+  a.set("branch_session", goog.json.serialize(b));
 }};
 // Input 5
 var utils = {}, DEBUG = !0, message;
@@ -806,12 +807,6 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
 }, trimPrefix = function(a) {
   return a.replace(BRANCH_KEY_PREFIX, "");
 }, retrieveValue = function(a) {
-  if ("object" == typeof a) {
-    try {
-      a = goog.json.parse(a);
-    } catch (b) {
-    }
-  }
   return "true" == a ? !0 : "false" == a ? !1 : a;
 }, webStorage = function(a) {
   var b = a ? localStorage : sessionStorage;
@@ -823,11 +818,6 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
     return a;
   }, get:function(a) {
     return retrieveValue(b.getItem(prefix(a)));
-  }, setObject:function(a) {
-    for (var d in a) {
-      var e = "object" == typeof a[d] ? goog.json.serialize(a[d]) : a[d];
-      b.setItem(prefix(d), e);
-    }
   }, set:function(a, d) {
     b.setItem(prefix(a), d);
   }, remove:function(a) {
@@ -849,41 +839,33 @@ BranchStorage.prototype.session = function() {
   return webStorage(!1);
 };
 var cookies = function(a) {
-  var b = function(b, d) {
-    var e = "";
-    a && (e = new Date, console.log(e), e.setTime(e.getTime() + 864E5 * COOKIE_DAYS), e = "; branch_expiration_date=" + e.toGMTString() + "; expires=" + e.toGMTString());
-    document.cookie = b + "=" + d + e + "; path=/";
-  };
   return{getAll:function() {
-    for (var a = document.cookie.split(";"), b = {}, e = 0;e < a.length;e++) {
-      var f = a[e].replace(" ", ""), f = f.substring(0, f.length);
-      -1 != f.indexOf(BRANCH_KEY_PREFIX) && (f = f.split("="), b[trimPrefix(f[0])] = retrieveValue(f[1]));
+    for (var a = document.cookie.split(";"), c = {}, d = 0;d < a.length;d++) {
+      var e = a[d].replace(" ", ""), e = e.substring(0, e.length);
+      -1 != e.indexOf(BRANCH_KEY_PREFIX) && (e = e.split("="), c[trimPrefix(e[0])] = retrieveValue(e[1]));
     }
-    return b;
+    return c;
   }, get:function(a) {
     a = prefix(a) + "=";
-    for (var b = document.cookie.split(";"), e = 0;e < b.length;e++) {
-      var f = b[e], f = f.substring(1, f.length);
-      if (0 == f.indexOf(a)) {
-        return retrieveValue(f.substring(a.length, f.length));
+    for (var c = document.cookie.split(";"), d = 0;d < c.length;d++) {
+      var e = c[d], e = e.substring(1, e.length);
+      if (0 == e.indexOf(a)) {
+        return retrieveValue(e.substring(a.length, e.length));
       }
     }
     return null;
-  }, setObject:function(a) {
-    for (var d in a) {
-      var e = "object" == typeof a[d] ? goog.json.serialize(a[d]) : a[d];
-      b(prefix(d), e);
-    }
-  }, set:function(a, d) {
-    b(prefix(a), d);
+  }, set:function(b, c) {
+    var d = prefix(b), e = "";
+    a && (e = new Date, console.log(e), e.setTime(e.getTime() + 864E5 * COOKIE_DAYS), e = "; branch_expiration_date=" + e.toGMTString() + "; expires=" + e.toGMTString());
+    document.cookie = d + "=" + c + e + "; path=/";
   }, remove:function(a) {
     document.cookie = prefix(a) + "=; expires=; path=/";
   }, clear:function() {
     for (var b = function(a) {
       document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
-    }, d = document.cookie.split(";"), e = 0;e < d.length;e++) {
-      var f = d[e], f = f.substring(1, f.length);
-      -1 != f.indexOf(BRANCH_KEY_PREFIX) && (a || -1 != f.indexOf("branch_expiration_date=") ? a && 0 < f.indexOf("branch_expiration_date=") && b(f) : b(f));
+    }, c = document.cookie.split(";"), d = 0;d < c.length;d++) {
+      var e = c[d], e = e.substring(1, e.length);
+      -1 != e.indexOf(BRANCH_KEY_PREFIX) && (a || -1 != e.indexOf("branch_expiration_date=") ? a && 0 < e.indexOf("branch_expiration_date=") && b(e) : b(e));
     }
   }, isEnabled:function() {
     return navigator.cookieEnabled;
@@ -899,8 +881,6 @@ BranchStorage.prototype.pojo = {getAll:function() {
   return this._store;
 }, get:function(a) {
   return "undefined" != typeof this._store[a] ? this._store[a] : null;
-}, setObject:function(a) {
-  this._store = utils.merge(this._store, a);
 }, set:function(a, b) {
   this._store[a] = b;
 }, remove:function(a) {
@@ -917,11 +897,6 @@ BranchStorage.prototype.titanium = {getAll:function() {
   return a;
 }, get:function(a) {
   retrieveValue(Ti.App.Properties.getString(prefix(a)));
-}, setObject:function(a) {
-  for (var b in a) {
-    var c = "object" == typeof a[b] ? goog.json.serialize(a[b]) : a[b];
-    Ti.App.Properties.setString(prefix(b), c);
-  }
 }, set:function(a, b) {
   Ti.App.Properties.setString(prefix(a), b);
 }, remove:function(a) {
@@ -1437,7 +1412,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         var g = d._storage.getAll();
         !f && g && d._storage.set("data", g.data);
       }
-      d._storage.setObject(c);
+      session.set(d._storage, c);
       d.init_state = init_states.INIT_SUCCEEDED;
       c.data_parsed = c.data ? goog.json.parse(c.data) : null;
     }
@@ -1448,7 +1423,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     a(b, c && utils.whiteListSessionData(c));
   };
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var g = web_session.deprecated_read(d._storage) || d._storage.getAll();
+  var g = session.get(d._storage);
   if (g && g.session_id) {
     f(null, g, !1);
   } else {
@@ -1486,13 +1461,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  var b = utils.whiteListSessionData(this._storage.getAll());
+  var b = utils.whiteListSessionData(session.get(this._storage));
   b.referring_link = this._referringLink();
   a(null, b);
 });
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-    a(null, utils.whiteListSessionData(this._storage.getAll()));
+    a(null, utils.whiteListSessionData(session.get(this._storage)));
   });
 }
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {

@@ -38,10 +38,6 @@ var prefix = function(key) { return BRANCH_KEY_PREFIX + key; }
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
 
 var retrieveValue = function(value) {
-	if (typeof value == "object") {
-		try { value = goog.json.parse(value); }
-		catch (e) { }
-	}
 	if (value == "true") { return true; }
 	else if (value == "false") { return false; }
 	return value;
@@ -58,12 +54,6 @@ var webStorage = function(perm) {
 			return allKeyValues;
 		},
 		get: function(key) { return retrieveValue(storageMethod.getItem(prefix(key))); },
-		setObject:function(data) {
-			for (var key in data) {
-				var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
-				storageMethod.setItem(prefix(key), value);
-			}
-		},
 		set: function(key, value) { storageMethod.setItem(prefix(key), value); },
 		remove: function(key) { storageMethod.removeItem(prefix(key)); },
 		clear: function() { storageMethod.clear(); },
@@ -125,12 +115,6 @@ var cookies = function(perm) {
 		    }
 		    return null;
 		},
-		setObject:function(data) {
-			for (var key in data) {
-				var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
-				setCookie(prefix(key), value);
-			}
-		},
 		set: function(key, value) { setCookie(prefix(key), value); },
 		remove: function(key) {
 			var expires = "";
@@ -166,9 +150,6 @@ BranchStorage.prototype['permcookie'] = function() {
 BranchStorage.prototype['pojo'] = {
 	getAll: function() { return this._store; },
 	get: function(key) { return typeof this._store[key] != 'undefined' ? this._store[key] : null; },
-	setObject: function(object) {
-		this._store = utils.merge(this._store, object);
-	},
 	set: function(key, value) { this._store[key] = value; },
 	remove: function(key) { delete this._store[key]; },
 	clear: function() { this._store = { }; },
@@ -188,12 +169,6 @@ BranchStorage.prototype['titanium'] = {
 		return returnObject;
 	},
 	get: function(key) { retrieveValue(Ti.App.Properties.getString(prefix(key))); },
-	setObject:function(data) {
-		for (var key in data) {
-			var value = typeof data[key] == 'object' ? goog.json.serialize(data[key]) : data[key];
-			Ti.App.Properties.setString(prefix(key), value);
-		}
-	},
 	set: function(key, value) { Ti.App.Properties.setString(prefix(key), value); },
 	remove: function(key) { Ti.App.Properties.setString(prefix(key), ""); },
 	clear: function() {
