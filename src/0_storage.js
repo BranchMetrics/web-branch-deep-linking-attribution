@@ -38,8 +38,10 @@ var prefix = function(key) { return BRANCH_KEY_PREFIX + key; }
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
 
 var retrieveValue = function(value) {
-	try { return goog.json.parse(value) || value; }
-	catch (e) { }
+	if (typeof value == "object") {
+		try { value = goog.json.parse(value); }
+		catch (e) { }
+	}
 	if (value == "true") { return true; }
 	else if (value == "false") { return false; }
 	return value;

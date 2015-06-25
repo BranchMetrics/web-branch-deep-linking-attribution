@@ -806,9 +806,11 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
 }, trimPrefix = function(a) {
   return a.replace(BRANCH_KEY_PREFIX, "");
 }, retrieveValue = function(a) {
-  try {
-    return goog.json.parse(a) || a;
-  } catch (b) {
+  if ("object" == typeof a) {
+    try {
+      a = goog.json.parse(a);
+    } catch (b) {
+    }
   }
   return "true" == a ? !0 : "false" == a ? !1 : a;
 }, webStorage = function(a) {
