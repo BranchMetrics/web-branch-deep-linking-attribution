@@ -8,7 +8,6 @@ var onload = function() {
 		window.mochaResults.reports = failedTests;
 	});
 
-	runner.on('fail', logFailure);
 	var logFailure = function(test, err) {
 
 		var flattenTitles = function(test) {
@@ -26,4 +25,5 @@ var onload = function() {
 			stack: err.stack,
 			titles: flattenTitles(test) });
 	};
+	runner.on('fail', logFailure);
 };
