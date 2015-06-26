@@ -44,7 +44,7 @@ describe('Branch', function() {
 
 	function basicTests(call, params) {
 		it('should fail if branch not initialized', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(params.length * 1, done);
+			var branch = initBranch(false), assert = testUtils.plan(params.length * 1 + 1, done);
 
 			function basicTest(param) {
 				var p = testUtils.nulls(param);
@@ -244,7 +244,7 @@ describe('Branch', function() {
 			referring_identity: '12345'
 		};
 		it('should call api with identity', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
 
 			branch.setIdentity("test_identity", function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
@@ -424,7 +424,7 @@ describe('Branch', function() {
 		});
 
 		it('should create new link if a click_id does not exist', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
 			sandbox.stub(branch._storage, "get", function(key, storage) {
 				return null;
 			});
@@ -499,7 +499,7 @@ describe('Branch', function() {
 	describe('validateCode', function() {
 		basicTests('validateCode', [ 0 ]);
 		it('should call api with required params and options', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
 
 			var expectedResponse = 'AB12CD';
 
@@ -517,7 +517,7 @@ describe('Branch', function() {
 	describe('applyCode', function() {
 		basicTests('applyCode', [ 0 ]);
 		it('should call api with required params and options', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
 
 			var expectedResponse = 'AB12CD';
 
@@ -611,7 +611,7 @@ describe('Branch', function() {
 
 	describe('addListener', function() {
 		it('should add and remove an event listener to the branch object and fire', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(5, done);
+			var branch = initBranch(true), assert = testUtils.plan(7, done);
 			var listenerFired = 0;
 			var listener = function(event) {
 				assert.equal('test_event', event, 'recieved event equals triggered event');

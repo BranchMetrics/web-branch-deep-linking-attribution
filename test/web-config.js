@@ -15,3 +15,5 @@ window.CORDOVA_BUILD = false;
 
 /** @define {boolean} */
 window.TITANIUM_BUILD = false;
+
+window.DEBUG = false;
