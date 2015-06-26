@@ -1248,7 +1248,6 @@ if (WEB_BUILD) { // jshint undef:false
  *     tags: ['tag1', 'tag2'],
  *     feature: 'dashboard',
  *     stage: 'new user',
- *     type: 1,
  *     data: {
  *         mydata: 'something',
  *         foo: 'bar',
