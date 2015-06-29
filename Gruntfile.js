@@ -5,20 +5,19 @@ var safari_browsers = [
 			browserName: 'safari',
 			platform: 'OS X 10.10',
 			version: '8.0'
-		}/*,
+		},
 		{
 			browserName: 'safari',
 			platform: 'OS X 10.9',
 			version: '7.0'
-		}*/
+		}
 	],
-
 	chrome_browsers = [
 		{
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '42.0'
-		}/*,
+		},
 		{
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
@@ -43,7 +42,7 @@ var safari_browsers = [
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '37.0'
-		}*/
+		}
 	],
 
 	firefox_browsers = [
@@ -51,7 +50,7 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '37'
-		}/*,
+		},
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
@@ -76,7 +75,7 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '32'
-		}*/
+		}
 	],
 
 	ios_browsers = [
