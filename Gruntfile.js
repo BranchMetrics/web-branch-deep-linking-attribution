@@ -79,7 +79,7 @@ var safari_browsers = [
 	],
 
 	ios_browsers = [
-		/*{
+		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '8.2'
@@ -119,10 +119,10 @@ var safari_browsers = [
 			platform: 'OS X 10.10',
 			version: '5.1'
 		}
-	*/],
+	],
 
 	android_browsers = [
-		/*{
+		{
 			browserName: 'android',
 			platform: 'Linux',
 			version: '5.1'
@@ -156,7 +156,7 @@ var safari_browsers = [
 			browserName: 'android',
 			platform: 'Linux',
 			version: '4.0'
-		}*/
+		}
 	],
 
 	ie_browsers = [
@@ -217,5 +217,6 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-saucelabs');
 	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-browserstack-tunnel');
 	grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
 };

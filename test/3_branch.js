@@ -10,13 +10,15 @@ goog.require('goog.json'); // jshint unused:false
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
 describe('Branch', function() {
-	var storage = new BranchStorage(['session', 'pojo']),
+	var storage = new BranchStorage(['pojo']),
 		sandbox,
 		requests;
 
 	beforeEach(function() {
 		testUtils.go('');
 		sandbox = sinon.sandbox.create();
+		localStorage.clear();
+		sessionStorage.clear();
 		requests = [];
 	});
 
