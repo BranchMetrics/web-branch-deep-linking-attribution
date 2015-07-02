@@ -5,20 +5,19 @@ var safari_browsers = [
 			browserName: 'safari',
 			platform: 'OS X 10.10',
 			version: '8.0'
-		}/*,
+		},
 		{
 			browserName: 'safari',
 			platform: 'OS X 10.9',
 			version: '7.0'
-		}*/
+		}
 	],
-
 	chrome_browsers = [
 		{
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '42.0'
-		}/*,
+		},
 		{
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
@@ -43,7 +42,7 @@ var safari_browsers = [
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '37.0'
-		}*/
+		}
 	],
 
 	firefox_browsers = [
@@ -51,7 +50,7 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '37'
-		}/*,
+		},
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
@@ -76,11 +75,11 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '32'
-		}*/
+		}
 	],
 
 	ios_browsers = [
-		/*{
+		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '8.2'
@@ -120,10 +119,10 @@ var safari_browsers = [
 			platform: 'OS X 10.10',
 			version: '5.1'
 		}
-	*/],
+	],
 
 	android_browsers = [
-		/*{
+		{
 			browserName: 'android',
 			platform: 'Linux',
 			version: '5.1'
@@ -157,7 +156,7 @@ var safari_browsers = [
 			browserName: 'android',
 			platform: 'Linux',
 			version: '4.0'
-		}*/
+		}
 	],
 
 	ie_browsers = [
@@ -218,5 +217,6 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-saucelabs');
 	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-browserstack-tunnel');
 	grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
 };

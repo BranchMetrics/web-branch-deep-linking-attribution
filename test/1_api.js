@@ -307,7 +307,7 @@ describe('Server', function() {
 
 		describe('/v1/referrals', function() {
 			it('should pass in identity_id', function(done) {
-				var assert = testUtils.plan(3, done);
+				var assert = testUtils.plan(4, done);
 				server.request(resources.referrals, testUtils.params({ }), storage, assert.done);
 
 				assert.equal(requests.length, 1, 'Request made');
@@ -613,7 +613,7 @@ describe('Server', function() {
 
 		describe('/v1/creditHistory', function() {
 			it('should pass in branch_key and session_id', function(done) {
-				var assert = testUtils.plan(3, done);
+				var assert = testUtils.plan(4, done);
 
 				server.request(resources.creditHistory, testUtils.params(), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
