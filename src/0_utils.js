@@ -8,7 +8,7 @@ goog.require('goog.json');
 goog.require('config');
 
 /** @define {boolean} */
-var DEBUG = true; // window.DEBUG != undefined ? window.DEBUG : true;
+var DEBUG = true;
 
 /* jshint ignore:start */
 /** @typedef {string} */

@@ -24,5 +24,5 @@ session.get = function(storage) {
  * @param {Object} data
  */
 session.set = function(storage, data) {
-	storage.set('branch_session', goog.json.serialize(data)); // on iOS 8.2, goog.json.serialize is undefined
+	storage.set('branch_session', goog.json.serialize(data));
 }
