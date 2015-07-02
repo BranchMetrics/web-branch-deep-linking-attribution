@@ -1424,7 +1424,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   };
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var g = session.get(d._storage);
-  if (g && g.session_id) {
+  if (WEB_BUILD && g && g.session_id) {
     f(null, g, !1);
   } else {
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
