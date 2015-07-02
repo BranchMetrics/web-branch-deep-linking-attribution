@@ -303,13 +303,15 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
 	var sessionData = session.get(self._storage);
 
-	if (sessionData  && sessionData['session_id']) {
+
+	if (WEB_BUILD && sessionData  && sessionData['session_id']) {
 		finishInit(null, sessionData, false);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
 			var storedValues = self._storage.getAll();
 			var freshInstall = !storedValues || !storedValues['identity_id'];
+
 
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {

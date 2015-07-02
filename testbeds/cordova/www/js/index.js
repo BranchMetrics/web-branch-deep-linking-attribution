@@ -51,6 +51,8 @@ var app = {
         branch.init('key_live_hohBTjb6eJS9jou8Tl1kIhddokjfbXJF', { isReferrable: true }, function(err, data) {
         	app.initComplete(err, data);
         });
+        var statusEle = document.getElementById("status");
+        statusEle.innerHTML = "Resumed..."
     },
 
     initComplete: function(err, data) {
