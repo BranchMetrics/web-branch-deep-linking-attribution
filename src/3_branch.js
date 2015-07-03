@@ -285,6 +285,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			data = setBranchValues(data);
 			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 				var first = self._storage.getAll();
+				// I feel this check is wrong?
 				if (!install && first) { self._storage.set("data", first.data); }
 			}
 

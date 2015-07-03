@@ -125,6 +125,10 @@ if (WEB_BUILD) {
 		}
 	};
 
+}
+
+if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+
 	resources.close = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/close",
@@ -137,9 +141,7 @@ if (WEB_BUILD) {
 			"device_fingerprint_id": validator(true, branch_id)
 		}
 	};
-}
 
-if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 	resources.install = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/install",
