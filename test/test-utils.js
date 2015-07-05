@@ -477,6 +477,7 @@ window.branch_sample_key = 'key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS',
 window.session_id = '98807509250212101',
 window.identity_id = '98807509250212101',
 window.browser_fingerprint_id = '79336952217731267';
+window.device_fingerprint_id = '79336952217731267';
 
 // Fix for IE 9
 window.console = window.console || { log: function() { return arguments; } };

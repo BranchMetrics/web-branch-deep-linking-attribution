@@ -13,10 +13,6 @@ goog.require('session');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-if (CORDOVA_BUILD) {  // jshint undef:false
-	var cordovaExec = require("cordova/exec");
-}
-
 var default_branch;
 
 /**
@@ -321,11 +317,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				});
 			};
 			if (CORDOVA_BUILD) { // jshint undef:false
-				var args = [];
+				var args = [ ];
 				if (isReferrable !== null) {
 					args.push(isReferrable ? 1 : 0);
 				}
-				cordovaExec(apiCordovaTitanium,
+				cordova.require("cordova/exec")(apiCordovaTitanium,
 					function() { done("Error getting device data!") },
 					"BranchDevice",
 					freshInstall ? "getInstallData" : "getOpenData", args);

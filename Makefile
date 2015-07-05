@@ -13,10 +13,11 @@ VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/
 ONPAGE_RELEASE=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="https://cdn.branch.io/branch-v$(VERSION).min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../../dist/web/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/web/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
+ONPAGE_CORDOVA_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/cordova/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 
 .PHONY: clean
 
-all: dist/web/build.min.js dist/web/build.js README.md CORDOVA_GUIDE.md TITANIUM_GUIDE.md WEB_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz dist/titanium/build.js dist/titanium/build.min.js dist/web/build.min.js.gz test/integration-test.html
+all: dist/web/build.min.js dist/web/build.js README.md CORDOVA_GUIDE.md TITANIUM_GUIDE.md WEB_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/cordova/build.js dist/cordova/build.min.js dist/web/build.min.js.gz dist/titanium/build.js dist/titanium/build.min.js dist/web/build.min.js.gz test/integration-test.html test/cordova-integration-test.html
 clean:
 	rm -f dist/web/** dist/cordova/** dist/titanium/** docs/web/3_branch_web.md docs/cordova/3_branch_cordova.md README.md CORDOVA_GUIDE.md testbeds/web/example.html test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
 release: clean all dist/web/build.min.js.gz
@@ -117,3 +118,6 @@ TITANIUM_GUIDE.md: docs/0_notice.md docs/titanium/1_intro.md docs/titanium/3_bra
 
 test/integration-test.html: test/integration-test.template.html
 	perl -pe 'BEGIN{$$a="$(ONPAGE_TEST)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html
+
+test/cordova-integration-test.html: test/cordova-integration-test.template.html
+	perl -pe 'BEGIN{$$a="$(ONPAGE_CORDOVA_TEST)"}; s#// INSERT INIT CODE#$$a#' test/cordova-integration-test.template.html > test/cordova-integration-test.html

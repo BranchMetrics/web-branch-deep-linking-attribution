@@ -1310,7 +1310,7 @@ var sendSMS = function(a, b, c, d) {
 };
 // Input 13
 if (CORDOVA_BUILD) {
-  var cordovaExec = require("cordova/exec")
+  var cordovaExec = cordova.require("cordova/exec")
 }
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
@@ -1437,7 +1437,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       if (CORDOVA_BUILD) {
         var m = [];
         null !== b && m.push(b ? 1 : 0);
-        cordovaExec(g, function() {
+        cordova.require("cordova/exec")(g, function() {
           a("Error getting device data!");
         }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
       }
