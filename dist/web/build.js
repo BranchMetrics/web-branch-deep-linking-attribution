@@ -1309,9 +1309,6 @@ var sendSMS = function(a, b, c, d) {
   a._publishEvent("willNotShowBanner");
 };
 // Input 13
-if (CORDOVA_BUILD) {
-  var cordovaExec = cordova.require("cordova/exec")
-}
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
