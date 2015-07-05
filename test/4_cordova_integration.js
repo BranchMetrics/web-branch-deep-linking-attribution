@@ -178,8 +178,26 @@ describe('Integration tests', function() {
 		});
 	});
 
+	describe('first', function() {
+		it('should make two requests and return first session data', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(assert);
+			branch.first(function(err, data) {
+				assert.deepEqual(data,
+					{
+						data: null,
+						referring_identity: null,
+						identity: "Branch",
+						has_app: true,
+						referring_link: null
+					});
+			});
+			assert.equal(requests.length, 1);
+		});
+	});
+
 	describe('logout', function() {
-		it('should make three requests and logout session', function(done) {
+		it('should make two requests and logout session', function(done) {
 			var assert = testUtils.plan(4, done);
 			branchInit(assert);
 			branch.logout(function(err) {
@@ -189,6 +207,18 @@ describe('Integration tests', function() {
 			requests[1].respond(200,
 				{ "Content-Type": "application/json" },
 				'{"session_id":"124235352855552203","identity_id":' + identity_id + ',"link":"https://bnc.lt/i/4tLqIdk017"}');
+		});
+	});
+
+	describe('close', function() {
+		it('should make two requests and close session', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(assert);
+			branch.close(function(err) {
+				assert.equal(err, null);
+			});
+			assert.equal(requests.length, 2);
+			requests[1].respond(200);
 		});
 	});
 
@@ -245,6 +275,101 @@ describe('Integration tests', function() {
 			requests[1].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } }');
+		});
+	});
+
+	describe('redeem', function() {
+		it('should make two requests and return error if present', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(assert);
+			branch.redeem(5, "rubies", function(err, data) {
+				assert.deepEqual(data, null);
+			});
+			assert.equal(requests.length, 2);
+			requests[1].respond(200);
+		});
+	});
+
+	describe('getCode', function() {
+		it('should make two requests and return object literal with code', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(assert);
+			var codeRequested = {
+				"amount":10,
+				"bucket":"party",
+				"calculation_type":1,
+				"location":2
+			};
+			var expectedResponse = { "referral_code": "1234567" };
+			branch.getCode(codeRequested, function(err, data) {
+				assert.deepEqual(data, expectedResponse);
+			});
+			assert.equal(requests.length, 2);
+			requests[1].respond(200,
+				{ "Content-Type": "application/json" },
+				JSON.stringify(expectedResponse));
+		});
+	});
+
+	describe('validateCode', function() {
+		it('should make two requests and return object literal with code', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(assert);
+			var code = "1234567";
+			branch.validateCode(code, function(err, data) {
+				assert.deepEqual(data, null);
+			});
+			assert.equal(requests.length, 2);
+			requests[1].respond(200);
+		});
+	});
+
+	describe('applyCode', function() {
+		it('should make two requests and return object literal with code', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(assert);
+			var code = "1234567";
+			branch.applyCode(code, function(err, data) {
+				assert.deepEqual(data, null);
+			});
+			assert.equal(requests.length, 2);
+			requests[1].respond(200);
+		});
+	});
+
+	describe('creditHistory', function() {
+		it('should make two requests and return error if present', function(done) {
+			var assert = testUtils.plan(4, done);
+			branchInit(assert);
+			var expectedResponse = [{
+				"transaction": {
+					"date": "2014-10-14T01:54:40.425Z",
+					"id": "50388077461373184",
+					"bucket": "default",
+					"type": 0,
+					"amount": 5
+				},
+				"referrer": "12345678",
+				"referree": null
+				},
+				{
+				"transaction": {
+					"date": "2014-10-14T01:55:09.474Z",
+					"id": "50388199301710081",
+					"bucket": "default",
+					"type": 2,
+					"amount": -3
+				},
+				"referrer": null,
+				"referree": "12345678"
+			}];
+			branch.creditHistory(function(err, data) {
+				assert.deepEqual(data, expectedResponse);
+			});
+			assert.equal(requests.length, 2);
+			requests[1].respond(200,
+				{ "Content-Type": "application/json" },
+				JSON.stringify(expectedResponse));
 		});
 	});
 

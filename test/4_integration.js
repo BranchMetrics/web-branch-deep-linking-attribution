@@ -266,6 +266,42 @@ describe('Integration tests', function() {
 		});
 	});
 
+	describe('creditHistory', function() {
+		it('should make two requests and return error if present', function(done) {
+			var assert = testUtils.plan(6, done);
+			branchInit(assert);
+			var expectedResponse = [{
+				"transaction": {
+					"date": "2014-10-14T01:54:40.425Z",
+					"id": "50388077461373184",
+					"bucket": "default",
+					"type": 0,
+					"amount": 5
+				},
+				"referrer": "12345678",
+				"referree": null
+				},
+				{
+				"transaction": {
+					"date": "2014-10-14T01:55:09.474Z",
+					"id": "50388199301710081",
+					"bucket": "default",
+					"type": 2,
+					"amount": -3
+				},
+				"referrer": null,
+				"referree": "12345678"
+			}];
+			branch.creditHistory(function(err, data) {
+				assert.deepEqual(data, expectedResponse);
+			});
+			assert.equal(requests.length, 3);
+			requests[2].respond(200,
+				{ "Content-Type": "application/json" },
+				JSON.stringify(expectedResponse));
+		});
+	});
+
 	describe('sendSMS', function() {
 		it('should make five requests and return an empty object', function(done) {
 			var assert = testUtils.plan(8, done);
