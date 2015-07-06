@@ -10,7 +10,7 @@ goog.require('utils');
 
 var COOKIE_DAYS = 365;
 
-var BRANCH_KEY_PREFIX = 'branch_';
+var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 /** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
@@ -53,10 +53,7 @@ var webStorage = function(perm) {
 			var allKeyValues = null;
 			for (var key in storageMethod) {
 				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) {
-					// The first check depend on this being false. An empty object is not false
-					if (allKeyValues === null) {
-						allKeyValues = {};
-					}
+					if (allKeyValues === null) { allKeyValues = { }; }
 					allKeyValues[trimPrefix(key)] = retrieveValue(storageMethod.getItem(key));
 				}
 			}
@@ -66,11 +63,9 @@ var webStorage = function(perm) {
 		set: function(key, value) { storageMethod.setItem(prefix(key), value); },
 		remove: function(key) { storageMethod.removeItem(prefix(key)); },
 		clear: function() {
-		  Object.keys(storageMethod).forEach(function (item) {
-		    if (/branch_session/.test(item)) {
-		      storageMethod.removeItem(item);
-		    }
-		  });
+			Object.keys(storageMethod).forEach(function (item) {
+				if (item.indexOf(BRANCH_KEY_PREFIX) == 0) { storageMethod.removeItem(item); }
+			});
 		},
 		isEnabled: function () {
 			try {

@@ -280,14 +280,21 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		return data;
 	}
 
+	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var sessionData = session.get(self._storage);
+
 	var finishInit = function(err, data, install) {
 		if (data) {
 			data = setBranchValues(data);
+
+			// don't think we need this any more
+			/*
 			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 				var first = self._storage.getAll();
 				// I feel this check is wrong?
 				if (!install && first) { self._storage.set("data", first.data); }
 			}
+			*/
 
 			session.set(self._storage, data);
 
@@ -301,21 +308,17 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
-	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-	var sessionData = session.get(self._storage);
-
 	if (sessionData  && sessionData['session_id']) {
 		finishInit(null, sessionData, false);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-			var storedValues = self._storage.getAll();
-			var freshInstall = !storedValues || !storedValues['identity_id'];
+			var freshInstall = !sessionData || !sessionData['identity_id'];
 
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
-					data['identity_id'] = storedValues['identity_id'];
-					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+					data['identity_id'] = sessionData['identity_id'];
+					data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
 				}
 				self._api(freshInstall ? resources.install : resources.open, data, function(err, data) {
 					finishInit(err, data, freshInstall);
