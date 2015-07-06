@@ -1,4 +1,4 @@
-goog.require('cordova_config');
+goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
 /* globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
@@ -24,10 +24,7 @@ describe('Integration tests', function() {
 			}
 		};
 		clearCookies(true, true);
-		branch._storage._store = {
-			"TEMP": { },
-			"PERM": { }
-		};
+		branch._storage._store = { };
 	};
 
 	before(function() {
@@ -37,9 +34,12 @@ describe('Integration tests', function() {
 		sinon.stub(branch._server, "createScript", function(src) {
 			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 		});
-		sinon.stub(cordova, "require", function() {
-			return function() { arguments[0]({ }); }
-		});
+		if (window.CORDOVA_BUILD) {
+			sinon.stub(cordova, "require", function() {
+				return function() { arguments[0]({ }); }
+			});
+		}
+
 	});
 
 	beforeEach(function() {
@@ -75,20 +75,44 @@ describe('Integration tests', function() {
 		}
 	};
 
+	var indexOfLastInitRequest = function(requestsAfterInit) {
+		return requestsAfterInit + (window.CORDOVA_BUILD ? 0 : 1);
+	};
+
+	var numberOfAsserts = function(assertsAfterInit) {
+		return assertsAfterInit + (window.CORDOVA_BUILD ? 2 : 4);
+	};
+
 	var branchInit = function(assert, callback) {
-		branch.init(device_fingerprint_id, { isReferrable: true }, callback);
-		requests[0].respond(200,
-				{ "Content-Type": "application/json" },
-				'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":"79336952217731267", "browser_fingerprint_id":null, "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
-		if (assert) {
-			assert.equal(requests.length, 1);
-			assert.equal(requests[0].requestBody, 'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id);
+		branch.init.apply(branch, window.CORDOVA_BUILD ? [ device_fingerprint_id, { isReferrable: true }, callback ] : [ device_fingerprint_id, callback ]);
+		if (window.CORDOVA_BUILD) {
+			requests[0].respond(200,
+					{ "Content-Type": "application/json" },
+					'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":"79336952217731267", "browser_fingerprint_id":null, "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
+			if (assert) {
+				assert.equal(requests.length, 1);
+				assert.equal(requests[0].requestBody, 'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id);
+			}
+		}
+		else {
+			if (assert) {
+				assert.equal(requests.length, 1);
+				assert.equal(requests[0].src, 'https://bnc.lt/_r?sdk=web' + config.version + '&callback=branch_callback__' + jsonpCallback.toString());
+			}
+			requests[0].callback(browser_fingerprint_id);
+			requests[1].respond(200,
+					{ "Content-Type": "application/json" },
+					'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
+			if (assert) {
+				assert.equal(requests.length, 2);
+				assert.equal(requests[1].requestBody, 'identity_id=' + identity_id + '&is_referrable=1&sdk=web' + config.version + '&browser_fingerprint_id=' + browser_fingerprint_id + '&app_id=' + browser_fingerprint_id);
+			}
 		}
 	};
 
 	describe('init', function() {
 		it('should call api with params and version', function(done) {
-			var assert = testUtils.plan(3, done);
+			var assert = testUtils.plan(numberOfAsserts(1), done);
 			branchInit(assert, function(err, data) {
 				assert.deepEqual(data,
 					{
@@ -103,7 +127,7 @@ describe('Integration tests', function() {
 		});
 
 		it('should support being called without a callback', function(done) {
-			var assert = testUtils.plan(2, done);
+			var assert = testUtils.plan(numberOfAsserts(0), done);
 			branchInit(assert);
 		});
 
@@ -113,7 +137,7 @@ describe('Integration tests', function() {
 				jsonpCallback--;
 				assert.equal(err.message, 'Error in API: 400');
 			});
-			requests[0].respond(400);
+			requests[indexOfLastInitRequest(0)].respond(400);
 		});
 
 		it('should attempt 5xx error three times total', function(done) {
@@ -121,18 +145,18 @@ describe('Integration tests', function() {
 			branch.init(browser_fingerprint_id, function(err) {
 				assert.equal(err.message, 'Error in API: 500');
 			});
-			requests[0].respond(500);
+			requests[indexOfLastInitRequest(0)].respond(500);
 			clock.tick(250);
-			requests[1].respond(500);
+			requests[indexOfLastInitRequest(1)].respond(500);
 			clock.tick(250);
-			requests[2].respond(500);
+			requests[indexOfLastInitRequest(2)].respond(500);
 		});
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			var assert = testUtils.plan(1, done);
 			if (testUtils.go("#r:12345")) {
 				branchInit();
-				assert.equal(true, requests[1].requestBody.indexOf('link_identifier=12345') > -1);
+				assert.equal(true, requests[indexOfLastInitRequest(1)].requestBody.indexOf('link_identifier=12345') > -1);
 			} else { done(); }
 
 		});
@@ -153,8 +177,8 @@ describe('Integration tests', function() {
 					'Expected response returned'
 				);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ "identity_id":' + identity_id + ', "link_click_id":"114750153298026746", "link":"https://bnc.lt/i/4LYQTXE0_k" }');
 		});
@@ -162,7 +186,7 @@ describe('Integration tests', function() {
 
 	describe('data', function() {
 		it('should make two requests and return session data', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.data(function(err, data) {
 				assert.deepEqual(data,
@@ -174,13 +198,13 @@ describe('Integration tests', function() {
 						referring_link: null
 					});
 			});
-			assert.equal(requests.length, 1);
+			assert.equal(requests.length, indexOfLastInitRequest(1));
 		});
 	});
 
 	describe('first', function() {
 		it('should make two requests and return first session data', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.first(function(err, data) {
 				assert.deepEqual(data,
@@ -192,19 +216,19 @@ describe('Integration tests', function() {
 						referring_link: null
 					});
 			});
-			assert.equal(requests.length, 1);
+			assert.equal(requests.length, indexOfLastInitRequest(1));
 		});
 	});
 
 	describe('logout', function() {
 		it('should make two requests and logout session', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.logout(function(err) {
 				assert.equal(err, null);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				'{"session_id":"124235352855552203","identity_id":' + identity_id + ',"link":"https://bnc.lt/i/4tLqIdk017"}');
 		});
@@ -212,38 +236,38 @@ describe('Integration tests', function() {
 
 	describe('close', function() {
 		it('should make two requests and close session', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.close(function(err) {
 				assert.equal(err, null);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200);
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
 
 	describe('track', function() {
 		it('should make two requests and return undefined, no metadata', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.track('track', { }, function(err, data) {
 				assert.equal(data, undefined);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ }');
 		});
 
 		it('should make two requests and return undefined, with metadata', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			var testMetadata = { "test": "meta_data" };
 			branchInit(assert);
 			branch.track('track', testMetadata, function(err, data) {
 				assert.equal(data, undefined);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify(testMetadata));
 		});
@@ -251,13 +275,13 @@ describe('Integration tests', function() {
 
 	describe('link', function() {
 		it('should make three requests and return short link', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.link(sampleParams, function(err, data) {
 				assert.equal(data, "https://bnc.lt/l/4manXlk0AJ");
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }');
 		});
@@ -265,14 +289,14 @@ describe('Integration tests', function() {
 
 	describe('referrals', function() {
 		it('should make three requests and return referral data', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			var expectedResponse = { "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } };
 			branchInit(assert);
 			branch.referrals(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } }');
 		});
@@ -280,19 +304,19 @@ describe('Integration tests', function() {
 
 	describe('redeem', function() {
 		it('should make two requests and return error if present', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.redeem(5, "rubies", function(err, data) {
 				assert.deepEqual(data, null);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200);
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
 
 	describe('getCode', function() {
 		it('should make two requests and return object literal with code', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			var codeRequested = {
 				"amount":10,
@@ -304,8 +328,8 @@ describe('Integration tests', function() {
 			branch.getCode(codeRequested, function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify(expectedResponse));
 		});
@@ -313,33 +337,33 @@ describe('Integration tests', function() {
 
 	describe('validateCode', function() {
 		it('should make two requests and return object literal with code', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			var code = "1234567";
 			branch.validateCode(code, function(err, data) {
 				assert.deepEqual(data, null);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200);
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
 
 	describe('applyCode', function() {
 		it('should make two requests and return object literal with code', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			var code = "1234567";
 			branch.applyCode(code, function(err, data) {
 				assert.deepEqual(data, null);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200);
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
 
 	describe('creditHistory', function() {
 		it('should make two requests and return error if present', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			var expectedResponse = [{
 				"transaction": {
@@ -366,8 +390,8 @@ describe('Integration tests', function() {
 			branch.creditHistory(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify(expectedResponse));
 		});
@@ -375,14 +399,14 @@ describe('Integration tests', function() {
 
 	describe('credits', function() {
 		it('should make three requests and return credits', function(done) {
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(numberOfAsserts(2), done);
 			var expectedResponse = { "default":"0" };
 			branchInit(assert);
 			branch.credits(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, 2);
-			requests[1].respond(200,
+			assert.equal(requests.length, indexOfLastInitRequest(2));
+			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
 				'{ "default":"0" }');
 		});
