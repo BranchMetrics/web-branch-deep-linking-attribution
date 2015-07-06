@@ -36,7 +36,7 @@ describe('Integration tests', function() {
 				requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 			});
 		}
-		if (window.CORDOVA_BUILD && cordova) {
+		else if (window.CORDOVA_BUILD && cordova) {
 			sinon.stub(cordova, "require", function() {
 				return function() { arguments[0]({ }); }
 			});
@@ -58,7 +58,7 @@ describe('Integration tests', function() {
 
 	after(function() {
 		if (window.WEB_BUILD) { branch._server.createScript.restore(); }
-		if (window.CORDOVA_BUILD && cordova) { cordova.require.restore(); }
+		else if (window.CORDOVA_BUILD && cordova) { cordova.require.restore(); }
 		xhr.restore();
 		clock.restore();
 	});
