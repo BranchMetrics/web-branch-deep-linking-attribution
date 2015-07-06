@@ -50,16 +50,23 @@ var webStorage = function(perm) {
 	var storageMethod = perm ? localStorage : sessionStorage;
 	return {
 		getAll: function() {
-			var allKeyValues = { };
+			var allKeyValues = null;
 			for (var key in storageMethod) {
-				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) { allKeyValues[trimPrefix(key)] = retrieveValue(storageMethod.getItem(key)); }
+				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) {
+					if (allKeyValues === null) { allKeyValues = { }; }
+					allKeyValues[trimPrefix(key)] = retrieveValue(storageMethod.getItem(key));
+				}
 			}
 			return allKeyValues;
 		},
 		get: function(key) { return retrieveValue(storageMethod.getItem(prefix(key))); },
 		set: function(key, value) { storageMethod.setItem(prefix(key), value); },
 		remove: function(key) { storageMethod.removeItem(prefix(key)); },
-		clear: function() { storageMethod.clear(); },
+		clear: function() {
+			Object.keys(storageMethod).forEach(function (item) {
+				if (item.indexOf(BRANCH_KEY_PREFIX) == 0) { storageMethod.removeItem(item); }
+			});
+		},
 		isEnabled: function () {
 			try {
 				storageMethod.setItem("test", "");

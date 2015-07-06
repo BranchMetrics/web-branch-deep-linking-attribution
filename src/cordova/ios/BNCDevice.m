@@ -8,6 +8,10 @@
 
 static NSString *link_click_identifier = nil;
 
+- (void)pluginInitialize {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleOpenUrl:) name:CDVPluginHandleOpenURLNotification object:nil];
+}
+
 - (void)handleOpenUrl:(NSNotification *)notification {
     NSURL *url = [notification object];
     if (url) {
@@ -39,7 +43,7 @@ static NSString *link_click_identifier = nil;
 - (void)getInstallData:(CDVInvokedUrlCommand *)command {
     BOOL debug = [[command argumentAtIndex:0 withDefault:[NSNumber numberWithBool:NO]] boolValue];
     int isReferrable = [[command argumentAtIndex:0 withDefault:[NSNumber numberWithInt:-1]] intValue];
-    
+
     NSMutableDictionary *post = [[NSMutableDictionary alloc] init];
     BOOL isRealHardwareId;
     NSString *hardwareId = [BNCDevice getUniqueHardwareId:&isRealHardwareId andIsDebug:debug];
@@ -74,16 +78,16 @@ static NSString *link_click_identifier = nil;
     } else {
         [post setObject:[NSNumber numberWithInt:isReferrable] forKey:@"is_referrable"];
     }
-    
+
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:post];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void)getOpenData:(CDVInvokedUrlCommand *)command {
     int isReferrable = [[command argumentAtIndex:0 withDefault:[NSNumber numberWithInt:-1]] intValue];
-    
+
     NSMutableDictionary *post = [[NSMutableDictionary alloc] init];
-    
+
     NSString *appVersion = [BNCDevice getAppVersion];
     if (appVersion) [post setObject:appVersion forKey:@"app_version"];
     if ([BNCDevice getOS]) [post setObject:[BNCDevice getOS] forKey:@"os"];
@@ -98,7 +102,7 @@ static NSString *link_click_identifier = nil;
         [post setObject:[NSNumber numberWithInt:isReferrable] forKey:@"is_referrable"];
     }
     if (link_click_identifier) [post setObject:link_click_identifier forKey:@"link_identifier"];
-    
+
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:post];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
@@ -107,7 +111,7 @@ static NSString *link_click_identifier = nil;
 + (NSString *)getUniqueHardwareId:(BOOL *)isReal andIsDebug:(BOOL)debug {
     NSString *uid = nil;
     *isReal = YES;
-    
+
     Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
     if (ASIdentifierManagerClass && !debug) {
         SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
@@ -116,16 +120,16 @@ static NSString *link_click_identifier = nil;
         NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
         uid = [uuid UUIDString];
     }
-    
+
     if (!uid && NSClassFromString(@"UIDevice")) {
         uid = [[UIDevice currentDevice].identifierForVendor UUIDString];
     }
-    
+
     if (!uid) {
         uid = [[NSUUID UUID] UUIDString];
         *isReal = NO;
     }
-    
+
     return uid;
 }
 
@@ -166,19 +170,19 @@ static NSString *link_click_identifier = nil;
 
 + (NSString *)getCarrier {
     NSString *carrierName = nil;
-    
+
     Class CTTelephonyNetworkInfoClass = NSClassFromString(@"CTTelephonyNetworkInfo");
     if (CTTelephonyNetworkInfoClass) {
         id networkInfo = [[CTTelephonyNetworkInfoClass alloc] init];
         SEL subscriberCellularProviderSelector = NSSelectorFromString(@"subscriberCellularProvider");
-        
+
         id carrier = ((id (*)(id, SEL))[networkInfo methodForSelector:subscriberCellularProviderSelector])(networkInfo, subscriberCellularProviderSelector);
         if (carrier) {
             SEL carrierNameSelector = NSSelectorFromString(@"carrierName");
             carrierName = ((NSString* (*)(id, SEL))[carrier methodForSelector:carrierNameSelector])(carrier, carrierNameSelector);
         }
     }
-    
+
     return carrierName;
 }
 
@@ -189,7 +193,7 @@ static NSString *link_click_identifier = nil;
 + (NSString *)getModel {
     struct utsname systemInfo;
     uname(&systemInfo);
-    
+
     return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
 }
 
@@ -213,17 +217,17 @@ static NSString *link_click_identifier = nil;
     NSString *storedAppVersion = [defs objectForKey:@"bnc_app_version"];
     NSString *currentAppVersion = [BNCDevice getAppVersion];
     NSFileManager *manager = [NSFileManager defaultManager];
-    
+
     // for creation date
     NSURL *documentsDirRoot = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
     NSDictionary *documentsDirAttributes = [manager attributesOfItemAtPath:documentsDirRoot.path error:nil];
     int appCreationDay = (int)([[documentsDirAttributes fileCreationDate] timeIntervalSince1970]/(60*60*24));
-    
+
     // for modification date
     NSString *bundleRoot = [[NSBundle mainBundle] bundlePath];
     NSDictionary *bundleAttributes = [manager attributesOfItemAtPath:bundleRoot error:nil];
     int appModificationDay = (int)([[bundleAttributes fileModificationDate] timeIntervalSince1970]/(60*60*24));
-    
+
     if (!storedAppVersion) {
         if (updateState) {
             [defs setValue:currentAppVersion forKey:@"bnc_app_version"];
