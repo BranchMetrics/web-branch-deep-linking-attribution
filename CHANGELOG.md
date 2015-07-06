@@ -3,6 +3,7 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+- Fixes undefined function `a.L()` with minified build in `addListener()` method
 
 ## [v1.6.0] - 2015-07-06
 - Fixes mobile saucelab tests and issue with silent failures

@@ -21,8 +21,8 @@
   + [.redeem()](#redeemamount-bucket-callback)
 
 5. Event Listener
-  + [.addListener()](#addlistener)
-  + [.removeListener()](#removelistener)
+  + [.addListener()](#addlistenerevent-listener)
+  + [.removeListener()](#removelistenerlistener)
 
 6. Smart Banner
   + [.banner()](#banneroptions-data)

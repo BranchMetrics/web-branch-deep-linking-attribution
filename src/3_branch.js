@@ -163,8 +163,8 @@ Branch.prototype._referringLink = function() {
  */
 Branch.prototype._publishEvent = function(event) {
 	this._listeners.forEach(function(subscription) {
-		if ((subscription.event && subscription.event == event) || !subscription.event) {
-			subscription.listener(event);
+		if ((subscription["event"] && subscription["event"] == event) || !subscription["event"]) {
+			subscription["listener"](event);
 		}
 	});
 };
@@ -1161,7 +1161,7 @@ if (WEB_BUILD) { // jshint undef:false
  *
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
-/*** +TOC_ITEM #addlistener &.addListener()& ^WEB ***/
+/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
 		if (typeof event == "function" && listener == undefined) { listener = event; }
 		if (listener) {
@@ -1179,11 +1179,11 @@ if (WEB_BUILD) { // jshint undef:false
  * Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
  *
  */
-/*** +TOC_ITEM #removelistener &.removeListener()& ^WEB ***/
+/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
 	Branch.prototype['removeListener'] = function(listener) {
 		if (listener) {
 			this._listeners = this._listeners.filter(function(subscription) {
-				if (subscription.listener !== listener) { return subscription; }
+				if (subscription["listener"] !== listener) { return subscription; }
 			});
 		}
 	};
