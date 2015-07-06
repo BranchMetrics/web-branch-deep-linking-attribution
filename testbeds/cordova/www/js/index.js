@@ -58,6 +58,8 @@ var app = {
         branch.init(app.branch_key, { isReferrable: true }, function(err, data) {
             app.initComplete(err, data);
         });
+        var statusEle = document.getElementById("status");
+        statusEle.innerHTML = "Resumed..."
     },
 
     initComplete: function(err, data) {

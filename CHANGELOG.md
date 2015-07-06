@@ -4,6 +4,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 - Fixes mobile saucelab tests and issue with silent failures
+- Fixes issue with Cordova SDK not loading previous session if present
 
 ## [v1.5.8] - 2015-06-25
 - Fixes bug with JSON parsing from stored session
