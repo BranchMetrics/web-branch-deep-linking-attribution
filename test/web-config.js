@@ -5,7 +5,7 @@ goog.provide('config');
 
 config.link_service_endpoint = 'https://bnc.lt';
 config.api_endpoint = 'https://api.branch.io';
-config.version = '1.5.8';
+config.version = '1.6.0';
 
 /** @define {boolean} */
 window.WEB_BUILD = true;
