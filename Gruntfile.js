@@ -183,14 +183,14 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'],
+					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html', 'http://127.0.0.1:9999/test/cordova-integration-test.html'],
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
 					build: grunt.file.readJSON('package.json')["build"],
 					pollInterval: 2000,         // (ms) Note: pollInterval * statusCheckAttempts should = 'max-duration'
-					statusCheckAttempts: 180,   // So if you change one of these, adjust 'max-duration' accordingly
-					'max-duration': 360,        // (s)
+					statusCheckAttempts: 360,   // So if you change one of these, adjust 'max-duration' accordingly
+					'max-duration': 720,        // (s)
 					testname: 'Web SDK Tests',
 					browsers: safari_browsers.concat(chrome_browsers,
 						firefox_browsers,

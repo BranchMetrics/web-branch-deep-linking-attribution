@@ -2,6 +2,7 @@ goog.require('utils');
 goog.require('Server');
 goog.require('resources');
 goog.require('storage');
+goog.require('config');
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
@@ -134,7 +135,7 @@ describe('Server', function() {
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
 				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&is_referrable=1&sdk=web0.0.0&browser_fingerprint_id=" + browser_fingerprint_id + "&branch_key=" + branch_sample_key, 'Data correct');
+				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&is_referrable=1&sdk=web" + config.version + "&browser_fingerprint_id=" + browser_fingerprint_id + "&branch_key=" + branch_sample_key, 'Data correct');
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 			});
 
@@ -173,7 +174,7 @@ describe('Server', function() {
 				var assert = testUtils.plan(2, done);
 				server.request(resources.open, testUtils.params({ "app_id": "5680621892404085", "is_referrable": 1 }, [ 'branch_key' ]), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&is_referrable=1&sdk=web0.0.0&browser_fingerprint_id=" + browser_fingerprint_id + "&app_id=" + "5680621892404085", 'Data correct');
+				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&is_referrable=1&sdk=web" + config.version + "&browser_fingerprint_id=" + browser_fingerprint_id + "&app_id=" + "5680621892404085", 'Data correct');
 			});
 
 			it('should fail without browser_fingerprint_id', function(done) {
@@ -218,7 +219,7 @@ describe('Server', function() {
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].url, 'https://api.branch.io/v1/profile', 'Endpoint correct');
 				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&identity=test_id&session_id=" + session_id + "&sdk=web0.0.0&branch_key=" + branch_sample_key);
+				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&identity=test_id&session_id=" + session_id + "&sdk=web" + config.version + "&branch_key=" + branch_sample_key);
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 			});
@@ -270,7 +271,7 @@ describe('Server', function() {
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].url, 'https://api.branch.io/v1/logout', 'Endpoint correct');
 				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(requests[0].requestBody, "session_id=" + session_id + "&identity_id=" + identity_id + "&sdk=web0.0.0&branch_key=" + branch_sample_key);
+				assert.equal(requests[0].requestBody, "session_id=" + session_id + "&identity_id=" + identity_id + "&sdk=web" + config.version + "&branch_key=" + branch_sample_key);
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 			});
@@ -311,7 +312,7 @@ describe('Server', function() {
 				server.request(resources.referrals, testUtils.params({ }), storage, assert.done);
 
 				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].url, 'https://api.branch.io/v1/referrals/' + identity_id + '?session_id=' + session_id + "&identity_id=" + identity_id + "&sdk=web0.0.0", 'Endpoint correct');
+				assert.equal(requests[0].url, 'https://api.branch.io/v1/referrals/' + identity_id + '?session_id=' + session_id + "&identity_id=" + identity_id + "&sdk=web" + config.version, 'Endpoint correct');
 				assert.equal(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
@@ -322,7 +323,7 @@ describe('Server', function() {
 				storage['set']('use_jsonp', true, "session");
 				server.request(resources.referrals, testUtils.params({ }), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].src, 'https://api.branch.io/v1/referrals/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web0.0.0&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
+				assert.equal(requests[0].src, 'https://api.branch.io/v1/referrals/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web' + config.version + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 				requests[0].callback();
 			});
 
@@ -341,7 +342,7 @@ describe('Server', function() {
 				server.request(resources.credits, testUtils.params({ }), storage, assert.done);
 
 				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].url, 'https://api.branch.io/v1/credits/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web0.0.0', 'Endpoint correct');
+				assert.equal(requests[0].url, 'https://api.branch.io/v1/credits/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web' + config.version, 'Endpoint correct');
 				assert.equal(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
@@ -352,7 +353,7 @@ describe('Server', function() {
 				storage['set']('use_jsonp', true, "session");
 				server.request(resources.credits, testUtils.params({ }), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].src, 'https://api.branch.io/v1/credits/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web0.0.0&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
+				assert.equal(requests[0].src, 'https://api.branch.io/v1/credits/' + identity_id + '?session_id=' + session_id + '&identity_id=' + identity_id + '&sdk=web' + config.version + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 				requests[0].callback();
 			});
 
@@ -371,7 +372,7 @@ describe('Server', function() {
 				var assert = testUtils.plan(3, done);
 				server.request(resources._r, testUtils.params(), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].src, 'https://bnc.lt/_r?sdk=web0.0.0&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
+				assert.equal(requests[0].src, 'https://bnc.lt/_r?sdk=web' + config.version + '&callback=branch_callback__' + (server._jsonp_callback_index - 1), 'Endpoint correct');
 				requests[0].callback();
 			});
 
@@ -393,8 +394,8 @@ describe('Server', function() {
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].url, 'https://api.branch.io/v1/redeem', 'Endpoint correct');
 				assert.equal(requests[0].method, 'POST', 'Method correct');
-				// "identity_id=98807509250212101&amount=1&bucket=testbucket&session_id=98807509250212101&sdk=web0.0.0&branch_key=key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS"
-				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&amount=1&bucket=testbucket&session_id=" + session_id + "&sdk=web0.0.0&branch_key=" + branch_sample_key);
+				// "identity_id=98807509250212101&amount=1&bucket=testbucket&session_id=98807509250212101&sdk=web" + config.version + "&branch_key=key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS"
+				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&amount=1&bucket=testbucket&session_id=" + session_id + "&sdk=web" + config.version + "&branch_key=" + branch_sample_key);
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 			});
@@ -456,7 +457,7 @@ describe('Server', function() {
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].url, 'https://api.branch.io/v1/url', 'Endpoint correct');
 				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&session_id=" + session_id + "&sdk=web0.0.0&branch_key=" + branch_sample_key);
+				assert.equal(requests[0].requestBody, "identity_id=" + identity_id + "&session_id=" + session_id + "&sdk=web" + config.version + "&branch_key=" + branch_sample_key);
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 			});
@@ -551,7 +552,7 @@ describe('Server', function() {
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(requests[0].url, 'https://api.branch.io/v1/event', 'Endpoint correct');
 				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(requests[0].requestBody, "event=testevent" + metadataString + "&session_id=" + session_id + "&identity_id=" + identity_id + "&sdk=web0.0.0&branch_key=" + branch_sample_key);
+				assert.equal(requests[0].requestBody, "event=testevent" + metadataString + "&session_id=" + session_id + "&identity_id=" + identity_id + "&sdk=web" + config.version + "&branch_key=" + branch_sample_key);
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '{ "session_id": 123 }');
 			});
@@ -617,7 +618,7 @@ describe('Server', function() {
 
 				server.request(resources.creditHistory, testUtils.params(), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].url, "https://api.branch.io/v1/credithistory?session_id=" + session_id + "&identity_id=" + identity_id + "&sdk=web0.0.0&branch_key=" + branch_sample_key, 'Endpoint correct');
+				assert.equal(requests[0].url, "https://api.branch.io/v1/credithistory?session_id=" + session_id + "&identity_id=" + identity_id + "&sdk=web" + config.version + "&branch_key=" + branch_sample_key, 'Endpoint correct');
 				assert.equal(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(200, { "Content-Type": "application/json" }, '[{"transaction":{"id":"63317099967152399","bucket":"default","type":0,"amount":5,"date":"2014-11-18T18:09:59.600Z"},"event":{"name":"web session start","metadata":{}},"referrer":"Branch","referree":null}]');

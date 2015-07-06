@@ -56,6 +56,7 @@ describe('Integration tests', function() {
 
 	after(function() {
 		branch._server.createScript.restore();
+		if (window.CORDOVA_BUILD) { cordova.require.restore(); }
 		xhr.restore();
 		clock.restore();
 	});

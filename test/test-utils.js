@@ -491,7 +491,7 @@ testUtils.params = function(extra, without) {
 		session_id: session_id,
 		identity_id: identity_id,
 		browser_fingerprint_id: browser_fingerprint_id,
-		sdk: 'web0.0.0'
+		sdk: window.sdk_version
 	}, extra || {});
 	for (var k = 0; k < (without || []).length; k++) {
 		delete p[without[k]];

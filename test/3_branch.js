@@ -14,6 +14,8 @@ describe('Branch', function() {
 		sandbox,
 		requests;
 
+	window.sdk_version = "web" + config.version;
+
 	beforeEach(function() {
 		testUtils.go('');
 		sandbox = sinon.sandbox.create();
@@ -91,7 +93,7 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "sdk": "web0.0.0", branch_key: branch_sample_key }, 'Request params to _r correct');
+			assert.deepEqual(requests[0].obj, { "sdk": "web" + config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
@@ -127,7 +129,7 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "sdk": "web0.0.0", branch_key: branch_sample_key }, 'Request params to _r correct');
+			assert.deepEqual(requests[0].obj, { "sdk": "web" + config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
@@ -276,7 +278,7 @@ describe('Branch', function() {
 				},
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
-				"sdk": "web0.0.0"
+				"sdk": "web" + config.version
 			};
 			expectedRequest.identity_id = identity_id;
 
@@ -303,7 +305,7 @@ describe('Branch', function() {
 				},
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
-				"sdk": "web0.0.0"
+				"sdk": "web" + config.version
 			};
 			expectedRequest.identity_id = identity_id;
 
@@ -345,7 +347,7 @@ describe('Branch', function() {
 					'$og_description': 'Branch Metrics',
 					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 				},
-				"sdk": "web0.0.0"
+				"sdk": "web" + config.version
 			});
 			if (desktop_url_append) {
 				val['data']['$desktop_url'] += desktop_url_append;
