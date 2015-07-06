@@ -31,9 +31,11 @@ describe('Integration tests', function() {
 		xhr = sinon.useFakeXMLHttpRequest();
 		clock = sinon.useFakeTimers();
 		xhr.onCreate = function(xhr) { requests.push(xhr); };
-		sinon.stub(branch._server, "createScript", function(src) {
-			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
-		});
+		if (window.WEB_BUILD) {
+			sinon.stub(branch._server, "createScript", function(src) {
+				requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
+			});
+		}
 		if (window.CORDOVA_BUILD) {
 			sinon.stub(cordova, "require", function() {
 				return function() { arguments[0]({ }); }
@@ -55,7 +57,7 @@ describe('Integration tests', function() {
 	});
 
 	after(function() {
-		branch._server.createScript.restore();
+		if (window.WEB_BUILD) { branch._server.createScript.restore(); }
 		if (window.CORDOVA_BUILD) { cordova.require.restore(); }
 		xhr.restore();
 		clock.restore();
