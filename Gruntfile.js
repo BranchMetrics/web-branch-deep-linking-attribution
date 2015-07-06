@@ -27,7 +27,7 @@ var safari_browsers = [
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '40.0'
-		},
+		}/*,
 		{
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
@@ -42,7 +42,7 @@ var safari_browsers = [
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '37.0'
-		}
+		}*/
 	],
 
 	firefox_browsers = [
@@ -60,7 +60,7 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '35'
-		},
+		}/*,
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
@@ -75,7 +75,7 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '32'
-		}
+		}*/
 	],
 
 	ios_browsers = [
@@ -103,7 +103,7 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '7.0'
-		},
+		}/*,
 		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
@@ -118,7 +118,7 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '5.1'
-		}
+		}*/
 	],
 
 	android_browsers = [
