@@ -282,16 +282,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	var finishInit = function(err, data, install) {
 		if (data) {
 			data = setBranchValues(data);
-
-			// don't think we need this any more
-			/*
-			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-				var first = self._storage.getAll();
-				// I feel this check is wrong?
-				if (!install && first) { self._storage.set("data", first.data); }
-			}
-			*/
-
 			session.set(self._storage, data);
 
 			self.init_state = init_states.INIT_SUCCEEDED;
