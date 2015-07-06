@@ -15,6 +15,8 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" src/0_config.js
+	sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" test/web-config.js
+	sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" test/cordova-config.js
 fi
 
 read -p "Update package.json? " -n 1 -r

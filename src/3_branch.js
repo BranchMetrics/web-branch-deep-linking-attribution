@@ -13,10 +13,6 @@ goog.require('session');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-if (CORDOVA_BUILD) {  // jshint undef:false
-	var cordovaExec = require("cordova/exec");
-}
-
 var default_branch;
 
 /**
@@ -280,14 +276,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		return data;
 	}
 
+	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
+	var sessionData = session.get(self._storage);
+
 	var finishInit = function(err, data, install) {
 		if (data) {
 			data = setBranchValues(data);
-			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-				var first = self._storage.getAll();
-				if (!install && first) { self._storage.set("data", first.data); }
-			}
-
 			session.set(self._storage, data);
 
 			self.init_state = init_states.INIT_SUCCEEDED;
@@ -300,32 +294,29 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
-	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-	var sessionData = session.get(self._storage);
-
-	if (sessionData  && sessionData['session_id']) {
+	if (WEB_BUILD && sessionData  && sessionData['session_id']) {
 		finishInit(null, sessionData, false);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-			var storedValues = self._storage.getAll();
-			var freshInstall = !storedValues || !storedValues['identity_id'];
+			var freshInstall = !sessionData || !sessionData['identity_id'];
+
 
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
-					data['identity_id'] = storedValues['identity_id'];
-					data['device_fingerprint_id'] = storedValues['device_fingerprint_id'];
+					data['identity_id'] = sessionData['identity_id'];
+					data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
 				}
 				self._api(freshInstall ? resources.install : resources.open, data, function(err, data) {
 					finishInit(err, data, freshInstall);
 				});
 			};
 			if (CORDOVA_BUILD) { // jshint undef:false
-				var args = [];
+				var args = [ ];
 				if (isReferrable !== null) {
 					args.push(isReferrable ? 1 : 0);
 				}
-				cordovaExec(apiCordovaTitanium,
+				cordova.require("cordova/exec")(apiCordovaTitanium,
 					function() { done("Error getting device data!") },
 					"BranchDevice",
 					freshInstall ? "getInstallData" : "getOpenData", args);
