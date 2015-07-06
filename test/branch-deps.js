@@ -22,7 +22,7 @@ goog.addDependency("../../../../../test/1_api.js", [], ['utils', 'Server', 'reso
 goog.addDependency("../../../../../test/3_branch.js", [], ['utils', 'Branch', 'resources', 'config', 'storage', 'session', 'goog.json']);
 goog.addDependency("../../../../../test/4_cordova_integration.js", [], ['config', 'goog.json']);
 goog.addDependency("../../../../../test/4_integration.js", [], ['config', 'goog.json']);
-goog.addDependency("../../../../../test/cordova-config.js", ['cordova_config'], []);
+goog.addDependency("../../../../../test/cordova-config.js", ['config'], []);
 goog.addDependency("../../../../../test/saucelabs.js", [], []);
 goog.addDependency("../../../../../test/test-utils.js", [], []);
 goog.addDependency("../../../../../test/web-config.js", ['config'], []);
