@@ -5,6 +5,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ## [VERSION] - unreleased
 - Fixes undefined function `a.L()` with minified build in `addListener()` method
 
+## [v1.6.1] - 2015-07-07
+- Fixed an issue with certain requests not working in IE10 and IE11
+
 ## [v1.6.0] - 2015-07-06
 - Fixes mobile saucelab tests and issue with silent failures
 - Fixes issue with Cordova SDK not loading previous session if present

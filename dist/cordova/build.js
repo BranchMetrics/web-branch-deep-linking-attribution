@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.0"}, WEB_BUILD = !1, CORDOVA_BUILD = !0, TITANIUM_BUILD = !1;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.1"}, WEB_BUILD = !1, CORDOVA_BUILD = !0, TITANIUM_BUILD = !1;
 // Input 2
 var Queue = function() {
   var a = [], b = function() {
@@ -1042,7 +1042,6 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  f.timeout = 5E3;
   f.ontimeout = function() {
     e(Error(utils.messages.timeout), null, 504);
   };

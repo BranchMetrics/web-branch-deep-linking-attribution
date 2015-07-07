@@ -142,7 +142,6 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 	var req = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
-	req.timeout = 5000;
 	req.ontimeout = function() {
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
