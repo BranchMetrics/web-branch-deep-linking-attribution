@@ -8,9 +8,10 @@
  */
 
 (function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
-	if (!root[branchStr] || (root[branchStr] && !root[branchStr]._q)) {
+	if (!root[branchStr]) {
+		root[branchStr] = branchSdk;
 		while (i < funcs.length) {
-			createCallback(branchSdk, funcs[i++]);
+			createCallback(root[branchStr], funcs[i++]);
 		}
 
 		scriptTag = doc.createElement(scriptStr);
@@ -18,9 +19,8 @@
 		scriptTag.src = 'SCRIPT_URL_HERE';
 		firstScript = doc.getElementsByTagName(scriptStr)[0];
 		firstScript.parentNode.insertBefore(scriptTag, firstScript);
-
-		root[branchStr] = branchSdk;
 	}
+	else { console.log("Branch is already embedded" ); }
 })(window, document, 'script', 'branch', function(branch, name) {
 	branch[name] = function() {
 		branch._q.push([ name, arguments ]);
