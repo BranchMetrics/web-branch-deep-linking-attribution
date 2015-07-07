@@ -8,7 +8,7 @@
  */
 
 (function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
-	if (!root[branchStr] || !root[branchStr]._q) {
+	if (!root[branchStr] || (root[branchStr] && !root[branchStr]._q)) {
 		while (i < funcs.length) {
 			createCallback(branchSdk, funcs[i++]);
 		}
