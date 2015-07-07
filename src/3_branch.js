@@ -80,6 +80,9 @@ var wrap = function(parameters, func, init) {
 					return done(new Error(utils.message(utils.messages.nonInit)), null);
 				}
 			}
+			else if (init && self.init_state != init_states.NO_INIT) {
+				return done(new Error(utils.message(utils.messages.existingInit)), null);
+			}
 			args.unshift(done);
 			func.apply(self, args);
 		});
