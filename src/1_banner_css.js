@@ -47,7 +47,7 @@ banner_css.mobile =
 	'#branch-banner { position: absolute; }\n' +
 	'#branch-banner-close { margin-top: 22px; }\n' +
 	'#branch-banner .content .left { position: absolute; right: 100px; left: 4px; height: 63px; float: left; }\n' +
-	'#branch-banner .content .right { width: 100px; margin-top: -22px; right: 4px; top: 50%; position: absolute; height: 24px; float: right; }\n' +
+	'#branch-banner .content .right { width: 150px; margin-top: -22px; right: 20px; top: 50%; position: absolute; height: 24px; float: right; }\n' +
 	'#branch-banner .content .left .details .title { font-size: 12px; }\n' +
 	'#branch-banner .content .left .details { padding-right: 6px; left: 88px; position: absolute; }\n' +
 	'#branch-banner a { text-decoration: none; }\n' +
