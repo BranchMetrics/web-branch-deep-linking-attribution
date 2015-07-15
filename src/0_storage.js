@@ -36,7 +36,7 @@ if (TITANIUM_BUILD) {
 };
 
 var prefix = function(key) {
-	return key = key == "branch_session" ? key : BRANCH_KEY_PREFIX + key;
+	return key = key == "branch_session" || key == "branch_session_first" ? key : BRANCH_KEY_PREFIX + key;
 }
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
 

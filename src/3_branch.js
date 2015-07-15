@@ -240,6 +240,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 /*** +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
 	var self = this;
+
 	self.init_state = init_states.INIT_PENDING;
 
 	if (utils.isKey(branch_key)) {
@@ -274,15 +275,18 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
 		}
 		return data;
-	}
+	},
 
-	var isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null;
-	var sessionData = session.get(self._storage);
+	isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null,
+	sessionData = session.get(self._storage),
+	url = (options && typeof options.url != 'undefined' && options.url != null) ? options.url : null,
+	link_identifier = WEB_BUILD ? (utils.getParamValue('_branch_match_id') || utils.hashValue('r')) : (url ? utils.getParamValue(url) : null),
+	freshInstall = !sessionData || !sessionData['identity_id'],
 
-	var finishInit = function(err, data, install) {
+	finishInit = function(err, data) {
 		if (data) {
 			data = setBranchValues(data);
-			session.set(self._storage, data);
+			session.set(self._storage, data, freshInstall); // make session.set accept a 3rd arg which stores a copy of the session in first install
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
@@ -294,13 +298,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
-	if (WEB_BUILD && sessionData  && sessionData['session_id']) {
-		finishInit(null, sessionData, false);
+	// Pick up here
+	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (link_identifier === sessionData['sessionData'] || link_identifier === sessionData['click_id'])) {
+		finishInit(null, sessionData);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-			var freshInstall = !sessionData || !sessionData['identity_id'];
-
 
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
@@ -308,7 +311,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
 				}
 				self._api(freshInstall ? resources.install : resources.open, data, function(err, data) {
-					finishInit(err, data, freshInstall);
+					finishInit(err, data);
 				});
 			};
 			if (CORDOVA_BUILD) { // jshint undef:false
@@ -322,11 +325,9 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					freshInstall ? "getInstallData" : "getOpenData", args);
 			}
 			if (TITANIUM_BUILD) { // jshint undef:false
-				var branchTitaniumSDK = require('io.branch.sdk');
-				var link_identifier, data, url =
-					(options && typeof options.url != 'undefined' && options.url != null) ? options.url : null;
-				if (url) { link_identifier = utils.getParamValue(url); }
-				if (data && link_identifier) { data['link_identifier'] = link_identifier; }
+				var data,
+					branchTitaniumSDK = require('io.branch.sdk');
+				if (link_identifier) { data['link_identifier'] = link_identifier; }
 				if (freshInstall) {
 					data = (isReferrable == null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
 				}
@@ -338,16 +339,15 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		}
 
 		if (WEB_BUILD) { // jshint undef:false
-			var link_identifier = utils.getParamValue('_branch_match_id') || utils.hashValue('r');
 			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
-				if (err) { return finishInit(err, null, false); }
+				if (err) { return finishInit(err, null); }
 				self._api(resources.open, {
 					"link_identifier": link_identifier,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
 					if (data && link_identifier) { data['click_id'] = link_identifier; }
-					finishInit(err, data, false);
+					finishInit(err, data);
 				});
 			});
 		}
@@ -373,8 +373,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	done(null, data);
 });
 
-if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-/** =CORDOVA
+/**
  * @function Branch.first
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -388,11 +387,10 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
  * ___
  *
  */
- 	/*** +TOC_ITEM #firstcallback &.first()& ^CORDOVA ***/
-	Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-		done(null, utils.whiteListSessionData(session.get(this._storage)));
-	});
-}
+/*** +TOC_ITEM #firstcallback &.first()& ^ALL ***/
+Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	done(null, utils.whiteListSessionData(session.get(this._storage, true)));
+});
 
 /**
  * @function Branch.setIdentity

@@ -36,7 +36,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.6.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data addListener removeListener setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.6.1.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data first addListener removeListener setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -80,6 +80,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 1. Branch Session
   + [.init()](#initbranch_key-options-callback)
   + [.data()](#datacallback)
+  + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
 
@@ -182,6 +183,23 @@ after `Branch.init` has been called if you need the session information at a
 later point.
 If the Branch session has already been initialized, the callback will return
 immediately, otherwise, it will return once Branch has been initialized.
+___
+
+
+
+### first(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_ - callback to read the session data.
+
+Returns the same session information and any referring data, as
+`Branch.init` did when the app was first installed. This is meant to be called
+after `Branch.init` has been called if you need the first session information at a
+later point.
+If the Branch session has already been initialized, the callback will return
+immediately, otherwise, it will return once Branch has been initialized.
+
 ___
 
 
