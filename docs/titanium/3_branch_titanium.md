@@ -296,7 +296,6 @@ branch.link({
     channel: 'facebook',
     feature: 'dashboard',
     stage: 'new user',
-    type: 1,
     data: {
         mydata: 'something',
         foo: 'bar',
@@ -374,7 +373,6 @@ branch.sendSMS(
         channel: 'facebook',
         feature: 'dashboard',
         stage: 'new user',
-        type: 1,
         data: {
             mydata: 'something',
             foo: 'bar',

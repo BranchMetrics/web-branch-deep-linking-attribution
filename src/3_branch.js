@@ -620,7 +620,6 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *     channel: 'facebook',
  *     feature: 'dashboard',
  *     stage: 'new user',
- *     type: 1,
  *     data: {
  *         mydata: 'something',
  *         foo: 'bar',
@@ -700,7 +699,6 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *         channel: 'facebook',
  *         feature: 'dashboard',
  *         stage: 'new user',
- *         type: 1,
  *         data: {
  *             mydata: 'something',
  *             foo: 'bar',
@@ -1268,8 +1266,8 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  */
- 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
- 	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
+	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
+	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }
 		var bannerOptions = {
