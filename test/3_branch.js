@@ -328,6 +328,28 @@ describe('Branch', function() {
 			requests[0].callback();
 			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
 		});
+
+		it('should overwrite existing session_id, sessionLink, and identity_id\'s', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(6, done);
+			branch.logout(function(err) {
+				assert(!err, 'No error');
+			});
+
+			assert.equal(requests.length, 1, 'Request made');
+
+			var original_session_id = branch.session_id,
+				original_identity_id = branch.identity_id,
+				original_link = branch.sessionLink;
+			var new_session_id = "new_session",
+				new_identity_id = "new_id",
+				new_link = "new_link";
+
+			requests[0].callback(null, { "identity_id": new_identity_id, "session_id": new_session_id, "link": new_link });
+			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.equal(branch.session_id, new_session_id, "branch session was replaced");
+			assert.equal(branch.identity_id, new_identity_id, "branch identity was replaced");
+			assert.equal(branch.sessionLink, new_link, "link was replaced");
+		});
 	});
 
 	describe('link', function() {

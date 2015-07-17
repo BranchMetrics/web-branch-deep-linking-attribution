@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.1"}, WEB_BUILD = !1, CORDOVA_BUILD = !0, TITANIUM_BUILD = !1;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.2"}, WEB_BUILD = !1, CORDOVA_BUILD = !0, TITANIUM_BUILD = !1;
 // Input 2
 var Queue = function() {
   var a = [], b = function() {
@@ -1462,6 +1462,7 @@ Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = this;
   this._api(resources.profile, {identity:b}, function(b, e) {
+    b && a(b);
     e = e || {};
     c.identity_id = e.identity_id.toString();
     c.sessionLink = e.link;
@@ -1471,7 +1472,17 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
   });
 });
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
-  this._api(resources.logout, {}, a);
+  var b = this;
+  this._api(resources.logout, {}, function(c, d) {
+    c && a(c);
+    d = d || {};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link};
+    b.sessionLink = d.link;
+    b.session_id = d.session_id;
+    b.identity_id = d.identity_id;
+    session.set(b._storage, d);
+    a(c);
+  });
 });
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {

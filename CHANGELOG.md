@@ -7,6 +7,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Adds the `.first()` method to the Web SDK, from Titanium and Cordova
 - Fixes the Titanium and Cordova `.first()` methods
 
+## [v1.6.2] - 2015-07-17
+- Fixes an issue that failed to logout sessions
+
 ## [v1.6.1] - 2015-07-07
 - Fixed an issue with certain requests not working in IE10 and IE11
 
