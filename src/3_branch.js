@@ -470,7 +470,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	this._api(resources.logout, { }, function(err, data) {
 		if (err) { done(err); }
 
-		var data = {
+		data = {
 			"data_parsed": null,
 			"data": null,
 			"referring_link": null,
