@@ -1387,9 +1387,9 @@ Branch.prototype._referringLink = function() {
   return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
 };
 Branch.prototype._publishEvent = function(a) {
-  this._listeners.forEach(function(b) {
-    (b.event && b.event == a || !b.event) && b.listener(a);
-  });
+  for (var b = 0;b < this._listeners.length;b++) {
+    this._listeners[b].event && this._listeners[b].event != a || this._listeners[b].listener(a);
+  }
 };
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.setDebug = function(a) {
