@@ -2,7 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.6.2] - 2015-07-17
+- Fixes an issue that failed to logout sessions
 
 ## [v1.6.1] - 2015-07-07
 - Fixed an issue with certain requests not working in IE10 and IE11
