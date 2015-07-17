@@ -431,6 +431,8 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
+		if (err) { done(err); }
+
 		data = data || { };
 		self.identity_id = data['identity_id'].toString();
 		self.sessionLink = data['link'];
@@ -464,7 +466,27 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
  */
 /*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
-	this._api(resources.logout, { }, done);
+	var self = this;
+	this._api(resources.logout, { }, function(err, data) {
+		if (err) { done(err); }
+
+		var data = {
+			"data_parsed": null,
+			"data": null,
+			"referring_link": null,
+			"click_id": null,
+			"link_click_id": null,
+			"session_id": data.session_id,
+			"identity_id": data.identity_id,
+			"link": data.link
+		};
+		self.sessionLink = data.link;
+		self.session_id = data.session_id;
+		self.identity_id = data.identity_id;
+		session.set(self._storage, data);
+
+		done(err);
+	});
 });
 
 
