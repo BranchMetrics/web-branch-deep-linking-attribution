@@ -1,10 +1,8 @@
 1. Branch Session
   + [.init()](#initbranch_key-options-callback)
   + [.data()](#datacallback)
-  + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
-  + [.close()](#closecallback)
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)
