@@ -10,18 +10,18 @@ goog.require('storage'); // jshint unused:false
  */
 banner_html.banner = function(options, action) {
 	return '<div class="content">' +
+		'<div class="right vertically-align-middle">' +
+			action +
+		'</div>' +
 		'<div class="left">' +
 			 (!options.disableHide ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
 			'<div class="icon">' +
 				'<img src="' + options.icon + '">' +
 			'</div>' +
-			'<div class="details">' +
+			'<div class="details vertically-align-middle">' +
 				'<div class="title">' + options.title + '</div>' +
 				'<div class="description">' + options.description + '</div>' +
 			'</div>' +
-		'</div>' +
-		'<div class="right" id="branch-banner-action">' +
-			action +
 		'</div>' +
 	'</div>';
 };
@@ -109,7 +109,7 @@ banner_html.div = function(options, action) {
  * @param {storage} storage
  */
 banner_html.markup = function(options, storage) {
-	var action = '<div id="branch-sms-form-container">' +
+	var action = '<div id="branch-sms-form-container" class="vertically-align-middle">' +
 		(utils.mobileUserAgent() ? banner_html.mobileAction(options, storage) : banner_html.desktopAction(options)) +
 	'</div>';
 
