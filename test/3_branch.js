@@ -173,10 +173,11 @@ describe('Branch', function() {
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			if (testUtils.go("#r:12345")) {
-				var branch = initBranch(false), assert = testUtils.plan(2, done);
+				var branch = initBranch(false), assert = testUtils.plan(3, done);
 
 				branch.init(branch_sample_key, function(err, data) {
-					assert.equal(utils.readStore(branch._storage).click_id, '12345', 'click_id from link_identifier hash stored in session_id');
+					assert.equal('12345', JSON.parse(localStorage.getItem('branch_session_first')).click_id, 'hash session_id stored in local storage');
+					assert.equal('12345', JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'hash session_id saved in session storage');
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
@@ -197,7 +198,8 @@ describe('Branch', function() {
 				var branch = initBranch(false), assert = testUtils.plan(2, done);
 
 				branch.init(branch_sample_key, function(err, data) {
-					assert.equal(utils.readStore(branch._storage).click_id, '67890', 'click_id from link_identifier get param stored in session_id');
+					assert.equal('67890', JSON.parse(localStorage.getItem('branch_session_first')).click_id, 'get param match id stored in local storage');
+					assert.equal('67890', JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'get param match id saved in session storage');
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
