@@ -137,7 +137,6 @@ describe('Integration tests', function() {
 		it('should return error to callback', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				jsonpCallback--;
 				assert.equal(err.message, 'Error in API: 400');
 			});
 			if (window.CORDOVA_BUILD) { requests[indexOfLastInitRequest(0)].respond(400); }
@@ -159,10 +158,10 @@ describe('Integration tests', function() {
 			}
 			requests[request_count].respond(500);
 			clock.tick(250);
-			request_count++
+			request_count++;
 			requests[request_count].respond(500);
 			clock.tick(250);
-			request_count++
+			request_count++;
 			requests[request_count].respond(500);
 		});
 
@@ -170,7 +169,7 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(1, done);
 			if (testUtils.go("#r:12345")) {
 				branchInit();
-				assert.equal(true, requests[indexOfLastInitRequest(1)].requestBody.indexOf('link_identifier=12345') > -1);
+				assert.equal(true, requests[indexOfLastInitRequest(0)].requestBody.indexOf('link_identifier=12345') > -1);
 			} else { done(); }
 
 		});
