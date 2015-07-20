@@ -77,6 +77,23 @@ ___
 
 
 
+### first(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_ - callback to read the session data.
+
+Returns the same session information and any referring data, as
+`Branch.init` did when the app was first installed. This is meant to be called
+after `Branch.init` has been called if you need the first session information at a
+later point.
+If the Branch session has already been initialized, the callback will return
+immediately, otherwise, it will return once Branch has been initialized.
+
+___
+
+
+
 ### setIdentity(identity, callback) 
 
 **Parameters**

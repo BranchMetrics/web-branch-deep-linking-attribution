@@ -93,6 +93,20 @@ utils.cleanLinkData = function(linkData, config) {
 };
 
 /**
+ * @param {String} link
+ */
+utils.clickIdFromLink = function(link) {
+	return link ? link.substring(link.lastIndexOf('/') + 1, link.length) : null;
+}
+
+/**
+ * @param {String} link
+ */
+utils.processReferringLink = function(link) {
+	return link ? link.substring(0, 4) != 'http' ? 'https://bnc.lt' + link : link : null;
+}
+
+/**
  * @param {Object} to
  * @param {Object} from
  */

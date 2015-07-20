@@ -3,6 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+- Fixed an issue that only loaded the first link click data the user ever clicked on
+- Adds the `.first()` method to the Web SDK, from Titanium and Cordova
+- Fixes the Titanium and Cordova `.first()` methods
 
 ## [v1.6.2] - 2015-07-17
 - Fixes an issue that failed to logout sessions
