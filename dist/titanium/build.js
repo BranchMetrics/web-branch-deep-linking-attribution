@@ -719,13 +719,13 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 // Input 4
 var session = {get:function(a, b) {
   try {
-    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session")) || null;
+    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
   } catch (c) {
     return null;
   }
 }, set:function(a, b, c) {
   a.set("branch_session", goog.json.serialize(b));
-  c && a.set("branch_session_first", goog.json.serialize(b));
+  c && a.set("branch_session_first", goog.json.serialize(b), !0);
 }};
 // Input 5
 var utils = {}, DEBUG = !0, message;
@@ -823,10 +823,10 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
       0 == d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
     }
     return a;
-  }, get:function(a) {
-    return retrieveValue(b.getItem(prefix(a)));
-  }, set:function(a, d) {
-    b.setItem(prefix(a), d);
+  }, get:function(a, d) {
+    return retrieveValue(d ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
+  }, set:function(a, d, e) {
+    e ? localStorage.setItem(prefix(a), d) : b.setItem(prefix(a), d);
   }, remove:function(a) {
     b.removeItem(prefix(a));
   }, clear:function() {

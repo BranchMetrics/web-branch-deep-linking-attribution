@@ -59,8 +59,8 @@ var webStorage = function(perm) {
 			}
 			return allKeyValues;
 		},
-		get: function(key) { return retrieveValue(storageMethod.getItem(prefix(key))); },
-		set: function(key, value) { storageMethod.setItem(prefix(key), value); },
+		get: function(key, perm_override) { return retrieveValue(perm_override ? localStorage.getItem(prefix(key)) : storageMethod.getItem(prefix(key))); },
+		set: function(key, value, perm_override) { perm_override ? localStorage.setItem(prefix(key), value) : storageMethod.setItem(prefix(key), value); },
 		remove: function(key) { storageMethod.removeItem(prefix(key)); },
 		clear: function() {
 			Object.keys(storageMethod).forEach(function (item) {
