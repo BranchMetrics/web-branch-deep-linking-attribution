@@ -170,7 +170,10 @@ describe('Integration tests', function() {
 			if (testUtils.go("#r:12345")) {
 				branchInit();
 				assert.equal(true, requests[indexOfLastInitRequest(0)].requestBody.indexOf('link_identifier=12345') > -1);
-			} else { done(); }
+			} else {
+				jsonpCallback--;
+				done();
+			}
 
 		});
 	});

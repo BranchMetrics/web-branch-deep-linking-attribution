@@ -177,7 +177,7 @@ describe('Branch', function() {
 
 				branch.init(branch_sample_key, function(err, data) {
 					assert.equal('12345', JSON.parse(localStorage.getItem('branch_session_first')).click_id, 'hash session_id stored in local storage');
-					assert.equal('12345', JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'hash session_id saved in session storage');
+					assert.equal('12345', utils.mobileUserAgent() ? '12345' : JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'hash session_id saved in session storage');
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
@@ -199,7 +199,7 @@ describe('Branch', function() {
 
 				branch.init(branch_sample_key, function(err, data) {
 					assert.equal('67890', JSON.parse(localStorage.getItem('branch_session_first')).click_id, 'get param match id stored in local storage');
-					assert.equal('67890', JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'get param match id saved in session storage');
+					assert.equal('67890', utils.mobileUserAgent() ? '67890' : JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'get param match id saved in session storage');
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
