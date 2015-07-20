@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.2"}, WEB_BUILD = !1, CORDOVA_BUILD = !1, TITANIUM_BUILD = !0;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.3"}, WEB_BUILD = !1, CORDOVA_BUILD = !1, TITANIUM_BUILD = !0;
 // Input 2
 var Queue = function() {
   var a = [], b = function() {
