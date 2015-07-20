@@ -753,6 +753,12 @@ utils.cleanLinkData = function(a, b) {
   a.data = goog.json.serialize(a.data || {});
   return a;
 };
+utils.clickIdFromLink = function(a) {
+  return a ? a.substring(a.lastIndexOf("/") + 1, a.length) : null;
+};
+utils.processReferringLink = function(a) {
+  return a ? "http" != a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
+};
 utils.merge = function(a, b) {
   for (var c in b) {
     b.hasOwnProperty(c) && (a[c] = b[c]);
@@ -1398,8 +1404,8 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     a.session_id && (d.session_id = a.session_id.toString());
     a.identity_id && (d.identity_id = a.identity_id.toString());
     a.link && (d.sessionLink = a.link);
-    a.referring_link && (a.referring_link = "http" != a.referring_link.substring(0, 4) ? "https://bnc.lt" + a.referring_link : a.referring_link);
-    !a.click_id && a.referring_link && (a.click_id = a.referring_link.substring(a.referring_link.lastIndexOf("/") + 1, a.referring_link.length));
+    a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
+    !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
       d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
     }
@@ -1416,7 +1422,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
   };
-  if (WEB_BUILD && f && f.session_id && (g === f.sessionData || g === f.click_id)) {
+  if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
     h(null, f);
   } else {
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -1434,10 +1440,10 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         }, "BranchDevice", k ? "getInstallData" : "getOpenData", l);
       }
       if (TITANIUM_BUILD) {
-        var m, l = require("io.branch.sdk");
-        g && (m.link_identifier = g);
-        m = k ? null == b ? l.getInstallData(d.debug, -1) : l.getInstallData(d.debug, b ? 1 : 0) : null == b ? l.getOpenData(-1) : l.getOpenData(b ? 1 : 0);
-        c(m);
+        var l = {}, m = require("io.branch.sdk");
+        g && (l.link_identifier = g);
+        l = k ? null == b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null == b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
+        c(l);
       }
     }
     WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {

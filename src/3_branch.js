@@ -261,13 +261,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
 		if (data['link']) { self.sessionLink = data['link']; }
 
-		// Double check that this works, second conditional would have never been called as an `else if`
 		if (data['referring_link']) {
-			data['referring_link'] = data['referring_link'].substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
+			data['referring_link'] = utils.processReferringLink(data['referring_link']); //.substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
-		// used to be an `else if` that would have never been called
+
 		if (!data['click_id'] && data['referring_link']) {
-			data['click_id'] = data['referring_link'].substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
+			data['click_id'] = utils.clickIdFromLink(data['referring_link']); // .substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
 		}
 
 		if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
@@ -286,7 +285,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	finishInit = function(err, data) {
 		if (data) {
 			data = setBranchValues(data);
-			session.set(self._storage, data, freshInstall); // make session.set accept a 3rd arg which stores a copy of the session in first install
+			session.set(self._storage, data, freshInstall);
 
 			self.init_state = init_states.INIT_SUCCEEDED;
 			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
@@ -298,8 +297,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
-	// Pick up here
-	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (link_identifier === sessionData['sessionData'] || link_identifier === sessionData['click_id'])) {
+	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
 		finishInit(null, sessionData);
 	}
 	else {
@@ -325,7 +323,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					freshInstall ? "getInstallData" : "getOpenData", args);
 			}
 			if (TITANIUM_BUILD) { // jshint undef:false
-				var data,
+				var data = { },
 					branchTitaniumSDK = require('io.branch.sdk');
 				if (link_identifier) { data['link_identifier'] = link_identifier; }
 				if (freshInstall) {
