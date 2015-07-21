@@ -523,8 +523,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
-      g[h - 2] = arguments[h];
+    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
+      g[k - 2] = arguments[k];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.3"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
 // Input 2
 var Queue = function() {
   var a = [], b = function() {
@@ -717,14 +717,15 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 4
-var session = {get:function(a) {
+var session = {get:function(a, b) {
   try {
-    return goog.json.parse(a.get("branch_session")) || null;
-  } catch (b) {
+    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
+  } catch (c) {
     return null;
   }
-}, set:function(a, b) {
+}, set:function(a, b, c) {
   a.set("branch_session", goog.json.serialize(b));
+  c && a.set("branch_session_first", goog.json.serialize(b), !0);
 }};
 // Input 5
 var utils = {}, DEBUG = !0, message;
@@ -751,6 +752,12 @@ utils.cleanLinkData = function(a, b) {
   WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
   a.data = goog.json.serialize(a.data || {});
   return a;
+};
+utils.clickIdFromLink = function(a) {
+  return a ? a.substring(a.lastIndexOf("/") + 1, a.length) : null;
+};
+utils.processReferringLink = function(a) {
+  return a ? "http" != a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
 };
 utils.merge = function(a, b) {
   for (var c in b) {
@@ -782,14 +789,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
     ;
   }
   return b;
@@ -803,7 +810,7 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
     }
   }
 }, prefix = function(a) {
-  return "branch_session" == a ? a : BRANCH_KEY_PREFIX + a;
+  return "branch_session" == a || "branch_session_first" == a ? a : BRANCH_KEY_PREFIX + a;
 }, trimPrefix = function(a) {
   return a.replace(BRANCH_KEY_PREFIX, "");
 }, retrieveValue = function(a) {
@@ -816,10 +823,10 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
       0 == d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
     }
     return a;
-  }, get:function(a) {
-    return retrieveValue(b.getItem(prefix(a)));
-  }, set:function(a, d) {
-    b.setItem(prefix(a), d);
+  }, get:function(a, d) {
+    return retrieveValue(d ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
+  }, set:function(a, d, e) {
+    e ? localStorage.setItem(prefix(a), d) : b.setItem(prefix(a), d);
   }, remove:function(a) {
     b.removeItem(prefix(a));
   }, clear:function() {
@@ -937,7 +944,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, h = function() {
+    }, k = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -949,11 +956,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * h();
+      return a * k();
     }, vmin:function(a) {
-      return a * Math.min(h(), g());
+      return a * Math.min(k(), g());
     }, vmax:function(a) {
-      return a * Math.max(h(), g());
+      return a * Math.max(k(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * f;
     }}[b](f), 10);
@@ -1081,16 +1088,16 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(f.error));
   }
-  var g, h = "";
-  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
-  var k = RETRIES, m = function(a, b, c) {
-    a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
-      l();
+  var g, k = "";
+  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
+  var h = RETRIES, l = function(a, b, c) {
+    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+      m();
     }, RETRY_DELAY)) : d(a, b);
-  }, l = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, m) : e.XHRRequest(g, h, a.method, c, m);
+  }, m = function() {
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
   };
-  l();
+  m();
 };
 // Input 9
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
@@ -1167,10 +1174,10 @@ resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method
 // Input 10
 var banner_css = {banner:function(a) {
   return ".branch-banner-is-active { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
-  1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + "; background: rgba(255, 255, 255, 0.95); color: #333; " + ("top" == a.position ? "border-bottom" : "border-top") + ': 1px solid #ddd; padding: 6px; }\n#branch-banner .icon { float: left; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .details { top: 50%; transform: translateY(-50%); float: left; position: absolute; left: 92px; }\n#branch-banner .details > * { display: block; }\n#branch-banner .right > div { float: right; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
-}, desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 24px; top: 14px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .left, .right { width: 47%;  top: 0; float: left; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-block { display: inline-block; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 145px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; display: inline-block; margin-top: -18px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n", 
-nonie:"#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n", ie:"#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n", mobile:"#branch-banner { position: absolute; }\n#branch-banner-close { margin-top: 22px; }\n#branch-banner .content .left { position: absolute; right: 100px; left: 4px; height: 63px; float: left; }\n#branch-banner .content .right { width: 100px; margin-top: -22px; right: 4px; top: 50%; position: absolute; height: 24px; float: right; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-banner .content .left .details { padding-right: 6px; left: 88px; position: absolute; }\n#branch-banner a { text-decoration: none; }\n#branch-mobile-action { top: 7px; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n", 
-ios:"#branch-banner-close { margin-left: 4px; }\n#branch-mobile-action { top: 7px; }\n#branch-banner a { color: #428bca; }\n", android:"#branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px; border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; }\n#branch-mobile-action { top: 2px; text-decoration:none; border-bottom: 3px solid #A4C639; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n"};
+  1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + "; background: rgba(255, 255, 255, 0.95); color: #333; " + ("top" == a.position ? "border-bottom" : "border-top") + ': 1px solid #ddd; }\n#branch-banner .icon { float: left; padding-bottom: 40px; }\n#branch-banner .content .left { padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n#branch-banner .details > * { display: block; }\n#branch-banner .content .left { height: 63px; }\n#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; padding-top: 6px; z-index: 1; }\n#branch-banner .right > div { float: left; padding-top: 3px; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
+}, desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 24px; top: 14px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-block { display: inline-block; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 145px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; display: inline-block; margin-top: -18px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n", 
+nonie:"#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n", ie:"#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n", mobile:"#branch-banner { position: absolute; }\n#branch-banner-close { margin-top: 22px; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-banner a { text-decoration: none; }\n#branch-mobile-action { white-space: nowrap; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n@media only screen and (min-device-width: 320px) and (max-device-width: 350px) { #branch-banner .content .right { max-width: 120px; } }\n@media only screen and (min-device-width: 351px) and (max-device-width: 400px) and (orientation: landscape) { #branch-banner .content .right { max-width: 150px; } }\n@media only screen and (min-device-width: 401px) and (max-device-width: 480px) and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n", 
+ios:"#branch-banner-close { margin-left: 4px; }\n#branch-banner a { color: #428bca; }\n", android:"#branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px; border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; }\n#branch-mobile-action { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n"};
 banner_css.iframe = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + banner_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n";
 banner_css.inneriframe = "body { margin: 0; }\n";
 banner_css.iframe_position = function(a, b) {
@@ -1190,7 +1197,7 @@ banner_css.css = function(a, b) {
 };
 // Input 11
 var banner_html = {banner:function(a, b) {
-  return'<div class="content"><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details"><div class="title">' + a.title + '</div><div class="description">' + a.description + '</div></div></div><div class="right" id="branch-banner-action">' + b + "</div></div>";
+  return'<div class="content"><div class="right vertically-align-middle">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + '</div><div class="description">' + a.description + "</div></div></div></div>";
 }, mobileAction:function(a, b) {
   return'<a id="branch-mobile-action" href="#" target="_parent">' + (b.get("has_app") ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
@@ -1218,33 +1225,33 @@ var banner_html = {banner:function(a, b) {
   document.body.appendChild(c);
   return c;
 }, markup:function(a, b) {
-  var c = '<div id="branch-sms-form-container">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
+  var c = '<div id="branch-sms-form-container" class="vertically-align-middle">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
 }};
 // Input 12
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, m = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, l = function() {
-    k = a.createElement("div");
-    k.className = "branch-icon-wrapper";
-    k.id = "branch-checkmark";
-    k.style = "opacity: 0;";
-    k.innerHTML = banner_html.checkmark();
-    h.appendChild(k);
+  }, m = function() {
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      k.style.opacity = "1";
+      h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
-    m();
+    l();
     f.style.background = "#FFD4D4";
     e.className = "error";
     setTimeout(function() {
@@ -1255,9 +1262,9 @@ var sendSMS = function(a, b, c, d) {
   if (e) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), l(), setTimeout(function() {
-        h.removeChild(k);
-        m();
+      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+        k.removeChild(h);
+        l();
       }, banner_utils.success_timeout));
     })) : n();
   }
@@ -1279,20 +1286,20 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, l = f.getElementById("branch-banner-close"), n = function(a) {
+    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
         a();
       }, banner_utils.animationSpeed + banner_utils.animationDelay);
       setTimeout(function() {
-        "top" == b.position ? document.body.style.marginTop = h : "bottom" == b.position && (document.body.style.marginBottom = m);
+        "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = l);
         banner_utils.removeClass(document.body, "branch-banner-is-active");
       }, banner_utils.animationDelay);
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
       "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
     };
-    l && (l.onclick = function(b) {
+    m && (m.onclick = function(b) {
       b.preventDefault();
       a._publishEvent("willCloseBanner");
       n(function() {
@@ -1300,7 +1307,7 @@ var sendSMS = function(a, b, c, d) {
       });
     });
     banner_utils.addClass(document.body, "branch-banner-is-active");
-    "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
+    "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
     setTimeout(function() {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
       a._publishEvent("didShowBanner");
@@ -1319,7 +1326,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var k = function(b, c) {
+      var h = function(b, c) {
         if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
@@ -1328,16 +1335,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state == init_states.INIT_PENDING) {
-          return k(Error(utils.message(utils.messages.initPending)), null);
+          return h(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state == init_states.INIT_FAILED) {
-          return k(Error(utils.message(utils.messages.initFailed)), null);
+          return h(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state == init_states.NO_INIT || !d.init_state) {
-          return k(Error(utils.message(utils.messages.nonInit)), null);
+          return h(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(k);
+      e.unshift(h);
       b.apply(d, e);
     });
   };
@@ -1397,56 +1404,57 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     a.session_id && (d.session_id = a.session_id.toString());
     a.identity_id && (d.identity_id = a.identity_id.toString());
     a.link && (d.sessionLink = a.link);
-    a.referring_link && (a.referring_link = "http" != a.referring_link.substring(0, 4) ? "https://bnc.lt" + a.referring_link : a.referring_link);
-    !a.click_id && a.referring_link && (a.click_id = a.referring_link.substring(a.referring_link.lastIndexOf("/") + 1, a.referring_link.length));
+    a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
+    !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
       d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
     }
     return a;
   };
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var f = session.get(d._storage), g = function(b, c, f) {
-    c && (c = e(c), session.set(d._storage, c), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+  var f = session.get(d._storage);
+  c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
+  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(b, c) {
+    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     d.keepAlive && setTimeout(function() {
       d.keepAlive = !1;
     }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
   };
-  if (WEB_BUILD && f && f.session_id) {
-    g(null, f, !1);
+  if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
+    h(null, f);
   } else {
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      var h = !f || !f.identity_id, k = function(a) {
-        h || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
-        d._api(h ? resources.install : resources.open, a, function(a, b) {
-          g(a, b, h);
+      c = function(a) {
+        k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
+        d._api(k ? resources.install : resources.open, a, function(a, b) {
+          h(a, b);
         });
       };
       if (CORDOVA_BUILD) {
-        var m = [];
-        null !== b && m.push(b ? 1 : 0);
-        cordova.require("cordova/exec")(k, function() {
+        var l = [];
+        null !== b && l.push(b ? 1 : 0);
+        cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
-        }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
+        }, "BranchDevice", k ? "getInstallData" : "getOpenData", l);
       }
       if (TITANIUM_BUILD) {
-        var m = require("io.branch.sdk"), l, n;
-        (c = c && "undefined" != typeof c.url && null != c.url ? c.url : null) && (l = utils.getParamValue(c));
-        n && l && (n.link_identifier = l);
-        n = h ? null == b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null == b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
-        k(n);
+        var l = {}, m = require("io.branch.sdk");
+        g && (l.link_identifier = g);
+        l = k ? null == b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null == b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
+        c(l);
       }
     }
-    WEB_BUILD && (l = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), d._api(resources._r, {sdk:config.version}, function(a, b) {
+    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
       if (a) {
-        return g(a, null, !1);
+        return h(a, null);
       }
-      d._api(resources.open, {link_identifier:l, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-        b && l && (b.click_id = l);
-        g(a, b, !1);
+      d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+        b && g && (b.click_id = g);
+        h(a, b);
       });
-    }));
+    });
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
@@ -1454,14 +1462,13 @@ Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   b.referring_link = this._referringLink();
   a(null, b);
 });
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-    a(null, utils.whiteListSessionData(session.get(this._storage)));
-  });
-}
+Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  a(null, utils.whiteListSessionData(session.get(this._storage, !0)));
+});
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = this;
   this._api(resources.profile, {identity:b}, function(b, e) {
+    b && a(b);
     e = e || {};
     c.identity_id = e.identity_id.toString();
     c.sessionLink = e.link;
@@ -1471,7 +1478,17 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
   });
 });
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
-  this._api(resources.logout, {}, a);
+  var b = this;
+  this._api(resources.logout, {}, function(c, d) {
+    c && a(c);
+    d = d || {};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link};
+    b.sessionLink = d.link;
+    b.session_id = d.session_id;
+    b.identity_id = d.identity_id;
+    session.set(b._storage, d);
+    a(c);
+  });
 });
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {

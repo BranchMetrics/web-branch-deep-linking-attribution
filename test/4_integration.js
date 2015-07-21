@@ -137,7 +137,6 @@ describe('Integration tests', function() {
 		it('should return error to callback', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				jsonpCallback--;
 				assert.equal(err.message, 'Error in API: 400');
 			});
 			if (window.CORDOVA_BUILD) { requests[indexOfLastInitRequest(0)].respond(400); }
@@ -159,10 +158,10 @@ describe('Integration tests', function() {
 			}
 			requests[request_count].respond(500);
 			clock.tick(250);
-			request_count++
+			request_count++;
 			requests[request_count].respond(500);
 			clock.tick(250);
-			request_count++
+			request_count++;
 			requests[request_count].respond(500);
 		});
 
@@ -170,8 +169,11 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(1, done);
 			if (testUtils.go("#r:12345")) {
 				branchInit();
-				assert.equal(true, requests[indexOfLastInitRequest(1)].requestBody.indexOf('link_identifier=12345') > -1);
-			} else { done(); }
+				assert.equal(true, requests[indexOfLastInitRequest(0)].requestBody.indexOf('link_identifier=12345') > -1);
+			} else {
+				jsonpCallback--;
+				done();
+			}
 
 		});
 	});
@@ -250,15 +252,25 @@ describe('Integration tests', function() {
 
 	describe('logout', function() {
 		it('should make two requests and logout session', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(2), done);
+			var assert = testUtils.plan(numberOfAsserts(5), done);
 			branchInit(assert);
-			branch.logout(function(err) {
+			branch.logout(function(err, data) {
 				assert.equal(err, null);
+				assert.equal(branch.session_id, new_session_id, "branch session was replaced");
+				assert.equal(branch.identity_id, new_identity_id, "branch identity was replaced");
+				assert.equal(branch.sessionLink, new_link, "link was replaced");
 			});
+			var original_session_id = branch.session_id,
+				original_identity_id = branch.identity_id,
+				original_link = branch.sessionLink;
+			var new_session_id = "new_session",
+				new_identity_id = "new_id",
+				new_link = "new_link";
+
 			assert.equal(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(200,
 				{ "Content-Type": "application/json" },
-				'{"session_id":"124235352855552203","identity_id":' + identity_id + ',"link":"https://bnc.lt/i/4tLqIdk017"}');
+				JSON.stringify({ "session_id": new_session_id, "identity_id": new_identity_id, "link": new_link }));
 		});
 	});
 

@@ -540,8 +540,10 @@ testUtils.go = function(suffix) {
 	if (!window.history.pushState) { return false; }
 	var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
 	if (new_location != window.location.toString()) {
-		return window.history.pushState && window.history.pushState({}, '', new_location); // Simply not possible in IE 9
+		window.history.pushState({}, '', new_location); // Simply not possible in IE 9
+    return true;
 	}
+  else { return false; }
 };
 
 return assert;
