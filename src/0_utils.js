@@ -25,6 +25,10 @@ utils.httpMethod = { POST: 'POST', GET: 'GET' };
 
 /** @typedef {{destination: string, endpoint: string, method: utils._httpMethod, params: ?Object.<string, _validator>, queryPart: ?Object.<string, _validator>, jsonp: ?boolean }} */
 utils.resource;
+
+/** @typedef {{listener: function(string):null, event: string}} */
+utils.listener;
+
 /* jshint ignore:end */
 
 /** @type {Object<string,message>} */

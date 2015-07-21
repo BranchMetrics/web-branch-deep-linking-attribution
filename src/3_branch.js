@@ -99,11 +99,11 @@ Branch = function() {
 	this._queue = Queue();
 
 	var storageMethods = [ ];
-	if (CORDOVA_BUILD) { storageMethods = ['local']; }
-	else if (TITANIUM_BUILD) { storageMethods = ['titanium']; }
+	if (CORDOVA_BUILD) { storageMethods = [ 'local' ]; }
+	else if (TITANIUM_BUILD) { storageMethods = [ 'titanium' ]; }
 	else if (WEB_BUILD) {
-		if (utils.mobileUserAgent()) { storageMethods = ['local', 'permcookie']; }
-		else { storageMethods = ['session', 'cookie']; }
+		if (utils.mobileUserAgent()) { storageMethods = [ 'local', 'permcookie' ]; }
+		else { storageMethods = [ 'session', 'cookie' ]; }
 	}
 	storageMethods.push('pojo');
 
@@ -112,7 +112,10 @@ Branch = function() {
 	this._server = new Server();
 
 	var sdk = 'web';
+
+	/** @type {Array<utils.listener>} */
 	this._listeners = [ ];
+
 	if (CORDOVA_BUILD) { sdk = 'cordova'; }
 	if (TITANIUM_BUILD) { sdk = 'titanium'; }
 	this.sdk = sdk + config.version;
@@ -120,6 +123,7 @@ Branch = function() {
 	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		this.debug = false;
 	}
+
 	this.init_state = init_states.NO_INIT;
 };
 
@@ -162,11 +166,11 @@ Branch.prototype._referringLink = function() {
  * @param {string} event
  */
 Branch.prototype._publishEvent = function(event) {
-	this._listeners.forEach(function(subscription) {
-		if ((subscription["event"] && subscription["event"] == event) || !subscription["event"]) {
-			subscription["listener"](event);
+	for (var i = 0; i < this._listeners.length; i++) {
+		if (!this._listeners[i].event || this._listeners[i].event == event) {
+			this._listeners[i].listener(event);
 		}
-	});
+	}
 };
 
 if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
@@ -1183,8 +1187,8 @@ if (WEB_BUILD) { // jshint undef:false
 		if (typeof event == "function" && listener == undefined) { listener = event; }
 		if (listener) {
 			this._listeners.push({
-				"listener": listener,
-				"event": event || null
+				listener: listener,
+				event: event || null
 			});
 		}
 	};
@@ -1200,7 +1204,7 @@ if (WEB_BUILD) { // jshint undef:false
 	Branch.prototype['removeListener'] = function(listener) {
 		if (listener) {
 			this._listeners = this._listeners.filter(function(subscription) {
-				if (subscription["listener"] !== listener) { return subscription; }
+				if (subscription.listener !== listener) { return subscription; }
 			});
 		}
 	};
