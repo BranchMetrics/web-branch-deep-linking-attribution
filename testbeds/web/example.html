@@ -112,19 +112,16 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript">
-
 (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="../../dist/web/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data first addListener removeListener setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "), 0);
 
   branch.init('5680621892404085', function(err, data) {
     document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
   });
-
 </script>
   <script type="text/javascript">
     var info = $('.info');
     var request = $('.request');
     var response = $('.response');
-
     var sampleParams = {
         tags: [ 'tag1', 'tag2' ],
         channel: 'sample app',
@@ -139,7 +136,6 @@
           '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
         }
       };
-
       var getInputVal = function(inputID) {
         var inputElement = $(inputID);
         if (inputElement.val() == '' || inputElement.val() == false) {
@@ -151,21 +147,18 @@
         }
         return inputElement.val();
       };
-
     $('#init').click(function() {
       request.html('branch.init();');
       branch.init('5680621892404085', function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#data').click(function() {
       request.html("branch.data();");
       branch.data(function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#setIdentity').click(function() {
       var identity = getInputVal('#identityID');
       request.html("branch.setIdentity('" + identity + "');");
@@ -173,7 +166,6 @@
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#logout').click(function() {
       request.html('branch.logout();');
       branch.logout(function(err, data) {
@@ -195,14 +187,12 @@
         response.html(JSON.stringify(err || data || 'undefined'));
       });
     });
-
     $('#link').click(function() {
       request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
       branch.link(sampleParams, function(err, link) {
         response.html('<a href="' + link + '">' + link + '</a>');
       });
     });
-
     $('#sendSMS').click(function() {
       var smsOptions = {};
       var phone = getInputVal('#SMSNumber');
@@ -211,7 +201,6 @@
         response.html(JSON.stringify(err || data || 'undefined'));
       });
     });
-
     $('#sendSMSNew').click(function() {
       var smsOptions = { make_new_link: true };
       var phone = getInputVal('#SMSNumber');
@@ -220,44 +209,39 @@
         response.html(JSON.stringify(err || data || 'undefined'));
       });
     });
-
     $('#referrals').click(function() {
       request.html('branch.referrals();');
       branch.referrals(function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#credits').click(function() {
       request.html('branch.credits();');
       branch.credits(function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#creditHistory').click(function() {
       request.html('branch.creditHistory();');
       branch.creditHistory(function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#applyCode').click(function() {
       request.html('branch.applyCode({code: ' + getInputVal('#code-input') + '});');
       branch.applyCode(getInputVal('#code-input'), 'default', function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#validateCode').click(function() {
       request.html('branch.validateCode({code: ' + getInputVal('#code-input') + '});');
       branch.validateCode(getInputVal('#code-input'), 'default', function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#getCode').click(function() {
       request.html('branch.getCode({ amount: ' + getInputVal("#code-amount") + ', calculation_type: ' + getInputVal("input:radio[name ='code-type']:checked") + ', location: ' + getInputVal("input:radio[name ='code-location']:checked") + ', bucket: ' + getInputVal("#code-bucket") + ', prefix: ' + getInputVal("#code-prefix") + ', expiration: ' + getInputVal("#code-expiration") + ' });');
+      // var amount = parseInt(getInputVal('#code-amount'));
       branch.getCode({
         amount: parseInt(getInputVal('#code-amount')),
         calculation_type: parseInt(getInputVal("input:radio[name ='code-type']:checked")),
@@ -269,14 +253,12 @@
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#redeem').click(function() {
       request.html('branch.redeem({amount: ' + getInputVal('#redeem-amount') +', bucket: \'' + getInputVal('#redeem-bucket') + '\'});');
       branch.redeem(parseInt(getInputVal('#redeem-amount')), getInputVal('#redeem-bucket'), function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
-
     $('#banner').click(function() {
       request.html('branch.banner({icon: \'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png\',title: \'Branch Demo App\',description: \'The Branch demo app!\',data: {foo: \'bar\'}});');
       branch.banner(

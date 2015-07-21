@@ -717,17 +717,6 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 4
-var session = {get:function(a, b) {
-  try {
-    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
-  } catch (c) {
-    return null;
-  }
-}, set:function(a, b, c) {
-  a.set("branch_session", goog.json.serialize(b));
-  c && a.set("branch_session_first", goog.json.serialize(b), !0);
-}};
-// Input 5
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
@@ -801,7 +790,7 @@ utils.base64encode = function(a) {
   }
   return b;
 };
-// Input 6
+// Input 5
 var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]], c = "function" == typeof c ? c() : c;
@@ -920,6 +909,20 @@ BranchStorage.prototype.titanium = {getAll:function() {
   } catch (a) {
     return!1;
   }
+}};
+// Input 6
+var session = {get:function(a, b) {
+  try {
+    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
+  } catch (c) {
+    return null;
+  }
+}, set:function(a, b, c) {
+  a.set("branch_session", goog.json.serialize(b));
+  c && a.set("branch_session_first", goog.json.serialize(b), !0);
+}, update:function(a, b) {
+  var c = session.get(a), c = utils.merge(b, c);
+  a.set("branch_session", goog.json.serialize(c));
 }};
 // Input 7
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
@@ -1415,7 +1418,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var f = session.get(d._storage);
   c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    c && (console.log(c), c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     d.keepAlive && setTimeout(function() {
       d.keepAlive = !1;
@@ -1469,11 +1472,13 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
   var c = this;
   this._api(resources.profile, {identity:b}, function(b, e) {
     b && a(b);
+    console.log(e);
     e = e || {};
     c.identity_id = e.identity_id.toString();
     c.sessionLink = e.link;
     c.identity = e.identity;
     e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
+    session.update(c._storage, e);
     a(null, e);
   });
 });
@@ -1486,7 +1491,7 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     b.sessionLink = d.link;
     b.session_id = d.session_id;
     b.identity_id = d.identity_id;
-    session.set(b._storage, d);
+    session.update(b._storage, d);
     a(c);
   });
 });
@@ -1547,7 +1552,7 @@ Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a)
 });
 Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   b.type = "credit";
-  b.creation_type = 2;
+  b.creation_type = b.creation_type || 2;
   this._api(resources.getCode, b, a);
 });
 Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
