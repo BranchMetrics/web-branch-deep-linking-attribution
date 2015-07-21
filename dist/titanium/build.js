@@ -921,7 +921,7 @@ var session = {get:function(a, b) {
   a.set("branch_session", goog.json.serialize(b));
   c && a.set("branch_session_first", goog.json.serialize(b), !0);
 }, update:function(a, b) {
-  var c = session.get(a), c = utils.merge(b, c);
+  var c = session.get(a), c = utils.merge(c, b);
   a.set("branch_session", goog.json.serialize(c));
 }};
 // Input 7
@@ -1472,7 +1472,6 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
   var c = this;
   this._api(resources.profile, {identity:b}, function(b, e) {
     b && a(b);
-    console.log(e);
     e = e || {};
     c.identity_id = e.identity_id.toString();
     c.sessionLink = e.link;

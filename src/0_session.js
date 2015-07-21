@@ -38,6 +38,6 @@ session.set = function(storage, data, first) {
  */
 session.update = function(storage, new_data) {
 	var current_data = session.get(storage);
-	var data = utils.merge(new_data, current_data);
+	var data = utils.merge(current_data, new_data);
 	storage.set('branch_session', goog.json.serialize(data));
 }

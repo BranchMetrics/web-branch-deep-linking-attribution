@@ -288,7 +288,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 	finishInit = function(err, data) {
 		if (data) {
-			console.log(data);
 			data = setBranchValues(data);
 			session.set(self._storage, data, freshInstall);
 
@@ -434,14 +433,14 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
 		if (err) { done(err); }
 
-		console.log(data);
-
 		data = data || { };
 		self.identity_id = data['identity_id'].toString();
 		self.sessionLink = data['link'];
 		self.identity = data['identity'];
+
 		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
 		session.update(self._storage, data);
+
 		done(null, data);
 	});
 });
@@ -485,6 +484,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"identity_id": data.identity_id,
 			"link": data.link
 		};
+
 		self.sessionLink = data.link;
 		self.session_id = data.session_id;
 		self.identity_id = data.identity_id;
