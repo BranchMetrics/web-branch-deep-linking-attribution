@@ -90,9 +90,9 @@
           <input class="radio-input" type="radio" name="code-type" value="1">Unlimted (1)
           <input class="radio-input" type="radio" name="code-type" value="0">One Time Use (0)<br><br>
           <h6>Who Gets the Points?</h6>
-          <input class="radio-input" type="radio" name="code-type" value="0">Referree (0)
-          <input class="radio-input" type="radio" name="code-type" value="2">Referrer (2)
-          <input class="radio-input" type="radio" name="code-type" value="3">Both (3)<br><br>
+          <input class="radio-input" type="radio" name="code-location" value="0">Referree (0)
+          <input class="radio-input" type="radio" name="code-location" value="2">Referrer (2)
+          <input class="radio-input" type="radio" name="code-location" value="3">Both (3)<br><br>
         </div>
         <div class="group">
           <button id="getCode" class="btn btn-info">.getCode()</button>
@@ -243,8 +243,15 @@
     });
 
     $('#getCode').click(function() {
-      request.html('branch.getCode();');
-      branch.credits(function(err, data) {
+      request.html('branch.getCode({ amount: ' + getInputVal("#code-amount") + ', calculation_type: ' + getInputVal("input:radio[name ='code-type']:checked") + ', location: ' + getInputVal("input:radio[name ='code-location']:checked") + ', bucket: ' + getInputVal("#code-bucket") + ', prefix: ' + getInputVal("#code-prefix") + ', expiration: ' + getInputVal("#code-expiration") + ' });');
+      branch.getCode({
+        amount: parseInt(getInputVal('#code-amount')),
+        calculation_type: parseInt(getInputVal("input:radio[name ='code-type']:checked")),
+        location: parseInt(getInputVal("input:radio[name ='code-location']:checked")),
+        bucket: getInputVal('#code-bucket'),
+        prefix: getInputVal('#code-prefix'),
+        expiration: getInputVal('#code-expiration')
+      }, function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
