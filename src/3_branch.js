@@ -436,7 +436,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		data = data || { };
 		self.identity_id = data['identity_id'].toString();
 		self.sessionLink = data['link'];
-		self.identity = data['identity'];
+		self.identity = identity;
 
 		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
 		session.update(self._storage, data);
@@ -480,6 +480,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
+			"identity": null,
 			"session_id": data.session_id,
 			"identity_id": data.identity_id,
 			"link": data.link
@@ -488,6 +489,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.sessionLink = data.link;
 		self.session_id = data.session_id;
 		self.identity_id = data.identity_id;
+		self.identity = data.identity;
 		session.update(self._storage, data);
 
 		done(err);

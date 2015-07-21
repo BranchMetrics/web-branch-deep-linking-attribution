@@ -1418,7 +1418,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var f = session.get(d._storage);
   c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(b, c) {
-    c && (console.log(c), c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     d.keepAlive && setTimeout(function() {
       d.keepAlive = !1;
@@ -1470,12 +1470,12 @@ Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
 });
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = this;
-  this._api(resources.profile, {identity:b}, function(b, e) {
-    b && a(b);
+  this._api(resources.profile, {identity:b}, function(d, e) {
+    d && a(d);
     e = e || {};
     c.identity_id = e.identity_id.toString();
     c.sessionLink = e.link;
-    c.identity = e.identity;
+    c.identity = b;
     e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
     session.update(c._storage, e);
     a(null, e);
@@ -1486,10 +1486,11 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, function(c, d) {
     c && a(c);
     d = d || {};
-    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link};
     b.sessionLink = d.link;
     b.session_id = d.session_id;
     b.identity_id = d.identity_id;
+    b.identity = d.identity;
     session.update(b._storage, d);
     a(c);
   });
