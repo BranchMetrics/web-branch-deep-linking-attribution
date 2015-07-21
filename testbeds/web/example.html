@@ -8,7 +8,7 @@
     .btn {
       margin-top: 5px;
     }
-    #SMSNumber {
+    .example-input {
       width: 125px;
       display: inline-block;
       margin-top: 5px;
@@ -45,6 +45,7 @@
           <button id="init" class="btn btn-success">.init()</button>
           <!-- <button id="close" class="btn btn-danger">.close()</button> -->
           <button id="data" class="btn btn-info">.data()</button>
+          <input class="example-input" type="text" id="identityID" class="form-control" placeholder="test@test.com">
           <button id="setIdentity" class="btn btn-info">.setIdentity()</button>
           <button id="logout" class="btn btn-info">.logout()</button>
         </div>
@@ -60,7 +61,7 @@
       <div class="row col-lg-8 col-lg-offset-2">
       <h4>SMS</h4>
         <div class="group">
-          <input type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
+          <input class="example-input" type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
           <button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, {})</button>
           <button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, {make_new_link: true})</button>
         </div>
@@ -70,6 +71,7 @@
         <div class="group">
           <button id="referrals" class="btn btn-info">.referrals()</button>
           <button id="credits" class="btn btn-info">.credits()</button>
+          <button id="creditHistory" class="btn btn-info">.creditHistory()</button>
           <button id="redeem" class="btn btn-info">.redeem()</button>
         </div>
       </div>
@@ -106,17 +108,17 @@
         }
       };
 
-      var phoneNumber = function() {
-        var phoneNumberID = $('#SMSNumber');
-        if (phoneNumberID.val() == '') {
-          phoneNumberID.parent().addClass('has-error');
+      var getInputVal = function(inputID) {
+        var inputElement = $(inputID);
+        if (inputElement.val() == '') {
+          inputElement.parent().addClass('has-error');
           return false;
         }
         else {
-          phoneNumberID.parent().removeClass('has-error');
+          inputElement.parent().removeClass('has-error');
         }
-        return phoneNumberID.val();
-      }
+        return inputElement.val();
+      };
 
     $('#init').click(function() {
       request.html('branch.init();');
@@ -133,8 +135,9 @@
     });
 
     $('#setIdentity').click(function() {
-      request.html("branch.setIdentity('Branch');");
-      branch.setIdentity('Branch', function(err, data) {
+      var identity = getInputVal('#identityID');
+      request.html("branch.setIdentity('" + identity + "');");
+      branch.setIdentity(identity, function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
@@ -170,7 +173,7 @@
 
     $('#sendSMS').click(function() {
       var smsOptions = {};
-      var phone = phoneNumber();
+      var phone = getInputVal('#SMSNumber');
       request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
       branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
         response.html(JSON.stringify(err || data || 'undefined'));
@@ -179,7 +182,7 @@
 
     $('#sendSMSNew').click(function() {
       var smsOptions = { make_new_link: true };
-      var phone = phoneNumber();
+      var phone = getInputVal('#SMSNumber');
       request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
       branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
         response.html(JSON.stringify(err || data || 'undefined'));
@@ -196,6 +199,13 @@
     $('#credits').click(function() {
       request.html('branch.credits();');
       branch.credits(function(err, data) {
+        response.html(JSON.stringify(err || data));
+      });
+    });
+
+    $('#creditHistory').click(function() {
+      request.html('branch.creditHistory();');
+      branch.creditHistory(function(err, data) {
         response.html(JSON.stringify(err || data));
       });
     });
