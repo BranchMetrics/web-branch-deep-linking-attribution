@@ -2,7 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.6.4] - 2015-07-21
 - Adds Code creating, applying, validating to web testbed
 - Fixes undefined function `a.L()` with minified build in `addListener()` method
 - Fixes setIdentity() and logout() functions failing to manage Cordova sessions properly
