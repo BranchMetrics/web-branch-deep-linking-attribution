@@ -1197,8 +1197,14 @@ banner_css.css = function(a, b) {
 // Input 11
 var banner_html = {banner:function(a, b) {
   return'<div class="content"><div class="right vertically-align-middle">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + '</div><div class="description">' + a.description + "</div></div></div></div>";
-}, mobileAction:function(a, b) {
-  return'<a id="branch-mobile-action" href="#" target="_parent">' + (b.get("has_app") ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+}, mobileAction:function(a, b, c) {
+  var d = function(a) {
+    return'<a id="branch-mobile-action" href="#" target="_parent">' + a + "</a>";
+  };
+  c.addListener("downloadedApp", function() {
+    (a.iframe ? document.getElementById("branch-banner-iframe").contentWindow.document : document).getElementById("branch-mobile-action").innerHTML = d(a.openAppButtonText);
+  });
+  return d(session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText);
 }, desktopAction:function(a) {
   return'<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
@@ -1223,9 +1229,9 @@ var banner_html = {banner:function(a, b) {
   c.innerHTML = banner_html.banner(a, b);
   document.body.appendChild(c);
   return c;
-}, markup:function(a, b) {
-  var c = '<div id="branch-sms-form-container" class="vertically-align-middle">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
-  return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
+}, markup:function(a, b, c, d) {
+  b = '<div id="branch-sms-form-container" class="vertically-align-middle">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b, c) : banner_html.desktopAction(a)) + "</div>";
+  return a.iframe ? banner_html.iframe(a, b) : banner_html.div(a, b);
 }};
 // Input 12
 var sendSMS = function(a, b, c, d) {
@@ -1270,7 +1276,7 @@ var sendSMS = function(a, b, c, d) {
 }, banner = function(a, b, c, d) {
   if (banner_utils.shouldAppend(d, b)) {
     a._publishEvent("willShowBanner");
-    var e = banner_html.markup(b, d);
+    var e = banner_html.markup(b, d, a);
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     var f = b.iframe ? e.contentWindow.document : document;
@@ -1415,8 +1421,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
     f || (f = session.get(d._storage));
-    d._api(resources.hasApp, {browser_fingerprint_id:f.browser_fingerprint_id}, function(c, d) {
-      a.has_app = d;
+    d._api(resources.hasApp, {browser_fingerprint_id:f.browser_fingerprint_id}, function(c, e) {
+      e != a.has_app && e && d._publishEvent("downloadedApp");
+      a.has_app = e;
       b(null, a);
     });
   }, l = function(b, c) {

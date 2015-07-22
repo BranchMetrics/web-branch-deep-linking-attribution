@@ -289,6 +289,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	check_has_app = function(data, cb) {
 		if (!sessionData) { sessionData = session.get(self._storage); }
 		self._api(resources.hasApp, { "browser_fingerprint_id": sessionData['browser_fingerprint_id'] }, function(err, has_app) {
+			if (has_app != data['has_app'] && has_app) { self._publishEvent("downloadedApp"); }
 			data['has_app'] = has_app;
 			cb(null, data);
 		});
@@ -1214,6 +1215,7 @@ if (WEB_BUILD) { // jshint undef:false
  * - willSendBannerSMS
  * - sendBannerSMSError
  * - didSendBannerSMS
+ * - downloadedApp
  *
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/

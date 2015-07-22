@@ -740,6 +740,7 @@ branch.addListener(listener);
 - willSendBannerSMS
 - sendBannerSMSError
 - didSendBannerSMS
+- downloadedApp
 
 
 

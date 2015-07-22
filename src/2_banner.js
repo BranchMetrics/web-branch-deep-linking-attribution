@@ -103,7 +103,7 @@ banner = function(branch, options, linkData, storage) {
 		branch._publishEvent("willShowBanner");
 
 		// Create markup
-		var element = banner_html.markup(options, storage);
+		var element = banner_html.markup(options, storage, branch);
 
 		// Add CSS
 		banner_css.css(options, element);
