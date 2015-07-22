@@ -65,6 +65,7 @@ Server.prototype.getUrl = function(resource, data) {
 				destinationObject['app_id'] = data['app_id'];
 			}
 			else {
+				// way to return this!!
 				err = utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]);
 			}
 			return destinationObject;
@@ -75,7 +76,7 @@ Server.prototype.getUrl = function(resource, data) {
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
-				err = typeof resource.queryPart[k] == 'function' ? resource.queryPart[k](resource.endpoint, k, data[k]) : false;
+				err = typeof resource.queryPart[k] == 'function' ? resource.queryPart[k](resource.endpoint, k, data[k]) : err;
 				if (err) { return { error: err }; }
 				url += '/' + data[k];
 			}

@@ -1001,7 +1001,7 @@ Server.prototype.getUrl = function(a, b) {
   if (a.queryPart) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
-        if (e = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : !1) {
+        if (e = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : e) {
           return{error:e};
         }
         f += "/" + b[c];
