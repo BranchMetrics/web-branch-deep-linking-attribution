@@ -88,7 +88,7 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '8.1'
-		},
+		}/*,
 		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
@@ -103,7 +103,7 @@ var safari_browsers = [
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
 			version: '7.0'
-		}/*,
+		},
 		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
