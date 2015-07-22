@@ -287,6 +287,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	freshInstall = !sessionData || !sessionData['identity_id'],
 
 	check_has_app = function(data, cb) {
+		if (!sessionData) { sessionData = session.get(self._storage); }
 		self._api(resources.hasApp, { "browser_fingerprint_id": sessionData['browser_fingerprint_id'] }, function(err, has_app) {
 			data['has_app'] = has_app;
 			cb(null, data);
@@ -308,8 +309,28 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		done(err, data && utils.whiteListSessionData(data));
 	};
 
+	var allTheWaysToSayHidden =
+		[{ 'hidden': 'visibilitychange' },
+		{ 'mozHidden': 'mozvisibilitychange' },
+		{ 'msHidden': 'msvisibilitychange' },
+		{ 'webkitHidden': 'webkitvisibilitychange' }],
+
+	attachVisibilityEvent = function(data) {
+		for(var index = 0; index < allTheWaysToSayHidden.length; index++) {
+				var hidden = Object.keys(allTheWaysToSayHidden[index])[0],
+				event = allTheWaysToSayHidden[index][hidden];
+			if (typeof document[hidden] !== 'undefined') {
+				document['addEventListener'](event, function() {
+					if (!document[hidden]) { check_has_app(data, finishInit); }
+				}, false);
+				break;
+			}
+		}
+	};
+
 	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
-		check_has_app(sessionData, finishInit)
+		attachVisibilityEvent(sessionData);
+		check_has_app(sessionData, finishInit);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -356,6 +377,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
 					if (data && link_identifier) { data['click_id'] = link_identifier; }
+					attachVisibilityEvent(data);
 					finishInit(err, data);
 				});
 			});
