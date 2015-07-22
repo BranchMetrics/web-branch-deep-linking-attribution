@@ -436,8 +436,11 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		data = data || { };
 		self.identity_id = data['identity_id'].toString();
 		self.sessionLink = data['link'];
-		self.identity = data['identity'];
+		self.identity = identity;
+
 		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
+		session.update(self._storage, data);
+
 		done(null, data);
 	});
 });
@@ -477,14 +480,17 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
+			"identity": null,
 			"session_id": data.session_id,
 			"identity_id": data.identity_id,
 			"link": data.link
 		};
+
 		self.sessionLink = data.link;
 		self.session_id = data.session_id;
 		self.identity_id = data.identity_id;
-		session.set(self._storage, data);
+		self.identity = data.identity;
+		session.update(self._storage, data);
 
 		done(err);
 	});
@@ -857,7 +863,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  * | --- | ---
  * | amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
  * | calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
- * | location | *required* - An integer that etermines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
+ * | location | *required* - An integer that determines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
  * | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
  * | prefix | *optional* - A string to be prepended to the code.
  * | expiration | *optional* - A date string that if present, determines the date on which the code expires.
@@ -898,7 +904,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 /*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
 Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	data.type = "credit";
-	data.creation_type = 2;
+	data.creation_type = data.creation_type || 2;
 	this._api(resources.getCode, data, done);
 });
 

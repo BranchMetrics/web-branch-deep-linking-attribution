@@ -4,7 +4,7 @@ var app = {
     // ------------------ Inititalization & Utility Methods ------------------
 
     initialize: function() {
-        app.branch_key = "key_live_hohBTjb6eJS9jou8Tl1kIhddokjfbXJF";
+        app.branch_key = "5680621892404085";
         document.addEventListener('deviceready', app.onDeviceReady, false);
     },
 
@@ -174,6 +174,6 @@ var app = {
 
     creditHistory: function() {
         var params = { "bucket": app.getElementValue("rewards_bucket") || "" };
-        app.executeBranchMethod("creditHistory", [ params ], "rewards_bucket");
+        app.executeBranchMethod("creditHistory", [ params ], "rewards_status_label");
     }
 };
