@@ -286,6 +286,13 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	link_identifier = WEB_BUILD ? (utils.getParamValue('_branch_match_id') || utils.hashValue('r')) : (url ? utils.getParamValue(url) : null),
 	freshInstall = !sessionData || !sessionData['identity_id'],
 
+	check_has_app = function(data, cb) {
+		self._api(resources.hasApp, { "browser_fingerprint_id": sessionData['browser_fingerprint_id'] }, function(err, has_app) {
+			data['has_app'] = has_app;
+			cb(null, data);
+		});
+	},
+
 	finishInit = function(err, data) {
 		if (data) {
 			data = setBranchValues(data);
@@ -302,7 +309,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	};
 
 	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
-		finishInit(null, sessionData);
+		check_has_app(sessionData, finishInit)
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
