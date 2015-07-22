@@ -992,43 +992,36 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+  var c, d, e, f = a.destination + a.endpoint, g = /^[0-9]{15,20}$/, k = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
     "undefined" == typeof c && (c = {});
-    if (b.branch_key && g.test(b.branch_key)) {
-      c.branch_key = b.branch_key;
-    } else {
-      if (b.app_id && f.test(b.app_id)) {
-        c.app_id = b.app_id;
-      } else {
-        return{error:utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"])};
-      }
-    }
+    b.branch_key && k.test(b.branch_key) ? c.branch_key = b.branch_key : b.app_id && g.test(b.app_id) ? c.app_id = b.app_id : e = utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]);
     return c;
   };
-  if (a.queryPart || "/v1/has-app" == a.endpoint) {
-    for (c in a.queryPart = k(b, a.queryPart), a.queryPart) {
+  "/v1/has-app" == a.endpoint && (a.queryPart = h(b, a.queryPart));
+  if (a.queryPart) {
+    for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
-        if (d = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : !1) {
-          return{error:d};
+        if (e = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : !1) {
+          return{error:e};
         }
-        e += "/" + b[c];
+        f += "/" + b[c];
       }
     }
   }
-  var h = {};
+  var l = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      if (d = a.params[c](a.endpoint, c, b[c])) {
-        return{error:d};
+      if (e = a.params[c](a.endpoint, c, b[c])) {
+        return{error:e};
       }
       d = b[c];
-      "undefined" != typeof d && "" !== d && null !== d && (h[c] = d);
+      "undefined" != typeof d && "" !== d && null !== d && (l[c] = d);
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
-    b = k(b, h);
+    b = h(b, l);
   }
-  return{data:this.serializeObject(h, ""), url:e};
+  return e ? {error:e} : {data:this.serializeObject(l, ""), url:f};
 };
 Server.prototype.createScript = function(a) {
   var b = document.createElement("script");

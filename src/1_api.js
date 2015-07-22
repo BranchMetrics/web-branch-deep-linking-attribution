@@ -65,13 +65,14 @@ Server.prototype.getUrl = function(resource, data) {
 				destinationObject['app_id'] = data['app_id'];
 			}
 			else {
-				return { error: utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]) };
+				err = utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]);
 			}
 			return destinationObject;
 		};
 
-	if (resource.queryPart || resource.endpoint == "/v1/has-app") {
-		resource.queryPart = appendKeyOrId(data, resource.queryPart);
+	if (resource.endpoint == "/v1/has-app") { resource.queryPart = appendKeyOrId(data, resource.queryPart); }
+
+	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
 				err = typeof resource.queryPart[k] == 'function' ? resource.queryPart[k](resource.endpoint, k, data[k]) : false;
@@ -85,7 +86,6 @@ Server.prototype.getUrl = function(resource, data) {
 		if (resource.params.hasOwnProperty(k)) {
 			err = resource.params[k](resource.endpoint, k, data[k]);
 			if (err) { return { error: err }; }
-
 			v = data[k];
 			if (!(typeof v == 'undefined' || v === '' || v === null)) {
 				d[k] = v;
@@ -97,6 +97,7 @@ Server.prototype.getUrl = function(resource, data) {
 		data = appendKeyOrId(data, d);
 	}
 
+	if (err) { return { error: err } }
 	return { data: this.serializeObject(d, ''), url: url };
 };
 
