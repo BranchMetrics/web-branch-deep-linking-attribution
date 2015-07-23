@@ -41,10 +41,10 @@ __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acc
 
 ### [Full Documentation for the Cordova Web SDK](https://github.com/BranchMetrics/Web-SDK/blob/master/CORDOVA_GUIDE.md)
 
-The Web SDK is provided as a plugin for Cordova and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Web-SDK.git.  For example:
+The Web SDK is provided as a plugin for Cordova and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK.  For example:
 
 ```sh
-$ cordova plugin add https://github.com/BranchMetrics/Web-SDK.git
+$ cordova plugin add https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK
 ```
 
 You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
@@ -57,7 +57,7 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
 
 ## Appcelerator Titanum
 
-### [Full Documentation for the Titanium Web SDK](https://github.com/BranchMetrics/Web-SDK/blob/master/TITANIUM_GUIDE.md)
+### [Full Documentation for the Titanium Web SDK](https://github.com/BranchMetrics/Titanium-Deferred-Deep-Linking-SDK)
 
 The Web SDK is provided as a module for Titanium.
 
