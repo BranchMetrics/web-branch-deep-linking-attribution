@@ -464,8 +464,8 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		if (err) { done(err); }
 
 		data = data || { };
-		self.identity_id = data['identity_id'].toString();
-		self.sessionLink = data['link'];
+		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
+		if (data['link']) { self.sessionLink = data['link']; }
 		self.identity = identity;
 
 		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
