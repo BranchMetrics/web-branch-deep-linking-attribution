@@ -33,7 +33,7 @@ banner_html.banner = function(options, action) {
  * @param {storage} storage
  */
 banner_html.mobileAction = function(options, storage) {
-	return '<a id="branch-mobile-action" class="branch-button" href="#" target="_parent">' + (storage.get('has_app') ? options.openAppButtonText : options.downloadAppButtonText) + '</a>';
+	return '<button id="branch-mobile-action" class="branch-button" target="_parent">' + (storage.get('has_app') ? options.openAppButtonText : options.downloadAppButtonText) + '</button>';
 };
 
 banner_html.desktopAction = function(options) {
