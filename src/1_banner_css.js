@@ -16,7 +16,7 @@ banner_css.banner = function(options) {
 	'#branch-banner .content .left > * { margin-left: 10px; display: inline-block; }\n' +
 	'#branch-banner .content .left { height: 63px; padding-top: 5px; padding-bottom: 5px; }\n' +
 	'#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; z-index: 1; }\n' +
-	'#branch-banner .branch-button { cursor: pointer; font-weight: 400; border-radius: 2px; border: 1px solid #ccc; background: #fff; color: #000; padding: 8px 15px; }\n' +1
+	'#branch-banner .branch-button { cursor: pointer; font-weight: 400; border-radius: 2px; border: 1px solid #ccc; background: #fff; color: #000; padding: 8px 15px; }\n' +
 	'#branch-banner-action { top: 17px; }\n' +
 	'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
 };

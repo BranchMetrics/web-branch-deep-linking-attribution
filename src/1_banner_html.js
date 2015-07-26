@@ -43,7 +43,7 @@ banner_html.desktopAction = function(options) {
 	'<div id="branch-sms-block">' +
 		'<form id="sms-form">' +
 			'<input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + options.phonePreviewText + '">' +
-			'<button type="submit" id="branch-sms-send" class="branch-animation">' + options.sendLinkText + '</button>' +
+			'<button type="submit" id="branch-sms-send" class="branch-button">' + options.sendLinkText + '</button>' +
 		'</form>' +
 	'</div>';
 };
