@@ -10,11 +10,12 @@ goog.require('storage'); // jshint unused:false
  */
 banner_html.banner = function(options, action) {
 	return '<div class="content">' +
-		'<div class="right vertically-align-middle">' +
+		'<div class="right">' +
 			action +
+            (!options.disableHide && !utils.mobileUserAgent() ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
 		'</div>' +
 		'<div class="left">' +
-			 (!options.disableHide ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
+			 (!options.disableHide && utils.mobileUserAgent() ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
 			'<div class="icon">' +
 				'<img src="' + options.icon + '">' +
 			'</div>' +
@@ -32,7 +33,7 @@ banner_html.banner = function(options, action) {
  * @param {storage} storage
  */
 banner_html.mobileAction = function(options, storage) {
-	return '<a id="branch-mobile-action" href="#" target="_parent">' + (storage.get('has_app') ? options.openAppButtonText : options.downloadAppButtonText) + '</a>';
+	return '<a id="branch-mobile-action" class="branch-button" href="#" target="_parent">' + (storage.get('has_app') ? options.openAppButtonText : options.downloadAppButtonText) + '</a>';
 };
 
 banner_html.desktopAction = function(options) {
@@ -120,4 +121,3 @@ banner_html.markup = function(options, storage) {
 		return banner_html.div(options, action);
 	}
 };
-
