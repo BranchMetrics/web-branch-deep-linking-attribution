@@ -15,7 +15,7 @@ banner_utils.animationDelay = 20;
 
 // Height of banner.
 /** @type {string} */
-banner_utils.bannerHeight = '76px';
+banner_utils.bannerHeight = '73px';
 
 // How long to show red error state
 /** @type {number} */

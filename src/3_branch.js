@@ -1318,7 +1318,8 @@ if (WEB_BUILD) { // jshint undef:false
 			customCSS: options['customCSS'] || '',
 			mobileSticky: typeof options['mobileSticky'] == 'undefined' ? false : options['mobileSticky'],
 			desktopSticky: typeof options['desktopSticky'] == 'undefined' ? true : options['desktopSticky'],
-			make_new_link: !!options['make_new_link']
+			make_new_link: !!options['make_new_link'],
+            dark_theme: typeof options['dark_theme'] == 'undefined' ? false : options['dark_theme']
 		};
 
 		if (typeof options['showMobile'] != 'undefined') {
