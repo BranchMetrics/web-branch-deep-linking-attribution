@@ -3,6 +3,7 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+- Fix error that prevented subsequent APi calls after logging out on Cordova and Titanium
 - Remove Cordova SDK from the Web SDK repo, and move to it's own repo
 
 ## [v1.6.4] - 2015-07-21
