@@ -7,12 +7,12 @@ banner_css.banner = function(options) {
 	'.branch-banner-is-active { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
 	'#branch-banner { width:100%; z-index: 99999; font-family: Open Sans, Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n' +
 	'#branch-banner-close { color: #aaa; font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +
-	'#branch-banner .content { overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; ' + (options.position == 'top' ? 'border-bottom' : 'border-top') + ': 1px solid #ddd; }\n' +
+	'#branch-banner .content { overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: ' + (options.dark_theme ? '#444' : '#FFF') + '; color: ' + (options.dark_theme ? '#FFF' : '#333') + '; ' + (options.position == 'top' ? 'border-bottom' : 'border-top') + ': 1px solid #ddd; }\n' +
 	'#branch-banner .icon { float: left; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
 	'#branch-banner .vertically-align-middle { position: relative; top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n' +
 	'#branch-banner .title { font-size: 18px; font-weight: 700; }\n' +
-	'#branch-banner .description { font-size: 12px; font-weight: 400; }\n' +
+	'#branch-banner .description { font-size: 12px; font-weight: 400; ' + (options.dark_theme ? '#CECECE' : '#333') + '}\n' +
 	'#branch-banner .content .left > * { margin-left: 10px; display: inline-block; }\n' +
 	'#branch-banner .content .left { height: 63px; padding-top: 5px; }\n' +
 	'#branch-banner .content .right { float: right; height: 63px; }\n' +
