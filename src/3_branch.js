@@ -483,7 +483,8 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"identity": null,
 			"session_id": data.session_id,
 			"identity_id": data.identity_id,
-			"link": data.link
+			"link": data.link,
+			"device_fingerprint_id": self.device_fingerprint_id || null
 		};
 
 		self.sessionLink = data.link;
