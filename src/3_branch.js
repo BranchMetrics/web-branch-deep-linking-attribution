@@ -289,9 +289,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	check_has_app = function(sessionData, cb) {
 		var currentSessionData = sessionData || session.get(self._storage);
 		self._api(resources.hasApp, { "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] }, function(err, has_app) {
-			if (has_app != currentSessionData['has_app'] && has_app) { self._publishEvent("downloadedApp"); }
-			currentSessionData['has_app'] = has_app;
-			cb(null, currentSessionData);
+			if (has_app != currentSessionData['has_app'] && has_app) {
+				self._publishEvent("downloadedApp");
+				currentSessionData['has_app'] = has_app;
+				session.set(self._storage, currentSessionData);
+			}
+			cb && cb(err, currentSessionData);
 		});
 	},
 
@@ -322,7 +325,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				event = allTheWaysToSayHidden[index][hidden];
 			if (typeof document[hidden] !== 'undefined') {
 				document['addEventListener'](event, function() {
-					if (!document[hidden]) { check_has_app(null, finishInit); }
+					if (!document[hidden]) { check_has_app(); }
 				}, false);
 				break;
 			}
@@ -335,7 +338,6 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
 					data['identity_id'] = sessionData['identity_id'];

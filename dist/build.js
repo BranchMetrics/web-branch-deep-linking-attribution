@@ -1422,9 +1422,8 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
     var c = a || session.get(d._storage);
     d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
-      e != c.has_app && e && d._publishEvent("downloadedApp");
-      c.has_app = e;
-      b(null, c);
+      e != c.has_app && e && (d._publishEvent("downloadedApp"), c.has_app = e, session.set(d._storage, c));
+      b && b(a, c);
     });
   }, l = function(b, c) {
     c && (c = e(c), session.set(d._storage, c, h), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
@@ -1438,7 +1437,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       var b = Object.keys(m[a])[0], c = m[a][b];
       if ("undefined" !== typeof document[b]) {
         document.addEventListener(c, function() {
-          document[b] || k(null, l);
+          document[b] || k();
         }, !1);
         break;
       }
