@@ -1214,25 +1214,28 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  * #### Available `Branch.banner()` Events:
- * - willShowBanner
- * - willNotShowBanner
- * - didShowBanner
- * - willCloseBanner
- * - didCloseBanner
- * - willSendBannerSMS
- * - sendBannerSMSError
- * - didSendBannerSMS
- * - downloadedApp
+ * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
+ * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more events will be emitted.
+ * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
+ * - *willCloseBanner*: `closeBanner()` calle, and the smart banner will close.
+ * - *didCloseBanner*: Smart banner close animation started, and is closing.
+ * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
+ * - *sendBannerSMSError*: `sendSMS()` error returned.
+ * - *didSendBannerSMS*: SMS successfully sent.
+ * - *downloadedApp*: User installed app, and banner text updated.
  *
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event == "function" && listener == undefined) { listener = event; }
+		if (typeof event == "function" && listener == undefined) {
+			listener = event;
+			event = null;
+		}
 		if (listener) {
 			this._listeners.push({
 				listener: listener,
-				event: event || null
+				event: event
 			});
 		}
 	};
