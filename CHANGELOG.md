@@ -3,9 +3,15 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+<<<<<<< HEAD
 ### New Functionality
 - The `has_app` property in the session, and the mobile device action text automatically updates when a user installs the app - without reloading the page!
 ### Improvements
+=======
+
+## [v1.6.5] - 2015-07-28
+- Fix error that prevented subsequent APi calls after logging out on Cordova and Titanium
+>>>>>>> master
 - Remove Cordova SDK from the Web SDK repo, and move to it's own repo
 
 ## [v1.6.4] - 2015-07-21

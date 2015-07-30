@@ -605,7 +605,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.4"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.5"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
 // Input 2
 var Queue = function() {
   var a = [], b = function() {
@@ -1493,8 +1493,8 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
   this._api(resources.profile, {identity:b}, function(d, e) {
     d && a(d);
     e = e || {};
-    c.identity_id = e.identity_id.toString();
-    c.sessionLink = e.link;
+    e.identity_id && (c.identity_id = e.identity_id.toString());
+    e.link && (c.sessionLink = e.link);
     c.identity = b;
     e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
     session.update(c._storage, e);
@@ -1506,7 +1506,7 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, function(c, d) {
     c && a(c);
     d = d || {};
-    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
     b.sessionLink = d.link;
     b.session_id = d.session_id;
     b.identity_id = d.identity_id;
