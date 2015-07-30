@@ -1422,7 +1422,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
     var c = a || session.get(d._storage);
     d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
-      e != c.has_app && e && (d._publishEvent("downloadedApp"), c.has_app = e, session.set(d._storage, c));
+      e != c.has_app && e && (c.has_app = e, session.update(d._storage, c), d._publishEvent("downloadedApp"));
       b && b(a, c);
     });
   }, l = function(b, c) {

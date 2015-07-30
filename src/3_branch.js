@@ -290,9 +290,9 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		var currentSessionData = sessionData || session.get(self._storage);
 		self._api(resources.hasApp, { "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] }, function(err, has_app) {
 			if (has_app != currentSessionData['has_app'] && has_app) {
-				self._publishEvent("downloadedApp");
 				currentSessionData['has_app'] = has_app;
-				session.set(self._storage, currentSessionData);
+				session.update(self._storage, currentSessionData);
+				self._publishEvent("downloadedApp");
 			}
 			cb && cb(err, currentSessionData);
 		});
