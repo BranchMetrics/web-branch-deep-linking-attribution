@@ -1420,11 +1420,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var f = session.get(d._storage);
   c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
-    f || (f = session.get(d._storage));
-    d._api(resources.hasApp, {browser_fingerprint_id:f.browser_fingerprint_id}, function(c, e) {
-      e != a.has_app && e && d._publishEvent("downloadedApp");
-      a.has_app = e;
-      b(null, a);
+    var c = a || session.get(d._storage);
+    d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
+      e != c.has_app && e && d._publishEvent("downloadedApp");
+      c.has_app = e;
+      b(null, c);
     });
   }, l = function(b, c) {
     c && (c = e(c), session.set(d._storage, c, h), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
@@ -1433,19 +1433,19 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       d.keepAlive = !1;
     }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
-  }, m = [{hidden:"visibilitychange"}, {mozHidden:"mozvisibilitychange"}, {msHidden:"msvisibilitychange"}, {webkitHidden:"webkitvisibilitychange"}], p = function(a) {
-    for (var b = 0;b < m.length;b++) {
-      var c = Object.keys(m[b])[0], d = m[b][c];
-      if ("undefined" !== typeof document[c]) {
-        document.addEventListener(d, function() {
-          document[c] || k(a, l);
+  }, m = [{hidden:"visibilitychange"}, {mozHidden:"mozvisibilitychange"}, {msHidden:"msvisibilitychange"}, {webkitHidden:"webkitvisibilitychange"}], p = function() {
+    for (var a = 0;a < m.length;a++) {
+      var b = Object.keys(m[a])[0], c = m[a][b];
+      if ("undefined" !== typeof document[b]) {
+        document.addEventListener(c, function() {
+          document[b] || k(null, l);
         }, !1);
         break;
       }
     }
   };
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
-    p(f), k(f, l);
+    p(), k(f, l);
   } else {
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
       c = function(a) {

@@ -286,12 +286,12 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	link_identifier = WEB_BUILD ? (utils.getParamValue('_branch_match_id') || utils.hashValue('r')) : (url ? utils.getParamValue(url) : null),
 	freshInstall = !sessionData || !sessionData['identity_id'],
 
-	check_has_app = function(data, cb) {
-		if (!sessionData) { sessionData = session.get(self._storage); }
-		self._api(resources.hasApp, { "browser_fingerprint_id": sessionData['browser_fingerprint_id'] }, function(err, has_app) {
-			if (has_app != data['has_app'] && has_app) { self._publishEvent("downloadedApp"); }
-			data['has_app'] = has_app;
-			cb(null, data);
+	check_has_app = function(sessionData, cb) {
+		var currentSessionData = sessionData || session.get(self._storage);
+		self._api(resources.hasApp, { "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] }, function(err, has_app) {
+			if (has_app != currentSessionData['has_app'] && has_app) { self._publishEvent("downloadedApp"); }
+			currentSessionData['has_app'] = has_app;
+			cb(null, currentSessionData);
 		});
 	},
 
@@ -316,13 +316,13 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		{ 'msHidden': 'msvisibilitychange' },
 		{ 'webkitHidden': 'webkitvisibilitychange' }],
 
-	attachVisibilityEvent = function(data) {
+	attachVisibilityEvent = function() {
 		for(var index = 0; index < allTheWaysToSayHidden.length; index++) {
 				var hidden = Object.keys(allTheWaysToSayHidden[index])[0],
 				event = allTheWaysToSayHidden[index][hidden];
 			if (typeof document[hidden] !== 'undefined') {
 				document['addEventListener'](event, function() {
-					if (!document[hidden]) { check_has_app(data, finishInit); }
+					if (!document[hidden]) { check_has_app(null, finishInit); }
 				}, false);
 				break;
 			}
@@ -330,7 +330,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	};
 
 	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
-		attachVisibilityEvent(sessionData);
+		attachVisibilityEvent();
 		check_has_app(sessionData, finishInit);
 	}
 	else {
