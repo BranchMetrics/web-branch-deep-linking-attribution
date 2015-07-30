@@ -63,17 +63,17 @@ var webStorage = function(perm) {
 		set: function(key, value, perm_override) { perm_override ? localStorage.setItem(prefix(key), value) : storageMethod.setItem(prefix(key), value); },
 		remove: function(key) { storageMethod.removeItem(prefix(key)); },
 		clear: function() {
-			Object.keys(storageMethod).forEach(function (item) {
+			Object.keys(storageMethod).forEach(function(item) {
 				if (item.indexOf(BRANCH_KEY_PREFIX) == 0) { storageMethod.removeItem(item); }
 			});
 		},
-		isEnabled: function () {
+		isEnabled: function() {
 			try {
 				storageMethod.setItem("test", "");
 				storageMethod.removeItem("test");
 				return true;
 			}
-			catch(err) {
+			catch (err) {
 				return false;
 			}
 		}
@@ -145,7 +145,7 @@ var cookies = function(perm) {
 			}
 		},
 		isEnabled: function() { return navigator.cookieEnabled; }
-	}
+	};
 };
 
 BranchStorage.prototype['cookie'] = function() {
@@ -196,7 +196,7 @@ BranchStorage.prototype['titanium'] = {
 			Ti.App.Properties.getString("test");
 			return true;
 		}
-		catch(err) {
+		catch (err) {
 			return false;
 		}
 	}

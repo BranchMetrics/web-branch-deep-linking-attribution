@@ -266,11 +266,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data['link']) { self.sessionLink = data['link']; }
 
 		if (data['referring_link']) {
-			data['referring_link'] = utils.processReferringLink(data['referring_link']); //.substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
+			data['referring_link'] = utils.processReferringLink(data['referring_link']);
 		}
 
 		if (!data['click_id'] && data['referring_link']) {
-			data['click_id'] = utils.clickIdFromLink(data['referring_link']); // .substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
+			data['click_id'] = utils.clickIdFromLink(data['referring_link']);
 		}
 
 		if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
@@ -618,7 +618,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 				"language": navigator.language
 			}, metadata || {})
 		}, done);
-	} else {
+	}
+	else {
 		this._api(resources.event, {
 			"event": event,
 			"metadata": metadata || {}

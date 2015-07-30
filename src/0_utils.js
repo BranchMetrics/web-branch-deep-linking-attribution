@@ -138,7 +138,8 @@ utils.mobileUserAgent = function() {
 		if (navigator.userAgent.match(/android/i)) { return 'android'; }
 		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
 		else { return 'ios'; }
-	} else { return false; }
+	}
+	else { return false; }
 };
 
 /**
