@@ -1090,12 +1090,12 @@ Server.prototype.request = function(a, b, c, d) {
   "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
   var k = RETRIES, l = function(a, b, c) {
     a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
-      m();
+      n();
     }, RETRY_DELAY)) : d(a, b);
-  }, m = function() {
+  }, n = function() {
     c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
   };
-  m();
+  n();
 };
 // Input 9
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
@@ -1241,7 +1241,7 @@ var sendSMS = function(a, b, c, d) {
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, m = function() {
+  }, n = function() {
     k = a.createElement("div");
     k.className = "branch-icon-wrapper";
     k.id = "branch-checkmark";
@@ -1255,7 +1255,7 @@ var sendSMS = function(a, b, c, d) {
       k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, p = function() {
+  }, m = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1265,13 +1265,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var n = e.value;
-    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), p()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+    var p = e.value;
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError"), m()) : (b._publishEvent("didSendBannerSMS"), n(), setTimeout(function() {
         h.removeChild(k);
         l();
       }, banner_utils.success_timeout));
-    })) : p();
+    })) : m();
   }
 }, banner = function(a, b, c, d) {
   if (banner_utils.shouldAppend(d, b)) {
@@ -1291,7 +1291,7 @@ var sendSMS = function(a, b, c, d) {
         sendSMS(f, a, b, c);
       });
     }
-    var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), p = function(a) {
+    var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
       setTimeout(function() {
         banner_utils.removeElement(e);
         banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1304,10 +1304,10 @@ var sendSMS = function(a, b, c, d) {
       "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
       "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
     };
-    m && (m.onclick = function(b) {
+    n && (n.onclick = function(b) {
       b.preventDefault();
       a._publishEvent("willCloseBanner");
-      p(function() {
+      m(function() {
         a._publishEvent("didCloseBanner");
       });
     });
@@ -1317,7 +1317,7 @@ var sendSMS = function(a, b, c, d) {
       "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
       a._publishEvent("didShowBanner");
     }, banner_utils.animationDelay);
-    return p;
+    return m;
   }
   a._publishEvent("willNotShowBanner");
 };
@@ -1432,19 +1432,15 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       d.keepAlive = !1;
     }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
-  }, m = [{hidden:"visibilitychange"}, {mozHidden:"mozvisibilitychange"}, {msHidden:"msvisibilitychange"}, {webkitHidden:"webkitvisibilitychange"}], p = function() {
-    for (var a = 0;a < m.length;a++) {
-      var b = Object.keys(m[a])[0], c = m[a][b];
-      if ("undefined" !== typeof document[b]) {
-        document.addEventListener(c, function() {
-          document[b] || k();
-        }, !1);
-        break;
-      }
-    }
+  }, n = function() {
+    var a, b;
+    void 0 != typeof document.hidden ? (a = "hidden", b = "visibilitychange") : void 0 != typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : void 0 != typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : void 0 != typeof document.webkitvisibilitychange && (a = "webkitHidden", b = "webkitvisibilitychange");
+    document.addEventListener(b, function() {
+      document[a] || k();
+    }, !1);
   };
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
-    p(), k(f, l);
+    n(), k(f, l);
   } else {
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
       c = function(a) {
@@ -1454,17 +1450,17 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         });
       };
       if (CORDOVA_BUILD) {
-        var n = [];
-        null !== b && n.push(b ? 1 : 0);
+        var m = [];
+        null !== b && m.push(b ? 1 : 0);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
-        }, "BranchDevice", h ? "getInstallData" : "getOpenData", n);
+        }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
       }
       if (TITANIUM_BUILD) {
-        var n = {}, q = require("io.branch.sdk");
-        g && (n.link_identifier = g);
-        n = h ? null == b ? q.getInstallData(d.debug, -1) : q.getInstallData(d.debug, b ? 1 : 0) : null == b ? q.getOpenData(-1) : q.getOpenData(b ? 1 : 0);
-        c(n);
+        var m = {}, p = require("io.branch.sdk");
+        g && (m.link_identifier = g);
+        m = h ? null == b ? p.getInstallData(d.debug, -1) : p.getInstallData(d.debug, b ? 1 : 0) : null == b ? p.getOpenData(-1) : p.getOpenData(b ? 1 : 0);
+        c(m);
       }
     }
     WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
@@ -1473,7 +1469,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       }
       d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
         b && g && (b.click_id = g);
-        p(b);
+        n(b);
         l(a, b);
       });
     });

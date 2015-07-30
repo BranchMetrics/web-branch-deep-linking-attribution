@@ -311,25 +311,29 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		// Keep android titanium from calling close
 		if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
 		done(err, data && utils.whiteListSessionData(data));
-	};
-
-	var allTheWaysToSayHidden =
-		[{ 'hidden': 'visibilitychange' },
-		{ 'mozHidden': 'mozvisibilitychange' },
-		{ 'msHidden': 'msvisibilitychange' },
-		{ 'webkitHidden': 'webkitvisibilitychange' }],
+	},
 
 	attachVisibilityEvent = function() {
-		for(var index = 0; index < allTheWaysToSayHidden.length; index++) {
-				var hidden = Object.keys(allTheWaysToSayHidden[index])[0],
-				event = allTheWaysToSayHidden[index][hidden];
-			if (typeof document[hidden] !== 'undefined') {
-				document['addEventListener'](event, function() {
-					if (!document[hidden]) { check_has_app(); }
-				}, false);
-				break;
-			}
+		var hidden, changeEvent;
+		if (typeof document.hidden != undefined) {
+			hidden = "hidden",
+			changeEvent = "visibilitychange";
 		}
+		else if (typeof document.mozHidden != undefined) {
+			hidden = "mozHidden",
+			changeEvent = "mozvisibilitychange";
+		}
+		else if (typeof document.msHidden != undefined) {
+			hidden = "msHidden",
+			changeEvent = "msvisibilitychange";
+		}
+		else if (typeof document.webkitvisibilitychange != undefined) {
+			hidden = "webkitHidden",
+			changeEvent = "webkitvisibilitychange";
+		}
+		document.addEventListener(changeEvent, function() {
+			if (!document[hidden]) { check_has_app(); }
+		}, false);
 	};
 
 	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
