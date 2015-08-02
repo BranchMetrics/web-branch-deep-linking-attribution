@@ -1,21 +1,21 @@
 {
   "name": "branch-sdk",
-  "version": "1.6.5",
-  "description": "Branch Metrics Web SDK",
+  "version": "1.6.6",
+  "description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
   "main": "dist/build.min.js",
   "scripts": {
     "test": "grunt test"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BranchMetrics/Web-SDK.git"
+    "url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK.git"
   },
   "author": "Dmitri Gaskin <dmitrig01@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BranchMetrics/Web-SDK/issues"
+    "url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/issues"
   },
-  "homepage": "https://github.com/BranchMetrics/Web-SDK",
+  "homepage": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK",
   "devDependencies": {
     "falafel": "1.0.1",
     "grunt": "~0.4.0",
@@ -34,5 +34,5 @@
   "dependencies": {
     "request": "^2.55.0"
   },
-  "build": "1.6.5"
+  "build": "1.6.6"
 }
