@@ -11,7 +11,7 @@ goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
 	var phone = doc.getElementById('branch-sms-phone');
-	var sendButton  = doc.getElementById('branch-sms-send');
+	var sendButton    = doc.getElementById('branch-sms-send');
 	var branchLoader = doc.getElementById('branch-loader-wrapper');
 	var smsFormContainer = doc.getElementById('branch-sms-form-container');
 	var checkmark;
@@ -99,93 +99,93 @@ var sendSMS = function(doc, branch, options, linkData) {
  * @param {storage} storage
  */
 banner = function(branch, options, linkData, storage) {
-  if (!banner_utils.shouldAppend(storage, options)) {
-    branch._publishEvent("willNotShowBanner");
-    return null;
-  }
-
-  branch._publishEvent("willShowBanner");
-
-  // Create markup
-  var element = banner_html.markup(options, storage);
-
-  // Add CSS
-  banner_css.css(options, element);
-
-  // Attach actions
-  linkData['channel'] = linkData['channel'] || 'app banner';
-
-  var doc = options.iframe ? element.contentWindow.document : document;
-  if (utils.mobileUserAgent()) {
-    var referring_link = branch._referringLink();
-    if (referring_link && !options['make_new_link']) {
-      doc.getElementById('branch-mobile-action').href = referring_link;
+    if (!banner_utils.shouldAppend(storage, options)) {
+        branch._publishEvent("willNotShowBanner");
+        return null;
     }
-    else {
-      branch["link"](linkData, function(err, url) {
-        if (err) {
-          // Todo: figure out something good to do here. Maybe a
-          // long link? Or why not always a long link?
+
+    branch._publishEvent("willShowBanner");
+
+    // Create markup
+    var element = banner_html.markup(options, storage);
+
+    // Add CSS
+    banner_css.css(options, element);
+
+    // Attach actions
+    linkData['channel'] = linkData['channel'] || 'app banner';
+
+    var doc = options.iframe ? element.contentWindow.document : document;
+    if (utils.mobileUserAgent()) {
+        var referring_link = branch._referringLink();
+        if (referring_link && !options['make_new_link']) {
+            doc.getElementById('branch-mobile-action').href = referring_link;
         }
         else {
-          doc.getElementById('branch-mobile-action').href = url;
+            branch["link"](linkData, function(err, url) {
+                if (err) {
+                    // Todo: figure out something good to do here. Maybe a
+                    // long link? Or why not always a long link?
+                }
+                else {
+                    doc.getElementById('branch-mobile-action').href = url;
+                }
+            });
         }
-      });
     }
-  }
-  else {
-    doc.getElementById('sms-form').addEventListener('submit', function(ev) {
-      ev.preventDefault();
-      sendSMS(doc, branch, options, linkData);
-    });
-  }
+    else {
+        doc.getElementById('sms-form').addEventListener('submit', function(ev) {
+            ev.preventDefault();
+            sendSMS(doc, branch, options, linkData);
+        });
+    }
 
-  var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
-    bodyMarginTopInline = document.body.style.marginTop,
-    bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom'),
-    bodyMarginBottomInline = document.body.style.marginBottom,
+    var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
+        bodyMarginTopInline = document.body.style.marginTop,
+        bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom'),
+        bodyMarginBottomInline = document.body.style.marginBottom,
 
-    closeButton = doc.getElementById('branch-banner-close'),
+        closeButton = doc.getElementById('branch-banner-close'),
 
-    closeBanner = function(callback) {
-      setTimeout(function() {
-        banner_utils.removeElement(element);
-        banner_utils.removeElement(document.getElementById('branch-css'));
-        callback();
-      }, banner_utils.animationSpeed + banner_utils.animationDelay);
+        closeBanner = function(callback) {
+            setTimeout(function() {
+                banner_utils.removeElement(element);
+                banner_utils.removeElement(document.getElementById('branch-css'));
+                callback();
+            }, banner_utils.animationSpeed + banner_utils.animationDelay);
 
-      setTimeout(function() {
-        if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
-        else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
-        banner_utils.removeClass(document.body, 'branch-banner-is-active');
-      }, banner_utils.animationDelay);
-      if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
-      else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
+            setTimeout(function() {
+                if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
+                else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
+                banner_utils.removeClass(document.body, 'branch-banner-is-active');
+            }, banner_utils.animationDelay);
+            if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+            else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-      if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
-      else { storage.set('hideBanner', true); }
-    };
+            if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
+            else { storage.set('hideBanner', true); }
+        };
 
-  if (closeButton) {
-    closeButton.onclick = function(ev) {
-      ev.preventDefault();
-      branch._publishEvent("willCloseBanner");
-      closeBanner(function() {
-        branch._publishEvent("didCloseBanner");
-      });
-    };
-  }
+    if (closeButton) {
+        closeButton.onclick = function(ev) {
+            ev.preventDefault();
+            branch._publishEvent("willCloseBanner");
+            closeBanner(function() {
+                branch._publishEvent("didCloseBanner");
+            });
+        };
+    }
 
-  // Trigger animation
-  banner_utils.addClass(document.body, 'branch-banner-is-active');
-  if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
-  else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
+    // Trigger animation
+    banner_utils.addClass(document.body, 'branch-banner-is-active');
+    if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
+    else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
 
-  setTimeout(function() {
-    if (options.position == 'top') { element.style.top = '0'; }
-    else if (options.position == 'bottom') { element.style.bottom = '0'; }
-    branch._publishEvent("didShowBanner");
-  }, banner_utils.animationDelay);
+    setTimeout(function() {
+        if (options.position == 'top') { element.style.top = '0'; }
+        else if (options.position == 'bottom') { element.style.bottom = '0'; }
+        branch._publishEvent("didShowBanner");
+    }, banner_utils.animationDelay);
 
-  return closeBanner;
+    return closeBanner;
 };
