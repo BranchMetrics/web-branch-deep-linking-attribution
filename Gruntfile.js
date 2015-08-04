@@ -100,9 +100,11 @@ var safari_browsers = [
 			version: '7.1'
 		},
 		{
-			browserName: 'iphone',
-			platform: 'OS X 10.10',
-			version: '7.0'
+			appiumVersion: '1.4.7',
+			browserName: 'Safari',
+			deviceName: 'iPhone Simulator',
+			platformName: 'iOS',
+			platformVersion: '7.0'
 		}/*,
 		{
 			browserName: 'iphone',
