@@ -80,38 +80,33 @@ var safari_browsers = [
 
 	ios_browsers = [
 		{
-			appiumVersion: '1.4.7',
-			browserName: 'Safari',
+			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
-			platformName: 'iOS',
+			platform: 'OS X 10.10',
 			platformVersion: '8.2'
 		},
 		{
-			appiumVersion: '1.4.7',
-			browserName: 'Safari',
+			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
-			platformName: 'iOS',
+			platform: 'OS X 10.10',
 			platformVersion: '8.1'
 		},
 		{
-			appiumVersion: '1.4.7',
-			browserName: 'Safari',
+			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
-			platformName: 'iOS',
+			platform: 'OS X 10.10',
 			platformVersion: '8.0'
 		},
 		{
-			appiumVersion: '1.4.7',
-			browserName: 'Safari',
+			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
-			platformName: 'iOS',
+			platform: 'OS X 10.10',
 			platformVersion: '7.1'
 		},
 		{
-			appiumVersion: '1.4.7',
-			browserName: 'Safari',
+			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
-			platformName: 'iOS',
+			platform: 'OS X 10.10',
 			platformVersion: '7.0'
 		}/*,
 		{
