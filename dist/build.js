@@ -167,7 +167,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   var a = goog.global.document;
   return "undefined" != typeof a && "write" in a;
 }, goog.findBasePath_ = function() {
-  if (goog.global.CLOSURE_BASE_PATH) {
+  if (goog.isDef(goog.global.CLOSURE_BASE_PATH)) {
     goog.basePath = goog.global.CLOSURE_BASE_PATH;
   } else {
     if (goog.inHtmlDocument_()) {
@@ -182,7 +182,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   }
 }, goog.importScript_ = function(a, b) {
   (goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_)(a, b) && (goog.dependencies_.written[a] = !0);
-}, goog.IS_OLD_IE_ = !goog.global.atob && goog.global.document && goog.global.document.all, goog.importModule_ = function(a) {
+}, goog.IS_OLD_IE_ = !(goog.global.atob || !goog.global.document || !goog.global.document.all), goog.importModule_ = function(a) {
   goog.importScript_("", 'goog.retrieveAndExecModule_("' + a + '");') && (goog.dependencies_.written[a] = !0);
 }, goog.queuedModules_ = [], goog.wrapModule_ = function(a, b) {
   return goog.LOAD_MODULE_USING_EVAL && goog.isDef(goog.global.JSON) ? "goog.loadModule(" + goog.global.JSON.stringify(b + "\n//# sourceURL=" + a + "\n") + ");" : 'goog.loadModule(function(exports) {"use strict";' + b + "\n;return exports});\n//# sourceURL=" + a + "\n";
@@ -1293,52 +1293,52 @@ var sendSMS = function(a, b, c, d) {
     })) : n();
   }
 }, banner = function(a, b, c, d) {
-  if (banner_utils.shouldAppend(d, b)) {
-    a._publishEvent("willShowBanner");
-    var e = banner_html.markup(b, d);
-    banner_css.css(b, e);
-    c.channel = c.channel || "app banner";
-    var f = b.iframe ? e.contentWindow.document : document;
-    if (utils.mobileUserAgent()) {
-      var g = a._referringLink();
-      g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
-        a || (f.getElementById("branch-mobile-action").href = b);
-      });
-    } else {
-      f.getElementById("sms-form").addEventListener("submit", function(d) {
-        d.preventDefault();
-        sendSMS(f, a, b, c);
-      });
-    }
-    var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
-      setTimeout(function() {
-        banner_utils.removeElement(e);
-        banner_utils.removeElement(document.getElementById("branch-css"));
-        a();
-      }, banner_utils.animationSpeed + banner_utils.animationDelay);
-      setTimeout(function() {
-        "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = l);
-        banner_utils.removeClass(document.body, "branch-banner-is-active");
-      }, banner_utils.animationDelay);
-      "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-      "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
-    };
-    m && (m.onclick = function(b) {
-      b.preventDefault();
-      a._publishEvent("willCloseBanner");
-      n(function() {
-        a._publishEvent("didCloseBanner");
-      });
-    });
-    banner_utils.addClass(document.body, "branch-banner-is-active");
-    "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
-    setTimeout(function() {
-      "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
-      a._publishEvent("didShowBanner");
-    }, banner_utils.animationDelay);
-    return n;
+  if (!banner_utils.shouldAppend(d, b)) {
+    return a._publishEvent("willNotShowBanner"), null;
   }
-  a._publishEvent("willNotShowBanner");
+  a._publishEvent("willShowBanner");
+  var e = banner_html.markup(b, d);
+  banner_css.css(b, e);
+  c.channel = c.channel || "app banner";
+  var f = b.iframe ? e.contentWindow.document : document;
+  if (utils.mobileUserAgent()) {
+    var g = a._referringLink();
+    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
+      a || (f.getElementById("branch-mobile-action").href = b);
+    });
+  } else {
+    f.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(f, a, b, c);
+    });
+  }
+  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
+    setTimeout(function() {
+      banner_utils.removeElement(e);
+      banner_utils.removeElement(document.getElementById("branch-css"));
+      a();
+    }, banner_utils.animationSpeed + banner_utils.animationDelay);
+    setTimeout(function() {
+      "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = l);
+      banner_utils.removeClass(document.body, "branch-banner-is-active");
+    }, banner_utils.animationDelay);
+    "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
+    "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
+  };
+  m && (m.onclick = function(b) {
+    b.preventDefault();
+    a._publishEvent("willCloseBanner");
+    n(function() {
+      a._publishEvent("didCloseBanner");
+    });
+  });
+  banner_utils.addClass(document.body, "branch-banner-is-active");
+  "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
+  setTimeout(function() {
+    "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
+    a._publishEvent("didShowBanner");
+  }, banner_utils.animationDelay);
+  return n;
 };
 // Input 13
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
