@@ -55,12 +55,12 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '36'
-		},
+		}/*,
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '35'
-		}/*,
+		},
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
