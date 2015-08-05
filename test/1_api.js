@@ -34,7 +34,7 @@ describe('Server helpers', function() {
 
 describe('Server', function() {
 	var server = new Server(),
-		storage = new BranchStorage(['session', 'pojo']),
+		storage = new BranchStorage([ 'session', 'pojo' ]),
 		xhr,
 		requests,
 		clock;

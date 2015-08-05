@@ -85,7 +85,7 @@ var wrap = function(parameters, func, init) {
 		});
 	};
 	return r;
-}
+};
 
 /***
  * @class Branch
@@ -266,7 +266,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data['link']) { self.sessionLink = data['link']; }
 
 		if (data['referring_link']) {
-			data['referring_link'] = utils.processReferringLink(data['referring_link']); //.substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
+			data['referring_link'] = utils.processReferringLink(data['referring_link']); // .substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
 		}
 
 		if (!data['click_id'] && data['referring_link']) {
@@ -282,7 +282,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 	isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null,
 	sessionData = session.get(self._storage),
-	url = (options && typeof options.url != 'undefined' && options.url != null) ? options.url : null,
+	url = (options && typeof options.url != 'undefined' && options.url !== null) ? options.url : null,
 	link_identifier = WEB_BUILD ? (utils.getParamValue('_branch_match_id') || utils.hashValue('r')) : (url ? utils.getParamValue(url) : null),
 	freshInstall = !sessionData || !sessionData['identity_id'],
 
@@ -322,7 +322,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					args.push(isReferrable ? 1 : 0);
 				}
 				cordova.require("cordova/exec")(apiCordovaTitanium,
-					function() { done("Error getting device data!") },
+					function() { done("Error getting device data!"); },
 					"BranchDevice",
 					freshInstall ? "getInstallData" : "getOpenData", args);
 			}
@@ -331,10 +331,10 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					branchTitaniumSDK = require('io.branch.sdk');
 				if (link_identifier) { data['link_identifier'] = link_identifier; }
 				if (freshInstall) {
-					data = (isReferrable == null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
+					data = (isReferrable === null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
 				}
 				else {
-					data = (isReferrable == null) ? branchTitaniumSDK.getOpenData(-1) : branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
+					data = (isReferrable === null) ? branchTitaniumSDK.getOpenData(-1) : branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
 				}
 				apiCordovaTitanium(data);
 			}
@@ -582,7 +582,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 				"language": navigator.language
 			}, metadata || {})
 		}, done);
-	} else {
+	}
+	else {
 		this._api(resources.event, {
 			"event": event,
 			"metadata": metadata || {}
@@ -933,7 +934,8 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *     function(err) {
  *         if (err) {
  *             console.log(err);
- *         } else {
+ *         }
+ *         else {
  *             console.log("Code is valid");
  *         }
  *     }
@@ -979,7 +981,8 @@ Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(d
  *     function(err) {
  *         if (err) {
  *             console.log(err);
- *         } else {
+ *         }
+ *         else {
  *             console.log("Code applied");
  *         }
  *     }
@@ -1191,7 +1194,7 @@ if (WEB_BUILD) { // jshint undef:false
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event == "function" && listener == undefined) { listener = event; }
+		if (typeof event == "function" && listener === undefined) { listener = event; }
 		if (listener) {
 			this._listeners.push({
 				listener: listener,

@@ -149,9 +149,11 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		req.onerror = function(e) {
 			if (req.status === 402) {
 				callback(new Error('Not enough credits to redeem.'), null, req.status);
-			} else if (e.error) {
+			}
+			else if (e.error) {
 				callback(new Error(e.error), null, req.status);
-			} else {
+			}
+			else {
 				callback(new Error("Error in API: " + req.status), null, req.status);
 			}
 		};
@@ -171,7 +173,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 				callback(new Error('Error in API: ' + req.status), null, req.status);
 			}
 		};
-	} else {
+	}
+	else {
 		req.onreadystatechange = function() {
 			if (req.readyState === 4) {
 				if (req.status === 200) {

@@ -603,7 +603,8 @@ branch.validateCode(
     function(err) {
         if (err) {
             console.log(err);
-        } else {
+        }
+        else {
             console.log("Code is valid");
         }
     }
@@ -648,7 +649,8 @@ branch.applyCode(
     function(err) {
         if (err) {
             console.log(err);
-        } else {
+        }
+        else {
             console.log("Code applied");
         }
     }

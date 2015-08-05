@@ -10,7 +10,7 @@ goog.require('goog.json'); // jshint unused:false
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
 describe('Branch', function() {
-	var storage = new BranchStorage(['pojo']),
+	var storage = new BranchStorage([ 'pojo' ]),
 		sandbox,
 		requests;
 
@@ -190,7 +190,8 @@ describe('Branch', function() {
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version
 				}, 'Request to open params correct');
-			} else { done(); }
+			}
+			else { done(); }
 		});
 
 		it('should store in session and call open with link_identifier from get param', function(done) {
@@ -212,7 +213,8 @@ describe('Branch', function() {
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version
 				}, 'Request to open params correct');
-			} else { done(); }
+			}
+			else { done(); }
 		});
 	});
 

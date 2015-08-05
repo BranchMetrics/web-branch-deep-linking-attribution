@@ -3,7 +3,7 @@ goog.require('storage'); // jshint ignore:line
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 describe('session storage', function() {
-	var storage = new BranchStorage(['session']); // jshint ignore:line
+	var storage = new BranchStorage([ 'session' ]); // jshint ignore:line
 
 	var itemKey = 'key';
 	var itemValue = 'value';
@@ -39,7 +39,7 @@ describe('session storage', function() {
 });
 
 describe('local storage', function() {
-	var storage = new BranchStorage(['local']); // jshint ignore:line
+	var storage = new BranchStorage([ 'local' ]); // jshint ignore:line
 
 	var itemKey = 'key';
 	var itemValue = 'value';
@@ -109,7 +109,7 @@ describe('cookie storage', function() {
 });
 */
 describe('pojo storage', function() {
-	var storage = new BranchStorage(['pojo']); // jshint ignore:line
+	var storage = new BranchStorage([ 'pojo' ]); // jshint ignore:line
 
 	var itemKey = 'key';
 	var itemValue = 'value';
