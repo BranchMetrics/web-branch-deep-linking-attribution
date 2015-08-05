@@ -83,31 +83,31 @@ var safari_browsers = [
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
-			platformVersion: '8.2'
+			version: '8.2'
 		},
 		{
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
-			platformVersion: '8.1'
+			version: '8.1'
 		},
 		{
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
-			platformVersion: '8.0'
+			version: '8.0'
 		},
 		{
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
-			platformVersion: '7.1'
+			version: '7.1'
 		},
 		{
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
-			platformVersion: '7.0'
+			version: '7.0'
 		}/*,
 		{
 			browserName: 'iphone',
