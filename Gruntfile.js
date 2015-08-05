@@ -55,12 +55,12 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '36'
-		},
+		}/*,
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '35'
-		}/*,
+		},
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
@@ -81,29 +81,34 @@ var safari_browsers = [
 	ios_browsers = [
 		{
 			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '8.2'
 		},
 		{
 			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '8.1'
 		},
 		{
 			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '8.0'
 		},
 		{
 			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '7.1'
-		},
+		}/*,
 		{
 			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '7.0'
-		}/*,
+		},
 		{
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
