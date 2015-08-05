@@ -485,64 +485,64 @@ window.console = window.console || { log: function() { return arguments; } };
 window.testUtils = testUtils = {};
 
 testUtils.params = function(extra, without) {
-	// Returns new object every time.
-	var p = utils.merge({
-		branch_key: branch_sample_key,
-		session_id: session_id,
-		identity_id: identity_id,
-		browser_fingerprint_id: browser_fingerprint_id,
-		sdk: window.sdk_version
-	}, extra || {});
-	for (var k = 0; k < (without || []).length; k++) {
-		delete p[without[k]];
-	}
-	return p;
+    // Returns new object every time.
+    var p = utils.merge({
+        branch_key: branch_sample_key,
+        session_id: session_id,
+        identity_id: identity_id,
+        browser_fingerprint_id: browser_fingerprint_id,
+        sdk: window.sdk_version
+    }, extra || {});
+    for (var k = 0; k < (without || []).length; k++) {
+        delete p[without[k]];
+    }
+    return p;
 };
 
 testUtils.nulls = function(n) {
-	var p = [];
-	for (var k = 0; k < n; k++) { p.push(null); }
-	return p;
+    var p = [];
+    for (var k = 0; k < n; k++) { p.push(null); }
+    return p;
 };
 testUtils.after = function(n, done) {
-	var remaining = n;
-	return function() {
-		remaining--;
-		if (remaining == 0) { done(); }
-		if (remaining < 0) { console.log('ERROR!!! More calls than planned'); }
-	};
+    var remaining = n;
+    return function() {
+        remaining--;
+        if (remaining == 0) { done(); }
+        if (remaining < 0) { console.log('ERROR!!! More calls than planned'); }
+    };
 };
 var assertions = [ 'fail', 'equal', 'notEqual', 'deepEqual', 'notDeepEqual', 'strictEqual', 'notStrinctEqual', 'throws', 'doesNotThrow', 'ifError' ];
 testUtils.plan = function(n, done) {
-	var d = testUtils.after(n, done);
-	var ret = function() {
-		assert.apply(assert, Array.prototype.slice.call(arguments, 0));
-		d();
-	};
-	function create(name) {
-		ret[name] = function() {
-			assert[name].apply(assert, Array.prototype.slice.call(arguments, 0));
-			d();
-		};
-	}
-	for (var i = 0; i < assertions.length; i++) { create(assertions[i]) }
+    var d = testUtils.after(n, done);
+    var ret = function() {
+        assert.apply(assert, Array.prototype.slice.call(arguments, 0));
+        d();
+    };
+    function create(name) {
+        ret[name] = function() {
+            assert[name].apply(assert, Array.prototype.slice.call(arguments, 0));
+            d();
+        };
+    }
+    for (var i = 0; i < assertions.length; i++) { create(assertions[i]) }
 
-	ret.done = function(err) {
-		return ret(!err);
-	};
+    ret.done = function(err) {
+        return ret(!err);
+    };
 
-	return ret;
+    return ret;
 };
 
 testUtils.unplanned = function() { return assert; };
 
 testUtils.go = function(suffix) {
-	if (!window.history.pushState) { return false; }
-	var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
-	if (new_location != window.location.toString()) {
-		window.history.pushState({}, '', new_location); // Simply not possible in IE 9
+    if (!window.history.pushState) { return false; }
+    var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
+    if (new_location != window.location.toString()) {
+        window.history.pushState({}, '', new_location); // Simply not possible in IE 9
     return true;
-	}
+    }
   else { return false; }
 };
 
