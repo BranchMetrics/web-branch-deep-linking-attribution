@@ -18,7 +18,7 @@ var storage;
 if (TITANIUM_BUILD) {
 	/** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
 	// todo(dmitri): what does this line do? do you actuall mean `prop = Ti.App.Properties;`?
-	// Ti.App.Properties;
+	Ti.App.Properties;
 }
 
 /**
@@ -37,8 +37,7 @@ if (TITANIUM_BUILD) {
 };
 
 var prefix = function(key) {
-	key = key == "branch_session" || key == "branch_session_first" ? key : BRANCH_KEY_PREFIX + key;
-	return key;
+	return key == "branch_session" || key == "branch_session_first" ? key : BRANCH_KEY_PREFIX + key;
 };
 var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); };
 
