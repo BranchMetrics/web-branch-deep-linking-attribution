@@ -10,86 +10,86 @@ goog.require('banner_html');
 goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
-	var phone = doc.getElementById('branch-sms-phone');
-	var sendButton  = doc.getElementById('branch-sms-send');
-	var branchLoader = doc.getElementById('branch-loader-wrapper');
-	var smsFormContainer = doc.getElementById('branch-sms-form-container');
-	var checkmark;
+    var phone = doc.getElementById('branch-sms-phone');
+    var sendButton  = doc.getElementById('branch-sms-send');
+    var branchLoader = doc.getElementById('branch-loader-wrapper');
+    var smsFormContainer = doc.getElementById('branch-sms-form-container');
+    var checkmark;
 
-	var disableForm = function() {
-		sendButton.setAttribute('disabled', '');
-		phone.setAttribute('disabled', '');
-		sendButton.style.opacity = '.4';
-		phone.style.opacity = '.4';
-		branchLoader.style.opacity = '1';
-		phone.className = '';
-	};
+    var disableForm = function() {
+        sendButton.setAttribute('disabled', '');
+        phone.setAttribute('disabled', '');
+        sendButton.style.opacity = '.4';
+        phone.style.opacity = '.4';
+        branchLoader.style.opacity = '1';
+        phone.className = '';
+    };
 
-	var enableForm = function() {
-		sendButton.removeAttribute('disabled');
-		phone.removeAttribute('disabled');
-		sendButton.style.opacity = '1';
-		phone.style.opacity = '1';
-		branchLoader.style.opacity = '0';
-	};
+    var enableForm = function() {
+        sendButton.removeAttribute('disabled');
+        phone.removeAttribute('disabled');
+        sendButton.style.opacity = '1';
+        phone.style.opacity = '1';
+        branchLoader.style.opacity = '0';
+    };
 
-	var hideFormShowSuccess = function() {
-		checkmark = doc.createElement('div');
-		checkmark.className = 'branch-icon-wrapper';
-		checkmark.id = 'branch-checkmark';
-		checkmark.style = 'opacity: 0;';
-		checkmark.innerHTML = banner_html.checkmark();
-		smsFormContainer.appendChild(checkmark);
+    var hideFormShowSuccess = function() {
+        checkmark = doc.createElement('div');
+        checkmark.className = 'branch-icon-wrapper';
+        checkmark.id = 'branch-checkmark';
+        checkmark.style = 'opacity: 0;';
+        checkmark.innerHTML = banner_html.checkmark();
+        smsFormContainer.appendChild(checkmark);
 
-		sendButton.style.opacity = '0';
+        sendButton.style.opacity = '0';
 
-		phone.style.opacity = '0';
+        phone.style.opacity = '0';
 
-		branchLoader.style.opacity = '0';
+        branchLoader.style.opacity = '0';
 
-		setTimeout(function() {
-			checkmark.style.opacity = '1';
-		}, banner_utils.animationDelay);
+        setTimeout(function() {
+            checkmark.style.opacity = '1';
+        }, banner_utils.animationDelay);
 
-		phone.value = '';
-	};
+        phone.value = '';
+    };
 
-	var errorForm = function() {
-		enableForm();
-		sendButton.style.background = "#FFD4D4";
+    var errorForm = function() {
+        enableForm();
+        sendButton.style.background = "#FFD4D4";
 
-		phone.className = 'error';
+        phone.className = 'error';
 
-		setTimeout(function() {
-			sendButton.style.background = "#FFFFFF";
-			phone.className = '';
-		}, banner_utils.error_timeout);
-	};
+        setTimeout(function() {
+            sendButton.style.background = "#FFFFFF";
+            phone.className = '';
+        }, banner_utils.error_timeout);
+    };
 
-	if (phone) {
-		var phone_val = phone.value;
-		if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
-			branch._publishEvent("willSendBannerSMS");
-			disableForm();
-			branch["sendSMS"](phone_val, linkData, options, function(err) {
-				if (err) {
-					branch._publishEvent("sendBannerSMSError");
-					errorForm();
-				}
-				else {
-					branch._publishEvent("didSendBannerSMS");
-					hideFormShowSuccess();
-					setTimeout(function() {
-						smsFormContainer.removeChild(checkmark);
-						enableForm();
-					}, banner_utils.success_timeout);
-				}
-			 });
-		}
-		else {
-			errorForm();
-		}
-	}
+    if (phone) {
+        var phone_val = phone.value;
+        if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
+            branch._publishEvent("willSendBannerSMS");
+            disableForm();
+            branch["sendSMS"](phone_val, linkData, options, function(err) {
+                if (err) {
+                    branch._publishEvent("sendBannerSMSError");
+                    errorForm();
+                }
+                else {
+                    branch._publishEvent("didSendBannerSMS");
+                    hideFormShowSuccess();
+                    setTimeout(function() {
+                        smsFormContainer.removeChild(checkmark);
+                        enableForm();
+                    }, banner_utils.success_timeout);
+                }
+             });
+        }
+        else {
+            errorForm();
+        }
+    }
 };
 
 /**
@@ -99,91 +99,91 @@ var sendSMS = function(doc, branch, options, linkData) {
  * @param {storage} storage
  */
 banner = function(branch, options, linkData, storage) {
-	if (banner_utils.shouldAppend(storage, options)) {
-		branch._publishEvent("willShowBanner");
+    if (banner_utils.shouldAppend(storage, options)) {
+        branch._publishEvent("willShowBanner");
 
-		// Create markup
-		var element = banner_html.markup(options, storage);
+        // Create markup
+        var element = banner_html.markup(options, storage);
 
-		// Add CSS
-		banner_css.css(options, element);
+        // Add CSS
+        banner_css.css(options, element);
 
-		// Attach actions
-		linkData['channel'] = linkData['channel'] || 'app banner';
+        // Attach actions
+        linkData['channel'] = linkData['channel'] || 'app banner';
 
-		var doc = options.iframe ? element.contentWindow.document : document;
-		if (utils.mobileUserAgent()) {
-			var referring_link = branch._referringLink();
-			if (referring_link && !options['make_new_link']) {
-				doc.getElementById('branch-mobile-action').href = referring_link;
-			}
-			else {
-				branch["link"](linkData, function(err, url) {
-					if (err) {
-						// Todo: figure out something good to do here. Maybe a
-						// long link? Or why not always a long link?
-					}
-					else {
-						doc.getElementById('branch-mobile-action').href = url;
-					}
-				});
-			}
-		}
-		else {
-			doc.getElementById('sms-form').addEventListener('submit', function(ev) {
-				ev.preventDefault();
-				sendSMS(doc, branch, options, linkData);
-			});
-		}
+        var doc = options.iframe ? element.contentWindow.document : document;
+        if (utils.mobileUserAgent()) {
+            var referring_link = branch._referringLink();
+            if (referring_link && !options['make_new_link']) {
+                doc.getElementById('branch-mobile-action').href = referring_link;
+            }
+            else {
+                branch["link"](linkData, function(err, url) {
+                    if (err) {
+                        // Todo: figure out something good to do here. Maybe a
+                        // long link? Or why not always a long link?
+                    }
+                    else {
+                        doc.getElementById('branch-mobile-action').href = url;
+                    }
+                });
+            }
+        }
+        else {
+            doc.getElementById('sms-form').addEventListener('submit', function(ev) {
+                ev.preventDefault();
+                sendSMS(doc, branch, options, linkData);
+            });
+        }
 
-		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
-			bodyMarginTopInline = document.body.style.marginTop,
-			bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom'),
-			bodyMarginBottomInline = document.body.style.marginBottom,
+        var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top'),
+            bodyMarginTopInline = document.body.style.marginTop,
+            bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom'),
+            bodyMarginBottomInline = document.body.style.marginBottom,
 
-			closeButton = doc.getElementById('branch-banner-close'),
+            closeButton = doc.getElementById('branch-banner-close'),
 
-			closeBanner = function(callback) {
-				setTimeout(function() {
-					banner_utils.removeElement(element);
-					banner_utils.removeElement(document.getElementById('branch-css'));
-					callback();
-				}, banner_utils.animationSpeed + banner_utils.animationDelay);
+            closeBanner = function(callback) {
+                setTimeout(function() {
+                    banner_utils.removeElement(element);
+                    banner_utils.removeElement(document.getElementById('branch-css'));
+                    callback();
+                }, banner_utils.animationSpeed + banner_utils.animationDelay);
 
-				setTimeout(function() {
-					if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
-					else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
-					banner_utils.removeClass(document.body, 'branch-banner-is-active');
-				}, banner_utils.animationDelay);
-				if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
-				else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
+                setTimeout(function() {
+                    if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
+                    else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
+                    banner_utils.removeClass(document.body, 'branch-banner-is-active');
+                }, banner_utils.animationDelay);
+                if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+                else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
 
-				if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
-				else { storage.set('hideBanner', true); }
-			};
+                if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
+                else { storage.set('hideBanner', true); }
+            };
 
-		if (closeButton) {
-			closeButton.onclick = function(ev) {
-				ev.preventDefault();
-				branch._publishEvent("willCloseBanner");
-				closeBanner(function() {
-					branch._publishEvent("didCloseBanner");
-				});
-			};
-		}
+        if (closeButton) {
+            closeButton.onclick = function(ev) {
+                ev.preventDefault();
+                branch._publishEvent("willCloseBanner");
+                closeBanner(function() {
+                    branch._publishEvent("didCloseBanner");
+                });
+            };
+        }
 
-		// Trigger animation
-		banner_utils.addClass(document.body, 'branch-banner-is-active');
-		if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
-		else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
+        // Trigger animation
+        banner_utils.addClass(document.body, 'branch-banner-is-active');
+        if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
+        else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
 
-		setTimeout(function() {
-			if (options.position == 'top') { element.style.top = '0'; }
-			else if (options.position == 'bottom') { element.style.bottom = '0'; }
-			branch._publishEvent("didShowBanner");
-		}, banner_utils.animationDelay);
+        setTimeout(function() {
+            if (options.position == 'top') { element.style.top = '0'; }
+            else if (options.position == 'bottom') { element.style.bottom = '0'; }
+            branch._publishEvent("didShowBanner");
+        }, banner_utils.animationDelay);
 
-		return closeBanner;
-	}
-	else { branch._publishEvent("willNotShowBanner"); }
+        return closeBanner;
+    }
+    else { branch._publishEvent("willNotShowBanner"); }
 };

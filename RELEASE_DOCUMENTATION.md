@@ -6,22 +6,22 @@ The entire process for releasing new versions of the Branch SDK, and geenrating 
 
 ### Features of Build and Release Automation
 + **Makefile**
-	+ Building and minification with Google Closure Compiler
-	+ gzip of minified JavaScript
-	+ Separate builds for Web and Cordova
-	+ Embeding of Branch snipet on the Web testbed
-	+ Embedding of Branch snipet on the integration Mocha.js test page
-	+ Documentation generation from JSDoc style inline comments from `src/3_branch.js`
-	+ Concatenation of a summary README that includes an introduction, most recent Web snipet, and overview of Web Smart Banner and Cordova
-	+ Concatenation of full documentation for both Web and Cordova of an introdocution, an automatically generated table of contents, and JSDoc generated function descriptions and spec.
+    + Building and minification with Google Closure Compiler
+    + gzip of minified JavaScript
+    + Separate builds for Web and Cordova
+    + Embeding of Branch snipet on the Web testbed
+    + Embedding of Branch snipet on the integration Mocha.js test page
+    + Documentation generation from JSDoc style inline comments from `src/3_branch.js`
+    + Concatenation of a summary README that includes an introduction, most recent Web snipet, and overview of Web Smart Banner and Cordova
+    + Concatenation of full documentation for both Web and Cordova of an introdocution, an automatically generated table of contents, and JSDoc generated function descriptions and spec.
 
 + **Release.sh**
-	+ Version number management in `0_config.js`, `package.json`, `CHANGELOG.md`, `bower.json`, `plugin.xml`, Git commit and tag
-	+ Build a release build with the Makefile
-	+ Upload both the minified and gzipped Web SDK, and the example web testbed to S3
-	+ Publish to npm
-	+ Reset everything: Changelog unreleased version at top, clean and remake, then commit
-	+ Reminder to update the Branch integration guide - soon to be automated
+    + Version number management in `0_config.js`, `package.json`, `CHANGELOG.md`, `bower.json`, `plugin.xml`, Git commit and tag
+    + Build a release build with the Makefile
+    + Upload both the minified and gzipped Web SDK, and the example web testbed to S3
+    + Publish to npm
+    + Reset everything: Changelog unreleased version at top, clean and remake, then commit
+    + Reminder to update the Branch integration guide - soon to be automated
 
 ## Documentation
 
