@@ -8,6 +8,8 @@ goog.require('utils');
 goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 
+/*globals Ti, TITANIUM_BUILD */
+
 var RETRIES = 2,
 	RETRY_DELAY = 200,
 	TIMEOUT = 5000;

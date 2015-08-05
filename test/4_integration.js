@@ -1,7 +1,8 @@
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-/* globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
+/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch, cordova */
+/*globals device_fingerprint_id */
 
 describe('Integration tests', function() {
 	var requests = [ ], xhr, clock, jsonpCallback = 0;

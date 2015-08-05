@@ -8,6 +8,8 @@ goog.provide('storage');
 goog.require('goog.json');
 goog.require('utils');
 
+/*globals Ti, TITANIUM_BUILD */
+
 var COOKIE_DAYS = 365;
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
@@ -18,7 +20,7 @@ var storage;
 if (TITANIUM_BUILD) {
 	/** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
 	// todo(dmitri): what does this line do? do you actuall mean `prop = Ti.App.Properties;`?
-	Ti.App.Properties;
+	// Ti.App.Properties;
 }
 
 /**
