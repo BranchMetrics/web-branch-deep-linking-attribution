@@ -31,17 +31,17 @@ var getOpenData = function() {};
 var getInstallData = function() {};
 
 var Ti = {
-	App: {
-		Properties: {
-			getString: function() {},
-			setString: function() {}
-		}
-	},
-	Network: {
-		createHTTPClient: function() {}
-	},
-	Platform: {
-		osname: ""
-	}
+    App: {
+        Properties: {
+            getString: function() {},
+            setString: function() {}
+        }
+    },
+    Network: {
+        createHTTPClient: function() {}
+    },
+    Platform: {
+        osname: ""
+    }
 };
 
