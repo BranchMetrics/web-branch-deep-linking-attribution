@@ -544,8 +544,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
-      g[k - 2] = arguments[k];
+    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
+      g[h - 2] = arguments[h];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -756,7 +756,7 @@ utils.message = function(a, b) {
   return c;
 };
 utils.whiteListSessionData = function(a) {
-  return {data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null, referring_link:a.referring_link || null};
+  return {data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:"undefined" != typeof a.has_app ? a.has_app : null, referring_link:a.referring_link || null};
 };
 utils.cleanLinkData = function(a, b) {
   WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
@@ -799,14 +799,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, k, h = 0;
+  var b = "", c, d, e, f, g, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -968,7 +968,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, k = function() {
+    }, h = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -980,11 +980,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * k();
+      return a * h();
     }, vmin:function(a) {
-      return a * Math.min(k(), g());
+      return a * Math.min(h(), g());
     }, vmax:function(a) {
-      return a * Math.max(k(), g());
+      return a * Math.max(h(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * f;
     }}[b](f), 10);
@@ -1013,41 +1013,36 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint;
+  var c, d, e, f = a.destination + a.endpoint, g = /^[0-9]{15,20}$/, h = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+    "undefined" == typeof c && (c = {});
+    b.branch_key && h.test(b.branch_key) ? c.branch_key = b.branch_key : b.app_id && g.test(b.app_id) ? c.app_id = b.app_id : e = utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]);
+    return c;
+  };
+  "/v1/has-app" == a.endpoint && (a.queryPart = k(b, a.queryPart));
   if (a.queryPart) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
-        if (d = a.queryPart[c](a.endpoint, c, b[c])) {
-          return {error:d};
+        if (e = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : e) {
+          return {error:e};
         }
-        e += "/" + b[c];
+        f += "/" + b[c];
       }
     }
   }
-  var f = {};
+  var l = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      if (d = a.params[c](a.endpoint, c, b[c])) {
-        return {error:d};
+      if (e = a.params[c](a.endpoint, c, b[c])) {
+        return {error:e};
       }
       d = b[c];
-      "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
+      "undefined" != typeof d && "" !== d && null !== d && (l[c] = d);
     }
   }
-  c = /^[0-9]{15,20}$/;
-  d = /key_(live|test)_[A-Za-z0-9]{32}/;
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
-    if (b.branch_key && d.test(b.branch_key)) {
-      f.branch_key = b.branch_key;
-    } else {
-      if (b.app_id && c.test(b.app_id)) {
-        f.app_id = b.app_id;
-      } else {
-        return {error:utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"])};
-      }
-    }
+    b = k(b, l);
   }
-  return {data:this.serializeObject(f, ""), url:e};
+  return e ? {error:e} : {data:this.serializeObject(l, ""), url:f};
 };
 Server.prototype.createScript = function(a) {
   var b = document.createElement("script");
@@ -1112,16 +1107,16 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(f.error));
   }
-  var g, k = "";
-  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
-  var h = RETRIES, l = function(a, b, c) {
-    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
-      m();
+  var g, h = "";
+  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
+  var k = RETRIES, l = function(a, b, c) {
+    a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
+      n();
     }, RETRY_DELAY)) : d(a, b);
-  }, m = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
+  }, n = function() {
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
   };
-  m();
+  n();
 };
 // Input 9
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
@@ -1194,6 +1189,7 @@ resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credit
 resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:defaults({})};
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.num), bucket:validator(!0, validationTypes.str)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.str), tags:validator(!1, validationTypes.arr), feature:validator(!1, validationTypes.str), campaign:validator(!1, validationTypes.str), channel:validator(!1, validationTypes.str), stage:validator(!1, validationTypes.str), type:validator(!1, validationTypes.num), alias:validator(!1, validationTypes.str)})};
+resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.str), metadata:validator(!0, validationTypes.obj)})};
 // Input 10
 var banner_css = {banner:function(a) {
@@ -1222,8 +1218,14 @@ banner_css.css = function(a, b) {
 // Input 11
 var banner_html = {banner:function(a, b) {
   return '<div class="content"><div class="right vertically-align-middle">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + '</div><div class="description">' + a.description + "</div></div></div></div>";
-}, mobileAction:function(a, b) {
-  return '<a id="branch-mobile-action" href="#" target="_parent">' + (b.get("has_app") ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+}, mobileAction:function(a, b, c) {
+  var d = function(a) {
+    return '<a id="branch-mobile-action" href="#" target="_parent">' + a + "</a>";
+  };
+  c.addListener("downloadedApp", function() {
+    (a.iframe ? document.getElementById("branch-banner-iframe").contentWindow.document : document).getElementById("branch-mobile-action").innerHTML = d(a.openAppButtonText);
+  });
+  return d(session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText);
 }, desktopAction:function(a) {
   return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
@@ -1248,33 +1250,33 @@ var banner_html = {banner:function(a, b) {
   c.innerHTML = banner_html.banner(a, b);
   document.body.appendChild(c);
   return c;
-}, markup:function(a, b) {
-  var c = '<div id="branch-sms-form-container" class="vertically-align-middle">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
-  return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
+}, markup:function(a, b, c, d) {
+  b = '<div id="branch-sms-form-container" class="vertically-align-middle">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b, c) : banner_html.desktopAction(a)) + "</div>";
+  return a.iframe ? banner_html.iframe(a, b) : banner_html.div(a, b);
 }};
 // Input 12
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, m = function() {
-    h = a.createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = banner_html.checkmark();
-    k.appendChild(h);
+  }, n = function() {
+    k = a.createElement("div");
+    k.className = "branch-icon-wrapper";
+    k.id = "branch-checkmark";
+    k.style = "opacity: 0;";
+    k.innerHTML = banner_html.checkmark();
+    h.appendChild(k);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      h.style.opacity = "1";
+      k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, n = function() {
+  }, m = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1286,59 +1288,59 @@ var sendSMS = function(a, b, c, d) {
   if (e) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
-        k.removeChild(h);
+      a ? (b._publishEvent("sendBannerSMSError"), m()) : (b._publishEvent("didSendBannerSMS"), n(), setTimeout(function() {
+        h.removeChild(k);
         l();
       }, banner_utils.success_timeout));
-    })) : n();
+    })) : m();
   }
 }, banner = function(a, b, c, d) {
-  if (!banner_utils.shouldAppend(d, b)) {
-    return a._publishEvent("willNotShowBanner"), null;
-  }
-  a._publishEvent("willShowBanner");
-  var e = banner_html.markup(b, d);
-  banner_css.css(b, e);
-  c.channel = c.channel || "app banner";
-  var f = b.iframe ? e.contentWindow.document : document;
-  if (utils.mobileUserAgent()) {
-    var g = a._referringLink();
-    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
-      a || (f.getElementById("branch-mobile-action").href = b);
+  if (banner_utils.shouldAppend(d, b)) {
+    a._publishEvent("willShowBanner");
+    var e = banner_html.markup(b, d, a);
+    banner_css.css(b, e);
+    c.channel = c.channel || "app banner";
+    var f = b.iframe ? e.contentWindow.document : document;
+    if (utils.mobileUserAgent()) {
+      var g = a._referringLink();
+      g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
+        a || (f.getElementById("branch-mobile-action").href = b);
+      });
+    } else {
+      f.getElementById("sms-form").addEventListener("submit", function(d) {
+        d.preventDefault();
+        sendSMS(f, a, b, c);
+      });
+    }
+    var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
+      setTimeout(function() {
+        banner_utils.removeElement(e);
+        banner_utils.removeElement(document.getElementById("branch-css"));
+        a();
+      }, banner_utils.animationSpeed + banner_utils.animationDelay);
+      setTimeout(function() {
+        "top" == b.position ? document.body.style.marginTop = h : "bottom" == b.position && (document.body.style.marginBottom = l);
+        banner_utils.removeClass(document.body, "branch-banner-is-active");
+      }, banner_utils.animationDelay);
+      "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
+      "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
+    };
+    n && (n.onclick = function(b) {
+      b.preventDefault();
+      a._publishEvent("willCloseBanner");
+      m(function() {
+        a._publishEvent("didCloseBanner");
+      });
     });
-  } else {
-    f.getElementById("sms-form").addEventListener("submit", function(d) {
-      d.preventDefault();
-      sendSMS(f, a, b, c);
-    });
-  }
-  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
+    banner_utils.addClass(document.body, "branch-banner-is-active");
+    "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
     setTimeout(function() {
-      banner_utils.removeElement(e);
-      banner_utils.removeElement(document.getElementById("branch-css"));
-      a();
-    }, banner_utils.animationSpeed + banner_utils.animationDelay);
-    setTimeout(function() {
-      "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = l);
-      banner_utils.removeClass(document.body, "branch-banner-is-active");
+      "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
+      a._publishEvent("didShowBanner");
     }, banner_utils.animationDelay);
-    "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-    "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
-  };
-  m && (m.onclick = function(b) {
-    b.preventDefault();
-    a._publishEvent("willCloseBanner");
-    n(function() {
-      a._publishEvent("didCloseBanner");
-    });
-  });
-  banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
-  setTimeout(function() {
-    "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
-    a._publishEvent("didShowBanner");
-  }, banner_utils.animationDelay);
-  return n;
+    return m;
+  }
+  a._publishEvent("willNotShowBanner");
 };
 // Input 13
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
@@ -1350,7 +1352,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
@@ -1359,16 +1361,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state == init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state == init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed)), null);
+          return k(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state == init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -1438,45 +1440,58 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var f = session.get(d._storage);
   c = c && "undefined" != typeof c.url && null !== c.url ? c.url : null;
-  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
+    var c = a || session.get(d._storage);
+    d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
+      e != c.has_app && e && (c.has_app = e, session.update(d._storage, c), d._publishEvent("downloadedApp"));
+      b && b(a, c);
+    });
+  }, l = function(b, c) {
+    c && (c = e(c), session.set(d._storage, c, h), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     d.keepAlive && setTimeout(function() {
       d.keepAlive = !1;
     }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
+  }, n = function() {
+    var a, b;
+    void 0 != typeof document.hidden ? (a = "hidden", b = "visibilitychange") : void 0 != typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : void 0 != typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : void 0 != typeof document.webkitvisibilitychange && (a = "webkitHidden", b = "webkitvisibilitychange");
+    document.addEventListener(b, function() {
+      document[a] || k();
+    }, !1);
   };
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
-    h(null, f);
+    n(), k(f, l);
   } else {
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
       c = function(a) {
-        k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
-        d._api(k ? resources.install : resources.open, a, function(a, b) {
-          h(a, b);
+        h || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
+        d._api(h ? resources.install : resources.open, a, function(a, b) {
+          l(a, b);
         });
       };
       if (CORDOVA_BUILD) {
-        var l = [];
-        null !== b && l.push(b ? 1 : 0);
+        var m = [];
+        null !== b && m.push(b ? 1 : 0);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
-        }, "BranchDevice", k ? "getInstallData" : "getOpenData", l);
+        }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
       }
       if (TITANIUM_BUILD) {
-        var l = {}, m = require("io.branch.sdk");
-        g && (l.link_identifier = g);
-        l = k ? null === b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null === b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
-        c(l);
+        var m = {}, p = require("io.branch.sdk");
+        g && (m.link_identifier = g);
+        m = h ? null === b ? p.getInstallData(d.debug, -1) : p.getInstallData(d.debug, b ? 1 : 0) : null === b ? p.getOpenData(-1) : p.getOpenData(b ? 1 : 0);
+        c(m);
       }
     }
     WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
       if (a) {
-        return h(a, null);
+        return l(a, null);
       }
       d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
         b && g && (b.click_id = g);
-        h(a, b);
+        n(b);
+        l(a, b);
       });
     });
   }
@@ -1494,8 +1509,8 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
   this._api(resources.profile, {identity:b}, function(d, e) {
     d && a(d);
     e = e || {};
-    c.identity_id = e.identity_id.toString();
-    c.sessionLink = e.link;
+    e.identity_id && (c.identity_id = e.identity_id.toString());
+    e.link && (c.sessionLink = e.link);
     c.identity = b;
     e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
     session.update(c._storage, e);
@@ -1592,8 +1607,8 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
-  "function" == typeof a && void 0 === b && (b = a);
-  b && this._listeners.push({listener:b, event:a || null});
+  "function" == typeof a && void 0 === b && (b = a, a = null);
+  b && this._listeners.push({listener:b, event:a});
 }, Branch.prototype.removeListener = function(a) {
   a && (this._listeners = this._listeners.filter(function(b) {
     if (b.listener !== a) {

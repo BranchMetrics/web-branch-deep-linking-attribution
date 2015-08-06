@@ -3,6 +3,8 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+### New Functionality
+- The `has_app` property in the session, and the mobile device action text automatically updates when a user installs the app - without reloading the page!
 
 ## [v1.6.6] - 2015-08-02
 - Fixed bower path

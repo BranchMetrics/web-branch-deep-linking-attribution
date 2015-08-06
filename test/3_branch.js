@@ -1,4 +1,4 @@
-goog.require('utils');
+ goog.require('utils');
 goog.require('Branch');
 goog.require('resources');
 goog.require('config');
@@ -24,8 +24,8 @@ describe('Branch', function() {
 		requests = [];
 	});
 
-	function initBranch(runInit) {
-		storage.clear();
+	function initBranch(runInit, keepStorage) {
+		if (!keepStorage) { storage.clear(); }
 		var branch = new Branch();
 
 		sandbox.stub(branch._server, "request", function(resource, obj, storage, callback) {
@@ -215,6 +215,29 @@ describe('Branch', function() {
 				}, 'Request to open params correct');
 			}
 			else { done(); }
+		});
+
+		it('should not call has_app if no session present', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			branch.init(branch_sample_key, function(err, data) {
+				assert.equal(requests.length, 2, 'two requests made');
+				assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made, not has_app");
+			});
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+		});
+
+		it('should call has_app if session present', function(done) {
+			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			branch.init(branch_sample_key);
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+
+			requests = [ ];
+			branch = initBranch(false, true), assert = testUtils.plan(2, done);
+			branch.init(branch_sample_key);
+			assert.equal(requests.length, 1, 'one requests made');
+			assert.deepEqual(requests[0].resource.endpoint, "/v1/has-app", "Request to has_app made");
 		});
 	});
 
