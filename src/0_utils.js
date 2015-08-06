@@ -78,6 +78,7 @@ utils.whiteListSessionData = function(data) {
 		'data': data['data'] || null,
 		'referring_identity': data['referring_identity'] || null,
 		'identity': data['identity'] || null,
+		// 'has_app': true,
 		'has_app': typeof data['has_app'] != 'undefined' ? data['has_app'] : null,
 		'referring_link': data['referring_link'] || null
 	};

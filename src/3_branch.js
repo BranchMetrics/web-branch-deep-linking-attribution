@@ -286,7 +286,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	link_identifier = WEB_BUILD ? (utils.getParamValue('_branch_match_id') || utils.hashValue('r')) : (url ? utils.getParamValue(url) : null),
 	freshInstall = !sessionData || !sessionData['identity_id'],
 
-	chackHasApp = function(sessionData, cb) {
+	checkHasApp = function(sessionData, cb) {
 		var currentSessionData = sessionData || session.get(self._storage);
 		self._api(resources.hasApp, { "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] }, function(err, has_app) {
 			if (has_app != currentSessionData['has_app'] && has_app) {
@@ -332,13 +332,13 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 			changeEvent = "webkitvisibilitychange";
 		}
 		document.addEventListener(changeEvent, function() {
-			if (!document[hidden]) { chackHasApp(); }
+			if (!document[hidden]) { checkHasApp(); }
 		}, false);
 	};
 
 	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
 		attachVisibilityEvent();
-		chackHasApp(sessionData, finishInit);
+		checkHasApp(sessionData, finishInit);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
