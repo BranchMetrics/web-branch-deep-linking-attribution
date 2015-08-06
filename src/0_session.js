@@ -30,7 +30,7 @@ session.get = function(storage, first) {
 session.set = function(storage, data, first) {
 	storage.set('branch_session', goog.json.serialize(data));
 	if (first) { storage.set('branch_session_first', goog.json.serialize(data), true); }
-}
+};
 
  /**
  * @param {BranchStorage} storage
@@ -40,4 +40,4 @@ session.update = function(storage, new_data) {
 	var current_data = session.get(storage);
 	var data = utils.merge(current_data, new_data);
 	storage.set('branch_session', goog.json.serialize(data));
-}
+};

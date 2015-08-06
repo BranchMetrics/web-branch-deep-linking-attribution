@@ -8,6 +8,8 @@ goog.provide('storage');
 goog.require('goog.json');
 goog.require('utils');
 
+/*globals Ti, TITANIUM_BUILD */
+
 var COOKIE_DAYS = 365;
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
@@ -36,15 +38,15 @@ if (TITANIUM_BUILD) {
 };
 
 var prefix = function(key) {
-	return key = key == "branch_session" || key == "branch_session_first" ? key : BRANCH_KEY_PREFIX + key;
-}
-var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); }
+	return key == "branch_session" || key == "branch_session_first" ? key : BRANCH_KEY_PREFIX + key;
+};
+var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); };
 
 var retrieveValue = function(value) {
 	if (value == "true") { return true; }
 	else if (value == "false") { return false; }
 	return value;
-}
+};
 
 var webStorage = function(perm) {
 	var storageMethod = perm ? localStorage : sessionStorage;
@@ -52,7 +54,7 @@ var webStorage = function(perm) {
 		getAll: function() {
 			var allKeyValues = null;
 			for (var key in storageMethod) {
-				if (key.indexOf(BRANCH_KEY_PREFIX) == 0) {
+				if (key.indexOf(BRANCH_KEY_PREFIX) === 0) {
 					if (allKeyValues === null) { allKeyValues = { }; }
 					allKeyValues[trimPrefix(key)] = retrieveValue(storageMethod.getItem(key));
 				}
@@ -60,24 +62,31 @@ var webStorage = function(perm) {
 			return allKeyValues;
 		},
 		get: function(key, perm_override) { return retrieveValue(perm_override ? localStorage.getItem(prefix(key)) : storageMethod.getItem(prefix(key))); },
-		set: function(key, value, perm_override) { perm_override ? localStorage.setItem(prefix(key), value) : storageMethod.setItem(prefix(key), value); },
+		set: function(key, value, perm_override) {
+			if (perm_override) {
+				localStorage.setItem(prefix(key), value);
+			}
+			else {
+				storageMethod.setItem(prefix(key), value);
+			}
+		},
 		remove: function(key) { storageMethod.removeItem(prefix(key)); },
 		clear: function() {
-			Object.keys(storageMethod).forEach(function (item) {
-				if (item.indexOf(BRANCH_KEY_PREFIX) == 0) { storageMethod.removeItem(item); }
+			Object.keys(storageMethod).forEach(function(item) {
+				if (item.indexOf(BRANCH_KEY_PREFIX) === 0) { storageMethod.removeItem(item); }
 			});
 		},
-		isEnabled: function () {
+		isEnabled: function() {
 			try {
 				storageMethod.setItem("test", "");
 				storageMethod.removeItem("test");
 				return true;
 			}
-			catch(err) {
+			catch (err) {
 				return false;
 			}
 		}
-	}
+	};
 };
 
 /** @type storage */
@@ -121,7 +130,7 @@ var cookies = function(perm) {
 		    for (var i = 0; i < cookieArray.length; i++) {
 		        var cookie = cookieArray[i];
 		        cookie = cookie.substring(1, cookie.length);
-		        if (cookie.indexOf(keyEQ) == 0) { return retrieveValue(cookie.substring(keyEQ.length, cookie.length)); }
+		        if (cookie.indexOf(keyEQ) === 0) { return retrieveValue(cookie.substring(keyEQ.length, cookie.length)); }
 		    }
 		    return null;
 		},
@@ -145,7 +154,7 @@ var cookies = function(perm) {
 			}
 		},
 		isEnabled: function() { return navigator.cookieEnabled; }
-	}
+	};
 };
 
 BranchStorage.prototype['cookie'] = function() {
@@ -196,7 +205,7 @@ BranchStorage.prototype['titanium'] = {
 			Ti.App.Properties.getString("test");
 			return true;
 		}
-		catch(err) {
+		catch (err) {
 			return false;
 		}
 	}

@@ -101,14 +101,14 @@ utils.cleanLinkData = function(linkData, config) {
  */
 utils.clickIdFromLink = function(link) {
 	return link ? link.substring(link.lastIndexOf('/') + 1, link.length) : null;
-}
+};
 
 /**
  * @param {String} link
  */
 utils.processReferringLink = function(link) {
 	return link ? link.substring(0, 4) != 'http' ? 'https://bnc.lt' + link : link : null;
-}
+};
 
 /**
  * @param {Object} to
@@ -138,7 +138,8 @@ utils.mobileUserAgent = function() {
 		if (navigator.userAgent.match(/android/i)) { return 'android'; }
 		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
 		else { return 'ios'; }
-	} else { return false; }
+	}
+	else { return false; }
 };
 
 /**

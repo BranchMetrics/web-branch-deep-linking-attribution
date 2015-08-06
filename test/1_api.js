@@ -1,10 +1,10 @@
 goog.require('utils');
 goog.require('Server');
 goog.require('resources');
-goog.require('storage');
+goog.require('storage'); // jshint unused:false
 goog.require('config');
 
-/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
+/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 
 describe('Server helpers', function() {
 	var server = new Server();
@@ -34,7 +34,7 @@ describe('Server helpers', function() {
 
 describe('Server', function() {
 	var server = new Server(),
-		storage = new BranchStorage(['session', 'pojo']),
+		storage = new BranchStorage([ 'session', 'pojo' ]),
 		xhr,
 		requests,
 		clock;

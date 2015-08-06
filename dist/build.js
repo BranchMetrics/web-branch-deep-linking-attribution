@@ -830,7 +830,7 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
   return {getAll:function() {
     var a = null, d;
     for (d in b) {
-      0 == d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
+      0 === d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
     }
     return a;
   }, get:function(a, d) {
@@ -841,7 +841,7 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
     b.removeItem(prefix(a));
   }, clear:function() {
     Object.keys(b).forEach(function(a) {
-      0 == a.indexOf(BRANCH_KEY_PREFIX) && b.removeItem(a);
+      0 === a.indexOf(BRANCH_KEY_PREFIX) && b.removeItem(a);
     });
   }, isEnabled:function() {
     try {
@@ -868,7 +868,7 @@ var cookies = function(a) {
     a = prefix(a) + "=";
     for (var c = document.cookie.split(";"), d = 0;d < c.length;d++) {
       var e = c[d], e = e.substring(1, e.length);
-      if (0 == e.indexOf(a)) {
+      if (0 === e.indexOf(a)) {
         return retrieveValue(e.substring(a.length, e.length));
       }
     }
@@ -1437,7 +1437,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   };
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var f = session.get(d._storage);
-  c = c && "undefined" != typeof c.url && null != c.url ? c.url : null;
+  c = c && "undefined" != typeof c.url && null !== c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(b, c) {
     c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
@@ -1466,7 +1466,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       if (TITANIUM_BUILD) {
         var l = {}, m = require("io.branch.sdk");
         g && (l.link_identifier = g);
-        l = k ? null == b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null == b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
+        l = k ? null === b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null === b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
         c(l);
       }
     }
@@ -1592,7 +1592,7 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
-  "function" == typeof a && void 0 == b && (b = a);
+  "function" == typeof a && void 0 === b && (b = a);
   b && this._listeners.push({listener:b, event:a || null});
 }, Branch.prototype.removeListener = function(a) {
   a && (this._listeners = this._listeners.filter(function(b) {
