@@ -289,8 +289,8 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	checkHasApp = function(sessionData, cb) {
 		var currentSessionData = sessionData || session.get(self._storage);
 		self._api(resources.hasApp, { "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] }, function(err, has_app) {
-			if (has_app != currentSessionData['has_app'] && has_app) {
-				currentSessionData['has_app'] = has_app;
+			if (has_app && !currentSessionData['has_app']) {
+				currentSessionData['has_app'] = true;
 				session.update(self._storage, currentSessionData);
 				self._publishEvent("downloadedApp");
 			}
