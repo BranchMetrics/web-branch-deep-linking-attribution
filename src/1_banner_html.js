@@ -4,7 +4,6 @@ goog.require('utils');
 goog.require('session');
 goog.require('storage'); // jshint unused:false
 
-
 /**
  * @param {banner_utils.options} options
  * @param {string} action
