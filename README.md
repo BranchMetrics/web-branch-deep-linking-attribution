@@ -40,11 +40,35 @@ __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acc
 
 ## Cordova/PhoneGap
 
-### [Cordova has moved!!](https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK)
+### [Full Documentation for the Cordova Web SDK](https://github.com/BranchMetrics/Web-SDK/blob/master/CORDOVA_GUIDE.md)
+
+The Web SDK is provided as a plugin for Cordova and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK.  For example:
+
+```sh
+$ cordova plugin add https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK
+```
+
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+
+```js
+  branch.init("YOUR BRANCH KEY HERE", function(err, data) {
+  	app.initComplete(err, data);
+  });
+```
 
 ## Appcelerator Titanum
 
-### [Titanium has moved!](https://github.com/BranchMetrics/Titanium-Deferred-Deep-Linking-SDK)
+### [Full Documentation for the Titanium Web SDK](https://github.com/BranchMetrics/Titanium-Deferred-Deep-Linking-SDK)
+
+The Web SDK is provided as a module for Titanium.
+
+You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+
+```js
+  branch.init("YOUR BRANCH KEY HERE", function(err, data) {
+  	app.initComplete(err, data);
+  });
+```
 
 ## Commonly Used Features
 
@@ -63,6 +87,12 @@ For an in-depth explanation of everything the App Smart Banner can do, see the [
 Powerful, customizeable, and easy-to-create deeplinks are what Branch does best. The Web SDK delivers on this promise of providing a simple and powerful function for generating short deep links asynchronously: `link()`. The method has all of the same options and parameters available on the public API `POST /v1/url` endpoint, and is called from a robust queueing mechanism and XHRRequest implementation with JSONP fallback that is well tested down to IE9, and every major browser.
 
 Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback) or [Cordova](https://github.com/BranchMetrics/Web-SDK/blob/master/CORDOVA_GUIDE.md#linkdata-callback)
+
+## Using the Sample Web App
+
+We provide a sample web app which demonstrates what Branch Metrics Web SDK can do. The online version can be found at <https://cdn.branch.io/example.html>. Alternatively, you can open `example.html` locally to for the same effect.
+
+To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
 
 * * *
 

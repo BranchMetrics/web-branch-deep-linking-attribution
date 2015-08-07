@@ -87,6 +87,12 @@ Powerful, customizeable, and easy-to-create deeplinks are what Branch does best.
 
 Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback) or [Cordova](https://github.com/BranchMetrics/Web-SDK/blob/master/CORDOVA_GUIDE.md#linkdata-callback)
 
+## Using the Sample Web App
+
+We provide a sample web app which demonstrates what Branch Metrics Web SDK can do. The online version can be found at <https://cdn.branch.io/example.html>. Alternatively, you can open `example.html` locally to for the same effect.
+
+To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
+
 * * *
 
 ## Contributing
