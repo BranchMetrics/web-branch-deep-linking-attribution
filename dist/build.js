@@ -1016,12 +1016,15 @@ Server.prototype.getUrl = function(a, b) {
   var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
     "undefined" == typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
-      return c.branch_key = b.branch_key, c;
+      c.branch_key = b.branch_key;
+    } else {
+      if (b.app_id && f.test(b.app_id)) {
+        c.app_id = b.app_id;
+      } else {
+        throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
+      }
     }
-    if (b.app_id && f.test(b.app_id)) {
-      return c.app_id = b.app_id, c;
-    }
-    throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
+    return c;
   };
   if ("/v1/has-app" == a.endpoint) {
     try {
