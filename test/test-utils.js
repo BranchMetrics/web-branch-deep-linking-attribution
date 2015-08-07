@@ -26,11 +26,11 @@
 
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define([], factory); // AMD
+	define([], factory); // AMD
   } else if (typeof exports === 'object') {
-    module.exports = factory(); // CommonJS
+	module.exports = factory(); // CommonJS
   } else {
-    root.assert = factory(); // Global
+	root.assert = factory(); // Global
   }
 })(this, function() {
 
@@ -47,66 +47,66 @@ var create = Object.create || function(p) {
 // UTILITY
 var util = {
   inherits: function(ctor, superCtor) {
-    ctor.super_ = superCtor;
-    ctor.prototype = create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
+	ctor.super_ = superCtor;
+	ctor.prototype = create(superCtor.prototype, {
+	  constructor: {
+		value: ctor,
+		enumerable: false,
+		writable: true,
+		configurable: true
+	  }
+	});
   },
   isArray: function(ar) {
-    return Array.isArray(ar);
+	return Array.isArray(ar);
   },
   isBoolean: function(arg) {
-    return typeof arg === 'boolean';
+	return typeof arg === 'boolean';
   },
   isNull: function(arg) {
-    return arg === null;
+	return arg === null;
   },
   isNullOrUndefined: function(arg) {
-    return arg == null;
+	return arg == null;
   },
   isNumber: function(arg) {
-    return typeof arg === 'number';
+	return typeof arg === 'number';
   },
   isString: function(arg) {
-    return typeof arg === 'string';
+	return typeof arg === 'string';
   },
   isSymbol: function(arg) {
-    return typeof arg === 'symbol';
+	return typeof arg === 'symbol';
   },
   isUndefined: function(arg) {
-    return arg === void 0;
+	return arg === void 0;
   },
   isRegExp: function(re) {
-    return util.isObject(re) && util.objectToString(re) === '[object RegExp]';
+	return util.isObject(re) && util.objectToString(re) === '[object RegExp]';
   },
   isObject: function(arg) {
-    return typeof arg === 'object' && arg !== null;
+	return typeof arg === 'object' && arg !== null;
   },
   isDate: function(d) {
-    return util.isObject(d) && util.objectToString(d) === '[object Date]';
+	return util.isObject(d) && util.objectToString(d) === '[object Date]';
   },
   isError: function(e) {
-    return isObject(e) &&
-      (objectToString(e) === '[object Error]' || e instanceof Error);
+	return isObject(e) &&
+	  (objectToString(e) === '[object Error]' || e instanceof Error);
   },
   isFunction: function(arg) {
-    return typeof arg === 'function';
+	return typeof arg === 'function';
   },
   isPrimitive: function(arg) {
-    return arg === null ||
-      typeof arg === 'boolean' ||
-      typeof arg === 'number' ||
-      typeof arg === 'string' ||
-      typeof arg === 'symbol' ||  // ES6 symbol
-      typeof arg === 'undefined';
+	return arg === null ||
+	  typeof arg === 'boolean' ||
+	  typeof arg === 'number' ||
+	  typeof arg === 'string' ||
+	  typeof arg === 'symbol' ||  // ES6 symbol
+	  typeof arg === 'undefined';
   },
   objectToString: function(o) {
-    return Object.prototype.toString.call(o);
+	return Object.prototype.toString.call(o);
   }
 };
 
@@ -115,39 +115,39 @@ var pSlice = Array.prototype.slice;
 // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
 var Object_keys = typeof Object.keys === 'function' ? Object.keys : (function() {
   var hasOwnProperty = Object.prototype.hasOwnProperty,
-      hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
-      dontEnums = [
-        'toString',
-        'toLocaleString',
-        'valueOf',
-        'hasOwnProperty',
-        'isPrototypeOf',
-        'propertyIsEnumerable',
-        'constructor'
-      ],
-      dontEnumsLength = dontEnums.length;
+	  hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
+	  dontEnums = [
+		'toString',
+		'toLocaleString',
+		'valueOf',
+		'hasOwnProperty',
+		'isPrototypeOf',
+		'propertyIsEnumerable',
+		'constructor'
+	  ],
+	  dontEnumsLength = dontEnums.length;
 
   return function(obj) {
-    if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
-      throw new TypeError('Object.keys called on non-object');
-    }
+	if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+	  throw new TypeError('Object.keys called on non-object');
+	}
 
-    var result = [], prop, i;
+	var result = [], prop, i;
 
-    for (prop in obj) {
-      if (hasOwnProperty.call(obj, prop)) {
-        result.push(prop);
-      }
-    }
+	for (prop in obj) {
+	  if (hasOwnProperty.call(obj, prop)) {
+		result.push(prop);
+	  }
+	}
 
-    if (hasDontEnumBug) {
-      for (i = 0; i < dontEnumsLength; i++) {
-        if (hasOwnProperty.call(obj, dontEnums[i])) {
-          result.push(dontEnums[i]);
-        }
-      }
-    }
-    return result;
+	if (hasDontEnumBug) {
+	  for (i = 0; i < dontEnumsLength; i++) {
+		if (hasOwnProperty.call(obj, dontEnums[i])) {
+		  result.push(dontEnums[i]);
+		}
+	  }
+	}
+	return result;
   };
 })();
 
@@ -159,8 +159,8 @@ var assert = ok;
 
 // 2. The AssertionError is defined in assert.
 // new assert.AssertionError({ message: message,
-//                             actual: actual,
-//                             expected: expected })
+//							 actual: actual,
+//							 expected: expected })
 
 assert.AssertionError = function AssertionError(options) {
   this.name = 'AssertionError';
@@ -168,21 +168,21 @@ assert.AssertionError = function AssertionError(options) {
   this.expected = options.expected;
   this.operator = options.operator;
   if (options.message) {
-    this.message = options.message;
-    this.generatedMessage = false;
+	this.message = options.message;
+	this.generatedMessage = false;
   } else {
-    this.message = getMessage(this);
-    this.generatedMessage = true;
+	this.message = getMessage(this);
+	this.generatedMessage = true;
   }
   var stackStartFunction = options.stackStartFunction || fail;
   if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, stackStartFunction);
+	Error.captureStackTrace(this, stackStartFunction);
   } else {
-    // try to throw an error now, and from the stack property
-    // work out the line that called in to assert.js.
-    try {
-      this.stack = (new Error).stack.toString();
-    } catch (e) {}
+	// try to throw an error now, and from the stack property
+	// work out the line that called in to assert.js.
+	try {
+	  this.stack = (new Error).stack.toString();
+	} catch (e) {}
   }
 };
 
@@ -191,29 +191,29 @@ util.inherits(assert.AssertionError, Error);
 
 function replacer(key, value) {
   if (util.isUndefined(value)) {
-    return '' + value;
+	return '' + value;
   }
   if (util.isNumber(value) && (isNaN(value) || !isFinite(value))) {
-    return value.toString();
+	return value.toString();
   }
   if (util.isFunction(value) || util.isRegExp(value)) {
-    return value.toString();
+	return value.toString();
   }
   return value;
 }
 
 function truncate(s, n) {
   if (util.isString(s)) {
-    return s.length < n ? s : s.slice(0, n);
+	return s.length < n ? s : s.slice(0, n);
   } else {
-    return s;
+	return s;
   }
 }
 
 function getMessage(self) {
   return truncate(JSON.stringify(self.actual, replacer), 128) + ' ' +
-         self.operator + ' ' +
-         truncate(JSON.stringify(self.expected, replacer), 128);
+		 self.operator + ' ' +
+		 truncate(JSON.stringify(self.expected, replacer), 128);
 }
 
 // At present only the three keys mentioned above are used and
@@ -229,11 +229,11 @@ function getMessage(self) {
 
 function fail(actual, expected, message, operator, stackStartFunction) {
   throw new assert.AssertionError({
-    message: message,
-    actual: actual,
-    expected: expected,
-    operator: operator,
-    stackStartFunction: stackStartFunction
+	message: message,
+	actual: actual,
+	expected: expected,
+	operator: operator,
+	stackStartFunction: stackStartFunction
   });
 }
 
@@ -265,7 +265,7 @@ assert.equal = function equal(actual, expected, message) {
 
 assert.notEqual = function notEqual(actual, expected, message) {
   if (actual == expected) {
-    fail(actual, expected, message, '!=', assert.notEqual);
+	fail(actual, expected, message, '!=', assert.notEqual);
   }
 };
 
@@ -274,43 +274,43 @@ assert.notEqual = function notEqual(actual, expected, message) {
 
 assert.deepEqual = function deepEqual(actual, expected, message) {
   if (!_deepEqual(actual, expected)) {
-    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+	fail(actual, expected, message, 'deepEqual', assert.deepEqual);
   }
 };
 
 function _deepEqual(actual, expected) {
   // 7.1. All identical values are equivalent, as determined by ===.
   if (actual === expected) {
-    return true;
+	return true;
 
   //  } else if (util.isBuffer(actual) && util.isBuffer(expected)) {
-  //    if (actual.length != expected.length) return false;
+  //	if (actual.length != expected.length) return false;
   //
-  //    for (var i = 0; i < actual.length; i++) {
-  //      if (actual[i] !== expected[i]) return false;
-  //    }
+  //	for (var i = 0; i < actual.length; i++) {
+  //	  if (actual[i] !== expected[i]) return false;
+  //	}
   //
-  //    return true;
+  //	return true;
   //
   // 7.2. If the expected value is a Date object, the actual value is
   // equivalent if it is also a Date object that refers to the same time.
   } else if (util.isDate(actual) && util.isDate(expected)) {
-    return actual.getTime() === expected.getTime();
+	return actual.getTime() === expected.getTime();
 
   // 7.3 If the expected value is a RegExp object, the actual value is
   // equivalent if it is also a RegExp object with the same source and
   // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
   } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
-    return actual.source === expected.source &&
-           actual.global === expected.global &&
-           actual.multiline === expected.multiline &&
-           actual.lastIndex === expected.lastIndex &&
-           actual.ignoreCase === expected.ignoreCase;
+	return actual.source === expected.source &&
+		   actual.global === expected.global &&
+		   actual.multiline === expected.multiline &&
+		   actual.lastIndex === expected.lastIndex &&
+		   actual.ignoreCase === expected.ignoreCase;
 
   // 7.4. Other pairs that do not both pass typeof value == 'object',
   // equivalence is determined by ==.
   } else if (!util.isObject(actual) && !util.isObject(expected)) {
-    return actual == expected;
+	return actual == expected;
 
   // 7.5 For all other Object pairs, including Array objects, equivalence is
   // determined by having the same number of owned properties (as verified
@@ -319,7 +319,7 @@ function _deepEqual(actual, expected) {
   // corresponding key, and an identical 'prototype' property. Note: this
   // accounts for both named and indexed properties on Arrays.
   } else {
-    return objEquiv(actual, expected);
+	return objEquiv(actual, expected);
   }
 }
 
@@ -329,55 +329,55 @@ var isArguments = function(object) {
 
 (function() {
   if (!isArguments(arguments)) {
-    isArguments = function(object) {
-      return object != null &&
-        typeof object === 'object' &&
-        typeof object.callee === 'function' &&
-        typeof object.length === 'number' || false;
-    };
+	isArguments = function(object) {
+	  return object != null &&
+		typeof object === 'object' &&
+		typeof object.callee === 'function' &&
+		typeof object.length === 'number' || false;
+	};
   }
 })();
 
 function objEquiv(a, b) {
   if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b))
-    return false;
+	return false;
   // an identical 'prototype' property.
   if (a.prototype !== b.prototype) return false;
   //~~~I've managed to break Object.keys through screwy arguments passing.
   //   Converting to array solves the problem.
   var aIsArgs = isArguments(a),
-      bIsArgs = isArguments(b);
+	  bIsArgs = isArguments(b);
   if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
-    return false;
+	return false;
   if (aIsArgs) {
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return _deepEqual(a, b);
+	a = pSlice.call(a);
+	b = pSlice.call(b);
+	return _deepEqual(a, b);
   }
   try {
-    var ka = Object_keys(a),
-        kb = Object_keys(b),
-        key, i;
+	var ka = Object_keys(a),
+		kb = Object_keys(b),
+		key, i;
   } catch (e) {//happens when one is a string literal and the other isn't
-    return false;
+	return false;
   }
   // having the same number of owned properties (keys incorporates
   // hasOwnProperty)
   if (ka.length != kb.length)
-    return false;
+	return false;
   //the same set of keys (although not necessarily the same order),
   ka.sort();
   kb.sort();
   //~~~cheap key test
   for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
-      return false;
+	if (ka[i] != kb[i])
+	  return false;
   }
   //equivalent values for every corresponding key, and
   //~~~possibly expensive deep test
   for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!_deepEqual(a[key], b[key])) return false;
+	key = ka[i];
+	if (!_deepEqual(a[key], b[key])) return false;
   }
   return true;
 }
@@ -387,7 +387,7 @@ function objEquiv(a, b) {
 
 assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
   if (_deepEqual(actual, expected)) {
-    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+	fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
   }
 };
 
@@ -396,7 +396,7 @@ assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
 
 assert.strictEqual = function strictEqual(actual, expected, message) {
   if (actual !== expected) {
-    fail(actual, expected, message, '===', assert.strictEqual);
+	fail(actual, expected, message, '===', assert.strictEqual);
   }
 };
 
@@ -405,21 +405,21 @@ assert.strictEqual = function strictEqual(actual, expected, message) {
 
 assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
   if (actual === expected) {
-    fail(actual, expected, message, '!==', assert.notStrictEqual);
+	fail(actual, expected, message, '!==', assert.notStrictEqual);
   }
 };
 
 function expectedException(actual, expected) {
   if (!actual || !expected) {
-    return false;
+	return false;
   }
 
   if (Object.prototype.toString.call(expected) == '[object RegExp]') {
-    return expected.test(actual);
+	return expected.test(actual);
   } else if (actual instanceof expected) {
-    return true;
+	return true;
   } else if (expected.call({}, actual) === true) {
-    return true;
+	return true;
   }
 
   return false;
@@ -429,30 +429,30 @@ function _throws(shouldThrow, block, expected, message) {
   var actual;
 
   if (util.isString(expected)) {
-    message = expected;
-    expected = null;
+	message = expected;
+	expected = null;
   }
 
   try {
-    block();
+	block();
   } catch (e) {
-    actual = e;
+	actual = e;
   }
 
   message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
-            (message ? ' ' + message : '.');
+			(message ? ' ' + message : '.');
 
   if (shouldThrow && !actual) {
-    fail(actual, expected, 'Missing expected exception' + message);
+	fail(actual, expected, 'Missing expected exception' + message);
   }
 
   if (!shouldThrow && expectedException(actual, expected)) {
-    fail(actual, expected, 'Got unwanted exception' + message);
+	fail(actual, expected, 'Got unwanted exception' + message);
   }
 
   if ((shouldThrow && actual && expected &&
-      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
-    throw actual;
+	  !expectedException(actual, expected)) || (!shouldThrow && actual)) {
+	throw actual;
   }
 }
 
@@ -485,64 +485,64 @@ window.console = window.console || { log: function() { return arguments; } };
 window.testUtils = testUtils = {};
 
 testUtils.params = function(extra, without) {
-    // Returns new object every time.
-    var p = utils.merge({
-        branch_key: branch_sample_key,
-        session_id: session_id,
-        identity_id: identity_id,
-        browser_fingerprint_id: browser_fingerprint_id,
-        sdk: window.sdk_version
-    }, extra || {});
-    for (var k = 0; k < (without || []).length; k++) {
-        delete p[without[k]];
-    }
-    return p;
+	// Returns new object every time.
+	var p = utils.merge({
+		branch_key: branch_sample_key,
+		session_id: session_id,
+		identity_id: identity_id,
+		browser_fingerprint_id: browser_fingerprint_id,
+		sdk: window.sdk_version
+	}, extra || {});
+	for (var k = 0; k < (without || []).length; k++) {
+		delete p[without[k]];
+	}
+	return p;
 };
 
 testUtils.nulls = function(n) {
-    var p = [];
-    for (var k = 0; k < n; k++) { p.push(null); }
-    return p;
+	var p = [];
+	for (var k = 0; k < n; k++) { p.push(null); }
+	return p;
 };
 testUtils.after = function(n, done) {
-    var remaining = n;
-    return function() {
-        remaining--;
-        if (remaining == 0) { done(); }
-        if (remaining < 0) { console.log('ERROR!!! More calls than planned'); }
-    };
+	var remaining = n;
+	return function() {
+		remaining--;
+		if (remaining == 0) { done(); }
+		if (remaining < 0) { console.log('ERROR!!! More calls than planned'); }
+	};
 };
 var assertions = [ 'fail', 'equal', 'notEqual', 'deepEqual', 'notDeepEqual', 'strictEqual', 'notStrinctEqual', 'throws', 'doesNotThrow', 'ifError' ];
 testUtils.plan = function(n, done) {
-    var d = testUtils.after(n, done);
-    var ret = function() {
-        assert.apply(assert, Array.prototype.slice.call(arguments, 0));
-        d();
-    };
-    function create(name) {
-        ret[name] = function() {
-            assert[name].apply(assert, Array.prototype.slice.call(arguments, 0));
-            d();
-        };
-    }
-    for (var i = 0; i < assertions.length; i++) { create(assertions[i]) }
+	var d = testUtils.after(n, done);
+	var ret = function() {
+		assert.apply(assert, Array.prototype.slice.call(arguments, 0));
+		d();
+	};
+	function create(name) {
+		ret[name] = function() {
+			assert[name].apply(assert, Array.prototype.slice.call(arguments, 0));
+			d();
+		};
+	}
+	for (var i = 0; i < assertions.length; i++) { create(assertions[i]) }
 
-    ret.done = function(err) {
-        return ret(!err);
-    };
+	ret.done = function(err) {
+		return ret(!err);
+	};
 
-    return ret;
+	return ret;
 };
 
 testUtils.unplanned = function() { return assert; };
 
 testUtils.go = function(suffix) {
-    if (!window.history.pushState) { return false; }
-    var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
-    if (new_location != window.location.toString()) {
-        window.history.pushState({}, '', new_location); // Simply not possible in IE 9
-    return true;
-    }
+	if (!window.history.pushState) { return false; }
+	var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
+	if (new_location != window.location.toString()) {
+		window.history.pushState({}, '', new_location); // Simply not possible in IE 9
+	return true;
+	}
   else { return false; }
 };
 

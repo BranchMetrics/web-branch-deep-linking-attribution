@@ -6,7 +6,7 @@
 
 * * *
 
-### setDebug(debug) 
+### setDebug(debug)
 
 **Parameters**
 
@@ -23,7 +23,7 @@ THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
 
 
-### init(branch_key, options, callback) 
+### init(branch_key, options, callback)
 
 **Parameters**
 
@@ -52,23 +52,23 @@ the link the user was referred by.
 ##### Usage
 ```js
 branch.init(
-    branch_key,
-    options
-    callback (err, data),
+	branch_key,
+	options
+	callback (err, data),
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-     "Error message",
-     {
-          data_parsed:        { },                          // If the user was referred from a link, and the link has associated data, the data is passed in here.
-          referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
-          has_app:            true,                         // Does the user have the app installed already?
-          identity:           'BranchUser',                 // Unique string that identifies the user
-          referring_link:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
-     }
+	"Error message",
+	{
+		data_parsed:		{ },							// If the user was referred from a link, and the link has associated data, the data is passed in here.
+		referring_identity:	'12345',						// If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+		has_app:			true,							// Does the user have the app installed already?
+		identity:			'BranchUser',					// Unique string that identifies the user
+		referring_link:		'https://bnc.lt/c/jgg75-Gjd3'	// The referring link click, if available.
+	}
 );
 ```
 
@@ -77,7 +77,7 @@ ___
 
 
 
-### data(callback) 
+### data(callback)
 
 **Parameters**
 
@@ -93,7 +93,7 @@ ___
 
 
 
-### first(callback) 
+### first(callback)
 
 **Parameters**
 
@@ -112,7 +112,7 @@ ___
 
 
 
-### setIdentity(identity, callback) 
+### setIdentity(identity, callback)
 
 **Parameters**
 
@@ -129,28 +129,28 @@ UUID, Facebook ID, etc.
 ##### Usage
 ```js
 branch.setIdentity(
-    identity,
-    callback (err, data)
+	identity,
+	callback (err, data)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-     "Error message",
-     {
-          identity_id:             '12345', // Server-generated ID of the user identity, stored in `sessionStorage`.
-          link:                    'url',   // New link to use (replaces old stored link), stored in `sessionStorage`.
-          referring_data_parsed:    { },      // Returns the initial referring data for this identity, if exists, as a parsed object.
-          referring_identity:      '12345'  // Returns the initial referring identity for this identity, if exists.
-     }
+	"Error message",
+	{
+		identity_id:			'12345',	// Server-generated ID of the user identity, stored in `sessionStorage`.
+		link:					'url',		// New link to use (replaces old stored link), stored in `sessionStorage`.
+		referring_data_parsed:	{ },		// Returns the initial referring data for this identity, if exists, as a parsed object.
+		referring_identity:		'12345'		// Returns the initial referring identity for this identity, if exists.
+	}
 );
 ```
 ___
 
 
 
-### logout(callback) 
+### logout(callback)
 
 **Parameters**
 
@@ -161,21 +161,21 @@ Logs out the current session, replaces session IDs and identity IDs.
 ##### Usage
 ```js
 branch.logout(
-    callback (err)
+	callback (err)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-     "Error message"
+	 "Error message"
 );
 ```
 ___
 
 
 
-### close(callback) 
+### close(callback)
 
 **Parameters**
 
@@ -186,14 +186,14 @@ Close the current session.
 ##### Usage
 ```js
 branch.close(
-    callback (err)
+	callback (err)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-     "Error message"
+	 "Error message"
 );
 ```
 
@@ -205,7 +205,7 @@ ___
 
 
 
-### track(event, metadata, callback) 
+### track(event, metadata, callback)
 
 **Parameters**
 
@@ -221,9 +221,9 @@ The `metadata` parameter is a formatted JSON object that can contain any data an
 ##### Usage
 ```js
 branch.event(
-    event,
-    metadata,
-    callback (err)
+	event,
+	metadata,
+	callback (err)
 );
 ```
 
@@ -239,7 +239,7 @@ ___
 
 
 
-### link(data, callback) 
+### link(data, callback)
 
 **Parameters**
 
@@ -290,47 +290,47 @@ You have the ability to control the direct deep linking of each link as well:
 #### Usage
 ```js
 branch.link(
-    data,
-    callback (err, link)
+	data,
+	callback (err, link)
 );
 ```
 
 #### Example
 ```js
 branch.link({
-    tags: [ 'tag1', 'tag2' ],
-    channel: 'facebook',
-    feature: 'dashboard',
-    stage: 'new user',
-    type: 1,
-    data: {
-        mydata: 'something',
-        foo: 'bar',
-        '$desktop_url': 'http://myappwebsite.com',
-        '$ios_url': 'http://myappwebsite.com/ios',
-        '$ipad_url': 'http://myappwebsite.com/ipad',
-        '$android_url': 'http://myappwebsite.com/android',
-        '$og_app_id': '12345',
-        '$og_title': 'My App',
-        '$og_description': 'My app\'s description.',
-        '$og_image_url': 'http://myappwebsite.com/image.png'
-    }
+	tags: [ 'tag1', 'tag2' ],
+	channel: 'facebook',
+	feature: 'dashboard',
+	stage: 'new user',
+	type: 1,
+	data: {
+		mydata: 'something',
+		foo: 'bar',
+		'$desktop_url': 'http://myappwebsite.com',
+		'$ios_url': 'http://myappwebsite.com/ios',
+		'$ipad_url': 'http://myappwebsite.com/ipad',
+		'$android_url': 'http://myappwebsite.com/android',
+		'$og_app_id': '12345',
+		'$og_title': 'My App',
+		'$og_description': 'My app\'s description.',
+		'$og_image_url': 'http://myappwebsite.com/image.png'
+	}
 }, function(err, link) {
-    console.log(err, link);
+	console.log(err, link);
 });
 ```
 
 ##### Callback Format
 ```js
 callback(
-    "Error message",
-    'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
+	"Error message",
+	'https://bnc.lt/l/3HZMytU-BW' // Branch deep linking URL
 );
 ```
 
 
 
-### sendSMS(phone, linkData, options, callback) 
+### sendSMS(phone, linkData, options, callback)
 
 **Parameters**
 
@@ -364,38 +364,38 @@ of `sendSMS`, and `sendSMS` will always make a new link.
 #### Usage
 ```js
 branch.sendSMS(
-    phone,
-    linkData,
-    options,
-    callback (err, data)
+	phone,
+	linkData,
+	options,
+	callback (err, data)
 );
 ```
 
 ##### Example
 ```js
 branch.sendSMS(
-    phone: '9999999999',
-    {
-        tags: ['tag1', 'tag2'],
-        channel: 'facebook',
-        feature: 'dashboard',
-        stage: 'new user',
-        type: 1,
-        data: {
-            mydata: 'something',
-            foo: 'bar',
-            '$desktop_url': 'http://myappwebsite.com',
-            '$ios_url': 'http://myappwebsite.com/ios',
-            '$ipad_url': 'http://myappwebsite.com/ipad',
-            '$android_url': 'http://myappwebsite.com/android',
-            '$og_app_id': '12345',
-            '$og_title': 'My App',
-            '$og_description': 'My app\'s description.',
-            '$og_image_url': 'http://myappwebsite.com/image.png'
-        }
-    },
-    { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
-    function(err) { console.log(err); }
+	phone: '9999999999',
+	{
+		tags: ['tag1', 'tag2'],
+		channel: 'facebook',
+		feature: 'dashboard',
+		stage: 'new user',
+		type: 1,
+		data: {
+			mydata: 'something',
+			foo: 'bar',
+			'$desktop_url': 'http://myappwebsite.com',
+			'$ios_url': 'http://myappwebsite.com/ios',
+			'$ipad_url': 'http://myappwebsite.com/ipad',
+			'$android_url': 'http://myappwebsite.com/android',
+			'$og_app_id': '12345',
+			'$og_title': 'My App',
+			'$og_description': 'My app\'s description.',
+			'$og_image_url': 'http://myappwebsite.com/image.png'
+		}
+	},
+	{ make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
+	function(err) { console.log(err); }
 });
 ```
 
@@ -420,7 +420,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### referrals(callback) 
+### referrals(callback)
 
 **Parameters**
 
@@ -433,28 +433,28 @@ Retrieves a complete summary of the referrals the current user has made.
 ##### Usage
 ```js
 branch.referrals(
-    callback (err, data)
+	callback (err, data)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-    "Error message",
-    {
-        'install': {
-             total: 5,
-             unique: 2
-        },
-        'open': {
-             total: 4,
-             unique: 3
-        },
-        'buy': {
-            total: 7,
-            unique: 3
-        }
-    }
+	"Error message",
+	{
+		'install': {
+			 total: 5,
+			 unique: 2
+		},
+		'open': {
+			 total: 4,
+			 unique: 3
+		},
+		'buy': {
+			total: 7,
+			unique: 3
+		}
+	}
 );
 ```
 
@@ -462,7 +462,7 @@ callback(
 
 
 
-### getCode(options, callback) 
+### getCode(options, callback)
 
 **Parameters**
 
@@ -485,31 +485,31 @@ The `options` object can containt the following properties:
 ##### Usage
 
 branch.getCode(
-    options,
-    callback(err,data)
+	options,
+	callback(err,data)
 );
 
 ##### Example
 
 ```js
 branch.getCode(
-    {
-      "amount":10,
-      "bucket":"party",
-      "calculation_type":1,
-      "location":2
-    },
-    callback (err, data)
+	{
+	  "amount":10,
+	  "bucket":"party",
+	  "calculation_type":1,
+	  "location":2
+	},
+	callback (err, data)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-     "Error message",
-     {
-       "referral_code":"AB12CD"
-     }
+	 "Error message",
+	 {
+	   "referral_code":"AB12CD"
+	 }
 );
 ```
 
@@ -517,7 +517,7 @@ ___
 
 
 
-### validateCode(code, callback) 
+### validateCode(code, callback)
 
 **Parameters**
 
@@ -531,8 +531,8 @@ Validate a referral code before using.
 
 ```js
 branch.validateCode(
-    code, // The code to validate
-    callback (err)
+	code, // The code to validate
+	callback (err)
 );
 ```
 
@@ -540,22 +540,22 @@ branch.validateCode(
 
 ```js
 branch.validateCode(
-    "AB12CD",
-    function(err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("Code is valid");
-        }
-    }
+	"AB12CD",
+	function(err) {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log("Code is valid");
+		}
+	}
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-    "Error message",
-    callback(err)
+	"Error message",
+	callback(err)
 );
 ```
 
@@ -563,7 +563,7 @@ ___
 
 
 
-### applyCode(code, callback) 
+### applyCode(code, callback)
 
 **Parameters**
 
@@ -577,8 +577,8 @@ Apply a referral code.
 
 ```js
 branch.applyCode(
-    code, // The code to apply
-    callback (err)
+	code, // The code to apply
+	callback (err)
 );
 ```
 
@@ -586,22 +586,22 @@ branch.applyCode(
 
 ```js
 branch.applyCode(
-    "AB12CD",
-    function(err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("Code applied");
-        }
-    }
+	"AB12CD",
+	function(err) {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log("Code applied");
+		}
+	}
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-    "Error message",
-    callback(err)
+	"Error message",
+	callback(err)
 );
 ```
 ___
@@ -610,7 +610,7 @@ ___
 
 
 
-### credits(callback) 
+### credits(callback)
 
 **Parameters**
 
@@ -623,24 +623,24 @@ This call will retrieve the entire history of credits and redemptions from the i
 ##### Usage
 ```js
 branch.credits(
-    callback (err, data)
+	callback (err, data)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-    "Error message",
-    {
-        'default': 15,
-        'other bucket': 9
-    }
+	"Error message",
+	{
+		'default': 15,
+		'other bucket': 9
+	}
 );
 ```
 
 
 
-### creditHistory(options, callback) 
+### creditHistory(options, callback)
 
 **Parameters**
 
@@ -662,8 +662,8 @@ Properties available in the `options` object:
 
 ```js
 branch.creditHistory(
-     options,
-     callback(err, data)
+	 options,
+	 callback(err, data)
 );
 ```
 
@@ -671,43 +671,43 @@ branch.creditHistory(
 
 ```js
 branch.creditHistory(
-    {
-      "length":50,
-      "direction":0,
-      "begin_after_id":"123456789012345",
-      "bucket":"default"
-    }
-    callback (err, data)
+	{
+	  "length":50,
+	  "direction":0,
+	  "begin_after_id":"123456789012345",
+	  "bucket":"default"
+	}
+	callback (err, data)
 );
 ```
 
 ##### Callback Format
 ```js
 callback(
-    "Error message",
+	"Error message",
 [
-    {
-        "transaction": {
-                           "date": "2014-10-14T01:54:40.425Z",
-                           "id": "50388077461373184",
-                           "bucket": "default",
-                           "type": 0,
-                           "amount": 5
-                       },
-        "referrer": "12345678",
-        "referree": null
-    },
-    {
-        "transaction": {
-                           "date": "2014-10-14T01:55:09.474Z",
-                           "id": "50388199301710081",
-                           "bucket": "default",
-                           "type": 2,
-                           "amount": -3
-                       },
-        "referrer": null,
-        "referree": "12345678"
-    }
+	{
+		"transaction": {
+						   "date": "2014-10-14T01:54:40.425Z",
+						   "id": "50388077461373184",
+						   "bucket": "default",
+						   "type": 0,
+						   "amount": 5
+					   },
+		"referrer": "12345678",
+		"referree": null
+	},
+	{
+		"transaction": {
+						   "date": "2014-10-14T01:55:09.474Z",
+						   "id": "50388199301710081",
+						   "bucket": "default",
+						   "type": 2,
+						   "amount": -3
+					   },
+		"referrer": null,
+		"referree": "12345678"
+	}
 ]
 );
 ```
@@ -718,7 +718,7 @@ callback(
 
 
 
-### redeem(amount, bucket, callback) 
+### redeem(amount, bucket, callback)
 
 **Parameters**
 
@@ -734,9 +734,9 @@ Credits are stored in `buckets`, which you can define as points, currency, whate
 
 ```js
 branch.redeem(
-    amount, // Amount of credits to be redeemed
-    bucket,  // String of bucket name to redeem credits from
-    callback (err)
+	amount, // Amount of credits to be redeemed
+	bucket,  // String of bucket name to redeem credits from
+	callback (err)
 );
 ```
 
@@ -744,11 +744,11 @@ branch.redeem(
 
 ```js
 branch.redeem(
-    5,
-    "Rubies",
-    function(err) {
-        console.log(err);
-    }
+	5,
+	"Rubies",
+	function(err) {
+		console.log(err);
+	}
 );
 ```
 
@@ -772,12 +772,12 @@ The app sharing banner includes a number of ways to easily customize it by speci
 You can set the icon, title, and description for your app with the properties: `icon`, `title`, and `description`. For example, an app banner with these three properties set:
 ```js
 branch.banner(
-    {
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!'
-    },
-    {... link data ...}
+	{
+		 icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+		 title: 'Branch Demo App',
+		 description: 'The Branch demo app!'
+	},
+	{... link data ...}
 );
 ```
 
@@ -786,18 +786,18 @@ On mobile devices, the app banner show's an option either to download the app if
 When the banner is opened on a desktop devide, a simpel form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
 ```js
 branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Call to action customization
-         openAppButtonText: 'Open',
-         downloadAppButtonText: 'Install',
-         phonePreviewText: '+44 9999-9999',
-         sendLinkText: 'Txt me!'
-    },
-    {... link data ...}
+	{
+		 // required app info properties
+		 icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+		 title: 'Branch Demo App',
+		 description: 'The Branch demo app!',
+		 // Call to action customization
+		 openAppButtonText: 'Open',
+		 downloadAppButtonText: 'Install',
+		 phonePreviewText: '+44 9999-9999',
+		 sendLinkText: 'Txt me!'
+	},
+	{... link data ...}
 );
 ```
 
@@ -805,17 +805,17 @@ branch.banner(
 The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
 ```js
 branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Platforms customization
-         showDesktop: false,
-         showiOS: true,
-         showAndroid: true
-    },
-    {... link data ...}
+	{
+		 // required app info properties
+		 icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+		 title: 'Branch Demo App',
+		 description: 'The Branch demo app!',
+		 // Platforms customization
+		 showDesktop: false,
+		 showiOS: true,
+		 showAndroid: true
+	},
+	{... link data ...}
 );
 ```
 
@@ -830,21 +830,21 @@ The `mobileSticky` property defaults to false, but can be set to true if you wan
 The `desktopSticky` property defaults to true, but can be set to false if you want the user to only see the app banner when they are scrolled to the top of the page.
 ```js
 branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Display preferences
-         iframe: false,
-         disableHide: true,
-         forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
-         position: 'bottom',
-         mobileSticky: true,
-         desktopSticky: true,
-         customCSS: '.title { color: #F00; }'
-    },
-    {... link data ...}
+	{
+		 // required app info properties
+		 icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+		 title: 'Branch Demo App',
+		 description: 'The Branch demo app!',
+		 // Display preferences
+		 iframe: false,
+		 disableHide: true,
+		 forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
+		 position: 'bottom',
+		 mobileSticky: true,
+		 desktopSticky: true,
+		 customCSS: '.title { color: #F00; }'
+	},
+	{... link data ...}
 );
 ```
 
@@ -852,15 +852,15 @@ branch.banner(
 By default, tthe app banner will reusue a link that has most recently been created. If this is not desired, and you wish an enitrley new link to be created and overwrite the previous link, you can set `make_new_link` to true.
 ```js
 branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Link preferences
-         make_new_link: true
-    },
-    {... link data ...}
+	{
+		 // required app info properties
+		 icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+		 title: 'Branch Demo App',
+		 description: 'The Branch demo app!',
+		 // Link preferences
+		 make_new_link: true
+	},
+	{... link data ...}
 );
 ```
 
@@ -875,7 +875,7 @@ This will add exactly the space required to show the app banner above your navig
 
 
 
-### banner(options, data) 
+### banner(options, data)
 
 **Parameters**
 
@@ -897,8 +897,8 @@ THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
 
 ```js
 branch.banner(
-    options, // Banner options: See example for all available options
-    data // Data for link, same as Branch.link()
+	options, // Banner options: See example for all available options
+	data // Data for link, same as Branch.link()
 );
 ```
 
@@ -906,41 +906,41 @@ branch.banner(
 
 ```js
 branch.banner({
-    icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-    title: 'Branch Demo App',
-    description: 'The Branch demo app!',
-    openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
-    downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
-    sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
-    phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-    showiOS: true,                          // Should the banner be shown on iOS devices?
-    showAndroid: true,                      // Should the banner be shown on Android devices?
-    showDesktop: true,                      // Should the banner be shown on desktop devices?
-    iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
-    disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
-    forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
-    position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
-    mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
-    desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
-    customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
-    make_new_link: false                    // Should the banner create a new link, even if a link already exists?
+	icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+	title: 'Branch Demo App',
+	description: 'The Branch demo app!',
+	openAppButtonText: 'Open',				// Text to show on button if the user has the app installed
+	downloadAppButtonText: 'Download',		// Text to show on button if the user does not have the app installed
+	sendLinkText: 'Send Link',				// Text to show on desktop button to allow users to text themselves the app
+	phonePreviewText: '+44 9999-9999',		// The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
+	showiOS: true,							// Should the banner be shown on iOS devices?
+	showAndroid: true,						// Should the banner be shown on Android devices?
+	showDesktop: true,						// Should the banner be shown on desktop devices?
+	iframe: true,							// Show banner in an iframe, recomended to isolate Branch banner CSS
+	disableHide: false,						// Should the user have the ability to hide the banner? (show's X on left side)
+	forgetHide: false,						// Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
+	position: 'top',						// Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
+	mobileSticky: false,					// Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
+	desktopSticky: true,					// Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
+	customCSS: '.title { color: #F00; }',	// Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
+	make_new_link: false					// Should the banner create a new link, even if a link already exists?
 }, {
-    tags: ['tag1', 'tag2'],
-    feature: 'dashboard',
-    stage: 'new user',
-    type: 1,
-    data: {
-        mydata: 'something',
-        foo: 'bar',
-        '$desktop_url': 'http://myappwebsite.com',
-        '$ios_url': 'http://myappwebsite.com/ios',
-        '$ipad_url': 'http://myappwebsite.com/ipad',
-        '$android_url': 'http://myappwebsite.com/android',
-        '$og_app_id': '12345',
-        '$og_title': 'My App',
-        '$og_description': 'My app\'s description.',
-        '$og_image_url': 'http://myappwebsite.com/image.png'
-    }
+	tags: ['tag1', 'tag2'],
+	feature: 'dashboard',
+	stage: 'new user',
+	type: 1,
+	data: {
+		mydata: 'something',
+		foo: 'bar',
+		'$desktop_url': 'http://myappwebsite.com',
+		'$ios_url': 'http://myappwebsite.com/ios',
+		'$ipad_url': 'http://myappwebsite.com/ipad',
+		'$android_url': 'http://myappwebsite.com/android',
+		'$og_app_id': '12345',
+		'$og_title': 'My App',
+		'$og_description': 'My app\'s description.',
+		'$og_image_url': 'http://myappwebsite.com/image.png'
+	}
 });
 ```
 ___
