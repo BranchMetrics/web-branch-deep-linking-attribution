@@ -26,10 +26,10 @@ if (TITANIUM_BUILD) {
  * @class BranchStorage
  * @constructor
  */
- var BranchStorage = function(storageMethods) {
+var BranchStorage = function(storageMethods) {
     for (var i = 0; i < storageMethods.length; i++) {
         var storageMethod = this[storageMethods[i]];
-            storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
+        storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
         if (storageMethod.isEnabled()) {
             storageMethod._store = { };
             return storageMethod;

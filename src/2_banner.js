@@ -84,7 +84,7 @@ var sendSMS = function(doc, branch, options, linkData) {
                         enableForm();
                     }, banner_utils.success_timeout);
                 }
-             });
+            });
         }
         else {
             errorForm();

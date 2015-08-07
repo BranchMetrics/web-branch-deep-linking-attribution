@@ -7,7 +7,7 @@ goog.require('goog.json');
 goog.require('utils');
 goog.provide('session');
 
- /**
+/**
  * @param {BranchStorage} storage
  * @param {boolean=} first
  * @return {Object}
@@ -22,7 +22,7 @@ session.get = function(storage, first) {
     }
 };
 
- /**
+/**
  * @param {BranchStorage} storage
  * @param {Object} data
  * @param {boolean=} first
@@ -32,7 +32,7 @@ session.set = function(storage, data, first) {
     if (first) { storage.set('branch_session_first', goog.json.serialize(data), true); }
 };
 
- /**
+/**
  * @param {BranchStorage} storage
  * @param {Object} data
  */
