@@ -1237,12 +1237,11 @@ if (WEB_BUILD) { // jshint undef:false
 	Branch.prototype['addListener'] = function(event, listener) {
 		if (typeof event == "function" && listener === undefined) {
 			listener = event;
-			event = null;
         }
 		if (listener) {
 			this._listeners.push({
 				listener: listener,
-				event: event
+				event: event || null
 			});
 		}
 	};
