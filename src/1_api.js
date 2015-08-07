@@ -53,12 +53,32 @@ Server.prototype.serializeObject = function(obj, prefix) {
  * @param {Object.<string, *>} data
  */
 Server.prototype.getUrl = function(resource, data) {
-	var k, v, err;
-	var url = resource.destination + resource.endpoint;
+	var k, v, err,
+		url = resource.destination + resource.endpoint,
+		branch_id = /^[0-9]{15,20}$/,
+		branch_key = /key_(live|test)_[A-Za-z0-9]{32}/,
+
+		appendKeyOrId = function(data, destinationObject) {
+			if (typeof destinationObject == 'undefined') { destinationObject = { }; }
+			if (data['branch_key'] && branch_key.test(data['branch_key'])) {
+				destinationObject['branch_key'] = data['branch_key'];
+			}
+			else if (data['app_id'] && branch_id.test(data['app_id'])) {
+				destinationObject['app_id'] = data['app_id'];
+			}
+			else {
+				// way to return this!!
+				err = utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]);
+			}
+			return destinationObject;
+		};
+
+	if (resource.endpoint == "/v1/has-app") { resource.queryPart = appendKeyOrId(data, resource.queryPart); }
+
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
-				err = resource.queryPart[k](resource.endpoint, k, data[k]);
+				err = typeof resource.queryPart[k] == 'function' ? resource.queryPart[k](resource.endpoint, k, data[k]) : err;
 				if (err) { return { error: err }; }
 				url += '/' + data[k];
 			}
@@ -69,29 +89,18 @@ Server.prototype.getUrl = function(resource, data) {
 		if (resource.params.hasOwnProperty(k)) {
 			err = resource.params[k](resource.endpoint, k, data[k]);
 			if (err) { return { error: err }; }
-
 			v = data[k];
 			if (!(typeof v == 'undefined' || v === '' || v === null)) {
 				d[k] = v;
 			}
 		}
 	}
-	// check for branch_key then app_id here
-	var branch_id = /^[0-9]{15,20}$/;
-	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
 	if (resource.method === "POST" || resource.endpoint === "/v1/credithistory") {
-		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
-			d['branch_key'] = data['branch_key'];
-		}
-		else if (data['app_id'] && branch_id.test(data['app_id'])) {
-			d['app_id'] = data['app_id'];
-		}
-		else {
-			return { error: utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]) };
-		}
+		data = appendKeyOrId(data, d);
 	}
 
+	if (err) { return { error: err }; }
 	return { data: this.serializeObject(d, ''), url: url };
 };
 

@@ -266,11 +266,11 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		if (data['link']) { self.sessionLink = data['link']; }
 
 		if (data['referring_link']) {
-			data['referring_link'] = utils.processReferringLink(data['referring_link']); // .substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
+			data['referring_link'] = utils.processReferringLink(data['referring_link']);
 		}
 
 		if (!data['click_id'] && data['referring_link']) {
-			data['click_id'] = utils.clickIdFromLink(data['referring_link']); // .substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
+			data['click_id'] = utils.clickIdFromLink(data['referring_link']);
 		}
 
 		if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
@@ -286,6 +286,20 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	link_identifier = WEB_BUILD ? (utils.getParamValue('_branch_match_id') || utils.hashValue('r')) : (url ? utils.getParamValue(url) : null),
 	freshInstall = !sessionData || !sessionData['identity_id'],
 
+	checkHasApp = function(sessionData, cb) {
+		var currentSessionData = sessionData || session.get(self._storage);
+		self._api(resources.hasApp, { "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] }, function(err, has_app) {
+			if (has_app && !currentSessionData['has_app']) {
+				currentSessionData['has_app'] = true;
+				session.update(self._storage, currentSessionData);
+				self._publishEvent("downloadedApp");
+			}
+			if (cb) {
+				cb(err, currentSessionData);
+			}
+		});
+	},
+
 	finishInit = function(err, data) {
 		if (data) {
 			data = setBranchValues(data);
@@ -299,14 +313,39 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		// Keep android titanium from calling close
 		if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
 		done(err, data && utils.whiteListSessionData(data));
+	},
+
+	attachVisibilityEvent = function() {
+		var hidden, changeEvent;
+		if (typeof document.hidden !== "undefined") {
+			hidden = "hidden";
+			changeEvent = "visibilitychange";
+		}
+		else if (typeof document.mozHidden !== "undefined") {
+			hidden = "mozHidden";
+			changeEvent = "mozvisibilitychange";
+		}
+		else if (typeof document.msHidden !== "undefined") {
+			hidden = "msHidden";
+			changeEvent = "msvisibilitychange";
+		}
+		else if (typeof document.webkitHidden !== "undefined") {
+			hidden = "webkitHidden";
+			changeEvent = "webkitvisibilitychange";
+		}
+		if (changeEvent) {
+			document.addEventListener(changeEvent, function() {
+				if (!document[hidden]) { checkHasApp(null, null); }
+			}, false);
+		}
 	};
 
 	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
-		finishInit(null, sessionData);
+		attachVisibilityEvent();
+		checkHasApp(sessionData, finishInit);
 	}
 	else {
 		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-
 			var apiCordovaTitanium = function(data) {
 				if (!freshInstall) {
 					data['identity_id'] = sessionData['identity_id'];
@@ -349,6 +388,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
 					if (data && link_identifier) { data['click_id'] = link_identifier; }
+					attachVisibilityEvent();
 					finishInit(err, data);
 				});
 			});
@@ -434,8 +474,8 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		if (err) { done(err); }
 
 		data = data || { };
-		self.identity_id = data['identity_id'].toString();
-		self.sessionLink = data['link'];
+		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
+		if (data['link']) { self.sessionLink = data['link']; }
 		self.identity = identity;
 
 		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
@@ -1181,20 +1221,23 @@ if (WEB_BUILD) { // jshint undef:false
  * ```
  *
  * #### Available `Branch.banner()` Events:
- * - willShowBanner
- * - willNotShowBanner
- * - didShowBanner
- * - willCloseBanner
- * - didCloseBanner
- * - willSendBannerSMS
- * - sendBannerSMSError
- * - didSendBannerSMS
+ * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
+ * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more events will be emitted.
+ * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
+ * - *willCloseBanner*: `closeBanner()` calle, and the smart banner will close.
+ * - *didCloseBanner*: Smart banner close animation started, and is closing.
+ * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
+ * - *sendBannerSMSError*: `sendSMS()` error returned.
+ * - *didSendBannerSMS*: SMS successfully sent.
+ * - *downloadedApp*: User installed app, and banner text updated.
  *
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event == "function" && listener === undefined) { listener = event; }
+		if (typeof event == "function" && listener === undefined) {
+			listener = event;
+        }
 		if (listener) {
 			this._listeners.push({
 				listener: listener,
