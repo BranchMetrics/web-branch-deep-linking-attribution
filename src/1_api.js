@@ -62,18 +62,25 @@ Server.prototype.getUrl = function(resource, data) {
 			if (typeof destinationObject == 'undefined') { destinationObject = { }; }
 			if (data['branch_key'] && branch_key.test(data['branch_key'])) {
 				destinationObject['branch_key'] = data['branch_key'];
+				return destinationObject;
 			}
 			else if (data['app_id'] && branch_id.test(data['app_id'])) {
 				destinationObject['app_id'] = data['app_id'];
+				return destinationObject;
 			}
 			else {
-				// way to return this!!
-				err = utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]);
+				throw Error(utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]));
 			}
-			return destinationObject;
 		};
 
-	if (resource.endpoint == "/v1/has-app") { resource.queryPart = appendKeyOrId(data, resource.queryPart); }
+	if (resource.endpoint == "/v1/has-app") {
+		try {
+			resource.queryPart = appendKeyOrId(data, resource.queryPart);
+		}
+		catch (e) {
+			return { error: e.message };
+		}
+	}
 
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
@@ -97,10 +104,14 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	if (resource.method === "POST" || resource.endpoint === "/v1/credithistory") {
-		data = appendKeyOrId(data, d);
+		try {
+			data = appendKeyOrId(data, d);
+		}
+		catch (e) {
+			return { error: e.message };
+		}
 	}
 
-	if (err) { return { error: err }; }
 	return { data: this.serializeObject(d, ''), url: url };
 };
 

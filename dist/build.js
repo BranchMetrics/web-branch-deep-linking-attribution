@@ -1013,36 +1013,51 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e, f = a.destination + a.endpoint, g = /^[0-9]{15,20}$/, h = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
     "undefined" == typeof c && (c = {});
-    b.branch_key && h.test(b.branch_key) ? c.branch_key = b.branch_key : b.app_id && g.test(b.app_id) ? c.app_id = b.app_id : e = utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]);
-    return c;
+    if (b.branch_key && g.test(b.branch_key)) {
+      return c.branch_key = b.branch_key, c;
+    }
+    if (b.app_id && f.test(b.app_id)) {
+      return c.app_id = b.app_id, c;
+    }
+    throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
-  "/v1/has-app" == a.endpoint && (a.queryPart = k(b, a.queryPart));
+  if ("/v1/has-app" == a.endpoint) {
+    try {
+      a.queryPart = h(b, a.queryPart);
+    } catch (k) {
+      return {error:k.message};
+    }
+  }
   if (a.queryPart) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
-        if (e = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : e) {
-          return {error:e};
+        if (d = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : d) {
+          return {error:d};
         }
-        f += "/" + b[c];
+        e += "/" + b[c];
       }
     }
   }
   var l = {};
   for (c in a.params) {
     if (a.params.hasOwnProperty(c)) {
-      if (e = a.params[c](a.endpoint, c, b[c])) {
-        return {error:e};
+      if (d = a.params[c](a.endpoint, c, b[c])) {
+        return {error:d};
       }
       d = b[c];
       "undefined" != typeof d && "" !== d && null !== d && (l[c] = d);
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
-    b = k(b, l);
+    try {
+      b = h(b, l);
+    } catch (n) {
+      return {error:n.message};
+    }
   }
-  return e ? {error:e} : {data:this.serializeObject(l, ""), url:f};
+  return {data:this.serializeObject(l, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
   var b = document.createElement("script");
