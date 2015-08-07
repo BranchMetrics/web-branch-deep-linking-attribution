@@ -15,8 +15,8 @@ The SDK can be initialized by calling `branch.init()`, just as with the Web SDK.
 
 ```js
 branch.init('BRANCH KEY', function(err, data) {
-	if (err) { console.log("Init error: " + err); }
-	else { console.log("Init successful: " + data); }
+    if (err) { console.log("Init error: " + err); }
+    else { console.log("Init successful: " + data); }
 });
 ```
 
@@ -42,28 +42,28 @@ Titanium generates a 'pause' and 'resume' event for iOS when the app goes into a
 // but we wait for the Titanium Window, which corresponds to an
 // activity, to open to start the session.
 if (Ti.Platform.osname === "android") {
-	Alloy.Globals.open_url = Ti.Android.currentActivity.intent.data;
+    Alloy.Globals.open_url = Ti.Android.currentActivity.intent.data;
 }
 
 // If this is not Android, we want to initialize the branch session
 // at app startup.  Close it when we go into the background and
 // open it again when the app comes back to the foreground.
 else if (Ti.Platform.osname.match(/i(os|p(hone|od|ad))/i)) {
-	var url = Ti.App.getArguments().url;
-	branch.init(BranchKey, { "isReferrable" : true, "url": url }, initDone);
+    var url = Ti.App.getArguments().url;
+    branch.init(BranchKey, { "isReferrable" : true, "url": url }, initDone);
 
-	Ti.App.addEventListener('resume', function(e) {
-		console.log("Resume");
-		branch.init(BranchKey, { isReferrable : true }, initDone);
-	});
+    Ti.App.addEventListener('resume', function(e) {
+        console.log("Resume");
+        branch.init(BranchKey, { isReferrable : true }, initDone);
+    });
 
-	Ti.App.addEventListener('pause', function(e) {
-		console.log("Pause");
-		branch.close(function(err) {
-			if (err) { console.log("Error with close: " + err.message); }
-			else { console.log("Close complete"); }
-		});
-	});
+    Ti.App.addEventListener('pause', function(e) {
+        console.log("Pause");
+        branch.close(function(err) {
+            if (err) { console.log("Error with close: " + err.message); }
+            else { console.log("Close complete"); }
+        });
+    });
 }
 
 ```
@@ -79,28 +79,28 @@ In Android Titanium gives you access to the onStart and onStop Activity life cyc
 // one activity to another and not send excess inits or close the session
 // accidentally.
 if (Ti.Platform.osname === "android") {
-	$.index.activity.onStart = function() {
-		branch.init('BRANCH KEY',
-		{ "isReferrable" : true, "url": Alloy.Globals.open_url },
-		function(err, data) {
-			if (err != null) {
-				console.log("Init error: " + JSON.stringify(err));
-				Alloy.Globals.status = err.message;
-			} else {
-				console.log("Init successful: " + JSON.stringify(data));
-				Alloy.Globals.status = "Ok";
-			}
-			Ti.App.fireEvent("branch_init");
-		});
-	};
+    $.index.activity.onStart = function() {
+        branch.init('BRANCH KEY',
+        { "isReferrable" : true, "url": Alloy.Globals.open_url },
+        function(err, data) {
+            if (err != null) {
+                console.log("Init error: " + JSON.stringify(err));
+                Alloy.Globals.status = err.message;
+            } else {
+                console.log("Init successful: " + JSON.stringify(data));
+                Alloy.Globals.status = "Ok";
+            }
+            Ti.App.fireEvent("branch_init");
+        });
+    };
 
-	$.index.activity.onStop = function() {
-		branch.close(function(err) {
-			if (err) {
-				console.log("Error on close: " + err);
-			}
-		});
-	};
+    $.index.activity.onStop = function() {
+        branch.close(function(err) {
+            if (err) {
+                console.log("Error on close: " + err);
+            }
+        });
+    };
 }
 
 ```
