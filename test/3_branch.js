@@ -234,7 +234,8 @@ describe('Branch', function() {
 			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
 
 			requests = [ ];
-			branch = initBranch(false, true), assert = testUtils.plan(2, done);
+			branch = initBranch(false, true);
+			assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key);
 			assert.equal(requests.length, 1, 'one requests made');
 			assert.deepEqual(requests[0].resource.endpoint, "/v1/has-app", "Request to has_app made");

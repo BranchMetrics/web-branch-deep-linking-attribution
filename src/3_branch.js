@@ -294,7 +294,9 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 				session.update(self._storage, currentSessionData);
 				self._publishEvent("downloadedApp");
 			}
-			cb && cb(err, currentSessionData);
+			if (cb) {
+				cb(err, currentSessionData);
+			}
 		});
 	},
 
@@ -315,25 +317,27 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 	attachVisibilityEvent = function() {
 		var hidden, changeEvent;
-		if (typeof document.hidden != undefined) {
-			hidden = "hidden",
+		if (typeof document.hidden !== "undefined") {
+			hidden = "hidden";
 			changeEvent = "visibilitychange";
 		}
-		else if (typeof document.mozHidden != undefined) {
-			hidden = "mozHidden",
+		else if (typeof document.mozHidden !== "undefined") {
+			hidden = "mozHidden";
 			changeEvent = "mozvisibilitychange";
 		}
-		else if (typeof document.msHidden != undefined) {
-			hidden = "msHidden",
+		else if (typeof document.msHidden !== "undefined") {
+			hidden = "msHidden";
 			changeEvent = "msvisibilitychange";
 		}
-		else if (typeof document.webkitvisibilitychange != undefined) {
-			hidden = "webkitHidden",
+		else if (typeof document.webkitHidden !== "undefined") {
+			hidden = "webkitHidden";
 			changeEvent = "webkitvisibilitychange";
 		}
-		document.addEventListener(changeEvent, function() {
-			if (!document[hidden]) { checkHasApp(); }
-		}, false);
+		if (changeEvent) {
+			document.addEventListener(changeEvent, function() {
+				if (!document[hidden]) { checkHasApp(null, null); }
+			}, false);
+		}
 	};
 
 	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
@@ -384,7 +388,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 					"browser_fingerprint_id": browser_fingerprint_id
 				}, function(err, data) {
 					if (data && link_identifier) { data['click_id'] = link_identifier; }
-					attachVisibilityEvent(data);
+					attachVisibilityEvent();
 					finishInit(err, data);
 				});
 			});

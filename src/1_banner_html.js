@@ -117,7 +117,7 @@ banner_html.div = function(options, action) {
  * @param {banner_utils.options} options
  * @param {storage} storage
  */
-banner_html.markup = function(options, storage, branch, doc) {
+banner_html.markup = function(options, storage, branch) {
 	var action = '<div id="branch-sms-form-container" class="vertically-align-middle">' +
 		(utils.mobileUserAgent() ? banner_html.mobileAction(options, storage, branch) : banner_html.desktopAction(options)) +
 	'</div>';

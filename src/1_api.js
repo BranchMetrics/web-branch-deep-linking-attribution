@@ -100,7 +100,7 @@ Server.prototype.getUrl = function(resource, data) {
 		data = appendKeyOrId(data, d);
 	}
 
-	if (err) { return { error: err } }
+	if (err) { return { error: err }; }
 	return { data: this.serializeObject(d, ''), url: url };
 };
 

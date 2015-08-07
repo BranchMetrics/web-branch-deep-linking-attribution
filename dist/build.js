@@ -1250,7 +1250,7 @@ var banner_html = {banner:function(a, b) {
   c.innerHTML = banner_html.banner(a, b);
   document.body.appendChild(c);
   return c;
-}, markup:function(a, b, c, d) {
+}, markup:function(a, b, c) {
   b = '<div id="branch-sms-form-container" class="vertically-align-middle">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b, c) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, b) : banner_html.div(a, b);
 }};
@@ -1455,9 +1455,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     a(b, c && utils.whiteListSessionData(c));
   }, n = function() {
     var a, b;
-    void 0 != typeof document.hidden ? (a = "hidden", b = "visibilitychange") : void 0 != typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : void 0 != typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : void 0 != typeof document.webkitvisibilitychange && (a = "webkitHidden", b = "webkitvisibilitychange");
-    document.addEventListener(b, function() {
-      document[a] || k();
+    "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
+    b && document.addEventListener(b, function() {
+      document[a] || k(null, null);
     }, !1);
   };
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
@@ -1490,7 +1490,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       }
       d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
         b && g && (b.click_id = g);
-        n(b);
+        n();
         l(a, b);
       });
     });
