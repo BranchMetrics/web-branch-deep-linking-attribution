@@ -62,14 +62,15 @@ Server.prototype.getUrl = function(resource, data) {
 			if (typeof destinationObject == 'undefined') { destinationObject = { }; }
 			if (data['branch_key'] && branch_key.test(data['branch_key'])) {
 				destinationObject['branch_key'] = data['branch_key'];
+				return destinationObject;
 			}
 			else if (data['app_id'] && branch_id.test(data['app_id'])) {
 				destinationObject['app_id'] = data['app_id'];
+				return destinationObject;
 			}
 			else {
 				throw Error(utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]));
 			}
-			return destinationObject;
 		};
 
 	if (resource.endpoint == "/v1/has-app") {
