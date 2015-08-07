@@ -29,11 +29,11 @@ __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acc
 ```html
 <script type="text/javascript">
 
-    // INSERT INIT CODE
+	// INSERT INIT CODE
 
-    branch.init('BRANCH KEY', function(err, data) {
-        // callback to handle err or data
-    });
+	branch.init('BRANCH KEY', function(err, data) {
+    	// callback to handle err or data
+	});
 </script>
 ```
 
@@ -51,7 +51,7 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
 
 ```js
   branch.init("YOUR BRANCH KEY HERE", function(err, data) {
-      app.initComplete(err, data);
+  	app.initComplete(err, data);
   });
 ```
 
@@ -65,7 +65,7 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
 
 ```js
   branch.init("YOUR BRANCH KEY HERE", function(err, data) {
-      app.initComplete(err, data);
+  	app.initComplete(err, data);
   });
 ```
 

@@ -38,11 +38,11 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-    // INSERT INIT CODE
+	// INSERT INIT CODE
 
-    branch.init('BRANCH KEY', function(err, data) {
-        // callback to handle err or data
-    });
+	branch.init('BRANCH KEY', function(err, data) {
+    	// callback to handle err or data
+	});
 </script>
 ```
 
@@ -72,7 +72,7 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
 
 ```js
   branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
-      app.initComplete(err, data);
+  	app.initComplete(err, data);
   });
 ```
 
@@ -91,10 +91,10 @@ The actual SDK javascript code is compiled in the build.js file which is a Commo
 You can access the Branch functions by using require to load the CommonJS module.
 
 ```js
-    var branch = require('build');
-    branch.init('YOUR BRANCH KEY HERE', function(err, data) {
-        // Do post init work here...
-    });
+	var branch = require('build');
+	branch.init('YOUR BRANCH KEY HERE', function(err, data) {
+		// Do post init work here...
+	});
 ```
 
 See the TITANIUM_GUIDE for more details and the Titanium testbed app for an example.
