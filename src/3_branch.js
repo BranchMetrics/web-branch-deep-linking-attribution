@@ -1235,9 +1235,7 @@ if (WEB_BUILD) { // jshint undef:false
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event == "function" && listener === undefined) {
-			listener = event;
-        }
+		if (typeof event == "function" && listener === undefined) { listener = event; }
 		if (listener) {
 			this._listeners.push({
 				listener: listener,
