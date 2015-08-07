@@ -1,4 +1,4 @@
- goog.require('utils');
+goog.require('utils');
 goog.require('Branch');
 goog.require('resources');
 goog.require('config');

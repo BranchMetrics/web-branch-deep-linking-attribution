@@ -90,7 +90,7 @@ var safari_browsers = [
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '8.1'
-		}/*,
+		},
 		{
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
