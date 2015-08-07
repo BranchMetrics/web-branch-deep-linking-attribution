@@ -756,7 +756,7 @@ utils.message = function(a, b) {
   return c;
 };
 utils.whiteListSessionData = function(a) {
-  return {data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:"undefined" != typeof a.has_app ? a.has_app : null, referring_link:a.referring_link || null};
+  return {data:a.data || null, referring_identity:a.referring_identity || null, identity:a.identity || null, has_app:a.has_app || null, referring_link:a.referring_link || null};
 };
 utils.cleanLinkData = function(a, b) {
   WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
