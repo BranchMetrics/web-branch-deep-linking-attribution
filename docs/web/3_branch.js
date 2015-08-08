@@ -688,23 +688,23 @@ callback(
 [
 	{
 		"transaction": {
-							 "date": "2014-10-14T01:54:40.425Z",
-							 "id": "50388077461373184",
-							 "bucket": "default",
-							 "type": 0,
-							 "amount": 5
-						 },
+			"date": "2014-10-14T01:54:40.425Z",
+			"id": "50388077461373184",
+			"bucket": "default",
+			"type": 0,
+			"amount": 5
+		},
 		"referrer": "12345678",
 		"referree": null
 	},
 	{
 		"transaction": {
-							 "date": "2014-10-14T01:55:09.474Z",
-							 "id": "50388199301710081",
-							 "bucket": "default",
-							 "type": 2,
-							 "amount": -3
-						 },
+			 "date": "2014-10-14T01:55:09.474Z",
+			 "id": "50388199301710081",
+			 "bucket": "default",
+			 "type": 2,
+			 "amount": -3
+		 },
 		"referrer": null,
 		"referree": "12345678"
 	}
