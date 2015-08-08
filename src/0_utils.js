@@ -166,7 +166,7 @@ utils.isKey = function(key_or_id) {
  */
 utils.snakeToCamel = function(string) {
 	var find = /(\-\w)/g,
-		convert =  function(matches) {
+		convert = function(matches) {
 			return matches[1].toUpperCase();
 		};
 	return string.replace(find, convert);

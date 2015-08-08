@@ -494,10 +494,10 @@ branch.getCode(
 ```js
 branch.getCode(
 	{
-	  "amount":10,
-	  "bucket":"party",
-	  "calculation_type":1,
-	  "location":2
+		"amount":10,
+		"bucket":"party",
+		"calculation_type":1,
+		"location":2
 	},
 	callback (err, data)
 );
@@ -508,7 +508,7 @@ branch.getCode(
 callback(
 	 "Error message",
 	 {
-	   "referral_code":"AB12CD"
+	 	"referral_code":"AB12CD"
 	 }
 );
 ```
@@ -672,10 +672,10 @@ branch.creditHistory(
 ```js
 branch.creditHistory(
 	{
-	  "length":50,
-	  "direction":0,
-	  "begin_after_id":"123456789012345",
-	  "bucket":"default"
+		"length":50,
+		"direction":0,
+		"begin_after_id":"123456789012345",
+		"bucket":"default"
 	}
 	callback (err, data)
 );
@@ -688,23 +688,23 @@ callback(
 [
 	{
 		"transaction": {
-						   "date": "2014-10-14T01:54:40.425Z",
-						   "id": "50388077461373184",
-						   "bucket": "default",
-						   "type": 0,
-						   "amount": 5
-					   },
+							 "date": "2014-10-14T01:54:40.425Z",
+							 "id": "50388077461373184",
+							 "bucket": "default",
+							 "type": 0,
+							 "amount": 5
+						 },
 		"referrer": "12345678",
 		"referree": null
 	},
 	{
 		"transaction": {
-						   "date": "2014-10-14T01:55:09.474Z",
-						   "id": "50388199301710081",
-						   "bucket": "default",
-						   "type": 2,
-						   "amount": -3
-					   },
+							 "date": "2014-10-14T01:55:09.474Z",
+							 "id": "50388199301710081",
+							 "bucket": "default",
+							 "type": 2,
+							 "amount": -3
+						 },
 		"referrer": null,
 		"referree": "12345678"
 	}
@@ -735,7 +735,7 @@ Credits are stored in `buckets`, which you can define as points, currency, whate
 ```js
 branch.redeem(
 	amount, // Amount of credits to be redeemed
-	bucket,  // String of bucket name to redeem credits from
+	bucket,	// String of bucket name to redeem credits from
 	callback (err)
 );
 ```

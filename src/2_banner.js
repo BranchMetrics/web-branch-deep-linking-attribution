@@ -11,7 +11,7 @@ goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
 	var phone = doc.getElementById('branch-sms-phone');
-	var sendButton    = doc.getElementById('branch-sms-send');
+	var sendButton = doc.getElementById('branch-sms-send');
 	var branchLoader = doc.getElementById('branch-loader-wrapper');
 	var smsFormContainer = doc.getElementById('branch-sms-form-container');
 	var checkmark;

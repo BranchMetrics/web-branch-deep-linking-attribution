@@ -137,7 +137,7 @@ var cookies = function(perm) {
 		set: function(key, value) { setCookie(prefix(key), value); },
 		remove: function(key) {
 			var expires = "";
-			document.cookie = prefix(key) + "=; expires="  + expires + "; path=/";
+			document.cookie = prefix(key) + "=; expires=" + expires + "; path=/";
 		},
 		clear: function() {
 			var deleteCookie = function(cookie) {

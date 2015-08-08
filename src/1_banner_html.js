@@ -14,7 +14,7 @@ banner_html.banner = function(options, action) {
 			action +
 		'</div>' +
 		'<div class="left">' +
-			 (!options.disableHide ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
+			(!options.disableHide ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
 			'<div class="icon">' +
 				'<img src="' + options.icon + '">' +
 			'</div>' +

@@ -9,7 +9,7 @@ goog.exportPath_ = function(a, b, c) {
   c = c || goog.global;
   a[0] in c || !c.execScript || c.execScript("var " + a[0]);
   for (var d;a.length && (d = a.shift());) {
-	!a.length && goog.isDef(b) ? c[d] = b : c = c[d] ? c[d] : c[d] = {};
+    !a.length && goog.isDef(b) ? c[d] = b : c = c[d] ? c[d] : c[d] = {};
   }
 };
 goog.define = function(a, b) {
@@ -25,36 +25,36 @@ goog.DISALLOW_TEST_ONLY_CODE = COMPILED && !goog.DEBUG;
 goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING = !1;
 goog.provide = function(a) {
   if (!COMPILED && goog.isProvided_(a)) {
-	throw Error('Namespace "' + a + '" already declared.');
+    throw Error('Namespace "' + a + '" already declared.');
   }
   goog.constructNamespace_(a);
 };
 goog.constructNamespace_ = function(a, b) {
   if (!COMPILED) {
-	delete goog.implicitNamespaces_[a];
-	for (var c = a;(c = c.substring(0, c.lastIndexOf("."))) && !goog.getObjectByName(c);) {
-	  goog.implicitNamespaces_[c] = !0;
-	}
+    delete goog.implicitNamespaces_[a];
+    for (var c = a;(c = c.substring(0, c.lastIndexOf("."))) && !goog.getObjectByName(c);) {
+      goog.implicitNamespaces_[c] = !0;
+    }
   }
   goog.exportPath_(a, b);
 };
 goog.VALID_MODULE_RE_ = /^[a-zA-Z_$][a-zA-Z0-9._$]*$/;
 goog.module = function(a) {
   if (!goog.isString(a) || !a || -1 == a.search(goog.VALID_MODULE_RE_)) {
-	throw Error("Invalid module identifier");
+    throw Error("Invalid module identifier");
   }
   if (!goog.isInModuleLoader_()) {
-	throw Error("Module " + a + " has been loaded incorrectly.");
+    throw Error("Module " + a + " has been loaded incorrectly.");
   }
   if (goog.moduleLoaderState_.moduleName) {
-	throw Error("goog.module may only be called once per module.");
+    throw Error("goog.module may only be called once per module.");
   }
   goog.moduleLoaderState_.moduleName = a;
   if (!COMPILED) {
-	if (goog.isProvided_(a)) {
-	  throw Error('Namespace "' + a + '" already declared.');
-	}
-	delete goog.implicitNamespaces_[a];
+    if (goog.isProvided_(a)) {
+      throw Error('Namespace "' + a + '" already declared.');
+    }
+    delete goog.implicitNamespaces_[a];
   }
 };
 goog.module.get = function(a) {
@@ -62,7 +62,7 @@ goog.module.get = function(a) {
 };
 goog.module.getInternal_ = function(a) {
   if (!COMPILED) {
-	return goog.isProvided_(a) ? a in goog.loadedModules_ ? goog.loadedModules_[a] : goog.getObjectByName(a) : null;
+    return goog.isProvided_(a) ? a in goog.loadedModules_ ? goog.loadedModules_[a] : goog.getObjectByName(a) : null;
   }
 };
 goog.moduleLoaderState_ = null;
@@ -71,22 +71,22 @@ goog.isInModuleLoader_ = function() {
 };
 goog.module.declareTestMethods = function() {
   if (!goog.isInModuleLoader_()) {
-	throw Error("goog.module.declareTestMethods must be called from within a goog.module");
+    throw Error("goog.module.declareTestMethods must be called from within a goog.module");
   }
   goog.moduleLoaderState_.declareTestMethods = !0;
 };
 goog.module.declareLegacyNamespace = function() {
   if (!COMPILED && !goog.isInModuleLoader_()) {
-	throw Error("goog.module.declareLegacyNamespace must be called from within a goog.module");
+    throw Error("goog.module.declareLegacyNamespace must be called from within a goog.module");
   }
   if (!COMPILED && !goog.moduleLoaderState_.moduleName) {
-	throw Error("goog.module must be called prior to goog.module.declareLegacyNamespace.");
+    throw Error("goog.module must be called prior to goog.module.declareLegacyNamespace.");
   }
   goog.moduleLoaderState_.declareLegacyNamespace = !0;
 };
 goog.setTestOnly = function(a) {
   if (goog.DISALLOW_TEST_ONLY_CODE) {
-	throw a = a || "", Error("Importing test-only code into non-debug environment" + (a ? ": " + a : "."));
+    throw a = a || "", Error("Importing test-only code into non-debug environment" + (a ? ": " + a : "."));
   }
 };
 goog.forwardDeclare = function(a) {
@@ -96,30 +96,30 @@ COMPILED || (goog.isProvided_ = function(a) {
 }, goog.implicitNamespaces_ = {"goog.module":!0});
 goog.getObjectByName = function(a, b) {
   for (var c = a.split("."), d = b || goog.global, e;e = c.shift();) {
-	if (goog.isDefAndNotNull(d[e])) {
-	  d = d[e];
-	} else {
-	  return null;
-	}
+    if (goog.isDefAndNotNull(d[e])) {
+      d = d[e];
+    } else {
+      return null;
+    }
   }
   return d;
 };
 goog.globalize = function(a, b) {
   var c = b || goog.global, d;
   for (d in a) {
-	c[d] = a[d];
+    c[d] = a[d];
   }
 };
 goog.addDependency = function(a, b, c, d) {
   if (goog.DEPENDENCIES_ENABLED) {
-	var e;
-	a = a.replace(/\\/g, "/");
-	for (var f = goog.dependencies_, g = 0;e = b[g];g++) {
-	  f.nameToPath[e] = a, f.pathIsModule[a] = !!d;
-	}
-	for (d = 0;b = c[d];d++) {
-	  a in f.requires || (f.requires[a] = {}), f.requires[a][b] = !0;
-	}
+    var e;
+    a = a.replace(/\\/g, "/");
+    for (var f = goog.dependencies_, g = 0;e = b[g];g++) {
+      f.nameToPath[e] = a, f.pathIsModule[a] = !!d;
+    }
+    for (d = 0;b = c[d];d++) {
+      a in f.requires || (f.requires[a] = {}), f.requires[a][b] = !0;
+    }
   }
 };
 goog.ENABLE_DEBUG_LOADER = !0;
@@ -128,19 +128,19 @@ goog.logToConsole_ = function(a) {
 };
 goog.require = function(a) {
   if (!COMPILED) {
-	goog.ENABLE_DEBUG_LOADER && goog.IS_OLD_IE_ && goog.maybeProcessDeferredDep_(a);
-	if (goog.isProvided_(a)) {
-	  return goog.isInModuleLoader_() ? goog.module.getInternal_(a) : null;
-	}
-	if (goog.ENABLE_DEBUG_LOADER) {
-	  var b = goog.getPathFromDeps_(a);
-	  if (b) {
-		return goog.included_[b] = !0, goog.writeScripts_(), null;
-	  }
-	}
-	a = "goog.require could not find: " + a;
-	goog.logToConsole_(a);
-	throw Error(a);
+    goog.ENABLE_DEBUG_LOADER && goog.IS_OLD_IE_ && goog.maybeProcessDeferredDep_(a);
+    if (goog.isProvided_(a)) {
+      return goog.isInModuleLoader_() ? goog.module.getInternal_(a) : null;
+    }
+    if (goog.ENABLE_DEBUG_LOADER) {
+      var b = goog.getPathFromDeps_(a);
+      if (b) {
+        return goog.included_[b] = !0, goog.writeScripts_(), null;
+      }
+    }
+    a = "goog.require could not find: " + a;
+    goog.logToConsole_(a);
+    throw Error(a);
   }
 };
 goog.basePath = "";
@@ -151,11 +151,11 @@ goog.abstractMethod = function() {
 };
 goog.addSingletonGetter = function(a) {
   a.getInstance = function() {
-	if (a.instance_) {
-	  return a.instance_;
-	}
-	goog.DEBUG && (goog.instantiatedSingletons_[goog.instantiatedSingletons_.length] = a);
-	return a.instance_ = new a;
+    if (a.instance_) {
+      return a.instance_;
+    }
+    goog.DEBUG && (goog.instantiatedSingletons_[goog.instantiatedSingletons_.length] = a);
+    return a.instance_ = new a;
   };
 };
 goog.instantiatedSingletons_ = [];
@@ -168,17 +168,17 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   return "undefined" != typeof a && "write" in a;
 }, goog.findBasePath_ = function() {
   if (goog.isDef(goog.global.CLOSURE_BASE_PATH)) {
-	goog.basePath = goog.global.CLOSURE_BASE_PATH;
+    goog.basePath = goog.global.CLOSURE_BASE_PATH;
   } else {
-	if (goog.inHtmlDocument_()) {
-	  for (var a = goog.global.document.getElementsByTagName("SCRIPT"), b = a.length - 1;0 <= b;--b) {
-		var c = a[b].src, d = c.lastIndexOf("?"), d = -1 == d ? c.length : d;
-		if ("base.js" == c.substr(d - 7, 7)) {
-		  goog.basePath = c.substr(0, d - 7);
-		  break;
-		}
-	  }
-	}
+    if (goog.inHtmlDocument_()) {
+      for (var a = goog.global.document.getElementsByTagName("SCRIPT"), b = a.length - 1;0 <= b;--b) {
+        var c = a[b].src, d = c.lastIndexOf("?"), d = -1 == d ? c.length : d;
+        if ("base.js" == c.substr(d - 7, 7)) {
+          goog.basePath = c.substr(0, d - 7);
+          break;
+        }
+      }
+    }
   }
 }, goog.importScript_ = function(a, b) {
   (goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_)(a, b) && (goog.dependencies_.written[a] = !0);
@@ -189,11 +189,11 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
 }, goog.loadQueuedModules_ = function() {
   var a = goog.queuedModules_.length;
   if (0 < a) {
-	var b = goog.queuedModules_;
-	goog.queuedModules_ = [];
-	for (var c = 0;c < a;c++) {
-	  goog.maybeProcessDeferredPath_(b[c]);
-	}
+    var b = goog.queuedModules_;
+    goog.queuedModules_ = [];
+    for (var c = 0;c < a;c++) {
+      goog.maybeProcessDeferredPath_(b[c]);
+    }
   }
 }, goog.maybeProcessDeferredDep_ = function(a) {
   goog.isDeferredModule_(a) && goog.allDepsAreAvailable_(a) && (a = goog.getPathFromDeps_(a), goog.maybeProcessDeferredPath_(goog.basePath + a));
@@ -201,48 +201,48 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   return (a = goog.getPathFromDeps_(a)) && goog.dependencies_.pathIsModule[a] ? goog.basePath + a in goog.dependencies_.deferred : !1;
 }, goog.allDepsAreAvailable_ = function(a) {
   if ((a = goog.getPathFromDeps_(a)) && a in goog.dependencies_.requires) {
-	for (var b in goog.dependencies_.requires[a]) {
-	  if (!goog.isProvided_(b) && !goog.isDeferredModule_(b)) {
-		return !1;
-	  }
-	}
+    for (var b in goog.dependencies_.requires[a]) {
+      if (!goog.isProvided_(b) && !goog.isDeferredModule_(b)) {
+        return !1;
+      }
+    }
   }
   return !0;
 }, goog.maybeProcessDeferredPath_ = function(a) {
   if (a in goog.dependencies_.deferred) {
-	var b = goog.dependencies_.deferred[a];
-	delete goog.dependencies_.deferred[a];
-	goog.globalEval(b);
+    var b = goog.dependencies_.deferred[a];
+    delete goog.dependencies_.deferred[a];
+    goog.globalEval(b);
   }
 }, goog.loadModule = function(a) {
   var b = goog.moduleLoaderState_;
   try {
-	goog.moduleLoaderState_ = {moduleName:void 0, declareTestMethods:!1};
-	var c;
-	if (goog.isFunction(a)) {
-	  c = a.call(goog.global, {});
-	} else {
-	  if (goog.isString(a)) {
-		c = goog.loadModuleFromSource_.call(goog.global, a);
-	  } else {
-		throw Error("Invalid module definition");
-	  }
-	}
-	var d = goog.moduleLoaderState_.moduleName;
-	if (!goog.isString(d) || !d) {
-	  throw Error('Invalid module name "' + d + '"');
-	}
-	goog.moduleLoaderState_.declareLegacyNamespace ? goog.constructNamespace_(d, c) : goog.SEAL_MODULE_EXPORTS && Object.seal && Object.seal(c);
-	goog.loadedModules_[d] = c;
-	if (goog.moduleLoaderState_.declareTestMethods) {
-	  for (var e in c) {
-		if (0 === e.indexOf("test", 0) || "tearDown" == e || "setUp" == e || "setUpPage" == e || "tearDownPage" == e) {
-		  goog.global[e] = c[e];
-		}
-	  }
-	}
+    goog.moduleLoaderState_ = {moduleName:void 0, declareTestMethods:!1};
+    var c;
+    if (goog.isFunction(a)) {
+      c = a.call(goog.global, {});
+    } else {
+      if (goog.isString(a)) {
+        c = goog.loadModuleFromSource_.call(goog.global, a);
+      } else {
+        throw Error("Invalid module definition");
+      }
+    }
+    var d = goog.moduleLoaderState_.moduleName;
+    if (!goog.isString(d) || !d) {
+      throw Error('Invalid module name "' + d + '"');
+    }
+    goog.moduleLoaderState_.declareLegacyNamespace ? goog.constructNamespace_(d, c) : goog.SEAL_MODULE_EXPORTS && Object.seal && Object.seal(c);
+    goog.loadedModules_[d] = c;
+    if (goog.moduleLoaderState_.declareTestMethods) {
+      for (var e in c) {
+        if (0 === e.indexOf("test", 0) || "tearDown" == e || "setUp" == e || "setUpPage" == e || "tearDownPage" == e) {
+          goog.global[e] = c[e];
+        }
+      }
+    }
   } finally {
-	goog.moduleLoaderState_ = b;
+    goog.moduleLoaderState_ = b;
   }
 }, goog.loadModuleFromSource_ = function(a) {
   eval(a);
@@ -258,16 +258,16 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   b.head.appendChild(c);
 }, goog.writeScriptTag_ = function(a, b) {
   if (goog.inHtmlDocument_()) {
-	var c = goog.global.document;
-	if (!goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING && "complete" == c.readyState) {
-	  if (/\bdeps.js$/.test(a)) {
-		return !1;
-	  }
-	  throw Error('Cannot write "' + a + '" after document load');
-	}
-	var d = goog.IS_OLD_IE_;
-	void 0 === b ? d ? (d = " onreadystatechange='goog.onScriptLoad_(this, " + ++goog.lastNonModuleScriptIndex_ + ")' ", c.write('<script type="text/javascript" src="' + a + '"' + d + ">\x3c/script>")) : goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING ? goog.appendScriptSrcNode_(a) : goog.writeScriptSrcNode_(a) : c.write('<script type="text/javascript">' + b + "\x3c/script>");
-	return !0;
+    var c = goog.global.document;
+    if (!goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING && "complete" == c.readyState) {
+      if (/\bdeps.js$/.test(a)) {
+        return !1;
+      }
+      throw Error('Cannot write "' + a + '" after document load');
+    }
+    var d = goog.IS_OLD_IE_;
+    void 0 === b ? d ? (d = " onreadystatechange='goog.onScriptLoad_(this, " + ++goog.lastNonModuleScriptIndex_ + ")' ", c.write('<script type="text/javascript" src="' + a + '"' + d + ">\x3c/script>")) : goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING ? goog.appendScriptSrcNode_(a) : goog.writeScriptSrcNode_(a) : c.write('<script type="text/javascript">' + b + "\x3c/script>");
+    return !0;
   }
   return !1;
 }, goog.lastNonModuleScriptIndex_ = 0, goog.onScriptLoad_ = function(a, b) {
@@ -275,36 +275,36 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   return !0;
 }, goog.writeScripts_ = function() {
   function a(e) {
-	if (!(e in d.written)) {
-	  if (!(e in d.visited) && (d.visited[e] = !0, e in d.requires)) {
-		for (var f in d.requires[e]) {
-		  if (!goog.isProvided_(f)) {
-			if (f in d.nameToPath) {
-			  a(d.nameToPath[f]);
-			} else {
-			  throw Error("Undefined nameToPath for " + f);
-			}
-		  }
-		}
-	  }
-	  e in c || (c[e] = !0, b.push(e));
-	}
+    if (!(e in d.written)) {
+      if (!(e in d.visited) && (d.visited[e] = !0, e in d.requires)) {
+        for (var f in d.requires[e]) {
+          if (!goog.isProvided_(f)) {
+            if (f in d.nameToPath) {
+              a(d.nameToPath[f]);
+            } else {
+              throw Error("Undefined nameToPath for " + f);
+            }
+          }
+        }
+      }
+      e in c || (c[e] = !0, b.push(e));
+    }
   }
   var b = [], c = {}, d = goog.dependencies_, e;
   for (e in goog.included_) {
-	d.written[e] || a(e);
+    d.written[e] || a(e);
   }
   for (var f = 0;f < b.length;f++) {
-	e = b[f], goog.dependencies_.written[e] = !0;
+    e = b[f], goog.dependencies_.written[e] = !0;
   }
   var g = goog.moduleLoaderState_;
   goog.moduleLoaderState_ = null;
   for (f = 0;f < b.length;f++) {
-	if (e = b[f]) {
-	  d.pathIsModule[e] ? goog.importModule_(goog.basePath + e) : goog.importScript_(goog.basePath + e);
-	} else {
-	  throw goog.moduleLoaderState_ = g, Error("Undefined script input");
-	}
+    if (e = b[f]) {
+      d.pathIsModule[e] ? goog.importModule_(goog.basePath + e) : goog.importScript_(goog.basePath + e);
+    } else {
+      throw goog.moduleLoaderState_ = g, Error("Undefined script input");
+    }
   }
   goog.moduleLoaderState_ = g;
 }, goog.getPathFromDeps_ = function(a) {
@@ -313,13 +313,13 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
 goog.normalizePath_ = function(a) {
   a = a.split("/");
   for (var b = 0;b < a.length;) {
-	"." == a[b] ? a.splice(b, 1) : b && ".." == a[b] && a[b - 1] && ".." != a[b - 1] ? a.splice(--b, 2) : b++;
+    "." == a[b] ? a.splice(b, 1) : b && ".." == a[b] && a[b - 1] && ".." != a[b - 1] ? a.splice(--b, 2) : b++;
   }
   return a.join("/");
 };
 goog.loadFileSync_ = function(a) {
   if (goog.global.CLOSURE_LOAD_FILE_SYNC) {
-	return goog.global.CLOSURE_LOAD_FILE_SYNC(a);
+    return goog.global.CLOSURE_LOAD_FILE_SYNC(a);
   }
   var b = new goog.global.XMLHttpRequest;
   b.open("get", a, !1);
@@ -328,43 +328,43 @@ goog.loadFileSync_ = function(a) {
 };
 goog.retrieveAndExecModule_ = function(a) {
   if (!COMPILED) {
-	var b = a;
-	a = goog.normalizePath_(a);
-	var c = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_, d = goog.loadFileSync_(a);
-	if (null != d) {
-	  d = goog.wrapModule_(a, d), goog.IS_OLD_IE_ ? (goog.dependencies_.deferred[b] = d, goog.queuedModules_.push(b)) : c(a, d);
-	} else {
-	  throw Error("load of " + a + "failed");
-	}
+    var b = a;
+    a = goog.normalizePath_(a);
+    var c = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_, d = goog.loadFileSync_(a);
+    if (null != d) {
+      d = goog.wrapModule_(a, d), goog.IS_OLD_IE_ ? (goog.dependencies_.deferred[b] = d, goog.queuedModules_.push(b)) : c(a, d);
+    } else {
+      throw Error("load of " + a + "failed");
+    }
   }
 };
 goog.typeOf = function(a) {
   var b = typeof a;
   if ("object" == b) {
-	if (a) {
-	  if (a instanceof Array) {
-		return "array";
-	  }
-	  if (a instanceof Object) {
-		return b;
-	  }
-	  var c = Object.prototype.toString.call(a);
-	  if ("[object Window]" == c) {
-		return "object";
-	  }
-	  if ("[object Array]" == c || "number" == typeof a.length && "undefined" != typeof a.splice && "undefined" != typeof a.propertyIsEnumerable && !a.propertyIsEnumerable("splice")) {
-		return "array";
-	  }
-	  if ("[object Function]" == c || "undefined" != typeof a.call && "undefined" != typeof a.propertyIsEnumerable && !a.propertyIsEnumerable("call")) {
-		return "function";
-	  }
-	} else {
-	  return "null";
-	}
+    if (a) {
+      if (a instanceof Array) {
+        return "array";
+      }
+      if (a instanceof Object) {
+        return b;
+      }
+      var c = Object.prototype.toString.call(a);
+      if ("[object Window]" == c) {
+        return "object";
+      }
+      if ("[object Array]" == c || "number" == typeof a.length && "undefined" != typeof a.splice && "undefined" != typeof a.propertyIsEnumerable && !a.propertyIsEnumerable("splice")) {
+        return "array";
+      }
+      if ("[object Function]" == c || "undefined" != typeof a.call && "undefined" != typeof a.propertyIsEnumerable && !a.propertyIsEnumerable("call")) {
+        return "function";
+      }
+    } else {
+      return "null";
+    }
   } else {
-	if ("function" == b && "undefined" == typeof a.call) {
-	  return "object";
-	}
+    if ("function" == b && "undefined" == typeof a.call) {
+      return "object";
+    }
   }
   return b;
 };
@@ -409,7 +409,7 @@ goog.hasUid = function(a) {
 goog.removeUid = function(a) {
   "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
   try {
-	delete a[goog.UID_PROPERTY_];
+    delete a[goog.UID_PROPERTY_];
   } catch (b) {
   }
 };
@@ -420,14 +420,14 @@ goog.removeHashCode = goog.removeUid;
 goog.cloneObject = function(a) {
   var b = goog.typeOf(a);
   if ("object" == b || "array" == b) {
-	if (a.clone) {
-	  return a.clone();
-	}
-	var b = "array" == b ? [] : {}, c;
-	for (c in a) {
-	  b[c] = goog.cloneObject(a[c]);
-	}
-	return b;
+    if (a.clone) {
+      return a.clone();
+    }
+    var b = "array" == b ? [] : {}, c;
+    for (c in a) {
+      b[c] = goog.cloneObject(a[c]);
+    }
+    return b;
   }
   return a;
 };
@@ -436,18 +436,18 @@ goog.bindNative_ = function(a, b, c) {
 };
 goog.bindJs_ = function(a, b, c) {
   if (!a) {
-	throw Error();
+    throw Error();
   }
   if (2 < arguments.length) {
-	var d = Array.prototype.slice.call(arguments, 2);
-	return function() {
-	  var c = Array.prototype.slice.call(arguments);
-	  Array.prototype.unshift.apply(c, d);
-	  return a.apply(b, c);
-	};
+    var d = Array.prototype.slice.call(arguments, 2);
+    return function() {
+      var c = Array.prototype.slice.call(arguments);
+      Array.prototype.unshift.apply(c, d);
+      return a.apply(b, c);
+    };
   }
   return function() {
-	return a.apply(b, arguments);
+    return a.apply(b, arguments);
   };
 };
 goog.bind = function(a, b, c) {
@@ -457,14 +457,14 @@ goog.bind = function(a, b, c) {
 goog.partial = function(a, b) {
   var c = Array.prototype.slice.call(arguments, 1);
   return function() {
-	var b = c.slice();
-	b.push.apply(b, arguments);
-	return a.apply(this, b);
+    var b = c.slice();
+    b.push.apply(b, arguments);
+    return a.apply(this, b);
   };
 };
 goog.mixin = function(a, b) {
   for (var c in b) {
-	a[c] = b[c];
+    a[c] = b[c];
   }
 };
 goog.now = goog.TRUSTED_SITE && Date.now || function() {
@@ -472,47 +472,47 @@ goog.now = goog.TRUSTED_SITE && Date.now || function() {
 };
 goog.globalEval = function(a) {
   if (goog.global.execScript) {
-	goog.global.execScript(a, "JavaScript");
+    goog.global.execScript(a, "JavaScript");
   } else {
-	if (goog.global.eval) {
-	  if (null == goog.evalWorksForGlobals_) {
-		if (goog.global.eval("var _evalTest_ = 1;"), "undefined" != typeof goog.global._evalTest_) {
-		  try {
-			delete goog.global._evalTest_;
-		  } catch (b) {
-		  }
-		  goog.evalWorksForGlobals_ = !0;
-		} else {
-		  goog.evalWorksForGlobals_ = !1;
-		}
-	  }
-	  if (goog.evalWorksForGlobals_) {
-		goog.global.eval(a);
-	  } else {
-		var c = goog.global.document, d = c.createElement("SCRIPT");
-		d.type = "text/javascript";
-		d.defer = !1;
-		d.appendChild(c.createTextNode(a));
-		c.body.appendChild(d);
-		c.body.removeChild(d);
-	  }
-	} else {
-	  throw Error("goog.globalEval not available");
-	}
+    if (goog.global.eval) {
+      if (null == goog.evalWorksForGlobals_) {
+        if (goog.global.eval("var _evalTest_ = 1;"), "undefined" != typeof goog.global._evalTest_) {
+          try {
+            delete goog.global._evalTest_;
+          } catch (b) {
+          }
+          goog.evalWorksForGlobals_ = !0;
+        } else {
+          goog.evalWorksForGlobals_ = !1;
+        }
+      }
+      if (goog.evalWorksForGlobals_) {
+        goog.global.eval(a);
+      } else {
+        var c = goog.global.document, d = c.createElement("SCRIPT");
+        d.type = "text/javascript";
+        d.defer = !1;
+        d.appendChild(c.createTextNode(a));
+        c.body.appendChild(d);
+        c.body.removeChild(d);
+      }
+    } else {
+      throw Error("goog.globalEval not available");
+    }
   }
 };
 goog.evalWorksForGlobals_ = null;
 goog.getCssName = function(a, b) {
   var c = function(a) {
-	return goog.cssNameMapping_[a] || a;
+    return goog.cssNameMapping_[a] || a;
   }, d = function(a) {
-	a = a.split("-");
-	for (var b = [], d = 0;d < a.length;d++) {
-	  b.push(c(a[d]));
-	}
-	return b.join("-");
+    a = a.split("-");
+    for (var b = [], d = 0;d < a.length;d++) {
+      b.push(c(a[d]));
+    }
+    return b.join("-");
   }, d = goog.cssNameMapping_ ? "BY_WHOLE" == goog.cssNameMappingStyle_ ? c : d : function(a) {
-	return a;
+    return a;
   };
   return b ? a + "-" + d(b) : d(a);
 };
@@ -523,7 +523,7 @@ goog.setCssNameMapping = function(a, b) {
 !COMPILED && goog.global.CLOSURE_CSS_NAME_MAPPING && (goog.cssNameMapping_ = goog.global.CLOSURE_CSS_NAME_MAPPING);
 goog.getMsg = function(a, b) {
   b && (a = a.replace(/\{\$([^}]+)}/g, function(a, d) {
-	return d in b ? b[d] : a;
+    return d in b ? b[d] : a;
   }));
   return a;
 };
@@ -544,38 +544,38 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-	for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
-	  g[k - 2] = arguments[k];
-	}
-	return b.prototype[c].apply(a, g);
+    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
+      g[k - 2] = arguments[k];
+    }
+    return b.prototype[c].apply(a, g);
   };
 };
 goog.base = function(a, b, c) {
   var d = arguments.callee.caller;
   if (goog.STRICT_MODE_COMPATIBLE || goog.DEBUG && !d) {
-	throw Error("arguments.caller not defined.  goog.base() cannot be used with strict mode code. See http://www.ecma-international.org/ecma-262/5.1/#sec-C");
+    throw Error("arguments.caller not defined.  goog.base() cannot be used with strict mode code. See http://www.ecma-international.org/ecma-262/5.1/#sec-C");
   }
   if (d.superClass_) {
-	for (var e = Array(arguments.length - 1), f = 1;f < arguments.length;f++) {
-	  e[f - 1] = arguments[f];
-	}
-	return d.superClass_.constructor.apply(a, e);
+    for (var e = Array(arguments.length - 1), f = 1;f < arguments.length;f++) {
+      e[f - 1] = arguments[f];
+    }
+    return d.superClass_.constructor.apply(a, e);
   }
   e = Array(arguments.length - 2);
   for (f = 2;f < arguments.length;f++) {
-	e[f - 2] = arguments[f];
+    e[f - 2] = arguments[f];
   }
   for (var f = !1, g = a.constructor;g;g = g.superClass_ && g.superClass_.constructor) {
-	if (g.prototype[b] === d) {
-	  f = !0;
-	} else {
-	  if (f) {
-		return g.prototype[b].apply(a, e);
-	  }
-	}
+    if (g.prototype[b] === d) {
+      f = !0;
+    } else {
+      if (f) {
+        return g.prototype[b].apply(a, e);
+      }
+    }
   }
   if (a[b] === d) {
-	return a.constructor.prototype[b].apply(a, e);
+    return a.constructor.prototype[b].apply(a, e);
   }
   throw Error("goog.base called from a method of one name to a method of a different name");
 };
@@ -586,7 +586,7 @@ COMPILED || (goog.global.COMPILED = COMPILED);
 goog.defineClass = function(a, b) {
   var c = b.constructor, d = b.statics;
   c && c != Object.prototype.constructor || (c = function() {
-	throw Error("cannot instantiate an interface (no constructor defined).");
+    throw Error("cannot instantiate an interface (no constructor defined).");
   });
   c = goog.defineClass.createSealingConstructor_(c, a);
   a && goog.inherits(c, a);
@@ -599,26 +599,26 @@ goog.defineClass = function(a, b) {
 goog.defineClass.SEAL_CLASS_INSTANCES = goog.DEBUG;
 goog.defineClass.createSealingConstructor_ = function(a, b) {
   if (goog.defineClass.SEAL_CLASS_INSTANCES && Object.seal instanceof Function) {
-	if (b && b.prototype && b.prototype[goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_]) {
-	  return a;
-	}
-	var c = function() {
-	  var b = a.apply(this, arguments) || this;
-	  b[goog.UID_PROPERTY_] = b[goog.UID_PROPERTY_];
-	  this.constructor === c && Object.seal(b);
-	  return b;
-	};
-	return c;
+    if (b && b.prototype && b.prototype[goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_]) {
+      return a;
+    }
+    var c = function() {
+      var b = a.apply(this, arguments) || this;
+      b[goog.UID_PROPERTY_] = b[goog.UID_PROPERTY_];
+      this.constructor === c && Object.seal(b);
+      return b;
+    };
+    return c;
   }
   return a;
 };
 goog.defineClass.OBJECT_PROTOTYPE_FIELDS_ = "constructor hasOwnProperty isPrototypeOf propertyIsEnumerable toLocaleString toString valueOf".split(" ");
 goog.defineClass.applyProperties_ = function(a, b) {
   for (var c in b) {
-	Object.prototype.hasOwnProperty.call(b, c) && (a[c] = b[c]);
+    Object.prototype.hasOwnProperty.call(b, c) && (a[c] = b[c]);
   }
   for (var d = 0;d < goog.defineClass.OBJECT_PROTOTYPE_FIELDS_.length;d++) {
-	c = goog.defineClass.OBJECT_PROTOTYPE_FIELDS_[d], Object.prototype.hasOwnProperty.call(b, c) && (a[c] = b[c]);
+    c = goog.defineClass.OBJECT_PROTOTYPE_FIELDS_[d], Object.prototype.hasOwnProperty.call(b, c) && (a[c] = b[c]);
   }
 };
 goog.tagUnsealableClass = function(a) {
@@ -630,16 +630,16 @@ var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.
 // Input 2
 var Queue = function() {
   var a = [], b = function() {
-	if (a.length) {
-	  a[0](function() {
-		a.shift();
-		b();
-	  });
-	}
+    if (a.length) {
+      a[0](function() {
+        a.shift();
+        b();
+      });
+    }
   };
   return function(c) {
-	a.push(c);
-	1 == a.length && b();
+    a.push(c);
+    1 == a.length && b();
   };
 };
 // Input 3
@@ -651,10 +651,10 @@ goog.json.isValid = function(a) {
 goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
   a = String(a);
   if (goog.json.isValid(a)) {
-	try {
-	  return eval("(" + a + ")");
-	} catch (b) {
-	}
+    try {
+      return eval("(" + a + ")");
+    } catch (b) {
+    }
   }
   throw Error("Invalid JSON string: " + a);
 };
@@ -674,45 +674,45 @@ goog.json.Serializer.prototype.serialize = function(a) {
 };
 goog.json.Serializer.prototype.serializeInternal = function(a, b) {
   if (null == a) {
-	b.push("null");
+    b.push("null");
   } else {
-	if ("object" == typeof a) {
-	  if (goog.isArray(a)) {
-		this.serializeArray(a, b);
-		return;
-	  }
-	  if (a instanceof String || a instanceof Number || a instanceof Boolean) {
-		a = a.valueOf();
-	  } else {
-		this.serializeObject_(a, b);
-		return;
-	  }
-	}
-	switch(typeof a) {
-	  case "string":
-		this.serializeString_(a, b);
-		break;
-	  case "number":
-		this.serializeNumber_(a, b);
-		break;
-	  case "boolean":
-		b.push(a);
-		break;
-	  case "function":
-		b.push("null");
-		break;
-	  default:
-		throw Error("Unknown type: " + typeof a);;
-	}
+    if ("object" == typeof a) {
+      if (goog.isArray(a)) {
+        this.serializeArray(a, b);
+        return;
+      }
+      if (a instanceof String || a instanceof Number || a instanceof Boolean) {
+        a = a.valueOf();
+      } else {
+        this.serializeObject_(a, b);
+        return;
+      }
+    }
+    switch(typeof a) {
+      case "string":
+        this.serializeString_(a, b);
+        break;
+      case "number":
+        this.serializeNumber_(a, b);
+        break;
+      case "boolean":
+        b.push(a);
+        break;
+      case "function":
+        b.push("null");
+        break;
+      default:
+        throw Error("Unknown type: " + typeof a);;
+    }
   }
 };
 goog.json.Serializer.charToJsonCharCache_ = {'"':'\\"', "\\":"\\\\", "/":"\\/", "\b":"\\b", "\f":"\\f", "\n":"\\n", "\r":"\\r", "\t":"\\t", "\x0B":"\\u000b"};
 goog.json.Serializer.charsToReplace_ = /\uffff/.test("\uffff") ? /[\\\"\x00-\x1f\x7f-\uffff]/g : /[\\\"\x00-\x1f\x7f-\xff]/g;
 goog.json.Serializer.prototype.serializeString_ = function(a, b) {
   b.push('"', a.replace(goog.json.Serializer.charsToReplace_, function(a) {
-	var b = goog.json.Serializer.charToJsonCharCache_[a];
-	b || (b = "\\u" + (a.charCodeAt(0) | 65536).toString(16).substr(1), goog.json.Serializer.charToJsonCharCache_[a] = b);
-	return b;
+    var b = goog.json.Serializer.charToJsonCharCache_[a];
+    b || (b = "\\u" + (a.charCodeAt(0) | 65536).toString(16).substr(1), goog.json.Serializer.charToJsonCharCache_[a] = b);
+    return b;
   }), '"');
 };
 goog.json.Serializer.prototype.serializeNumber_ = function(a, b) {
@@ -722,7 +722,7 @@ goog.json.Serializer.prototype.serializeArray = function(a, b) {
   var c = a.length;
   b.push("[");
   for (var d = "", e = 0;e < c;e++) {
-	b.push(d), d = a[e], this.serializeInternal(this.replacer_ ? this.replacer_.call(a, String(e), d) : d, b), d = ",";
+    b.push(d), d = a[e], this.serializeInternal(this.replacer_ ? this.replacer_.call(a, String(e), d) : d, b), d = ",";
   }
   b.push("]");
 };
@@ -730,10 +730,10 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("{");
   var c = "", d;
   for (d in a) {
-	if (Object.prototype.hasOwnProperty.call(a, d)) {
-	  var e = a[d];
-	  "function" != typeof e && (b.push(c), this.serializeString_(d, b), b.push(":"), this.serializeInternal(this.replacer_ ? this.replacer_.call(a, d, e) : e, b), c = ",");
-	}
+    if (Object.prototype.hasOwnProperty.call(a, d)) {
+      var e = a[d];
+      "function" != typeof e && (b.push(c), this.serializeString_(d, b), b.push(":"), this.serializeInternal(this.replacer_ ? this.replacer_.call(a, d, e) : e, b), c = ",");
+    }
   }
   b.push("}");
 };
@@ -750,7 +750,7 @@ utils.getLocationHash = function() {
 };
 utils.message = function(a, b) {
   var c = a.replace(/\$(\d)/g, function(a, c) {
-	return b[parseInt(c, 10) - 1];
+    return b[parseInt(c, 10) - 1];
   });
   DEBUG && console && console.log(c);
   return c;
@@ -771,13 +771,13 @@ utils.processReferringLink = function(a) {
 };
 utils.merge = function(a, b) {
   for (var c in b) {
-	b.hasOwnProperty(c) && (a[c] = b[c]);
+    b.hasOwnProperty(c) && (a[c] = b[c]);
   }
   return a;
 };
 utils.hashValue = function(a) {
   try {
-	return utils.getLocationHash().match(new RegExp(a + ":([^&]*)"))[1];
+    return utils.getLocationHash().match(new RegExp(a + ":([^&]*)"))[1];
   } catch (b) {
   }
 };
@@ -786,7 +786,7 @@ utils.mobileUserAgent = function() {
 };
 utils.getParamValue = function(a) {
   try {
-	return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
+    return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
   } catch (b) {
   }
 };
@@ -795,7 +795,7 @@ utils.isKey = function(a) {
 };
 utils.snakeToCamel = function(a) {
   return a.replace(/(\-\w)/g, function(a) {
-	return a[1].toUpperCase();
+    return a[1].toUpperCase();
   });
 };
 utils.base64encode = function(a) {
@@ -803,21 +803,21 @@ utils.base64encode = function(a) {
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
-	f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
+    f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
   for (a = d;h < a.length;) {
-	c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
-	;
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? g = k = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+    ;
   }
   return b;
 };
 // Input 5
 var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
-	var c = this[a[b]], c = "function" == typeof c ? c() : c;
-	if (c.isEnabled()) {
-	  return c._store = {}, c;
-	}
+    var c = this[a[b]], c = "function" == typeof c ? c() : c;
+    if (c.isEnabled()) {
+      return c._store = {}, c;
+    }
   }
 }, prefix = function(a) {
   return "branch_session" == a || "branch_session_first" == a ? a : BRANCH_KEY_PREFIX + a;
@@ -828,27 +828,27 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
 }, webStorage = function(a) {
   var b = a ? localStorage : sessionStorage;
   return {getAll:function() {
-	var a = null, d;
-	for (d in b) {
-	  0 === d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
-	}
-	return a;
+    var a = null, d;
+    for (d in b) {
+      0 === d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
+    }
+    return a;
   }, get:function(a, d) {
-	return retrieveValue(d ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
+    return retrieveValue(d ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
   }, set:function(a, d, e) {
-	e ? localStorage.setItem(prefix(a), d) : b.setItem(prefix(a), d);
+    e ? localStorage.setItem(prefix(a), d) : b.setItem(prefix(a), d);
   }, remove:function(a) {
-	b.removeItem(prefix(a));
+    b.removeItem(prefix(a));
   }, clear:function() {
-	Object.keys(b).forEach(function(a) {
-	  0 === a.indexOf(BRANCH_KEY_PREFIX) && b.removeItem(a);
-	});
+    Object.keys(b).forEach(function(a) {
+      0 === a.indexOf(BRANCH_KEY_PREFIX) && b.removeItem(a);
+    });
   }, isEnabled:function() {
-	try {
-	  return b.setItem("test", ""), b.removeItem("test"), !0;
-	} catch (a) {
-	  return !1;
-	}
+    try {
+      return b.setItem("test", ""), b.removeItem("test"), !0;
+    } catch (a) {
+      return !1;
+    }
   }};
 };
 BranchStorage.prototype.local = function() {
@@ -859,35 +859,35 @@ BranchStorage.prototype.session = function() {
 };
 var cookies = function(a) {
   return {getAll:function() {
-	for (var a = document.cookie.split(";"), c = {}, d = 0;d < a.length;d++) {
-	  var e = a[d].replace(" ", ""), e = e.substring(0, e.length);
-	  -1 != e.indexOf(BRANCH_KEY_PREFIX) && (e = e.split("="), c[trimPrefix(e[0])] = retrieveValue(e[1]));
-	}
-	return c;
+    for (var a = document.cookie.split(";"), c = {}, d = 0;d < a.length;d++) {
+      var e = a[d].replace(" ", ""), e = e.substring(0, e.length);
+      -1 != e.indexOf(BRANCH_KEY_PREFIX) && (e = e.split("="), c[trimPrefix(e[0])] = retrieveValue(e[1]));
+    }
+    return c;
   }, get:function(a) {
-	a = prefix(a) + "=";
-	for (var c = document.cookie.split(";"), d = 0;d < c.length;d++) {
-	  var e = c[d], e = e.substring(1, e.length);
-	  if (0 === e.indexOf(a)) {
-		return retrieveValue(e.substring(a.length, e.length));
-	  }
-	}
-	return null;
+    a = prefix(a) + "=";
+    for (var c = document.cookie.split(";"), d = 0;d < c.length;d++) {
+      var e = c[d], e = e.substring(1, e.length);
+      if (0 === e.indexOf(a)) {
+        return retrieveValue(e.substring(a.length, e.length));
+      }
+    }
+    return null;
   }, set:function(b, c) {
-	var d = prefix(b), e = "";
-	a && (e = new Date, console.log(e), e.setTime(e.getTime() + 864E5 * COOKIE_DAYS), e = "; branch_expiration_date=" + e.toGMTString() + "; expires=" + e.toGMTString());
-	document.cookie = d + "=" + c + e + "; path=/";
+    var d = prefix(b), e = "";
+    a && (e = new Date, console.log(e), e.setTime(e.getTime() + 864E5 * COOKIE_DAYS), e = "; branch_expiration_date=" + e.toGMTString() + "; expires=" + e.toGMTString());
+    document.cookie = d + "=" + c + e + "; path=/";
   }, remove:function(a) {
-	document.cookie = prefix(a) + "=; expires=; path=/";
+    document.cookie = prefix(a) + "=; expires=; path=/";
   }, clear:function() {
-	for (var b = function(a) {
-	  document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
-	}, c = document.cookie.split(";"), d = 0;d < c.length;d++) {
-	  var e = c[d], e = e.substring(1, e.length);
-	  -1 != e.indexOf(BRANCH_KEY_PREFIX) && (a || -1 != e.indexOf("branch_expiration_date=") ? a && 0 < e.indexOf("branch_expiration_date=") && b(e) : b(e));
-	}
+    for (var b = function(a) {
+      document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
+    }, c = document.cookie.split(";"), d = 0;d < c.length;d++) {
+      var e = c[d], e = e.substring(1, e.length);
+      -1 != e.indexOf(BRANCH_KEY_PREFIX) && (a || -1 != e.indexOf("branch_expiration_date=") ? a && 0 < e.indexOf("branch_expiration_date=") && b(e) : b(e));
+    }
   }, isEnabled:function() {
-	return navigator.cookieEnabled;
+    return navigator.cookieEnabled;
   }};
 };
 BranchStorage.prototype.cookie = function() {
@@ -911,7 +911,7 @@ BranchStorage.prototype.pojo = {getAll:function() {
 }};
 BranchStorage.prototype.titanium = {getAll:function() {
   for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
-	-1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = retrieveValue(Ti.App.Properties.getString(b[c])));
+    -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = retrieveValue(Ti.App.Properties.getString(b[c])));
   }
   return a;
 }, get:function(a) {
@@ -922,21 +922,21 @@ BranchStorage.prototype.titanium = {getAll:function() {
   Ti.App.Properties.setString(prefix(a), "");
 }, clear:function() {
   for (var a = Ti.App.Properties.listProperties(), b = 0;b < a.length;b++) {
-	-1 != a[b].indexOf(BRANCH_KEY_PREFIX) && Ti.App.Properties.setString(a[b], "");
+    -1 != a[b].indexOf(BRANCH_KEY_PREFIX) && Ti.App.Properties.setString(a[b], "");
   }
 }, isEnabled:function() {
   try {
-	return Ti.App.Properties.setString("test", ""), Ti.App.Properties.getString("test"), !0;
+    return Ti.App.Properties.setString("test", ""), Ti.App.Properties.getString("test"), !0;
   } catch (a) {
-	return !1;
+    return !1;
   }
 }};
 // Input 6
 var session = {get:function(a, b) {
   try {
-	return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
+    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
   } catch (c) {
-	return null;
+    return null;
   }
 }, set:function(a, b, c) {
   a.set("branch_session", goog.json.serialize(b));
@@ -961,33 +961,33 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return document.body.currentStyle ? document.body.currentStyle[utils.snakeToCamel(a)] : window.getComputedStyle(document.body).getPropertyValue(a);
 }, addCSSLengths:function(a, b) {
   var c = function(a) {
-	if (!a) {
-	  return 0;
-	}
-	var b = a.replace(/[0-9,\.]/g, "");
-	a = a.match(/\d+/g);
-	var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
-	  return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-	}, k = function() {
-	  return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
-	};
-	return parseInt({px:function(a) {
-	  return a;
-	}, em:function(a) {
-	  return document.body.currentStyle ? a * c(document.body.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.body).fontSize);
-	}, rem:function(a) {
-	  return document.documentElement.currentStyle ? a * c(document.documentElement.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-	}, vw:function(a) {
-	  return a * g();
-	}, vh:function(a) {
-	  return a * k();
-	}, vmin:function(a) {
-	  return a * Math.min(k(), g());
-	}, vmax:function(a) {
-	  return a * Math.max(k(), g());
-	}, "%":function() {
-	  return document.body.clientWidth / 100 * f;
-	}}[b](f), 10);
+    if (!a) {
+      return 0;
+    }
+    var b = a.replace(/[0-9,\.]/g, "");
+    a = a.match(/\d+/g);
+    var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
+      return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
+    }, k = function() {
+      return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
+    };
+    return parseInt({px:function(a) {
+      return a;
+    }, em:function(a) {
+      return document.body.currentStyle ? a * c(document.body.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.body).fontSize);
+    }, rem:function(a) {
+      return document.documentElement.currentStyle ? a * c(document.documentElement.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+    }, vw:function(a) {
+      return a * g();
+    }, vh:function(a) {
+      return a * k();
+    }, vmin:function(a) {
+      return a * Math.min(k(), g());
+    }, vmax:function(a) {
+      return a * Math.max(k(), g());
+    }, "%":function() {
+      return document.body.clientWidth / 100 * f;
+    }}[b](f), 10);
   };
   return (c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
@@ -1002,50 +1002,50 @@ Server.prototype._jsonp_callback_index = 0;
 Server.prototype.serializeObject = function(a, b) {
   var c = [];
   if (a instanceof Array) {
-	for (var d = 0;d < a.length;d++) {
-	  c.push(encodeURIComponent(b) + "=" + encodeURIComponent(a[d]));
-	}
+    for (var d = 0;d < a.length;d++) {
+      c.push(encodeURIComponent(b) + "=" + encodeURIComponent(a[d]));
+    }
   } else {
-	for (d in a) {
-	  a.hasOwnProperty(d) && (a[d] instanceof Array || "object" == typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
-	}
+    for (d in a) {
+      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" == typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
+    }
   }
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
   var c, d, e = a.destination + a.endpoint;
   if (a.queryPart) {
-	for (c in a.queryPart) {
-	  if (a.queryPart.hasOwnProperty(c)) {
-		if (d = a.queryPart[c](a.endpoint, c, b[c])) {
-		  return {error:d};
-		}
-		e += "/" + b[c];
-	  }
-	}
+    for (c in a.queryPart) {
+      if (a.queryPart.hasOwnProperty(c)) {
+        if (d = a.queryPart[c](a.endpoint, c, b[c])) {
+          return {error:d};
+        }
+        e += "/" + b[c];
+      }
+    }
   }
   var f = {};
   for (c in a.params) {
-	if (a.params.hasOwnProperty(c)) {
-	  if (d = a.params[c](a.endpoint, c, b[c])) {
-		return {error:d};
-	  }
-	  d = b[c];
-	  "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
-	}
+    if (a.params.hasOwnProperty(c)) {
+      if (d = a.params[c](a.endpoint, c, b[c])) {
+        return {error:d};
+      }
+      d = b[c];
+      "undefined" != typeof d && "" !== d && null !== d && (f[c] = d);
+    }
   }
   c = /^[0-9]{15,20}$/;
   d = /key_(live|test)_[A-Za-z0-9]{32}/;
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
-	if (b.branch_key && d.test(b.branch_key)) {
-	  f.branch_key = b.branch_key;
-	} else {
-	  if (b.app_id && c.test(b.app_id)) {
-		f.app_id = b.app_id;
-	  } else {
-		return {error:utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"])};
-	  }
-	}
+    if (b.branch_key && d.test(b.branch_key)) {
+      f.branch_key = b.branch_key;
+    } else {
+      if (b.app_id && c.test(b.app_id)) {
+        f.app_id = b.app_id;
+      } else {
+        return {error:utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"])};
+      }
+    }
   }
   return {data:this.serializeObject(f, ""), url:e};
 };
@@ -1061,65 +1061,65 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
   b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
-	window[e] = function() {
-	};
-	d(Error(utils.messages.timeout), null, 504);
+    window[e] = function() {
+    };
+    d(Error(utils.messages.timeout), null, 504);
   }, TIMEOUT);
   window[e] = function(a) {
-	window.clearTimeout(g);
-	d(null, a);
+    window.clearTimeout(g);
+    d(null, a);
   };
   this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.ontimeout = function() {
-	e(Error(utils.messages.timeout), null, 504);
+    e(Error(utils.messages.timeout), null, 504);
   };
   TITANIUM_BUILD ? (f.onerror = function(a) {
-	402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : a.error ? e(Error(a.error), null, f.status) : e(Error("Error in API: " + f.status), null, f.status);
+    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : a.error ? e(Error(a.error), null, f.status) : e(Error("Error in API: " + f.status), null, f.status);
   }, f.onload = function() {
-	if (200 === f.status) {
-	  try {
-		e(null, goog.json.parse(f.responseText), f.status);
-	  } catch (a) {
-		e(null, {}, f.status);
-	  }
-	} else {
-	  402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
-	}
+    if (200 === f.status) {
+      try {
+        e(null, goog.json.parse(f.responseText), f.status);
+      } catch (a) {
+        e(null, {}, f.status);
+      }
+    } else {
+      402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
+    }
   }) : f.onreadystatechange = function() {
-	if (4 === f.readyState) {
-	  if (200 === f.status) {
-		try {
-		  e(null, goog.json.parse(f.responseText), f.status);
-		} catch (a) {
-		  e(null, {}, f.status);
-		}
-	  } else {
-		402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
-	  }
-	}
+    if (4 === f.readyState) {
+      if (200 === f.status) {
+        try {
+          e(null, goog.json.parse(f.responseText), f.status);
+        } catch (a) {
+          e(null, {}, f.status);
+        }
+      } else {
+        402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
+      }
+    }
   };
   try {
-	f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
+    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-	d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
+    d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
 Server.prototype.request = function(a, b, c, d) {
   var e = this, f = this.getUrl(a, b);
   if (f.error) {
-	return d(Error(f.error));
+    return d(Error(f.error));
   }
   var g, k = "";
   "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
   var h = RETRIES, l = function(a, b, c) {
-	a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
-	  m();
-	}, RETRY_DELAY)) : d(a, b);
+    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+      m();
+    }, RETRY_DELAY)) : d(a, b);
   }, m = function() {
-	c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
   };
   m();
 };
@@ -1127,43 +1127,43 @@ Server.prototype.request = function(a, b, c, d) {
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
-	if ("number" == typeof e || e) {
-	  if (b == validationTypes.obj) {
-		if ("object" != typeof e) {
-		  return utils.message(utils.messages.invalidType, [c, d, "an object"]);
-		}
-	  } else {
-		if (b == validationTypes.arr) {
-		  if (!(e instanceof Array)) {
-			return utils.message(utils.messages.invalidType, [c, d, "an array"]);
-		  }
-		} else {
-		  if (b == validationTypes.num) {
-			if ("number" != typeof e) {
-			  return utils.message(utils.messages.invalidType, [c, d, "a number"]);
-			}
-		  } else {
-			if (b == validationTypes.bool) {
-			  if ("boolean" != typeof e) {
-				return utils.message(utils.messages.invalidType, [c, d, "a boolean"]);
-			  }
-			} else {
-			  if ("string" != typeof e) {
-				return utils.message(utils.messages.invalidType, [c, d, "a string"]);
-			  }
-			  if (b != validationTypes.str && !b.test(e)) {
-				return utils.message(utils.messages.invalidType, [c, d, "in the proper format"]);
-			  }
-			}
-		  }
-		}
-	  }
-	} else {
-	  if (a) {
-		return utils.message(utils.messages.missingParam, [c, d]);
-	  }
-	}
-	return !1;
+    if ("number" == typeof e || e) {
+      if (b == validationTypes.obj) {
+        if ("object" != typeof e) {
+          return utils.message(utils.messages.invalidType, [c, d, "an object"]);
+        }
+      } else {
+        if (b == validationTypes.arr) {
+          if (!(e instanceof Array)) {
+            return utils.message(utils.messages.invalidType, [c, d, "an array"]);
+          }
+        } else {
+          if (b == validationTypes.num) {
+            if ("number" != typeof e) {
+              return utils.message(utils.messages.invalidType, [c, d, "a number"]);
+            }
+          } else {
+            if (b == validationTypes.bool) {
+              if ("boolean" != typeof e) {
+                return utils.message(utils.messages.invalidType, [c, d, "a boolean"]);
+              }
+            } else {
+              if ("string" != typeof e) {
+                return utils.message(utils.messages.invalidType, [c, d, "a string"]);
+              }
+              if (b != validationTypes.str && !b.test(e)) {
+                return utils.message(utils.messages.invalidType, [c, d, "in the proper format"]);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      if (a) {
+        return utils.message(utils.messages.missingParam, [c, d]);
+      }
+    }
+    return !1;
   };
 }
 var branch_id = /^[0-9]{15,20}$/;
@@ -1171,7 +1171,7 @@ function defaults(a) {
   var b = {};
   WEB_BUILD && (b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.str)});
   if (CORDOVA_BUILD || TITANIUM_BUILD) {
-	b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.str)};
+    b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.str)};
   }
   return utils.merge(a, b);
 }
@@ -1255,46 +1255,46 @@ var banner_html = {banner:function(a, b) {
 // Input 12
 var sendSMS = function(a, b, c, d) {
   var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
-	f.removeAttribute("disabled");
-	e.removeAttribute("disabled");
-	f.style.opacity = "1";
-	e.style.opacity = "1";
-	g.style.opacity = "0";
+    f.removeAttribute("disabled");
+    e.removeAttribute("disabled");
+    f.style.opacity = "1";
+    e.style.opacity = "1";
+    g.style.opacity = "0";
   }, m = function() {
-	h = a.createElement("div");
-	h.className = "branch-icon-wrapper";
-	h.id = "branch-checkmark";
-	h.style = "opacity: 0;";
-	h.innerHTML = banner_html.checkmark();
-	k.appendChild(h);
-	f.style.opacity = "0";
-	e.style.opacity = "0";
-	g.style.opacity = "0";
-	setTimeout(function() {
-	  h.style.opacity = "1";
-	}, banner_utils.animationDelay);
-	e.value = "";
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
+    f.style.opacity = "0";
+    e.style.opacity = "0";
+    g.style.opacity = "0";
+    setTimeout(function() {
+      h.style.opacity = "1";
+    }, banner_utils.animationDelay);
+    e.value = "";
   }, n = function() {
-	l();
-	f.style.background = "#FFD4D4";
-	e.className = "error";
-	setTimeout(function() {
-	  f.style.background = "#FFFFFF";
-	  e.className = "";
-	}, banner_utils.error_timeout);
+    l();
+    f.style.background = "#FFD4D4";
+    e.className = "error";
+    setTimeout(function() {
+      f.style.background = "#FFFFFF";
+      e.className = "";
+    }, banner_utils.error_timeout);
   };
   if (e) {
-	var p = e.value;
-	/^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-	  a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
-		k.removeChild(h);
-		l();
-	  }, banner_utils.success_timeout));
-	})) : n();
+    var p = e.value;
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+        k.removeChild(h);
+        l();
+      }, banner_utils.success_timeout));
+    })) : n();
   }
 }, banner = function(a, b, c, d) {
   if (!banner_utils.shouldAppend(d, b)) {
-	return a._publishEvent("willNotShowBanner"), null;
+    return a._publishEvent("willNotShowBanner"), null;
   }
   a._publishEvent("willShowBanner");
   var e = banner_html.markup(b, d);
@@ -1302,79 +1302,79 @@ var sendSMS = function(a, b, c, d) {
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
   if (utils.mobileUserAgent()) {
-	var g = a._referringLink();
-	g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
-	  a || (f.getElementById("branch-mobile-action").href = b);
-	});
+    var g = a._referringLink();
+    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
+      a || (f.getElementById("branch-mobile-action").href = b);
+    });
   } else {
-	f.getElementById("sms-form").addEventListener("submit", function(d) {
-	  d.preventDefault();
-	  sendSMS(f, a, b, c);
-	});
+    f.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(f, a, b, c);
+    });
   }
   var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
-	setTimeout(function() {
-	  banner_utils.removeElement(e);
-	  banner_utils.removeElement(document.getElementById("branch-css"));
-	  a();
-	}, banner_utils.animationSpeed + banner_utils.animationDelay);
-	setTimeout(function() {
-	  "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = l);
-	  banner_utils.removeClass(document.body, "branch-banner-is-active");
-	}, banner_utils.animationDelay);
-	"top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-	"number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
+    setTimeout(function() {
+      banner_utils.removeElement(e);
+      banner_utils.removeElement(document.getElementById("branch-css"));
+      a();
+    }, banner_utils.animationSpeed + banner_utils.animationDelay);
+    setTimeout(function() {
+      "top" == b.position ? document.body.style.marginTop = k : "bottom" == b.position && (document.body.style.marginBottom = l);
+      banner_utils.removeClass(document.body, "branch-banner-is-active");
+    }, banner_utils.animationDelay);
+    "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
+    "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
   };
   m && (m.onclick = function(b) {
-	b.preventDefault();
-	a._publishEvent("willCloseBanner");
-	n(function() {
-	  a._publishEvent("didCloseBanner");
-	});
+    b.preventDefault();
+    a._publishEvent("willCloseBanner");
+    n(function() {
+      a._publishEvent("didCloseBanner");
+    });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
   "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
   setTimeout(function() {
-	"top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
-	a._publishEvent("didShowBanner");
+    "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
+    a._publishEvent("didShowBanner");
   }, banner_utils.animationDelay);
   return n;
 };
 // Input 13
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
-	var d = this, e, f, g = arguments[arguments.length - 1];
-	a === callback_params.NO_CALLBACK || "function" != typeof g ? (f = function(a) {
-	  if (a) {
-		throw a;
-	  }
-	}, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
-	d._queue(function(g) {
-	  var h = function(b, c) {
-		if (b && a === callback_params.NO_CALLBACK) {
-		  throw b;
-		}
-		a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
-		g();
-	  };
-	  if (!c) {
-		if (d.init_state == init_states.INIT_PENDING) {
-		  return h(Error(utils.message(utils.messages.initPending)), null);
-		}
-		if (d.init_state == init_states.INIT_FAILED) {
-		  return h(Error(utils.message(utils.messages.initFailed)), null);
-		}
-		if (d.init_state == init_states.NO_INIT || !d.init_state) {
-		  return h(Error(utils.message(utils.messages.nonInit)), null);
-		}
-	  }
-	  e.unshift(h);
-	  b.apply(d, e);
-	});
+    var d = this, e, f, g = arguments[arguments.length - 1];
+    a === callback_params.NO_CALLBACK || "function" != typeof g ? (f = function(a) {
+      if (a) {
+        throw a;
+      }
+    }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
+    d._queue(function(g) {
+      var h = function(b, c) {
+        if (b && a === callback_params.NO_CALLBACK) {
+          throw b;
+        }
+        a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+        g();
+      };
+      if (!c) {
+        if (d.init_state == init_states.INIT_PENDING) {
+          return h(Error(utils.message(utils.messages.initPending)), null);
+        }
+        if (d.init_state == init_states.INIT_FAILED) {
+          return h(Error(utils.message(utils.messages.initFailed)), null);
+        }
+        if (d.init_state == init_states.NO_INIT || !d.init_state) {
+          return h(Error(utils.message(utils.messages.nonInit)), null);
+        }
+      }
+      e.unshift(h);
+      b.apply(d, e);
+    });
   };
 }, Branch = function() {
   if (!(this instanceof Branch)) {
-	return default_branch || (default_branch = new Branch), default_branch;
+    return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = Queue();
   var a = [];
@@ -1388,7 +1388,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
   TITANIUM_BUILD && (a = "titanium");
   this.sdk = a + config.version;
   if (CORDOVA_BUILD || TITANIUM_BUILD) {
-	this.debug = !1;
+    this.debug = !1;
   }
   this.init_state = init_states.NO_INIT;
 };
@@ -1401,7 +1401,7 @@ Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
   (CORDOVA_BUILD || TITANIUM_BUILD) && (a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id);
   return this._server.request(a, b, this._storage, function(a, b) {
-	c(a, b);
+    c(a, b);
   });
 };
 Branch.prototype._referringLink = function() {
@@ -1410,12 +1410,12 @@ Branch.prototype._referringLink = function() {
 };
 Branch.prototype._publishEvent = function(a) {
   for (var b = 0;b < this._listeners.length;b++) {
-	this._listeners[b].event && this._listeners[b].event != a || this._listeners[b].listener(a);
+    this._listeners[b].event && this._listeners[b].event != a || this._listeners[b].listener(a);
   }
 };
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.setDebug = function(a) {
-	this.debug = a;
+    this.debug = a;
   };
 }
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
@@ -1425,60 +1425,60 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   c = c && "function" == typeof c ? {isReferrable:null} : c;
   TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
   var e = function(a) {
-	a.session_id && (d.session_id = a.session_id.toString());
-	a.identity_id && (d.identity_id = a.identity_id.toString());
-	a.link && (d.sessionLink = a.link);
-	a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
-	!a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
-	if (CORDOVA_BUILD || TITANIUM_BUILD) {
-	  d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
-	}
-	return a;
+    a.session_id && (d.session_id = a.session_id.toString());
+    a.identity_id && (d.identity_id = a.identity_id.toString());
+    a.link && (d.sessionLink = a.link);
+    a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
+    !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
+    if (CORDOVA_BUILD || TITANIUM_BUILD) {
+      d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
+    }
+    return a;
   };
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var f = session.get(d._storage);
   c = c && "undefined" != typeof c.url && null !== c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(b, c) {
-	c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
-	b && (d.init_state = init_states.INIT_FAILED);
-	d.keepAlive && setTimeout(function() {
-	  d.keepAlive = !1;
-	}, 2E3);
-	a(b, c && utils.whiteListSessionData(c));
+    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    b && (d.init_state = init_states.INIT_FAILED);
+    d.keepAlive && setTimeout(function() {
+      d.keepAlive = !1;
+    }, 2E3);
+    a(b, c && utils.whiteListSessionData(c));
   };
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
-	h(null, f);
+    h(null, f);
   } else {
-	if (CORDOVA_BUILD || TITANIUM_BUILD) {
-	  c = function(a) {
-		k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
-		d._api(k ? resources.install : resources.open, a, function(a, b) {
-		  h(a, b);
-		});
-	  };
-	  if (CORDOVA_BUILD) {
-		var l = [];
-		null !== b && l.push(b ? 1 : 0);
-		cordova.require("cordova/exec")(c, function() {
-		  a("Error getting device data!");
-		}, "BranchDevice", k ? "getInstallData" : "getOpenData", l);
-	  }
-	  if (TITANIUM_BUILD) {
-		var l = {}, m = require("io.branch.sdk");
-		g && (l.link_identifier = g);
-		l = k ? null === b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null === b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
-		c(l);
-	  }
-	}
-	WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
-	  if (a) {
-		return h(a, null);
-	  }
-	  d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-		b && g && (b.click_id = g);
-		h(a, b);
-	  });
-	});
+    if (CORDOVA_BUILD || TITANIUM_BUILD) {
+      c = function(a) {
+        k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
+        d._api(k ? resources.install : resources.open, a, function(a, b) {
+          h(a, b);
+        });
+      };
+      if (CORDOVA_BUILD) {
+        var l = [];
+        null !== b && l.push(b ? 1 : 0);
+        cordova.require("cordova/exec")(c, function() {
+          a("Error getting device data!");
+        }, "BranchDevice", k ? "getInstallData" : "getOpenData", l);
+      }
+      if (TITANIUM_BUILD) {
+        var l = {}, m = require("io.branch.sdk");
+        g && (l.link_identifier = g);
+        l = k ? null === b ? m.getInstallData(d.debug, -1) : m.getInstallData(d.debug, b ? 1 : 0) : null === b ? m.getOpenData(-1) : m.getOpenData(b ? 1 : 0);
+        c(l);
+      }
+    }
+    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
+      if (a) {
+        return h(a, null);
+      }
+      d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+        b && g && (b.click_id = g);
+        h(a, b);
+      });
+    });
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
@@ -1492,43 +1492,43 @@ Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = this;
   this._api(resources.profile, {identity:b}, function(d, e) {
-	d && a(d);
-	e = e || {};
-	c.identity_id = e.identity_id.toString();
-	c.sessionLink = e.link;
-	c.identity = b;
-	e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
-	session.update(c._storage, e);
-	a(null, e);
+    d && a(d);
+    e = e || {};
+    c.identity_id = e.identity_id.toString();
+    c.sessionLink = e.link;
+    c.identity = b;
+    e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
+    session.update(c._storage, e);
+    a(null, e);
   });
 });
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   var b = this;
   this._api(resources.logout, {}, function(c, d) {
-	c && a(c);
-	d = d || {};
-	d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
-	b.sessionLink = d.link;
-	b.session_id = d.session_id;
-	b.identity_id = d.identity_id;
-	b.identity = d.identity;
-	session.update(b._storage, d);
-	a(c);
+    c && a(c);
+    d = d || {};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
+    b.sessionLink = d.link;
+    b.session_id = d.session_id;
+    b.identity_id = d.identity_id;
+    b.identity = d.identity;
+    session.update(b._storage, d);
+    a(c);
   });
 });
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
-	var b = this;
-	if (this.keepAlive) {
-	  return a(null);
-	}
-	this._api(resources.close, {}, function(c, d) {
-	  delete b.session_id;
-	  delete b.sessionLink;
-	  b.init_state = init_states.NO_INIT;
-	  b._storage.clear();
-	  a(null);
-	});
+    var b = this;
+    if (this.keepAlive) {
+      return a(null);
+    }
+    this._api(resources.close, {}, function(c, d) {
+      delete b.session_id;
+      delete b.sessionLink;
+      b.init_state = init_states.NO_INIT;
+      b._storage.clear();
+      a(null);
+    });
   });
 }
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
@@ -1537,35 +1537,35 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b, config), function(b, d) {
-	a(b, d && d.url);
+    a(b, d && d.url);
   });
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
-	f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
+    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
   }
   var f = this;
   if ("function" == typeof d) {
-	d = {};
+    d = {};
   } else {
-	if ("undefined" === typeof d || null === d) {
-	  d = {};
-	}
+    if ("undefined" === typeof d || null === d) {
+      d = {};
+    }
   }
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" != c.channel || (c.channel = "sms");
   var g = f._referringLink();
   g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
-	if (b) {
-	  return a(b);
-	}
-	f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
-	  if (b) {
-		return a(b);
-	  }
-	  f._storage.set("click_id", c.click_id);
-	  e(c.click_id);
-	});
+    if (b) {
+      return a(b);
+    }
+    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+      if (b) {
+        return a(b);
+      }
+      f._storage.set("click_id", c.click_id);
+      e(c.click_id);
+    });
   });
 });
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
@@ -1596,9 +1596,9 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   b && this._listeners.push({listener:b, event:a || null});
 }, Branch.prototype.removeListener = function(a) {
   a && (this._listeners = this._listeners.filter(function(b) {
-	if (b.listener !== a) {
-	  return b;
-	}
+    if (b.listener !== a) {
+      return b;
+    }
   }));
 }, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" == typeof b.forgetHide && "undefined" != typeof b.forgetHide && (b.forgetHide = b.forgetHide);
@@ -1609,11 +1609,11 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   a();
 }), Branch.prototype.closeBanner = wrap(0, function(a) {
   if (this.closeBannerPointer) {
-	var b = this;
-	this._publishEvent("willCloseBanner");
-	this.closeBannerPointer(function() {
-	  b._publishEvent("didCloseBanner");
-	});
+    var b = this;
+    this._publishEvent("willCloseBanner");
+    this.closeBannerPointer(function() {
+      b._publishEvent("didCloseBanner");
+    });
   }
   a();
 }));
@@ -1621,8 +1621,8 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
 var branch_instance = new Branch;
 if (!TITANIUM_BUILD && window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
-	var task = queue[i];
-	branch_instance[task[0]].apply(branch_instance, task[1]);
+    var task = queue[i];
+    branch_instance[task[0]].apply(branch_instance, task[1]);
   }
 }
 "function" === typeof define && define.amd ? define("branch", function() {
