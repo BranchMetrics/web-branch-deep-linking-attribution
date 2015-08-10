@@ -1524,8 +1524,8 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
   this._api(resources.profile, {identity:b}, function(d, e) {
     d && a(d);
     e = e || {};
-    e.identity_id && (c.identity_id = e.identity_id.toString());
-    e.link && (c.sessionLink = e.link);
+    c.identity_id = e.identity_id ? e.identity_id.toString() : null;
+    c.sessionLink = e.link;
     c.identity = b;
     e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
     session.update(c._storage, e);

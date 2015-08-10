@@ -289,6 +289,25 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('setIdentity accepts empty data', function() {
+		basicTests('setIdentity', [ 1 ]);
+
+		var expectedRequest = testUtils.params({ "identity": "test_identity" }, [ 'browser_fingerprint_id' ]);
+		var expectedResponse = { };
+		it('should call api with identity', function(done) {
+			var branch = initBranch(true), assert = testUtils.plan(4, done);
+
+			branch.setIdentity("test_identity", function(err, res) {
+				assert.deepEqual(res, expectedResponse, 'response returned');
+				assert(!err, 'No error');
+			});
+
+			assert.equal(requests.length, 1, 'Request made');
+			requests[0].callback(null, expectedResponse);
+			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
+		});
+	});
+
 	describe('track', function() {
 		// basicTests('track', [ 1, 2 ]);
 
