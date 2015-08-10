@@ -434,7 +434,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		if (err) { done(err); }
 
 		data = data || { };
-		self.identity_id = data['identity_id'] ? data['identity_id'].toString() : undefined;
+		self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
 		self.sessionLink = data['link'];
 		self.identity = identity;
 
