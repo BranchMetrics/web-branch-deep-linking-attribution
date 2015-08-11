@@ -456,7 +456,7 @@ branch.sendSMS(
     },
     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
     function(err) { console.log(err); }
-});
+);
 ```
 
 ##### Callback Format
