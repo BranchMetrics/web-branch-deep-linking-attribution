@@ -92,7 +92,12 @@ utils.cleanLinkData = function(linkData, config) {
 			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '').replace(/([\?\&]_branch_match_id=\d+)/, '');
 		}
 	}
-	linkData['data'] = goog.json.serialize(linkData['data'] || {});
+	try {
+		JSON.parse(linkData['data']);
+	}
+	catch (e) {
+		linkData['data'] = JSON.stringify(linkData['data']);
+	}
 	return linkData;
 };
 

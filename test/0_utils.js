@@ -60,6 +60,51 @@ describe('utils', function() {
 		});
 	});
 
+	describe('cleanLinkData', function() {
+		it('should accept undefined', function() {
+			var linkData = {
+				field1: 12345,
+				field2: "67890",
+				"field 3": true,
+				field4: null
+			};
+			var cleanedLinkData = utils.cleanLinkData(linkData);
+			assert.deepEqual(cleanedLinkData, linkData, 'Accept undefined field "data"');
+		});
+
+		it('should stringify field "data"', function() {
+			var linkData = {
+				"data":
+				{
+					subfield1:"bar",
+					"subfield2":false
+				},
+				field1: 12345,
+				field2: "67890",
+				"field 3": true,
+				field4: null
+			};
+			var cleanedLinkData = utils.cleanLinkData(linkData);
+			assert.deepEqual(cleanedLinkData, linkData, 'Stringified field "data"');
+		});
+
+		it('should not stringify pre-stringified field "data"', function() {
+			var linkData = {
+				"data":
+				{
+					subfield1:"bar",
+					"subfield2":false
+				},
+				field1: 12345,
+				field2: "67890",
+				"field 3": true,
+				field4: null
+			};
+			var cleanedLinkData = utils.cleanLinkData((utils.cleanLinkData(linkData)));
+			assert.deepEqual(cleanedLinkData, linkData, 'Over-stringified field "data"');
+		});
+	});
+
 	describe('message', function() {
 		it('should produce a missing param message', function() {
 			var message = utils.message(utils.messages.missingParam, [ 'endpoint', 'param' ]);
