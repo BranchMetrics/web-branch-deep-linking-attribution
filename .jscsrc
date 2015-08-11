@@ -28,7 +28,7 @@
 	"requireSpaceAfterBinaryOperators": [ "=", ",", "+", "-", "/", "*", "==", "===", "!=", "!==" ],
 	"disallowMultipleLineStrings": true,
 	"validateLineBreaks": "LF",
-	"disallowMixedSpacesAndTabs": "smart",
+	"disallowMixedSpacesAndTabs": true,
 	"disallowTrailingWhitespace": true,
 	"disallowTrailingComma": true,
 	"requireKeywordsOnNewLine": [ "else" ],

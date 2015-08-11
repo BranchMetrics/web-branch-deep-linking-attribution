@@ -14,7 +14,7 @@ banner_html.banner = function(options, action) {
 			action +
 		'</div>' +
 		'<div class="left">' +
-			 (!options.disableHide ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
+			(!options.disableHide ? '<div id="branch-banner-close" class="branch-animation">&times;</div>' : '') +
 			'<div class="icon">' +
 				'<img src="' + options.icon + '">' +
 			'</div>' +
@@ -72,7 +72,7 @@ banner_html.iframe = function(options, action) {
 	document.body.appendChild(iframe);
 
 	var bodyClass,
-	    userAgent = utils.mobileUserAgent();
+		userAgent = utils.mobileUserAgent();
 	if (userAgent == 'ios' || userAgent == 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}

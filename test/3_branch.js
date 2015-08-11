@@ -379,7 +379,7 @@ describe('Branch', function() {
 		basicTests('link', [ 1 ]);
 
 		var expectedRequest = function(serialized, source, desktop_url_append) {
-				var val = testUtils.params({
+			var val = testUtils.params({
 				tags: [ 'tag1', 'tag2' ],
 				channel: 'sample app',
 				feature: 'create link',
@@ -684,7 +684,7 @@ describe('Branch', function() {
 		});
 	});
 
-/*
+	/*
 	describe.fail('Queueing used correctly', function() {
 		it('Should wait to call track after init', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(2, done);

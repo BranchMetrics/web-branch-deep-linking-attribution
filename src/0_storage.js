@@ -26,10 +26,10 @@ if (TITANIUM_BUILD) {
  * @class BranchStorage
  * @constructor
  */
- var BranchStorage = function(storageMethods) {
+var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
-			storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
+		storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
 			storageMethod._store = { };
 			return storageMethod;
@@ -102,13 +102,13 @@ BranchStorage.prototype['session'] = function() {
 var cookies = function(perm) {
 	var setCookie = function(key, value) {
 		var expires = "";
-	    if (perm) {
-	        var date = new Date();
-	        console.log(date);
-	        date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
-	        expires = "; branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
-	    }
-	    document.cookie = key + "=" + value + expires + "; path=/";
+		if (perm) {
+			var date = new Date();
+			console.log(date);
+			date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
+			expires = "; branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
+		}
+		document.cookie = key + "=" + value + expires + "; path=/";
 	};
 	return {
 		getAll: function() {
@@ -126,18 +126,18 @@ var cookies = function(perm) {
 		},
 		get: function(key) {
 			var keyEQ = prefix(key) + "=";
-		    var cookieArray = document.cookie.split(';');
-		    for (var i = 0; i < cookieArray.length; i++) {
-		        var cookie = cookieArray[i];
-		        cookie = cookie.substring(1, cookie.length);
-		        if (cookie.indexOf(keyEQ) === 0) { return retrieveValue(cookie.substring(keyEQ.length, cookie.length)); }
-		    }
-		    return null;
+			var cookieArray = document.cookie.split(';');
+			for (var i = 0; i < cookieArray.length; i++) {
+				var cookie = cookieArray[i];
+				cookie = cookie.substring(1, cookie.length);
+				if (cookie.indexOf(keyEQ) === 0) { return retrieveValue(cookie.substring(keyEQ.length, cookie.length)); }
+			}
+			return null;
 		},
 		set: function(key, value) { setCookie(prefix(key), value); },
 		remove: function(key) {
 			var expires = "";
-			document.cookie = prefix(key) + "=; expires="  + expires + "; path=/";
+			document.cookie = prefix(key) + "=; expires=" + expires + "; path=/";
 		},
 		clear: function() {
 			var deleteCookie = function(cookie) {
@@ -182,7 +182,7 @@ BranchStorage.prototype['titanium'] = {
 			props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
 			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
-			    returnObject[props[i]] = retrieveValue(Ti.App.Properties.getString(props[i]));
+				returnObject[props[i]] = retrieveValue(Ti.App.Properties.getString(props[i]));
 			}
 		}
 		return returnObject;
@@ -195,7 +195,7 @@ BranchStorage.prototype['titanium'] = {
 		var props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
 			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
-			    Ti.App.Properties.setString(props[i], "");
+				Ti.App.Properties.setString(props[i], "");
 			}
 		}
 	},
