@@ -116,7 +116,7 @@ describe('utils', function() {
 				source: "web-sdk"
 			};
 			var cleanedLinkData = utils.cleanLinkData((utils.cleanLinkData(linkData)));
-			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Over-stringified field "data"');
+			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Refrain from over-stringifying field "data"');
 		});
 	});
 
