@@ -96,7 +96,7 @@ utils.cleanLinkData = function(linkData, config) {
 		JSON.parse(linkData['data']);
 	}
 	catch (e) {
-		linkData['data'] = JSON.stringify(linkData['data']);
+		linkData['data'] = goog.json.serialize(linkData['data']);
 	}
 	return linkData;
 };

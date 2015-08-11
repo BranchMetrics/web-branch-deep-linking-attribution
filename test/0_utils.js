@@ -62,14 +62,13 @@ describe('utils', function() {
 
 	describe('cleanLinkData', function() {
 		it('should accept undefined', function() {
-			var linkData = {
-				field1: 12345,
-				field2: "67890",
-				"field 3": true,
-				field4: null
+			var linkData = { };
+			var expectedCleanedLinkData = {
+				source: "web-sdk",
+				data: "null"
 			};
 			var cleanedLinkData = utils.cleanLinkData(linkData);
-			assert.deepEqual(cleanedLinkData, linkData, 'Accept undefined field "data"');
+			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Accept undefined field "data"');
 		});
 
 		it('should stringify field "data"', function() {
@@ -84,8 +83,16 @@ describe('utils', function() {
 				"field 3": true,
 				field4: null
 			};
+			var expectedCleanedLinkData = {
+				"data": '{"subfield1":"bar","subfield2":false}',
+				field1: 12345,
+				field2: "67890",
+				"field 3": true,
+				field4: null,
+				source: "web-sdk"
+			};
 			var cleanedLinkData = utils.cleanLinkData(linkData);
-			assert.deepEqual(cleanedLinkData, linkData, 'Stringified field "data"');
+			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Stringified field "data"');
 		});
 
 		it('should not stringify pre-stringified field "data"', function() {
@@ -100,8 +107,16 @@ describe('utils', function() {
 				"field 3": true,
 				field4: null
 			};
+			var expectedCleanedLinkData = {
+				"data": '{"subfield1":"bar","subfield2":false}',
+				field1: 12345,
+				field2: "67890",
+				"field 3": true,
+				field4: null,
+				source: "web-sdk"
+			};
 			var cleanedLinkData = utils.cleanLinkData((utils.cleanLinkData(linkData)));
-			assert.deepEqual(cleanedLinkData, linkData, 'Over-stringified field "data"');
+			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Over-stringified field "data"');
 		});
 	});
 
