@@ -86,7 +86,7 @@ if (WEB_BUILD) {
 	resources.open = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/open",
-		method:	 utils.httpMethod.POST,
+		method: utils.httpMethod.POST,
 		params: {
 			"identity_id": validator(false, branch_id),
 			"link_identifier": validator(false, validationTypes.str),
@@ -130,7 +130,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 	resources.install = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/install",
-		method:	 utils.httpMethod.POST,
+		method: utils.httpMethod.POST,
 		params: {
 			"link_identifier": validator(false, validationTypes.str),
 			"sdk": validator(false, validationTypes.str),
@@ -159,7 +159,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 	resources.open = {
 		destination: config.api_endpoint,
 		endpoint: "/v1/open",
-		method:	 utils.httpMethod.POST,
+		method: utils.httpMethod.POST,
 		params: {
 			"identity_id": validator(true, branch_id),
 			"link_identifier": validator(false, validationTypes.str),
@@ -231,7 +231,7 @@ resources.logout = {
 resources.profile = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/profile",
-	method:	 utils.httpMethod.POST,
+	method: utils.httpMethod.POST,
 	params: defaults({
 		"identity_id": validator(true, branch_id),
 		"identity": validator(true, validationTypes.str)
