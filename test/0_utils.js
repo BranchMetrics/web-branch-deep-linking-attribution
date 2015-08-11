@@ -65,7 +65,7 @@ describe('utils', function() {
 			var linkData = { };
 			var expectedCleanedLinkData = {
 				source: "web-sdk",
-				data: "null"
+				data: "{}"
 			};
 			var cleanedLinkData = utils.cleanLinkData(linkData);
 			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Accept undefined field "data"');

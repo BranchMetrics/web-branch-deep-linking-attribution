@@ -763,7 +763,7 @@ utils.cleanLinkData = function(a, b) {
   try {
     JSON.parse(a.data);
   } catch (c) {
-    a.data = goog.json.serialize(a.data);
+    a.data = goog.json.serialize(a.data || {});
   }
   return a;
 };
