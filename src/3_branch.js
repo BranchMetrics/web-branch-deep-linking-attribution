@@ -20,9 +20,9 @@ var default_branch;
  * @enum {number}
  */
 var callback_params = {
-  NO_CALLBACK: 0,
-  CALLBACK_ERR: 1,
-  CALLBACK_ERR_DATA: 2
+	NO_CALLBACK: 0,
+	CALLBACK_ERR: 1,
+	CALLBACK_ERR_DATA: 2
 };
 
 /**
@@ -30,10 +30,10 @@ var callback_params = {
  * @enum {number}
  */
 var init_states = {
-  NO_INIT: 0,
-  INIT_PENDING: 1,
-  INIT_FAILED: 2,
-  INIT_SUCCEEDED: 3
+	NO_INIT: 0,
+	INIT_PENDING: 1,
+	INIT_FAILED: 2,
+	INIT_SUCCEEDED: 3
 };
 
 /***
@@ -174,18 +174,18 @@ Branch.prototype._publishEvent = function(event) {
 };
 
 if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-/** =CORDOVA
- * @function Branch.setDebug
- * @param {boolean} debug - _required_ - Set the SDK debug flag.
- *
- * Setting the SDK debug flag will generate a new device ID each time the app is installed
- * instead of possibly using the same device id.  This is useful when testing.
- *
- * This needs to be set before the Branch.init call!!!
- *
- * ---
- *
- */
+	/** =CORDOVA
+	 * @function Branch.setDebug
+	 * @param {boolean} debug - _required_ - Set the SDK debug flag.
+	 *
+	 * Setting the SDK debug flag will generate a new device ID each time the app is installed
+	 * instead of possibly using the same device id.  This is useful when testing.
+	 *
+	 * This needs to be set before the Branch.init call!!!
+	 *
+	 * ---
+	 *
+	 */
 	Branch.prototype['setDebug'] = function(debug) {
 		this.debug = debug;
 	};
@@ -539,30 +539,30 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 
 
 if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-/** =CORDOVA
- * @function Branch.close
- * @param {function(?Error)=} callback - _optional_
- *
- * Close the current session.
- *
- * ##### Usage
- * ```js
- * branch.close(
- *     callback (err)
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *      "Error message"
- * );
- * ```
- * ___
- *
- * ## Tracking events
- *
- */
+	/** =CORDOVA
+	 * @function Branch.close
+	 * @param {function(?Error)=} callback - _optional_
+	 *
+	 * Close the current session.
+	 *
+	 * ##### Usage
+	 * ```js
+	 * branch.close(
+	 *     callback (err)
+	 * );
+	 * ```
+	 *
+	 * ##### Callback Format
+	 * ```js
+	 * callback(
+	 *      "Error message"
+	 * );
+	 * ```
+	 * ___
+	 *
+	 * ## Tracking events
+	 *
+	 */
 	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
@@ -785,7 +785,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *     },
  *     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
  *     function(err) { console.log(err); }
- * });
+ * );
  * ```
  *
  * ##### Callback Format
@@ -1193,47 +1193,46 @@ Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, func
  * ```
  * ___
  */
- /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
+/*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
 
 if (WEB_BUILD) { // jshint undef:false
-
-/** =WEB
- * @function Branch.addListener
- * @param {String} event - _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
- * @param {function(String)} listener - _required_ - Listeneing function that will recieves an event as a string.
- *
- * The Branch Web SDK includes a simple event listener, that currently only publishes events for `Branch.banner()` events.
- * Future development will include the ability to subscribe to events related to all other Web SDK functionality.
- *
- * ##### Example
- *
- * ```
- * var listener = function(event) { console.log(event); }
- *
- * // Specify an event to listen for
- * branch.addListener('willShowBanner', listener);
- *
- * // Listen for all events
- * branch.addListener(listener);
- * ```
- *
- * #### Available `Branch.banner()` Events:
- * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
- * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more events will be emitted.
- * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
- * - *willCloseBanner*: `closeBanner()` calle, and the smart banner will close.
- * - *didCloseBanner*: Smart banner close animation started, and is closing.
- * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
- * - *sendBannerSMSError*: `sendSMS()` error returned.
- * - *didSendBannerSMS*: SMS successfully sent.
- * - *downloadedApp*: User installed app, and banner text updated.
- *
- */
-/*** +TOC_HEADING &Event Listener& ^WEB ***/
-/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
+	/** =WEB
+	 * @function Branch.addListener
+	 * @param {String} event - _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
+	 * @param {function(String)} listener - _required_ - Listeneing function that will recieves an event as a string.
+	 *
+	 * The Branch Web SDK includes a simple event listener, that currently only publishes events for `Branch.banner()` events.
+	 * Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+	 *
+	 * ##### Example
+	 *
+	 * ```
+	 * var listener = function(event) { console.log(event); }
+	 *
+	 * // Specify an event to listen for
+	 * branch.addListener('willShowBanner', listener);
+	 *
+	 * // Listen for all events
+	 * branch.addListener(listener);
+	 * ```
+	 *
+	 * #### Available `Branch.banner()` Events:
+	 * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
+	 * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more events will be emitted.
+	 * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
+	 * - *willCloseBanner*: `closeBanner()` calle, and the smart banner will close.
+	 * - *didCloseBanner*: Smart banner close animation started, and is closing.
+	 * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
+	 * - *sendBannerSMSError*: `sendSMS()` error returned.
+	 * - *didSendBannerSMS*: SMS successfully sent.
+	 * - *downloadedApp*: User installed app, and banner text updated.
+	 *
+	 */
+	/*** +TOC_HEADING &Event Listener& ^WEB ***/
+	/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
 		if (typeof event == "function" && listener === undefined) { listener = event; }
 		if (listener) {
@@ -1244,14 +1243,14 @@ if (WEB_BUILD) { // jshint undef:false
 		}
 	};
 
-/** =WEB
- * @function Branch.removeListener
- * @param {function(String)} listener - _required_ - Reference to the listening function you would like to remove. *note*: this must be the same reference that was passed to `branch.addListener()`, not an identical clone of the function.
- *
- * Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
- *
- */
-/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
+	/** =WEB
+	 * @function Branch.removeListener
+	 * @param {function(String)} listener - _required_ - Reference to the listening function you would like to remove. *note*: this must be the same reference that was passed to `branch.addListener()`, not an identical clone of the function.
+	 *
+	 * Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
+	 *
+	 */
+	/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
 	Branch.prototype['removeListener'] = function(listener) {
 		if (listener) {
 			this._listeners = this._listeners.filter(function(subscription) {
@@ -1260,86 +1259,86 @@ if (WEB_BUILD) { // jshint undef:false
 		}
 	};
 
-/** =WEB
- * @function Branch.banner
- * @param {Object} options - _required_ - object of all the options to setup the banner
- * @param {Object} data - _required_ - object of all link data, same as Branch.link()
- *
- * **[Formerly `appBanner()`](CHANGELOG.md)**
- *
- * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
- *
- * *Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation of everything you can do!*
- *
- * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
- * |------------------|----------------------|----------------------|
- * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
- *
- * #### Usage
- *
- * ```js
- * branch.banner(
- *     options, // Banner options: See example for all available options
- *     data // Data for link, same as Branch.link()
- * );
- * ```
- *
- * ##### Example
- *
- * ```js
- * branch.banner({
- *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
- *     title: 'Branch Demo App',
- *     description: 'The Branch demo app!',
- *     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
- *     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
- *     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
- *     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
- *     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
- *     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
- *     showAndroid: true,                      // Should the banner be shown on Android devices?
- *     showDesktop: true,                      // Should the banner be shown on desktop devices?
- *     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
- *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
- *     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
- *     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
- *     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
- *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
- *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
- *     make_new_link: false                    // Should the banner create a new link, even if a link already exists?
- * }, {
- *     tags: ['tag1', 'tag2'],
- *     feature: 'dashboard',
- *     stage: 'new user',
- *     data: {
- *         mydata: 'something',
- *         foo: 'bar',
- *         '$desktop_url': 'http://myappwebsite.com',
- *         '$ios_url': 'http://myappwebsite.com/ios',
- *         '$ipad_url': 'http://myappwebsite.com/ipad',
- *         '$android_url': 'http://myappwebsite.com/android',
- *         '$og_app_id': '12345',
- *         '$og_title': 'My App',
- *         '$og_description': 'My app\'s description.',
- *         '$og_image_url': 'http://myappwebsite.com/image.png'
- *     }
- * });
- * ```
- * ___
- *
- * ### closeBanner()
- *
- * #### Closing the App Banner Programmatically
- *
- * The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
- * other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
- *
- * ##### Usage
- * ```js
- * branch.closeBanner();
- * ```
- *
- */
+	/** =WEB
+	 * @function Branch.banner
+	 * @param {Object} options - _required_ - object of all the options to setup the banner
+	 * @param {Object} data - _required_ - object of all link data, same as Branch.link()
+	 *
+	 * **[Formerly `appBanner()`](CHANGELOG.md)**
+	 *
+	 * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+	 *
+	 * *Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation of everything you can do!*
+	 *
+	 * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
+	 * |------------------|----------------------|----------------------|
+	 * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
+	 *
+	 * #### Usage
+	 *
+	 * ```js
+	 * branch.banner(
+	 *     options, // Banner options: See example for all available options
+	 *     data // Data for link, same as Branch.link()
+	 * );
+	 * ```
+	 *
+	 * ##### Example
+	 *
+	 * ```js
+	 * branch.banner({
+	 *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+	 *     title: 'Branch Demo App',
+	 *     description: 'The Branch demo app!',
+	 *     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
+	 *     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
+	 *     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
+	 *     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
+	 *     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
+	 *     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
+	 *     showAndroid: true,                      // Should the banner be shown on Android devices?
+	 *     showDesktop: true,                      // Should the banner be shown on desktop devices?
+	 *     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
+	 *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
+	 *     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
+	 *     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
+	 *     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
+	 *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
+	 *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
+	 *     make_new_link: false                    // Should the banner create a new link, even if a link already exists?
+	 * }, {
+	 *     tags: ['tag1', 'tag2'],
+	 *     feature: 'dashboard',
+	 *     stage: 'new user',
+	 *     data: {
+	 *         mydata: 'something',
+	 *         foo: 'bar',
+	 *         '$desktop_url': 'http://myappwebsite.com',
+	 *         '$ios_url': 'http://myappwebsite.com/ios',
+	 *         '$ipad_url': 'http://myappwebsite.com/ipad',
+	 *         '$android_url': 'http://myappwebsite.com/android',
+	 *         '$og_app_id': '12345',
+	 *         '$og_title': 'My App',
+	 *         '$og_description': 'My app\'s description.',
+	 *         '$og_image_url': 'http://myappwebsite.com/image.png'
+	 *     }
+	 * });
+	 * ```
+	 * ___
+	 *
+	 * ### closeBanner()
+	 *
+	 * #### Closing the App Banner Programmatically
+	 *
+	 * The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
+	 * other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
+	 *
+	 * ##### Usage
+	 * ```js
+	 * branch.closeBanner();
+	 * ```
+	 *
+	 */
 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
 	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {

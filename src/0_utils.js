@@ -86,13 +86,18 @@ utils.whiteListSessionData = function(data) {
 utils.cleanLinkData = function(linkData, config) {
 	/* jshint undef:false */
 	if (WEB_BUILD) { // WTF, I don't know why I can't just do undef:false for the line.
-	/* jshint undef:true */
-		linkData['source'] = 'web-sdk';
-		if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
-			linkData['data']['$desktop_url'] = linkData['data']['$desktop_url'].replace(/#r:[a-z0-9-_]+$/i, '').replace(/([\?\&]_branch_match_id=\d+)/, '');
+		/* jshint undef:true */
+		linkData.source = 'web-sdk';
+		if (linkData.data && linkData.data.$desktop_url !== undefined) {
+			linkData.data.$desktop_url = linkData.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, '').replace(/([\?\&]_branch_match_id=\d+)/, '');
 		}
 	}
-	linkData['data'] = goog.json.serialize(linkData['data'] || {});
+	try {
+		JSON.parse(linkData.data);
+	}
+	catch (e) {
+		linkData.data = goog.json.serialize(linkData.data || {});
+	}
 	return linkData;
 };
 
@@ -166,8 +171,8 @@ utils.isKey = function(key_or_id) {
  */
 utils.snakeToCamel = function(string) {
 	var find = /(\-\w)/g,
-		convert =  function(matches) {
-		    return matches[1].toUpperCase();
+		convert = function(matches) {
+			return matches[1].toUpperCase();
 		};
 	return string.replace(find, convert);
 };

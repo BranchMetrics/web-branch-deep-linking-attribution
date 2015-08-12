@@ -760,7 +760,11 @@ utils.whiteListSessionData = function(a) {
 };
 utils.cleanLinkData = function(a, b) {
   WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
-  a.data = goog.json.serialize(a.data || {});
+  try {
+    JSON.parse(a.data);
+  } catch (c) {
+    a.data = goog.json.serialize(a.data || {});
+  }
   return a;
 };
 utils.clickIdFromLink = function(a) {
@@ -1314,7 +1318,7 @@ var sendSMS = function(a, b, c, d) {
     return a._publishEvent("willNotShowBanner"), null;
   }
   a._publishEvent("willShowBanner");
-  var e = banner_html.markup(b, d, a);
+  var e = banner_html.markup(b, d);
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
