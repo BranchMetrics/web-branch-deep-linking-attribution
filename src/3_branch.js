@@ -340,7 +340,7 @@ Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 		}
 	};
 
-	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
+	if (WEB_BUILD && sessionData && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
 		attachVisibilityEvent();
 		checkHasApp(sessionData, finishInit);
 	}
@@ -737,7 +737,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * A robust function to give your users the ability to share links via SMS. If
  * the user navigated to this page via a Branch link, `sendSMS` will send that
  * same link. Otherwise, it will create a new link with the data provided in
- * the `params` argument. `sendSMS` also  registers a click event with the
+ * the `params` argument. `sendSMS` also registers a click event with the
  * `channel` pre-filled with `'sms'` before sending an sms to the provided
  * `phone` parameter. This way the entire link click event is recorded starting
  * with the user sending an sms.
