@@ -39,7 +39,6 @@ banner_html.mobileAction = function(options, storage, branch) {
 		var doc = options.iframe ? document.getElementById("branch-banner-iframe").contentWindow.document : document;
 		doc.getElementById('branch-mobile-action').innerHTML = linkWrapper(options.openAppButtonText);
 	};
-	branch.addListener('downloadedApp', updateActionText);
 	return linkWrapper(session.get(storage)['has_app'] ? options.openAppButtonText : options.downloadAppButtonText);
 };
 

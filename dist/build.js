@@ -1238,13 +1238,7 @@ banner_css.css = function(a, b) {
 var banner_html = {banner:function(a, b) {
   return '<div class="content"><div class="right vertically-align-middle">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + '</div><div class="description">' + a.description + "</div></div></div></div>";
 }, mobileAction:function(a, b, c) {
-  var d = function(a) {
-    return '<a id="branch-mobile-action" href="#" target="_parent">' + a + "</a>";
-  };
-  c.addListener("downloadedApp", function() {
-    (a.iframe ? document.getElementById("branch-banner-iframe").contentWindow.document : document).getElementById("branch-mobile-action").innerHTML = d(a.openAppButtonText);
-  });
-  return d(session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText);
+  return '<a id="branch-mobile-action" href="#" target="_parent">' + (session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
   return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
