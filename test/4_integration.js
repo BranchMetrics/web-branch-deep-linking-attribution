@@ -91,8 +91,14 @@ describe('Integration tests', function() {
 		branch.init.apply(branch, window.CORDOVA_BUILD ? [ device_fingerprint_id, { isReferrable: true }, callback ] : [ device_fingerprint_id, callback ]);
 		if (window.CORDOVA_BUILD) {
 			requests[0].respond(200,
-					{ "Content-Type": "application/json" },
-					'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":"79336952217731267", "browser_fingerprint_id":null, "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
+				{ "Content-Type": "application/json" },
+				'{ "identity_id":' + identity_id +
+					', "session_id":"123088518049178533"' +
+					', "device_fingerprint_id":"79336952217731267"' +
+					', "browser_fingerprint_id":null' +
+					', "link":"https://bnc.lt/i/4LYQTXE0_k"' +
+					', "identity":"Branch","has_app":true }'
+			);
 			if (assert) {
 				assert.equal(requests.length, 1);
 				assert.equal(requests[0].requestBody, 'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id);
@@ -104,12 +110,21 @@ describe('Integration tests', function() {
 				assert.equal(requests[0].src, 'https://bnc.lt/_r?sdk=web' + config.version + '&callback=branch_callback__' + jsonpCallback.toString());
 			}
 			requests[0].callback(browser_fingerprint_id);
-			requests[1].respond(200,
-					{ "Content-Type": "application/json" },
-					'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
+			requests[1].respond(
+				200,
+				{ "Content-Type": "application/json" },
+				'{ "identity_id":' + identity_id +
+					', "session_id":"123088518049178533", "device_fingerprint_id":null, ' +
+					'"browser_fingerprint_id":"79336952217731267", ' +
+					'"link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }'
+			);
 			if (assert) {
 				assert.equal(requests.length, 2);
-				assert.equal(requests[1].requestBody, 'identity_id=' + identity_id + '&is_referrable=1&sdk=web' + config.version + '&browser_fingerprint_id=' + browser_fingerprint_id + '&app_id=' + browser_fingerprint_id);
+				assert.equal(requests[1].requestBody,
+					'identity_id=' + identity_id +
+					'&is_referrable=1&sdk=web' + config.version +
+					'&browser_fingerprint_id=' + browser_fingerprint_id +
+					'&app_id=' + browser_fingerprint_id);
 			}
 		}
 	};
