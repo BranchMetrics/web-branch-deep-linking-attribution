@@ -13,6 +13,8 @@ goog.require('session');
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
+/*globals CORDOVA_BUILD, TITANIUM_BUILD, WEB_BUILD, Ti, BranchStorage, cordova, require */
+
 var default_branch;
 
 /**
@@ -120,7 +122,7 @@ Branch = function() {
 	if (TITANIUM_BUILD) { sdk = 'titanium'; }
 	this.sdk = sdk + config.version;
 
-	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+	if (CORDOVA_BUILD || TITANIUM_BUILD) {
 		this.debug = false;
 	}
 
@@ -159,7 +161,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 		obj['sdk'] = this.sdk;
 	}
 
-	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+	if (CORDOVA_BUILD || TITANIUM_BUILD) {
 		if (((resource.params && resource.params['device_fingerprint_id']) ||
 				(resource.queryPart && resource.queryPart['device_fingerprint_id'])) &&
 				this.device_fingerprint_id) {
@@ -196,7 +198,7 @@ Branch.prototype._publishEvent = function(event) {
 	}
 };
 
-if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
 	/** =CORDOVA
 	 * @function Branch.setDebug
 	 * @param {boolean} debug - _required_ - Set the SDK debug flag.
@@ -281,7 +283,7 @@ Branch.prototype['init'] = wrap(
 
 		options = (options && typeof options == 'function') ? { "isReferrable": null } : options;
 
-		if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
+		if (TITANIUM_BUILD && Ti.Platform.osname === "android") {
 			self.keepAlive = true;
 		}
 
@@ -296,7 +298,7 @@ Branch.prototype['init'] = wrap(
 				data['click_id'] = utils.clickIdFromLink(data['referring_link']);
 			}
 
-			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+			if (CORDOVA_BUILD || TITANIUM_BUILD) {
 				self.device_fingerprint_id = data['device_fingerprint_id'];
 				if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
 			}
@@ -317,19 +319,23 @@ Branch.prototype['init'] = wrap(
 			(url ? utils.getParamValue(url) : null),
 		freshInstall = !sessionData || !sessionData['identity_id'],
 
-checkHasApp = function(sessionData, cb) {
-	var currentSessionData = sessionData || session.get(self._storage);
-	self._api(resources.hasApp, { "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] }, function(err, has_app) {
-		if (has_app && !currentSessionData['has_app']) {
-			currentSessionData['has_app'] = true;
-			session.update(self._storage, currentSessionData);
-			self._publishEvent("didDownloadApp");
-		}
-		if (cb) {
-			cb(err, currentSessionData);
-		}
-	});
-},
+		checkHasApp = function(sessionData, cb) {
+			var currentSessionData = sessionData || session.get(self._storage);
+			self._api(
+				resources.hasApp,
+				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
+				function(err, has_app) {
+					if (has_app && !currentSessionData['has_app']) {
+						currentSessionData['has_app'] = true;
+						session.update(self._storage, currentSessionData);
+						self._publishEvent("didDownloadApp");
+					}
+					if (cb) {
+						cb(err, currentSessionData);
+					}
+				}
+			);
+		},
 
 		finishInit = function(err, data) {
 			if (data) {
@@ -344,41 +350,41 @@ checkHasApp = function(sessionData, cb) {
 			// Keep android titanium from calling close
 			if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
 			done(err, data && utils.whiteListSessionData(data));
-	},
+		},
 
-	attachVisibilityEvent = function() {
-		var hidden, changeEvent;
-		if (typeof document.hidden !== "undefined") {
-			hidden = "hidden";
-			changeEvent = "visibilitychange";
-		}
-		else if (typeof document.mozHidden !== "undefined") {
-			hidden = "mozHidden";
-			changeEvent = "mozvisibilitychange";
-		}
-		else if (typeof document.msHidden !== "undefined") {
-			hidden = "msHidden";
-			changeEvent = "msvisibilitychange";
-		}
-		else if (typeof document.webkitHidden !== "undefined") {
-			hidden = "webkitHidden";
-			changeEvent = "webkitvisibilitychange";
-		}
-		if (changeEvent) {
-			document.addEventListener(changeEvent, function() {
-				if (!document[hidden]) { checkHasApp(null, null); }
-			}, false);
-		}
-	};
+		attachVisibilityEvent = function() {
+			var hidden, changeEvent;
+			if (typeof document.hidden !== "undefined") {
+				hidden = "hidden";
+				changeEvent = "visibilitychange";
+			}
+			else if (typeof document.mozHidden !== "undefined") {
+				hidden = "mozHidden";
+				changeEvent = "mozvisibilitychange";
+			}
+			else if (typeof document.msHidden !== "undefined") {
+				hidden = "msHidden";
+				changeEvent = "msvisibilitychange";
+			}
+			else if (typeof document.webkitHidden !== "undefined") {
+				hidden = "webkitHidden";
+				changeEvent = "webkitvisibilitychange";
+			}
+			if (changeEvent) {
+				document.addEventListener(changeEvent, function() {
+					if (!document[hidden]) { checkHasApp(null, null); }
+				}, false);
+			}
+		};
 
-	if (WEB_BUILD &&
-			sessionData &&
-			sessionData['session_id'] &&
-			(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
-			link_identifier === sessionData['click_id'])) {
-		attachVisibilityEvent();
-		checkHasApp(sessionData, finishInit);
-	}
+		if (WEB_BUILD &&
+				sessionData &&
+				sessionData['session_id'] &&
+				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
+				link_identifier === sessionData['click_id'])) {
+			attachVisibilityEvent();
+			checkHasApp(sessionData, finishInit);
+		}
 		else {
 			if (CORDOVA_BUILD || TITANIUM_BUILD) {
 
@@ -395,7 +401,7 @@ checkHasApp = function(sessionData, cb) {
 						}
 					);
 				};
-				if (CORDOVA_BUILD) { // jshint undef:false
+				if (CORDOVA_BUILD) {
 					var args = [ ];
 					if (isReferrable !== null) {
 						args.push(isReferrable ? 1 : 0);
@@ -405,7 +411,7 @@ checkHasApp = function(sessionData, cb) {
 						"BranchDevice",
 						freshInstall ? "getInstallData" : "getOpenData", args);
 				}
-				if (TITANIUM_BUILD) { // jshint undef:false
+				if (TITANIUM_BUILD) {
 					var data = { },
 						branchTitaniumSDK = require('io.branch.sdk');
 					if (link_identifier) { data['link_identifier'] = link_identifier; }
@@ -423,7 +429,7 @@ checkHasApp = function(sessionData, cb) {
 				}
 			}
 
-			if (WEB_BUILD) { // jshint undef:false
+			if (WEB_BUILD) {
 				self._api(
 					resources._r,
 					{ "sdk": config.version },
@@ -598,7 +604,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 });
 
 
-if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+if (CORDOVA_BUILD || TITANIUM_BUILD) {
 	/** =CORDOVA
 	 * @function Branch.close
 	 * @param {function(?Error)=} callback - _optional_
@@ -1280,7 +1286,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
 
-if (WEB_BUILD) { // jshint undef:false
+if (WEB_BUILD) {
 	/** =WEB
 	 * @function Branch.addListener
 	 * @param {String} event - _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
