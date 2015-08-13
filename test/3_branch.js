@@ -318,7 +318,7 @@ describe('Branch', function() {
 			assert.deepEqual(
 				requests[1].resource.endpoint,
 				"/v1/has-app",
-				"Second request should be send to /v1/has-app"
+				"Second request should be sent to /v1/has-app"
 			);
 		});
 	});
