@@ -737,7 +737,7 @@ branch.addListener(listener);
 - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
 - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more events will be emitted.
 - *didShowBanner*: Smart banner animation started and was is being shown to the user.
-- *willCloseBanner*: `closeBanner()` calle, and the smart banner will close.
+- *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
 - *didCloseBanner*: Smart banner close animation started, and is closing.
 - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
 - *sendBannerSMSError*: `sendSMS()` error returned.

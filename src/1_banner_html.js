@@ -34,19 +34,9 @@ banner_html.banner = function(options, action) {
  * @param {storage} storage
  */
 banner_html.mobileAction = function(options, storage, branch) {
-	var linkWrapper = function(text) {
-		return '<a id="branch-mobile-action" href="#" target="_parent">' + text + '</a>';
-	},
-	updateActionText = function() {
-		var doc = options.iframe ?
-			document.getElementById("branch-banner-iframe").contentWindow.document :
-			document;
-		doc.getElementById('branch-mobile-action').innerHTML =
-			linkWrapper(options.openAppButtonText);
-	};
-	return linkWrapper(
-		session.get(storage)['has_app'] ? options.openAppButtonText : options.downloadAppButtonText
-	);
+	return '<a id="branch-mobile-action" href="#" target="_parent">' +
+		(session.get(storage)['has_app'] ? options.openAppButtonText : options.downloadAppButtonText) +
+		'</a>';
 };
 
 banner_html.desktopAction = function(options) {
