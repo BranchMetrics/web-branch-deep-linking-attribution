@@ -74,7 +74,10 @@ Server.prototype.getUrl = function(resource, data) {
 				return destinationObject;
 			}
 			else {
-				throw Error(utils.message(utils.messages.missingParam, [ resource.endpoint, 'branch_key or app_id' ]));
+				throw Error(utils.message(
+					utils.messages.missingParam,
+					[ resource.endpoint, 'branch_key or app_id' ]
+				));
 			}
 		};
 
@@ -90,7 +93,9 @@ Server.prototype.getUrl = function(resource, data) {
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
-				err = typeof resource.queryPart[k] == 'function' ? resource.queryPart[k](resource.endpoint, k, data[k]) : err;
+				err = (typeof resource.queryPart[k] == 'function') ?
+					resource.queryPart[k](resource.endpoint, k, data[k]) :
+					err;
 				if (err) { return { error: err }; }
 				url += '/' + data[k];
 			}

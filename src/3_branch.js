@@ -323,7 +323,7 @@ checkHasApp = function(sessionData, cb) {
 		if (has_app && !currentSessionData['has_app']) {
 			currentSessionData['has_app'] = true;
 			session.update(self._storage, currentSessionData);
-			self._publishEvent("downloadedApp");
+			self._publishEvent("didDownloadApp");
 		}
 		if (cb) {
 			cb(err, currentSessionData);
@@ -1310,7 +1310,7 @@ if (WEB_BUILD) { // jshint undef:false
 	 * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
 	 * - *sendBannerSMSError*: `sendSMS()` error returned.
 	 * - *didSendBannerSMS*: SMS successfully sent.
-	 * - *downloadedApp*: User installed app, and banner text updated.
+	 * - *didDownloadApp*: User installed app, and banner text updated.
 	 *
 	 */
 	/*** +TOC_HEADING &Event Listener& ^WEB ***/

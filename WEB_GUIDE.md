@@ -854,7 +854,7 @@ branch.addListener(listener);
 - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
 - *sendBannerSMSError*: `sendSMS()` error returned.
 - *didSendBannerSMS*: SMS successfully sent.
-- *downloadedApp*: User installed app, and banner text updated.
+- *didDownloadApp*: User installed app, and banner text updated.
 
 
 

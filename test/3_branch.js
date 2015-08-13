@@ -235,61 +235,86 @@ describe('Branch', function() {
 			else { done(); }
 		});
 
-		it('should store in session and call open with link_identifier from get param', function(done) {
-			if (testUtils.go("?_branch_match_id=67890")) {
-				var branch = initBranch(false), assert = testUtils.plan(2, done);
+		it(
+			'should store in session and call open with link_identifier from get param',
+			function(done) {
+				if (testUtils.go("?_branch_match_id=67890")) {
+					var branch = initBranch(false), assert = testUtils.plan(2, done);
 
-				branch.init(branch_sample_key, function(err, data) {
-					assert.equal(
-						'67890',
-						JSON.parse(localStorage.getItem('branch_session_first')).click_id,
-						'get param match id stored in local storage'
-					);
-					assert.equal(
-						'67890',
-						utils.mobileUserAgent() ?
-							'67890' :
-							JSON.parse(sessionStorage.getItem('branch_session')).click_id,
-						'get param match id saved in session storage'
-					);
-				});
+					branch.init(branch_sample_key, function(err, data) {
+						assert.equal(
+							'67890',
+							JSON.parse(localStorage.getItem('branch_session_first')).click_id,
+							'get param match id stored in local storage'
+						);
+						assert.equal(
+							'67890',
+							utils.mobileUserAgent() ?
+								'67890' :
+								JSON.parse(sessionStorage.getItem('branch_session')).click_id,
+							'get param match id saved in session storage'
+						);
+					});
 
-				requests[0].callback(null, browser_fingerprint_id);
-				requests[1].callback(null, { session_id: "1234", something: "else" });
+					requests[0].callback(null, browser_fingerprint_id);
+					requests[1].callback(null, { session_id: "1234", something: "else" });
 
-				assert.deepEqual(requests[1].obj, {
-					"branch_key": branch_sample_key,
-					"link_identifier": '67890',
-					"is_referrable": 1,
-					"browser_fingerprint_id": browser_fingerprint_id,
-					"sdk": "web" + config.version
-				}, 'Request to open params correct');
+					assert.deepEqual(requests[1].obj, {
+						"branch_key": branch_sample_key,
+						"link_identifier": '67890',
+						"is_referrable": 1,
+						"browser_fingerprint_id": browser_fingerprint_id,
+						"sdk": "web" + config.version
+					}, 'Request to open params correct');
+				}
+				else { done(); }
 			}
-			else { done(); }
-		});
+		);
 
 		it('should not call has_app if no session present', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err, data) {
 				assert.equal(requests.length, 2, 'two requests made');
-				assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made, not has_app");
+				assert.deepEqual(
+					requests[0].resource.endpoint,
+					"/_r",
+					"Request to open made, not has_app"
+				);
 			});
 			requests[0].callback(null, browser_fingerprint_id);
-			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+			requests[1].callback(
+				null,
+				{
+					session_id: session_id,
+					browser_fingerprint_id: browser_fingerprint_id,
+					identity_id: identity_id
+				}
+			);
 		});
 
 		it('should call has_app if session present', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key);
 			requests[0].callback(null, browser_fingerprint_id);
-			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+			requests[1].callback(
+				null,
+				{
+					session_id: session_id,
+					browser_fingerprint_id: browser_fingerprint_id,
+					identity_id: identity_id
+				}
+			);
 
 			requests = [ ];
 			branch = initBranch(false, true);
 			assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key);
 			assert.equal(requests.length, 1, 'one requests made');
-			assert.deepEqual(requests[0].resource.endpoint, "/v1/has-app", "Request to has_app made");
+			assert.deepEqual(
+				requests[0].resource.endpoint,
+				"/v1/has-app",
+				"Request to has_app made"
+			);
 		});
 	});
 
