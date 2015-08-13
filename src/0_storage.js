@@ -19,7 +19,7 @@ var storage;
 
 if (TITANIUM_BUILD) {
 	/** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
-	Ti.App.Properties;
+	Ti.App.Properties; // jshint ignore:line
 }
 
 /**
