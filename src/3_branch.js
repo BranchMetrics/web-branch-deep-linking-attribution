@@ -325,10 +325,9 @@ Branch.prototype['init'] = wrap(
 					resources._r,
 					{ "sdk": config.version },
 					function(err, browser_fingerprint_id) {
-						if (err) {
-							// return finishInit(err, null);
+						if (browser_fingerprint_id) {
+							currentSessionData.browser_fingerprint_id = browser_fingerprint_id;
 						}
-						currentSessionData.browser_fingerprint_id = browser_fingerprint_id;
 					}
 				);
 			}
