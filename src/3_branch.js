@@ -320,6 +320,18 @@ Branch.prototype['init'] = wrap(
 		freshInstall = !sessionData || !sessionData['identity_id'],
 
 		checkHasApp = function(sessionData, cb) {
+			if (WEB_BUILD) {
+				self._api(
+					resources._r,
+					{ "sdk": config.version },
+					function(err, browser_fingerprint_id) {
+						if (err) {
+							// return finishInit(err, null);
+						}
+						currentSessionData.browser_fingerprint_id = browser_fingerprint_id;
+					}
+				);
+			}
 			var currentSessionData = sessionData || session.get(self._storage);
 			self._api(
 				resources.hasApp,
