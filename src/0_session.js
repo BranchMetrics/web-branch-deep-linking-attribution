@@ -29,7 +29,9 @@ session.get = function(storage, first) {
  */
 session.set = function(storage, data, first) {
 	storage.set('branch_session', goog.json.serialize(data));
-	if (first) { storage.set('branch_session_first', goog.json.serialize(data), true); }
+	if (first) {
+		storage.set('branch_session_first', goog.json.serialize(data), true);
+	}
 };
 
 /**

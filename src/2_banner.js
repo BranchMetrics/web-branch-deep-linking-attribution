@@ -155,15 +155,25 @@ banner = function(branch, options, linkData, storage) {
 			}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 			setTimeout(function() {
-				if (options.position == 'top') { document.body.style.marginTop = bodyMarginTopInline; }
-				else if (options.position == 'bottom') { document.body.style.marginBottom = bodyMarginBottomInline; }
+				if (options.position == 'top') {
+					document.body.style.marginTop = bodyMarginTopInline;
+				}
+				else if (options.position == 'bottom') {
+					document.body.style.marginBottom = bodyMarginBottomInline;
+				}
 				banner_utils.removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
 			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
-			else if (options.position == 'bottom') { element.style.bottom = '-' + banner_utils.bannerHeight; }
+			else if (options.position == 'bottom') {
+				element.style.bottom = '-' + banner_utils.bannerHeight;
+			}
 
-			if (typeof options.forgetHide == 'number') { storage.set('hideBanner', banner_utils.getDate(options.forgetHide)); }
-			else { storage.set('hideBanner', true); }
+			if (typeof options.forgetHide == 'number') {
+				storage.set('hideBanner', banner_utils.getDate(options.forgetHide));
+			}
+			else {
+				storage.set('hideBanner', true);
+			}
 		};
 
 	if (closeButton) {
@@ -178,12 +188,22 @@ banner = function(branch, options, linkData, storage) {
 
 	// Trigger animation
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
-	if (options.position == 'top') { document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed); }
-	else if (options.position == 'bottom') { document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed); }
+	if (options.position == 'top') {
+		document.body.style.marginTop =
+			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
+	}
+	else if (options.position == 'bottom') {
+		document.body.style.marginBottom =
+			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
+	}
 
 	setTimeout(function() {
-		if (options.position == 'top') { element.style.top = '0'; }
-		else if (options.position == 'bottom') { element.style.bottom = '0'; }
+		if (options.position == 'top') {
+			element.style.top = '0';
+		}
+		else if (options.position == 'bottom') {
+			element.style.bottom = '0';
+		}
 		branch._publishEvent("didShowBanner");
 	}, banner_utils.animationDelay);
 
