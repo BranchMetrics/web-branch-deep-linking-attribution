@@ -1,6 +1,7 @@
 /**
  * A custom storage abstraction class that implements:
- * sessionStorage, localStorage, cookies, titanium storage, and a plain old javascript object as a fallback
+ * sessionStorage, localStorage, cookies, titanium storage,
+ * and a plain old javascript object as a fallback
  */
 
 goog.provide('storage');
@@ -61,7 +62,13 @@ var webStorage = function(perm) {
 			}
 			return allKeyValues;
 		},
-		get: function(key, perm_override) { return retrieveValue(perm_override ? localStorage.getItem(prefix(key)) : storageMethod.getItem(prefix(key))); },
+		get: function(key, perm_override) {
+			return retrieveValue(
+				perm_override ?
+					localStorage.getItem(prefix(key)) :
+					storageMethod.getItem(prefix(key))
+			);
+		},
 		set: function(key, value, perm_override) {
 			if (perm_override) {
 				localStorage.setItem(prefix(key), value);
@@ -106,7 +113,8 @@ var cookies = function(perm) {
 			var date = new Date();
 			console.log(date);
 			date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
-			expires = "; branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
+			expires = "; branch_expiration_date=" + date.toGMTString() +
+				"; expires=" + date.toGMTString();
 		}
 		document.cookie = key + "=" + value + expires + "; path=/";
 	};
@@ -130,7 +138,9 @@ var cookies = function(perm) {
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i];
 				cookie = cookie.substring(1, cookie.length);
-				if (cookie.indexOf(keyEQ) === 0) { return retrieveValue(cookie.substring(keyEQ.length, cookie.length)); }
+				if (cookie.indexOf(keyEQ) === 0) {
+					return retrieveValue(cookie.substring(keyEQ.length, cookie.length));
+				}
 			}
 			return null;
 		},
@@ -148,8 +158,12 @@ var cookies = function(perm) {
 				var cookie = cookieArray[i];
 				cookie = cookie.substring(1, cookie.length);
 				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
-					if (!perm && cookie.indexOf("branch_expiration_date=") == -1) { deleteCookie(cookie); }
-					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) { deleteCookie(cookie); }
+					if (!perm && cookie.indexOf("branch_expiration_date=") == -1) {
+						deleteCookie(cookie);
+					}
+					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) {
+						deleteCookie(cookie);
+					}
 				}
 			}
 		},

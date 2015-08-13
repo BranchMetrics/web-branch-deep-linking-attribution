@@ -36,7 +36,8 @@ utils.messages = {
 	missingParam: 'API request $1 missing parameter $2',
 	invalidType: 'API request $1, parameter $2 is not $3',
 	nonInit: 'Branch SDK not initialized',
-	initPending: 'Branch SDK initialization pending and a Branch method was called outside of the queue order',
+	initPending: 'Branch SDK initialization pending' +
+		' and a Branch method was called outside of the queue order',
 	initFailed: 'Branch SDK initialization failed, so further methods cannot be called',
 	existingInit: 'Branch SDK already initilized',
 	missingAppId: 'Missing Branch app ID',
@@ -89,7 +90,10 @@ utils.cleanLinkData = function(linkData, config) {
 		/* jshint undef:true */
 		linkData.source = 'web-sdk';
 		if (linkData.data && linkData.data.$desktop_url !== undefined) {
-			linkData.data.$desktop_url = linkData.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, '').replace(/([\?\&]_branch_match_id=\d+)/, '');
+			linkData.data.$desktop_url =
+				linkData.data.$desktop_url
+					.replace(/#r:[a-z0-9-_]+$/i, '')
+					.replace(/([\?\&]_branch_match_id=\d+)/, '');
 		}
 	}
 	try {
@@ -225,7 +229,11 @@ utils.base64encode = function(input) {
 		else if (isNaN(chr3)) {
 			enc4 = 64;
 		}
-		output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+		output = output +
+			keyStr.charAt(enc1) +
+			keyStr.charAt(enc2) +
+			keyStr.charAt(enc3) +
+			keyStr.charAt(enc4);
 	}
 	return output;
 };

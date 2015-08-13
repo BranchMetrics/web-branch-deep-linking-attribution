@@ -56,7 +56,9 @@ banner_utils.getDate = function(days) {
 };
 
 banner_utils.getBodyStyle = function(style) {
-	if (document.body.currentStyle) { return document.body.currentStyle[utils.snakeToCamel(style)]; }
+	if (document.body.currentStyle) {
+		return document.body.currentStyle[utils.snakeToCamel(style)];
+	}
 	else { return window.getComputedStyle(document.body).getPropertyValue(style); }
 };
 
@@ -66,17 +68,30 @@ banner_utils.addCSSLengths  = function(length1, length2) {
 		var unit = input.replace(/[0-9,\.]/g, ''),
 			inputArray = input.match(/\d+/g),
 			value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10),
-			vw = function() { return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100; },
-			vh = function() { return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100; };
+			vw = function() {
+				return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
+			},
+			vh = function() {
+				return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) /
+					100;
+			};
 		return parseInt({
 			"px": function(value) { return value; },
 			"em": function(value) {
-				if (document.body.currentStyle) { return value * convertToUnitlessPixels(document.body.currentStyle.fontSize); }
+				if (document.body.currentStyle) {
+					return value * convertToUnitlessPixels(document.body.currentStyle.fontSize);
+				}
 				else { return value * parseFloat(window.getComputedStyle(document.body).fontSize); }
 			},
 			"rem": function(value) {
-				if (document.documentElement.currentStyle) { return value * convertToUnitlessPixels(document.documentElement.currentStyle.fontSize); }
-				else { return value * parseFloat(window.getComputedStyle(document.documentElement).fontSize); }
+				if (document.documentElement.currentStyle) {
+					return value *
+						convertToUnitlessPixels(document.documentElement.currentStyle.fontSize);
+				}
+				else {
+					return value *
+						parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+				}
 			},
 			"vw": function(value) { return value * vw(); },
 			"vh": function(value) { return value * vh(); },
@@ -110,6 +125,7 @@ banner_utils.shouldAppend = function(storage, options) {
 			(options.showDesktop && !utils.mobileUserAgent()) ||
 			(options.showAndroid && utils.mobileUserAgent() == 'android') ||
 			(options.showiPad && utils.mobileUserAgent() == 'ipad') ||
-			(utils.mobileUserAgent() != 'ipad' && options.showiOS && utils.mobileUserAgent() == 'ios')
+			(utils.mobileUserAgent() != 'ipad' && options.showiOS &&
+				utils.mobileUserAgent() == 'ios')
 		);
 };
