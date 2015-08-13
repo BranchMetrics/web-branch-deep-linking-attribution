@@ -2,7 +2,10 @@ goog.provide('banner_utils');
 goog.require('storage'); // jshint unused:false
 goog.require('utils');
 
-/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean, make_new_link:boolean}} */
+/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string,
+ * downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean,
+ * showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean,
+ * make_new_link:boolean}} */
 banner_utils.options; // jshint ignore:line
 
 // UI Animation transition speed in ms.
@@ -40,7 +43,9 @@ banner_utils.hasClass = function(element, className) {
 };
 
 banner_utils.addClass = function(element, className) {
-	if (!banner_utils.hasClass(element, className)) { element.className += " " + className; }
+	if (!banner_utils.hasClass(element, className)) {
+		element.className += " " + className;
+	}
 };
 
 banner_utils.removeClass = function(element, className) {
@@ -64,7 +69,9 @@ banner_utils.getBodyStyle = function(style) {
 
 banner_utils.addCSSLengths  = function(length1, length2) {
 	var convertToUnitlessPixels = function(input) {
-		if (!input) { return 0; }
+		if (!input) {
+			return 0;
+		}
 		var unit = input.replace(/[0-9,\.]/g, ''),
 			inputArray = input.match(/\d+/g),
 			value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10),
@@ -116,7 +123,9 @@ banner_utils.shouldAppend = function(storage, options) {
 	else { hideBanner = !hideBanner; }
 
 	var forgetHide = options.forgetHide;
-	if (typeof forgetHide == 'number') { forgetHide = false; }
+	if (typeof forgetHide == 'number') {
+		forgetHide = false;
+	}
 
 	return !document.getElementById('branch-banner') &&
 		!document.getElementById('branch-banner-iframe') &&

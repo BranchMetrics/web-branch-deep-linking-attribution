@@ -36,6 +36,7 @@
 	"requireCapitalizedConstructors": true,
 	"safeContextKeyword": [ "self" ],
 	"disallowYodaConditions": true,
+    "maximumLineLength": 100,
 	"requireSpaceAfterLineComment": true,
 	"disallowNewlineBeforeBlockStatements": true
 }
