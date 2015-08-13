@@ -151,9 +151,10 @@ describe('Integration tests', function() {
 				assert.deepEqual(data,
 					{
 						data: null,
-						referring_identity: null,
-						identity: "Branch",
+						data_parsed: null,
 						has_app: true,
+						identity: "Branch",
+						referring_identity: null,
 						referring_link: null
 					},
 					'Expected response returned');
@@ -249,9 +250,10 @@ describe('Integration tests', function() {
 				assert.deepEqual(data,
 					{
 						data: null,
-						referring_identity: null,
-						identity: "Branch",
+						data_parsed: null,
 						has_app: true,
+						identity: "Branch",
+						referring_identity: null,
 						referring_link: null
 					});
 			});
@@ -268,9 +270,10 @@ describe('Integration tests', function() {
 					assert.deepEqual(data,
 						{
 							data: null,
-							referring_identity: null,
-							identity: "Branch",
+							data_parsed: null,
 							has_app: true,
+							identity: "Branch",
+							referring_identity: null,
 							referring_link: null
 						});
 				});
