@@ -133,15 +133,38 @@ Branch = function() {
  * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
-	if (this.app_id) { obj['app_id'] = this.app_id; }
-	if (this.branch_key) { obj['branch_key'] = this.branch_key; }
-	if (((resource.params && resource.params['session_id']) || (resource.queryPart && resource.queryPart['session_id'])) && this.session_id) { obj['session_id'] = this.session_id; }
-	if (((resource.params && resource.params['identity_id']) || (resource.queryPart && resource.queryPart['identity_id'])) && this.identity_id) { obj['identity_id'] = this.identity_id; }
-	if (((resource.params && resource.params['link_click_id']) || (resource.queryPart && resource.queryPart['link_click_id'])) && this.link_click_id) { obj['link_click_id'] = this.link_click_id; }
-	if (((resource.params && resource.params['sdk']) || (resource.queryPart && resource.queryPart['sdk'])) && this.sdk) { obj['sdk'] = this.sdk; }
+	if (this.app_id) {
+		obj['app_id'] = this.app_id;
+	}
+	if (this.branch_key) {
+		obj['branch_key'] = this.branch_key;
+	}
+	if (((resource.params && resource.params['session_id']) ||
+			(resource.queryPart && resource.queryPart['session_id'])) &&
+			this.session_id) {
+		obj['session_id'] = this.session_id;
+	}
+	if (((resource.params && resource.params['identity_id']) ||
+			(resource.queryPart && resource.queryPart['identity_id'])) &&
+			this.identity_id) {
+		obj['identity_id'] = this.identity_id;
+	}
+	if (((resource.params && resource.params['link_click_id']) ||
+			(resource.queryPart && resource.queryPart['link_click_id'])) &&
+			this.link_click_id) {
+		obj['link_click_id'] = this.link_click_id;
+	}
+	if (((resource.params && resource.params['sdk']) ||
+			(resource.queryPart && resource.queryPart['sdk'])) && this.sdk) {
+		obj['sdk'] = this.sdk;
+	}
 
 	if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-		if (((resource.params && resource.params['device_fingerprint_id']) || (resource.queryPart && resource.queryPart['device_fingerprint_id'])) && this.device_fingerprint_id) { obj['device_fingerprint_id'] = this.device_fingerprint_id; }
+		if (((resource.params && resource.params['device_fingerprint_id']) ||
+				(resource.queryPart && resource.queryPart['device_fingerprint_id'])) &&
+				this.device_fingerprint_id) {
+			obj['device_fingerprint_id'] = this.device_fingerprint_id;
+		}
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
@@ -242,119 +265,155 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
  */
 /*** +TOC_HEADING &Branch Session& ^ALL ***/
 /*** +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
-Branch.prototype['init'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, branch_key, options) {
-	var self = this;
+Branch.prototype['init'] = wrap(
+	callback_params.CALLBACK_ERR_DATA,
+	function(done, branch_key, options) {
+		var self = this;
 
-	self.init_state = init_states.INIT_PENDING;
+		self.init_state = init_states.INIT_PENDING;
 
-	if (utils.isKey(branch_key)) {
-		self.branch_key = branch_key;
-	}
-	else {
-		self.app_id = branch_key;
-	}
-
-	options = (options && typeof options == 'function') ? { "isReferrable": null } : options;
-
-	if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
-		self.keepAlive = true;
-	}
-
-	var setBranchValues = function(data) {
-		if (data['session_id']) { self.session_id = data['session_id'].toString(); }
-		if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
-		if (data['link']) { self.sessionLink = data['link']; }
-
-		if (data['referring_link']) {
-			data['referring_link'] = utils.processReferringLink(data['referring_link']); // .substring(0, 4) != 'http' ? 'https://bnc.lt' + data['referring_link'] : data['referring_link'];
+		if (utils.isKey(branch_key)) {
+			self.branch_key = branch_key;
+		}
+		else {
+			self.app_id = branch_key;
 		}
 
-		if (!data['click_id'] && data['referring_link']) {
-			data['click_id'] = utils.clickIdFromLink(data['referring_link']); // .substring(data['referring_link'].lastIndexOf('/') + 1, data['referring_link'].length);
+		options = (options && typeof options == 'function') ? { "isReferrable": null } : options;
+
+		if (TITANIUM_BUILD && Ti.Platform.osname === "android") { // jshint undef:false
+			self.keepAlive = true;
 		}
 
-		if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-			self.device_fingerprint_id = data['device_fingerprint_id'];
-			if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
+		var setBranchValues = function(data) {
+			if (data['session_id']) { self.session_id = data['session_id'].toString(); }
+			if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
+			if (data['link']) { self.sessionLink = data['link']; }
+
+			if (data['referring_link']) {
+				data['referring_link'] = utils.processReferringLink(data['referring_link']);
+			}
+
+			if (!data['click_id'] && data['referring_link']) {
+				data['click_id'] = utils.clickIdFromLink(data['referring_link']);
+			}
+
+			if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
+				self.device_fingerprint_id = data['device_fingerprint_id'];
+				if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
+			}
+			return data;
+		},
+
+		isReferrable = (options &&
+				typeof options.isReferrable != 'undefined' &&
+				options.isReferrable !== null) ?
+			options.isReferrable :
+			null,
+		sessionData = session.get(self._storage),
+		url = (options && typeof options.url != 'undefined' && options.url !== null) ?
+			options.url :
+			null,
+		link_identifier = WEB_BUILD ?
+			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
+			(url ? utils.getParamValue(url) : null),
+		freshInstall = !sessionData || !sessionData['identity_id'],
+
+		finishInit = function(err, data) {
+			if (data) {
+				data = setBranchValues(data);
+				session.set(self._storage, data, freshInstall);
+
+				self.init_state = init_states.INIT_SUCCEEDED;
+				data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
+			}
+			if (err) { self.init_state = init_states.INIT_FAILED; }
+
+			// Keep android titanium from calling close
+			if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
+			done(err, data && utils.whiteListSessionData(data));
+		};
+
+		if (WEB_BUILD &&
+				sessionData  &&
+				sessionData['session_id'] &&
+				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
+				link_identifier === sessionData['click_id'])) {
+			finishInit(null, sessionData);
 		}
-		return data;
+		else {
+			if (CORDOVA_BUILD || TITANIUM_BUILD) {
+
+				var apiCordovaTitanium = function(data) {
+					if (!freshInstall) {
+						data['identity_id'] = sessionData['identity_id'];
+						data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
+					}
+					self._api(
+						freshInstall ? resources.install : resources.open,
+						data,
+						function(err, data) {
+							finishInit(err, data);
+						}
+					);
+				};
+				if (CORDOVA_BUILD) { // jshint undef:false
+					var args = [ ];
+					if (isReferrable !== null) {
+						args.push(isReferrable ? 1 : 0);
+					}
+					cordova.require("cordova/exec")(apiCordovaTitanium,
+						function() { done("Error getting device data!"); },
+						"BranchDevice",
+						freshInstall ? "getInstallData" : "getOpenData", args);
+				}
+				if (TITANIUM_BUILD) { // jshint undef:false
+					var data = { },
+						branchTitaniumSDK = require('io.branch.sdk');
+					if (link_identifier) { data['link_identifier'] = link_identifier; }
+					if (freshInstall) {
+						data = (isReferrable === null) ?
+							branchTitaniumSDK.getInstallData(self.debug, -1) :
+							branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
+					}
+					else {
+						data = (isReferrable === null) ?
+							branchTitaniumSDK.getOpenData(-1) :
+							branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
+					}
+					apiCordovaTitanium(data);
+				}
+			}
+
+			if (WEB_BUILD) { // jshint undef:false
+				self._api(
+					resources._r,
+					{ "sdk": config.version },
+					function(err, browser_fingerprint_id) {
+						if (err) {
+							return finishInit(err, null);
+						}
+						self._api(
+							resources.open,
+							{
+								"link_identifier": link_identifier,
+								"is_referrable": 1,
+								"browser_fingerprint_id": browser_fingerprint_id
+							},
+							function(err, data) {
+								if (data && link_identifier) {
+									data['click_id'] = link_identifier;
+								}
+								finishInit(err, data);
+							}
+						);
+					}
+				);
+			}
+		}
 	},
-
-	isReferrable = options && typeof options.isReferrable != 'undefined' && options.isReferrable !== null ? options.isReferrable : null,
-	sessionData = session.get(self._storage),
-	url = (options && typeof options.url != 'undefined' && options.url !== null) ? options.url : null,
-	link_identifier = WEB_BUILD ? (utils.getParamValue('_branch_match_id') || utils.hashValue('r')) : (url ? utils.getParamValue(url) : null),
-	freshInstall = !sessionData || !sessionData['identity_id'],
-
-	finishInit = function(err, data) {
-		if (data) {
-			data = setBranchValues(data);
-			session.set(self._storage, data, freshInstall);
-
-			self.init_state = init_states.INIT_SUCCEEDED;
-			data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
-		}
-		if (err) { self.init_state = init_states.INIT_FAILED; }
-
-		// Keep android titanium from calling close
-		if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
-		done(err, data && utils.whiteListSessionData(data));
-	};
-
-	if (WEB_BUILD && sessionData  && sessionData['session_id'] && (utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
-		finishInit(null, sessionData);
-	}
-	else {
-		if (CORDOVA_BUILD || TITANIUM_BUILD) {
-
-			var apiCordovaTitanium = function(data) {
-				if (!freshInstall) {
-					data['identity_id'] = sessionData['identity_id'];
-					data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
-				}
-				self._api(freshInstall ? resources.install : resources.open, data, function(err, data) {
-					finishInit(err, data);
-				});
-			};
-			if (CORDOVA_BUILD) { // jshint undef:false
-				var args = [ ];
-				if (isReferrable !== null) {
-					args.push(isReferrable ? 1 : 0);
-				}
-				cordova.require("cordova/exec")(apiCordovaTitanium,
-					function() { done("Error getting device data!"); },
-					"BranchDevice",
-					freshInstall ? "getInstallData" : "getOpenData", args);
-			}
-			if (TITANIUM_BUILD) { // jshint undef:false
-				var data = { },
-					branchTitaniumSDK = require('io.branch.sdk');
-				if (link_identifier) { data['link_identifier'] = link_identifier; }
-				if (freshInstall) {
-					data = (isReferrable === null) ? branchTitaniumSDK.getInstallData(self.debug, -1) : branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
-				}
-				else {
-					data = (isReferrable === null) ? branchTitaniumSDK.getOpenData(-1) : branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
-				}
-				apiCordovaTitanium(data);
-			}
-		}
-
-		if (WEB_BUILD) { // jshint undef:false
-			self._api(resources._r, { "sdk": config.version }, function(err, browser_fingerprint_id) {
-				if (err) { return finishInit(err, null); }
-				self._api(resources.open, {
-					"link_identifier": link_identifier,
-					"is_referrable": 1,
-					"browser_fingerprint_id": browser_fingerprint_id
-				}, function(err, data) {
-					if (data && link_identifier) { data['click_id'] = link_identifier; }
-					finishInit(err, data);
-				});
-			});
-		}
-	}
-}, true);
+	true
+);
 
 /**
  * @function Branch.data
@@ -438,7 +497,9 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		self.sessionLink = data['link'];
 		self.identity = identity;
 
-		data['referring_data_parsed'] = data['referring_data'] ? goog.json.parse(data['referring_data']) : null;
+		data['referring_data_parsed'] = data['referring_data'] ?
+			goog.json.parse(data['referring_data']) :
+			null;
 		session.update(self._storage, data);
 
 		done(null, data);
@@ -769,44 +830,63 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *
  */
 /*** +TOC_ITEM #sendsmsphone-linkdata-options-callback &.sendSMS()& ^ALL ***/
-Branch.prototype['sendSMS'] = wrap(callback_params.CALLBACK_ERR, function(done, phone, linkData, options) {
-	var self = this;
-	if (typeof options == 'function') {
-		options = { };
-	}
-	else if (typeof options === 'undefined' || options === null) {
-		options = { };
-	}
-	options["make_new_link"] = options["make_new_link"] || false;
+Branch.prototype['sendSMS'] = wrap(
+	callback_params.CALLBACK_ERR,
+	function(done, phone, linkData, options) {
+		var self = this;
+		if (typeof options == 'function') {
+			options = { };
+		}
+		else if (typeof options === 'undefined' || options === null) {
+			options = { };
+		}
+		options["make_new_link"] = options["make_new_link"] || false;
 
-	if (!linkData['channel'] || linkData['channel'] == 'app banner') { linkData['channel'] = 'sms'; }
+		if (!linkData['channel'] || linkData['channel'] == 'app banner') {
+			linkData['channel'] = 'sms';
+		}
 
-	function sendSMS(click_id) {
-		self._api(resources.SMSLinkSend, {
-			"link_url": click_id,
-			"phone": phone
-		}, done);
-	}
+		function sendSMS(click_id) {
+			self._api(resources.SMSLinkSend, {
+				"link_url": click_id,
+				"phone": phone
+			}, done);
+		}
 
-	var referring_link = self._referringLink();
-	if (referring_link && !options['make_new_link']) {
-		sendSMS(referring_link.substring(referring_link.lastIndexOf('/') + 1, referring_link.length));
+		var referring_link = self._referringLink();
+		if (referring_link && !options['make_new_link']) {
+			sendSMS(referring_link.substring(
+				referring_link.lastIndexOf('/') + 1, referring_link.length
+			));
+		}
+		else {
+			self._api(
+				resources.link,
+				utils.cleanLinkData(linkData, config),
+				function(err, data) {
+					if (err) {
+						return done(err);
+					}
+					var url = data['url'];
+					self._api(
+						resources.linkClick,
+						{
+							"link_url": 'l/' + url.split('/').pop(),
+							"click": "click"
+						},
+						function(err, data) {
+							if (err) {
+								return done(err);
+							}
+							self._storage.set('click_id', data['click_id']);
+							sendSMS(data['click_id']);
+						}
+					);
+				}
+			);
+		}
 	}
-	else {
-		self._api(resources.link, utils.cleanLinkData(linkData, config), function(err, data) {
-			if (err) { return done(err); }
-			var url = data['url'];
-			self._api(resources.linkClick, {
-				"link_url": 'l/' + url.split('/').pop(),
-				"click": "click"
-			}, function(err, data) {
-				if (err) { return done(err); }
-				self._storage.set('click_id', data['click_id']);
-				sendSMS(data['click_id']);
-			});
-		});
-	}
-});
+);
 
 /**
  * @function Branch.referrals
@@ -1113,9 +1193,12 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *
  */
 /*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
-Branch.prototype['creditHistory'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, options) {
-	this._api(resources.creditHistory, options || { }, done);
-});
+Branch.prototype['creditHistory'] = wrap(
+	callback_params.CALLBACK_ERR_DATA,
+	function(done, options) {
+		this._api(resources.creditHistory, options || { }, done);
+	}
+);
 
 /**
  * @function Branch.redeem
@@ -1302,7 +1385,10 @@ if (WEB_BUILD) { // jshint undef:false
 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
 	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
-		if (typeof options['forgetHide'] == 'undefined' && typeof options['forgetHide'] != 'undefined') { options['forgetHide'] = options['forgetHide']; }
+		if (typeof options['forgetHide'] == 'undefined' &&
+				typeof options['forgetHide'] != 'undefined') {
+			options['forgetHide'] = options['forgetHide'];
+		}
 		var bannerOptions = {
 			icon: options['icon'] || '',
 			title: options['title'] || '',
@@ -1311,17 +1397,33 @@ if (WEB_BUILD) { // jshint undef:false
 			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
 			sendLinkText: options['sendLinkText'] || 'Send Link',
 			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
-			iframe: typeof options['iframe'] == 'undefined' ? true : options['iframe'],
-			showiOS: typeof options['showiOS'] == 'undefined' ? true : options['showiOS'],
-			showiPad: typeof options['showiPad'] == 'undefined' ? true : options['showiPad'],
-			showAndroid: typeof options['showAndroid'] == 'undefined' ? true : options['showAndroid'],
-			showDesktop: typeof options['showDesktop'] == 'undefined' ? true : options['showDesktop'],
+			iframe: typeof options['iframe'] == 'undefined' ?
+				true :
+				options['iframe'],
+			showiOS: typeof options['showiOS'] == 'undefined' ?
+				true :
+				options['showiOS'],
+			showiPad: typeof options['showiPad'] == 'undefined' ?
+				true :
+				options['showiPad'],
+			showAndroid: typeof options['showAndroid'] == 'undefined' ?
+				true :
+				options['showAndroid'],
+			showDesktop: typeof options['showDesktop'] == 'undefined' ?
+				true :
+				options['showDesktop'],
 			disableHide: !!options['disableHide'],
-			forgetHide: typeof options['forgetHide'] == 'number' ? options['forgetHide'] : !!options['forgetHide'],
+			forgetHide: typeof options['forgetHide'] == 'number' ?
+				options['forgetHide'] :
+				!!options['forgetHide'],
 			position: options['position'] || 'top',
 			customCSS: options['customCSS'] || '',
-			mobileSticky: typeof options['mobileSticky'] == 'undefined' ? false : options['mobileSticky'],
-			desktopSticky: typeof options['desktopSticky'] == 'undefined' ? true : options['desktopSticky'],
+			mobileSticky: typeof options['mobileSticky'] == 'undefined' ?
+				false :
+				options['mobileSticky'],
+			desktopSticky: typeof options['desktopSticky'] == 'undefined' ?
+				true :
+				options['desktopSticky'],
 			make_new_link: !!options['make_new_link']
 		};
 
