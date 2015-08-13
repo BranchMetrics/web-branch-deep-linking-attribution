@@ -64,7 +64,9 @@ banner_utils.getBodyStyle = function(style) {
 	if (document.body.currentStyle) {
 		return document.body.currentStyle[utils.snakeToCamel(style)];
 	}
-	else { return window.getComputedStyle(document.body).getPropertyValue(style); }
+	else {
+		return window.getComputedStyle(document.body).getPropertyValue(style);
+	}
 };
 
 banner_utils.addCSSLengths  = function(length1, length2) {
@@ -88,7 +90,9 @@ banner_utils.addCSSLengths  = function(length1, length2) {
 				if (document.body.currentStyle) {
 					return value * convertToUnitlessPixels(document.body.currentStyle.fontSize);
 				}
-				else { return value * parseFloat(window.getComputedStyle(document.body).fontSize); }
+				else {
+					return value * parseFloat(window.getComputedStyle(document.body).fontSize);
+				}
 			},
 			"rem": function(value) {
 				if (document.documentElement.currentStyle) {
@@ -120,7 +124,9 @@ banner_utils.shouldAppend = function(storage, options) {
 	if (typeof hideBanner == 'number') {
 		hideBanner = new Date() >= new Date(hideBanner);
 	}
-	else { hideBanner = !hideBanner; }
+	else {
+		hideBanner = !hideBanner;
+	}
 
 	var forgetHide = options.forgetHide;
 	if (typeof forgetHide == 'number') {
@@ -134,7 +140,6 @@ banner_utils.shouldAppend = function(storage, options) {
 			(options.showDesktop && !utils.mobileUserAgent()) ||
 			(options.showAndroid && utils.mobileUserAgent() == 'android') ||
 			(options.showiPad && utils.mobileUserAgent() == 'ipad') ||
-			(utils.mobileUserAgent() != 'ipad' && options.showiOS &&
-				utils.mobileUserAgent() == 'ios')
+			(options.showiOS && utils.mobileUserAgent() == 'ios')
 		);
 };
