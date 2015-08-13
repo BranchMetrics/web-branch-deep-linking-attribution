@@ -3,39 +3,21 @@ goog.require('banner_utils');
 goog.require('utils');
 
 banner_css.banner = function(options) {
-	return
-	'.branch-banner-is-active { -webkit-transition: all ' +
-		(banner_utils.animationSpeed * 1.5 / 1000) +
-		's ease; transition: all 0' +
-		(banner_utils.animationSpeed * 1.5 / 1000) +
-		's ease; }\n' +
-	'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif;' +
-		' -webkit-font-smoothing: antialiased; -webkit-user-select: none;' +
-		' -moz-user-select: none; user-select: none; -webkit-transition: all ' +
-		(banner_utils.animationSpeed / 1000) +
-		's ease; transition: all 0' +
-		(banner_utils.animationSpeed / 1000) +
-		's ease; }\n' +
+	return '.branch-banner-is-active { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
+	'#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
 	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +
-	'#branch-banner .content { width:100%; overflow: hidden; height: ' +
-		banner_utils.bannerHeight +
-		'; background: rgba(255, 255, 255, 0.95); color: #333; ' +
-		(options.position == 'top' ? 'border-bottom' : 'border-top') +
-		': 1px solid #ddd; }\n' +
+	'#branch-banner .content { width:100%; overflow: hidden; height: ' + banner_utils.bannerHeight + '; background: rgba(255, 255, 255, 0.95); color: #333; ' + (options.position == 'top' ? 'border-bottom' : 'border-top') + ': 1px solid #ddd; }\n' +
 	'#branch-banner .icon { float: left; padding-bottom: 40px; }\n' +
 	'#branch-banner .content .left { padding: 6px; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; }\n' +
-	'#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%);' +
-		' -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n' +
+	'#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n' +
 	'#branch-banner .details > * { display: block; }\n' +
 	'#branch-banner .content .left { height: 63px; }\n' +
-	'#branch-banner .content .right { float: right; height: 63px;' +
-		' margin-bottom: 50px; padding-top: 6px; z-index: 1; }\n' +
+	'#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; padding-top: 6px; z-index: 1; }\n' +
 	'#branch-banner .right > div { float: left; padding-top: 3px; }\n' +
 	'#branch-banner-action { top: 17px; }\n' +
-	'#branch-banner .content:after { content: ""; position: absolute;' +
-		' left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
+	'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
 };
 
 banner_css.desktop =
@@ -85,26 +67,13 @@ banner_css.android =
 	'#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n';
 
 banner_css.iframe =
-	'body { -webkit-transition: all ' +
-		(banner_utils.animationSpeed * 1.5 / 1000) +
-		's ease; transition: all 0' +
-		(banner_utils.animationSpeed * 1.5 / 1000)
-		+ 's ease; }\n' +
-	'#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2);' +
-		' width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: ' +
-		banner_utils.bannerHeight +
-		'; z-index: 99999; -webkit-transition: all ' +
-		(banner_utils.animationSpeed / 1000) +
-		's ease; transition: all 0' +
-		(banner_utils.animationSpeed / 1000) +
-		's ease; }\n';
+	'body { -webkit-transition: all ' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n' +
+	'#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: ' + banner_utils.bannerHeight + '; z-index: 99999; -webkit-transition: all ' + (banner_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (banner_utils.animationSpeed / 1000) + 's ease; }\n';
 
 banner_css.inneriframe = 'body { margin: 0; }\n';
 
 banner_css.iframe_position = function(sticky, position) {
-	return '#branch-banner-iframe { position: ' +
-		(position == 'top' ? (sticky ? 'fixed' : 'absolute') : 'fixed') +
-		'; }\n';
+	return '#branch-banner-iframe { position: ' + (position == 'top' ? (sticky ? 'fixed' : 'absolute') : 'fixed') + '; }\n';
 };
 
 /**
@@ -140,10 +109,7 @@ banner_css.css = function(options, element) {
 		var iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
-		iFrameCSS.innerHTML = banner_css.iframe +
-			(utils.mobileUserAgent() ?
-				banner_css.iframe_position(options.mobileSticky, options.position) :
-				banner_css.iframe_position(options.desktopSticky, options.position));
+		iFrameCSS.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(options.mobileSticky, options.position) : banner_css.iframe_position(options.desktopSticky, options.position));
 		document.head.appendChild(iFrameCSS);
 	}
 
