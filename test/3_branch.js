@@ -309,11 +309,16 @@ describe('Branch', function() {
 			branch = initBranch(false, true);
 			assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key);
-			assert.equal(requests.length, 1, 'one requests made');
+			assert.equal(requests.length, 2, "Should make 2 requests");
 			assert.deepEqual(
 				requests[0].resource.endpoint,
+				"/_r",
+				"First request should be sent to /_r"
+			);
+			assert.deepEqual(
+				requests[1].resource.endpoint,
 				"/v1/has-app",
-				"Request to has_app made"
+				"Second request should be send to /v1/has-app"
 			);
 		});
 	});
