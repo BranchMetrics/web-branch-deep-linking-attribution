@@ -88,28 +88,58 @@ describe('Integration tests', function() {
 	};
 
 	var branchInit = function(assert, callback) {
-		branch.init.apply(branch, window.CORDOVA_BUILD ? [ device_fingerprint_id, { isReferrable: true }, callback ] : [ device_fingerprint_id, callback ]);
+		branch.init.apply(
+			branch,
+			window.CORDOVA_BUILD ?
+				[ device_fingerprint_id, { isReferrable: true }, callback ] :
+				[ device_fingerprint_id, callback ]
+		);
 		if (window.CORDOVA_BUILD) {
-			requests[0].respond(200,
-					{ "Content-Type": "application/json" },
-					'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":"79336952217731267", "browser_fingerprint_id":null, "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
+			requests[0].respond(
+				200,
+				{ "Content-Type": "application/json" },
+				'{ "identity_id":' + identity_id +
+					', "session_id":"123088518049178533"' +
+					', "device_fingerprint_id":"79336952217731267"' +
+					', "browser_fingerprint_id":null' +
+					', "link":"https://bnc.lt/i/4LYQTXE0_k"' +
+					', "identity":"Branch","has_app":true }'
+			);
 			if (assert) {
 				assert.equal(requests.length, 1);
-				assert.equal(requests[0].requestBody, 'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id);
+				assert.equal(
+					requests[0].requestBody,
+					'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id
+				);
 			}
 		}
 		else {
 			if (assert) {
 				assert.equal(requests.length, 1);
-				assert.equal(requests[0].src, 'https://bnc.lt/_r?sdk=web' + config.version + '&callback=branch_callback__' + jsonpCallback.toString());
+				assert.equal(
+					requests[0].src,
+					'https://bnc.lt/_r?sdk=web' + config.version +
+						'&callback=branch_callback__' + jsonpCallback.toString()
+				);
 			}
 			requests[0].callback(browser_fingerprint_id);
-			requests[1].respond(200,
-					{ "Content-Type": "application/json" },
-					'{ "identity_id":' + identity_id + ', "session_id":"123088518049178533", "device_fingerprint_id":null, "browser_fingerprint_id":"79336952217731267", "link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }');
+			requests[1].respond(
+				200,
+				{ "Content-Type": "application/json" },
+				'{ "identity_id":' + identity_id +
+					', "session_id":"123088518049178533", "device_fingerprint_id":null, ' +
+					'"browser_fingerprint_id":"79336952217731267", ' +
+					'"link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }'
+			);
 			if (assert) {
 				assert.equal(requests.length, 2);
-				assert.equal(requests[1].requestBody, 'identity_id=' + identity_id + '&is_referrable=1&sdk=web' + config.version + '&browser_fingerprint_id=' + browser_fingerprint_id + '&app_id=' + browser_fingerprint_id);
+				assert.equal(
+					requests[1].requestBody,
+					'identity_id=' + identity_id +
+						'&is_referrable=1&sdk=web' + config.version +
+						'&browser_fingerprint_id=' + browser_fingerprint_id +
+						'&app_id=' + browser_fingerprint_id
+				);
 			}
 		}
 	};
@@ -170,7 +200,12 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(1, done);
 			if (testUtils.go("#r:12345")) {
 				branchInit();
-				assert.equal(true, requests[indexOfLastInitRequest(0)].requestBody.indexOf('link_identifier=12345') > -1);
+				assert.equal(
+					true,
+					requests[indexOfLastInitRequest(0)]
+						.requestBody
+						.indexOf('link_identifier=12345') > -1
+				);
 			}
 			else {
 				jsonpCallback--;
@@ -196,9 +231,13 @@ describe('Integration tests', function() {
 				);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "identity_id":' + identity_id + ', "link_click_id":"114750153298026746", "link":"https://bnc.lt/i/4LYQTXE0_k" }');
+				'{ "identity_id":' + identity_id +
+					', "link_click_id":"114750153298026746"' +
+					', "link":"https://bnc.lt/i/4LYQTXE0_k" }'
+			);
 		});
 	});
 
@@ -270,9 +309,15 @@ describe('Integration tests', function() {
 				new_link = "new_link";
 
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify({ "session_id": new_session_id, "identity_id": new_identity_id, "link": new_link }));
+				JSON.stringify({
+					"session_id": new_session_id,
+					"identity_id": new_identity_id,
+					"link": new_link
+				})
+			);
 		});
 	});
 
@@ -284,9 +329,11 @@ describe('Integration tests', function() {
 				assert.equal(data, undefined);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ }');
+				'{ }'
+			);
 		});
 
 		it('should make two requests and return undefined, with metadata', function(done) {
@@ -297,9 +344,11 @@ describe('Integration tests', function() {
 				assert.equal(data, undefined);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify(testMetadata));
+				JSON.stringify(testMetadata)
+			);
 		});
 	});
 
@@ -311,24 +360,43 @@ describe('Integration tests', function() {
 				assert.equal(data, "https://bnc.lt/l/4manXlk0AJ");
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }');
+				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }'
+			);
 		});
 	});
 
 	describe('referrals', function() {
 		it('should make three requests and return referral data', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
-			var expectedResponse = { "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } };
+			var expectedResponse = {
+				"install": {
+					"total": 5,
+					"unique": 2
+				},
+				"open": {
+					"total": 4,
+					"unique": 3
+				},
+				"buy": {
+					"total": 7,
+					"unique": 3
+				}
+			};
 			branchInit(assert);
 			branch.referrals(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } }');
+				'{ "install": { "total": 5, "unique": 2 }' +
+					', "open": { "total": 4, "unique": 3 }' +
+					', "buy": { "total": 7, "unique": 3 } }'
+			);
 		});
 	});
 
@@ -359,9 +427,11 @@ describe('Integration tests', function() {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify(expectedResponse));
+				JSON.stringify(expectedResponse)
+			);
 		});
 	});
 
@@ -421,9 +491,11 @@ describe('Integration tests', function() {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify(expectedResponse));
+				JSON.stringify(expectedResponse)
+			);
 		});
 	});
 
@@ -436,9 +508,11 @@ describe('Integration tests', function() {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "default":"0" }');
+				'{ "default":"0" }'
+			);
 		});
 	});
 });
