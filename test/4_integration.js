@@ -95,7 +95,8 @@ describe('Integration tests', function() {
 				[ device_fingerprint_id, callback ]
 		);
 		if (window.CORDOVA_BUILD) {
-			requests[0].respond(200,
+			requests[0].respond(
+				200,
 				{ "Content-Type": "application/json" },
 				'{ "identity_id":' + identity_id +
 					', "session_id":"123088518049178533"' +
@@ -132,11 +133,13 @@ describe('Integration tests', function() {
 			);
 			if (assert) {
 				assert.equal(requests.length, 2);
-				assert.equal(requests[1].requestBody,
+				assert.equal(
+					requests[1].requestBody,
 					'identity_id=' + identity_id +
-					'&is_referrable=1&sdk=web' + config.version +
-					'&browser_fingerprint_id=' + browser_fingerprint_id +
-					'&app_id=' + browser_fingerprint_id);
+						'&is_referrable=1&sdk=web' + config.version +
+						'&browser_fingerprint_id=' + browser_fingerprint_id +
+						'&app_id=' + browser_fingerprint_id
+				);
 			}
 		}
 	};
@@ -326,9 +329,11 @@ describe('Integration tests', function() {
 				assert.equal(data, undefined);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ }');
+				'{ }'
+			);
 		});
 
 		it('should make two requests and return undefined, with metadata', function(done) {
@@ -339,9 +344,11 @@ describe('Integration tests', function() {
 				assert.equal(data, undefined);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify(testMetadata));
+				JSON.stringify(testMetadata)
+			);
 		});
 	});
 
@@ -353,9 +360,11 @@ describe('Integration tests', function() {
 				assert.equal(data, "https://bnc.lt/l/4manXlk0AJ");
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }');
+				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }'
+			);
 		});
 	});
 
@@ -418,9 +427,11 @@ describe('Integration tests', function() {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify(expectedResponse));
+				JSON.stringify(expectedResponse)
+			);
 		});
 	});
 
@@ -480,9 +491,11 @@ describe('Integration tests', function() {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify(expectedResponse));
+				JSON.stringify(expectedResponse)
+			);
 		});
 	});
 
@@ -495,9 +508,11 @@ describe('Integration tests', function() {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "default":"0" }');
+				'{ "default":"0" }'
+			);
 		});
 	});
 });

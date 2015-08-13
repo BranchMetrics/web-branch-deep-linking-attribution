@@ -119,7 +119,8 @@ describe('Server', function() {
 				function(err) {
 					assert.equal(
 						err.message,
-						'Error in API: ' + requests[0].status, 'correct error message'
+						'Error in API: ' + requests[0].status,
+						'correct error message'
 					);
 				}
 			);
@@ -140,7 +141,8 @@ describe('Server', function() {
 				function(err) {
 					assert.equal(
 						err.message,
-						'Error in API: ' + requests[0].status, 'correct error message'
+						'Error in API: ' + requests[0].status,
+						'correct error message'
 					);
 				}
 			);
@@ -225,12 +227,17 @@ describe('Server', function() {
 
 			it('should fail without is_referrable', function(done) {
 				var assert = testUtils.plan(2, done);
-				server.request(resources.open, testUtils.params({ }), storage, function(err) {
-					assert.equal(
-						err.message,
-						"API request /v1/open missing parameter is_referrable"
-					);
-				});
+				server.request(
+					resources.open,
+					testUtils.params({ }),
+					storage,
+					function(err) {
+						assert.equal(
+							err.message,
+							"API request /v1/open missing parameter is_referrable"
+						);
+					}
+				);
 				assert.equal(requests.length, 0, 'No request made');
 			});
 
@@ -577,7 +584,7 @@ describe('Server', function() {
 				assert.equal(requests.length, 1, 'Request made');
 				assert.equal(
 					requests[0].url,
-						'https://api.branch.io/v1/credits/' + identity_id +
+					'https://api.branch.io/v1/credits/' + identity_id +
 						'?session_id=' + session_id +
 						'&identity_id=' + identity_id +
 						'&sdk=web' + config.version,
@@ -999,7 +1006,8 @@ describe('Server', function() {
 					requests[0].src,
 					'https://api.branch.io/v1/event?&data=' + encodedData +
 						'&callback=branch_callback__' +
-						(server._jsonp_callback_index - 1), 'Endpoint correct'
+						(server._jsonp_callback_index - 1),
+					'Endpoint correct'
 				);
 				requests[0].callback();
 			});
@@ -1104,16 +1112,16 @@ describe('Server', function() {
 						"&identity_id=" + identity_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key,
-					'Endpoint correct');
+					'Endpoint correct'
+				);
 				assert.equal(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(
 					200,
 					{ "Content-Type": "application/json" },
-					'[{' +
-						'"transaction":{' +
-							'"id":"63317099967152399","bucket":"default","type":0,"amount":5' +
-							',"date":"2014-11-18T18:09:59.600Z"},' +
+					'[{"transaction":{' +
+						'"id":"63317099967152399","bucket":"default","type":0,"amount":5' +
+						',"date":"2014-11-18T18:09:59.600Z"},' +
 						'"event":{"name":"web session start","metadata":{}},' +
 						'"referrer":"Branch",' +
 						'"referree":null}]'

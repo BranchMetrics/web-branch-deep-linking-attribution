@@ -217,7 +217,8 @@ describe('Branch', function() {
 						utils.mobileUserAgent() ?
 							'12345' :
 							JSON.parse(sessionStorage.getItem('branch_session')).click_id,
-						'hash session_id saved in session storage');
+						'hash session_id saved in session storage'
+					);
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
