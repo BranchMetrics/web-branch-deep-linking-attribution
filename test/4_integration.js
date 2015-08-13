@@ -88,7 +88,12 @@ describe('Integration tests', function() {
 	};
 
 	var branchInit = function(assert, callback) {
-		branch.init.apply(branch, window.CORDOVA_BUILD ? [ device_fingerprint_id, { isReferrable: true }, callback ] : [ device_fingerprint_id, callback ]);
+		branch.init.apply(
+			branch,
+			window.CORDOVA_BUILD ?
+				[ device_fingerprint_id, { isReferrable: true }, callback ] :
+				[ device_fingerprint_id, callback ]
+		);
 		if (window.CORDOVA_BUILD) {
 			requests[0].respond(200,
 				{ "Content-Type": "application/json" },
@@ -101,13 +106,20 @@ describe('Integration tests', function() {
 			);
 			if (assert) {
 				assert.equal(requests.length, 1);
-				assert.equal(requests[0].requestBody, 'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id);
+				assert.equal(
+					requests[0].requestBody,
+					'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id
+				);
 			}
 		}
 		else {
 			if (assert) {
 				assert.equal(requests.length, 1);
-				assert.equal(requests[0].src, 'https://bnc.lt/_r?sdk=web' + config.version + '&callback=branch_callback__' + jsonpCallback.toString());
+				assert.equal(
+					requests[0].src,
+					'https://bnc.lt/_r?sdk=web' + config.version +
+						'&callback=branch_callback__' + jsonpCallback.toString()
+				);
 			}
 			requests[0].callback(browser_fingerprint_id);
 			requests[1].respond(
@@ -185,7 +197,12 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(1, done);
 			if (testUtils.go("#r:12345")) {
 				branchInit();
-				assert.equal(true, requests[indexOfLastInitRequest(0)].requestBody.indexOf('link_identifier=12345') > -1);
+				assert.equal(
+					true,
+					requests[indexOfLastInitRequest(0)]
+						.requestBody
+						.indexOf('link_identifier=12345') > -1
+				);
 			}
 			else {
 				jsonpCallback--;
@@ -211,9 +228,13 @@ describe('Integration tests', function() {
 				);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "identity_id":' + identity_id + ', "link_click_id":"114750153298026746", "link":"https://bnc.lt/i/4LYQTXE0_k" }');
+				'{ "identity_id":' + identity_id +
+					', "link_click_id":"114750153298026746"' +
+					', "link":"https://bnc.lt/i/4LYQTXE0_k" }'
+			);
 		});
 	});
 
@@ -285,9 +306,15 @@ describe('Integration tests', function() {
 				new_link = "new_link";
 
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				JSON.stringify({ "session_id": new_session_id, "identity_id": new_identity_id, "link": new_link }));
+				JSON.stringify({
+					"session_id": new_session_id,
+					"identity_id": new_identity_id,
+					"link": new_link
+				})
+			);
 		});
 	});
 
@@ -335,15 +362,32 @@ describe('Integration tests', function() {
 	describe('referrals', function() {
 		it('should make three requests and return referral data', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
-			var expectedResponse = { "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } };
+			var expectedResponse = {
+				"install": {
+					"total": 5,
+					"unique": 2
+				},
+				"open": {
+					"total": 4,
+					"unique": 3
+				},
+				"buy": {
+					"total": 7,
+					"unique": 3
+				}
+			};
 			branchInit(assert);
 			branch.referrals(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
-			requests[indexOfLastInitRequest(1)].respond(200,
+			requests[indexOfLastInitRequest(1)].respond(
+				200,
 				{ "Content-Type": "application/json" },
-				'{ "install": { "total": 5, "unique": 2 }, "open": { "total": 4, "unique": 3 }, "buy": { "total": 7, "unique": 3 } }');
+				'{ "install": { "total": 5, "unique": 2 }' +
+					', "open": { "total": 4, "unique": 3 }' +
+					', "buy": { "total": 7, "unique": 3 } }'
+			);
 		});
 	});
 
