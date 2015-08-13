@@ -68,7 +68,11 @@ describe('utils', function() {
 				data: "{}"
 			};
 			var cleanedLinkData = utils.cleanLinkData(linkData);
-			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Accept undefined field "data"');
+			assert.deepEqual(
+				cleanedLinkData,
+				expectedCleanedLinkData,
+				'Accept undefined field "data"'
+			);
 		});
 
 		it('should stringify field "data"', function() {
@@ -116,19 +120,34 @@ describe('utils', function() {
 				source: "web-sdk"
 			};
 			var cleanedLinkData = utils.cleanLinkData((utils.cleanLinkData(linkData)));
-			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Refrain from over-stringifying field "data"');
+			assert.deepEqual(
+				cleanedLinkData,
+				expectedCleanedLinkData,
+				'Refrain from over-stringifying field "data"'
+			);
 		});
 	});
 
 	describe('message', function() {
 		it('should produce a missing param message', function() {
 			var message = utils.message(utils.messages.missingParam, [ 'endpoint', 'param' ]);
-			assert.equal('API request endpoint missing parameter param', message, 'Expected missing param message produced');
+			assert.equal(
+				'API request endpoint missing parameter param',
+				message,
+				'Expected missing param message produced'
+			);
 		});
 
 		it('should produce an invalid param type message', function() {
-			var message = utils.message(utils.messages.invalidType, [ 'endpoint', 'param', 'type' ]);
-			assert.equal('API request endpoint, parameter param is not type', message, 'Expected invalid param type message produced');
+			var message = utils.message(
+				utils.messages.invalidType,
+				[ 'endpoint', 'param', 'type' ]
+			);
+			assert.equal(
+				'API request endpoint, parameter param is not type',
+				message,
+				'Expected invalid param type message produced'
+			);
 		});
 
 		it('should produce a Branch SDK non init message', function() {
@@ -138,7 +157,11 @@ describe('utils', function() {
 
 		it('should produce a Branch SDK already init message', function() {
 			var message = utils.message(utils.messages.existingInit);
-			assert.equal('Branch SDK already initilized', message, 'Branch SDK already initialized');
+			assert.equal(
+				'Branch SDK already initilized',
+				message,
+				'Branch SDK already initialized'
+			);
 		});
 
 		it('should produce a missing app id', function() {
@@ -148,7 +171,11 @@ describe('utils', function() {
 
 		it('should produce a call branch init first', function() {
 			var message = utils.message(utils.messages.callBranchInitFirst);
-			assert.equal('Branch.init must be called first', message, 'Branch must be called first message');
+			assert.equal(
+				'Branch.init must be called first',
+				message,
+				'Branch must be called first message'
+			);
 		});
 
 		it('should produce a timeout message', function() {

@@ -37,10 +37,15 @@ Server.prototype.serializeObject = function(obj, prefix) {
 		for (var prop in obj) {
 			if (obj.hasOwnProperty(prop)) {
 				if (obj[prop] instanceof Array || typeof obj[prop] == 'object') {
-					pairs.push(this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop));
+					pairs.push(
+						this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
+					);
 				}
 				else {
-					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) + '=' + encodeURIComponent(obj[prop]));
+					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
+						'=' +
+						encodeURIComponent(obj[prop])
+					);
 				}
 			}
 		}
@@ -140,7 +145,9 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
-		postData = (requestMethod == 'POST') ? encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) : "";
+		postData = (requestMethod == 'POST') ?
+			encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
+			"";
 
 	var timeout_trigger = window.setTimeout(function() {
 		window[callbackString] = function() { };
@@ -152,7 +159,11 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 		callback(null, data);
 	};
 
-	this.createScript(requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') + (postData ? postPrefix + postData : '') + (requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') + '&callback=' + callbackString);
+	this.createScript(
+		requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') +
+		(postData ? postPrefix + postData : '') +
+		(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
+		'&callback=' + callbackString);
 };
 
 /**
@@ -163,7 +174,11 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {function(?Error,*=,?=)=} callback
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
-	var req = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+	var req = TITANIUM_BUILD ?
+		Ti.Network.createHTTPClient() :
+		(window.XMLHttpRequest ?
+			new XMLHttpRequest() :
+			new ActiveXObject("Microsoft.XMLHTTP"));
 	req.ontimeout = function() {
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
@@ -191,7 +206,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 			else if (req.status === 402) {
 				callback(new Error('Not enough credits to redeem.'), null, req.status);
 			}
-			else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
+			else if (req.status.toString().substring(0, 1) === "4" ||
+					req.status.toString().substring(0, 1) === "5") {
 				callback(new Error('Error in API: ' + req.status), null, req.status);
 			}
 		};
@@ -210,7 +226,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 				else if (req.status === 402) {
 					callback(new Error('Not enough credits to redeem.'), null, req.status);
 				}
-				else if (req.status.toString().substring(0, 1) === "4" || req.status.toString().substring(0, 1) === "5") {
+				else if (req.status.toString().substring(0, 1) === "4" ||
+						req.status.toString().substring(0, 1) === "5") {
 					callback(new Error('Error in API: ' + req.status), null, req.status);
 				}
 			}

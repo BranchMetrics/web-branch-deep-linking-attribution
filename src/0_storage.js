@@ -1,6 +1,7 @@
 /**
  * A custom storage abstraction class that implements:
- * sessionStorage, localStorage, cookies, titanium storage, and a plain old javascript object as a fallback
+ * sessionStorage, localStorage, cookies, titanium storage,
+ * and a plain old javascript object as a fallback
  */
 
 goog.provide('storage');
@@ -14,12 +15,14 @@ var COOKIE_DAYS = 365;
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
-/** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)), remove:function(string), clear:function(), isEnabled:function()}} */
+/** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)),
+ * remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
 
 if (TITANIUM_BUILD) {
-	/** @typedef {{listProperties: function(), setString: function({string}, {string}), getString: function({string})}}*/
-	Ti.App.Properties;
+	/** @typedef {{listProperties: function(), setString: function({string}, {string}),
+	 * getString: function({string})}}*/
+	Ti.App.Properties; // jshint ignore:line
 }
 
 /**
@@ -38,13 +41,22 @@ var BranchStorage = function(storageMethods) {
 };
 
 var prefix = function(key) {
-	return key == "branch_session" || key == "branch_session_first" ? key : BRANCH_KEY_PREFIX + key;
+	return (key == "branch_session" || key == "branch_session_first") ?
+		key :
+		BRANCH_KEY_PREFIX + key;
 };
-var trimPrefix = function(key) { return key.replace(BRANCH_KEY_PREFIX, ""); };
+
+var trimPrefix = function(key) {
+	return key.replace(BRANCH_KEY_PREFIX, "");
+};
 
 var retrieveValue = function(value) {
-	if (value == "true") { return true; }
-	else if (value == "false") { return false; }
+	if (value == "true") {
+		return true;
+	}
+	else if (value == "false") {
+		return false;
+	}
 	return value;
 };
 
@@ -55,13 +67,21 @@ var webStorage = function(perm) {
 			var allKeyValues = null;
 			for (var key in storageMethod) {
 				if (key.indexOf(BRANCH_KEY_PREFIX) === 0) {
-					if (allKeyValues === null) { allKeyValues = { }; }
+					if (allKeyValues === null) {
+						allKeyValues = {
+						}; }
 					allKeyValues[trimPrefix(key)] = retrieveValue(storageMethod.getItem(key));
 				}
 			}
 			return allKeyValues;
 		},
-		get: function(key, perm_override) { return retrieveValue(perm_override ? localStorage.getItem(prefix(key)) : storageMethod.getItem(prefix(key))); },
+		get: function(key, perm_override) {
+			return retrieveValue(
+				perm_override ?
+					localStorage.getItem(prefix(key)) :
+					storageMethod.getItem(prefix(key))
+			);
+		},
 		set: function(key, value, perm_override) {
 			if (perm_override) {
 				localStorage.setItem(prefix(key), value);
@@ -70,10 +90,14 @@ var webStorage = function(perm) {
 				storageMethod.setItem(prefix(key), value);
 			}
 		},
-		remove: function(key) { storageMethod.removeItem(prefix(key)); },
+		remove: function(key) {
+			storageMethod.removeItem(prefix(key));
+		},
 		clear: function() {
 			Object.keys(storageMethod).forEach(function(item) {
-				if (item.indexOf(BRANCH_KEY_PREFIX) === 0) { storageMethod.removeItem(item); }
+				if (item.indexOf(BRANCH_KEY_PREFIX) === 0) {
+					storageMethod.removeItem(item);
+				}
 			});
 		},
 		isEnabled: function() {
@@ -106,7 +130,8 @@ var cookies = function(perm) {
 			var date = new Date();
 			console.log(date);
 			date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
-			expires = "; branch_expiration_date=" + date.toGMTString() + "; expires=" + date.toGMTString();
+			expires = "; branch_expiration_date=" + date.toGMTString() +
+				"; expires=" + date.toGMTString();
 		}
 		document.cookie = key + "=" + value + expires + "; path=/";
 	};
@@ -130,11 +155,15 @@ var cookies = function(perm) {
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i];
 				cookie = cookie.substring(1, cookie.length);
-				if (cookie.indexOf(keyEQ) === 0) { return retrieveValue(cookie.substring(keyEQ.length, cookie.length)); }
+				if (cookie.indexOf(keyEQ) === 0) {
+					return retrieveValue(cookie.substring(keyEQ.length, cookie.length));
+				}
 			}
 			return null;
 		},
-		set: function(key, value) { setCookie(prefix(key), value); },
+		set: function(key, value) {
+			setCookie(prefix(key), value);
+		},
 		remove: function(key) {
 			var expires = "";
 			document.cookie = prefix(key) + "=; expires=" + expires + "; path=/";
@@ -148,12 +177,18 @@ var cookies = function(perm) {
 				var cookie = cookieArray[i];
 				cookie = cookie.substring(1, cookie.length);
 				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
-					if (!perm && cookie.indexOf("branch_expiration_date=") == -1) { deleteCookie(cookie); }
-					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) { deleteCookie(cookie); }
+					if (!perm && cookie.indexOf("branch_expiration_date=") == -1) {
+						deleteCookie(cookie);
+					}
+					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) {
+						deleteCookie(cookie);
+					}
 				}
 			}
 		},
-		isEnabled: function() { return navigator.cookieEnabled; }
+		isEnabled: function() {
+			return navigator.cookieEnabled;
+		}
 	};
 };
 
@@ -167,12 +202,24 @@ BranchStorage.prototype['permcookie'] = function() {
 
 /** @type storage */
 BranchStorage.prototype['pojo'] = {
-	getAll: function() { return this._store; },
-	get: function(key) { return typeof this._store[key] != 'undefined' ? this._store[key] : null; },
-	set: function(key, value) { this._store[key] = value; },
-	remove: function(key) { delete this._store[key]; },
-	clear: function() { this._store = { }; },
-	isEnabled: function() { return true; }
+	getAll: function() {
+		return this._store;
+	},
+	get: function(key) {
+		return typeof this._store[key] != 'undefined' ? this._store[key] : null;
+	},
+	set: function(key, value) {
+		this._store[key] = value;
+	},
+	remove: function(key) {
+		delete this._store[key];
+	},
+	clear: function() {
+		this._store = { };
+	},
+	isEnabled: function() {
+		return true;
+	}
 };
 
 /** @type storage */
@@ -187,9 +234,15 @@ BranchStorage.prototype['titanium'] = {
 		}
 		return returnObject;
 	},
-	get: function(key) { retrieveValue(Ti.App.Properties.getString(prefix(key))); },
-	set: function(key, value) { Ti.App.Properties.setString(prefix(key), value); },
-	remove: function(key) { Ti.App.Properties.setString(prefix(key), ""); },
+	get: function(key) {
+		retrieveValue(Ti.App.Properties.getString(prefix(key)));
+	},
+	set: function(key, value) {
+		Ti.App.Properties.setString(prefix(key), value);
+	},
+	remove: function(key) {
+		Ti.App.Properties.setString(prefix(key), "");
+	},
 	clear: function() {
 		/** @lends {Array} */
 		var props = Ti.App.Properties.listProperties();

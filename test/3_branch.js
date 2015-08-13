@@ -39,7 +39,14 @@ describe('Branch', function() {
 		if (runInit) {
 			branch.init(branch_sample_key);
 			requests[0].callback(null, browser_fingerprint_id);
-			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+			requests[1].callback(
+				null,
+				{
+					session_id: session_id,
+					browser_fingerprint_id: browser_fingerprint_id,
+					identity_id: identity_id
+				}
+			);
 			requests = [];
 		}
 
@@ -48,7 +55,8 @@ describe('Branch', function() {
 
 	function basicTests(call, params) {
 		it('should fail if branch not initialized', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(params.length * 1 + 1, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(params.length * 1 + 1, done);
 
 			function basicTest(param) {
 				var p = testUtils.nulls(param);
@@ -93,7 +101,14 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "sdk": "web" + config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
+			assert.deepEqual(
+				requests[0].obj,
+				{
+					"sdk": "web" + config.version,
+					branch_key: branch_sample_key
+				},
+				'Request params to _r correct'
+			);
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
@@ -129,7 +144,14 @@ describe('Branch', function() {
 			requests[1].callback(null, expectedResponse);
 
 			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
-			assert.deepEqual(requests[0].obj, { "sdk": "web" + config.version, branch_key: branch_sample_key }, 'Request params to _r correct');
+			assert.deepEqual(
+				requests[0].obj,
+				{
+					"sdk": "web" + config.version,
+					branch_key: branch_sample_key
+				},
+				'Request params to _r correct'
+			);
 
 			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
 			assert.deepEqual(requests[1].obj, {
@@ -149,14 +171,23 @@ describe('Branch', function() {
 			branch.init(branch_sample_key);
 
 			requests[0].callback(null, browser_fingerprint_id);
-			requests[1].callback(null, { session_id: session_id, browser_fingerprint_id: browser_fingerprint_id, identity_id: identity_id });
+			requests[1].callback(
+				null,
+				{
+					session_id: session_id,
+					browser_fingerprint_id: browser_fingerprint_id,
+					identity_id: identity_id
+				}
+			);
 
 			assert(true, 'Succeeded');
 		});
 
 		it('should return invalid app id error', function(done) {
 			var branch = initBranch(false), assert = testUtils.plan(1, done);
-			branch.init(branch_sample_key, function(err) { assert.equal(err.message, 'Invalid app id'); });
+			branch.init(branch_sample_key, function(err) {
+				assert.equal(err.message, 'Invalid app id');
+			});
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(new Error('Invalid app id'));
@@ -176,8 +207,18 @@ describe('Branch', function() {
 				var branch = initBranch(false), assert = testUtils.plan(3, done);
 
 				branch.init(branch_sample_key, function(err, data) {
-					assert.equal('12345', JSON.parse(localStorage.getItem('branch_session_first')).click_id, 'hash session_id stored in local storage');
-					assert.equal('12345', utils.mobileUserAgent() ? '12345' : JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'hash session_id saved in session storage');
+					assert.equal(
+						'12345',
+						JSON.parse(localStorage.getItem('branch_session_first')).click_id,
+						'hash session_id stored in local storage'
+					);
+					assert.equal(
+						'12345',
+						utils.mobileUserAgent() ?
+							'12345' :
+							JSON.parse(sessionStorage.getItem('branch_session')).click_id,
+						'hash session_id saved in session storage'
+					);
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
@@ -199,8 +240,18 @@ describe('Branch', function() {
 				var branch = initBranch(false), assert = testUtils.plan(2, done);
 
 				branch.init(branch_sample_key, function(err, data) {
-					assert.equal('67890', JSON.parse(localStorage.getItem('branch_session_first')).click_id, 'get param match id stored in local storage');
-					assert.equal('67890', utils.mobileUserAgent() ? '67890' : JSON.parse(sessionStorage.getItem('branch_session')).click_id, 'get param match id saved in session storage');
+					assert.equal(
+						'67890',
+						JSON.parse(localStorage.getItem('branch_session_first')).click_id,
+						'get param match id stored in local storage'
+					);
+					assert.equal(
+						'67890',
+						utils.mobileUserAgent() ?
+							'67890' :
+							JSON.parse(sessionStorage.getItem('branch_session')).click_id,
+						'get param match id saved in session storage'
+					);
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
@@ -268,7 +319,10 @@ describe('Branch', function() {
 	describe('setIdentity', function() {
 		basicTests('setIdentity', [ 1 ]);
 
-		var expectedRequest = testUtils.params({ "identity": "test_identity" }, [ 'browser_fingerprint_id' ]);
+		var expectedRequest = testUtils.params(
+			{ "identity": "test_identity" },
+			[ 'browser_fingerprint_id' ]
+		);
 		var expectedResponse = {
 			identity_id: '12345',
 			link: 'url',
@@ -292,7 +346,10 @@ describe('Branch', function() {
 	describe('setIdentity accepts empty data', function() {
 		basicTests('setIdentity', [ 1 ]);
 
-		var expectedRequest = testUtils.params({ "identity": "test_identity" }, [ 'browser_fingerprint_id' ]);
+		var expectedRequest = testUtils.params(
+			{ "identity": "test_identity" },
+			[ 'browser_fingerprint_id' ]
+		);
 		var expectedResponse = { };
 		it('should call api with identity', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(4, done);
@@ -373,30 +430,48 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+				'All params sent'
+			);
 		});
 
-		it('should overwrite existing session_id, sessionLink, and identity_id\'s', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(6, done);
-			branch.logout(function(err) {
-				assert(!err, 'No error');
-			});
+		it(
+			'should overwrite existing session_id, sessionLink, and identity_id\'s',
+			function(done) {
+				var branch = initBranch(true), assert = testUtils.plan(6, done);
+				branch.logout(function(err) {
+					assert(!err, 'No error');
+				});
 
-			assert.equal(requests.length, 1, 'Request made');
+				assert.equal(requests.length, 1, 'Request made');
 
-			var original_session_id = branch.session_id,
-				original_identity_id = branch.identity_id,
-				original_link = branch.sessionLink;
-			var new_session_id = "new_session",
-				new_identity_id = "new_id",
-				new_link = "new_link";
+				var original_session_id = branch.session_id,
+					original_identity_id = branch.identity_id,
+					original_link = branch.sessionLink;
+				var new_session_id = "new_session",
+					new_identity_id = "new_id",
+					new_link = "new_link";
 
-			requests[0].callback(null, { "identity_id": new_identity_id, "session_id": new_session_id, "link": new_link });
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
-			assert.equal(branch.session_id, new_session_id, "branch session was replaced");
-			assert.equal(branch.identity_id, new_identity_id, "branch identity was replaced");
-			assert.equal(branch.sessionLink, new_link, "link was replaced");
-		});
+				requests[0].callback(
+					null,
+					{
+						"identity_id": new_identity_id,
+						"session_id": new_session_id,
+						"link": new_link
+					}
+				);
+				assert.deepEqual(
+					requests[0].obj,
+					testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+					'All params sent'
+				);
+				assert.equal(branch.session_id, new_session_id, "branch session was replaced");
+				assert.equal(branch.identity_id, new_identity_id, "branch identity was replaced");
+				assert.equal(branch.sessionLink, new_link, "link was replaced");
+			}
+		);
 	});
 
 	describe('link', function() {
@@ -454,7 +529,11 @@ describe('Branch', function() {
 			var branch = initBranch(true), assert = testUtils.plan(2, done);
 			branch.link(expectedRequest(false, false, '#r:12345'));
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(JSON.parse(requests[0].obj['data'])['$desktop_url'].indexOf('#r:12345'), -1, 'web-sdk source set');
+			assert.equal(
+				JSON.parse(requests[0].obj['data'])['$desktop_url'].indexOf('#r:12345'),
+				-1,
+				'web-sdk source set'
+			);
 		});
 	});
 
@@ -540,7 +619,11 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+				'All params sent'
+			);
 		});
 	});
 
@@ -565,7 +648,11 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params(options, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params(options, [ 'browser_fingerprint_id' ]),
+				'All params sent'
+			);
 		});
 	});
 
@@ -583,7 +670,11 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]),
+				'All params sent'
+			);
 		});
 	});
 
@@ -601,7 +692,11 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]),
+				'All params sent'
+			);
 		});
 	});
 
@@ -623,7 +718,11 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params({ }, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+				'All params sent'
+			);
 		});
 	});
 
@@ -663,7 +762,11 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, testUtils.params(options, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params(options, [ 'browser_fingerprint_id' ]),
+				'All params sent'
+			);
 		});
 	});
 
@@ -678,7 +781,14 @@ describe('Branch', function() {
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
-			assert.deepEqual(requests[0].obj, testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'browser_fingerprint_id' ]), 'All params sent');
+			assert.deepEqual(
+				requests[0].obj,
+				testUtils.params(
+					{ "amount": 1, "bucket": "testbucket" },
+					[ 'browser_fingerprint_id' ]
+				),
+				'All params sent'
+			);
 		});
 	});
 
@@ -703,7 +813,11 @@ describe('Branch', function() {
 
 			branch.addListener(listener);
 			branch._publishEvent('test_event');
-			assert.equal(branch._listeners.length, 1, 'one listener listening with no event specified');
+			assert.equal(
+				branch._listeners.length,
+				1,
+				'one listener listening with no event specified'
+			);
 			assert.equal(listenerFired, 1, 'observer fired once');
 		});
 	});
@@ -725,7 +839,15 @@ describe('Branch', function() {
 			requests[0].callback(null, browser_fingerprint_id);
 
 			assert.equal(requests[1].resource.endpoint, '/v1/open');
-			requests[1].callback(null, { "branch_key": branch_sample_key, "link_identifier": undefined, "is_referrable": 1, "browser_fingerprint_id": browser_fingerprint_id });
+			requests[1].callback(
+				null,
+				{
+					"branch_key": branch_sample_key,
+					"link_identifier": undefined,
+					"is_referrable": 1,
+					"browser_fingerprint_id": browser_fingerprint_id
+				}
+			);
 
 			assert.equal(requests[2].resource.endpoint, '/v1/track');
 			requests[2].callback(null, {});

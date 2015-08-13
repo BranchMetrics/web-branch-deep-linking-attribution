@@ -2,7 +2,10 @@ goog.provide('banner_utils');
 goog.require('storage'); // jshint unused:false
 goog.require('utils');
 
-/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string, downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean, showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean, make_new_link:boolean}} */
+/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string,
+ * downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean,
+ * showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean,
+ * make_new_link:boolean}} */
 banner_utils.options; // jshint ignore:line
 
 // UI Animation transition speed in ms.
@@ -40,7 +43,9 @@ banner_utils.hasClass = function(element, className) {
 };
 
 banner_utils.addClass = function(element, className) {
-	if (!banner_utils.hasClass(element, className)) { element.className += " " + className; }
+	if (!banner_utils.hasClass(element, className)) {
+		element.className += " " + className;
+	}
 };
 
 banner_utils.removeClass = function(element, className) {
@@ -56,27 +61,44 @@ banner_utils.getDate = function(days) {
 };
 
 banner_utils.getBodyStyle = function(style) {
-	if (document.body.currentStyle) { return document.body.currentStyle[utils.snakeToCamel(style)]; }
+	if (document.body.currentStyle) {
+		return document.body.currentStyle[utils.snakeToCamel(style)];
+	}
 	else { return window.getComputedStyle(document.body).getPropertyValue(style); }
 };
 
 banner_utils.addCSSLengths  = function(length1, length2) {
 	var convertToUnitlessPixels = function(input) {
-		if (!input) { return 0; }
+		if (!input) {
+			return 0;
+		}
 		var unit = input.replace(/[0-9,\.]/g, ''),
 			inputArray = input.match(/\d+/g),
 			value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10),
-			vw = function() { return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100; },
-			vh = function() { return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100; };
+			vw = function() {
+				return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
+			},
+			vh = function() {
+				return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) /
+					100;
+			};
 		return parseInt({
 			"px": function(value) { return value; },
 			"em": function(value) {
-				if (document.body.currentStyle) { return value * convertToUnitlessPixels(document.body.currentStyle.fontSize); }
+				if (document.body.currentStyle) {
+					return value * convertToUnitlessPixels(document.body.currentStyle.fontSize);
+				}
 				else { return value * parseFloat(window.getComputedStyle(document.body).fontSize); }
 			},
 			"rem": function(value) {
-				if (document.documentElement.currentStyle) { return value * convertToUnitlessPixels(document.documentElement.currentStyle.fontSize); }
-				else { return value * parseFloat(window.getComputedStyle(document.documentElement).fontSize); }
+				if (document.documentElement.currentStyle) {
+					return value *
+						convertToUnitlessPixels(document.documentElement.currentStyle.fontSize);
+				}
+				else {
+					return value *
+						parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+				}
 			},
 			"vw": function(value) { return value * vw(); },
 			"vh": function(value) { return value * vh(); },
@@ -101,7 +123,9 @@ banner_utils.shouldAppend = function(storage, options) {
 	else { hideBanner = !hideBanner; }
 
 	var forgetHide = options.forgetHide;
-	if (typeof forgetHide == 'number') { forgetHide = false; }
+	if (typeof forgetHide == 'number') {
+		forgetHide = false;
+	}
 
 	return !document.getElementById('branch-banner') &&
 		!document.getElementById('branch-banner-iframe') &&
@@ -110,6 +134,7 @@ banner_utils.shouldAppend = function(storage, options) {
 			(options.showDesktop && !utils.mobileUserAgent()) ||
 			(options.showAndroid && utils.mobileUserAgent() == 'android') ||
 			(options.showiPad && utils.mobileUserAgent() == 'ipad') ||
-			(utils.mobileUserAgent() != 'ipad' && options.showiOS && utils.mobileUserAgent() == 'ios')
+			(utils.mobileUserAgent() != 'ipad' && options.showiOS &&
+				utils.mobileUserAgent() == 'ios')
 		);
 };
