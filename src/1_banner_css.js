@@ -60,13 +60,23 @@ banner_css.desktop =
 		' -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); }' +
 		' 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg);' +
 		' -ms-transform: rotate(360deg); } }\n' +
-	'@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n' +
-	'#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n';
+	'@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg);' +
+		' -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); }' +
+		' 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg);' +
+		' -ms-transform: rotate(360deg); } }\n' +
+	'#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite;' +
+		' animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out;' +
+		' border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%;' +
+		' border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n';
 
 banner_css.nonie =
-	'#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n' +
-	'@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n' +
-	'@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n';
+	'#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625;' +
+		' stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards;' +
+		' animation: dash 2s ease-out forwards; }\n' +
+	'@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; }' +
+		' 100% { stroke-dashoffset: 0; } }\n' +
+	'@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; }' +
+		' 100% { stroke-dashoffset: 0; } }\n';
 
 banner_css.ie = '#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n';
 
@@ -76,10 +86,14 @@ banner_css.mobile =
 	'#branch-banner .content .left .details .title { font-size: 12px; }\n' +
 	'#branch-banner a { text-decoration: none; }\n' +
 	'#branch-mobile-action { white-space: nowrap; }\n' +
-	'#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n' +
-	'@media only screen and (min-device-width: 320px) and (max-device-width: 350px) { #branch-banner .content .right { max-width: 120px; } }\n' +
-	'@media only screen and (min-device-width: 351px) and (max-device-width: 400px) and (orientation: landscape) { #branch-banner .content .right { max-width: 150px; } }\n' +
-	'@media only screen and (min-device-width: 401px) and (max-device-width: 480px) and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n';
+	'#branch-banner .content .left .details .description { font-size: 11px;' +
+		' font-weight: normal; }\n' +
+	'@media only screen and (min-device-width: 320px) and (max-device-width: 350px) {' +
+		' #branch-banner .content .right { max-width: 120px; } }\n' +
+	'@media only screen and (min-device-width: 351px) and (max-device-width: 400px)' +
+		' and (orientation: landscape) { #branch-banner .content .right { max-width: 150px; } }\n' +
+	'@media only screen and (min-device-width: 401px) and (max-device-width: 480px)' +
+		' and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n';
 
 banner_css.ios =
 	'#branch-banner-close { margin-left: 4px; }\n' +
@@ -87,8 +101,11 @@ banner_css.ios =
 
 // Styles thanks to https://github.com/asianmack/play-store-smartbanner/blob/master/smartbanner.html
 banner_css.android =
-	'#branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px; border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; }\n' +
-	'#branch-mobile-action { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n' +
+	'#branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px;' +
+		' border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; }\n' +
+	'#branch-mobile-action { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639;' +
+		' padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff;' +
+		' font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n' +
 	'#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n';
 
 banner_css.iframe =
@@ -97,7 +114,8 @@ banner_css.iframe =
 		's ease; transition: all 0' +
 		(banner_utils.animationSpeed * 1.5 / 1000) +
 		's ease; }\n' +
-	'#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: ' +
+	'#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%;' +
+		' left: 0; right: 0; border: 0; height: ' +
 		banner_utils.bannerHeight +
 		'; z-index: 99999; -webkit-transition: all ' +
 		(banner_utils.animationSpeed / 1000) +
@@ -147,7 +165,9 @@ banner_css.css = function(options, element) {
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
 		iFrameCSS.innerHTML = banner_css.iframe +
-			(utils.mobileUserAgent() ? banner_css.iframe_position(options.mobileSticky, options.position) : banner_css.iframe_position(options.desktopSticky, options.position));
+			(utils.mobileUserAgent() ?
+				banner_css.iframe_position(options.mobileSticky, options.position) :
+				banner_css.iframe_position(options.desktopSticky, options.position));
 		document.head.appendChild(iFrameCSS);
 	}
 
