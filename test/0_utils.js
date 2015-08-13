@@ -32,31 +32,30 @@ describe('utils', function() {
 	});
 
 	describe('whiteListSessionData', function() {
-		it('should filter unwanted params', function() {
+		it('should remove unwanted params', function() {
 			var data = {
-				"data": {
-					"sample": "data"
+				"data": "string",
+				"data_parsed": {
+					"key": "value"
 				},
-				"referring_identity": "12345",
-				"identity": "67890",
 				"has_app": true,
-				"unwanted": "param",
-				"referring_link": null
+				"identity": "67890",
+				"referring_identity": "12345",
+				"referring_link": null,
+				"unwanted": "param"
 			};
 			var whiteListedData = utils.whiteListSessionData(data);
-			delete data["unwanted"];
-			assert.deepEqual(whiteListedData, data, 'Filtered unwanted param');
+			delete data.unwanted;
+			assert.deepEqual(whiteListedData, data, 'Unwanted param should be removed');
 		});
 
 		it('should make missing params null', function() {
 			var data = {
-				"data": {
-					"sample": "data"
-				},
-				"referring_identity": "12345",
-				"identity": "67890"
+				"data": "string",
+				"identity": "67890",
+				"referring_identity": "12345"
 			};
-			assert.equal(null, data["has_app"], 'Make has_app null');
+			assert.equal(null, data.has_app, 'has_app should be null');
 		});
 	});
 
