@@ -78,11 +78,12 @@ utils.message = function(message, params) {
  */
 utils.whiteListSessionData = function(data) {
 	return {
-		'data': data['data'] || null,
-		'referring_identity': data['referring_identity'] || null,
-		'identity': data['identity'] || null,
-		'has_app': data['has_app'] || null,
-		'referring_link': data['referring_link'] || null
+		'data': ('data' in data) ? data.data : null,
+		'data_parsed': ('data_parsed' in data) ? data.data_parsed : null,
+		'referring_identity': ('referring_identity' in data) ? data.referring_identity : null,
+		'identity': ('identity' in data) ? data.identity : null,
+		'has_app': ('has_app' in data) ? data.has_app : null,
+		'referring_link': ('referring_link' in data) ? data.referring_link : null
 	};
 };
 
