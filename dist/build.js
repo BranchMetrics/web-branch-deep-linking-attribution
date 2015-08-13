@@ -997,7 +997,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, shouldAppend:function(a, b) {
   var c = a.get("hideBanner"), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
   "number" == typeof d && (d = !1);
-  return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" == utils.mobileUserAgent() || b.showiPad && "ipad" == utils.mobileUserAgent() || "ipad" != utils.mobileUserAgent() && b.showiOS && "ios" == utils.mobileUserAgent());
+  return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" == utils.mobileUserAgent() || b.showiPad && "ipad" == utils.mobileUserAgent() || b.showiOS && "ios" == utils.mobileUserAgent());
 }};
 // Input 8
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {

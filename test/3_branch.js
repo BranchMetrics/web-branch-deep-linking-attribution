@@ -56,7 +56,7 @@ describe('Branch', function() {
 	function basicTests(call, params) {
 		it('should fail if branch not initialized', function(done) {
 			var branch = initBranch(false);
-			var assert = testUtils.plan(params.length * 1 + 1, done);
+			var assert = testUtils.plan(params.length + 1, done);
 
 			function basicTest(param) {
 				var p = testUtils.nulls(param);
