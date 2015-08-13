@@ -128,7 +128,10 @@ banner_utils.shouldAppend = function(storage, options) {
 		hideBanner = !hideBanner;
 	}
 
-	var forgetHide = options.forgetHide && (typeof forgetHide == 'number');
+	var forgetHide = options.forgetHide;
+	if (typeof forgetHide == 'number') {
+		forgetHide = false;
+	}
 
 	return !document.getElementById('branch-banner') &&
 		!document.getElementById('branch-banner-iframe') &&
