@@ -37,10 +37,15 @@ Server.prototype.serializeObject = function(obj, prefix) {
 		for (var prop in obj) {
 			if (obj.hasOwnProperty(prop)) {
 				if (obj[prop] instanceof Array || typeof obj[prop] == 'object') {
-					pairs.push(this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop));
+					pairs.push(
+						this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
+					);
 				}
 				else {
-					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) + '=' + encodeURIComponent(obj[prop]));
+					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
+						'=' +
+						encodeURIComponent(obj[prop])
+					);
 				}
 			}
 		}
