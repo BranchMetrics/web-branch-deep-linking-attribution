@@ -468,7 +468,9 @@ assert.doesNotThrow = function(block, /*optional*/message) {
   _throws.apply(this, [false].concat(pSlice.call(arguments)));
 };
 
-assert.ifError = function(err) { if (err) {throw err;}};
+assert.ifError = function(err) {
+	if (err) {throw err;}
+};
 
 // ===================================================================================================
 
@@ -501,15 +503,21 @@ testUtils.params = function(extra, without) {
 
 testUtils.nulls = function(n) {
 	var p = [];
-	for (var k = 0; k < n; k++) { p.push(null); }
+	for (var k = 0; k < n; k++) {
+		p.push(null);
+	}
 	return p;
 };
 testUtils.after = function(n, done) {
 	var remaining = n;
 	return function() {
 		remaining--;
-		if (remaining == 0) { done(); }
-		if (remaining < 0) { console.log('ERROR!!! More calls than planned'); }
+		if (remaining == 0) {
+			done();
+		}
+		if (remaining < 0) {
+			console.log('ERROR!!! More calls than planned');
+		}
 	};
 };
 var assertions = [ 'fail', 'equal', 'notEqual', 'deepEqual', 'notDeepEqual', 'strictEqual', 'notStrinctEqual', 'throws', 'doesNotThrow', 'ifError' ];
@@ -525,7 +533,9 @@ testUtils.plan = function(n, done) {
 			d();
 		};
 	}
-	for (var i = 0; i < assertions.length; i++) { create(assertions[i]) }
+	for (var i = 0; i < assertions.length; i++) {
+		create(assertions[i])
+	}
 
 	ret.done = function(err) {
 		return ret(!err);
@@ -537,7 +547,9 @@ testUtils.plan = function(n, done) {
 testUtils.unplanned = function() { return assert; };
 
 testUtils.go = function(suffix) {
-	if (!window.history.pushState) { return false; }
+	if (!window.history.pushState) {
+		return false;
+	}
 	var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
 	if (new_location != window.location.toString()) {
 		window.history.pushState({}, '', new_location); // Simply not possible in IE 9
