@@ -138,7 +138,7 @@
       };
       var getInputVal = function(inputID) {
         var inputElement = $(inputID);
-        if (inputElement.val() == '' || inputElement.val() == false) {
+        if (inputElement.val() === '' || !inputElement.val()) {
           inputElement.parent().addClass('has-error');
           return '';
         }

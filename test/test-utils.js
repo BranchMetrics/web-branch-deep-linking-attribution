@@ -39,7 +39,7 @@
 // Object.create compatible in IE
 var create = Object.create || function(p) {
   if (!p) throw Error('no type');
-  function f() {};
+  function f() {}
   f.prototype = p;
   return new f();
 };
@@ -67,16 +67,13 @@ var util = {
 	return arg === null;
   },
   isNullOrUndefined: function(arg) {
-	return arg == null;
+	return (typeof arg === 'undefined') || (arg === null);
   },
   isNumber: function(arg) {
 	return typeof arg === 'number';
   },
   isString: function(arg) {
 	return typeof arg === 'string';
-  },
-  isSymbol: function(arg) {
-	return typeof arg === 'symbol';
   },
   isUndefined: function(arg) {
 	return arg === void 0;
@@ -96,14 +93,6 @@ var util = {
   },
   isFunction: function(arg) {
 	return typeof arg === 'function';
-  },
-  isPrimitive: function(arg) {
-	return arg === null ||
-	  typeof arg === 'boolean' ||
-	  typeof arg === 'number' ||
-	  typeof arg === 'string' ||
-	  typeof arg === 'symbol' ||  // ES6 symbol
-	  typeof arg === 'undefined';
   },
   objectToString: function(o) {
 	return Object.prototype.toString.call(o);
@@ -324,7 +313,7 @@ function _deepEqual(actual, expected) {
 }
 
 var isArguments = function(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
+  return Object.prototype.toString.call(object) === '[object Arguments]';
 };
 
 (function() {
@@ -414,7 +403,7 @@ function expectedException(actual, expected) {
 	return false;
   }
 
-  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+  if (Object.prototype.toString.call(expected) === '[object RegExp]') {
 	return expected.test(actual);
   } else if (actual instanceof expected) {
 	return true;
@@ -512,7 +501,7 @@ testUtils.after = function(n, done) {
 	var remaining = n;
 	return function() {
 		remaining--;
-		if (remaining == 0) {
+		if (remaining === 0) {
 			done();
 		}
 		if (remaining < 0) {
