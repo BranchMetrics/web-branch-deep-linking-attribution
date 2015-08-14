@@ -1,8 +1,8 @@
 goog.provide('banner_html');
 goog.require('banner_utils');
 goog.require('utils');
+goog.require('session');
 goog.require('storage'); // jshint unused:false
-
 
 /**
  * @param {banner_utils.options} options
@@ -33,9 +33,9 @@ banner_html.banner = function(options, action) {
  * @param {banner_utils.options} options
  * @param {storage} storage
  */
-banner_html.mobileAction = function(options, storage) {
+banner_html.mobileAction = function(options, storage, branch) {
 	return '<a id="branch-mobile-action" href="#" target="_parent">' +
-		(storage.get('has_app') ? options.openAppButtonText : options.downloadAppButtonText) +
+		(session.get(storage)['has_app'] ? options.openAppButtonText : options.downloadAppButtonText) +
 		'</a>';
 };
 
@@ -124,10 +124,10 @@ banner_html.div = function(options, action) {
  * @param {banner_utils.options} options
  * @param {storage} storage
  */
-banner_html.markup = function(options, storage) {
+banner_html.markup = function(options, storage, branch) {
 	var action = '<div id="branch-sms-form-container" class="vertically-align-middle">' +
 		(utils.mobileUserAgent() ?
-			banner_html.mobileAction(options, storage) :
+			banner_html.mobileAction(options, storage, branch) :
 			banner_html.desktopAction(options)) +
 	'</div>';
 

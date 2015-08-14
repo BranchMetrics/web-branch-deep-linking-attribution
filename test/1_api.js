@@ -659,6 +659,58 @@ describe('Server', function() {
 			});
 		});
 
+		describe('/v1/has_app', function() {
+			it('should pass in sdk', function(done) {
+				var assert = testUtils.plan(2, done);
+				server.request(
+					resources.hasApp,
+					testUtils.params({ }, [ 'identity_id', 'sdk', 'session_id' ]),
+					storage,
+					assert.done
+				);
+				assert.equal(requests.length, 1, 'Request made');
+				assert.equal(
+					requests[0].url,
+					'https://api.branch.io/v1/has-app/' + branch_sample_key +
+						'?browser_fingerprint_id=' + browser_fingerprint_id,
+					'Endpoint correct'
+				);
+			});
+
+			it('should fail without browser_fingerprint_id', function(done) {
+				var assert = testUtils.plan(2, done);
+				server.request(
+					resources.hasApp,
+					testUtils.params(
+						{ },
+						[ 'browser_fingerprint_id', 'identity_id', 'sdk', 'session_id' ]
+					),
+					storage,
+					function(err) {
+						assert.equal(
+							err.message,
+							"API request /v1/has-app missing parameter browser_fingerprint_id"
+						);
+					}
+				);
+				assert.equal(requests.length, 0, 'Request not made');
+			});
+
+			it('should fail without branch_key', function(done) {
+				var assert = testUtils.plan(2, done);
+				server.request(
+					resources.hasApp,
+					testUtils.params({ }, [ 'branch_key', 'identity_id', 'sdk', 'session_id' ]),
+					storage,
+					function(err) {
+						assert.equal(
+							err.message,
+							"API request /v1/has-app missing parameter branch_key or app_id"
+						);
+				});
+				assert.equal(requests.length, 0, 'Request not made');
+			});
+		});
 
 		describe('/v1/redeem', function() {
 			it('should pass in branch_key, identity_id, amount, and bucket', function(done) {
@@ -678,8 +730,8 @@ describe('Server', function() {
 					'Endpoint correct'
 				);
 				assert.equal(requests[0].method, 'POST', 'Method correct');
-				// "identity_id=98807509250212101&amount=1&bucket=testbucket'
-				// + '&session_id=98807509250212101&sdk=web" + config.version +
+				// "identity_id=98807509250212101&amount=1&bucket=testbucket' +
+				// '&session_id=98807509250212101&sdk=web" + config.version +
 				// "&branch_key=key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS"
 				assert.equal(
 					requests[0].requestBody,

@@ -410,7 +410,7 @@ callback(
 A robust function to give your users the ability to share links via SMS. If
 the user navigated to this page via a Branch link, `sendSMS` will send that
 same link. Otherwise, it will create a new link with the data provided in
-the `params` argument. `sendSMS` also  registers a click event with the
+the `params` argument. `sendSMS` also registers a click event with the
 `channel` pre-filled with `'sms'` before sending an sms to the provided
 `phone` parameter. This way the entire link click event is recorded starting
 with the user sending an sms.
@@ -846,14 +846,15 @@ branch.addListener(listener);
 ```
 
 #### Available `Branch.banner()` Events:
-- willShowBanner
-- willNotShowBanner
-- didShowBanner
-- willCloseBanner
-- didCloseBanner
-- willSendBannerSMS
-- sendBannerSMSError
-- didSendBannerSMS
+- *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
+- *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more events will be emitted.
+- *didShowBanner*: Smart banner animation started and was is being shown to the user.
+- *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
+- *didCloseBanner*: Smart banner close animation started, and is closing.
+- *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
+- *sendBannerSMSError*: `sendSMS()` error returned.
+- *didSendBannerSMS*: SMS successfully sent.
+- *didDownloadApp*: User installed app, and banner text updated.
 
 
 
