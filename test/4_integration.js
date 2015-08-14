@@ -17,10 +17,16 @@ describe('Integration tests', function() {
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i];
-				while (cookie.charAt(0) == ' ') { cookie = cookie.substring(1, cookie.length); }
+				while (cookie.charAt(0) == ' ') {
+					cookie = cookie.substring(1, cookie.length);
+				}
 				if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") === 0) {
-					if (temp && cookie.indexOf("branch_expiration_date=") == -1) { deleteCookie(cookie); }
-					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) { deleteCookie(cookie); }
+					if (temp && cookie.indexOf("branch_expiration_date=") == -1) {
+						deleteCookie(cookie);
+					}
+					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) {
+						deleteCookie(cookie);
+					}
 				}
 			}
 		};
@@ -58,8 +64,12 @@ describe('Integration tests', function() {
 	});
 
 	after(function() {
-		if (window.WEB_BUILD) { branch._server.createScript.restore(); }
-		else if (window.CORDOVA_BUILD && cordova) { cordova.require.restore(); }
+		if (window.WEB_BUILD) {
+			branch._server.createScript.restore();
+		}
+		else if (window.CORDOVA_BUILD && cordova) {
+			cordova.require.restore();
+		}
 		xhr.restore();
 		clock.restore();
 	});
@@ -171,7 +181,9 @@ describe('Integration tests', function() {
 			branch.init(browser_fingerprint_id, function(err) {
 				assert.equal(err.message, 'Error in API: 400');
 			});
-			if (window.CORDOVA_BUILD) { requests[indexOfLastInitRequest(0)].respond(400); }
+			if (window.CORDOVA_BUILD) {
+				requests[indexOfLastInitRequest(0)].respond(400);
+			}
 			else {
 				requests[0].callback(browser_fingerprint_id);
 				requests[1].respond(400);

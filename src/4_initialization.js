@@ -34,7 +34,9 @@ else if (typeof exports === 'object') {
 
 if (!TITANIUM_BUILD) {
 	// Always make a global.
-	if (window) { window['branch'] = branch_instance; }
+	if (window) {
+		window['branch'] = branch_instance;
+	}
 }
 
 // Ensue close is allways called on a pause in mobile apps

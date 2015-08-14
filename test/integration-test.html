@@ -29,7 +29,9 @@
 	<script type="text/javascript" src="saucelabs.js"></script>
 
 	<script type="text/javascript">
-		if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+		if (window.mochaPhantomJS) {
+            mochaPhantomJS.run();
+        }
 		else {
 			// This is pretty hack, but on a lot of browsers in SauceLabs, it take a bit for the branch src to load into the browser. If the tests start before it is loaded, they fail - specifically when Sinon trys to wrap branch._server. Note, this is *different* from branch.init, that is called in the tests themselves.
 			var checkBranchLoadTimer = setTimeout(function() {

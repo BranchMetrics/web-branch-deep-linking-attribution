@@ -1496,7 +1496,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       if (TITANIUM_BUILD) {
         var m = {}, p = require("io.branch.sdk");
         g && (m.link_identifier = g);
-        m = h ? null === b ? p.getInstallData(d.debug, -1) : p.getInstallData(d.debug, b ? 1 : 0) : null === b ? p.getOpenData(-1) : p.getOpenData(b ? 1 : 0);
+        m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
         c(m);
       }
     }

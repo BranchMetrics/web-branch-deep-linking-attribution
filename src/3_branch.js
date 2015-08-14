@@ -49,7 +49,9 @@ var wrap = function(parameters, func, init) {
 		lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg != "function") {
 			callback = function(err) {
-				if (err) { throw(err); }
+				if (err) {
+					throw(err);
+				}
 			};
 			args = Array.prototype.slice.call(arguments);
 		}
@@ -62,7 +64,9 @@ var wrap = function(parameters, func, init) {
 			 * @type {function(?Error,?): undefined}
 			 */
 			var done = function(err, data) {
-				if (err && parameters === callback_params.NO_CALLBACK) { throw err; }
+				if (err && parameters === callback_params.NO_CALLBACK) {
+					throw err;
+				}
 				else if (parameters === callback_params.CALLBACK_ERR) {
 					callback(err);
 				}
@@ -95,17 +99,27 @@ var wrap = function(parameters, func, init) {
  */
 Branch = function() {
 	if (!(this instanceof Branch)) {
-		if (!default_branch) { default_branch = new Branch(); }
+		if (!default_branch) {
+			default_branch = new Branch();
+		}
 		return default_branch;
 	}
 	this._queue = Queue();
 
 	var storageMethods = [ ];
-	if (CORDOVA_BUILD) { storageMethods = [ 'local' ]; }
-	else if (TITANIUM_BUILD) { storageMethods = [ 'titanium' ]; }
+	if (CORDOVA_BUILD) {
+		storageMethods = [ 'local' ];
+	}
+	else if (TITANIUM_BUILD) {
+		storageMethods = [ 'titanium' ];
+	}
 	else if (WEB_BUILD) {
-		if (utils.mobileUserAgent()) { storageMethods = [ 'local', 'permcookie' ]; }
-		else { storageMethods = [ 'session', 'cookie' ]; }
+		if (utils.mobileUserAgent()) {
+			storageMethods = [ 'local', 'permcookie' ];
+		}
+		else {
+			storageMethods = [ 'session', 'cookie' ];
+		}
 	}
 	storageMethods.push('pojo');
 
@@ -118,8 +132,12 @@ Branch = function() {
 	/** @type {Array<utils.listener>} */
 	this._listeners = [ ];
 
-	if (CORDOVA_BUILD) { sdk = 'cordova'; }
-	if (TITANIUM_BUILD) { sdk = 'titanium'; }
+	if (CORDOVA_BUILD) {
+		sdk = 'cordova';
+	}
+	if (TITANIUM_BUILD) {
+		sdk = 'titanium';
+	}
 	this.sdk = sdk + config.version;
 
 	if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -181,9 +199,15 @@ Branch.prototype._referringLink = function() {
 	var referring_link = this._storage.get('referring_link'),
 		click_id = this._storage.get('click_id');
 
-	if (referring_link) { return referring_link; }
-	else if (click_id) { return config.link_service_endpoint + '/c/' + click_id; }
-	else { return null; }
+	if (referring_link) {
+		return referring_link;
+	}
+	else if (click_id) {
+		return config.link_service_endpoint + '/c/' + click_id;
+	}
+	else {
+		return null;
+	}
 };
 
 /***
@@ -288,9 +312,15 @@ Branch.prototype['init'] = wrap(
 		}
 
 		var setBranchValues = function(data) {
-			if (data['session_id']) { self.session_id = data['session_id'].toString(); }
-			if (data['identity_id']) { self.identity_id = data['identity_id'].toString(); }
-			if (data['link']) { self.sessionLink = data['link']; }
+			if (data['session_id']) {
+				self.session_id = data['session_id'].toString();
+			}
+			if (data['identity_id']) {
+				self.identity_id = data['identity_id'].toString();
+			}
+			if (data['link']) {
+				self.sessionLink = data['link'];
+			}
 			if (data['referring_link']) {
 				data['referring_link'] = utils.processReferringLink(data['referring_link']);
 			}
@@ -300,7 +330,9 @@ Branch.prototype['init'] = wrap(
 
 			if (CORDOVA_BUILD || TITANIUM_BUILD) {
 				self.device_fingerprint_id = data['device_fingerprint_id'];
-				if (data['link_click_id']) { self.link_click_id = data['link_click_id']; }
+				if (data['link_click_id']) {
+					self.link_click_id = data['link_click_id'];
+				}
 			}
 			return data;
 		},
@@ -356,10 +388,14 @@ Branch.prototype['init'] = wrap(
 				self.init_state = init_states.INIT_SUCCEEDED;
 				data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
 			}
-			if (err) { self.init_state = init_states.INIT_FAILED; }
+			if (err) {
+				self.init_state = init_states.INIT_FAILED;
+			}
 
 			// Keep android titanium from calling close
-			if (self.keepAlive) { setTimeout(function() { self.keepAlive = false; }, 2000); }
+			if (self.keepAlive) {
+				setTimeout(function() { self.keepAlive = false; }, 2000);
+			}
 			done(err, data && utils.whiteListSessionData(data));
 		},
 
@@ -425,16 +461,19 @@ Branch.prototype['init'] = wrap(
 				if (TITANIUM_BUILD) {
 					var data = { },
 						branchTitaniumSDK = require('io.branch.sdk');
-					if (link_identifier) { data['link_identifier'] = link_identifier; }
+					if (link_identifier) {
+						data['link_identifier'] = link_identifier;
+					}
 					if (freshInstall) {
-						data = (isReferrable === null) ?
-							branchTitaniumSDK.getInstallData(self.debug, -1) :
-							branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
+						data = branchTitaniumSDK.getInstallData(
+							self.debug,
+							(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
+						);
 					}
 					else {
-						data = (isReferrable === null) ?
-							branchTitaniumSDK.getOpenData(-1) :
-							branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
+						data = branchTitaniumSDK.getOpenData(
+							(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
+						);
 					}
 					apiCordovaTitanium(data);
 				}
@@ -546,7 +585,9 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		if (err) { done(err); }
+		if (err) {
+			done(err);
+		}
 
 		data = data || { };
 		self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
@@ -588,7 +629,9 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	var self = this;
 	this._api(resources.logout, { }, function(err, data) {
-		if (err) { done(err); }
+		if (err) {
+			done(err);
+		}
 
 		data = data || { };
 		data = {
@@ -643,7 +686,9 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
 	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
 	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
-		if (this.keepAlive) { return done(null); }
+		if (this.keepAlive) {
+			return done(null);
+		}
 		this._api(resources.close, { }, function(err, data) {
 			delete self.session_id;
 			delete self.sessionLink;
@@ -1333,7 +1378,9 @@ if (WEB_BUILD) {
 	/*** +TOC_HEADING &Event Listener& ^WEB ***/
 	/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event == "function" && listener === undefined) { listener = event; }
+		if (typeof event == "function" && listener === undefined) {
+			listener = event;
+		}
 		if (listener) {
 			this._listeners.push({
 				listener: listener,
@@ -1353,7 +1400,9 @@ if (WEB_BUILD) {
 	Branch.prototype['removeListener'] = function(listener) {
 		if (listener) {
 			this._listeners = this._listeners.filter(function(subscription) {
-				if (subscription.listener !== listener) { return subscription; }
+				if (subscription.listener !== listener) {
+					return subscription;
+				}
 			});
 		}
 	};

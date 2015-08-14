@@ -96,7 +96,9 @@ Server.prototype.getUrl = function(resource, data) {
 				err = (typeof resource.queryPart[k] == 'function') ?
 					resource.queryPart[k](resource.endpoint, k, data[k]) :
 					err;
-				if (err) { return { error: err }; }
+				if (err) {
+					return { error: err };
+				}
 				url += '/' + data[k];
 			}
 		}
@@ -105,7 +107,10 @@ Server.prototype.getUrl = function(resource, data) {
 	for (k in resource.params) {
 		if (resource.params.hasOwnProperty(k)) {
 			err = resource.params[k](resource.endpoint, k, data[k]);
-			if (err) { return { error: err }; }
+			if (err) {
+				return { error: err };
+			}
+
 			v = data[k];
 			if (!(typeof v == 'undefined' || v === '' || v === null)) {
 				d[k] = v;
@@ -261,7 +266,9 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
 
 	var u = this.getUrl(resource, data);
-	if (u.error) { return callback(new Error(u.error)); }
+	if (u.error) {
+		return callback(new Error(u.error));
+	}
 
 	var url, postData = '';
 	if (resource.method == 'GET') {
