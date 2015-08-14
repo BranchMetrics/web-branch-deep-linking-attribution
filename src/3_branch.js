@@ -410,14 +410,15 @@ Branch.prototype['init'] = wrap(
 						data['link_identifier'] = link_identifier;
 					}
 					if (freshInstall) {
-						data = (isReferrable === null) ?
-							branchTitaniumSDK.getInstallData(self.debug, -1) :
-							branchTitaniumSDK.getInstallData(self.debug, isReferrable ? 1 : 0);
+						data = branchTitaniumSDK.getInstallData(
+							self.debug,
+							(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
+						);
 					}
 					else {
-						data = (isReferrable === null) ?
-							branchTitaniumSDK.getOpenData(-1) :
-							branchTitaniumSDK.getOpenData(isReferrable ? 1 : 0);
+						data = branchTitaniumSDK.getOpenData(
+							(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
+						);
 					}
 					apiCordovaTitanium(data);
 				}
