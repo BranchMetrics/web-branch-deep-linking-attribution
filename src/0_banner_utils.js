@@ -85,7 +85,9 @@ banner_utils.addCSSLengths  = function(length1, length2) {
 					100;
 			};
 		return parseInt({
-			"px": function(value) { return value; },
+			"px": function(value) {
+				return value;
+			},
 			"em": function(value) {
 				if (document.body.currentStyle) {
 					return value * convertToUnitlessPixels(document.body.currentStyle.fontSize);
@@ -104,11 +106,21 @@ banner_utils.addCSSLengths  = function(length1, length2) {
 						parseFloat(window.getComputedStyle(document.documentElement).fontSize);
 				}
 			},
-			"vw": function(value) { return value * vw(); },
-			"vh": function(value) { return value * vh(); },
-			"vmin": function(value) { return value * Math.min(vh(), vw()); },
-			"vmax": function(value) { return value * Math.max(vh(), vw()); },
-			"%": function() { return (document.body.clientWidth / 100) * value; }
+			"vw": function(value) {
+				return value * vw();
+			},
+			"vh": function(value) {
+				return value * vh();
+			},
+			"vmin": function(value) {
+				return value * Math.min(vh(), vw());
+			},
+			"vmax": function(value) {
+				return value * Math.max(vh(), vw());
+			},
+			"%": function() {
+				return (document.body.clientWidth / 100) * value;
+			}
 		}[unit](value), 10);
 	};
 	return (convertToUnitlessPixels(length1) + convertToUnitlessPixels(length2)).toString() + 'px';

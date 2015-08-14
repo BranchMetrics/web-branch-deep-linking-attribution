@@ -163,7 +163,9 @@ banner = function(branch, options, linkData, storage) {
 				}
 				banner_utils.removeClass(document.body, 'branch-banner-is-active');
 			}, banner_utils.animationDelay);
-			if (options.position == 'top') { element.style.top = '-' + banner_utils.bannerHeight; }
+			if (options.position == 'top') {
+				element.style.top = '-' + banner_utils.bannerHeight;
+			}
 			else if (options.position == 'bottom') {
 				element.style.bottom = '-' + banner_utils.bannerHeight;
 			}

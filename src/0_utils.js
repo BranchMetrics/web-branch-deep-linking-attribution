@@ -68,7 +68,9 @@ utils.message = function(message, params) {
 	var msg = message.replace(/\$(\d)/g, function(_, place) {
 		return params[parseInt(place, 10) - 1];
 	});
-	if (DEBUG && console) { console.log(msg); }
+	if (DEBUG && console) {
+		console.log(msg);
+	}
 	return msg;
 };
 
@@ -128,7 +130,9 @@ utils.processReferringLink = function(link) {
  */
 utils.merge = function(to, from) {
 	for (var attr in from) {
-		if (from.hasOwnProperty(attr)) { to[attr] = from[attr]; }
+		if (from.hasOwnProperty(attr)) {
+			to[attr] = from[attr];
+		}
 	}
 	return to;
 };
@@ -147,8 +151,12 @@ utils.hashValue = function(key) {
 
 utils.mobileUserAgent = function() {
 	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
-		if (navigator.userAgent.match(/android/i)) { return 'android'; }
-		else if (navigator.userAgent.match(/ipad/i)) { return 'ipad'; }
+		if (navigator.userAgent.match(/android/i)) {
+			return 'android';
+		}
+		else if (navigator.userAgent.match(/ipad/i)) {
+			return 'ipad';
+		}
 		else { return 'ios'; }
 	}
 	else { return false; }

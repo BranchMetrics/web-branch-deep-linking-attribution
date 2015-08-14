@@ -15,6 +15,8 @@ var Queue = function() {
 	};
 	return function(task) {
 		queue.push(task);
-		if (queue.length == 1) { next(); }
+		if (queue.length == 1) {
+			next();
+		}
 	};
 };
