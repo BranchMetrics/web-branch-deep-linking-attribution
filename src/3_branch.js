@@ -1490,9 +1490,9 @@ if (WEB_BUILD) {
 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
 	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
-		if (typeof options['forgetHide'] == 'undefined' &&
-				typeof options['forgetHide'] != 'undefined') {
-			options['forgetHide'] = options['forgetHide'];
+		if (typeof options['showAgain'] === 'undefined' &&
+				typeof options['forgetHide'] !== 'undefined') {
+			options['showAgain'] = options['forgetHide'];
 		}
 		var bannerOptions = {
 			icon: options['icon'] || '',
