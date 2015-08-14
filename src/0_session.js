@@ -36,7 +36,7 @@ session.set = function(storage, data, first) {
 
 /**
  * @param {BranchStorage} storage
- * @param {Object} data
+ * @param {Object} new_data
  */
 session.update = function(storage, new_data) {
 	var current_data = session.get(storage);
