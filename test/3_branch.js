@@ -810,7 +810,6 @@ describe('Branch', function() {
 			var branch = initBranch(false), assert = testUtils.plan(5, done);
 			branch.init(branch_key, function(err) { assert(!err, 'No error'); });
 			branch.track('did something else', function(err) { assert(!err, 'No error'); });
-
 			assert.equal(requests[0].resource.endpoint, '/_r');
 			requests[0].callback(null, browser_fingerprint_id);
 
