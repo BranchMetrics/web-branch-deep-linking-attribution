@@ -1659,7 +1659,7 @@ if (!TITANIUM_BUILD && window.branch && window.branch._q) {
 "function" === typeof define && define.amd ? define("branch", function() {
   return branch_instance;
 }) : "object" === typeof exports && (module.exports = branch_instance);
-TITANIUM_BUILD || window && (window.branch = branch_instance);
+!TITANIUM_BUILD && window && (window.branch = branch_instance);
 CORDOVA_BUILD && document.addEventListener("pause", function() {
   console.log("Closing branch session on pause event.");
   branch_instance.close(function() {

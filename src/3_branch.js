@@ -154,36 +154,36 @@ Branch = function() {
  */
 Branch.prototype._api = function(resource, obj, callback) {
 	if (this.app_id) {
-		obj['app_id'] = this.app_id;
+		obj.app_id = this.app_id;
 	}
 	if (this.branch_key) {
-		obj['branch_key'] = this.branch_key;
+		obj.branch_key = this.branch_key;
 	}
-	if (((resource.params && resource.params['session_id']) ||
-			(resource.queryPart && resource.queryPart['session_id'])) &&
+	if (((resource.params && resource.params.session_id) ||
+			(resource.queryPart && resource.queryPart.session_id)) &&
 			this.session_id) {
-		obj['session_id'] = this.session_id;
+		obj.session_id = this.session_id;
 	}
-	if (((resource.params && resource.params['identity_id']) ||
-			(resource.queryPart && resource.queryPart['identity_id'])) &&
+	if (((resource.params && resource.params.identity_id) ||
+			(resource.queryPart && resource.queryPart.identity_id)) &&
 			this.identity_id) {
-		obj['identity_id'] = this.identity_id;
+		obj.identity_id = this.identity_id;
 	}
-	if (((resource.params && resource.params['link_click_id']) ||
-			(resource.queryPart && resource.queryPart['link_click_id'])) &&
+	if (((resource.params && resource.params.link_click_id) ||
+			(resource.queryPart && resource.queryPart.link_click_id)) &&
 			this.link_click_id) {
-		obj['link_click_id'] = this.link_click_id;
+		obj.link_click_id = this.link_click_id;
 	}
-	if (((resource.params && resource.params['sdk']) ||
-			(resource.queryPart && resource.queryPart['sdk'])) && this.sdk) {
-		obj['sdk'] = this.sdk;
+	if (((resource.params && resource.params.sdk) ||
+			(resource.queryPart && resource.queryPart.sdk)) && this.sdk) {
+		obj.sdk = this.sdk;
 	}
 
 	if (CORDOVA_BUILD || TITANIUM_BUILD) {
-		if (((resource.params && resource.params['device_fingerprint_id']) ||
-				(resource.queryPart && resource.queryPart['device_fingerprint_id'])) &&
+		if (((resource.params && resource.params.device_fingerprint_id) ||
+				(resource.queryPart && resource.queryPart.device_fingerprint_id)) &&
 				this.device_fingerprint_id) {
-			obj['device_fingerprint_id'] = this.device_fingerprint_id;
+			obj.device_fingerprint_id = this.device_fingerprint_id;
 		}
 	}
 
@@ -235,7 +235,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
 	 * ---
 	 *
 	 */
-	Branch.prototype['setDebug'] = function(debug) {
+	Branch.prototype.setDebug = function(debug) {
 		this.debug = debug;
 	};
 }
@@ -291,7 +291,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  */
 /*** +TOC_HEADING &Branch Session& ^ALL ***/
 /*** +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
-Branch.prototype['init'] = wrap(
+Branch.prototype.init = wrap(
 	callback_params.CALLBACK_ERR_DATA,
 	function(done, branch_key, options) {
 		var self = this;
@@ -312,26 +312,26 @@ Branch.prototype['init'] = wrap(
 		}
 
 		var setBranchValues = function(data) {
-			if (data['session_id']) {
-				self.session_id = data['session_id'].toString();
+			if (data.session_id) {
+				self.session_id = data.session_id.toString();
 			}
-			if (data['identity_id']) {
-				self.identity_id = data['identity_id'].toString();
+			if (data.identity_id) {
+				self.identity_id = data.identity_id.toString();
 			}
-			if (data['link']) {
-				self.sessionLink = data['link'];
+			if (data.link) {
+				self.sessionLink = data.link;
 			}
-			if (data['referring_link']) {
-				data['referring_link'] = utils.processReferringLink(data['referring_link']);
+			if (data.referring_link) {
+				data.referring_link = utils.processReferringLink(data.referring_link);
 			}
-			if (!data['click_id'] && data['referring_link']) {
-				data['click_id'] = utils.clickIdFromLink(data['referring_link']);
+			if (!data.click_id && data.referring_link) {
+				data.click_id = utils.clickIdFromLink(data.referring_link);
 			}
 
 			if (CORDOVA_BUILD || TITANIUM_BUILD) {
-				self.device_fingerprint_id = data['device_fingerprint_id'];
-				if (data['link_click_id']) {
-					self.link_click_id = data['link_click_id'];
+				self.device_fingerprint_id = data.device_fingerprint_id;
+				if (data.link_click_id) {
+					self.link_click_id = data.link_click_id;
 				}
 			}
 			return data;
@@ -349,7 +349,7 @@ Branch.prototype['init'] = wrap(
 		link_identifier = WEB_BUILD ?
 			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
 			(url ? utils.getParamValue(url) : null),
-		freshInstall = !sessionData || !sessionData['identity_id'],
+		freshInstall = !sessionData || !sessionData.identity_id,
 
 		checkHasApp = function(sessionData, cb) {
 			if (WEB_BUILD) {
@@ -366,10 +366,10 @@ Branch.prototype['init'] = wrap(
 			var currentSessionData = sessionData || session.get(self._storage);
 			self._api(
 				resources.hasApp,
-				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
+				{ "browser_fingerprint_id": currentSessionData.browser_fingerprint_id },
 				function(err, has_app) {
-					if (has_app && !currentSessionData['has_app']) {
-						currentSessionData['has_app'] = true;
+					if (has_app && !currentSessionData.has_app) {
+						currentSessionData.has_app = true;
 						session.update(self._storage, currentSessionData);
 						self._publishEvent("didDownloadApp");
 					}
@@ -386,7 +386,7 @@ Branch.prototype['init'] = wrap(
 				session.set(self._storage, data, freshInstall);
 
 				self.init_state = init_states.INIT_SUCCEEDED;
-				data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
+				data.data_parsed = data.data ? goog.json.parse(data.data) : null;
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
@@ -426,9 +426,9 @@ Branch.prototype['init'] = wrap(
 
 		if (WEB_BUILD &&
 				sessionData &&
-				sessionData['session_id'] &&
-				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
-				link_identifier === sessionData['click_id'])) {
+				sessionData.session_id &&
+				(utils.processReferringLink(link_identifier) === sessionData.referring_link ||
+				link_identifier === sessionData.click_id)) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
 		}
@@ -437,8 +437,8 @@ Branch.prototype['init'] = wrap(
 
 				var apiCordovaTitanium = function(data) {
 					if (!freshInstall) {
-						data['identity_id'] = sessionData['identity_id'];
-						data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
+						data.identity_id = sessionData.identity_id;
+						data.device_fingerprint_id = sessionData.device_fingerprint_id;
 					}
 					self._api(
 						freshInstall ? resources.install : resources.open,
@@ -462,7 +462,7 @@ Branch.prototype['init'] = wrap(
 					var data = { },
 						branchTitaniumSDK = require('io.branch.sdk');
 					if (link_identifier) {
-						data['link_identifier'] = link_identifier;
+						data.link_identifier = link_identifier;
 					}
 					if (freshInstall) {
 						data = branchTitaniumSDK.getInstallData(
@@ -496,7 +496,7 @@ Branch.prototype['init'] = wrap(
 							},
 							function(err, data) {
 								if (data && link_identifier) {
-									data['click_id'] = link_identifier;
+									data.click_id = link_identifier;
 								}
 								attachVisibilityEvent();
 								finishInit(err, data);
@@ -523,9 +523,9 @@ Branch.prototype['init'] = wrap(
  * ___
  */
 /*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
-Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(session.get(this._storage));
-	data['referring_link'] = this._referringLink();
+	data.referring_link = this._referringLink();
 	done(null, data);
 });
 
@@ -544,7 +544,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *
  */
 /*** +TOC_ITEM #firstcallback &.first()& ^ALL ***/
-Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	done(null, utils.whiteListSessionData(session.get(this._storage, true)));
 });
 
@@ -582,7 +582,7 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
  * ___
  */
 /*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
-Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
+Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
 	this._api(resources.profile, { "identity": identity }, function(err, data) {
 		if (err) {
@@ -590,12 +590,12 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		}
 
 		data = data || { };
-		self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
-		self.sessionLink = data['link'];
+		self.identity_id = data.identity_id ? data.identity_id.toString() : null;
+		self.sessionLink = data.link;
 		self.identity = identity;
 
-		data['referring_data_parsed'] = data['referring_data'] ?
-			goog.json.parse(data['referring_data']) :
+		data.referring_data_parsed = data.referring_data ?
+			goog.json.parse(data.referring_data) :
 			null;
 		session.update(self._storage, data);
 
@@ -626,7 +626,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
  *
  */
 /*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
-Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
+Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(done) {
 	var self = this;
 	this._api(resources.logout, { }, function(err, data) {
 		if (err) {
@@ -684,7 +684,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
 	 *
 	 */
 	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
-	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
+	Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(done) {
 		var self = this;
 		if (this.keepAlive) {
 			return done(null);
@@ -730,7 +730,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  */
 /*** +TOC_HEADING &Event Tracking& ^ALL ***/
 /*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
-Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
+Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
 	if (!metadata) {
 		metadata = { };
 	}
@@ -841,9 +841,9 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  */
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
-Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	this._api(resources.link, utils.cleanLinkData(data, config), function(err, data) {
-		done(err, data && data['url']);
+		done(err, data && data.url);
 	});
 });
 
@@ -931,7 +931,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *
  */
 /*** +TOC_ITEM #sendsmsphone-linkdata-options-callback &.sendSMS()& ^ALL ***/
-Branch.prototype['sendSMS'] = wrap(
+Branch.prototype.sendSMS = wrap(
 	callback_params.CALLBACK_ERR,
 	function(done, phone, linkData, options) {
 		var self = this;
@@ -941,10 +941,10 @@ Branch.prototype['sendSMS'] = wrap(
 		else if (typeof options === 'undefined' || options === null) {
 			options = { };
 		}
-		options["make_new_link"] = options["make_new_link"] || false;
+		options.make_new_link = options.make_new_link || false;
 
-		if (!linkData['channel'] || linkData['channel'] == 'app banner') {
-			linkData['channel'] = 'sms';
+		if (!linkData.channel || linkData.channel == 'app banner') {
+			linkData.channel = 'sms';
 		}
 
 		function sendSMS(click_id) {
@@ -955,7 +955,7 @@ Branch.prototype['sendSMS'] = wrap(
 		}
 
 		var referring_link = self._referringLink();
-		if (referring_link && !options['make_new_link']) {
+		if (referring_link && !options.make_new_link) {
 			sendSMS(referring_link.substring(
 				referring_link.lastIndexOf('/') + 1, referring_link.length
 			));
@@ -968,7 +968,7 @@ Branch.prototype['sendSMS'] = wrap(
 					if (err) {
 						return done(err);
 					}
-					var url = data['url'];
+					var url = data.url;
 					self._api(
 						resources.linkClick,
 						{
@@ -979,8 +979,8 @@ Branch.prototype['sendSMS'] = wrap(
 							if (err) {
 								return done(err);
 							}
-							self._storage.set('click_id', data['click_id']);
-							sendSMS(data['click_id']);
+							self._storage.set('click_id', data.click_id);
+							sendSMS(data.click_id);
 						}
 					);
 				}
@@ -1030,7 +1030,7 @@ Branch.prototype['sendSMS'] = wrap(
  */
 /*** +TOC_HEADING &Referrals and Credits& ^ALL ***/
 /*** +TOC_ITEM #referralscallback &.referrals()& ^ALL ***/
-Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.referrals, { }, done);
 });
 
@@ -1085,7 +1085,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  *
  */
 /*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
-Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	data.type = "credit";
 	data.creation_type = data.creation_type || 2;
 	this._api(resources.getCode, data, done);
@@ -1134,7 +1134,7 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *
  */
 /*** +TOC_ITEM #validatecodecode-callback &.validateCode()& ^ALL ***/
-Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(resources.validateCode, { "code": code }, done);
 });
 
@@ -1183,7 +1183,7 @@ Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(d
  *
  */
 /*** +TOC_ITEM #applycodecode-callback &.applyCode()& ^ALL ***/
-Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
+Branch.prototype.applyCode = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(resources.applyCode, { "code": code }, done);
 });
 
@@ -1215,7 +1215,7 @@ Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done
  *
  */
 /*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
-Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+Branch.prototype.credits = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.credits, { }, done);
 });
 
@@ -1294,7 +1294,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *
  */
 /*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
-Branch.prototype['creditHistory'] = wrap(
+Branch.prototype.creditHistory = wrap(
 	callback_params.CALLBACK_ERR_DATA,
 	function(done, options) {
 		this._api(resources.creditHistory, options || { }, done);
@@ -1338,7 +1338,7 @@ Branch.prototype['creditHistory'] = wrap(
  * ___
  */
 /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
-Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
+Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
 	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
 });
 
@@ -1377,7 +1377,7 @@ if (WEB_BUILD) {
 	 */
 	/*** +TOC_HEADING &Event Listener& ^WEB ***/
 	/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
-	Branch.prototype['addListener'] = function(event, listener) {
+	Branch.prototype.addListener = function(event, listener) {
 		if (typeof event == "function" && listener === undefined) {
 			listener = event;
 		}
@@ -1397,7 +1397,7 @@ if (WEB_BUILD) {
 	 *
 	 */
 	/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
-	Branch.prototype['removeListener'] = function(listener) {
+	Branch.prototype.removeListener = function(listener) {
 		if (listener) {
 			this._listeners = this._listeners.filter(function(subscription) {
 				if (subscription.listener !== listener) {
@@ -1489,57 +1489,57 @@ if (WEB_BUILD) {
 	 */
 	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
 	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
-	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
+	Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 		if ('showAgain' in options && 'forgetHide' in options) {
 			options.showAgain = options.forgetHide;
 		}
 		var bannerOptions = {
-			icon: options['icon'] || '',
-			title: options['title'] || '',
-			description: options['description'] || '',
-			openAppButtonText: options['openAppButtonText'] || 'View in app',
-			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
-			sendLinkText: options['sendLinkText'] || 'Send Link',
-			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
-			iframe: typeof options['iframe'] == 'undefined' ?
+			icon: options.icon || '',
+			title: options.title || '',
+			description: options.description || '',
+			openAppButtonText: options.openAppButtonText || 'View in app',
+			downloadAppButtonText: options.downloadAppButtonText || 'Download App',
+			sendLinkText: options.sendLinkText || 'Send Link',
+			phonePreviewText: options.phonePreviewText || '(999) 999-9999',
+			iframe: typeof options.iframe == 'undefined' ?
 				true :
-				options['iframe'],
-			showiOS: typeof options['showiOS'] == 'undefined' ?
+				options.iframe,
+			showiOS: typeof options.showiOS == 'undefined' ?
 				true :
-				options['showiOS'],
-			showiPad: typeof options['showiPad'] == 'undefined' ?
+				options.showiOS,
+			showiPad: typeof options.showiPad == 'undefined' ?
 				true :
-				options['showiPad'],
-			showAndroid: typeof options['showAndroid'] == 'undefined' ?
+				options.showiPad,
+			showAndroid: typeof options.showAndroid == 'undefined' ?
 				true :
-				options['showAndroid'],
-			showDesktop: typeof options['showDesktop'] == 'undefined' ?
+				options.showAndroid,
+			showDesktop: typeof options.showDesktop == 'undefined' ?
 				true :
-				options['showDesktop'],
-			disableHide: !!options['disableHide'],
-			forgetHide: typeof options['forgetHide'] == 'number' ?
-				options['forgetHide'] :
-				!!options['forgetHide'],
-			position: options['position'] || 'top',
-			customCSS: options['customCSS'] || '',
-			mobileSticky: typeof options['mobileSticky'] == 'undefined' ?
+				options.showDesktop,
+			disableHide: !!options.disableHide,
+			forgetHide: typeof options.forgetHide == 'number' ?
+				options.forgetHide :
+				!!options.forgetHide,
+			position: options.position || 'top',
+			customCSS: options.customCSS || '',
+			mobileSticky: typeof options.mobileSticky == 'undefined' ?
 				false :
-				options['mobileSticky'],
-			desktopSticky: typeof options['desktopSticky'] == 'undefined' ?
+				options.mobileSticky,
+			desktopSticky: typeof options.desktopSticky == 'undefined' ?
 				true :
-				options['desktopSticky'],
-			make_new_link: !!options['make_new_link']
+				options.desktopSticky,
+			make_new_link: !!options.make_new_link
 		};
 
-		if (typeof options['showMobile'] != 'undefined') {
-			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
+		if (typeof options.showMobile != 'undefined') {
+			bannerOptions.showiOS = bannerOptions.showAndroid = options.showMobile;
 		}
 
 		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
 		done();
 	});
 
-	Branch.prototype['closeBanner'] = wrap(0, function(done) {
+	Branch.prototype.closeBanner = wrap(0, function(done) {
 		if (this.closeBannerPointer) {
 			var self = this;
 			this._publishEvent("willCloseBanner");

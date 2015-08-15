@@ -71,7 +71,7 @@ var sendSMS = function(doc, branch, options, linkData) {
 		if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
 			branch._publishEvent("willSendBannerSMS");
 			disableForm();
-			branch["sendSMS"](phone_val, linkData, options, function(err) {
+			branch.sendSMS(phone_val, linkData, options, function(err) {
 				if (err) {
 					branch._publishEvent("sendBannerSMSError");
 					errorForm();
@@ -113,16 +113,16 @@ banner = function(branch, options, linkData, storage) {
 	banner_css.css(options, element);
 
 	// Attach actions
-	linkData['channel'] = linkData['channel'] || 'app banner';
+	linkData.channel = linkData.channel || 'app banner';
 
 	var doc = options.iframe ? element.contentWindow.document : document;
 	if (utils.mobileUserAgent()) {
 		var referring_link = branch._referringLink();
-		if (referring_link && !options['make_new_link']) {
+		if (referring_link && !options.make_new_link) {
 			doc.getElementById('branch-mobile-action').href = referring_link;
 		}
 		else {
-			branch["link"](linkData, function(err, url) {
+			branch.link(linkData, function(err, url) {
 				if (err) {
 					// Todo: figure out something good to do here. Maybe a
 					// long link? Or why not always a long link?

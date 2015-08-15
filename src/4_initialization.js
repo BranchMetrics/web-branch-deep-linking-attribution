@@ -11,8 +11,8 @@ goog.require('config'); // jshint unused:false
 branch_instance = new Branch();
 
 if (!TITANIUM_BUILD) {
-	if (window['branch'] && window['branch']['_q']) {
-		var queue = window['branch']['_q'];
+	if (window.branch && window.branch._q) {
+		var queue = window.branch._q;
 		for (var i = 0; i < queue.length; i++) {
 			var task = queue[i];
 			branch_instance[task[0]].apply(branch_instance, task[1]);
@@ -35,7 +35,7 @@ else if (typeof exports === 'object') {
 if (!TITANIUM_BUILD) {
 	// Always make a global.
 	if (window) {
-		window['branch'] = branch_instance;
+		window.branch = branch_instance;
 	}
 }
 

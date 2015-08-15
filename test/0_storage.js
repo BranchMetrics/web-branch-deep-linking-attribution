@@ -14,7 +14,7 @@ describe('session storage', function() {
 		assert.equal(sessionStorage.getItem(BRANCH_KEY_PREFIX + itemKey), itemValue, 'key / vaue stored');
 	});
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
@@ -50,7 +50,7 @@ describe('local storage', function() {
 		assert.equal(localStorage.getItem(BRANCH_KEY_PREFIX + itemKey), itemValue, 'key / vaue stored');
 	});
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
@@ -77,13 +77,13 @@ describe('local storage', function() {
 // Revist this because Date() is all screwed up because of Sinon, which erases all cookies
 /*
 describe('cookie storage', function() {
-	var storage = new BranchStorage(['permcookie']); // jshint ignore:line
+	var storage = new BranchStorage(.permcookie); // jshint ignore:line
 
 	var itemKey = 'key';
 	var itemValue = 'value';
 	var assert = testUtils.unplanned();
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		storage.set(itemKey, itemValue);
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
@@ -120,7 +120,7 @@ describe('pojo storage', function() {
 		assert.equal(storage._store[itemKey], itemValue, 'key / vaue stored');
 	});
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
@@ -140,7 +140,7 @@ describe('pojo storage', function() {
 	it('should clear all items', function() {
 		storage.set('key', 'value');
 		storage.clear();
-		assert.deepEqual(storage._store['key'], null, 'Storage cleared');
+		assert.deepEqual(storage._store.key, null, 'Storage cleared');
 	});
 
 });

@@ -331,7 +331,7 @@ describe('Branch', function() {
 				'referring_identity': 'referring_user',
 				'identity': 'identity',
 				'has_app': false,
-				'referring_link':  '/c/ngJf86-h'
+				'referring_link': '/c/ngJf86-h'
 			};
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;
@@ -524,13 +524,13 @@ describe('Branch', function() {
 				"sdk": "web" + config.version
 			});
 			if (desktop_url_append) {
-				val['data']['$desktop_url'] += desktop_url_append;
+				val.data.$desktop_url += desktop_url_append;
 			}
 			if (serialized) {
-				val['data'] = JSON.stringify(val['data']);
+				val.data = JSON.stringify(val.data);
 			}
 			if (source) {
-				val['source'] = 'web-sdk';
+				val.source = 'web-sdk';
 			}
 			return val;
 		};
@@ -541,7 +541,7 @@ describe('Branch', function() {
 			var branch = initBranch(true), assert = testUtils.plan(4, done);
 			branch.link(expectedRequest(), function(err, link) {
 				assert(!err, 'No error');
-				assert.equal(link, expectedResponse["url"], 'link returned');
+				assert.equal(link, expectedResponse.url, 'link returned');
 			});
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
@@ -552,7 +552,7 @@ describe('Branch', function() {
 			var branch = initBranch(true), assert = testUtils.plan(2, done);
 			branch.link(expectedRequest());
 			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].obj['source'], 'web-sdk', 'web-sdk source set');
+			assert.equal(requests[0].obj.source, 'web-sdk', 'web-sdk source set');
 		});
 
 		it('should remove r hash from desktop_url', function(done) {
@@ -560,7 +560,7 @@ describe('Branch', function() {
 			branch.link(expectedRequest(false, false, '#r:12345'));
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(
-				JSON.parse(requests[0].obj['data'])['$desktop_url'].indexOf('#r:12345'),
+				JSON.parse(requests[0].obj.data).$desktop_url.indexOf('#r:12345'),
 				-1,
 				'web-sdk source set'
 			);
@@ -851,50 +851,5 @@ describe('Branch', function() {
 			assert.equal(listenerFired, 1, 'observer fired once');
 		});
 	});
-
-	/*
-	describe.fail('Queueing used correctly', function() {
-		it('Should wait to call track after init', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(2, done);
-			branch.init(branch_key, function(err) { assert(!err, 'No error'); });
-			branch.track('did something', function(err) { assert(!err, 'No error'); });
-		});
-
-		it('Should call requests in correct order', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(5, done);
-			branch.init(branch_key, function(err) { assert(!err, 'No error'); });
-			branch.track('did something else', function(err) { assert(!err, 'No error'); });
-
-			assert.equal(requests[0].resource.endpoint, '/_r');
-			requests[0].callback(null, browser_fingerprint_id);
-
-			assert.equal(requests[1].resource.endpoint, '/v1/open');
-			requests[1].callback(
-				null,
-				{
-					"branch_key": branch_sample_key,
-					"link_identifier": undefined,
-					"is_referrable": 1,
-					"browser_fingerprint_id": browser_fingerprint_id
-				}
-			);
-
-			assert.equal(requests[2].resource.endpoint, '/v1/track');
-			requests[2].callback(null, {});
-		});
-
-		it('If init fails, other calls should error', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(4, done);
-			branch.init(branch_key, function(err) { assert(err, 'init errored'); });
-			branch.track('did another thing', function(err) {
-				assert(err, 'track errored');
-				assert.equal(requests.length, 1, 'No further requests made');
-			});
-
-			assert.equal(requests[0].resource.endpoint, '/_r')
-			requests[0].callback(new Error('Initting failed'));
-		});
-	});
-*/
 });
 
