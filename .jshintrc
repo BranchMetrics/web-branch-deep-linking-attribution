@@ -1,18 +1,19 @@
 {
-	"browser": true,
-	"sub": true,
-	"undef": true,
-	"trailing": true,
-	"curly": true,
 	"bitwise": false,
+	"browser": true,
+	"curly": true,
 	"forin": true,
 	"freeze": true,
 	"immed": true,
+	"latedef": true,
+	"maxlen": 100,
+	"mocha": "true",
 	"noarg": true,
 	"nonbsp": true,
-	"unused": true,
-	"latedef": true,
+	"predef": [ "console", "module", "goog", "define", "ActiveXObject" ],
 	"scripturl": true,
-	"mocha": "true",
-	"predef": [ "console", "module", "goog", "define", "ActiveXObject" ]
+	"sub": true,
+	"trailing": true,
+	"undef": true,
+	"unused": true
 }
