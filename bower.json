@@ -6,7 +6,7 @@
 	"license": "https://github.com/BranchMetrics/Web-SDK/blob/master/LICENSE",
 	"authors": [
 		"Dmitri Gaskin <dmitri@branchmetrics.io>",
-		"Scott Hasbrouck <scott@branchmetrics.io"
+		"Kirk Tang <kirk@branch.io>"
 	],
 	"homepage": "http://branch.io",
 	"repository": {
@@ -14,27 +14,27 @@
 		"url": "git@github.com:BranchMetrics/Web-SDK.git"
 	},
 	"ignore": [
-		"compiler",
-		"docs",
-		"src/**",
-		"dist/build.min.js.gz",
-		"externs",
-		"node_modules",
-		"tests",
+		".gitignore",
 		".jscsrc",
 		".jshintignore",
 		".jshintrc",
 		"CHANGELOG.md",
 		"LICENSE",
 		"Makefile",
-		"build.sh",
 		"README.md",
-		"lint.sh",
-		"package.json",
-		"transform.js",
+		"build.sh",
+		"compiler",
+		"dist/build.min.js.gz",
 		"dist/cordova/**",
+		"docs",
+		"externs",
+		"lint.sh",
+		"node_modules",
+		"package.json",
+		"src/**",
 		"testbeds/**",
-		".gitignore"
+		"tests",
+		"transform.js"
 	],
   "build": "1.6.7"
 }
