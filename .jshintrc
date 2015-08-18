@@ -10,7 +10,13 @@
 	"mocha": "true",
 	"noarg": true,
 	"nonbsp": true,
-	"predef": [ "console", "module", "goog", "define", "ActiveXObject" ],
+	"predef": [
+		"ActiveXObject",
+		"console",
+		"define",
+		"goog",
+		"module"
+	],
 	"scripturl": true,
 	"sub": true,
 	"trailing": true,

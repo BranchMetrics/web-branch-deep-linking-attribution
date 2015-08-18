@@ -27,22 +27,7 @@ var safari_browsers = [
 			browserName: 'chrome',
 			platform: 'OS X 10.10',
 			version: '40.0'
-		}/*,
-		{
-			browserName: 'chrome',
-			platform: 'OS X 10.10',
-			version: '39.0'
-		},
-		{
-			browserName: 'chrome',
-			platform: 'OS X 10.10',
-			version: '38.0'
-		},
-		{
-			browserName: 'chrome',
-			platform: 'OS X 10.10',
-			version: '37.0'
-		}*/
+		}
 	],
 
 	firefox_browsers = [
@@ -55,27 +40,7 @@ var safari_browsers = [
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
 			version: '36'
-		}/*,
-		{
-			browserName: 'firefox',
-			platform: 'OS X 10.10',
-			version: '35'
-		},
-		{
-			browserName: 'firefox',
-			platform: 'OS X 10.10',
-			version: '34'
-		},
-		{
-			browserName: 'firefox',
-			platform: 'OS X 10.10',
-			version: '33'
-		},
-		{
-			browserName: 'firefox',
-			platform: 'OS X 10.10',
-			version: '32'
-		}*/
+		}
 	],
 
 	ios_browsers = [
@@ -102,28 +67,7 @@ var safari_browsers = [
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '7.1'
-		}/*,
-		{
-			browserName: 'iphone',
-			deviceName: 'iPhone Simulator',
-			platform: 'OS X 10.10',
-			version: '7.0'
-		},
-		{
-			browserName: 'iphone',
-			platform: 'OS X 10.10',
-			version: '6.1'
-		},
-		{
-			browserName: 'iphone',
-			platform: 'OS X 10.10',
-			version: '6.0'
-		},
-		{
-			browserName: 'iphone',
-			platform: 'OS X 10.10',
-			version: '5.1'
-		}*/
+		}
 	],
 
 	android_browsers = [
