@@ -3,38 +3,124 @@
 	"disallowMultipleLineStrings": true,
 	"disallowNewlineBeforeBlockStatements": true,
 	"disallowSpaceAfterObjectKeys": true,
-	"disallowSpaceAfterPrefixUnaryOperators": [ "++", "--", "+", "-", "~", "!" ],
-	"disallowSpaceBeforeBinaryOperators": [ "," ],
-	"disallowSpaceBeforePostfixUnaryOperators": [ "++", "--", ";" ],
-	"disallowSpacesInAnonymousFunctionExpression": { "beforeOpeningRoundBrace": true },
-	"disallowSpacesInFunction": { "beforeOpeningRoundBrace": true },
-	"disallowSpacesInFunctionDeclaration": { "beforeOpeningRoundBrace": true },
-	"disallowSpacesInFunctionExpression": { "beforeOpeningRoundBrace": true },
-	"disallowSpacesInNamedFunctionExpression": { "beforeOpeningRoundBrace": true },
+	"disallowSpaceAfterPrefixUnaryOperators": [
+		"!",
+		"+",
+		"++",
+		"-",
+		"--",
+		"~"
+	],
+	"disallowSpaceBeforeBinaryOperators": [
+		","
+	],
+	"disallowSpaceBeforePostfixUnaryOperators": [
+		"++",
+		"--",
+		";"
+	],
+	"disallowSpaceBeforeComma": true,
+	"disallowSpaceBeforeSemicolon": true,
+	"disallowSpacesInAnonymousFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
+	"disallowSpacesInFunction": {
+		"beforeOpeningRoundBrace": true
+	},
+	"disallowSpacesInFunctionDeclaration": {
+		"beforeOpeningRoundBrace": true
+	},
+	"disallowSpacesInFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
+	"disallowSpacesInNamedFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
 	"disallowSpacesInsideParentheses": true,
 	"disallowTrailingComma": true,
 	"disallowTrailingWhitespace": true,
 	"disallowYodaConditions": true,
-	"fileExtensions": [ ".js" ],
+	"fileExtensions": [
+		".js"
+	],
 	"requireCapitalizedConstructors": true,
 	"requireCommaBeforeLineBreak": true,
-	"requireCurlyBraces": [ "if", "else", "for", "while", "do", "try", "catch" ],
-	"requireKeywordsOnNewLine": [ "else" ],
+	"requireCurlyBraces": [
+		"catch",
+		"do",
+		"else",
+		"for",
+		"if",
+		"try",
+		"while"
+	],
+	"requireKeywordsOnNewLine": [
+		"else"
+	],
 	"requireLineFeedAtFileEnd": true,
 	"requireParenthesesAroundIIFE": true,
-	"requireSpaceAfterBinaryOperators": [ "=", ",", "+", "-", "/", "*", "==", "===", "!=", "!==" ],
-	"requireSpaceAfterKeywords": [ "if", "else", "for", "while", "do", "switch", "return", "try", "catch" ],
+	"requireSemicolons": true,
+	"requireSpaceAfterBinaryOperators": [
+		"!=",
+		"!==",
+		"*",
+		"+",
+		",",
+		"-",
+		"/",
+		"=",
+		"==",
+		"==="
+	],
+	"requireSpaceAfterKeywords": [
+		"catch",
+		"do",
+		"else",
+		"for",
+		"if",
+		"return",
+		"switch",
+		"try",
+		"while"
+	],
 	"requireSpaceAfterLineComment": true,
-	"requireSpaceBeforeBinaryOperators": [ "=", "+", "-", "/", "*", "==", "===", "!=", "!==" ],
+	"requireSpaceBeforeBinaryOperators": [
+		"!=",
+		"!==",
+		"*",
+		"+",
+		"-",
+		"/",
+		"=",
+		"==",
+		"==="
+	],
 	"requireSpaceBeforeBlockStatements": true,
-	"requireSpacesInAnonymousFunctionExpression": { "beforeOpeningCurlyBrace": true },
-	"requireSpacesInConditionalExpression": { "afterTest": true, "beforeConsequent": true, "afterConsequent": true, "beforeAlternate": true },
-	"requireSpacesInFunction": { "beforeOpeningCurlyBrace": true },
-	"requireSpacesInFunctionDeclaration": { "beforeOpeningCurlyBrace": true },
-	"requireSpacesInFunctionExpression": { "beforeOpeningCurlyBrace": true },
-	"requireSpacesInNamedFunctionExpression": { "beforeOpeningCurlyBrace": true },
-	"requireSpacesInsideArrayBrackets": "allButNested",
+	"requireSpacesInAnonymousFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"requireSpacesInConditionalExpression": {
+		"afterConsequent": true,
+		"afterTest": true,
+		"beforeAlternate": true,
+		"beforeConsequent": true
+	},
+	"requireSpacesInFunction": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"requireSpacesInFunctionDeclaration": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"requireSpacesInFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"requireSpacesInNamedFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"requireSpacesInsideArrayBrackets": "all",
 	"requireSpacesInsideObjectBrackets": "all",
-	"safeContextKeyword": [ "self" ],
+	"safeContextKeyword": [
+		"self"
+	],
 	"validateLineBreaks": "LF"
 }
