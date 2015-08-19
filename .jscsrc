@@ -4,38 +4,38 @@
 	"disallowNewlineBeforeBlockStatements": true,
 	"disallowSpaceAfterObjectKeys": true,
 	"disallowSpaceAfterPrefixUnaryOperators": [
-    "!",
-    "+",
-    "++",
-    "-",
-    "--",
-    "~"
-  ],
+		"!",
+		"+",
+		"++",
+		"-",
+		"--",
+		"~"
+	],
 	"disallowSpaceBeforeBinaryOperators": [
-    ","
-  ],
+		","
+	],
 	"disallowSpaceBeforePostfixUnaryOperators": [
-    "++",
-    "--",
-    ";"
-  ],
+		"++",
+		"--",
+		";"
+	],
 	"disallowSpaceBeforeComma": true,
 	"disallowSpaceBeforeSemicolon": true,
 	"disallowSpacesInAnonymousFunctionExpression": {
-    "beforeOpeningRoundBrace": true
-  },
+		"beforeOpeningRoundBrace": true
+	},
 	"disallowSpacesInFunction": {
-    "beforeOpeningRoundBrace": true
-  },
+		"beforeOpeningRoundBrace": true
+	},
 	"disallowSpacesInFunctionDeclaration": {
-    "beforeOpeningRoundBrace": true
-  },
+		"beforeOpeningRoundBrace": true
+	},
 	"disallowSpacesInFunctionExpression": {
-    "beforeOpeningRoundBrace": true
-  },
+		"beforeOpeningRoundBrace": true
+	},
 	"disallowSpacesInNamedFunctionExpression": {
-    "beforeOpeningRoundBrace": true
-  },
+		"beforeOpeningRoundBrace": true
+	},
 	"disallowSpacesInsideParentheses": true,
 	"disallowTrailingComma": true,
 	"disallowTrailingWhitespace": true,
