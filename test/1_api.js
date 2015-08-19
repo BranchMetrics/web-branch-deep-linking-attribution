@@ -11,23 +11,95 @@ describe('Server helpers', function() {
 	var assert = testUtils.unplanned();
 	it('serializeObject should work', function() {
 		// Test simple objects
-		assert.equal(server.serializeObject({ a: 'b' }), 'a=b');
-		assert.equal(server.serializeObject({ a: 'b', c: 'def' }), 'a=b&c=def');
-		assert.equal(server.serializeObject({ a: 'b', e: 123 }), 'a=b&e=123');
-		assert.equal(server.serializeObject({ a: 'fo &)!@# bar' }), 'a=fo%20%26)!%40%23%20bar');
+		assert.equal(
+			server.serializeObject(
+				{
+					a: 'b'
+				}
+			),
+			'a=b'
+		);
+		assert.equal(
+			server.serializeObject(
+				{
+					a: 'b',
+					c: 'def'
+				}
+			),
+			'a=b&c=def'
+		);
+		assert.equal(
+			server.serializeObject(
+				{
+					a: 'b',
+					e: 123
+				}
+			),
+			'a=b&e=123'
+		);
+		assert.equal(
+			server.serializeObject(
+				{
+					a: 'fo &)!@# bar'
+				}
+			),
+			'a=fo%20%26)!%40%23%20bar'
+		);
 
 		// Test nested objects
-		assert.equal(server.serializeObject({ a: { b: 'c', d: 'e' } }), 'a.b=c&a.d=e');
 		assert.equal(
-			server.serializeObject({ a: { b: 'c', d: { e: 'f', g: 'h' } } }),
+			server.serializeObject(
+				{
+					a: {
+						b: 'c',
+						d: 'e'
+					}
+				}
+			),
+			'a.b=c&a.d=e'
+		);
+		assert.equal(
+			server.serializeObject(
+				{
+					a: {
+						b: 'c',
+						d: {
+							e: 'f',
+							g: 'h'
+						}
+					}
+				}
+			),
 			'a.b=c&a.d.e=f&a.d.g=h'
 		);
 
 		// Test arrays
-		assert.equal(server.serializeObject({ a: [ 'b', 'c' ] }), 'a=b&a=c');
+		assert.equal(
+			server.serializeObject(
+				{
+					a: [
+						'b',
+						'c'
+					]
+				}
+			),
+			'a=b&a=c'
+		);
 
 		// Test arrays in objects
-		assert.equal(server.serializeObject({ a: { b: [ 'c', 'd' ] } }), 'a.b=c&a.b=d');
+		assert.equal(
+			server.serializeObject(
+				{
+					a: {
+						b: [
+							'c',
+							'd'
+						]
+					}
+				}
+			),
+			'a.b=c&a.b=d'
+		);
 	});
 
 	describe('getUrl', function() {
@@ -50,7 +122,9 @@ describe('Server', function() {
 		});
 
 		requests = [];
-		xhr.onCreate = function(xhr) { requests.push(xhr); };
+		xhr.onCreate = function(xhr) {
+			requests.push(xhr);
+		};
 	});
 
 	afterEach(function() {
@@ -633,7 +707,7 @@ describe('Server', function() {
 
 		describe('/_r', function() {
 			// branch_key is actually not required here
-			it('should pass in  sdk', function(done) {
+			it('should pass in sdk', function(done) {
 				var assert = testUtils.plan(3, done);
 				server.request(resources._r, testUtils.params(), storage, assert.done);
 				assert.equal(requests.length, 1, 'Request made');
@@ -979,7 +1053,7 @@ describe('Server', function() {
 					testUtils.params({ "click": "click" }),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request  missing parameter link_url");
+						assert.equal(err.message, "API request missing parameter link_url");
 					}
 				);
 				assert.equal(requests.length, 0, 'No request made');
@@ -992,7 +1066,7 @@ describe('Server', function() {
 					testUtils.params({ "link_url": "3hpH54U-58" }),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request  missing parameter click");
+						assert.equal(err.message, "API request missing parameter click");
 					}
 				);
 				assert.equal(requests.length, 0, 'No request made');

@@ -15,7 +15,13 @@ goog.require('config');
 var resources = { };
 
 /** @enum {number} */
-var validationTypes = { obj: 0, str: 1, num: 2, arr: 3, bool: 4 }; // now includes bool
+var validationTypes = {
+	obj: 0,
+	str: 1,
+	num: 2,
+	arr: 3,
+	bool: 4
+};
 
 /* jshint ignore:start */
 
@@ -114,15 +120,20 @@ if (WEB_BUILD) {
 		endpoint: "/_r",
 		method: utils.httpMethod.GET,
 		jsonp: true,
-		params: { "sdk": validator(true, validationTypes.str) }
+		params: {
+			"sdk": validator(true, validationTypes.str)
+		}
 	};
 
 	resources.linkClick = {
 		destination: config.link_service_endpoint,
 		endpoint: "",
 		method: utils.httpMethod.GET,
-		queryPart: { "link_url": validator(true, validationTypes.str) },
-		params: { "click": validator(true, validationTypes.str) }
+		queryPart: {
+			"link_url": validator(true, validationTypes.str)
+		},
+		params: {
+			"click": validator(true, validationTypes.str) }
 	};
 
 	resources.SMSLinkSend = {
@@ -222,7 +233,9 @@ resources.validateCode = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/referralcode",
 	method: utils.httpMethod.POST,
-	queryPart: { "code": validator(true, validationTypes.str) },
+	queryPart: {
+		"code": validator(true, validationTypes.str)
+	},
 	params: defaults({ })
 };
 
@@ -230,7 +243,9 @@ resources.applyCode = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/applycode",
 	method: utils.httpMethod.POST,
-	queryPart: { "code": validator(true, validationTypes.str) },
+	queryPart: {
+		"code": validator(true, validationTypes.str)
+	},
 	params: defaults({ })
 };
 
@@ -255,7 +270,9 @@ resources.referrals = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/referrals",
 	method: utils.httpMethod.GET,
-	queryPart: { "identity_id": validator(true, branch_id) },
+	queryPart: {
+		"identity_id": validator(true, branch_id)
+	},
 	params: defaults({ })
 };
 
@@ -276,7 +293,9 @@ resources.credits = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/credits",
 	method: utils.httpMethod.GET,
-	queryPart: { "identity_id": validator(true, branch_id) },
+	queryPart: {
+		"identity_id": validator(true, branch_id)
+	},
 	params: defaults({ })
 };
 
@@ -313,7 +332,9 @@ resources.hasApp = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/has-app",
 	method: utils.httpMethod.GET,
-	params: { "browser_fingerprint_id": validator(true, branch_id) }
+	params: {
+		"browser_fingerprint_id": validator(true, branch_id)
+	}
 };
 
 resources.event = {
