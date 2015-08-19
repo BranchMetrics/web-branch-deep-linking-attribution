@@ -15,7 +15,7 @@ goog.require('config');
 var resources = { };
 
 /** @enum {number} */
-var validationTypes = { obj: 0, str: 1, num: 2, arr: 3, bool: 4 };  // now includes bool
+var validationTypes = { obj: 0, str: 1, num: 2, arr: 3, bool: 4 }; // now includes bool
 
 /* jshint ignore:start */
 
@@ -280,7 +280,7 @@ resources.credits = {
 	params: defaults({ })
 };
 
-resources.redeem =  {
+resources.redeem = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/redeem",
 	method: utils.httpMethod.POST,

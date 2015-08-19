@@ -331,7 +331,7 @@ describe('Branch', function() {
 				'referring_identity': 'referring_user',
 				'identity': 'identity',
 				'has_app': false,
-				'referring_link':  '/c/ngJf86-h'
+				'referring_link': '/c/ngJf86-h'
 			};
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;

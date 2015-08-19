@@ -69,7 +69,7 @@ banner_utils.getBodyStyle = function(style) {
 	}
 };
 
-banner_utils.addCSSLengths  = function(length1, length2) {
+banner_utils.addCSSLengths = function(length1, length2) {
 	var convertToUnitlessPixels = function(input) {
 		if (!input) {
 			return 0;
