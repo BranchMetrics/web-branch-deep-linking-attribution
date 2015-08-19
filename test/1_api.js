@@ -1053,7 +1053,7 @@ describe('Server', function() {
 					testUtils.params({ "click": "click" }),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request missing parameter link_url");
+						assert.equal(err.message, "API request  missing parameter link_url");
 					}
 				);
 				assert.equal(requests.length, 0, 'No request made');
@@ -1066,7 +1066,7 @@ describe('Server', function() {
 					testUtils.params({ "link_url": "3hpH54U-58" }),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request missing parameter click");
+						assert.equal(err.message, "API request  missing parameter click");
 					}
 				);
 				assert.equal(requests.length, 0, 'No request made');
