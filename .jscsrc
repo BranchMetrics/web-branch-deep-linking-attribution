@@ -45,6 +45,7 @@
 	"fileExtensions": [
 		".js"
 	],
+	"requireBlocksOnNewline": true,
 	"requireCapitalizedConstructors": true,
 	"requireCommaBeforeLineBreak": true,
 	"requireCurlyBraces": [

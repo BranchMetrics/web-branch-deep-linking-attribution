@@ -10,7 +10,10 @@ var Queue = function() {
 	var queue = [];
 	var next = function() {
 		if (queue.length) {
-			queue[0](function() { queue.shift(); next(); });
+			queue[0](function() {
+				queue.shift();
+				next();
+			});
 		}
 	};
 	return function(task) {

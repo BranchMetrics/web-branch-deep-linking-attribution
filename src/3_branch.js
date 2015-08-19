@@ -307,7 +307,11 @@ Branch.prototype['init'] = wrap(
 			self.app_id = branch_key;
 		}
 
-		options = (options && typeof options == 'function') ? { "isReferrable": null } : options;
+		options = (options && typeof options == 'function') ?
+			{
+				"isReferrable": null
+			} :
+			options;
 
 		if (TITANIUM_BUILD && Ti.Platform.osname === "android") {
 			self.keepAlive = true;
@@ -396,7 +400,12 @@ Branch.prototype['init'] = wrap(
 
 			// Keep android titanium from calling close
 			if (self.keepAlive) {
-				setTimeout(function() { self.keepAlive = false; }, 2000);
+				setTimeout(
+					function() {
+						self.keepAlive = false;
+					},
+					2000
+				);
 			}
 			done(err, data && utils.whiteListSessionData(data));
 		};
@@ -422,7 +431,9 @@ Branch.prototype['init'] = wrap(
 			}
 			if (changeEvent) {
 				document.addEventListener(changeEvent, function() {
-					if (!document[hidden]) { checkHasApp(null, null); }
+					if (!document[hidden]) {
+						checkHasApp(null, null);
+					}
 				}, false);
 			}
 		};
@@ -457,7 +468,9 @@ Branch.prototype['init'] = wrap(
 						args.push(isReferrable ? 1 : 0);
 					}
 					cordova.require("cordova/exec")(apiCordovaTitanium,
-						function() { done("Error getting device data!"); },
+						function() {
+							done("Error getting device data!");
+						},
 						"BranchDevice",
 						freshInstall ? "getInstallData" : "getOpenData", args);
 				}
@@ -587,23 +600,29 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 /*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
-	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		if (err) {
-			done(err);
+	this._api(
+		resources.profile,
+		{
+			"identity": identity
+		},
+		function(err, data) {
+			if (err) {
+				done(err);
+			}
+
+			data = data || { };
+			self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
+			self.sessionLink = data['link'];
+			self.identity = identity;
+
+			data['referring_data_parsed'] = data['referring_data'] ?
+				goog.json.parse(data['referring_data']) :
+				null;
+			session.update(self._storage, data);
+
+			done(null, data);
 		}
-
-		data = data || { };
-		self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
-		self.sessionLink = data['link'];
-		self.identity = identity;
-
-		data['referring_data_parsed'] = data['referring_data'] ?
-			goog.json.parse(data['referring_data']) :
-			null;
-		session.update(self._storage, data);
-
-		done(null, data);
-	});
+	);
 });
 
 /**
@@ -1138,7 +1157,13 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  */
 /*** +TOC_ITEM #validatecodecode-callback &.validateCode()& ^ALL ***/
 Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-	this._api(resources.validateCode, { "code": code }, done);
+	this._api(
+		resources.validateCode,
+		{
+			"code": code
+		},
+		done
+	);
 });
 
 /**
@@ -1187,7 +1212,12 @@ Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(d
  */
 /*** +TOC_ITEM #applycodecode-callback &.applyCode()& ^ALL ***/
 Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-	this._api(resources.applyCode, { "code": code }, done);
+	this._api(
+		resources.applyCode,
+		{
+			"code": code
+		}, done
+	);
 });
 
 /**
@@ -1342,7 +1372,13 @@ Branch.prototype['creditHistory'] = wrap(
  */
 /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
-	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
+	this._api(
+		resources.redeem,
+		{
+			"amount": amount,
+			"bucket": bucket
+		}, done
+	);
 });
 
 if (WEB_BUILD) {

@@ -66,7 +66,9 @@ Server.prototype.getUrl = function(resource, data) {
 	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
 	var appendKeyOrId = function(data, destinationObject) {
-			if (typeof destinationObject == 'undefined') { destinationObject = { }; }
+			if (typeof destinationObject == 'undefined') {
+				destinationObject = { };
+			}
 			if (data['branch_key'] && branch_key.test(data['branch_key'])) {
 				destinationObject['branch_key'] = data['branch_key'];
 				return destinationObject;
@@ -88,7 +90,9 @@ Server.prototype.getUrl = function(resource, data) {
 			resource.queryPart = appendKeyOrId(data, resource.queryPart);
 		}
 		catch (e) {
-			return { error: e.message };
+			return {
+				error: e.message
+			};
 		}
 	}
 
@@ -99,7 +103,9 @@ Server.prototype.getUrl = function(resource, data) {
 					resource.queryPart[k](resource.endpoint, k, data[k]) :
 					err;
 				if (err) {
-					return { error: err };
+					return {
+						error: err
+					};
 				}
 				url += '/' + data[k];
 			}
@@ -110,7 +116,9 @@ Server.prototype.getUrl = function(resource, data) {
 		if (resource.params.hasOwnProperty(k)) {
 			err = resource.params[k](resource.endpoint, k, data[k]);
 			if (err) {
-				return { error: err };
+				return {
+					error: err
+				};
 			}
 
 			v = data[k];
@@ -125,11 +133,16 @@ Server.prototype.getUrl = function(resource, data) {
 			data = appendKeyOrId(data, d);
 		}
 		catch (e) {
-			return { error: e.message };
+			return {
+				error: e.message
+			};
 		}
 	}
 
-	return { data: this.serializeObject(d, ''), url: url };
+	return {
+		data: this.serializeObject(d, ''),
+		url: url
+	};
 };
 
 /**

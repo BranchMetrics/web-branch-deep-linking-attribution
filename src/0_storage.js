@@ -68,8 +68,8 @@ var webStorage = function(perm) {
 			for (var key in storageMethod) {
 				if (key.indexOf(BRANCH_KEY_PREFIX) === 0) {
 					if (allKeyValues === null) {
-						allKeyValues = {
-						}; }
+						allKeyValues = { };
+					}
 					allKeyValues[trimPrefix(key)] = retrieveValue(storageMethod.getItem(key));
 				}
 			}

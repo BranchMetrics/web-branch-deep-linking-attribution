@@ -40,7 +40,9 @@ describe('Integration tests', function() {
 	before(function() {
 		xhr = sinon.useFakeXMLHttpRequest();
 		clock = sinon.useFakeTimers();
-		xhr.onCreate = function(xhr) { requests.push(xhr); };
+		xhr.onCreate = function(xhr) {
+			requests.push(xhr);
+		};
 		if (window.WEB_BUILD) {
 			sinon.stub(branch._server, "createScript", function(src) {
 				requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
@@ -48,7 +50,9 @@ describe('Integration tests', function() {
 		}
 		else if (window.CORDOVA_BUILD && cordova) {
 			sinon.stub(cordova, "require", function() {
-				return function() { arguments[0]({ }); };
+				return function() {
+					arguments[0]({ });
+				};
 			});
 		}
 
@@ -104,8 +108,17 @@ describe('Integration tests', function() {
 		branch.init.apply(
 			branch,
 			window.CORDOVA_BUILD ?
-				[ device_fingerprint_id, { isReferrable: true }, callback ] :
-				[ device_fingerprint_id, callback ]
+				[
+					device_fingerprint_id,
+					{
+						isReferrable: true
+					},
+					callback
+				] :
+				[
+					device_fingerprint_id,
+					callback
+				]
 		);
 		if (window.CORDOVA_BUILD) {
 			requests[0].respond(
@@ -356,7 +369,9 @@ describe('Integration tests', function() {
 
 		it('should make two requests and return undefined, with metadata', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
-			var testMetadata = { "test": "meta_data" };
+			var testMetadata = {
+				"test": "meta_data"
+			};
 			branchInit(assert);
 			branch.track('track', testMetadata, function(err, data) {
 				assert.equal(data, undefined);
@@ -440,7 +455,9 @@ describe('Integration tests', function() {
 				"calculation_type":1,
 				"location":2
 			};
-			var expectedResponse = { "referral_code": "1234567" };
+			var expectedResponse = {
+				"referral_code": "1234567"
+			};
 			branch.getCode(codeRequested, function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
@@ -520,7 +537,9 @@ describe('Integration tests', function() {
 	describe('credits', function() {
 		it('should make three requests and return credits', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
-			var expectedResponse = { "default":"0" };
+			var expectedResponse = {
+				"default":"0"
+			};
 			branchInit(assert);
 			branch.credits(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
