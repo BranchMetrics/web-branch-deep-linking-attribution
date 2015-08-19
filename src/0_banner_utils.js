@@ -74,13 +74,13 @@ banner_utils.addCSSLengths = function(length1, length2) {
 		if (!input) {
 			return 0;
 		}
-		var unit = input.replace(/[0-9,\.]/g, ''),
-			inputArray = input.match(/\d+/g),
-			value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10),
-			vw = function() {
+		var unit = input.replace(/[0-9,\.]/g, '');
+		var inputArray = input.match(/\d+/g);
+		var value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10);
+		var vw = function() {
 				return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-			},
-			vh = function() {
+			};
+		var vh = function() {
 				return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) /
 					100;
 			};

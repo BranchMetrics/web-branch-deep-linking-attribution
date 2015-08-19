@@ -10,9 +10,9 @@ goog.require('goog.json'); // jshint unused:false
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 
 describe('Branch', function() {
-	var storage = new BranchStorage([ 'pojo' ]),
-		sandbox,
-		requests;
+	var storage = new BranchStorage([ 'pojo' ]);
+	var sandbox;
+	var requests;
 
 	window.sdk_version = "web" + config.version;
 
@@ -80,7 +80,8 @@ describe('Branch', function() {
 
 	describe('init', function() {
 		it('should call api with params and version', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(7, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(7, done);
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;
 			});
@@ -123,7 +124,8 @@ describe('Branch', function() {
 		});
 
 		it('should not whitelist referring_link', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(7, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(7, done);
 			sandbox.stub(utils, "whiteListSessionData", function(data) {
 				return data;
 			});
@@ -166,7 +168,8 @@ describe('Branch', function() {
 		});
 
 		it('should support being called without a callback', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(1, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(1, done);
 
 			branch.init(branch_sample_key);
 
@@ -184,7 +187,8 @@ describe('Branch', function() {
 		});
 
 		it('should return invalid app id error', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(1, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(1, done);
 			branch.init(branch_sample_key, function(err) {
 				assert.equal(err.message, 'Invalid app id');
 			});
@@ -194,7 +198,8 @@ describe('Branch', function() {
 		});
 
 		it('should fail early on browser fingerprint error', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err) {
 				assert.equal(err.message, 'Browser fingerprint fetch failed');
 				assert.equal(requests.length, 1, 'Only 1 request made');
@@ -204,7 +209,8 @@ describe('Branch', function() {
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			if (testUtils.go("#r:12345")) {
-				var branch = initBranch(false), assert = testUtils.plan(3, done);
+				var branch = initBranch(false);
+				var assert = testUtils.plan(3, done);
 
 				branch.init(branch_sample_key, function(err, data) {
 					assert.equal(
@@ -239,7 +245,8 @@ describe('Branch', function() {
 			'should store in session and call open with link_identifier from get param',
 			function(done) {
 				if (testUtils.go("?_branch_match_id=67890")) {
-					var branch = initBranch(false), assert = testUtils.plan(2, done);
+					var branch = initBranch(false);
+					var assert = testUtils.plan(2, done);
 
 					branch.init(branch_sample_key, function(err, data) {
 						assert.equal(
@@ -272,7 +279,8 @@ describe('Branch', function() {
 		);
 
 		it('should not call has_app if no session present', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err, data) {
 				assert.equal(requests.length, 2, 'two requests made');
 				assert.deepEqual(
@@ -293,7 +301,8 @@ describe('Branch', function() {
 		});
 
 		it('should call has_app if session present', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key);
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(
@@ -325,7 +334,8 @@ describe('Branch', function() {
 
 	describe('data', function() {
 		it('should return whitelisted session storage data', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(2, done);
 			var whitelistedData = {
 				'data': 'data',
 				'referring_identity': 'referring_user',
@@ -360,7 +370,8 @@ describe('Branch', function() {
 			referring_identity: '12345'
 		};
 		it('should call api with identity', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			branch.setIdentity("test_identity", function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
@@ -382,7 +393,8 @@ describe('Branch', function() {
 		);
 		var expectedResponse = { };
 		it('should call api with identity', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			branch.setIdentity("test_identity", function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
@@ -399,7 +411,8 @@ describe('Branch', function() {
 		// basicTests('track', [ 1, 2 ]);
 
 		it('should call api with event with no metadata', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(3, done);
 			branch.track("test_event", function(err) {
 				assert(!err, 'No error');
 			});
@@ -422,7 +435,8 @@ describe('Branch', function() {
 		});
 
 		it('should call api with event with metadata', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(3, done);
 			var metadata = {
 				"test": "meta_data"
 			};
@@ -453,7 +467,8 @@ describe('Branch', function() {
 		basicTests('logout', [ 0 ]);
 
 		it('should call api with branch_key and session_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(3, done);
 			branch.logout(function(err) {
 				assert(!err, 'No error');
 			});
@@ -470,19 +485,20 @@ describe('Branch', function() {
 		it(
 			'should overwrite existing session_id, sessionLink, and identity_id\'s',
 			function(done) {
-				var branch = initBranch(true), assert = testUtils.plan(6, done);
+				var branch = initBranch(true);
+				var assert = testUtils.plan(6, done);
 				branch.logout(function(err) {
 					assert(!err, 'No error');
 				});
 
 				assert.equal(requests.length, 1, 'Request made');
 
-				var original_session_id = branch.session_id,
-					original_identity_id = branch.identity_id,
-					original_link = branch.sessionLink;
-				var new_session_id = "new_session",
-					new_identity_id = "new_id",
-					new_link = "new_link";
+				var original_session_id = branch.session_id;
+				var original_identity_id = branch.identity_id;
+				var original_link = branch.sessionLink;
+				var new_session_id = "new_session";
+				var new_identity_id = "new_id";
+				var new_link = "new_link";
 
 				requests[0].callback(
 					null,
@@ -538,7 +554,8 @@ describe('Branch', function() {
 		var expectedResponse = { "url": "https://bnc.lt/l/3HZMytU-BW" };
 
 		it('should call api with serialized data and return link', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 			branch.link(expectedRequest(), function(err, link) {
 				assert(!err, 'No error');
 				assert.equal(link, expectedResponse["url"], 'link returned');
@@ -549,14 +566,16 @@ describe('Branch', function() {
 		});
 
 		it('should add source = "web-sdk" to link data', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(2, done);
 			branch.link(expectedRequest());
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(requests[0].obj['source'], 'web-sdk', 'web-sdk source set');
 		});
 
 		it('should remove r hash from desktop_url', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(2, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(2, done);
 			branch.link(expectedRequest(false, false, '#r:12345'));
 			assert.equal(requests.length, 1, 'Request made');
 			assert.equal(
@@ -586,7 +605,8 @@ describe('Branch', function() {
 		});
 
 		it('should call SMSLinkSend if a click_id already exists', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(3, done);
 			sandbox.stub(branch._storage, "get", function(key, storage) {
 				return '12345';
 			});
@@ -606,7 +626,8 @@ describe('Branch', function() {
 		});
 
 		it('should create new link if a click_id does not exist', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 			sandbox.stub(branch._storage, "get", function(key, storage) {
 				return null;
 			});
@@ -625,7 +646,8 @@ describe('Branch', function() {
 		basicTests('referrals', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			var expectedResponse = {
 				"install": {
@@ -660,7 +682,8 @@ describe('Branch', function() {
 	describe('getCode', function() {
 		basicTests('getCode', [ 0 ]);
 		it('should call api with required params and options', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			var options = {
 				"amount":10,
@@ -689,7 +712,8 @@ describe('Branch', function() {
 	describe('validateCode', function() {
 		basicTests('validateCode', [ 0 ]);
 		it('should call api with required params and options', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			var expectedResponse = 'AB12CD';
 
@@ -711,7 +735,8 @@ describe('Branch', function() {
 	describe('applyCode', function() {
 		basicTests('applyCode', [ 0 ]);
 		it('should call api with required params and options', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			var expectedResponse = 'AB12CD';
 
@@ -734,7 +759,8 @@ describe('Branch', function() {
 		basicTests('credits', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			var expectedResponse = {
 				"default": 15,
@@ -760,7 +786,8 @@ describe('Branch', function() {
 		basicTests('creditHistory', [ 0 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(4, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(4, done);
 
 			var options = {
 				"length":50,
@@ -804,7 +831,8 @@ describe('Branch', function() {
 		basicTests('redeem', [ 2 ]);
 
 		it('should call api with identity_id', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(3, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(3, done);
 			branch.redeem(1, "testbucket", function(err) {
 				assert(!err, 'No error');
 			});
@@ -824,7 +852,8 @@ describe('Branch', function() {
 
 	describe('addListener', function() {
 		it('should add and remove an event listener to the branch object and fire', function(done) {
-			var branch = initBranch(true), assert = testUtils.plan(7, done);
+			var branch = initBranch(true);
+			var assert = testUtils.plan(7, done);
 			var listenerFired = 0;
 			var listener = function(event) {
 				assert.equal('test_event', event, 'recieved event equals triggered event');
@@ -855,13 +884,15 @@ describe('Branch', function() {
 	/*
 	describe.fail('Queueing used correctly', function() {
 		it('Should wait to call track after init', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(2, done);
+			var branch = initBranch(false), assert = testUtils.plan(2;
+			var done);
 			branch.init(branch_key, function(err) { assert(!err, 'No error'); });
 			branch.track('did something', function(err) { assert(!err, 'No error'); });
 		});
 
 		it('Should call requests in correct order', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(5, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(5, done);
 			branch.init(branch_key, function(err) { assert(!err, 'No error'); });
 			branch.track('did something else', function(err) { assert(!err, 'No error'); });
 
@@ -884,7 +915,8 @@ describe('Branch', function() {
 		});
 
 		it('If init fails, other calls should error', function(done) {
-			var branch = initBranch(false), assert = testUtils.plan(4, done);
+			var branch = initBranch(false);
+			var assert = testUtils.plan(4, done);
 			branch.init(branch_key, function(err) { assert(err, 'init errored'); });
 			branch.track('did another thing', function(err) {
 				assert(err, 'track errored');

@@ -36,11 +36,11 @@ describe('Server helpers', function() {
 });
 
 describe('Server', function() {
-	var server = new Server(),
-		storage = new BranchStorage([ 'session', 'pojo' ]),
-		xhr,
-		requests,
-		clock;
+	var server = new Server();
+	var storage = new BranchStorage([ 'session', 'pojo' ]);
+	var xhr;
+	var requests;
+	var clock;
 	beforeEach(function() {
 		storage.clear();
 		xhr = sinon.useFakeXMLHttpRequest();

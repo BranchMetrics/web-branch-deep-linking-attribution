@@ -5,7 +5,10 @@ goog.require('goog.json'); // jshint unused:false
 /*globals device_fingerprint_id */
 
 describe('Integration tests', function() {
-	var requests = [ ], xhr, clock, jsonpCallback = 0;
+	var requests = [ ];
+	var xhr;
+	var clock;
+	var jsonpCallback = 0;
 
 	var clearBranchStorage = function() {
 		sessionStorage.clear();
@@ -316,12 +319,12 @@ describe('Integration tests', function() {
 				assert.equal(branch.identity_id, new_identity_id, "branch identity was replaced");
 				assert.equal(branch.sessionLink, new_link, "link was replaced");
 			});
-			var original_session_id = branch.session_id,
-				original_identity_id = branch.identity_id,
-				original_link = branch.sessionLink;
-			var new_session_id = "new_session",
-				new_identity_id = "new_id",
-				new_link = "new_link";
+			var original_session_id = branch.session_id;
+			var original_identity_id = branch.identity_id;
+			var original_link = branch.sessionLink;
+			var new_session_id = "new_session";
+			var new_identity_id = "new_id";
+			var new_link = "new_link";
 
 			assert.equal(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(

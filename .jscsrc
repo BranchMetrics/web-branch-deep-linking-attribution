@@ -2,6 +2,7 @@
 	"disallowMixedSpacesAndTabs": true,
 	"disallowMultipleLineStrings": true,
 	"disallowMultipleSpaces": true,
+	"disallowMultipleVarDecl": true,
 	"disallowNewlineBeforeBlockStatements": true,
 	"disallowSpaceAfterObjectKeys": true,
 	"disallowSpaceAfterPrefixUnaryOperators": [

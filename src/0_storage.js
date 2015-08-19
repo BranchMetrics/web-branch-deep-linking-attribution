@@ -137,8 +137,8 @@ var cookies = function(perm) {
 	};
 	return {
 		getAll: function() {
-			var cookieArray = document.cookie.split(';'),
-				returnCookieObject = { };
+			var cookieArray = document.cookie.split(';');
+			var returnCookieObject = { };
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i].replace(" ", "");
 				cookie = cookie.substring(0, cookie.length);
@@ -225,8 +225,8 @@ BranchStorage.prototype['pojo'] = {
 /** @type storage */
 BranchStorage.prototype['titanium'] = {
 	getAll: function() {
-		var returnObject = { },
-			props = Ti.App.Properties.listProperties();
+		var returnObject = { };
+		var props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
 			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
 				returnObject[props[i]] = retrieveValue(Ti.App.Properties.getString(props[i]));
