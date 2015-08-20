@@ -25,7 +25,9 @@ describe('Branch', function() {
 	});
 
 	function initBranch(runInit, keepStorage) {
-		if (!keepStorage) { storage.clear(); }
+		if (!keepStorage) {
+			storage.clear();
+		}
 		var branch = new Branch();
 
 		sandbox.stub(branch._server, "request", function(resource, obj, storage, callback) {
@@ -222,7 +224,13 @@ describe('Branch', function() {
 				});
 
 				requests[0].callback(null, browser_fingerprint_id);
-				requests[1].callback(null, { session_id: "1234", something: "else" });
+				requests[1].callback(
+					null,
+					{
+						session_id: "1234",
+						something: "else"
+					}
+				);
 
 				assert.deepEqual(requests[1].obj, {
 					"branch_key": branch_sample_key,
@@ -232,7 +240,9 @@ describe('Branch', function() {
 					"sdk": "web" + config.version
 				}, 'Request to open params correct');
 			}
-			else { done(); }
+			else {
+				done();
+			}
 		});
 
 		it(
@@ -257,7 +267,13 @@ describe('Branch', function() {
 					});
 
 					requests[0].callback(null, browser_fingerprint_id);
-					requests[1].callback(null, { session_id: "1234", something: "else" });
+					requests[1].callback(
+						null,
+						{
+							session_id: "1234",
+							something: "else"
+						}
+					);
 
 					assert.deepEqual(requests[1].obj, {
 						"branch_key": branch_sample_key,
@@ -267,7 +283,9 @@ describe('Branch', function() {
 						"sdk": "web" + config.version
 					}, 'Request to open params correct');
 				}
-				else { done(); }
+				else {
+					done();
+				}
 			}
 		);
 
@@ -535,7 +553,9 @@ describe('Branch', function() {
 			return val;
 		};
 
-		var expectedResponse = { "url": "https://bnc.lt/l/3HZMytU-BW" };
+		var expectedResponse = {
+			"url": "https://bnc.lt/l/3HZMytU-BW"
+		};
 
 		it('should call api with serialized data and return link', function(done) {
 			var branch = initBranch(true), assert = testUtils.plan(4, done);
@@ -598,7 +618,13 @@ describe('Branch', function() {
 				"sdk": "web" + config.version
 			};
 
-			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
+			branch.sendSMS(
+				'9999999999',
+				linkData,
+				function(err) {
+					assert(!err, 'No error');
+				}
+			);
 
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback();
@@ -611,11 +637,27 @@ describe('Branch', function() {
 				return null;
 			});
 
-			branch.sendSMS('9999999999', linkData, function(err) { assert(!err, 'No error'); });
+			branch.sendSMS(
+				'9999999999',
+				linkData,
+				function(err) {
+					assert(!err, 'No error');
+				}
+			);
 			assert.equal(requests.length, 1, 'Requests made');
-			requests[0].callback(null, { "url": "https://bnc.lt/l/4FPE0v-04H" });
+			requests[0].callback(
+				null,
+				{
+					"url": "https://bnc.lt/l/4FPE0v-04H"
+				}
+			);
 			assert.equal(requests.length, 2, 'Requests made');
-			requests[1].callback(null, { "click_id":"4FWepu-03S" });
+			requests[1].callback(
+				null,
+				{
+					"click_id":"4FWepu-03S"
+				}
+			);
 			assert.equal(requests.length, 3, 'Requests made');
 			requests[2].callback();
 		});

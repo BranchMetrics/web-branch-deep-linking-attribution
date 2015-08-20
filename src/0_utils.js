@@ -21,7 +21,10 @@ utils.sessionData;
 utils._httpMethod;
 
 /** @enum {utils._httpMethod} */
-utils.httpMethod = { POST: 'POST', GET: 'GET' };
+utils.httpMethod = {
+	POST: 'POST',
+	GET: 'GET'
+};
 
 /** @typedef {{destination: string, endpoint: string, method: utils._httpMethod,
  * params: ?Object.<string, _validator>, queryPart: ?Object.<string, _validator>,
@@ -157,9 +160,13 @@ utils.mobileUserAgent = function() {
 		else if (navigator.userAgent.match(/ipad/i)) {
 			return 'ipad';
 		}
-		else { return 'ios'; }
+		else {
+			return 'ios';
+		}
 	}
-	else { return false; }
+	else {
+		return false;
+	}
 };
 
 /**
