@@ -45,8 +45,10 @@ var init_states = {
  */
 var wrap = function(parameters, func, init) {
 	var r = function() {
-		var self = this, args, callback,
-		lastArg = arguments[arguments.length - 1];
+		var self = this;
+		var args;
+		var callback;
+		var lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg != "function") {
 			callback = function(err) {
 				if (err) {
@@ -196,8 +198,8 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = this._storage.get('referring_link'),
-		click_id = this._storage.get('click_id');
+	var referring_link = this._storage.get('referring_link');
+	var click_id = this._storage.get('click_id');
 
 	if (referring_link) {
 		return referring_link;
@@ -339,23 +341,23 @@ Branch.prototype['init'] = wrap(
 				}
 			}
 			return data;
-		},
+		};
 
-		isReferrable = (options &&
+		var isReferrable = (options &&
 				typeof options.isReferrable != 'undefined' &&
 				options.isReferrable !== null) ?
 			options.isReferrable :
-			null,
-		sessionData = session.get(self._storage),
-		url = (options && typeof options.url != 'undefined' && options.url !== null) ?
+			null;
+		var sessionData = session.get(self._storage);
+		var url = (options && typeof options.url != 'undefined' && options.url !== null) ?
 			options.url :
-			null,
-		link_identifier = WEB_BUILD ?
+			null;
+		var link_identifier = WEB_BUILD ?
 			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
-			(url ? utils.getParamValue(url) : null),
-		freshInstall = !sessionData || !sessionData['identity_id'],
+			(url ? utils.getParamValue(url) : null);
+		var freshInstall = !sessionData || !sessionData['identity_id'];
 
-		checkHasApp = function(sessionData, cb) {
+		var checkHasApp = function(sessionData, cb) {
 			if (WEB_BUILD) {
 				self._api(
 					resources._r,
@@ -382,9 +384,9 @@ Branch.prototype['init'] = wrap(
 					}
 				}
 			);
-		},
+		};
 
-		finishInit = function(err, data) {
+		var finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
 				session.set(self._storage, data, freshInstall);
@@ -406,10 +408,11 @@ Branch.prototype['init'] = wrap(
 				);
 			}
 			done(err, data && utils.whiteListSessionData(data));
-		},
+		};
 
-		attachVisibilityEvent = function() {
-			var hidden, changeEvent;
+		var attachVisibilityEvent = function() {
+			var hidden;
+			var changeEvent;
 			if (typeof document.hidden !== "undefined") {
 				hidden = "hidden";
 				changeEvent = "visibilitychange";
@@ -472,8 +475,8 @@ Branch.prototype['init'] = wrap(
 						freshInstall ? "getInstallData" : "getOpenData", args);
 				}
 				if (TITANIUM_BUILD) {
-					var data = { },
-						branchTitaniumSDK = require('io.branch.sdk');
+					var data = { };
+					var branchTitaniumSDK = require('io.branch.sdk');
 					if (link_identifier) {
 						data['link_identifier'] = link_identifier;
 					}

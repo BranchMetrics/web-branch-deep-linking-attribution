@@ -192,10 +192,10 @@ utils.isKey = function(key_or_id) {
  * @param {string} string
  */
 utils.snakeToCamel = function(string) {
-	var find = /(\-\w)/g,
-		convert = function(matches) {
-			return matches[1].toUpperCase();
-		};
+	var find = /(\-\w)/g;
+	var convert = function(matches) {
+		return matches[1].toUpperCase();
+	};
 	return string.replace(find, convert);
 };
 
@@ -229,7 +229,13 @@ utils.base64encode = function(input) {
 	var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
 	var output = '';
-	var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+	var chr1;
+	var chr2;
+	var chr3;
+	var enc1;
+	var enc2;
+	var enc3;
+	var enc4;
 	var i = 0;
 	input = utf8_encode(input);
 

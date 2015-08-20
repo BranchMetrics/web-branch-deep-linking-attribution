@@ -7,8 +7,8 @@ goog.provide('Queue');
  * @returns {function(function(function()))}
  */
 var Queue = function() {
-	var queue = [],
-	next = function() {
+	var queue = [];
+	var next = function() {
 		if (queue.length) {
 			queue[0](function() {
 				queue.shift();
