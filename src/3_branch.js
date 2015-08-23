@@ -45,8 +45,10 @@ var init_states = {
  */
 var wrap = function(parameters, func, init) {
 	var r = function() {
-		var self = this, args, callback,
-		lastArg = arguments[arguments.length - 1];
+		var self = this;
+		var args;
+		var callback;
+		var lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg != "function") {
 			callback = function(err) {
 				if (err) {
@@ -196,8 +198,8 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = this._storage.get('referring_link'),
-		click_id = this._storage.get('click_id');
+	var referring_link = this._storage.get('referring_link');
+	var click_id = this._storage.get('click_id');
 
 	if (referring_link) {
 		return referring_link;
@@ -305,7 +307,11 @@ Branch.prototype['init'] = wrap(
 			self.app_id = branch_key;
 		}
 
-		options = (options && typeof options == 'function') ? { "isReferrable": null } : options;
+		options = (options && typeof options == 'function') ?
+			{
+				"isReferrable": null
+			} :
+			options;
 
 		if (TITANIUM_BUILD && Ti.Platform.osname === "android") {
 			self.keepAlive = true;
@@ -335,23 +341,23 @@ Branch.prototype['init'] = wrap(
 				}
 			}
 			return data;
-		},
+		};
 
-		isReferrable = (options &&
+		var isReferrable = (options &&
 				typeof options.isReferrable != 'undefined' &&
 				options.isReferrable !== null) ?
 			options.isReferrable :
-			null,
-		sessionData = session.get(self._storage),
-		url = (options && typeof options.url != 'undefined' && options.url !== null) ?
+			null;
+		var sessionData = session.get(self._storage);
+		var url = (options && typeof options.url != 'undefined' && options.url !== null) ?
 			options.url :
-			null,
-		link_identifier = WEB_BUILD ?
+			null;
+		var link_identifier = WEB_BUILD ?
 			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
-			(url ? utils.getParamValue(url) : null),
-		freshInstall = !sessionData || !sessionData['identity_id'],
+			(url ? utils.getParamValue(url) : null);
+		var freshInstall = !sessionData || !sessionData['identity_id'];
 
-		checkHasApp = function(sessionData, cb) {
+		var checkHasApp = function(sessionData, cb) {
 			if (WEB_BUILD) {
 				self._api(
 					resources._r,
@@ -378,9 +384,9 @@ Branch.prototype['init'] = wrap(
 					}
 				}
 			);
-		},
+		};
 
-		finishInit = function(err, data) {
+		var finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
 				session.set(self._storage, data, freshInstall);
@@ -394,13 +400,19 @@ Branch.prototype['init'] = wrap(
 
 			// Keep android titanium from calling close
 			if (self.keepAlive) {
-				setTimeout(function() { self.keepAlive = false; }, 2000);
+				setTimeout(
+					function() {
+						self.keepAlive = false;
+					},
+					2000
+				);
 			}
 			done(err, data && utils.whiteListSessionData(data));
-		},
+		};
 
-		attachVisibilityEvent = function() {
-			var hidden, changeEvent;
+		var attachVisibilityEvent = function() {
+			var hidden;
+			var changeEvent;
 			if (typeof document.hidden !== "undefined") {
 				hidden = "hidden";
 				changeEvent = "visibilitychange";
@@ -419,7 +431,9 @@ Branch.prototype['init'] = wrap(
 			}
 			if (changeEvent) {
 				document.addEventListener(changeEvent, function() {
-					if (!document[hidden]) { checkHasApp(null, null); }
+					if (!document[hidden]) {
+						checkHasApp(null, null);
+					}
 				}, false);
 			}
 		};
@@ -454,13 +468,15 @@ Branch.prototype['init'] = wrap(
 						args.push(isReferrable ? 1 : 0);
 					}
 					cordova.require("cordova/exec")(apiCordovaTitanium,
-						function() { done("Error getting device data!"); },
+						function() {
+							done("Error getting device data!");
+						},
 						"BranchDevice",
 						freshInstall ? "getInstallData" : "getOpenData", args);
 				}
 				if (TITANIUM_BUILD) {
-					var data = { },
-						branchTitaniumSDK = require('io.branch.sdk');
+					var data = { };
+					var branchTitaniumSDK = require('io.branch.sdk');
 					if (link_identifier) {
 						data['link_identifier'] = link_identifier;
 					}
@@ -584,23 +600,29 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 /*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
-	this._api(resources.profile, { "identity": identity }, function(err, data) {
-		if (err) {
-			done(err);
+	this._api(
+		resources.profile,
+		{
+			"identity": identity
+		},
+		function(err, data) {
+			if (err) {
+				done(err);
+			}
+
+			data = data || { };
+			self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
+			self.sessionLink = data['link'];
+			self.identity = identity;
+
+			data['referring_data_parsed'] = data['referring_data'] ?
+				goog.json.parse(data['referring_data']) :
+				null;
+			session.update(self._storage, data);
+
+			done(null, data);
 		}
-
-		data = data || { };
-		self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
-		self.sessionLink = data['link'];
-		self.identity = identity;
-
-		data['referring_data_parsed'] = data['referring_data'] ?
-			goog.json.parse(data['referring_data']) :
-			null;
-		session.update(self._storage, data);
-
-		done(null, data);
-	});
+	);
 });
 
 /**
@@ -1135,7 +1157,13 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  */
 /*** +TOC_ITEM #validatecodecode-callback &.validateCode()& ^ALL ***/
 Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-	this._api(resources.validateCode, { "code": code }, done);
+	this._api(
+		resources.validateCode,
+		{
+			"code": code
+		},
+		done
+	);
 });
 
 /**
@@ -1184,7 +1212,12 @@ Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(d
  */
 /*** +TOC_ITEM #applycodecode-callback &.applyCode()& ^ALL ***/
 Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-	this._api(resources.applyCode, { "code": code }, done);
+	this._api(
+		resources.applyCode,
+		{
+			"code": code
+		}, done
+	);
 });
 
 /**
@@ -1339,7 +1372,13 @@ Branch.prototype['creditHistory'] = wrap(
  */
 /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
 Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
-	this._api(resources.redeem, { "amount": amount, "bucket": bucket }, done);
+	this._api(
+		resources.redeem,
+		{
+			"amount": amount,
+			"bucket": bucket
+		}, done
+	);
 });
 
 if (WEB_BUILD) {

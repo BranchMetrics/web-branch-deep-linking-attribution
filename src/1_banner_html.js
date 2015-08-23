@@ -85,8 +85,8 @@ banner_html.iframe = function(options, action) {
 	iframe.className = 'branch-animation';
 	document.body.appendChild(iframe);
 
-	var bodyClass,
-		userAgent = utils.mobileUserAgent();
+	var bodyClass;
+	var userAgent = utils.mobileUserAgent();
 	if (userAgent == 'ios' || userAgent == 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}
@@ -131,7 +131,7 @@ banner_html.markup = function(options, storage, branch) {
 		(utils.mobileUserAgent() ?
 			banner_html.mobileAction(options, storage, branch) :
 			banner_html.desktopAction(options)) +
-	'</div>';
+		'</div>';
 
 	if (options.iframe) {
 		return banner_html.iframe(options, action);

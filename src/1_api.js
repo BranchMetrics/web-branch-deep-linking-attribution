@@ -10,9 +10,9 @@ goog.require('storage'); // jshint unused:false
 
 /*globals Ti, TITANIUM_BUILD */
 
-var RETRIES = 2,
-	RETRY_DELAY = 200,
-	TIMEOUT = 5000;
+var RETRIES = 2;
+var RETRY_DELAY = 200;
+var TIMEOUT = 5000;
 
 /**
  * @class Server
@@ -58,35 +58,41 @@ Server.prototype.serializeObject = function(obj, prefix) {
  * @param {Object.<string, *>} data
  */
 Server.prototype.getUrl = function(resource, data) {
-	var k, v, err,
-		url = resource.destination + resource.endpoint,
-		branch_id = /^[0-9]{15,20}$/,
-		branch_key = /key_(live|test)_[A-Za-z0-9]{32}/,
+	var k;
+	var v;
+	var err;
+	var url = resource.destination + resource.endpoint;
+	var branch_id = /^[0-9]{15,20}$/;
+	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
-		appendKeyOrId = function(data, destinationObject) {
-			if (typeof destinationObject == 'undefined') { destinationObject = { }; }
-			if (data['branch_key'] && branch_key.test(data['branch_key'])) {
-				destinationObject['branch_key'] = data['branch_key'];
-				return destinationObject;
-			}
-			else if (data['app_id'] && branch_id.test(data['app_id'])) {
-				destinationObject['app_id'] = data['app_id'];
-				return destinationObject;
-			}
-			else {
-				throw Error(utils.message(
-					utils.messages.missingParam,
-					[ resource.endpoint, 'branch_key or app_id' ]
-				));
-			}
-		};
+	var appendKeyOrId = function(data, destinationObject) {
+		if (typeof destinationObject == 'undefined') {
+			destinationObject = { };
+		}
+		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
+			destinationObject['branch_key'] = data['branch_key'];
+			return destinationObject;
+		}
+		else if (data['app_id'] && branch_id.test(data['app_id'])) {
+			destinationObject['app_id'] = data['app_id'];
+			return destinationObject;
+		}
+		else {
+			throw Error(utils.message(
+				utils.messages.missingParam,
+				[ resource.endpoint, 'branch_key or app_id' ]
+			));
+		}
+	};
 
 	if (resource.endpoint == "/v1/has-app") {
 		try {
 			resource.queryPart = appendKeyOrId(data, resource.queryPart);
 		}
 		catch (e) {
-			return { error: e.message };
+			return {
+				error: e.message
+			};
 		}
 	}
 
@@ -97,7 +103,9 @@ Server.prototype.getUrl = function(resource, data) {
 					resource.queryPart[k](resource.endpoint, k, data[k]) :
 					err;
 				if (err) {
-					return { error: err };
+					return {
+						error: err
+					};
 				}
 				url += '/' + data[k];
 			}
@@ -108,7 +116,9 @@ Server.prototype.getUrl = function(resource, data) {
 		if (resource.params.hasOwnProperty(k)) {
 			err = resource.params[k](resource.endpoint, k, data[k]);
 			if (err) {
-				return { error: err };
+				return {
+					error: err
+				};
 			}
 
 			v = data[k];
@@ -123,11 +133,16 @@ Server.prototype.getUrl = function(resource, data) {
 			data = appendKeyOrId(data, d);
 		}
 		catch (e) {
-			return { error: e.message };
+			return {
+				error: e.message
+			};
 		}
 	}
 
-	return { data: this.serializeObject(d, ''), url: url };
+	return {
+		data: this.serializeObject(d, ''),
+		url: url
+	};
 };
 
 /**
@@ -154,15 +169,18 @@ var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
-	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=',
-		postData = (requestMethod == 'POST') ?
-			encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
-			"";
+	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=';
+	var postData = (requestMethod == 'POST') ?
+		encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
+		"";
 
-	var timeout_trigger = window.setTimeout(function() {
-		window[callbackString] = function() { };
-		callback(new Error(utils.messages.timeout), null, 504);
-	}, TIMEOUT);
+	var timeout_trigger = window.setTimeout(
+		function() {
+			window[callbackString] = function() { };
+			callback(new Error(utils.messages.timeout), null, 504);
+		},
+		TIMEOUT
+	);
 
 	window[callbackString] = function(data) {
 		window.clearTimeout(timeout_trigger);
@@ -270,7 +288,8 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		return callback(new Error(u.error));
 	}
 
-	var url, postData = '';
+	var url;
+	var postData = '';
 	if (resource.method == 'GET') {
 		url = u.url + '?' + u.data;
 	}
