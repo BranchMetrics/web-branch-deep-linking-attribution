@@ -125,5 +125,6 @@
 	"safeContextKeyword": [
 		"self"
 	],
-	"validateLineBreaks": "LF"
+	"validateLineBreaks": "LF",
+	"validateParameterSeparator": ", "
 }
