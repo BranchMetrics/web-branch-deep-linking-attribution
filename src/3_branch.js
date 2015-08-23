@@ -198,19 +198,22 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var click_id = this._storage.get('click_id');
-
-	var storage = session.get(this._storage);
-	var referring_link = storage ? storage['referring_link'] : null;
+	var sessionData = session.get(this._storage);
+	var referring_link = sessionData ? sessionData['referring_link'] : null;
 	if (referring_link) {
 		return referring_link;
 	}
-	else if (click_id) {
+	referring_link = this._storage.get('referring_link');
+	if (referring_link) {
+		return referring_link;
+	}
+
+	var click_id = this._storage.get('click_id');
+	if (click_id) {
 		return config.link_service_endpoint + '/c/' + click_id;
 	}
-	else {
-		return null;
-	}
+
+	return null;
 };
 
 /***

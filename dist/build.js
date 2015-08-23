@@ -1420,8 +1420,8 @@ Branch.prototype._api = function(a, b, c) {
   });
 };
 Branch.prototype._referringLink = function() {
-  var a = this._storage.get("click_id"), b = session.get(this._storage);
-  return (b = b ? b.referring_link : null) ? b : a ? config.link_service_endpoint + "/c/" + a : null;
+  var a = session.get(this._storage);
+  return (a = a ? a.referring_link : null) || (a = this._storage.get("referring_link")) ? a : (a = this._storage.get("click_id")) ? config.link_service_endpoint + "/c/" + a : null;
 };
 Branch.prototype._publishEvent = function(a) {
   for (var b = 0;b < this._listeners.length;b++) {
