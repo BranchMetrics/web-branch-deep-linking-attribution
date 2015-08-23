@@ -6,8 +6,7 @@
 	"freeze": true,
 	"immed": true,
 	"latedef": true,
-	"maxlen": 100,
-	"mocha": "true",
+	"mocha": true,
 	"noarg": true,
 	"nonbsp": true,
 	"predef": [
