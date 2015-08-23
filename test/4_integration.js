@@ -500,7 +500,8 @@ describe('Integration tests', function() {
 		it('should make two requests and return error if present', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
-			var expectedResponse = [ {
+			var expectedResponse = [
+				{
 					"transaction": {
 						"date": "2014-10-14T01:54:40.425Z",
 						"id": "50388077461373184",
@@ -521,7 +522,8 @@ describe('Integration tests', function() {
 					},
 					"referrer": null,
 					"referree": "12345678"
-				} ];
+				}
+			];
 			branch.creditHistory(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});

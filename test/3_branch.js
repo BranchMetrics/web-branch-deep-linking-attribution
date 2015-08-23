@@ -838,21 +838,23 @@ describe('Branch', function() {
 				"bucket":"default"
 			};
 
-			var expectedResponse = [ {
-				"transaction": {
-					"id":"65301496270422583",
-					"bucket":"default",
-					"type":2,
-					"amount":-5,
-					"date":"2014-11-24T05:35:16.547Z"
-				},
-				"event": {
-					"name":null,
-					"metadata":null
-				},
-				"referrer":null,
-				"referree":null
-			} ];
+			var expectedResponse = [
+				{
+					"transaction": {
+						"id":"65301496270422583",
+						"bucket":"default",
+						"type":2,
+						"amount":-5,
+						"date":"2014-11-24T05:35:16.547Z"
+					},
+					"event": {
+						"name":null,
+						"metadata":null
+					},
+					"referrer":null,
+					"referree":null
+				}
+			];
 
 			branch.creditHistory(options, function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');

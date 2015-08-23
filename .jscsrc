@@ -126,5 +126,6 @@
 		"self"
 	],
 	"validateLineBreaks": "LF",
+	"validateNewlineAfterArrayElements": true,
 	"validateParameterSeparator": ", "
 }
