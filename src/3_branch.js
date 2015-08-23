@@ -198,9 +198,10 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = this._storage.get('referring_link');
 	var click_id = this._storage.get('click_id');
 
+	var storage = session.get(this._storage);
+	var referring_link = storage ? storage['referring_link'] : null;
 	if (referring_link) {
 		return referring_link;
 	}
