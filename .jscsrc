@@ -125,6 +125,7 @@
 	"safeContextKeyword": [
 		"self"
 	],
+	"validateIndentation": "\t",
 	"validateLineBreaks": "LF",
 	"validateNewlineAfterArrayElements": true,
 	"validateParameterSeparator": ", "
