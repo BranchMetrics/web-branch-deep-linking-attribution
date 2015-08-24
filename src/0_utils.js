@@ -83,12 +83,12 @@ utils.message = function(message, params) {
  */
 utils.whiteListSessionData = function(data) {
 	return {
-		'data': ('data' in data) ? data.data : null,
-		'data_parsed': ('data_parsed' in data) ? data.data_parsed : null,
-		'has_app': ('has_app' in data) ? data.has_app : null,
-		'identity': ('identity' in data) ? data.identity : null,
-		'referring_identity': ('referring_identity' in data) ? data.referring_identity : null,
-		'referring_link': ('referring_link' in data) ? data.referring_link : null
+		'data': data['data'] || null,
+		'data_parsed': data['data_parsed'] || null,
+		'has_app': data['has_app'] || null,
+		'identity': data.identity || null,
+		'referring_identity': data['referring_identity'] || null,
+		'referring_link': data['referring_link'] || null
 	};
 };
 
@@ -96,19 +96,19 @@ utils.cleanLinkData = function(linkData, config) {
 	/* jshint undef:false */
 	if (WEB_BUILD) { // WTF, I don't know why I can't just do undef:false for the line.
 		/* jshint undef:true */
-		linkData.source = 'web-sdk';
-		if (linkData.data && linkData.data.$desktop_url !== undefined) {
-			linkData.data.$desktop_url =
-				linkData.data.$desktop_url
+		linkData['source'] = 'web-sdk';
+		if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
+			linkData['data']['$desktop_url'] =
+				linkData['data']['$desktop_url']
 					.replace(/#r:[a-z0-9-_]+$/i, '')
 					.replace(/([\?\&]_branch_match_id=\d+)/, '');
 		}
 	}
 	try {
-		JSON.parse(linkData.data);
+		JSON.parse(linkData['data']);
 	}
 	catch (e) {
-		linkData.data = goog.json.serialize(linkData.data || {});
+		linkData['data'] = goog.json.serialize(linkData['data'] || {});
 	}
 	return linkData;
 };

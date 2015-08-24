@@ -67,11 +67,11 @@ var sendSMS = function(doc, branch, options, linkData) {
 	};
 
 	if (phone) {
-		var phone_val = phone.value;
-		if ((/^\d{7,}$/).test(phone_val.replace(/[\s()+\-\.]|ext/gi, ''))) {
+		var phoneValue = phone.value;
+		if ((/^\d{7,}$/).test(phoneValue.replace(/[\s()+\-\.]|ext/gi, ''))) {
 			branch._publishEvent("willSendBannerSMS");
 			disableForm();
-			branch["sendSMS"](phone_val, linkData, options, function(err) {
+			branch["sendSMS"](phoneValue, linkData, options, function(err) {
 				if (err) {
 					branch._publishEvent("sendBannerSMSError");
 					errorForm();
@@ -117,9 +117,9 @@ banner = function(branch, options, linkData, storage) {
 
 	var doc = options.iframe ? element.contentWindow.document : document;
 	if (utils.mobileUserAgent()) {
-		var referring_link = branch._referringLink();
-		if (referring_link && !options['make_new_link']) {
-			doc.getElementById('branch-mobile-action').href = referring_link;
+		var referringLink = branch._referringLink();
+		if (referringLink && !options['make_new_link']) {
+			doc.getElementById('branch-mobile-action').href = referringLink;
 		}
 		else {
 			branch["link"](linkData, function(err, url) {

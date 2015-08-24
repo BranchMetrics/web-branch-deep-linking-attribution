@@ -198,14 +198,14 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = this._storage.get('referring_link');
-	var click_id = this._storage.get('click_id');
+	var referringLink = this._storage.get('referring_link');
+	var clickId = this._storage.get('click_id');
 
-	if (referring_link) {
-		return referring_link;
+	if (referringLink) {
+		return referringLink;
 	}
-	else if (click_id) {
-		return config.link_service_endpoint + '/c/' + click_id;
+	else if (clickId) {
+		return config.link_service_endpoint + '/c/' + clickId;
 	}
 	else {
 		return null;
@@ -352,7 +352,7 @@ Branch.prototype['init'] = wrap(
 		var url = (options && typeof options.url != 'undefined' && options.url !== null) ?
 			options.url :
 			null;
-		var link_identifier = WEB_BUILD ?
+		var linkIdentifier = WEB_BUILD ?
 			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
 			(url ? utils.getParamValue(url) : null);
 		var freshInstall = !sessionData || !sessionData['identity_id'];
@@ -441,8 +441,8 @@ Branch.prototype['init'] = wrap(
 		if (WEB_BUILD &&
 				sessionData &&
 				sessionData['session_id'] &&
-				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
-				link_identifier === sessionData['click_id'])) {
+				(utils.processReferringLink(linkIdentifier) === sessionData['referring_link'] ||
+				linkIdentifier === sessionData['click_id'])) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
 		}
@@ -477,8 +477,8 @@ Branch.prototype['init'] = wrap(
 				if (TITANIUM_BUILD) {
 					var data = { };
 					var branchTitaniumSDK = require('io.branch.sdk');
-					if (link_identifier) {
-						data['link_identifier'] = link_identifier;
+					if (linkIdentifier) {
+						data['link_identifier'] = linkIdentifier;
 					}
 					if (freshInstall) {
 						data = branchTitaniumSDK.getInstallData(
@@ -506,13 +506,13 @@ Branch.prototype['init'] = wrap(
 						self._api(
 							resources.open,
 							{
-								"link_identifier": link_identifier,
+								"link_identifier": linkIdentifier,
 								"is_referrable": 1,
 								"browser_fingerprint_id": browser_fingerprint_id
 							},
 							function(err, data) {
-								if (data && link_identifier) {
-									data['click_id'] = link_identifier;
+								if (data && linkIdentifier) {
+									data['click_id'] = linkIdentifier;
 								}
 								attachVisibilityEvent();
 								finishInit(err, data);
@@ -976,10 +976,10 @@ Branch.prototype['sendSMS'] = wrap(
 			}, done);
 		}
 
-		var referring_link = self._referringLink();
-		if (referring_link && !options['make_new_link']) {
-			sendSMS(referring_link.substring(
-				referring_link.lastIndexOf('/') + 1, referring_link.length
+		var referringLink = self._referringLink();
+		if (referringLink && !options['make_new_link']) {
+			sendSMS(referringLink.substring(
+				referringLink.lastIndexOf('/') + 1, referringLink.length
 			));
 		}
 		else {
