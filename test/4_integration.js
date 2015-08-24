@@ -211,18 +211,18 @@ describe('Integration tests', function() {
 			branch.init(browser_fingerprint_id, function(err) {
 				assert.equal(err.message, 'Error in API: 500');
 			});
-			var request_count = 0;
+			var requestCount = 0;
 			if (window.WEB_BUILD) {
-				requests[request_count].callback(browser_fingerprint_id);
-				request_count++;
+				requests[requestCount].callback(browser_fingerprint_id);
+				requestCount++;
 			}
-			requests[request_count].respond(500);
+			requests[requestCount].respond(500);
 			clock.tick(250);
-			request_count++;
-			requests[request_count].respond(500);
+			requestCount++;
+			requests[requestCount].respond(500);
 			clock.tick(250);
-			request_count++;
-			requests[request_count].respond(500);
+			requestCount++;
+			requests[requestCount].respond(500);
 		});
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
@@ -328,25 +328,22 @@ describe('Integration tests', function() {
 			branchInit(assert);
 			branch.logout(function(err, data) {
 				assert.equal(err, null);
-				assert.equal(branch.session_id, new_session_id, "branch session was replaced");
-				assert.equal(branch.identity_id, new_identity_id, "branch identity was replaced");
-				assert.equal(branch.sessionLink, new_link, "link was replaced");
+				assert.equal(branch.session_id, newSessionId, "branch session was replaced");
+				assert.equal(branch.identity_id, newIdentityId, "branch identity was replaced");
+				assert.equal(branch.sessionLink, newLink, "link was replaced");
 			});
-			var original_session_id = branch.session_id;
-			var original_identity_id = branch.identity_id;
-			var original_link = branch.sessionLink;
-			var new_session_id = "new_session";
-			var new_identity_id = "new_id";
-			var new_link = "new_link";
+			var newSessionId = "new_session";
+			var newIdentityId = "new_id";
+			var newLink = "new_link";
 
 			assert.equal(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify({
-					"session_id": new_session_id,
-					"identity_id": new_identity_id,
-					"link": new_link
+					"session_id": newSessionId,
+					"identity_id": newIdentityId,
+					"link": newLink
 				})
 			);
 		});

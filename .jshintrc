@@ -6,7 +6,7 @@
 	"freeze": true,
 	"immed": true,
 	"latedef": true,
-	"mocha": "true",
+	"mocha": true,
 	"noarg": true,
 	"nonbsp": true,
 	"predef": [
