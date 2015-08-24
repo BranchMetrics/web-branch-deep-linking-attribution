@@ -11,7 +11,11 @@ describe('session storage', function() {
 
 	it('should set an item', function() {
 		storage.set(itemKey, itemValue);
-		assert.equal(sessionStorage.getItem(BRANCH_KEY_PREFIX + itemKey), itemValue, 'key / vaue stored');
+		assert.equal(
+			sessionStorage.getItem(BRANCH_KEY_PREFIX + itemKey),
+			itemValue,
+			'key / vaue stored'
+		);
 	});
 
 	it('shold get stored item with key', function() {
@@ -47,7 +51,11 @@ describe('local storage', function() {
 
 	it('should set an item in localStorage', function() {
 		storage.set(itemKey, itemValue);
-		assert.equal(localStorage.getItem(BRANCH_KEY_PREFIX + itemKey), itemValue, 'key / vaue stored');
+		assert.equal(
+			localStorage.getItem(BRANCH_KEY_PREFIX + itemKey),
+			itemValue,
+			'key / vaue stored'
+		);
 	});
 
 	it('shold get stored item with key', function() {
