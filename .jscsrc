@@ -1,4 +1,8 @@
 {
+	"disallowKeywords": [
+		"eval",
+		"with"
+	],
 	"disallowMixedSpacesAndTabs": true,
 	"disallowMultipleLineStrings": true,
 	"disallowMultipleSpaces": true,
@@ -126,5 +130,8 @@
 	"safeContextKeyword": [
 		"self"
 	],
-	"validateLineBreaks": "LF"
+	"validateIndentation": "\t",
+	"validateLineBreaks": "LF",
+	"validateNewlineAfterArrayElements": true,
+	"validateParameterSeparator": ", "
 }

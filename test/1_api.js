@@ -781,7 +781,8 @@ describe('Server', function() {
 							err.message,
 							"API request /v1/has-app missing parameter branch_key or app_id"
 						);
-				});
+					}
+				);
 				assert.equal(requests.length, 0, 'Request not made');
 			});
 		});

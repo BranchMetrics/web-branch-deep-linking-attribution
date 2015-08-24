@@ -174,7 +174,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 		encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
 		"";
 
-	var timeout_trigger = window.setTimeout(
+	var timeoutTrigger = window.setTimeout(
 		function() {
 			window[callbackString] = function() { };
 			callback(new Error(utils.messages.timeout), null, 504);
@@ -183,7 +183,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 	);
 
 	window[callbackString] = function(data) {
-		window.clearTimeout(timeout_trigger);
+		window.clearTimeout(timeoutTrigger);
 		callback(null, data);
 	};
 

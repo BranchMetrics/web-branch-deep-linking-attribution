@@ -2,6 +2,7 @@
 	"bitwise": false,
 	"browser": true,
 	"curly": true,
+	"eqeqeq": false,
 	"forin": true,
 	"freeze": true,
 	"immed": true,
@@ -9,6 +10,7 @@
 	"maxlen": 100,
 	"mocha": true,
 	"noarg": true,
+	"nocomma": true,
 	"nonbsp": true,
 	"predef": [
 		"ActiveXObject",
