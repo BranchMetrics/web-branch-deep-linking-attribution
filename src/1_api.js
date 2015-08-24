@@ -99,7 +99,7 @@ Server.prototype.getUrl = function(resource, data) {
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
 			if (resource.queryPart.hasOwnProperty(k)) {
-				err = (typeof resource.queryPart[k] == 'function') ?
+				err = (typeof resource.queryPart[k] === 'function') ?
 					resource.queryPart[k](resource.endpoint, k, data[k]) :
 					err;
 				if (err) {
@@ -122,7 +122,7 @@ Server.prototype.getUrl = function(resource, data) {
 			}
 
 			v = data[k];
-			if (!(typeof v == 'undefined' || v === '' || v === null)) {
+			if (!(typeof v === 'undefined' || v === '' || v === null)) {
 				d[k] = v;
 			}
 		}
