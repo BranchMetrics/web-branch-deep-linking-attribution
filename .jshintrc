@@ -19,6 +19,7 @@
 		"module"
 	],
 	"scripturl": true,
+	"shadow": "inner",
 	"sub": true,
 	"trailing": true,
 	"undef": true,
