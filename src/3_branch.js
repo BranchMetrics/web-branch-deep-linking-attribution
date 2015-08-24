@@ -198,18 +198,18 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referringLink = this._storage.get('referring_link');
-	var clickId = this._storage.get('click_id');
-
+	var sessionData = session.get(this._storage);
+	var referringLink = sessionData ? sessionData['referring_link'] : null;
 	if (referringLink) {
 		return referringLink;
 	}
-	else if (clickId) {
+
+	var clickId = this._storage.get('click_id');
+	if (clickId) {
 		return config.link_service_endpoint + '/c/' + clickId;
 	}
-	else {
-		return null;
-	}
+
+	return null;
 };
 
 /***
@@ -970,10 +970,14 @@ Branch.prototype['sendSMS'] = wrap(
 		}
 
 		function sendSMS(click_id) {
-			self._api(resources.SMSLinkSend, {
-				"link_url": click_id,
-				"phone": phone
-			}, done);
+			self._api(
+				resources.SMSLinkSend,
+				{
+					"link_url": click_id,
+					"phone": phone
+				},
+				done
+			);
 		}
 
 		var referringLink = self._referringLink();
