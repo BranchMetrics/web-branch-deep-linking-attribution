@@ -511,19 +511,16 @@ describe('Branch', function() {
 
 				assert.equal(requests.length, 1, 'Request made');
 
-				var original_session_id = branch.session_id;
-				var original_identity_id = branch.identity_id;
-				var original_link = branch.sessionLink;
-				var new_session_id = "new_session";
-				var new_identity_id = "new_id";
-				var new_link = "new_link";
+				var newSessionId = "new_session";
+				var newIdentityId = "new_id";
+				var newLink = "new_link";
 
 				requests[0].callback(
 					null,
 					{
-						"identity_id": new_identity_id,
-						"session_id": new_session_id,
-						"link": new_link
+						"identity_id": newIdentityId,
+						"session_id": newSessionId,
+						"link": newLink
 					}
 				);
 				assert.deepEqual(
@@ -531,9 +528,9 @@ describe('Branch', function() {
 					testUtils.params({ }, [ 'browser_fingerprint_id' ]),
 					'All params sent'
 				);
-				assert.equal(branch.session_id, new_session_id, "branch session was replaced");
-				assert.equal(branch.identity_id, new_identity_id, "branch identity was replaced");
-				assert.equal(branch.sessionLink, new_link, "link was replaced");
+				assert.equal(branch.session_id, newSessionId, "branch session was replaced");
+				assert.equal(branch.identity_id, newIdentityId, "branch identity was replaced");
+				assert.equal(branch.sessionLink, newLink, "link was replaced");
 			}
 		);
 	});
@@ -541,7 +538,7 @@ describe('Branch', function() {
 	describe('link', function() {
 		basicTests('link', [ 1 ]);
 
-		var expectedRequest = function(serialized, source, desktop_url_append) {
+		var expectedRequest = function(serialized, source, desktopUrlAppend) {
 			var val = testUtils.params({
 				tags: [ 'tag1', 'tag2' ],
 				channel: 'sample app',
@@ -557,8 +554,8 @@ describe('Branch', function() {
 				},
 				"sdk": "web" + config.version
 			});
-			if (desktop_url_append) {
-				val['data']['$desktop_url'] += desktop_url_append;
+			if (desktopUrlAppend) {
+				val['data']['$desktop_url'] += desktopUrlAppend;
 			}
 			if (serialized) {
 				val['data'] = JSON.stringify(val['data']);
@@ -838,21 +835,23 @@ describe('Branch', function() {
 				"bucket":"default"
 			};
 
-			var expectedResponse = [ {
-				"transaction": {
-					"id":"65301496270422583",
-					"bucket":"default",
-					"type":2,
-					"amount":-5,
-					"date":"2014-11-24T05:35:16.547Z"
-				},
-				"event": {
-					"name":null,
-					"metadata":null
-				},
-				"referrer":null,
-				"referree":null
-			} ];
+			var expectedResponse = [
+				{
+					"transaction": {
+						"id":"65301496270422583",
+						"bucket":"default",
+						"type":2,
+						"amount":-5,
+						"date":"2014-11-24T05:35:16.547Z"
+					},
+					"event": {
+						"name":null,
+						"metadata":null
+					},
+					"referrer":null,
+					"referree":null
+				}
+			];
 
 			branch.creditHistory(options, function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
