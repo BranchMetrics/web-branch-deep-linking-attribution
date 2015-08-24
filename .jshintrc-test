@@ -11,6 +11,7 @@
 	"mocha": true,
 	"noarg": true,
 	"nocomma": true,
+	"node": true,
 	"nonbsp": true,
 	"predef": [
 		"ActiveXObject",
