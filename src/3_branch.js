@@ -198,14 +198,14 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var referring_link = this._storage.get('referring_link');
-	var click_id = this._storage.get('click_id');
+	var referringLink = this._storage.get('referring_link');
+	var clickId = this._storage.get('click_id');
 
-	if (referring_link) {
-		return referring_link;
+	if (referringLink) {
+		return referringLink;
 	}
-	else if (click_id) {
-		return config.link_service_endpoint + '/c/' + click_id;
+	else if (clickId) {
+		return config.link_service_endpoint + '/c/' + clickId;
 	}
 	else {
 		return null;
@@ -976,10 +976,10 @@ Branch.prototype['sendSMS'] = wrap(
 			}, done);
 		}
 
-		var referring_link = self._referringLink();
-		if (referring_link && !options['make_new_link']) {
-			sendSMS(referring_link.substring(
-				referring_link.lastIndexOf('/') + 1, referring_link.length
+		var referringLink = self._referringLink();
+		if (referringLink && !options['make_new_link']) {
+			sendSMS(referringLink.substring(
+				referringLink.lastIndexOf('/') + 1, referringLink.length
 			));
 		}
 		else {

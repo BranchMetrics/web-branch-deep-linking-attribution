@@ -120,7 +120,7 @@
 		var pSlice = Array.prototype.slice;
 
 		// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
-		var Object_keys = typeof Object.keys === 'function' ?
+		var objectKeys = typeof Object.keys === 'function' ?
 			Object.keys :
 			(function() {
 				var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -370,8 +370,8 @@
 				return _deepEqual(a, b);
 			}
 			try {
-				var ka = Object_keys(a);
-				var kb = Object_keys(b);
+				var ka = objectKeys(a);
+				var kb = objectKeys(b);
 				var key;
 				var i;
 			} catch (e) {//happens when one is a string literal and the other isn't
@@ -596,9 +596,9 @@
 			if (!window.history.pushState) {
 				return false;
 			}
-			var new_location = window.location.toString().split(/[\?#]/)[0] + suffix;
-			if (new_location !== window.location.toString()) {
-				window.history.pushState({}, '', new_location); // Simply not possible in IE 9
+			var newLocation = window.location.toString().split(/[\?#]/)[0] + suffix;
+			if (newLocation !== window.location.toString()) {
+				window.history.pushState({}, '', newLocation); // Simply not possible in IE 9
 				return true;
 			}
 			else {
