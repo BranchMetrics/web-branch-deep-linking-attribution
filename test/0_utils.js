@@ -55,7 +55,7 @@ describe('utils', function() {
 				"identity": "67890",
 				"referring_identity": "12345"
 			};
-			assert.equal(null, data.has_app, 'has_app should be null');
+			assert.equal(null, data['has_app'], 'has_app should be null');
 		});
 	});
 
