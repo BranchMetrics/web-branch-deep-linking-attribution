@@ -36,15 +36,9 @@ Server.prototype.serializeObject = function(obj, prefix) {
 	else {
 		for (var prop in obj) {
 			if (obj.hasOwnProperty(prop)) {
-				if ((obj[prop] instanceof Array || typeof obj[prop] == 'object') && prop != 'metadata') {
+				if (obj[prop] instanceof Array || typeof obj[prop] == 'object') {
 					pairs.push(
 						this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
-					);
-				}
-				else if (prop == 'metadata') {
-					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
-						'=' +
-						encodeURIComponent(JSON.stringify(obj[prop]))
 					);
 				}
 				else {
@@ -145,6 +139,9 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
+	if (resource.endpoint === '/v1/event') {
+		d.metadata = JSON.stringify(d.metadata || {});
+	}
 	return {
 		data: this.serializeObject(d, ''),
 		url: url
