@@ -1571,7 +1571,7 @@ if (WEB_BUILD) {
 			make_new_link: !!options['make_new_link']
 		};
 
-		if (typeof options['showMobile'] !=='undefined') {
+		if (typeof options['showMobile'] !== 'undefined') {
 			bannerOptions.showiOS = options['showMobile'];
 			bannerOptions.showAndroid = options['showMobile'];
 		}
