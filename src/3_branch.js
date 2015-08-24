@@ -352,7 +352,7 @@ Branch.prototype['init'] = wrap(
 		var url = (options && typeof options.url != 'undefined' && options.url !== null) ?
 			options.url :
 			null;
-		var linkIdentifier = WEB_BUILD ?
+		var link_identifier = WEB_BUILD ?
 			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
 			(url ? utils.getParamValue(url) : null);
 		var freshInstall = !sessionData || !sessionData['identity_id'];
@@ -441,8 +441,8 @@ Branch.prototype['init'] = wrap(
 		if (WEB_BUILD &&
 				sessionData &&
 				sessionData['session_id'] &&
-				(utils.processReferringLink(linkIdentifier) === sessionData['referring_link'] ||
-				linkIdentifier === sessionData['click_id'])) {
+				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
+				link_identifier === sessionData['click_id'])) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
 		}
@@ -477,8 +477,8 @@ Branch.prototype['init'] = wrap(
 				if (TITANIUM_BUILD) {
 					var data = { };
 					var branchTitaniumSDK = require('io.branch.sdk');
-					if (linkIdentifier) {
-						data['link_identifier'] = linkIdentifier;
+					if (link_identifier) {
+						data['link_identifier'] = link_identifier;
 					}
 					if (freshInstall) {
 						data = branchTitaniumSDK.getInstallData(
@@ -506,13 +506,13 @@ Branch.prototype['init'] = wrap(
 						self._api(
 							resources.open,
 							{
-								"link_identifier": linkIdentifier,
+								"link_identifier": link_identifier,
 								"is_referrable": 1,
 								"browser_fingerprint_id": browser_fingerprint_id
 							},
 							function(err, data) {
-								if (data && linkIdentifier) {
-									data['click_id'] = linkIdentifier;
+								if (data && link_identifier) {
+									data['click_id'] = link_identifier;
 								}
 								attachVisibilityEvent();
 								finishInit(err, data);

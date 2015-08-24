@@ -62,18 +62,18 @@ Server.prototype.getUrl = function(resource, data) {
 	var v;
 	var err;
 	var url = resource.destination + resource.endpoint;
-	var branchId = /^[0-9]{15,20}$/;
-	var branchKey = /key_(live|test)_[A-Za-z0-9]{32}/;
+	var branch_id = /^[0-9]{15,20}$/;
+	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
 	var appendKeyOrId = function(data, destinationObject) {
 		if (typeof destinationObject == 'undefined') {
 			destinationObject = { };
 		}
-		if (data['branch_key'] && branchKey.test(data['branch_key'])) {
+		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
 			destinationObject['branch_key'] = data['branch_key'];
 			return destinationObject;
 		}
-		else if (data['app_id'] && branchId.test(data['app_id'])) {
+		else if (data['app_id'] && branch_id.test(data['app_id'])) {
 			destinationObject['app_id'] = data['app_id'];
 			return destinationObject;
 		}
