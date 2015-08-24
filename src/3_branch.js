@@ -203,10 +203,6 @@ Branch.prototype._referringLink = function() {
 	if (referringLink) {
 		return referringLink;
 	}
-	referringLink = this._storage.get('referring_link');
-	if (referringLink) {
-		return referringLink;
-	}
 
 	var clickId = this._storage.get('click_id');
 	if (clickId) {
@@ -974,10 +970,14 @@ Branch.prototype['sendSMS'] = wrap(
 		}
 
 		function sendSMS(click_id) {
-			self._api(resources.SMSLinkSend, {
-				"link_url": click_id,
-				"phone": phone
-			}, done);
+			self._api(
+				resources.SMSLinkSend,
+				{
+					"link_url": click_id,
+					"phone": phone
+				},
+				done
+			);
 		}
 
 		var referringLink = self._referringLink();
