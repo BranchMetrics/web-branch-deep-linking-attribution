@@ -1420,8 +1420,8 @@ Branch.prototype._api = function(a, b, c) {
   });
 };
 Branch.prototype._referringLink = function() {
-  var a = this._storage.get("referring_link"), b = this._storage.get("click_id");
-  return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
+  var a = session.get(this._storage);
+  return (a = a ? a.referring_link : null) ? a : (a = this._storage.get("click_id")) ? config.link_service_endpoint + "/c/" + a : null;
 };
 Branch.prototype._publishEvent = function(a) {
   for (var b = 0;b < this._listeners.length;b++) {
@@ -1586,6 +1586,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" != c.channel || (c.channel = "sms");
   var g = f._referringLink();
+  console.log("kirkdebug + referringLink", g);
   g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
     if (b) {
       return a(b);
