@@ -183,8 +183,13 @@
   */
     $('#track').click(function() {
       request.html('branch.track(\'Tracked this event\');');
-      branch.track('Tracked this event', function(err, data) {
-        response.html(JSON.stringify(err || data || 'undefined'));
+      branch.track(
+		  'Tracked this event',
+		  {
+			  'metadata foo': 'metadata bar'
+		  },
+		  function(err) {
+        response.html(JSON.stringify(err || 'no error'));
       });
     });
     $('#link').click(function() {
