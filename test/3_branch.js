@@ -14,7 +14,7 @@ describe('Branch', function() {
 	var sandbox;
 	var requests;
 
-	window.sdk_version = "web" + config.version;
+	window.sdk_version = 'web' + config.version;
 
 	beforeEach(function() {
 		testUtils.go('');
@@ -30,7 +30,7 @@ describe('Branch', function() {
 		}
 		var branch = new Branch();
 
-		sandbox.stub(branch._server, "request", function(resource, obj, storage, callback) {
+		sandbox.stub(branch._server, 'request', function(resource, obj, storage, callback) {
 			requests.push({
 				resource: resource,
 				obj: obj,
@@ -84,14 +84,14 @@ describe('Branch', function() {
 		it('should call api with params and version', function(done) {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(7, done);
-			sandbox.stub(utils, "whiteListSessionData", function(data) {
+			sandbox.stub(utils, 'whiteListSessionData', function(data) {
 				return data;
 			});
 			var expectedResponse = {
 				"session_id": "113636235674656786",
 				"identity_id": "98807509250212101",
 				"identity": "Branch",
-				"has_app":true,
+				"has_app": true,
 				"referring_link": null
 			};
 
@@ -103,7 +103,7 @@ describe('Branch', function() {
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, expectedResponse);
 
-			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
+			assert.deepEqual(requests[0].resource.endpoint, '/_r', 'Request to open made');
 			assert.deepEqual(
 				requests[0].obj,
 				{
@@ -113,7 +113,7 @@ describe('Branch', function() {
 				'Request params to _r correct'
 			);
 
-			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
+			assert.deepEqual(requests[1].resource.endpoint, '/v1/open', 'Request to open made');
 			assert.deepEqual(requests[1].obj, {
 				"branch_key": branch_sample_key,
 				"link_identifier": undefined,
@@ -128,7 +128,7 @@ describe('Branch', function() {
 		it('should not whitelist referring_link', function(done) {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(7, done);
-			sandbox.stub(utils, "whiteListSessionData", function(data) {
+			sandbox.stub(utils, 'whiteListSessionData', function(data) {
 				return data;
 			});
 			var expectedResponse = {
@@ -147,7 +147,7 @@ describe('Branch', function() {
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, expectedResponse);
 
-			assert.deepEqual(requests[0].resource.endpoint, "/_r", "Request to open made");
+			assert.deepEqual(requests[0].resource.endpoint, '/_r', 'Request to open made');
 			assert.deepEqual(
 				requests[0].obj,
 				{
@@ -157,7 +157,7 @@ describe('Branch', function() {
 				'Request params to _r correct'
 			);
 
-			assert.deepEqual(requests[1].resource.endpoint, "/v1/open", "Request to open made");
+			assert.deepEqual(requests[1].resource.endpoint, '/v1/open', 'Request to open made');
 			assert.deepEqual(requests[1].obj, {
 				"branch_key": branch_sample_key,
 				"link_identifier": undefined,
@@ -210,7 +210,7 @@ describe('Branch', function() {
 		});
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
-			if (testUtils.go("#r:12345")) {
+			if (testUtils.go('#r:12345')) {
 				var branch = initBranch(false);
 				var assert = testUtils.plan(3, done);
 
@@ -254,7 +254,7 @@ describe('Branch', function() {
 		it(
 			'should store in session and call open with link_identifier from get param',
 			function(done) {
-				if (testUtils.go("?_branch_match_id=67890")) {
+				if (testUtils.go('?_branch_match_id=67890')) {
 					var branch = initBranch(false);
 					var assert = testUtils.plan(2, done);
 
@@ -303,8 +303,8 @@ describe('Branch', function() {
 				assert.equal(requests.length, 2, 'two requests made');
 				assert.deepEqual(
 					requests[0].resource.endpoint,
-					"/_r",
-					"Request to open made, not has_app"
+					'/_r',
+					'Request to open made, not has_app'
 				);
 			});
 			requests[0].callback(null, browser_fingerprint_id);
@@ -336,16 +336,16 @@ describe('Branch', function() {
 			branch = initBranch(false, true);
 			assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key);
-			assert.equal(requests.length, 2, "Should make 2 requests");
+			assert.equal(requests.length, 2, 'Should make 2 requests');
 			assert.deepEqual(
 				requests[0].resource.endpoint,
-				"/_r",
-				"First request should be sent to /_r"
+				'/_r',
+				'First request should be sent to /_r'
 			);
 			assert.deepEqual(
 				requests[1].resource.endpoint,
-				"/v1/has-app",
-				"Second request should be sent to /v1/has-app"
+				'/v1/has-app',
+				'Second request should be sent to /v1/has-app'
 			);
 		});
 	});
@@ -361,10 +361,10 @@ describe('Branch', function() {
 				'has_app': false,
 				'referring_link': '/c/ngJf86-h'
 			};
-			sandbox.stub(utils, "whiteListSessionData", function(data) {
+			sandbox.stub(utils, 'whiteListSessionData', function(data) {
 				return data;
 			});
-			sandbox.stub(session, "get", function(storage) {
+			sandbox.stub(session, 'get', function(storage) {
 				return whitelistedData;
 			});
 			branch.data(function(err, res) {
@@ -391,7 +391,7 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
-			branch.setIdentity("test_identity", function(err, res) {
+			branch.setIdentity('test_identity', function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
@@ -414,7 +414,7 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
-			branch.setIdentity("test_identity", function(err, res) {
+			branch.setIdentity('test_identity', function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert(!err, 'No error');
 			});
@@ -431,7 +431,7 @@ describe('Branch', function() {
 		it('should call api with event with no metadata', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
-			branch.track("test_event", function(err) {
+			branch.track('test_event', function(err) {
 				assert(!err, 'No error');
 			});
 			var expectedRequest = {
@@ -458,7 +458,7 @@ describe('Branch', function() {
 			var metadata = {
 				"test": "meta_data"
 			};
-			branch.track("test_event", metadata, function(err) {
+			branch.track('test_event', metadata, function(err) {
 				assert(!err, 'No error');
 			});
 			var expectedRequest = {
@@ -511,9 +511,9 @@ describe('Branch', function() {
 
 				assert.equal(requests.length, 1, 'Request made');
 
-				var newSessionId = "new_session";
-				var newIdentityId = "new_id";
-				var newLink = "new_link";
+				var newSessionId = 'new_session';
+				var newIdentityId = 'new_id';
+				var newLink = 'new_link';
 
 				requests[0].callback(
 					null,
@@ -528,9 +528,9 @@ describe('Branch', function() {
 					testUtils.params({ }, [ 'browser_fingerprint_id' ]),
 					'All params sent'
 				);
-				assert.equal(branch.session_id, newSessionId, "branch session was replaced");
-				assert.equal(branch.identity_id, newIdentityId, "branch identity was replaced");
-				assert.equal(branch.sessionLink, newLink, "link was replaced");
+				assert.equal(branch.session_id, newSessionId, 'branch session was replaced');
+				assert.equal(branch.identity_id, newIdentityId, 'branch identity was replaced');
+				assert.equal(branch.sessionLink, newLink, 'link was replaced');
 			}
 		);
 	});
@@ -575,7 +575,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(4, done);
 			branch.link(expectedRequest(), function(err, link) {
 				assert(!err, 'No error');
-				assert.equal(link, expectedResponse["url"], 'link returned');
+				assert.equal(link, expectedResponse['url'], 'link returned');
 			});
 			assert.equal(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
@@ -624,7 +624,7 @@ describe('Branch', function() {
 		it('should call SMSLinkSend if a click_id already exists', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
-			sandbox.stub(branch._storage, "get", function(key, storage) {
+			sandbox.stub(branch._storage, 'get', function(key, storage) {
 				return '12345';
 			});
 
@@ -651,7 +651,7 @@ describe('Branch', function() {
 		it('should create new link if a click_id does not exist', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
-			sandbox.stub(branch._storage, "get", function(key, storage) {
+			sandbox.stub(branch._storage, 'get', function(key, storage) {
 				return null;
 			});
 
@@ -845,11 +845,11 @@ describe('Branch', function() {
 						"date":"2014-11-24T05:35:16.547Z"
 					},
 					"event": {
-						"name":null,
-						"metadata":null
+						"name": null,
+						"metadata": null
 					},
-					"referrer":null,
-					"referree":null
+					"referrer": null,
+					"referree": null
 				}
 			];
 
@@ -874,7 +874,7 @@ describe('Branch', function() {
 		it('should call api with identity_id', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
-			branch.redeem(1, "testbucket", function(err) {
+			branch.redeem(1, 'testbucket', function(err) {
 				assert(!err, 'No error');
 			});
 

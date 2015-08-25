@@ -15,7 +15,7 @@ describe('Integration tests', function() {
 		localStorage.clear();
 		var clearCookies = function(temp, perm) {
 			var deleteCookie = function(cookie) {
-				document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/";
+				document.cookie = cookie.substring(0, cookie.indexOf('=')) + '=;expires=-1;path=/';
 			};
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
@@ -23,11 +23,11 @@ describe('Integration tests', function() {
 				while (cookie.charAt(0) === ' ') {
 					cookie = cookie.substring(1, cookie.length);
 				}
-				if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") === 0) {
-					if (temp && cookie.indexOf("branch_expiration_date=") === -1) {
+				if (cookie.indexOf('BRANCH_WEBSDK_COOKIE') === 0) {
+					if (temp && cookie.indexOf('branch_expiration_date=') === -1) {
 						deleteCookie(cookie);
 					}
-					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) {
+					else if (perm && cookie.indexOf('branch_expiration_date=') > 0) {
 						deleteCookie(cookie);
 					}
 				}
@@ -44,12 +44,12 @@ describe('Integration tests', function() {
 			requests.push(xhr);
 		};
 		if (window.WEB_BUILD) {
-			sinon.stub(branch._server, "createScript", function(src) {
+			sinon.stub(branch._server, 'createScript', function(src) {
 				requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 			});
 		}
 		else if (window.CORDOVA_BUILD && cordova) {
-			sinon.stub(cordova, "require", function() {
+			sinon.stub(cordova, 'require', function() {
 				return function() {
 					arguments[0]({ });
 				};
@@ -227,7 +227,7 @@ describe('Integration tests', function() {
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			var assert = testUtils.plan(1, done);
-			if (testUtils.go("#r:12345")) {
+			if (testUtils.go('#r:12345')) {
 				branchInit();
 				assert.equal(
 					true,
@@ -252,8 +252,8 @@ describe('Integration tests', function() {
 				assert.deepEqual(data,
 					{
 						"identity_id": identity_id,
-						"link_click_id":"114750153298026746",
-						"link":"https://bnc.lt/i/4LYQTXE0_k",
+						"link_click_id": "114750153298026746",
+						"link": "https://bnc.lt/i/4LYQTXE0_k",
 						"referring_data_parsed": null
 					},
 					'Expected response returned'
@@ -328,13 +328,13 @@ describe('Integration tests', function() {
 			branchInit(assert);
 			branch.logout(function(err, data) {
 				assert.equal(err, null);
-				assert.equal(branch.session_id, newSessionId, "branch session was replaced");
-				assert.equal(branch.identity_id, newIdentityId, "branch identity was replaced");
-				assert.equal(branch.sessionLink, newLink, "link was replaced");
+				assert.equal(branch.session_id, newSessionId, 'branch session was replaced');
+				assert.equal(branch.identity_id, newIdentityId, 'branch identity was replaced');
+				assert.equal(branch.sessionLink, newLink, 'link was replaced');
 			});
-			var newSessionId = "new_session";
-			var newIdentityId = "new_id";
-			var newLink = "new_link";
+			var newSessionId = 'new_session';
+			var newIdentityId = 'new_id';
+			var newLink = 'new_link';
 
 			assert.equal(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
@@ -387,7 +387,7 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.link(sampleParams, function(err, data) {
-				assert.equal(data, "https://bnc.lt/l/4manXlk0AJ");
+				assert.equal(data, 'https://bnc.lt/l/4manXlk0AJ');
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
@@ -434,7 +434,7 @@ describe('Integration tests', function() {
 		it('should make two requests and return error if present', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
-			branch.redeem(5, "rubies", function(err, data) {
+			branch.redeem(5, 'rubies', function(err, data) {
 				assert.deepEqual(data, null);
 			});
 			assert.equal(requests.length, indexOfLastInitRequest(2));
@@ -471,7 +471,7 @@ describe('Integration tests', function() {
 		it('should make two requests and return object literal with code', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
-			var code = "1234567";
+			var code = '1234567';
 			branch.validateCode(code, function(err, data) {
 				assert.deepEqual(data, null);
 			});
@@ -484,7 +484,7 @@ describe('Integration tests', function() {
 		it('should make two requests and return object literal with code', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
-			var code = "1234567";
+			var code = '1234567';
 			branch.applyCode(code, function(err, data) {
 				assert.deepEqual(data, null);
 			});
@@ -537,7 +537,7 @@ describe('Integration tests', function() {
 		it('should make three requests and return credits', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			var expectedResponse = {
-				"default":"0"
+				"default": "0"
 			};
 			branchInit(assert);
 			branch.credits(function(err, data) {

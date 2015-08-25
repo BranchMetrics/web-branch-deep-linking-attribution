@@ -131,7 +131,7 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.method === "POST" || resource.endpoint === "/v1/credithistory") {
+	if (resource.method === 'POST' || resource.endpoint === '/v1/credithistory') {
 		try {
 			data = appendKeyOrId(data, d);
 		}
@@ -209,7 +209,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		Ti.Network.createHTTPClient() :
 		(window.XMLHttpRequest ?
 			new XMLHttpRequest() :
-			new ActiveXObject("Microsoft.XMLHTTP"));
+			new ActiveXObject('Microsoft.XMLHTTP'));
 	req.ontimeout = function() {
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
@@ -222,7 +222,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 				callback(new Error(e.error), null, req.status);
 			}
 			else {
-				callback(new Error("Error in API: " + req.status), null, req.status);
+				callback(new Error('Error in API: ' + req.status), null, req.status);
 			}
 		};
 		req.onload = function() {
@@ -308,7 +308,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	 * @type {function(?Error,*=): ?undefined}
 	 */
 	var done = function(err, data, status) {
-		if (err && retries > 0 && status.toString().substring(0, 1) === "5") {
+		if (err && retries > 0 && status.toString().substring(0, 1) === '5') {
 			retries--;
 			window.setTimeout(function() {
 				makeRequest();

@@ -181,7 +181,7 @@ utils.getParamValue = function(key) {
  * @param {string} key_or_id
  */
 utils.isKey = function(key_or_id) {
-	return key_or_id.indexOf("key_") > -1;
+	return key_or_id.indexOf('key_') > -1;
 };
 
 /**
@@ -202,7 +202,7 @@ utils.snakeToCamel = function(string) {
  */
 utils.base64encode = function(input) {
 	var utf8_encode = function(string) {
-		string = string.replace(/\r\n/g, "\n");
+		string = string.replace(/\r\n/g, '\n');
 		var utftext = '';
 		for (var n = 0; n < string.length; n++) {
 			var c = string.charCodeAt(n);

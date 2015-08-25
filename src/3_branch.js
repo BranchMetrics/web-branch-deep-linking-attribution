@@ -313,7 +313,7 @@ Branch.prototype['init'] = wrap(
 			} :
 			options;
 
-		if (TITANIUM_BUILD && Ti.Platform.osname === "android") {
+		if (TITANIUM_BUILD && Ti.Platform.osname === 'android') {
 			self.keepAlive = true;
 		}
 
@@ -377,7 +377,7 @@ Branch.prototype['init'] = wrap(
 					if (has_app && !currentSessionData['has_app']) {
 						currentSessionData['has_app'] = true;
 						session.update(self._storage, currentSessionData);
-						self._publishEvent("didDownloadApp");
+						self._publishEvent('didDownloadApp');
 					}
 					if (cb) {
 						cb(err, currentSessionData);
@@ -413,21 +413,21 @@ Branch.prototype['init'] = wrap(
 		var attachVisibilityEvent = function() {
 			var hidden;
 			var changeEvent;
-			if (typeof document.hidden !== "undefined") {
-				hidden = "hidden";
-				changeEvent = "visibilitychange";
+			if (typeof document.hidden !== 'undefined') {
+				hidden = 'hidden';
+				changeEvent = 'visibilitychange';
 			}
-			else if (typeof document.mozHidden !== "undefined") {
-				hidden = "mozHidden";
-				changeEvent = "mozvisibilitychange";
+			else if (typeof document.mozHidden !== 'undefined') {
+				hidden = 'mozHidden';
+				changeEvent = 'mozvisibilitychange';
 			}
-			else if (typeof document.msHidden !== "undefined") {
-				hidden = "msHidden";
-				changeEvent = "msvisibilitychange";
+			else if (typeof document.msHidden !== 'undefined') {
+				hidden = 'msHidden';
+				changeEvent = 'msvisibilitychange';
 			}
-			else if (typeof document.webkitHidden !== "undefined") {
-				hidden = "webkitHidden";
-				changeEvent = "webkitvisibilitychange";
+			else if (typeof document.webkitHidden !== 'undefined') {
+				hidden = 'webkitHidden';
+				changeEvent = 'webkitvisibilitychange';
 			}
 			if (changeEvent) {
 				document.addEventListener(changeEvent, function() {
@@ -467,12 +467,12 @@ Branch.prototype['init'] = wrap(
 					if (isReferrable !== null) {
 						args.push(isReferrable ? 1 : 0);
 					}
-					cordova.require("cordova/exec")(apiCordovaTitanium,
+					cordova.require('cordova/exec')(apiCordovaTitanium,
 						function() {
-							done("Error getting device data!");
+							done('Error getting device data!');
 						},
-						"BranchDevice",
-						freshInstall ? "getInstallData" : "getOpenData", args);
+						'BranchDevice',
+						freshInstall ? 'getInstallData' : 'getOpenData', args);
 				}
 				if (TITANIUM_BUILD) {
 					var data = { };

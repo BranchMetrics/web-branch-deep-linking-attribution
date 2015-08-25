@@ -44,7 +44,7 @@ banner_utils.hasClass = function(element, className) {
 
 banner_utils.addClass = function(element, className) {
 	if (!banner_utils.hasClass(element, className)) {
-		element.className += " " + className;
+		element.className += ' ' + className;
 	}
 };
 
