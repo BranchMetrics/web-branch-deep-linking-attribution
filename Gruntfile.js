@@ -132,8 +132,10 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					// I have Cordova tests on saucelabs disabled for now. There are a few issues with dependencies I need to work out
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'/*, 'http://127.0.0.1:9999/test/cordova-integration-test.html'*/],
+					urls: [
+						'http://127.0.0.1:9999/test/test.html',
+						'http://127.0.0.1:9999/test/integration-test.html'
+					],
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
@@ -142,11 +144,13 @@ module.exports = function(grunt) {
 					statusCheckAttempts: 360,   // So if you change one of these, adjust 'max-duration' accordingly
 					'max-duration': 720,        // (s)
 					testname: 'Web SDK Tests',
-					browsers: safari_browsers.concat(chrome_browsers,
+					browsers: safari_browsers.concat(
+						chrome_browsers,
 						firefox_browsers,
 						ios_browsers,
 						android_browsers,
-						ie_browsers)
+						ie_browsers
+					)
 				}
 			}
 		},
@@ -162,7 +166,9 @@ module.exports = function(grunt) {
 
 	// Loading dependencies
 	for (var key in grunt.file.readJSON("package.json").devDependencies) {
-		if (key !== "grunt" && key.indexOf("grunt") === 0) grunt.loadNpmTasks(key);
+		if (key !== "grunt" && key.indexOf("grunt") === 0) {
+			grunt.loadNpmTasks(key);
+		}
 	}
 
 	grunt.loadNpmTasks('grunt-saucelabs');
