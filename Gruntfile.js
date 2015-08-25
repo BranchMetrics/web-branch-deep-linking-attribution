@@ -144,13 +144,11 @@ module.exports = function(grunt) {
 					statusCheckAttempts: 360,   // So if you change one of these, adjust 'max-duration' accordingly
 					'max-duration': 720,        // (s)
 					testname: 'Web SDK Tests',
-					browsers: safari_browsers.concat(
-						chrome_browsers,
+					browsers: safari_browsers.concat(chrome_browsers,
 						firefox_browsers,
 						ios_browsers,
 						android_browsers,
-						ie_browsers
-					)
+						ie_browsers)
 				}
 			}
 		},
