@@ -639,7 +639,7 @@ var Queue = function() {
   };
   return function(c) {
     a.push(c);
-    1 == a.length && b();
+    1 === a.length && b();
   };
 };
 // Input 3
@@ -771,7 +771,7 @@ utils.clickIdFromLink = function(a) {
   return a ? a.substring(a.lastIndexOf("/") + 1, a.length) : null;
 };
 utils.processReferringLink = function(a) {
-  return a ? "http" != a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
+  return a ? "http" !== a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
 };
 utils.merge = function(a, b) {
   for (var c in b) {
@@ -786,7 +786,7 @@ utils.hashValue = function(a) {
   }
 };
 utils.mobileUserAgent = function() {
-  return navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i) ? navigator.userAgent.match(/android/i) ? "android" : navigator.userAgent.match(/ipad/i) ? "ipad" : "ios" : !1;
+  return navigator.userAgent.match(/android/i) ? "android" : navigator.userAgent.match(/ipad/i) ? "ipad" : navigator.userAgent.match(/i(os|p(hone|od))/i) ? "ios" : !1;
 };
 utils.getParamValue = function(a) {
   try {
@@ -818,17 +818,17 @@ utils.base64encode = function(a) {
 // Input 5
 var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
-    var c = this[a[b]], c = "function" == typeof c ? c() : c;
+    var c = this[a[b]], c = "function" === typeof c ? c() : c;
     if (c.isEnabled()) {
       return c._store = {}, c;
     }
   }
 }, prefix = function(a) {
-  return "branch_session" == a || "branch_session_first" == a ? a : BRANCH_KEY_PREFIX + a;
+  return "branch_session" === a || "branch_session_first" === a ? a : BRANCH_KEY_PREFIX + a;
 }, trimPrefix = function(a) {
   return a.replace(BRANCH_KEY_PREFIX, "");
 }, retrieveValue = function(a) {
-  return "true" == a ? !0 : "false" == a ? !1 : a;
+  return "true" === a ? !0 : "false" === a ? !1 : a;
 }, webStorage = function(a) {
   var b = a ? localStorage : sessionStorage;
   return {getAll:function() {
@@ -865,7 +865,7 @@ var cookies = function(a) {
   return {getAll:function() {
     for (var a = document.cookie.split(";"), c = {}, d = 0;d < a.length;d++) {
       var e = a[d].replace(" ", ""), e = e.substring(0, e.length);
-      -1 != e.indexOf(BRANCH_KEY_PREFIX) && (e = e.split("="), c[trimPrefix(e[0])] = retrieveValue(e[1]));
+      -1 !== e.indexOf(BRANCH_KEY_PREFIX) && (e = e.split("="), c[trimPrefix(e[0])] = retrieveValue(e[1]));
     }
     return c;
   }, get:function(a) {
@@ -888,7 +888,7 @@ var cookies = function(a) {
       document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
     }, c = document.cookie.split(";"), d = 0;d < c.length;d++) {
       var e = c[d], e = e.substring(1, e.length);
-      -1 != e.indexOf(BRANCH_KEY_PREFIX) && (a || -1 != e.indexOf("branch_expiration_date=") ? a && 0 < e.indexOf("branch_expiration_date=") && b(e) : b(e));
+      -1 !== e.indexOf(BRANCH_KEY_PREFIX) && (a || -1 !== e.indexOf("branch_expiration_date=") ? a && 0 < e.indexOf("branch_expiration_date=") && b(e) : b(e));
     }
   }, isEnabled:function() {
     return navigator.cookieEnabled;
@@ -903,7 +903,7 @@ BranchStorage.prototype.permcookie = function() {
 BranchStorage.prototype.pojo = {getAll:function() {
   return this._store;
 }, get:function(a) {
-  return "undefined" != typeof this._store[a] ? this._store[a] : null;
+  return "undefined" !== typeof this._store[a] ? this._store[a] : null;
 }, set:function(a, b) {
   this._store[a] = b;
 }, remove:function(a) {
@@ -915,7 +915,7 @@ BranchStorage.prototype.pojo = {getAll:function() {
 }};
 BranchStorage.prototype.titanium = {getAll:function() {
   for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
-    -1 != b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = retrieveValue(Ti.App.Properties.getString(b[c])));
+    -1 !== b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = retrieveValue(Ti.App.Properties.getString(b[c])));
   }
   return a;
 }, get:function(a) {
@@ -926,7 +926,7 @@ BranchStorage.prototype.titanium = {getAll:function() {
   Ti.App.Properties.setString(prefix(a), "");
 }, clear:function() {
   for (var a = Ti.App.Properties.listProperties(), b = 0;b < a.length;b++) {
-    -1 != a[b].indexOf(BRANCH_KEY_PREFIX) && Ti.App.Properties.setString(a[b], "");
+    -1 !== a[b].indexOf(BRANCH_KEY_PREFIX) && Ti.App.Properties.setString(a[b], "");
   }
 }, isEnabled:function() {
   try {
@@ -995,9 +995,9 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   };
   return (c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
-  var c = a.get("hideBanner"), c = "number" == typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
-  "number" == typeof d && (d = !1);
-  return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" == utils.mobileUserAgent() || b.showiPad && "ipad" == utils.mobileUserAgent() || b.showiOS && "ios" == utils.mobileUserAgent());
+  var c = a.get("hideBanner"), c = "number" === typeof c ? new Date >= new Date(c) : !c, d = b.forgetHide;
+  "number" === typeof d && (d = !1);
+  return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" === utils.mobileUserAgent() || b.showiPad && "ipad" === utils.mobileUserAgent() || b.showiOS && "ios" === utils.mobileUserAgent());
 }};
 // Input 8
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
@@ -1011,14 +1011,14 @@ Server.prototype.serializeObject = function(a, b) {
     }
   } else {
     for (d in a) {
-      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" == typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
+      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" === typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
     }
   }
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
   var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
-    "undefined" == typeof c && (c = {});
+    "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
       return c.branch_key = b.branch_key, c;
     }
@@ -1027,7 +1027,7 @@ Server.prototype.getUrl = function(a, b) {
     }
     throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
-  if ("/v1/has-app" == a.endpoint) {
+  if ("/v1/has-app" === a.endpoint) {
     try {
       a.queryPart = h(b, a.queryPart);
     } catch (k) {
@@ -1037,7 +1037,7 @@ Server.prototype.getUrl = function(a, b) {
   if (a.queryPart) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
-        if (d = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : d) {
+        if (d = "function" === typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : d) {
           return {error:d};
         }
         e += "/" + b[c];
@@ -1051,7 +1051,7 @@ Server.prototype.getUrl = function(a, b) {
         return {error:d};
       }
       d = b[c];
-      "undefined" != typeof d && "" !== d && null !== d && (l[c] = d);
+      "undefined" !== typeof d && "" !== d && null !== d && (l[c] = d);
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
@@ -1073,7 +1073,7 @@ Server.prototype.createScript = function(a) {
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
   var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
-  b = "POST" == c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
+  b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
     window[e] = function() {
     };
@@ -1127,7 +1127,7 @@ Server.prototype.request = function(a, b, c, d) {
     return d(Error(f.error));
   }
   var g, h = "";
-  "GET" == a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
+  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
   var k = RETRIES, l = function(a, b, c) {
     a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       n();
@@ -1141,31 +1141,31 @@ Server.prototype.request = function(a, b, c, d) {
 var resources = {}, validationTypes = {obj:0, str:1, num:2, arr:3, bool:4}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
-    if ("number" == typeof e || e) {
-      if (b == validationTypes.obj) {
-        if ("object" != typeof e) {
+    if ("number" === typeof e || e) {
+      if (b === validationTypes.obj) {
+        if ("object" !== typeof e) {
           return utils.message(utils.messages.invalidType, [c, d, "an object"]);
         }
       } else {
-        if (b == validationTypes.arr) {
+        if (b === validationTypes.arr) {
           if (!(e instanceof Array)) {
             return utils.message(utils.messages.invalidType, [c, d, "an array"]);
           }
         } else {
-          if (b == validationTypes.num) {
-            if ("number" != typeof e) {
+          if (b === validationTypes.num) {
+            if ("number" !== typeof e) {
               return utils.message(utils.messages.invalidType, [c, d, "a number"]);
             }
           } else {
-            if (b == validationTypes.bool) {
-              if ("boolean" != typeof e) {
+            if (b === validationTypes.bool) {
+              if ("boolean" !== typeof e) {
                 return utils.message(utils.messages.invalidType, [c, d, "a boolean"]);
               }
             } else {
-              if ("string" != typeof e) {
+              if ("string" !== typeof e) {
                 return utils.message(utils.messages.invalidType, [c, d, "a string"]);
               }
-              if (b != validationTypes.str && !b.test(e)) {
+              if (b !== validationTypes.str && !b.test(e)) {
                 return utils.message(utils.messages.invalidType, [c, d, "in the proper format"]);
               }
             }
@@ -1213,18 +1213,18 @@ resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method
 // Input 10
 var banner_css = {banner:function(a) {
   return ".branch-banner-is-active { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
-  1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + "; background: rgba(255, 255, 255, 0.95); color: #333; " + ("top" == a.position ? "border-bottom" : "border-top") + ': 1px solid #ddd; }\n#branch-banner .icon { float: left; padding-bottom: 40px; }\n#branch-banner .content .left { padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n#branch-banner .details > * { display: block; }\n#branch-banner .content .left { height: 63px; }\n#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; padding-top: 6px; z-index: 1; }\n#branch-banner .right > div { float: left; padding-top: 3px; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
+  1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + "; background: rgba(255, 255, 255, 0.95); color: #333; " + ("top" === a.position ? "border-bottom" : "border-top") + ': 1px solid #ddd; }\n#branch-banner .icon { float: left; padding-bottom: 40px; }\n#branch-banner .content .left { padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n#branch-banner .details > * { display: block; }\n#branch-banner .content .left { height: 63px; }\n#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; padding-top: 6px; z-index: 1; }\n#branch-banner .right > div { float: left; padding-top: 3px; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
 }, desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 24px; top: 14px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-block { display: inline-block; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 145px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; display: inline-block; margin-top: -18px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n", 
 nonie:"#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n", ie:"#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n", mobile:"#branch-banner { position: absolute; }\n#branch-banner-close { margin-top: 22px; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-banner a { text-decoration: none; }\n#branch-mobile-action { white-space: nowrap; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n@media only screen and (min-device-width: 320px) and (max-device-width: 350px) { #branch-banner .content .right { max-width: 120px; } }\n@media only screen and (min-device-width: 351px) and (max-device-width: 400px) and (orientation: landscape) { #branch-banner .content .right { max-width: 150px; } }\n@media only screen and (min-device-width: 401px) and (max-device-width: 480px) and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n", 
 ios:"#branch-banner-close { margin-left: 4px; }\n#branch-banner a { color: #428bca; }\n", android:"#branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px; border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; }\n#branch-mobile-action { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n"};
 banner_css.iframe = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + banner_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n";
 banner_css.inneriframe = "body { margin: 0; }\n";
 banner_css.iframe_position = function(a, b) {
-  return "#branch-banner-iframe { position: " + ("top" == b ? a ? "fixed" : "absolute" : "fixed") + "; }\n";
+  return "#branch-banner-iframe { position: " + ("top" === b ? a ? "fixed" : "absolute" : "fixed") + "; }\n";
 };
 banner_css.css = function(a, b) {
   var c = banner_css.banner(a), d = utils.mobileUserAgent();
-  "ios" != d && "ipad" != d || !a.showiOS ? "android" == d && a.showAndroid ? c += banner_css.mobile + banner_css.android : (c += banner_css.desktop, c = window.ActiveXObject ? c + banner_css.ie : c + banner_css.nonie) : c += banner_css.mobile + banner_css.ios;
+  "ios" !== d && "ipad" !== d || !a.showiOS ? "android" === d && a.showAndroid ? c += banner_css.mobile + banner_css.android : (c += banner_css.desktop, c = window.ActiveXObject ? c + banner_css.ie : c + banner_css.nonie) : c += banner_css.mobile + banner_css.ios;
   c += a.customCSS;
   a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(a.mobileSticky, a.position) : banner_css.iframe_position(a.desktopSticky, a.position)), document.head.appendChild(d));
   d = document.createElement("style");
@@ -1232,7 +1232,7 @@ banner_css.css = function(a, b) {
   d.id = "branch-css";
   d.innerHTML = c;
   (a.iframe ? b.contentWindow.document : document).head.appendChild(d);
-  "top" == a.position ? b.style.top = "-" + banner_utils.bannerHeight : "bottom" == a.position && (b.style.bottom = "-" + banner_utils.bannerHeight);
+  "top" === a.position ? b.style.top = "-" + banner_utils.bannerHeight : "bottom" === a.position && (b.style.bottom = "-" + banner_utils.bannerHeight);
 };
 // Input 11
 var banner_html = {banner:function(a, b) {
@@ -1251,7 +1251,7 @@ var banner_html = {banner:function(a, b) {
   c.id = "branch-banner-iframe";
   c.className = "branch-animation";
   document.body.appendChild(c);
-  var d = utils.mobileUserAgent(), d = '<html><head></head><body class="' + ("ios" == d || "ipad" == d ? "branch-banner-ios" : "android" == d ? "branch-banner-android" : "branch-banner-desktop") + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
+  var d = utils.mobileUserAgent(), d = '<html><head></head><body class="' + ("ios" === d || "ipad" === d ? "branch-banner-ios" : "android" === d ? "branch-banner-android" : "branch-banner-desktop") + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
   c.contentWindow.document.open();
   c.contentWindow.document.write(d);
   c.contentWindow.document.close();
@@ -1334,11 +1334,11 @@ var sendSMS = function(a, b, c, d) {
       a();
     }, banner_utils.animationSpeed + banner_utils.animationDelay);
     setTimeout(function() {
-      "top" == b.position ? document.body.style.marginTop = h : "bottom" == b.position && (document.body.style.marginBottom = l);
+      "top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = l);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay);
-    "top" == b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" == b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
-    "number" == typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
+    "top" === b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
+    "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
   };
   n && (n.onclick = function(b) {
     b.preventDefault();
@@ -1348,9 +1348,9 @@ var sendSMS = function(a, b, c, d) {
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" == b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" == b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
   setTimeout(function() {
-    "top" == b.position ? e.style.top = "0" : "bottom" == b.position && (e.style.bottom = "0");
+    "top" === b.position ? e.style.top = "0" : "bottom" === b.position && (e.style.bottom = "0");
     a._publishEvent("didShowBanner");
   }, banner_utils.animationDelay);
   return m;
@@ -1359,7 +1359,7 @@ var sendSMS = function(a, b, c, d) {
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
-    a === callback_params.NO_CALLBACK || "function" != typeof g ? (f = function(a) {
+    a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
       if (a) {
         throw a;
       }
@@ -1373,13 +1373,13 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
         g();
       };
       if (!c) {
-        if (d.init_state == init_states.INIT_PENDING) {
+        if (d.init_state === init_states.INIT_PENDING) {
           return k(Error(utils.message(utils.messages.initPending)), null);
         }
-        if (d.init_state == init_states.INIT_FAILED) {
+        if (d.init_state === init_states.INIT_FAILED) {
           return k(Error(utils.message(utils.messages.initFailed)), null);
         }
-        if (d.init_state == init_states.NO_INIT || !d.init_state) {
+        if (d.init_state === init_states.NO_INIT || !d.init_state) {
           return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
@@ -1425,7 +1425,7 @@ Branch.prototype._referringLink = function() {
 };
 Branch.prototype._publishEvent = function(a) {
   for (var b = 0;b < this._listeners.length;b++) {
-    this._listeners[b].event && this._listeners[b].event != a || this._listeners[b].listener(a);
+    this._listeners[b].event && this._listeners[b].event !== a || this._listeners[b].listener(a);
   }
 };
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -1437,7 +1437,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
-  c = c && "function" == typeof c ? {isReferrable:null} : c;
+  c = c && "function" === typeof c ? {isReferrable:null} : c;
   TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
   var e = function(a) {
     a.session_id && (d.session_id = a.session_id.toString());
@@ -1450,9 +1450,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }
     return a;
   };
-  b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
+  b = c && "undefined" !== typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var f = session.get(d._storage);
-  c = c && "undefined" != typeof c.url && null !== c.url ? c.url : null;
+  c = c && "undefined" !== typeof c.url && null !== c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
     WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
@@ -1576,7 +1576,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
   }
   var f = this;
-  if ("function" == typeof d) {
+  if ("function" === typeof d) {
     d = {};
   } else {
     if ("undefined" === typeof d || null === d) {
@@ -1584,9 +1584,8 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     }
   }
   d.make_new_link = d.make_new_link || !1;
-  c.channel && "app banner" != c.channel || (c.channel = "sms");
+  c.channel && "app banner" !== c.channel || (c.channel = "sms");
   var g = f._referringLink();
-  console.log("kirkdebug + referringLink", g);
   g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
     if (b) {
       return a(b);
@@ -1624,7 +1623,7 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
-  "function" == typeof a && void 0 === b && (b = a);
+  "function" === typeof a && void 0 === b && (b = a);
   b && this._listeners.push({listener:b, event:a || null});
 }, Branch.prototype.removeListener = function(a) {
   a && (this._listeners = this._listeners.filter(function(b) {
@@ -1634,9 +1633,9 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   }));
 }, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
-  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" == typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" == 
-  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" == typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" == typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" == typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};
-  "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
+  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === 
+  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};
+  "undefined" !== typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
 }), Branch.prototype.closeBanner = wrap(0, function(a) {

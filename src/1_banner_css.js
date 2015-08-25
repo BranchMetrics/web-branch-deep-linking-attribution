@@ -20,7 +20,7 @@ banner_css.banner = function(options) {
 	'#branch-banner .content { width:100%; overflow: hidden; height: ' +
 		banner_utils.bannerHeight +
 		'; background: rgba(255, 255, 255, 0.95); color: #333; ' +
-		(options.position == 'top' ? 'border-bottom' : 'border-top') +
+		(options.position === 'top' ? 'border-bottom' : 'border-top') +
 		': 1px solid #ddd; }\n' +
 	'#branch-banner .icon { float: left; padding-bottom: 40px; }\n' +
 	'#branch-banner .content .left { padding: 6px; }\n' +
@@ -127,7 +127,7 @@ banner_css.inneriframe = 'body { margin: 0; }\n';
 
 banner_css.iframe_position = function(sticky, position) {
 	return '#branch-banner-iframe { position: ' +
-		(position == 'top' ? (sticky ? 'fixed' : 'absolute') : 'fixed') +
+		(position === 'top' ? (sticky ? 'fixed' : 'absolute') : 'fixed') +
 		'; }\n';
 };
 
@@ -141,10 +141,10 @@ banner_css.css = function(options, element) {
 
 	// User agent specific styles
 	var userAgent = utils.mobileUserAgent();
-	if ((userAgent == 'ios' || userAgent == 'ipad') && options.showiOS) {
+	if ((userAgent === 'ios' || userAgent === 'ipad') && options.showiOS) {
 		style += banner_css.mobile + banner_css.ios;
 	}
-	else if (userAgent == 'android' && options.showAndroid) {
+	else if (userAgent === 'android' && options.showAndroid) {
 		style += banner_css.mobile + banner_css.android;
 	}
 	else {
@@ -178,10 +178,10 @@ banner_css.css = function(options, element) {
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
 	doc.head.appendChild(css);
-	if (options.position == 'top') {
+	if (options.position === 'top') {
 		element.style.top = '-' + banner_utils.bannerHeight;
 	}
-	else if (options.position == 'bottom') {
+	else if (options.position === 'bottom') {
 		element.style.bottom = '-' + banner_utils.bannerHeight;
 	}
 };

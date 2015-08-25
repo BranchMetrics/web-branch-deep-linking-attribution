@@ -32,7 +32,7 @@ if (TITANIUM_BUILD) {
 var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
-		storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
+		storageMethod = typeof storageMethod === 'function' ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
 			storageMethod._store = { };
 			return storageMethod;
@@ -41,7 +41,7 @@ var BranchStorage = function(storageMethods) {
 };
 
 var prefix = function(key) {
-	return (key == "branch_session" || key == "branch_session_first") ?
+	return (key === 'branch_session' || key === 'branch_session_first') ?
 		key :
 		BRANCH_KEY_PREFIX + key;
 };
@@ -51,10 +51,10 @@ var trimPrefix = function(key) {
 };
 
 var retrieveValue = function(value) {
-	if (value == "true") {
+	if (value === 'true') {
 		return true;
 	}
-	else if (value == "false") {
+	else if (value === 'false') {
 		return false;
 	}
 	return value;
@@ -142,7 +142,7 @@ var cookies = function(perm) {
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i].replace(" ", "");
 				cookie = cookie.substring(0, cookie.length);
-				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
+				if (cookie.indexOf(BRANCH_KEY_PREFIX) !== -1) {
 					var splitCookie = cookie.split('=');
 					returnCookieObject[trimPrefix(splitCookie[0])] = retrieveValue(splitCookie[1]);
 				}
@@ -176,8 +176,8 @@ var cookies = function(perm) {
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i];
 				cookie = cookie.substring(1, cookie.length);
-				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
-					if (!perm && cookie.indexOf("branch_expiration_date=") == -1) {
+				if (cookie.indexOf(BRANCH_KEY_PREFIX) !== -1) {
+					if (!perm && cookie.indexOf("branch_expiration_date=") === -1) {
 						deleteCookie(cookie);
 					}
 					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) {
@@ -206,7 +206,7 @@ BranchStorage.prototype['pojo'] = {
 		return this._store;
 	},
 	get: function(key) {
-		return typeof this._store[key] != 'undefined' ? this._store[key] : null;
+		return typeof this._store[key] !== 'undefined' ? this._store[key] : null;
 	},
 	set: function(key, value) {
 		this._store[key] = value;
@@ -228,7 +228,7 @@ BranchStorage.prototype['titanium'] = {
 		var returnObject = { };
 		var props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
-			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
+			if (props[i].indexOf(BRANCH_KEY_PREFIX) !== -1) {
 				returnObject[props[i]] = retrieveValue(Ti.App.Properties.getString(props[i]));
 			}
 		}
@@ -247,7 +247,7 @@ BranchStorage.prototype['titanium'] = {
 		/** @lends {Array} */
 		var props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
-			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
+			if (props[i].indexOf(BRANCH_KEY_PREFIX) !== -1) {
 				Ti.App.Properties.setString(props[i], "");
 			}
 		}

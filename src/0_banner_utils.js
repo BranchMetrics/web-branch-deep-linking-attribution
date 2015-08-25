@@ -135,7 +135,7 @@ banner_utils.addCSSLengths = function(length1, length2) {
  */
 banner_utils.shouldAppend = function(storage, options) {
 	var hideBanner = storage.get('hideBanner');
-	if (typeof hideBanner == 'number') {
+	if (typeof hideBanner === 'number') {
 		hideBanner = new Date() >= new Date(hideBanner);
 	}
 	else {
@@ -143,7 +143,7 @@ banner_utils.shouldAppend = function(storage, options) {
 	}
 
 	var forgetHide = options.forgetHide;
-	if (typeof forgetHide == 'number') {
+	if (typeof forgetHide === 'number') {
 		forgetHide = false;
 	}
 
@@ -152,8 +152,8 @@ banner_utils.shouldAppend = function(storage, options) {
 		(hideBanner || forgetHide) &&
 		(
 			(options.showDesktop && !utils.mobileUserAgent()) ||
-			(options.showAndroid && utils.mobileUserAgent() == 'android') ||
-			(options.showiPad && utils.mobileUserAgent() == 'ipad') ||
-			(options.showiOS && utils.mobileUserAgent() == 'ios')
+			(options.showAndroid && utils.mobileUserAgent() === 'android') ||
+			(options.showiPad && utils.mobileUserAgent() === 'ipad') ||
+			(options.showiOS && utils.mobileUserAgent() === 'ios')
 		);
 };

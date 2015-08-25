@@ -86,7 +86,7 @@ utils.whiteListSessionData = function(data) {
 		'data': data['data'] || null,
 		'data_parsed': data['data_parsed'] || null,
 		'has_app': data['has_app'] || null,
-		'identity': data.identity || null,
+		'identity': data['identity'] || null,
 		'referring_identity': data['referring_identity'] || null,
 		'referring_link': data['referring_link'] || null
 	};
@@ -124,7 +124,7 @@ utils.clickIdFromLink = function(link) {
  * @param {String} link
  */
 utils.processReferringLink = function(link) {
-	return link ? link.substring(0, 4) != 'http' ? 'https://bnc.lt' + link : link : null;
+	return link ? link.substring(0, 4) !== 'http' ? 'https://bnc.lt' + link : link : null;
 };
 
 /**
@@ -153,20 +153,16 @@ utils.hashValue = function(key) {
 };
 
 utils.mobileUserAgent = function() {
-	if (navigator.userAgent.match(/android|i(os|p(hone|od|ad))/i)) {
-		if (navigator.userAgent.match(/android/i)) {
-			return 'android';
-		}
-		else if (navigator.userAgent.match(/ipad/i)) {
-			return 'ipad';
-		}
-		else {
-			return 'ios';
-		}
+	if (navigator.userAgent.match(/android/i)) {
+		return 'android';
 	}
-	else {
-		return false;
+	if (navigator.userAgent.match(/ipad/i)) {
+		return 'ipad';
 	}
+	if (navigator.userAgent.match(/i(os|p(hone|od))/i)) {
+		return 'ios';
+	}
+	return false;
 };
 
 /**

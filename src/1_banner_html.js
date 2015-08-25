@@ -87,10 +87,10 @@ banner_html.iframe = function(options, action) {
 
 	var bodyClass;
 	var userAgent = utils.mobileUserAgent();
-	if (userAgent == 'ios' || userAgent == 'ipad') {
+	if (userAgent === 'ios' || userAgent === 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}
-	else if (userAgent == 'android') {
+	else if (userAgent === 'android') {
 		bodyClass = 'branch-banner-android';
 	}
 	else {
