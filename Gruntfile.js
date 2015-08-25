@@ -48,6 +48,18 @@ var safari_browsers = [
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
+			version: '8.4'
+		},
+		{
+			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
+			platform: 'OS X 10.10',
+			version: '8.3'
+		},
+		{
+			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
+			platform: 'OS X 10.10',
 			version: '8.2'
 		},
 		{
@@ -55,18 +67,6 @@ var safari_browsers = [
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '8.1'
-		},
-		{
-			browserName: 'iphone',
-			deviceName: 'iPhone Simulator',
-			platform: 'OS X 10.10',
-			version: '8.0'
-		},
-		{
-			browserName: 'iphone',
-			deviceName: 'iPhone Simulator',
-			platform: 'OS X 10.10',
-			version: '7.1'
 		}
 	],
 
@@ -132,8 +132,10 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					// I have Cordova tests on saucelabs disabled for now. There are a few issues with dependencies I need to work out
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'/*, 'http://127.0.0.1:9999/test/cordova-integration-test.html'*/],
+					urls: [
+						'http://127.0.0.1:9999/test/test.html',
+						'http://127.0.0.1:9999/test/integration-test.html'
+					],
 					tunnelTimeout: 5,
 					throttled: 10,
 					maxRetries: 3,
@@ -162,7 +164,9 @@ module.exports = function(grunt) {
 
 	// Loading dependencies
 	for (var key in grunt.file.readJSON("package.json").devDependencies) {
-		if (key !== "grunt" && key.indexOf("grunt") === 0) grunt.loadNpmTasks(key);
+		if (key !== "grunt" && key.indexOf("grunt") === 0) {
+			grunt.loadNpmTasks(key);
+		}
 	}
 
 	grunt.loadNpmTasks('grunt-saucelabs');
