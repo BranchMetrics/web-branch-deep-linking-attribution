@@ -48,6 +48,18 @@ var safari_browsers = [
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
+			version: '8.4'
+		},
+		{
+			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
+			platform: 'OS X 10.10',
+			version: '8.3'
+		},
+		{
+			browserName: 'iphone',
+			deviceName: 'iPhone Simulator',
+			platform: 'OS X 10.10',
 			version: '8.2'
 		},
 		{
@@ -55,18 +67,6 @@ var safari_browsers = [
 			deviceName: 'iPhone Simulator',
 			platform: 'OS X 10.10',
 			version: '8.1'
-		},
-		{
-			browserName: 'iphone',
-			deviceName: 'iPhone Simulator',
-			platform: 'OS X 10.10',
-			version: '8.0'
-		},
-		{
-			browserName: 'iphone',
-			deviceName: 'iPhone Simulator',
-			platform: 'OS X 10.10',
-			version: '7.1'
 		}
 	],
 
