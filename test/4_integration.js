@@ -20,11 +20,11 @@ describe('Integration tests', function() {
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i];
-				while (cookie.charAt(0) == ' ') {
+				while (cookie.charAt(0) === ' ') {
 					cookie = cookie.substring(1, cookie.length);
 				}
 				if (cookie.indexOf("BRANCH_WEBSDK_COOKIE") === 0) {
-					if (temp && cookie.indexOf("branch_expiration_date=") == -1) {
+					if (temp && cookie.indexOf("branch_expiration_date=") === -1) {
 						deleteCookie(cookie);
 					}
 					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) {
