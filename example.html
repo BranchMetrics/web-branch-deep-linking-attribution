@@ -138,7 +138,7 @@
       };
       var getInputVal = function(inputID) {
         var inputElement = $(inputID);
-        if (inputElement.val() == '' || inputElement.val() == false) {
+        if (!inputElement.val()) {
           inputElement.parent().addClass('has-error');
           return '';
         }
@@ -154,7 +154,7 @@
       });
     });
     $('#data').click(function() {
-      request.html("branch.data();");
+      request.html('branch.data();');
       branch.data(function(err, data) {
         response.html(JSON.stringify(err || data));
       });
@@ -169,7 +169,7 @@
     $('#logout').click(function() {
       request.html('branch.logout();');
       branch.logout(function(err, data) {
-        response.html(JSON.stringify(err || "undefined"));
+        response.html(JSON.stringify(err || 'undefined'));
       });
     });
     /*
@@ -193,7 +193,7 @@
       });
     });
     $('#link').click(function() {
-      request.html("branch.link(" + JSON.stringify(sampleParams) + ");");
+      request.html('branch.link(' + JSON.stringify(sampleParams) + ');');
       branch.link(sampleParams, function(err, link) {
         response.html('<a href="' + link + '">' + link + '</a>');
       });
@@ -201,7 +201,7 @@
     $('#sendSMS').click(function() {
       var smsOptions = {};
       var phone = getInputVal('#SMSNumber');
-      request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
+      request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ');');
       branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
         response.html(JSON.stringify(err || data || 'undefined'));
       });
@@ -209,7 +209,7 @@
     $('#sendSMSNew').click(function() {
       var smsOptions = { make_new_link: true };
       var phone = getInputVal('#SMSNumber');
-      request.html("branch.sendSMS(" + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ");");
+      request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', '  + smsOptions + ');');
       branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
         response.html(JSON.stringify(err || data || 'undefined'));
       });

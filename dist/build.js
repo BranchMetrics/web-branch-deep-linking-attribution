@@ -903,7 +903,7 @@ BranchStorage.prototype.permcookie = function() {
 BranchStorage.prototype.pojo = {getAll:function() {
   return this._store;
 }, get:function(a) {
-  return "undefined" !== typeof this._store[a] ? this._store[a] : null;
+  return this._store[a] || null;
 }, set:function(a, b) {
   this._store[a] = b;
 }, remove:function(a) {
@@ -1220,7 +1220,7 @@ ios:"#branch-banner-close { margin-left: 4px; }\n#branch-banner a { color: #428b
 banner_css.iframe = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + banner_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n";
 banner_css.inneriframe = "body { margin: 0; }\n";
 banner_css.iframe_position = function(a, b) {
-  return "#branch-banner-iframe { position: " + ("top" === b ? a ? "fixed" : "absolute" : "fixed") + "; }\n";
+  return "#branch-banner-iframe { position: " + ("top" !== b || a ? "fixed" : "absolute") + "; }\n";
 };
 banner_css.css = function(a, b) {
   var c = banner_css.banner(a), d = utils.mobileUserAgent();

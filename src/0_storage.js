@@ -54,7 +54,7 @@ var retrieveValue = function(value) {
 	if (value === 'true') {
 		return true;
 	}
-	else if (value === 'false') {
+	if (value === 'false') {
 		return false;
 	}
 	return value;
@@ -206,7 +206,7 @@ BranchStorage.prototype['pojo'] = {
 		return this._store;
 	},
 	get: function(key) {
-		return typeof this._store[key] !== 'undefined' ? this._store[key] : null;
+		return this._store[key] || null;
 	},
 	set: function(key, value) {
 		this._store[key] = value;

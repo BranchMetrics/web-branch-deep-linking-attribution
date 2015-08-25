@@ -124,7 +124,7 @@ utils.clickIdFromLink = function(link) {
  * @param {String} link
  */
 utils.processReferringLink = function(link) {
-	return link ? link.substring(0, 4) !== 'http' ? 'https://bnc.lt' + link : link : null;
+	return link ? (link.substring(0, 4) !== 'http' ? 'https://bnc.lt' + link : link) : null;
 };
 
 /**

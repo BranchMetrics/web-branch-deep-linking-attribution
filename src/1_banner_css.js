@@ -127,7 +127,7 @@ banner_css.inneriframe = 'body { margin: 0; }\n';
 
 banner_css.iframe_position = function(sticky, position) {
 	return '#branch-banner-iframe { position: ' +
-		(position === 'top' ? (sticky ? 'fixed' : 'absolute') : 'fixed') +
+		((position === 'top' && !sticky) ? 'absolute' : 'fixed') +
 		'; }\n';
 };
 
