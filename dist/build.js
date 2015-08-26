@@ -1061,6 +1061,7 @@ Server.prototype.getUrl = function(a, b) {
       return {error:n.message};
     }
   }
+  "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
   return {data:this.serializeObject(l, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
