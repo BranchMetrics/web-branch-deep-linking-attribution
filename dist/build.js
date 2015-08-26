@@ -1061,6 +1061,7 @@ Server.prototype.getUrl = function(a, b) {
       return {error:n.message};
     }
   }
+  "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
   return {data:this.serializeObject(l, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
@@ -1586,7 +1587,6 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" != c.channel || (c.channel = "sms");
   var g = f._referringLink();
-  console.log("kirkdebug + referringLink", g);
   g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
     if (b) {
       return a(b);
