@@ -248,7 +248,8 @@ utils.base64encode = function(input) {
 		enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
 		enc4 = chr3 & 63;
 		if (isNaN(chr2)) {
-			enc3 = enc4 = 64;
+			enc3 = 64;
+			enc4 = 64;
 		}
 		else if (isNaN(chr3)) {
 			enc4 = 64;

@@ -49,7 +49,7 @@ var wrap = function(parameters, func, init) {
 		var args;
 		var callback;
 		var lastArg = arguments[arguments.length - 1];
-		if (parameters === callback_params.NO_CALLBACK || typeof lastArg != "function") {
+		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== "function") {
 			callback = function(err) {
 				if (err) {
 					throw(err);
@@ -306,7 +306,7 @@ Branch.prototype['init'] = wrap(
 			self.app_id = branch_key;
 		}
 
-		options = (options && typeof options == 'function') ?
+		options = (options && typeof options === 'function') ?
 			{
 				"isReferrable": null
 			} :
@@ -348,7 +348,7 @@ Branch.prototype['init'] = wrap(
 			options.isReferrable :
 			null;
 		var sessionData = session.get(self._storage);
-		var url = (options && typeof options.url != 'undefined' && options.url !== null) ?
+		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
 			options.url :
 			null;
 		var link_identifier = WEB_BUILD ?
@@ -1417,7 +1417,7 @@ if (WEB_BUILD) {
 	/*** +TOC_HEADING &Event Listener& ^WEB ***/
 	/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event == "function" && listener === undefined) {
+		if (typeof event === "function" && listener === undefined) {
 			listener = event;
 		}
 		if (listener) {
@@ -1571,8 +1571,9 @@ if (WEB_BUILD) {
 			make_new_link: !!options['make_new_link']
 		};
 
-		if (typeof options['showMobile'] != 'undefined') {
-			bannerOptions.showiOS = bannerOptions.showAndroid = options['showMobile'];
+		if (typeof options['showMobile'] !== 'undefined') {
+			bannerOptions.showiOS = options['showMobile'];
+			bannerOptions.showAndroid = options['showMobile'];
 		}
 
 		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);

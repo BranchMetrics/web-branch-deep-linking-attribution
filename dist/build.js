@@ -810,7 +810,7 @@ utils.base64encode = function(a) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
   for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? g = h = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -1037,7 +1037,7 @@ Server.prototype.getUrl = function(a, b) {
   if (a.queryPart) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
-        if (d = "function" == typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : d) {
+        if (d = "function" === typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : d) {
           return {error:d};
         }
         e += "/" + b[c];
@@ -1051,7 +1051,7 @@ Server.prototype.getUrl = function(a, b) {
         return {error:d};
       }
       d = b[c];
-      "undefined" != typeof d && "" !== d && null !== d && (l[c] = d);
+      "undefined" !== typeof d && "" !== d && null !== d && (l[c] = d);
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
@@ -1360,7 +1360,7 @@ var sendSMS = function(a, b, c, d) {
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
-    a === callback_params.NO_CALLBACK || "function" != typeof g ? (f = function(a) {
+    a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
       if (a) {
         throw a;
       }
@@ -1438,7 +1438,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
-  c = c && "function" == typeof c ? {isReferrable:null} : c;
+  c = c && "function" === typeof c ? {isReferrable:null} : c;
   TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
   var e = function(a) {
     a.session_id && (d.session_id = a.session_id.toString());
@@ -1453,7 +1453,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   };
   b = c && "undefined" != typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var f = session.get(d._storage);
-  c = c && "undefined" != typeof c.url && null !== c.url ? c.url : null;
+  c = c && "undefined" !== typeof c.url && null !== c.url ? c.url : null;
   var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
     WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
@@ -1624,7 +1624,7 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   this._api(resources.redeem, {amount:b, bucket:c}, a);
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
-  "function" == typeof a && void 0 === b && (b = a);
+  "function" === typeof a && void 0 === b && (b = a);
   b && this._listeners.push({listener:b, event:a || null});
 }, Branch.prototype.removeListener = function(a) {
   a && (this._listeners = this._listeners.filter(function(b) {
@@ -1636,7 +1636,7 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" == typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" == typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" == typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" == 
   typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" == typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" == typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" == typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" == typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};
-  "undefined" != typeof b.showMobile && (d.showiOS = d.showAndroid = b.showMobile);
+  "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
 }), Branch.prototype.closeBanner = wrap(0, function(a) {
