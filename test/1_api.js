@@ -1080,7 +1080,10 @@ describe('Server', function() {
 					"user_agent": "test_agent",
 					"language": "test_language"
 				};
-			var metadataString = '&metadata=' + encodeURIComponent(JSON.stringify(metadata));
+			var metadataString =
+				"&metadata.url=testurl" +
+				"&metadata.user_agent=test_agent" +
+				"&metadata.language=test_language";
 
 			it('should pass in branch_key, session_id, event and metadata', function(done) {
 				storage['set']('use_jsonp', false);

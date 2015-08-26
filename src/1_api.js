@@ -139,9 +139,6 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.endpoint === '/v1/event') {
-		d.metadata = JSON.stringify(d.metadata || {});
-	}
 	return {
 		data: this.serializeObject(d, ''),
 		url: url
