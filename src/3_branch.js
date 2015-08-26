@@ -198,18 +198,17 @@ Branch.prototype._api = function(resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function() {
-	var sessionData = session.get(this._storage);
-	var referringLink = sessionData ? sessionData['referring_link'] : null;
+	var referringLink = this._storage.get('referring_link');
+	var clickId = this._storage.get('click_id');
 	if (referringLink) {
 		return referringLink;
 	}
-
-	var clickId = this._storage.get('click_id');
-	if (clickId) {
+	else if (clickId) {
 		return config.link_service_endpoint + '/c/' + clickId;
 	}
-
-	return null;
+	else {
+		return null;
+	}
 };
 
 /***
@@ -971,13 +970,10 @@ Branch.prototype['sendSMS'] = wrap(
 
 		function sendSMS(click_id) {
 			self._api(
-				resources.SMSLinkSend,
-				{
+				resources.SMSLinkSend, {
 					"link_url": click_id,
 					"phone": phone
-				},
-				done
-			);
+				}, done);
 		}
 
 		var referringLink = self._referringLink();

@@ -1061,7 +1061,6 @@ Server.prototype.getUrl = function(a, b) {
       return {error:n.message};
     }
   }
-  "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
   return {data:this.serializeObject(l, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
@@ -1421,8 +1420,8 @@ Branch.prototype._api = function(a, b, c) {
   });
 };
 Branch.prototype._referringLink = function() {
-  var a = session.get(this._storage);
-  return (a = a ? a.referring_link : null) ? a : (a = this._storage.get("click_id")) ? config.link_service_endpoint + "/c/" + a : null;
+  var a = this._storage.get("referring_link"), b = this._storage.get("click_id");
+  return a ? a : b ? config.link_service_endpoint + "/c/" + b : null;
 };
 Branch.prototype._publishEvent = function(a) {
   for (var b = 0;b < this._listeners.length;b++) {
