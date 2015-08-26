@@ -79,7 +79,7 @@ banner_html.checkmark = function() {
 banner_html.iframe = function(options, action) {
 	var iframe = document.createElement('iframe');
 	iframe.src = 'about:blank'; // solves CORS issues, test in IE
-	iframe.style.overflow = "hidden";
+	iframe.style.overflow = 'hidden';
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
@@ -87,10 +87,10 @@ banner_html.iframe = function(options, action) {
 
 	var bodyClass;
 	var userAgent = utils.mobileUserAgent();
-	if (userAgent == 'ios' || userAgent == 'ipad') {
+	if (userAgent === 'ios' || userAgent === 'ipad') {
 		bodyClass = 'branch-banner-ios';
 	}
-	else if (userAgent == 'android') {
+	else if (userAgent === 'android') {
 		bodyClass = 'branch-banner-android';
 	}
 	else {

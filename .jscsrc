@@ -65,6 +65,7 @@
 		"else"
 	],
 	"requireLineFeedAtFileEnd": true,
+	"requireLineBreakAfterVariableAssignment": true,
 	"requireParenthesesAroundIIFE": true,
 	"requireSemicolons": true,
 	"requireSpaceAfterBinaryOperators": [

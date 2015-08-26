@@ -39,36 +39,36 @@ var _validator;
 function validator(required, type) {
 	return function(endpoint, param, data) {
 		// Must ensure data is not a number before doing a !data otherwise the number can't be 0.
-		if ((typeof data != 'number') && !data) {
+		if ((typeof data !== 'number') && !data) {
 			if (required) {
 				return utils.message(utils.messages.missingParam, [ endpoint, param ]);
 			}
 		}
-		else if (type == validationTypes.obj) {
-			if (typeof data != 'object') {
+		else if (type === validationTypes.obj) {
+			if (typeof data !== 'object') {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'an object' ]);
 			}
 		}
-		else if (type == validationTypes.arr) {
+		else if (type === validationTypes.arr) {
 			if (!(data instanceof Array)) {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'an array' ]);
 			}
 		}
-		else if (type == validationTypes.num) {
-			if (typeof data != 'number') {
+		else if (type === validationTypes.num) {
+			if (typeof data !== 'number') {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'a number' ]);
 			}
 		}
-		else if (type == validationTypes.bool) {
-			if (typeof data != 'boolean') {
+		else if (type === validationTypes.bool) {
+			if (typeof data !== 'boolean') {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'a boolean' ]);
 			}
 		}
 		// String or regex validator
-		else if (typeof data != 'string') {
+		else if (typeof data !== 'string') {
 			return utils.message(utils.messages.invalidType, [ endpoint, param, 'a string' ]);
 		}
-		else if (type != validationTypes.str && !type.test(data)) {
+		else if (type !== validationTypes.str && !type.test(data)) {
 			return utils.message(
 				utils.messages.invalidType,
 				[ endpoint, param, 'in the proper format' ]

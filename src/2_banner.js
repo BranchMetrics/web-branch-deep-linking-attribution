@@ -56,12 +56,12 @@ var sendSMS = function(doc, branch, options, linkData) {
 
 	var errorForm = function() {
 		enableForm();
-		sendButton.style.background = "#FFD4D4";
+		sendButton.style.background = '#FFD4D4';
 
 		phone.className = 'error';
 
 		setTimeout(function() {
-			sendButton.style.background = "#FFFFFF";
+			sendButton.style.background = '#FFFFFF';
 			phone.className = '';
 		}, banner_utils.error_timeout);
 	};
@@ -69,15 +69,15 @@ var sendSMS = function(doc, branch, options, linkData) {
 	if (phone) {
 		var phoneValue = phone.value;
 		if ((/^\d{7,}$/).test(phoneValue.replace(/[\s()+\-\.]|ext/gi, ''))) {
-			branch._publishEvent("willSendBannerSMS");
+			branch._publishEvent('willSendBannerSMS');
 			disableForm();
-			branch["sendSMS"](phoneValue, linkData, options, function(err) {
+			branch['sendSMS'](phoneValue, linkData, options, function(err) {
 				if (err) {
-					branch._publishEvent("sendBannerSMSError");
+					branch._publishEvent('sendBannerSMSError');
 					errorForm();
 				}
 				else {
-					branch._publishEvent("didSendBannerSMS");
+					branch._publishEvent('didSendBannerSMS');
 					hideFormShowSuccess();
 					setTimeout(function() {
 						smsFormContainer.removeChild(checkmark);
@@ -100,11 +100,11 @@ var sendSMS = function(doc, branch, options, linkData) {
  */
 banner = function(branch, options, linkData, storage) {
 	if (!banner_utils.shouldAppend(storage, options)) {
-		branch._publishEvent("willNotShowBanner");
+		branch._publishEvent('willNotShowBanner');
 		return null;
 	}
 
-	branch._publishEvent("willShowBanner");
+	branch._publishEvent('willShowBanner');
 
 	// Create markup
 	var element = banner_html.markup(options, storage);
@@ -122,7 +122,7 @@ banner = function(branch, options, linkData, storage) {
 			doc.getElementById('branch-mobile-action').href = referringLink;
 		}
 		else {
-			branch["link"](linkData, function(err, url) {
+			branch['link'](linkData, function(err, url) {
 				if (err) {
 					// Todo: figure out something good to do here. Maybe a
 					// long link? Or why not always a long link?
@@ -155,22 +155,22 @@ banner = function(branch, options, linkData, storage) {
 		}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 		setTimeout(function() {
-			if (options.position == 'top') {
+			if (options.position === 'top') {
 				document.body.style.marginTop = bodyMarginTopInline;
 			}
-			else if (options.position == 'bottom') {
+			else if (options.position === 'bottom') {
 				document.body.style.marginBottom = bodyMarginBottomInline;
 			}
 			banner_utils.removeClass(document.body, 'branch-banner-is-active');
 		}, banner_utils.animationDelay);
-		if (options.position == 'top') {
+		if (options.position === 'top') {
 			element.style.top = '-' + banner_utils.bannerHeight;
 		}
-		else if (options.position == 'bottom') {
+		else if (options.position === 'bottom') {
 			element.style.bottom = '-' + banner_utils.bannerHeight;
 		}
 
-		if (typeof options.forgetHide == 'number') {
+		if (typeof options.forgetHide === 'number') {
 			storage.set('hideBanner', banner_utils.getDate(options.forgetHide));
 		}
 		else {
@@ -181,32 +181,32 @@ banner = function(branch, options, linkData, storage) {
 	if (closeButton) {
 		closeButton.onclick = function(ev) {
 			ev.preventDefault();
-			branch._publishEvent("willCloseBanner");
+			branch._publishEvent('willCloseBanner');
 			closeBanner(function() {
-				branch._publishEvent("didCloseBanner");
+				branch._publishEvent('didCloseBanner');
 			});
 		};
 	}
 
 	// Trigger animation
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
-	if (options.position == 'top') {
+	if (options.position === 'top') {
 		document.body.style.marginTop =
 			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
 	}
-	else if (options.position == 'bottom') {
+	else if (options.position === 'bottom') {
 		document.body.style.marginBottom =
 			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
 	}
 
 	setTimeout(function() {
-		if (options.position == 'top') {
+		if (options.position === 'top') {
 			element.style.top = '0';
 		}
-		else if (options.position == 'bottom') {
+		else if (options.position === 'bottom') {
 			element.style.bottom = '0';
 		}
-		branch._publishEvent("didShowBanner");
+		branch._publishEvent('didShowBanner');
 	}, banner_utils.animationDelay);
 
 	return closeBanner;

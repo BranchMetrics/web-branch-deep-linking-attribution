@@ -29,7 +29,7 @@ describe('session storage', function() {
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, "session");
+		storage.set(itemKey + 'testRemove', itemValue, 'session');
 		storage.remove(itemKey + 'testRemove');
 		var item = storage.get(itemKey + 'testRemove');
 		assert.equal(item, null, 'returned null');
@@ -69,7 +69,7 @@ describe('local storage', function() {
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, "session");
+		storage.set(itemKey + 'testRemove', itemValue, 'session');
 		storage.remove(itemKey + 'testRemove');
 		var item = storage.get(itemKey + 'testRemove');
 		assert.equal(item, null, 'returned null');
@@ -103,7 +103,7 @@ describe('cookie storage', function() {
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, "session");
+		storage.set(itemKey + 'testRemove', itemValue, 'session');
 		storage.remove(itemKey + 'testRemove');
 		var item = storage.get(itemKey + 'testRemove');
 		assert.equal(item, null, 'returned null');
@@ -139,7 +139,7 @@ describe('pojo storage', function() {
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, "session");
+		storage.set(itemKey + 'testRemove', itemValue, 'session');
 		storage.remove(itemKey + 'testRemove');
 		var item = storage.get(itemKey + 'testRemove');
 		assert.equal(item, null, 'returned null');

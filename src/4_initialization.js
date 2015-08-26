@@ -47,7 +47,7 @@ if (!TITANIUM_BUILD) {
 // Ensue close is allways called on a pause in mobile apps
 if (CORDOVA_BUILD) { // jshint undef:false
 	document.addEventListener('pause', function() {
-		console.log("Closing branch session on pause event.");
+		console.log('Closing branch session on pause event.');
 		branch_instance.close(function() {});
 	}, false);
 }

@@ -32,7 +32,7 @@ if (TITANIUM_BUILD) {
 var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
-		storageMethod = typeof storageMethod == 'function' ? storageMethod() : storageMethod;
+		storageMethod = typeof storageMethod === 'function' ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
 			storageMethod._store = { };
 			return storageMethod;
@@ -41,20 +41,20 @@ var BranchStorage = function(storageMethods) {
 };
 
 var prefix = function(key) {
-	return (key == "branch_session" || key == "branch_session_first") ?
+	return (key === 'branch_session' || key === 'branch_session_first') ?
 		key :
 		BRANCH_KEY_PREFIX + key;
 };
 
 var trimPrefix = function(key) {
-	return key.replace(BRANCH_KEY_PREFIX, "");
+	return key.replace(BRANCH_KEY_PREFIX, '');
 };
 
 var retrieveValue = function(value) {
-	if (value == "true") {
+	if (value === 'true') {
 		return true;
 	}
-	else if (value == "false") {
+	if (value === 'false') {
 		return false;
 	}
 	return value;
@@ -102,8 +102,8 @@ var webStorage = function(perm) {
 		},
 		isEnabled: function() {
 			try {
-				storageMethod.setItem("test", "");
-				storageMethod.removeItem("test");
+				storageMethod.setItem('test', '');
+				storageMethod.removeItem('test');
 				return true;
 			}
 			catch (err) {
@@ -125,24 +125,24 @@ BranchStorage.prototype['session'] = function() {
 
 var cookies = function(perm) {
 	var setCookie = function(key, value) {
-		var expires = "";
+		var expires = '';
 		if (perm) {
 			var date = new Date();
 			console.log(date);
 			date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
-			expires = "; branch_expiration_date=" + date.toGMTString() +
-				"; expires=" + date.toGMTString();
+			expires = '; branch_expiration_date=' + date.toGMTString() +
+				'; expires=' + date.toGMTString();
 		}
-		document.cookie = key + "=" + value + expires + "; path=/";
+		document.cookie = key + '=' + value + expires + '; path=/';
 	};
 	return {
 		getAll: function() {
 			var cookieArray = document.cookie.split(';');
 			var returnCookieObject = { };
 			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i].replace(" ", "");
+				var cookie = cookieArray[i].replace(' ', '');
 				cookie = cookie.substring(0, cookie.length);
-				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
+				if (cookie.indexOf(BRANCH_KEY_PREFIX) !== -1) {
 					var splitCookie = cookie.split('=');
 					returnCookieObject[trimPrefix(splitCookie[0])] = retrieveValue(splitCookie[1]);
 				}
@@ -150,7 +150,7 @@ var cookies = function(perm) {
 			return returnCookieObject;
 		},
 		get: function(key) {
-			var keyEQ = prefix(key) + "=";
+			var keyEQ = prefix(key) + '=';
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i];
@@ -165,22 +165,22 @@ var cookies = function(perm) {
 			setCookie(prefix(key), value);
 		},
 		remove: function(key) {
-			var expires = "";
-			document.cookie = prefix(key) + "=; expires=" + expires + "; path=/";
+			var expires = '';
+			document.cookie = prefix(key) + '=; expires=' + expires + '; path=/';
 		},
 		clear: function() {
 			var deleteCookie = function(cookie) {
-				document.cookie = cookie.substring(0, cookie.indexOf('=')) + "=;expires=-1;path=/";
+				document.cookie = cookie.substring(0, cookie.indexOf('=')) + '=;expires=-1;path=/';
 			};
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i];
 				cookie = cookie.substring(1, cookie.length);
-				if (cookie.indexOf(BRANCH_KEY_PREFIX) != -1) {
-					if (!perm && cookie.indexOf("branch_expiration_date=") == -1) {
+				if (cookie.indexOf(BRANCH_KEY_PREFIX) !== -1) {
+					if (!perm && cookie.indexOf('branch_expiration_date=') === -1) {
 						deleteCookie(cookie);
 					}
-					else if (perm && cookie.indexOf("branch_expiration_date=") > 0) {
+					else if (perm && cookie.indexOf('branch_expiration_date=') > 0) {
 						deleteCookie(cookie);
 					}
 				}
@@ -206,7 +206,7 @@ BranchStorage.prototype['pojo'] = {
 		return this._store;
 	},
 	get: function(key) {
-		return typeof this._store[key] != 'undefined' ? this._store[key] : null;
+		return this._store[key] || null;
 	},
 	set: function(key, value) {
 		this._store[key] = value;
@@ -228,7 +228,7 @@ BranchStorage.prototype['titanium'] = {
 		var returnObject = { };
 		var props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
-			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
+			if (props[i].indexOf(BRANCH_KEY_PREFIX) !== -1) {
 				returnObject[props[i]] = retrieveValue(Ti.App.Properties.getString(props[i]));
 			}
 		}
@@ -241,21 +241,21 @@ BranchStorage.prototype['titanium'] = {
 		Ti.App.Properties.setString(prefix(key), value);
 	},
 	remove: function(key) {
-		Ti.App.Properties.setString(prefix(key), "");
+		Ti.App.Properties.setString(prefix(key), '');
 	},
 	clear: function() {
 		/** @lends {Array} */
 		var props = Ti.App.Properties.listProperties();
 		for (var i = 0; i < props.length; i++) {
-			if (props[i].indexOf(BRANCH_KEY_PREFIX) != -1) {
-				Ti.App.Properties.setString(props[i], "");
+			if (props[i].indexOf(BRANCH_KEY_PREFIX) !== -1) {
+				Ti.App.Properties.setString(props[i], '');
 			}
 		}
 	},
 	isEnabled: function() {
 		try {
-			Ti.App.Properties.setString("test", "");
-			Ti.App.Properties.getString("test");
+			Ti.App.Properties.setString('test', '');
+			Ti.App.Properties.getString('test');
 			return true;
 		}
 		catch (err) {

@@ -2,7 +2,7 @@
 	"bitwise": false,
 	"browser": true,
 	"curly": true,
-	"eqeqeq": false,
+	"eqeqeq": true,
 	"forin": true,
 	"freeze": true,
 	"immed": true,
