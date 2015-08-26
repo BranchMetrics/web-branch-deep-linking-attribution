@@ -36,7 +36,7 @@ Server.prototype.serializeObject = function(obj, prefix) {
 	else {
 		for (var prop in obj) {
 			if (obj.hasOwnProperty(prop)) {
-				if (obj[prop] instanceof Array || typeof obj[prop] == 'object') {
+				if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
 					pairs.push(
 						this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
 					);
@@ -66,7 +66,7 @@ Server.prototype.getUrl = function(resource, data) {
 	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
 	var appendKeyOrId = function(data, destinationObject) {
-		if (typeof destinationObject == 'undefined') {
+		if (typeof destinationObject === 'undefined') {
 			destinationObject = { };
 		}
 		if (data['branch_key'] && branch_key.test(data['branch_key'])) {
@@ -80,12 +80,15 @@ Server.prototype.getUrl = function(resource, data) {
 		else {
 			throw Error(utils.message(
 				utils.messages.missingParam,
-				[ resource.endpoint, 'branch_key or app_id' ]
+				[
+					resource.endpoint,
+					'branch_key or app_id'
+				]
 			));
 		}
 	};
 
-	if (resource.endpoint == "/v1/has-app") {
+	if (resource.endpoint === '/v1/has-app') {
 		try {
 			resource.queryPart = appendKeyOrId(data, resource.queryPart);
 		}
@@ -128,7 +131,7 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.method === "POST" || resource.endpoint === "/v1/credithistory") {
+	if (resource.method === 'POST' || resource.endpoint === '/v1/credithistory') {
 		try {
 			data = appendKeyOrId(data, d);
 		}
@@ -173,9 +176,9 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=';
-	var postData = (requestMethod == 'POST') ?
+	var postData = (requestMethod === 'POST') ?
 		encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
-		"";
+		'';
 
 	var timeoutTrigger = window.setTimeout(
 		function() {
@@ -209,7 +212,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		Ti.Network.createHTTPClient() :
 		(window.XMLHttpRequest ?
 			new XMLHttpRequest() :
-			new ActiveXObject("Microsoft.XMLHTTP"));
+			new ActiveXObject('Microsoft.XMLHTTP'));
 	req.ontimeout = function() {
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
@@ -222,7 +225,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 				callback(new Error(e.error), null, req.status);
 			}
 			else {
-				callback(new Error("Error in API: " + req.status), null, req.status);
+				callback(new Error('Error in API: ' + req.status), null, req.status);
 			}
 		};
 		req.onload = function() {
@@ -237,8 +240,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 			else if (req.status === 402) {
 				callback(new Error('Not enough credits to redeem.'), null, req.status);
 			}
-			else if (req.status.toString().substring(0, 1) === "4" ||
-					req.status.toString().substring(0, 1) === "5") {
+			else if (req.status.toString().substring(0, 1) === '4' ||
+					req.status.toString().substring(0, 1) === '5') {
 				callback(new Error('Error in API: ' + req.status), null, req.status);
 			}
 		};
@@ -257,8 +260,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 				else if (req.status === 402) {
 					callback(new Error('Not enough credits to redeem.'), null, req.status);
 				}
-				else if (req.status.toString().substring(0, 1) === "4" ||
-						req.status.toString().substring(0, 1) === "5") {
+				else if (req.status.toString().substring(0, 1) === '4' ||
+						req.status.toString().substring(0, 1) === '5') {
 					callback(new Error('Error in API: ' + req.status), null, req.status);
 				}
 			}
@@ -293,7 +296,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 
 	var url;
 	var postData = '';
-	if (resource.method == 'GET') {
+	if (resource.method === 'GET') {
 		url = u.url + '?' + u.data;
 	}
 	else {
@@ -308,7 +311,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	 * @type {function(?Error,*=): ?undefined}
 	 */
 	var done = function(err, data, status) {
-		if (err && retries > 0 && status.toString().substring(0, 1) === "5") {
+		if (err && retries > 0 && status.toString().substring(0, 1) === '5') {
 			retries--;
 			window.setTimeout(function() {
 				makeRequest();

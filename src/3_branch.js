@@ -49,7 +49,7 @@ var wrap = function(parameters, func, init) {
 		var args;
 		var callback;
 		var lastArg = arguments[arguments.length - 1];
-		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== "function") {
+		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== 'function') {
 			callback = function(err) {
 				if (err) {
 					throw(err);
@@ -78,13 +78,13 @@ var wrap = function(parameters, func, init) {
 				next();
 			};
 			if (!init) {
-				if (self.init_state == init_states.INIT_PENDING) {
+				if (self.init_state === init_states.INIT_PENDING) {
 					return done(new Error(utils.message(utils.messages.initPending)), null);
 				}
-				else if (self.init_state == init_states.INIT_FAILED) {
+				else if (self.init_state === init_states.INIT_FAILED) {
 					return done(new Error(utils.message(utils.messages.initFailed)), null);
 				}
-				else if (self.init_state == init_states.NO_INIT || !self.init_state) {
+				else if (self.init_state === init_states.NO_INIT || !self.init_state) {
 					return done(new Error(utils.message(utils.messages.nonInit)), null);
 				}
 			}
@@ -217,7 +217,7 @@ Branch.prototype._referringLink = function() {
  */
 Branch.prototype._publishEvent = function(event) {
 	for (var i = 0; i < this._listeners.length; i++) {
-		if (!this._listeners[i].event || this._listeners[i].event == event) {
+		if (!this._listeners[i].event || this._listeners[i].event === event) {
 			this._listeners[i].listener(event);
 		}
 	}
@@ -312,7 +312,7 @@ Branch.prototype['init'] = wrap(
 			} :
 			options;
 
-		if (TITANIUM_BUILD && Ti.Platform.osname === "android") {
+		if (TITANIUM_BUILD && Ti.Platform.osname === 'android') {
 			self.keepAlive = true;
 		}
 
@@ -343,7 +343,7 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var isReferrable = (options &&
-				typeof options.isReferrable != 'undefined' &&
+				typeof options.isReferrable !== 'undefined' &&
 				options.isReferrable !== null) ?
 			options.isReferrable :
 			null;
@@ -376,7 +376,7 @@ Branch.prototype['init'] = wrap(
 					if (has_app && !currentSessionData['has_app']) {
 						currentSessionData['has_app'] = true;
 						session.update(self._storage, currentSessionData);
-						self._publishEvent("didDownloadApp");
+						self._publishEvent('didDownloadApp');
 					}
 					if (cb) {
 						cb(err, currentSessionData);
@@ -412,21 +412,21 @@ Branch.prototype['init'] = wrap(
 		var attachVisibilityEvent = function() {
 			var hidden;
 			var changeEvent;
-			if (typeof document.hidden !== "undefined") {
-				hidden = "hidden";
-				changeEvent = "visibilitychange";
+			if (typeof document.hidden !== 'undefined') {
+				hidden = 'hidden';
+				changeEvent = 'visibilitychange';
 			}
-			else if (typeof document.mozHidden !== "undefined") {
-				hidden = "mozHidden";
-				changeEvent = "mozvisibilitychange";
+			else if (typeof document.mozHidden !== 'undefined') {
+				hidden = 'mozHidden';
+				changeEvent = 'mozvisibilitychange';
 			}
-			else if (typeof document.msHidden !== "undefined") {
-				hidden = "msHidden";
-				changeEvent = "msvisibilitychange";
+			else if (typeof document.msHidden !== 'undefined') {
+				hidden = 'msHidden';
+				changeEvent = 'msvisibilitychange';
 			}
-			else if (typeof document.webkitHidden !== "undefined") {
-				hidden = "webkitHidden";
-				changeEvent = "webkitvisibilitychange";
+			else if (typeof document.webkitHidden !== 'undefined') {
+				hidden = 'webkitHidden';
+				changeEvent = 'webkitvisibilitychange';
 			}
 			if (changeEvent) {
 				document.addEventListener(changeEvent, function() {
@@ -466,12 +466,12 @@ Branch.prototype['init'] = wrap(
 					if (isReferrable !== null) {
 						args.push(isReferrable ? 1 : 0);
 					}
-					cordova.require("cordova/exec")(apiCordovaTitanium,
+					cordova.require('cordova/exec')(apiCordovaTitanium,
 						function() {
-							done("Error getting device data!");
+							done('Error getting device data!');
 						},
-						"BranchDevice",
-						freshInstall ? "getInstallData" : "getOpenData", args);
+						'BranchDevice',
+						freshInstall ? 'getInstallData' : 'getOpenData', args);
 				}
 				if (TITANIUM_BUILD) {
 					var data = { };
@@ -956,7 +956,7 @@ Branch.prototype['sendSMS'] = wrap(
 	callback_params.CALLBACK_ERR,
 	function(done, phone, linkData, options) {
 		var self = this;
-		if (typeof options == 'function') {
+		if (typeof options === 'function') {
 			options = { };
 		}
 		else if (typeof options === 'undefined' || options === null) {
@@ -964,7 +964,7 @@ Branch.prototype['sendSMS'] = wrap(
 		}
 		options["make_new_link"] = options["make_new_link"] || false;
 
-		if (!linkData['channel'] || linkData['channel'] == 'app banner') {
+		if (!linkData['channel'] || linkData['channel'] === 'app banner') {
 			linkData['channel'] = 'sms';
 		}
 
@@ -1417,7 +1417,7 @@ if (WEB_BUILD) {
 	/*** +TOC_HEADING &Event Listener& ^WEB ***/
 	/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event === "function" && listener === undefined) {
+		if (typeof event === 'function' && listener === undefined) {
 			listener = event;
 		}
 		if (listener) {
@@ -1541,31 +1541,31 @@ if (WEB_BUILD) {
 			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
 			sendLinkText: options['sendLinkText'] || 'Send Link',
 			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
-			iframe: typeof options['iframe'] == 'undefined' ?
+			iframe: typeof options['iframe'] === 'undefined' ?
 				true :
 				options['iframe'],
-			showiOS: typeof options['showiOS'] == 'undefined' ?
+			showiOS: typeof options['showiOS'] === 'undefined' ?
 				true :
 				options['showiOS'],
-			showiPad: typeof options['showiPad'] == 'undefined' ?
+			showiPad: typeof options['showiPad'] === 'undefined' ?
 				true :
 				options['showiPad'],
-			showAndroid: typeof options['showAndroid'] == 'undefined' ?
+			showAndroid: typeof options['showAndroid'] === 'undefined' ?
 				true :
 				options['showAndroid'],
-			showDesktop: typeof options['showDesktop'] == 'undefined' ?
+			showDesktop: typeof options['showDesktop'] === 'undefined' ?
 				true :
 				options['showDesktop'],
 			disableHide: !!options['disableHide'],
-			forgetHide: typeof options['forgetHide'] == 'number' ?
+			forgetHide: typeof options['forgetHide'] === 'number' ?
 				options['forgetHide'] :
 				!!options['forgetHide'],
 			position: options['position'] || 'top',
 			customCSS: options['customCSS'] || '',
-			mobileSticky: typeof options['mobileSticky'] == 'undefined' ?
+			mobileSticky: typeof options['mobileSticky'] === 'undefined' ?
 				false :
 				options['mobileSticky'],
-			desktopSticky: typeof options['desktopSticky'] == 'undefined' ?
+			desktopSticky: typeof options['desktopSticky'] === 'undefined' ?
 				true :
 				options['desktopSticky'],
 			make_new_link: !!options['make_new_link']

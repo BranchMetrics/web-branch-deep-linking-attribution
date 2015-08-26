@@ -188,7 +188,7 @@ describe('utils', function() {
 		});
 	});
 
-	describe("getParamValue", function() {
+	describe('getParamValue', function() {
 		it('should return search param value', function() {
 			if (testUtils.go('?test=testsearch')) {
 				var value = utils.getParamValue('test');
@@ -204,7 +204,7 @@ describe('utils', function() {
 		});
 	});
 
-	describe("hashValue", function() {
+	describe('hashValue', function() {
 		it('should return hash param value', function() {
 			if (testUtils.go('#test:testhash')) {
 				var value = utils.hashValue('test');
