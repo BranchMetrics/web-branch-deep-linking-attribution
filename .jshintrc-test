@@ -11,6 +11,7 @@
 	"mocha": true,
 	"noarg": true,
 	"nocomma": true,
+	"node": true,
 	"nonbsp": true,
 	"predef": [
 		"ActiveXObject",
@@ -26,6 +27,7 @@
 		"testUtils"
 	],
 	"scripturl": true,
+	"shadow": "inner",
 	"sub": true,
 	"trailing": true,
 	"undef": true,
