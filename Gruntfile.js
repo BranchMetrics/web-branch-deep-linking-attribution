@@ -5,11 +5,6 @@ var safari_browsers = [
 			browserName: 'safari',
 			platform: 'OS X 10.10',
 			version: '8.0'
-		},
-		{
-			browserName: 'safari',
-			platform: 'OS X 10.9',
-			version: '7.0'
 		}
 	],
 	chrome_browsers = [
@@ -34,12 +29,12 @@ var safari_browsers = [
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
-			version: '37'
+			version: '40.0'
 		},
 		{
 			browserName: 'firefox',
 			platform: 'OS X 10.10',
-			version: '36'
+			version: '39.0'
 		}
 	],
 
@@ -47,26 +42,16 @@ var safari_browsers = [
 		{
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
+			deviceOrientation: 'portrait',
 			platform: 'OS X 10.10',
-			version: '8.2'
+			version: '8.4'
 		},
 		{
 			browserName: 'iphone',
 			deviceName: 'iPhone Simulator',
+			deviceOrientation: 'portrait',
 			platform: 'OS X 10.10',
-			version: '8.1'
-		},
-		{
-			browserName: 'iphone',
-			deviceName: 'iPhone Simulator',
-			platform: 'OS X 10.10',
-			version: '8.0'
-		},
-		{
-			browserName: 'iphone',
-			deviceName: 'iPhone Simulator',
-			platform: 'OS X 10.10',
-			version: '7.1'
+			version: '8.3'
 		}
 	],
 
@@ -132,22 +117,21 @@ module.exports = function(grunt) {
 			all: {
 				options: {
 					username: 'branchmetrics',
-					// I have Cordova tests on saucelabs disabled for now. There are a few issues with dependencies I need to work out
-					urls: ['http://127.0.0.1:9999/test/test.html', 'http://127.0.0.1:9999/test/integration-test.html'/*, 'http://127.0.0.1:9999/test/cordova-integration-test.html'*/],
-					tunnelTimeout: 5,
-					throttled: 10,
+					urls: [
+						'http://0.0.0.0:9999/test/test.html',
+						'http://0.0.0.0:9999/test/integration-test.html'
+					],
 					maxRetries: 3,
-					build: grunt.file.readJSON('package.json')["build"],
-					pollInterval: 2000,         // (ms) Note: pollInterval * statusCheckAttempts should = 'max-duration'
-					statusCheckAttempts: 360,   // So if you change one of these, adjust 'max-duration' accordingly
-					'max-duration': 720,        // (s)
 					testname: 'Web SDK Tests',
 					browsers: safari_browsers.concat(chrome_browsers,
-						firefox_browsers,
-						ios_browsers,
+						// firefox_browsers,
+						// ios_browsers,
 						android_browsers,
 						ie_browsers)
 				}
+			},
+			options: {
+				force: true
 			}
 		},
 		connect: {
@@ -162,11 +146,12 @@ module.exports = function(grunt) {
 
 	// Loading dependencies
 	for (var key in grunt.file.readJSON("package.json").devDependencies) {
-		if (key !== "grunt" && key.indexOf("grunt") === 0) grunt.loadNpmTasks(key);
+		if (key !== "grunt" && key.indexOf("grunt") === 0) {
+			grunt.loadNpmTasks(key);
+		}
 	}
 
 	grunt.loadNpmTasks('grunt-saucelabs');
 	grunt.loadNpmTasks('grunt-contrib-connect');
-	grunt.loadNpmTasks('grunt-browserstack-tunnel');
 	grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
 };
