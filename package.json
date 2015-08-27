@@ -4,7 +4,8 @@
   "description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
   "main": "dist/build.min.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "lint": "./lint.sh"
   },
   "repository": {
     "type": "git",
