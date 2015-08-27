@@ -2,6 +2,7 @@
  * This provides the principal function to make a call to the API. Basically
  * a fancy wrapper around XHR/JSONP/etc.
  */
+'use strict';
 
 goog.provide('Server');
 goog.require('utils');

@@ -1,7 +1,9 @@
+'use strict';
+
 goog.require('Queue');
 
 describe('Queue', function() {
-	var queue = Queue();
+	var queue = new Queue();
 	var clock = sinon.useFakeTimers();
 	var orderCalled = [];
 

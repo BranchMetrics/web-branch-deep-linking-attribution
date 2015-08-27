@@ -2,6 +2,7 @@
  * This file is just for the closure compiler, to tell it the types of various
  * external functions. @type{?} means it's "optional".
  */
+'use strict';
 
 /** @type {?} */
 var define;

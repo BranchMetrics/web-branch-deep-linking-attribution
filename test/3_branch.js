@@ -1,3 +1,5 @@
+'use strict';
+
 goog.require('utils');
 goog.require('Branch');
 goog.require('resources');

@@ -1,6 +1,8 @@
 /**
  * A simple blocking queue for the API requests
  */
+'use strict';
+
 goog.provide('Queue');
 
 /**

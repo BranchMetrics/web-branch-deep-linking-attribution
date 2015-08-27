@@ -1,3 +1,5 @@
+'use strict';
+
 goog.require('utils');
 goog.require('Server');
 goog.require('resources');

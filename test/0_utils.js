@@ -1,3 +1,5 @@
+'use strict';
+
 goog.require('utils');
 
 describe('utils', function() {

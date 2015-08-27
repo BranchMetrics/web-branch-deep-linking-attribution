@@ -1,6 +1,7 @@
 /***
  * This file provides the main Branch function.
  */
+'use strict';
 
 goog.provide('Branch');
 goog.require('utils');
@@ -106,7 +107,7 @@ Branch = function() {
 		}
 		return default_branch;
 	}
-	this._queue = Queue();
+	this._queue = new Queue();
 
 	var storageMethods = [ ];
 	if (CORDOVA_BUILD) {
