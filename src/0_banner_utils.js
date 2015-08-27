@@ -1,3 +1,4 @@
+'use strict';
 goog.provide('banner_utils');
 goog.require('storage'); // jshint unused:false
 goog.require('utils');

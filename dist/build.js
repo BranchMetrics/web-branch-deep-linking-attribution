@@ -628,7 +628,7 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.9"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
 // Input 2
-var Queue = function() {
+var task_queue = function() {
   var a = [], b = function() {
     if (a.length) {
       a[0](function() {
@@ -1392,7 +1392,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
   if (!(this instanceof Branch)) {
     return default_branch || (default_branch = new Branch), default_branch;
   }
-  this._queue = Queue();
+  this._queue = task_queue();
   var a = [];
   CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && (a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"]);
   a.push("pojo");

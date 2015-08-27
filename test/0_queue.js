@@ -1,7 +1,9 @@
-goog.require('Queue');
+'use strict';
 
-describe('Queue', function() {
-	var queue = Queue();
+goog.require('task_queue');
+
+describe('task_queue', function() {
+	var queue = task_queue();
 	var clock = sinon.useFakeTimers();
 	var orderCalled = [];
 

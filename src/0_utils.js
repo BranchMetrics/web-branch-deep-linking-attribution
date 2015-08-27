@@ -1,6 +1,7 @@
 /**
  * Just provides a couple of utilities.
  */
+'use strict';
 
 goog.provide('utils');
 /*jshint unused:false*/

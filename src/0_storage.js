@@ -3,6 +3,7 @@
  * sessionStorage, localStorage, cookies, titanium storage,
  * and a plain old javascript object as a fallback
  */
+'use strict';
 
 goog.provide('storage');
 /*jshint unused:false*/

@@ -1,3 +1,5 @@
+'use strict';
+
 goog.require('storage'); // jshint ignore:line
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';

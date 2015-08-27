@@ -1,3 +1,5 @@
+'use strict';
+
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
