@@ -8,7 +8,7 @@ goog.require('utils');
 goog.require('resources');
 goog.require('Server');
 goog.require('banner');
-goog.require('Queue');
+goog.require('task_queue');
 goog.require('storage');
 goog.require('session');
 goog.require('config');
@@ -107,7 +107,7 @@ Branch = function() {
 		}
 		return default_branch;
 	}
-	this._queue = new Queue();
+	this._queue = task_queue();
 
 	var storageMethods = [ ];
 	if (CORDOVA_BUILD) {
