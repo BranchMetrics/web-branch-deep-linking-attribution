@@ -4,6 +4,8 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v1.6.9] - 2015-08-26
+- Fixed error that prevented metadata from being passed to the server correctly in branch.track() for the min.js version
 ## [v1.6.8] - 2015-08-25
 - Fixed error that prevented referring_link from persisting through sessions
 - Fixed error that prevented metadata from being passed to the server correctly in branch.track()
