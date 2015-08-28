@@ -270,7 +270,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  * ```js
  * branch.init(
  *     branch_key,
- *     options
+ *     options,
  *     callback (err, data),
  * );
  * ```

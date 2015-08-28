@@ -36,5 +36,5 @@
 		"tests",
 		"transform.js"
 	],
-  "build": "1.6.9"
+	"build": "1.6.9"
 }
