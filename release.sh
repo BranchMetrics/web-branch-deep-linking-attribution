@@ -100,12 +100,7 @@ read -p "Clean up -e backup files?" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  rm -f bower.json-e
-  rm -f CHANGELOG.md-e
-  rm -f package.json-e
-  rm -f plugin.xml-e
-  rm -f src/0_config.js-e
-  rm -f test/web-config.js-e
+  rm -f bower.json-e CHANGELOG.md-e package.json-e plugin.xml-e src/0_config.js-e test/web-config.js-e
 fi
 
 echo "Integration Guide URL: https://github.com/BranchMetrics/Branch-Integration-Guides/blob/master/smart-banner-guide.md"
