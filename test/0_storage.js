@@ -20,7 +20,7 @@ describe('session storage', function() {
 		);
 	});
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
@@ -60,7 +60,7 @@ describe('local storage', function() {
 		);
 	});
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
@@ -93,7 +93,7 @@ describe('cookie storage', function() {
 	var itemValue = 'value';
 	var assert = testUtils.unplanned();
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		storage.set(itemKey, itemValue);
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
@@ -130,7 +130,7 @@ describe('pojo storage', function() {
 		assert.equal(storage._store[itemKey], itemValue, 'key / vaue stored');
 	});
 
-	it('shold get stored item with key', function() {
+	it('should get stored item with key', function() {
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
