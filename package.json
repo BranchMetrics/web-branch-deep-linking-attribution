@@ -1,40 +1,40 @@
 {
-  "name": "branch-sdk",
-  "version": "1.6.9",
-  "description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
-  "main": "dist/build.min.js",
-  "precommit": ["lint"],
-  "scripts": {
-    "lint": "./lint.sh",
+	"name": "branch-sdk",
+	"version": "1.6.9",
+	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
+	"main": "dist/build.min.js",
+	"precommit": ["lint"],
+	"scripts": {
+		"lint": "./lint.sh",
 	"test": "grunt test"
-   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK.git"
-  },
-  "author": "Dmitri Gaskin <dmitrig01@gmail.com>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/issues"
-  },
-  "homepage": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK",
-  "devDependencies": {
-    "falafel": "1.0.1",
-    "grunt": "^0.4.5",
-    "grunt-cli": "~0.1.6",
-    "grunt-contrib-connect": "~0.9.0",
-    "grunt-contrib-watch": "~0.6.1",
-    "grunt-saucelabs": "~8.6.1",
-    "jsdoc": "3.2.2",
-    "jsdox": "0.4.9",
-    "karma": "^0.12.37",
-    "karma-browserstack-launcher": "^0.1.2",
-    "mocha": "^2.2.1",
-    "precommit-hook": "1.0.7",
-    "sinon": "1.13.0"
-  },
-  "dependencies": {
-    "request": "^2.55.0"
-  },
-  "build": "1.6.9"
+	 },
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK.git"
+	},
+	"author": "Dmitri Gaskin <dmitrig01@gmail.com>",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/issues"
+	},
+	"homepage": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK",
+	"devDependencies": {
+		"falafel": "1.0.1",
+		"grunt": "^0.4.5",
+		"grunt-cli": "~0.1.6",
+		"grunt-contrib-connect": "~0.9.0",
+		"grunt-contrib-watch": "~0.6.1",
+		"grunt-saucelabs": "~8.6.1",
+		"jsdoc": "3.2.2",
+		"jsdox": "0.4.9",
+		"karma": "^0.12.37",
+		"karma-browserstack-launcher": "^0.1.2",
+		"mocha": "^2.2.1",
+		"precommit-hook": "1.0.7",
+		"sinon": "1.13.0"
+	},
+	"dependencies": {
+		"request": "^2.55.0"
+	},
+	"build": "1.6.9"
 }
