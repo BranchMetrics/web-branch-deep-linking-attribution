@@ -21,6 +21,7 @@
 	],
 	"scripturl": true,
 	"shadow": "inner",
+	"strict": true,
 	"sub": true,
 	"trailing": true,
 	"undef": true,

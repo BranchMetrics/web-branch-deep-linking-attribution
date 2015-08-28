@@ -3,9 +3,11 @@
   "version": "1.6.9",
   "description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
   "main": "dist/build.min.js",
+  "precommit": ["lint"],
   "scripts": {
-    "test": "grunt test"
-  },
+    "lint": "./lint.sh",
+	"test": "grunt test"
+   },
   "repository": {
     "type": "git",
     "url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK.git"

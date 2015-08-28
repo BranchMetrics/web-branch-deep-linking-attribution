@@ -1,6 +1,7 @@
 /*
  * Branch Session
  */
+'use strict';
 
 /*jshint unused:false*/
 goog.require('goog.json');

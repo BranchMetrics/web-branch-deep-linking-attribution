@@ -3,6 +3,7 @@
  * were any tasks that were executed on the dummy branch object before real
  * branch was loaded.
  */
+'use strict';
 
 goog.provide('branch_instance');
 goog.require('Branch');

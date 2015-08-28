@@ -1,6 +1,7 @@
 /**
  * This provides the markup, styles, and helper functions for all Banner UI Elements
  */
+'use strict';
 
 goog.provide('banner');
 goog.require('banner_utils');

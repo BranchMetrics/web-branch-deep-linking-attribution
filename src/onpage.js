@@ -6,6 +6,7 @@
  * This script creates a window.branch object with a number of calls. When you
  * call them, it saves your call for later.
  */
+'use strict';
 
 (function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
 	if (!root[branchStr] || !root[branchStr]._q) {
