@@ -37,7 +37,7 @@ the link the user was referred by.
 ```js
 branch.init(
     branch_key,
-    options
+    options,
     callback (err, data),
 );
 ```
