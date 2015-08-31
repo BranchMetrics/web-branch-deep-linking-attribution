@@ -1,6 +1,6 @@
 'use strict';
-
 goog.provide('banner_html');
+
 goog.require('banner_utils');
 goog.require('utils');
 goog.require('session');

@@ -2,13 +2,12 @@
  * This provides the markup, styles, and helper functions for all Banner UI Elements
  */
 'use strict';
-
 goog.provide('banner');
+
+goog.require('utils');
 goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
-
-goog.require('utils');
 
 var sendSMS = function(doc, branch, options, linkData) {
 	var phone = doc.getElementById('branch-sms-phone');
