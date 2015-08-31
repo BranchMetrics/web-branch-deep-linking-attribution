@@ -2,8 +2,9 @@
  * This file provides the main Branch function.
  */
 'use strict';
-
 goog.provide('Branch');
+
+goog.require('goog.json'); // jshint unused:false
 goog.require('utils');
 goog.require('resources');
 goog.require('Server');
@@ -12,7 +13,6 @@ goog.require('task_queue');
 goog.require('storage');
 goog.require('session');
 goog.require('config');
-goog.require('goog.json'); // jshint unused:false
 
 /*globals CORDOVA_BUILD, TITANIUM_BUILD, WEB_BUILD, Ti, BranchStorage, cordova, require */
 

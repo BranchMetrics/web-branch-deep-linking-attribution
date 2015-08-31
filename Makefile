@@ -5,7 +5,16 @@ COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() 
 COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --define 'DEBUG=false'
 COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE --define 'DEBUG=true'
 
-SOURCES=src/0_config.js src/0_storage.js src/0_session.js src/0_utils.js src/0_queue.js src/0_banner_utils.js src/1_api.js src/1_resources.js src/1_banner_css.js src/1_banner_html.js src/2_banner.js src/3_branch.js src/4_initialization.js $(COMPILER_LIBRARY)/goog/**
+SOURCES=$(COMPILER_LIBRARY)/goog/**\
+src/0_config.js src/0_queue.js\
+src/1_utils.js\
+src/2_resources.js src/2_session.js src/2_storage.js\
+src/3_api.js src/3_banner_utils.js\
+src/4_banner_css.js src/4_banner_html.js\
+src/5_banner.js\
+src/6_branch.js\
+src/7_initialization.js
+
 EXTERN=src/extern.js
 
 VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/$$1/')
@@ -64,7 +73,7 @@ endif
 # Documentation
 
 docs/web/3_branch_web.md: $(SOURCES)
-	perl -pe 's/\/\*\*\ =CORDOVA/\/\*\*\*/gx' src/3_branch.js > src/3_branch_web.js
+	perl -pe 's/\/\*\*\ =CORDOVA/\/\*\*\*/gx' src/6_branch.js > src/3_branch_web.js
 	perl -p -i -e 's/=WEB//gx' src/3_branch_web.js
 	jsdox src/3_branch_web.js --output docs/web
 	rm src/3_branch_web.js
@@ -74,7 +83,7 @@ README.md: docs/0_notice.md docs/readme/1_main.md docs/4_footer.md
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
 WEB_GUIDE.md: docs/0_notice.md docs/web/1_intro.md docs/web/3_branch_web.md docs/4_footer.md
-	perl build_utils/toc_generator.pl src/3_branch.js docs/web/2_table_of_contents.md WEB
+	perl build_utils/toc_generator.pl src/6_branch.js docs/web/2_table_of_contents.md WEB
 	cat docs/0_notice.md docs/web/1_intro.md docs/web/2_table_of_contents.md docs/web/3_branch_web.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > WEB_GUIDE.md
 	perl -p -i -e 's/# Global//' WEB_GUIDE.md
