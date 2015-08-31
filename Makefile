@@ -22,7 +22,7 @@ clean:
 release: clean all dist/build.min.js.gz
 	@echo "released"
 
-# Kinda gross, but will download closure compiler if you don't have it.
+# Download closure compiler if none is found
 compiler/compiler.jar:
 	mkdir -p compiler && \
 		wget http://dl.google.com/closure-compiler/compiler-latest.zip && \
