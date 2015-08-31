@@ -1139,7 +1139,7 @@ Server.prototype.request = function(a, b, c, d) {
   n();
 };
 // Input 9
-var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLE:4}, _validator;
+var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
     if ("number" === typeof e || e) {

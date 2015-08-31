@@ -21,7 +21,7 @@ var validationTypes = {
 	STRING: 1,
 	NUMBER: 2,
 	ARRAY: 3,
-	BOOLE: 4
+	BOOLEAN: 4
 };
 
 /* jshint ignore:start */
