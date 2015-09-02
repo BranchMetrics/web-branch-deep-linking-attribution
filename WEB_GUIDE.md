@@ -116,7 +116,7 @@ ___
 
 
 
-* * *
+___
 
 ### init(branch_key, options, callback) 
 
@@ -774,7 +774,7 @@ callback(
 );
 ```
 
----
+___
 
 ## Credit redemption
 
@@ -953,7 +953,7 @@ branch.closeBanner();
 
 
 
-* * *
+___
 
 
 

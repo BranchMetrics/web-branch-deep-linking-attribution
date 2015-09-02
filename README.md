@@ -102,7 +102,7 @@ We provide a sample web app which demonstrates what Branch Metrics Web SDK can d
 
 To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
 
-* * *
+___
 
 ## Contributing
 Whether you are an avid engineer, a partner, or a Branch employee, we activley welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
@@ -113,7 +113,7 @@ and the [Google Closure Compiler](https://developers.google.com/closure/compiler
 
 For an in-depth guide to working with developing for the Web SDK, refer to the [release documentation](https://github.com/BranchMetrics/Web-SDK/blob/master/RELEASE_DOCUMENTATION.md).
 
-* * *
+___
 
 ## Bugs / Help / Support
 
