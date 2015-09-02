@@ -774,7 +774,7 @@ callback(
 );
 ```
 
----
+___
 
 ## Credit redemption
 

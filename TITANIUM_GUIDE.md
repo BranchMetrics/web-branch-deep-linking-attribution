@@ -175,7 +175,7 @@ ___
 
 
 
-* * *
+___
 
 ### setDebug(debug) 
 
@@ -188,7 +188,7 @@ instead of possibly using the same device id.  This is useful when testing.
 
 This needs to be set before the Branch.init call!!!
 
----
+___
 
 
 
@@ -873,7 +873,7 @@ callback(
 );
 ```
 
----
+___
 
 ## Credit redemption
 
@@ -922,7 +922,7 @@ ___
 
 
 
-* * *
+___
 
 
 

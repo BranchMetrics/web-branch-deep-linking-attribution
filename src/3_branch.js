@@ -235,7 +235,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
 	 *
 	 * This needs to be set before the Branch.init call!!!
 	 *
-	 * ---
+	 * ___
 	 *
 	 */
 	Branch.prototype['setDebug'] = function(debug) {
@@ -1323,7 +1323,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  * );
  * ```
  *
- * ---
+ * ___
  *
  * ## Credit redemption
  *

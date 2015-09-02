@@ -662,7 +662,7 @@ callback(
 );
 ```
 
----
+___
 
 ## Credit redemption
 
