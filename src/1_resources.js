@@ -224,7 +224,7 @@ resources.getCode = {
 		"expiration": validator(false, validationTypes.STRING),
 		"calculation_type": validator(true, validationTypes.NUMBER),
 		"location": validator(true, validationTypes.NUMBER),
-		"creation_type": validator(true, validationTypes.NUMBER),
+		"creation_source": validator(true, validationTypes.NUMBER),
 		"type": validator(true, validationTypes.STRING),
 		"bucket": validator(false, validationTypes.STRING)
 	})
