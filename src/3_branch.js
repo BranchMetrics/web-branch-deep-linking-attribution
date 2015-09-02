@@ -1110,7 +1110,8 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  */
 /*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
 Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	data.type = 'credit';
+	data['type'] = 'credit';
+	data['creation_source'] = data['creation_source'] || 2; // EventResponse.CREATION_SOURCE_SDK
 	this._api(resources.getCode, data, done);
 });
 
