@@ -4,7 +4,7 @@
 
 
 
-___
+* * *
 
 ### init(branch_key, options, callback) 
 
@@ -841,7 +841,7 @@ branch.closeBanner();
 
 
 
-___
+* * *
 
 
 
