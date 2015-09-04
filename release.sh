@@ -6,6 +6,12 @@ VERSION_NO_V=$(echo $1 | tr -d "\nv")
 VERSION="v"$VERSION_NO_V
 DATE=$(date "+%Y-%m-%d")
 
+echo "Sanity checks"
+
+read -p "Are you on the master branch?" -n 1 -r
+read -p "Have you amended CHANGELOG.md and git push it?" -n 1 -r
+read -p "Are you synced to HEAD?" -n 1 -r
+
 echo "Releasing Branch Web SDK"
 
 echo "Building files"
@@ -103,16 +109,16 @@ then
   rm -f bower.json-e CHANGELOG.md-e package.json-e plugin.xml-e src/0_config.js-e test/web-config.js-e
 fi
 
-echo "Integration Guide URL: https://github.com/BranchMetrics/Branch-Integration-Guides/blob/master/smart-banner-guide.md"
-read -p "Did you update the Branch Integration Guide, specifically the Javascript Snippet and App Banner?" -n 1 -r
+echo "Done script."
+read -p "Have you updated the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/_initialization.md ?" -n 1 -r
+read -p "Have you updated the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/send_sms_example.md ?" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	echo "Ok"
 fi
 
-echo "Done script. Now push:"
-echo "    git push"
-echo "    git push origin $VERSION"
+echo "Last step, run:"
+echo "    git push; git push origin $VERSION"
 
 echo ""
