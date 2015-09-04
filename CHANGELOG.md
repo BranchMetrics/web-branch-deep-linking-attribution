@@ -3,9 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
-- Fixed error that prevented branch.setIdentity() to function after branch.logout() had been called
 
 ## [v1.6.10] - 2015-09-04
+- Fixed error that prevented branch.setIdentity() to function after branch.logout() had been called
 
 ## [v1.6.9] - 2015-08-26
 - Fixed error that prevented metadata from being passed to the server correctly in branch.track() for the min.js version
