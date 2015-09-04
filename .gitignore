@@ -31,7 +31,7 @@ npm-debug.log
 tmp
 .map
 Thumbs.db
-
+*.*-e
 src/titanium/BranchSDK/build/*
 src/titanium/BranchSDK/android/dist/branchsdk.jar
 src/titanium/BranchSDK/android/libs/*
