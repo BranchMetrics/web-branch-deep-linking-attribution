@@ -112,6 +112,11 @@ fi
 echo "Done script."
 read -p "Have you updated the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/_initialization.md ?" -n 1 -r
 read -p "Have you updated the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/send_sms_example.md ?" -n 1 -r
+
+echo "Post-release sanity checks."
+read -p "Can you visit https://cdn.branch.io/branch-$VERSION.min.js ?" -n 1 -r
+read -p "Is https://cdn.branch.io/example.html using the right version number $VERSION?" -n 1 -r
+
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
@@ -120,5 +125,8 @@ fi
 
 echo "Last step, run:"
 echo "    git push; git push origin $VERSION"
+
+echo ""
+echo "Remember to check https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/tree/$VERSION/CHANGELOG.md "
 
 echo ""
