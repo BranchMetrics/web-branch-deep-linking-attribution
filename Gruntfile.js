@@ -129,20 +129,6 @@ var test_urls = [
 
 module.exports = function(grunt) {
 	grunt.initConfig({
-		// 'saucelabs-mocha': {
-		// 	all: {
-		// 		options: {
-		// 			username: 'branchmetrics',
-		// 			urls: test_urls,
-		// 			maxRetries: 3,
-		// 			testname: 'Web SDK Tests',
-		// 			browsers: chrome_browsers
-		// 		}
-		// 	},
-		// 	options: {
-		// 		force: true
-		// 	}
-		// },
 		'saucelabs-mocha': {
 			all: {
 				options: {
@@ -155,7 +141,7 @@ module.exports = function(grunt) {
 						chrome_browsers,
 						firefox_browsers,
 						android_browsers,
-						// ios_browsers,
+						ios_browsers,
 						ie_browsers)
 				}
 			},
