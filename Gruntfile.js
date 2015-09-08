@@ -138,9 +138,9 @@ module.exports = function(grunt) {
 						// safari_browsers,
 						// chrome_browsers,
 						firefox_browsers,
+						android_browsers,
 						chrome_browsers)
 						// ios_browsers,
-						// android_browsers,
 						// ie_browsers)
 				}
 			},
