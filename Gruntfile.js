@@ -136,11 +136,12 @@ module.exports = function(grunt) {
 					testname: 'Web SDK Tests',
 					browsers: [].concat(
 						// safari_browsers,
-						chrome_browsers,
-						firefox_browsers,
+						// chrome_browsers,
+						chrome_browsers)
+						// firefox_browsers,
 						// ios_browsers,
-						android_browsers,
-						ie_browsers)
+						// android_browsers,
+						// ie_browsers)
 				}
 			},
 			options: {
