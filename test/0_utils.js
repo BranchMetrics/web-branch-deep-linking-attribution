@@ -60,7 +60,7 @@ describe('utils', function() {
 				"referring_identity": "12345"
 			};
 			var whiteListedData = utils.whiteListSessionData(data);
-			assert.ok(null === whiteListedData['has_app'], 'has_app should be null');
+			assert.ok(whiteListedData['has_app'] === null, 'has_app should be null');
 		});
 	});
 
@@ -193,7 +193,6 @@ describe('utils', function() {
 		});
 
 		it('should produce a missing URL error', function() {
-			;
 			assert.equal(
 				utils.message(utils.messages.missingUrl),
 				'Required argument: URL, is missing',
