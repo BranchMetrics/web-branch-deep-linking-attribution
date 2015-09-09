@@ -626,7 +626,7 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.9"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.10"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
 // Input 2
 var task_queue = function() {
   var a = [], b = function() {
@@ -1199,7 +1199,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
   is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), is_referrable:validator(!1, validationTypes.NUMBER)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), 
   session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id)}};
 }
-resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({prefix:validator(!1, validationTypes.STRING), amount:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), location:validator(!0, validationTypes.NUMBER), creation_type:validator(!0, validationTypes.NUMBER), type:validator(!0, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING)})};
+resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({prefix:validator(!1, validationTypes.STRING), amount:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), location:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), type:validator(!0, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:defaults({session_id:validator(!0, branch_id)})};
@@ -1606,7 +1606,7 @@ Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a)
 });
 Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   b.type = "credit";
-  b.creation_type = b.creation_type || 2;
+  b.creation_source = b.creation_source || 2;
   this._api(resources.getCode, b, a);
 });
 Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
