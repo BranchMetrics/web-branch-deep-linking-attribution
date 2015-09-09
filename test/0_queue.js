@@ -5,11 +5,11 @@ goog.require('task_queue');
 describe('task_queue', function() {
 	var clock = sinon.useFakeTimers();
 	var assert = testUtils.unplanned();
-
-	it('should queue a function and call it', function(done) {
-		var queue = task_queue();
-		var orderCalled = [];
-
+	var queue;
+	var orderCalled;
+	beforeEach(function() {
+		queue = task_queue();
+		orderCalled = [];
 		queue(function(next) {
 			setTimeout(function() {
 				orderCalled.push(0);
@@ -17,22 +17,15 @@ describe('task_queue', function() {
 			}, 10);
 		});
 		assert.equal(undefined, orderCalled[0], 'Has not yet called function');
+	});
+
+	it('should queue a function and call it', function(done) {
 		clock.tick(10);
 		assert.equal(0, orderCalled[0], 'Function called');
 		done();
 	});
 
 	it('should enqueue two functions, and call them in order', function(done) {
-		var queue = task_queue();
-		var orderCalled = [];
-
-		queue(function(next) {
-			setTimeout(function() {
-				orderCalled.push(0);
-				next();
-			}, 10);
-		});
-		assert.equal(undefined, orderCalled[0], 'Has not yet called function');
 		queue(function(next) {
 			setTimeout(function() {
 				orderCalled.push(1);
