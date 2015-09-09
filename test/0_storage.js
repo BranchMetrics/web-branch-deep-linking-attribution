@@ -3,84 +3,89 @@
 goog.require('storage'); // jshint ignore:line
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
+var ITEM_KEY = 'key';
+var ITEM_KEY_UNSTORED = 'key unstored';
+var ITEM_VALUE = 'value';
 
 describe('session storage', function() {
 	var storage = new BranchStorage([ 'session' ]); // jshint ignore:line
-
-	var itemKey = 'key';
-	var itemValue = 'value';
 	var assert = testUtils.unplanned();
+	beforeEach(function() {
+		storage.clear();
+	});
 
 	it('should set an item', function() {
-		storage.set(itemKey, itemValue);
+		storage.set(ITEM_KEY, ITEM_VALUE);
 		assert.equal(
-			sessionStorage.getItem(BRANCH_KEY_PREFIX + itemKey),
-			itemValue,
+			sessionStorage.getItem(BRANCH_KEY_PREFIX + ITEM_KEY),
+			ITEM_VALUE,
 			'key / vaue stored'
 		);
 	});
 
 	it('should get stored item with key', function() {
-		var item = storage.get(itemKey);
-		assert.equal(item, itemValue, 'correct value with key');
+		storage.set(ITEM_KEY, ITEM_VALUE);
+		var item = storage.get(ITEM_KEY);
+		assert.equal(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
-		var item = storage.get('not_an_item');
+		var item = storage.get(ITEM_KEY_UNSTORED);
 		assert.equal(item, null, 'returned null');
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, 'session');
-		storage.remove(itemKey + 'testRemove');
-		var item = storage.get(itemKey + 'testRemove');
+		storage.set(ITEM_KEY, ITEM_VALUE, 'session');
+		storage.remove(ITEM_KEY);
+		var item = storage.get(ITEM_KEY);
 		assert.equal(item, null, 'returned null');
 	});
 
 	it('should clear all items', function() {
-		storage.set('key', 'value');
+		storage.set(ITEM_KEY, ITEM_VALUE);
 		storage.clear();
-		assert.deepEqual(sessionStorage.getItem('key'), null, 'Storage cleared');
+		assert.deepEqual(sessionStorage.getItem(ITEM_KEY), null, 'Storage cleared');
 	});
 });
 
 describe('local storage', function() {
 	var storage = new BranchStorage([ 'local' ]); // jshint ignore:line
-
-	var itemKey = 'key';
-	var itemValue = 'value';
 	var assert = testUtils.unplanned();
+	beforeEach(function() {
+		storage.clear();
+	});
 
 	it('should set an item in localStorage', function() {
-		storage.set(itemKey, itemValue);
+		storage.set(ITEM_KEY, ITEM_VALUE);
 		assert.equal(
-			localStorage.getItem(BRANCH_KEY_PREFIX + itemKey),
-			itemValue,
+			localStorage.getItem(BRANCH_KEY_PREFIX + ITEM_KEY),
+			ITEM_VALUE,
 			'key / vaue stored'
 		);
 	});
 
 	it('should get stored item with key', function() {
-		var item = storage.get(itemKey);
-		assert.equal(item, itemValue, 'correct value with key');
+		storage.set(ITEM_KEY, ITEM_VALUE);
+		var item = storage.get(ITEM_KEY);
+		assert.equal(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
-		var item = storage.get('not_an_item');
+		var item = storage.get(ITEM_KEY_UNSTORED);
 		assert.equal(item, null, 'returned null');
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, 'session');
-		storage.remove(itemKey + 'testRemove');
-		var item = storage.get(itemKey + 'testRemove');
+		storage.set(ITEM_KEY, ITEM_VALUE, 'session');
+		storage.remove(ITEM_KEY);
+		var item = storage.get(ITEM_KEY);
 		assert.equal(item, null, 'returned null');
 	});
 
 	it('should clear all items', function() {
-		storage.set('key', 'value');
+		storage.set(ITEM_KEY, ITEM_VALUE);
 		storage.clear();
-		assert.deepEqual(localStorage.getItem('key'), null, 'Storage cleared');
+		assert.deepEqual(localStorage.getItem(ITEM_KEY), null, 'Storage cleared');
 	});
 });
 
@@ -89,14 +94,14 @@ describe('local storage', function() {
 describe('cookie storage', function() {
 	var storage = new BranchStorage(['permcookie']); // jshint ignore:line
 
-	var itemKey = 'key';
-	var itemValue = 'value';
+	var ITEM_KEY = 'key';
+	var ITEM_VALUE = 'value';
 	var assert = testUtils.unplanned();
 
 	it('should get stored item with key', function() {
-		storage.set(itemKey, itemValue);
-		var item = storage.get(itemKey);
-		assert.equal(item, itemValue, 'correct value with key');
+		storage.set(ITEM_KEY, ITEM_VALUE);
+		var item = storage.get(ITEM_KEY);
+		assert.equal(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
@@ -105,9 +110,9 @@ describe('cookie storage', function() {
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, 'session');
-		storage.remove(itemKey + 'testRemove');
-		var item = storage.get(itemKey + 'testRemove');
+		storage.set(ITEM_KEY + 'testRemove', ITEM_VALUE, 'session');
+		storage.remove(ITEM_KEY + 'testRemove');
+		var item = storage.get(ITEM_KEY + 'testRemove');
 		assert.equal(item, null, 'returned null');
 	});
 
@@ -118,39 +123,41 @@ describe('cookie storage', function() {
 	});
 });
 */
+
 describe('pojo storage', function() {
 	var storage = new BranchStorage([ 'pojo' ]); // jshint ignore:line
-
-	var itemKey = 'key';
-	var itemValue = 'value';
 	var assert = testUtils.unplanned();
+	beforeEach(function() {
+		storage.clear();
+	});
 
 	it('should set a temporary item', function() {
-		storage.set(itemKey, itemValue);
-		assert.equal(storage._store[itemKey], itemValue, 'key / vaue stored');
+		storage.set(ITEM_KEY, ITEM_VALUE);
+		assert.equal(storage._store[ITEM_KEY], ITEM_VALUE, 'key / vaue stored');
 	});
 
 	it('should get stored item with key', function() {
-		var item = storage.get(itemKey);
-		assert.equal(item, itemValue, 'correct value with key');
+		storage.set(ITEM_KEY, ITEM_VALUE);
+		var item = storage.get(ITEM_KEY);
+		assert.equal(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
-		var item = storage.get('not_an_item');
+		storage.set(ITEM_KEY, ITEM_VALUE);
+		var item = storage.get(ITEM_KEY_UNSTORED);
 		assert.equal(item, null, 'returned null');
 	});
 
 	it('should remove an item', function() {
-		storage.set(itemKey + 'testRemove', itemValue, 'session');
-		storage.remove(itemKey + 'testRemove');
-		var item = storage.get(itemKey + 'testRemove');
+		storage.set(ITEM_KEY, ITEM_VALUE, 'session');
+		storage.remove(ITEM_KEY);
+		var item = storage.get(ITEM_KEY);
 		assert.equal(item, null, 'returned null');
 	});
 
 	it('should clear all items', function() {
-		storage.set('key', 'value');
+		storage.set(ITEM_KEY, ITEM_VALUE);
 		storage.clear();
-		assert.deepEqual(storage._store['key'], null, 'Storage cleared');
+		assert.deepEqual(storage._store[ITEM_KEY], null, 'Storage cleared');
 	});
-
 });

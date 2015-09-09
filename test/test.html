@@ -13,7 +13,7 @@
 	<script src="../node_modules/mocha/mocha.js"></script>
 	<script src="../node_modules/sinon/pkg/sinon-1.13.0.js"></script>
 	<script src="test-utils.js"></script>
-	<script type="text/javascript">
+	<script>
 		mocha.ui('bdd');
 		mocha.reporter('html');
 
@@ -26,16 +26,16 @@
 		goog.require('session');
 	</script>
 
-	<script type="text/javascript" src="1_api.js"></script>
-	<script type="text/javascript" src="3_branch.js"></script>
-	<script type="text/javascript" src="0_utils.js"></script>
-	<script type="text/javascript" src="0_queue.js"></script>
-	<script type="text/javascript" src="0_storage.js"></script>
+	<script src="0_queue.js"></script>
+	<script src="0_storage.js"></script>
+	<script src="0_utils.js"></script>
+	<script src="1_api.js"></script>
+	<script src="3_branch.js"></script>
 	<!-- just add others here -->
 
-	<script type="text/javascript" src="saucelabs.js"></script>
+	<script src="saucelabs.js"></script>
 
-	<script type="text/javascript">
+	<script>
 		if (window.mochaPhantomJS) {
 			mochaPhantomJS.run();
 		}
