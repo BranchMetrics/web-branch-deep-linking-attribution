@@ -145,18 +145,8 @@ describe('Server', function() {
 
 	describe('XHR Request', function() {
 		beforeEach(function() {
-			goog.json.parse = function() {};
-			sinon.stub(goog.json, "parse", function(data) {
-				return data;
-			});
 			requests = [];
 			storage.clear();
-		});
-
-		afterEach(function() {
-			if (typeof goog.json.parse.restore === 'function') {
-				goog.json.parse.restore();
-			}
 		});
 
 		it('should instantiate an XHR', function(done) {
@@ -188,7 +178,7 @@ describe('Server', function() {
 				'POST',
 				storage,
 				function(err, data) {
-					assert.equal(data, responseText, 'successful response');
+					assert.equal(Object.getOwnPropertyNames(data).length, 0, 'successful response');
 				}
 			);
 			requests[0].status = 200;
