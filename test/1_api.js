@@ -11,6 +11,7 @@ goog.require('config');
 describe('Server helpers', function() {
 	var server = new Server();
 	var assert = testUtils.unplanned();
+
 	it('serializeObject should work', function() {
 		// Test simple objects
 		assert.equal(
@@ -144,6 +145,7 @@ describe('Server', function() {
 
 	describe('XHR Request', function() {
 		beforeEach(function() {
+			sinon.goog.json = function() {};
 			sinon.stub(goog.json, "parse", function(data) {
 				return data;
 			});
@@ -871,7 +873,6 @@ describe('Server', function() {
 
 			it('should fail without identity_id', function(done) {
 				var assert = testUtils.plan(2, done);
-
 				server.request(
 					resources.redeem,
 					testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'identity_id' ]),
