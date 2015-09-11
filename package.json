@@ -31,7 +31,7 @@
 		"karma-browserstack-launcher": "^0.1.2",
 		"mocha": "^2.2.1",
 		"precommit-hook": "1.0.7",
-		"sinon": "1.13.0"
+		"sinon": "1.16.1"
 	},
 	"dependencies": {
 		"request": "^2.55.0"
