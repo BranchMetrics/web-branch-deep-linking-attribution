@@ -10,6 +10,9 @@ describe('session storage', function() {
 	var itemKey = 'key';
 	var itemValue = 'value';
 	var assert = testUtils.unplanned();
+	beforeEach(function() {
+		storage.clear();
+	});
 
 	it('should set an item', function() {
 		storage.set(itemKey, itemValue);
@@ -21,6 +24,7 @@ describe('session storage', function() {
 	});
 
 	it('should get stored item with key', function() {
+		storage.set(itemKey, itemValue);
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
@@ -50,6 +54,9 @@ describe('local storage', function() {
 	var itemKey = 'key';
 	var itemValue = 'value';
 	var assert = testUtils.unplanned();
+	beforeEach(function() {
+		storage.clear();
+	});
 
 	it('should set an item in localStorage', function() {
 		storage.set(itemKey, itemValue);
@@ -61,6 +68,7 @@ describe('local storage', function() {
 	});
 
 	it('should get stored item with key', function() {
+		storage.set(itemKey, itemValue);
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
@@ -124,6 +132,9 @@ describe('pojo storage', function() {
 	var itemKey = 'key';
 	var itemValue = 'value';
 	var assert = testUtils.unplanned();
+	beforeEach(function() {
+		storage.clear();
+	});
 
 	it('should set a temporary item', function() {
 		storage.set(itemKey, itemValue);
@@ -131,6 +142,7 @@ describe('pojo storage', function() {
 	});
 
 	it('should get stored item with key', function() {
+		storage.set(itemKey, itemValue);
 		var item = storage.get(itemKey);
 		assert.equal(item, itemValue, 'correct value with key');
 	});
