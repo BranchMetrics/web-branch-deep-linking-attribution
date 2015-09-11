@@ -149,6 +149,7 @@ describe('Server', function() {
 				return data;
 			});
 			requests = [];
+			storage.clear();
 		});
 
 		afterEach(function() {
@@ -264,6 +265,7 @@ describe('Server', function() {
 		describe('/v1/open', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in branch_key and browser_finge rprint_id', function(done) {
@@ -437,6 +439,7 @@ describe('Server', function() {
 		describe('/v1/profile', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in branch_key and identity', function(done) {
@@ -535,6 +538,7 @@ describe('Server', function() {
 		describe('/v1/logout', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in branch_key and session_id', function(done) {
@@ -619,6 +623,7 @@ describe('Server', function() {
 		describe('/v1/referrals', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in identity_id', function(done) {
@@ -679,6 +684,7 @@ describe('Server', function() {
 		describe('/v1/credits', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in identity_id', function(done) {
@@ -739,6 +745,7 @@ describe('Server', function() {
 		describe('/_r', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			// branch_key is actually not required here
@@ -771,6 +778,7 @@ describe('Server', function() {
 		describe('/v1/has_app', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in sdk', function(done) {
@@ -829,6 +837,7 @@ describe('Server', function() {
 		describe('/v1/redeem', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in branch_key, identity_id, amount, and bucket', function(done) {
@@ -955,6 +964,7 @@ describe('Server', function() {
 		describe('/v1/link', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in branch_key and identity_id', function(done) {
@@ -1051,6 +1061,7 @@ describe('Server', function() {
 		describe('/l', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in link_url and click', function(done) {
@@ -1133,6 +1144,7 @@ describe('Server', function() {
 			var metadataString = '&metadata=' + encodeURIComponent(JSON.stringify(metadata));
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in branch_key, session_id, event and metadata', function(done) {
@@ -1279,6 +1291,7 @@ describe('Server', function() {
 		describe('/v1/creditHistory', function() {
 			beforeEach(function() {
 				requests = [];
+				storage.clear();
 			});
 
 			it('should pass in branch_key and session_id', function(done) {
