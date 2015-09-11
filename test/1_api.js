@@ -145,10 +145,10 @@ describe('Server', function() {
 
 	describe('XHR Request', function() {
 		beforeEach(function() {
-			sinon.goog.json = function() {};
 			sinon.stub(goog.json, "parse", function(data) {
 				return data;
 			});
+			requests = [];
 		});
 
 		afterEach(function() {
@@ -262,6 +262,10 @@ describe('Server', function() {
 
 	describe('Resources', function() {
 		describe('/v1/open', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in branch_key and browser_finge rprint_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -431,6 +435,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/profile', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in branch_key and identity', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -525,6 +533,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/logout', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in branch_key and session_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -605,6 +617,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/referrals', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in identity_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
@@ -661,6 +677,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/credits', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in identity_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
@@ -717,6 +737,10 @@ describe('Server', function() {
 		});
 
 		describe('/_r', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			// branch_key is actually not required here
 			it('should pass in sdk', function(done) {
 				var assert = testUtils.plan(3, done);
@@ -745,6 +769,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/has_app', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in sdk', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(
@@ -799,6 +827,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/redeem', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in branch_key, identity_id, amount, and bucket', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -921,6 +953,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/link', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in branch_key and identity_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -1013,6 +1049,10 @@ describe('Server', function() {
 		});
 
 		describe('/l', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in link_url and click', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
@@ -1091,6 +1131,9 @@ describe('Server', function() {
 					"language": "test_language"
 				};
 			var metadataString = '&metadata=' + encodeURIComponent(JSON.stringify(metadata));
+			beforeEach(function() {
+				requests = [];
+			});
 
 			it('should pass in branch_key, session_id, event and metadata', function(done) {
 				storage['set']('use_jsonp', false);
@@ -1234,6 +1277,10 @@ describe('Server', function() {
 		});
 
 		describe('/v1/creditHistory', function() {
+			beforeEach(function() {
+				requests = [];
+			});
+
 			it('should pass in branch_key and session_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
