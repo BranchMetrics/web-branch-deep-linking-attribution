@@ -123,9 +123,8 @@ var ie_browsers = [
 ];
 
 var test_urls = [
-	'http://0.0.0.0:9999/test/test.html'
-	// 'http://0.0.0.0:9999/test/test.html',
-	// 'http://0.0.0.0:9999/test/integration-test.html'
+	'http://0.0.0.0:9999/test/test.html',
+	'http://0.0.0.0:9999/test/integration-test.html'
 ];
 
 module.exports = function(grunt) {
@@ -138,7 +137,7 @@ module.exports = function(grunt) {
 					maxRetries: 3,
 					testname: 'Web SDK Tests',
 					browsers: [].concat(
-						safari_browsers,
+						// safari_browsers,
 						chrome_browsers,
 						// firefox_browsers,
 						android_browsers,
