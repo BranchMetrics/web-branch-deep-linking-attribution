@@ -11,6 +11,7 @@ goog.require('config');
 describe('Server helpers', function() {
 	var server = new Server();
 	var assert = testUtils.unplanned();
+
 	it('serializeObject should work', function() {
 		// Test simple objects
 		assert.equal(
@@ -119,6 +120,7 @@ describe('Server', function() {
 		storage.clear();
 		xhr = sinon.useFakeXMLHttpRequest();
 		clock = sinon.useFakeTimers();
+		server.createScript = function() {};
 		sinon.stub(server, "createScript", function(src) {
 			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 		});
@@ -130,20 +132,21 @@ describe('Server', function() {
 	});
 
 	afterEach(function() {
-		xhr.restore();
-		clock.restore();
-		server.createScript.restore();
+		if (typeof xhr.restore === 'function') {
+			xhr.restore();
+		}
+		if (typeof clock.restore === 'function') {
+			clock.restore();
+		}
+		if (typeof server.createScript.restore === 'function') {
+			server.createScript.restore();
+		}
 	});
 
 	describe('XHR Request', function() {
 		beforeEach(function() {
-			sinon.stub(goog.json, "parse", function(data) {
-				return data;
-			});
-		});
-
-		afterEach(function() {
-			goog.json.parse.restore();
+			requests = [];
+			storage.clear();
 		});
 
 		it('should instantiate an XHR', function(done) {
@@ -175,7 +178,7 @@ describe('Server', function() {
 				'POST',
 				storage,
 				function(err, data) {
-					assert.equal(data, responseText, 'successful response');
+					assert.equal(Object.getOwnPropertyNames(data).length, 0, 'successful response');
 				}
 			);
 			requests[0].status = 200;
@@ -253,6 +256,11 @@ describe('Server', function() {
 
 	describe('Resources', function() {
 		describe('/v1/open', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in branch_key and browser_finge rprint_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -422,6 +430,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/profile', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in branch_key and identity', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -516,6 +529,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/logout', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in branch_key and session_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -596,6 +614,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/referrals', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in identity_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
@@ -652,6 +675,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/credits', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in identity_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
@@ -708,6 +736,11 @@ describe('Server', function() {
 		});
 
 		describe('/_r', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			// branch_key is actually not required here
 			it('should pass in sdk', function(done) {
 				var assert = testUtils.plan(3, done);
@@ -736,6 +769,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/has_app', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in sdk', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(
@@ -790,6 +828,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/redeem', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in branch_key, identity_id, amount, and bucket', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -864,7 +907,6 @@ describe('Server', function() {
 
 			it('should fail without identity_id', function(done) {
 				var assert = testUtils.plan(2, done);
-
 				server.request(
 					resources.redeem,
 					testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'identity_id' ]),
@@ -913,6 +955,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/link', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in branch_key and identity_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
@@ -1005,6 +1052,11 @@ describe('Server', function() {
 		});
 
 		describe('/l', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in link_url and click', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
@@ -1083,6 +1135,10 @@ describe('Server', function() {
 					"language": "test_language"
 				};
 			var metadataString = '&metadata=' + encodeURIComponent(JSON.stringify(metadata));
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
 
 			it('should pass in branch_key, session_id, event and metadata', function(done) {
 				storage['set']('use_jsonp', false);
@@ -1226,6 +1282,11 @@ describe('Server', function() {
 		});
 
 		describe('/v1/creditHistory', function() {
+			beforeEach(function() {
+				requests = [];
+				storage.clear();
+			});
+
 			it('should pass in branch_key and session_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(4, done);
