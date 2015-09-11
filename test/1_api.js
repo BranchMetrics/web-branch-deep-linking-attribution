@@ -119,6 +119,7 @@ describe('Server', function() {
 		storage.clear();
 		xhr = sinon.useFakeXMLHttpRequest();
 		clock = sinon.useFakeTimers();
+		server.createScript = function() {};
 		sinon.stub(server, "createScript", function(src) {
 			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 		});
