@@ -123,8 +123,9 @@ var ie_browsers = [
 ];
 
 var test_urls = [
-	'http://0.0.0.0:9999/test/test.html',
-	'http://0.0.0.0:9999/test/integration-test.html'
+	'http://0.0.0.0:9999/test/test.html'
+	// 'http://0.0.0.0:9999/test/test.html',
+	// 'http://0.0.0.0:9999/test/integration-test.html'
 ];
 
 module.exports = function(grunt) {
