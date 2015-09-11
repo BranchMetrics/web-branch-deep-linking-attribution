@@ -145,6 +145,7 @@ describe('Server', function() {
 
 	describe('XHR Request', function() {
 		beforeEach(function() {
+			goog.json.parse = function() {};
 			sinon.stub(goog.json, "parse", function(data) {
 				return data;
 			});
@@ -153,7 +154,9 @@ describe('Server', function() {
 		});
 
 		afterEach(function() {
-			goog.json.parse.restore();
+			if (typeof goog.json.parse.restore === 'function') {
+				goog.json.parse.restore();
+			}
 		});
 
 		it('should instantiate an XHR', function(done) {
