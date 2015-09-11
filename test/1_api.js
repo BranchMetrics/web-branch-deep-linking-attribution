@@ -130,9 +130,9 @@ describe('Server', function() {
 	});
 
 	afterEach(function() {
-		xhr.restore();
-		clock.restore();
-		server.createScript.restore();
+		xhr.restore && xhr.restore();
+		clock.restore && clock.restore();
+		server.createScript.restore && server.createScript.restore();
 	});
 
 	describe('XHR Request', function() {
