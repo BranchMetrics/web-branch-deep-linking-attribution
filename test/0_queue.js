@@ -20,7 +20,6 @@ describe('task_queue', function() {
 	});
 
 	it('should queue a function and call it', function(done) {
-		assert.equal(orderCalled[0] === undefined, 'Function not yet called');
 		clock.tick(15);
 		assert.equal(orderCalled[0], 0, 'Function called');
 		done();
