@@ -2,8 +2,6 @@
 
 goog.require('task_queue');
 
-var sinon = require('sinon');
-
 describe('task_queue', function() {
 	var queue;
 	var orderCalled;
