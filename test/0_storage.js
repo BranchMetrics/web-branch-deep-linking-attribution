@@ -12,7 +12,7 @@ describe('session storage', function() {
 	var assert = testUtils.unplanned();
 	beforeEach(function() {
 		storage.clear();
-	}
+	});
 
 	it('should set an item', function() {
 		storage.set(itemKey, itemValue);
@@ -56,7 +56,7 @@ describe('local storage', function() {
 	var assert = testUtils.unplanned();
 	beforeEach(function() {
 		storage.clear();
-	}
+	});
 
 	it('should set an item in localStorage', function() {
 		storage.set(itemKey, itemValue);
@@ -134,7 +134,7 @@ describe('pojo storage', function() {
 	var assert = testUtils.unplanned();
 	beforeEach(function() {
 		storage.clear();
-	}
+	});
 
 	it('should set a temporary item', function() {
 		storage.set(itemKey, itemValue);
