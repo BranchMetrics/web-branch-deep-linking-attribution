@@ -5,11 +5,6 @@ var safari_browsers = [
 		browserName: 'safari',
 		platform: 'OS X 10.10',
 		version: '8.0'
-	},
-	{
-		browserName: 'safari',
-		platform: 'OS X 10.9',
-		version: '7.0'
 	}
 ];
 
@@ -137,7 +132,7 @@ module.exports = function(grunt) {
 					maxRetries: 3,
 					testname: 'Web SDK Tests',
 					browsers: [].concat(
-						// safari_browsers,
+						safari_browsers,
 						chrome_browsers,
 						// firefox_browsers,
 						android_browsers,
