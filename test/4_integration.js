@@ -75,7 +75,7 @@ describe('Integration tests', function() {
 	});
 
 	after(function() {
-		if (window.WEB_BUILD && typeof branch._server.createScript.restore === 'funciton') {
+		if (window.WEB_BUILD && typeof branch._server.createScript.restore === 'function') {
 			branch._server.createScript.restore();
 		}
 		else if (window.CORDOVA_BUILD && cordova && typeof cordova.require.restore === 'function') {
