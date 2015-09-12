@@ -46,11 +46,13 @@ describe('Integration tests', function() {
 			requests.push(xhr);
 		};
 		if (window.WEB_BUILD) {
+			branch._server.createScript = function() {};
 			sinon.stub(branch._server, 'createScript', function(src) {
 				requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
 			});
 		}
 		else if (window.CORDOVA_BUILD && cordova) {
+			cordova.require = function() {};
 			sinon.stub(cordova, 'require', function() {
 				return function() {
 					arguments[0]({ });
@@ -73,14 +75,18 @@ describe('Integration tests', function() {
 	});
 
 	after(function() {
-		if (window.WEB_BUILD) {
+		if (window.WEB_BUILD && typeof branch._server.createScript.restore === 'funciton') {
 			branch._server.createScript.restore();
 		}
-		else if (window.CORDOVA_BUILD && cordova) {
+		else if (window.CORDOVA_BUILD && cordova && typeof cordova.require.restore === 'function') {
 			cordova.require.restore();
 		}
-		xhr.restore();
-		clock.restore();
+		if (typeof xhr.restore === 'function') {
+			xhr.restore();
+		}
+		if (typeof clock.restore === 'function') {
+			clock.restore();
+		}
 	});
 
 	var sampleParams = {
