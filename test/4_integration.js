@@ -134,8 +134,8 @@ describe('Integration tests', function() {
 					', "identity":"Branch","has_app":true }'
 			);
 			if (assert) {
-				assert.equal(requests.length, 1);
-				assert.equal(
+				assert.strictEqual(requests.length, 1);
+				assert.strictEqual(
 					requests[0].requestBody,
 					'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id
 				);
@@ -143,8 +143,8 @@ describe('Integration tests', function() {
 		}
 		else {
 			if (assert) {
-				assert.equal(requests.length, 1);
-				assert.equal(
+				assert.strictEqual(requests.length, 1);
+				assert.strictEqual(
 					requests[0].src,
 					'https://bnc.lt/_r?sdk=web' + config.version +
 						'&callback=branch_callback__' + jsonpCallback.toString()
@@ -160,8 +160,8 @@ describe('Integration tests', function() {
 					'"link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }'
 			);
 			if (assert) {
-				assert.equal(requests.length, 2);
-				assert.equal(
+				assert.strictEqual(requests.length, 2);
+				assert.strictEqual(
 					requests[1].requestBody,
 					'identity_id=' + identity_id +
 						'&is_referrable=1&sdk=web' + config.version +
@@ -197,7 +197,7 @@ describe('Integration tests', function() {
 		it('should return error to callback', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				assert.equal(err.message, 'Error in API: 400');
+				assert.strictEqual(err.message, 'Error in API: 400');
 			});
 			if (window.CORDOVA_BUILD) {
 				requests[indexOfLastInitRequest(0)].respond(400);
@@ -211,7 +211,7 @@ describe('Integration tests', function() {
 		it('should attempt 5xx error three times total', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
-				assert.equal(err.message, 'Error in API: 500');
+				assert.strictEqual(err.message, 'Error in API: 500');
 			});
 			var requestCount = 0;
 			if (window.WEB_BUILD) {
@@ -231,7 +231,7 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(1, done);
 			if (testUtils.go('#r:12345')) {
 				branchInit();
-				assert.equal(
+				assert.strictEqual(
 					true,
 					requests[indexOfLastInitRequest(0)]
 						.requestBody
@@ -261,7 +261,7 @@ describe('Integration tests', function() {
 					'Expected response returned'
 				);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -287,7 +287,7 @@ describe('Integration tests', function() {
 						referring_link: null
 					});
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(1));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(1));
 		});
 	});
 
@@ -307,7 +307,7 @@ describe('Integration tests', function() {
 							referring_link: null
 						});
 				});
-				assert.equal(requests.length, indexOfLastInitRequest(1));
+				assert.strictEqual(requests.length, indexOfLastInitRequest(1));
 			});
 		});
 
@@ -316,9 +316,9 @@ describe('Integration tests', function() {
 				var assert = testUtils.plan(numberOfAsserts(2), done);
 				branchInit(assert);
 				branch.close(function(err) {
-					assert.equal(err, null);
+					assert.strictEqual(err, null);
 				});
-				assert.equal(requests.length, indexOfLastInitRequest(2));
+				assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 				requests[indexOfLastInitRequest(1)].respond(200);
 			});
 		});
@@ -329,16 +329,16 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(numberOfAsserts(5), done);
 			branchInit(assert);
 			branch.logout(function(err, data) {
-				assert.equal(err, null);
-				assert.equal(branch.session_id, newSessionId, 'branch session was replaced');
-				assert.equal(branch.identity_id, newIdentityId, 'branch identity was replaced');
-				assert.equal(branch.sessionLink, newLink, 'link was replaced');
+				assert.strictEqual(err, null);
+				assert.strictEqual(branch.session_id, newSessionId, 'branch session was replaced');
+				assert.strictEqual(branch.identity_id, newIdentityId, 'branch identity was replaced');
+				assert.strictEqual(branch.sessionLink, newLink, 'link was replaced');
 			});
 			var newSessionId = 'new_session';
 			var newIdentityId = 'new_id';
 			var newLink = 'new_link';
 
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -356,9 +356,9 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.track('track', { }, function(err, data) {
-				assert.equal(data, undefined);
+				assert.strictEqual(data, undefined);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -373,9 +373,9 @@ describe('Integration tests', function() {
 			};
 			branchInit(assert);
 			branch.track('track', testMetadata, function(err, data) {
-				assert.equal(data, undefined);
+				assert.strictEqual(data, undefined);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -389,9 +389,9 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.link(sampleParams, function(err, data) {
-				assert.equal(data, 'https://bnc.lt/l/4manXlk0AJ');
+				assert.strictEqual(data, 'https://bnc.lt/l/4manXlk0AJ');
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -421,7 +421,7 @@ describe('Integration tests', function() {
 			branch.referrals(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -439,7 +439,7 @@ describe('Integration tests', function() {
 			branch.redeem(5, 'rubies', function(err, data) {
 				assert.deepEqual(data, null);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
@@ -460,7 +460,7 @@ describe('Integration tests', function() {
 			branch.getCode(codeRequested, function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -477,7 +477,7 @@ describe('Integration tests', function() {
 			branch.validateCode(code, function(err, data) {
 				assert.deepEqual(data, null);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
@@ -490,7 +490,7 @@ describe('Integration tests', function() {
 			branch.applyCode(code, function(err, data) {
 				assert.deepEqual(data, null);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
@@ -526,7 +526,7 @@ describe('Integration tests', function() {
 			branch.creditHistory(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -545,7 +545,7 @@ describe('Integration tests', function() {
 			branch.credits(function(err, data) {
 				assert.deepEqual(data, expectedResponse);
 			});
-			assert.equal(requests.length, indexOfLastInitRequest(2));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },

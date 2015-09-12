@@ -14,7 +14,7 @@ describe('Server helpers', function() {
 
 	it('serializeObject should work', function() {
 		// Test simple objects
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: 'b'
@@ -22,7 +22,7 @@ describe('Server helpers', function() {
 			),
 			'a=b'
 		);
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: 'b',
@@ -31,7 +31,7 @@ describe('Server helpers', function() {
 			),
 			'a=b&c=def'
 		);
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: 'b',
@@ -40,7 +40,7 @@ describe('Server helpers', function() {
 			),
 			'a=b&e=123'
 		);
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: 'fo &)!@# bar'
@@ -50,7 +50,7 @@ describe('Server helpers', function() {
 		);
 
 		// Test nested objects
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: {
@@ -61,7 +61,7 @@ describe('Server helpers', function() {
 			),
 			'a.b=c&a.d=e'
 		);
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: {
@@ -77,7 +77,7 @@ describe('Server helpers', function() {
 		);
 
 		// Test arrays
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: [
@@ -90,7 +90,7 @@ describe('Server helpers', function() {
 		);
 
 		// Test arrays in objects
-		assert.equal(
+		assert.strictEqual(
 			server.serializeObject(
 				{
 					a: {
@@ -159,9 +159,9 @@ describe('Server', function() {
 				storage,
 				spyCallback
 			);
-			assert.equal(requests.length, 1, 'Request made');
-			assert.equal(requests[0].timeout, 5000, 'timeout set to 5s');
-			assert.equal(
+			assert.strictEqual(requests.length, 1, 'Request made');
+			assert.strictEqual(requests[0].timeout, 5000, 'timeout set to 5s');
+			assert.strictEqual(
 				requests[0].requestHeaders['Content-Type'],
 				'application/x-www-form-urlencoded;charset=utf-8'
 			);
@@ -178,7 +178,7 @@ describe('Server', function() {
 				'POST',
 				storage,
 				function(err, data) {
-					assert.equal(Object.getOwnPropertyNames(data).length, 0, 'successful response');
+					assert.strictEqual(Object.getOwnPropertyNames(data).length, 0, 'successful response');
 				}
 			);
 			requests[0].status = 200;
@@ -196,7 +196,7 @@ describe('Server', function() {
 				'POST',
 				storage,
 				function(err) {
-					assert.equal(
+					assert.strictEqual(
 						err.message,
 						'Error in API: ' + requests[0].status,
 						'correct error message'
@@ -218,7 +218,7 @@ describe('Server', function() {
 				'POST',
 				storage,
 				function(err) {
-					assert.equal(
+					assert.strictEqual(
 						err.message,
 						'Error in API: ' + requests[0].status,
 						'correct error message'
@@ -240,7 +240,7 @@ describe('Server', function() {
 				'POST',
 				storage,
 				function(err) {
-					assert.equal(
+					assert.strictEqual(
 						err.message,
 						'Not enough credits to redeem.',
 						'correct error message'
@@ -270,10 +270,10 @@ describe('Server', function() {
 					storage,
 					assert.done
 				);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
-				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
+				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
+				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&is_referrable=1&sdk=web" + config.version +
@@ -294,12 +294,12 @@ describe('Server', function() {
 
 				var completeParams = testUtils.params({ "is_referrable": 1 });
 				server.request(resources.open, completeParams, storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
+				assert.strictEqual(requests.length, 1, 'Request made');
 
 				var encodedData = encodeURIComponent(
 					utils.base64encode(goog.json.serialize(completeParams))
 				);
-				assert.equal(
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/open?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
@@ -316,13 +316,13 @@ describe('Server', function() {
 					testUtils.params({ }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/open missing parameter is_referrable"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without branch_key', function(done) {
@@ -332,13 +332,13 @@ describe('Server', function() {
 					testUtils.params({ "is_referrable": 1 }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/open missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should pass without branch_key but with app_id', function(done) {
@@ -353,8 +353,8 @@ describe('Server', function() {
 					storage,
 					assert.done
 				);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&is_referrable=1&sdk=web" + config.version +
@@ -370,13 +370,13 @@ describe('Server', function() {
 					testUtils.params({ is_referrable: 1 }, [ 'browser_fingerprint_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/open missing parameter browser_fingerprint_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			// param format and type tests
@@ -387,13 +387,13 @@ describe('Server', function() {
 					testUtils.params({ "branch_key": "ahd&7393j", "is_referrable": 1 }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/open missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail with link_identifier as number, not string', function(done) {
@@ -403,13 +403,13 @@ describe('Server', function() {
 					testUtils.params({ "link_identifier": 45433, "is_referrable": 1 }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/open, parameter link_identifier is not a string"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail with is_referrable as string, not number', function(done) {
@@ -419,13 +419,13 @@ describe('Server', function() {
 					testUtils.params({ "is_referrable": "1" }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/open, parameter is_referrable is not a number"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -445,13 +445,13 @@ describe('Server', function() {
 					assert.done
 				);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/profile', 'Endpoint correct'
 				);
-				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(
+				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
+				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&identity=test_id&session_id=" + session_id +
@@ -472,12 +472,12 @@ describe('Server', function() {
 				storage['set']('use_jsonp', true);
 				var completeParams = testUtils.params({ "identity": "test_id" });
 				server.request(resources.profile, completeParams, storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
+				assert.strictEqual(requests.length, 1, 'Request made');
 
 				var encodedData = encodeURIComponent(
 					utils.base64encode(goog.json.serialize(completeParams))
 				);
-				assert.equal(
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/profile?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
@@ -490,9 +490,9 @@ describe('Server', function() {
 			it('should fail without identity', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(resources.profile, testUtils.params(), storage, function(err) {
-					assert.equal(err.message, "API request /v1/profile missing parameter identity");
+					assert.strictEqual(err.message, "API request /v1/profile missing parameter identity");
 				});
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without branch_key', function(done) {
@@ -502,13 +502,13 @@ describe('Server', function() {
 					testUtils.params({ "identity": "test_id" }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/profile missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without identity_id', function(done) {
@@ -518,13 +518,13 @@ describe('Server', function() {
 					testUtils.params({ identity: 'foo' }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/profile missing parameter identity_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -539,13 +539,13 @@ describe('Server', function() {
 				var assert = testUtils.plan(5, done);
 				server.request(resources.logout, testUtils.params({ }), storage, assert.done);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/logout', 'Endpoint correct'
 				);
-				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(
+				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
+				assert.strictEqual(
 					requests[0].requestBody,
 					"session_id=" + session_id +
 						"&identity_id=" + identity_id +
@@ -566,12 +566,12 @@ describe('Server', function() {
 
 				var completeParams = testUtils.params({ });
 				server.request(resources.logout, completeParams, storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
+				assert.strictEqual(requests.length, 1, 'Request made');
 
 				var encodedData = encodeURIComponent(
 					utils.base64encode(goog.json.serialize(completeParams))
 				);
-				assert.equal(
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/logout?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
@@ -587,13 +587,13 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/logout missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without session_id', function(done) {
@@ -603,13 +603,13 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'session_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/logout missing parameter session_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -624,15 +624,15 @@ describe('Server', function() {
 				var assert = testUtils.plan(4, done);
 				server.request(resources.referrals, testUtils.params({ }), storage, assert.done);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/referrals/' + identity_id +
 						'?session_id=' + session_id +
 						"&identity_id=" + identity_id +
 						"&sdk=web" + config.version,
 					'Endpoint correct');
-				assert.equal(requests[0].method, 'GET', 'Method correct');
+				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(
 					200,
@@ -645,8 +645,8 @@ describe('Server', function() {
 				var assert = testUtils.plan(3, done);
 				storage['set']('use_jsonp', true);
 				server.request(resources.referrals, testUtils.params({ }), storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/referrals/' + identity_id +
 						'?session_id=' + session_id +
@@ -664,13 +664,13 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/referrals missing parameter identity_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -685,15 +685,15 @@ describe('Server', function() {
 				var assert = testUtils.plan(4, done);
 				server.request(resources.credits, testUtils.params({ }), storage, assert.done);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/credits/' + identity_id +
 						'?session_id=' + session_id +
 						'&identity_id=' + identity_id +
 						'&sdk=web' + config.version,
 					'Endpoint correct');
-				assert.equal(requests[0].method, 'GET', 'Method correct');
+				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(
 					200,
@@ -706,8 +706,8 @@ describe('Server', function() {
 				var assert = testUtils.plan(3, done);
 				storage['set']('use_jsonp', true);
 				server.request(resources.credits, testUtils.params({ }), storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/credits/' + identity_id +
 						'?session_id=' + session_id +
@@ -725,13 +725,13 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/credits missing parameter identity_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -745,8 +745,8 @@ describe('Server', function() {
 			it('should pass in sdk', function(done) {
 				var assert = testUtils.plan(3, done);
 				server.request(resources._r, testUtils.params(), storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].src,
 					'https://bnc.lt/_r?sdk=web' + config.version +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
@@ -761,10 +761,10 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'sdk' ]),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request /_r missing parameter sdk");
+						assert.strictEqual(err.message, "API request /_r missing parameter sdk");
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -782,8 +782,8 @@ describe('Server', function() {
 					storage,
 					assert.done
 				);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/has-app/' + branch_sample_key +
 						'?browser_fingerprint_id=' + browser_fingerprint_id,
@@ -801,13 +801,13 @@ describe('Server', function() {
 					),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/has-app missing parameter browser_fingerprint_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'Request not made');
+				assert.strictEqual(requests.length, 0, 'Request not made');
 			});
 
 			it('should fail without branch_key', function(done) {
@@ -817,13 +817,13 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key', 'identity_id', 'sdk', 'session_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/has-app missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'Request not made');
+				assert.strictEqual(requests.length, 0, 'Request not made');
 			});
 		});
 
@@ -843,17 +843,17 @@ describe('Server', function() {
 					assert.done
 				);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/redeem',
 					'Endpoint correct'
 				);
-				assert.equal(requests[0].method, 'POST', 'Method correct');
+				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
 				// "identity_id=98807509250212101&amount=1&bucket=testbucket' +
 				// '&session_id=98807509250212101&sdk=web" + config.version +
 				// "&branch_key=key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS"
-				assert.equal(
+				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&amount=1&bucket=testbucket&session_id=" + session_id +
@@ -874,12 +874,12 @@ describe('Server', function() {
 
 				var completeParams = testUtils.params({ "amount": 1, "bucket": "testbucket" });
 				server.request(resources.redeem, completeParams, storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
+				assert.strictEqual(requests.length, 1, 'Request made');
 
 				var encodedData = encodeURIComponent(
 					utils.base64encode(goog.json.serialize(completeParams))
 				);
-				assert.equal(
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/redeem?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
@@ -896,13 +896,13 @@ describe('Server', function() {
 					testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without identity_id', function(done) {
@@ -912,13 +912,13 @@ describe('Server', function() {
 					testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter identity_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without amount', function(done) {
@@ -928,13 +928,13 @@ describe('Server', function() {
 					testUtils.params({ "bucket": "testbucket" }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter amount"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without bucket', function(done) {
@@ -944,13 +944,13 @@ describe('Server', function() {
 					testUtils.params({ "amount": 1 }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter bucket"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -966,10 +966,10 @@ describe('Server', function() {
 
 				server.request(resources.link, testUtils.params(), storage, assert.done);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].url, 'https://api.branch.io/v1/url', 'Endpoint correct');
-				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(requests[0].url, 'https://api.branch.io/v1/url', 'Endpoint correct');
+				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
+				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&session_id=" + session_id +
@@ -988,11 +988,11 @@ describe('Server', function() {
 				var assert = testUtils.plan(3, done);
 				storage['set']('use_jsonp', true);
 				server.request(resources.link, testUtils.params(), storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
+				assert.strictEqual(requests.length, 1, 'Request made');
 				var encodedData = encodeURIComponent(
 					utils.base64encode(goog.json.serialize(testUtils.params()))
 				);
-				assert.equal(
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/url?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
@@ -1008,13 +1008,13 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/url missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without identity_id', function(done) {
@@ -1024,13 +1024,13 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/url missing parameter identity_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			// param format and type tests
@@ -1041,13 +1041,13 @@ describe('Server', function() {
 					testUtils.params({ "tags": "Hello, I'm not an array." }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/url, parameter tags is not an array"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -1067,13 +1067,13 @@ describe('Server', function() {
 					assert.done
 				);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					'https://bnc.lt/3hpH54U-58?click=click',
 					'Endpoint correct'
 				);
-				assert.equal(requests[0].method, 'GET', 'Method correct');
+				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(
 					200,
@@ -1091,8 +1091,8 @@ describe('Server', function() {
 					storage,
 					assert.done
 				);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].src,
 					'https://bnc.lt/3hpH54U-58?click=click&callback=branch_callback__' +
 						(server._jsonp_callback_index - 1),
@@ -1108,10 +1108,10 @@ describe('Server', function() {
 					testUtils.params({ "click": "click" }),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request  missing parameter link_url");
+						assert.strictEqual(err.message, "API request  missing parameter link_url");
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without click', function(done) {
@@ -1121,10 +1121,10 @@ describe('Server', function() {
 					testUtils.params({ "link_url": "3hpH54U-58" }),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request  missing parameter click");
+						assert.strictEqual(err.message, "API request  missing parameter click");
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -1151,10 +1151,10 @@ describe('Server', function() {
 					assert.done
 				);
 
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(requests[0].url, 'https://api.branch.io/v1/event', 'Endpoint correct');
-				assert.equal(requests[0].method, 'POST', 'Method correct');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(requests[0].url, 'https://api.branch.io/v1/event', 'Endpoint correct');
+				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
+				assert.strictEqual(
 					requests[0].requestBody,
 					"event=testevent" + metadataString +
 						"&session_id=" + session_id +
@@ -1179,12 +1179,12 @@ describe('Server', function() {
 					"metadata": metadata
 				});
 				server.request(resources.event, completeParams, storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
+				assert.strictEqual(requests.length, 1, 'Request made');
 
 				var encodedData = encodeURIComponent(utils.base64encode(
 					goog.json.serialize(completeParams)
 				));
-				assert.equal(
+				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/event?&data=' + encodedData +
 						'&callback=branch_callback__' +
@@ -1204,13 +1204,13 @@ describe('Server', function() {
 					),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/event missing parameter branch_key or app_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without session_id', function(done) {
@@ -1223,13 +1223,13 @@ describe('Server', function() {
 					),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/event missing parameter session_id"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without event', function(done) {
@@ -1239,10 +1239,10 @@ describe('Server', function() {
 					testUtils.params({ "metadata": metadata }),
 					storage,
 					function(err) {
-						assert.equal(err.message, "API request /v1/event missing parameter event");
+						assert.strictEqual(err.message, "API request /v1/event missing parameter event");
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			it('should fail without metadata', function(done) {
@@ -1252,13 +1252,13 @@ describe('Server', function() {
 					testUtils.params({ "event": "testevent" }),
 					storage,
 					function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/event missing parameter metadata"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
 			// param format and type tests
@@ -1271,13 +1271,13 @@ describe('Server', function() {
 						"event": "testevent"
 					}),
 					storage, function(err) {
-						assert.equal(
+						assert.strictEqual(
 							err.message,
 							"API request /v1/event, parameter metadata is not an object"
 						);
 					}
 				);
-				assert.equal(requests.length, 0, 'No request made');
+				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 		});
 
@@ -1292,8 +1292,8 @@ describe('Server', function() {
 				var assert = testUtils.plan(4, done);
 
 				server.request(resources.creditHistory, testUtils.params(), storage, assert.done);
-				assert.equal(requests.length, 1, 'Request made');
-				assert.equal(
+				assert.strictEqual(requests.length, 1, 'Request made');
+				assert.strictEqual(
 					requests[0].url,
 					"https://api.branch.io/v1/credithistory?session_id=" + session_id +
 						"&identity_id=" + identity_id +
@@ -1301,7 +1301,7 @@ describe('Server', function() {
 						"&branch_key=" + branch_sample_key,
 					'Endpoint correct'
 				);
-				assert.equal(requests[0].method, 'GET', 'Method correct');
+				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(
 					200,
