@@ -20,12 +20,10 @@ dependencies:
     - tar -xzf sc-latest-linux.tar.gz
     - jscs --help || npm install -g jscs
     - jshint -v || npm install -g jshint
-    - grunt -v || npm install -g grunt-cli
   cache_directories:
     - "~/nvm/v0.10.31"
     - compiler
 
 test:
   override:
-    - ./lint.sh
     - grunt test
