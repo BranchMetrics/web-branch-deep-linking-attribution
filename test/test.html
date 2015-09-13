@@ -13,7 +13,7 @@
 	<script src="../node_modules/mocha/mocha.js"></script>
 	<script src="../node_modules/sinon/pkg/sinon-1.13.0.js"></script>
 	<script src="test-utils.js"></script>
-	<script>
+	<script type="text/javascript">
 		mocha.ui('bdd');
 		mocha.reporter('html');
 
@@ -33,9 +33,9 @@
 	<script type="text/javascript" src="3_branch.js"></script>
 	<!-- just add others here -->
 
-	<script src="saucelabs.js"></script>
+	<script type="text/javascript" src="saucelabs.js"></script>
 
-	<script>
+	<script type="text/javascript">
 		if (window.mochaPhantomJS) {
 			mochaPhantomJS.run();
 		}
