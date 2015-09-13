@@ -269,7 +269,11 @@ describe('Integration tests', function() {
 					'Expected response returned'
 				);
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -332,7 +336,11 @@ describe('Integration tests', function() {
 				branch.close(function(err) {
 					assert.strictEqual(err, null, 'Err is null');
 				});
-				assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+				assert.strictEqual(
+					requests.length,
+					indexOfLastInitRequest(2),
+					'Expect requests length'
+				);
 				requests[indexOfLastInitRequest(1)].respond(200);
 			});
 		});
@@ -345,14 +353,22 @@ describe('Integration tests', function() {
 			branch.logout(function(err, data) {
 				assert.strictEqual(err, null, 'Expect no err');
 				assert.strictEqual(branch.session_id, newSessionId, 'branch session was replaced');
-				assert.strictEqual(branch.identity_id, newIdentityId, 'branch identity was replaced');
+				assert.strictEqual(
+					branch.identity_id,
+					newIdentityId,
+					'branch identity was replaced'
+				);
 				assert.strictEqual(branch.sessionLink, newLink, 'link was replaced');
 			});
 			var newSessionId = 'new_session';
 			var newIdentityId = 'new_id';
 			var newLink = 'new_link';
 
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -372,7 +388,11 @@ describe('Integration tests', function() {
 			branch.track('track', { }, function(err, data) {
 				assert.strictEqual(data, undefined, 'Expect data to be undefined');
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -389,7 +409,11 @@ describe('Integration tests', function() {
 			branch.track('track', testMetadata, function(err, data) {
 				assert.strictEqual(data, undefined, 'Expect data to be undefined');
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -409,7 +433,11 @@ describe('Integration tests', function() {
 					'Expect data in branch.link callback'
 				);
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -443,7 +471,11 @@ describe('Integration tests', function() {
 					'Expect data in branch.referrals callback'
 				);
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -461,7 +493,11 @@ describe('Integration tests', function() {
 			branch.redeem(5, 'rubies', function(err, data) {
 				assert.strictEqual(data, undefined, 'Expect data in branch.redeem callback');
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
@@ -486,7 +522,11 @@ describe('Integration tests', function() {
 					'Expect data in branch.getCode callback'
 				);
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -503,7 +543,11 @@ describe('Integration tests', function() {
 			branch.validateCode(code, function(err, data) {
 				assert.strictEqual(data, undefined, 'Expect data in branch.validateCode callback');
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
@@ -516,7 +560,11 @@ describe('Integration tests', function() {
 			branch.applyCode(code, function(err, data) {
 				assert.strictEqual(data, undefined, 'Expect data in branch.applyCode callback');
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(200);
 		});
 	});
@@ -556,7 +604,11 @@ describe('Integration tests', function() {
 					'Expect data in branch.creditHistory callback'
 				);
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
@@ -579,7 +631,11 @@ describe('Integration tests', function() {
 					'Expect data in branch.credits callback'
 				);
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(2), 'Expect requests length');
+			assert.strictEqual(
+				requests.length,
+				indexOfLastInitRequest(2),
+				'Expect requests length'
+			);
 			requests[indexOfLastInitRequest(1)].respond(
 				200,
 				{ "Content-Type": "application/json" },
