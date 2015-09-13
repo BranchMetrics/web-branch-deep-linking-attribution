@@ -9,7 +9,7 @@ describe('utils', function() {
 		it('should encode a string', function() {
 			var string = 'test string to encode';
 			var expectedEncoded = 'dGVzdCBzdHJpbmcgdG8gZW5jb2Rl';
-			assert.equal(utils.base64encode(string), expectedEncoded, 'Correctly encoded');
+			assert.strictEqual(utils.base64encode(string), expectedEncoded, 'Correctly encoded');
 		});
 	});
 
@@ -60,7 +60,7 @@ describe('utils', function() {
 				"referring_identity": "12345"
 			};
 			var whiteListedData = utils.whiteListSessionData(data);
-			assert.ok(whiteListedData['has_app'] === null, 'has_app should be null');
+			assert.strictEqual(null, whiteListedData['has_app'], 'has_app should be null');
 		});
 	});
 
@@ -134,7 +134,7 @@ describe('utils', function() {
 
 	describe('message', function() {
 		it('should produce a missing param message', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(utils.messages.missingParam, [ 'endpoint', 'param' ]),
 				'API request endpoint missing parameter param',
 				'Expected missing param message produced'
@@ -142,7 +142,7 @@ describe('utils', function() {
 		});
 
 		it('should produce an invalid param type message', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(
 					utils.messages.invalidType,
 					[ 'endpoint', 'param', 'type' ]
@@ -153,7 +153,7 @@ describe('utils', function() {
 		});
 
 		it('should produce a Branch SDK not init message', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(utils.messages.nonInit),
 				'Branch SDK not initialized',
 				'Expected Branch SDK not init message produced'
@@ -161,7 +161,7 @@ describe('utils', function() {
 		});
 
 		it('should produce a Branch SDK already init message', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(utils.messages.existingInit),
 				'Branch SDK already initilized',
 				'Expected Branch SDK already initialized message produced'
@@ -169,7 +169,7 @@ describe('utils', function() {
 		});
 
 		it('should produce a missing app id', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(utils.messages.missingAppId),
 				'Missing Branch app ID',
 				'Expected Branch app id missing message produced'
@@ -177,7 +177,7 @@ describe('utils', function() {
 		});
 
 		it('should produce a call branch init first', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(utils.messages.callBranchInitFirst),
 				'Branch.init must be called first',
 				'Expected Branch must be called first message produced'
@@ -185,7 +185,7 @@ describe('utils', function() {
 		});
 
 		it('should produce a timeout message', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(utils.messages.timeout),
 				'Request timed out',
 				'Expected Request timed out message produced'
@@ -193,7 +193,7 @@ describe('utils', function() {
 		});
 
 		it('should produce a missing URL error', function() {
-			assert.equal(
+			assert.strictEqual(
 				utils.message(utils.messages.missingUrl),
 				'Required argument: URL, is missing',
 				'Expected Missing url message produced'
@@ -204,7 +204,7 @@ describe('utils', function() {
 	describe('getParamValue', function() {
 		it('should return search param value', function() {
 			if (testUtils.go('?test=testsearch')) {
-				assert.equal(
+				assert.strictEqual(
 					utils.getParamValue('test'),
 					'testsearch',
 					'Returns search param'
@@ -214,10 +214,7 @@ describe('utils', function() {
 
 		it('should return undefined if not set', function() {
 			if (testUtils.go('')) {
-				assert.ok(
-					utils.getParamValue('test') === undefined,
-					'returns undefined'
-				);
+				assert.strictEqual(undefined, utils.getParamValue('test'), 'returns undefined');
 			}
 		});
 	});
@@ -225,7 +222,7 @@ describe('utils', function() {
 	describe('hashValue', function() {
 		it('should return hash param value', function() {
 			if (testUtils.go('#test:testhash')) {
-				assert.equal(
+				assert.strictEqual(
 					utils.hashValue('test'),
 					'testhash',
 					'Returns hash param'
@@ -235,10 +232,7 @@ describe('utils', function() {
 
 		it('should return undefined if not set', function() {
 			if (testUtils.go('')) {
-				assert.ok(
-					utils.hashValue('test') === undefined,
-					'returns undefined'
-				);
+				assert.strictEqual(undefined, utils.hashValue('test'), 'returns undefined');
 			}
 		});
 	});
