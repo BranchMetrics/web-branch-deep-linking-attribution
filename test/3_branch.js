@@ -533,7 +533,11 @@ describe('Branch', function() {
 					'All params sent'
 				);
 				assert.strictEqual(branch.session_id, newSessionId, 'branch session was replaced');
-				assert.strictEqual(branch.identity_id, newIdentityId, 'branch identity was replaced');
+				assert.strictEqual(
+					branch.identity_id,
+					newIdentityId,
+					'branch identity was replaced'
+				);
 				assert.strictEqual(branch.sessionLink, newLink, 'link was replaced');
 			}
 		);
@@ -936,14 +940,27 @@ describe('Branch', function() {
 			var branch = initBranch(false), assert = testUtils.plan(2;
 			var done);
 			branch.init(branch_key, function(err) { assert.strictEqual(err, null, 'No error'); });
-			branch.track('did something', function(err) { assert.strictEqual(err, null, 'No error'); });
+			branch.track(
+				'did
+				something',
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
 		});
 
 		it('Should call requests in correct order', function(done) {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(5, done);
 			branch.init(branch_key, function(err) { assert.strictEqual(err, null, 'No error'); });
-			branch.track('did something else', function(err) { assert.strictEqual(err, null, 'No error'); });
+			branch.track(
+				'did
+				something
+				else',
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
 
 			assert.strictEqual(requests[0].resource.endpoint, '/_r');
 			requests[0].callback(null, browser_fingerprint_id);
