@@ -60,7 +60,7 @@ describe('utils', function() {
 				"referring_identity": "12345"
 			};
 			var whiteListedData = utils.whiteListSessionData(data);
-			assert.strictEqual(null, whiteListedData['has_app'], 'has_app should be null');
+			assert.strictEqual(whiteListedData['has_app'], null, 'has_app should be null');
 		});
 	});
 
