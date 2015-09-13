@@ -5,11 +5,6 @@ var safari_browsers = [
 		browserName: 'safari',
 		platform: 'OS X 10.10',
 		version: '8.0'
-	},
-	{
-		browserName: 'safari',
-		platform: 'OS X 10.9',
-		version: '7.0'
 	}
 ];
 
@@ -123,9 +118,8 @@ var ie_browsers = [
 ];
 
 var test_urls = [
-	'http://0.0.0.0:9999/test/test.html'
-	// 'http://0.0.0.0:9999/test/test.html',
-	// 'http://0.0.0.0:9999/test/integration-test.html'
+	'http://0.0.0.0:9999/test/test.html',
+	'http://0.0.0.0:9999/test/integration-test.html'
 ];
 
 module.exports = function(grunt) {
@@ -140,7 +134,7 @@ module.exports = function(grunt) {
 					browsers: [].concat(
 						safari_browsers,
 						chrome_browsers,
-						firefox_browsers,
+						// firefox_browsers,
 						android_browsers,
 						ios_browsers,
 						ie_browsers)

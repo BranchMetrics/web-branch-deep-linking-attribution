@@ -16,7 +16,7 @@ describe('session storage', function() {
 
 	it('should set an item', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
-		assert.equal(
+		assert.strictEqual(
 			sessionStorage.getItem(BRANCH_KEY_PREFIX + ITEM_KEY),
 			ITEM_VALUE,
 			'key / vaue stored'
@@ -26,19 +26,19 @@ describe('session storage', function() {
 	it('should get stored item with key', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
 		var item = storage.get(ITEM_KEY);
-		assert.equal(item, ITEM_VALUE, 'correct value with key');
+		assert.strictEqual(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
 		var item = storage.get(ITEM_KEY_UNSTORED);
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should remove an item', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE, 'session');
 		storage.remove(ITEM_KEY);
 		var item = storage.get(ITEM_KEY);
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should clear all items', function() {
@@ -57,7 +57,7 @@ describe('local storage', function() {
 
 	it('should set an item in localStorage', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
-		assert.equal(
+		assert.strictEqual(
 			localStorage.getItem(BRANCH_KEY_PREFIX + ITEM_KEY),
 			ITEM_VALUE,
 			'key / vaue stored'
@@ -67,19 +67,19 @@ describe('local storage', function() {
 	it('should get stored item with key', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
 		var item = storage.get(ITEM_KEY);
-		assert.equal(item, ITEM_VALUE, 'correct value with key');
+		assert.strictEqual(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
 		var item = storage.get(ITEM_KEY_UNSTORED);
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should remove an item', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE, 'session');
 		storage.remove(ITEM_KEY);
 		var item = storage.get(ITEM_KEY);
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should clear all items', function() {
@@ -101,19 +101,19 @@ describe('cookie storage', function() {
 	it('should get stored item with key', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
 		var item = storage.get(ITEM_KEY);
-		assert.equal(item, ITEM_VALUE, 'correct value with key');
+		assert.strictEqual(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
 		var item = storage.get('not_an_item');
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should remove an item', function() {
 		storage.set(ITEM_KEY + 'testRemove', ITEM_VALUE, 'session');
 		storage.remove(ITEM_KEY + 'testRemove');
 		var item = storage.get(ITEM_KEY + 'testRemove');
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should clear all items', function() {
@@ -133,26 +133,26 @@ describe('pojo storage', function() {
 
 	it('should set a temporary item', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
-		assert.equal(storage._store[ITEM_KEY], ITEM_VALUE, 'key / vaue stored');
+		assert.strictEqual(storage._store[ITEM_KEY], ITEM_VALUE, 'key / vaue stored');
 	});
 
 	it('should get stored item with key', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
 		var item = storage.get(ITEM_KEY);
-		assert.equal(item, ITEM_VALUE, 'correct value with key');
+		assert.strictEqual(item, ITEM_VALUE, 'correct value with key');
 	});
 
 	it('should return null for an unstored item', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
 		var item = storage.get(ITEM_KEY_UNSTORED);
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should remove an item', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE, 'session');
 		storage.remove(ITEM_KEY);
 		var item = storage.get(ITEM_KEY);
-		assert.equal(item, null, 'returned null');
+		assert.strictEqual(item, null, 'returned null');
 	});
 
 	it('should clear all items', function() {

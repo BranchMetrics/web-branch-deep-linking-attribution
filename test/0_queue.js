@@ -5,10 +5,11 @@ goog.require('task_queue');
 describe('task_queue', function() {
 	var queue;
 	var orderCalled;
-	var clock = sinon.useFakeTimers();
+	var clock;
 	var assert = testUtils.unplanned();
 	beforeEach(function() {
 		queue = task_queue();
+		clock = sinon.useFakeTimers();
 		orderCalled = [];
 		queue(function(next) {
 			setTimeout(function() {
@@ -16,12 +17,12 @@ describe('task_queue', function() {
 				next();
 			}, 10);
 		});
-		assert(orderCalled[0] === undefined, 'Has not yet called function');
+		assert.strictEqual(orderCalled[0], undefined, 'Has not yet called function');
 	});
 
 	it('should queue a function and call it', function(done) {
-		clock.tick(15);
-		assert.equal(orderCalled[0], 0, 'Function called');
+		clock.tick(11);
+		assert.strictEqual(orderCalled[0], 0, 'Function called');
 		done();
 	});
 
@@ -32,11 +33,11 @@ describe('task_queue', function() {
 				next();
 			}, 10);
 		});
-		clock.tick(15);
-		assert.equal(orderCalled[0], 0, 'Called first function');
-		assert(orderCalled[1] === undefined, 'Has not yet called second function');
-		clock.tick(15);
-		assert.equal(orderCalled[1], 1, 'Called second function');
+		clock.tick(11);
+		assert.strictEqual(orderCalled[0], 0, 'Called first function');
+		assert.strictEqual(orderCalled[1], undefined, 'Has not yet called second function');
+		clock.tick(11);
+		assert.strictEqual(orderCalled[1], 1, 'Called second function');
 		done();
 	});
 });
