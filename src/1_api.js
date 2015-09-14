@@ -101,19 +101,17 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.queryPart) {
-		for (k in resource.queryPart) {
-			if (!resource.queryPart.hasOwnProperty(k)) {
-				continue;
-			}
-			err = (typeof resource.queryPart[k] === 'function') ?
-				resource.queryPart[k](resource.endpoint, k, data[k]) :
-				err;
-			if (err) {
-				return { error: err };
-			}
-			url += '/' + data[k];
+	for (k in resource.queryPart) {
+		if (!resource.queryPart.hasOwnProperty(k)) {
+			continue;
 		}
+		err = (typeof resource.queryPart[k] === 'function') ?
+			resource.queryPart[k](resource.endpoint, k, data[k]) :
+			err;
+		if (err) {
+			return { error: err };
+		}
+		url += '/' + data[k];
 	}
 	var d = { };
 	for (k in resource.params) {
