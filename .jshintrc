@@ -7,7 +7,7 @@
 	"freeze": true,
 	"immed": true,
 	"latedef": true,
-	"maxdepth": 4,
+	"maxdepth": 3,
 	"mocha": true,
 	"noarg": true,
 	"nocomma": true,

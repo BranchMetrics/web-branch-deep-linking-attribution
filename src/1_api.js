@@ -33,22 +33,23 @@ Server.prototype.serializeObject = function(obj, prefix) {
 		for (var i = 0; i < obj.length; i++) {
 			pairs.push(encodeURIComponent(prefix) + '=' + encodeURIComponent(obj[i]));
 		}
+		return pairs.join('&');
 	}
-	else {
-		for (var prop in obj) {
-			if (obj.hasOwnProperty(prop)) {
-				if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
-					pairs.push(
-						this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
-					);
-				}
-				else {
-					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
-						'=' +
-						encodeURIComponent(obj[prop])
-					);
-				}
-			}
+
+	for (var prop in obj) {
+		if (!obj.hasOwnProperty(prop)) {
+			continue;
+		}
+		if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
+			pairs.push(
+				this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
+			);
+		}
+		else {
+			pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
+				'=' +
+				encodeURIComponent(obj[prop])
+			);
 		}
 	}
 	return pairs.join('&');
@@ -102,17 +103,16 @@ Server.prototype.getUrl = function(resource, data) {
 
 	if (resource.queryPart) {
 		for (k in resource.queryPart) {
-			if (resource.queryPart.hasOwnProperty(k)) {
-				err = (typeof resource.queryPart[k] === 'function') ?
-					resource.queryPart[k](resource.endpoint, k, data[k]) :
-					err;
-				if (err) {
-					return {
-						error: err
-					};
-				}
-				url += '/' + data[k];
+			if (!resource.queryPart.hasOwnProperty(k)) {
+				continue;
 			}
+			err = (typeof resource.queryPart[k] === 'function') ?
+				resource.queryPart[k](resource.endpoint, k, data[k]) :
+				err;
+			if (err) {
+				return { error: err };
+			}
+			url += '/' + data[k];
 		}
 	}
 	var d = { };
