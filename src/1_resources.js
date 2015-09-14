@@ -17,11 +17,11 @@ var resources = { };
 
 /** @enum {number} */
 var validationTypes = {
-	obj: 0,
-	str: 1,
-	num: 2,
-	arr: 3,
-	bool: 4
+	OBJECT: 0,
+	STRING: 1,
+	NUMBER: 2,
+	ARRAY: 3,
+	BOOLEAN: 4
 };
 
 /* jshint ignore:start */
@@ -45,22 +45,22 @@ function validator(required, type) {
 				return utils.message(utils.messages.missingParam, [ endpoint, param ]);
 			}
 		}
-		else if (type === validationTypes.obj) {
+		else if (type === validationTypes.OBJECT) {
 			if (typeof data !== 'object') {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'an object' ]);
 			}
 		}
-		else if (type === validationTypes.arr) {
+		else if (type === validationTypes.ARRAY) {
 			if (!(data instanceof Array)) {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'an array' ]);
 			}
 		}
-		else if (type === validationTypes.num) {
+		else if (type === validationTypes.NUMBER) {
 			if (typeof data !== 'number') {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'a number' ]);
 			}
 		}
-		else if (type === validationTypes.bool) {
+		else if (type === validationTypes.BOOLEAN) {
 			if (typeof data !== 'boolean') {
 				return utils.message(utils.messages.invalidType, [ endpoint, param, 'a boolean' ]);
 			}
@@ -69,7 +69,7 @@ function validator(required, type) {
 		else if (typeof data !== 'string') {
 			return utils.message(utils.messages.invalidType, [ endpoint, param, 'a string' ]);
 		}
-		else if (type !== validationTypes.str && !type.test(data)) {
+		else if (type !== validationTypes.STRING && !type.test(data)) {
 			return utils.message(
 				utils.messages.invalidType,
 				[ endpoint, param, 'in the proper format' ]
@@ -88,7 +88,7 @@ function defaults(obj) {
 		def = {
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.str)
+			"sdk": validator(true, validationTypes.STRING)
 		};
 	}
 	if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -96,7 +96,7 @@ function defaults(obj) {
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.str)
+			"sdk": validator(true, validationTypes.STRING)
 		};
 	}
 	return utils.merge(obj, def);
@@ -109,9 +109,9 @@ if (WEB_BUILD) {
 		method: utils.httpMethod.POST,
 		params: {
 			"identity_id": validator(false, branch_id),
-			"link_identifier": validator(false, validationTypes.str),
-			"is_referrable": validator(true, validationTypes.num),
-			"sdk": validator(false, validationTypes.str),
+			"link_identifier": validator(false, validationTypes.STRING),
+			"is_referrable": validator(true, validationTypes.NUMBER),
+			"sdk": validator(false, validationTypes.STRING),
 			"browser_fingerprint_id": validator(true, branch_id)
 		}
 	};
@@ -122,7 +122,7 @@ if (WEB_BUILD) {
 		method: utils.httpMethod.GET,
 		jsonp: true,
 		params: {
-			"sdk": validator(true, validationTypes.str)
+			"sdk": validator(true, validationTypes.STRING)
 		}
 	};
 
@@ -131,10 +131,10 @@ if (WEB_BUILD) {
 		endpoint: "",
 		method: utils.httpMethod.GET,
 		queryPart: {
-			"link_url": validator(true, validationTypes.str)
+			"link_url": validator(true, validationTypes.STRING)
 		},
 		params: {
-			"click": validator(true, validationTypes.str) }
+			"click": validator(true, validationTypes.STRING) }
 	};
 
 	resources.SMSLinkSend = {
@@ -142,11 +142,11 @@ if (WEB_BUILD) {
 		endpoint: "/c",
 		method: utils.httpMethod.POST,
 		queryPart: {
-			"link_url": validator(true, validationTypes.str)
+			"link_url": validator(true, validationTypes.STRING)
 		},
 		params: {
-			"sdk": validator(false, validationTypes.str),
-			"phone": validator(true, validationTypes.str)
+			"sdk": validator(false, validationTypes.STRING),
+			"phone": validator(true, validationTypes.STRING)
 		}
 	};
 }
@@ -157,27 +157,27 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		endpoint: "/v1/install",
 		method: utils.httpMethod.POST,
 		params: {
-			"link_identifier": validator(false, validationTypes.str),
-			"sdk": validator(false, validationTypes.str),
-			"hardware_id": validator(false, validationTypes.str),
-			"is_hardware_id_real": validator(false, validationTypes.bool),
-			"app_version": validator(false, validationTypes.str),
-			"carrier": validator(false, validationTypes.str),
-			"bluetooth": validator(false, validationTypes.bool),
-			"bluetooth_version": validator(false, validationTypes.str),
-			"has_nfc": validator(false, validationTypes.bool),
-			"has_telephone": validator(false, validationTypes.bool),
-			"brand": validator(false, validationTypes.str),
-			"model": validator(false, validationTypes.str),
-			"os": validator(false, validationTypes.str),
-			"uri_scheme": validator(false, validationTypes.str),
-			"os_version": validator(false, validationTypes.str),
-			"screen_dpi": validator(false, validationTypes.num),
-			"screen_width": validator(false, validationTypes.num),
-			"screen_height": validator(false, validationTypes.num),
-			"is_referrable": validator(false, validationTypes.num),
-			"update": validator(false, validationTypes.num),
-			"add_tracking_enabled": validator(false, validationTypes.bool)
+			"link_identifier": validator(false, validationTypes.STRING),
+			"sdk": validator(false, validationTypes.STRING),
+			"hardware_id": validator(false, validationTypes.STRING),
+			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
+			"app_version": validator(false, validationTypes.STRING),
+			"carrier": validator(false, validationTypes.STRING),
+			"bluetooth": validator(false, validationTypes.BOOLEAN),
+			"bluetooth_version": validator(false, validationTypes.STRING),
+			"has_nfc": validator(false, validationTypes.BOOLEAN),
+			"has_telephone": validator(false, validationTypes.BOOLEAN),
+			"brand": validator(false, validationTypes.STRING),
+			"model": validator(false, validationTypes.STRING),
+			"os": validator(false, validationTypes.STRING),
+			"uri_scheme": validator(false, validationTypes.STRING),
+			"os_version": validator(false, validationTypes.STRING),
+			"screen_dpi": validator(false, validationTypes.NUMBER),
+			"screen_width": validator(false, validationTypes.NUMBER),
+			"screen_height": validator(false, validationTypes.NUMBER),
+			"is_referrable": validator(false, validationTypes.NUMBER),
+			"update": validator(false, validationTypes.NUMBER),
+			"add_tracking_enabled": validator(false, validationTypes.BOOLEAN)
 		}
 	};
 
@@ -187,16 +187,16 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		method: utils.httpMethod.POST,
 		params: {
 			"identity_id": validator(true, branch_id),
-			"link_identifier": validator(false, validationTypes.str),
+			"link_identifier": validator(false, validationTypes.STRING),
 			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.str),
-			"hardware_id": validator(false, validationTypes.str),
-			"is_hardware_id_real": validator(false, validationTypes.bool),
-			"app_version": validator(false, validationTypes.str),
-			"os": validator(false, validationTypes.str),
-			"uri_scheme": validator(false, validationTypes.str),
-			"os_version": validator(false, validationTypes.str),
-			"is_referrable": validator(false, validationTypes.num)
+			"sdk": validator(false, validationTypes.STRING),
+			"hardware_id": validator(false, validationTypes.STRING),
+			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
+			"app_version": validator(false, validationTypes.STRING),
+			"os": validator(false, validationTypes.STRING),
+			"uri_scheme": validator(false, validationTypes.STRING),
+			"os_version": validator(false, validationTypes.STRING),
+			"is_referrable": validator(false, validationTypes.NUMBER)
 		}
 	};
 
@@ -206,7 +206,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		method: utils.httpMethod.POST,
 		params: {
 			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.str),
+			"sdk": validator(true, validationTypes.STRING),
 			"session_id": validator(true, branch_id),
 			"link_click_id": validator(false, branch_id),
 			"device_fingerprint_id": validator(true, branch_id)
@@ -219,14 +219,14 @@ resources.getCode = {
 	endpoint: "/v1/referralcode",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"prefix": validator(false, validationTypes.str),
-		"amount": validator(true, validationTypes.num),
-		"expiration": validator(false, validationTypes.str),
-		"calculation_type": validator(true, validationTypes.num),
-		"location": validator(true, validationTypes.num),
-		"creation_type": validator(true, validationTypes.num),
-		"type": validator(true, validationTypes.str),
-		"bucket": validator(false, validationTypes.str)
+		"prefix": validator(false, validationTypes.STRING),
+		"amount": validator(true, validationTypes.NUMBER),
+		"expiration": validator(false, validationTypes.STRING),
+		"calculation_type": validator(true, validationTypes.NUMBER),
+		"location": validator(true, validationTypes.NUMBER),
+		"creation_source": validator(true, validationTypes.NUMBER),
+		"type": validator(true, validationTypes.STRING),
+		"bucket": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -235,7 +235,7 @@ resources.validateCode = {
 	endpoint: "/v1/referralcode",
 	method: utils.httpMethod.POST,
 	queryPart: {
-		"code": validator(true, validationTypes.str)
+		"code": validator(true, validationTypes.STRING)
 	},
 	params: defaults({ })
 };
@@ -245,7 +245,7 @@ resources.applyCode = {
 	endpoint: "/v1/applycode",
 	method: utils.httpMethod.POST,
 	queryPart: {
-		"code": validator(true, validationTypes.str)
+		"code": validator(true, validationTypes.STRING)
 	},
 	params: defaults({ })
 };
@@ -263,7 +263,7 @@ resources.profile = {
 	method: utils.httpMethod.POST,
 	params: defaults({
 		"identity_id": validator(true, branch_id),
-		"identity": validator(true, validationTypes.str)
+		"identity": validator(true, validationTypes.STRING)
 	})
 };
 
@@ -283,10 +283,10 @@ resources.creditHistory = {
 	method: utils.httpMethod.GET,
 	params: defaults({
 		"link_click_id": validator(false, branch_id),
-		"length": validator(false, validationTypes.num),
-		"direction": validator(false, validationTypes.num),
+		"length": validator(false, validationTypes.NUMBER),
+		"direction": validator(false, validationTypes.NUMBER),
 		"begin_after_id": validator(false, branch_id),
-		"bucket": validator(false, validationTypes.str)
+		"bucket": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -306,8 +306,8 @@ resources.redeem = {
 	method: utils.httpMethod.POST,
 	params: defaults({
 		"identity_id": validator(true, branch_id),
-		"amount": validator(true, validationTypes.num),
-		"bucket": validator(true, validationTypes.str)
+		"amount": validator(true, validationTypes.NUMBER),
+		"bucket": validator(true, validationTypes.STRING)
 	})
 };
 
@@ -318,14 +318,14 @@ resources.link = {
 	ref: "obj",
 	params: defaults({
 		"identity_id": validator(true, branch_id),
-		"data": validator(false, validationTypes.str),
-		"tags": validator(false, validationTypes.arr),
-		"feature": validator(false, validationTypes.str),
-		"campaign": validator(false, validationTypes.str),
-		"channel": validator(false, validationTypes.str),
-		"stage": validator(false, validationTypes.str),
-		"type": validator(false, validationTypes.num),
-		"alias": validator(false, validationTypes.str)
+		"data": validator(false, validationTypes.STRING),
+		"tags": validator(false, validationTypes.ARRAY),
+		"feature": validator(false, validationTypes.STRING),
+		"campaign": validator(false, validationTypes.STRING),
+		"channel": validator(false, validationTypes.STRING),
+		"stage": validator(false, validationTypes.STRING),
+		"type": validator(false, validationTypes.NUMBER),
+		"alias": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -343,7 +343,7 @@ resources.event = {
 	endpoint: "/v1/event",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"event": validator(true, validationTypes.str),
-		"metadata": validator(true, validationTypes.obj)
+		"event": validator(true, validationTypes.STRING),
+		"metadata": validator(true, validationTypes.OBJECT)
 	})
 };

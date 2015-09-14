@@ -32,7 +32,7 @@ __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acc
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.6.9.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data first addListener removeListener setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-v1.6.10.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"init data first addListener removeListener setIdentity logout track link sendSMS referrals credits creditHistory applyCode validateCode getCode redeem banner closeBanner".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -102,7 +102,7 @@ We provide a sample web app which demonstrates what Branch Metrics Web SDK can d
 
 To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
 
-* * *
+___
 
 ## Contributing
 Whether you are an avid engineer, a partner, or a Branch employee, we activley welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
@@ -113,7 +113,7 @@ and the [Google Closure Compiler](https://developers.google.com/closure/compiler
 
 For an in-depth guide to working with developing for the Web SDK, refer to the [release documentation](https://github.com/BranchMetrics/Web-SDK/blob/master/RELEASE_DOCUMENTATION.md).
 
-* * *
+___
 
 ## Bugs / Help / Support
 

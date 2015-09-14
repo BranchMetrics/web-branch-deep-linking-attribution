@@ -178,13 +178,8 @@
 			this.actual = options.actual;
 			this.expected = options.expected;
 			this.operator = options.operator;
-			if (options.message) {
-				this.message = options.message;
-				this.generatedMessage = false;
-			} else {
-				this.message = getMessage(this);
-				this.generatedMessage = true;
-			}
+			this.message = (options.message && (options.message + ": ")) + getMessage(this);
+			this.generatedMessage = true;
 
 			var stackStartFunction = options.stackStartFunction || fail;
 			if (Error.captureStackTrace) {
@@ -494,7 +489,6 @@
 		};
 
 		// =========================================================================
-
 
 		window.branch_sample_key = 'key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS',
 		window.session_id = '98807509250212101',

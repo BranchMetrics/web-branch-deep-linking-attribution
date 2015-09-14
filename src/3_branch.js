@@ -53,7 +53,7 @@ var wrap = function(parameters, func, init) {
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== 'function') {
 			callback = function(err) {
 				if (err) {
-					throw(err);
+					throw err;
 				}
 			};
 			args = Array.prototype.slice.call(arguments);
@@ -235,7 +235,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
 	 *
 	 * This needs to be set before the Branch.init call!!!
 	 *
-	 * ---
+	 * ___
 	 *
 	 */
 	Branch.prototype['setDebug'] = function(debug) {
@@ -365,7 +365,7 @@ Branch.prototype['init'] = wrap(
 					{ "sdk": config.version },
 					function(err, browser_fingerprint_id) {
 						if (browser_fingerprint_id) {
-							currentSessionData.browser_fingerprint_id = browser_fingerprint_id;
+							currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
 						}
 					}
 				);
@@ -567,7 +567,7 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 
 /**
  * @function Branch.setIdentity
- * @param {string} identity - _required_ - a string uniquely identifying the user – often a user ID or email address.
+ * @param {string} identity - _required_ - a string uniquely identifying the user - often a user ID or email address.
  * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
  *
  * **[Formerly `identify()`](CHANGELOG.md)**
@@ -664,16 +664,16 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"click_id": null,
 			"link_click_id": null,
 			"identity": null,
-			"session_id": data.session_id,
-			"identity_id": data.identity_id,
-			"link": data.link,
+			"session_id": data['session_id'],
+			"identity_id": data['identity_id'],
+			"link": data['link'],
 			"device_fingerprint_id": self.device_fingerprint_id || null
 		};
 
-		self.sessionLink = data.link;
-		self.session_id = data.session_id;
-		self.identity_id = data.identity_id;
-		self.identity = data.identity;
+		self.sessionLink = data['link'];
+		self.session_id = data['session_id'];
+		self.identity_id = data['identity_id'];
+		self.identity = data['identity'];
 		session.update(self._storage, data);
 
 		done(err);
@@ -1110,8 +1110,8 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  */
 /*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
 Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	data.type = "credit";
-	data.creation_type = data.creation_type || 2;
+	data['type'] = 'credit';
+	data['creation_source'] = data['creation_source'] || 2; // EventResponse.CREATION_SOURCE_SDK
 	this._api(resources.getCode, data, done);
 });
 
@@ -1323,7 +1323,7 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  * );
  * ```
  *
- * ---
+ * ___
  *
  * ## Credit redemption
  *
