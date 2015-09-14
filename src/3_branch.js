@@ -505,7 +505,8 @@ Branch.prototype['init'] = wrap(
 				freshInstall ? 'getInstallData' : 'getOpenData',
 				args
 			);
-		} else if (TITANIUM_BUILD) {
+		}
+		else if (TITANIUM_BUILD) {
 			var data = { };
 			var branchTitaniumSDK = require('io.branch.sdk');
 			if (link_identifier) {
