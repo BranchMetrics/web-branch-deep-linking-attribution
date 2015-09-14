@@ -3,8 +3,6 @@
 # Table Of Contents Generator for the Branch Web SDK
 # Scott Hasbrouck, scott@branchmetrics.io
 #
-# Documenting this here so some poor soul doesn't come along X years in the future wondering what the hell this does.
-#
 # Using this thing is pretty simple.
 # There are three arguments:
 # (1) *Required* the file you want it to read from.
@@ -30,8 +28,6 @@
 # Motivation for doing this: I kept forgetting to add new links at the top of the documentation for new methods,
 # and to update the links if I changed the name of the method or the arguments. Plus, it just
 # made sense to have all this in-line with the source code, since the rest of the documentation was that way.
-#
-# That's all!
 
 my $read_file = @ARGV[0];
 my $write_file = @ARGV[1];

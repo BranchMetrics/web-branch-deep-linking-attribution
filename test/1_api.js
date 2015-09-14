@@ -105,9 +105,7 @@ describe('Server helpers', function() {
 		);
 	});
 
-	describe('getUrl', function() {
-		// ...
-	});
+	describe('getUrl', function() {});
 });
 
 describe('Server', function() {
