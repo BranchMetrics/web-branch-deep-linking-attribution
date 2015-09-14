@@ -116,13 +116,17 @@ describe('Branch', function() {
 			);
 
 			assert.deepEqual(requests[1].resource.endpoint, '/v1/open', 'Request to open made');
-			assert.deepEqual(requests[1].obj, {
-				"branch_key": branch_sample_key,
-				"link_identifier": undefined,
-				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id,
-				"sdk": "web" + config.version
-			}, 'Request to open params correct');
+			assert.deepEqual(
+				requests[1].obj,
+				{
+					"branch_key": branch_sample_key,
+					"link_identifier": undefined,
+					"is_referrable": 1,
+					"browser_fingerprint_id": browser_fingerprint_id,
+					"sdk": "web" + config.version
+				},
+				'Request to open params correct'
+			);
 
 			assert.strictEqual(requests.length, 2, '2 requests made');
 		});
@@ -137,7 +141,7 @@ describe('Branch', function() {
 				"session_id": "113636235674656786",
 				"identity_id": "98807509250212101",
 				"identity": "Branch",
-				"has_app":true,
+				"has_app": true,
 				"referring_link": '/c/ngJf86-h'
 			};
 
@@ -160,13 +164,17 @@ describe('Branch', function() {
 			);
 
 			assert.deepEqual(requests[1].resource.endpoint, '/v1/open', 'Request to open made');
-			assert.deepEqual(requests[1].obj, {
-				"branch_key": branch_sample_key,
-				"link_identifier": undefined,
-				"is_referrable": 1,
-				"browser_fingerprint_id": browser_fingerprint_id,
-				"sdk": "web" + config.version
-			}, 'Request to open params correct');
+			assert.deepEqual(
+				requests[1].obj,
+				{
+					"branch_key": branch_sample_key,
+					"link_identifier": undefined,
+					"is_referrable": 1,
+					"browser_fingerprint_id": browser_fingerprint_id,
+					"sdk": "web" + config.version
+				},
+				'Request to open params correct'
+			);
 
 			assert.strictEqual(requests.length, 2, '2 requests made');
 		});
@@ -218,15 +226,15 @@ describe('Branch', function() {
 
 				branch.init(branch_sample_key, function(err, data) {
 					assert.strictEqual(
-						'12345',
 						JSON.parse(localStorage.getItem('branch_session_first')).click_id,
+						'12345',
 						'hash session_id stored in local storage'
 					);
 					assert.strictEqual(
-						'12345',
 						utils.mobileUserAgent() ?
 							'12345' :
 							JSON.parse(sessionStorage.getItem('branch_session')).click_id,
+						'12345',
 						'hash session_id saved in session storage'
 					);
 				});
@@ -240,13 +248,17 @@ describe('Branch', function() {
 					}
 				);
 
-				assert.deepEqual(requests[1].obj, {
-					"branch_key": branch_sample_key,
-					"link_identifier": '12345',
-					"is_referrable": 1,
-					"browser_fingerprint_id": browser_fingerprint_id,
-					"sdk": "web" + config.version
-				}, 'Request to open params correct');
+				assert.deepEqual(
+					requests[1].obj,
+					{
+						"branch_key": branch_sample_key,
+						"link_identifier": '12345',
+						"is_referrable": 1,
+						"browser_fingerprint_id": browser_fingerprint_id,
+						"sdk": "web" + config.version
+					},
+					'Request to open params correct'
+				);
 			}
 			else {
 				done();
@@ -262,15 +274,15 @@ describe('Branch', function() {
 
 					branch.init(branch_sample_key, function(err, data) {
 						assert.strictEqual(
-							'67890',
 							JSON.parse(localStorage.getItem('branch_session_first')).click_id,
+							'67890',
 							'get param match id stored in local storage'
 						);
 						assert.strictEqual(
-							'67890',
 							utils.mobileUserAgent() ?
 								'67890' :
 								JSON.parse(sessionStorage.getItem('branch_session')).click_id,
+							'67890',
 							'get param match id saved in session storage'
 						);
 					});
@@ -284,13 +296,17 @@ describe('Branch', function() {
 						}
 					);
 
-					assert.deepEqual(requests[1].obj, {
-						"branch_key": branch_sample_key,
-						"link_identifier": '67890',
-						"is_referrable": 1,
-						"browser_fingerprint_id": browser_fingerprint_id,
-						"sdk": "web" + config.version
-					}, 'Request to open params correct');
+					assert.deepEqual(
+						requests[1].obj,
+						{
+							"branch_key": branch_sample_key,
+							"link_identifier": '67890',
+							"is_referrable": 1,
+							"browser_fingerprint_id": browser_fingerprint_id,
+							"sdk": "web" + config.version
+						},
+						'Request to open params correct'
+					);
 				}
 				else {
 					done();
@@ -715,7 +731,6 @@ describe('Branch', function() {
 
 			branch.referrals(function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert(true);
 				assert.strictEqual(err, null, 'No error');
 			});
 
