@@ -53,7 +53,7 @@ var wrap = function(parameters, func, init) {
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== 'function') {
 			callback = function(err) {
 				if (err) {
-					throw(err);
+					throw err;
 				}
 			};
 			args = Array.prototype.slice.call(arguments);
@@ -567,7 +567,7 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 
 /**
  * @function Branch.setIdentity
- * @param {string} identity - _required_ - a string uniquely identifying the user – often a user ID or email address.
+ * @param {string} identity - _required_ - a string uniquely identifying the user - often a user ID or email address.
  * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
  *
  * **[Formerly `identify()`](CHANGELOG.md)**
