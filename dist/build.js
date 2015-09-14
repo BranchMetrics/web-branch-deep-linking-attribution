@@ -1481,37 +1481,38 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
     n(), k(f, l);
   } else {
-    if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      c = function(a) {
+    if (WEB_BUILD) {
+      d._api(resources._r, {sdk:config.version}, function(a, b) {
+        if (a) {
+          return l(a, null);
+        }
+        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+          b && g && (b.click_id = g);
+          n();
+          l(a, b);
+        });
+      });
+    } else {
+      if (c = function(a) {
         h || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
         d._api(h ? resources.install : resources.open, a, function(a, b) {
           l(a, b);
         });
-      };
-      if (CORDOVA_BUILD) {
+      }, CORDOVA_BUILD) {
         var m = [];
         null !== b && m.push(b ? 1 : 0);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
         }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
-      }
-      if (TITANIUM_BUILD) {
-        var m = {}, p = require("io.branch.sdk");
-        g && (m.link_identifier = g);
-        m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
-        c(m);
+      } else {
+        if (TITANIUM_BUILD) {
+          var m = {}, p = require("io.branch.sdk");
+          g && (m.link_identifier = g);
+          m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
+          c(m);
+        }
       }
     }
-    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
-      if (a) {
-        return l(a, null);
-      }
-      d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-        b && g && (b.click_id = g);
-        n();
-        l(a, b);
-      });
-    });
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
