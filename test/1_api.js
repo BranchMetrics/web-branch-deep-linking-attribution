@@ -265,7 +265,7 @@ describe('Server', function() {
 				storage.clear();
 			});
 
-			it('should pass in branch_key and browser_finge rprint_id', function(done) {
+			it('should pass in branch_key and browser_fingerprint_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
 				server.request(
