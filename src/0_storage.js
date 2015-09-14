@@ -12,8 +12,6 @@ goog.require('utils');
 
 /*globals Ti, TITANIUM_BUILD */
 
-var COOKIE_DAYS = 365;
-
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 /** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)),
@@ -129,8 +127,7 @@ var cookies = function(perm) {
 		var expires = '';
 		if (perm) {
 			var date = new Date();
-			console.log(date);
-			date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
+			date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
 			expires = '; branch_expiration_date=' + date.toGMTString() +
 				'; expires=' + date.toGMTString();
 		}
