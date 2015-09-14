@@ -95,7 +95,7 @@ utils.whiteListSessionData = function(data) {
 
 utils.cleanLinkData = function(linkData, config) {
 	/* jshint undef:false */
-	if (WEB_BUILD) { // WTF, I don't know why I can't just do undef:false for the line.
+	if (WEB_BUILD) {
 		/* jshint undef:true */
 		linkData['source'] = 'web-sdk';
 		if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
