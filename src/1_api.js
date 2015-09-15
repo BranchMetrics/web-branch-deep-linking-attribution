@@ -28,27 +28,32 @@ Server.prototype._jsonp_callback_index = 0;
  * @param {string} prefix
  */
 Server.prototype.serializeObject = function(obj, prefix) {
+	if (typeof obj === 'undefined') {
+		return '';
+	}
+
 	var pairs = [ ];
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
 			pairs.push(encodeURIComponent(prefix) + '=' + encodeURIComponent(obj[i]));
 		}
+		return pairs.join('&');
 	}
-	else {
-		for (var prop in obj) {
-			if (obj.hasOwnProperty(prop)) {
-				if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
-					pairs.push(
-						this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
-					);
-				}
-				else {
-					pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
-						'=' +
-						encodeURIComponent(obj[prop])
-					);
-				}
-			}
+
+	for (var prop in obj) {
+		if (!obj.hasOwnProperty(prop)) {
+			continue;
+		}
+		if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
+			pairs.push(
+				this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
+			);
+		}
+		else {
+			pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
+				'=' +
+				encodeURIComponent(obj[prop])
+			);
 		}
 	}
 	return pairs.join('&');
@@ -100,34 +105,36 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.queryPart) {
+	if (typeof resource.queryPart !== 'undefined') {
 		for (k in resource.queryPart) {
-			if (resource.queryPart.hasOwnProperty(k)) {
-				err = (typeof resource.queryPart[k] === 'function') ?
-					resource.queryPart[k](resource.endpoint, k, data[k]) :
-					err;
+			if (!resource.queryPart.hasOwnProperty(k)) {
+				continue;
+			}
+			err = (typeof resource.queryPart[k] === 'function') ?
+				resource.queryPart[k](resource.endpoint, k, data[k]) :
+				err;
+			if (err) {
+				return { error: err };
+			}
+			url += '/' + data[k];
+		}
+	}
+
+	var d = { };
+	if (typeof resource.params !== 'undefined') {
+		for (k in resource.params) {
+			if (resource.params.hasOwnProperty(k)) {
+				err = resource.params[k](resource.endpoint, k, data[k]);
 				if (err) {
 					return {
 						error: err
 					};
 				}
-				url += '/' + data[k];
-			}
-		}
-	}
-	var d = { };
-	for (k in resource.params) {
-		if (resource.params.hasOwnProperty(k)) {
-			err = resource.params[k](resource.endpoint, k, data[k]);
-			if (err) {
-				return {
-					error: err
-				};
-			}
 
-			v = data[k];
-			if (!(typeof v === 'undefined' || v === '' || v === null)) {
-				d[k] = v;
+				v = data[k];
+				if (!(typeof v === 'undefined' || v === '' || v === null)) {
+					d[k] = v;
+				}
 			}
 		}
 	}

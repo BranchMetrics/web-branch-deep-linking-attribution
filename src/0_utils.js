@@ -133,6 +133,10 @@ utils.processReferringLink = function(link) {
  * @param {Object} from
  */
 utils.merge = function(to, from) {
+	if (typeof from === 'undefined') {
+		return to;
+	}
+
 	for (var attr in from) {
 		if (from.hasOwnProperty(attr)) {
 			to[attr] = from[attr];
