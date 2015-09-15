@@ -36,22 +36,25 @@ Server.prototype.serializeObject = function(obj, prefix) {
 		return pairs.join('&');
 	}
 
-	for (var prop in obj) {
-		if (!obj.hasOwnProperty(prop)) {
-			continue;
-		}
-		if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
-			pairs.push(
-				this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
-			);
-		}
-		else {
-			pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
-				'=' +
-				encodeURIComponent(obj[prop])
-			);
+	if (typeof obj !== 'undefined') {
+		for (var prop in obj) {
+			if (!obj.hasOwnProperty(prop)) {
+				continue;
+			}
+			if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
+				pairs.push(
+					this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
+				);
+			}
+			else {
+				pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
+					'=' +
+					encodeURIComponent(obj[prop])
+				);
+			}
 		}
 	}
+
 	return pairs.join('&');
 };
 
@@ -117,18 +120,20 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	var d = { };
-	for (k in resource.params) {
-		if (resource.params.hasOwnProperty(k)) {
-			err = resource.params[k](resource.endpoint, k, data[k]);
-			if (err) {
-				return {
-					error: err
-				};
-			}
+	if (typeof resource.params !== 'undefined') {
+		for (k in resource.params) {
+			if (resource.params.hasOwnProperty(k)) {
+				err = resource.params[k](resource.endpoint, k, data[k]);
+				if (err) {
+					return {
+						error: err
+					};
+				}
 
-			v = data[k];
-			if (!(typeof v === 'undefined' || v === '' || v === null)) {
-				d[k] = v;
+				v = data[k];
+				if (!(typeof v === 'undefined' || v === '' || v === null)) {
+					d[k] = v;
+				}
 			}
 		}
 	}

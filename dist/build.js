@@ -774,6 +774,9 @@ utils.processReferringLink = function(a) {
   return a ? "http" !== a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
 };
 utils.merge = function(a, b) {
+  if ("undefined" === typeof b) {
+    return a;
+  }
   for (var c in b) {
     b.hasOwnProperty(c) && (a[c] = b[c]);
   }
@@ -832,6 +835,9 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
 }, webStorage = function(a) {
   var b = a ? localStorage : sessionStorage;
   return {getAll:function() {
+    if ("undefined" === typeof b) {
+      return null;
+    }
     var a = null, d;
     for (d in b) {
       0 === d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
@@ -1009,7 +1015,9 @@ Server.prototype.serializeObject = function(a, b) {
     for (var d = 0;d < a.length;d++) {
       c.push(encodeURIComponent(b) + "=" + encodeURIComponent(a[d]));
     }
-  } else {
+    return c.join("&");
+  }
+  if ("undefined" !== typeof a) {
     for (d in a) {
       a.hasOwnProperty(d) && (a[d] instanceof Array || "object" === typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
     }
@@ -1034,7 +1042,7 @@ Server.prototype.getUrl = function(a, b) {
       return {error:k.message};
     }
   }
-  if (a.queryPart) {
+  if ("undefined" !== typeof a.queryPart) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
         if (d = "function" === typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : d) {
@@ -1045,13 +1053,15 @@ Server.prototype.getUrl = function(a, b) {
     }
   }
   var l = {};
-  for (c in a.params) {
-    if (a.params.hasOwnProperty(c)) {
-      if (d = a.params[c](a.endpoint, c, b[c])) {
-        return {error:d};
+  if ("undefined" !== typeof a.params) {
+    for (c in a.params) {
+      if (a.params.hasOwnProperty(c)) {
+        if (d = a.params[c](a.endpoint, c, b[c])) {
+          return {error:d};
+        }
+        d = b[c];
+        "undefined" !== typeof d && "" !== d && null !== d && (l[c] = d);
       }
-      d = b[c];
-      "undefined" !== typeof d && "" !== d && null !== d && (l[c] = d);
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
