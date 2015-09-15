@@ -12,6 +12,7 @@ goog.require('utils');
 
 /*globals Ti, TITANIUM_BUILD */
 
+var COOKIE_MS = 365 * 24 * 60 * 60 * 1000;
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 /** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)),
@@ -127,7 +128,7 @@ var cookies = function(perm) {
 		var expires = '';
 		if (perm) {
 			var date = new Date();
-			date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
+			date.setTime(date.getTime() + COOKIE_MS);
 			expires = '; branch_expiration_date=' + date.toGMTString() +
 				'; expires=' + date.toGMTString();
 		}

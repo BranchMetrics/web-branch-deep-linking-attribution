@@ -816,7 +816,7 @@ utils.base64encode = function(a) {
   return b;
 };
 // Input 5
-var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
+var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]], c = "function" === typeof c ? c() : c;
     if (c.isEnabled()) {
@@ -879,7 +879,7 @@ var cookies = function(a) {
     return null;
   }, set:function(b, c) {
     var d = prefix(b), e = "";
-    a && (e = new Date, console.log(e), e.setTime(e.getTime() + 864E5 * COOKIE_DAYS), e = "; branch_expiration_date=" + e.toGMTString() + "; expires=" + e.toGMTString());
+    a && (e = new Date, e.setTime(e.getTime() + COOKIE_MS), e = "; branch_expiration_date=" + e.toGMTString() + "; expires=" + e.toGMTString());
     document.cookie = d + "=" + c + e + "; path=/";
   }, remove:function(a) {
     document.cookie = prefix(a) + "=; expires=; path=/";
