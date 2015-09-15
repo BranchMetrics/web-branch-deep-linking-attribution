@@ -1010,6 +1010,9 @@ var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
 Server.prototype.serializeObject = function(a, b) {
+  if ("undefined" === typeof a) {
+    return "";
+  }
   var c = [];
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
@@ -1017,10 +1020,8 @@ Server.prototype.serializeObject = function(a, b) {
     }
     return c.join("&");
   }
-  if ("undefined" !== typeof a) {
-    for (d in a) {
-      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" === typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
-    }
+  for (d in a) {
+    a.hasOwnProperty(d) && (a[d] instanceof Array || "object" === typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
   }
   return c.join("&");
 };

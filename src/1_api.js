@@ -28,6 +28,10 @@ Server.prototype._jsonp_callback_index = 0;
  * @param {string} prefix
  */
 Server.prototype.serializeObject = function(obj, prefix) {
+	if (typeof obj === 'undefined') {
+		return '';
+	}
+
 	var pairs = [ ];
 	if (obj instanceof Array) {
 		for (var i = 0; i < obj.length; i++) {
@@ -36,25 +40,22 @@ Server.prototype.serializeObject = function(obj, prefix) {
 		return pairs.join('&');
 	}
 
-	if (typeof obj !== 'undefined') {
-		for (var prop in obj) {
-			if (!obj.hasOwnProperty(prop)) {
-				continue;
-			}
-			if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
-				pairs.push(
-					this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
-				);
-			}
-			else {
-				pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
-					'=' +
-					encodeURIComponent(obj[prop])
-				);
-			}
+	for (var prop in obj) {
+		if (!obj.hasOwnProperty(prop)) {
+			continue;
+		}
+		if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
+			pairs.push(
+				this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop)
+			);
+		}
+		else {
+			pairs.push(encodeURIComponent(prefix ? prefix + '.' + prop : prop) +
+				'=' +
+				encodeURIComponent(obj[prop])
+			);
 		}
 	}
-
 	return pairs.join('&');
 };
 
