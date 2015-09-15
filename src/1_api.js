@@ -101,18 +101,21 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	for (k in resource.queryPart) {
-		if (!resource.queryPart.hasOwnProperty(k)) {
-			continue;
+	if (typeof resource.queryPart !== 'undefined') {
+		for (k in resource.queryPart) {
+			if (!resource.queryPart.hasOwnProperty(k)) {
+				continue;
+			}
+			err = (typeof resource.queryPart[k] === 'function') ?
+				resource.queryPart[k](resource.endpoint, k, data[k]) :
+				err;
+			if (err) {
+				return { error: err };
+			}
+			url += '/' + data[k];
 		}
-		err = (typeof resource.queryPart[k] === 'function') ?
-			resource.queryPart[k](resource.endpoint, k, data[k]) :
-			err;
-		if (err) {
-			return { error: err };
-		}
-		url += '/' + data[k];
 	}
+
 	var d = { };
 	for (k in resource.params) {
 		if (resource.params.hasOwnProperty(k)) {
