@@ -22,12 +22,36 @@
 
 		root[branchStr] = branchSdk;
 	}
-})(window, document, 'script', 'branch', function(branch, name) {
-	branch[name] = function() {
-		branch._q.push([ name, arguments ]);
-	};
-}, {
-	_q: [], // _q: the "queue" of calls
-	_v: 1 // _v: the "version" of the embed script
-},
-'init;data;first;addListener;removeListener;setIdentity;logout;track;link;sendSMS;referrals;credits;creditHistory;applyCode;validateCode;getCode;redeem;banner;closeBanner'.split(';'), 0);
+})(
+	window, document, 'script', 'branch', function(branch, name) {
+		branch[name] = function() {
+			branch._q.push([ name, arguments ]);
+		};
+	},
+	{
+		_q: [], // _q: the "queue" of calls
+		_v: 1 // _v: the "version" of the embed script
+	},
+	[
+		'addListener',
+		'applyCode',
+		'banner',
+		'closeBanner',
+		'creditHistory',
+		'credits',
+		'data',
+		'first',
+		'getCode',
+		'init',
+		'link',
+		'logout',
+		'redeem',
+		'referrals',
+		'removeListener',
+		'sendSMS',
+		'setIdentity',
+		'track',
+		'validateCode'
+	],
+	0
+);
