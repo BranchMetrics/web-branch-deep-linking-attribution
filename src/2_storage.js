@@ -33,7 +33,7 @@ if (TITANIUM_BUILD) {
 var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
-		storageMethod = typeof storageMethod === 'function' ? storageMethod() : storageMethod;
+		storageMethod = (typeof storageMethod === 'function') ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
 			storageMethod._store = { };
 			return storageMethod;
@@ -65,6 +65,10 @@ var webStorage = function(perm) {
 	var storageMethod = perm ? localStorage : sessionStorage;
 	return {
 		getAll: function() {
+			if (typeof storageMethod === 'undefined') {
+				return null;
+			}
+
 			var allKeyValues = null;
 			for (var key in storageMethod) {
 				if (key.indexOf(BRANCH_KEY_PREFIX) === 0) {

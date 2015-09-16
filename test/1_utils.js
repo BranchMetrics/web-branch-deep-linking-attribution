@@ -8,16 +8,16 @@ describe('utils', function() {
 	describe('base64encode', function() {
 		it('should encode a string', function() {
 			var string = 'test string to encode';
-			var encoded = 'dGVzdCBzdHJpbmcgdG8gZW5jb2Rl';
-			var testEncoded = utils.base64encode(string);
-			assert.equal(encoded, testEncoded, 'Correctly encoded');
+			var expectedEncoded = 'dGVzdCBzdHJpbmcgdG8gZW5jb2Rl';
+			assert.strictEqual(utils.base64encode(string), expectedEncoded, 'Correctly encoded');
 		});
 	});
 
 	describe('merge', function() {
-		it('should merge to objects', function() {
+		it('should merge two objects despite duplication', function() {
 			var obj1 = { "simple": "object" };
 			var obj2 = {
+				"simple": "object",
 				"nested": {
 					"object": "here"
 				}
@@ -28,8 +28,7 @@ describe('utils', function() {
 					"object": "here"
 				}
 			};
-			var mergedObject = utils.merge(obj1, obj2);
-			assert.deepEqual(mergedObject, expectedMerged, 'Correctly merged');
+			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
 		});
 	});
 
@@ -46,9 +45,12 @@ describe('utils', function() {
 				"referring_link": null,
 				"unwanted": "param"
 			};
-			var whiteListedData = utils.whiteListSessionData(data);
 			delete data.unwanted;
-			assert.deepEqual(whiteListedData, data, 'Unwanted param should be removed');
+			assert.deepEqual(
+				utils.whiteListSessionData(data),
+				data,
+				'Unwanted param should be removed'
+			);
 		});
 
 		it('should make missing params null', function() {
@@ -57,29 +59,28 @@ describe('utils', function() {
 				"identity": "67890",
 				"referring_identity": "12345"
 			};
-			assert.equal(null, data['has_app'], 'has_app should be null');
+			var whiteListedData = utils.whiteListSessionData(data);
+			assert.strictEqual(whiteListedData['has_app'], null, 'has_app should be null');
 		});
 	});
 
 	describe('cleanLinkData', function() {
-		it('should accept undefined', function() {
+		it('should accept empty linkData', function() {
 			var linkData = { };
 			var expectedCleanedLinkData = {
 				source: "web-sdk",
 				data: "{}"
 			};
-			var cleanedLinkData = utils.cleanLinkData(linkData);
 			assert.deepEqual(
-				cleanedLinkData,
+				utils.cleanLinkData(linkData),
 				expectedCleanedLinkData,
-				'Accept undefined field "data"'
+				'Accept empty linkData'
 			);
 		});
 
-		it('should stringify field "data"', function() {
+		it('should stringify field "data" and add "source"', function() {
 			var linkData = {
-				"data":
-				{
+				"data": {
 					subfield1:"bar",
 					"subfield2":false
 				},
@@ -96,8 +97,11 @@ describe('utils', function() {
 				field4: null,
 				source: "web-sdk"
 			};
-			var cleanedLinkData = utils.cleanLinkData(linkData);
-			assert.deepEqual(cleanedLinkData, expectedCleanedLinkData, 'Stringified field "data"');
+			assert.deepEqual(
+				utils.cleanLinkData(linkData),
+				expectedCleanedLinkData,
+				'Stringified field "data" and added "source"'
+			);
 		});
 
 		it('should not stringify pre-stringified field "data"', function() {
@@ -120,9 +124,8 @@ describe('utils', function() {
 				field4: null,
 				source: "web-sdk"
 			};
-			var cleanedLinkData = utils.cleanLinkData((utils.cleanLinkData(linkData)));
 			assert.deepEqual(
-				cleanedLinkData,
+				utils.cleanLinkData((utils.cleanLinkData(linkData))),
 				expectedCleanedLinkData,
 				'Refrain from over-stringifying field "data"'
 			);
@@ -131,77 +134,87 @@ describe('utils', function() {
 
 	describe('message', function() {
 		it('should produce a missing param message', function() {
-			var message = utils.message(utils.messages.missingParam, [ 'endpoint', 'param' ]);
-			assert.equal(
+			assert.strictEqual(
+				utils.message(utils.messages.missingParam, [ 'endpoint', 'param' ]),
 				'API request endpoint missing parameter param',
-				message,
 				'Expected missing param message produced'
 			);
 		});
 
 		it('should produce an invalid param type message', function() {
-			var message = utils.message(
-				utils.messages.invalidType,
-				[ 'endpoint', 'param', 'type' ]
-			);
-			assert.equal(
+			assert.strictEqual(
+				utils.message(
+					utils.messages.invalidType,
+					[ 'endpoint', 'param', 'type' ]
+				),
 				'API request endpoint, parameter param is not type',
-				message,
 				'Expected invalid param type message produced'
 			);
 		});
 
-		it('should produce a Branch SDK non init message', function() {
-			var message = utils.message(utils.messages.nonInit);
-			assert.equal('Branch SDK not initialized', message, 'Branch SDK not initialized');
+		it('should produce a Branch SDK not init message', function() {
+			assert.strictEqual(
+				utils.message(utils.messages.nonInit),
+				'Branch SDK not initialized',
+				'Expected Branch SDK not init message produced'
+			);
 		});
 
 		it('should produce a Branch SDK already init message', function() {
-			var message = utils.message(utils.messages.existingInit);
-			assert.equal(
+			assert.strictEqual(
+				utils.message(utils.messages.existingInit),
 				'Branch SDK already initilized',
-				message,
-				'Branch SDK already initialized'
+				'Expected Branch SDK already initialized message produced'
 			);
 		});
 
 		it('should produce a missing app id', function() {
-			var message = utils.message(utils.messages.missingAppId);
-			assert.equal('Missing Branch app ID', message, 'Branch app id missing');
+			assert.strictEqual(
+				utils.message(utils.messages.missingAppId),
+				'Missing Branch app ID',
+				'Expected Branch app id missing message produced'
+			);
 		});
 
 		it('should produce a call branch init first', function() {
-			var message = utils.message(utils.messages.callBranchInitFirst);
-			assert.equal(
+			assert.strictEqual(
+				utils.message(utils.messages.callBranchInitFirst),
 				'Branch.init must be called first',
-				message,
-				'Branch must be called first message'
+				'Expected Branch must be called first message produced'
 			);
 		});
 
 		it('should produce a timeout message', function() {
-			var message = utils.message(utils.messages.timeout);
-			assert.equal('Request timed out', message, 'Request timed out');
+			assert.strictEqual(
+				utils.message(utils.messages.timeout),
+				'Request timed out',
+				'Expected Request timed out message produced'
+				);
 		});
 
 		it('should produce a missing URL error', function() {
-			var message = utils.message(utils.messages.missingUrl);
-			assert.equal('Required argument: URL, is missing', message, 'Missing url');
+			assert.strictEqual(
+				utils.message(utils.messages.missingUrl),
+				'Required argument: URL, is missing',
+				'Expected Missing url message produced'
+			);
 		});
 	});
 
 	describe('getParamValue', function() {
 		it('should return search param value', function() {
 			if (testUtils.go('?test=testsearch')) {
-				var value = utils.getParamValue('test');
-				assert.equal('testsearch', value, 'Returns search param');
+				assert.strictEqual(
+					utils.getParamValue('test'),
+					'testsearch',
+					'Returns search param'
+				);
 			}
 		});
 
 		it('should return undefined if not set', function() {
 			if (testUtils.go('')) {
-				var value = utils.getParamValue('test');
-				assert.equal(undefined, value, 'returns undefined');
+				assert.strictEqual(undefined, utils.getParamValue('test'), 'returns undefined');
 			}
 		});
 	});
@@ -209,15 +222,17 @@ describe('utils', function() {
 	describe('hashValue', function() {
 		it('should return hash param value', function() {
 			if (testUtils.go('#test:testhash')) {
-				var value = utils.hashValue('test');
-				assert.equal('testhash', value, 'Returns hash param');
+				assert.strictEqual(
+					utils.hashValue('test'),
+					'testhash',
+					'Returns hash param'
+				);
 			}
 		});
 
 		it('should return undefined if not set', function() {
 			if (testUtils.go('')) {
-				var value = utils.hashValue('test');
-				assert.equal(undefined, value, 'returns undefined');
+				assert.strictEqual(undefined, utils.hashValue('test'), 'returns undefined');
 			}
 		});
 	});

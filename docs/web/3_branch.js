@@ -4,9 +4,9 @@
 
 
 
-* * *
+___
 
-### setDebug(debug) 
+### setDebug(debug)
 
 **Parameters**
 
@@ -19,11 +19,11 @@ This needs to be set before the Branch.init call!!!
 
 THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
 
----
+___
 
 
 
-### init(branch_key, options, callback) 
+### init(branch_key, options, callback)
 
 **Parameters**
 
@@ -77,7 +77,7 @@ ___
 
 
 
-### data(callback) 
+### data(callback)
 
 **Parameters**
 
@@ -93,7 +93,7 @@ ___
 
 
 
-### first(callback) 
+### first(callback)
 
 **Parameters**
 
@@ -112,7 +112,7 @@ ___
 
 
 
-### setIdentity(identity, callback) 
+### setIdentity(identity, callback)
 
 **Parameters**
 
@@ -150,7 +150,7 @@ ___
 
 
 
-### logout(callback) 
+### logout(callback)
 
 **Parameters**
 
@@ -175,7 +175,7 @@ ___
 
 
 
-### close(callback) 
+### close(callback)
 
 **Parameters**
 
@@ -205,7 +205,7 @@ ___
 
 
 
-### track(event, metadata, callback) 
+### track(event, metadata, callback)
 
 **Parameters**
 
@@ -239,7 +239,7 @@ ___
 
 
 
-### link(data, callback) 
+### link(data, callback)
 
 **Parameters**
 
@@ -330,7 +330,7 @@ callback(
 
 
 
-### sendSMS(phone, linkData, options, callback) 
+### sendSMS(phone, linkData, options, callback)
 
 **Parameters**
 
@@ -420,7 +420,7 @@ Warning: For a referral program, you should not use unique awards for custom eve
 
 
 
-### referrals(callback) 
+### referrals(callback)
 
 **Parameters**
 
@@ -462,7 +462,7 @@ callback(
 
 
 
-### getCode(options, callback) 
+### getCode(options, callback)
 
 **Parameters**
 
@@ -517,7 +517,7 @@ ___
 
 
 
-### validateCode(code, callback) 
+### validateCode(code, callback)
 
 **Parameters**
 
@@ -563,7 +563,7 @@ ___
 
 
 
-### applyCode(code, callback) 
+### applyCode(code, callback)
 
 **Parameters**
 
@@ -610,7 +610,7 @@ ___
 
 
 
-### credits(callback) 
+### credits(callback)
 
 **Parameters**
 
@@ -640,7 +640,7 @@ callback(
 
 
 
-### creditHistory(options, callback) 
+### creditHistory(options, callback)
 
 **Parameters**
 
@@ -712,13 +712,13 @@ callback(
 );
 ```
 
----
+___
 
 ## Credit redemption
 
 
 
-### redeem(amount, bucket, callback) 
+### redeem(amount, bucket, callback)
 
 **Parameters**
 
@@ -875,7 +875,7 @@ This will add exactly the space required to show the app banner above your navig
 
 
 
-### banner(options, data) 
+### banner(options, data)
 
 **Parameters**
 
@@ -960,7 +960,7 @@ branch.closeBanner();
 
 
 
-* * *
+___
 
 
 

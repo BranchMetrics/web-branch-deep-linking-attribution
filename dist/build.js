@@ -721,7 +721,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.9"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.6.10"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1;
 // Input 3
 var task_queue = function() {
   var a = [], b = function() {
@@ -774,6 +774,9 @@ utils.processReferringLink = function(a) {
   return a ? "http" !== a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
 };
 utils.merge = function(a, b) {
+  if ("undefined" === typeof b) {
+    return a;
+  }
   for (var c in b) {
     b.hasOwnProperty(c) && (a[c] = b[c]);
   }
@@ -876,7 +879,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
   is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), is_referrable:validator(!1, validationTypes.NUMBER)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), 
   session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id)}};
 }
-resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({prefix:validator(!1, validationTypes.STRING), amount:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), location:validator(!0, validationTypes.NUMBER), creation_type:validator(!0, validationTypes.NUMBER), type:validator(!0, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING)})};
+resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({prefix:validator(!1, validationTypes.STRING), amount:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), location:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), type:validator(!0, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:defaults({session_id:validator(!0, branch_id)})};
@@ -920,6 +923,9 @@ var COOKIE_DAYS = 365, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchS
 }, webStorage = function(a) {
   var b = a ? localStorage : sessionStorage;
   return {getAll:function() {
+    if ("undefined" === typeof b) {
+      return null;
+    }
     var a = null, d;
     for (d in b) {
       0 === d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
@@ -1028,15 +1034,18 @@ var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
 Server.prototype.serializeObject = function(a, b) {
+  if ("undefined" === typeof a) {
+    return "";
+  }
   var c = [];
   if (a instanceof Array) {
     for (var d = 0;d < a.length;d++) {
       c.push(encodeURIComponent(b) + "=" + encodeURIComponent(a[d]));
     }
-  } else {
-    for (d in a) {
-      a.hasOwnProperty(d) && (a[d] instanceof Array || "object" === typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
-    }
+    return c.join("&");
+  }
+  for (d in a) {
+    a.hasOwnProperty(d) && (a[d] instanceof Array || "object" === typeof a[d] ? c.push(this.serializeObject(a[d], b ? b + "." + d : d)) : c.push(encodeURIComponent(b ? b + "." + d : d) + "=" + encodeURIComponent(a[d])));
   }
   return c.join("&");
 };
@@ -1058,7 +1067,7 @@ Server.prototype.getUrl = function(a, b) {
       return {error:k.message};
     }
   }
-  if (a.queryPart) {
+  if ("undefined" !== typeof a.queryPart) {
     for (c in a.queryPart) {
       if (a.queryPart.hasOwnProperty(c)) {
         if (d = "function" === typeof a.queryPart[c] ? a.queryPart[c](a.endpoint, c, b[c]) : d) {
@@ -1069,13 +1078,15 @@ Server.prototype.getUrl = function(a, b) {
     }
   }
   var l = {};
-  for (c in a.params) {
-    if (a.params.hasOwnProperty(c)) {
-      if (d = a.params[c](a.endpoint, c, b[c])) {
-        return {error:d};
+  if ("undefined" !== typeof a.params) {
+    for (c in a.params) {
+      if (a.params.hasOwnProperty(c)) {
+        if (d = a.params[c](a.endpoint, c, b[c])) {
+          return {error:d};
+        }
+        d = b[c];
+        "undefined" !== typeof d && "" !== d && null !== d && (l[c] = d);
       }
-      d = b[c];
-      "undefined" !== typeof d && "" !== d && null !== d && (l[c] = d);
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
@@ -1481,37 +1492,38 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
     n(), k(f, l);
   } else {
-    if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      c = function(a) {
+    if (WEB_BUILD) {
+      d._api(resources._r, {sdk:config.version}, function(a, b) {
+        if (a) {
+          return l(a, null);
+        }
+        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+          b && g && (b.click_id = g);
+          n();
+          l(a, b);
+        });
+      });
+    } else {
+      if (c = function(a) {
         h || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
         d._api(h ? resources.install : resources.open, a, function(a, b) {
           l(a, b);
         });
-      };
-      if (CORDOVA_BUILD) {
+      }, CORDOVA_BUILD) {
         var m = [];
         null !== b && m.push(b ? 1 : 0);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
         }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
-      }
-      if (TITANIUM_BUILD) {
-        var m = {}, p = require("io.branch.sdk");
-        g && (m.link_identifier = g);
-        m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
-        c(m);
+      } else {
+        if (TITANIUM_BUILD) {
+          var m = {}, p = require("io.branch.sdk");
+          g && (m.link_identifier = g);
+          m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
+          c(m);
+        }
       }
     }
-    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
-      if (a) {
-        return l(a, null);
-      }
-      d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-        b && g && (b.click_id = g);
-        n();
-        l(a, b);
-      });
-    });
   }
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
@@ -1606,7 +1618,7 @@ Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a)
 });
 Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   b.type = "credit";
-  b.creation_type = b.creation_type || 2;
+  b.creation_source = b.creation_source || 2;
   this._api(resources.getCode, b, a);
 });
 Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
