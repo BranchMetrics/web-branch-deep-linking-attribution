@@ -53,7 +53,7 @@ var wrap = function(parameters, func, init) {
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== 'function') {
 			callback = function(err) {
 				if (err) {
-					throw(err);
+					throw err;
 				}
 			};
 			args = Array.prototype.slice.call(arguments);
@@ -446,82 +446,84 @@ Branch.prototype['init'] = wrap(
 				link_identifier === sessionData['click_id'])) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
+			return;
 		}
-		else {
-			if (CORDOVA_BUILD || TITANIUM_BUILD) {
 
-				var apiCordovaTitanium = function(data) {
-					if (!freshInstall) {
-						data['identity_id'] = sessionData['identity_id'];
-						data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
+		if (WEB_BUILD) {
+			self._api(
+				resources._r,
+				{ "sdk": config.version },
+				function(err, browser_fingerprint_id) {
+					if (err) {
+						return finishInit(err, null);
 					}
 					self._api(
-						freshInstall ? resources.install : resources.open,
-						data,
+						resources.open,
+						{
+							"link_identifier": link_identifier,
+							"is_referrable": 1,
+							"browser_fingerprint_id": browser_fingerprint_id
+						},
 						function(err, data) {
+							if (data && link_identifier) {
+								data['click_id'] = link_identifier;
+							}
+							attachVisibilityEvent();
 							finishInit(err, data);
 						}
 					);
-				};
-				if (CORDOVA_BUILD) {
-					var args = [ ];
-					if (isReferrable !== null) {
-						args.push(isReferrable ? 1 : 0);
-					}
-					cordova.require('cordova/exec')(apiCordovaTitanium,
-						function() {
-							done('Error getting device data!');
-						},
-						'BranchDevice',
-						freshInstall ? 'getInstallData' : 'getOpenData', args);
 				}
-				if (TITANIUM_BUILD) {
-					var data = { };
-					var branchTitaniumSDK = require('io.branch.sdk');
-					if (link_identifier) {
-						data['link_identifier'] = link_identifier;
-					}
-					if (freshInstall) {
-						data = branchTitaniumSDK.getInstallData(
-							self.debug,
-							(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
-						);
-					}
-					else {
-						data = branchTitaniumSDK.getOpenData(
-							(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
-						);
-					}
-					apiCordovaTitanium(data);
-				}
-			}
+			);
+			return;
+		}
 
-			if (WEB_BUILD) {
-				self._api(
-					resources._r,
-					{ "sdk": config.version },
-					function(err, browser_fingerprint_id) {
-						if (err) {
-							return finishInit(err, null);
-						}
-						self._api(
-							resources.open,
-							{
-								"link_identifier": link_identifier,
-								"is_referrable": 1,
-								"browser_fingerprint_id": browser_fingerprint_id
-							},
-							function(err, data) {
-								if (data && link_identifier) {
-									data['click_id'] = link_identifier;
-								}
-								attachVisibilityEvent();
-								finishInit(err, data);
-							}
-						);
-					}
+		var apiCordovaTitanium = function(data) {
+			if (!freshInstall) {
+				data['identity_id'] = sessionData['identity_id'];
+				data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
+			}
+			self._api(
+				freshInstall ? resources.install : resources.open,
+				data,
+				function(err, data) {
+					finishInit(err, data);
+				}
+			);
+		};
+
+		if (CORDOVA_BUILD) {
+			var args = [ ];
+			if (isReferrable !== null) {
+				args.push(isReferrable ? 1 : 0);
+			}
+			cordova.require('cordova/exec')(
+				apiCordovaTitanium,
+				function() {
+					done('Error getting device data!');
+				},
+				'BranchDevice',
+				freshInstall ? 'getInstallData' : 'getOpenData',
+				args
+			);
+		}
+		else if (TITANIUM_BUILD) {
+			var data = { };
+			var branchTitaniumSDK = require('io.branch.sdk');
+			if (link_identifier) {
+				data['link_identifier'] = link_identifier;
+			}
+			if (freshInstall) {
+				data = branchTitaniumSDK.getInstallData(
+					self.debug,
+					(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
 				);
 			}
+			else {
+				data = branchTitaniumSDK.getOpenData(
+					(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
+				);
+			}
+			apiCordovaTitanium(data);
 		}
 	},
 	true
@@ -567,7 +569,7 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 
 /**
  * @function Branch.setIdentity
- * @param {string} identity - _required_ - a string uniquely identifying the user – often a user ID or email address.
+ * @param {string} identity - _required_ - a string uniquely identifying the user - often a user ID or email address.
  * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
  *
  * **[Formerly `identify()`](CHANGELOG.md)**

@@ -12,8 +12,7 @@ goog.require('utils');
 
 /*globals Ti, TITANIUM_BUILD */
 
-var COOKIE_DAYS = 365;
-
+var COOKIE_MS = 365 * 24 * 60 * 60 * 1000;
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 /** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)),
@@ -33,7 +32,7 @@ if (TITANIUM_BUILD) {
 var BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
-		storageMethod = typeof storageMethod === 'function' ? storageMethod() : storageMethod;
+		storageMethod = (typeof storageMethod === 'function') ? storageMethod() : storageMethod;
 		if (storageMethod.isEnabled()) {
 			storageMethod._store = { };
 			return storageMethod;
@@ -65,6 +64,10 @@ var webStorage = function(perm) {
 	var storageMethod = perm ? localStorage : sessionStorage;
 	return {
 		getAll: function() {
+			if (typeof storageMethod === 'undefined') {
+				return null;
+			}
+
 			var allKeyValues = null;
 			for (var key in storageMethod) {
 				if (key.indexOf(BRANCH_KEY_PREFIX) === 0) {
@@ -129,8 +132,7 @@ var cookies = function(perm) {
 		var expires = '';
 		if (perm) {
 			var date = new Date();
-			console.log(date);
-			date.setTime(date.getTime() + (COOKIE_DAYS * 24 * 60 * 60 * 1000));
+			date.setTime(date.getTime() + COOKIE_MS);
 			expires = '; branch_expiration_date=' + date.toGMTString() +
 				'; expires=' + date.toGMTString();
 		}

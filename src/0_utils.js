@@ -95,7 +95,7 @@ utils.whiteListSessionData = function(data) {
 
 utils.cleanLinkData = function(linkData, config) {
 	/* jshint undef:false */
-	if (WEB_BUILD) { // WTF, I don't know why I can't just do undef:false for the line.
+	if (WEB_BUILD) {
 		/* jshint undef:true */
 		linkData['source'] = 'web-sdk';
 		if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
@@ -133,6 +133,10 @@ utils.processReferringLink = function(link) {
  * @param {Object} from
  */
 utils.merge = function(to, from) {
+	if (typeof from === 'undefined') {
+		return to;
+	}
+
 	for (var attr in from) {
 		if (from.hasOwnProperty(attr)) {
 			to[attr] = from[attr];

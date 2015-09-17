@@ -105,9 +105,7 @@ describe('Server helpers', function() {
 		);
 	});
 
-	describe('getUrl', function() {
-		// ...
-	});
+	describe('getUrl', function() {});
 });
 
 describe('Server', function() {
@@ -178,7 +176,11 @@ describe('Server', function() {
 				'POST',
 				storage,
 				function(err, data) {
-					assert.strictEqual(Object.getOwnPropertyNames(data).length, 0, 'successful response');
+					assert.strictEqual(
+						Object.getOwnPropertyNames(data).length,
+						0,
+						'successful response'
+					);
 				}
 			);
 			requests[0].status = 200;
@@ -261,7 +263,7 @@ describe('Server', function() {
 				storage.clear();
 			});
 
-			it('should pass in branch_key and browser_finge rprint_id', function(done) {
+			it('should pass in branch_key and browser_fingerprint_id', function(done) {
 				storage['set']('use_jsonp', false);
 				var assert = testUtils.plan(5, done);
 				server.request(
@@ -271,7 +273,11 @@ describe('Server', function() {
 					assert.done
 				);
 				assert.strictEqual(requests.length, 1, 'Request made');
-				assert.strictEqual(requests[0].url, 'https://api.branch.io/v1/open', 'Endpoint correct');
+				assert.strictEqual(
+					requests[0].url,
+					'https://api.branch.io/v1/open',
+					'Endpoint correct'
+				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
 				assert.strictEqual(
 					requests[0].requestBody,
@@ -490,7 +496,11 @@ describe('Server', function() {
 			it('should fail without identity', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(resources.profile, testUtils.params(), storage, function(err) {
-					assert.strictEqual(err.message, "API request /v1/profile missing parameter identity");
+					assert.strictEqual(
+						err.message,
+						"API request /v1/profile missing parameter identity",
+						'Expected err.message'
+					);
 				});
 				assert.strictEqual(requests.length, 0, 'No request made');
 			});
@@ -504,7 +514,8 @@ describe('Server', function() {
 					function(err) {
 						assert.strictEqual(
 							err.message,
-							"API request /v1/profile missing parameter branch_key or app_id"
+							"API request /v1/profile missing parameter branch_key or app_id",
+							'Expected err.message'
 						);
 					}
 				);
@@ -520,7 +531,8 @@ describe('Server', function() {
 					function(err) {
 						assert.strictEqual(
 							err.message,
-							"API request /v1/profile missing parameter identity_id"
+							"API request /v1/profile missing parameter identity_id",
+							'Expected err.message'
 						);
 					}
 				);
@@ -542,7 +554,8 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/logout', 'Endpoint correct'
+					'https://api.branch.io/v1/logout', 'Endpoint correct',
+					'Expected url for the first request'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
 				assert.strictEqual(
@@ -550,7 +563,8 @@ describe('Server', function() {
 					"session_id=" + session_id +
 						"&identity_id=" + identity_id +
 						"&sdk=web" + config.version +
-						"&branch_key=" + branch_sample_key
+						"&branch_key=" + branch_sample_key,
+					'Expected request body for the first request'
 				);
 
 				requests[0].respond(
@@ -967,7 +981,11 @@ describe('Server', function() {
 				server.request(resources.link, testUtils.params(), storage, assert.done);
 
 				assert.strictEqual(requests.length, 1, 'Request made');
-				assert.strictEqual(requests[0].url, 'https://api.branch.io/v1/url', 'Endpoint correct');
+				assert.strictEqual(
+					requests[0].url,
+					'https://api.branch.io/v1/url',
+					'Endpoint correct'
+				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
 				assert.strictEqual(
 					requests[0].requestBody,
@@ -1152,7 +1170,11 @@ describe('Server', function() {
 				);
 
 				assert.strictEqual(requests.length, 1, 'Request made');
-				assert.strictEqual(requests[0].url, 'https://api.branch.io/v1/event', 'Endpoint correct');
+				assert.strictEqual(
+					requests[0].url,
+					'https://api.branch.io/v1/event',
+					'Endpoint correct'
+				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
 				assert.strictEqual(
 					requests[0].requestBody,
@@ -1239,7 +1261,10 @@ describe('Server', function() {
 					testUtils.params({ "metadata": metadata }),
 					storage,
 					function(err) {
-						assert.strictEqual(err.message, "API request /v1/event missing parameter event");
+						assert.strictEqual(
+							err.message,
+							"API request /v1/event missing parameter event"
+						);
 					}
 				);
 				assert.strictEqual(requests.length, 0, 'No request made');
