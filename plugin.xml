@@ -4,7 +4,7 @@
 	<description>Branch SDK Plugin</description>
 	<license>Apache 2.0</license>
 	<keywords>branch</keywords>
-	<js-module src="dist/cordova/build.js" name="branch">
+	<js-module src="dist/build.js" name="branch">
 		<clobbers target="branch" />
 		<clobbers target="Branch" />
 	</js-module>
