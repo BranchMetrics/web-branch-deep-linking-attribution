@@ -2,7 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.6.11] - 2015-09-17
 - Fixed error in `branch.init()` that failed to send `browser_fingerprint_id` to API when checking for `has_app`
 
 ## [v1.6.10] - 2015-09-04

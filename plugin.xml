@@ -1,5 +1,5 @@
-<?xml version="1.6.10"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="io.branch.sdk" version="1.6.10">
+<?xml version="1.6.11"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="io.branch.sdk" version="1.6.11">
 	<name>BranchSDK</name>
 	<description>Branch SDK Plugin</description>
 	<license>Apache 2.0</license>
