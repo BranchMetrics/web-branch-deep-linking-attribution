@@ -120,8 +120,6 @@ fi
 echo "Done script."
 read -p "Have you updated the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/_initialization.md ?" -n 1 -r
 echo
-read -p "Have you updated the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/send_sms_example.md ?" -n 1 -r
-echo
 
 echo "Post-release sanity checks."
 read -p "Can you visit https://cdn.branch.io/branch-$VERSION.min.js ?" -n 1 -r
