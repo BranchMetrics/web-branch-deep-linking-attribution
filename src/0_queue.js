@@ -2,7 +2,6 @@
  * A simple blocking queue for the API requests
  */
 'use strict';
-
 goog.provide('task_queue');
 
 /**

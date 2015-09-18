@@ -1,6 +1,6 @@
 'use strict';
-
 goog.provide('banner_css');
+
 goog.require('banner_utils');
 goog.require('utils');
 

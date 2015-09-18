@@ -4,8 +4,8 @@
  * branch was loaded.
  */
 'use strict';
-
 goog.provide('branch_instance');
+
 goog.require('Branch');
 goog.require('config'); // jshint unused:false
 
