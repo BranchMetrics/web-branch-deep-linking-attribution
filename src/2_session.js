@@ -1,12 +1,9 @@
-/*
- * Branch Session
- */
 'use strict';
+goog.provide('session');
 
 /*jshint unused:false*/
 goog.require('goog.json');
 goog.require('utils');
-goog.provide('session');
 
 /**
  * @param {BranchStorage} storage
