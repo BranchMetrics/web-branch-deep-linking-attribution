@@ -396,8 +396,7 @@ describe('Branch', function() {
 		basicTests('setIdentity', [ 1 ]);
 
 		var expectedRequest = testUtils.params(
-			{ "identity": "test_identity" },
-			[ 'browser_fingerprint_id' ]
+			{ "identity": "test_identity" }
 		);
 		var expectedResponse = {
 			identity_id: '12345',
@@ -424,8 +423,7 @@ describe('Branch', function() {
 		basicTests('setIdentity', [ 1 ]);
 
 		var expectedRequest = testUtils.params(
-			{ "identity": "test_identity" },
-			[ 'browser_fingerprint_id' ]
+			{ "identity": "test_identity" }
 		);
 		var expectedResponse = { };
 		it('should call api with identity', function(done) {
@@ -461,6 +459,7 @@ describe('Branch', function() {
 				},
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
+				"browser_fingerprint_id": browser_fingerprint_id,
 				"sdk": "web" + config.version
 			};
 			expectedRequest.identity_id = identity_id;
@@ -489,6 +488,7 @@ describe('Branch', function() {
 				},
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
+				"browser_fingerprint_id": browser_fingerprint_id,
 				"sdk": "web" + config.version
 			};
 			expectedRequest.identity_id = identity_id;
@@ -514,7 +514,7 @@ describe('Branch', function() {
 			requests[0].callback();
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+				testUtils.params({ }),
 				'All params sent'
 			);
 		});
@@ -545,7 +545,7 @@ describe('Branch', function() {
 				);
 				assert.deepEqual(
 					requests[0].obj,
-					testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+					testUtils.params({ }),
 					'All params sent'
 				);
 				assert.strictEqual(branch.session_id, newSessionId, 'branch session was replaced');
@@ -738,7 +738,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+				testUtils.params({ }),
 				'All params sent'
 			);
 		});
@@ -768,7 +768,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params(options, [ 'browser_fingerprint_id' ]),
+				testUtils.params(options),
 				'All params sent'
 			);
 		});
@@ -791,7 +791,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]),
+				testUtils.params({ "code": expectedResponse }),
 				'All params sent'
 			);
 		});
@@ -814,7 +814,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ "code": expectedResponse }, [ 'browser_fingerprint_id' ]),
+				testUtils.params({ "code": expectedResponse }),
 				'All params sent'
 			);
 		});
@@ -841,7 +841,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ }, [ 'browser_fingerprint_id' ]),
+				testUtils.params({ }),
 				'All params sent'
 			);
 		});
@@ -888,7 +888,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params(options, [ 'browser_fingerprint_id' ]),
+				testUtils.params(options),
 				'All params sent'
 			);
 		});
@@ -909,10 +909,7 @@ describe('Branch', function() {
 			requests[0].callback();
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params(
-					{ "amount": 1, "bucket": "testbucket" },
-					[ 'browser_fingerprint_id' ]
-				),
+				testUtils.params({ "amount": 1, "bucket": "testbucket" }),
 				'All params sent'
 			);
 		});
