@@ -88,6 +88,7 @@ function defaults(obj) {
 		def = {
 			"session_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
+			"browser_fingerprint_id": validator(true, branch_id),
 			"sdk": validator(true, validationTypes.STRING)
 		};
 	}

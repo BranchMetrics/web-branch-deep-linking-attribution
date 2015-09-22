@@ -190,6 +190,14 @@ Branch.prototype._api = function(resource, obj, callback) {
 		}
 	}
 
+	if (WEB_BUILD) {
+		if (((resource.params && resource.params['browser_fingerprint_id']) ||
+				(resource.queryPart && resource.queryPart['browser_fingerprint_id'])) &&
+				this.browser_fingerprint_id) {
+			obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
+		}
+	}
+
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
@@ -340,6 +348,9 @@ Branch.prototype['init'] = wrap(
 				if (data['link_click_id']) {
 					self.link_click_id = data['link_click_id'];
 				}
+			}
+			if (WEB_BUILD) {
+				self.browser_fingerprint_id = data['browser_fingerprint_id'];
 			}
 			return data;
 		};
