@@ -1104,6 +1104,7 @@ Server.prototype.createScript = function(a) {
   b.type = "text/javascript";
   b.async = !0;
   b.src = a;
+  console.log(b);
   document.getElementsByTagName("head")[0].appendChild(b);
 };
 var jsonp_callback_index = 0;
