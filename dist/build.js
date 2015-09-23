@@ -1104,7 +1104,6 @@ Server.prototype.createScript = function(a) {
   b.type = "text/javascript";
   b.async = !0;
   b.src = a;
-  console.log(b);
   document.getElementsByTagName("head")[0].appendChild(b);
 };
 var jsonp_callback_index = 0;
@@ -1140,6 +1139,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
       402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
     }
   }) : (f.onerror = function(a) {
+    console.log(a);
     e(Error(a.error || "Error in API: " + f.status), null, f.status);
   }, f.onreadystatechange = function() {
     if (4 === f.readyState) {
