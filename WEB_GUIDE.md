@@ -56,7 +56,7 @@ In addition to working as a standalone library, the Branch SDK works great in Co
 
 #### Initialization and Event Handling
 
-You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+You should initialize the Branch SDK session once the 'deviceready' event fires and each time the 'resume' event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
   branch.init("YOUR BRANCH KEY HERE", function(err, data) {
@@ -64,7 +64,7 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
   });
 ```
 
-The session close will be sent automatically on any ‘pause’ event.
+The session close will be sent automatically on any 'pause' event.
 
 ### SDK Method Queue
 

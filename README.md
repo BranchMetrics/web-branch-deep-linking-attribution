@@ -50,7 +50,7 @@ The Web SDK is provided as a plugin for Cordova and can be installed with Cordov
 $ cordova plugin add https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK
 ```
 
-You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+You should initialize the Branch SDK session once the 'deviceready' event fires and each time the 'resume' event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
   branch.init("YOUR BRANCH KEY HERE", function(err, data) {
@@ -64,7 +64,7 @@ You should initialize the Branch SDK session once the ‘deviceready’ event fi
 
 The Web SDK is provided as a module for Titanium.
 
-You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+You should initialize the Branch SDK session once the 'deviceready' event fires and each time the 'resume' event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
   branch.init("YOUR BRANCH KEY HERE", function(err, data) {
