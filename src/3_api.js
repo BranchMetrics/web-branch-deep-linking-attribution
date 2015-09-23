@@ -229,11 +229,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 			if (req.status === 402) {
 				callback(new Error('Not enough credits to redeem.'), null, req.status);
 			}
-			else if (e.error) {
-				callback(new Error(e.error), null, req.status);
-			}
 			else {
-				callback(new Error('Error in API: ' + req.status), null, req.status);
+				callback(new Error(e.error || ('Error in API: ' + req.status)), null, req.status);
 			}
 		};
 		req.onload = function() {
@@ -255,6 +252,9 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		};
 	}
 	else {
+		req.onerror = function(e) {
+			callback(new Error(e.error || ('Error in API: ' + req.status)), null, req.status);
+		};
 		req.onreadystatechange = function() {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
@@ -280,9 +280,12 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		req.open(method, url, true);
 		req.timeout = TIMEOUT;
 		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		console.log('before sending');
 		req.send(data);
+		console.log('after sending');
 	}
 	catch (e) {
+		console.log('after catching');
 		storage.set('use_jsonp', true);
 		this.jsonpRequest(url, data, method, callback);
 	}
