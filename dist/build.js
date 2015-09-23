@@ -1154,9 +1154,9 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     }
   });
   try {
-    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), console.log("before sending"), f.send(b), console.log("after sending");
+    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
-    console.log("after catching"), d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
+    d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
 Server.prototype.request = function(a, b, c, d) {
@@ -1585,7 +1585,6 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  console.log("called");
   this._api(resources.link, utils.cleanLinkData(b, config), function(b, d) {
     a(b, d && d.url);
   });

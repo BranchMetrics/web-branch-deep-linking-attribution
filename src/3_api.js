@@ -280,12 +280,9 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		req.open(method, url, true);
 		req.timeout = TIMEOUT;
 		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-		console.log('before sending');
 		req.send(data);
-		console.log('after sending');
 	}
 	catch (e) {
-		console.log('after catching');
 		storage.set('use_jsonp', true);
 		this.jsonpRequest(url, data, method, callback);
 	}
