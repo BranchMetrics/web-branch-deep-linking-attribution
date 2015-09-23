@@ -254,6 +254,26 @@ describe('Server', function() {
 			requests[0].responseText = responseText;
 			requests[0].onreadystatechange();
 		});
+
+		it('should error on onerror()', function(done) {
+			var assert = testUtils.plan(1, done);
+			var responseText = 'response';
+			server.XHRRequest(
+				resources.profile,
+				testUtils.params({ "identity": "test_id" }),
+				'POST',
+				storage,
+				function(err) {
+					assert.strictEqual(
+						err.message,
+						'Error in API: 1234',
+						'correct error message'
+					);
+				}
+			);
+			requests[0].status = 1234;
+			requests[0].onerror(new Error('sample error'));
+		});
 	});
 
 	describe('Resources', function() {

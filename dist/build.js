@@ -167,7 +167,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   var a = goog.global.document;
   return "undefined" != typeof a && "write" in a;
 }, goog.findBasePath_ = function() {
-  if (goog.global.CLOSURE_BASE_PATH) {
+  if (goog.isDef(goog.global.CLOSURE_BASE_PATH)) {
     goog.basePath = goog.global.CLOSURE_BASE_PATH;
   } else {
     if (goog.inHtmlDocument_()) {
@@ -182,7 +182,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   }
 }, goog.importScript_ = function(a, b) {
   (goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_)(a, b) && (goog.dependencies_.written[a] = !0);
-}, goog.IS_OLD_IE_ = !goog.global.atob && goog.global.document && goog.global.document.all, goog.importModule_ = function(a) {
+}, goog.IS_OLD_IE_ = !(goog.global.atob || !goog.global.document || !goog.global.document.all), goog.importModule_ = function(a) {
   goog.importScript_("", 'goog.retrieveAndExecModule_("' + a + '");') && (goog.dependencies_.written[a] = !0);
 }, goog.queuedModules_ = [], goog.wrapModule_ = function(a, b) {
   return goog.LOAD_MODULE_USING_EVAL && goog.isDef(goog.global.JSON) ? "goog.loadModule(" + goog.global.JSON.stringify(b + "\n//# sourceURL=" + a + "\n") + ");" : 'goog.loadModule(function(exports) {"use strict";' + b + "\n;return exports});\n//# sourceURL=" + a + "\n";
@@ -475,15 +475,26 @@ goog.globalEval = function(a) {
     goog.global.execScript(a, "JavaScript");
   } else {
     if (goog.global.eval) {
-      if (null == goog.evalWorksForGlobals_ && (goog.global.eval("var _et_ = 1;"), "undefined" != typeof goog.global._et_ ? (delete goog.global._et_, goog.evalWorksForGlobals_ = !0) : goog.evalWorksForGlobals_ = !1), goog.evalWorksForGlobals_) {
+      if (null == goog.evalWorksForGlobals_) {
+        if (goog.global.eval("var _evalTest_ = 1;"), "undefined" != typeof goog.global._evalTest_) {
+          try {
+            delete goog.global._evalTest_;
+          } catch (b) {
+          }
+          goog.evalWorksForGlobals_ = !0;
+        } else {
+          goog.evalWorksForGlobals_ = !1;
+        }
+      }
+      if (goog.evalWorksForGlobals_) {
         goog.global.eval(a);
       } else {
-        var b = goog.global.document, c = b.createElement("SCRIPT");
-        c.type = "text/javascript";
-        c.defer = !1;
-        c.appendChild(b.createTextNode(a));
-        b.body.appendChild(c);
-        b.body.removeChild(c);
+        var c = goog.global.document, d = c.createElement("SCRIPT");
+        d.type = "text/javascript";
+        d.defer = !1;
+        d.appendChild(c.createTextNode(a));
+        c.body.appendChild(d);
+        c.body.removeChild(d);
       }
     } else {
       throw Error("goog.globalEval not available");
@@ -671,6 +682,7 @@ goog.json.Serializer.prototype.serializeInternal = function(a, b) {
         b.push(a);
         break;
       case "function":
+        b.push("null");
         break;
       default:
         throw Error("Unknown type: " + typeof a);;
@@ -1115,7 +1127,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     e(Error(utils.messages.timeout), null, 504);
   };
   TITANIUM_BUILD ? (f.onerror = function(a) {
-    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : a.error ? e(Error(a.error), null, f.status) : e(Error("Error in API: " + f.status), null, f.status);
+    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : e(Error(a.error || "Error in API: " + f.status), null, f.status);
   }, f.onload = function() {
     if (200 === f.status) {
       try {
@@ -1126,7 +1138,10 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     } else {
       402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
     }
-  }) : f.onreadystatechange = function() {
+  }) : (f.onerror = function(a) {
+    console.log(a);
+    e(Error(a.error || "Error in API: " + f.status), null, f.status);
+  }, f.onreadystatechange = function() {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
@@ -1138,7 +1153,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
         402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
-  };
+  });
   try {
     f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
