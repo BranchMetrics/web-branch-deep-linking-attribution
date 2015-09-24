@@ -68,15 +68,15 @@ Note that this SDK is meant for use with full Cordova/Phonegap apps.  If you are
 
 #### Initialization and Event Handling
 
-You should initialize the Branch SDK session once the ‘deviceready’ event fires and each time the ‘resume’ event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
+You should initialize the Branch SDK session once the 'deviceready' event fires and each time the 'resume' event fires.  See the example code below. You will need your Branch Key from the Branch dashboard.
 
 ```js
-  branch.init(‘YOUR BRANCH KEY HERE’, function(err, data) {
+  branch.init('YOUR BRANCH KEY HERE', function(err, data) {
   	app.initComplete(err, data);
   });
 ```
 
-The session close will be sent automatically on any ‘pause’ event.
+The session close will be sent automatically on any 'pause' event.
 
 ### Quick Install (Titanium)
 

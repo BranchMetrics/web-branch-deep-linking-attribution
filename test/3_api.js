@@ -254,6 +254,26 @@ describe('Server', function() {
 			requests[0].responseText = responseText;
 			requests[0].onreadystatechange();
 		});
+
+		it('should error on onerror()', function(done) {
+			var assert = testUtils.plan(1, done);
+			var responseText = 'response';
+			server.XHRRequest(
+				resources.profile,
+				testUtils.params({ "identity": "test_id" }),
+				'POST',
+				storage,
+				function(err) {
+					assert.strictEqual(
+						err.message,
+						'Error in API: 1234',
+						'correct error message'
+					);
+				}
+			);
+			requests[0].status = 1234;
+			requests[0].onerror(new Error('sample error'));
+		});
 	});
 
 	describe('Resources', function() {
@@ -461,6 +481,7 @@ describe('Server', function() {
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&identity=test_id&session_id=" + session_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key
 				);
@@ -562,6 +583,7 @@ describe('Server', function() {
 					requests[0].requestBody,
 					"session_id=" + session_id +
 						"&identity_id=" + identity_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key,
 					'Expected request body for the first request'
@@ -644,6 +666,7 @@ describe('Server', function() {
 					'https://api.branch.io/v1/referrals/' + identity_id +
 						'?session_id=' + session_id +
 						"&identity_id=" + identity_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version,
 					'Endpoint correct');
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
@@ -665,6 +688,7 @@ describe('Server', function() {
 					'https://api.branch.io/v1/referrals/' + identity_id +
 						'?session_id=' + session_id +
 						'&identity_id=' + identity_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						'&sdk=web' + config.version +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct');
@@ -705,6 +729,7 @@ describe('Server', function() {
 					'https://api.branch.io/v1/credits/' + identity_id +
 						'?session_id=' + session_id +
 						'&identity_id=' + identity_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						'&sdk=web' + config.version,
 					'Endpoint correct');
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
@@ -726,6 +751,7 @@ describe('Server', function() {
 					'https://api.branch.io/v1/credits/' + identity_id +
 						'?session_id=' + session_id +
 						'&identity_id=' + identity_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						'&sdk=web' + config.version +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct');
@@ -871,6 +897,7 @@ describe('Server', function() {
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&amount=1&bucket=testbucket&session_id=" + session_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key
 				);
@@ -991,6 +1018,7 @@ describe('Server', function() {
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
 						"&session_id=" + session_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key
 				);
@@ -1181,6 +1209,7 @@ describe('Server', function() {
 					"event=testevent" + metadataString +
 						"&session_id=" + session_id +
 						"&identity_id=" + identity_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key
 				);
@@ -1322,6 +1351,7 @@ describe('Server', function() {
 					requests[0].url,
 					"https://api.branch.io/v1/credithistory?session_id=" + session_id +
 						"&identity_id=" + identity_id +
+						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key,
 					'Endpoint correct'

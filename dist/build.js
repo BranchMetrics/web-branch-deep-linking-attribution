@@ -864,7 +864,7 @@ function validator(a, b) {
 var branch_id = /^[0-9]{15,20}$/;
 function defaults(a) {
   var b = {};
-  WEB_BUILD && (b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING)});
+  WEB_BUILD && (b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), browser_fingerprint_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING)});
   if (CORDOVA_BUILD || TITANIUM_BUILD) {
     b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING)};
   }
@@ -1127,7 +1127,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     e(Error(utils.messages.timeout), null, 504);
   };
   TITANIUM_BUILD ? (f.onerror = function(a) {
-    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : a.error ? e(Error(a.error), null, f.status) : e(Error("Error in API: " + f.status), null, f.status);
+    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : e(Error(a.error || "Error in API: " + f.status), null, f.status);
   }, f.onload = function() {
     if (200 === f.status) {
       try {
@@ -1138,7 +1138,9 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     } else {
       402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
     }
-  }) : f.onreadystatechange = function() {
+  }) : (f.onerror = function(a) {
+    e(Error(a.error || "Error in API: " + f.status), null, f.status);
+  }, f.onreadystatechange = function() {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
@@ -1150,7 +1152,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
         402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
-  };
+  });
   try {
     f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
@@ -1428,6 +1430,7 @@ Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id);
   (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
   (CORDOVA_BUILD || TITANIUM_BUILD) && (a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id);
+  WEB_BUILD && (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
   return this._server.request(a, b, this._storage, function(a, b) {
     c(a, b);
   });
@@ -1461,6 +1464,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
       d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
     }
+    WEB_BUILD && (d.browser_fingerprint_id = a.browser_fingerprint_id);
     return a;
   };
   b = c && "undefined" !== typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
