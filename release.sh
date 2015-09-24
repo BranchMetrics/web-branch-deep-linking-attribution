@@ -16,6 +16,13 @@ if [ "$branch" == "master" ]; then
 	exit 1
 fi
 
+# check whether the branch is clean
+if [[ $(git status --porcelain 2> /dev/null | tail -n1) != "" ]]
+then
+  echo 'ERROR: branch dirty'
+  exit 1
+fi
+
 read -p "Update CHANGELOG.md?" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
