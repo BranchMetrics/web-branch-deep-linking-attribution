@@ -23,7 +23,7 @@ Getting started with either a Web or Cordova integration is simple, and begins w
 
 ### [Full Documentation for the Web SDK](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md)
 
-Adding the Branch Web SDK source code to your project can be done manually, or by using Bower or npm: `bower install branch-web` or `npm install branch-web` respectively.
+Adding the Branch Web SDK source code to your project can be done manually, or by using Bower or npm: `bower install branch-web-sdk` or `npm install branch-web-sdk` respectively.
 
 __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings).__
 

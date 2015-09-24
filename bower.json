@@ -1,5 +1,5 @@
 {
-	"name": "branch-web",
+	"name": "branch-web-sdk",
 	"description": "The Branch Web SDK provides an easy way to interact with the Branch API, to track and attribute mobile app downloads and referrals.",
 	"version": "1.6.11",
 	"main": "dist/build.min.js",
