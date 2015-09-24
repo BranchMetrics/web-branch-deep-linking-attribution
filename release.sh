@@ -113,7 +113,7 @@ read -p "Can you visit https://cdn.branch.io/branch-$VERSION.min.js ?" -n 1 -r
 echo
 read -p "Is https://cdn.branch.io/example.html using the right version number $VERSION?" -n 1 -r
 echo
-read -p "Is https://www.npmjs.com/package/branch-web-sdk using the right version number $VERSION?" -n 1 -r
+read -p "Is https://www.npmjs.com/package/branch-sdk using the right version number $VERSION?" -n 1 -r
 echo
 
 echo
