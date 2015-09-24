@@ -1,6 +1,6 @@
 # Branch Web SDK Build and Release Documentation
 
-**Last Updated**: May 31st, 2015, by Scott Hasbrouck
+**Last Updated**: Sep. 24th, 2015
 
 The entire process for releasing new versions of the Branch SDK, and geenrating accompanying doumentation, is enitrley automated.
 
@@ -16,7 +16,7 @@ The entire process for releasing new versions of the Branch SDK, and geenrating 
 	+ Concatenation of full documentation for both Web and Cordova of an introdocution, an automatically generated table of contents, and JSDoc generated function descriptions and spec.
 
 + **Release.sh**
-	+ Version number management in `0_config.js`, `package.json`, `CHANGELOG.md`, `bower.json`, `plugin.xml`, Git commit and tag
+	+ Version number management in `0_config.js`, `package.json`, `CHANGELOG.md`, `bower.json`, Git commit and tag
 	+ Build a release build with the Makefile
 	+ Upload both the minified and gzipped Web SDK, and the example web testbed to S3
 	+ Publish to npm

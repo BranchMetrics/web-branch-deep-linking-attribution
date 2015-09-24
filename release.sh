@@ -39,9 +39,10 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json
+	sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION_NO_V\"/" package.json
 fi
 
-read -p "Bump changelog version? " -n 1 -r
+read -p "Bump CHANGELOG version? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
@@ -53,21 +54,7 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" bower.json
-fi
-
-read -p "Bump build number? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
 	sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION_NO_V\"/" bower.json
-	sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION_NO_V\"/" package.json
-fi
-
-read -p "Update plugin.xml? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	sed -i -e "s/version=\".*\"/version=\"$VERSION_NO_V\"/" plugin.xml
 fi
 
 make release
@@ -114,7 +101,7 @@ read -p "Clean up -e backup files?" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  rm -f bower.json-e CHANGELOG.md-e package.json-e plugin.xml-e src/0_config.js-e test/web-config.js-e
+  rm -f bower.json-e CHANGELOG.md-e package.json-e src/0_config.js-e test/web-config.js-e
 fi
 
 echo "Done script."
