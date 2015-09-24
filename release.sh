@@ -23,6 +23,10 @@ then
   exit 1
 fi
 
+# update to the latest
+git pull origin master
+git submodule foreach git pull origin master
+
 read -p "Update CHANGELOG.md?" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
