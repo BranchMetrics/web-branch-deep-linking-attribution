@@ -15,3 +15,10 @@ var CORDOVA_BUILD = false; // jshint unused:false
 
 /** @define {boolean} */
 var TITANIUM_BUILD = false; // jshint unused:false
+
+var isApp = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
+if (isApp && WEB_BUILD) {
+	console.warning("Please use Branch Cordova SDK instead. Visit " +
+		"https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK" +
+		" for more details.");
+}
