@@ -12,16 +12,20 @@ echo "Releasing Branch Web SDK"
 branch_name="$(git symbolic-ref HEAD 2>/dev/null)"
 branch_name=${branch_name##refs/heads/}
 if [ $branch_name != "master" ]; then
-  echo "ERROR: not on master branch"
+	echo "ERROR: not on master branch: "$branch_name
 	exit 1
 fi
 
 # check whether the branch is clean
-if [[ $(git status --porcelain 2> /dev/null | tail -n1) != "" ]]
-then
-  echo 'ERROR: branch dirty'
-  exit 1
-fi
+check_git_branch() {
+	if [[ $(git status --porcelain 2> /dev/null | tail -n1) != "" ]]
+	then
+		echo 'ERROR: branch dirty'
+		exit 1
+	fi
+}
+
+check_git_branch
 
 # update to the latest
 git pull origin master
@@ -30,8 +34,8 @@ read -p "Update CHANGELOG.md?" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  vi CHANGELOG.md
-  git commit -am "Updated CHANGELOG.md"
+	vi CHANGELOG.md
+	git commit -am "Updated CHANGELOG.md"
 fi
 
 echo "Building files"
@@ -73,8 +77,9 @@ read -p "Commit? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  git add .
+	git add dist/build.min.js.gz
 	git commit -am "Tagging release $VERSION"
+	check_git_branch
 fi
 
 read -p "Tag? " -n 1 -r
@@ -88,7 +93,7 @@ read -p "Copy to S3? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js  --acl public-read
+	aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
 	aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
 fi
 
@@ -99,21 +104,21 @@ then
 	npm publish
 fi
 
-read -p "Clean up -e backup files?" -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  rm -f bower.json-e CHANGELOG.md-e package.json-e src/0_config.js-e test/web-config.js-e
-fi
-
 read -p "Reset? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
 	make clean
-  make
+	make
 	git commit -am "Resetting to HEAD"
+fi
+
+read -p "Clean up -e backup files?" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	rm -f bower.json-e CHANGELOG.md-e package.json-e src/0_config.js-e test/web-config.js-e
 fi
 
 echo "Done script."
