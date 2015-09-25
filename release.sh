@@ -99,20 +99,21 @@ then
 	npm publish
 fi
 
-read -p "Reset? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
-	make clean && make
-	git commit -am "Resetting to HEAD"
-fi
-
 read -p "Clean up -e backup files?" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
   rm -f bower.json-e CHANGELOG.md-e package.json-e src/0_config.js-e test/web-config.js-e
+fi
+
+read -p "Reset? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
+	make clean
+  make
+	git commit -am "Resetting to HEAD"
 fi
 
 echo "Done script."
