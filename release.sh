@@ -11,10 +11,20 @@ echo "Releasing Branch Web SDK"
 # check whether on master branch
 branch_name="$(git symbolic-ref HEAD 2>/dev/null)"
 branch_name=${branch_name##refs/heads/}
-if [ "$branch" == "master" ]; then
+if [ $branch_name != "master" ]; then
   echo "ERROR: not on master branch"
 	exit 1
 fi
+
+# check whether the branch is clean
+if [[ $(git status --porcelain 2> /dev/null | tail -n1) != "" ]]
+then
+  echo 'ERROR: branch dirty'
+  exit 1
+fi
+
+# update to the latest
+git pull origin master
 
 read -p "Update CHANGELOG.md?" -n 1 -r
 echo
