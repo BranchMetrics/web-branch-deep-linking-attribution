@@ -73,6 +73,7 @@ read -p "Commit? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+  git add .
 	git commit -am "Tagging release $VERSION"
 fi
 
