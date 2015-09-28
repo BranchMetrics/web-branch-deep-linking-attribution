@@ -878,7 +878,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	this._api(resources.link, utils.cleanLinkData(data, config), function(err, data) {
+	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
 		done(err, data && data['url']);
 	});
 });
@@ -1000,7 +1000,7 @@ Branch.prototype['sendSMS'] = wrap(
 		else {
 			self._api(
 				resources.link,
-				utils.cleanLinkData(linkData, config),
+				utils.cleanLinkData(linkData),
 				function(err, data) {
 					if (err) {
 						return done(err);

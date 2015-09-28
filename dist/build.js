@@ -759,11 +759,11 @@ utils.message = function(a, b) {
 utils.whiteListSessionData = function(a) {
   return {data:a.data || null, data_parsed:a.data_parsed || null, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
-utils.cleanLinkData = function(a, b) {
+utils.cleanLinkData = function(a) {
   WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
   try {
     JSON.parse(a.data);
-  } catch (c) {
+  } catch (b) {
     a.data = goog.json.serialize(a.data || {});
   }
   return a;
@@ -1586,7 +1586,7 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  this._api(resources.link, utils.cleanLinkData(b, config), function(b, d) {
+  this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
     a(b, d && d.url);
   });
 });
@@ -1605,7 +1605,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" !== c.channel || (c.channel = "sms");
   var g = f._referringLink();
-  g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c, config), function(b, c) {
+  g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c), function(b, c) {
     if (b) {
       return a(b);
     }
