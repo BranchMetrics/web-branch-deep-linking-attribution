@@ -93,7 +93,7 @@ utils.whiteListSessionData = function(data) {
 	};
 };
 
-utils.cleanLinkData = function(linkData, config) {
+utils.cleanLinkData = function(linkData) {
 	/* jshint undef:false */
 	if (WEB_BUILD) {
 		/* jshint undef:true */
