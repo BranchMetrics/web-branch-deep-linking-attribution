@@ -922,7 +922,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ##### Example
  * ```js
  * branch.sendSMS(
- *     phone: '9999999999',
+ *     '9999999999',
  *     {
  *         tags: ['tag1', 'tag2'],
  *         channel: 'facebook',
