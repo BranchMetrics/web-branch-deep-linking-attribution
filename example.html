@@ -169,7 +169,7 @@
 		$('#logout').click(function() {
 			request.html('branch.logout();');
 			branch.logout(function(err, data) {
-				response.html(err || JSON.stringify('undefined'));
+				response.html(err || 'undefined');
 			});
 		});
 		$('#track').click(function() {
@@ -180,7 +180,7 @@
 					'metadata foo': 'metadata bar'
 				},
 				function(err) {
-					response.html(err || JSON.stringify('no error'));
+					response.html(err || 'no error');
 				});
 		});
 		$('#link').click(function() {
