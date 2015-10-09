@@ -325,7 +325,7 @@ branch.sendSMS(
 ##### Example
 ```js
 branch.sendSMS(
-    phone: '9999999999',
+    '9999999999',
     {
         tags: ['tag1', 'tag2'],
         channel: 'facebook',
