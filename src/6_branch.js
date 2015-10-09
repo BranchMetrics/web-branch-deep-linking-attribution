@@ -541,6 +541,31 @@ Branch.prototype['init'] = wrap(
 );
 
 /**
+ * @function Branch.deepview
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ */
+Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
+	var self = this;
+
+	var getBranchEquivalentUrl = function(branch_key, params) {
+		var url = 'https://bnc.lt/a/' + branch_key + '?';
+		if (params) {
+			for (var key in params) {
+				if (params.hasOwnProperty(key)) {
+					url += '&' + encodeURIComponent(key) +
+						'=' + encodeURIComponent(params[key]);
+				}
+			}
+		}
+		Branch.prototype._equivalent_base_url = url;
+		return url + '&js_embed=true';
+	};
+	this._server.createScript(getBranchEquivalentUrl(self.branch_key, data['url_params']));
+
+	done(self._equivalent_base_url, null);
+});
+
+/**
  * @function Branch.data
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *

@@ -1531,6 +1531,19 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }
   }
 }, !0);
+Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
+  this._server.createScript(function(a, b) {
+    var c = "https://bnc.lt/a/" + a + "?";
+    if (b) {
+      for (var g in b) {
+        b.hasOwnProperty(g) && (c += "&" + encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
+      }
+    }
+    Branch.prototype._equivalent_base_url = c;
+    return c + "&js_embed=true";
+  }(this.branch_key, b.url_params));
+  a(this._equivalent_base_url, null);
+});
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));
   b.referring_link = this._referringLink();

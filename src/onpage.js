@@ -40,6 +40,7 @@
 		'creditHistory',
 		'credits',
 		'data',
+		'deepview',
 		'first',
 		'getCode',
 		'init',
