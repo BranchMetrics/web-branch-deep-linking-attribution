@@ -547,20 +547,18 @@ Branch.prototype['init'] = wrap(
 Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
 	var self = this;
 
-	var getBranchEquivalentUrl = function(branch_key, params) {
-		var url = 'https://bnc.lt/a/' + branch_key + '?';
-		if (params) {
-			for (var key in params) {
-				if (params.hasOwnProperty(key)) {
-					url += '&' + encodeURIComponent(key) +
-						'=' + encodeURIComponent(params[key]);
-				}
+	var url = 'https://bnc.lt/a/' + self.branch_key + '?';
+	var params = data['url_params'];
+	if (params) {
+		for (var key in params) {
+			if (params.hasOwnProperty(key)) {
+				url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
 			}
 		}
-		Branch.prototype._equivalent_base_url = url;
-		return url + '&js_embed=true';
-	};
-	this._server.createScript(getBranchEquivalentUrl(self.branch_key, data['url_params']));
+	}
+	Branch.prototype._equivalent_base_url = url;
+	var branchEquivalentUrl = url + '&js_embed=true';
+	this._server.createScript(branchEquivalentUrl);
 
 	done(self._equivalent_base_url, null);
 });

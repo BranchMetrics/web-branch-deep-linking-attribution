@@ -1532,16 +1532,14 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }
 }, !0);
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
-  this._server.createScript(function(a, b) {
-    var c = "https://bnc.lt/a/" + a + "?";
-    if (b) {
-      for (var g in b) {
-        b.hasOwnProperty(g) && (c += "&" + encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
-      }
+  c = "https://bnc.lt/a/" + this.branch_key + "?";
+  if (b = b.url_params) {
+    for (var d in b) {
+      b.hasOwnProperty(d) && (c += "&" + encodeURIComponent(d) + "=" + encodeURIComponent(b[d]));
     }
-    Branch.prototype._equivalent_base_url = c;
-    return c + "&js_embed=true";
-  }(this.branch_key, b.url_params));
+  }
+  Branch.prototype._equivalent_base_url = c;
+  this._server.createScript(c + "&js_embed=true");
   a(this._equivalent_base_url, null);
 });
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
