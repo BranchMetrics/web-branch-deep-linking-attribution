@@ -348,3 +348,21 @@ resources.event = {
 		"metadata": validator(true, validationTypes.OBJECT)
 	})
 };
+
+resources.deepview = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/deepview",
+	method: utils.httpMethod.POST,
+	ref: "obj",
+	params: defaults({
+		"alias": validator(false, validationTypes.STRING), // - right?
+		"campaign": validator(false, validationTypes.STRING),
+		"channel": validator(false, validationTypes.STRING),
+		"data": validator(false, validationTypes.STRING),
+		"feature": validator(false, validationTypes.STRING),
+		"identity_id": validator(true, branch_id), // ??
+		"stage": validator(false, validationTypes.STRING),
+		"tags": validator(false, validationTypes.ARRAY),
+		"type": validator(false, validationTypes.NUMBER) // - type 0 right?
+	})
+};
