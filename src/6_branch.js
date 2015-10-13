@@ -126,6 +126,12 @@ Branch = function() {
 	}
 	storageMethods.push('pojo');
 
+    try {
+        window.localStorage.getItem('test');
+    } catch(e) {
+        storageMethods = ['pojo'];
+    }
+
 	this._storage = new BranchStorage(storageMethods);
 
 	this._server = new Server();
