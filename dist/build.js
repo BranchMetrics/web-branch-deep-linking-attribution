@@ -896,6 +896,11 @@ var session = {get:function(a, b) {
 }};
 // Input 7
 var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
+  try {
+    window.localStorage.setItem(BRANCH_KEY_PREFIX + "test", "test"), window.localStorage.removeItem(BRANCH_KEY_PREFIX + "test");
+  } catch (d) {
+    a = ["pojo"];
+  }
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]], c = "function" === typeof c ? c() : c;
     if (c.isEnabled()) {
@@ -1398,11 +1403,6 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
   var a = [];
   CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && (a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"]);
   a.push("pojo");
-  try {
-    window.localStorage.getItem("test");
-  } catch (b) {
-    a = ["pojo"];
-  }
   this._storage = new BranchStorage(a);
   this._server = new Server;
   a = "web";
