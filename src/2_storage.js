@@ -30,6 +30,13 @@ if (TITANIUM_BUILD) {
  * @constructor
  */
 var BranchStorage = function(storageMethods) {
+    try {
+        window.localStorage.setItem(BRANCH_KEY_PREFIX + 'test', 'test');
+        window.localStorage.removeItem(BRANCH_KEY_PREFIX + 'test');
+    } catch(e) {
+        storageMethods = ['pojo'];
+    }
+
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
 		storageMethod = (typeof storageMethod === 'function') ? storageMethod() : storageMethod;
