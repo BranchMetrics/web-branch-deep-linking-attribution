@@ -135,7 +135,8 @@ if (WEB_BUILD) {
 			"link_url": validator(true, validationTypes.STRING)
 		},
 		params: {
-			"click": validator(true, validationTypes.STRING) }
+			"click": validator(true, validationTypes.STRING)
+		}
 	};
 
 	resources.SMSLinkSend = {
@@ -355,14 +356,13 @@ resources.deepview = {
 	method: utils.httpMethod.POST,
 	ref: "obj",
 	params: defaults({
-		"alias": validator(false, validationTypes.STRING), // - right?
 		"campaign": validator(false, validationTypes.STRING),
 		"channel": validator(false, validationTypes.STRING),
 		"data": validator(false, validationTypes.STRING),
+		"click_id": validator(false, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),
-		"identity_id": validator(true, branch_id), // ??
+		"open-app": validator(false, validationTypes.BOOLEAN), // implies link service change
 		"stage": validator(false, validationTypes.STRING),
-		"tags": validator(false, validationTypes.ARRAY),
-		"type": validator(false, validationTypes.NUMBER) // - type 0 right?
+		"tags": validator(false, validationTypes.ARRAY)
 	})
 };

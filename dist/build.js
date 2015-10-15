@@ -721,7 +721,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.7.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"http://localhost:5001", version:"1.7.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
 // Input 3
 var task_queue = function() {
@@ -893,8 +893,7 @@ resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:ut
 validationTypes.STRING)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT)})};
-resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
-validationTypes.NUMBER)})};
+resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", method:utils.httpMethod.POST, ref:"obj", params:defaults({campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), click_id:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), "open-app":validator(!1, validationTypes.BOOLEAN), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
 // Input 6
 var session = {get:function(a, b) {
   try {
@@ -1534,15 +1533,10 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }
 }, !0);
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
-  c = "https://bnc.lt/a/" + this.branch_key + "?";
-  if (b = b.url_params) {
-    for (var d in b) {
-      b.hasOwnProperty(d) && (c += "&" + encodeURIComponent(d) + "=" + encodeURIComponent(b[d]));
-    }
-  }
-  Branch.prototype._equivalent_base_url = c;
-  this._server.createScript(c + "&js_embed=true");
-  a(this._equivalent_base_url, null);
+  this._api(resources.deepview, utils.cleanLinkData(b), function(b, c) {
+    console.log("api deepview callback", b, c);
+    a(b, c);
+  });
 });
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));
