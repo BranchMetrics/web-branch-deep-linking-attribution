@@ -545,14 +545,23 @@ Branch.prototype['init'] = wrap(
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  */
 Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
+	var self = this;
 	if (!options) {
 		options = { };
 	}
 	var cleanedData = utils.cleanLinkData(data);
+
 	if (options['open_app']) {
 		cleanedData['open_app'] = true;
 	}
-	console.log('highlight me cleanLinkData', cleanedData);
+
+	var referringLink = self._referringLink();
+	if (referringLink && !options['make_new_link']) {
+		cleanedData['link_click_id'] = referringLink.substring(
+			referringLink.lastIndexOf('/') + 1, referringLink.length
+		);
+	}
+
 	this._api(resources.deepview, cleanedData, function(err, data) {
 		console.log('api deepview callback', err, data);
 		done(err, data);

@@ -1536,7 +1536,8 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, 
   c || (c = {});
   b = utils.cleanLinkData(b);
   c.open_app && (b.open_app = !0);
-  console.log("highlight me cleanLinkData", b);
+  var d = this._referringLink();
+  d && !c.make_new_link && (b.link_click_id = d.substring(d.lastIndexOf("/") + 1, d.length));
   this._api(resources.deepview, b, function(b, c) {
     console.log("api deepview callback", b, c);
     a(b, c);
@@ -1597,9 +1598,8 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  var c = utils.cleanLinkData(b);
-  this._api(resources.link, c, function(b, c) {
-    a(b, c && c.url);
+  this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
+    a(b, d && d.url);
   });
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
