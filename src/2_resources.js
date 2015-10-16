@@ -319,15 +319,32 @@ resources.link = {
 	method: utils.httpMethod.POST,
 	ref: "obj",
 	params: defaults({
-		"identity_id": validator(true, branch_id),
-		"data": validator(false, validationTypes.STRING),
-		"tags": validator(false, validationTypes.ARRAY),
-		"feature": validator(false, validationTypes.STRING),
+		"alias": validator(false, validationTypes.STRING),
 		"campaign": validator(false, validationTypes.STRING),
 		"channel": validator(false, validationTypes.STRING),
+		"data": validator(false, validationTypes.STRING),
+		"feature": validator(false, validationTypes.STRING),
+		"identity_id": validator(true, branch_id),
 		"stage": validator(false, validationTypes.STRING),
-		"type": validator(false, validationTypes.NUMBER),
-		"alias": validator(false, validationTypes.STRING)
+		"tags": validator(false, validationTypes.ARRAY),
+		"type": validator(false, validationTypes.NUMBER)
+	})
+};
+
+resources.deepview = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/deepview",
+	method: utils.httpMethod.POST,
+	ref: "obj",
+	params: defaults({
+		"campaign": validator(false, validationTypes.STRING),
+		"channel": validator(false, validationTypes.STRING),
+		"data": validator(false, validationTypes.STRING),
+		"feature": validator(false, validationTypes.STRING),
+		"link_click_id": validator(false, validationTypes.STRING),
+		"open-app": validator(false, validationTypes.BOOLEAN), // implies link service change
+		"stage": validator(false, validationTypes.STRING),
+		"tags": validator(false, validationTypes.ARRAY)
 	})
 };
 
@@ -347,22 +364,5 @@ resources.event = {
 	params: defaults({
 		"event": validator(true, validationTypes.STRING),
 		"metadata": validator(true, validationTypes.OBJECT)
-	})
-};
-
-resources.deepview = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/deepview",
-	method: utils.httpMethod.POST,
-	ref: "obj",
-	params: defaults({
-		"campaign": validator(false, validationTypes.STRING),
-		"channel": validator(false, validationTypes.STRING),
-		"data": validator(false, validationTypes.STRING),
-		"click_id": validator(false, validationTypes.STRING),
-		"feature": validator(false, validationTypes.STRING),
-		"open-app": validator(false, validationTypes.BOOLEAN), // implies link service change
-		"stage": validator(false, validationTypes.STRING),
-		"tags": validator(false, validationTypes.ARRAY)
 	})
 };

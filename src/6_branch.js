@@ -545,8 +545,15 @@ Branch.prototype['init'] = wrap(
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  */
 Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
-	// need to introduce options
-	this._api(resources.deepview, utils.cleanLinkData(data), function(err, data) {
+	if (!options) {
+		options = { };
+	}
+	var cleanedData = utils.cleanLinkData(data);
+	if (options['open_app']) {
+		cleanedData['open_app'] = true;
+	}
+	console.log('highlight me cleanLinkData', cleanedData);
+	this._api(resources.deepview, cleanedData, function(err, data) {
 		console.log('api deepview callback', err, data);
 		done(err, data);
 	});
