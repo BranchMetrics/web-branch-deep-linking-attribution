@@ -342,7 +342,7 @@ resources.deepview = {
 		"data": validator(false, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),
 		"link_click_id": validator(false, validationTypes.STRING),
-		"open-app": validator(false, validationTypes.BOOLEAN), // implies link service change
+		"open_app": validator(false, validationTypes.BOOLEAN),
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY)
 	})
