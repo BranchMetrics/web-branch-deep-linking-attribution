@@ -546,6 +546,7 @@ Branch.prototype['init'] = wrap(
  */
 Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
 	var self = this;
+
 	if (!options) {
 		options = { };
 	}
