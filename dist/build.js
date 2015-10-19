@@ -1101,12 +1101,11 @@ Server.prototype.getUrl = function(a, b) {
   "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
   return {data:this.serializeObject(l, ""), url:e};
 };
-Server.prototype.createScript = function(a) {
-  var b = document.createElement("script");
-  b.type = "text/javascript";
-  b.async = !0;
-  b.src = a;
-  document.getElementsByTagName("head")[0].appendChild(b);
+Server.prototype.createScript = function(a, b) {
+  var c = document.createElement("script");
+  c.type = "text/javascript";
+  b ? (c.defer = !0, c.text = a) : (c.async = !0, c.src = a);
+  document.getElementsByTagName("head")[0].appendChild(c);
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
@@ -1121,7 +1120,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window.clearTimeout(g);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, !1);
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
@@ -1533,13 +1532,15 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }
 }, !0);
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
+  var d = this;
   c || (c = {});
   b = utils.cleanLinkData(b);
   c.open_app && (b.open_app = !0);
-  var d = this._referringLink();
-  d && !c.make_new_link && (b.link_click_id = d.substring(d.lastIndexOf("/") + 1, d.length));
+  var e = d._referringLink();
+  e && !c.make_new_link && (b.link_click_id = e.substring(e.lastIndexOf("/") + 1, e.length));
   this._api(resources.deepview, b, function(b, c) {
-    console.log("api deepview callback", b, c);
+    b && a(b, c);
+    d._server.createScript(c[0], !0);
     a(b, c);
   });
 });

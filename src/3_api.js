@@ -163,11 +163,18 @@ Server.prototype.getUrl = function(resource, data) {
  * This function is standalone for easy mocking.
  * @param {string} src
  */
-Server.prototype.createScript = function(src) {
+Server.prototype.createScript = function(src, internal) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
-	script.async = true;
-	script.src = src;
+
+	if (internal) {
+		script.defer = true;
+		script.text = src;
+	}
+	else {
+		script.async = true;
+		script.src = src;
+	}
 
 	document.getElementsByTagName('head')[0].appendChild(script);
 };
@@ -203,9 +210,10 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 
 	this.createScript(
 		requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') +
-		(postData ? postPrefix + postData : '') +
-		(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
-		'&callback=' + callbackString);
+			(postData ? postPrefix + postData : '') +
+			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
+			'&callback=' + callbackString,
+		false /* internal */);
 };
 
 /**

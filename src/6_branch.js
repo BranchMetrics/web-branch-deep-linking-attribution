@@ -563,7 +563,11 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(
 	}
 
 	this._api(resources.deepview, cleanedData, function(err, data) {
-		console.log('api deepview callback', err, data);
+		if (err) {
+			done(err, data);
+		}
+
+		self._server.createScript(data[0], true /* internal */);
 		done(err, data);
 	});
 });
