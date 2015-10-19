@@ -1009,7 +1009,7 @@ Branch.prototype['sendSMS'] = wrap(
 					self._api(
 						resources.linkClick,
 						{
-							"link_url": 'l/' + url.split('/').pop(),
+							"link_url": url.substring(url.lastIndexOf(url.match(/\/\w\//)[0])),
 							"click": "click"
 						},
 						function(err, data) {

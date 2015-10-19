@@ -1609,7 +1609,8 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     if (b) {
       return a(b);
     }
-    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+    var d = c.url;
+    f._api(resources.linkClick, {link_url:d.substring(d.lastIndexOf(d.match(/\/\w\//)[0])), click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }
