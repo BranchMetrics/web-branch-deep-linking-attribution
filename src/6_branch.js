@@ -557,7 +557,11 @@ Branch.prototype['deepview'] = wrap(
 		if (cleanedData['tags']) {
 			cleanedData['tags'] = goog.json.serialize(cleanedData['tags']);
 		}
-		cleanedData['metadata'] = cleanedData['data'];
+
+		if (cleanedData['data']) {
+			cleanedData['metadata'] = cleanedData['data'];
+			delete cleanedData['data'];
+		}
 
 		if (options['open_app']) {
 			cleanedData['open_app'] = true;
@@ -581,35 +585,6 @@ Branch.prototype['deepview'] = wrap(
 		});
 	}
 );
-
-// Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
-// 	var self = this;
-
-// 	if (!options) {
-// 		options = { };
-// 	}
-// 	var cleanedData = utils.cleanLinkData(data);
-
-// 	if (options['open_app']) {
-// 		cleanedData['open_app'] = true;
-// 	}
-
-// 	var referringLink = self._referringLink();
-// 	if (referringLink && !options['make_new_link']) {
-// 		cleanedData['link_click_id'] = referringLink.substring(
-// 			referringLink.lastIndexOf('/') + 1, referringLink.length
-// 		);
-// 	}
-
-// 	this._api(resources.deepview, cleanedData, function(err, data) {
-// 		if (err) {
-// 			done(err, data);
-// 		}
-
-// 		self._server.createScript(data[0], true /* internal */);
-// 		done(err, data);
-// 	});
-// });
 
 /**
  * @function Branch.data
