@@ -1603,9 +1603,6 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  if (document.getElementById(DEEPVIEW_CTA_ELEMENT_ID)) {
-    return a(null, "__branchDeepviewCta");
-  }
   this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
     a(b, d && d.url);
   });

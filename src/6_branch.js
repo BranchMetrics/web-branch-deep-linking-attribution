@@ -580,9 +580,8 @@ Branch.prototype['deepview'] = wrap(
 		}
 
 		this._api(resources.deepview, cleanedData, function(err, data) {
-			console.log('highlight me err, data', err, data);
 			if (err) {
-				done(err);
+				return done(err);
 			}
 
 			self._server.createScript(data, DEEPVIEW_CTA_ELEMENT_ID, true /* internal */);
@@ -929,10 +928,6 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	if (document.getElementById(DEEPVIEW_CTA_ELEMENT_ID)) {
-		return done(null, '__branchDeepviewCta');
-	}
-
 	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
 		done(err, data && data['url']);
 	});
