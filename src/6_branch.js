@@ -39,6 +39,11 @@ var init_states = {
 	INIT_SUCCEEDED: 3
 };
 
+/**
+ * Elememt ID for deepveiw cta script
+ */
+var DEEPVIEW_CTA_ELEMENT_ID = 'branch-deepview-cta';
+
 /***
  * @param {number} parameters
  * @param {function(...?): undefined} func
@@ -580,7 +585,7 @@ Branch.prototype['deepview'] = wrap(
 				done(err);
 			}
 
-			self._server.createScript(data, true /* internal */);
+			self._server.createScript(data, DEEPVIEW_CTA_ELEMENT_ID, true /* internal */);
 			done(err, data);
 		});
 	}
@@ -924,6 +929,10 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+	if (document.getElementById(DEEPVIEW_CTA_ELEMENT_ID)) {
+		return done(null, '__branchDeepviewCta');
+	}
+
 	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
 		done(err, data && data['url']);
 	});

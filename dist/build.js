@@ -1101,11 +1101,12 @@ Server.prototype.getUrl = function(a, b) {
   "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
   return {data:this.serializeObject(l, ""), url:e};
 };
-Server.prototype.createScript = function(a, b) {
-  var c = document.createElement("script");
-  c.type = "text/javascript";
-  b ? (c.defer = !0, c.text = a) : (c.async = !0, c.src = a);
-  document.getElementsByTagName("head")[0].appendChild(c);
+Server.prototype.createScript = function(a, b, c) {
+  var d = document.createElement("script");
+  d.type = "text/javascript";
+  b && (d.id = b);
+  c ? (d.defer = !0, d.text = a) : (d.async = !0, d.src = a);
+  document.getElementsByTagName("head")[0].appendChild(d);
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
@@ -1372,7 +1373,7 @@ var sendSMS = function(a, b, c, d) {
   return m;
 };
 // Input 13
-var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, DEEPVIEW_CTA_ELEMENT_ID = "branch-deepview-cta", wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
     a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
@@ -1543,7 +1544,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, 
   this._api(resources.deepview, b, function(b, c) {
     console.log("highlight me err, data", b, c);
     b && a(b);
-    d._server.createScript(c, !0);
+    d._server.createScript(c, DEEPVIEW_CTA_ELEMENT_ID, !0);
     a(b, c);
   });
 });
@@ -1602,6 +1603,9 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
+  if (document.getElementById(DEEPVIEW_CTA_ELEMENT_ID)) {
+    return a(null, "__branchDeepviewCta");
+  }
   this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
     a(b, d && d.url);
   });

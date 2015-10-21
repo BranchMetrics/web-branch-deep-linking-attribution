@@ -165,9 +165,13 @@ Server.prototype.getUrl = function(resource, data) {
  * This function is standalone for easy mocking.
  * @param {string} src
  */
-Server.prototype.createScript = function(src, internal) {
+Server.prototype.createScript = function(src, elementId, internal) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
+
+	if (elementId) {
+		script.id = elementId;
+	}
 
 	if (internal) {
 		script.defer = true;
