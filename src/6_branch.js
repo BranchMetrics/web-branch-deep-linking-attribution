@@ -1633,7 +1633,8 @@ if (WEB_BUILD) {
 			desktopSticky: typeof options['desktopSticky'] === 'undefined' ?
 				true :
 				options['desktopSticky'],
-			make_new_link: !!options['make_new_link']
+			make_new_link: !!options['make_new_link'],
+			open_app: !!options['open_app']
 		};
 
 		if (typeof options['showMobile'] !== 'undefined') {

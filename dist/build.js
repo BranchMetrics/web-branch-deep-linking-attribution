@@ -1169,6 +1169,7 @@ Server.prototype.request = function(a, b, c, d) {
   var g, h = "";
   "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
   var k = RETRIES, l = function(a, b, c) {
+    console.log("highlight me done err data status", a, b, c);
     a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       n();
     }, RETRY_DELAY)) : d(a, b);
@@ -1333,16 +1334,25 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
-  if (utils.mobileUserAgent()) {
-    var g = a._referringLink();
-    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
-      a || (f.getElementById("branch-mobile-action").href = b);
+  if (b.open_app) {
+    b.open_app = !1, a.deepview(c, b, function(a, b) {
+      if (a) {
+        throw a;
+      }
+      f.getElementById("branch-mobile-action").onClick = null;
     });
   } else {
-    f.getElementById("sms-form").addEventListener("submit", function(d) {
-      d.preventDefault();
-      sendSMS(f, a, b, c);
-    });
+    if (utils.mobileUserAgent()) {
+      var g = a._referringLink();
+      g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
+        a || (f.getElementById("branch-mobile-action").href = b);
+      });
+    } else {
+      f.getElementById("sms-form").addEventListener("submit", function(d) {
+        d.preventDefault();
+        sendSMS(f, a, b, c);
+      });
+    }
   }
   var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
     setTimeout(function() {
@@ -1534,6 +1544,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
 }, !0);
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
   var d = this;
+  console.log("highlight me data and options in deepview", b, c);
   c || (c = {});
   b = utils.cleanLinkData(b);
   b.tags && (b.tags = goog.json.serialize(b.tags));
@@ -1545,6 +1556,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, 
     if (b) {
       return a(b);
     }
+    console.log("highlight me data from branchl", c);
     d._server.createScript(c, DEEPVIEW_CTA_ELEMENT_ID, !0);
     a(b, c);
   });
@@ -1669,10 +1681,9 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
     }
   }));
 }, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
-  console.log("highlight me", eval("__branchDeepviewCta"));
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === 
-  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};
+  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link, open_app:!!b.open_app};
   "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();

@@ -334,6 +334,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	 * @type {function(?Error,*=): ?undefined}
 	 */
 	var done = function(err, data, status) {
+		console.log('highlight me done err data status', err, data, status);
 		if (err && retries > 0 && status.toString().substring(0, 1) === '5') {
 			retries--;
 			window.setTimeout(function() {
