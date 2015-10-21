@@ -1121,7 +1121,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window.clearTimeout(g);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, !1);
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, null, !1);
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
@@ -1542,8 +1542,9 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, 
   var e = d._referringLink();
   e && !c.make_new_link && (b.link_click_id = e.substring(e.lastIndexOf("/") + 1, e.length));
   this._api(resources.deepview, b, function(b, c) {
-    console.log("highlight me err, data", b, c);
-    b && a(b);
+    if (b) {
+      return a(b);
+    }
     d._server.createScript(c, DEEPVIEW_CTA_ELEMENT_ID, !0);
     a(b, c);
   });
@@ -1668,6 +1669,7 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
     }
   }));
 }, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+  console.log("highlight me", eval("__branchDeepviewCta"));
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === 
   typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};

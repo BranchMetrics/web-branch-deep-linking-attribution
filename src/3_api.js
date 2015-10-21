@@ -219,7 +219,8 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 			(postData ? postPrefix + postData : '') +
 			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
 			'&callback=' + callbackString,
-		false /* internal */);
+		null,
+		false);
 };
 
 /**

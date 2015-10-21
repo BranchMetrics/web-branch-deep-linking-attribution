@@ -584,7 +584,7 @@ Branch.prototype['deepview'] = wrap(
 				return done(err);
 			}
 
-			self._server.createScript(data, DEEPVIEW_CTA_ELEMENT_ID, true /* internal */);
+			self._server.createScript(data, DEEPVIEW_CTA_ELEMENT_ID, true);
 			done(err, data);
 		});
 	}
