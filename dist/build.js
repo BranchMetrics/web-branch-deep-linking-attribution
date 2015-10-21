@@ -1542,7 +1542,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, 
   e && !c.make_new_link && (b.link_click_id = e.substring(e.lastIndexOf("/") + 1, e.length));
   this._api(resources.deepview, b, function(b, c) {
     console.log("highlight me err, data", b, c);
-    b && a(b, c);
+    b && a(b);
     d._server.createScript(c, !0);
     a(b, c);
   });

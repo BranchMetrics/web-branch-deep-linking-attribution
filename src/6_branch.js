@@ -577,7 +577,7 @@ Branch.prototype['deepview'] = wrap(
 		this._api(resources.deepview, cleanedData, function(err, data) {
 			console.log('highlight me err, data', err, data);
 			if (err) {
-				done(err, data);
+				done(err);
 			}
 
 			self._server.createScript(data, true /* internal */);
