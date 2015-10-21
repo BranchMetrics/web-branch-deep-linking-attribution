@@ -139,7 +139,9 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.method === 'POST' || resource.endpoint === '/v1/credithistory') {
+	if (resource.method === 'POST' ||
+			resource.endpoint === '/v1/credithistory' ||
+			resource.endpoint === '/v1/deepview') {
 		try {
 			data = appendKeyOrId(data, d);
 		}

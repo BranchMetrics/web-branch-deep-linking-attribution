@@ -331,20 +331,37 @@ resources.link = {
 	})
 };
 
+// resources.deepviewpost = {
+// 	destination: config.api_endpoint,
+// 	endpoint: "/v1/deepview",
+// 	method: utils.httpMethod.POST,
+// 	ref: "obj",
+// 	params: defaults({
+// 		"campaign": validator(false, validationTypes.STRING),
+// 		"channel": validator(false, validationTypes.STRING),
+// 		"data": validator(false, validationTypes.STRING),
+// 		"feature": validator(false, validationTypes.STRING),
+// 		"link_click_id": validator(false, validationTypes.STRING),
+// 		"open_app": validator(false, validationTypes.BOOLEAN),
+// 		"stage": validator(false, validationTypes.STRING),
+// 		"tags": validator(false, validationTypes.ARRAY)
+// 	})
+// };
+
 resources.deepview = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/deepview",
-	method: utils.httpMethod.POST,
-	ref: "obj",
+	jsonp: true,
+	method: utils.httpMethod.GET,
 	params: defaults({
 		"campaign": validator(false, validationTypes.STRING),
 		"channel": validator(false, validationTypes.STRING),
-		"data": validator(false, validationTypes.STRING),
+		"metadata": validator(true, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),
 		"link_click_id": validator(false, validationTypes.STRING),
 		"open_app": validator(false, validationTypes.BOOLEAN),
 		"stage": validator(false, validationTypes.STRING),
-		"tags": validator(false, validationTypes.ARRAY)
+		"tags": validator(false, validationTypes.STRING)
 	})
 };
 

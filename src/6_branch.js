@@ -544,34 +544,72 @@ Branch.prototype['init'] = wrap(
  * @function Branch.deepview
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  */
-Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
-	var self = this;
+Branch.prototype['deepview'] = wrap(
+	callback_params.CALLBACK_ERR_DATA,
+	function(done, data, options) {
+		var self = this;
 
-	if (!options) {
-		options = { };
-	}
-	var cleanedData = utils.cleanLinkData(data);
+		if (!options) {
+			options = { };
+		}
+		var cleanedData = utils.cleanLinkData(data);
 
-	if (options['open_app']) {
-		cleanedData['open_app'] = true;
-	}
+		if (cleanedData['tags']) {
+			cleanedData['tags'] = goog.json.serialize(cleanedData['tags']);
+		}
+		cleanedData['metadata'] = cleanedData['data'];
 
-	var referringLink = self._referringLink();
-	if (referringLink && !options['make_new_link']) {
-		cleanedData['link_click_id'] = referringLink.substring(
-			referringLink.lastIndexOf('/') + 1, referringLink.length
-		);
-	}
-
-	this._api(resources.deepview, cleanedData, function(err, data) {
-		if (err) {
-			done(err, data);
+		if (options['open_app']) {
+			cleanedData['open_app'] = true;
 		}
 
-		self._server.createScript(data[0], true /* internal */);
-		done(err, data);
-	});
-});
+		var referringLink = self._referringLink();
+		if (referringLink && !options['make_new_link']) {
+			cleanedData['link_click_id'] = referringLink.substring(
+				referringLink.lastIndexOf('/') + 1, referringLink.length
+			);
+		}
+
+		this._api(resources.deepview, cleanedData, function(err, data) {
+			console.log('highlight me err, data', err, data);
+			if (err) {
+				done(err, data);
+			}
+
+			// self._server.createScript(data[0], true /* internal */);
+			done(err, data);
+		});
+	}
+);
+
+// Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data, options) {
+// 	var self = this;
+
+// 	if (!options) {
+// 		options = { };
+// 	}
+// 	var cleanedData = utils.cleanLinkData(data);
+
+// 	if (options['open_app']) {
+// 		cleanedData['open_app'] = true;
+// 	}
+
+// 	var referringLink = self._referringLink();
+// 	if (referringLink && !options['make_new_link']) {
+// 		cleanedData['link_click_id'] = referringLink.substring(
+// 			referringLink.lastIndexOf('/') + 1, referringLink.length
+// 		);
+// 	}
+
+// 	this._api(resources.deepview, cleanedData, function(err, data) {
+// 		if (err) {
+// 			done(err, data);
+// 		}
+
+// 		self._server.createScript(data[0], true /* internal */);
+// 		done(err, data);
+// 	});
+// });
 
 /**
  * @function Branch.data
