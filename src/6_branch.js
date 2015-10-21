@@ -580,7 +580,7 @@ Branch.prototype['deepview'] = wrap(
 				done(err, data);
 			}
 
-			// self._server.createScript(data[0], true /* internal */);
+			self._server.createScript(data, true /* internal */);
 			done(err, data);
 		});
 	}

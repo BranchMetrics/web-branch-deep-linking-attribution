@@ -1532,16 +1532,18 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }
 }, !0);
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
+  var d = this;
   c || (c = {});
   b = utils.cleanLinkData(b);
   b.tags && (b.tags = goog.json.serialize(b.tags));
   b.data && (b.metadata = b.data, delete b.data);
   c.open_app && (b.open_app = !0);
-  var d = this._referringLink();
-  d && !c.make_new_link && (b.link_click_id = d.substring(d.lastIndexOf("/") + 1, d.length));
+  var e = d._referringLink();
+  e && !c.make_new_link && (b.link_click_id = e.substring(e.lastIndexOf("/") + 1, e.length));
   this._api(resources.deepview, b, function(b, c) {
     console.log("highlight me err, data", b, c);
     b && a(b, c);
+    d._server.createScript(c, !0);
     a(b, c);
   });
 });
