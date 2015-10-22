@@ -467,6 +467,11 @@ try to open app, and to visit the platform-appropriate app stores if the open-ap
 
 If *branch.deepview* has not been called, an error will arise with a reminder to call
 *branch.deepview* first.
+
+##### Usage
+```js
+branch.deepviewCta();
+```
 ___
 
 # Referral system rewarding functionality

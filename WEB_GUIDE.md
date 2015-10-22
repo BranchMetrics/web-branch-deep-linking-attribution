@@ -93,7 +93,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
   + [.link()](#linkdata-callback)
   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
   + [.deepview()](#deepviewdata-options-callback)
-  + [.deepviewCta()](#deepviewcallback)
+  + [.deepviewCta()](#deepviewctaperform)
 
 4. Referrals and Credits
   + [.referrals()](#referralscallback)
@@ -581,6 +581,11 @@ try to open app, and to visit the platform-appropriate app stores if the open-ap
 
 If *branch.deepview* has not been called, an error will arise with a reminder to call
 *branch.deepview* first.
+
+##### Usage
+```js
+branch.deepviewCta();
+```
 ___
 
 # Referral system rewarding functionality

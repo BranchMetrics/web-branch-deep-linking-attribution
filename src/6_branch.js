@@ -1165,6 +1165,11 @@ Branch.prototype['deepview'] = wrap(
  *
  * If *branch.deepview* has not been called, an error will arise with a reminder to call
  * *branch.deepview* first.
+ *
+ * ##### Usage
+ * ```js
+ * branch.deepviewCta();
+ * ```
  * ___
  *
  * # Referral system rewarding functionality
@@ -1180,7 +1185,7 @@ Branch.prototype['deepview'] = wrap(
  * ## Retrieve referrals list
  *
  */
-/*** +TOC_ITEM #deepviewcallback &.deepviewCta()& ^ALL ***/
+/*** +TOC_ITEM #deepviewctaperform &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
 		return done(new Error(
