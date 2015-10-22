@@ -1254,7 +1254,7 @@ banner_css.css = function(a, b) {
 var banner_html = {banner:function(a, b) {
   return '<div class="content"><div class="right vertically-align-middle">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + '</div><div class="description">' + a.description + "</div></div></div></div>";
 }, mobileAction:function(a, b, c) {
-  return '<a id="branch-mobile-action" href="#" target="_parent">' + (session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+  return '<a id="branch-mobile-action" href="#" target="_parent" onclick="return true">' + (session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
   return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
@@ -1332,25 +1332,28 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
-  if (b.open_app) {
-    b.open_app = !1, a.deepview(c, b, function(a) {
+  b.open_app = !1;
+  a.deepview(c, b, function(a) {
+    if (a) {
+      throw a;
+    }
+    console.log(f.getElementById("sms-form"));
+  });
+  if (utils.mobileUserAgent()) {
+    var g = a._referringLink();
+    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : b.open_app ? (b.open_app = !1, a.deepview(c, b, function(a) {
       if (a) {
         throw a;
       }
-      f.getElementById("branch-mobile-action").onClick = null;
+      f.getElementById("branch-mobile-action").onclick = "branch.deepviewCta(); return false";
+    })) : a.link(c, function(a, b) {
+      a || (f.getElementById("branch-mobile-action").href = b);
     });
   } else {
-    if (utils.mobileUserAgent()) {
-      var g = a._referringLink();
-      g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
-        a || (f.getElementById("branch-mobile-action").href = b);
-      });
-    } else {
-      f.getElementById("sms-form").addEventListener("submit", function(d) {
-        d.preventDefault();
-        sendSMS(f, a, b, c);
-      });
-    }
+    f.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(f, a, b, c);
+    });
   }
   var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
     setTimeout(function() {

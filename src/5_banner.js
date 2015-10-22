@@ -117,19 +117,20 @@ banner = function(branch, options, linkData, storage) {
 
 	var doc = options.iframe ? element.contentWindow.document : document;
 
-	if (options.open_app) {
-		options.open_app = false;
-		branch['deepview'](linkData, options, function(err) {
-			if (err) {
-				throw err;
-			}
-			doc.getElementById('branch-mobile-action').onClick = null;
-		});
-	}
-	else if (utils.mobileUserAgent()) {
+	if (utils.mobileUserAgent()) {
 		var referringLink = branch._referringLink();
 		if (referringLink && !options['make_new_link']) {
 			doc.getElementById('branch-mobile-action').href = referringLink;
+		}
+		else if (options.open_app) {
+			options.open_app = false;
+			branch['deepview'](linkData, options, function(err) {
+				if (err) {
+					throw err;
+				}
+				doc.getElementById('branch-mobile-action').onclick =
+					'branch.deepviewCta(); return false';
+			});
 		}
 		else {
 			branch['link'](linkData, function(err, url) {
