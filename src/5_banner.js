@@ -119,10 +119,7 @@ banner = function(branch, options, linkData, storage) {
 
 	if (utils.mobileUserAgent()) {
 		var referringLink = branch._referringLink();
-		if (referringLink && !options['make_new_link']) {
-			doc.getElementById('branch-mobile-action').href = referringLink;
-		}
-		else if (options.open_app) {
+		if (options.open_app) {
 			options.open_app = false;
 			branch['deepview'](linkData, options, function(err) {
 				if (err) {
@@ -131,6 +128,9 @@ banner = function(branch, options, linkData, storage) {
 				doc.getElementById('branch-mobile-action').onclick =
 					'branch.deepviewCta(); return false';
 			});
+		}
+		else if (referringLink && !options['make_new_link']) {
+			doc.getElementById('branch-mobile-action').href = referringLink;
 		}
 		else {
 			branch['link'](linkData, function(err, url) {
