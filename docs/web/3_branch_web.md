@@ -456,7 +456,13 @@ callback(
 
 
 
-### Branch.deepviewCta
+### deepviewCta(event, silent) 
+
+**Parameters**
+
+**event**: `Object`, _optional_ - from the event binding function
+
+**silent**: `boolean`, _optional_ - whether to fail silently or throw an error if branch.deepview() hasn't been called. When *event* is set, this is implied to be *true*.
 
 Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
 *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
@@ -465,11 +471,30 @@ deepview finishes, and thus the CTA is to visit the platform-appropriate app sto
 other hand, the deepview is configured with the option *`open_app`* being false, the CTA is to
 try to open app, and to visit the platform-appropriate app stores if the open-app attempt failes.
 
-If *branch.deepview* has not been called, an error will arise with a reminder to call
-*branch.deepview* first.
+If *branch.deepview* has not been called and *silent* is not set to true, an error will arise
+with a reminder to call *branch.deepview* first.
 
 ##### Usage
 ```js
+// If you're using jQuery, then:
+$('a.deepview-cta').click(branch.deepviewCta);
+
+// Or you can:
+document.getElementById('my-elem').onClick = branch.deepviewCta;
+
+// Or in HTML you can:
+<a href='...' onclick='return branch.deepviewCta(null, true)'>
+
+// If you wish to dedicate a CTA link only to branch deepviewCta, you can:
+branch.deepview(data, option, function(err) {
+    if (err) {
+        throw err;
+    }
+    ${'a.deepview-cta').click = branch.deepviewCta(null, false);
+});
+
+```
+// You can call this function any time after branch.deepview() is finished by simply:
 branch.deepviewCta();
 ```
 ___
@@ -477,14 +502,14 @@ ___
 # Referral system rewarding functionality
 In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
-2. Reward the invitee for installing the app from the original user&#39;s referral link
+2. Reward the invitee for installing the app from the original user's referral link
 3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
 
-These reward definitions are created on the dashboard, under the &#39;Reward Rules&#39; section in the &#39;Referrals&#39; tab on the dashboard.
+These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
 
 Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
 
-## Retrieve referrals list() 
+## Retrieve referrals list
 
 
 

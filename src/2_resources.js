@@ -344,7 +344,7 @@ resources.deepview = {
 		"link_click_id": validator(false, validationTypes.STRING),
 		"open_app": validator(false, validationTypes.BOOLEAN),
 		"stage": validator(false, validationTypes.STRING),
-		"tags": validator(false, validationTypes.STRING)
+		"tags": validator(false, validationTypes.ARRAY)
 	})
 };
 

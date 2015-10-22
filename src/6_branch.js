@@ -1117,10 +1117,6 @@ Branch.prototype['deepview'] = wrap(
 		}
 		var cleanedData = utils.cleanLinkData(data);
 
-		if (cleanedData['tags']) {
-			cleanedData['tags'] = goog.json.serialize(cleanedData['tags']);
-		}
-
 		if (cleanedData['data']) {
 			cleanedData['metadata'] = cleanedData['data'];
 			delete cleanedData['data'];
@@ -1145,16 +1141,16 @@ Branch.prototype['deepview'] = wrap(
 			if (typeof data === 'function') {
 				self._deepviewCta = data;
 			}
-			else {
-				self._server.createScript(data, true);
-				done(null);
-			}
+			done(null, data);
 		});
 	}
 );
 
 /**
  * @function Branch.deepviewCta
+ *
+ * @param {Object=} event - _optional_ - from the event binding function
+ * @param {boolean} silent - _optional_ - whether to fail silently or throw an error if branch.deepview() hasn't been called. When *event* is set, this is implied to be *true*.
  *
  * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
  * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
@@ -1163,11 +1159,30 @@ Branch.prototype['deepview'] = wrap(
  * other hand, the deepview is configured with the option *`open_app`* being false, the CTA is to
  * try to open app, and to visit the platform-appropriate app stores if the open-app attempt failes.
  *
- * If *branch.deepview* has not been called, an error will arise with a reminder to call
- * *branch.deepview* first.
+ * If *branch.deepview* has not been called and *silent* is not set to true, an error will arise
+ * with a reminder to call *branch.deepview* first.
  *
  * ##### Usage
  * ```js
+ * // If you're using jQuery, then:
+ * $('a.deepview-cta').click(branch.deepviewCta);
+ *
+ * // Or you can:
+ * document.getElementById('my-elem').onClick = branch.deepviewCta;
+ *
+ * // Or in HTML you can:
+ * <a href='...' onclick='return branch.deepviewCta(null, true)'>
+ *
+ * // If you wish to dedicate a CTA link only to branch deepviewCta, you can:
+ * branch.deepview(data, option, function(err) {
+ *     if (err) {
+ *         throw err;
+ *     }
+ *     ${'a.deepview-cta').click = branch.deepviewCta(null, false);
+ * });
+ *
+ * ```
+ * // You can call this function any time after branch.deepview() is finished by simply:
  * branch.deepviewCta();
  * ```
  * ___
@@ -1185,14 +1200,23 @@ Branch.prototype['deepview'] = wrap(
  * ## Retrieve referrals list
  *
  */
-/*** +TOC_ITEM #deepviewctaperform &.deepviewCta()& ^ALL ***/
-Branch.prototype['deepviewCta'] = function() {
+/*** +TOC_ITEM #deepviewctaevent-silent &.deepviewCta()& ^ALL ***/
+Branch.prototype['deepviewCta'] = function(event, silent) {
 	if (typeof this._deepviewCta === 'undefined') {
-		throw new Error(
-			'Cannot call deepview CTA, did you forget to call branch.deepview()?'
-		);
+		if (silent) {
+			return true;
+		}
+		else {
+			throw new Error(
+				'Cannot call deepview CTA, did you forget to call branch.deepview()?'
+			);
+		}
+	}
+	if (typeof event === 'object' && typeof event.preventDefault === 'function') {
+		event.preventDefault();
 	}
 	this._deepviewCta();
+	return false;
 };
 
 /**

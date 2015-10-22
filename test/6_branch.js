@@ -751,7 +751,7 @@ describe('Branch', function() {
 			var obj = requests[0].obj;
 			assert.strictEqual(obj.data, undefined, 'data is not sent');
 			assert.strictEqual(obj.metadata, '{"mydata":"bar"}', 'metadata is sent');
-			assert.strictEqual(obj.tags, '["tag1","tag2"]', 'metadata is sent');
+			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');
 			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
 			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
@@ -773,7 +773,7 @@ describe('Branch', function() {
 
 			requests[0].callback();
 			var obj = requests[0].obj;
-			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is sent');
+			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
 		});
 
 		it('should reuse the referring link if make_new_link is not true', function(done) {
