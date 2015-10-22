@@ -335,11 +335,11 @@ resources.deepview = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/deepview",
 	jsonp: true,
-	method: utils.httpMethod.GET,
+	method: utils.httpMethod.POST,
 	params: defaults({
 		"campaign": validator(false, validationTypes.STRING),
 		"channel": validator(false, validationTypes.STRING),
-		"metadata": validator(true, validationTypes.STRING),
+		"data": validator(true, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),
 		"link_click_id": validator(false, validationTypes.STRING),
 		"open_app": validator(false, validationTypes.BOOLEAN),

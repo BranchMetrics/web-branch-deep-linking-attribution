@@ -1117,11 +1117,6 @@ Branch.prototype['deepview'] = wrap(
 		}
 		var cleanedData = utils.cleanLinkData(data);
 
-		if (cleanedData['data']) {
-			cleanedData['metadata'] = cleanedData['data'];
-			delete cleanedData['data'];
-		}
-
 		if (options['open_app']) {
 			cleanedData['open_app'] = true;
 		}
