@@ -205,10 +205,9 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 
 	this.createScript(
 		requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') +
-			(postData ? postPrefix + postData : '') +
-			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
-			'&callback=' + callbackString
-	);
+		(postData ? postPrefix + postData : '') +
+		(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
+		'&callback=' + callbackString);
 };
 
 /**
