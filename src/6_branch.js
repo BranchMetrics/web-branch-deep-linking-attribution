@@ -1117,7 +1117,7 @@ Branch.prototype['sendSMS'] = wrap(
  * ```
  *
  */
-/*** +TOC_ITEM #deepview-callback &.deepview()& ^ALL ***/
+/*** +TOC_ITEM #deepviewcallback &.deepview()& ^ALL ***/
 Branch.prototype['deepview'] = wrap(
 	callback_params.CALLBACK_ERR,
 	function(done, data, options) {
@@ -1179,7 +1179,7 @@ Branch.prototype['deepview'] = wrap(
  * *branch.deepview* first.
  * ___
  */
-/*** +TOC_ITEM #deepview-callback &.deepviewCta()& ^ALL ***/
+/*** +TOC_ITEM #deepviewcallback &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
 		return done(new Error(

@@ -92,8 +92,8 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 3. Deep Linking
   + [.link()](#linkdata-callback)
   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
-  + [.deepview()](#deepview-callback)
-  + [.deepviewCta()](#deepview-callback)
+  + [.deepview()](#deepviewcallback)
+  + [.deepviewCta()](#deepviewcallback)
 
 4. Referrals and Credits
   + [.referrals()](#referralscallback)
