@@ -707,6 +707,96 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('deepview', function() {
+		basicTests('deepview', [ 1 ]);
+
+		var branch;
+		var linkData = testUtils.params({
+			channel: 'sample app',
+			data: { mydata: 'bar' },
+			feature: 'create link',
+			stage: 'created link',
+			tags: [ 'tag1', 'tag2' ]
+		});
+		var options = {
+			make_new_link: true,
+			open_app: true
+		};
+
+		beforeEach(function() {
+			branch = initBranch(true);
+			requests = [];
+		});
+
+		afterEach(function() {
+			if (typeof branch._referringLink.restore === 'function') {
+				branch._referringLink.restore();
+			}
+		});
+
+		it('should call v1/deepview endpoint with the right params', function(done) {
+			var assert = testUtils.plan(8, done);
+
+			branch.deepview(
+				linkData,
+				options,
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+
+			assert.strictEqual(requests.length, 1, 'Request made');
+			requests[0].callback();
+
+			var obj = requests[0].obj;
+			assert.strictEqual(obj.data, undefined, 'data is not sent');
+			assert.strictEqual(obj.metadata, '{"mydata":"bar"}', 'metadata is sent');
+			assert.strictEqual(obj.tags, '["tag1","tag2"]', 'metadata is sent');
+			assert.strictEqual(obj.open_app, true, 'open_app is sent');
+			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
+			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
+		});
+
+		it('should ignore the referring link if make_new_link is true', function(done) {
+			var assert = testUtils.plan(2, done);
+			sandbox.stub(branch, '_referringLink', function() {
+				return '123abc';
+			});
+
+			branch.deepview(
+				linkData,
+				{ make_new_link: true },
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+
+			requests[0].callback();
+			var obj = requests[0].obj;
+			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is sent');
+		});
+
+		it('should reuse the referring link if make_new_link is not true', function(done) {
+			var assert = testUtils.plan(2, done);
+			sandbox.stub(branch, '_referringLink', function() {
+				return '123abc';
+			});
+
+			branch.deepview(
+				linkData,
+				{},
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+
+			requests[0].callback();
+			var obj = requests[0].obj;
+			assert.strictEqual(obj.link_click_id, '123abc', 'link_click_id is sent');
+		});
+
+	});
+
 	describe('referrals', function() {
 		basicTests('referrals', [ 0 ]);
 
