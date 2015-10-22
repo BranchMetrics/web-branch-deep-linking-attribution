@@ -165,13 +165,9 @@ Server.prototype.getUrl = function(resource, data) {
  * This function is standalone for easy mocking.
  * @param {string} src
  */
-Server.prototype.createScript = function(src, elementId, internal) {
+Server.prototype.createScript = function(src, internal) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
-
-	if (elementId) {
-		script.id = elementId;
-	}
 
 	if (internal) {
 		script.defer = true;
@@ -219,7 +215,6 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 			(postData ? postPrefix + postData : '') +
 			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
 			'&callback=' + callbackString,
-		null,
 		false);
 };
 
@@ -334,7 +329,6 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	 * @type {function(?Error,*=): ?undefined}
 	 */
 	var done = function(err, data, status) {
-		console.log('highlight me done err data status', err, data, status);
 		if (err && retries > 0 && status.toString().substring(0, 1) === '5') {
 			retries--;
 			window.setTimeout(function() {

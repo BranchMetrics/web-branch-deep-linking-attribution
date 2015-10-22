@@ -39,11 +39,6 @@ var init_states = {
 	INIT_SUCCEEDED: 3
 };
 
-/**
- * Elememt ID for deepveiw cta script
- */
-var DEEPVIEW_CTA_ELEMENT_ID = 'branch-deepview-cta';
-
 /***
  * @param {number} parameters
  * @param {function(...?): undefined} func
@@ -584,8 +579,13 @@ Branch.prototype['deepview'] = wrap(
 				return done(err);
 			}
 
-			self._server.createScript(data, DEEPVIEW_CTA_ELEMENT_ID, true);
-			done(err, data);
+			if (typeof data === 'function') {
+				Branch.prototype['deepviewCta'] = data;
+			}
+			else {
+				self._server.createScript(data, true);
+				done(err, null);
+			}
 		});
 	}
 );

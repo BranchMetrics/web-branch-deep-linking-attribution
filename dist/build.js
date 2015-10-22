@@ -1101,12 +1101,11 @@ Server.prototype.getUrl = function(a, b) {
   "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
   return {data:this.serializeObject(l, ""), url:e};
 };
-Server.prototype.createScript = function(a, b, c) {
-  var d = document.createElement("script");
-  d.type = "text/javascript";
-  b && (d.id = b);
-  c ? (d.defer = !0, d.text = a) : (d.async = !0, d.src = a);
-  document.getElementsByTagName("head")[0].appendChild(d);
+Server.prototype.createScript = function(a, b) {
+  var c = document.createElement("script");
+  c.type = "text/javascript";
+  b ? (c.defer = !0, c.text = a) : (c.async = !0, c.src = a);
+  document.getElementsByTagName("head")[0].appendChild(c);
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
@@ -1121,7 +1120,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window.clearTimeout(g);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, null, !1);
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, !1);
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
@@ -1169,7 +1168,6 @@ Server.prototype.request = function(a, b, c, d) {
   var g, h = "";
   "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
   var k = RETRIES, l = function(a, b, c) {
-    console.log("highlight me done err data status", a, b, c);
     a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       n();
     }, RETRY_DELAY)) : d(a, b);
@@ -1335,7 +1333,7 @@ var sendSMS = function(a, b, c, d) {
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
   if (b.open_app) {
-    b.open_app = !1, a.deepview(c, b, function(a, b) {
+    b.open_app = !1, a.deepview(c, b, function(a) {
       if (a) {
         throw a;
       }
@@ -1383,7 +1381,7 @@ var sendSMS = function(a, b, c, d) {
   return m;
 };
 // Input 13
-var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, DEEPVIEW_CTA_ELEMENT_ID = "branch-deepview-cta", wrap = function(a, b, c) {
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
     a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
@@ -1544,7 +1542,6 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
 }, !0);
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
   var d = this;
-  console.log("highlight me data and options in deepview", b, c);
   c || (c = {});
   b = utils.cleanLinkData(b);
   b.tags && (b.tags = goog.json.serialize(b.tags));
@@ -1556,9 +1553,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, 
     if (b) {
       return a(b);
     }
-    console.log("highlight me data from branchl", c);
-    d._server.createScript(c, DEEPVIEW_CTA_ELEMENT_ID, !0);
-    a(b, c);
+    "function" === typeof c ? Branch.prototype.deepviewCta = c : (d._server.createScript(c, !0), a(b, null));
   });
 });
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
