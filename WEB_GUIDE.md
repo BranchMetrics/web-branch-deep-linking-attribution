@@ -92,7 +92,7 @@ If `branch.init()` fails, all subsequent branch methods will fail.
 3. Deep Linking
   + [.link()](#linkdata-callback)
   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
-  + [.deepview()](#deepviewcallback)
+  + [.deepview()](#deepviewdata-options-callback)
   + [.deepviewCta()](#deepviewcallback)
 
 4. Referrals and Credits
@@ -470,17 +470,7 @@ callback("Error message");
 
 ___
 
-# Referral system rewarding functionality
-In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
-1. Reward the original user for taking action (eg. inviting, purchasing, etc)
-2. Reward the invitee for installing the app from the original user's referral link
-3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
-
-These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
-
-Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
-
-## Retrieve referrals list
+## Deepview
 
 
 
@@ -578,15 +568,27 @@ callback(
 );
 ```
 
+___
+
+# Referral system rewarding functionality
+In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
+1. Reward the original user for taking action (eg. inviting, purchasing, etc)
+2. Reward the invitee for installing the app from the original user's referral link
+3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
+
+These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
+
+Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+
+## Retrieve referrals list
 
 
-### deepviewCta(callback) 
+
+### deepviewCta(Perform) 
 
 **Parameters**
 
-**callback**: `function`, _optional_ - returns an error if unsuccessful
-
-Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
+**Perform**: `function`, the branch deepview CTA (call to action) on mobile. Namely, depends on how
 *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
 configured with the option *`open_app`* being true, an immediate attempt is made as soon as
 deepview finishes, and thus the CTA is to visit the platform-appropriate app stores; if on the
