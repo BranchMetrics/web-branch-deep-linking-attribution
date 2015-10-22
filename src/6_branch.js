@@ -1176,7 +1176,6 @@ Branch.prototype['deepview'] = wrap(
  *     ${'a.deepview-cta').click = branch.deepviewCta(null, false);
  * });
  *
- * ```
  * // You can call this function any time after branch.deepview() is finished by simply:
  * branch.deepviewCta();
  * ```
