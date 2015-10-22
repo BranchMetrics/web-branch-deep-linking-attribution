@@ -1017,7 +1017,7 @@ Branch.prototype['sendSMS'] = wrap(
 
 /**
  * @function Branch.deepview
- * @param {Object} data - _required_ - link data and metadata.
+ * @param {Object} data - _required_ - object of all link data, same as Branch.link().
  * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if one already exists_, *open_app*, _whether to try to open the app immediately_ }.
  * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
@@ -1107,39 +1107,36 @@ Branch.prototype['sendSMS'] = wrap(
  *
  */
 /*** +TOC_ITEM #deepviewdata-options-callback &.deepview()& ^ALL ***/
-Branch.prototype['deepview'] = wrap(
-	callback_params.CALLBACK_ERR,
-	function(done, data, options) {
-		var self = this;
+Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done, data, options) {
+	var self = this;
 
-		if (!options) {
-			options = { };
-		}
-		var cleanedData = utils.cleanLinkData(data);
-
-		if (options['open_app']) {
-			cleanedData['open_app'] = true;
-		}
-
-		var referringLink = self._referringLink();
-		if (referringLink && !options['make_new_link']) {
-			cleanedData['link_click_id'] = referringLink.substring(
-				referringLink.lastIndexOf('/') + 1, referringLink.length
-			);
-		}
-
-		this._api(resources.deepview, cleanedData, function(err, data) {
-			if (err) {
-				return done(err);
-			}
-
-			if (typeof data === 'function') {
-				self._deepviewCta = data;
-			}
-			done(null, data);
-		});
+	if (!options) {
+		options = { };
 	}
-);
+	var cleanedData = utils.cleanLinkData(data);
+
+	if (options['open_app']) {
+		cleanedData['open_app'] = true;
+	}
+
+	var referringLink = self._referringLink();
+	if (referringLink && !options['make_new_link']) {
+		cleanedData['link_click_id'] = referringLink.substring(
+			referringLink.lastIndexOf('/') + 1, referringLink.length
+		);
+	}
+
+	this._api(resources.deepview, cleanedData, function(err, data) {
+		if (err) {
+			return done(err);
+		}
+
+		if (typeof data === 'function') {
+			self._deepviewCta = data;
+		}
+		done(null);
+	});
+});
 
 /**
  * @function Branch.deepviewCta
@@ -1694,7 +1691,9 @@ if (WEB_BUILD) {
 	 *     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
 	 *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
 	 *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
-	 *     make_new_link: false                    // Should the banner create a new link, even if a link already exists?
+	 *     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
+	 *     open_app: false,                        // Should the banner try to open the app immediately on load?
+	 *
 	 * }, {
 	 *     tags: ['tag1', 'tag2'],
 	 *     feature: 'dashboard',

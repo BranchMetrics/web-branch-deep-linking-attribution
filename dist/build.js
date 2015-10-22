@@ -1339,7 +1339,7 @@ var sendSMS = function(a, b, c, d) {
       if (a) {
         throw a;
       }
-      f.getElementById("branch-mobile-action").onclick = "branch.deepviewCta(); return false";
+      f.getElementById("branch-mobile-action").onclick = "return branch.deepviewCta(null, false)";
     })) : g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
       a || (f.getElementById("branch-mobile-action").href = b);
     });
@@ -1636,7 +1636,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
       return a(b);
     }
     "function" === typeof c && (d._deepviewCta = c);
-    a(null, c);
+    a(null);
   });
 });
 Branch.prototype.deepviewCta = function(a, b) {

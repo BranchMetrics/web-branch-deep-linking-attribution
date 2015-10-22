@@ -478,7 +478,7 @@ ___
 
 **Parameters**
 
-**data**: `Object`, _required_ - link data and metadata.
+**data**: `Object`, _required_ - object of all link data, same as Branch.link().
 
 **options**: `Object`, _optional_ - { *make_new_link*: _whether to create a new link even if one already exists_, *open_app*, _whether to try to open the app immediately_ }.
 
@@ -607,7 +607,6 @@ branch.deepview(data, option, function(err) {
     ${'a.deepview-cta').click = branch.deepviewCta(null, false);
 });
 
-```
 // You can call this function any time after branch.deepview() is finished by simply:
 branch.deepviewCta();
 ```
@@ -1062,7 +1061,9 @@ branch.banner({
     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
-    make_new_link: false                    // Should the banner create a new link, even if a link already exists?
+    make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
+    open_app: false,                        // Should the banner try to open the app immediately on load?
+
 }, {
     tags: ['tag1', 'tag2'],
     feature: 'dashboard',
