@@ -1549,8 +1549,15 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, 
     if (b) {
       return a(b);
     }
-    "function" === typeof c ? Branch.prototype.deepviewCta = c : (d._server.createScript(c, !0), a(b, null));
+    "function" === typeof c ? d._deepviewCta = c : (d._server.createScript(c, !0), a(b, null));
   });
+});
+Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
+  if ("undefined" === typeof this._deepviewCta) {
+    return a(Error("Cannot call deepview CTA, did you forget to call branch.deepview()?"));
+  }
+  this._deepviewCta();
+  a(null);
 });
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));

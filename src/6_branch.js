@@ -580,7 +580,7 @@ Branch.prototype['deepview'] = wrap(
 			}
 
 			if (typeof data === 'function') {
-				Branch.prototype['deepviewCta'] = data;
+				self._deepviewCta = data;
 			}
 			else {
 				self._server.createScript(data, true);
@@ -589,6 +589,16 @@ Branch.prototype['deepview'] = wrap(
 		});
 	}
 );
+
+Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
+	if (typeof this._deepviewCta === 'undefined') {
+		return done(new Error(
+			'Cannot call deepview CTA, did you forget to call branch.deepview()?'
+		));
+	}
+	this._deepviewCta();
+	done(null);
+});
 
 /**
  * @function Branch.data
