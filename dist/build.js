@@ -1091,7 +1091,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  if ("POST" === a.method || "/v1/credithistory" === a.endpoint || "/v1/deepview" === a.endpoint) {
+  if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
       b = h(b, l);
     } catch (n) {
@@ -1101,11 +1101,12 @@ Server.prototype.getUrl = function(a, b) {
   "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
   return {data:this.serializeObject(l, ""), url:e};
 };
-Server.prototype.createScript = function(a, b) {
-  var c = document.createElement("script");
-  c.type = "text/javascript";
-  b ? (c.defer = !0, c.text = a) : (c.async = !0, c.src = a);
-  document.getElementsByTagName("head")[0].appendChild(c);
+Server.prototype.createScript = function(a) {
+  var b = document.createElement("script");
+  b.type = "text/javascript";
+  b.async = !0;
+  b.src = a;
+  document.getElementsByTagName("head")[0].appendChild(b);
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
@@ -1120,7 +1121,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window.clearTimeout(g);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, !1);
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
