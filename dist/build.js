@@ -1639,13 +1639,12 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
     "function" === typeof c ? d._deepviewCta = c : (d._server.createScript(c, !0), a(null));
   });
 });
-Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
+Branch.prototype.deepviewCta = function() {
   if ("undefined" === typeof this._deepviewCta) {
-    return a(Error("Cannot call deepview CTA, did you forget to call branch.deepview()?"));
+    throw Error("Cannot call deepview CTA, did you forget to call branch.deepview()?");
   }
   this._deepviewCta();
-  a(null);
-});
+};
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);
 });

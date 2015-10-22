@@ -1186,15 +1186,14 @@ Branch.prototype['deepview'] = wrap(
  *
  */
 /*** +TOC_ITEM #deepviewctaperform &.deepviewCta()& ^ALL ***/
-Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
+Branch.prototype['deepviewCta'] = function() {
 	if (typeof this._deepviewCta === 'undefined') {
-		return done(new Error(
+		throw new Error(
 			'Cannot call deepview CTA, did you forget to call branch.deepview()?'
-		));
+		);
 	}
 	this._deepviewCta();
-	done(null);
-});
+};
 
 /**
  * @function Branch.referrals
