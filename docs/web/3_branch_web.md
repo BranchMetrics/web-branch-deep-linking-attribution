@@ -454,27 +454,11 @@ callback(
 );
 ```
 
-___
-
-# Referral system rewarding functionality
-In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
-1. Reward the original user for taking action (eg. inviting, purchasing, etc)
-2. Reward the invitee for installing the app from the original user's referral link
-3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
-
-These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
-
-Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
-
-## Retrieve referrals list
 
 
+### Branch.deepviewCta
 
-### deepviewCta(Perform) 
-
-**Parameters**
-
-**Perform**: `function`, the branch deepview CTA (call to action) on mobile. Namely, depends on how
+Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
 *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
 configured with the option *`open_app`* being true, an immediate attempt is made as soon as
 deepview finishes, and thus the CTA is to visit the platform-appropriate app stores; if on the
@@ -484,6 +468,18 @@ try to open app, and to visit the platform-appropriate app stores if the open-ap
 If *branch.deepview* has not been called, an error will arise with a reminder to call
 *branch.deepview* first.
 ___
+
+# Referral system rewarding functionality
+In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
+1. Reward the original user for taking action (eg. inviting, purchasing, etc)
+2. Reward the invitee for installing the app from the original user&#39;s referral link
+3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
+
+These reward definitions are created on the dashboard, under the &#39;Reward Rules&#39; section in the &#39;Referrals&#39; tab on the dashboard.
+
+Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+
+## Retrieve referrals list() 
 
 
 
