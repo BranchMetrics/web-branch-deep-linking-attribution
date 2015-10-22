@@ -11,6 +11,8 @@
 3. Deep Linking
   + [.link()](#linkdata-callback)
   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
+  + [.deepview()](#deepview-callback)
+  + [.deepviewCta()](#deepview-callback)
 
 4. Referrals and Credits
   + [.referrals()](#referralscallback)

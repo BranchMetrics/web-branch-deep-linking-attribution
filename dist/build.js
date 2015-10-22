@@ -1536,29 +1536,6 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }
   }
 }, !0);
-Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
-  var d = this;
-  c || (c = {});
-  b = utils.cleanLinkData(b);
-  b.tags && (b.tags = goog.json.serialize(b.tags));
-  b.data && (b.metadata = b.data, delete b.data);
-  c.open_app && (b.open_app = !0);
-  var e = d._referringLink();
-  e && !c.make_new_link && (b.link_click_id = e.substring(e.lastIndexOf("/") + 1, e.length));
-  this._api(resources.deepview, b, function(b, c) {
-    if (b) {
-      return a(b);
-    }
-    "function" === typeof c ? d._deepviewCta = c : (d._server.createScript(c, !0), a(b, null));
-  });
-});
-Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
-  if ("undefined" === typeof this._deepviewCta) {
-    return a(Error("Cannot call deepview CTA, did you forget to call branch.deepview()?"));
-  }
-  this._deepviewCta();
-  a(null);
-});
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));
   b.referring_link = this._referringLink();
@@ -1645,6 +1622,29 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
       e(c.click_id);
     });
   });
+});
+Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
+  var d = this;
+  c || (c = {});
+  b = utils.cleanLinkData(b);
+  b.tags && (b.tags = goog.json.serialize(b.tags));
+  b.data && (b.metadata = b.data, delete b.data);
+  c.open_app && (b.open_app = !0);
+  var e = d._referringLink();
+  e && !c.make_new_link && (b.link_click_id = e.substring(e.lastIndexOf("/") + 1, e.length));
+  this._api(resources.deepview, b, function(b, c) {
+    if (b) {
+      return a(b);
+    }
+    "function" === typeof c ? d._deepviewCta = c : (d._server.createScript(c, !0), a(null));
+  });
+});
+Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
+  if ("undefined" === typeof this._deepviewCta) {
+    return a(Error("Cannot call deepview CTA, did you forget to call branch.deepview()?"));
+  }
+  this._deepviewCta();
+  a(null);
 });
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);

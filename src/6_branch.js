@@ -541,66 +541,6 @@ Branch.prototype['init'] = wrap(
 );
 
 /**
- * @function Branch.deepview
- * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
- */
-Branch.prototype['deepview'] = wrap(
-	callback_params.CALLBACK_ERR_DATA,
-	function(done, data, options) {
-		var self = this;
-
-		if (!options) {
-			options = { };
-		}
-		var cleanedData = utils.cleanLinkData(data);
-
-		if (cleanedData['tags']) {
-			cleanedData['tags'] = goog.json.serialize(cleanedData['tags']);
-		}
-
-		if (cleanedData['data']) {
-			cleanedData['metadata'] = cleanedData['data'];
-			delete cleanedData['data'];
-		}
-
-		if (options['open_app']) {
-			cleanedData['open_app'] = true;
-		}
-
-		var referringLink = self._referringLink();
-		if (referringLink && !options['make_new_link']) {
-			cleanedData['link_click_id'] = referringLink.substring(
-				referringLink.lastIndexOf('/') + 1, referringLink.length
-			);
-		}
-
-		this._api(resources.deepview, cleanedData, function(err, data) {
-			if (err) {
-				return done(err);
-			}
-
-			if (typeof data === 'function') {
-				self._deepviewCta = data;
-			}
-			else {
-				self._server.createScript(data, true);
-				done(err, null);
-			}
-		});
-	}
-);
-
-Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
-	if (typeof this._deepviewCta === 'undefined') {
-		return done(new Error(
-			'Cannot call deepview CTA, did you forget to call branch.deepview()?'
-		));
-	}
-	this._deepviewCta();
-	done(null);
-});
-
-/**
  * @function Branch.data
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
  *
@@ -1085,6 +1025,170 @@ Branch.prototype['sendSMS'] = wrap(
 		}
 	}
 );
+
+/**
+ * @function Branch.deepview
+ * @param {Object} data - _required_ - link data and metadata.
+ * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if one already exists_, *open_app*, _whether to try to open the app immediately_ }.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Register the current page view as a deepview, and inject Branch deepview CTA from the server.
+ * The `data` parameter can include an object with optional data you would like to store, including
+ * Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
+ *
+ * **data** The dictionary to embed with the link. Accessed as session or install parameters from the SDK.
+ *
+ * **Note**
+ * You can customize the Facebook OG tags of each URL if you want to dynamically share content by using the following optional keys in the data dictionary. Please use this [Facebook tool](https://developers.facebook.com/tools/debug/og/object) to debug your OG tags!
+ *
+ * | Key | Value
+ * | --- | ---
+ * | "$og_title" | The title you'd like to appear for the link in social media
+ * | "$og_description" | The description you'd like to appear for the link in social media
+ * | "$og_image_url" | The URL for the image you'd like to appear for the link in social media
+ * | "$og_video" | The URL for the video
+ * | "$og_url" | The URL you'd like to appear
+ * | "$og_redirect" | If you want to bypass our OG tags and use your own, use this key with the URL that contains your site's metadata.
+ *
+ * Also, you can set custom redirection by inserting the following optional keys in the dictionary:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | "$desktop_url" | Where to send the user on a desktop or laptop. By default it is the Branch-hosted text-me service
+ * | "$android_url" | The replacement URL for the Play Store to send the user if they don't have the app. _Only necessary if you want a mobile web splash_
+ * | "$ios_url" | The replacement URL for the App Store to send the user if they don't have the app. _Only necessary if you want a mobile web splash_
+ * | "$ipad_url" | Same as above but for iPad Store
+ * | "$fire_url" | Same as above but for Amazon Fire Store
+ * | "$blackberry_url" | Same as above but for Blackberry Store
+ * | "$windows_phone_url" | Same as above but for Windows Store
+ * | "$after_click_url" | When a user returns to the browser after going to the app, take them to this URL. _iOS only; Android coming soon_
+ *
+ * You have the ability to control the direct deep linking of each link as well:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | "$deeplink_path" | The value of the deep link path that you'd like us to append to your URI. For example, you could specify "$deeplink_path": "radio/station/456" and we'll open the app with the URI "yourapp://radio/station/456?link_click_id=branch-identifier". This is primarily for supporting legacy deep linking infrastructure.
+ *
+ * #### Usage
+ * ```js
+ * branch.deepview(
+ *     data,
+ *     options,
+ *     callback (err)
+ * );
+ * ```
+ *
+ * #### Example
+ * ```js
+ * branch.deepview(
+ *     {
+ *         channel: 'facebook',
+ *         data: {
+ *             mydata: 'content of my data',
+ *             foo: 'bar',
+ *             '$desktop_url': 'https://en.wikipedia.org/wiki/Internet',
+ *             '$ios_url': 'https://en.wikipedia.org/wiki/Internet',
+ *             '$ipad_url': 'https://en.wikipedia.org/wiki/Internet',
+ *             '$android_url': 'https://en.wikipedia.org/wiki/Internet',
+ *             '$deepview_path': 'item_id=12345',
+ *             '$og_app_id': '12345',
+ *             '$og_title': 'My App',
+ *             '$og_description': 'My app\'s description.'
+ *         },
+ *         feature: 'dashboard',
+ *         stage: 'new user',
+ *         tags: [ 'tag1', 'tag2' ],
+ *     },
+ *     {
+ *         make_new_link: true,
+ *         open_app: true
+ *     },
+ *     function(err) {
+ *         console.log(err || 'no error');
+ *     }
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message"
+ * );
+ * ```
+ *
+ */
+/*** +TOC_ITEM #deepview-callback &.deepview()& ^ALL ***/
+Branch.prototype['deepview'] = wrap(
+	callback_params.CALLBACK_ERR,
+	function(done, data, options) {
+		var self = this;
+
+		if (!options) {
+			options = { };
+		}
+		var cleanedData = utils.cleanLinkData(data);
+
+		if (cleanedData['tags']) {
+			cleanedData['tags'] = goog.json.serialize(cleanedData['tags']);
+		}
+
+		if (cleanedData['data']) {
+			cleanedData['metadata'] = cleanedData['data'];
+			delete cleanedData['data'];
+		}
+
+		if (options['open_app']) {
+			cleanedData['open_app'] = true;
+		}
+
+		var referringLink = self._referringLink();
+		if (referringLink && !options['make_new_link']) {
+			cleanedData['link_click_id'] = referringLink.substring(
+				referringLink.lastIndexOf('/') + 1, referringLink.length
+			);
+		}
+
+		this._api(resources.deepview, cleanedData, function(err, data) {
+			if (err) {
+				return done(err);
+			}
+
+			if (typeof data === 'function') {
+				self._deepviewCta = data;
+			}
+			else {
+				self._server.createScript(data, true);
+				done(null);
+			}
+		});
+	}
+);
+
+/**
+ * @function Branch.deepviewCta
+ * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ *
+ * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
+ * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
+ * configured with the option *`open_app`* being true, an immediate attempt is made as soon as
+ * deepview finishes, and thus the CTA is to visit the platform-appropriate app stores; if on the
+ * other hand, the deepview is configured with the option *`open_app`* being false, the CTA is to
+ * try to open app, and to visit the platform-appropriate app stores if the open-app attempt failes.
+ *
+ * If *branch.deepview* has not been called, an error will arise with a reminder to call
+ * *branch.deepview* first.
+ * ___
+ */
+/*** +TOC_ITEM #deepview-callback &.deepviewCta()& ^ALL ***/
+Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
+	if (typeof this._deepviewCta === 'undefined') {
+		return done(new Error(
+			'Cannot call deepview CTA, did you forget to call branch.deepview()?'
+		));
+	}
+	this._deepviewCta();
+	done(null);
+});
 
 /**
  * @function Branch.referrals
