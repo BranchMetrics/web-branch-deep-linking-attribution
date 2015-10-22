@@ -735,7 +735,7 @@ describe('Branch', function() {
 		});
 
 		it('should call v1/deepview endpoint with the right params', function(done) {
-			var assert = testUtils.plan(8, done);
+			var assert = testUtils.plan(7, done);
 
 			branch.deepview(
 				linkData,
@@ -749,8 +749,7 @@ describe('Branch', function() {
 			requests[0].callback();
 
 			var obj = requests[0].obj;
-			assert.strictEqual(obj.data, undefined, 'data is not sent');
-			assert.strictEqual(obj.metadata, '{"mydata":"bar"}', 'metadata is sent');
+			assert.strictEqual(obj.data, '{"mydata":"bar"}', 'data is sent');
 			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');
 			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
