@@ -139,9 +139,7 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.method === 'POST' ||
-			resource.endpoint === '/v1/credithistory' ||
-			resource.endpoint === '/v1/deepview') {
+	if (resource.method === 'POST' || resource.endpoint === '/v1/credithistory') {
 		try {
 			data = appendKeyOrId(data, d);
 		}
@@ -165,18 +163,11 @@ Server.prototype.getUrl = function(resource, data) {
  * This function is standalone for easy mocking.
  * @param {string} src
  */
-Server.prototype.createScript = function(src, internal) {
+Server.prototype.createScript = function(src) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
-
-	if (internal) {
-		script.defer = true;
-		script.text = src;
-	}
-	else {
-		script.async = true;
-		script.src = src;
-	}
+	script.async = true;
+	script.src = src;
 
 	document.getElementsByTagName('head')[0].appendChild(script);
 };
@@ -216,8 +207,8 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 		requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') +
 			(postData ? postPrefix + postData : '') +
 			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
-			'&callback=' + callbackString,
-		false);
+			'&callback=' + callbackString
+	);
 };
 
 /**
