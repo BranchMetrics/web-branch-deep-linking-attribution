@@ -118,7 +118,7 @@ banner = function(branch, options, linkData, storage) {
 	var doc = options.iframe ? element.contentWindow.document : document;
 	if (utils.mobileUserAgent()) {
 		var referringLink = branch._referringLink();
-		if (referringLink && !options['make_new_link']) {
+		if (referringLink && !options.make_new_link) {
 			doc.getElementById('branch-mobile-action').href = referringLink;
 		}
 		else {
