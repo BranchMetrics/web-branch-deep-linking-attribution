@@ -170,9 +170,9 @@ describe('Integration tests', function() {
 				assert.strictEqual(requests.length, 2, 'Exactly two requests were made');
 				assert.strictEqual(
 					requests[1].requestBody,
-					'identity_id=' + identity_id +
+					'browser_fingerprint_id=' + browser_fingerprint_id +
+						'&identity_id=' + identity_id +
 						'&is_referrable=1&sdk=web' + config.version +
-						'&browser_fingerprint_id=' + browser_fingerprint_id +
 						'&app_id=' + browser_fingerprint_id,
 					'The second request has the right .requestBody'
 				);
