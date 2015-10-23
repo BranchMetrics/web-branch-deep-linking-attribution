@@ -46,9 +46,9 @@ describe('Branch', function() {
 			requests[1].callback(
 				null,
 				{
-					session_id: session_id,
 					browser_fingerprint_id: browser_fingerprint_id,
-					identity_id: identity_id
+					identity_id: identity_id,
+					session_id: session_id
 				}
 			);
 			requests = [];

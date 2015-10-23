@@ -86,18 +86,18 @@ function defaults(obj) {
 	var def = {};
 	if (WEB_BUILD) {
 		def = {
-			"session_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
 			"browser_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.STRING)
+			"identity_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.STRING),
+			"session_id": validator(true, branch_id)
 		};
 	}
 	if (CORDOVA_BUILD || TITANIUM_BUILD) {
 		def = {
-			"session_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
 			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.STRING)
+			"identity_id": validator(true, branch_id),
+			"sdk": validator(true, validationTypes.STRING),
+			"session_id": validator(true, branch_id)
 		};
 	}
 	return utils.merge(obj, def);
@@ -109,11 +109,11 @@ if (WEB_BUILD) {
 		endpoint: "/v1/open",
 		method: utils.httpMethod.POST,
 		params: {
+			"browser_fingerprint_id": validator(true, branch_id),
 			"identity_id": validator(false, branch_id),
-			"link_identifier": validator(false, validationTypes.STRING),
 			"is_referrable": validator(true, validationTypes.NUMBER),
-			"sdk": validator(false, validationTypes.STRING),
-			"browser_fingerprint_id": validator(true, branch_id)
+			"link_identifier": validator(false, validationTypes.STRING),
+			"sdk": validator(false, validationTypes.STRING)
 		}
 	};
 
@@ -158,27 +158,27 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		endpoint: "/v1/install",
 		method: utils.httpMethod.POST,
 		params: {
-			"link_identifier": validator(false, validationTypes.STRING),
-			"sdk": validator(false, validationTypes.STRING),
-			"hardware_id": validator(false, validationTypes.STRING),
-			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
+			"add_tracking_enabled": validator(false, validationTypes.BOOLEAN),
 			"app_version": validator(false, validationTypes.STRING),
-			"carrier": validator(false, validationTypes.STRING),
 			"bluetooth": validator(false, validationTypes.BOOLEAN),
 			"bluetooth_version": validator(false, validationTypes.STRING),
+			"brand": validator(false, validationTypes.STRING),
+			"carrier": validator(false, validationTypes.STRING),
+			"hardware_id": validator(false, validationTypes.STRING),
 			"has_nfc": validator(false, validationTypes.BOOLEAN),
 			"has_telephone": validator(false, validationTypes.BOOLEAN),
-			"brand": validator(false, validationTypes.STRING),
+			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
+			"is_referrable": validator(false, validationTypes.NUMBER),
+			"link_identifier": validator(false, validationTypes.STRING),
 			"model": validator(false, validationTypes.STRING),
 			"os": validator(false, validationTypes.STRING),
-			"uri_scheme": validator(false, validationTypes.STRING),
 			"os_version": validator(false, validationTypes.STRING),
 			"screen_dpi": validator(false, validationTypes.NUMBER),
-			"screen_width": validator(false, validationTypes.NUMBER),
 			"screen_height": validator(false, validationTypes.NUMBER),
-			"is_referrable": validator(false, validationTypes.NUMBER),
+			"screen_width": validator(false, validationTypes.NUMBER),
+			"sdk": validator(false, validationTypes.STRING),
 			"update": validator(false, validationTypes.NUMBER),
-			"add_tracking_enabled": validator(false, validationTypes.BOOLEAN)
+			"uri_scheme": validator(false, validationTypes.STRING)
 		}
 	};
 
@@ -187,17 +187,17 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		endpoint: "/v1/open",
 		method: utils.httpMethod.POST,
 		params: {
-			"identity_id": validator(true, branch_id),
-			"link_identifier": validator(false, validationTypes.STRING),
-			"device_fingerprint_id": validator(true, branch_id),
-			"sdk": validator(false, validationTypes.STRING),
-			"hardware_id": validator(false, validationTypes.STRING),
-			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
 			"app_version": validator(false, validationTypes.STRING),
+			"device_fingerprint_id": validator(true, branch_id),
+			"hardware_id": validator(false, validationTypes.STRING),
+			"identity_id": validator(true, branch_id),
+			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
+			"is_referrable": validator(false, validationTypes.NUMBER),
+			"link_identifier": validator(false, validationTypes.STRING),
 			"os": validator(false, validationTypes.STRING),
-			"uri_scheme": validator(false, validationTypes.STRING),
 			"os_version": validator(false, validationTypes.STRING),
-			"is_referrable": validator(false, validationTypes.NUMBER)
+			"sdk": validator(false, validationTypes.STRING),
+			"uri_scheme": validator(false, validationTypes.STRING)
 		}
 	};
 
@@ -206,11 +206,11 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 		endpoint: "/v1/close",
 		method: utils.httpMethod.POST,
 		params: {
+			"device_fingerprint_id": validator(true, branch_id),
 			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.STRING),
-			"session_id": validator(true, branch_id),
 			"link_click_id": validator(false, branch_id),
-			"device_fingerprint_id": validator(true, branch_id)
+			"sdk": validator(true, validationTypes.STRING),
+			"session_id": validator(true, branch_id)
 		}
 	};
 }
@@ -220,14 +220,14 @@ resources.getCode = {
 	endpoint: "/v1/referralcode",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"prefix": validator(false, validationTypes.STRING),
 		"amount": validator(true, validationTypes.NUMBER),
-		"expiration": validator(false, validationTypes.STRING),
+		"bucket": validator(false, validationTypes.STRING),
 		"calculation_type": validator(true, validationTypes.NUMBER),
-		"location": validator(true, validationTypes.NUMBER),
 		"creation_source": validator(true, validationTypes.NUMBER),
-		"type": validator(true, validationTypes.STRING),
-		"bucket": validator(false, validationTypes.STRING)
+		"expiration": validator(false, validationTypes.STRING),
+		"location": validator(true, validationTypes.NUMBER),
+		"prefix": validator(false, validationTypes.STRING),
+		"type": validator(true, validationTypes.STRING)
 	})
 };
 
@@ -255,7 +255,9 @@ resources.logout = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/logout",
 	method: utils.httpMethod.POST,
-	params: defaults({ "session_id": validator(true, branch_id) })
+	params: defaults({
+		"session_id": validator(true, branch_id)
+	})
 };
 
 resources.profile = {
@@ -283,11 +285,11 @@ resources.creditHistory = {
 	endpoint: "/v1/credithistory",
 	method: utils.httpMethod.GET,
 	params: defaults({
-		"link_click_id": validator(false, branch_id),
-		"length": validator(false, validationTypes.NUMBER),
-		"direction": validator(false, validationTypes.NUMBER),
 		"begin_after_id": validator(false, branch_id),
-		"bucket": validator(false, validationTypes.STRING)
+		"bucket": validator(false, validationTypes.STRING),
+		"direction": validator(false, validationTypes.NUMBER),
+		"length": validator(false, validationTypes.NUMBER),
+		"link_click_id": validator(false, branch_id)
 	})
 };
 
@@ -306,9 +308,9 @@ resources.redeem = {
 	endpoint: "/v1/redeem",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"identity_id": validator(true, branch_id),
 		"amount": validator(true, validationTypes.NUMBER),
-		"bucket": validator(true, validationTypes.STRING)
+		"bucket": validator(true, validationTypes.STRING),
+		"identity_id": validator(true, branch_id)
 	})
 };
 
@@ -318,15 +320,15 @@ resources.link = {
 	method: utils.httpMethod.POST,
 	ref: "obj",
 	params: defaults({
-		"identity_id": validator(true, branch_id),
-		"data": validator(false, validationTypes.STRING),
-		"tags": validator(false, validationTypes.ARRAY),
-		"feature": validator(false, validationTypes.STRING),
+		"alias": validator(false, validationTypes.STRING),
 		"campaign": validator(false, validationTypes.STRING),
 		"channel": validator(false, validationTypes.STRING),
+		"data": validator(false, validationTypes.STRING),
+		"feature": validator(false, validationTypes.STRING),
+		"identity_id": validator(true, branch_id),
 		"stage": validator(false, validationTypes.STRING),
-		"type": validator(false, validationTypes.NUMBER),
-		"alias": validator(false, validationTypes.STRING)
+		"tags": validator(false, validationTypes.ARRAY),
+		"type": validator(false, validationTypes.NUMBER)
 	})
 };
 
