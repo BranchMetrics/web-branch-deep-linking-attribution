@@ -3,6 +3,7 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+- Fixed error in `branch.banner()` that caused the option `make_new_link` to be ignored.
 
 ## [v1.7.0] - 2015-09-25
 - Fixed error in network failure handling that caused subsequent calls to fail once an early network connection failure has occurred.
