@@ -1121,6 +1121,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window.clearTimeout(g);
     d(null, a);
   };
+  console.log("highlight me callbackString", e);
   this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
