@@ -526,7 +526,7 @@ describe('Branch', function() {
 				var assert = testUtils.plan(6, done);
 				branch.logout(function(err) {
 					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				});
 
 				assert.strictEqual(requests.length, 1, 'Request made');
@@ -664,7 +664,7 @@ describe('Branch', function() {
 				linkData,
 				function(err) {
 					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				}
 			);
 
@@ -685,7 +685,7 @@ describe('Branch', function() {
 				linkData,
 				function(err) {
 					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				}
 			);
 			assert.strictEqual(requests.length, 1, 'Requests made');
@@ -902,7 +902,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(3, done);
 			branch.redeem(1, 'testbucket', function(err) {
 				assert(true);
-				// assert.strictEqual(err, null, 'No error');
+				assert.strictEqual(err, null, 'No error');
 			});
 
 			assert.strictEqual(requests.length, 1, 'Request made');

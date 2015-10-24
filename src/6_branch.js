@@ -992,7 +992,10 @@ Branch.prototype['sendSMS'] = wrap(
 				resources.SMSLinkSend, {
 					"link_url": click_id,
 					"phone": phone
-				}, done);
+				},
+				function (err) {
+					done(err || null);
+				});
 		}
 
 		var referringLink = self._referringLink();
@@ -1396,7 +1399,10 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 		{
 			"amount": amount,
 			"bucket": bucket
-		}, done
+		},
+		function (err) {
+			done(err || null);
+		}
 	);
 });
 
