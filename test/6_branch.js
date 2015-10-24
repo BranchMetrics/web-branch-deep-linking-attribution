@@ -442,7 +442,7 @@ describe('Branch', function() {
 	});
 
 	describe('track', function() {
-		// basicTests('track', [ 1, 2 ]);
+		basicTests('track', [ 1, 2 ]);
 
 		it('should call api with event with no metadata', function(done) {
 			var branch = initBranch(true);
@@ -628,7 +628,7 @@ describe('Branch', function() {
 	});
 
 	describe('sendSMS', function() {
-		// basicTests('sendSMS', [ 3, 4 ]);
+		basicTests('sendSMS', [ 3, 4 ]);
 
 		var linkData = testUtils.params({
 			tags: [ 'tag1', 'tag2' ],

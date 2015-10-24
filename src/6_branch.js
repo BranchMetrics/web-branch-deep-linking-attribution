@@ -67,6 +67,10 @@ var wrap = function(parameters, func, init) {
 			 * @type {function(?Error,?): undefined}
 			 */
 			var done = function(err, data) {
+				if (err) {
+					self._queue = task_queue();
+				}
+
 				if (err && parameters === callback_params.NO_CALLBACK) {
 					throw err;
 				}
