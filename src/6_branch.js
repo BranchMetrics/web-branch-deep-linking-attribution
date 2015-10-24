@@ -689,7 +689,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.identity = data['identity'];
 		session.update(self._storage, data);
 
-		done(err);
+		done(null);
 	});
 });
 

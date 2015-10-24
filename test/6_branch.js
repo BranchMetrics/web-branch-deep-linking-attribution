@@ -507,7 +507,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(3, done);
 			branch.logout(function(err) {
 				assert(true);
-				// assert.strictEqual(err, null, 'No error');
+				assert.strictEqual(err, null, 'No error');
 			});
 
 			assert.strictEqual(requests.length, 1, 'Request made');
