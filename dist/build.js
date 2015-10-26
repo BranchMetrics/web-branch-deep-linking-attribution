@@ -1339,7 +1339,7 @@ var sendSMS = function(a, b, c, d) {
       if (a) {
         throw a;
       }
-      f.getElementById("branch-mobile-action").onclick = "return branch.deepviewCta(null)";
+      f.getElementById("branch-mobile-action").onclick = "branch.deepviewCta()";
     })) : g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
       a || (f.getElementById("branch-mobile-action").href = b);
     });
@@ -1639,11 +1639,11 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
     a(null);
   });
 });
-Branch.prototype.deepviewCta = wrap(callback_params.NO_CALLBACK, function(a, b) {
+Branch.prototype.deepviewCta = wrap(callback_params.NO_CALLBACK, function(a) {
   if ("undefined" === typeof this._deepviewCta) {
     throw Error("Cannot call Deepview CTA, please call branch.deepview() first.");
   }
-  "object" === typeof b && (b.preventDefault ? b.preventDefault() : b.returnValue = !1);
+  window.event && (window.event.preventDefault ? window.event.preventDefault() : window.event.returnValue = !1);
   this._deepviewCta();
   a();
 });

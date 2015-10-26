@@ -1141,8 +1141,6 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 /**
  * @function Branch.deepviewCta
  *
- * @param {Object=} event - _optional_ - from the event binding function
- *
  * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
  * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
  * configured with the option *`open_app`* being true, an immediate attempt is made as soon as
@@ -1162,7 +1160,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * document.getElementById('my-elem').onClick = branch.deepviewCta;
  *
  * // Or in HTML you can:
- * <a href='...' onclick='branch.deepviewCta(null)'>
+ * <a href='...' onclick='branch.deepviewCta()'>
  *
  * // If you wish to dedicate a CTA link only to branch deepviewCta, you can:
  * branch.deepview(data, option, function(err) {
@@ -1190,17 +1188,17 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * ## Retrieve referrals list
  *
  */
-/*** +TOC_ITEM #deepviewctaevent &.deepviewCta()& ^ALL ***/
-Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done, event) {
+/*** +TOC_ITEM #deepviewctacallback &.deepviewCta()& ^ALL ***/
+Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
 		throw new Error('Cannot call Deepview CTA, please call branch.deepview() first.');
 	}
-	if (typeof event === 'object') {
-		if (event.preventDefault) {
-			event.preventDefault();
+	if (window.event) {
+		if (window.event.preventDefault) {
+			window.event.preventDefault();
 		}
 		else {
-			event.returnValue = false;
+			window.event.returnValue = false;
 		}
 	}
 	this._deepviewCta();

@@ -126,7 +126,7 @@ banner = function(branch, options, linkData, storage) {
 					throw err;
 				}
 				doc.getElementById('branch-mobile-action').onclick =
-					'return branch.deepviewCta(null)';
+					'branch.deepviewCta()';
 			});
 		}
 		else if (referringLink && !options.make_new_link) {
