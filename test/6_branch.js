@@ -506,7 +506,6 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
 			branch.logout(function(err) {
-				assert(true);
 				assert.strictEqual(err, null, 'No error');
 			});
 
