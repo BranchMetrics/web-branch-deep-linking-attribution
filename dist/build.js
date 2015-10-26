@@ -721,7 +721,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"http://localhost:5002", api_endpoint:"http://localhost:5001", version:"1.7.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
+var config = {link_service_endpoint:"http://localhost:5002", api_endpoint:"http://localhost:5001", version:"1.7.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
 // Input 3
 var task_queue = function() {
@@ -1339,7 +1339,7 @@ var sendSMS = function(a, b, c, d) {
       if (a) {
         throw a;
       }
-      f.getElementById("branch-mobile-action").onclick = "return branch.deepviewCta(null, false)";
+      f.getElementById("branch-mobile-action").onclick = "return branch.deepviewCta(null)";
     })) : g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
       a || (f.getElementById("branch-mobile-action").href = b);
     });

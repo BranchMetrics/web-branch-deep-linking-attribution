@@ -129,7 +129,7 @@ banner = function(branch, options, linkData, storage) {
 					'return branch.deepviewCta(null)';
 			});
 		}
-		else if (referringLink && !options['make_new_link']) {
+		else if (referringLink && !options.make_new_link) {
 			doc.getElementById('branch-mobile-action').href = referringLink;
 		}
 		else {
