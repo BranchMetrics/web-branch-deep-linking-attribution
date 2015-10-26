@@ -183,9 +183,7 @@ var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
-	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0 ||
-		requestURL.indexOf('localhost:5001') >= 0) ? '&data=' : '&post_data='; // @nocommit
-	// var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=';
+	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=';
 	var postData = (requestMethod === 'POST') ?
 		encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
 		'';
