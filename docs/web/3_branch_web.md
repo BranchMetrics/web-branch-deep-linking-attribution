@@ -483,7 +483,7 @@ $('a.deepview-cta').click(branch.deepviewCta);
 document.getElementById('my-elem').onClick = branch.deepviewCta;
 
 // Or in HTML you can:
-<a href='...' onclick='return branch.deepviewCta(null, true)'>
+<a href='...' onclick='branch.deepviewCta(null, true); return false'>
 
 // If you wish to dedicate a CTA link only to branch deepviewCta, you can:
 branch.deepview(data, option, function(err) {

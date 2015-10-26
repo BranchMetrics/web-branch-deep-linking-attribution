@@ -1639,17 +1639,17 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
     a(null);
   });
 });
-Branch.prototype.deepviewCta = function(a, b) {
+Branch.prototype.deepviewCta = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   if ("undefined" === typeof this._deepviewCta) {
-    if (b) {
-      return !0;
+    if (c) {
+      a();
+    } else {
+      throw Error("Cannot call Deepview CTA, please call branch.deepview() first.");
     }
-    throw Error("Cannot call deepview CTA, did you forget to call branch.deepview()?");
   }
-  "object" === typeof a && "function" === typeof a.preventDefault && a.preventDefault();
+  "object" === typeof b && (b.preventDefault ? b.preventDefault() : b.returnValue = !1);
   this._deepviewCta();
-  return !1;
-};
+});
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);
 });

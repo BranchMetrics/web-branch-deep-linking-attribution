@@ -1163,7 +1163,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * document.getElementById('my-elem').onClick = branch.deepviewCta;
  *
  * // Or in HTML you can:
- * <a href='...' onclick='return branch.deepviewCta(null, true)'>
+ * <a href='...' onclick='branch.deepviewCta(null, true); return false'>
  *
  * // If you wish to dedicate a CTA link only to branch deepviewCta, you can:
  * branch.deepview(data, option, function(err) {
@@ -1192,23 +1192,27 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  *
  */
 /*** +TOC_ITEM #deepviewctaevent-silent &.deepviewCta()& ^ALL ***/
-Branch.prototype['deepviewCta'] = function(event, silent) {
+Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done, event, silent) {
 	if (typeof this._deepviewCta === 'undefined') {
 		if (silent) {
-			return true;
+			done();
 		}
 		else {
 			throw new Error(
-				'Cannot call deepview CTA, did you forget to call branch.deepview()?'
+				'Cannot call Deepview CTA, please call branch.deepview() first.'
 			);
 		}
 	}
-	if (typeof event === 'object' && typeof event.preventDefault === 'function') {
-		event.preventDefault();
+	if (typeof event === 'object') {
+		if (event.preventDefault) {
+			event.preventDefault();
+		}
+		else {
+			event.returnValue = false;
+		}
 	}
 	this._deepviewCta();
-	return false;
-};
+});
 
 /**
  * @function Branch.referrals
