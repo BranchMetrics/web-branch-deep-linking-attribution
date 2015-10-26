@@ -12,7 +12,7 @@
   + [.link()](#linkdata-callback)
   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
   + [.deepview()](#deepviewdata-options-callback)
-  + [.deepviewCta()](#deepviewctaevent-silent)
+  + [.deepviewCta()](#deepviewctaevent)
 
 4. Referrals and Credits
   + [.referrals()](#referralscallback)

@@ -1142,7 +1142,6 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * @function Branch.deepviewCta
  *
  * @param {Object=} event - _optional_ - from the event binding function
- * @param {boolean} silent - _optional_ - whether to fail silently or throw an error if branch.deepview() hasn't been called. When *event* is set, this is implied to be *true*.
  *
  * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
  * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
@@ -1151,8 +1150,8 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * other hand, the deepview is configured with the option *`open_app`* being false, the CTA is to
  * try to open app, and to visit the platform-appropriate app stores if the open-app attempt failes.
  *
- * If *branch.deepview* has not been called and *silent* is not set to true, an error will arise
- * with a reminder to call *branch.deepview* first.
+ * If *branch.deepview* has not been called, an error will arise with a reminder to call
+ * *branch.deepview* first.
  *
  * ##### Usage
  * ```js
@@ -1163,14 +1162,14 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * document.getElementById('my-elem').onClick = branch.deepviewCta;
  *
  * // Or in HTML you can:
- * <a href='...' onclick='branch.deepviewCta(null, true); return false'>
+ * <a href='...' onclick='branch.deepviewCta(null)'>
  *
  * // If you wish to dedicate a CTA link only to branch deepviewCta, you can:
  * branch.deepview(data, option, function(err) {
  *     if (err) {
  *         throw err;
  *     }
- *     ${'a.deepview-cta').click = branch.deepviewCta(null, false);
+ *     ${'a.deepview-cta').click(branch.deepviewCta);
  * });
  *
  * // You can call this function any time after branch.deepview() is finished by simply:
@@ -1191,17 +1190,10 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * ## Retrieve referrals list
  *
  */
-/*** +TOC_ITEM #deepviewctaevent-silent &.deepviewCta()& ^ALL ***/
-Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done, event, silent) {
+/*** +TOC_ITEM #deepviewctaevent &.deepviewCta()& ^ALL ***/
+Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done, event) {
 	if (typeof this._deepviewCta === 'undefined') {
-		if (silent) {
-			done();
-		}
-		else {
-			throw new Error(
-				'Cannot call Deepview CTA, please call branch.deepview() first.'
-			);
-		}
+		throw new Error('Cannot call Deepview CTA, please call branch.deepview() first.');
 	}
 	if (typeof event === 'object') {
 		if (event.preventDefault) {
@@ -1212,6 +1204,7 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(don
 		}
 	}
 	this._deepviewCta();
+	done();
 });
 
 /**

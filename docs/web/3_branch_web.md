@@ -456,13 +456,11 @@ callback(
 
 
 
-### deepviewCta(event, silent) 
+### deepviewCta(event) 
 
 **Parameters**
 
 **event**: `Object`, _optional_ - from the event binding function
-
-**silent**: `boolean`, _optional_ - whether to fail silently or throw an error if branch.deepview() hasn't been called. When *event* is set, this is implied to be *true*.
 
 Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
 *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
@@ -471,8 +469,8 @@ deepview finishes, and thus the CTA is to visit the platform-appropriate app sto
 other hand, the deepview is configured with the option *`open_app`* being false, the CTA is to
 try to open app, and to visit the platform-appropriate app stores if the open-app attempt failes.
 
-If *branch.deepview* has not been called and *silent* is not set to true, an error will arise
-with a reminder to call *branch.deepview* first.
+If *branch.deepview* has not been called, an error will arise with a reminder to call
+*branch.deepview* first.
 
 ##### Usage
 ```js
@@ -483,14 +481,14 @@ $('a.deepview-cta').click(branch.deepviewCta);
 document.getElementById('my-elem').onClick = branch.deepviewCta;
 
 // Or in HTML you can:
-<a href='...' onclick='branch.deepviewCta(null, true); return false'>
+<a href='...' onclick='branch.deepviewCta(null)'>
 
 // If you wish to dedicate a CTA link only to branch deepviewCta, you can:
 branch.deepview(data, option, function(err) {
     if (err) {
         throw err;
     }
-    ${'a.deepview-cta').click = branch.deepviewCta(null, false);
+    ${'a.deepview-cta').click(branch.deepviewCta);
 });
 
 // You can call this function any time after branch.deepview() is finished by simply:
