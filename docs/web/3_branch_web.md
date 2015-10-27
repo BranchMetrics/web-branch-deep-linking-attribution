@@ -1,4 +1,3 @@
-# from code :(
 # Global
 
 
