@@ -79,12 +79,12 @@ docs/web/3_branch_web.md: $(SOURCES)
 	rm src/3_branch_web.js
 
 README.md: docs/0_notice.md docs/readme/1_main.md docs/4_footer.md
-	cat docs/0_notice.md docs/readme/1_main.md docs/4_footer.md | \
+	cat docs/web/1_intro.md docs/0_notice.md docs/readme/1_main.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
 Reference.md: docs/0_notice.md docs/web/1_intro.md docs/web/3_branch_web.md docs/4_footer.md
 	perl build_utils/toc_generator.pl src/6_branch.js docs/web/2_table_of_contents.md WEB
-	cat docs/0_notice.md docs/web/1_intro.md docs/web/2_table_of_contents.md docs/web/3_branch_web.md docs/4_footer.md | \
+	cat docs/0_notice.md docs/web/1_reference_into.md docs/web/2_table_of_contents.md docs/web/3_branch_web.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > Reference.md
 	perl -p -i -e 's/# Global//' Reference.md
 
