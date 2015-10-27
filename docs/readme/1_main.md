@@ -41,7 +41,7 @@ __Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acc
 
 ## Cordova/PhoneGap
 
-### [Full Documentation for the Cordova Web SDK](https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK/blob/master/README.md)
+### [Full Documentation for the Cordova Web SDK](https://dev.branch.io/recipes/quickstart_guide/cordova/#installing-the-sdk-files)
 
 The Web SDK is provided as a plugin for Cordova and can be installed with Cordova plugin or the Plugman tool.  Point the tool at this repositry, https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK.  For example:
 
@@ -59,7 +59,7 @@ You should initialize the Branch SDK session once the 'deviceready' event fires 
 
 ## Appcelerator Titanum
 
-### [Full Documentation for the Titanium Web SDK](https://github.com/BranchMetrics/Titanium-Deferred-Deep-Linking-SDK)
+### [Full Documentation for the Titanium Web SDK](https://dev.branch.io/recipes/quickstart_guide/titanium/)
 
 The Web SDK is provided as a module for Titanium.
 
