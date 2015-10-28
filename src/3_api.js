@@ -184,6 +184,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('api.branch.io') >= 0) ? '&data=' : '&post_data=';
+	postPrefix = (requestURL.indexOf('api.branch.io') >= 0 || requestURL.indexOf('localhost:5001') >= 0) ? '&data=' : '&post_data='; // @nocommit
 	var postData = (requestMethod === 'POST') ?
 		encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
 		'';
