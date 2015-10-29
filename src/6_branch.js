@@ -507,6 +507,10 @@ Branch.prototype['init'] = wrap(
 			if (isReferrable !== null) {
 				args.push(isReferrable ? 1 : 0);
 			}
+			if (freshInstall) {
+				// 'debug' is the first argument to getInstallData, but is not used in getOpenData
+				args.unshift(self.debug);
+			}
 			cordova.require('cordova/exec')(
 				apiCordovaTitanium,
 				function() {
