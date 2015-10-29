@@ -1411,7 +1411,7 @@ if (WEB_BUILD) {
 	 *
 	 * ##### Example
 	 *
-	 * ```
+	 * ```js
 	 * var listener = function(event) { console.log(event); }
 	 *
 	 * // Specify an event to listen for
