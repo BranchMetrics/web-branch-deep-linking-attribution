@@ -301,9 +301,9 @@ describe('Server', function() {
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
 				assert.strictEqual(
 					requests[0].requestBody,
-					"identity_id=" + identity_id +
+					"browser_fingerprint_id=" + browser_fingerprint_id +
+						"&identity_id=" + identity_id +
 						"&is_referrable=1&sdk=web" + config.version +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&branch_key=" + branch_sample_key,
 					'Data correct');
 				requests[0].respond(
@@ -382,9 +382,9 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].requestBody,
-					"identity_id=" + identity_id +
+					"browser_fingerprint_id=" + browser_fingerprint_id +
+						"&identity_id=" + identity_id +
 						"&is_referrable=1&sdk=web" + config.version +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&app_id=" + "5680621892404085",
 					'Data correct');
 			});
@@ -480,10 +480,12 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
-						"&identity=test_id&session_id=" + session_id +
+						"&identity=test_id" +
 						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
-						"&branch_key=" + branch_sample_key
+						"&session_id=" + session_id +
+						"&branch_key=" + branch_sample_key,
+					'Params correct'
 				);
 
 				requests[0].respond(
@@ -582,8 +584,8 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"session_id=" + session_id +
-						"&identity_id=" + identity_id +
 						"&browser_fingerprint_id=" + browser_fingerprint_id +
+						"&identity_id=" + identity_id +
 						"&sdk=web" + config.version +
 						"&branch_key=" + branch_sample_key,
 					'Expected request body for the first request'
@@ -664,11 +666,12 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/referrals/' + identity_id +
-						'?session_id=' + session_id +
+						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						"&identity_id=" + identity_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
-						"&sdk=web" + config.version,
-					'Endpoint correct');
+						"&sdk=web" + config.version +
+						'&session_id=' + session_id,
+					'Endpoint correct'
+				);
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 
 				requests[0].respond(
@@ -686,12 +689,13 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/referrals/' + identity_id +
-						'?session_id=' + session_id +
+						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						'&identity_id=' + identity_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						'&sdk=web' + config.version +
+						'&session_id=' + session_id +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
-					'Endpoint correct');
+					'Endpoint correct'
+				);
 				requests[0].callback();
 			});
 
@@ -727,10 +731,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].url,
 					'https://api.branch.io/v1/credits/' + identity_id +
-						'?session_id=' + session_id +
+						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						'&identity_id=' + identity_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
-						'&sdk=web' + config.version,
+						'&sdk=web' + config.version +
+						'&session_id=' + session_id,
 					'Endpoint correct');
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 
@@ -749,10 +753,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					'https://api.branch.io/v1/credits/' + identity_id +
-						'?session_id=' + session_id +
+						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						'&identity_id=' + identity_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						'&sdk=web' + config.version +
+						'&session_id=' + session_id +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct');
 				requests[0].callback();
@@ -890,15 +894,14 @@ describe('Server', function() {
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
-				// "identity_id=98807509250212101&amount=1&bucket=testbucket' +
-				// '&session_id=98807509250212101&sdk=web" + config.version +
-				// "&branch_key=key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS"
 				assert.strictEqual(
 					requests[0].requestBody,
-					"identity_id=" + identity_id +
-						"&amount=1&bucket=testbucket&session_id=" + session_id +
+					"amount=1" +
+						"&bucket=testbucket" +
+						"&identity_id=" + identity_id +
 						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
+						"&session_id=" + session_id +
 						"&branch_key=" + branch_sample_key
 				);
 
@@ -1017,9 +1020,9 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
-						"&session_id=" + session_id +
 						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
+						"&session_id=" + session_id +
 						"&branch_key=" + branch_sample_key
 				);
 
@@ -1207,10 +1210,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"event=testevent" + metadataString +
-						"&session_id=" + session_id +
-						"&identity_id=" + identity_id +
 						"&browser_fingerprint_id=" + browser_fingerprint_id +
+						"&identity_id=" + identity_id +
 						"&sdk=web" + config.version +
+						"&session_id=" + session_id +
 						"&branch_key=" + branch_sample_key
 				);
 
@@ -1349,10 +1352,11 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					"https://api.branch.io/v1/credithistory?session_id=" + session_id +
+					"https://api.branch.io/v1/credithistory" +
+						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						"&identity_id=" + identity_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
 						"&sdk=web" + config.version +
+						"&session_id=" + session_id +
 						"&branch_key=" + branch_sample_key,
 					'Endpoint correct'
 				);

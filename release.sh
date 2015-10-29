@@ -144,5 +144,7 @@ echo "    git push; git push origin $VERSION"
 
 echo
 echo "Remember to check https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/tree/$VERSION/CHANGELOG.md "
+echo
+echo "Remember to ping @jed on slack about this release "
 
 echo
