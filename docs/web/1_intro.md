@@ -1,8 +1,6 @@
-# Full Documentation for Web SDK
+# Branch Web SDK
 
-**[New documentation portal](https://dev.branch.io) and [support portal with user forums](http://support.branch.io)**.
-
-This documentation outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a web app.
+**[New documentation portal](https://dev.branch.io) and [support portal with user forums](http://support.branch.io)**.  This documentation outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a web app.
 
 Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
 
