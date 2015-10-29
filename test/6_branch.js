@@ -696,6 +696,7 @@ describe('Branch', function() {
 				}
 			);
 			assert.strictEqual(requests.length, 2, 'Requests made');
+			console.log('req link url', requests[1].obj.link_url);
 			requests[1].callback(
 				null,
 				{
