@@ -263,3 +263,20 @@ utils.base64encode = function(input) {
 	}
 	return output;
 };
+
+/**
+ * Extract the deeplink path from urls in the forms of:
+ * - "protocol://domain.name/deeplink.path
+ * - "domain.name/deeplink.path"
+ *
+ * @param {string} url
+ */
+utils.extractDeeplinkPath = function(url) {
+	if (!url) {
+		return null;
+	}
+	if (url.indexOf('://') > -1) {
+		url = url.split('://')[1];
+	}
+	return url.substring(url.indexOf('/') + 1);
+};

@@ -1010,11 +1010,10 @@ Branch.prototype['sendSMS'] = wrap(
 						return done(err);
 					}
 					var url = data['url'];
-					console.log('highlight me url', url);
 					self._api(
 						resources.linkClick,
 						{
-							"link_url": 'l/' + url.split('/').pop(),
+							"link_url": utils.extractDeeplinkPath(url),
 							"click": "click"
 						},
 						function(err, data) {
