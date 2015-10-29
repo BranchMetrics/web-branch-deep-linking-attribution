@@ -524,7 +524,6 @@ describe('Branch', function() {
 				var branch = initBranch(true);
 				var assert = testUtils.plan(6, done);
 				branch.logout(function(err) {
-					assert(true);
 					assert.strictEqual(err, null, 'No error');
 				});
 
@@ -662,7 +661,6 @@ describe('Branch', function() {
 				'9999999999',
 				linkData,
 				function(err) {
-					assert(true);
 					assert.strictEqual(err, null, 'No error');
 				}
 			);
@@ -683,7 +681,6 @@ describe('Branch', function() {
 				'9999999999',
 				linkData,
 				function(err) {
-					assert(true);
 					assert.strictEqual(err, null, 'No error');
 				}
 			);
@@ -900,7 +897,6 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
 			branch.redeem(1, 'testbucket', function(err) {
-				assert(true);
 				assert.strictEqual(err, null, 'No error');
 			});
 
