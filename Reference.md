@@ -35,10 +35,6 @@
 ___
 
 
-
-
-
-
 * * *
 
 ### init(branch_key, options, callback) 
