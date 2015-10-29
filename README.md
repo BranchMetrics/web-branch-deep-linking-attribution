@@ -20,10 +20,10 @@ To modify this local web app, edit `src/web/example.template.html` first, and th
 
 
 ## Additional Resources
-- [Integration guide](https://dev.branch.io/recipes/quickstart_guide/ios/)
+- [Integration guide](https://dev.branch.io/recipes/quickstart_guide/web/)
 - Technical Reference (in this repo)
 - Changelog (in this repo)
-- [Testing](https://dev.branch.io/recipes/testing_your_integration/ios/)
+- [Testing](https://dev.branch.io/recipes/testing_your_integration/web/)
 - [Support portal, FAQ, and user forums](http://support.branch.io)
 
 
