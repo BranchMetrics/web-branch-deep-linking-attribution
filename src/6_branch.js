@@ -68,7 +68,7 @@ var wrap = function(parameters, func, init) {
 			 */
 			var done = function(err, data) {
 				if (err) {
-					self._queue = task_queue();
+					setTimeout(next);
 				}
 
 				if (err && parameters === callback_params.NO_CALLBACK) {
@@ -80,7 +80,6 @@ var wrap = function(parameters, func, init) {
 				else if (parameters === callback_params.CALLBACK_ERR_DATA) {
 					callback(err, data);
 				}
-				next();
 			};
 			if (!init) {
 				if (self.init_state === init_states.INIT_PENDING) {

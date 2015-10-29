@@ -1371,12 +1371,11 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
       var h = function(b, c) {
-        b && (d._queue = task_queue());
+        b && setTimeout(g);
         if (b && a === callback_params.NO_CALLBACK) {
           throw b;
         }
         a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
-        g();
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
