@@ -78,8 +78,8 @@ docs/web/3_branch_web.md: $(SOURCES)
 	jsdox src/3_branch_web.js --output docs/web
 	rm src/3_branch_web.js
 
-README.md: docs/web/1_intro.md docs/readme/1_main.md docs/4_footer.md
-	cat docs/web/1_intro.md docs/readme/1_main.md docs/4_footer.md | \
+README.md: docs/readme/1_main.md docs/4_footer.md
+	cat docs/readme/1_main.md docs/4_footer.md | \
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
 Reference.md: docs/web/3_branch_web.md docs/4_footer.md
