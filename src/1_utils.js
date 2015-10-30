@@ -265,9 +265,13 @@ utils.base64encode = function(input) {
 };
 
 /**
- * Extract the deeplink path from urls in the forms of:
- * - "protocol://domain.name/deeplink.path
- * - "domain.name/deeplink.path"
+ * Extract the path (the part of the url excluding protocol and domain name) from urls in the forms
+ * of:
+ * - "protocol://domain.name/some/path
+ * - "domain.name/some/path"
+ *
+ * and returns (for the above sample input cases):
+ * - "some/path"
  *
  * @param {string} url
  */
