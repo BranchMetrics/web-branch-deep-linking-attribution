@@ -470,17 +470,13 @@ If *branch.deepview* has not been called, an error will arise with a reminder to
 
 ##### Usage
 ```js
-&#x2F;&#x2F; If you&#39;re using jQuery, then:
-$(&#39;a.deepview-cta&#39;).click(branch.deepviewCta);
+$(&#39;a.deepview-cta&#39;).click(branch.deepviewCta); &#x2F;&#x2F; If you&#39;re using jQuery
 
-&#x2F;&#x2F; Or you can:
-document.getElementById(&#39;my-elem&#39;).onClick = branch.deepviewCta;
+document.getElementById(&#39;my-elem&#39;).onClick = branch.deepviewCta; &#x2F;&#x2F; Or generally
 
-&#x2F;&#x2F; Or in HTML you can:
-&lt;a href=&#39;...&#39; onclick=&#39;branch.deepviewCta()&#39;&gt;
+&lt;a href=&#39;...&#39; onclick=&#39;branch.deepviewCta()&#39;&gt; &#x2F;&#x2F; In HTML
 
-&#x2F;&#x2F; If you wish to dedicate a CTA link only to branch deepviewCta, you can:
-branch.deepview(data, option, function(err) {
+branch.deepview(data, option, function(err) { &#x2F;&#x2F; We recommend to assign deepviewCta in deepview callback
     if (err) {
         throw err;
     }
@@ -488,7 +484,7 @@ branch.deepview(data, option, function(err) {
 });
 
 &#x2F;&#x2F; You can call this function any time after branch.deepview() is finished by simply:
-branch.deepviewCta();
+branch.deepviewCta(); &#x2F;&#x2F; After the deepview call is successful, you can call deepviewCta in your javascript
 ```
 ___
 

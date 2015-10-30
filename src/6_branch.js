@@ -1157,17 +1157,13 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  *
  * ##### Usage
  * ```js
- * // If you're using jQuery, then:
- * $('a.deepview-cta').click(branch.deepviewCta);
+ * $('a.deepview-cta').click(branch.deepviewCta); // If you're using jQuery
  *
- * // Or you can:
- * document.getElementById('my-elem').onClick = branch.deepviewCta;
+ * document.getElementById('my-elem').onClick = branch.deepviewCta; // Or generally
  *
- * // Or in HTML you can:
- * <a href='...' onclick='branch.deepviewCta()'>
+ * <a href='...' onclick='branch.deepviewCta()'> // In HTML
  *
- * // If you wish to dedicate a CTA link only to branch deepviewCta, you can:
- * branch.deepview(data, option, function(err) {
+ * branch.deepview(data, option, function(err) { // We recommend to assign deepviewCta in deepview callback
  *     if (err) {
  *         throw err;
  *     }
@@ -1175,7 +1171,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * });
  *
  * // You can call this function any time after branch.deepview() is finished by simply:
- * branch.deepviewCta();
+ * branch.deepviewCta(); // After the deepview call is successful, you can call deepviewCta in your javascript
  * ```
  * ___
  *
@@ -1192,7 +1188,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * ## Retrieve referrals list
  *
  */
-/*** +TOC_ITEM #deepviewctacallback &.deepviewCta()& ^ALL ***/
+/*** +TOC_ITEM #branchdeepviewcta &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
 		throw new Error('Cannot call Deepview CTA, please call branch.deepview() first.');
