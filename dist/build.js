@@ -819,6 +819,13 @@ utils.base64encode = function(a) {
   }
   return b;
 };
+utils.extractDeeplinkPath = function(a) {
+  if (!a) {
+    return null;
+  }
+  -1 < a.indexOf("://") && (a = a.split("://")[1]);
+  return a.substring(a.indexOf("/") + 1);
+};
 // Input 5
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
@@ -1610,7 +1617,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     if (b) {
       return a(b);
     }
-    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+    f._api(resources.linkClick, {link_url:utils.extractDeeplinkPath(c.url), click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }

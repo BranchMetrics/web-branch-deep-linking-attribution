@@ -263,3 +263,24 @@ utils.base64encode = function(input) {
 	}
 	return output;
 };
+
+/**
+ * Extract the path (the part of the url excluding protocol and domain name) from urls in the forms
+ * of:
+ * - "protocol://domain.name/some/path
+ * - "domain.name/some/path"
+ *
+ * and returns (for the above sample input cases):
+ * - "some/path"
+ *
+ * @param {string} url
+ */
+utils.extractDeeplinkPath = function(url) {
+	if (!url) {
+		return null;
+	}
+	if (url.indexOf('://') > -1) {
+		url = url.split('://')[1];
+	}
+	return url.substring(url.indexOf('/') + 1);
+};
