@@ -1335,12 +1335,12 @@ var sendSMS = function(a, b, c, d) {
   var f = b.iframe ? e.contentWindow.document : document;
   if (utils.mobileUserAgent()) {
     var g = a._referringLink();
-    b.open_app ? (b.open_app = !1, a.deepview(c, b, function(a) {
+    b.open_app ? a.deepview(c, b, function(a) {
       if (a) {
         throw a;
       }
       f.getElementById("branch-mobile-action").onclick = "branch.deepviewCta()";
-    })) : g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
+    }) : g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
       a || (f.getElementById("branch-mobile-action").href = b);
     });
   } else {
