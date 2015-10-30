@@ -1157,6 +1157,13 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  *
  * ##### Usage
  * ```js
+ * branch.referrals(
+ *     callback (err, data)
+ * );
+ * ```
+ *
+ * ##### Usage
+ * ```js
  * $('a.deepview-cta').click(branch.deepviewCta); // If you are using jQuery
  *
  * document.getElementById('my-elem').onClick = branch.deepviewCta; // Or generally
@@ -1183,6 +1190,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * );
  * branch.deepviewCta(); // After the deepview call is successful, you can call deepviewCta in your javascript
  * ```
+ *
  * ___
  *
  * # Referral system rewarding functionality

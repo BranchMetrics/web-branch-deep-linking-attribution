@@ -470,6 +470,13 @@ If *branch.deepview* has not been called, an error will arise with a reminder to
 
 ##### Usage
 ```js
+branch.referrals(
+    callback (err, data)
+);
+```
+
+##### Usage
+```js
 $(&#39;a.deepview-cta&#39;).click(branch.deepviewCta); &#x2F;&#x2F; If you are using jQuery
 
 document.getElementById(&#39;my-elem&#39;).onClick = branch.deepviewCta; &#x2F;&#x2F; Or generally
@@ -496,6 +503,7 @@ callback(
 );
 branch.deepviewCta(); &#x2F;&#x2F; After the deepview call is successful, you can call deepviewCta in your javascript
 ```
+
 ___
 
 # Referral system rewarding functionality
