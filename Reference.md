@@ -16,7 +16,7 @@
   + [.link()](#linkdata-callback)
   + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
   + [.deepview()](#deepviewdata-options-callback)
-  + [.deepviewCta()](#branchdeepviewcta)
+  + [.deepviewCta()](#deepviewcta)
 
 4. Referrals and Credits
   + [.referrals()](#referralscallback)
@@ -513,7 +513,8 @@ document.getElementById('my-elem').onClick = branch.deepviewCta; // Or generally
 
 <a href='...' onclick='branch.deepviewCta()'> // In HTML
 
-branch.deepview(data, option, function(err) { // We recommend to assign deepviewCta in deepview callback
+// We recommend to assign deepviewCta in deepview callback:
+branch.deepview(data, option, function(err) {
     if (err) {
         throw err;
     }
@@ -521,7 +522,7 @@ branch.deepview(data, option, function(err) { // We recommend to assign deepview
 });
 
 // You can call this function any time after branch.deepview() is finished by simply:
-branch.deepviewCta(); // After the deepview call is successful, you can call deepviewCta in your javascript
+branch.deepviewCta();
 ```
 
 ___

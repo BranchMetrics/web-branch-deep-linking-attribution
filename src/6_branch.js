@@ -1192,7 +1192,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * ## Retrieve referrals list
  *
  */
-/*** +TOC_ITEM #branchdeepviewcta &.deepviewCta()& ^ALL ***/
+/*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
 		throw new Error('Cannot call Deepview CTA, please call branch.deepview() first.');
