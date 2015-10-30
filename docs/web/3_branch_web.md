@@ -456,11 +456,7 @@ callback(
 
 
 
-### deepviewCta(null) 
-
-**Parameters**
-
-**null**: `null`, no parameter required
+### deepviewCta() 
 
 Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
 *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
