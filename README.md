@@ -52,7 +52,7 @@ This SDK requires only native browser Javascript and has been tested in all mode
 In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
 
 ### Web Based Integration
-[Full Documentation for the Web SDK](https://dev.branch.io/recipes/quickstart_guide/web)
+[Full Documentation for the Web SDK](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/WEB_GUIDE.md)
 
 ### Cordova/PhoneGap
 [Full Documentation for the Cordova Web SDK](https://dev.branch.io/recipes/quickstart_guide/cordova/#installing-the-sdk-files)
