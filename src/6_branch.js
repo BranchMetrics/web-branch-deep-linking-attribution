@@ -1143,8 +1143,8 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 });
 
 /**
- * @function Branch.deepviewCta()
- * @param {Void}
+ * @function Branch.deepviewCta
+ * @param {null} null - no parameter required
  *
  * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
  * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
@@ -1155,13 +1155,6 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  *
  * If *branch.deepview* has not been called, an error will arise with a reminder to call
  * *branch.deepview* first.
- *
- * ##### Usage
- * ```js
- * branch.referrals(
- *     callback (err, data)
- * );
- * ```
  *
  * ##### Usage
  * ```js

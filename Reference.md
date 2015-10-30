@@ -493,11 +493,13 @@ callback(
 
 
 
-### deepviewCta()(Perform) 
+### deepviewCta(null) 
 
 **Parameters**
 
-**Perform**: `Void`, the branch deepview CTA (call to action) on mobile. Namely, depends on how
+**null**: `null`, no parameter required
+
+Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
 *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
 configured with the option *`open_app`* being true, an immediate attempt is made as soon as
 deepview finishes, and thus the CTA is to visit the platform-appropriate app stores; if on the
@@ -506,13 +508,6 @@ try to open app, and to visit the platform-appropriate app stores if the open-ap
 
 If *branch.deepview* has not been called, an error will arise with a reminder to call
 *branch.deepview* first.
-
-##### Usage
-```js
-branch.referrals(
-    callback (err, data)
-);
-```
 
 ##### Usage
 ```js
