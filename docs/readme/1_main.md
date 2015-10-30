@@ -14,7 +14,7 @@ To modify this local web app, edit `src/web/example.template.html` first, and th
 - Set up incoming link handling
 - Smart Banner (optional)
 - Deep link generation
-- Send SMS messages
+- Send SMS messages (optional)
 - Identify users
 
 
