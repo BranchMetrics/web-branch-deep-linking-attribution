@@ -507,7 +507,7 @@ If *branch.deepview* has not been called, an error will arise with a reminder to
 
 ##### Usage
 ```js
-$(&#39;a.deepview-cta&#39;).click(branch.deepviewCta); &#x2F;&#x2F; If you&#39;re using jQuery
+$(&#39;a.deepview-cta&#39;).click(branch.deepviewCta); &#x2F;&#x2F; If you are using jQuery
 
 document.getElementById(&#39;my-elem&#39;).onClick = branch.deepviewCta; &#x2F;&#x2F; Or generally
 
@@ -521,6 +521,16 @@ branch.deepview(data, option, function(err) { &#x2F;&#x2F; We recommend to assig
 });
 
 &#x2F;&#x2F; You can call this function any time after branch.deepview() is finished by simply:
+callback(
+     &quot;Error message&quot;,
+     {
+          data_parsed:        { },                          &#x2F;&#x2F; If the user was referred from a link, and the link has associated data, the data is passed in here.
+          referring_identity: &#39;12345&#39;,                      &#x2F;&#x2F; If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
+          has_app:            true,                         &#x2F;&#x2F; Does the user have the app installed already?
+          identity:           &#39;BranchUser&#39;,                 &#x2F;&#x2F; Unique string that identifies the user
+          referring_link:          &#39;https:&#x2F;&#x2F;bnc.lt&#x2F;c&#x2F;jgg75-Gjd3&#39; &#x2F;&#x2F; The referring link click, if available.
+     }
+);
 branch.deepviewCta(); &#x2F;&#x2F; After the deepview call is successful, you can call deepviewCta in your javascript
 ```
 ___
