@@ -1143,8 +1143,8 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 });
 
 /**
- * @function Branch.deepviewCta
- * @param none
+ * @function Branch.deepviewCta()
+ * @param {Void}
  *
  * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
  * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
