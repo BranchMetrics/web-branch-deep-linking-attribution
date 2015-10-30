@@ -721,7 +721,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"http://localhost:5001", version:"1.7.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.7.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
 // Input 3
 var task_queue = function() {
@@ -818,6 +818,13 @@ utils.base64encode = function(a) {
     ;
   }
   return b;
+};
+utils.extractDeeplinkPath = function(a) {
+  if (!a) {
+    return null;
+  }
+  -1 < a.indexOf("://") && (a = a.split("://")[1]);
+  return a.substring(a.indexOf("/") + 1);
 };
 // Input 5
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -1110,7 +1117,7 @@ Server.prototype.createScript = function(a) {
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
-  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=", f = 0 <= a.indexOf("api.branch.io") || 0 <= a.indexOf("localhost:5001") ? "&data=" : "&post_data=";
+  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
   b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
     window[e] = function() {
@@ -1616,7 +1623,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     if (b) {
       return a(b);
     }
-    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+    f._api(resources.linkClick, {link_url:utils.extractDeeplinkPath(c.url), click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }
