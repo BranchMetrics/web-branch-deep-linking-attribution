@@ -1144,6 +1144,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 /**
  * @function Branch.deepviewCta
+ * @param none
  *
  * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
  * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
@@ -1178,16 +1179,6 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * });
  *
  * // You can call this function any time after branch.deepview() is finished by simply:
- * callback(
- *      "Error message",
- *      {
- *           data_parsed:        { },                          // If the user was referred from a link, and the link has associated data, the data is passed in here.
- *           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
- *           has_app:            true,                         // Does the user have the app installed already?
- *           identity:           'BranchUser',                 // Unique string that identifies the user
- *           referring_link:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
- *      }
- * );
  * branch.deepviewCta(); // After the deepview call is successful, you can call deepviewCta in your javascript
  * ```
  *

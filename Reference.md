@@ -493,9 +493,11 @@ callback(
 
 
 
-### Branch.deepviewCta
+### deepviewCta(none) 
 
-Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
+**Parameters**
+
+**none**: , Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
 *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
 configured with the option *`open_app`* being true, an immediate attempt is made as soon as
 deepview finishes, and thus the CTA is to visit the platform-appropriate app stores; if on the
@@ -514,31 +516,21 @@ branch.referrals(
 
 ##### Usage
 ```js
-$(&#39;a.deepview-cta&#39;).click(branch.deepviewCta); &#x2F;&#x2F; If you are using jQuery
+$('a.deepview-cta').click(branch.deepviewCta); // If you are using jQuery
 
-document.getElementById(&#39;my-elem&#39;).onClick = branch.deepviewCta; &#x2F;&#x2F; Or generally
+document.getElementById('my-elem').onClick = branch.deepviewCta; // Or generally
 
-&lt;a href=&#39;...&#39; onclick=&#39;branch.deepviewCta()&#39;&gt; &#x2F;&#x2F; In HTML
+<a href='...' onclick='branch.deepviewCta()'> // In HTML
 
-branch.deepview(data, option, function(err) { &#x2F;&#x2F; We recommend to assign deepviewCta in deepview callback
+branch.deepview(data, option, function(err) { // We recommend to assign deepviewCta in deepview callback
     if (err) {
         throw err;
     }
-    ${&#39;a.deepview-cta&#39;).click(branch.deepviewCta);
+    ${'a.deepview-cta').click(branch.deepviewCta);
 });
 
-&#x2F;&#x2F; You can call this function any time after branch.deepview() is finished by simply:
-callback(
-     &quot;Error message&quot;,
-     {
-          data_parsed:        { },                          &#x2F;&#x2F; If the user was referred from a link, and the link has associated data, the data is passed in here.
-          referring_identity: &#39;12345&#39;,                      &#x2F;&#x2F; If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
-          has_app:            true,                         &#x2F;&#x2F; Does the user have the app installed already?
-          identity:           &#39;BranchUser&#39;,                 &#x2F;&#x2F; Unique string that identifies the user
-          referring_link:          &#39;https:&#x2F;&#x2F;bnc.lt&#x2F;c&#x2F;jgg75-Gjd3&#39; &#x2F;&#x2F; The referring link click, if available.
-     }
-);
-branch.deepviewCta(); &#x2F;&#x2F; After the deepview call is successful, you can call deepviewCta in your javascript
+// You can call this function any time after branch.deepview() is finished by simply:
+branch.deepviewCta(); // After the deepview call is successful, you can call deepviewCta in your javascript
 ```
 
 ___
@@ -546,14 +538,14 @@ ___
 # Referral system rewarding functionality
 In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
-2. Reward the invitee for installing the app from the original user&#39;s referral link
+2. Reward the invitee for installing the app from the original user's referral link
 3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
 
-These reward definitions are created on the dashboard, under the &#39;Reward Rules&#39; section in the &#39;Referrals&#39; tab on the dashboard.
+These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
 
 Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
 
-## Retrieve referrals list() 
+## Retrieve referrals list
 
 
 
