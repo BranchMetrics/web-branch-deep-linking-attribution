@@ -859,7 +859,7 @@ Future development will include the ability to subscribe to events related to al
 
 ##### Example
 
-```
+```js
 var listener = function(event) { console.log(event); }
 
 // Specify an event to listen for

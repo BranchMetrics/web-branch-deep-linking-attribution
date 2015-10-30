@@ -1523,6 +1523,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       }, CORDOVA_BUILD) {
         var m = [];
         null !== b && m.push(b ? 1 : 0);
+        h && m.unshift(d.debug);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
         }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);

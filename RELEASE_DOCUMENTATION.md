@@ -72,7 +72,7 @@ The markdown files concatenated together to make the Full Cordova SDK documentat
 ## Releasing the Web SDK
 The entire release process has been encapsulated into a single shell script: `release.sh`. The release script has a few dependencies you'll need to make sure you have installed: [AWS CLI](http://aws.amazon.com/cli/), [make](http://www.gnu.org/software/make/), and you'll need environment variables to upload the SDK and Web testbed to S3. For convenience, I've placed mine in a simple shell script that I have added to `.gitignore`:
 `aws_access_keys.sh`
-```
+```sh
 #!/bin/bash
 
 export AWS_ACCESS_KEY_ID='ID_GOES_HERE'
