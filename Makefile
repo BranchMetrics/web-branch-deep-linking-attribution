@@ -88,5 +88,7 @@ Reference.md: docs/web/3_branch_web.md docs/9_footer.md
 		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > Reference.md
 	perl -p -i -e 's/# Global//' Reference.md
 
+# integration test page
+
 test/integration-test.html: test/integration-test.template.html
 	perl -pe 'BEGIN{$$a="$(ONPAGE_TEST)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html
