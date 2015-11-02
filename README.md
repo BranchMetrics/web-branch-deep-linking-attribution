@@ -24,7 +24,6 @@ To modify this local web app, edit `src/web/example.template.html` first, and th
 - [Changelog](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/CHANGELOG.md)
 - [Support portal, FAQ, and user forums](http://support.branch.io)
 
-
 ## Overview
 
 The Branch Web SDK provides an easy way to interact with the Branch API on your website, web app, or PhoneGap/Cordova mobile app. It requires no frameworks, is 100% native JavaScript and is only ~9K gzipped.
