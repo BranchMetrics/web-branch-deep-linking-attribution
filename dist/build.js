@@ -1635,7 +1635,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   var d = this;
   c || (c = {});
-  var e = "https://bnc.lt/a/" + d.branch_key, f = !0, g;
+  var e = config.link_service_endpoint + "/a/" + d.branch_key, f = !0, g;
   for (g in b) {
     b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
   }

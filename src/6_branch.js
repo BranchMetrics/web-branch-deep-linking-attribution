@@ -1124,7 +1124,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		options = { };
 	}
 
-	var fallbackUrl = 'https://bnc.lt/a/' + self.branch_key;
+	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
 	var encodeLinkProperty = function(key, data) {
 		return encodeURIComponent(utils.base64encode(goog.json.serialize(data[key])));
