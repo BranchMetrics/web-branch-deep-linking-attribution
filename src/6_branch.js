@@ -1023,7 +1023,13 @@ Branch.prototype['sendSMS'] = wrap(
  * @function Branch.deepview
  * @param {Object} data - _required_ - object of all link data, same as Branch.link().
  * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if one already exists_, *open_app*, _whether to try to open the app immediately_ }.
- * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
+ * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
+ *
+ * In the event that the API call in deepview() has failed, we will fall back to use a
+ * [Branch dynamic link](https://github.com/BranchMetrics/Deferred-Deep-Linking-Public-API#structuring-a-dynamic-deeplink)
+ * for the deepview CTA. If you wish to implement your own error fallback logic, you can do so in
+ * the deepview() callback. Note that in order to give developers full control, the `open_app`
+ * option parameter is ignored in this scenario.
  *
  * Register the current page view as a deepview, and inject Branch deepview CTA from the server.
  * The `data` parameter can include an object with optional data you would like to store, including
@@ -1130,14 +1136,46 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		);
 	}
 
+	var getFallbackUrl = function() {
+		var url = 'https://bnc.lt/a/' + self.branch_key;
+		var first = true;
+		var encodeLinkProperty = function(key, data) {
+			if (key !== 'data') {
+				return encodeURIComponent(data[key]);
+			}
+			return encodeURIComponent(utils.base64encode(goog.json.serialize(data[key])));
+		};
+
+		for (var key in data) {
+			if (data.hasOwnProperty(key)) {
+				if (first) {
+					url += '?';
+					first = false;
+				}
+				else {
+					url += '&';
+				}
+				url += encodeURIComponent(key) + '=' + encodeLinkProperty(key, data);
+			}
+		}
+		if (options.open_app) {
+			url += '&passive_load=false';
+		}
+		return url;
+	};
+
 	this._api(resources.deepview, cleanedData, function(err, data) {
 		if (err) {
+			self._deepviewCta = function() {
+				window.location.href = getFallbackUrl();
+			};
 			return done(err);
 		}
 
 		if (typeof data === 'function') {
 			self._deepviewCta = data;
 		}
+
 		done(null);
 	});
 });

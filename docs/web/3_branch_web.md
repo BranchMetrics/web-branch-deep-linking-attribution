@@ -368,7 +368,13 @@ ___
 
 **options**: `Object`, _optional_ - { *make_new_link*: _whether to create a new link even if one already exists_, *open_app*, _whether to try to open the app immediately_ }.
 
-**callback**: `function`, _optional_ - returns an error if unsuccessful
+**callback**: `function`, _optional_ - returns an error if the API call is unsuccessful
+
+In the event that the API call in deepview() has failed, we will fall back to use a
+[Branch dynamic link](https://github.com/BranchMetrics/Deferred-Deep-Linking-Public-API#structuring-a-dynamic-deeplink)
+for the deepview CTA. If you wish to implement your own error fallback logic, you can do so in
+the deepview() callback. Note that in order to give developers full control, the `open_app`
+option parameter is ignored in this scenario.
 
 Register the current page view as a deepview, and inject Branch deepview CTA from the server.
 The `data` parameter can include an object with optional data you would like to store, including

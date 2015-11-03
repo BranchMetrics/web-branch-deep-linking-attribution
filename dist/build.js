@@ -1323,8 +1323,8 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+    var q = e.value;
+    /^\d{7,}$/.test(q.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(q, d, c, function(a) {
       a ? (b._publishEvent("sendBannerSMSError"), m()) : (b._publishEvent("didSendBannerSMS"), n(), setTimeout(function() {
         h.removeChild(k);
         l();
@@ -1536,9 +1536,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
       } else {
         if (TITANIUM_BUILD) {
-          var m = {}, p = require("io.branch.sdk");
+          var m = {}, q = require("io.branch.sdk");
           g && (m.link_identifier = g);
-          m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
+          m = h ? q.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : q.getOpenData(null === b ? -1 : b ? 1 : 0);
           c(m);
         }
       }
@@ -1635,15 +1635,29 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   var d = this;
   c || (c = {});
-  b = utils.cleanLinkData(b);
-  c.open_app && (b.open_app = !0);
-  var e = d._referringLink();
-  e && !c.make_new_link && (b.link_click_id = e.substring(e.lastIndexOf("/") + 1, e.length));
-  this._api(resources.deepview, b, function(b, c) {
-    if (b) {
-      return a(b);
+  var e = utils.cleanLinkData(b);
+  c.open_app && (e.open_app = !0);
+  var f = d._referringLink();
+  f && !c.make_new_link && (e.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
+  this._api(resources.deepview, e, function(e, f) {
+    if (e) {
+      return d._deepviewCta = function() {
+        var a = window.location, e = "https://bnc.lt/a/" + d.branch_key, f = !0, g;
+        for (g in b) {
+          if (b.hasOwnProperty(g)) {
+            f ? (e += "?", f = !1) : e += "&";
+            var h = encodeURIComponent(g) + "=", p;
+            p = g;
+            var r = b;
+            p = "data" !== p ? encodeURIComponent(r[p]) : encodeURIComponent(utils.base64encode(goog.json.serialize(r[p])));
+            e += h + p;
+          }
+        }
+        c.open_app && (e += "&passive_load=false");
+        a.href = e;
+      }, a(e);
     }
-    "function" === typeof c && (d._deepviewCta = c);
+    "function" === typeof f && (d._deepviewCta = f);
     a(null);
   });
 });
