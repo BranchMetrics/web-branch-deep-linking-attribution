@@ -772,7 +772,7 @@ utils.clickIdFromLink = function(a) {
   return a ? a.substring(a.lastIndexOf("/") + 1, a.length) : null;
 };
 utils.processReferringLink = function(a) {
-  return a ? "http" !== a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
+  return a ? "http" !== a.substring(0, 4) ? config.link_service_endpoint + a : a : null;
 };
 utils.merge = function(a, b) {
   if ("undefined" === typeof b) {
