@@ -1123,6 +1123,31 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	if (!options) {
 		options = { };
 	}
+
+	var fallbackUrl = 'https://bnc.lt/a/' + self.branch_key;
+	var first = true;
+	var encodeLinkProperty = function(key, data) {
+		return encodeURIComponent(utils.base64encode(goog.json.serialize(data[key])));
+	};
+
+	for (var key in data) {
+		if (data.hasOwnProperty(key)) {
+			if (key !== 'data') {
+				if (first) {
+					fallbackUrl += '?';
+					first = false;
+				}
+				else {
+					fallbackUrl += '&';
+				}
+				fallbackUrl += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
+			}
+		}
+	}
+	if (options['open_app']) {
+		fallbackUrl += '&passive_load=false';
+	}
+
 	var cleanedData = utils.cleanLinkData(data);
 
 	if (options['open_app']) {
@@ -1136,38 +1161,10 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		);
 	}
 
-	var getFallbackUrl = function() {
-		var url = 'https://bnc.lt/a/' + self.branch_key;
-		var first = true;
-		var encodeLinkProperty = function(key, data) {
-			if (key !== 'data') {
-				return encodeURIComponent(data[key]);
-			}
-			return encodeURIComponent(utils.base64encode(goog.json.serialize(data[key])));
-		};
-
-		for (var key in data) {
-			if (data.hasOwnProperty(key)) {
-				if (first) {
-					url += '?';
-					first = false;
-				}
-				else {
-					url += '&';
-				}
-				url += encodeURIComponent(key) + '=' + encodeLinkProperty(key, data);
-			}
-		}
-		if (options.open_app) {
-			url += '&passive_load=false';
-		}
-		return url;
-	};
-
 	this._api(resources.deepview, cleanedData, function(err, data) {
 		if (err) {
 			self._deepviewCta = function() {
-				window.location.href = getFallbackUrl();
+				window.location = fallbackUrl;
 			};
 			return done(err);
 		}
