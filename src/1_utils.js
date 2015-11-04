@@ -125,7 +125,7 @@ utils.clickIdFromLink = function(link) {
  * @param {String} link
  */
 utils.processReferringLink = function(link) {
-	return link ? (link.substring(0, 4) !== 'http' ? 'https://bnc.lt' + link : link) : null;
+	return link ? (link.substring(0, 4) !== 'http' ? config.link_service_endpoint + link : link) : null;
 };
 
 /**
@@ -262,4 +262,25 @@ utils.base64encode = function(input) {
 			keyStr.charAt(enc4);
 	}
 	return output;
+};
+
+/**
+ * Extract the path (the part of the url excluding protocol and domain name) from urls in the forms
+ * of:
+ * - "protocol://domain.name/some/path
+ * - "domain.name/some/path"
+ *
+ * and returns (for the above sample input cases):
+ * - "some/path"
+ *
+ * @param {string} url
+ */
+utils.extractDeeplinkPath = function(url) {
+	if (!url) {
+		return null;
+	}
+	if (url.indexOf('://') > -1) {
+		url = url.split('://')[1];
+	}
+	return url.substring(url.indexOf('/') + 1);
 };
