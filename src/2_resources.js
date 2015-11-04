@@ -178,7 +178,8 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 			"screen_width": validator(false, validationTypes.NUMBER),
 			"sdk": validator(false, validationTypes.STRING),
 			"update": validator(false, validationTypes.NUMBER),
-			"uri_scheme": validator(false, validationTypes.STRING)
+			"uri_scheme": validator(false, validationTypes.STRING),
+			"universal_link_url": validator(false, validationTypes.STRING)
 		}
 	};
 
@@ -197,7 +198,8 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
 			"os": validator(false, validationTypes.STRING),
 			"os_version": validator(false, validationTypes.STRING),
 			"sdk": validator(false, validationTypes.STRING),
-			"uri_scheme": validator(false, validationTypes.STRING)
+			"uri_scheme": validator(false, validationTypes.STRING),
+			"universal_link_url": validator(false, validationTypes.STRING)
 		}
 	};
 
