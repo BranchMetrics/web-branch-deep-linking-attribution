@@ -1383,8 +1383,6 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
             throw b;
           }
           a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
-        } catch (d) {
-          throw d;
         } finally {
           g();
         }

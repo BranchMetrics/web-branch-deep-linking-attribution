@@ -77,10 +77,8 @@ var wrap = function(parameters, func, init) {
 					else if (parameters === callback_params.CALLBACK_ERR_DATA) {
 						callback(err, data);
 					}
-				} catch (err) {
-					// the callback functions may or may not throw an error...
-					throw err;
-				} finally {
+				}
+				finally {
 					// ...but we always want to call next
 					next();
 				}
