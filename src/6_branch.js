@@ -67,18 +67,22 @@ var wrap = function(parameters, func, init) {
 			 * @type {function(?Error,?): undefined}
 			 */
 			var done = function(err, data) {
-				if (err) {
-					setTimeout(next);
-				}
-
-				if (err && parameters === callback_params.NO_CALLBACK) {
+				try {
+					if (err && parameters === callback_params.NO_CALLBACK) {
+						throw err;
+					}
+					else if (parameters === callback_params.CALLBACK_ERR) {
+						callback(err);
+					}
+					else if (parameters === callback_params.CALLBACK_ERR_DATA) {
+						callback(err, data);
+					}
+				} catch (err) {
+					// the callback functions may or may not throw an error...
 					throw err;
-				}
-				else if (parameters === callback_params.CALLBACK_ERR) {
-					callback(err);
-				}
-				else if (parameters === callback_params.CALLBACK_ERR_DATA) {
-					callback(err, data);
+				} finally {
+					// ...but we always want to call next
+					next();
 				}
 			};
 			if (!init) {
