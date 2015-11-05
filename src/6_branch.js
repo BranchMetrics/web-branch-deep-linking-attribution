@@ -1042,13 +1042,16 @@ Branch.prototype['sendSMS'] = wrap(
 /**
  * @function Branch.deepview
  * @param {Object} data - _required_ - object of all link data, same as Branch.link().
- * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if one already exists_, *open_app*, _whether to try to open the app immediately_ }.
+ * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if
+ * one already exists_. *passive_load*, _whether to try to open the app passively (as opposed to
+ * opening it upon user clicking); passive_load has no effects on iOS 9._
+ * }.
  * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
  *
  * In the event that the API call in deepview() has failed, we will fall back to use a
  * [Branch dynamic link](https://github.com/BranchMetrics/Deferred-Deep-Linking-Public-API#structuring-a-dynamic-deeplink)
  * for the deepview CTA. If you wish to implement your own error fallback logic, you can do so in
- * the deepview() callback. Note that in order to give developers full control, the `open_app`
+ * the deepview() callback. Note that in order to give developers full control, the `passive_load`
  * option parameter is ignored in this scenario.
  *
  * Register the current page view as a deepview, and inject Branch deepview CTA from the server.
@@ -1120,7 +1123,7 @@ Branch.prototype['sendSMS'] = wrap(
  *     },
  *     {
  *         make_new_link: true,
- *         open_app: true
+ *         passive_load: true
  *     },
  *     function(err) {
  *         console.log(err || 'no error');
@@ -1167,7 +1170,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	var cleanedData = utils.cleanLinkData(data);
 
-	if (options['open_app']) {
+	if (options['passive_load']) {
 		fallbackUrl += '&passive_load=true';
 		cleanedData['passive_load'] = true;
 	}
@@ -1200,15 +1203,16 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  *
  * @description
  *
- * Perform the branch deepview CTA (call to action) on mobile. Namely, depends on how
- * *branch.deepview* is set up, the mobile users are redirected accordingly. If the deepview is
- * configured with the option *`open_app`* being true, an immediate attempt is made as soon as
- * deepview finishes, and thus the CTA is to visit the platform-appropriate app stores; if on the
- * other hand, the deepview is configured with the option *`open_app`* being false, the CTA is to
- * try to open app, and to visit the platform-appropriate app stores if the open-app attempt failes.
+ * Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
+ * finished. If the `branch.deepview()` call is finished with no error, when `branch.deepviewCta()` is called,
+ * an attempt is made to open the app and deeplink the end user into it; if the end user does not
+ * have the app installed, they will be redirected to the platform-appropriate app stores. If on the
+ * other hand, `branch.deepview()` returns with an error, `branch.deepviewCta()` will fall back to
+ * redirect the user using
+ * [Branch dynamic links](https://github.com/BranchMetrics/Deferred-Deep-Linking-Public-API#structuring-a-dynamic-deeplink).
  *
- * If *branch.deepview* has not been called, an error will arise with a reminder to call
- * *branch.deepview* first.
+ * If `branch.deepview()` has not been called, an error will arise with a reminder to call
+ * `branch.deepview()` first.
  *
  * ##### Usage
  * ```js
@@ -1233,14 +1237,19 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * ___
  *
  * # Referral system rewarding functionality
- * In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
+ * In a standard referral system, you have 2 parties: the original user and the invitee. Our system
+ * is flexible enough to handle rewards for all users for any actions. Here are a couple example
+ * scenarios:
  * 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
  * 2. Reward the invitee for installing the app from the original user's referral link
- * 3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
+ * 3. Reward the original user when the invitee takes action (eg. give the original user credit when
+ *     their the invitee buys something)
  *
- * These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
+ * These reward definitions are created on the dashboard, under the 'Reward Rules' section in the
+ * 'Referrals' tab on the dashboard.
  *
- * Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+ * Warning: For a referral program, you should not use unique awards for custom events and redeem
+ * pre-identify call. This can allow users to cheat the system.
  *
  * ## Retrieve referrals list
  *
@@ -1762,7 +1771,7 @@ if (WEB_BUILD) {
 	 *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
 	 *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
 	 *     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
-	 *     open_app: false,                        // Should the banner try to open the app immediately on load?
+	 *     passive_load: false,                    // Should the banner try to open the app passively (without the user actively clicking) on load?
 	 *
 	 * }, {
 	 *     tags: ['tag1', 'tag2'],
@@ -1841,7 +1850,7 @@ if (WEB_BUILD) {
 				true :
 				options['desktopSticky'],
 			make_new_link: !!options['make_new_link'],
-			passive_load: !!options['open_app']
+			passive_load: !!options['passive_load']
 		};
 
 		if (typeof options['showMobile'] !== 'undefined') {

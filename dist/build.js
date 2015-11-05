@@ -1342,7 +1342,7 @@ var sendSMS = function(a, b, c, d) {
   var f = b.iframe ? e.contentWindow.document : document;
   if (utils.mobileUserAgent()) {
     var g = a._referringLink();
-    b.open_app ? (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b, function(a) {
+    b.passive_load ? (b.passive_load = b.passive_load, b.make_new_link = b.make_new_link, a.deepview(c, b, function(a) {
       if (a) {
         throw a;
       }
@@ -1645,7 +1645,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
     b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
   }
   b = utils.cleanLinkData(b);
-  c.open_app && (e += "&passive_load=true", b.passive_load = !0);
+  c.passive_load && (e += "&passive_load=true", b.passive_load = !0);
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
@@ -1702,7 +1702,7 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
 }, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === 
-  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link, passive_load:!!b.open_app};
+  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link, passive_load:!!b.passive_load};
   "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
