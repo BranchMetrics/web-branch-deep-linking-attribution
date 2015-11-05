@@ -1395,11 +1395,14 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
       var k = function(b, c) {
-        if (b && a === callback_params.NO_CALLBACK) {
-          throw b;
+        try {
+          if (b && a === callback_params.NO_CALLBACK) {
+            throw b;
+          }
+          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+        } finally {
+          g();
         }
-        a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
-        g();
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
@@ -1577,7 +1580,7 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     b.identity_id = d.identity_id;
     b.identity = d.identity;
     session.update(b._storage, d);
-    a(c);
+    a(null);
   });
 });
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -1606,7 +1609,9 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
-    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
+    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, function(b) {
+      a(b || null);
+    });
   }
   var f = this;
   if ("function" === typeof d) {
@@ -1681,7 +1686,9 @@ Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, functio
   this._api(resources.creditHistory, b || {}, a);
 });
 Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
-  this._api(resources.redeem, {amount:b, bucket:c}, a);
+  this._api(resources.redeem, {amount:b, bucket:c}, function(b) {
+    a(b || null);
+  });
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   "function" === typeof a && void 0 === b && (b = a);

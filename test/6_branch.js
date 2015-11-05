@@ -442,7 +442,7 @@ describe('Branch', function() {
 	});
 
 	describe('track', function() {
-		// basicTests('track', [ 1, 2 ]);
+		basicTests('track', [ 1, 2 ]);
 
 		it('should call api with event with no metadata', function(done) {
 			var branch = initBranch(true);
@@ -506,8 +506,7 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
 			branch.logout(function(err) {
-				assert(true);
-				// assert.strictEqual(err, null, 'No error');
+				assert.strictEqual(err, null, 'No error');
 			});
 
 			assert.strictEqual(requests.length, 1, 'Request made');
@@ -525,8 +524,7 @@ describe('Branch', function() {
 				var branch = initBranch(true);
 				var assert = testUtils.plan(6, done);
 				branch.logout(function(err) {
-					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				});
 
 				assert.strictEqual(requests.length, 1, 'Request made');
@@ -628,7 +626,7 @@ describe('Branch', function() {
 	});
 
 	describe('sendSMS', function() {
-		// basicTests('sendSMS', [ 3, 4 ]);
+		basicTests('sendSMS', [ 3, 4 ]);
 
 		var linkData = testUtils.params({
 			tags: [ 'tag1', 'tag2' ],
@@ -663,8 +661,7 @@ describe('Branch', function() {
 				'9999999999',
 				linkData,
 				function(err) {
-					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				}
 			);
 
@@ -684,8 +681,7 @@ describe('Branch', function() {
 				'9999999999',
 				linkData,
 				function(err) {
-					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				}
 			);
 			assert.strictEqual(requests.length, 1, 'Requests made');
@@ -1035,8 +1031,7 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
 			branch.redeem(1, 'testbucket', function(err) {
-				assert(true);
-				// assert.strictEqual(err, null, 'No error');
+				assert.strictEqual(err, null, 'No error');
 			});
 
 			assert.strictEqual(requests.length, 1, 'Request made');

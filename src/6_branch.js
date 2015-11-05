@@ -67,16 +67,21 @@ var wrap = function(parameters, func, init) {
 			 * @type {function(?Error,?): undefined}
 			 */
 			var done = function(err, data) {
-				if (err && parameters === callback_params.NO_CALLBACK) {
-					throw err;
+				try {
+					if (err && parameters === callback_params.NO_CALLBACK) {
+						throw err;
+					}
+					else if (parameters === callback_params.CALLBACK_ERR) {
+						callback(err);
+					}
+					else if (parameters === callback_params.CALLBACK_ERR_DATA) {
+						callback(err, data);
+					}
 				}
-				else if (parameters === callback_params.CALLBACK_ERR) {
-					callback(err);
+				finally {
+					// ...but we always want to call next
+					next();
 				}
-				else if (parameters === callback_params.CALLBACK_ERR_DATA) {
-					callback(err, data);
-				}
-				next();
 			};
 			if (!init) {
 				if (self.init_state === init_states.INIT_PENDING) {
@@ -693,7 +698,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.identity = data['identity'];
 		session.update(self._storage, data);
 
-		done(err);
+		done(null);
 	});
 });
 
@@ -981,7 +986,10 @@ Branch.prototype['sendSMS'] = wrap(
 				resources.SMSLinkSend, {
 					"link_url": click_id,
 					"phone": phone
-				}, done);
+				},
+				function(err) {
+					done(err || null);
+				});
 		}
 
 		var referringLink = self._referringLink();
@@ -1608,7 +1616,10 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 		{
 			"amount": amount,
 			"bucket": bucket
-		}, done
+		},
+		function(err) {
+			done(err || null);
+		}
 	);
 });
 
