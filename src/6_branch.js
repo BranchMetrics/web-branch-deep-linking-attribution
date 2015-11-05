@@ -1144,14 +1144,12 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 			}
 		}
 	}
-	if (options['open_app']) {
-		fallbackUrl += '&passive_load=false';
-	}
 
 	var cleanedData = utils.cleanLinkData(data);
 
 	if (options['open_app']) {
-		cleanedData['open_app'] = true;
+		fallbackUrl += '&passive_load=true';
+		cleanedData['passive_load'] = true;
 	}
 
 	var referringLink = self._referringLink();
@@ -1804,7 +1802,7 @@ if (WEB_BUILD) {
 				true :
 				options['desktopSticky'],
 			make_new_link: !!options['make_new_link'],
-			open_app: !!options['open_app']
+			passive_load: !!options['open_app']
 		};
 
 		if (typeof options['showMobile'] !== 'undefined') {

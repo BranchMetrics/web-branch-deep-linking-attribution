@@ -120,6 +120,8 @@ banner = function(branch, options, linkData, storage) {
 	if (utils.mobileUserAgent()) {
 		var referringLink = branch._referringLink();
 		if (options.open_app) {
+			options['open_app'] = options.open_app;
+			options['make_new_link'] = options.make_new_link;
 			branch['deepview'](linkData, options, function(err) {
 				if (err) {
 					throw err;
