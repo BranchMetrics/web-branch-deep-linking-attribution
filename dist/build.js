@@ -1501,10 +1501,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         if (a) {
           return l(a, null);
         }
-        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-          b && g && (b.click_id = g);
+        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, c) {
+          c && g && (c.click_id = g);
           n();
-          l(a, b);
+          d._api(resources.hasApp, {browser_fingerprint_id:b}, function(a, b) {
+            b && (c.has_app = !0);
+            l(a, c);
+          });
         });
       });
     } else {

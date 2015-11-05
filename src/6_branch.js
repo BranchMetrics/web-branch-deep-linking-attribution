@@ -485,7 +485,16 @@ Branch.prototype['init'] = wrap(
 								data['click_id'] = link_identifier;
 							}
 							attachVisibilityEvent();
-							finishInit(err, data);
+							self._api(
+								resources.hasApp,
+								{ "browser_fingerprint_id": browser_fingerprint_id },
+								function(err, has_app) {
+									if (has_app) {
+										data['has_app'] = true;
+									}
+									finishInit(err, data);
+								}
+							);
 						}
 					);
 				}
@@ -998,7 +1007,7 @@ Branch.prototype['sendSMS'] = wrap(
 					"link_url": click_id,
 					"phone": phone
 				},
-				function (err) {
+				function(err) {
 					done(err || null);
 				});
 		}
@@ -1405,7 +1414,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 			"amount": amount,
 			"bucket": bucket
 		},
-		function (err) {
+		function(err) {
 			done(err || null);
 		}
 	);
