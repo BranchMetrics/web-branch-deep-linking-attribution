@@ -835,8 +835,22 @@ describe('Branch', function() {
 			assert.strictEqual(obj.link_click_id, '123abc', 'link_click_id is sent');
 		});
 
-		// it('should execute callback data if it is a function', function(done) {
-		it('should return error and use fallbackUrl when the request has error', function(done) {
+		it('should execute callback data if it is a function', function(done) {
+			var assert = testUtils.plan(2, done);
+
+			branch.deepview(
+				{},
+				{},
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+			requests[0].callback(null, new function() {
+				assert(true, 'callback function gets executed');
+			});
+		});
+
+		it('should return error and use the correct fallbackUrl when the request has error', function(done) {
 			var assert = testUtils.plan(2, done);
 
 			sandbox.stub(branch, '_windowRedirect', function(url) {
@@ -844,10 +858,12 @@ describe('Branch', function() {
 			});
 
 			branch.deepview(
-				{},
+				{
+					"abc": "def"
+				},
 				{},
 				function(err) {
-					assert.strictEqual(err.message, 'error message abc');
+					assert.strictEqual(err.message, 'error message abc', 'expected error message');
 				}
 			);
 			requests[0].callback(new Error('error message abc'));
@@ -856,7 +872,11 @@ describe('Branch', function() {
 				branch._windowRedirect.restore();
 			}
 			sandbox.stub(branch, '_windowRedirect', function(url) {
-				assert.strictEqual(url, 'https://bnc.lt/a/' + window.branch_sample_key, 'rediretion happened');
+				assert.strictEqual(
+					url,
+					'https://bnc.lt/a/' + window.branch_sample_key + '?abc=def',
+					'rediretion happened'
+				);
 			});
 			branch._deepviewCta(); // redirection happens now
 
