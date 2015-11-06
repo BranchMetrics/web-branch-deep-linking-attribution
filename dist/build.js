@@ -1650,13 +1650,16 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
       return d._deepviewCta = function() {
-        window.location = e;
+        d._windowRedirect(e);
       }, a(b);
     }
     "function" === typeof c && (d._deepviewCta = c);
     a(null);
   });
 });
+Branch.prototype._windowRedirect = function(a) {
+  window.location = a;
+};
 Branch.prototype.deepviewCta = wrap(callback_params.NO_CALLBACK, function(a) {
   if ("undefined" === typeof this._deepviewCta) {
     throw Error("Cannot call Deepview CTA, please call branch.deepview() first.");

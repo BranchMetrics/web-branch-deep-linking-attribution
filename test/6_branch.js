@@ -786,7 +786,7 @@ describe('Branch', function() {
 				}
 			);
 
-			assert.strictEqual(requests.length, 1, 'Request made');
+			assert.strictEqual(requests.length, 1, 'exactly one request made');
 			requests[0].callback();
 
 			var obj = requests[0].obj;
@@ -833,6 +833,36 @@ describe('Branch', function() {
 			requests[0].callback();
 			var obj = requests[0].obj;
 			assert.strictEqual(obj.link_click_id, '123abc', 'link_click_id is sent');
+		});
+
+		// it('should execute callback data if it is a function', function(done) {
+		it('should return error and use fallbackUrl when the request has error', function(done) {
+			var assert = testUtils.plan(2, done);
+
+			sandbox.stub(branch, '_windowRedirect', function(url) {
+				assert(false, 'redirect should not happen unless explicitly called');
+			});
+
+			branch.deepview(
+				{},
+				{},
+				function(err) {
+					assert.strictEqual(err.message, 'error message abc');
+				}
+			);
+			requests[0].callback(new Error('error message abc'));
+
+			if (typeof branch._windowRedirect.restore === 'function') {
+				branch._windowRedirect.restore();
+			}
+			sandbox.stub(branch, '_windowRedirect', function(url) {
+				assert.strictEqual(url, 'https://bnc.lt/a/' + window.branch_sample_key, 'rediretion happened');
+			});
+			branch._deepviewCta(); // redirection happens now
+
+			if (typeof branch._windowRedirect.restore === 'function') {
+				branch._windowRedirect.restore();
+			}
 		});
 
 	});

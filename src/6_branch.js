@@ -1185,7 +1185,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	this._api(resources.deepview, cleanedData, function(err, data) {
 		if (err) {
 			self._deepviewCta = function() {
-				window.location = fallbackUrl;
+				self._windowRedirect(fallbackUrl);
 			};
 			return done(err);
 		}
@@ -1197,6 +1197,10 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		done(null);
 	});
 });
+
+Branch.prototype._windowRedirect = function(url) {
+	window.location = url;
+};
 
 /**
  * @function Branch.deepviewCta
