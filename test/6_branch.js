@@ -835,8 +835,8 @@ describe('Branch', function() {
 			assert.strictEqual(obj.link_click_id, '123abc', 'link_click_id is sent');
 		});
 
-		it('should execute callback data if it is a function', function(done) {
-			var assert = testUtils.plan(2, done);
+		it('should assign the function in request callback to branch._deepviewCta', function(done) {
+			var assert = testUtils.plan(4, done);
 
 			branch.deepview(
 				{},
@@ -845,9 +845,12 @@ describe('Branch', function() {
 					assert.strictEqual(err, null, 'No error');
 				}
 			);
-			requests[0].callback(null, new function() {
+			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
+			requests[0].callback(null, function() {
 				assert(true, 'callback function gets executed');
 			});
+			assert.strictEqual(typeof branch._deepviewCta, 'function', 'changed to function type');
+			branch._deepviewCta();
 		});
 
 		it('should return error and use the correct fallbackUrl when the request has error', function(done) {
@@ -885,6 +888,34 @@ describe('Branch', function() {
 			}
 		});
 
+	});
+
+	describe('deepviewCta', function() {
+		var branch;
+		beforeEach(function() {
+			branch = initBranch(true);
+		});
+
+		it('should throw an error if branch._deepviewCta is undefined', function (done) {
+			var assert = testUtils.plan(2, done);
+			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
+			try {
+				branch.deepviewCta();
+			} catch (e) {
+				assert.strictEqual(
+					e.message,
+					'Cannot call Deepview CTA, please call branch.deepview() first.',
+					'expected error'
+				);
+			}
+		});
+
+		it('should not throw an error if branch._deepviewCta is a function', function (done) {
+			var assert = testUtils.plan(1, done);
+			branch._deepviewCta = function(){};
+			branch.deepviewCta();
+			assert(true, 'no error');
+		});
 	});
 
 	describe('referrals', function() {
