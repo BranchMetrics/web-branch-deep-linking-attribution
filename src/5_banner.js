@@ -119,7 +119,10 @@ banner = function(branch, options, linkData, storage) {
 
 	if (utils.mobileUserAgent()) {
 		var referringLink = branch._referringLink();
-		if (options.passive_load) {
+		if (referringLink && !options.make_new_link) {
+			doc.getElementById('branch-mobile-action').href = referringLink;
+		}
+		else {
 			options['passive_load'] = options.passive_load;
 			options['make_new_link'] = options.make_new_link;
 			branch['deepview'](linkData, options, function(err) {
@@ -128,20 +131,6 @@ banner = function(branch, options, linkData, storage) {
 				}
 				doc.getElementById('branch-mobile-action').onclick =
 					'branch.deepviewCta()';
-			});
-		}
-		else if (referringLink && !options.make_new_link) {
-			doc.getElementById('branch-mobile-action').href = referringLink;
-		}
-		else {
-			branch['link'](linkData, function(err, url) {
-				if (err) {
-					// Todo: figure out something good to do here. Maybe a
-					// long link? Or why not always a long link?
-				}
-				else {
-					doc.getElementById('branch-mobile-action').href = url;
-				}
 			});
 		}
 	}

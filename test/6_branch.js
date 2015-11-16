@@ -853,7 +853,7 @@ describe('Branch', function() {
 			branch._deepviewCta();
 		});
 
-		it('should return error and use the correct fallbackUrl when the request has error', function(done) {
+		it('should return err and use the right fallback when the req has err', function(done) {
 			var assert = testUtils.plan(2, done);
 
 			sandbox.stub(branch, '_windowRedirect', function(url) {
@@ -896,7 +896,7 @@ describe('Branch', function() {
 			branch = initBranch(true);
 		});
 
-		it('should throw an error if branch._deepviewCta is undefined', function (done) {
+		it('should throw an error if branch._deepviewCta is undefined', function(done) {
 			var assert = testUtils.plan(2, done);
 			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
 			try {
@@ -910,9 +910,9 @@ describe('Branch', function() {
 			}
 		});
 
-		it('should not throw an error if branch._deepviewCta is a function', function (done) {
+		it('should not throw an error if branch._deepviewCta is a function', function(done) {
 			var assert = testUtils.plan(1, done);
-			branch._deepviewCta = function(){};
+			branch._deepviewCta = function() {};
 			branch.deepviewCta();
 			assert(true, 'no error');
 		});

@@ -376,57 +376,22 @@ ___
 
 **Parameters**
 
-**data**: `Object`, _required_ - object of all link data, same as Branch.link().
+**data**: `Object`, _required_ - object of all link data, same as branch.link().
 
 **options**: `Object`, _optional_ - { *make_new_link*: _whether to create a new link even if
 one already exists_. *passive_load*, _whether to try to open the app passively (as opposed to
-opening it upon user clicking); passive_load has no effects on iOS 9._
+opening it upon user clicking); defaults to true_
 }.
 
 **callback**: `function`, _optional_ - returns an error if the API call is unsuccessful
 
-In the event that the API call in deepview() has failed, we will fall back to use a
-[Branch dynamic link](https://github.com/BranchMetrics/Deferred-Deep-Linking-Public-API#structuring-a-dynamic-deeplink)
-for the deepview CTA. If you wish to implement your own error fallback logic, you can do so in
-the deepview() callback. Note that in order to give developers full control, the `passive_load`
-option parameter is ignored in this scenario.
-
-Register the current page view as a deepview, and inject Branch deepview CTA from the server.
-The `data` parameter can include an object with optional data you would like to store, including
-Facebook [Open Graph data](https://developers.facebook.com/docs/opengraph).
-
-**data** The dictionary to embed with the link. Accessed as session or install parameters from the SDK.
-
-**Note**
-You can customize the Facebook OG tags of each URL if you want to dynamically share content by using the following optional keys in the data dictionary. Please use this [Facebook tool](https://developers.facebook.com/tools/debug/og/object) to debug your OG tags!
-
-| Key | Value
-| --- | ---
-| "$og_title" | The title you'd like to appear for the link in social media
-| "$og_description" | The description you'd like to appear for the link in social media
-| "$og_image_url" | The URL for the image you'd like to appear for the link in social media
-| "$og_video" | The URL for the video
-| "$og_url" | The URL you'd like to appear
-| "$og_redirect" | If you want to bypass our OG tags and use your own, use this key with the URL that contains your site's metadata.
-
-Also, you can set custom redirection by inserting the following optional keys in the dictionary:
-
-| Key | Value
-| --- | ---
-| "$desktop_url" | Where to send the user on a desktop or laptop. By default it is the Branch-hosted text-me service
-| "$android_url" | The replacement URL for the Play Store to send the user if they don't have the app. _Only necessary if you want a mobile web splash_
-| "$ios_url" | The replacement URL for the App Store to send the user if they don't have the app. _Only necessary if you want a mobile web splash_
-| "$ipad_url" | Same as above but for iPad Store
-| "$fire_url" | Same as above but for Amazon Fire Store
-| "$blackberry_url" | Same as above but for Blackberry Store
-| "$windows_phone_url" | Same as above but for Windows Store
-| "$after_click_url" | When a user returns to the browser after going to the app, take them to this URL. _iOS only; Android coming soon_
-
-You have the ability to control the direct deep linking of each link as well:
-
-| Key | Value
-| --- | ---
-| "$deeplink_path" | The value of the deep link path that you'd like us to append to your URI. For example, you could specify "$deeplink_path": "radio/station/456" and we'll open the app with the URI "yourapp://radio/station/456?link_click_id=branch-identifier". This is primarily for supporting legacy deep linking infrastructure.
+Turns the current page into a "deepview" – a preview of app content. This gives the page two
+special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
+installed on their phone, we will try to open the app automaticaly and deeplink them to this
+content (this can be toggled off by turning passive_load to false, but this is not recommended),
+and (2) provides a callback to open the app directly, accessible as `branch.deepviewCta()`;
+you'll want to have a button on your web page that says something like "View in app", which
+calls this function.
 
 #### Usage
 ```js
@@ -445,14 +410,7 @@ branch.deepview(
         data: {
             mydata: 'content of my data',
             foo: 'bar',
-            '$desktop_url': 'https://en.wikipedia.org/wiki/Internet',
-            '$ios_url': 'https://en.wikipedia.org/wiki/Internet',
-            '$ipad_url': 'https://en.wikipedia.org/wiki/Internet',
-            '$android_url': 'https://en.wikipedia.org/wiki/Internet',
-            '$deepview_path': 'item_id=12345',
-            '$og_app_id': '12345',
-            '$og_title': 'My App',
-            '$og_description': 'My app\'s description.'
+            '$deepview_path': 'item_id=12345'
         },
         feature: 'dashboard',
         stage: 'new user',
