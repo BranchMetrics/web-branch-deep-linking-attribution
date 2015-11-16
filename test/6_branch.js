@@ -761,7 +761,7 @@ describe('Branch', function() {
 		});
 		var options = {
 			make_new_link: true,
-			passive_load: true
+			open_app: true
 		};
 
 		beforeEach(function() {
@@ -792,7 +792,7 @@ describe('Branch', function() {
 			var obj = requests[0].obj;
 			assert.strictEqual(obj.data, '{"mydata":"bar"}', 'data is sent');
 			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
-			assert.strictEqual(obj.passive_load, true, 'passive_load is sent');
+			assert.strictEqual(obj.open_app, true, 'open_app is sent');
 			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
 			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
 		});

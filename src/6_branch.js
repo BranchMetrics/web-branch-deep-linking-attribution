@@ -1052,7 +1052,7 @@ Branch.prototype['sendSMS'] = wrap(
  * @function Branch.deepview
  * @param {Object} data - _required_ - object of all link data, same as branch.link().
  * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if
- * one already exists_. *passive_load*, _whether to try to open the app passively (as opposed to
+ * one already exists_. *open_app*, _whether to try to open the app passively (as opposed to
  * opening it upon user clicking); defaults to true_
  * }.
  * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
@@ -1060,7 +1060,7 @@ Branch.prototype['sendSMS'] = wrap(
  * Turns the current page into a "deepview" – a preview of app content. This gives the page two
  * special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
  * installed on their phone, we will try to open the app automaticaly and deeplink them to this
- * content (this can be toggled off by turning passive_load to false, but this is not recommended),
+ * content (this can be toggled off by turning open_app to false, but this is not recommended),
  * and (2) provides a callback to open the app directly, accessible as `branch.deepviewCta()`;
  * you'll want to have a button on your web page that says something like "View in app", which
  * calls this function.
@@ -1093,7 +1093,7 @@ Branch.prototype['sendSMS'] = wrap(
  *     },
  *     {
  *         make_new_link: true,
- *         passive_load: true
+ *         open_app: true
  *     },
  *     function(err) {
  *         console.log(err || 'no error');
@@ -1140,9 +1140,8 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	var cleanedData = utils.cleanLinkData(data);
 
-	if (options['passive_load']) {
-		fallbackUrl += '&passive_load=true';
-		cleanedData['passive_load'] = true;
+	if (options['open_app']) {
+		cleanedData['open_app'] = true;
 	}
 
 	var referringLink = self._referringLink();
@@ -1745,7 +1744,7 @@ if (WEB_BUILD) {
 	 *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
 	 *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
 	 *     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
-	 *     passive_load: false,                    // Should the banner try to open the app passively (without the user actively clicking) on load?
+	 *     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
 	 *
 	 * }, {
 	 *     tags: ['tag1', 'tag2'],
@@ -1824,7 +1823,7 @@ if (WEB_BUILD) {
 				true :
 				options['desktopSticky'],
 			make_new_link: !!options['make_new_link'],
-			passive_load: !!options['passive_load']
+			open_app: !!options['open_app']
 		};
 
 		if (typeof options['showMobile'] !== 'undefined') {

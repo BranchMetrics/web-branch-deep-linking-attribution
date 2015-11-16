@@ -346,7 +346,7 @@ resources.deepview = {
 		"data": validator(true, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),
 		"link_click_id": validator(false, validationTypes.STRING),
-		"passive_load": validator(false, validationTypes.BOOLEAN),
+		"open_app": validator(false, validationTypes.BOOLEAN),
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY)
 	})

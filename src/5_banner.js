@@ -123,7 +123,7 @@ banner = function(branch, options, linkData, storage) {
 			doc.getElementById('branch-mobile-action').href = referringLink;
 		}
 		else {
-			options['passive_load'] = options.passive_load;
+			options['open_app'] = options.open_app;
 			options['make_new_link'] = options.make_new_link;
 			branch['deepview'](linkData, options, function(err) {
 				if (err) {
