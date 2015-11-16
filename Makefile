@@ -25,7 +25,7 @@ ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/build.js"};s\#SC
 
 .PHONY: clean
 
-all: dist/build.min.js dist/build.js Reference.md README.md TITANIUM_GUIDE.md WEB_GUIDE.md example.html test/branch-deps.js test/integration-test.html
+all: dist/build.min.js dist/build.js Reference.md README.md TITANIUM_GUIDE.md example.html test/branch-deps.js test/integration-test.html
 clean:
 	rm -f dist/** docs/web/3_branch_web.md Reference.md README.md example.html test/branch-deps.js dist/build.min.js.gz test/integration-test.html
 release: clean all dist/build.min.js.gz
