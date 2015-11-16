@@ -150,26 +150,26 @@
 		$('#init').click(function() {
 			request.html('branch.init();');
 			branch.init('5680621892404085', function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#data').click(function() {
 			request.html('branch.data();');
 			branch.data(function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#setIdentity').click(function() {
 			var identity = getInputVal('#identityID');
 			request.html("branch.setIdentity('" + identity + "');");
 			branch.setIdentity(identity, function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#logout').click(function() {
 			request.html('branch.logout();');
 			branch.logout(function(err, data) {
-				response.html(JSON.stringify(err || 'undefined'));
+				response.html(err || 'undefined');
 			});
 		});
 		$('#track').click(function() {
@@ -180,7 +180,7 @@
 					'metadata foo': 'metadata bar'
 				},
 				function(err) {
-					response.html(JSON.stringify(err || 'no error'));
+					response.html(err || 'no error');
 				});
 		});
 		$('#link').click(function() {
@@ -194,7 +194,7 @@
 			var phone = getInputVal('#SMSNumber');
 			request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
 			branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
-				response.html(JSON.stringify(err || data || 'undefined'));
+				response.html(err || JSON.stringify(data) || 'undefined');
 			});
 		});
 		$('#sendSMSNew').click(function() {
@@ -202,37 +202,37 @@
 			var phone = getInputVal('#SMSNumber');
 			request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
 			branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
-				response.html(JSON.stringify(err || data || 'undefined'));
+				response.html(err || JSON.stringify(data) || 'undefined');
 			});
 		});
 		$('#referrals').click(function() {
 			request.html('branch.referrals();');
 			branch.referrals(function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#credits').click(function() {
 			request.html('branch.credits();');
 			branch.credits(function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#creditHistory').click(function() {
 			request.html('branch.creditHistory();');
 			branch.creditHistory(function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#applyCode').click(function() {
 			request.html('branch.applyCode({code: ' + getInputVal('#code-input') + '});');
 			branch.applyCode(getInputVal('#code-input'), 'default', function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#validateCode').click(function() {
 			request.html('branch.validateCode({code: ' + getInputVal('#code-input') + '});');
 			branch.validateCode(getInputVal('#code-input'), 'default', function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#getCode').click(function() {
@@ -253,7 +253,7 @@
 				prefix: getInputVal('#code-prefix'),
 				expiration: getInputVal('#code-expiration')
 			}, function(err, data) {
-				response.html(JSON.stringify(err || data));
+				response.html(err || JSON.stringify(data));
 			});
 		});
 		$('#redeem').click(function() {
@@ -266,7 +266,7 @@
 				parseInt(getInputVal('#redeem-amount')),
 				getInputVal('#redeem-bucket'),
 				function(err, data) {
-					response.html(JSON.stringify(err || data));
+					response.html(err || JSON.stringify(data));
 				}
 				);
 		});

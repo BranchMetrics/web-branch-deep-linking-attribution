@@ -442,7 +442,7 @@ describe('Branch', function() {
 	});
 
 	describe('track', function() {
-		// basicTests('track', [ 1, 2 ]);
+		basicTests('track', [ 1, 2 ]);
 
 		it('should call api with event with no metadata', function(done) {
 			var branch = initBranch(true);
@@ -506,8 +506,7 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
 			branch.logout(function(err) {
-				assert(true);
-				// assert.strictEqual(err, null, 'No error');
+				assert.strictEqual(err, null, 'No error');
 			});
 
 			assert.strictEqual(requests.length, 1, 'Request made');
@@ -525,8 +524,7 @@ describe('Branch', function() {
 				var branch = initBranch(true);
 				var assert = testUtils.plan(6, done);
 				branch.logout(function(err) {
-					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				});
 
 				assert.strictEqual(requests.length, 1, 'Request made');
@@ -628,7 +626,7 @@ describe('Branch', function() {
 	});
 
 	describe('sendSMS', function() {
-		// basicTests('sendSMS', [ 3, 4 ]);
+		basicTests('sendSMS', [ 3, 4 ]);
 
 		var linkData = testUtils.params({
 			tags: [ 'tag1', 'tag2' ],
@@ -663,8 +661,7 @@ describe('Branch', function() {
 				'9999999999',
 				linkData,
 				function(err) {
-					assert(true);
-					// assert.strictEqual(err, null, 'No error');
+					assert.strictEqual(err, null, 'No error');
 				}
 			);
 
@@ -675,7 +672,45 @@ describe('Branch', function() {
 
 		it('should create new link if a click_id does not exist', function(done) {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.plan(6, done);
+			sandbox.stub(branch._storage, 'get', function(key, storage) {
+				return null;
+			});
+
+			branch.sendSMS(
+				'9999999999',
+				linkData,
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+			assert.strictEqual(requests.length, 1, 'Requests made');
+			requests[0].callback(
+				null,
+				{
+					"url": "https://bnc.lt/l/4FPE0v-04H"
+				}
+			);
+			assert.strictEqual(requests.length, 2, 'Requests made');
+			assert.strictEqual(requests[1].obj.click, 'click', 'the second request is a click');
+			assert.strictEqual(
+				requests[1].obj.link_url,
+				'l/4FPE0v-04H',
+				'the second request has the correct link url'
+			);
+			requests[1].callback(
+				null,
+				{
+					"click_id":"4FWepu-03S"
+				}
+			);
+			assert.strictEqual(requests.length, 3, 'Requests made');
+			requests[2].callback();
+		});
+
+		it('should handle app short url link from the api', function(done) {
+			var branch = initBranch(true);
+			var assert = testUtils.plan(6, done);
 			sandbox.stub(branch._storage, 'get', function(key, storage) {
 				return null;
 			});
@@ -692,10 +727,16 @@ describe('Branch', function() {
 			requests[0].callback(
 				null,
 				{
-					"url": "https://bnc.lt/l/4FPE0v-04H"
+					"url": "https://bnc.lt/ZPOc/p1Ej1fHI4n"
 				}
 			);
 			assert.strictEqual(requests.length, 2, 'Requests made');
+			assert.strictEqual(requests[1].obj.click, 'click', 'the second request is a click');
+			assert.strictEqual(
+				requests[1].obj.link_url,
+				'ZPOc/p1Ej1fHI4n',
+				'the second request has the correct link url'
+			);
 			requests[1].callback(
 				null,
 				{
@@ -901,8 +942,7 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(3, done);
 			branch.redeem(1, 'testbucket', function(err) {
-				assert(true);
-				// assert.strictEqual(err, null, 'No error');
+				assert.strictEqual(err, null, 'No error');
 			});
 
 			assert.strictEqual(requests.length, 1, 'Request made');

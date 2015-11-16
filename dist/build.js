@@ -167,7 +167,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   var a = goog.global.document;
   return "undefined" != typeof a && "write" in a;
 }, goog.findBasePath_ = function() {
-  if (goog.isDef(goog.global.CLOSURE_BASE_PATH)) {
+  if (goog.global.CLOSURE_BASE_PATH) {
     goog.basePath = goog.global.CLOSURE_BASE_PATH;
   } else {
     if (goog.inHtmlDocument_()) {
@@ -182,7 +182,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   }
 }, goog.importScript_ = function(a, b) {
   (goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_)(a, b) && (goog.dependencies_.written[a] = !0);
-}, goog.IS_OLD_IE_ = !(goog.global.atob || !goog.global.document || !goog.global.document.all), goog.importModule_ = function(a) {
+}, goog.IS_OLD_IE_ = !goog.global.atob && goog.global.document && goog.global.document.all, goog.importModule_ = function(a) {
   goog.importScript_("", 'goog.retrieveAndExecModule_("' + a + '");') && (goog.dependencies_.written[a] = !0);
 }, goog.queuedModules_ = [], goog.wrapModule_ = function(a, b) {
   return goog.LOAD_MODULE_USING_EVAL && goog.isDef(goog.global.JSON) ? "goog.loadModule(" + goog.global.JSON.stringify(b + "\n//# sourceURL=" + a + "\n") + ");" : 'goog.loadModule(function(exports) {"use strict";' + b + "\n;return exports});\n//# sourceURL=" + a + "\n";
@@ -475,26 +475,15 @@ goog.globalEval = function(a) {
     goog.global.execScript(a, "JavaScript");
   } else {
     if (goog.global.eval) {
-      if (null == goog.evalWorksForGlobals_) {
-        if (goog.global.eval("var _evalTest_ = 1;"), "undefined" != typeof goog.global._evalTest_) {
-          try {
-            delete goog.global._evalTest_;
-          } catch (b) {
-          }
-          goog.evalWorksForGlobals_ = !0;
-        } else {
-          goog.evalWorksForGlobals_ = !1;
-        }
-      }
-      if (goog.evalWorksForGlobals_) {
+      if (null == goog.evalWorksForGlobals_ && (goog.global.eval("var _et_ = 1;"), "undefined" != typeof goog.global._et_ ? (delete goog.global._et_, goog.evalWorksForGlobals_ = !0) : goog.evalWorksForGlobals_ = !1), goog.evalWorksForGlobals_) {
         goog.global.eval(a);
       } else {
-        var c = goog.global.document, d = c.createElement("SCRIPT");
-        d.type = "text/javascript";
-        d.defer = !1;
-        d.appendChild(c.createTextNode(a));
-        c.body.appendChild(d);
-        c.body.removeChild(d);
+        var b = goog.global.document, c = b.createElement("SCRIPT");
+        c.type = "text/javascript";
+        c.defer = !1;
+        c.appendChild(b.createTextNode(a));
+        b.body.appendChild(c);
+        b.body.removeChild(c);
       }
     } else {
       throw Error("goog.globalEval not available");
@@ -682,7 +671,6 @@ goog.json.Serializer.prototype.serializeInternal = function(a, b) {
         b.push(a);
         break;
       case "function":
-        b.push("null");
         break;
       default:
         throw Error("Unknown type: " + typeof a);;
@@ -772,7 +760,7 @@ utils.clickIdFromLink = function(a) {
   return a ? a.substring(a.lastIndexOf("/") + 1, a.length) : null;
 };
 utils.processReferringLink = function(a) {
-  return a ? "http" !== a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
+  return a ? "http" !== a.substring(0, 4) ? config.link_service_endpoint + a : a : null;
 };
 utils.merge = function(a, b) {
   if ("undefined" === typeof b) {
@@ -818,6 +806,13 @@ utils.base64encode = function(a) {
     ;
   }
   return b;
+};
+utils.extractDeeplinkPath = function(a) {
+  if (!a) {
+    return null;
+  }
+  -1 < a.indexOf("://") && (a = a.split("://")[1]);
+  return a.substring(a.indexOf("/") + 1);
 };
 // Input 5
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -876,9 +871,9 @@ validationTypes.STRING)}}, resources.linkClick = {destination:config.link_servic
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
   resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{add_tracking_enabled:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), bluetooth:validator(!1, validationTypes.BOOLEAN), bluetooth_version:validator(!1, validationTypes.STRING), brand:validator(!1, validationTypes.STRING), carrier:validator(!1, validationTypes.STRING), hardware_id:validator(!1, validationTypes.STRING), has_nfc:validator(!1, 
   validationTypes.BOOLEAN), has_telephone:validator(!1, validationTypes.BOOLEAN), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), model:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), screen_dpi:validator(!1, validationTypes.NUMBER), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, 
-  validationTypes.NUMBER), sdk:validator(!1, validationTypes.STRING), update:validator(!1, validationTypes.NUMBER), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_version:validator(!1, validationTypes.STRING), device_fingerprint_id:validator(!0, branch_id), hardware_id:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), 
-  is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{device_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), link_click_id:validator(!1, 
-  branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)}};
+  validationTypes.NUMBER), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), update:validator(!1, validationTypes.NUMBER), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_version:validator(!1, validationTypes.STRING), device_fingerprint_id:validator(!0, branch_id), hardware_id:validator(!1, validationTypes.STRING), identity_id:validator(!0, 
+  branch_id), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", 
+  method:utils.httpMethod.POST, params:{device_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)}};
 }
 resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
@@ -1382,11 +1377,14 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
       var k = function(b, c) {
-        if (b && a === callback_params.NO_CALLBACK) {
-          throw b;
+        try {
+          if (b && a === callback_params.NO_CALLBACK) {
+            throw b;
+          }
+          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+        } finally {
+          g();
         }
-        a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
-        g();
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
@@ -1502,10 +1500,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         if (a) {
           return l(a, null);
         }
-        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-          b && g && (b.click_id = g);
+        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, c) {
+          c && g && (c.click_id = g);
           n();
-          l(a, b);
+          d._api(resources.hasApp, {browser_fingerprint_id:b}, function(a, b) {
+            b && (c.has_app = !0);
+            l(a, c);
+          });
         });
       });
     } else {
@@ -1517,6 +1518,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       }, CORDOVA_BUILD) {
         var m = [];
         null !== b && m.push(b ? 1 : 0);
+        h && m.unshift(d.debug);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
         }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
@@ -1563,7 +1565,7 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     b.identity_id = d.identity_id;
     b.identity = d.identity;
     session.update(b._storage, d);
-    a(c);
+    a(null);
   });
 });
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -1592,7 +1594,9 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
-    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
+    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, function(b) {
+      a(b || null);
+    });
   }
   var f = this;
   if ("function" === typeof d) {
@@ -1609,7 +1613,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     if (b) {
       return a(b);
     }
-    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+    f._api(resources.linkClick, {link_url:utils.extractDeeplinkPath(c.url), click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }
@@ -1639,7 +1643,9 @@ Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, functio
   this._api(resources.creditHistory, b || {}, a);
 });
 Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
-  this._api(resources.redeem, {amount:b, bucket:c}, a);
+  this._api(resources.redeem, {amount:b, bucket:c}, function(b) {
+    a(b || null);
+  });
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   "function" === typeof a && void 0 === b && (b = a);

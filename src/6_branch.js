@@ -67,16 +67,21 @@ var wrap = function(parameters, func, init) {
 			 * @type {function(?Error,?): undefined}
 			 */
 			var done = function(err, data) {
-				if (err && parameters === callback_params.NO_CALLBACK) {
-					throw err;
+				try {
+					if (err && parameters === callback_params.NO_CALLBACK) {
+						throw err;
+					}
+					else if (parameters === callback_params.CALLBACK_ERR) {
+						callback(err);
+					}
+					else if (parameters === callback_params.CALLBACK_ERR_DATA) {
+						callback(err, data);
+					}
 				}
-				else if (parameters === callback_params.CALLBACK_ERR) {
-					callback(err);
+				finally {
+					// ...but we always want to call next
+					next();
 				}
-				else if (parameters === callback_params.CALLBACK_ERR_DATA) {
-					callback(err, data);
-				}
-				next();
 			};
 			if (!init) {
 				if (self.init_state === init_states.INIT_PENDING) {
@@ -255,7 +260,8 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
  * @param {{isReferrable:?boolean}=} options - _optional_ - { *isReferrable*: _Is this a referrable session_ }.
- * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
+ * session data.
  *
  * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
  * AND THE TITANIUM MODULE
@@ -265,7 +271,8 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  * Branch methods are stored in a queue, so even if the SDK is not fully
  * instantiated, calls made to it will be queued in the order they were
  * originally called.
- * If the session was opened from a referring link, `data()` will also return the referring link click as `referring_link`, which gives you the ability to continue the click flow.
+ * If the session was opened from a referring link, `data()` will also return the referring link
+ * click as `referring_link`, which gives you the ability to continue the click flow.
  *
  * The init function on the Branch object initiates the Branch session and
  * creates a new user session, if it doesn't already exist, in
@@ -292,7 +299,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  *           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  *           has_app:            true,                         // Does the user have the app installed already?
  *           identity:           'BranchUser',                 // Unique string that identifies the user
- *           referring_link:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+ *           referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
  *      }
  * );
  * ```
@@ -480,7 +487,16 @@ Branch.prototype['init'] = wrap(
 								data['click_id'] = link_identifier;
 							}
 							attachVisibilityEvent();
-							finishInit(err, data);
+							self._api(
+								resources.hasApp,
+								{ "browser_fingerprint_id": browser_fingerprint_id },
+								function(err, has_app) {
+									if (has_app) {
+										data['has_app'] = true;
+									}
+									finishInit(err, data);
+								}
+							);
 						}
 					);
 				}
@@ -546,7 +562,8 @@ Branch.prototype['init'] = wrap(
 
 /**
  * @function Branch.data
- * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
+ * session data.
  *
  * Returns the same session information and any referring data, as
  * `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -565,7 +582,8 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 /**
  * @function Branch.first
- * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the session data.
+ * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
+ * session data.
  *
  * Returns the same session information and any referring data, as
  * `Branch.init` did when the app was first installed. This is meant to be called
@@ -584,8 +602,10 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 
 /**
  * @function Branch.setIdentity
- * @param {string} identity - _required_ - a string uniquely identifying the user - often a user ID or email address.
- * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's Branch identity id and unique link.
+ * @param {string} identity - _required_ - a string uniquely identifying the user - often a user ID
+ * or email address.
+ * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's
+ * Branch identity id and unique link.
  *
  * **[Formerly `identify()`](CHANGELOG.md)**
  *
@@ -693,7 +713,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.identity = data['identity'];
 		session.update(self._storage, data);
 
-		done(err);
+		done(null);
 	});
 });
 
@@ -745,8 +765,9 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  * @param {Object=} metadata - _optional_ - object of event metadata.
  * @param {function(?Error)=} callback - _optional_
  *
- * This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
- * The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
+ * This function allows you to track any event with supporting metadata. Use the events you track to
+ * create funnels in the Branch dashboard.  The `metadata` parameter is a formatted JSON object that
+ * can contain any data and has limitless hierarchy.
  *
  * ##### Usage
  * ```js
@@ -796,7 +817,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 /**
  * @function Branch.link
  * @param {Object} data - _required_ - link data and metadata.
- * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep linking URL.
+ * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep
+ * linking URL.
  *
  * **[Formerly `createLink()`](CHANGELOG.md)**
  *
@@ -804,10 +826,13 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * object with optional data you would like to store, including Facebook
  * [Open Graph data](https://developers.facebook.com/docs/opengraph).
  *
- * **data** The dictionary to embed with the link. Accessed as session or install parameters from the SDK.
+ * **data** The dictionary to embed with the link. Accessed as session or install parameters from
+ * the SDK.
  *
  * **Note**
- * You can customize the Facebook OG tags of each URL if you want to dynamically share content by using the following optional keys in the data dictionary. Please use this [Facebook tool](https://developers.facebook.com/tools/debug/og/object) to debug your OG tags!
+ * You can customize the Facebook OG tags of each URL if you want to dynamically share content by
+ * using the following optional keys in the data dictionary. Please use this
+ * [Facebook tool](https://developers.facebook.com/tools/debug/og/object) to debug your OG tags!
  *
  * | Key | Value
  * | --- | ---
@@ -891,7 +916,8 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * @function Branch.sendSMS
  * @param {string} phone - _required_ - phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
- * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+ * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a
+ * new link even if one already exists
  * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
  *
  * **[Formerly `SMSLink()`](CHANGELOG.md)**
@@ -958,14 +984,19 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ___
  *
  * # Referral system rewarding functionality
- * In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
+ * In a standard referral system, you have 2 parties: the original user and the invitee. Our system
+ * is flexible enough to handle rewards for all users for any actions. Here are a couple example
+ * scenarios:
  * 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
  * 2. Reward the invitee for installing the app from the original user's referral link
- * 3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
+ * 3. Reward the original user when the invitee takes action (eg. give the original user credit when
+ *     their the invitee buys something)
  *
- * These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
+ * These reward definitions are created on the dashboard, under the 'Reward Rules' section in the
+ * 'Referrals' tab on the dashboard.
  *
- * Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+ * Warning: For a referral program, you should not use unique awards for custom events and redeem
+ * pre-identify call. This can allow users to cheat the system.
  *
  * ## Retrieve referrals list
  *
@@ -992,7 +1023,10 @@ Branch.prototype['sendSMS'] = wrap(
 				resources.SMSLinkSend, {
 					"link_url": click_id,
 					"phone": phone
-				}, done);
+				},
+				function(err) {
+					done(err || null);
+				});
 		}
 
 		var referringLink = self._referringLink();
@@ -1013,7 +1047,7 @@ Branch.prototype['sendSMS'] = wrap(
 					self._api(
 						resources.linkClick,
 						{
-							"link_url": 'l/' + url.split('/').pop(),
+							"link_url": utils.extractDeeplinkPath(url),
 							"click": "click"
 						},
 						function(err, data) {
@@ -1080,14 +1114,15 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
  * @param {Object} options - _required_ - contins options for referral code creation.
  * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
- * Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
+ * Create a referral code using the supplied parameters.  The code can be given to other users to
+ * enter.  Applying the code will add credits to the referrer, referree or both.
  * The `options` object can containt the following properties:
  *
  * | Key | Value
  * | --- | ---
  * | amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
  * | calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
- * | location | *required* - An integer that determines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
+ * | location | *required* - An integer that determines who gets the credits:  0 for the referree, 2 for the referring user or 3 for both.
  * | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
  * | prefix | *optional* - A string to be prepended to the code.
  * | expiration | *optional* - A date string that if present, determines the date on which the code expires.
@@ -1274,7 +1309,8 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
 /**
  * @function Branch.creditHistory
  * @param {Object} options - _optional_ - options controlling the returned history.
- * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history data.
+ * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history
+ * data.
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
  * Properties available in the `options` object:
@@ -1361,7 +1397,9 @@ Branch.prototype['creditHistory'] = wrap(
  *
  * **[Formerly `redeemCredits()`](CHANGELOG.md)**
  *
- * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
+ * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense
+ * for your app. When you want to redeem credits, call this method with the number of points to be
+ * redeemed, and the bucket to redeem them from.
  *
  * ```js
  * branch.redeem(
@@ -1396,22 +1434,29 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 		{
 			"amount": amount,
 			"bucket": bucket
-		}, done
+		},
+		function(err) {
+			done(err || null);
+		}
 	);
 });
 
 if (WEB_BUILD) {
 	/** =WEB
 	 * @function Branch.addListener
-	 * @param {String} event - _optional_ - Specify which events you would like to listen for. If not defined, the observer will recieve all events.
-	 * @param {function(String)} listener - _required_ - Listeneing function that will recieves an event as a string.
+	 * @param {String} event - _optional_ - Specify which events you would like to listen for. If
+	 * not defined, the observer will recieve all events.
+	 * @param {function(String)} listener - _required_ - Listeneing function that will recieves an
+	 * event as a string.
 	 *
-	 * The Branch Web SDK includes a simple event listener, that currently only publishes events for `Branch.banner()` events.
-	 * Future development will include the ability to subscribe to events related to all other Web SDK functionality.
+	 * The Branch Web SDK includes a simple event listener, that currently only publishes events for
+	 * `Branch.banner()` events.
+	 * Future development will include the ability to subscribe to events related to all other Web
+	 * SDK functionality.
 	 *
 	 * ##### Example
 	 *
-	 * ```
+	 * ```js
 	 * var listener = function(event) { console.log(event); }
 	 *
 	 * // Specify an event to listen for
@@ -1423,7 +1468,8 @@ if (WEB_BUILD) {
 	 *
 	 * #### Available `Branch.banner()` Events:
 	 * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
-	 * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more events will be emitted.
+	 * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
+	 *      events will be emitted.
 	 * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
 	 * - *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
 	 * - *didCloseBanner*: Smart banner close animation started, and is closing.
@@ -1449,9 +1495,13 @@ if (WEB_BUILD) {
 
 	/** =WEB
 	 * @function Branch.removeListener
-	 * @param {function(String)} listener - _required_ - Reference to the listening function you would like to remove. *note*: this must be the same reference that was passed to `branch.addListener()`, not an identical clone of the function.
+	 * @param {function(String)} listener - _required_ - Reference to the listening function you
+	 * would like to remove. *note*: this must be the same reference that was passed to
+	 * `branch.addListener()`, not an identical clone of the function.
 	 *
-	 * Remove the listener from observations, if it is present. Not that this function must be passed a referrence to the _same_ function that was passed to `branch.addListener()`, not just an identical clone of the function.
+	 * Remove the listener from observations, if it is present. Not that this function must be
+	 * passed a referrence to the _same_ function that was passed to `branch.addListener()`, not
+	 * just an identical clone of the function.
 	 *
 	 */
 	/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
@@ -1472,9 +1522,11 @@ if (WEB_BUILD) {
 	 *
 	 * **[Formerly `appBanner()`](CHANGELOG.md)**
 	 *
-	 * Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+	 * Display a smart banner directing the user to your app through a Branch referral link.  The
+	 * `data` param is the exact same as in `branch.link()`.
 	 *
-	 * *Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation of everything you can do!*
+	 * *Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation
+	 * of everything you can do!*
 	 *
 	 * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 	 * |------------------|----------------------|----------------------|
@@ -1536,8 +1588,9 @@ if (WEB_BUILD) {
 	 *
 	 * #### Closing the App Banner Programmatically
 	 *
-	 * The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
-	 * other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
+	 * The App Banner includes a close button the user can click, but you may want to close the
+	 * banner with a timeout, or via some other user interaction with your web app. In this case,
+	 * closing the banner is very simple by calling `Branch.closeBanner()`.
 	 *
 	 * ##### Usage
 	 * ```js
