@@ -430,6 +430,9 @@ and (2) provides a callback to open the app directly, accessible as `branch.deep
 you'll want to have a button on your web page that says something like "View in app", which
 calls this function.
 
+See [this tutorial](https://blog.branch.io/how-to-deep-link-from-your-mobile-website) for a full
+guide on how to use the deepview functionality of the Web SDK.
+
 #### Usage
 ```js
 branch.deepview(
