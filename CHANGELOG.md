@@ -2,7 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.8.0] - 2015-11-17
 - Added deepview functionality!
 - Fixed an edge case where the queue was throwing errors.
 
