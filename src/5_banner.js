@@ -116,20 +116,21 @@ banner = function(branch, options, linkData, storage) {
 	linkData['channel'] = linkData['channel'] || 'app banner';
 
 	var doc = options.iframe ? element.contentWindow.document : document;
+
 	if (utils.mobileUserAgent()) {
 		var referringLink = branch._referringLink();
 		if (referringLink && !options.make_new_link) {
 			doc.getElementById('branch-mobile-action').href = referringLink;
 		}
 		else {
-			branch['link'](linkData, function(err, url) {
+			options['open_app'] = options.open_app;
+			options['make_new_link'] = options.make_new_link;
+			branch['deepview'](linkData, options, function(err) {
 				if (err) {
-					// Todo: figure out something good to do here. Maybe a
-					// long link? Or why not always a long link?
+					throw err;
 				}
-				else {
-					doc.getElementById('branch-mobile-action').href = url;
-				}
+				doc.getElementById('branch-mobile-action').onclick =
+					'branch.deepviewCta()';
 			});
 		}
 	}

@@ -748,6 +748,176 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('deepview', function() {
+		basicTests('deepview', [ 1 ]);
+
+		var branch;
+		var linkData = testUtils.params({
+			channel: 'sample app',
+			data: { mydata: 'bar' },
+			feature: 'create link',
+			stage: 'created link',
+			tags: [ 'tag1', 'tag2' ]
+		});
+		var options = {
+			make_new_link: true,
+			open_app: true
+		};
+
+		beforeEach(function() {
+			branch = initBranch(true);
+			requests = [];
+		});
+
+		afterEach(function() {
+			if (typeof branch._referringLink.restore === 'function') {
+				branch._referringLink.restore();
+			}
+		});
+
+		it('should call v1/deepview endpoint with the right params', function(done) {
+			var assert = testUtils.plan(7, done);
+
+			branch.deepview(
+				linkData,
+				options,
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+
+			assert.strictEqual(requests.length, 1, 'exactly one request made');
+			requests[0].callback();
+
+			var obj = requests[0].obj;
+			assert.strictEqual(obj.data, '{"mydata":"bar"}', 'data is sent');
+			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
+			assert.strictEqual(obj.open_app, true, 'open_app is sent');
+			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
+			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
+		});
+
+		it('should ignore the referring link if make_new_link is true', function(done) {
+			var assert = testUtils.plan(2, done);
+			sandbox.stub(branch, '_referringLink', function() {
+				return '123abc';
+			});
+
+			branch.deepview(
+				linkData,
+				{ make_new_link: true },
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+
+			requests[0].callback();
+			var obj = requests[0].obj;
+			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
+		});
+
+		it('should reuse the referring link if make_new_link is not true', function(done) {
+			var assert = testUtils.plan(2, done);
+			sandbox.stub(branch, '_referringLink', function() {
+				return '123abc';
+			});
+
+			branch.deepview(
+				linkData,
+				{},
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+
+			requests[0].callback();
+			var obj = requests[0].obj;
+			assert.strictEqual(obj.link_click_id, '123abc', 'link_click_id is sent');
+		});
+
+		it('should assign the function in request callback to branch._deepviewCta', function(done) {
+			var assert = testUtils.plan(4, done);
+
+			branch.deepview(
+				{},
+				{},
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
+			requests[0].callback(null, function() {
+				assert(true, 'callback function gets executed');
+			});
+			assert.strictEqual(typeof branch._deepviewCta, 'function', 'changed to function type');
+			branch._deepviewCta();
+		});
+
+		it('should return err and use the right fallback when the req has err', function(done) {
+			var assert = testUtils.plan(2, done);
+
+			sandbox.stub(branch, '_windowRedirect', function(url) {
+				assert(false, 'redirect should not happen unless explicitly called');
+			});
+
+			branch.deepview(
+				{
+					"abc": "def"
+				},
+				{},
+				function(err) {
+					assert.strictEqual(err.message, 'error message abc', 'expected error message');
+				}
+			);
+			requests[0].callback(new Error('error message abc'));
+
+			if (typeof branch._windowRedirect.restore === 'function') {
+				branch._windowRedirect.restore();
+			}
+			sandbox.stub(branch, '_windowRedirect', function(url) {
+				assert.strictEqual(
+					url,
+					'https://bnc.lt/a/' + window.branch_sample_key + '?abc=def',
+					'rediretion happened'
+				);
+			});
+			branch._deepviewCta(); // redirection happens now
+
+			if (typeof branch._windowRedirect.restore === 'function') {
+				branch._windowRedirect.restore();
+			}
+		});
+
+	});
+
+	describe('deepviewCta', function() {
+		var branch;
+		beforeEach(function() {
+			branch = initBranch(true);
+		});
+
+		it('should throw an error if branch._deepviewCta is undefined', function(done) {
+			var assert = testUtils.plan(2, done);
+			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
+			try {
+				branch.deepviewCta();
+			} catch (e) {
+				assert.strictEqual(
+					e.message,
+					'Cannot call Deepview CTA, please call branch.deepview() first.',
+					'expected error'
+				);
+			}
+		});
+
+		it('should not throw an error if branch._deepviewCta is a function', function(done) {
+			var assert = testUtils.plan(1, done);
+			branch._deepviewCta = function() {};
+			branch.deepviewCta();
+			assert(true, 'no error');
+		});
+	});
+
 	describe('referrals', function() {
 		basicTests('referrals', [ 0 ]);
 

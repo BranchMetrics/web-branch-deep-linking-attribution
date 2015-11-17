@@ -135,7 +135,8 @@ if (WEB_BUILD) {
 			"link_url": validator(true, validationTypes.STRING)
 		},
 		params: {
-			"click": validator(true, validationTypes.STRING) }
+			"click": validator(true, validationTypes.STRING)
+		}
 	};
 
 	resources.SMSLinkSend = {
@@ -331,6 +332,23 @@ resources.link = {
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY),
 		"type": validator(false, validationTypes.NUMBER)
+	})
+};
+
+resources.deepview = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/deepview",
+	jsonp: true,
+	method: utils.httpMethod.POST,
+	params: defaults({
+		"campaign": validator(false, validationTypes.STRING),
+		"channel": validator(false, validationTypes.STRING),
+		"data": validator(true, validationTypes.STRING),
+		"feature": validator(false, validationTypes.STRING),
+		"link_click_id": validator(false, validationTypes.STRING),
+		"open_app": validator(false, validationTypes.BOOLEAN),
+		"stage": validator(false, validationTypes.STRING),
+		"tags": validator(false, validationTypes.ARRAY)
 	})
 };
 

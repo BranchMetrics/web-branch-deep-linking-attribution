@@ -368,6 +368,111 @@ callback("Error message");
 
 ___
 
+## Deepview
+
+
+
+### deepview(data, options, callback) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - object of all link data, same as branch.link().
+
+**options**: `Object`, _optional_ - { *make_new_link*: _whether to create a new link even if
+one already exists_. *open_app*, _whether to try to open the app passively (as opposed to
+opening it upon user clicking); defaults to true_
+}.
+
+**callback**: `function`, _optional_ - returns an error if the API call is unsuccessful
+
+Turns the current page into a "deepview" – a preview of app content. This gives the page two
+special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
+installed on their phone, we will try to open the app automaticaly and deeplink them to this
+content (this can be toggled off by turning open_app to false, but this is not recommended),
+and (2) provides a callback to open the app directly, accessible as `branch.deepviewCta()`;
+you'll want to have a button on your web page that says something like "View in app", which
+calls this function.
+
+See [this tutorial](https://blog.branch.io/how-to-deep-link-from-your-mobile-website) for a full
+guide on how to use the deepview functionality of the Web SDK.
+
+#### Usage
+```js
+branch.deepview(
+    data,
+    options,
+    callback (err)
+);
+```
+
+#### Example
+```js
+branch.deepview(
+    {
+        channel: 'facebook',
+        data: {
+            mydata: 'content of my data',
+            foo: 'bar',
+            '$deepview_path': 'item_id=12345'
+        },
+        feature: 'dashboard',
+        stage: 'new user',
+        tags: [ 'tag1', 'tag2' ],
+    },
+    {
+        make_new_link: true,
+        open_app: true
+    },
+    function(err) {
+        console.log(err || 'no error');
+    }
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message"
+);
+```
+
+
+
+### deepviewCta() 
+
+Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
+finished. If the `branch.deepview()` call is finished with no error, when `branch.deepviewCta()` is called,
+an attempt is made to open the app and deeplink the end user into it; if the end user does not
+have the app installed, they will be redirected to the platform-appropriate app stores. If on the
+other hand, `branch.deepview()` returns with an error, `branch.deepviewCta()` will fall back to
+redirect the user using
+[Branch dynamic links](https://github.com/BranchMetrics/Deferred-Deep-Linking-Public-API#structuring-a-dynamic-deeplink).
+
+If `branch.deepview()` has not been called, an error will arise with a reminder to call
+`branch.deepview()` first.
+
+##### Usage
+```js
+$('a.deepview-cta').click(branch.deepviewCta); // If you are using jQuery
+
+document.getElementById('my-elem').onClick = branch.deepviewCta; // Or generally
+
+<a href='...' onclick='branch.deepviewCta()'> // In HTML
+
+// We recommend to assign deepviewCta in deepview callback:
+branch.deepview(data, option, function(err) {
+    if (err) {
+        throw err;
+    }
+    ${'a.deepview-cta').click(branch.deepviewCta);
+});
+
+// You can call this function any time after branch.deepview() is finished by simply:
+branch.deepviewCta();
+```
+
+___
+
 # Referral system rewarding functionality
 In a standard referral system, you have 2 parties: the original user and the invitee. Our system
 is flexible enough to handle rewards for all users for any actions. Here are a couple example
@@ -837,7 +942,9 @@ branch.banner({
     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
-    make_new_link: false                    // Should the banner create a new link, even if a link already exists?
+    make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
+    open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
+
 }, {
     tags: ['tag1', 'tag2'],
     feature: 'dashboard',
