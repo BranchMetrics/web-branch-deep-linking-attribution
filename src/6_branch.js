@@ -1140,7 +1140,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	var cleanedData = utils.cleanLinkData(data);
 
-	if (options['open_app']) {
+	if (options['open_app'] || options['open_app'] === null || typeof options['open_app'] === 'undefined') {
 		cleanedData['open_app'] = true;
 	}
 

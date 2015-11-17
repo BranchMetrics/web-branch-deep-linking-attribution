@@ -1634,7 +1634,9 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
     b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
   }
   b = utils.cleanLinkData(b);
-  c.open_app && (b.open_app = !0);
+  if (c.open_app || null === c.open_app || "undefined" === typeof c.open_app) {
+    b.open_app = !0;
+  }
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
