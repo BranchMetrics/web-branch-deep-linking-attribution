@@ -487,16 +487,7 @@ Branch.prototype['init'] = wrap(
 								data['click_id'] = link_identifier;
 							}
 							attachVisibilityEvent();
-							self._api(
-								resources.hasApp,
-								{ "browser_fingerprint_id": browser_fingerprint_id },
-								function(err, has_app) {
-									if (has_app) {
-										data['has_app'] = true;
-									}
-									finishInit(err, data);
-								}
-							);
+							finishInit(err, data);
 						}
 					);
 				}
