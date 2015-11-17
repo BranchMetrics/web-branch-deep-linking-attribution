@@ -3,6 +3,8 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+- Added deepview functionality!
+- Fixed an edge case where the queue was throwing errors.
 
 ## [v1.7.1] - 2015-10-23
 - Fixed error in `branch.banner()` that caused the option `make_new_link` to be ignored.
