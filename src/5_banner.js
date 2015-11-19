@@ -125,13 +125,10 @@ banner = function(branch, options, linkData, storage) {
 		else {
 			options['open_app'] = options.open_app;
 			options['make_new_link'] = options.make_new_link;
-			branch['deepview'](linkData, options, function(err) {
-				if (err) {
-					throw err;
-				}
-				doc.getElementById('branch-mobile-action').onclick =
-					'branch.deepviewCta()';
-			});
+			branch['deepview'](linkData, options);
+			doc.getElementById('branch-mobile-action').onclick = function() {
+				branch['deepviewCta']();
+			};
 		}
 	}
 	else {

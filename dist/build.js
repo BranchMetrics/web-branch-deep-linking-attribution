@@ -1330,12 +1330,9 @@ var sendSMS = function(a, b, c, d) {
   var f = b.iframe ? e.contentWindow.document : document;
   if (utils.mobileUserAgent()) {
     var g = a._referringLink();
-    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b, function(a) {
-      if (a) {
-        throw a;
-      }
-      f.getElementById("branch-mobile-action").onclick = "branch.deepviewCta()";
-    }));
+    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
+      a.deepviewCta();
+    });
   } else {
     f.getElementById("sms-form").addEventListener("submit", function(d) {
       d.preventDefault();
