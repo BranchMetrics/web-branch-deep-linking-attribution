@@ -903,7 +903,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	});
 });
 
-/**
+/** =WEB
  * @function Branch.sendSMS
  * @param {string} phone - _required_ - phone number to send SMS to
  * @param {Object} linkData - _required_ - object of link data
