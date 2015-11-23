@@ -61,7 +61,17 @@ var retrieveValue = function(value) {
 };
 
 var webStorage = function(perm) {
-	var storageMethod = perm ? localStorage : sessionStorage;
+	var storageMethod;
+	try {
+		storageMethod = perm ? localStorage : sessionStorage;
+	}
+	catch (err) {
+		return {
+			isEnabled: function() {
+				return false;
+			}
+		}
+	}
 	return {
 		getAll: function() {
 			if (typeof storageMethod === 'undefined') {
