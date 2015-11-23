@@ -1,6 +1,6 @@
 {
 	"name": "branch-sdk",
-	"version": "1.7.0",
+	"version": "1.8.1",
 	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
 	"main": "dist/build.min.js",
 	"precommit": ["lint"],
@@ -25,8 +25,10 @@
 		"grunt-contrib-connect": "~0.9.0",
 		"grunt-contrib-watch": "~0.6.1",
 		"grunt-saucelabs": "~8.6.1",
+		"jscs": "2.0.0",
 		"jsdoc": "3.2.2",
 		"jsdox": "0.4.9",
+		"jshint": "2.8.0",
 		"mocha": "^2.2.1",
 		"precommit-hook": "1.0.7",
 		"sinon": "1.13.0"
@@ -34,5 +36,5 @@
 	"dependencies": {
 		"request": "^2.55.0"
 	},
-	"build": "1.7.0"
+	"build": "1.8.1"
 }

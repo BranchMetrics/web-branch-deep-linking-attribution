@@ -1,29 +1,49 @@
-# Global
+# Branch Web SDK
 
+## API Reference
 
+1. Branch Session
+  + [.init()](#initbranch_key-options-callback)
+  + [.data()](#datacallback)
+  + [.first()](#firstcallback)
+  + [.setIdentity()](#setidentityidentity-callback)
+  + [.logout()](#logoutcallback)
 
+2. Event Tracking
+  + [.track()](#trackevent-metadata-callback)
 
+3. Deep Linking
+  + [.link()](#linkdata-callback)
+  + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
+  + [.deepview()](#deepviewdata-options-callback)
+  + [.deepviewCta()](#deepviewcta)
+
+4. Referrals and Credits
+  + [.referrals()](#referralscallback)
+  + [.getCode()](#getcodeoptions-callback)
+  + [.validateCode()](#validatecodecode-callback)
+  + [.applyCode()](#applycodecode-callback)
+  + [.credits()](#creditscallback)
+  + [.creditHistory()](#credithistoryoptions-callback)
+  + [.redeem()](#redeemamount-bucket-callback)
+
+5. Event Listener
+  + [.addListener()](#addlistenerevent-listener)
+  + [.removeListener()](#removelistenerlistener)
+
+6. Smart Banner
+  + [.banner()](#banneroptions-data)
 
 ___
 
-### setDebug(debug)
-
-**Parameters**
-
-**debug**: `boolean`, _required_ - Set the SDK debug flag.
-
-Setting the SDK debug flag will generate a new device ID each time the app is installed
-instead of possibly using the same device id.  This is useful when testing.
-
-This needs to be set before the Branch.init call!!!
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
-___
 
 
 
-### init(branch_key, options, callback)
+
+
+* * *
+
+### init(branch_key, options, callback) 
 
 **Parameters**
 
@@ -31,16 +51,19 @@ ___
 
 **options**: `Object`, _optional_ - { *isReferrable*: _Is this a referrable session_ }.
 
-**callback**: `function`, _optional_ - callback to read the session data.
+**callback**: `function`, _optional_ - callback to read the
+session data.
 
 THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
+AND THE TITANIUM MODULE
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
 Branch methods are stored in a queue, so even if the SDK is not fully
 instantiated, calls made to it will be queued in the order they were
 originally called.
-If the session was opened from a referring link, `data()` will also return the referring link click as `referring_link`, which gives you the ability to continue the click flow.
+If the session was opened from a referring link, `data()` will also return the referring link
+click as `referring_link`, which gives you the ability to continue the click flow.
 
 The init function on the Branch object initiates the Branch session and
 creates a new user session, if it doesn't already exist, in
@@ -53,7 +76,7 @@ the link the user was referred by.
 ```js
 branch.init(
     branch_key,
-    options
+    options,
     callback (err, data),
 );
 ```
@@ -67,7 +90,7 @@ callback(
           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
           has_app:            true,                         // Does the user have the app installed already?
           identity:           'BranchUser',                 // Unique string that identifies the user
-          referring_link:          'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+          referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
      }
 );
 ```
@@ -77,11 +100,12 @@ ___
 
 
 
-### data(callback)
+### data(callback) 
 
 **Parameters**
 
-**callback**: `function`, _optional_ - callback to read the session data.
+**callback**: `function`, _optional_ - callback to read the
+session data.
 
 Returns the same session information and any referring data, as
 `Branch.init`, but does not require the `app_id`. This is meant to be called
@@ -93,11 +117,12 @@ ___
 
 
 
-### first(callback)
+### first(callback) 
 
 **Parameters**
 
-**callback**: `function`, _optional_ - callback to read the session data.
+**callback**: `function`, _optional_ - callback to read the
+session data.
 
 Returns the same session information and any referring data, as
 `Branch.init` did when the app was first installed. This is meant to be called
@@ -106,19 +131,19 @@ later point.
 If the Branch session has already been initialized, the callback will return
 immediately, otherwise, it will return once Branch has been initialized.
 
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
 ___
 
 
 
-### setIdentity(identity, callback)
+### setIdentity(identity, callback) 
 
 **Parameters**
 
-**identity**: `string`, _required_ - a string uniquely identifying the user – often a user ID or email address.
+**identity**: `string`, _required_ - a string uniquely identifying the user - often a user ID
+or email address.
 
-**callback**: `function`, _optional_ - callback that returns the user's Branch identity id and unique link.
+**callback**: `function`, _optional_ - callback that returns the user's
+Branch identity id and unique link.
 
 **[Formerly `identify()`](CHANGELOG.md)**
 
@@ -150,7 +175,7 @@ ___
 
 
 
-### logout(callback)
+### logout(callback) 
 
 **Parameters**
 
@@ -175,37 +200,7 @@ ___
 
 
 
-### close(callback)
-
-**Parameters**
-
-**callback**: `function`, _optional_
-
-Close the current session.
-
-##### Usage
-```js
-branch.close(
-    callback (err)
-);
-```
-
-##### Callback Format
-```js
-callback(
-     "Error message"
-);
-```
-
-THIS METHOD IS CURRENTLY ONLY AVAILABLE IN THE CORDOVA/PHONEGAP PLUGIN
-
-___
-
-## Tracking events
-
-
-
-### track(event, metadata, callback)
+### track(event, metadata, callback) 
 
 **Parameters**
 
@@ -215,12 +210,13 @@ ___
 
 **callback**: `function`, _optional_
 
-This function allows you to track any event with supporting metadata. Use the events you track to create funnels in the Branch dashboard.
-The `metadata` parameter is a formatted JSON object that can contain any data and has limitless hierarchy.
+This function allows you to track any event with supporting metadata. Use the events you track to
+create funnels in the Branch dashboard.  The `metadata` parameter is a formatted JSON object that
+can contain any data and has limitless hierarchy.
 
 ##### Usage
 ```js
-branch.event(
+branch.track(
     event,
     metadata,
     callback (err)
@@ -239,13 +235,14 @@ ___
 
 
 
-### link(data, callback)
+### link(data, callback) 
 
 **Parameters**
 
 **data**: `Object`, _required_ - link data and metadata.
 
-**callback**: `function`, _required_ - returns a string of the Branch deep linking URL.
+**callback**: `function`, _required_ - returns a string of the Branch deep
+linking URL.
 
 **[Formerly `createLink()`](CHANGELOG.md)**
 
@@ -253,10 +250,13 @@ Creates and returns a deep linking URL.  The `data` parameter can include an
 object with optional data you would like to store, including Facebook
 [Open Graph data](https://developers.facebook.com/docs/opengraph).
 
-**data** The dictionary to embed with the link. Accessed as session or install parameters from the SDK.
+**data** The dictionary to embed with the link. Accessed as session or install parameters from
+the SDK.
 
 **Note**
-You can customize the Facebook OG tags of each URL if you want to dynamically share content by using the following optional keys in the data dictionary. Please use this [Facebook tool](https://developers.facebook.com/tools/debug/og/object) to debug your OG tags!
+You can customize the Facebook OG tags of each URL if you want to dynamically share content by
+using the following optional keys in the data dictionary. Please use this
+[Facebook tool](https://developers.facebook.com/tools/debug/og/object) to debug your OG tags!
 
 | Key | Value
 | --- | ---
@@ -302,7 +302,6 @@ branch.link({
     channel: 'facebook',
     feature: 'dashboard',
     stage: 'new user',
-    type: 1,
     data: {
         mydata: 'something',
         foo: 'bar',
@@ -330,7 +329,7 @@ callback(
 
 
 
-### sendSMS(phone, linkData, options, callback)
+### sendSMS(phone, linkData, options, callback) 
 
 **Parameters**
 
@@ -338,7 +337,8 @@ callback(
 
 **linkData**: `Object`, _required_ - object of link data
 
-**options**: `Object`, _optional_ - options: make_new_link, which forces the creation of a new link even if one already exists
+**options**: `Object`, _optional_ - options: make_new_link, which forces the creation of a
+new link even if one already exists
 
 **callback**: `function`, _optional_ - Returns an error if unsuccessful
 
@@ -347,7 +347,7 @@ callback(
 A robust function to give your users the ability to share links via SMS. If
 the user navigated to this page via a Branch link, `sendSMS` will send that
 same link. Otherwise, it will create a new link with the data provided in
-the `params` argument. `sendSMS` also  registers a click event with the
+the `params` argument. `sendSMS` also registers a click event with the
 `channel` pre-filled with `'sms'` before sending an sms to the provided
 `phone` parameter. This way the entire link click event is recorded starting
 with the user sending an sms.
@@ -374,13 +374,12 @@ branch.sendSMS(
 ##### Example
 ```js
 branch.sendSMS(
-    phone: '9999999999',
+    '9999999999',
     {
         tags: ['tag1', 'tag2'],
         channel: 'facebook',
         feature: 'dashboard',
         stage: 'new user',
-        type: 1,
         data: {
             mydata: 'something',
             foo: 'bar',
@@ -396,7 +395,7 @@ branch.sendSMS(
     },
     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
     function(err) { console.log(err); }
-});
+);
 ```
 
 ##### Callback Format
@@ -406,21 +405,131 @@ callback("Error message");
 
 ___
 
+## Deepview
+
+
+
+### deepview(data, options, callback) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - object of all link data, same as branch.link().
+
+**options**: `Object`, _optional_ - { *make_new_link*: _whether to create a new link even if
+one already exists_. *open_app*, _whether to try to open the app passively (as opposed to
+opening it upon user clicking); defaults to true_
+}.
+
+**callback**: `function`, _optional_ - returns an error if the API call is unsuccessful
+
+Turns the current page into a "deepview" – a preview of app content. This gives the page two
+special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
+installed on their phone, we will try to open the app automaticaly and deeplink them to this
+content (this can be toggled off by turning open_app to false, but this is not recommended),
+and (2) provides a callback to open the app directly, accessible as `branch.deepviewCta()`;
+you'll want to have a button on your web page that says something like "View in app", which
+calls this function.
+
+See [this tutorial](https://blog.branch.io/how-to-deep-link-from-your-mobile-website) for a full
+guide on how to use the deepview functionality of the Web SDK.
+
+#### Usage
+```js
+branch.deepview(
+    data,
+    options,
+    callback (err)
+);
+```
+
+#### Example
+```js
+branch.deepview(
+    {
+        channel: 'facebook',
+        data: {
+            mydata: 'content of my data',
+            foo: 'bar',
+            '$deepview_path': 'item_id=12345'
+        },
+        feature: 'dashboard',
+        stage: 'new user',
+        tags: [ 'tag1', 'tag2' ],
+    },
+    {
+        make_new_link: true,
+        open_app: true
+    },
+    function(err) {
+        console.log(err || 'no error');
+    }
+);
+```
+
+##### Callback Format
+```js
+callback(
+    "Error message"
+);
+```
+
+
+
+### deepviewCta() 
+
+Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
+finished. If the `branch.deepview()` call is finished with no error, when `branch.deepviewCta()` is called,
+an attempt is made to open the app and deeplink the end user into it; if the end user does not
+have the app installed, they will be redirected to the platform-appropriate app stores. If on the
+other hand, `branch.deepview()` returns with an error, `branch.deepviewCta()` will fall back to
+redirect the user using
+[Branch dynamic links](https://github.com/BranchMetrics/Deferred-Deep-Linking-Public-API#structuring-a-dynamic-deeplink).
+
+If `branch.deepview()` has not been called, an error will arise with a reminder to call
+`branch.deepview()` first.
+
+##### Usage
+```js
+$('a.deepview-cta').click(branch.deepviewCta); // If you are using jQuery
+
+document.getElementById('my-elem').onClick = branch.deepviewCta; // Or generally
+
+<a href='...' onclick='branch.deepviewCta()'> // In HTML
+
+// We recommend to assign deepviewCta in deepview callback:
+branch.deepview(data, option, function(err) {
+    if (err) {
+        throw err;
+    }
+    ${'a.deepview-cta').click(branch.deepviewCta);
+});
+
+// You can call this function any time after branch.deepview() is finished by simply:
+branch.deepviewCta();
+```
+
+___
+
 # Referral system rewarding functionality
-In a standard referral system, you have 2 parties: the original user and the invitee. Our system is flexible enough to handle rewards for all users for any actions. Here are a couple example scenarios:
+In a standard referral system, you have 2 parties: the original user and the invitee. Our system
+is flexible enough to handle rewards for all users for any actions. Here are a couple example
+scenarios:
 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
 2. Reward the invitee for installing the app from the original user's referral link
-3. Reward the original user when the invitee takes action (eg. give the original user credit when their the invitee buys something)
+3. Reward the original user when the invitee takes action (eg. give the original user credit when
+    their the invitee buys something)
 
-These reward definitions are created on the dashboard, under the 'Reward Rules' section in the 'Referrals' tab on the dashboard.
+These reward definitions are created on the dashboard, under the 'Reward Rules' section in the
+'Referrals' tab on the dashboard.
 
-Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
+Warning: For a referral program, you should not use unique awards for custom events and redeem
+pre-identify call. This can allow users to cheat the system.
 
 ## Retrieve referrals list
 
 
 
-### referrals(callback)
+### referrals(callback) 
 
 **Parameters**
 
@@ -462,7 +571,7 @@ callback(
 
 
 
-### getCode(options, callback)
+### getCode(options, callback) 
 
 **Parameters**
 
@@ -470,14 +579,15 @@ callback(
 
 **callback**: `function`, _optional_ - returns an error if unsuccessful
 
-Create a referral code using the supplied parameters.  The code can be given to other users to enter.  Applying the code will add credits to the referrer, referree or both.
+Create a referral code using the supplied parameters.  The code can be given to other users to
+enter.  Applying the code will add credits to the referrer, referree or both.
 The `options` object can containt the following properties:
 
 | Key | Value
 | --- | ---
 | amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
 | calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
-| location | *required* - An integer that etermines who get's the credits:  0 for the referree, 2 for the referring user or 3 for both.
+| location | *required* - An integer that determines who gets the credits:  0 for the referree, 2 for the referring user or 3 for both.
 | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
 | prefix | *optional* - A string to be prepended to the code.
 | expiration | *optional* - A date string that if present, determines the date on which the code expires.
@@ -512,12 +622,11 @@ callback(
      }
 );
 ```
-
 ___
 
 
 
-### validateCode(code, callback)
+### validateCode(code, callback) 
 
 **Parameters**
 
@@ -544,7 +653,8 @@ branch.validateCode(
     function(err) {
         if (err) {
             console.log(err);
-        } else {
+        }
+        else {
             console.log("Code is valid");
         }
     }
@@ -558,12 +668,11 @@ callback(
     callback(err)
 );
 ```
-
 ___
 
 
 
-### applyCode(code, callback)
+### applyCode(code, callback) 
 
 **Parameters**
 
@@ -590,7 +699,8 @@ branch.applyCode(
     function(err) {
         if (err) {
             console.log(err);
-        } else {
+        }
+        else {
             console.log("Code applied");
         }
     }
@@ -610,7 +720,7 @@ ___
 
 
 
-### credits(callback)
+### credits(callback) 
 
 **Parameters**
 
@@ -640,13 +750,14 @@ callback(
 
 
 
-### creditHistory(options, callback)
+### creditHistory(options, callback) 
 
 **Parameters**
 
 **options**: `Object`, _optional_ - options controlling the returned history.
 
-**callback**: `function`, _required_ - returns an array with credit history data.
+**callback**: `function`, _required_ - returns an array with credit history
+data.
 
 This call will retrieve the entire history of credits and redemptions from the individual user.
 Properties available in the `options` object:
@@ -718,7 +829,7 @@ ___
 
 
 
-### redeem(amount, bucket, callback)
+### redeem(amount, bucket, callback) 
 
 **Parameters**
 
@@ -730,7 +841,9 @@ ___
 
 **[Formerly `redeemCredits()`](CHANGELOG.md)**
 
-Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense for your app. When you want to redeem credits, call this method with the number of points to be redeemed, and the bucket to redeem them from.
+Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense
+for your app. When you want to redeem credits, call this method with the number of points to be
+redeemed, and the bucket to redeem them from.
 
 ```js
 branch.redeem(
@@ -758,124 +871,64 @@ callback("Error message");
 ```
 ___
 
-# Smart App Sharing Banner
 
-The Branch Web SDK has a built in sharing banner, that automatically displays a device specific banner for desktop, iOS, and Android. If the banner is shown on a desktop, a form for sending yourself the download link via SMS is shown.
-Otherwise, a button is shown that either says an "open" app phrase, or a "download" app phrase, based on whether or not the user has the app installed. Both of these phrases can be specified in the parameters when calling the banner function.
-**Styling**: The banner automatically styles itself based on if it is being shown on the desktop, iOS, or Android.
 
-# Customizing the App Sharing Banner
+### addListener(event, listener) 
 
-The app sharing banner includes a number of ways to easily customize it by specifying properties in the `options` object, which is the first argument of the banner.
+**Parameters**
 
-### Your App's Information _required_
-You can set the icon, title, and description for your app with the properties: `icon`, `title`, and `description`. For example, an app banner with these three properties set:
+**event**: `String`, _optional_ - Specify which events you would like to listen for. If
+not defined, the observer will recieve all events.
+
+**listener**: `function`, _required_ - Listeneing function that will recieves an
+event as a string.
+
+The Branch Web SDK includes a simple event listener, that currently only publishes events for
+`Branch.banner()` events.
+Future development will include the ability to subscribe to events related to all other Web
+SDK functionality.
+
+##### Example
+
 ```js
-branch.banner(
-    {
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!'
-    },
-    {... link data ...}
-);
+var listener = function(event) { console.log(event); }
+
+// Specify an event to listen for
+branch.addListener('willShowBanner', listener);
+
+// Listen for all events
+branch.addListener(listener);
 ```
 
-### The Call To Action Text _optional_
-On mobile devices, the app banner show's an option either to download the app if they do not have it installed, or open the app if they have already installed it. Both of these can be customized from their respective defaults of Download app, and View in app.
-When the banner is opened on a desktop devide, a simpel form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
-```js
-branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Call to action customization
-         openAppButtonText: 'Open',
-         downloadAppButtonText: 'Install',
-         phonePreviewText: '+44 9999-9999',
-         sendLinkText: 'Txt me!'
-    },
-    {... link data ...}
-);
-```
-
-### Enabed Platforms _optional_
-The app banner detects the platform environment as either, desktop, iOS, or Android, and is enabled on all 3 by default. You can easily customize which platforms see the app banner as follows:
-```js
-branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Platforms customization
-         showDesktop: false,
-         showiOS: true,
-         showAndroid: true
-    },
-    {... link data ...}
-);
-```
-
-### Display Preferences _optional_
-By default, the app banner displays inside of an iFrame (isolates the app banner css from your page), at the top of the page, shows a close button to the user, and will never show again once closed by the user. All of this functionality can be customized.
-The `iframe` property defaults to true, and can be set to false if you wish for the banner HTML to display within your page. This allows you to customize the CSS of the banner, past what the Web SDK allows.
-The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
-The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past. It can also be set to an integer, in which case, it would forget that the user has previously hid the banner after X days.
-The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
-The `customCSS` property allows you to style the banner, even if it is isolated within an iframe. To assist you with device specific styles, the body element of the banner has one of three classes: `branch-banner-android`, `branch-banner-ios`, or `branch-banner-desktop`.
-The `mobileSticky` property defaults to false, but can be set to true if you want the user to continue to see the app banner as they scroll.
-The `desktopSticky` property defaults to true, but can be set to false if you want the user to only see the app banner when they are scrolled to the top of the page.
-```js
-branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Display preferences
-         iframe: false,
-         disableHide: true,
-         forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
-         position: 'bottom',
-         mobileSticky: true,
-         desktopSticky: true,
-         customCSS: '.title { color: #F00; }'
-    },
-    {... link data ...}
-);
-```
-
-### Link Preferences _optional_
-By default, tthe app banner will reusue a link that has most recently been created. If this is not desired, and you wish an enitrley new link to be created and overwrite the previous link, you can set `make_new_link` to true.
-```js
-branch.banner(
-    {
-         // required app info properties
-         icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-         title: 'Branch Demo App',
-         description: 'The Branch demo app!',
-         // Link preferences
-         make_new_link: true
-    },
-    {... link data ...}
-);
-```
-
-### Playing nicely with other positon fixed "sticky" banners
-Do you already have a "sticky" element on the top of your website, such as a navigation bar? If so, the Branch app banner will likely interfere with it. Fortunatley, we have a solution!
-Without any configuration, the Web SDK adds a class called `branch-banner-is-active` to the body element of your website when the banner opens, and removes it when the banner closes.
-As an example, let's say you had an element on your website with a class of `header` that was `position: fixed;`. You could then add the following to your stylesheet:
-```css
-body.branch-banner-is-active .header { top: 76px; }
-```
-This will add exactly the space required to show the app banner above your navigation header!
+#### Available `Branch.banner()` Events:
+- *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
+- *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
+     events will be emitted.
+- *didShowBanner*: Smart banner animation started and was is being shown to the user.
+- *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
+- *didCloseBanner*: Smart banner close animation started, and is closing.
+- *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
+- *sendBannerSMSError*: `sendSMS()` error returned.
+- *didSendBannerSMS*: SMS successfully sent.
+- *didDownloadApp*: User installed app, and banner text updated.
 
 
 
-### banner(options, data)
+### removeListener(listener) 
+
+**Parameters**
+
+**listener**: `function`, _required_ - Reference to the listening function you
+would like to remove. *note*: this must be the same reference that was passed to
+`branch.addListener()`, not an identical clone of the function.
+
+Remove the listener from observations, if it is present. Not that this function must be
+passed a referrence to the _same_ function that was passed to `branch.addListener()`, not
+just an identical clone of the function.
+
+
+
+### banner(options, data) 
 
 **Parameters**
 
@@ -885,13 +938,15 @@ This will add exactly the space required to show the app banner above your navig
 
 **[Formerly `appBanner()`](CHANGELOG.md)**
 
-Display a smart banner directing the user to your app through a Branch referral link.  The `data` param is the exact same as in `branch.link()`.
+Display a smart banner directing the user to your app through a Branch referral link.  The
+`data` param is the exact same as in `branch.link()`.
+
+*Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation
+of everything you can do!*
 
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
 | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
-
-THIS METHOD IS ONLY AVAILABLE IN THE WEB SDK NOT IN THE CORDOVA/PHONEGAP PLUGIN
 
 #### Usage
 
@@ -913,7 +968,8 @@ branch.banner({
     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-    showiOS: true,                          // Should the banner be shown on iOS devices?
+    showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
+    showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
     showAndroid: true,                      // Should the banner be shown on Android devices?
     showDesktop: true,                      // Should the banner be shown on desktop devices?
     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
@@ -923,12 +979,13 @@ branch.banner({
     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
-    make_new_link: false                    // Should the banner create a new link, even if a link already exists?
+    make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
+    open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
+
 }, {
     tags: ['tag1', 'tag2'],
     feature: 'dashboard',
     stage: 'new user',
-    type: 1,
     data: {
         mydata: 'something',
         foo: 'bar',
@@ -949,8 +1006,9 @@ ___
 
 #### Closing the App Banner Programmatically
 
-The App Banner includes a close button the user can click, but you may want to close the banner with a timeout, or via some
-other user interaction with your web app. In this case, closing the banner is very simple by calling `Branch.closeBanner()`.
+The App Banner includes a close button the user can click, but you may want to close the
+banner with a timeout, or via some other user interaction with your web app. In this case,
+closing the banner is very simple by calling `Branch.closeBanner()`.
 
 ##### Usage
 ```js
@@ -960,7 +1018,7 @@ branch.closeBanner();
 
 
 
-___
+* * *
 
 
 
@@ -971,3 +1029,7 @@ ___
 
 
 
+## Bugs / Help / Support
+
+Feel free to report any bugs you might encounter in the repo's issues. Any support inquiries outside of bugs
+please send to [support@branch.io](mailto:support@branch.io).

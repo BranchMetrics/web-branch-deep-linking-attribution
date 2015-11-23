@@ -4,6 +4,16 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v1.8.1] - 2015-11-19
+- Fixed bug with banner on mobile
+
+## [v1.8.0] - 2015-11-17
+- Added deepview functionality!
+- Fixed an edge case where the queue was throwing errors.
+
+## [v1.7.1] - 2015-10-23
+- Fixed error in `branch.banner()` that caused the option `make_new_link` to be ignored.
+
 ## [v1.7.0] - 2015-09-25
 - Fixed error in network failure handling that caused subsequent calls to fail once an early network connection failure has occurred.
 

@@ -708,7 +708,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.7.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.8.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
 // Input 3
 var task_queue = function() {
@@ -759,7 +759,7 @@ utils.clickIdFromLink = function(a) {
   return a ? a.substring(a.lastIndexOf("/") + 1, a.length) : null;
 };
 utils.processReferringLink = function(a) {
-  return a ? "http" !== a.substring(0, 4) ? "https://bnc.lt" + a : a : null;
+  return a ? "http" !== a.substring(0, 4) ? config.link_service_endpoint + a : a : null;
 };
 utils.merge = function(a, b) {
   if ("undefined" === typeof b) {
@@ -805,6 +805,13 @@ utils.base64encode = function(a) {
     ;
   }
   return b;
+};
+utils.extractDeeplinkPath = function(a) {
+  if (!a) {
+    return null;
+  }
+  -1 < a.indexOf("://") && (a = a.split("://")[1]);
+  return a.substring(a.indexOf("/") + 1);
 };
 // Input 5
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -852,32 +859,33 @@ function validator(a, b) {
 var branch_id = /^[0-9]{15,20}$/;
 function defaults(a) {
   var b = {};
-  WEB_BUILD && (b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), browser_fingerprint_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING)});
+  WEB_BUILD && (b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)});
   if (CORDOVA_BUILD || TITANIUM_BUILD) {
-    b = {session_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING)};
+    b = {device_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
   }
   return utils.merge(a, b);
 }
-WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.STRING), is_referrable:validator(!0, validationTypes.NUMBER), sdk:validator(!1, validationTypes.STRING), browser_fingerprint_id:validator(!0, branch_id)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, 
+WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, 
 validationTypes.STRING)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}});
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), hardware_id:validator(!1, validationTypes.STRING), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), carrier:validator(!1, validationTypes.STRING), bluetooth:validator(!1, validationTypes.BOOLEAN), bluetooth_version:validator(!1, 
-  validationTypes.STRING), has_nfc:validator(!1, validationTypes.BOOLEAN), has_telephone:validator(!1, validationTypes.BOOLEAN), brand:validator(!1, validationTypes.STRING), model:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), screen_dpi:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, validationTypes.NUMBER), screen_height:validator(!1, validationTypes.NUMBER), 
-  is_referrable:validator(!1, validationTypes.NUMBER), update:validator(!1, validationTypes.NUMBER), add_tracking_enabled:validator(!1, validationTypes.BOOLEAN)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), link_identifier:validator(!1, validationTypes.STRING), device_fingerprint_id:validator(!0, branch_id), sdk:validator(!1, validationTypes.STRING), hardware_id:validator(!1, validationTypes.STRING), 
-  is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), is_referrable:validator(!1, validationTypes.NUMBER)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), 
-  session_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), device_fingerprint_id:validator(!0, branch_id)}};
+  resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{add_tracking_enabled:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), bluetooth:validator(!1, validationTypes.BOOLEAN), bluetooth_version:validator(!1, validationTypes.STRING), brand:validator(!1, validationTypes.STRING), carrier:validator(!1, validationTypes.STRING), hardware_id:validator(!1, validationTypes.STRING), has_nfc:validator(!1, 
+  validationTypes.BOOLEAN), has_telephone:validator(!1, validationTypes.BOOLEAN), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), model:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), screen_dpi:validator(!1, validationTypes.NUMBER), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, 
+  validationTypes.NUMBER), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), update:validator(!1, validationTypes.NUMBER), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_version:validator(!1, validationTypes.STRING), device_fingerprint_id:validator(!0, branch_id), hardware_id:validator(!1, validationTypes.STRING), identity_id:validator(!0, 
+  branch_id), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", 
+  method:utils.httpMethod.POST, params:{device_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)}};
 }
-resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({prefix:validator(!1, validationTypes.STRING), amount:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), location:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), type:validator(!0, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING)})};
+resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:defaults({session_id:validator(!0, branch_id)})};
 resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.STRING)})};
 resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:defaults({})};
-resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:defaults({link_click_id:validator(!1, branch_id), length:validator(!1, validationTypes.NUMBER), direction:validator(!1, validationTypes.NUMBER), begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.STRING)})};
+resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:defaults({begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.STRING), direction:validator(!1, validationTypes.NUMBER), length:validator(!1, validationTypes.NUMBER), link_click_id:validator(!1, branch_id)})};
 resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:defaults({})};
-resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, branch_id), amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING)})};
-resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({identity_id:validator(!0, branch_id), data:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), feature:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), stage:validator(!1, validationTypes.STRING), type:validator(!1, validationTypes.NUMBER), alias:validator(!1, 
-validationTypes.STRING)})};
+resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, branch_id)})};
+resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
+validationTypes.NUMBER)})};
+resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT)})};
 // Input 6
@@ -1326,8 +1334,8 @@ var sendSMS = function(a, b, c, d) {
   var f = b.iframe ? e.contentWindow.document : document;
   if (utils.mobileUserAgent()) {
     var g = a._referringLink();
-    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : a.link(c, function(a, b) {
-      a || (f.getElementById("branch-mobile-action").href = b);
+    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
+      a.deepviewCta();
     });
   } else {
     f.getElementById("sms-form").addEventListener("submit", function(d) {
@@ -1374,11 +1382,14 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
       var h = function(b, c) {
-        if (b && a === callback_params.NO_CALLBACK) {
-          throw b;
+        try {
+          if (b && a === callback_params.NO_CALLBACK) {
+            throw b;
+          }
+          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+        } finally {
+          g();
         }
-        a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
-        g();
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
@@ -1509,6 +1520,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       }, CORDOVA_BUILD) {
         var m = [];
         null !== b && m.push(b ? 1 : 0);
+        k && m.unshift(d.debug);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
         }, "BranchDevice", k ? "getInstallData" : "getOpenData", m);
@@ -1555,7 +1567,7 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     b.identity_id = d.identity_id;
     b.identity = d.identity;
     session.update(b._storage, d);
-    a(c);
+    a(null);
   });
 });
 if (CORDOVA_BUILD || TITANIUM_BUILD) {
@@ -1584,7 +1596,9 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
-    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, a);
+    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, function(b) {
+      a(b || null);
+    });
   }
   var f = this;
   if ("function" === typeof d) {
@@ -1601,7 +1615,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     if (b) {
       return a(b);
     }
-    f._api(resources.linkClick, {link_url:"l/" + c.url.split("/").pop(), click:"click"}, function(b, c) {
+    f._api(resources.linkClick, {link_url:utils.extractDeeplinkPath(c.url), click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }
@@ -1609,6 +1623,39 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
       e(c.click_id);
     });
   });
+});
+Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
+  var d = this;
+  c || (c = {});
+  var e = config.link_service_endpoint + "/a/" + d.branch_key, f = !0, g;
+  for (g in b) {
+    b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
+  }
+  b = utils.cleanLinkData(b);
+  if (c.open_app || null === c.open_app || "undefined" === typeof c.open_app) {
+    b.open_app = !0;
+  }
+  (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
+  this._api(resources.deepview, b, function(b, c) {
+    if (b) {
+      return d._deepviewCta = function() {
+        d._windowRedirect(e);
+      }, a(b);
+    }
+    "function" === typeof c && (d._deepviewCta = c);
+    a(null);
+  });
+});
+Branch.prototype._windowRedirect = function(a) {
+  window.location = a;
+};
+Branch.prototype.deepviewCta = wrap(callback_params.NO_CALLBACK, function(a) {
+  if ("undefined" === typeof this._deepviewCta) {
+    throw Error("Cannot call Deepview CTA, please call branch.deepview() first.");
+  }
+  window.event && (window.event.preventDefault ? window.event.preventDefault() : window.event.returnValue = !1);
+  this._deepviewCta();
+  a();
 });
 Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   this._api(resources.referrals, {}, a);
@@ -1631,7 +1678,9 @@ Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, functio
   this._api(resources.creditHistory, b || {}, a);
 });
 Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
-  this._api(resources.redeem, {amount:b, bucket:c}, a);
+  this._api(resources.redeem, {amount:b, bucket:c}, function(b) {
+    a(b || null);
+  });
 });
 WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   "function" === typeof a && void 0 === b && (b = a);
@@ -1645,7 +1694,7 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
 }, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === 
-  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link};
+  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link, open_app:!!b.open_app};
   "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
