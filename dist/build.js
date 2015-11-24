@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.8.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.8.1"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
 // Input 3
 var task_queue = function() {
@@ -1338,12 +1338,9 @@ var sendSMS = function(a, b, c, d) {
   var f = b.iframe ? e.contentWindow.document : document;
   if (utils.mobileUserAgent()) {
     var g = a._referringLink();
-    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b, function(a) {
-      if (a) {
-        throw a;
-      }
-      f.getElementById("branch-mobile-action").onclick = "branch.deepviewCta()";
-    }));
+    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
+      a.deepviewCta();
+    });
   } else {
     f.getElementById("sms-form").addEventListener("submit", function(d) {
       d.preventDefault();

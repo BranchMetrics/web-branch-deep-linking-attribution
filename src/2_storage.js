@@ -70,7 +70,7 @@ var webStorage = function(perm) {
 			isEnabled: function() {
 				return false;
 			}
-		}
+		};
 	}
 	return {
 		getAll: function() {
