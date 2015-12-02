@@ -17,6 +17,20 @@ banner_css.banner = function(options) {
 		's ease; transition: all 0' +
 		(banner_utils.animationSpeed / 1000) +
 		's ease; }\n' +
+	'#branch-banner .button{' +
+		' border: 1px solid ' + (options['buttonBorderColor'] || (options['theme'] === 'dark' ? 'transparent' : '#ccc')) + ';' +
+		' background: ' + (options['buttonBackgroundColor'] || '#fff') + ';' +
+		' color: ' + (options['buttonFontColor'] || '#000') + ';' +
+		' cursor: pointer; margin-top: 0px; font-size: 14px;' +
+		' display: inline-block; margin-left: 5px; font-weight: 400;' +
+		' border-radius: 4px; padding: 6px 12px; transition: all .2s ease;' +
+	'}\n' +
+	'#branch-banner .button:hover { ' +
+		' border: 1px solid ' + (options['buttonBorderColorHover'] || (options['theme'] === 'dark' ? 'transparent' : '#BABABA')) + ';' +
+		' background: ' + (options['buttonBackgroundColorHover'] || '#E0E0E0') + ';' +
+		' color: ' + (options['buttonFontColorHover'] || '#000') + ';' +
+	'}\n' +
+	'#branch-banner .button:focus { outline: none; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
 	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2;' +
 		'padding: 0 5px 0 5px; margin-right: 0; }\n' +
@@ -25,6 +39,11 @@ banner_css.banner = function(options) {
 		'; background: rgba(255, 255, 255, 0.95); color: #333; ' +
 		(options.position === 'top' ? 'border-bottom' : 'border-top') +
 		': 1px solid #ddd; }\n' +
+	'#branch-banner-close { color: #000; font-size: 24px; top: 14px; opacity: .5;' +
+		' transition: opacity .3s ease; }\n' +
+	'#branch-banner-close:hover { opacity: 1; }\n' +
+	'#branch-banner .title { font-size: 18px; font-weight:bold; color: #555; }\n' +
+	'#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; }\n' +
 	'#branch-banner .icon { float: left; padding-bottom: 40px; margin-right: 10px; margin-left: 5px; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; margin-right: 0; }\n' +
 	'#branch-banner .reviews { font-size:13px; margin: 1px 0 3px 0; color: #777; }\n' +
@@ -45,40 +64,26 @@ banner_css.banner = function(options) {
 	'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0;' +
 		' top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n' +
 	'#branch-banner .theme-dark.content { background: rgba(51, 51, 51, 0.95); }\n' +
+	'#branch-banner .theme-dark #branch-banner-close{ color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n' +
+	'#branch-banner .theme-dark .details { text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n' +
+	'#branch-banner .theme-dark .title { color: #fff; }\n' +
+	'#branch-banner .theme-dark .description { color: #fff; }\n' +
 	'#branch-banner .theme-dark .reviews { color: #888; }\n' +
 	'#branch-banner .theme-dark .reviews .star span{ color: #fff; }\n' +
 	'#branch-banner .theme-dark .reviews .review-count{ color: #fff; }\n' +
 	'';
 };
 
-banner_css.desktop = function(options) {
-	return '#branch-banner { position: fixed; min-width: 600px; }\n' +
-	'#branch-banner-close { color: #000; font-size: 24px; top: 14px; opacity: .5;' +
-		' transition: opacity .3s ease; }\n' +
-	'#branch-banner-close:hover { opacity: 1; }\n' +
-	'#branch-banner .title { font-size: 18px; font-weight:bold; color: #555; }\n' +
-	'#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; }\n' +
+banner_css.desktop =
+	'#branch-banner { position: fixed; min-width: 600px; }\n' +
 	'#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n' +
 	'#branch-sms-block { display: inline-block; }\n' +
-	'#branch-banner button{' +
-		' border: 1px solid ' + (options['buttonBorderColor'] || (options['theme'] === 'dark' ? 'transparent' : '#ccc')) + ';' +
-		' background: ' + (options['buttonBackgroundColor'] || '#fff') + ';' +
-		' color: ' + (options['buttonFontColor'] || '#000') + ';' +
-		' cursor: pointer; margin-top: 0px; font-size: 14px;' +
-		' display: inline-block; height: 30px; margin-left: 5px; font-weight: 400;' +
-		' border-radius: 4px; padding: 0px 12px; transition: all .2s ease;' +
-	'}\n' +
-	'#branch-banner button:hover { ' +
-		' border: 1px solid ' + (options['buttonBorderColorHover'] || '#BABABA') + ';' +
-		' background: ' + (options['buttonBackgroundColorHover'] || '#E0E0E0') + ';' +
-		' color: ' + (options['buttonFontColorHover'] || '#000') + ';' +
-	'}\n' +
 	'#branch-banner input{' +
 		' border: 1px solid #ccc; ' +
 		' font-weight: 400;  border-radius: 4px; height: 30px;' +
 		' padding: 5px 7px 4px; width: 145px; font-size: 14px;' +
 	'}\n' +
-	'#branch-banner input:focus, #branch-banner button:focus { outline: none; }\n' +
+	'#branch-banner input:focus { outline: none; }\n' +
 	'#branch-banner input.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n' +
 	'#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle;' +
 		' display: inline-block; margin-top: -18px; }\n' +
@@ -94,13 +99,8 @@ banner_css.desktop = function(options) {
 		' animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out;' +
 		' border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%;' +
 		' border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n' +
-	'#branch-banner .theme-dark #branch-banner-close{ color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n' +
 	'#branch-banner .theme-dark input { border-color: transparent; }\n' +
-	'#branch-banner .theme-dark .details { text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n' +
-	'#branch-banner .theme-dark .title { color: #fff; }\n' +
-	'#branch-banner .theme-dark .description { color: #fff; }\n' +
 	'';
-};
 
 banner_css.nonie =
 	'#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625;' +
@@ -115,7 +115,6 @@ banner_css.ie = '#branch-banner .checkmark { color: #428bca; font-size: 22px; }\
 
 banner_css.mobile =
 	'#branch-banner { position: absolute; }\n' +
-	'#branch-banner-close { margin-top: 22px; }\n' +
 	'#branch-banner .content .left .details .title { font-size: 12px; }\n' +
 	'#branch-banner a { text-decoration: none; }\n' +
 	'#branch-mobile-action { white-space: nowrap; }\n' +
@@ -129,7 +128,6 @@ banner_css.mobile =
 		' and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n';
 
 banner_css.ios =
-	'#branch-banner-close { margin-left: 4px; }\n' +
 	'#branch-banner a { color: #428bca; }\n';
 
 // Styles thanks to https://github.com/asianmack/play-store-smartbanner/blob/master/smartbanner.html
@@ -181,7 +179,7 @@ banner_css.css = function(options, element) {
 		style += banner_css.mobile + banner_css.android;
 	}
 	else {
-		style += banner_css.desktop(options);
+		style += banner_css.desktop;
 		if (window.ActiveXObject) {
 			style += banner_css.ie;
 		}

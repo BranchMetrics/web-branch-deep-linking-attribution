@@ -60,7 +60,7 @@ banner_html.banner = function(options, action) {
  * @param {storage} storage
  */
 banner_html.mobileAction = function(options, storage, branch) {
-	return '<a id="branch-mobile-action" href="#" target="_parent">' +
+	return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' +
 		(session.get(storage)['has_app'] ?
 			options.openAppButtonText :
 			options.downloadAppButtonText) +
@@ -77,7 +77,7 @@ banner_html.desktopAction = function(options) {
 			' id="branch-sms-phone" placeholder="' +
 			options.phonePreviewText +
 			'">' +
-			'<button type="submit" id="branch-sms-send" class="branch-animation">' +
+			'<button type="submit" id="branch-sms-send" class="branch-animation button">' +
 			options.sendLinkText + '</button>' +
 		'</form>' +
 	'</div>';
