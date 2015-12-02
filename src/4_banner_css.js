@@ -18,14 +18,14 @@ banner_css.banner = function(options) {
 		(banner_utils.animationSpeed / 1000) +
 		's ease; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
-	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; padding: 0 10px 0 10px; }\n' +
+	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; padding: 0 5px 0 5px; }\n' +
 	'#branch-banner .content { width:100%; overflow: hidden; height: ' +
 		banner_utils.bannerHeight +
 		'; background: rgba(255, 255, 255, 0.95); color: #333; ' +
 		(options.position === 'top' ? 'border-bottom' : 'border-top') +
 		': 1px solid #ddd; }\n' +
-	'#branch-banner .icon { float: left; padding-bottom: 40px; margin-right: 10px; }\n' +
-	'#branch-banner .content .left { padding: 6px 6px 6px 0; }\n' +
+	'#branch-banner .icon { float: left; padding-bottom: 40px; margin-right: 10px; margin-left: 5px; }\n' +
+	'#branch-banner .content .left { padding: 6px 5px 6px 5px; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; margin-right: 0; }\n' +
 	'#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%);' +
 		' -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n' +
