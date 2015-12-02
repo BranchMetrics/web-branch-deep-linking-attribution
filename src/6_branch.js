@@ -1782,7 +1782,7 @@ if (WEB_BUILD) {
 			icon: options['icon'] || '',
 			title: options['title'] || '',
 			description: options['description'] || '',
-			reviews: (
+			reviewCount: (
 				typeof options['reviewCount'] === 'number' &&
 				options['reviewCount'] > 0 // force greater than 0
 			) ?
@@ -1832,6 +1832,12 @@ if (WEB_BUILD) {
 			) ?
 				options['theme'] :
 				utils.bannerThemes[0],
+			buttonBorderColor: options['buttonBorderColor'] || '',
+			buttonBackgroundColor: options['buttonBackgroundColor'] || '',
+			buttonFontColor: options['buttonFontColor'] || '',
+			buttonBorderColorHover: options['buttonBorderColorHover'] || '',
+			buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
+			buttonFontColorHover: options['buttonFontColorHover'] || '',
 			make_new_link: !!options['make_new_link'],
 			open_app: !!options['open_app']
 		};

@@ -11,7 +11,7 @@ goog.require('storage'); // jshint unused:false
  * @param {string} action
  */
 banner_html.banner = function(options, action) {
-	return '<div class="content">' +
+	return '<div class="content' + (options['theme'] ? ' theme-' + options['theme'] : '') + '">' +
 		'<div class="right vertically-align-middle">' +
 			action +
 		'</div>' +
@@ -24,6 +24,30 @@ banner_html.banner = function(options, action) {
 			'</div>' +
 			'<div class="details vertically-align-middle">' +
 				'<div class="title">' + options.title + '</div>' +
+				((options.rating || options.reviewCount) ?
+					('<div class="reviews">' +
+						(options.rating ?
+							('<span class="stars">' +
+								(function() {
+									var stars = "";
+									for (var i = 0; i < 5; i++) {
+										stars += "<span class='star'>☆";
+										if (options.rating > i) {
+											stars += (i + 1 > options.rating && options.rating % 1) ?
+												"<span class='half'>★</span>" :
+												"<span class='full'>★</span>";
+										}
+										stars += "</span>";
+									}
+									return stars;
+								})() +
+							'</span>') :
+							'') +
+						(options.reviewCount ?
+							('<span class="review-count">' + options.reviewCount + '</span>') :
+							'') +
+					'</div>') :
+					'') +
 				'<div class="description">' + options.description + '</div>' +
 			'</div>' +
 		'</div>' +
