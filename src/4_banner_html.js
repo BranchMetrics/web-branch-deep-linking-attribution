@@ -142,4 +142,3 @@ banner_html.markup = function(options, storage, branch) {
 		return banner_html.div(options, action);
 	}
 };
-

@@ -1813,6 +1813,10 @@ if (WEB_BUILD) {
 			desktopSticky: typeof options['desktopSticky'] === 'undefined' ?
 				true :
 				options['desktopSticky'],
+			theme: (typeof options['theme'] === 'string' &&
+					utils.bannerThemes.indexOf(options['theme']) > -1) ?
+					options['theme'] :
+					utils.bannerThemes[0],
 			make_new_link: !!options['make_new_link'],
 			open_app: !!options['open_app']
 		};
