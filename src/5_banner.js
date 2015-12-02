@@ -118,18 +118,12 @@ banner = function(branch, options, linkData, storage) {
 	var doc = options.iframe ? element.contentWindow.document : document;
 
 	if (utils.mobileUserAgent()) {
-		var referringLink = branch._referringLink();
-		if (referringLink && !options.make_new_link) {
-			doc.getElementById('branch-mobile-action').href = referringLink;
-		}
-		else {
-			options['open_app'] = options.open_app;
-			options['make_new_link'] = options.make_new_link;
-			branch['deepview'](linkData, options);
-			doc.getElementById('branch-mobile-action').onclick = function() {
-				branch['deepviewCta']();
-			};
-		}
+		options['open_app'] = options.open_app;
+		options['make_new_link'] = options.make_new_link;
+		branch['deepview'](linkData, options);
+		doc.getElementById('branch-mobile-action').onclick = function() {
+			branch['deepviewCta']();
+		};
 	}
 	else {
 		doc.getElementById('sms-form').addEventListener('submit', function(ev) {
