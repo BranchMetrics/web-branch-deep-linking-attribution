@@ -18,7 +18,7 @@ banner_css.banner = function(options) {
 		(banner_utils.animationSpeed / 1000) +
 		's ease; }\n' +
 	'#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n' +
-	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n' +
+	'#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; padding:0 6px 0 4px; }\n' +
 	'#branch-banner .content { width:100%; overflow: hidden; height: ' +
 		banner_utils.bannerHeight +
 		'; background: rgba(255, 255, 255, 0.95); color: #333; ' +
