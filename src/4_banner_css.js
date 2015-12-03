@@ -22,7 +22,7 @@ banner_css.banner = function(options) {
 		' background: ' + (options['buttonBackgroundColor'] || '#fff') + ';' +
 		' color: ' + (options['buttonFontColor'] || '#000') + ';' +
 		' cursor: pointer; margin-top: 0px; font-size: 14px;' +
-		' display: inline-block; margin-left: 5px; font-weight: 400;' +
+		' display: inline-block; margin-left: 5px; font-weight: 400; text-decoration: none; ' +
 		' border-radius: 4px; padding: 6px 12px; transition: all .2s ease;' +
 	'}\n' +
 	'#branch-banner .button:hover { ' +
@@ -58,8 +58,8 @@ banner_css.banner = function(options) {
 	'#branch-banner .details > * { display: block; }\n' +
 	'#branch-banner .content .left { height: 63px; }\n' +
 	'#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px;' +
-		' padding-top: 6px; z-index: 1; }\n' +
-	'#branch-banner .right > div { float: left; padding-top: 3px; }\n' +
+		' padding-top: 22px; z-index: 1; }\n' +
+	'#branch-banner .right > div { float: left; }\n' +
 	'#branch-banner-action { top: 17px; }\n' +
 	'#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0;' +
 		' top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n' +
@@ -116,7 +116,6 @@ banner_css.ie = '#branch-banner .checkmark { color: #428bca; font-size: 22px; }\
 banner_css.mobile =
 	'#branch-banner { position: absolute; }\n' +
 	'#branch-banner .content .left .details .title { font-size: 12px; }\n' +
-	'#branch-banner a { text-decoration: none; }\n' +
 	'#branch-mobile-action { white-space: nowrap; }\n' +
 	'#branch-banner .content .left .details .description { font-size: 11px;' +
 		' font-weight: normal; }\n' +
@@ -127,17 +126,17 @@ banner_css.mobile =
 	'@media only screen and (min-device-width: 401px) and (max-device-width: 480px)' +
 		' and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n';
 
-banner_css.ios =
-	'#branch-banner a { color: #428bca; }\n';
+banner_css.ios = '';
 
 // Styles thanks to https://github.com/asianmack/play-store-smartbanner/blob/master/smartbanner.html
 banner_css.android =
-	'#branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px;' +
-		' border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; padding: 0; }\n' +
-	'#branch-mobile-action { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639;' +
-		' padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff;' +
+	'#branch-banner #branch-banner-close,' +
+	'#branch-banner .theme-dark #branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px; top: 24px; ' +
+		' border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; padding: 0; opacity: 1; }\n' +
+	'#branch-banner .button { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639;' +
+		' padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; margin-top: 2px; ' +
 		' font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n' +
-	'#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n';
+	'#branch-banner .button:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n';
 
 banner_css.iframe =
 	'body { -webkit-transition: all ' +

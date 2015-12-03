@@ -12,7 +12,7 @@ goog.require('storage'); // jshint unused:false
  */
 banner_html.banner = function(options, action) {
 	return '<div class="content' + (options['theme'] ? ' theme-' + options['theme'] : '') + '">' +
-		'<div class="right vertically-align-middle">' +
+		'<div class="right">' +
 			action +
 		'</div>' +
 		'<div class="left">' +
@@ -153,7 +153,7 @@ banner_html.div = function(options, action) {
  * @param {storage} storage
  */
 banner_html.markup = function(options, storage, branch) {
-	var action = '<div id="branch-sms-form-container" class="vertically-align-middle">' +
+	var action = '<div id="branch-sms-form-container">' +
 		(utils.mobileUserAgent() ?
 			banner_html.mobileAction(options, storage, branch) :
 			banner_html.desktopAction(options)) +
