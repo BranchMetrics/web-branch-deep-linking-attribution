@@ -396,7 +396,7 @@ goog.hasUid = function(a) {
   return !!a[goog.UID_PROPERTY_];
 };
 goog.removeUid = function(a) {
-  null !== a && "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
+  "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
   try {
     delete a[goog.UID_PROPERTY_];
   } catch (b) {
@@ -618,7 +618,7 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 goog.json = {};
 goog.json.USE_NATIVE_JSON = !1;
 goog.json.isValid = function(a) {
-  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/(?:"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)[\s\u2028\u2029]*(?=:|,|]|}|$)/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
+  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
 };
 goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
   a = String(a);
@@ -1354,17 +1354,12 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
-  if (utils.mobileUserAgent()) {
-    var g = a._referringLink();
-    g && !b.make_new_link ? f.getElementById("branch-mobile-action").href = g : (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
-      a.deepviewCta();
-    });
-  } else {
-    f.getElementById("sms-form").addEventListener("submit", function(d) {
-      d.preventDefault();
-      sendSMS(f, a, b, c);
-    });
-  }
+  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
+    a.deepviewCta();
+  }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
+    d.preventDefault();
+    sendSMS(f, a, b, c);
+  });
   var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
     setTimeout(function() {
       banner_utils.removeElement(e);
