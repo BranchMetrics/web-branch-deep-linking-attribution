@@ -375,11 +375,17 @@ Branch.prototype['init'] = wrap(
 			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
 			(url ? utils.getParamValue(url) : null);
 		var freshInstall = !sessionData || !sessionData['identity_id'];
-		var currentDesktopUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-		var sessionDesktopUrl = null;
-		try {
-			sessionDesktopUrl = JSON.parse(sessionData['data'])['$desktop_url'];
-		} catch (err) {}
+
+		function currentDesktopUrlMatchesSession() {
+			var currentDesktopUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+			var sessionDesktopUrl = null;
+			try {
+				sessionDesktopUrl = JSON.parse(sessionData['data'])['$desktop_url'];
+			}
+			finally {
+				return sessionDesktopUrl === currentDesktopUrl;
+			}
+		}
 
 		var checkHasApp = function(sessionData, cb) {
 			if (WEB_BUILD) {
@@ -465,7 +471,7 @@ Branch.prototype['init'] = wrap(
 		if (WEB_BUILD &&
 				sessionData &&
 				sessionData['session_id'] &&
-				sessionDesktopUrl === currentDesktopUrl &&
+				currentDesktopUrlMatchesSession() &&
 				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
 				link_identifier === sessionData['click_id'])) {
 			attachVisibilityEvent();

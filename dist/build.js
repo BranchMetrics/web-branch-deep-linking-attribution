@@ -396,7 +396,7 @@ goog.hasUid = function(a) {
   return !!a[goog.UID_PROPERTY_];
 };
 goog.removeUid = function(a) {
-  null !== a && "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
+  "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
   try {
     delete a[goog.UID_PROPERTY_];
   } catch (b) {
@@ -618,7 +618,7 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 goog.json = {};
 goog.json.USE_NATIVE_JSON = !1;
 goog.json.isValid = function(a) {
-  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/(?:"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)[\s\u2028\u2029]*(?=:|,|]|}|$)/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
+  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
 };
 goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
   a = String(a);
@@ -1309,7 +1309,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, n = function() {
+  }, p = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1319,13 +1319,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+    var n = e.value;
+    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError"), p()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : n();
+    })) : p();
   }
 }, banner = function(a, b, c, d) {
   if (!banner_utils.shouldAppend(d, b)) {
@@ -1347,7 +1347,7 @@ var sendSMS = function(a, b, c, d) {
       sendSMS(f, a, b, c);
     });
   }
-  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
+  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), p = function(a) {
     setTimeout(function() {
       banner_utils.removeElement(e);
       banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1363,7 +1363,7 @@ var sendSMS = function(a, b, c, d) {
   m && (m.onclick = function(b) {
     b.preventDefault();
     a._publishEvent("willCloseBanner");
-    n(function() {
+    p(function() {
       a._publishEvent("didCloseBanner");
     });
   });
@@ -1373,7 +1373,7 @@ var sendSMS = function(a, b, c, d) {
     "top" === b.position ? e.style.top = "0" : "bottom" === b.position && (e.style.bottom = "0");
     a._publishEvent("didShowBanner");
   }, banner_utils.animationDelay);
-  return n;
+  return p;
 };
 // Input 13
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
@@ -1458,86 +1458,90 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
   };
 }
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
-  var d = this;
-  d.init_state = init_states.INIT_PENDING;
-  utils.isKey(b) ? d.branch_key = b : d.app_id = b;
+  function d() {
+    var a = window.location.protocol + "//" + window.location.host + window.location.pathname, b = null;
+    try {
+      b = JSON.parse(g.data).$desktop_url;
+    } finally {
+      return b === a;
+    }
+  }
+  var e = this;
+  e.init_state = init_states.INIT_PENDING;
+  utils.isKey(b) ? e.branch_key = b : e.app_id = b;
   c = c && "function" === typeof c ? {isReferrable:null} : c;
-  TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
-  var e = function(a) {
-    a.session_id && (d.session_id = a.session_id.toString());
-    a.identity_id && (d.identity_id = a.identity_id.toString());
-    a.link && (d.sessionLink = a.link);
+  TITANIUM_BUILD && "android" === Ti.Platform.osname && (e.keepAlive = !0);
+  var f = function(a) {
+    a.session_id && (e.session_id = a.session_id.toString());
+    a.identity_id && (e.identity_id = a.identity_id.toString());
+    a.link && (e.sessionLink = a.link);
     a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
     !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
+      e.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (e.link_click_id = a.link_click_id);
     }
-    WEB_BUILD && (d.browser_fingerprint_id = a.browser_fingerprint_id);
+    WEB_BUILD && (e.browser_fingerprint_id = a.browser_fingerprint_id);
     return a;
   };
   b = c && "undefined" !== typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var f = session.get(d._storage);
+  var g = session.get(e._storage);
   c = c && "undefined" !== typeof c.url && null !== c.url ? c.url : null;
-  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id;
-  c = window.location.protocol + "//" + window.location.host + window.location.pathname;
-  var h = null;
-  try {
-    h = JSON.parse(f.data).$desktop_url;
-  } catch (q) {
-  }
-  var l = function(a, b) {
-    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
+  var k = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !g || !g.identity_id, l = function(a, b) {
+    WEB_BUILD && e._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
     });
-    var c = a || session.get(d._storage);
-    d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
-      e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
+    var c = a || session.get(e._storage);
+    e._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, d) {
+      d && !c.has_app && (c.has_app = !0, session.update(e._storage, c), e._publishEvent("didDownloadApp"));
       b && b(a, c);
     });
   }, m = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
-    b && (d.init_state = init_states.INIT_FAILED);
-    d.keepAlive && setTimeout(function() {
-      d.keepAlive = !1;
+    c && (c = f(c), session.set(e._storage, c, h), e.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    b && (e.init_state = init_states.INIT_FAILED);
+    e.keepAlive && setTimeout(function() {
+      e.keepAlive = !1;
     }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
-  }, n = function() {
+  }, p = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
       document[a] || l(null, null);
     }, !1);
   };
-  if (WEB_BUILD && f && f.session_id && h === c && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
-    n(), l(f, m);
+  if (WEB_BUILD && g && g.session_id && d() && (utils.processReferringLink(k) === g.referring_link || k === g.click_id)) {
+    p(), l(g, m);
   } else {
     if (WEB_BUILD) {
-      d._api(resources._r, {sdk:config.version}, function(a, b) {
+      e._api(resources._r, {sdk:config.version}, function(a, b) {
         if (a) {
           return m(a, null);
         }
-        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-          b && g && (b.click_id = g);
-          n();
+        e._api(resources.open, {link_identifier:k, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+          b && k && (b.click_id = k);
+          p();
           m(a, b);
         });
       });
     } else {
       if (c = function(a) {
-        k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
-        d._api(k ? resources.install : resources.open, a, function(a, b) {
+        h || (a.identity_id = g.identity_id, a.device_fingerprint_id = g.device_fingerprint_id);
+        e._api(h ? resources.install : resources.open, a, function(a, b) {
           m(a, b);
         });
       }, CORDOVA_BUILD) {
-        h = [], null !== b && h.push(b ? 1 : 0), k && h.unshift(d.debug), cordova.require("cordova/exec")(c, function() {
+        var n = [];
+        null !== b && n.push(b ? 1 : 0);
+        h && n.unshift(e.debug);
+        cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
-        }, "BranchDevice", k ? "getInstallData" : "getOpenData", h);
+        }, "BranchDevice", h ? "getInstallData" : "getOpenData", n);
       } else {
         if (TITANIUM_BUILD) {
-          var h = {}, p = require("io.branch.sdk");
-          g && (h.link_identifier = g);
-          h = k ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
-          c(h);
+          var n = {}, q = require("io.branch.sdk");
+          k && (n.link_identifier = k);
+          n = h ? q.getInstallData(e.debug, null === b ? -1 : b ? 1 : 0) : q.getOpenData(null === b ? -1 : b ? 1 : 0);
+          c(n);
         }
       }
     }
