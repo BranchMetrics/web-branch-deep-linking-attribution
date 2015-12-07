@@ -114,7 +114,8 @@
 	<script type="text/javascript">
 		// INSERT INIT CODE
 
-		branch.init('5680621892404085', function(err, data) {
+		// Note that this example is using the key in two places, here and below
+		branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
 			document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
 		});
 	</script>
@@ -149,7 +150,8 @@
 		};
 		$('#init').click(function() {
 			request.html('branch.init();');
-			branch.init('5680621892404085', function(err, data) {
+			// Note that this example is using the key in two places, here and above
+			branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
 				response.html(err || JSON.stringify(data));
 			});
 		});
@@ -276,7 +278,15 @@
 					'"http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png",' +
 					'title: "Branch Demo App",' +
 					'description: "The Branch demo app!",' +
-					'data: {foo: "bar"}' +
+					'data: {foo: "bar"},' +
+					'reviewCount: 1000,' +
+					'rating: 5,' +
+					'theme: "light,"' +
+					'iframe: "true,"' +
+					'showMobile: "true,"' +
+					'showDesktop: "true,"' +
+					'disableHide: "false,"' +
+					'forgetHide: "false"' +
 					'});'
 			);
 			branch.banner(
@@ -286,9 +296,14 @@
 					description: 'Branch Demo app!',
 					openAppButtonText: 'Open',
 					downloadAppButtonText: 'Download',
+					reviewCount: 1000, // Review count
+					rating: 5, // Average rating from 0 to 5 in increments of .5
+					theme: 'light', // Optional, defaults to light, can be 'light' or 'dark'
 					iframe: true, // Show banner in an iframe if CSS on your page is conflicting
 					showMobile: true, // true by default, just set here for an example
-					showDesktop: true // true by default, just set here for an example
+					showDesktop: true, // true by default, just set here for an example
+					disableHide: false, // false by default, just set here for an example
+					forgetHide: false // false by default, just set here for an example
 				}, // Banner Options
 				sampleParams // Link data or string of link
 			);
