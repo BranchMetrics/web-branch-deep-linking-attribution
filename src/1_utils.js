@@ -52,6 +52,16 @@ utils.messages = {
 	missingUrl: 'Required argument: URL, is missing'
 };
 
+/**
+ * List of valid banner themes
+ * The first theme in the list becomes the default theme if one is not specified
+ */
+/** @type {Array<string>} */
+utils.bannerThemes = [
+	"light",
+	"dark"
+];
+
 /*
  * Getters for location.search and location.hash, so that we can stub this for testing
  */

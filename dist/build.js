@@ -69,12 +69,6 @@ goog.moduleLoaderState_ = null;
 goog.isInModuleLoader_ = function() {
   return null != goog.moduleLoaderState_;
 };
-goog.module.declareTestMethods = function() {
-  if (!goog.isInModuleLoader_()) {
-    throw Error("goog.module.declareTestMethods must be called from within a goog.module");
-  }
-  goog.moduleLoaderState_.declareTestMethods = !0;
-};
 goog.module.declareLegacyNamespace = function() {
   if (!COMPILED && !goog.isInModuleLoader_()) {
     throw Error("goog.module.declareLegacyNamespace must be called from within a goog.module");
@@ -135,7 +129,7 @@ goog.require = function(a) {
     if (goog.ENABLE_DEBUG_LOADER) {
       var b = goog.getPathFromDeps_(a);
       if (b) {
-        return goog.included_[b] = !0, goog.writeScripts_(), null;
+        return goog.writeScripts_(b), null;
       }
     }
     a = "goog.require could not find: " + a;
@@ -163,11 +157,11 @@ goog.LOAD_MODULE_USING_EVAL = !0;
 goog.SEAL_MODULE_EXPORTS = goog.DEBUG;
 goog.loadedModules_ = {};
 goog.DEPENDENCIES_ENABLED = !COMPILED && goog.ENABLE_DEBUG_LOADER;
-goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsModule:{}, nameToPath:{}, requires:{}, visited:{}, written:{}, deferred:{}}, goog.inHtmlDocument_ = function() {
+goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:{}, requires:{}, visited:{}, written:{}, deferred:{}}, goog.inHtmlDocument_ = function() {
   var a = goog.global.document;
-  return "undefined" != typeof a && "write" in a;
+  return null != a && "write" in a;
 }, goog.findBasePath_ = function() {
-  if (goog.global.CLOSURE_BASE_PATH) {
+  if (goog.isDef(goog.global.CLOSURE_BASE_PATH)) {
     goog.basePath = goog.global.CLOSURE_BASE_PATH;
   } else {
     if (goog.inHtmlDocument_()) {
@@ -182,7 +176,7 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
   }
 }, goog.importScript_ = function(a, b) {
   (goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_)(a, b) && (goog.dependencies_.written[a] = !0);
-}, goog.IS_OLD_IE_ = !goog.global.atob && goog.global.document && goog.global.document.all, goog.importModule_ = function(a) {
+}, goog.IS_OLD_IE_ = !(goog.global.atob || !goog.global.document || !goog.global.document.all), goog.importModule_ = function(a) {
   goog.importScript_("", 'goog.retrieveAndExecModule_("' + a + '");') && (goog.dependencies_.written[a] = !0);
 }, goog.queuedModules_ = [], goog.wrapModule_ = function(a, b) {
   return goog.LOAD_MODULE_USING_EVAL && goog.isDef(goog.global.JSON) ? "goog.loadModule(" + goog.global.JSON.stringify(b + "\n//# sourceURL=" + a + "\n") + ");" : 'goog.loadModule(function(exports) {"use strict";' + b + "\n;return exports});\n//# sourceURL=" + a + "\n";
@@ -214,10 +208,12 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
     delete goog.dependencies_.deferred[a];
     goog.globalEval(b);
   }
+}, goog.loadModuleFromUrl = function(a) {
+  goog.retrieveAndExecModule_(a);
 }, goog.loadModule = function(a) {
   var b = goog.moduleLoaderState_;
   try {
-    goog.moduleLoaderState_ = {moduleName:void 0, declareTestMethods:!1};
+    goog.moduleLoaderState_ = {moduleName:void 0, declareLegacyNamespace:!1};
     var c;
     if (goog.isFunction(a)) {
       c = a.call(goog.global, {});
@@ -234,13 +230,6 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
     }
     goog.moduleLoaderState_.declareLegacyNamespace ? goog.constructNamespace_(d, c) : goog.SEAL_MODULE_EXPORTS && Object.seal && Object.seal(c);
     goog.loadedModules_[d] = c;
-    if (goog.moduleLoaderState_.declareTestMethods) {
-      for (var e in c) {
-        if (0 === e.indexOf("test", 0) || "tearDown" == e || "setUp" == e || "setUpPage" == e || "tearDownPage" == e) {
-          goog.global[e] = c[e];
-        }
-      }
-    }
   } finally {
     goog.moduleLoaderState_ = b;
   }
@@ -273,35 +262,35 @@ goog.DEPENDENCIES_ENABLED && (goog.included_ = {}, goog.dependencies_ = {pathIsM
 }, goog.lastNonModuleScriptIndex_ = 0, goog.onScriptLoad_ = function(a, b) {
   "complete" == a.readyState && goog.lastNonModuleScriptIndex_ == b && goog.loadQueuedModules_();
   return !0;
-}, goog.writeScripts_ = function() {
-  function a(e) {
-    if (!(e in d.written)) {
-      if (!(e in d.visited) && (d.visited[e] = !0, e in d.requires)) {
-        for (var f in d.requires[e]) {
+}, goog.writeScripts_ = function(a) {
+  function b(a) {
+    if (!(a in e.written || a in e.visited)) {
+      e.visited[a] = !0;
+      if (a in e.requires) {
+        for (var f in e.requires[a]) {
           if (!goog.isProvided_(f)) {
-            if (f in d.nameToPath) {
-              a(d.nameToPath[f]);
+            if (f in e.nameToPath) {
+              b(e.nameToPath[f]);
             } else {
               throw Error("Undefined nameToPath for " + f);
             }
           }
         }
       }
-      e in c || (c[e] = !0, b.push(e));
+      a in d || (d[a] = !0, c.push(a));
     }
   }
-  var b = [], c = {}, d = goog.dependencies_, e;
-  for (e in goog.included_) {
-    d.written[e] || a(e);
-  }
-  for (var f = 0;f < b.length;f++) {
-    e = b[f], goog.dependencies_.written[e] = !0;
+  var c = [], d = {}, e = goog.dependencies_;
+  b(a);
+  for (a = 0;a < c.length;a++) {
+    var f = c[a];
+    goog.dependencies_.written[f] = !0;
   }
   var g = goog.moduleLoaderState_;
   goog.moduleLoaderState_ = null;
-  for (f = 0;f < b.length;f++) {
-    if (e = b[f]) {
-      d.pathIsModule[e] ? goog.importModule_(goog.basePath + e) : goog.importScript_(goog.basePath + e);
+  for (a = 0;a < c.length;a++) {
+    if (f = c[a]) {
+      e.pathIsModule[f] ? goog.importModule_(goog.basePath + f) : goog.importScript_(goog.basePath + f);
     } else {
       throw goog.moduleLoaderState_ = g, Error("Undefined script input");
     }
@@ -407,7 +396,7 @@ goog.hasUid = function(a) {
   return !!a[goog.UID_PROPERTY_];
 };
 goog.removeUid = function(a) {
-  "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
+  null !== a && "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
   try {
     delete a[goog.UID_PROPERTY_];
   } catch (b) {
@@ -479,7 +468,7 @@ goog.globalEval = function(a) {
         if (goog.global.eval("var _evalTest_ = 1;"), "undefined" != typeof goog.global._evalTest_) {
           try {
             delete goog.global._evalTest_;
-          } catch (b) {
+          } catch (d) {
           }
           goog.evalWorksForGlobals_ = !0;
         } else {
@@ -489,12 +478,12 @@ goog.globalEval = function(a) {
       if (goog.evalWorksForGlobals_) {
         goog.global.eval(a);
       } else {
-        var c = goog.global.document, d = c.createElement("SCRIPT");
-        d.type = "text/javascript";
-        d.defer = !1;
-        d.appendChild(c.createTextNode(a));
-        c.body.appendChild(d);
-        c.body.removeChild(d);
+        var b = goog.global.document, c = b.createElement("SCRIPT");
+        c.type = "text/javascript";
+        c.defer = !1;
+        c.appendChild(b.createTextNode(a));
+        b.body.appendChild(c);
+        b.body.removeChild(c);
       }
     } else {
       throw Error("goog.globalEval not available");
@@ -523,7 +512,7 @@ goog.setCssNameMapping = function(a, b) {
 !COMPILED && goog.global.CLOSURE_CSS_NAME_MAPPING && (goog.cssNameMapping_ = goog.global.CLOSURE_CSS_NAME_MAPPING);
 goog.getMsg = function(a, b) {
   b && (a = a.replace(/\{\$([^}]+)}/g, function(a, d) {
-    return d in b ? b[d] : a;
+    return null != b && d in b ? b[d] : a;
   }));
   return a;
 };
@@ -544,8 +533,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
-      g[h - 2] = arguments[h];
+    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
+      g[k - 2] = arguments[k];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -629,7 +618,7 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 goog.json = {};
 goog.json.USE_NATIVE_JSON = !1;
 goog.json.isValid = function(a) {
-  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
+  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/(?:"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)[\s\u2028\u2029]*(?=:|,|]|}|$)/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
 };
 goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
   a = String(a);
@@ -679,7 +668,7 @@ goog.json.Serializer.prototype.serializeInternal = function(a, b) {
         this.serializeNumber_(a, b);
         break;
       case "boolean":
-        b.push(a);
+        b.push(String(a));
         break;
       case "function":
         b.push("null");
@@ -699,7 +688,7 @@ goog.json.Serializer.prototype.serializeString_ = function(a, b) {
   }), '"');
 };
 goog.json.Serializer.prototype.serializeNumber_ = function(a, b) {
-  b.push(isFinite(a) && !isNaN(a) ? a : "null");
+  b.push(isFinite(a) && !isNaN(a) ? String(a) : "null");
 };
 goog.json.Serializer.prototype.serializeArray = function(a, b) {
   var c = a.length;
@@ -743,6 +732,7 @@ var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
 missingUrl:"Required argument: URL, is missing"};
+utils.bannerThemes = ["light", "dark"];
 utils.getLocationSearch = function() {
   return window.location.search;
 };
@@ -807,14 +797,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? k = g = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
     ;
   }
   return b;
@@ -942,15 +932,15 @@ var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, Branc
     if ("undefined" === typeof b) {
       return null;
     }
-    var a = null, c;
-    for (c in b) {
-      0 === c.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(c)] = retrieveValue(b.getItem(c)));
+    var a = null, d;
+    for (d in b) {
+      0 === d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
     }
     return a;
-  }, get:function(a, c) {
-    return retrieveValue(c ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
-  }, set:function(a, c, f) {
-    f ? localStorage.setItem(prefix(a), c) : b.setItem(prefix(a), c);
+  }, get:function(a, d) {
+    return retrieveValue(d ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
+  }, set:function(a, d, e) {
+    e ? localStorage.setItem(prefix(a), d) : b.setItem(prefix(a), d);
   }, remove:function(a) {
     b.removeItem(prefix(a));
   }, clear:function() {
@@ -1066,7 +1056,7 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
     "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
       return c.branch_key = b.branch_key, c;
@@ -1078,9 +1068,9 @@ Server.prototype.getUrl = function(a, b) {
   };
   if ("/v1/has-app" === a.endpoint) {
     try {
-      a.queryPart = h(b, a.queryPart);
-    } catch (k) {
-      return {error:k.message};
+      a.queryPart = k(b, a.queryPart);
+    } catch (l) {
+      return {error:l.message};
     }
   }
   if ("undefined" !== typeof a.queryPart) {
@@ -1093,7 +1083,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  var l = {};
+  var h = {};
   if ("undefined" !== typeof a.params) {
     for (c in a.params) {
       if (a.params.hasOwnProperty(c)) {
@@ -1101,19 +1091,19 @@ Server.prototype.getUrl = function(a, b) {
           return {error:d};
         }
         d = b[c];
-        "undefined" !== typeof d && "" !== d && null !== d && (l[c] = d);
+        "undefined" !== typeof d && "" !== d && null !== d && (h[c] = d);
       }
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
-      b = h(b, l);
-    } catch (n) {
-      return {error:n.message};
+      b = k(b, h);
+    } catch (l) {
+      return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (l.metadata = JSON.stringify(l.metadata || {}));
-  return {data:this.serializeObject(l, ""), url:e};
+  "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
+  return {data:this.serializeObject(h, ""), url:e};
 };
 Server.prototype.createScript = function(a) {
   var b = document.createElement("script");
@@ -1180,14 +1170,14 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(f.error));
   }
-  var g, h = "";
-  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
-  var k = RETRIES, l = function(a, b, c) {
-    a && 0 < k && "5" === c.toString().substring(0, 1) ? (k--, window.setTimeout(function() {
+  var g, k = "";
+  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
+  var h = RETRIES, l = function(a, b, c) {
+    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
       n();
     }, RETRY_DELAY)) : d(a, b);
   }, n = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
   };
   n();
 };
@@ -1214,7 +1204,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, h = function() {
+    }, k = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -1226,11 +1216,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * h();
+      return a * k();
     }, vmin:function(a) {
-      return a * Math.min(h(), g());
+      return a * Math.min(k(), g());
     }, vmax:function(a) {
-      return a * Math.max(h(), g());
+      return a * Math.max(k(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * f;
     }}[b](f), 10);
@@ -1244,11 +1234,13 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 // Input 10
 var banner_css = {banner:function(a) {
   return ".branch-banner-is-active { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
-  1E3 + "s ease; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + "; background: rgba(255, 255, 255, 0.95); color: #333; " + ("top" === a.position ? "border-bottom" : "border-top") + ': 1px solid #ddd; }\n#branch-banner .icon { float: left; padding-bottom: 40px; }\n#branch-banner .content .left { padding: 6px; }\n#branch-banner .icon img { width: 63px; height: 63px; }\n#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n#branch-banner .details > * { display: block; }\n#branch-banner .content .left { height: 63px; }\n#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; padding-top: 6px; z-index: 1; }\n#branch-banner .right > div { float: left; padding-top: 3px; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n';
-}, desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-banner-close { color: #aaa; font-size: 24px; top: 14px; }\n#branch-banner-close:hover { color: #000; }\n#branch-banner .title { font-size: 14px; }\n#branch-banner .description { font-size: 12px; font-weight: normal; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-block { display: inline-block; }\n#branch-sms-phone { font-weight: 400; border-radius: 4px; height: 30px; border: 1px solid #ccc; padding: 5px 7px 4px; width: 145px; font-size: 14px; }\n#branch-sms-send { cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; height: 30px; margin-left: 5px; font-weight: 400; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #000; padding: 0px 12px; }\n#branch-sms-send:hover { border: 1px solid #BABABA; background: #E0E0E0; }\n#branch-sms-phone:focus, button:focus { outline: none; }\n#branch-sms-phone.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; display: inline-block; margin-top: -18px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n", 
-nonie:"#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n", ie:"#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n", mobile:"#branch-banner { position: absolute; }\n#branch-banner-close { margin-top: 22px; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-banner a { text-decoration: none; }\n#branch-mobile-action { white-space: nowrap; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n@media only screen and (min-device-width: 320px) and (max-device-width: 350px) { #branch-banner .content .right { max-width: 120px; } }\n@media only screen and (min-device-width: 351px) and (max-device-width: 400px) and (orientation: landscape) { #branch-banner .content .right { max-width: 150px; } }\n@media only screen and (min-device-width: 401px) and (max-device-width: 480px) and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n", 
-ios:"#branch-banner-close { margin-left: 4px; }\n#branch-banner a { color: #428bca; }\n", android:"#branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px; border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; }\n#branch-mobile-action { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n#branch-mobile-action:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n"};
-banner_css.iframe = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 1px rgba(0,0,0,0.2); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + banner_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n";
+  1E3 + "s ease; }\n#branch-banner .button{ border: 1px solid " + (a.buttonBorderColor || ("dark" === a.theme ? "transparent" : "#ccc")) + "; background: " + (a.buttonBackgroundColor || "#fff") + "; color: " + (a.buttonFontColor || "#000") + "; cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; margin-left: 5px; font-weight: 400; text-decoration: none;  border-radius: 4px; padding: 6px 12px; transition: all .2s ease;}\n#branch-banner .button:hover {  border: 1px solid " + (a.buttonBorderColorHover || 
+  ("dark" === a.theme ? "transparent" : "#BABABA")) + "; background: " + (a.buttonBackgroundColorHover || "#E0E0E0") + "; color: " + (a.buttonFontColorHover || "#000") + ";}\n#branch-banner .button:focus { outline: none; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2;padding: 0 5px 0 5px; margin-right: 0; }\n#branch-banner .content { width:100%; overflow: hidden; height: " + banner_utils.bannerHeight + 
+  "; background: rgba(255, 255, 255, 0.95); color: #333; " + ("top" === a.position ? "border-bottom" : "border-top") + ': 1px solid #ddd; }\n#branch-banner-close { color: #000; font-size: 24px; top: 14px; opacity: .5; transition: opacity .3s ease; }\n#branch-banner-close:hover { opacity: 1; }\n#branch-banner .title { font-size: 18px; font-weight:bold; color: #555; }\n#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; }\n#branch-banner .icon { float: left; padding-bottom: 40px; margin-right: 10px; margin-left: 5px; }\n#branch-banner .icon img { width: 63px; height: 63px; margin-right: 0; }\n#branch-banner .reviews { font-size:13px; margin: 1px 0 3px 0; color: #777; }\n#branch-banner .reviews .star { display:inline-block; position: relative; margin-right:0; }\n#branch-banner .reviews .star span { display: inline-block; margin-right: 0; color: #555; position: absolute; top: 0; left: 0; }\n#branch-banner .reviews .review-count { font-size:10px; }\n#branch-banner .reviews .star .half { width: 50%; overflow: hidden; display: block; }\n#branch-banner .content .left { padding: 6px 5px 6px 5px; }\n#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n#branch-banner .details > * { display: block; }\n#branch-banner .content .left { height: 63px; }\n#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; padding-top: 22px; z-index: 1; }\n#branch-banner .right > div { float: left; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n#branch-banner .theme-dark.content { background: rgba(51, 51, 51, 0.95); }\n#branch-banner .theme-dark #branch-banner-close{ color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n#branch-banner .theme-dark .details { text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n#branch-banner .theme-dark .title { color: #fff; }\n#branch-banner .theme-dark .description { color: #fff; }\n#branch-banner .theme-dark .reviews { color: #888; }\n#branch-banner .theme-dark .reviews .star span{ color: #fff; }\n#branch-banner .theme-dark .reviews .review-count{ color: #fff; }\n';
+}, desktop:"#branch-banner { position: fixed; min-width: 600px; }\n#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n#branch-sms-block { display: inline-block; }\n#branch-banner input{ border: 1px solid #ccc;  font-weight: 400;  border-radius: 4px; height: 30px; padding: 5px 7px 4px; width: 145px; font-size: 14px;}\n#branch-banner input:focus { outline: none; }\n#branch-banner input.error { color: rgb(194, 0, 0); border-color: rgb(194, 0, 0); }\n#branch-banner .branch-icon-wrapper { width:25px; height: 25px; vertical-align: middle; display: inline-block; margin-top: -18px; }\n@keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n@-webkit-keyframes branch-spinner { 0% { transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg); } 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); } }\n#branch-spinner { -webkit-animation: branch-spinner 1s ease-in-out infinite; animation: branch-spinner 1s ease-in-out infinite; transition: all 0.7s ease-in-out; border:2px solid #ddd; border-bottom-color:#428bca; width:80%; height:80%; border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n#branch-banner .theme-dark input { border-color: transparent; }\n", 
+nonie:"#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625; stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards; animation: dash 2s ease-out forwards; }\n@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; } 100% { stroke-dashoffset: 0; } }\n@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; } 100% { stroke-dashoffset: 0; } }\n", ie:"#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n", mobile:"#branch-banner { position: absolute; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-mobile-action { white-space: nowrap; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n@media only screen and (min-device-width: 320px) and (max-device-width: 350px) { #branch-banner .content .right { max-width: 120px; } }\n@media only screen and (min-device-width: 351px) and (max-device-width: 400px) and (orientation: landscape) { #branch-banner .content .right { max-width: 150px; } }\n@media only screen and (min-device-width: 401px) and (max-device-width: 480px) and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\n", 
+ios:"", android:"#branch-banner #branch-banner-close,#branch-banner .theme-dark #branch-banner-close { height:17px; width: 17px; text-align: center; font-size: 15px; top: 24px;  border-radius:14px; border:0; line-height:14px; color:#b1b1b3; background:#efefef; padding: 0; opacity: 1; }\n#branch-banner .button { top: 0; text-decoration:none; border-bottom: 3px solid #A4C639; padding: 0 10px; height: 24px; line-height: 24px; text-align: center; color: #fff; margin-top: 2px;  font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n#branch-banner .button:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n"};
+banner_css.iframe = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + banner_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n";
 banner_css.inneriframe = "body { margin: 0; }\n";
 banner_css.iframe_position = function(a, b) {
   return "#branch-banner-iframe { position: " + ("top" !== b || a ? "fixed" : "absolute") + "; }\n";
@@ -1267,11 +1259,26 @@ banner_css.css = function(a, b) {
 };
 // Input 11
 var banner_html = {banner:function(a, b) {
-  return '<div class="content"><div class="right vertically-align-middle">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + '</div><div class="description">' + a.description + "</div></div></div></div>";
+  var c = '<div class="content' + (a.theme ? " theme-" + a.theme : "") + '"><div class="right">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + "</div>", d;
+  if (a.rating || a.reviewCount) {
+    if (a.rating) {
+      d = "";
+      for (var e = 0;5 > e;e++) {
+        d += "<span class='star'>\u2606", a.rating > e && (d += e + 1 > a.rating && a.rating % 1 ? "<span class='half'>\u2605</span>" : "<span class='full'>\u2605</span>"), d += "</span>";
+      }
+      d = '<span class="stars">' + d + "</span>";
+    } else {
+      d = "";
+    }
+    d = '<div class="reviews">' + d + (a.reviewCount ? '<span class="review-count">' + a.reviewCount + "</span>" : "") + "</div>";
+  } else {
+    d = "";
+  }
+  return c + d + '<div class="description">' + a.description + "</div></div></div></div>";
 }, mobileAction:function(a, b, c) {
-  return '<a id="branch-mobile-action" href="#" target="_parent">' + (session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+  return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' + (session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
-  return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation">' + a.sendLinkText + "</button></form></div>";
+  return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation button">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
   return window.ActiveXObject ? '<span class="checkmark">&#x2713;</span>' : '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5" enable-background="new 0 0 98.5 98.5" xml:space="preserve"><path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10" d="M81.7,17.8C73.5,9.3,62,4,49.2,4C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/></svg>';
 }, iframe:function(a, b) {
@@ -1295,29 +1302,29 @@ var banner_html = {banner:function(a, b) {
   document.body.appendChild(c);
   return c;
 }, markup:function(a, b, c) {
-  b = '<div id="branch-sms-form-container" class="vertically-align-middle">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b, c) : banner_html.desktopAction(a)) + "</div>";
+  b = '<div id="branch-sms-form-container">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b, c) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, b) : banner_html.div(a, b);
 }};
 // Input 12
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
   }, n = function() {
-    k = a.createElement("div");
-    k.className = "branch-icon-wrapper";
-    k.id = "branch-checkmark";
-    k.style = "opacity: 0;";
-    k.innerHTML = banner_html.checkmark();
-    h.appendChild(k);
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      k.style.opacity = "1";
+      h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, m = function() {
@@ -1333,7 +1340,7 @@ var sendSMS = function(a, b, c, d) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
       a ? (b._publishEvent("sendBannerSMSError"), m()) : (b._publishEvent("didSendBannerSMS"), n(), setTimeout(function() {
-        h.removeChild(k);
+        k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
     })) : m();
@@ -1358,14 +1365,14 @@ var sendSMS = function(a, b, c, d) {
       sendSMS(f, a, b, c);
     });
   }
-  var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
+  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
     setTimeout(function() {
       banner_utils.removeElement(e);
       banner_utils.removeElement(document.getElementById("branch-css"));
       a();
     }, banner_utils.animationSpeed + banner_utils.animationDelay);
     setTimeout(function() {
-      "top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = l);
+      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = l);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay);
     "top" === b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
@@ -1379,7 +1386,7 @@ var sendSMS = function(a, b, c, d) {
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
   setTimeout(function() {
     "top" === b.position ? e.style.top = "0" : "bottom" === b.position && (e.style.bottom = "0");
     a._publishEvent("didShowBanner");
@@ -1396,7 +1403,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var k = function(b, c) {
+      var h = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
@@ -1408,16 +1415,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
-          return k(Error(utils.message(utils.messages.initPending)), null);
+          return h(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return k(Error(utils.message(utils.messages.initFailed)), null);
+          return h(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
-          return k(Error(utils.message(utils.messages.nonInit)), null);
+          return h(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(k);
+      e.unshift(h);
       b.apply(d, e);
     });
   };
@@ -1489,7 +1496,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   b = c && "undefined" !== typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
   var f = session.get(d._storage);
   c = c && "undefined" !== typeof c.url && null !== c.url ? c.url : null;
-  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
+  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(a, b) {
     WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
     });
@@ -1499,7 +1506,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       b && b(a, c);
     });
   }, l = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, h), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     d.keepAlive && setTimeout(function() {
       d.keepAlive = !1;
@@ -1509,11 +1516,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
-      document[a] || k(null, null);
+      document[a] || h(null, null);
     }, !1);
   };
   if (WEB_BUILD && f && f.session_id && (utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
-    n(), k(f, l);
+    n(), h(f, l);
   } else {
     if (WEB_BUILD) {
       d._api(resources._r, {sdk:config.version}, function(a, b) {
@@ -1528,22 +1535,22 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       });
     } else {
       if (c = function(a) {
-        h || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
-        d._api(h ? resources.install : resources.open, a, function(a, b) {
+        k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
+        d._api(k ? resources.install : resources.open, a, function(a, b) {
           l(a, b);
         });
       }, CORDOVA_BUILD) {
         var m = [];
         null !== b && m.push(b ? 1 : 0);
-        h && m.unshift(d.debug);
+        k && m.unshift(d.debug);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
-        }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
+        }, "BranchDevice", k ? "getInstallData" : "getOpenData", m);
       } else {
         if (TITANIUM_BUILD) {
           var m = {}, p = require("io.branch.sdk");
           g && (m.link_identifier = g);
-          m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
+          m = k ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
           c(m);
         }
       }
@@ -1708,8 +1715,10 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   }));
 }, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
-  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === 
-  typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, make_new_link:!!b.make_new_link, open_app:!!b.open_app};
+  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", 
+  iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === 
+  typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, theme:"string" === typeof b.theme && -1 < utils.bannerThemes.indexOf(b.theme) ? b.theme : utils.bannerThemes[0], buttonBorderColor:b.buttonBorderColor || "", buttonBackgroundColor:b.buttonBackgroundColor || "", buttonFontColor:b.buttonFontColor || "", buttonBorderColorHover:b.buttonBorderColorHover || "", buttonBackgroundColorHover:b.buttonBackgroundColorHover || "", buttonFontColorHover:b.buttonFontColorHover || 
+  "", make_new_link:!!b.make_new_link, open_app:!!b.open_app};
   "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
