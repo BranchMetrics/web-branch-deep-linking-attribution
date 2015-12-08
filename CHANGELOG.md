@@ -2,7 +2,12 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [1.8.3] - unreleased
+- Fixes banner call to use deepview logic even if there is a referring link
+- Updated banner layout, including themes
+- Added additional fields for banner
+- Use Branch Keys instead of API Key for example
+- Updated license
 
 ## [v1.8.2] - 2015-11-30
 - Fixed gracefully handle local and session storage unavailability
