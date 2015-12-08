@@ -41,3 +41,4 @@ testbeds/titanium/Branch-SDK-Testbed/iTunesConnect.png
 testbeds/titanium/Branch-SDK-Testbed/modules/*
 testbeds/titanium/Branch-SDK-Testbed/platform/*
 tmp
+local-testbench

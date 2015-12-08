@@ -11,8 +11,8 @@ goog.require('storage'); // jshint unused:false
  * @param {string} action
  */
 banner_html.banner = function(options, action) {
-	return '<div class="content">' +
-		'<div class="right vertically-align-middle">' +
+	return '<div class="content' + (options['theme'] ? ' theme-' + options['theme'] : '') + '">' +
+		'<div class="right">' +
 			action +
 		'</div>' +
 		'<div class="left">' +
@@ -24,6 +24,30 @@ banner_html.banner = function(options, action) {
 			'</div>' +
 			'<div class="details vertically-align-middle">' +
 				'<div class="title">' + options.title + '</div>' +
+				((options.rating || options.reviewCount) ?
+					('<div class="reviews">' +
+						(options.rating ?
+							('<span class="stars">' +
+								(function() {
+									var stars = "";
+									for (var i = 0; i < 5; i++) {
+										stars += "<span class='star'>☆";
+										if (options.rating > i) {
+											stars += (i + 1 > options.rating && options.rating % 1) ?
+												"<span class='half'>★</span>" :
+												"<span class='full'>★</span>";
+										}
+										stars += "</span>";
+									}
+									return stars;
+								})() +
+							'</span>') :
+							'') +
+						(options.reviewCount ?
+							('<span class="review-count">' + options.reviewCount + '</span>') :
+							'') +
+					'</div>') :
+					'') +
 				'<div class="description">' + options.description + '</div>' +
 			'</div>' +
 		'</div>' +
@@ -36,7 +60,7 @@ banner_html.banner = function(options, action) {
  * @param {storage} storage
  */
 banner_html.mobileAction = function(options, storage, branch) {
-	return '<a id="branch-mobile-action" href="#" target="_parent">' +
+	return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' +
 		(session.get(storage)['has_app'] ?
 			options.openAppButtonText :
 			options.downloadAppButtonText) +
@@ -53,7 +77,7 @@ banner_html.desktopAction = function(options) {
 			' id="branch-sms-phone" placeholder="' +
 			options.phonePreviewText +
 			'">' +
-			'<button type="submit" id="branch-sms-send" class="branch-animation">' +
+			'<button type="submit" id="branch-sms-send" class="branch-animation button">' +
 			options.sendLinkText + '</button>' +
 		'</form>' +
 	'</div>';
@@ -129,7 +153,7 @@ banner_html.div = function(options, action) {
  * @param {storage} storage
  */
 banner_html.markup = function(options, storage, branch) {
-	var action = '<div id="branch-sms-form-container" class="vertically-align-middle">' +
+	var action = '<div id="branch-sms-form-container">' +
 		(utils.mobileUserAgent() ?
 			banner_html.mobileAction(options, storage, branch) :
 			banner_html.desktopAction(options)) +
@@ -142,4 +166,3 @@ banner_html.markup = function(options, storage, branch) {
 		return banner_html.div(options, action);
 	}
 };
-
