@@ -312,6 +312,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
 Branch.prototype['init'] = wrap(
 	callback_params.CALLBACK_ERR_DATA,
 	function(done, branch_key, options) {
+
 		var self = this;
 
 		self.init_state = init_states.INIT_PENDING;
@@ -468,6 +469,7 @@ Branch.prototype['init'] = wrap(
 		}
 
 		if (WEB_BUILD) {
+
 			self._api(
 				resources._r,
 				{ "sdk": config.version },
