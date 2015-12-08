@@ -51,7 +51,10 @@ branch.banner(
       // Platforms customization
       showDesktop: false,
       showiOS: true,
-      showAndroid: true
+      showAndroid: true,
+      showBlackberry: true,
+      showWindowsPhone: true,
+      showKindle: true
  },
  {... link data ...}
 );
