@@ -6,28 +6,9 @@ We provide a sample web app which demonstrates what Branch Metrics Web SDK can d
 
 To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
 
-## Integration Checklist 
-
-- Create Branch Account and get your [Branch Key](https://dashboard.branch.io/#/settings)
-- Install SDK
-- Initialize Branch & Start Session
-- Set up incoming link handling
-- Smart Banner (optional)
-- Deep link generation
-- Send SMS messages (optional)
-- Identify users
-
-
-## Additional Resources
-- [Integration guide](https://dev.branch.io/recipes/quickstart_guide/web/)
-- [Testing](https://dev.branch.io/recipes/testing_your_integration/web/)
-- [Technical Reference](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/Reference.md) 
-- [Changelog](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/CHANGELOG.md)
-- [Support portal, FAQ, and user forums](http://support.branch.io)
-
 ## Overview
 
-The Branch Web SDK provides an easy way to interact with the Branch API on your website, web app, or PhoneGap/Cordova mobile app. It requires no frameworks, is 100% native JavaScript and is only ~9K gzipped.
+The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, is 100% native JavaScript and is only ~9K gzipped.
 
 The Branch Web SDK allows you to create and share links with a banner (web only), over SMS, or your own methods by generating deep links. It also offers event tracking, access to referrals, and management of credits.
 
@@ -49,19 +30,10 @@ This SDK requires only native browser Javascript and has been tested in all mode
 
 In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
 
-### Web Based Integration
-[Full Documentation for the Web SDK](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/Reference.md)
-
-### Cordova/PhoneGap
-[Full Documentation for the Cordova Web SDK](https://dev.branch.io/recipes/quickstart_guide/cordova/#installing-the-sdk-files)
-
-### Appcelerator Titanum
-[Full Documentation for the Titanium Web SDK](https://github.com/BranchMetrics/Titanium-Deferred-Deep-Linking-SDK/blob/master/README.md/)
-
 ## Commonly Used Features
 
 ### App Smart Banner
-While only available for websites and web apps (not Cordova), the app smart banner is one of the most widely used features of the Web SDK. A few short lines of code will produce an automatically
+While only available for websites and web apps, the app smart banner is one of the most widely used features of the Web SDK. A few short lines of code will produce an automatically
 generated, highly customizeable banner at either the top or bottom of the page it is installed on. The banner automatically styles itself for Android, iOS, and desktop, and generates a mobile deep
 link if on a mobile deive, or displays a "TXT me the app form" if on desktop. If you are looking for a very simple way of getting deeplinking setup on your website - both desktop and mobile - the
 Smart banner is a great start!
@@ -75,8 +47,7 @@ Powerful, customizeable, and easy-to-create deeplinks are what Branch does best.
 asynchronously: `link()`. The method has all of the same options and parameters available on the public API `POST /v1/url` endpoint, and is called from a robust queueing mechanism and XHRRequest
 implementation with JSONP fallback that is well tested down to IE9, and every major browser.
 
-Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback) or
-[Cordova](https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK/blob/master/README.md#linkdata-callback)
+Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback)
 
 ___
 
@@ -90,4 +61,3 @@ and the [Google Closure Compiler](https://developers.google.com/closure/compiler
 For an in-depth guide to working with developing for the Web SDK, refer to the [release documentation](https://github.com/BranchMetrics/Web-SDK/blob/master/RELEASE_DOCUMENTATION.md).
 
 ___
-

@@ -30,9 +30,6 @@ This SDK requires only native browser Javascript and has been tested in all mode
 
 In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
 
-### Web Based Integration
-[Full Documentation for the Web SDK](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/Reference.md)
-
 ## Commonly Used Features
 
 ### App Smart Banner
@@ -50,8 +47,21 @@ Powerful, customizeable, and easy-to-create deeplinks are what Branch does best.
 asynchronously: `link()`. The method has all of the same options and parameters available on the public API `POST /v1/url` endpoint, and is called from a robust queueing mechanism and XHRRequest
 implementation with JSONP fallback that is well tested down to IE9, and every major browser.
 
-Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback) or
+Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback)
 
+___
+
+## Contributing
+Whether you are an avid engineer, a partner, or a Branch employee, we activley welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
+
+To build the Web SDK, you'll need to run `npm install` to grab the necessary packages, be sure you have [make](http://www.gnu.org/software/make/),
+[python](https://www.python.org/downloads/) (comes with Mac OSX), [perl](http://learn.perl.org/installing/osx.html),
+and the [Google Closure Compiler](https://developers.google.com/closure/compiler/) (Closure compiler is automatically installed when you run `make` the first time.)
+
+For an in-depth guide to working with developing for the Web SDK, refer to the [release documentation](https://github.com/BranchMetrics/Web-SDK/blob/master/RELEASE_DOCUMENTATION.md).
+
+___
+# Branch Web SDK
 
 ## API Reference
 
@@ -88,9 +98,15 @@ Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetri
   + [.banner()](#banneroptions-data)
 
 ___
+# Global
 
 
-### init(branch_key, options, callback)
+
+
+
+* * *
+
+### init(branch_key, options, callback) 
 
 **Parameters**
 
@@ -147,7 +163,7 @@ ___
 
 
 
-### data(callback)
+### data(callback) 
 
 **Parameters**
 
@@ -164,7 +180,7 @@ ___
 
 
 
-### first(callback)
+### first(callback) 
 
 **Parameters**
 
@@ -182,7 +198,7 @@ ___
 
 
 
-### setIdentity(identity, callback)
+### setIdentity(identity, callback) 
 
 **Parameters**
 
@@ -222,7 +238,7 @@ ___
 
 
 
-### logout(callback)
+### logout(callback) 
 
 **Parameters**
 
@@ -247,7 +263,7 @@ ___
 
 
 
-### track(event, metadata, callback)
+### track(event, metadata, callback) 
 
 **Parameters**
 
@@ -282,7 +298,7 @@ ___
 
 
 
-### link(data, callback)
+### link(data, callback) 
 
 **Parameters**
 
@@ -376,7 +392,7 @@ callback(
 
 
 
-### sendSMS(phone, linkData, options, callback)
+### sendSMS(phone, linkData, options, callback) 
 
 **Parameters**
 
@@ -456,7 +472,7 @@ ___
 
 
 
-### deepview(data, options, callback)
+### deepview(data, options, callback) 
 
 **Parameters**
 
@@ -522,7 +538,7 @@ callback(
 
 
 
-### deepviewCta()
+### deepviewCta() 
 
 Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
 finished. If the `branch.deepview()` call is finished with no error, when `branch.deepviewCta()` is called,
@@ -576,7 +592,7 @@ pre-identify call. This can allow users to cheat the system.
 
 
 
-### referrals(callback)
+### referrals(callback) 
 
 **Parameters**
 
@@ -618,7 +634,7 @@ callback(
 
 
 
-### getCode(options, callback)
+### getCode(options, callback) 
 
 **Parameters**
 
@@ -673,7 +689,7 @@ ___
 
 
 
-### validateCode(code, callback)
+### validateCode(code, callback) 
 
 **Parameters**
 
@@ -719,7 +735,7 @@ ___
 
 
 
-### applyCode(code, callback)
+### applyCode(code, callback) 
 
 **Parameters**
 
@@ -767,7 +783,7 @@ ___
 
 
 
-### credits(callback)
+### credits(callback) 
 
 **Parameters**
 
@@ -797,7 +813,7 @@ callback(
 
 
 
-### creditHistory(options, callback)
+### creditHistory(options, callback) 
 
 **Parameters**
 
@@ -876,7 +892,7 @@ ___
 
 
 
-### redeem(amount, bucket, callback)
+### redeem(amount, bucket, callback) 
 
 **Parameters**
 
@@ -920,7 +936,7 @@ ___
 
 
 
-### addListener(event, listener)
+### addListener(event, listener) 
 
 **Parameters**
 
@@ -961,7 +977,7 @@ branch.addListener(listener);
 
 
 
-### removeListener(listener)
+### removeListener(listener) 
 
 **Parameters**
 
@@ -975,7 +991,7 @@ just an identical clone of the function.
 
 
 
-### banner(options, data)
+### banner(options, data) 
 
 **Parameters**
 
@@ -1011,19 +1027,10 @@ branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
     description: 'The Branch demo app!',
-    rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
-    reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
-    theme: 'light',                         // Overrides the default color theme of the banner. Possible values 'light' or 'dark'.
     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-    buttonBorderColor: null,                // Overrides the default button border color
-    buttonBackgroundColor: null,            // Overrides the default button background color
-    buttonFontColor: null,                  // Overrides the default button font color
-    buttonBorderColorHover: null,           // Overrides the default button border color during mouse over
-    buttonBackgroundColorHover: null,       // Overrides the default button background color during mouse over
-    buttonFontColorHover: null,             // Overrides the default button font color during mouse over
     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
     showAndroid: true,                      // Should the banner be shown on Android devices?
@@ -1074,18 +1081,16 @@ branch.closeBanner();
 
 
 
-___
+* * *
 
-## Contributing
-Whether you are an avid engineer, a partner, or a Branch employee, we activley welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
 
-To build the Web SDK, you'll need to run `npm install` to grab the necessary packages, be sure you have [make](http://www.gnu.org/software/make/),
-[python](https://www.python.org/downloads/) (comes with Mac OSX), [perl](http://learn.perl.org/installing/osx.html),
-and the [Google Closure Compiler](https://developers.google.com/closure/compiler/) (Closure compiler is automatically installed when you run `make` the first time.)
 
-For an in-depth guide to working with developing for the Web SDK, refer to the [release documentation](https://github.com/BranchMetrics/Web-SDK/blob/master/RELEASE_DOCUMENTATION.md).
 
-___
+
+
+
+
+
 
 ## Bugs / Help / Support
 
