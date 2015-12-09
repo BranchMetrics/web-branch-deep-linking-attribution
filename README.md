@@ -90,12 +90,6 @@ Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetri
 ___
 
 
-
-
-
-
-* * *
-
 ### init(branch_key, options, callback)
 
 **Parameters**
@@ -1070,8 +1064,6 @@ branch.closeBanner();
 
 
 
-
-* * *
 
 ___
 
