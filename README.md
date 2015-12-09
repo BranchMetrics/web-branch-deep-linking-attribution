@@ -6,22 +6,10 @@ We provide a sample web app which demonstrates what Branch Metrics Web SDK can d
 
 To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
 
-## Integration Checklist 
-
-- Create Branch Account and get your [Branch Key](https://dashboard.branch.io/#/settings)
-- Install SDK
-- Initialize Branch & Start Session
-- Set up incoming link handling
-- Smart Banner (optional)
-- Deep link generation
-- Send SMS messages (optional)
-- Identify users
-
-
 ## Additional Resources
 - [Integration guide](https://dev.branch.io/recipes/quickstart_guide/web/)
 - [Testing](https://dev.branch.io/recipes/testing_your_integration/web/)
-- [Technical Reference](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/Reference.md) 
+- [Technical Reference](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/Reference.md)
 - [Changelog](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/CHANGELOG.md)
 - [Support portal, FAQ, and user forums](http://support.branch.io)
 
