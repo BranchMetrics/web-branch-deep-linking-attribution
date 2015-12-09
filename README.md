@@ -1026,11 +1026,20 @@ branch.banner(
 branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
-    description: 'The Branch demo app!',
+    description: 'The Branch demo app!', 
+    rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
+    reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
+    theme: 'light',                         // Overrides the default color theme of the banner. Possible values 'light' or 'dark'.
     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
+    buttonBorderColor: null,                // Overrides the default button border color
+    buttonBackgroundColor: null,            // Overrides the default button background color
+    buttonFontColor: null,                  // Overrides the default button font color
+    buttonBorderColorHover: null,           // Overrides the default button border color during mouse over
+    buttonBackgroundColorHover: null,       // Overrides the default button background color during mouse over
+    buttonFontColorHover: null,             // Overrides the default button font color during mouse over
     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
     showAndroid: true,                      // Should the banner be shown on Android devices?
