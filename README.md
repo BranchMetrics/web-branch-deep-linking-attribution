@@ -8,7 +8,7 @@ To modify this local web app, edit `src/web/example.template.html` first, and th
 
 ## Overview
 
-The Branch Web SDK provides an easy way to interact with the Branch API on your website, web app, or PhoneGap/Cordova mobile app. It requires no frameworks, is 100% native JavaScript and is only ~9K gzipped.
+The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, is 100% native JavaScript and is only ~9K gzipped.
 
 The Branch Web SDK allows you to create and share links with a banner (web only), over SMS, or your own methods by generating deep links. It also offers event tracking, access to referrals, and management of credits.
 
@@ -33,16 +33,10 @@ In addition to working as a standalone library, the Branch SDK works great in Co
 ### Web Based Integration
 [Full Documentation for the Web SDK](https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/blob/master/Reference.md)
 
-### Cordova/PhoneGap
-[Full Documentation for the Cordova Web SDK](https://dev.branch.io/recipes/quickstart_guide/cordova/#installing-the-sdk-files)
-
-### Appcelerator Titanum
-[Full Documentation for the Titanium Web SDK](https://github.com/BranchMetrics/Titanium-Deferred-Deep-Linking-SDK/blob/master/README.md/)
-
 ## Commonly Used Features
 
 ### App Smart Banner
-While only available for websites and web apps (not Cordova), the app smart banner is one of the most widely used features of the Web SDK. A few short lines of code will produce an automatically
+While only available for websites and web apps, the app smart banner is one of the most widely used features of the Web SDK. A few short lines of code will produce an automatically
 generated, highly customizeable banner at either the top or bottom of the page it is installed on. The banner automatically styles itself for Android, iOS, and desktop, and generates a mobile deep
 link if on a mobile deive, or displays a "TXT me the app form" if on desktop. If you are looking for a very simple way of getting deeplinking setup on your website - both desktop and mobile - the
 Smart banner is a great start!
@@ -57,7 +51,6 @@ asynchronously: `link()`. The method has all of the same options and parameters 
 implementation with JSONP fallback that is well tested down to IE9, and every major browser.
 
 Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback) or
-[Cordova](https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK/blob/master/README.md#linkdata-callback)
 
 ___
 
