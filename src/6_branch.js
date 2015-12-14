@@ -1747,6 +1747,9 @@ if (WEB_BUILD) {
 	 *     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
 	 *     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
 	 *     showAndroid: true,                      // Should the banner be shown on Android devices?
+	 *     showBlackberry: true,                   // Should the banner be shown on Blackberry devices?
+	 *     showWindowsPhone: true,                 // Should the banner be shown on Windows Phone devices?
+	 *     showKindle: true,                       // Should the banner be shown on Kindle devices?
 	 *     showDesktop: true,                      // Should the banner be shown on desktop devices?
 	 *     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
 	 *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
@@ -1832,6 +1835,15 @@ if (WEB_BUILD) {
 			showAndroid: typeof options['showAndroid'] === 'undefined' ?
 				true :
 				options['showAndroid'],
+			showBlackberry: typeof options['showBlackberry'] === 'undefined' ?
+				true :
+				options['showBlackberry'],
+			showWindowsPhone: typeof options['showWindowsPhone'] === 'undefined' ?
+				true :
+				options['showWindowsPhone'],
+			showKindle: typeof options['showKindle'] === 'undefined' ?
+				true :
+				options['showKindle'],
 			showDesktop: typeof options['showDesktop'] === 'undefined' ?
 				true :
 				options['showDesktop'],
@@ -1866,6 +1878,9 @@ if (WEB_BUILD) {
 		if (typeof options['showMobile'] !== 'undefined') {
 			bannerOptions.showiOS = options['showMobile'];
 			bannerOptions.showAndroid = options['showMobile'];
+			bannerOptions.showBlackberry = options['showMobile'];
+			bannerOptions.showWindowsPhone = options['showMobile'];
+			bannerOptions.showKindle = options['showMobile'];
 		}
 
 		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);

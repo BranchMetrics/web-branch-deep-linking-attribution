@@ -138,6 +138,12 @@ banner_css.android =
 		' font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n' +
 	'#branch-banner .button:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n';
 
+banner_css.blackberry = '';
+
+banner_css.windows_phone = '';
+
+banner_css.kindle = '';
+
 banner_css.iframe =
 	'body { -webkit-transition: all ' +
 		(banner_utils.animationSpeed * 1.5 / 1000) +
@@ -176,6 +182,15 @@ banner_css.css = function(options, element) {
 	}
 	else if (userAgent === 'android' && options.showAndroid) {
 		style += banner_css.mobile + banner_css.android;
+	}
+	else if (userAgent === 'blackberry' && options.showBlackberry) {
+		style += banner_css.mobile + banner_css.blackberry;
+	}
+	else if (userAgent === 'windows_phone' && options.showWindowsPhone) {
+		style += banner_css.mobile + banner_css.windows_phone;
+	}
+	else if (userAgent === 'kindle' && options.showKindle) {
+		style += banner_css.mobile + banner_css.kindle;
 	}
 	else {
 		style += banner_css.desktop;

@@ -926,7 +926,7 @@ branch.banner(
 branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
-    description: 'The Branch demo app!', 
+    description: 'The Branch demo app!',
     rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
     reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
     theme: 'light',                         // Overrides the default color theme of the banner. Possible values 'light' or 'dark'.
@@ -943,6 +943,9 @@ branch.banner({
     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
     showAndroid: true,                      // Should the banner be shown on Android devices?
+    showBlackberry: true,                   // Should the banner be shown on Blackberry devices?
+    showWindowsPhone: true,                 // Should the banner be shown on Windows Phone devices?
+    showKindle: true,                       // Should the banner be shown on Kindle devices?
     showDesktop: true,                      // Should the banner be shown on desktop devices?
     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)

@@ -168,14 +168,36 @@ utils.hashValue = function(key) {
 };
 
 utils.mobileUserAgent = function() {
-	if (navigator.userAgent.match(/android/i)) {
+	var ua = navigator.userAgent;
+	if (ua.match(/android/i)) {
 		return 'android';
 	}
-	if (navigator.userAgent.match(/ipad/i)) {
+	if (ua.match(/ipad/i)) {
 		return 'ipad';
 	}
-	if (navigator.userAgent.match(/i(os|p(hone|od))/i)) {
+	if (ua.match(/i(os|p(hone|od))/i)) {
 		return 'ios';
+	}
+	if (ua.match(/\(BB[1-9][0-9]*\;/i)) {
+		return 'blackberry';
+	}
+	if (ua.match(/Windows Phone/i)) {
+		return 'windows_phone';
+	}
+	if (
+		ua.match(/Kindle/i) ||
+		ua.match(/Silk/i) ||
+		ua.match(/KFTT/i) ||
+		ua.match(/KFOT/i) ||
+		ua.match(/KFJWA/i) ||
+		ua.match(/KFJWI/i) ||
+		ua.match(/KFSOWI/i) ||
+		ua.match(/KFTHWA/i) ||
+		ua.match(/KFTHWI/i) ||
+		ua.match(/KFAPWA/i) ||
+		ua.match(/KFAPWI/i)
+	) {
+		return "kindle";
 	}
 	return false;
 };
