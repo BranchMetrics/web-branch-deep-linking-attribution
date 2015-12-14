@@ -43,7 +43,7 @@ banner_css.banner = function(options) {
 		' transition: opacity .3s ease; }\n' +
 	'#branch-banner-close:hover { opacity: 1; }\n' +
 	'#branch-banner .title { font-size: 18px; font-weight:bold; color: #555; }\n' +
-	'#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; }\n' +
+	'#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; max-height: 30px; overflow: hidden; }\n' +
 	'#branch-banner .icon { float: left; padding-bottom: 40px; margin-right: 10px; margin-left: 5px; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; margin-right: 0; }\n' +
 	'#branch-banner .reviews { font-size:13px; margin: 1px 0 3px 0; color: #777; }\n' +
