@@ -27,7 +27,7 @@ if (!TITANIUM_BUILD) {
 // AMD
 if (typeof define === 'function' && define.amd) {
 	define(
-		'branch',
+		[ 'branch' ],
 		function() {
 			return branch_instance;
 		}

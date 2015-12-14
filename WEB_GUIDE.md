@@ -117,7 +117,7 @@ ___
 
 * * *
 
-### init(branch_key, options, callback) 
+### init(branch_key, options, callback)
 
 **Parameters**
 
@@ -172,7 +172,7 @@ ___
 
 
 
-### data(callback) 
+### data(callback)
 
 **Parameters**
 
@@ -188,7 +188,7 @@ ___
 
 
 
-### first(callback) 
+### first(callback)
 
 **Parameters**
 
@@ -205,7 +205,7 @@ ___
 
 
 
-### setIdentity(identity, callback) 
+### setIdentity(identity, callback)
 
 **Parameters**
 
@@ -243,7 +243,7 @@ ___
 
 
 
-### logout(callback) 
+### logout(callback)
 
 **Parameters**
 
@@ -268,7 +268,7 @@ ___
 
 
 
-### track(event, metadata, callback) 
+### track(event, metadata, callback)
 
 **Parameters**
 
@@ -302,7 +302,7 @@ ___
 
 
 
-### link(data, callback) 
+### link(data, callback)
 
 **Parameters**
 
@@ -392,7 +392,7 @@ callback(
 
 
 
-### sendSMS(phone, linkData, options, callback) 
+### sendSMS(phone, linkData, options, callback)
 
 **Parameters**
 
@@ -471,7 +471,7 @@ ___
 
 
 
-### deepview(data, options, callback) 
+### deepview(data, options, callback)
 
 **Parameters**
 
@@ -613,11 +613,11 @@ These reward definitions are created on the dashboard, under the &#39;Reward Rul
 
 Warning: For a referral program, you should not use unique awards for custom events and redeem pre-identify call. This can allow users to cheat the system.
 
-## Retrieve referrals list() 
+## Retrieve referrals list()
 
 
 
-### referrals(callback) 
+### referrals(callback)
 
 **Parameters**
 
@@ -659,7 +659,7 @@ callback(
 
 
 
-### getCode(options, callback) 
+### getCode(options, callback)
 
 **Parameters**
 
@@ -713,7 +713,7 @@ ___
 
 
 
-### validateCode(code, callback) 
+### validateCode(code, callback)
 
 **Parameters**
 
@@ -759,7 +759,7 @@ ___
 
 
 
-### applyCode(code, callback) 
+### applyCode(code, callback)
 
 **Parameters**
 
@@ -807,7 +807,7 @@ ___
 
 
 
-### credits(callback) 
+### credits(callback)
 
 **Parameters**
 
@@ -837,7 +837,7 @@ callback(
 
 
 
-### creditHistory(options, callback) 
+### creditHistory(options, callback)
 
 **Parameters**
 
@@ -915,7 +915,7 @@ ___
 
 
 
-### redeem(amount, bucket, callback) 
+### redeem(amount, bucket, callback)
 
 **Parameters**
 
@@ -957,7 +957,7 @@ ___
 
 
 
-### addListener(event, listener) 
+### addListener(event, listener)
 
 **Parameters**
 
@@ -993,7 +993,7 @@ branch.addListener(listener);
 
 
 
-### removeListener(listener) 
+### removeListener(listener)
 
 **Parameters**
 
@@ -1003,7 +1003,7 @@ Remove the listener from observations, if it is present. Not that this function 
 
 
 
-### banner(options, data) 
+### banner(options, data)
 
 **Parameters**
 
@@ -1044,6 +1044,9 @@ branch.banner({
     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
     showAndroid: true,                      // Should the banner be shown on Android devices?
+    showBlackberry: true,                   // Should the banner be shown on Blackberry devices?
+    showWindowsPhone: true,                 // Should the banner be shown on Windows Phone devices?
+    showKindle: true,                       // Should the banner be shown on Kindle devices?
     showDesktop: true,                      // Should the banner be shown on desktop devices?
     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
