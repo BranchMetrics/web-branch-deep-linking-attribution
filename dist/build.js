@@ -731,7 +731,7 @@ var task_queue = function() {
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
-missingUrl:"Required argument: URL, is missing"};
+blockedByClient:"Request blocked by client, probably adblock", missingUrl:"Required argument: URL, is missing"};
 utils.bannerThemes = ["light", "dark"];
 utils.getLocationSearch = function() {
   return window.location.search;
@@ -1106,12 +1106,13 @@ Server.prototype.getUrl = function(a, b) {
   "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
   return {data:this.serializeObject(h, ""), url:e};
 };
-Server.prototype.createScript = function(a) {
-  var b = document.createElement("script");
-  b.type = "text/javascript";
-  b.async = !0;
-  b.src = a;
-  document.getElementsByTagName("head")[0].appendChild(b);
+Server.prototype.createScript = function(a, b) {
+  var c = document.createElement("script");
+  c.type = "text/javascript";
+  c.async = !0;
+  c.src = a;
+  c.onerror = b;
+  document.getElementsByTagName("head")[0].appendChild(c);
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
@@ -1126,7 +1127,9 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window.clearTimeout(g);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e);
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, function() {
+    d(Error(utils.messages.blockedByClient), null);
+  });
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
   var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
@@ -1174,7 +1177,7 @@ Server.prototype.request = function(a, b, c, d) {
   var g, k = "";
   "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
   var h = RETRIES, l = function(a, b, c) {
-    a && 0 < h && "5" === c.toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+    a && 0 < h && "5" === (c || "").toString().substring(0, 1) ? (h--, window.setTimeout(function() {
       m();
     }, RETRY_DELAY)) : d(a, b);
   }, m = function() {
