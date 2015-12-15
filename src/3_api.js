@@ -163,11 +163,13 @@ Server.prototype.getUrl = function(resource, data) {
  * This function is standalone for easy mocking.
  * @param {string} src
  */
-Server.prototype.createScript = function(src) {
+Server.prototype.createScript = function(src, onError) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.async = true;
 	script.src = src;
+	// This is not avaiable in all browsers
+	script.onerror = onError;
 
 	document.getElementsByTagName('head')[0].appendChild(script);
 };
@@ -205,7 +207,9 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 		requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') +
 		(postData ? postPrefix + postData : '') +
 		(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
-		'&callback=' + callbackString);
+		'&callback=' + callbackString, function() {
+			callback(new Error(utils.messages.blockedByClient), null);
+		});
 };
 
 /**
@@ -319,7 +323,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	 * @type {function(?Error,*=): ?undefined}
 	 */
 	var done = function(err, data, status) {
-		if (err && retries > 0 && status.toString().substring(0, 1) === '5') {
+		if (err && retries > 0 && (status || "").toString().substring(0, 1) === '5') {
 			retries--;
 			window.setTimeout(function() {
 				makeRequest();

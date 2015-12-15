@@ -7,7 +7,8 @@ goog.require('utils');
 
 /** @typedef {{icon:string, title:string, description:string, openAppButtonText:string,
  * downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean,
- * showAndroid:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean,
+ * showAndroid:boolean, showBlackberry:boolean, showWindowsPhone:boolean,
+ * showKindle:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean,
  * make_new_link:boolean}} */
 banner_utils.options; // jshint ignore:line
 
@@ -157,6 +158,9 @@ banner_utils.shouldAppend = function(storage, options) {
 			(options.showDesktop && !utils.mobileUserAgent()) ||
 			(options.showAndroid && utils.mobileUserAgent() === 'android') ||
 			(options.showiPad && utils.mobileUserAgent() === 'ipad') ||
-			(options.showiOS && utils.mobileUserAgent() === 'ios')
+			(options.showiOS && utils.mobileUserAgent() === 'ios') ||
+			(options.showBlackberry && utils.mobileUserAgent() === 'blackberry') ||
+			(options.showWindowsPhone && utils.mobileUserAgent() === 'windows_phone') ||
+			(options.showKindle && utils.mobileUserAgent() === 'kindle')
 		);
 };

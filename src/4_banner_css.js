@@ -43,7 +43,7 @@ banner_css.banner = function(options) {
 		' transition: opacity .3s ease; }\n' +
 	'#branch-banner-close:hover { opacity: 1; }\n' +
 	'#branch-banner .title { font-size: 18px; font-weight:bold; color: #555; }\n' +
-	'#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; }\n' +
+	'#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; max-height: 30px; overflow: hidden; }\n' +
 	'#branch-banner .icon { float: left; padding-bottom: 40px; margin-right: 10px; margin-left: 5px; }\n' +
 	'#branch-banner .icon img { width: 63px; height: 63px; margin-right: 0; }\n' +
 	'#branch-banner .reviews { font-size:13px; margin: 1px 0 3px 0; color: #777; }\n' +
@@ -138,6 +138,12 @@ banner_css.android =
 		' font-weight: bold; background-color: #A4C639; border-radius: 5px; }\n' +
 	'#branch-banner .button:hover { border-bottom:3px solid #8c9c29; background-color: #c1d739; }\n';
 
+banner_css.blackberry = '';
+
+banner_css.windows_phone = '';
+
+banner_css.kindle = '';
+
 banner_css.iframe =
 	'body { -webkit-transition: all ' +
 		(banner_utils.animationSpeed * 1.5 / 1000) +
@@ -176,6 +182,15 @@ banner_css.css = function(options, element) {
 	}
 	else if (userAgent === 'android' && options.showAndroid) {
 		style += banner_css.mobile + banner_css.android;
+	}
+	else if (userAgent === 'blackberry' && options.showBlackberry) {
+		style += banner_css.mobile + banner_css.blackberry;
+	}
+	else if (userAgent === 'windows_phone' && options.showWindowsPhone) {
+		style += banner_css.mobile + banner_css.windows_phone;
+	}
+	else if (userAgent === 'kindle' && options.showKindle) {
+		style += banner_css.mobile + banner_css.kindle;
 	}
 	else {
 		style += banner_css.desktop;
