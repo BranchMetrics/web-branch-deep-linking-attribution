@@ -400,7 +400,7 @@ Branch.prototype['init'] = wrap(
 					}
 				);
 			}
-			var currentSessionData = sessionData || session.get(self._storage);
+			var currentSessionData = sessionData || session.get(self._storage) || {};
 			self._api(
 				resources.hasApp,
 				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
