@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Branch Metrics Web SDK Example App</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<style type="text/css">
+		.btn {
+			margin-top: 5px;
+		}
+		.example-input {
+			width: 125px;
+			display: inline-block;
+			margin-top: 5px;
+			vertical-align: middle;
+		}
+		.radio-input {
+			margin-right: 10px !important;
+			margin-left: 20px !important;
+		}
+		.row {
+			margin-bottom: 30px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row col-lg-8 col-lg-offset-2">
+			<h2>Branch Metrics Web SDK Deepview Example</h2>
+		</div>
+		<section>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Session Info</h4>
+				<pre class="info">Reading session from .init()...</pre>
+				<br>
+				<h4>Request</h4>
+				<pre class="request">Click a button!</pre>
+				<br>
+				<h4>Response</h4>
+				<pre class="response">Click a button!</pre>
+			</div>
+		</section>
+		<section>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h3>Methods</h3>
+				<hr>
+				<h4>Session and Identity</h4>
+				<div class="group">
+					<button id="init" class="btn btn-success">.init()</button>
+					<button id="deepview" class="btn btn-info">.deepview()</button>
+                    <button id="deepviewCta" class="btn btn-info">.deepviewCta()</button>
+				</div>
+			</div>
+		</section>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
+
+		// Note that this example is using the key in two places, here and below
+		branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
+			document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+		});
+
+	</script>
+	<script type="text/javascript">
+
+        var info = $('.info');
+		var request = $('.request');
+		var response = $('.response');
+		var sampleParams = {
+			tags: [ 'tag1', 'tag2' ],
+			channel: 'sample app',
+			feature: 'create link',
+			stage: 'created link',
+			type: 1,
+			data: {
+				mydata: 'bar',
+				'$desktop_url': 'https://cdn.branch.io/example.html',
+				'$og_title': 'Branch Metrics',
+				'$og_description': 'Branch Metrics',
+				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+			}
+		};
+		var getInputVal = function(inputID) {
+			var inputElement = $(inputID);
+			if (!inputElement.val()) {
+				inputElement.parent().addClass('has-error');
+				return '';
+			}
+			else {
+				inputElement.parent().removeClass('has-error');
+			}
+			return inputElement.val();
+		};
+
+        $('#init').click(function() {
+			request.html('branch.init();');
+			// Note that this example is using the key in two places, here and above
+			branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+
+        $('#deepview').click(function() {
+			branch.deepview(
+                {
+                  'channel': 'mobile_web',
+                  'feature': 'deepview',
+                  data : {
+                    '$deeplink_path': 'page/1234',
+                    'user_profile': '7890',
+                    'page_id': '1234',
+                    'custom_data': 1234
+                  }
+                },
+                {
+                  'open_app': true
+                }
+            );
+
+		});
+
+        $('#deepviewCta').click(function() {
+            branch.deepviewCta();
+        });
+
+	</script>
+</body>
+</html>
