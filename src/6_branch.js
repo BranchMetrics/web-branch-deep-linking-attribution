@@ -1245,6 +1245,7 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(don
 			window.event.returnValue = false;
 		}
 	}
+	this._publishEvent('didDeepviewCTA');
 	this._deepviewCta();
 	done();
 });

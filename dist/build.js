@@ -396,7 +396,7 @@ goog.hasUid = function(a) {
   return !!a[goog.UID_PROPERTY_];
 };
 goog.removeUid = function(a) {
-  "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
+  null !== a && "removeAttribute" in a && a.removeAttribute(goog.UID_PROPERTY_);
   try {
     delete a[goog.UID_PROPERTY_];
   } catch (b) {
@@ -618,7 +618,7 @@ goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 goog.json = {};
 goog.json.USE_NATIVE_JSON = !1;
 goog.json.isValid = function(a) {
-  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
+  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/(?:"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)[\s\u2028\u2029]*(?=:|,|]|}|$)/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
 };
 goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
   a = String(a);
@@ -1282,7 +1282,7 @@ var banner_html = {banner:function(a, b) {
   }
   return c + d + '<div class="description">' + a.description + "</div></div></div></div>";
 }, mobileAction:function(a, b, c) {
-  return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' + (session.get(b).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
+  return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' + ((session.get(b) || {}).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
   return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation button">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
@@ -1509,7 +1509,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     WEB_BUILD && e._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
     });
-    var c = a || session.get(e._storage);
+    var c = a || session.get(e._storage) || {};
     e._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, d) {
       d && !c.has_app && (c.has_app = !0, session.update(e._storage, c), e._publishEvent("didDownloadApp"));
       b && b(a, c);
@@ -1685,6 +1685,7 @@ Branch.prototype.deepviewCta = wrap(callback_params.NO_CALLBACK, function(a) {
     throw Error("Cannot call Deepview CTA, please call branch.deepview() first.");
   }
   window.event && (window.event.preventDefault ? window.event.preventDefault() : window.event.returnValue = !1);
+  this._publishEvent("didDeepviewCTA");
   this._deepviewCta();
   a();
 });
