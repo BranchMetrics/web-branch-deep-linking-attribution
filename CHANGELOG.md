@@ -4,6 +4,8 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [VERSION] - unreleased
+
 ## [v1.8.4] - 2015-12-21
 - Remove referral functions
 - Support App Links on Android
