@@ -1255,35 +1255,7 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(don
  *
  * **[Formerly `showReferrals()`](CHANGELOG.md)**
  *
- * Retrieves a complete summary of the referrals the current user has made.
- *
- * ##### Usage
- * ```js
- * branch.referrals(
- *     callback (err, data)
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *     "Error message",
- *     {
- *         'install': {
- *              total: 5,
- *              unique: 2
- *         },
- *         'open': {
- *              total: 4,
- *              unique: 3
- *         },
- *         'buy': {
- *             total: 7,
- *             unique: 3
- *         }
- *     }
- * );
- * ```
+ * This function is no longer supported.
  *
  * ## Referral Codes
  *
