@@ -4,6 +4,12 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [1.8.4] - 2015-12-21
+- Remove referral functions
+- Support App Links on Android
+- Fixed issues for private browsing on iOS
+- New Deep View example page
+
 ## [1.8.3] - 2015-12-08
 - Fixes banner call to use deepview logic even if there is a referring link
 - Updated banner layout, including themes
