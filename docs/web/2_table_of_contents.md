@@ -15,7 +15,6 @@
   + [.deepviewCta()](#deepviewcta)
 
 4. Referrals and Credits
-  + [.referrals()](#referralscallback)
   + [.getCode()](#getcodeoptions-callback)
   + [.validateCode()](#validatecodecode-callback)
   + [.applyCode()](#applycodecode-callback)
