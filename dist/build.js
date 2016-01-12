@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.8.5"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"1.8.6"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
 // Input 3
 var task_queue = function() {
@@ -1179,12 +1179,12 @@ Server.prototype.request = function(a, b, c, d) {
   "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
   var h = RETRIES, l = function(a, b, c) {
     a && 0 < h && "5" === (c || "").toString().substring(0, 1) ? (h--, window.setTimeout(function() {
-      m();
+      n();
     }, RETRY_DELAY)) : d(a, b);
-  }, m = function() {
+  }, n = function() {
     c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
   };
-  m();
+  n();
 };
 // Input 9
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
@@ -1320,7 +1320,7 @@ var sendSMS = function(a, b, c, d) {
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, m = function() {
+  }, n = function() {
     h = a.createElement("div");
     h.className = "branch-icon-wrapper";
     h.id = "branch-checkmark";
@@ -1334,7 +1334,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, p = function() {
+  }, m = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1344,13 +1344,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var n = e.value;
-    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), p()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+    var p = e.value;
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError"), m()) : (b._publishEvent("didSendBannerSMS"), n(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : p();
+    })) : m();
   }
 }, banner = function(a, b, c, d) {
   if (!banner_utils.shouldAppend(d, b)) {
@@ -1367,7 +1367,7 @@ var sendSMS = function(a, b, c, d) {
     d.preventDefault();
     sendSMS(f, a, b, c);
   });
-  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), p = function(a) {
+  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
     setTimeout(function() {
       banner_utils.removeElement(e);
       banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1380,10 +1380,10 @@ var sendSMS = function(a, b, c, d) {
     "top" === b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide)) : d.set("hideBanner", !0);
   };
-  m && (m.onclick = function(b) {
+  n && (n.onclick = function(b) {
     b.preventDefault();
     a._publishEvent("willCloseBanner");
-    p(function() {
+    m(function() {
       a._publishEvent("didCloseBanner");
     });
   });
@@ -1393,7 +1393,7 @@ var sendSMS = function(a, b, c, d) {
     "top" === b.position ? e.style.top = "0" : "bottom" === b.position && (e.style.bottom = "0");
     a._publishEvent("didShowBanner");
   }, banner_utils.animationDelay);
-  return p;
+  return m;
 };
 // Input 13
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
@@ -1478,90 +1478,82 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
   };
 }
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
-  function d() {
-    var a = window.location.protocol + "//" + window.location.host + window.location.pathname, b = null;
-    try {
-      b = JSON.parse(g.data).$desktop_url;
-    } finally {
-      return b === a;
-    }
-  }
-  var e = this;
-  e.init_state = init_states.INIT_PENDING;
-  utils.isKey(b) ? e.branch_key = b : e.app_id = b;
+  var d = this;
+  d.init_state = init_states.INIT_PENDING;
+  utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c = c && "function" === typeof c ? {isReferrable:null} : c;
-  TITANIUM_BUILD && "android" === Ti.Platform.osname && (e.keepAlive = !0);
-  var f = function(a) {
-    a.session_id && (e.session_id = a.session_id.toString());
-    a.identity_id && (e.identity_id = a.identity_id.toString());
-    a.link && (e.sessionLink = a.link);
+  TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
+  var e = function(a) {
+    a.session_id && (d.session_id = a.session_id.toString());
+    a.identity_id && (d.identity_id = a.identity_id.toString());
+    a.link && (d.sessionLink = a.link);
     a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
     !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      e.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (e.link_click_id = a.link_click_id);
+      d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
     }
-    WEB_BUILD && (e.browser_fingerprint_id = a.browser_fingerprint_id);
+    WEB_BUILD && (d.browser_fingerprint_id = a.browser_fingerprint_id);
     return a;
   };
   b = c && "undefined" !== typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var g = session.get(e._storage);
+  var f = session.get(d._storage);
   c = c && "undefined" !== typeof c.url && null !== c.url ? c.url : null;
-  var k = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !g || !g.identity_id, l = function(a, b) {
-    WEB_BUILD && e._api(resources._r, {sdk:config.version}, function(a, b) {
+  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(a, b) {
+    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
     });
-    var c = a || session.get(e._storage) || {};
-    e._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, d) {
-      d && !c.has_app && (c.has_app = !0, session.update(e._storage, c), e._publishEvent("didDownloadApp"));
+    var c = a || session.get(d._storage) || {};
+    d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
+      e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
       b && b(a, c);
     });
-  }, m = function(b, c) {
-    c && (c = f(c), session.set(e._storage, c, h), e.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
-    b && (e.init_state = init_states.INIT_FAILED);
-    e.keepAlive && setTimeout(function() {
-      e.keepAlive = !1;
+  }, l = function(b, c) {
+    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    b && (d.init_state = init_states.INIT_FAILED);
+    d.keepAlive && setTimeout(function() {
+      d.keepAlive = !1;
     }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
-  }, p = function() {
+  }, n = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
-      document[a] || l(null, null);
+      document[a] || h(null, null);
     }, !1);
   };
-  if (WEB_BUILD && g && g.session_id && d() && (!k && g.referring_link || utils.processReferringLink(k) === g.referring_link || k === g.click_id)) {
-    p(), l(g, m);
+  if (WEB_BUILD && f && f.session_id && (!g && f.referring_link || utils.processReferringLink(g) === f.referring_link || g === f.click_id)) {
+    n(), h(f, l);
   } else {
     if (WEB_BUILD) {
-      e._api(resources._r, {sdk:config.version}, function(a, b) {
+      d._api(resources._r, {sdk:config.version}, function(a, b) {
         if (a) {
-          return m(a, null);
+          return l(a, null);
         }
-        e._api(resources.open, {link_identifier:k, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-          b && k && (b.click_id = k);
-          p();
-          m(a, b);
+        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+          b && g && (b.click_id = g);
+          n();
+          l(a, b);
         });
       });
     } else {
       if (c = function(a) {
-        h || (a.identity_id = g.identity_id, a.device_fingerprint_id = g.device_fingerprint_id);
-        e._api(h ? resources.install : resources.open, a, function(a, b) {
-          m(a, b);
+        k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
+        d._api(k ? resources.install : resources.open, a, function(a, b) {
+          l(a, b);
         });
       }, CORDOVA_BUILD) {
-        var n = [];
-        null !== b && n.push(b ? 1 : 0);
-        h && n.unshift(e.debug);
+        var m = [];
+        null !== b && m.push(b ? 1 : 0);
+        k && m.unshift(d.debug);
         cordova.require("cordova/exec")(c, function() {
           a("Error getting device data!");
-        }, "BranchDevice", h ? "getInstallData" : "getOpenData", n);
+        }, "BranchDevice", k ? "getInstallData" : "getOpenData", m);
       } else {
         if (TITANIUM_BUILD) {
-          var n = {}, q = require("io.branch.sdk");
-          k && (n.link_identifier = k);
-          n = h ? q.getInstallData(e.debug, null === b ? -1 : b ? 1 : 0) : q.getOpenData(null === b ? -1 : b ? 1 : 0);
-          c(n);
+          var m = {}, p = require("io.branch.sdk");
+          g && (m.link_identifier = g);
+          m = k ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
+          c(m);
         }
       }
     }
