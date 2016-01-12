@@ -66,7 +66,7 @@ ___
 ## API Reference
 
 1. Branch Session
-  + [.init()](#initbranch_key-options-callback)
+  + [.init()](#initbranchkey-options-callback)
   + [.data()](#datacallback)
   + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)
@@ -110,7 +110,7 @@ ___
 
 **Parameters**
 
-**branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
+**branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
 
 **options**: `Object`, _optional_ - { *isReferrable*: _Is this a referrable session_ }.
 

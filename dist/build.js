@@ -1529,7 +1529,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       document[a] || l(null, null);
     }, !1);
   };
-  if (WEB_BUILD && g && g.session_id && d() && (utils.processReferringLink(k) === g.referring_link || k === g.click_id)) {
+  if (WEB_BUILD && g && g.session_id && d() && (!k && g.referring_link || utils.processReferringLink(k) === g.referring_link || k === g.click_id)) {
     p(), l(g, m);
   } else {
     if (WEB_BUILD) {
