@@ -471,8 +471,7 @@ Branch.prototype['init'] = wrap(
 
 		if (WEB_BUILD &&
 				sessionData &&
-				sessionData['session_id'] &&
-				currentDesktopUrlMatchesSession()) {
+				sessionData['session_id']) {
 
 			if ((!link_identifier && sessionData['referring_link']) ||
 				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
