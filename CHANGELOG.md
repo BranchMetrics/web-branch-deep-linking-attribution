@@ -2,7 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v1.8.6] - 2016-01-12
+- Reverted an earlier fix for url path checks which prevented correct webhook data in some cases
 
 ## [v1.8.5] - 2016-01-12
 - Fix for referring link data not being kept when query string parameters are removed
