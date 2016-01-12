@@ -61,7 +61,7 @@ banner_html.banner = function(options, action) {
  */
 banner_html.mobileAction = function(options, storage, branch) {
 	return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' +
-		((session.get(storage) || {}).has_app ?
+		((session.get(storage) || {})['has_app'] ?
 			options.openAppButtonText :
 			options.downloadAppButtonText) +
 		'</a>';
