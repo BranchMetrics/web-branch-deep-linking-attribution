@@ -346,7 +346,12 @@ describe('Branch', function() {
 				{
 					session_id: session_id,
 					browser_fingerprint_id: browser_fingerprint_id,
-					identity_id: identity_id
+					identity_id: identity_id,
+					data: JSON.stringify({
+						'$desktop_url': window.location.protocol + "//" +
+										window.location.host +
+										window.location.pathname
+					})
 				}
 			);
 

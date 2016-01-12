@@ -472,12 +472,14 @@ Branch.prototype['init'] = wrap(
 		if (WEB_BUILD &&
 				sessionData &&
 				sessionData['session_id'] &&
-				currentDesktopUrlMatchesSession() &&
-				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] ||
-				link_identifier === sessionData['click_id'])) {
-			attachVisibilityEvent();
-			checkHasApp(sessionData, finishInit);
-			return;
+				currentDesktopUrlMatchesSession()) {
+
+			if ((!link_identifier && sessionData['referring_link']) ||
+				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
+				attachVisibilityEvent();
+				checkHasApp(sessionData, finishInit);
+				return;
+			}
 		}
 
 		if (WEB_BUILD) {
