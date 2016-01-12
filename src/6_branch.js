@@ -377,17 +377,6 @@ Branch.prototype['init'] = wrap(
 			(url ? utils.getParamValue(url) : null);
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
-		function currentDesktopUrlMatchesSession() {
-			var currentDesktopUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-			var sessionDesktopUrl = null;
-			try {
-				sessionDesktopUrl = JSON.parse(sessionData['data'])['$desktop_url'];
-			}
-			finally {
-				return sessionDesktopUrl === currentDesktopUrl;
-			}
-		}
-
 		var checkHasApp = function(sessionData, cb) {
 			if (WEB_BUILD) {
 				self._api(
