@@ -258,7 +258,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
 
 /**
  * @function Branch.init
- * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
+ * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
  * @param {{isReferrable:?boolean}=} options - _optional_ - { *isReferrable*: _Is this a referrable session_ }.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
  * session data.
@@ -308,7 +308,7 @@ if (CORDOVA_BUILD || TITANIUM_BUILD) {
  * ___
  */
 /*** +TOC_HEADING &Branch Session& ^ALL ***/
-/*** +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
+/*** +TOC_ITEM #initbranchkey-options-callback &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(
 	callback_params.CALLBACK_ERR_DATA,
 	function(done, branch_key, options) {
