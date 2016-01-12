@@ -377,17 +377,6 @@ Branch.prototype['init'] = wrap(
 			(url ? utils.getParamValue(url) : null);
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
-		function currentDesktopUrlMatchesSession() {
-			var currentDesktopUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-			var sessionDesktopUrl = null;
-			try {
-				sessionDesktopUrl = JSON.parse(sessionData['data'])['$desktop_url'];
-			}
-			finally {
-				return sessionDesktopUrl === currentDesktopUrl;
-			}
-		}
-
 		var checkHasApp = function(sessionData, cb) {
 			if (WEB_BUILD) {
 				self._api(
@@ -471,8 +460,7 @@ Branch.prototype['init'] = wrap(
 
 		if (WEB_BUILD &&
 				sessionData &&
-				sessionData['session_id'] &&
-				currentDesktopUrlMatchesSession()) {
+				sessionData['session_id']) {
 
 			if ((!link_identifier && sessionData['referring_link']) ||
 				(utils.processReferringLink(link_identifier) === sessionData['referring_link'] || link_identifier === sessionData['click_id'])) {
