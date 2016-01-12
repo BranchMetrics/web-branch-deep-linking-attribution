@@ -2,9 +2,12 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
-
-## [VERSION] - unreleased
+## [v1.8.5] - 2016-01-12
+- Fix for referring link data not being kept when query string parameters are removed
+- Fix for users of webpack not finding module 'branch'
+- Fix for banners always showing 'Download', even when a user had the app
+- Updated testing system for CircleCI
+- Documentation updates
 
 ## [v1.8.4] - 2015-12-21
 - Remove referral functions
