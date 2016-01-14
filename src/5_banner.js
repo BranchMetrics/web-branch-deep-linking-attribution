@@ -163,10 +163,10 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		if (typeof options.forgetHide === 'number') {
-			storage.set('hideBanner', banner_utils.getDate(options.forgetHide));
+			storage.set('hideBanner', banner_utils.getDate(options.forgetHide), true);
 		}
 		else {
-			storage.set('hideBanner', true);
+			storage.set('hideBanner', true, true);
 		}
 	};
 
