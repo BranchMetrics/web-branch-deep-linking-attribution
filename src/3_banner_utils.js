@@ -138,7 +138,7 @@ banner_utils.addCSSLengths = function(length1, length2) {
  * @return {boolean}
  */
 banner_utils.shouldAppend = function(storage, options) {
-	var hideBanner = storage.get('hideBanner');
+	var hideBanner = storage.get('hideBanner', true);
 	try {
 		if (typeof hideBanner === 'string') {
 			hideBanner = JSON.parse(hideBanner);
