@@ -802,7 +802,7 @@ Properties available in the `options` object:
 | bucket | *optional (max 63 characters)* - The bucket from which to retrieve credit transactions.
 | begin_after_id | *optional* - The credit transaction id of the last item in the previous retrieval. Retrieval will start from the transaction next to it. If none is specified, retrieval starts from the very beginning in the transaction history, depending on the order.
 | length | *optional* - The number of credit transactions to retrieve. If none is specified, up to 100 credit transactions will be retrieved.
-| direction | *optional* - The order of credit transactions to retrieve. If direction is `1`, retrieval is in least recent first order; If direction is `0`, or if none is specified, retrieval is in most recent first order.
+| direction | **DEPRECATED** - The order of credit transactions to retrieve. If direction is `1`, retrieval is in least recent first order; If direction is `0`, or if none is specified, retrieval is in most recent first order. No longer supported.
 
 ##### Usage
 
@@ -819,7 +819,7 @@ branch.creditHistory(
 branch.creditHistory(
     {
       "length":50,
-      "direction":0,
+      "direction":0, // no longer supported.
       "begin_after_id":"123456789012345",
       "bucket":"default"
     }
