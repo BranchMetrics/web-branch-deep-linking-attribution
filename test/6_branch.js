@@ -60,7 +60,7 @@ describe('Branch', function() {
 	function basicTests(call, params) {
 		it('should fail if branch not initialized', function(done) {
 			var branch = initBranch(false);
-			var assert = testUtils.plan(params.length + 1, done);
+			var assert = testUtils.plan(params.length * 2, done);
 
 			function basicTest(param) {
 				var p = testUtils.nulls(param);
@@ -270,7 +270,7 @@ describe('Branch', function() {
 			function(done) {
 				if (testUtils.go('?_branch_match_id=67890')) {
 					var branch = initBranch(false);
-					var assert = testUtils.plan(2, done);
+					var assert = testUtils.plan(3, done);
 
 					branch.init(branch_sample_key, function(err, data) {
 						assert.strictEqual(
@@ -336,9 +336,10 @@ describe('Branch', function() {
 			);
 		});
 
-		it('should call has_app if session present', function(done) {
+		it('should call has_app if session present but no link_identifier from get param',
+			function(done) {
 			var branch = initBranch(false);
-			var assert = testUtils.plan(2, done);
+			var assert = testUtils.plan(3, done);
 			branch.init(branch_sample_key);
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(
@@ -357,7 +358,6 @@ describe('Branch', function() {
 
 			requests = [ ];
 			branch = initBranch(false, true);
-			assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key);
 			assert.strictEqual(requests.length, 2, 'Should make 2 requests');
 			assert.deepEqual(
@@ -371,6 +371,64 @@ describe('Branch', function() {
 				'Second request should be sent to /v1/has-app'
 			);
 		});
+
+		it('should not call has_app if session and link_identifier present', function(done) {
+			var assert = testUtils.plan(3, done);
+			if (testUtils.go('?_branch_match_id=67890')) {
+
+				var branch = initBranch(false);
+				branch.init(branch_sample_key);
+
+				requests[0].callback(null, browser_fingerprint_id);
+				requests[1].callback(
+					null,
+					{
+						session_id: session_id,
+						browser_fingerprint_id: browser_fingerprint_id,
+						identity_id: identity_id,
+						data: JSON.stringify({
+							'$desktop_url': window.location.protocol + "//" +
+											window.location.host +
+											window.location.pathname
+						})
+					}
+				);
+
+				branch = initBranch(false, true);
+				branch.init(branch_sample_key);
+
+				requests[2].callback(null, browser_fingerprint_id);
+				requests[3].callback(
+					null,
+					{
+						session_id: session_id,
+						browser_fingerprint_id: browser_fingerprint_id,
+						identity_id: identity_id,
+						data: JSON.stringify({
+							'$desktop_url': window.location.protocol + "//" +
+											window.location.host +
+											window.location.pathname
+						})
+					}
+				);
+
+				assert.strictEqual(requests.length, 4, 'Should make 4 requests');
+				assert.deepEqual(
+					requests[2].resource.endpoint,
+					'/_r',
+					'First request should be sent to /_r'
+				);
+				assert.deepEqual(
+					requests[3].resource.endpoint,
+					'/v1/open',
+					'Second request should be sent to /v1/open'
+				);
+			}
+			else {
+				assert.fail();
+			}
+		});
+
 	});
 
 	describe('data', function() {
