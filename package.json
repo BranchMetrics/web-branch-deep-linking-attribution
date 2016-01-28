@@ -18,9 +18,6 @@
 		"url": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK/issues"
 	},
 	"homepage": "https://github.com/BranchMetrics/Smart-App-Banner-Deep-Linking-Web-SDK",
-	"peerDependencies": {
-		"grunt-cli": "~0.1.6"
-	},
 	"devDependencies": {
 		"falafel": "1.0.1",
 		"grunt": "^0.4.5",
