@@ -26,4 +26,4 @@ dependencies:
 
 test:
   override:
-    - grunt test
+    - npm run test
