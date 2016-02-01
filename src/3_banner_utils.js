@@ -165,7 +165,7 @@ banner_utils.shouldAppend = function(storage, options) {
 		(
 			(options.showDesktop && !utils.mobileUserAgent()) ||
 			(options.showAndroid && utils.mobileUserAgent() === 'android') ||
-			(options.showiPad && utils.mobileUserAgent() === 'ipad') ||
+			(options.showiPad && (utils.mobileUserAgent() === 'ipad' && options.showiOS)) ||
 			(options.showiOS && utils.mobileUserAgent() === 'ios') ||
 			(options.showBlackberry && utils.mobileUserAgent() === 'blackberry') ||
 			(options.showWindowsPhone && utils.mobileUserAgent() === 'windows_phone') ||
