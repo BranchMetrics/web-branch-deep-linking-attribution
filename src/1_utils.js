@@ -7,6 +7,7 @@ goog.provide('utils');
 /*jshint unused:false*/
 goog.require('goog.json');
 goog.require('config');
+goog.require('safejson');
 
 /** @define {boolean} */
 var DEBUG = true;
@@ -117,7 +118,7 @@ utils.cleanLinkData = function(linkData) {
 		}
 	}
 	try {
-		JSON.parse(linkData['data']);
+		safejson.parse(linkData['data']);
 	}
 	catch (e) {
 		linkData['data'] = goog.json.serialize(linkData['data'] || {});

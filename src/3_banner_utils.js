@@ -4,6 +4,7 @@ goog.provide('banner_utils');
 
 goog.require('storage'); // jshint unused:false
 goog.require('utils');
+goog.require('safejson');
 
 /** @typedef {{icon:string, title:string, description:string, openAppButtonText:string,
  * downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean,
@@ -141,7 +142,7 @@ banner_utils.shouldAppend = function(storage, options) {
 	var hideBanner = storage.get('hideBanner', true);
 	try {
 		if (typeof hideBanner === 'string') {
-			hideBanner = JSON.parse(hideBanner);
+			hideBanner = safejson.parse(hideBanner);
 		}
 	}
 	catch (e) {

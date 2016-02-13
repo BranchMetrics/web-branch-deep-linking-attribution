@@ -23,8 +23,3 @@ if (IS_CORDOVA_APP && WEB_BUILD) {
 		"https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK" +
 		" for more details.");
 }
-
-// Only use the closure compiler's JSON.parse as a fallback...otherwise 'eval' is used
-// instead by default, which can cause Content Security Policy issues.
-window.JSON = window.JSON || {};
-window.JSON.parse = window.JSON.parse || goog.json.parse;

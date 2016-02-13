@@ -13,6 +13,7 @@ goog.require('task_queue');
 goog.require('storage');
 goog.require('session');
 goog.require('config');
+goog.require('safejson');
 
 /*globals CORDOVA_BUILD, TITANIUM_BUILD, WEB_BUILD, Ti, BranchStorage, cordova, require */
 
@@ -412,7 +413,7 @@ Branch.prototype['init'] = wrap(
 				session.set(self._storage, data, freshInstall);
 
 				self.init_state = init_states.INIT_SUCCEEDED;
-				data['data_parsed'] = data['data'] ? JSON.parse(data['data']) : null;
+				data['data_parsed'] = data['data'] ? safejson.parse(data['data']) : null;
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
@@ -643,7 +644,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 			self.identity = identity;
 
 			data['referring_data_parsed'] = data['referring_data'] ?
-				JSON.parse(data['referring_data']) :
+				safejson.parse(data['referring_data']) :
 				null;
 			session.update(self._storage, data);
 

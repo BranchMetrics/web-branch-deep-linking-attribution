@@ -4,6 +4,7 @@ goog.provide('session');
 /*jshint unused:false*/
 goog.require('goog.json');
 goog.require('utils');
+goog.require('safejson');
 
 /**
  * @param {BranchStorage} storage
@@ -13,7 +14,7 @@ goog.require('utils');
 session.get = function(storage, first) {
 	var sessionString = first ? 'branch_session_first' : 'branch_session';
 	try {
-		return JSON.parse(storage.get(sessionString, first)) || null;
+		return safejson.parse(storage.get(sessionString, first)) || null;
 	}
 	catch (e) {
 		return null;
