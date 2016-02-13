@@ -13,7 +13,7 @@ goog.require('utils');
 session.get = function(storage, first) {
 	var sessionString = first ? 'branch_session_first' : 'branch_session';
 	try {
-		return goog.json.parse(storage.get(sessionString, first)) || null;
+		return JSON.parse(storage.get(sessionString, first)) || null;
 	}
 	catch (e) {
 		return null;

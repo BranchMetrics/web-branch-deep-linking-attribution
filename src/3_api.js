@@ -240,7 +240,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		req.onload = function() {
 			if (req.status === 200) {
 				try {
-					callback(null, goog.json.parse(req.responseText), req.status);
+					callback(null, JSON.parse(req.responseText), req.status);
 				}
 				catch (e) {
 					callback(null, { }, req.status);
@@ -263,7 +263,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
 					try {
-						callback(null, goog.json.parse(req.responseText), req.status);
+						callback(null, JSON.parse(req.responseText), req.status);
 					}
 					catch (e) {
 						callback(null, { }, req.status);

@@ -712,6 +712,8 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 // Input 2
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.0.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
+window.JSON = window.JSON || {};
+window.JSON.parse = window.JSON.parse || goog.json.parse;
 // Input 3
 var task_queue = function() {
   var a = [], b = function() {
@@ -896,7 +898,7 @@ resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method
 // Input 6
 var session = {get:function(a, b) {
   try {
-    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
+    return JSON.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
   } catch (c) {
     return null;
   }
@@ -1142,7 +1144,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
   }, f.onload = function() {
     if (200 === f.status) {
       try {
-        e(null, goog.json.parse(f.responseText), f.status);
+        e(null, JSON.parse(f.responseText), f.status);
       } catch (a) {
         e(null, {}, f.status);
       }
@@ -1155,7 +1157,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
-          e(null, goog.json.parse(f.responseText), f.status);
+          e(null, JSON.parse(f.responseText), f.status);
         } catch (a) {
           e(null, {}, f.status);
         }
@@ -1514,7 +1516,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       b && b(a, c);
     });
   }, l = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? JSON.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     d.keepAlive && setTimeout(function() {
       d.keepAlive = !1;
@@ -1581,7 +1583,7 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
     c.identity_id = e.identity_id ? e.identity_id.toString() : null;
     c.sessionLink = e.link;
     c.identity = b;
-    e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
+    e.referring_data_parsed = e.referring_data ? JSON.parse(e.referring_data) : null;
     session.update(c._storage, e);
     a(null, e);
   });

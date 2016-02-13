@@ -412,7 +412,7 @@ Branch.prototype['init'] = wrap(
 				session.set(self._storage, data, freshInstall);
 
 				self.init_state = init_states.INIT_SUCCEEDED;
-				data['data_parsed'] = data['data'] ? goog.json.parse(data['data']) : null;
+				data['data_parsed'] = data['data'] ? JSON.parse(data['data']) : null;
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
@@ -643,7 +643,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 			self.identity = identity;
 
 			data['referring_data_parsed'] = data['referring_data'] ?
-				goog.json.parse(data['referring_data']) :
+				JSON.parse(data['referring_data']) :
 				null;
 			session.update(self._storage, data);
 
