@@ -1190,7 +1190,7 @@ Branch.prototype._windowRedirect = function(url) {
  *     if (err) {
  *         throw err;
  *     }
- *     ${'a.deepview-cta').click(branch.deepviewCta);
+ *     $('a.deepview-cta').click(branch.deepviewCta);
  * });
  *
  * // You can call this function any time after branch.deepview() is finished by simply:
