@@ -2,7 +2,10 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.0.1] - 2016-02-16
+- Avoid using eval while parsing JSON, if able
+- Documentation cleanup
+- Allow for a constant url for updated SDK usage
 
 ## [v2.0.0] - 2016-01-28
 - Locking to a stable build
