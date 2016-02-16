@@ -94,6 +94,7 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
   aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
 fi
 
