@@ -713,6 +713,15 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
 var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.0.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
 IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
 // Input 3
+var safejson = {parse:function(a) {
+  a = String(a);
+  try {
+    return "object" === typeof JSON && "function" === typeof JSON.parse ? JSON.parse(a) : goog.json.parse(a);
+  } catch (b) {
+  }
+  throw Error("Invalid JSON string: " + a);
+}};
+// Input 4
 var task_queue = function() {
   var a = [], b = function() {
     if (a.length) {
@@ -727,7 +736,7 @@ var task_queue = function() {
     1 === a.length && b();
   };
 };
-// Input 4
+// Input 5
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
@@ -752,7 +761,7 @@ utils.whiteListSessionData = function(a) {
 utils.cleanLinkData = function(a) {
   WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
   try {
-    JSON.parse(a.data);
+    safejson.parse(a.data);
   } catch (b) {
     a.data = goog.json.serialize(a.data || {});
   }
@@ -817,7 +826,7 @@ utils.extractDeeplinkPath = function(a) {
   -1 < a.indexOf("://") && (a = a.split("://")[1]);
   return a.substring(a.indexOf("/") + 1);
 };
-// Input 5
+// Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
@@ -893,10 +902,10 @@ validationTypes.NUMBER)})};
 resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT)})};
-// Input 6
+// Input 7
 var session = {get:function(a, b) {
   try {
-    return goog.json.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
+    return safejson.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
   } catch (c) {
     return null;
   }
@@ -907,7 +916,7 @@ var session = {get:function(a, b) {
   var c = session.get(a), c = utils.merge(c, b);
   a.set("branch_session", goog.json.serialize(c));
 }};
-// Input 7
+// Input 8
 var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]], c = "function" === typeof c ? c() : c;
@@ -1037,7 +1046,7 @@ BranchStorage.prototype.titanium = {getAll:function() {
     return !1;
   }
 }};
-// Input 8
+// Input 9
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
@@ -1142,7 +1151,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
   }, f.onload = function() {
     if (200 === f.status) {
       try {
-        e(null, goog.json.parse(f.responseText), f.status);
+        e(null, safejson.parse(f.responseText), f.status);
       } catch (a) {
         e(null, {}, f.status);
       }
@@ -1155,7 +1164,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
-          e(null, goog.json.parse(f.responseText), f.status);
+          e(null, safejson.parse(f.responseText), f.status);
         } catch (a) {
           e(null, {}, f.status);
         }
@@ -1186,7 +1195,7 @@ Server.prototype.request = function(a, b, c, d) {
   };
   n();
 };
-// Input 9
+// Input 10
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
 }, hasClass:function(a, b) {
@@ -1234,7 +1243,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, shouldAppend:function(a, b) {
   var c = a.get("hideBanner", !0);
   try {
-    "string" === typeof c && (c = JSON.parse(c));
+    "string" === typeof c && (c = safejson.parse(c));
   } catch (e) {
     c = !1;
   }
@@ -1242,7 +1251,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   "number" === typeof d && (d = !1);
   return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" === utils.mobileUserAgent() || b.showiPad && "ipad" === utils.mobileUserAgent() || b.showiOS && "ios" === utils.mobileUserAgent() || b.showBlackberry && "blackberry" === utils.mobileUserAgent() || b.showWindowsPhone && "windows_phone" === utils.mobileUserAgent() || b.showKindle && "kindle" === utils.mobileUserAgent());
 }};
-// Input 10
+// Input 11
 var banner_css = {banner:function(a) {
   return ".branch-banner-is-active { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
   1E3 + "s ease; }\n#branch-banner .button{ border: 1px solid " + (a.buttonBorderColor || ("dark" === a.theme ? "transparent" : "#ccc")) + "; background: " + (a.buttonBackgroundColor || "#fff") + "; color: " + (a.buttonFontColor || "#000") + "; cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; margin-left: 5px; font-weight: 400; text-decoration: none;  border-radius: 4px; padding: 6px 12px; transition: all .2s ease;}\n#branch-banner .button:hover {  border: 1px solid " + (a.buttonBorderColorHover || 
@@ -1270,7 +1279,7 @@ banner_css.css = function(a, b) {
   (a.iframe ? b.contentWindow.document : document).head.appendChild(d);
   "top" === a.position ? b.style.top = "-" + banner_utils.bannerHeight : "bottom" === a.position && (b.style.bottom = "-" + banner_utils.bannerHeight);
 };
-// Input 11
+// Input 12
 var banner_html = {banner:function(a, b) {
   var c = '<div class="content' + (a.theme ? " theme-" + a.theme : "") + '"><div class="right">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + "</div>", d;
   if (a.rating || a.reviewCount) {
@@ -1318,7 +1327,7 @@ var banner_html = {banner:function(a, b) {
   b = '<div id="branch-sms-form-container">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b, c) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, b) : banner_html.div(a, b);
 }};
-// Input 12
+// Input 13
 var sendSMS = function(a, b, c, d) {
   var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     f.removeAttribute("disabled");
@@ -1401,7 +1410,7 @@ var sendSMS = function(a, b, c, d) {
   }, banner_utils.animationDelay);
   return m;
 };
-// Input 13
+// Input 14
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
@@ -1514,7 +1523,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       b && b(a, c);
     });
   }, l = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? goog.json.parse(c.data) : null);
+    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? safejson.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
     d.keepAlive && setTimeout(function() {
       d.keepAlive = !1;
@@ -1581,7 +1590,7 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
     c.identity_id = e.identity_id ? e.identity_id.toString() : null;
     c.sessionLink = e.link;
     c.identity = b;
-    e.referring_data_parsed = e.referring_data ? goog.json.parse(e.referring_data) : null;
+    e.referring_data_parsed = e.referring_data ? safejson.parse(e.referring_data) : null;
     session.update(c._storage, e);
     a(null, e);
   });
@@ -1741,7 +1750,7 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   }
   a();
 }));
-// Input 14
+// Input 15
 var branch_instance = new Branch;
 if (!TITANIUM_BUILD && window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {

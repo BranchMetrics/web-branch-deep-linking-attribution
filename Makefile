@@ -6,7 +6,9 @@ COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --define 'DEBUG=fal
 COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE --define 'DEBUG=true'
 
 SOURCES=$(COMPILER_LIBRARY)/goog/**\
-src/0_config.js src/0_queue.js\
+src/0_config.js\
+src/0_jsonparse.js\
+src/0_queue.js\
 src/1_utils.js\
 src/2_resources.js src/2_session.js src/2_storage.js\
 src/3_api.js src/3_banner_utils.js\
