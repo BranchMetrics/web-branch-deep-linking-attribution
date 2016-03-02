@@ -214,6 +214,7 @@ Branch.prototype._publishEvent = function(event) {
 /**
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
+ * @param {{ }=} options - _optional_ - { }.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
  * session data.
  *
@@ -275,10 +276,7 @@ Branch.prototype['init'] = wrap(
 			self.app_id = branch_key;
 		}
 
-		options = (options && typeof options === 'function') ?
-			{
-			} :
-			options;
+		options = (options && typeof options === 'function') ? { } : options;
 
 		var setBranchValues = function(data) {
 			if (data['session_id']) {

@@ -6,11 +6,13 @@
 
 * * *
 
-### init(branch_key, callback) 
+### init(branch_key, options, callback) 
 
 **Parameters**
 
 **branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
+
+**options**: `Object`, _optional_ - { }.
 
 **callback**: `function`, _optional_ - callback to read the
 session data.
