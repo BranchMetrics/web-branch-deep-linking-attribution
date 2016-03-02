@@ -106,16 +106,12 @@ utils.whiteListSessionData = function(data) {
 };
 
 utils.cleanLinkData = function(linkData) {
-	/* jshint undef:false */
-	if (WEB_BUILD) {
-		/* jshint undef:true */
-		linkData['source'] = 'web-sdk';
-		if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
-			linkData['data']['$desktop_url'] =
-				linkData['data']['$desktop_url']
-					.replace(/#r:[a-z0-9-_]+$/i, '')
-					.replace(/([\?\&]_branch_match_id=\d+)/, '');
-		}
+	linkData['source'] = 'web-sdk';
+	if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
+		linkData['data']['$desktop_url'] =
+			linkData['data']['$desktop_url']
+				.replace(/#r:[a-z0-9-_]+$/i, '')
+				.replace(/([\?\&]_branch_match_id=\d+)/, '');
 	}
 	try {
 		safejson.parse(linkData['data']);
