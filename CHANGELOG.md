@@ -2,9 +2,11 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.0.3] - 2016-03-02
+- Adjusted sizing / colors on stars
 
 ## [v2.0.2] - 2016-03-01
+- Updated ratings "stars" to use SVG (to fix an issue with Android)
 
 ## [v2.0.1] - 2016-02-16
 - Avoid using eval while parsing JSON, if able
