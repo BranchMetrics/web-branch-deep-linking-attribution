@@ -413,7 +413,7 @@ branch.deepview(
         data: {
             mydata: 'content of my data',
             foo: 'bar',
-            '$deepview_path': 'item_id=12345'
+            '$deeplink_path': 'item_id=12345'
         },
         feature: 'dashboard',
         stage: 'new user',
