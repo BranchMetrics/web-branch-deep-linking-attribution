@@ -379,12 +379,6 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
 		var checkHasApp = function(sessionData, cb) {
-			if (!utils.mobileUserAgent()) {
-				if (typeof cb === 'function') {
-					cb();
-				}
-				return;
-			}
 			if (WEB_BUILD) {
 				self._api(
 					resources._r,
