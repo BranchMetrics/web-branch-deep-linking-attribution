@@ -533,7 +533,7 @@ branch.deepview(
             '$ios_url': 'https://en.wikipedia.org/wiki/Internet',
             '$ipad_url': 'https://en.wikipedia.org/wiki/Internet',
             '$android_url': 'https://en.wikipedia.org/wiki/Internet',
-            '$deepview_path': 'item_id=12345',
+            '$deeplink_path': 'item_id=12345',
             '$og_app_id': '12345',
             '$og_title': 'My App',
             '$og_description': 'My app\'s description.'

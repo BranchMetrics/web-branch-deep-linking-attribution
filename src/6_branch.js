@@ -308,6 +308,12 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
 		var checkHasApp = function(sessionData, cb) {
+			if (!utils.mobileUserAgent()) {
+				if (typeof cb === 'function') {
+					cb();
+				}
+				return;
+			}
 			self._api(
 				resources._r,
 				{ "sdk": config.version },
@@ -886,7 +892,7 @@ Branch.prototype['sendSMS'] = wrap(
  *         data: {
  *             mydata: 'content of my data',
  *             foo: 'bar',
- *             '$deepview_path': 'item_id=12345'
+ *             '$deeplink_path': 'item_id=12345'
  *         },
  *         feature: 'dashboard',
  *         stage: 'new user',

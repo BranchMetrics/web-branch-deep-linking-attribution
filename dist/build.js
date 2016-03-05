@@ -1444,14 +1444,18 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   b = session.get(d._storage);
   var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id, g = function(a, b) {
-    d._api(resources._r, {sdk:config.version}, function(a, b) {
-      b && (c.browser_fingerprint_id = b);
-    });
-    var c = a || session.get(d._storage) || {};
-    d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
-      e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
-      b && b(a, c);
-    });
+    if (utils.mobileUserAgent()) {
+      d._api(resources._r, {sdk:config.version}, function(a, b) {
+        b && (c.browser_fingerprint_id = b);
+      });
+      var c = a || session.get(d._storage) || {};
+      d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
+        e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
+        b && b(a, c);
+      });
+    } else {
+      "function" === typeof b && b();
+    }
   }, k = function(b, c) {
     if (c) {
       var e = c;
