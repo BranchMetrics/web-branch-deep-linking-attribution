@@ -2,12 +2,12 @@
 
 goog.require('storage'); // jshint ignore:line
 
-var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
-var ITEM_KEY = 'key';
-var ITEM_KEY_UNSTORED = 'key unstored';
-var ITEM_VALUE = 'value';
-
 describe('session storage', function() {
+	var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
+	var ITEM_KEY = 'key';
+	var ITEM_KEY_UNSTORED = 'key unstored';
+	var ITEM_VALUE = 'value';
+
 	var storage = new BranchStorage([ 'session' ]); // jshint ignore:line
 	var assert = testUtils.unplanned();
 	beforeEach(function() {
@@ -49,6 +49,11 @@ describe('session storage', function() {
 });
 
 describe('local storage', function() {
+	var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
+	var ITEM_KEY = 'key';
+	var ITEM_KEY_UNSTORED = 'key unstored';
+	var ITEM_VALUE = 'value';
+
 	var storage = new BranchStorage([ 'local' ]); // jshint ignore:line
 	var assert = testUtils.unplanned();
 	beforeEach(function() {
@@ -125,6 +130,10 @@ describe('cookie storage', function() {
 */
 
 describe('pojo storage', function() {
+	var ITEM_KEY = 'key';
+	var ITEM_KEY_UNSTORED = 'key unstored';
+	var ITEM_VALUE = 'value';
+
 	var storage = new BranchStorage([ 'pojo' ]); // jshint ignore:line
 	var assert = testUtils.unplanned();
 	beforeEach(function() {

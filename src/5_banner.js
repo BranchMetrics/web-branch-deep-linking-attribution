@@ -8,6 +8,7 @@ goog.require('utils');
 goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
+goog.require('statistics');
 
 var sendSMS = function(doc, branch, options, linkData) {
 	var phone = doc.getElementById('branch-sms-phone');
@@ -101,6 +102,8 @@ var sendSMS = function(doc, branch, options, linkData) {
 banner = function(branch, options, linkData, storage) {
 	if (!banner_utils.shouldAppend(storage, options)) {
 		branch._publishEvent('willNotShowBanner');
+		statistics.set(storage, 'banner_show_count', 0);
+		statistics.adjust(storage, 'banner_skip_count', 1);
 		return null;
 	}
 
@@ -200,6 +203,9 @@ banner = function(branch, options, linkData, storage) {
 		}
 		branch._publishEvent('didShowBanner');
 	}, banner_utils.animationDelay);
+
+	statistics.set(storage, 'banner_skip_count', 0);
+	statistics.adjust(storage, 'banner_show_count', 1);
 
 	return closeBanner;
 };

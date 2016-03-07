@@ -14,6 +14,8 @@ goog.require('storage');
 goog.require('session');
 goog.require('config');
 goog.require('safejson');
+goog.require('banner_rules');
+goog.require('statistics');
 
 /*globals CORDOVA_BUILD, TITANIUM_BUILD, WEB_BUILD, Ti, BranchStorage, cordova, require */
 
@@ -154,6 +156,8 @@ Branch = function() {
 	}
 
 	this.init_state = init_states.NO_INIT;
+
+	statistics.adjust(this._storage, '_bncload', 1);
 };
 
 /***
@@ -428,6 +432,8 @@ Branch.prototype['init'] = wrap(
 					2000
 				);
 			}
+
+			statistics.adjust(self._storage, '_bncinit', 1);
 			done(err, data && utils.whiteListSessionData(data));
 		};
 
@@ -1844,6 +1850,7 @@ if (WEB_BUILD) {
 		}
 
 		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
+		statistics.adjust(this._storage, 'banner_call', 1);
 		done();
 	});
 

@@ -51,7 +51,9 @@ utils.messages = {
 	callBranchInitFirst: 'Branch.init must be called first',
 	timeout: 'Request timed out',
 	blockedByClient: 'Request blocked by client, probably adblock',
-	missingUrl: 'Required argument: URL, is missing'
+	missingUrl: 'Required argument: URL, is missing',
+	statsGeneralFail: 'Statistics data is not accessible',
+	statsParseFail: 'Could not parse statistics data'
 };
 
 /**
