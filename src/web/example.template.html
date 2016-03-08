@@ -52,6 +52,7 @@
 					<input class="example-input" type="text" id="identityID" class="form-control" placeholder="test@test.com">
 					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
 					<button id="logout" class="btn btn-info">.logout()</button>
+					<button id="statistics" class="btn btn-info">.statistics()</button>
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
@@ -171,6 +172,12 @@
 			request.html('branch.logout();');
 			branch.logout(function(err, data) {
 				response.html(err || 'undefined');
+			});
+		});
+		$('#statistics').click(function() {
+			request.html('branch.statistics();');
+			branch.statistics(function(err, data) {
+				response.html(err || JSON.stringify(data, null, '\t'));
 			});
 		});
 		$('#track').click(function() {

@@ -52,6 +52,7 @@
 		'removeListener',
 		'sendSMS',
 		'setIdentity',
+		'statistics',
 		'track',
 		'validateCode'
 	],

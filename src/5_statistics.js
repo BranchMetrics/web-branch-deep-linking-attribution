@@ -77,6 +77,36 @@ statistics.get = function(storage, key, callback) {
 	return value;
 };
 
+statistics.getAll = function(storage, callback) {
+	var statsString = storage.get('stats', true) || '';
+	var statsGlobal = null;
+	var stats = null;
+	var err = null;
+	var path = 'p_' + window.location.pathname;
+
+	if (statsString) {
+		try {
+			statsGlobal = JSON.parse(statsString);
+		}
+		catch (e) {
+			err = new Error(utils.messages.statsParseFail, null);
+		}
+	}
+
+	if (!statsGlobal.hasOwnProperty(path)) {
+		stats = null;
+	}
+	else {
+		stats = statsGlobal[path];
+	}
+
+	if (typeof callback === 'function') {
+		callback(err, stats);
+	}
+
+	return stats;
+};
+
 statistics.adjust = function(storage, key, value, callback) {
 	// utility function...assumes all statistics are numbers
 	var prevValue = Number(statistics.get(storage, key));

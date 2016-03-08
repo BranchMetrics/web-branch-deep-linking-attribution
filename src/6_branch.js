@@ -1864,4 +1864,50 @@ if (WEB_BUILD) {
 		}
 		done();
 	});
+
+	/** =WEB
+	 * @function Branch.statistics
+	 * @param {function(?Error,?)=} callback - _optional_ - callback to read statistics data
+	 *
+	 * Retrieve general usage statistics for the Web SDK
+	 *
+	 * #### Usage
+	 *
+	 * ```js
+	 * branch.statistics(
+	 *     callback
+	 * );
+	 * ```
+	 *
+	 * ##### Example
+	 *
+	 * ```js
+	 * branch.statistics(function(err, stats) {
+	 *     if (err) {
+	 *         console.error(err.message);
+	 *     }
+	 *     else {
+	 *         console.dir(stats);
+	 *     }
+	 * });
+	 * ```
+	 *
+	 * #### Available Data
+	 *
+	 * ```js
+	 *     stats = {
+	 *         _bncload: number,                       // The number of times this SDK was loaded
+	 *         _bncinit: number,                       // The number of times init() was called
+	 *         banner_skip_count: number,              // The run of banner skips (for any reason)
+	 *         banner_show_count: number,              // The run of banner displays
+	 *         banner_call: number,                    // The total number of times banner() was called
+	 *     }
+	 * ```
+	 *
+	 */
+	/*** +TOC_HEADING &Statistics& ^WEB ***/
+	/*** +TOC_ITEM #statistics-callback &.statistics()& ^WEB ***/
+	Branch.prototype['statistics'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+		return statistics.getAll(this._storage, done);
+	});
 }
