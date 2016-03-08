@@ -857,7 +857,9 @@ describe('Branch', function() {
 			assert.strictEqual(obj.data, '{"mydata":"bar"}', 'data is sent');
 			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');
-			assert.strictEqual(obj.append_deeplink_path, true, 'append_deeplink_path is sent');
+			assert.strictEqual(obj.append_deeplink_path,
+				utils.mobileUserAgent() ? true : undefined,
+				'append_deeplink_path is sent');
 			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
 			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
 		});
