@@ -5,6 +5,8 @@ goog.provide('banner_utils');
 goog.require('storage'); // jshint unused:false
 goog.require('utils');
 goog.require('safejson');
+goog.require('statistics');
+goog.require('session');
 
 /** @typedef {{icon:string, title:string, description:string, openAppButtonText:string,
  * downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean,
@@ -160,7 +162,7 @@ banner_utils.shouldAppend = function(storage, options) {
 		forgetHide = false;
 	}
 
-	return !document.getElementById('branch-banner') &&
+	var quickFail = !document.getElementById('branch-banner') &&
 		!document.getElementById('branch-banner-iframe') &&
 		(hideBanner || forgetHide) &&
 		(
@@ -172,4 +174,64 @@ banner_utils.shouldAppend = function(storage, options) {
 			(options.showWindowsPhone && utils.mobileUserAgent() === 'windows_phone') ||
 			(options.showKindle && utils.mobileUserAgent() === 'kindle')
 		);
+
+	if (!quickFail) {
+		return false;
+	}
+
+	if (!options.bannerRules) {
+		return true;
+	}
+
+	function findOperand(name) {
+		switch (name) {
+			case 'visit_count':
+				return statistics.get(storage, '_bncload');
+			case 'banner_call_count':
+				return statistics.get(storage, 'banner_call');
+			case 'has_app':
+				return !!(session.get(storage) || {})['has_app'];
+			default:
+				return null;
+		}
+	}
+
+	return !Array.prototype.some.call(options.bannerRules, function(rule) {
+		// by default, if a rule is not recognized, we do not fail
+		var valid = true;
+
+		// the first operand is a system value, the second operand is
+		// passed by the developer
+		var op1 = findOperand(rule.operand1);
+		var op2 = rule.operand2;
+
+		// we are using strings so that we can have more advanced operators
+		// in the future
+		switch (rule.operator) {
+			case '===':
+				valid = op1 === op2;
+				break;
+			case '!==':
+				valid = op1 !== op2;
+				break;
+			case '>':
+				valid = op1 > op2;
+				break;
+			case '>=':
+				valid = op1 >= op2;
+				break;
+			case '<':
+				valid = op1 < op2;
+				break;
+			case '<=':
+				valid = op1 <= op2;
+				break;
+			default:
+				// pass
+				break;
+		}
+
+		// for 'some()' to work, we return true only on failure
+		return !valid;
+	});
 };

@@ -3,6 +3,9 @@ goog.provide('statistics');
 
 goog.require('utils');
 
+/**
+ * @param {function(?Object, ?Object)=} callback
+ */
 statistics.set = function(storage, key, value, callback) {
 	var statsString = storage.get('stats', true) || '';
 	var statsGlobal = null;
@@ -44,7 +47,10 @@ statistics.set = function(storage, key, value, callback) {
 	return value;
 };
 
-statistics.get = function(storage, key, callback) {
+/**
+ * @param {function(?Object, ?Object)=} callback
+ */
+ statistics.get = function(storage, key, callback) {
 	var statsString = storage.get('stats', true) || '';
 	var statsGlobal = null;
 	var err = null;
@@ -77,6 +83,9 @@ statistics.get = function(storage, key, callback) {
 	return value;
 };
 
+/**
+ * @param {function(?Object, ?Object)=} callback
+ */
 statistics.getAll = function(storage, callback) {
 	var statsString = storage.get('stats', true) || '';
 	var statsGlobal = null;
@@ -107,6 +116,9 @@ statistics.getAll = function(storage, callback) {
 	return stats;
 };
 
+/**
+ * @param {function(?Object, ?Object)=} callback
+ */
 statistics.adjust = function(storage, key, value, callback) {
 	// utility function...assumes all statistics are numbers
 	var prevValue = Number(statistics.get(storage, key));

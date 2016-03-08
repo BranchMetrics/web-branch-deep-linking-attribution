@@ -14,7 +14,6 @@ goog.require('storage');
 goog.require('session');
 goog.require('config');
 goog.require('safejson');
-goog.require('banner_rules');
 goog.require('statistics');
 
 /*globals CORDOVA_BUILD, TITANIUM_BUILD, WEB_BUILD, Ti, BranchStorage, cordova, require */
@@ -1726,6 +1725,15 @@ if (WEB_BUILD) {
 	 *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
 	 *     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
 	 *     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
+	 *     bannerRules: [{                         // An optional array of rules that will allow the banner to display
+	 *         operator: '==',                        // ONLY when all rules pass.  The operators must be
+	 *         operand1: 'has_app',                   // strings.  The only valid operators currently are:
+	 *         operand2: true                         // '!=', '==', '>', '>=', '<', '<='
+	 *     }, {                                       // The valid operators current are:
+	 *         operator: '>=',                        // 'visit_count', 'banner_call_count', 'has_app'
+	 *         operand1: 'visit_count',
+	 *         operand2: 3
+	 *     }]
 	 *
 	 * }, {
 	 *     tags: ['tag1', 'tag2'],
@@ -1838,7 +1846,8 @@ if (WEB_BUILD) {
 			buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
 			buttonFontColorHover: options['buttonFontColorHover'] || '',
 			make_new_link: !!options['make_new_link'],
-			open_app: !!options['open_app']
+			open_app: !!options['open_app'],
+			bannerRules: options['bannerRules'] || []
 		};
 
 		if (typeof options['showMobile'] !== 'undefined') {
