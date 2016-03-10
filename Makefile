@@ -27,7 +27,7 @@ ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/build.js"};s\#SC
 
 .PHONY: clean
 
-all: dist/build.min.js dist/build.js README.md WEB_GUIDE.md example.html test/branch-deps.js test/integration-test.html
+all: dist/build.min.js dist/build.js README.md TITANIUM_GUIDE.md WEB_GUIDE.md example.html test/branch-deps.js test/integration-test.html
 clean:
 	rm -f dist/** docs/web/3_branch_web.md README.md example.html test/branch-deps.js dist/build.min.js.gz test/integration-test.html
 release: clean all dist/build.min.js.gz
@@ -57,10 +57,10 @@ test/branch-deps.js: $(SOURCES) compiler/library
 		rm test/branch-deps.js.tmp
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) > dist/build.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) --define 'WEB_BUILD=true' > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) > dist/build.min.js
+	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) --define 'WEB_BUILD=true' > dist/build.min.js
 
 dist/build.min.js.gz: dist/build.min.js
 	gzip -c dist/build.min.js > dist/build.min.js.gz

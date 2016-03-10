@@ -28,5 +28,17 @@ node_modules
 npm-debug.log
 pids
 sauce_access_keys.sh
+src/titanium/BranchSDK/android/dist/branchsdk.jar
+src/titanium/BranchSDK/android/libs/*
+src/titanium/BranchSDK/build/*
+src/titanium/BranchSDK/iphone/BranchSDK.xcodeproj/xcuserdata/*
+src/titanium/BranchSDK/iphone/build/*
+testbeds/cordova/platforms
+testbeds/cordova/plugins
+testbeds/titanium/Branch-SDK-Testbed/MarketplaceArtwork.png
+testbeds/titanium/Branch-SDK-Testbed/app/assets/*
+testbeds/titanium/Branch-SDK-Testbed/iTunesConnect.png
+testbeds/titanium/Branch-SDK-Testbed/modules/*
+testbeds/titanium/Branch-SDK-Testbed/platform/*
 tmp
 local-testbench
