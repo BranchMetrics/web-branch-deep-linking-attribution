@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.0.3"};
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.1.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -889,7 +889,8 @@ resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", me
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, branch_id)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
 validationTypes.NUMBER)})};
-resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
+resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), append_deeplink_path:validator(!1, validationTypes.BOOLEAN), stage:validator(!1, 
+validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT)})};
 // Input 7
@@ -1335,7 +1336,7 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
-  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
+  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
     a.deepviewCta();
   }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
     d.preventDefault();
@@ -1444,18 +1445,14 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   b = session.get(d._storage);
   var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id, g = function(a, b) {
-    if (utils.mobileUserAgent()) {
-      d._api(resources._r, {sdk:config.version}, function(a, b) {
-        b && (c.browser_fingerprint_id = b);
-      });
-      var c = a || session.get(d._storage) || {};
-      d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
-        e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
-        b && b(a, c);
-      });
-    } else {
-      "function" === typeof b && b();
-    }
+    d._api(resources._r, {sdk:config.version}, function(a, b) {
+      b && (c.browser_fingerprint_id = b);
+    });
+    var c = a || session.get(d._storage) || {};
+    d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
+      e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
+      b && b(a, c);
+    });
   }, k = function(b, c) {
     if (c) {
       var e = c;

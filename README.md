@@ -40,7 +40,7 @@ Smart banner is a great start!
 
 Get Started Installing the App Smart Banner for Web [Here](https://dev.branch.io/recipes/app_download_banner/)
 
-| ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
+![Smart Banner](https://dev.branch.io/img/pages/features/smart-banner/banner2.png)
 
 ### Short link generation
 Powerful, customizeable, and easy-to-create deeplinks are what Branch does best. The Web SDK delivers on this promise of providing a simple and powerful function for generating short deep links
@@ -270,9 +270,9 @@ ___
 
 **callback**: `function`, _optional_
 
-This function allows you to track any event with supporting metadata. Use the events you track to
-create funnels in the Branch dashboard.  The `metadata` parameter is a formatted JSON object that
-can contain any data and has limitless hierarchy.
+This function allows you to track any event with supporting metadata.
+The `metadata` parameter is a formatted JSON object that can contain
+any data and has limitless hierarchy.
 
 ##### Usage
 ```js

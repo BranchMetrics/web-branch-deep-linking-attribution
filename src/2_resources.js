@@ -269,6 +269,7 @@ resources.deepview = {
 		"feature": validator(false, validationTypes.STRING),
 		"link_click_id": validator(false, validationTypes.STRING),
 		"open_app": validator(false, validationTypes.BOOLEAN),
+		"append_deeplink_path": validator(false, validationTypes.BOOLEAN),
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY)
 	})

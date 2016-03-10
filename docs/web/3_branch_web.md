@@ -170,9 +170,9 @@ ___
 
 **callback**: `function`, _optional_
 
-This function allows you to track any event with supporting metadata. Use the events you track to
-create funnels in the Branch dashboard.  The `metadata` parameter is a formatted JSON object that
-can contain any data and has limitless hierarchy.
+This function allows you to track any event with supporting metadata.
+The `metadata` parameter is a formatted JSON object that can contain
+any data and has limitless hierarchy.
 
 ##### Usage
 ```js
