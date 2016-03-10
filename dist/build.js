@@ -1256,7 +1256,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   function c(b) {
     switch(b) {
       case "visit_count":
-        return statistics.get(a, "_bncload");
+        return statistics.get(a, "visit_count");
       case "banner_call_count":
         return statistics.get(a, "banner_call");
       case "has_app":
@@ -1508,7 +1508,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
   this._listeners = [];
   this.sdk = "web" + config.version;
   this.init_state = init_states.NO_INIT;
-  statistics.adjust(this._storage, "_bncload", 1);
+  statistics.adjust(this._storage, "visit_count", 1);
 };
 Branch.prototype._api = function(a, b, c) {
   this.app_id && (b.app_id = this.app_id);
@@ -1560,7 +1560,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       c.data_parsed = c.data ? safejson.parse(c.data) : null;
     }
     b && (d.init_state = init_states.INIT_FAILED);
-    statistics.adjust(d._storage, "_bncinit", 1);
+    statistics.adjust(d._storage, "branch_init", 1);
     a(b, c && utils.whiteListSessionData(c));
   }, h = function() {
     var a, b;

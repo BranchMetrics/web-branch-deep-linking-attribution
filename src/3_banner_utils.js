@@ -186,7 +186,7 @@ banner_utils.shouldAppend = function(storage, options) {
 	function findOperand(name) {
 		switch (name) {
 			case 'visit_count':
-				return statistics.get(storage, '_bncload');
+				return statistics.get(storage, 'visit_count');
 			case 'banner_call_count':
 				return statistics.get(storage, 'banner_call');
 			case 'has_app':

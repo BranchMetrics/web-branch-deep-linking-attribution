@@ -138,7 +138,7 @@ Branch = function() {
 
 	this.init_state = init_states.NO_INIT;
 
-	statistics.adjust(this._storage, '_bncload', 1);
+	statistics.adjust(this._storage, 'visit_count', 1);
 };
 
 /***
@@ -349,7 +349,7 @@ Branch.prototype['init'] = wrap(
 				self.init_state = init_states.INIT_FAILED;
 			}
 
-			statistics.adjust(self._storage, '_bncinit', 1);
+			statistics.adjust(self._storage, 'branch_init', 1);
 			done(err, data && utils.whiteListSessionData(data));
 		};
 
@@ -1715,8 +1715,8 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  *
  * ```js
  *     stats = {
- *         _bncload: number,                       // The number of times this SDK was loaded
- *         _bncinit: number,                       // The number of times init() was called
+ *         visit_count: number,                       // The number of times this SDK was loaded
+ *         branch_init: number,                       // The number of times init() was called
  *         banner_skip_count: number,              // The run of banner skips (for any reason)
  *         banner_show_count: number,              // The run of banner displays
  *         banner_call: number,                    // The total number of times banner() was called

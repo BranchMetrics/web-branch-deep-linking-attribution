@@ -1003,8 +1003,8 @@ branch.statistics(function(err, stats) {
 
 ```js
     stats = {
-        _bncload: number,                       // The number of times this SDK was loaded
-        _bncinit: number,                       // The number of times init() was called
+        visit_count: number,                       // The number of times this SDK was loaded
+        branch_init: number,                       // The number of times init() was called
         banner_skip_count: number,              // The run of banner skips (for any reason)
         banner_show_count: number,              // The run of banner displays
         banner_call: number,                    // The total number of times banner() was called
