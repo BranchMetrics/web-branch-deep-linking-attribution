@@ -1572,6 +1572,9 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   if (c.open_app || null === c.open_app || "undefined" === typeof c.open_app) {
     b.open_app = !0;
   }
+  if (c.appended_deeplink_path || null === c.appended_deeplink_path || "undefined" === typeof c.appended_deeplink_path) {
+    b.appended_deeplink_path = !0;
+  }
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
