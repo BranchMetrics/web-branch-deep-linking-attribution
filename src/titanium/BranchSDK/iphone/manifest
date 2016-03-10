@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.1
+apiversion: 2
+architectures: armv7 arm64 i386 x86_64
+description: BranchSDK
+author: Rob Petit
+license: github.com/BranchMetrics/Web-SDK/blob/master/LICENSE
+copyright: Copyright (c) 2015 Pawprint Labs Inc
+
+# these should not be edited
+name: BranchSDK
+moduleid: io.branch.sdk
+guid: 82839bd3-8a58-460d-80cf-dd7c2faa11e3
+platform: iphone
+minsdk: 4.0.0.GA

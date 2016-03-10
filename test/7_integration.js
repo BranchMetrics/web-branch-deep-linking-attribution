@@ -3,7 +3,7 @@
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
+/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch, cordova */
 /*globals device_fingerprint_id */
 
 describe('Integration tests', function() {
@@ -45,10 +45,21 @@ describe('Integration tests', function() {
 		xhr.onCreate = function(xhr) {
 			requests.push(xhr);
 		};
-		branch._server.createScript = function() {};
-		sinon.stub(branch._server, 'createScript', function(src) {
-			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
-		});
+		if (window.WEB_BUILD) {
+			branch._server.createScript = function() {};
+			sinon.stub(branch._server, 'createScript', function(src) {
+				requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
+			});
+		}
+		else if (window.CORDOVA_BUILD && cordova) {
+			cordova.require = function() {};
+			sinon.stub(cordova, 'require', function() {
+				return function() {
+					arguments[0]({ });
+				};
+			});
+		}
+
 	});
 
 	beforeEach(function() {
@@ -64,8 +75,11 @@ describe('Integration tests', function() {
 	});
 
 	after(function() {
-		if (typeof branch._server.createScript.restore === 'function') {
+		if (window.WEB_BUILD && typeof branch._server.createScript.restore === 'function') {
 			branch._server.createScript.restore();
+		}
+		else if (window.CORDOVA_BUILD && cordova && typeof cordova.require.restore === 'function') {
+			cordova.require.restore();
 		}
 		if (typeof xhr.restore === 'function') {
 			xhr.restore();
@@ -91,49 +105,78 @@ describe('Integration tests', function() {
 	};
 
 	var indexOfLastInitRequest = function(requestsAfterInit) {
-		return requestsAfterInit + 1;
+		return requestsAfterInit + (window.CORDOVA_BUILD ? 0 : 1);
 	};
 
 	var numberOfAsserts = function(assertsAfterInit) {
-		return assertsAfterInit + 4;
+		return assertsAfterInit + (window.CORDOVA_BUILD ? 2 : 4);
 	};
 
 	var branchInit = function(assert, callback) {
 		branch.init.apply(
 			branch,
-			[
-				device_fingerprint_id,
-				callback
-			]
+			window.CORDOVA_BUILD ?
+				[
+					device_fingerprint_id,
+					{
+						isReferrable: true
+					},
+					callback
+				] :
+				[
+					device_fingerprint_id,
+					callback
+				]
 		);
-		if (assert) {
-			assert.strictEqual(requests.length, 1, 'Exactly one request was made');
-			assert.strictEqual(
-				requests[0].src,
-				'https://bnc.lt/_r?sdk=web' + config.version +
-					'&callback=branch_callback__' + jsonpCallback.toString(),
-				'The first request has the right .src'
+		if (window.CORDOVA_BUILD) {
+			requests[0].respond(
+				200,
+				{ "Content-Type": "application/json" },
+				'{ "identity_id":' + identity_id +
+					', "session_id":"123088518049178533"' +
+					', "device_fingerprint_id":"79336952217731267"' +
+					', "browser_fingerprint_id":null' +
+					', "link":"https://bnc.lt/i/4LYQTXE0_k"' +
+					', "identity":"Branch","has_app":true }'
 			);
+			if (assert) {
+				assert.strictEqual(requests.length, 1);
+				assert.strictEqual(
+					requests[0].requestBody,
+					'sdk=cordova' + config.version + '&app_id=' + device_fingerprint_id
+				);
+			}
 		}
-		requests[0].callback(browser_fingerprint_id);
-		requests[1].respond(
-			200,
-			{ "Content-Type": "application/json" },
-			'{ "identity_id":' + identity_id +
-				', "session_id":"123088518049178533", "device_fingerprint_id":null, ' +
-				'"browser_fingerprint_id":"79336952217731267", ' +
-				'"link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }'
-		);
-		if (assert) {
-			assert.strictEqual(requests.length, 2, 'Exactly two requests were made');
-			assert.strictEqual(
-				requests[1].requestBody,
-				'browser_fingerprint_id=' + browser_fingerprint_id +
-					'&identity_id=' + identity_id +
-					'&is_referrable=1&sdk=web' + config.version +
-					'&app_id=' + browser_fingerprint_id,
-				'The second request has the right .requestBody'
+		else {
+			if (assert) {
+				assert.strictEqual(requests.length, 1, 'Exactly one request was made');
+				assert.strictEqual(
+					requests[0].src,
+					'https://bnc.lt/_r?sdk=web' + config.version +
+						'&callback=branch_callback__' + jsonpCallback.toString(),
+					'The first request has the right .src'
+				);
+			}
+			requests[0].callback(browser_fingerprint_id);
+			requests[1].respond(
+				200,
+				{ "Content-Type": "application/json" },
+				'{ "identity_id":' + identity_id +
+					', "session_id":"123088518049178533", "device_fingerprint_id":null, ' +
+					'"browser_fingerprint_id":"79336952217731267", ' +
+					'"link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }'
 			);
+			if (assert) {
+				assert.strictEqual(requests.length, 2, 'Exactly two requests were made');
+				assert.strictEqual(
+					requests[1].requestBody,
+					'browser_fingerprint_id=' + browser_fingerprint_id +
+						'&identity_id=' + identity_id +
+						'&is_referrable=1&sdk=web' + config.version +
+						'&app_id=' + browser_fingerprint_id,
+					'The second request has the right .requestBody'
+				);
+			}
 		}
 	};
 
@@ -164,8 +207,13 @@ describe('Integration tests', function() {
 			branch.init(browser_fingerprint_id, function(err) {
 				assert.strictEqual(err.message, 'Error in API: 400', 'Expect 400 error message');
 			});
-			requests[0].callback(browser_fingerprint_id);
-			requests[1].respond(400);
+			if (window.CORDOVA_BUILD) {
+				requests[indexOfLastInitRequest(0)].respond(400);
+			}
+			else {
+				requests[0].callback(browser_fingerprint_id);
+				requests[1].respond(400);
+			}
 		});
 
 		it('should attempt 5xx error three times total', function(done) {
@@ -174,8 +222,10 @@ describe('Integration tests', function() {
 				assert.strictEqual(err.message, 'Error in API: 500', 'Expect 500 error message');
 			});
 			var requestCount = 0;
-			requests[requestCount].callback(browser_fingerprint_id);
-			requestCount++;
+			if (window.WEB_BUILD) {
+				requests[requestCount].callback(browser_fingerprint_id);
+				requestCount++;
+			}
 			requests[requestCount].respond(500);
 			clock.tick(250);
 			requestCount++;
@@ -255,6 +305,46 @@ describe('Integration tests', function() {
 			assert.strictEqual(requests.length, indexOfLastInitRequest(1));
 		});
 	});
+
+	if (window.CORDOVA_BUILD) {
+		describe('first', function() {
+			it('should make two requests and return first session data', function(done) {
+				var assert = testUtils.plan(numberOfAsserts(2), done);
+				branchInit(assert);
+				branch.first(function(err, data) {
+					assert.deepEqual(
+						data,
+						{
+							data: null,
+							data_parsed: null,
+							has_app: true,
+							identity: "Branch",
+							referring_identity: null,
+							referring_link: null
+						},
+						'Expect data in branch.first callback'
+					);
+				});
+				assert.strictEqual(requests.length, indexOfLastInitRequest(1));
+			});
+		});
+
+		describe('close', function() {
+			it('should make two requests and close session', function(done) {
+				var assert = testUtils.plan(numberOfAsserts(2), done);
+				branchInit(assert);
+				branch.close(function(err) {
+					assert.strictEqual(err, null, 'Err is null');
+				});
+				assert.strictEqual(
+					requests.length,
+					indexOfLastInitRequest(2),
+					'Expect requests length'
+				);
+				requests[indexOfLastInitRequest(1)].respond(200);
+			});
+		});
+	}
 
 	describe('logout', function() {
 		it('should make two requests and logout session', function(done) {

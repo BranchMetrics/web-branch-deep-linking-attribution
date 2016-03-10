@@ -25,6 +25,7 @@
 		"build.sh",
 		"compiler",
 		"dist/build.min.js.gz",
+		"dist/cordova/**",
 		"docs",
 		"externs",
 		"lint.sh",
