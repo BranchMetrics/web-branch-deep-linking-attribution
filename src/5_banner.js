@@ -122,6 +122,7 @@ banner = function(branch, options, linkData, storage) {
 
 	if (utils.mobileUserAgent()) {
 		options['open_app'] = options.open_app;
+		options['append_deeplink_path'] = options.append_deeplink_path;
 		options['make_new_link'] = options.make_new_link;
 		branch['deepview'](linkData, options);
 		doc.getElementById('branch-mobile-action').onclick = function() {

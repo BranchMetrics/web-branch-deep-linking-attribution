@@ -40,7 +40,7 @@ Smart banner is a great start!
 
 Get Started Installing the App Smart Banner for Web [Here](https://dev.branch.io/recipes/app_download_banner/)
 
-| ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
+![Smart Banner](https://dev.branch.io/img/pages/features/smart-banner/banner2.png)
 
 ### Short link generation
 Powerful, customizeable, and easy-to-create deeplinks are what Branch does best. The Web SDK delivers on this promise of providing a simple and powerful function for generating short deep links
@@ -115,13 +115,10 @@ ___
 
 **branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
 
-**options**: `Object`, _optional_ - { *isReferrable*: _Is this a referrable session_ }.
+**options**: `Object`, _optional_ - { }.
 
 **callback**: `function`, _optional_ - callback to read the
 session data.
-
-THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
-AND THE TITANIUM MODULE
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -276,9 +273,9 @@ ___
 
 **callback**: `function`, _optional_
 
-This function allows you to track any event with supporting metadata. Use the events you track to
-create funnels in the Branch dashboard.  The `metadata` parameter is a formatted JSON object that
-can contain any data and has limitless hierarchy.
+This function allows you to track any event with supporting metadata.
+The `metadata` parameter is a formatted JSON object that can contain
+any data and has limitless hierarchy.
 
 ##### Usage
 ```js
@@ -516,7 +513,7 @@ branch.deepview(
         data: {
             mydata: 'content of my data',
             foo: 'bar',
-            '$deepview_path': 'item_id=12345'
+            '$deeplink_path': 'item_id=12345'
         },
         feature: 'dashboard',
         stage: 'new user',
@@ -1032,7 +1029,7 @@ branch.banner({
     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
     bannerRules: [{                         // An optional array of rules that will allow the banner to display
-        operator: '==',                        // ONLY when all rules pass.  The operators must be
+        operator: '===',                       // ONLY when all rules pass.  The operators must be
         operand1: 'has_app',                   // strings.  The only valid operators currently are:
         operand2: true                         // '!=', '==', '>', '>=', '<', '<='
     }, {                                       // The valid operators current are:

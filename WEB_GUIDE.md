@@ -122,12 +122,7 @@ ___
 
 **branch_key**: `string`, _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (depreciated) your app id.
 
-**options**: `Object`, _optional_ - { *isReferrable*: _Is this a referrable session_ }.
-
 **callback**: `function`, _optional_ - callback to read the session data.
-
-THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
-AND THE TITANIUM MODULE
 
 Adding the Branch script to your page automatically creates a window.branch
 object with all the external methods described below. All calls made to
@@ -538,7 +533,7 @@ branch.deepview(
             '$ios_url': 'https://en.wikipedia.org/wiki/Internet',
             '$ipad_url': 'https://en.wikipedia.org/wiki/Internet',
             '$android_url': 'https://en.wikipedia.org/wiki/Internet',
-            '$deepview_path': 'item_id=12345',
+            '$deeplink_path': 'item_id=12345',
             '$og_app_id': '12345',
             '$og_title': 'My App',
             '$og_description': 'My app\'s description.'

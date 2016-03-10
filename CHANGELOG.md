@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.0.4] - 2016-03-09
+- Append deeplink path for iOS
+
 ## [v2.0.3] - 2016-03-02
 - Adjusted sizing / colors on stars
 

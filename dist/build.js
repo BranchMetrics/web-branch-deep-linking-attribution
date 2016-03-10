@@ -533,8 +533,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
-      g[h - 2] = arguments[h];
+    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
+      g[k - 2] = arguments[k];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -710,8 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.0.3"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
-IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.1.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -759,7 +758,8 @@ utils.whiteListSessionData = function(a) {
   return {data:a.data || null, data_parsed:a.data_parsed || null, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
 utils.cleanLinkData = function(a) {
-  WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
+  a.source = "web-sdk";
+  a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
   try {
     safejson.parse(a.data);
   } catch (b) {
@@ -807,14 +807,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? k = g = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
     ;
   }
   return b;
@@ -871,23 +871,13 @@ function validator(a, b) {
 }
 var branch_id = /^[0-9]{15,20}$/;
 function defaults(a) {
-  var b = {};
-  WEB_BUILD && (b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)});
-  if (CORDOVA_BUILD || TITANIUM_BUILD) {
-    b = {device_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
-  }
+  var b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
   return utils.merge(a, b);
 }
-WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, 
-validationTypes.STRING)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}});
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{add_tracking_enabled:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), bluetooth:validator(!1, validationTypes.BOOLEAN), bluetooth_version:validator(!1, validationTypes.STRING), brand:validator(!1, validationTypes.STRING), carrier:validator(!1, validationTypes.STRING), hardware_id:validator(!1, validationTypes.STRING), has_nfc:validator(!1, 
-  validationTypes.BOOLEAN), has_telephone:validator(!1, validationTypes.BOOLEAN), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), push_identifier:validator(!1, validationTypes.STRING), android_app_link_url:validator(!1, validationTypes.STRING), external_intent_uri:validator(!1, validationTypes.STRING), external_intent_extra:validator(!1, validationTypes.STRING), model:validator(!1, 
-  validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), screen_dpi:validator(!1, validationTypes.NUMBER), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, validationTypes.NUMBER), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), update:validator(!1, validationTypes.NUMBER), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.open = {destination:config.api_endpoint, 
-  endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_version:validator(!1, validationTypes.STRING), device_fingerprint_id:validator(!0, branch_id), hardware_id:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), push_identifier:validator(!1, validationTypes.STRING), android_app_link_url:validator(!1, 
-  validationTypes.STRING), external_intent_uri:validator(!1, validationTypes.STRING), external_intent_extra:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{device_fingerprint_id:validator(!0, 
-  branch_id), identity_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)}};
-}
+resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING)}};
+resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING)}};
+resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
+resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
 resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
@@ -899,7 +889,8 @@ resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", me
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, branch_id)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
 validationTypes.NUMBER)})};
-resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
+resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), append_deeplink_path:validator(!1, validationTypes.BOOLEAN), stage:validator(!1, 
+validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT)})};
 // Input 7
@@ -1024,28 +1015,6 @@ BranchStorage.prototype.pojo = {getAll:function() {
 }, isEnabled:function() {
   return !0;
 }};
-BranchStorage.prototype.titanium = {getAll:function() {
-  for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
-    -1 !== b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = retrieveValue(Ti.App.Properties.getString(b[c])));
-  }
-  return a;
-}, get:function(a) {
-  retrieveValue(Ti.App.Properties.getString(prefix(a)));
-}, set:function(a, b) {
-  Ti.App.Properties.setString(prefix(a), b);
-}, remove:function(a) {
-  Ti.App.Properties.setString(prefix(a), "");
-}, clear:function() {
-  for (var a = Ti.App.Properties.listProperties(), b = 0;b < a.length;b++) {
-    -1 !== a[b].indexOf(BRANCH_KEY_PREFIX) && Ti.App.Properties.setString(a[b], "");
-  }
-}, isEnabled:function() {
-  try {
-    return Ti.App.Properties.setString("test", ""), Ti.App.Properties.getString("test"), !0;
-  } catch (a) {
-    return !1;
-  }
-}};
 // Input 9
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
@@ -1067,19 +1036,19 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
-    "undefined" === typeof c && (c = {});
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, d) {
+    "undefined" === typeof d && (d = {});
     if (b.branch_key && g.test(b.branch_key)) {
-      return c.branch_key = b.branch_key, c;
+      return d.branch_key = b.branch_key, d;
     }
     if (b.app_id && f.test(b.app_id)) {
-      return c.app_id = b.app_id, c;
+      return d.app_id = b.app_id, d;
     }
     throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
   if ("/v1/has-app" === a.endpoint) {
     try {
-      a.queryPart = h(b, a.queryPart);
+      a.queryPart = k(b, a.queryPart);
     } catch (l) {
       return {error:l.message};
     }
@@ -1094,7 +1063,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  var k = {};
+  var h = {};
   if ("undefined" !== typeof a.params) {
     for (c in a.params) {
       if (a.params.hasOwnProperty(c)) {
@@ -1102,19 +1071,19 @@ Server.prototype.getUrl = function(a, b) {
           return {error:d};
         }
         d = b[c];
-        "undefined" !== typeof d && "" !== d && null !== d && (k[c] = d);
+        "undefined" !== typeof d && "" !== d && null !== d && (h[c] = d);
       }
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
-      b = h(b, k);
+      b = k(b, h);
     } catch (l) {
       return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (k.metadata = JSON.stringify(k.metadata || {}));
-  return {data:this.serializeObject(k, ""), url:e};
+  "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
+  return {data:this.serializeObject(h, ""), url:e};
 };
 Server.prototype.createScript = function(a, b) {
   var c = document.createElement("script");
@@ -1142,25 +1111,14 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   });
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
-  var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.ontimeout = function() {
     e(Error(utils.messages.timeout), null, 504);
   };
-  TITANIUM_BUILD ? (f.onerror = function(a) {
-    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : e(Error(a.error || "Error in API: " + f.status), null, f.status);
-  }, f.onload = function() {
-    if (200 === f.status) {
-      try {
-        e(null, safejson.parse(f.responseText), f.status);
-      } catch (a) {
-        e(null, {}, f.status);
-      }
-    } else {
-      402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
-    }
-  }) : (f.onerror = function(a) {
+  f.onerror = function(a) {
     e(Error(a.error || "Error in API: " + f.status), null, f.status);
-  }, f.onreadystatechange = function() {
+  };
+  f.onreadystatechange = function() {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
@@ -1172,7 +1130,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
         402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
-  });
+  };
   try {
     f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
@@ -1184,33 +1142,33 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(f.error));
   }
-  var g, h = "";
-  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
-  var k = RETRIES, l = function(a, b, c) {
-    a && 0 < k && "5" === (c || "").toString().substring(0, 1) ? (k--, window.setTimeout(function() {
-      n();
+  var g, k = "";
+  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
+  var h = RETRIES, l = function(a, b, c) {
+    a && 0 < h && "5" === (c || "").toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+      m();
     }, RETRY_DELAY)) : d(a, b);
-  }, n = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
+  }, m = function() {
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
   };
-  n();
+  m();
 };
 // Input 10
 var statistics = {set:function(a, b, c, d) {
-  var e = a.get("stats", !0) || "", f = null, g = null, h = "p_" + window.location.pathname;
+  var e = a.get("stats", !0) || "", f = null, g = null, k = "p_" + window.location.pathname;
   if (e) {
     try {
       f = JSON.parse(e);
-    } catch (k) {
+    } catch (h) {
       g = Error(utils.messages.statsParseFail, null);
     }
   }
   f || (f = {});
-  f.hasOwnProperty(h) || (f[h] = {});
-  f[h][b] = c;
+  f.hasOwnProperty(k) || (f[k] = {});
+  f[k][b] = c;
   try {
     e = JSON.stringify(f);
-  } catch (k) {
+  } catch (h) {
     g = Error(utils.messages.statsParseFail, null), e = "";
   }
   a.set("stats", e, !0);
@@ -1272,7 +1230,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, h = function() {
+    }, k = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -1284,11 +1242,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * h();
+      return a * k();
     }, vmin:function(a) {
-      return a * Math.min(h(), g());
+      return a * Math.min(k(), g());
     }, vmax:function(a) {
-      return a * Math.max(h(), g());
+      return a * Math.max(k(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * f;
     }}[b](f), 10);
@@ -1420,27 +1378,27 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 14
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, n = function() {
-    k = a.createElement("div");
-    k.className = "branch-icon-wrapper";
-    k.id = "branch-checkmark";
-    k.style = "opacity: 0;";
-    k.innerHTML = banner_html.checkmark();
-    h.appendChild(k);
+  }, m = function() {
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      k.style.opacity = "1";
+      h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, m = function() {
+  }, n = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1452,11 +1410,11 @@ var sendSMS = function(a, b, c, d) {
   if (e) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), m()) : (b._publishEvent("didSendBannerSMS"), n(), setTimeout(function() {
-        h.removeChild(k);
+      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+        k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : m();
+    })) : n();
   }
 }, banner = function(a, b, c, d) {
   if (!banner_utils.shouldAppend(d, b)) {
@@ -1467,41 +1425,41 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
-  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
+  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
     a.deepviewCta();
   }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
     d.preventDefault();
     sendSMS(f, a, b, c);
   });
-  var g = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, k = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
+  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
     setTimeout(function() {
       banner_utils.removeElement(e);
       banner_utils.removeElement(document.getElementById("branch-css"));
       a();
     }, banner_utils.animationSpeed + banner_utils.animationDelay);
     setTimeout(function() {
-      "top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = l);
+      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = l);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay);
     "top" === b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
   };
-  n && (n.onclick = function(b) {
+  m && (m.onclick = function(b) {
     b.preventDefault();
     a._publishEvent("willCloseBanner");
-    m(function() {
+    n(function() {
       a._publishEvent("didCloseBanner");
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, g) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
   setTimeout(function() {
     "top" === b.position ? e.style.top = "0" : "bottom" === b.position && (e.style.bottom = "0");
     a._publishEvent("didShowBanner");
   }, banner_utils.animationDelay);
   statistics.set(d, "banner_skip_count", 0);
   statistics.adjust(d, "banner_show_count", 1);
-  return m;
+  return n;
 };
 // Input 15
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
@@ -1513,28 +1471,28 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var k = function(b, c) {
+      var h = function(b, d) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
           }
-          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, d);
         } finally {
           g();
         }
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
-          return k(Error(utils.message(utils.messages.initPending)), null);
+          return h(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return k(Error(utils.message(utils.messages.initFailed)), null);
+          return h(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
-          return k(Error(utils.message(utils.messages.nonInit)), null);
+          return h(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(k);
+      e.unshift(h);
       b.apply(d, e);
     });
   };
@@ -1543,19 +1501,12 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = task_queue();
-  var a = [];
-  CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && (a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"]);
+  var a = [], a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"];
   a.push("pojo");
   this._storage = new BranchStorage(a);
   this._server = new Server;
-  a = "web";
   this._listeners = [];
-  CORDOVA_BUILD && (a = "cordova");
-  TITANIUM_BUILD && (a = "titanium");
-  this.sdk = a + config.version;
-  if (CORDOVA_BUILD || TITANIUM_BUILD) {
-    this.debug = !1;
-  }
+  this.sdk = "web" + config.version;
   this.init_state = init_states.NO_INIT;
   statistics.adjust(this._storage, "_bncload", 1);
 };
@@ -1566,8 +1517,7 @@ Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && this.identity_id && (b.identity_id = this.identity_id);
   (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id);
   (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
-  (CORDOVA_BUILD || TITANIUM_BUILD) && (a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id);
-  WEB_BUILD && (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
+  (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
   return this._server.request(a, b, this._storage, function(a, b) {
     c(a, b);
   });
@@ -1581,34 +1531,13 @@ Branch.prototype._publishEvent = function(a) {
     this._listeners[b].event && this._listeners[b].event !== a || this._listeners[b].listener(a);
   }
 };
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  Branch.prototype.setDebug = function(a) {
-    this.debug = a;
-  };
-}
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
-  c = c && "function" === typeof c ? {isReferrable:null} : c;
-  TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
-  var e = function(a) {
-    a.session_id && (d.session_id = a.session_id.toString());
-    a.identity_id && (d.identity_id = a.identity_id.toString());
-    a.link && (d.sessionLink = a.link);
-    a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
-    !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
-    if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
-    }
-    WEB_BUILD && (d.browser_fingerprint_id = a.browser_fingerprint_id);
-    return a;
-  };
-  b = c && "undefined" !== typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var f = session.get(d._storage);
-  c = c && "undefined" !== typeof c.url && null !== c.url ? c.url : null;
-  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, h = !f || !f.identity_id, k = function(a, b) {
-    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
+  b = session.get(d._storage);
+  var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id, g = function(a, b) {
+    d._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
     });
     var c = a || session.get(d._storage) || {};
@@ -1616,58 +1545,40 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
       b && b(a, c);
     });
-  }, l = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, h), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? safejson.parse(c.data) : null);
+  }, k = function(b, c) {
+    if (c) {
+      var e = c;
+      e.session_id && (d.session_id = e.session_id.toString());
+      e.identity_id && (d.identity_id = e.identity_id.toString());
+      e.link && (d.sessionLink = e.link);
+      e.referring_link && (e.referring_link = utils.processReferringLink(e.referring_link));
+      !e.click_id && e.referring_link && (e.click_id = utils.clickIdFromLink(e.referring_link));
+      d.browser_fingerprint_id = e.browser_fingerprint_id;
+      c = e;
+      session.set(d._storage, c, f);
+      d.init_state = init_states.INIT_SUCCEEDED;
+      c.data_parsed = c.data ? safejson.parse(c.data) : null;
+    }
     b && (d.init_state = init_states.INIT_FAILED);
-    d.keepAlive && setTimeout(function() {
-      d.keepAlive = !1;
-    }, 2E3);
     statistics.adjust(d._storage, "_bncinit", 1);
     a(b, c && utils.whiteListSessionData(c));
-  }, n = function() {
+  }, h = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
-      document[a] || k(null, null);
+      document[a] || g(null, null);
     }, !1);
   };
-  if (WEB_BUILD && f && f.session_id && !g) {
-    n(), k(f, l);
-  } else {
-    if (WEB_BUILD) {
-      d._api(resources._r, {sdk:config.version}, function(a, b) {
-        if (a) {
-          return l(a, null);
-        }
-        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-          b && g && (b.click_id = g);
-          n();
-          l(a, b);
-        });
-      });
-    } else {
-      if (c = function(a) {
-        h || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
-        d._api(h ? resources.install : resources.open, a, function(a, b) {
-          l(a, b);
-        });
-      }, CORDOVA_BUILD) {
-        var m = [];
-        null !== b && m.push(b ? 1 : 0);
-        h && m.unshift(d.debug);
-        cordova.require("cordova/exec")(c, function() {
-          a("Error getting device data!");
-        }, "BranchDevice", h ? "getInstallData" : "getOpenData", m);
-      } else {
-        if (TITANIUM_BUILD) {
-          var m = {}, p = require("io.branch.sdk");
-          g && (m.link_identifier = g);
-          m = h ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
-          c(m);
-        }
-      }
+  b && b.session_id && !e ? (h(), g(b, k)) : d._api(resources._r, {sdk:config.version}, function(a, b) {
+    if (a) {
+      return k(a, null);
     }
-  }
+    d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+      b && e && (b.click_id = e);
+      h();
+      k(a, b);
+    });
+  });
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));
@@ -1704,24 +1615,9 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     a(null);
   });
 });
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
-    var b = this;
-    if (this.keepAlive) {
-      return a(null);
-    }
-    this._api(resources.close, {}, function(c, d) {
-      delete b.session_id;
-      delete b.sessionLink;
-      b.init_state = init_states.NO_INIT;
-      b._storage.clear();
-      a(null);
-    });
-  });
-}
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   c || (c = {});
-  TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
+  this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
@@ -1817,16 +1713,18 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
     a(b || null);
   });
 });
-WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
+Branch.prototype.addListener = function(a, b) {
   "function" === typeof a && void 0 === b && (b = a);
   b && this._listeners.push({listener:b, event:a || null});
-}, Branch.prototype.removeListener = function(a) {
+};
+Branch.prototype.removeListener = function(a) {
   a && (this._listeners = this._listeners.filter(function(b) {
     if (b.listener !== a) {
       return b;
     }
   }));
-}, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+};
+Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", 
   iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showBlackberry:"undefined" === typeof b.showBlackberry ? !0 : b.showBlackberry, showWindowsPhone:"undefined" === typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, showDesktop:"undefined" === 
@@ -1836,7 +1734,8 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   this.closeBannerPointer = banner(this, d, c, this._storage);
   statistics.adjust(this._storage, "banner_call", 1);
   a();
-}), Branch.prototype.closeBanner = wrap(0, function(a) {
+});
+Branch.prototype.closeBanner = wrap(0, function(a) {
   if (this.closeBannerPointer) {
     var b = this;
     this._publishEvent("willCloseBanner");
@@ -1845,12 +1744,13 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
     });
   }
   a();
-}), Branch.prototype.statistics = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+});
+Branch.prototype.statistics = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   return statistics.getAll(this._storage, a);
-}));
+});
 // Input 16
 var branch_instance = new Branch;
-if (!TITANIUM_BUILD && window.branch && window.branch._q) {
+if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
     var task = queue[i];
     branch_instance[task[0]].apply(branch_instance, task[1]);
@@ -1859,10 +1759,5 @@ if (!TITANIUM_BUILD && window.branch && window.branch._q) {
 "function" === typeof define && define.amd ? define("branch", function() {
   return branch_instance;
 }) : "object" === typeof exports && (module.exports = branch_instance);
-TITANIUM_BUILD || window && (window.branch = branch_instance);
-CORDOVA_BUILD && document.addEventListener("pause", function() {
-  console.log("Closing branch session on pause event.");
-  branch_instance.close(function() {
-  });
-}, !1);
+window && (window.branch = branch_instance);
 })();

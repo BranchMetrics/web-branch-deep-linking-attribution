@@ -7,7 +7,7 @@
 # There are three arguments:
 # (1) *Required* the file you want it to read from.
 # (2) *Required* the file you want it to write the results to.
-# (3) *Required* The target you're making the Table of contents for: WEB, CORDOVA, etc.
+# (3) *Required* The target you're making the Table of contents for: WEB, etc.
 #
 # Example:
 # $ perl toc_generator.pl YOUR_SWEET_FILE.js TARGET
