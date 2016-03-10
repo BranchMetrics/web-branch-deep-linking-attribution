@@ -52,6 +52,7 @@
 					<input class="example-input" type="text" id="identityID" class="form-control" placeholder="test@test.com">
 					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
 					<button id="logout" class="btn btn-info">.logout()</button>
+					<button id="statistics" class="btn btn-info">.statistics()</button>
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
@@ -111,7 +112,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity statistics track validateCode".split(" "), 0);
 
 		// Note that this example is using the key in two places, here and below
 		branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
@@ -171,6 +172,12 @@
 			request.html('branch.logout();');
 			branch.logout(function(err, data) {
 				response.html(err || 'undefined');
+			});
+		});
+		$('#statistics').click(function() {
+			request.html('branch.statistics();');
+			branch.statistics(function(err, data) {
+				response.html(err || JSON.stringify(data, null, '\t'));
 			});
 		});
 		$('#track').click(function() {

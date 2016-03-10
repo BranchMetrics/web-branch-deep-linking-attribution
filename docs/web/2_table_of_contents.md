@@ -30,4 +30,7 @@
 6. Smart Banner
   + [.banner()](#banneroptions-data)
 
+7. Statistics
+  + [.statistics()](#statistics-callback)
+
 ___

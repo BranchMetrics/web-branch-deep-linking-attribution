@@ -928,6 +928,15 @@ branch.banner({
     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
+    bannerRules: [{                         // An optional array of rules that will allow the banner to display
+        operator: '==',                        // ONLY when all rules pass.  The operators must be
+        operand1: 'has_app',                   // strings.  The only valid operators currently are:
+        operand2: true                         // '!=', '==', '>', '>=', '<', '<='
+    }, {                                       // The valid operators current are:
+        operator: '>=',                        // 'visit_count', 'banner_call_count', 'has_app'
+        operand1: 'visit_count',
+        operand2: 3
+    }]
 
 }, {
     tags: ['tag1', 'tag2'],
@@ -960,6 +969,49 @@ closing the banner is very simple by calling `Branch.closeBanner()`.
 ##### Usage
 ```js
 branch.closeBanner();
+```
+
+
+
+### statistics(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_ - callback to read statistics data
+
+Retrieve general usage statistics for the Web SDK
+
+#### Usage
+
+```js
+branch.statistics(
+    callback
+);
+```
+
+##### Example
+
+```js
+branch.statistics(function(err, stats) {
+    if (err) {
+        console.error(err.message);
+    }
+    else {
+        console.dir(stats);
+    }
+});
+```
+
+#### Available Data
+
+```js
+    stats = {
+        _bncload: number,                       // The number of times this SDK was loaded
+        _bncinit: number,                       // The number of times init() was called
+        banner_skip_count: number,              // The run of banner skips (for any reason)
+        banner_show_count: number,              // The run of banner displays
+        banner_call: number,                    // The total number of times banner() was called
+    }
 ```
 
 
