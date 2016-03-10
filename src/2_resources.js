@@ -83,148 +83,62 @@ function validator(required, type) {
 var branch_id = /^[0-9]{15,20}$/;
 
 function defaults(obj) {
-	var def = {};
-	if (WEB_BUILD) {
-		def = {
-			"browser_fingerprint_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.STRING),
-			"session_id": validator(true, branch_id)
-		};
-	}
-	if (CORDOVA_BUILD || TITANIUM_BUILD) {
-		def = {
-			"device_fingerprint_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
-			"sdk": validator(true, validationTypes.STRING),
-			"session_id": validator(true, branch_id)
-		};
-	}
+	var def = {
+		"browser_fingerprint_id": validator(true, branch_id),
+		"identity_id": validator(true, branch_id),
+		"sdk": validator(true, validationTypes.STRING),
+		"session_id": validator(true, branch_id)
+	};
 	return utils.merge(obj, def);
 }
 
-if (WEB_BUILD) {
-	resources.open = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/open",
-		method: utils.httpMethod.POST,
-		params: {
-			"browser_fingerprint_id": validator(true, branch_id),
-			"identity_id": validator(false, branch_id),
-			"is_referrable": validator(true, validationTypes.NUMBER),
-			"link_identifier": validator(false, validationTypes.STRING),
-			"sdk": validator(false, validationTypes.STRING)
-		}
-	};
+resources.open = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/open",
+	method: utils.httpMethod.POST,
+	params: {
+		"browser_fingerprint_id": validator(true, branch_id),
+		"identity_id": validator(false, branch_id),
+		"is_referrable": validator(true, validationTypes.NUMBER),
+		"link_identifier": validator(false, validationTypes.STRING),
+		"sdk": validator(false, validationTypes.STRING)
+	}
+};
 
-	resources._r = {
-		destination: config.link_service_endpoint,
-		endpoint: "/_r",
-		method: utils.httpMethod.GET,
-		jsonp: true,
-		params: {
-			"sdk": validator(true, validationTypes.STRING)
-		}
-	};
+resources._r = {
+	destination: config.link_service_endpoint,
+	endpoint: "/_r",
+	method: utils.httpMethod.GET,
+	jsonp: true,
+	params: {
+		"sdk": validator(true, validationTypes.STRING)
+	}
+};
 
-	resources.linkClick = {
-		destination: config.link_service_endpoint,
-		endpoint: "",
-		method: utils.httpMethod.GET,
-		queryPart: {
-			"link_url": validator(true, validationTypes.STRING)
-		},
-		params: {
-			"click": validator(true, validationTypes.STRING)
-		}
-	};
+resources.linkClick = {
+	destination: config.link_service_endpoint,
+	endpoint: "",
+	method: utils.httpMethod.GET,
+	queryPart: {
+		"link_url": validator(true, validationTypes.STRING)
+	},
+	params: {
+		"click": validator(true, validationTypes.STRING)
+	}
+};
 
-	resources.SMSLinkSend = {
-		destination: config.link_service_endpoint,
-		endpoint: "/c",
-		method: utils.httpMethod.POST,
-		queryPart: {
-			"link_url": validator(true, validationTypes.STRING)
-		},
-		params: {
-			"sdk": validator(false, validationTypes.STRING),
-			"phone": validator(true, validationTypes.STRING)
-		}
-	};
-}
-
-if (CORDOVA_BUILD || TITANIUM_BUILD) { // jshint undef:false
-	resources.install = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/install",
-		method: utils.httpMethod.POST,
-		params: {
-			"add_tracking_enabled": validator(false, validationTypes.BOOLEAN),
-			"app_version": validator(false, validationTypes.STRING),
-			"bluetooth": validator(false, validationTypes.BOOLEAN),
-			"bluetooth_version": validator(false, validationTypes.STRING),
-			"brand": validator(false, validationTypes.STRING),
-			"carrier": validator(false, validationTypes.STRING),
-			"hardware_id": validator(false, validationTypes.STRING),
-			"has_nfc": validator(false, validationTypes.BOOLEAN),
-			"has_telephone": validator(false, validationTypes.BOOLEAN),
-			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
-			"is_referrable": validator(false, validationTypes.NUMBER),
-			"link_identifier": validator(false, validationTypes.STRING),
-			"push_identifier": validator(false, validationTypes.STRING),
-			"android_app_link_url": validator(false, validationTypes.STRING),
-			"external_intent_uri": validator(false, validationTypes.STRING),
-			"external_intent_extra": validator(false, validationTypes.STRING),
-			"model": validator(false, validationTypes.STRING),
-			"os": validator(false, validationTypes.STRING),
-			"os_version": validator(false, validationTypes.STRING),
-			"screen_dpi": validator(false, validationTypes.NUMBER),
-			"screen_height": validator(false, validationTypes.NUMBER),
-			"screen_width": validator(false, validationTypes.NUMBER),
-			"sdk": validator(false, validationTypes.STRING),
-			"universal_link_url": validator(false, validationTypes.STRING),
-			"update": validator(false, validationTypes.NUMBER),
-			"uri_scheme": validator(false, validationTypes.STRING)
-		}
-	};
-
-	resources.open = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/open",
-		method: utils.httpMethod.POST,
-		params: {
-			"app_version": validator(false, validationTypes.STRING),
-			"device_fingerprint_id": validator(true, branch_id),
-			"hardware_id": validator(false, validationTypes.STRING),
-			"identity_id": validator(true, branch_id),
-			"is_hardware_id_real": validator(false, validationTypes.BOOLEAN),
-			"is_referrable": validator(false, validationTypes.NUMBER),
-			"link_identifier": validator(false, validationTypes.STRING),
-			"push_identifier": validator(false, validationTypes.STRING),
-			"android_app_link_url": validator(false, validationTypes.STRING),
-			"external_intent_uri": validator(false, validationTypes.STRING),
-			"external_intent_extra": validator(false, validationTypes.STRING),
-			"os": validator(false, validationTypes.STRING),
-			"os_version": validator(false, validationTypes.STRING),
-			"sdk": validator(false, validationTypes.STRING),
-			"universal_link_url": validator(false, validationTypes.STRING),
-			"uri_scheme": validator(false, validationTypes.STRING)
-		}
-	};
-
-	resources.close = {
-		destination: config.api_endpoint,
-		endpoint: "/v1/close",
-		method: utils.httpMethod.POST,
-		params: {
-			"device_fingerprint_id": validator(true, branch_id),
-			"identity_id": validator(true, branch_id),
-			"link_click_id": validator(false, branch_id),
-			"sdk": validator(true, validationTypes.STRING),
-			"session_id": validator(true, branch_id)
-		}
-	};
-}
+resources.SMSLinkSend = {
+	destination: config.link_service_endpoint,
+	endpoint: "/c",
+	method: utils.httpMethod.POST,
+	queryPart: {
+		"link_url": validator(true, validationTypes.STRING)
+	},
+	params: {
+		"sdk": validator(false, validationTypes.STRING),
+		"phone": validator(true, validationTypes.STRING)
+	}
+};
 
 resources.getCode = {
 	destination: config.api_endpoint,

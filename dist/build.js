@@ -710,8 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.1.0"}, WEB_BUILD = !0, CORDOVA_BUILD = !1, TITANIUM_BUILD = !1, IS_CORDOVA_APP = !!window.cordova;
-IS_CORDOVA_APP && WEB_BUILD && window.alert("Please use Branch Cordova SDK instead. Visit https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK for more details.");
+var config = {link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.1.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -759,7 +758,8 @@ utils.whiteListSessionData = function(a) {
   return {data:a.data || null, data_parsed:a.data_parsed || null, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
 utils.cleanLinkData = function(a) {
-  WEB_BUILD && (a.source = "web-sdk", a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, "")));
+  a.source = "web-sdk";
+  a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
   try {
     safejson.parse(a.data);
   } catch (b) {
@@ -871,23 +871,13 @@ function validator(a, b) {
 }
 var branch_id = /^[0-9]{15,20}$/;
 function defaults(a) {
-  var b = {};
-  WEB_BUILD && (b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)});
-  if (CORDOVA_BUILD || TITANIUM_BUILD) {
-    b = {device_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
-  }
+  var b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
   return utils.merge(a, b);
 }
-WEB_BUILD && (resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING)}}, resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, 
-validationTypes.STRING)}}, resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}}, resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}});
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  resources.install = {destination:config.api_endpoint, endpoint:"/v1/install", method:utils.httpMethod.POST, params:{add_tracking_enabled:validator(!1, validationTypes.BOOLEAN), app_version:validator(!1, validationTypes.STRING), bluetooth:validator(!1, validationTypes.BOOLEAN), bluetooth_version:validator(!1, validationTypes.STRING), brand:validator(!1, validationTypes.STRING), carrier:validator(!1, validationTypes.STRING), hardware_id:validator(!1, validationTypes.STRING), has_nfc:validator(!1, 
-  validationTypes.BOOLEAN), has_telephone:validator(!1, validationTypes.BOOLEAN), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), push_identifier:validator(!1, validationTypes.STRING), android_app_link_url:validator(!1, validationTypes.STRING), external_intent_uri:validator(!1, validationTypes.STRING), external_intent_extra:validator(!1, validationTypes.STRING), model:validator(!1, 
-  validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), screen_dpi:validator(!1, validationTypes.NUMBER), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, validationTypes.NUMBER), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), update:validator(!1, validationTypes.NUMBER), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.open = {destination:config.api_endpoint, 
-  endpoint:"/v1/open", method:utils.httpMethod.POST, params:{app_version:validator(!1, validationTypes.STRING), device_fingerprint_id:validator(!0, branch_id), hardware_id:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), is_hardware_id_real:validator(!1, validationTypes.BOOLEAN), is_referrable:validator(!1, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), push_identifier:validator(!1, validationTypes.STRING), android_app_link_url:validator(!1, 
-  validationTypes.STRING), external_intent_uri:validator(!1, validationTypes.STRING), external_intent_extra:validator(!1, validationTypes.STRING), os:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), universal_link_url:validator(!1, validationTypes.STRING), uri_scheme:validator(!1, validationTypes.STRING)}}, resources.close = {destination:config.api_endpoint, endpoint:"/v1/close", method:utils.httpMethod.POST, params:{device_fingerprint_id:validator(!0, 
-  branch_id), identity_id:validator(!0, branch_id), link_click_id:validator(!1, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)}};
-}
+resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING)}};
+resources._r = {destination:config.link_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING)}};
+resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
+resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
 resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
@@ -1025,28 +1015,6 @@ BranchStorage.prototype.pojo = {getAll:function() {
 }, isEnabled:function() {
   return !0;
 }};
-BranchStorage.prototype.titanium = {getAll:function() {
-  for (var a = {}, b = Ti.App.Properties.listProperties(), c = 0;c < b.length;c++) {
-    -1 !== b[c].indexOf(BRANCH_KEY_PREFIX) && (a[b[c]] = retrieveValue(Ti.App.Properties.getString(b[c])));
-  }
-  return a;
-}, get:function(a) {
-  retrieveValue(Ti.App.Properties.getString(prefix(a)));
-}, set:function(a, b) {
-  Ti.App.Properties.setString(prefix(a), b);
-}, remove:function(a) {
-  Ti.App.Properties.setString(prefix(a), "");
-}, clear:function() {
-  for (var a = Ti.App.Properties.listProperties(), b = 0;b < a.length;b++) {
-    -1 !== a[b].indexOf(BRANCH_KEY_PREFIX) && Ti.App.Properties.setString(a[b], "");
-  }
-}, isEnabled:function() {
-  try {
-    return Ti.App.Properties.setString("test", ""), Ti.App.Properties.getString("test"), !0;
-  } catch (a) {
-    return !1;
-  }
-}};
 // Input 9
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
@@ -1143,25 +1111,14 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   });
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
-  var f = TITANIUM_BUILD ? Ti.Network.createHTTPClient() : window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   f.ontimeout = function() {
     e(Error(utils.messages.timeout), null, 504);
   };
-  TITANIUM_BUILD ? (f.onerror = function(a) {
-    402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : e(Error(a.error || "Error in API: " + f.status), null, f.status);
-  }, f.onload = function() {
-    if (200 === f.status) {
-      try {
-        e(null, safejson.parse(f.responseText), f.status);
-      } catch (a) {
-        e(null, {}, f.status);
-      }
-    } else {
-      402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
-    }
-  }) : (f.onerror = function(a) {
+  f.onerror = function(a) {
     e(Error(a.error || "Error in API: " + f.status), null, f.status);
-  }, f.onreadystatechange = function() {
+  };
+  f.onreadystatechange = function() {
     if (4 === f.readyState) {
       if (200 === f.status) {
         try {
@@ -1173,7 +1130,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e) {
         402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
-  });
+  };
   try {
     f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (g) {
@@ -1189,12 +1146,12 @@ Server.prototype.request = function(a, b, c, d) {
   "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
   var h = RETRIES, l = function(a, b, c) {
     a && 0 < h && "5" === (c || "").toString().substring(0, 1) ? (h--, window.setTimeout(function() {
-      n();
+      m();
     }, RETRY_DELAY)) : d(a, b);
-  }, n = function() {
+  }, m = function() {
     c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
   };
-  n();
+  m();
 };
 // Input 10
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
@@ -1338,7 +1295,7 @@ var sendSMS = function(a, b, c, d) {
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, n = function() {
+  }, m = function() {
     h = a.createElement("div");
     h.className = "branch-icon-wrapper";
     h.id = "branch-checkmark";
@@ -1352,7 +1309,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, m = function() {
+  }, n = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -1364,11 +1321,11 @@ var sendSMS = function(a, b, c, d) {
   if (e) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), m()) : (b._publishEvent("didSendBannerSMS"), n(), setTimeout(function() {
+      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : m();
+    })) : n();
   }
 }, banner = function(a, b, c, d) {
   if (!banner_utils.shouldAppend(d, b)) {
@@ -1385,7 +1342,7 @@ var sendSMS = function(a, b, c, d) {
     d.preventDefault();
     sendSMS(f, a, b, c);
   });
-  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), m = function(a) {
+  var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
     setTimeout(function() {
       banner_utils.removeElement(e);
       banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1398,10 +1355,10 @@ var sendSMS = function(a, b, c, d) {
     "top" === b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
   };
-  n && (n.onclick = function(b) {
+  m && (m.onclick = function(b) {
     b.preventDefault();
     a._publishEvent("willCloseBanner");
-    m(function() {
+    n(function() {
       a._publishEvent("didCloseBanner");
     });
   });
@@ -1411,7 +1368,7 @@ var sendSMS = function(a, b, c, d) {
     "top" === b.position ? e.style.top = "0" : "bottom" === b.position && (e.style.bottom = "0");
     a._publishEvent("didShowBanner");
   }, banner_utils.animationDelay);
-  return m;
+  return n;
 };
 // Input 14
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
@@ -1453,19 +1410,12 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = task_queue();
-  var a = [];
-  CORDOVA_BUILD ? a = ["local"] : TITANIUM_BUILD ? a = ["titanium"] : WEB_BUILD && (a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"]);
+  var a = [], a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"];
   a.push("pojo");
   this._storage = new BranchStorage(a);
   this._server = new Server;
-  a = "web";
   this._listeners = [];
-  CORDOVA_BUILD && (a = "cordova");
-  TITANIUM_BUILD && (a = "titanium");
-  this.sdk = a + config.version;
-  if (CORDOVA_BUILD || TITANIUM_BUILD) {
-    this.debug = !1;
-  }
+  this.sdk = "web" + config.version;
   this.init_state = init_states.NO_INIT;
 };
 Branch.prototype._api = function(a, b, c) {
@@ -1475,8 +1425,7 @@ Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && this.identity_id && (b.identity_id = this.identity_id);
   (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id);
   (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
-  (CORDOVA_BUILD || TITANIUM_BUILD) && (a.params && a.params.device_fingerprint_id || a.queryPart && a.queryPart.device_fingerprint_id) && this.device_fingerprint_id && (b.device_fingerprint_id = this.device_fingerprint_id);
-  WEB_BUILD && (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
+  (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
   return this._server.request(a, b, this._storage, function(a, b) {
     c(a, b);
   });
@@ -1490,34 +1439,13 @@ Branch.prototype._publishEvent = function(a) {
     this._listeners[b].event && this._listeners[b].event !== a || this._listeners[b].listener(a);
   }
 };
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  Branch.prototype.setDebug = function(a) {
-    this.debug = a;
-  };
-}
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
-  c = c && "function" === typeof c ? {isReferrable:null} : c;
-  TITANIUM_BUILD && "android" === Ti.Platform.osname && (d.keepAlive = !0);
-  var e = function(a) {
-    a.session_id && (d.session_id = a.session_id.toString());
-    a.identity_id && (d.identity_id = a.identity_id.toString());
-    a.link && (d.sessionLink = a.link);
-    a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
-    !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
-    if (CORDOVA_BUILD || TITANIUM_BUILD) {
-      d.device_fingerprint_id = a.device_fingerprint_id, a.link_click_id && (d.link_click_id = a.link_click_id);
-    }
-    WEB_BUILD && (d.browser_fingerprint_id = a.browser_fingerprint_id);
-    return a;
-  };
-  b = c && "undefined" !== typeof c.isReferrable && null !== c.isReferrable ? c.isReferrable : null;
-  var f = session.get(d._storage);
-  c = c && "undefined" !== typeof c.url && null !== c.url ? c.url : null;
-  var g = WEB_BUILD ? utils.getParamValue("_branch_match_id") || utils.hashValue("r") : c ? utils.getParamValue(c) : null, k = !f || !f.identity_id, h = function(a, b) {
-    WEB_BUILD && d._api(resources._r, {sdk:config.version}, function(a, b) {
+  b = session.get(d._storage);
+  var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id, g = function(a, b) {
+    d._api(resources._r, {sdk:config.version}, function(a, b) {
       b && (c.browser_fingerprint_id = b);
     });
     var c = a || session.get(d._storage) || {};
@@ -1525,57 +1453,39 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
       b && b(a, c);
     });
-  }, l = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, k), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? safejson.parse(c.data) : null);
+  }, k = function(b, c) {
+    if (c) {
+      var e = c;
+      e.session_id && (d.session_id = e.session_id.toString());
+      e.identity_id && (d.identity_id = e.identity_id.toString());
+      e.link && (d.sessionLink = e.link);
+      e.referring_link && (e.referring_link = utils.processReferringLink(e.referring_link));
+      !e.click_id && e.referring_link && (e.click_id = utils.clickIdFromLink(e.referring_link));
+      d.browser_fingerprint_id = e.browser_fingerprint_id;
+      c = e;
+      session.set(d._storage, c, f);
+      d.init_state = init_states.INIT_SUCCEEDED;
+      c.data_parsed = c.data ? safejson.parse(c.data) : null;
+    }
     b && (d.init_state = init_states.INIT_FAILED);
-    d.keepAlive && setTimeout(function() {
-      d.keepAlive = !1;
-    }, 2E3);
     a(b, c && utils.whiteListSessionData(c));
-  }, n = function() {
+  }, h = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
-      document[a] || h(null, null);
+      document[a] || g(null, null);
     }, !1);
   };
-  if (WEB_BUILD && f && f.session_id && !g) {
-    n(), h(f, l);
-  } else {
-    if (WEB_BUILD) {
-      d._api(resources._r, {sdk:config.version}, function(a, b) {
-        if (a) {
-          return l(a, null);
-        }
-        d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-          b && g && (b.click_id = g);
-          n();
-          l(a, b);
-        });
-      });
-    } else {
-      if (c = function(a) {
-        k || (a.identity_id = f.identity_id, a.device_fingerprint_id = f.device_fingerprint_id);
-        d._api(k ? resources.install : resources.open, a, function(a, b) {
-          l(a, b);
-        });
-      }, CORDOVA_BUILD) {
-        var m = [];
-        null !== b && m.push(b ? 1 : 0);
-        k && m.unshift(d.debug);
-        cordova.require("cordova/exec")(c, function() {
-          a("Error getting device data!");
-        }, "BranchDevice", k ? "getInstallData" : "getOpenData", m);
-      } else {
-        if (TITANIUM_BUILD) {
-          var m = {}, p = require("io.branch.sdk");
-          g && (m.link_identifier = g);
-          m = k ? p.getInstallData(d.debug, null === b ? -1 : b ? 1 : 0) : p.getOpenData(null === b ? -1 : b ? 1 : 0);
-          c(m);
-        }
-      }
+  b && b.session_id && !e ? (h(), g(b, k)) : d._api(resources._r, {sdk:config.version}, function(a, b) {
+    if (a) {
+      return k(a, null);
     }
-  }
+    d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+      b && e && (b.click_id = e);
+      h();
+      k(a, b);
+    });
+  });
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));
@@ -1612,24 +1522,9 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     a(null);
   });
 });
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-  Branch.prototype.close = wrap(callback_params.CALLBACK_ERR, function(a) {
-    var b = this;
-    if (this.keepAlive) {
-      return a(null);
-    }
-    this._api(resources.close, {}, function(c, d) {
-      delete b.session_id;
-      delete b.sessionLink;
-      b.init_state = init_states.NO_INIT;
-      b._storage.clear();
-      a(null);
-    });
-  });
-}
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   c || (c = {});
-  TITANIUM_BUILD ? this._api(resources.event, {event:b, metadata:c || {}}, a) : this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
+  this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
@@ -1725,16 +1620,18 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
     a(b || null);
   });
 });
-WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
+Branch.prototype.addListener = function(a, b) {
   "function" === typeof a && void 0 === b && (b = a);
   b && this._listeners.push({listener:b, event:a || null});
-}, Branch.prototype.removeListener = function(a) {
+};
+Branch.prototype.removeListener = function(a) {
   a && (this._listeners = this._listeners.filter(function(b) {
     if (b.listener !== a) {
       return b;
     }
   }));
-}, Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
+};
+Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", 
   iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showBlackberry:"undefined" === typeof b.showBlackberry ? !0 : b.showBlackberry, showWindowsPhone:"undefined" === typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, showDesktop:"undefined" === 
@@ -1743,7 +1640,8 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
   "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile, d.showBlackberry = b.showMobile, d.showWindowsPhone = b.showMobile, d.showKindle = b.showMobile);
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
-}), Branch.prototype.closeBanner = wrap(0, function(a) {
+});
+Branch.prototype.closeBanner = wrap(0, function(a) {
   if (this.closeBannerPointer) {
     var b = this;
     this._publishEvent("willCloseBanner");
@@ -1752,10 +1650,10 @@ WEB_BUILD && (Branch.prototype.addListener = function(a, b) {
     });
   }
   a();
-}));
+});
 // Input 15
 var branch_instance = new Branch;
-if (!TITANIUM_BUILD && window.branch && window.branch._q) {
+if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
     var task = queue[i];
     branch_instance[task[0]].apply(branch_instance, task[1]);
@@ -1764,10 +1662,5 @@ if (!TITANIUM_BUILD && window.branch && window.branch._q) {
 "function" === typeof define && define.amd ? define("branch", function() {
   return branch_instance;
 }) : "object" === typeof exports && (module.exports = branch_instance);
-TITANIUM_BUILD || window && (window.branch = branch_instance);
-CORDOVA_BUILD && document.addEventListener("pause", function() {
-  console.log("Closing branch session on pause event.");
-  branch_instance.close(function() {
-  });
-}, !1);
+window && (window.branch = branch_instance);
 })();

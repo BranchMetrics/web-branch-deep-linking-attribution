@@ -15,7 +15,7 @@ goog.require('session');
 goog.require('config');
 goog.require('safejson');
 
-/*globals CORDOVA_BUILD, TITANIUM_BUILD, WEB_BUILD, Ti, BranchStorage, cordova, require */
+/*globals Ti, BranchStorage, require */
 
 var default_branch;
 
@@ -116,19 +116,11 @@ Branch = function() {
 	this._queue = task_queue();
 
 	var storageMethods = [ ];
-	if (CORDOVA_BUILD) {
-		storageMethods = [ 'local' ];
+	if (utils.mobileUserAgent()) {
+		storageMethods = [ 'local', 'permcookie' ];
 	}
-	else if (TITANIUM_BUILD) {
-		storageMethods = [ 'titanium' ];
-	}
-	else if (WEB_BUILD) {
-		if (utils.mobileUserAgent()) {
-			storageMethods = [ 'local', 'permcookie' ];
-		}
-		else {
-			storageMethods = [ 'session', 'cookie' ];
-		}
+	else {
+		storageMethods = [ 'session', 'cookie' ];
 	}
 	storageMethods.push('pojo');
 
@@ -141,17 +133,7 @@ Branch = function() {
 	/** @type {Array<utils.listener>} */
 	this._listeners = [ ];
 
-	if (CORDOVA_BUILD) {
-		sdk = 'cordova';
-	}
-	if (TITANIUM_BUILD) {
-		sdk = 'titanium';
-	}
 	this.sdk = sdk + config.version;
-
-	if (CORDOVA_BUILD || TITANIUM_BUILD) {
-		this.debug = false;
-	}
 
 	this.init_state = init_states.NO_INIT;
 };
@@ -188,20 +170,10 @@ Branch.prototype._api = function(resource, obj, callback) {
 		obj['sdk'] = this.sdk;
 	}
 
-	if (CORDOVA_BUILD || TITANIUM_BUILD) {
-		if (((resource.params && resource.params['device_fingerprint_id']) ||
-				(resource.queryPart && resource.queryPart['device_fingerprint_id'])) &&
-				this.device_fingerprint_id) {
-			obj['device_fingerprint_id'] = this.device_fingerprint_id;
-		}
-	}
-
-	if (WEB_BUILD) {
-		if (((resource.params && resource.params['browser_fingerprint_id']) ||
-				(resource.queryPart && resource.queryPart['browser_fingerprint_id'])) &&
-				this.browser_fingerprint_id) {
-			obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
-		}
+	if (((resource.params && resource.params['browser_fingerprint_id']) ||
+			(resource.queryPart && resource.queryPart['browser_fingerprint_id'])) &&
+			this.browser_fingerprint_id) {
+		obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
@@ -239,33 +211,12 @@ Branch.prototype._publishEvent = function(event) {
 	}
 };
 
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-	/** =CORDOVA
-	 * @function Branch.setDebug
-	 * @param {boolean} debug - _required_ - Set the SDK debug flag.
-	 *
-	 * Setting the SDK debug flag will generate a new device ID each time the app is installed
-	 * instead of possibly using the same device id.  This is useful when testing.
-	 *
-	 * This needs to be set before the Branch.init call!!!
-	 *
-	 * ___
-	 *
-	 */
-	Branch.prototype['setDebug'] = function(debug) {
-		this.debug = debug;
-	};
-}
-
 /**
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
- * @param {{isReferrable:?boolean}=} options - _optional_ - { *isReferrable*: _Is this a referrable session_ }.
+ * @param {{ }=} options - _optional_ - { }.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
  * session data.
- *
- * THE "isReferrable" OPTION IS ONLY USED IN THE CORDOVA/PHONEGAP PLUGIN
- * AND THE TITANIUM MODULE
  *
  * Adding the Branch script to your page automatically creates a window.branch
  * object with all the external methods described below. All calls made to
@@ -325,15 +276,7 @@ Branch.prototype['init'] = wrap(
 			self.app_id = branch_key;
 		}
 
-		options = (options && typeof options === 'function') ?
-			{
-				"isReferrable": null
-			} :
-			options;
-
-		if (TITANIUM_BUILD && Ti.Platform.osname === 'android') {
-			self.keepAlive = true;
-		}
+		options = (options && typeof options === 'function') ? { } : options;
 
 		var setBranchValues = function(data) {
 			if (data['session_id']) {
@@ -352,44 +295,28 @@ Branch.prototype['init'] = wrap(
 				data['click_id'] = utils.clickIdFromLink(data['referring_link']);
 			}
 
-			if (CORDOVA_BUILD || TITANIUM_BUILD) {
-				self.device_fingerprint_id = data['device_fingerprint_id'];
-				if (data['link_click_id']) {
-					self.link_click_id = data['link_click_id'];
-				}
-			}
-			if (WEB_BUILD) {
-				self.browser_fingerprint_id = data['browser_fingerprint_id'];
-			}
+			self.browser_fingerprint_id = data['browser_fingerprint_id'];
+
 			return data;
 		};
 
-		var isReferrable = (options &&
-				typeof options.isReferrable !== 'undefined' &&
-				options.isReferrable !== null) ?
-			options.isReferrable :
-			null;
 		var sessionData = session.get(self._storage);
 		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
 			options.url :
 			null;
-		var link_identifier = WEB_BUILD ?
-			(utils.getParamValue('_branch_match_id') || utils.hashValue('r')) :
-			(url ? utils.getParamValue(url) : null);
+		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
 		var checkHasApp = function(sessionData, cb) {
-			if (WEB_BUILD) {
-				self._api(
-					resources._r,
-					{ "sdk": config.version },
-					function(err, browser_fingerprint_id) {
-						if (browser_fingerprint_id) {
-							currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
-						}
+			self._api(
+				resources._r,
+				{ "sdk": config.version },
+				function(err, browser_fingerprint_id) {
+					if (browser_fingerprint_id) {
+						currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
 					}
-				);
-			}
+				}
+			);
 			var currentSessionData = sessionData || session.get(self._storage) || {};
 			self._api(
 				resources.hasApp,
@@ -417,16 +344,6 @@ Branch.prototype['init'] = wrap(
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
-			}
-
-			// Keep android titanium from calling close
-			if (self.keepAlive) {
-				setTimeout(
-					function() {
-						self.keepAlive = false;
-					},
-					2000
-				);
 			}
 			done(err, data && utils.whiteListSessionData(data));
 		};
@@ -459,93 +376,36 @@ Branch.prototype['init'] = wrap(
 			}
 		};
 
-		if (WEB_BUILD && sessionData && sessionData['session_id'] && !link_identifier) {
+		if (sessionData && sessionData['session_id'] && !link_identifier) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
 			return;
 		}
 
-		if (WEB_BUILD) {
-
-			self._api(
-				resources._r,
-				{ "sdk": config.version },
-				function(err, browser_fingerprint_id) {
-					if (err) {
-						return finishInit(err, null);
-					}
-					self._api(
-						resources.open,
-						{
-							"link_identifier": link_identifier,
-							"is_referrable": 1,
-							"browser_fingerprint_id": browser_fingerprint_id
-						},
-						function(err, data) {
-							if (data && link_identifier) {
-								data['click_id'] = link_identifier;
-							}
-							attachVisibilityEvent();
-							finishInit(err, data);
+		self._api(
+			resources._r,
+			{ "sdk": config.version },
+			function(err, browser_fingerprint_id) {
+				if (err) {
+					return finishInit(err, null);
+				}
+				self._api(
+					resources.open,
+					{
+						"link_identifier": link_identifier,
+						"is_referrable": 1,
+						"browser_fingerprint_id": browser_fingerprint_id
+					},
+					function(err, data) {
+						if (data && link_identifier) {
+							data['click_id'] = link_identifier;
 						}
-					);
-				}
-			);
-			return;
-		}
-
-		var apiCordovaTitanium = function(data) {
-			if (!freshInstall) {
-				data['identity_id'] = sessionData['identity_id'];
-				data['device_fingerprint_id'] = sessionData['device_fingerprint_id'];
-			}
-			self._api(
-				freshInstall ? resources.install : resources.open,
-				data,
-				function(err, data) {
-					finishInit(err, data);
-				}
-			);
-		};
-
-		if (CORDOVA_BUILD) {
-			var args = [ ];
-			if (isReferrable !== null) {
-				args.push(isReferrable ? 1 : 0);
-			}
-			if (freshInstall) {
-				// 'debug' is the first argument to getInstallData, but is not used in getOpenData
-				args.unshift(self.debug);
-			}
-			cordova.require('cordova/exec')(
-				apiCordovaTitanium,
-				function() {
-					done('Error getting device data!');
-				},
-				'BranchDevice',
-				freshInstall ? 'getInstallData' : 'getOpenData',
-				args
-			);
-		}
-		else if (TITANIUM_BUILD) {
-			var data = { };
-			var branchTitaniumSDK = require('io.branch.sdk');
-			if (link_identifier) {
-				data['link_identifier'] = link_identifier;
-			}
-			if (freshInstall) {
-				data = branchTitaniumSDK.getInstallData(
-					self.debug,
-					(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
+						attachVisibilityEvent();
+						finishInit(err, data);
+					}
 				);
 			}
-			else {
-				data = branchTitaniumSDK.getOpenData(
-					(isReferrable === null) ? -1 : (isReferrable ? 1 : 0)
-				);
-			}
-			apiCordovaTitanium(data);
-		}
+		);
 	},
 	true
 );
@@ -708,47 +568,6 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 });
 
 
-if (CORDOVA_BUILD || TITANIUM_BUILD) {
-	/** =CORDOVA
-	 * @function Branch.close
-	 * @param {function(?Error)=} callback - _optional_
-	 *
-	 * Close the current session.
-	 *
-	 * ##### Usage
-	 * ```js
-	 * branch.close(
-	 *     callback (err)
-	 * );
-	 * ```
-	 *
-	 * ##### Callback Format
-	 * ```js
-	 * callback(
-	 *      "Error message"
-	 * );
-	 * ```
-	 * ___
-	 *
-	 * ## Tracking events
-	 *
-	 */
-	/*** +TOC_ITEM #closecallback &.close()& ^CORDOVA ***/
-	Branch.prototype['close'] = wrap(callback_params.CALLBACK_ERR, function(done) {
-		var self = this;
-		if (this.keepAlive) {
-			return done(null);
-		}
-		this._api(resources.close, { }, function(err, data) {
-			delete self.session_id;
-			delete self.sessionLink;
-			self.init_state = init_states.NO_INIT;
-			self._storage.clear();
-			done(null);
-		});
-	});
-}
-
 /**
  * @function Branch.track
  * @param {string} event - _required_ - name of the event to be tracked.
@@ -786,22 +605,14 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		metadata = { };
 	}
 
-	if (!TITANIUM_BUILD) {
-		this._api(resources.event, {
-			"event": event,
-			"metadata": utils.merge({
-				"url": document.URL,
-				"user_agent": navigator.userAgent,
-				"language": navigator.language
-			}, metadata || {})
-		}, done);
-	}
-	else {
-		this._api(resources.event, {
-			"event": event,
-			"metadata": metadata || {}
-		}, done);
-	}
+	this._api(resources.event, {
+		"event": event,
+		"metadata": utils.merge({
+			"url": document.URL,
+			"user_agent": navigator.userAgent,
+			"language": navigator.language
+		}, metadata || {})
+	}, done);
 });
 
 /**
@@ -1587,277 +1398,275 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 	);
 });
 
-if (WEB_BUILD) {
-	/** =WEB
-	 * @function Branch.addListener
-	 * @param {String} event - _optional_ - Specify which events you would like to listen for. If
-	 * not defined, the observer will recieve all events.
-	 * @param {function(String)} listener - _required_ - Listeneing function that will recieves an
-	 * event as a string.
-	 *
-	 * The Branch Web SDK includes a simple event listener, that currently only publishes events for
-	 * `Branch.banner()` events.
-	 * Future development will include the ability to subscribe to events related to all other Web
-	 * SDK functionality.
-	 *
-	 * ##### Example
-	 *
-	 * ```js
-	 * var listener = function(event) { console.log(event); }
-	 *
-	 * // Specify an event to listen for
-	 * branch.addListener('willShowBanner', listener);
-	 *
-	 * // Listen for all events
-	 * branch.addListener(listener);
-	 * ```
-	 *
-	 * #### Available `Branch.banner()` Events:
-	 * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
-	 * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
-	 *      events will be emitted.
-	 * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
-	 * - *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
-	 * - *didCloseBanner*: Smart banner close animation started, and is closing.
-	 * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
-	 * - *sendBannerSMSError*: `sendSMS()` error returned.
-	 * - *didSendBannerSMS*: SMS successfully sent.
-	 * - *didDownloadApp*: User installed app, and banner text updated.
-	 *
-	 */
-	/*** +TOC_HEADING &Event Listener& ^WEB ***/
-	/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
-	Branch.prototype['addListener'] = function(event, listener) {
-		if (typeof event === 'function' && listener === undefined) {
-			listener = event;
-		}
-		if (listener) {
-			this._listeners.push({
-				listener: listener,
-				event: event || null
-			});
-		}
+/** =WEB
+ * @function Branch.addListener
+ * @param {String} event - _optional_ - Specify which events you would like to listen for. If
+ * not defined, the observer will recieve all events.
+ * @param {function(String)} listener - _required_ - Listeneing function that will recieves an
+ * event as a string.
+ *
+ * The Branch Web SDK includes a simple event listener, that currently only publishes events for
+ * `Branch.banner()` events.
+ * Future development will include the ability to subscribe to events related to all other Web
+ * SDK functionality.
+ *
+ * ##### Example
+ *
+ * ```js
+ * var listener = function(event) { console.log(event); }
+ *
+ * // Specify an event to listen for
+ * branch.addListener('willShowBanner', listener);
+ *
+ * // Listen for all events
+ * branch.addListener(listener);
+ * ```
+ *
+ * #### Available `Branch.banner()` Events:
+ * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
+ * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
+ *      events will be emitted.
+ * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
+ * - *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
+ * - *didCloseBanner*: Smart banner close animation started, and is closing.
+ * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
+ * - *sendBannerSMSError*: `sendSMS()` error returned.
+ * - *didSendBannerSMS*: SMS successfully sent.
+ * - *didDownloadApp*: User installed app, and banner text updated.
+ *
+ */
+/*** +TOC_HEADING &Event Listener& ^WEB ***/
+/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
+Branch.prototype['addListener'] = function(event, listener) {
+	if (typeof event === 'function' && listener === undefined) {
+		listener = event;
+	}
+	if (listener) {
+		this._listeners.push({
+			listener: listener,
+			event: event || null
+		});
+	}
+};
+
+/** =WEB
+ * @function Branch.removeListener
+ * @param {function(String)} listener - _required_ - Reference to the listening function you
+ * would like to remove. *note*: this must be the same reference that was passed to
+ * `branch.addListener()`, not an identical clone of the function.
+ *
+ * Remove the listener from observations, if it is present. Not that this function must be
+ * passed a referrence to the _same_ function that was passed to `branch.addListener()`, not
+ * just an identical clone of the function.
+ *
+ */
+/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
+Branch.prototype['removeListener'] = function(listener) {
+	if (listener) {
+		this._listeners = this._listeners.filter(function(subscription) {
+			if (subscription.listener !== listener) {
+				return subscription;
+			}
+		});
+	}
+};
+
+/** =WEB
+ * @function Branch.banner
+ * @param {Object} options - _required_ - object of all the options to setup the banner
+ * @param {Object} data - _required_ - object of all link data, same as Branch.link()
+ *
+ * **[Formerly `appBanner()`](CHANGELOG.md)**
+ *
+ * Display a smart banner directing the user to your app through a Branch referral link.  The
+ * `data` param is the exact same as in `branch.link()`.
+ *
+ * *Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation
+ * of everything you can do!*
+ *
+ * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
+ * |------------------|----------------------|----------------------|
+ * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
+ *
+ * #### Usage
+ *
+ * ```js
+ * branch.banner(
+ *     options, // Banner options: See example for all available options
+ *     data // Data for link, same as Branch.link()
+ * );
+ * ```
+ *
+ * ##### Example
+ *
+ * ```js
+ * branch.banner({
+ *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+ *     title: 'Branch Demo App',
+ *     description: 'The Branch demo app!',
+ *     rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
+ *     reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
+ *     theme: 'light',                         // Overrides the default color theme of the banner. Possible values 'light' or 'dark'.
+ *     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
+ *     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
+ *     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
+ *     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
+ *     buttonBorderColor: null,                // Overrides the default button border color
+ *     buttonBackgroundColor: null,            // Overrides the default button background color
+ *     buttonFontColor: null,                  // Overrides the default button font color
+ *     buttonBorderColorHover: null,           // Overrides the default button border color during mouse over
+ *     buttonBackgroundColorHover: null,       // Overrides the default button background color during mouse over
+ *     buttonFontColorHover: null,             // Overrides the default button font color during mouse over
+ *     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
+ *     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
+ *     showAndroid: true,                      // Should the banner be shown on Android devices?
+ *     showBlackberry: true,                   // Should the banner be shown on Blackberry devices?
+ *     showWindowsPhone: true,                 // Should the banner be shown on Windows Phone devices?
+ *     showKindle: true,                       // Should the banner be shown on Kindle devices?
+ *     showDesktop: true,                      // Should the banner be shown on desktop devices?
+ *     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
+ *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
+ *     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
+ *     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
+ *     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
+ *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
+ *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
+ *     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
+ *     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
+ *
+ * }, {
+ *     tags: ['tag1', 'tag2'],
+ *     feature: 'dashboard',
+ *     stage: 'new user',
+ *     data: {
+ *         mydata: 'something',
+ *         foo: 'bar',
+ *         '$desktop_url': 'http://myappwebsite.com',
+ *         '$ios_url': 'http://myappwebsite.com/ios',
+ *         '$ipad_url': 'http://myappwebsite.com/ipad',
+ *         '$android_url': 'http://myappwebsite.com/android',
+ *         '$og_app_id': '12345',
+ *         '$og_title': 'My App',
+ *         '$og_description': 'My app\'s description.',
+ *         '$og_image_url': 'http://myappwebsite.com/image.png'
+ *     }
+ * });
+ * ```
+ * ___
+ *
+ * ### closeBanner()
+ *
+ * #### Closing the App Banner Programmatically
+ *
+ * The App Banner includes a close button the user can click, but you may want to close the
+ * banner with a timeout, or via some other user interaction with your web app. In this case,
+ * closing the banner is very simple by calling `Branch.closeBanner()`.
+ *
+ * ##### Usage
+ * ```js
+ * branch.closeBanner();
+ * ```
+ *
+ */
+/*** +TOC_HEADING &Smart Banner& ^WEB ***/
+/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
+Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
+	if (typeof options['showAgain'] === 'undefined' &&
+			typeof options['forgetHide'] !== 'undefined') {
+		options['showAgain'] = options['forgetHide'];
+	}
+	var bannerOptions = {
+		icon: options['icon'] || '',
+		title: options['title'] || '',
+		description: options['description'] || '',
+		reviewCount: (
+			typeof options['reviewCount'] === 'number' &&
+			options['reviewCount'] > 0 // force greater than 0
+		) ?
+			Math.floor(options['reviewCount']) : // force no decimal
+			null,
+		rating: (
+			typeof options['rating'] === 'number' &&
+			options['rating'] <= 5 &&
+			options['rating'] > 0
+		) ?
+			Math.round(options['rating'] * 2) / 2 : // force increments of .5
+			null,
+		openAppButtonText: options['openAppButtonText'] || 'View in app',
+		downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
+		sendLinkText: options['sendLinkText'] || 'Send Link',
+		phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
+		iframe: typeof options['iframe'] === 'undefined' ?
+			true :
+			options['iframe'],
+		showiOS: typeof options['showiOS'] === 'undefined' ?
+			true :
+			options['showiOS'],
+		showiPad: typeof options['showiPad'] === 'undefined' ?
+			true :
+			options['showiPad'],
+		showAndroid: typeof options['showAndroid'] === 'undefined' ?
+			true :
+			options['showAndroid'],
+		showBlackberry: typeof options['showBlackberry'] === 'undefined' ?
+			true :
+			options['showBlackberry'],
+		showWindowsPhone: typeof options['showWindowsPhone'] === 'undefined' ?
+			true :
+			options['showWindowsPhone'],
+		showKindle: typeof options['showKindle'] === 'undefined' ?
+			true :
+			options['showKindle'],
+		showDesktop: typeof options['showDesktop'] === 'undefined' ?
+			true :
+			options['showDesktop'],
+		disableHide: !!options['disableHide'],
+		forgetHide: typeof options['forgetHide'] === 'number' ?
+			options['forgetHide'] :
+			!!options['forgetHide'],
+		position: options['position'] || 'top',
+		customCSS: options['customCSS'] || '',
+		mobileSticky: typeof options['mobileSticky'] === 'undefined' ?
+			false :
+			options['mobileSticky'],
+		desktopSticky: typeof options['desktopSticky'] === 'undefined' ?
+			true :
+			options['desktopSticky'],
+		theme: (
+			typeof options['theme'] === 'string' &&
+			utils.bannerThemes.indexOf(options['theme']) > -1
+		) ?
+			options['theme'] :
+			utils.bannerThemes[0],
+		buttonBorderColor: options['buttonBorderColor'] || '',
+		buttonBackgroundColor: options['buttonBackgroundColor'] || '',
+		buttonFontColor: options['buttonFontColor'] || '',
+		buttonBorderColorHover: options['buttonBorderColorHover'] || '',
+		buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
+		buttonFontColorHover: options['buttonFontColorHover'] || '',
+		make_new_link: !!options['make_new_link'],
+		open_app: !!options['open_app']
 	};
 
-	/** =WEB
-	 * @function Branch.removeListener
-	 * @param {function(String)} listener - _required_ - Reference to the listening function you
-	 * would like to remove. *note*: this must be the same reference that was passed to
-	 * `branch.addListener()`, not an identical clone of the function.
-	 *
-	 * Remove the listener from observations, if it is present. Not that this function must be
-	 * passed a referrence to the _same_ function that was passed to `branch.addListener()`, not
-	 * just an identical clone of the function.
-	 *
-	 */
-	/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
-	Branch.prototype['removeListener'] = function(listener) {
-		if (listener) {
-			this._listeners = this._listeners.filter(function(subscription) {
-				if (subscription.listener !== listener) {
-					return subscription;
-				}
-			});
-		}
-	};
+	if (typeof options['showMobile'] !== 'undefined') {
+		bannerOptions.showiOS = options['showMobile'];
+		bannerOptions.showAndroid = options['showMobile'];
+		bannerOptions.showBlackberry = options['showMobile'];
+		bannerOptions.showWindowsPhone = options['showMobile'];
+		bannerOptions.showKindle = options['showMobile'];
+	}
 
-	/** =WEB
-	 * @function Branch.banner
-	 * @param {Object} options - _required_ - object of all the options to setup the banner
-	 * @param {Object} data - _required_ - object of all link data, same as Branch.link()
-	 *
-	 * **[Formerly `appBanner()`](CHANGELOG.md)**
-	 *
-	 * Display a smart banner directing the user to your app through a Branch referral link.  The
-	 * `data` param is the exact same as in `branch.link()`.
-	 *
-	 * *Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation
-	 * of everything you can do!*
-	 *
-	 * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
-	 * |------------------|----------------------|----------------------|
-	 * | ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
-	 *
-	 * #### Usage
-	 *
-	 * ```js
-	 * branch.banner(
-	 *     options, // Banner options: See example for all available options
-	 *     data // Data for link, same as Branch.link()
-	 * );
-	 * ```
-	 *
-	 * ##### Example
-	 *
-	 * ```js
-	 * branch.banner({
-	 *     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-	 *     title: 'Branch Demo App',
-	 *     description: 'The Branch demo app!',
-	 *     rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
-	 *     reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
-	 *     theme: 'light',                         // Overrides the default color theme of the banner. Possible values 'light' or 'dark'.
-	 *     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
-	 *     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
-	 *     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
-	 *     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-	 *     buttonBorderColor: null,                // Overrides the default button border color
-	 *     buttonBackgroundColor: null,            // Overrides the default button background color
-	 *     buttonFontColor: null,                  // Overrides the default button font color
-	 *     buttonBorderColorHover: null,           // Overrides the default button border color during mouse over
-	 *     buttonBackgroundColorHover: null,       // Overrides the default button background color during mouse over
-	 *     buttonFontColorHover: null,             // Overrides the default button font color during mouse over
-	 *     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
-	 *     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
-	 *     showAndroid: true,                      // Should the banner be shown on Android devices?
-	 *     showBlackberry: true,                   // Should the banner be shown on Blackberry devices?
-	 *     showWindowsPhone: true,                 // Should the banner be shown on Windows Phone devices?
-	 *     showKindle: true,                       // Should the banner be shown on Kindle devices?
-	 *     showDesktop: true,                      // Should the banner be shown on desktop devices?
-	 *     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
-	 *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
-	 *     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
-	 *     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
-	 *     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
-	 *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
-	 *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
-	 *     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
-	 *     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
-	 *
-	 * }, {
-	 *     tags: ['tag1', 'tag2'],
-	 *     feature: 'dashboard',
-	 *     stage: 'new user',
-	 *     data: {
-	 *         mydata: 'something',
-	 *         foo: 'bar',
-	 *         '$desktop_url': 'http://myappwebsite.com',
-	 *         '$ios_url': 'http://myappwebsite.com/ios',
-	 *         '$ipad_url': 'http://myappwebsite.com/ipad',
-	 *         '$android_url': 'http://myappwebsite.com/android',
-	 *         '$og_app_id': '12345',
-	 *         '$og_title': 'My App',
-	 *         '$og_description': 'My app\'s description.',
-	 *         '$og_image_url': 'http://myappwebsite.com/image.png'
-	 *     }
-	 * });
-	 * ```
-	 * ___
-	 *
-	 * ### closeBanner()
-	 *
-	 * #### Closing the App Banner Programmatically
-	 *
-	 * The App Banner includes a close button the user can click, but you may want to close the
-	 * banner with a timeout, or via some other user interaction with your web app. In this case,
-	 * closing the banner is very simple by calling `Branch.closeBanner()`.
-	 *
-	 * ##### Usage
-	 * ```js
-	 * branch.closeBanner();
-	 * ```
-	 *
-	 */
-	/*** +TOC_HEADING &Smart Banner& ^WEB ***/
-	/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
-	Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
-		if (typeof options['showAgain'] === 'undefined' &&
-				typeof options['forgetHide'] !== 'undefined') {
-			options['showAgain'] = options['forgetHide'];
-		}
-		var bannerOptions = {
-			icon: options['icon'] || '',
-			title: options['title'] || '',
-			description: options['description'] || '',
-			reviewCount: (
-				typeof options['reviewCount'] === 'number' &&
-				options['reviewCount'] > 0 // force greater than 0
-			) ?
-				Math.floor(options['reviewCount']) : // force no decimal
-				null,
-			rating: (
-				typeof options['rating'] === 'number' &&
-				options['rating'] <= 5 &&
-				options['rating'] > 0
-			) ?
-				Math.round(options['rating'] * 2) / 2 : // force increments of .5
-				null,
-			openAppButtonText: options['openAppButtonText'] || 'View in app',
-			downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
-			sendLinkText: options['sendLinkText'] || 'Send Link',
-			phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
-			iframe: typeof options['iframe'] === 'undefined' ?
-				true :
-				options['iframe'],
-			showiOS: typeof options['showiOS'] === 'undefined' ?
-				true :
-				options['showiOS'],
-			showiPad: typeof options['showiPad'] === 'undefined' ?
-				true :
-				options['showiPad'],
-			showAndroid: typeof options['showAndroid'] === 'undefined' ?
-				true :
-				options['showAndroid'],
-			showBlackberry: typeof options['showBlackberry'] === 'undefined' ?
-				true :
-				options['showBlackberry'],
-			showWindowsPhone: typeof options['showWindowsPhone'] === 'undefined' ?
-				true :
-				options['showWindowsPhone'],
-			showKindle: typeof options['showKindle'] === 'undefined' ?
-				true :
-				options['showKindle'],
-			showDesktop: typeof options['showDesktop'] === 'undefined' ?
-				true :
-				options['showDesktop'],
-			disableHide: !!options['disableHide'],
-			forgetHide: typeof options['forgetHide'] === 'number' ?
-				options['forgetHide'] :
-				!!options['forgetHide'],
-			position: options['position'] || 'top',
-			customCSS: options['customCSS'] || '',
-			mobileSticky: typeof options['mobileSticky'] === 'undefined' ?
-				false :
-				options['mobileSticky'],
-			desktopSticky: typeof options['desktopSticky'] === 'undefined' ?
-				true :
-				options['desktopSticky'],
-			theme: (
-				typeof options['theme'] === 'string' &&
-				utils.bannerThemes.indexOf(options['theme']) > -1
-			) ?
-				options['theme'] :
-				utils.bannerThemes[0],
-			buttonBorderColor: options['buttonBorderColor'] || '',
-			buttonBackgroundColor: options['buttonBackgroundColor'] || '',
-			buttonFontColor: options['buttonFontColor'] || '',
-			buttonBorderColorHover: options['buttonBorderColorHover'] || '',
-			buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
-			buttonFontColorHover: options['buttonFontColorHover'] || '',
-			make_new_link: !!options['make_new_link'],
-			open_app: !!options['open_app']
-		};
+	this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
+	done();
+});
 
-		if (typeof options['showMobile'] !== 'undefined') {
-			bannerOptions.showiOS = options['showMobile'];
-			bannerOptions.showAndroid = options['showMobile'];
-			bannerOptions.showBlackberry = options['showMobile'];
-			bannerOptions.showWindowsPhone = options['showMobile'];
-			bannerOptions.showKindle = options['showMobile'];
-		}
-
-		this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
-		done();
-	});
-
-	Branch.prototype['closeBanner'] = wrap(0, function(done) {
-		if (this.closeBannerPointer) {
-			var self = this;
-			this._publishEvent("willCloseBanner");
-			this.closeBannerPointer(function() {
-				self._publishEvent("didCloseBanner");
-			});
-		}
-		done();
-	});
-}
+Branch.prototype['closeBanner'] = wrap(0, function(done) {
+	if (this.closeBannerPointer) {
+		var self = this;
+		this._publishEvent("willCloseBanner");
+		this.closeBannerPointer(function() {
+			self._publishEvent("didCloseBanner");
+		});
+	}
+	done();
+});

@@ -27,40 +27,10 @@ var sessionStorage = {
 // Used in Cordova
 var require = function(module) {};
 
-// We need localStorage in the cordova version of the code
 var localStorage = {
 	clear: function() {},
 	getItem: function() {},
 	removeItem: function() {},
 	setItem: function() {}
-};
-
-// Handle the cordova calls, in particular the cordova.plugin.getInstallData and cordova.plugin.getOpenData used in init.
-var cordova = {
-	plugins: {
-		branch_device: {
-			getInstallData: function() {},
-			getOpenData: function() {}
-		}
-	}
-};
-
-// Titanium calls
-var getOpenData = function() {};
-var getInstallData = function() {};
-
-var Ti = {
-	App: {
-		Properties: {
-			getString: function() {},
-			setString: function() {}
-		}
-	},
-	Network: {
-		createHTTPClient: function() {}
-	},
-	Platform: {
-		osname: ""
-	}
 };
 
