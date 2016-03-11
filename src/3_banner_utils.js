@@ -196,42 +196,41 @@ banner_utils.shouldAppend = function(storage, options) {
 		}
 	}
 
-	return !Array.prototype.some.call(options.bannerRules, function(rule) {
+	function checkRule(rule) {
 		// by default, if a rule is not recognized, we do not fail
 		var valid = true;
-
-		// the first operand is a system value, the second operand is
-		// passed by the developer
-		var op1 = findOperand(rule.operand1);
-		var op2 = rule.operand2;
 
 		// we are using strings so that we can have more advanced operators
 		// in the future
 		switch (rule.operator) {
+			case '||':
+				valid = checkRule(rule.operand1) || checkRule(rule.operand2);
+				break;
 			case '===':
-				valid = op1 === op2;
+				valid = findOperand(rule.operand1) === rule.operand2;
 				break;
 			case '!==':
-				valid = op1 !== op2;
+				valid = findOperand(rule.operand1) !== rule.operand2;
 				break;
 			case '>':
-				valid = op1 > op2;
+				valid = findOperand(rule.operand1) > rule.operand2;
 				break;
 			case '>=':
-				valid = op1 >= op2;
+				valid = findOperand(rule.operand1) >= rule.operand2;
 				break;
 			case '<':
-				valid = op1 < op2;
+				valid = findOperand(rule.operand1) < rule.operand2;
 				break;
 			case '<=':
-				valid = op1 <= op2;
+				valid = findOperand(rule.operand1) <= rule.operand2;
 				break;
 			default:
 				// pass
 				break;
 		}
 
-		// for 'some()' to work, we return true only on failure
-		return !valid;
-	});
+		return valid;
+	}
+
+	return Array.prototype.every.call(options.bannerRules, checkRule);
 };

@@ -1036,13 +1036,13 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, d) {
-    "undefined" === typeof d && (d = {});
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+    "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
-      return d.branch_key = b.branch_key, d;
+      return c.branch_key = b.branch_key, c;
     }
     if (b.app_id && f.test(b.app_id)) {
-      return d.app_id = b.app_id, d;
+      return c.app_id = b.app_id, c;
     }
     throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
@@ -1265,38 +1265,42 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
         return null;
     }
   }
-  var d = a.get("hideBanner", !0);
-  try {
-    "string" === typeof d && (d = safejson.parse(d));
-  } catch (f) {
-    d = !1;
-  }
-  var d = "number" === typeof d ? new Date >= new Date(d) : !d, e = b.forgetHide;
-  "number" === typeof e && (e = !1);
-  return document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || !d && !e || !(b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" === utils.mobileUserAgent() || b.showiPad && "ipad" === utils.mobileUserAgent() || b.showiOS && "ios" === utils.mobileUserAgent() || b.showBlackberry && "blackberry" === utils.mobileUserAgent() || b.showWindowsPhone && "windows_phone" === utils.mobileUserAgent() || b.showKindle && "kindle" === utils.mobileUserAgent()) ? 
-  !1 : b.bannerRules ? !Array.prototype.some.call(b.bannerRules, function(a) {
-    var b = !0, d = c(a.operand1), e = a.operand2;
+  function d(a) {
+    var b = !0;
     switch(a.operator) {
+      case "||":
+        b = d(a.operand1) || d(a.operand2);
+        break;
       case "===":
-        b = d === e;
+        b = c(a.operand1) === a.operand2;
         break;
       case "!==":
-        b = d !== e;
+        b = c(a.operand1) !== a.operand2;
         break;
       case ">":
-        b = d > e;
+        b = c(a.operand1) > a.operand2;
         break;
       case ">=":
-        b = d >= e;
+        b = c(a.operand1) >= a.operand2;
         break;
       case "<":
-        b = d < e;
+        b = c(a.operand1) < a.operand2;
         break;
       case "<=":
-        b = d <= e;
+        b = c(a.operand1) <= a.operand2;
     }
-    return !b;
-  }) : !0;
+    return b;
+  }
+  var e = a.get("hideBanner", !0);
+  try {
+    "string" === typeof e && (e = safejson.parse(e));
+  } catch (g) {
+    e = !1;
+  }
+  var e = "number" === typeof e ? new Date >= new Date(e) : !e, f = b.forgetHide;
+  "number" === typeof f && (f = !1);
+  return document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || !e && !f || !(b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" === utils.mobileUserAgent() || b.showiPad && "ipad" === utils.mobileUserAgent() || b.showiOS && "ios" === utils.mobileUserAgent() || b.showBlackberry && "blackberry" === utils.mobileUserAgent() || b.showWindowsPhone && "windows_phone" === utils.mobileUserAgent() || b.showKindle && "kindle" === utils.mobileUserAgent()) ? 
+  !1 : b.bannerRules ? Array.prototype.every.call(b.bannerRules, d) : !0;
 }};
 // Input 12
 var banner_css = {banner:function(a) {
@@ -1471,12 +1475,12 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, d) {
+      var h = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
           }
-          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, d);
+          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
         } finally {
           g();
         }
