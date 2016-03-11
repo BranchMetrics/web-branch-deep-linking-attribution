@@ -1,7 +1,7 @@
 /**
  * A custom storage abstraction class that implements:
- * sessionStorage, localStorage, cookies, titanium storage,
- * and a plain old javascript object as a fallback
+ * sessionStorage, localStorage, cookies, and a plain
+ * old javascript object as a fallback
  */
 'use strict';
 
@@ -10,7 +10,7 @@ goog.provide('storage');
 goog.require('goog.json');
 goog.require('utils');
 
-/*globals Ti, TITANIUM_BUILD */
+/*globals Ti */
 
 var COOKIE_MS = 365 * 24 * 60 * 60 * 1000;
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
@@ -18,12 +18,6 @@ var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 /** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)),
  * remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
-
-if (TITANIUM_BUILD) {
-	/** @typedef {{listProperties: function(), setString: function({string}, {string}),
-	 * getString: function({string})}}*/
-	Ti.App.Properties; // jshint ignore:line
-}
 
 /**
  * @class BranchStorage
@@ -232,47 +226,5 @@ BranchStorage.prototype['pojo'] = {
 	},
 	isEnabled: function() {
 		return true;
-	}
-};
-
-/** @type storage */
-BranchStorage.prototype['titanium'] = {
-	getAll: function() {
-		var returnObject = { };
-		var props = Ti.App.Properties.listProperties();
-		for (var i = 0; i < props.length; i++) {
-			if (props[i].indexOf(BRANCH_KEY_PREFIX) !== -1) {
-				returnObject[props[i]] = retrieveValue(Ti.App.Properties.getString(props[i]));
-			}
-		}
-		return returnObject;
-	},
-	get: function(key) {
-		retrieveValue(Ti.App.Properties.getString(prefix(key)));
-	},
-	set: function(key, value) {
-		Ti.App.Properties.setString(prefix(key), value);
-	},
-	remove: function(key) {
-		Ti.App.Properties.setString(prefix(key), '');
-	},
-	clear: function() {
-		/** @lends {Array} */
-		var props = Ti.App.Properties.listProperties();
-		for (var i = 0; i < props.length; i++) {
-			if (props[i].indexOf(BRANCH_KEY_PREFIX) !== -1) {
-				Ti.App.Properties.setString(props[i], '');
-			}
-		}
-	},
-	isEnabled: function() {
-		try {
-			Ti.App.Properties.setString('test', '');
-			Ti.App.Properties.getString('test');
-			return true;
-		}
-		catch (err) {
-			return false;
-		}
 	}
 };
