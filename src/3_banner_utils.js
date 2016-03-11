@@ -202,27 +202,27 @@ banner_utils.shouldAppend = function(storage, options) {
 
 		// we are using strings so that we can have more advanced operators
 		// in the future
-		switch (rule.operator) {
+		switch (rule['operator']) {
 			case '||':
-				valid = checkRule(rule.operand1) || checkRule(rule.operand2);
+				valid = checkRule(rule['operand1']) || checkRule(rule['operand2']);
 				break;
 			case '===':
-				valid = findOperand(rule.operand1) === rule.operand2;
+				valid = findOperand(rule['operand1']) === rule['operand2'];
 				break;
 			case '!==':
-				valid = findOperand(rule.operand1) !== rule.operand2;
+				valid = findOperand(rule['operand1']) !== rule['operand2'];
 				break;
 			case '>':
-				valid = findOperand(rule.operand1) > rule.operand2;
+				valid = findOperand(rule['operand1']) > rule['operand2'];
 				break;
 			case '>=':
-				valid = findOperand(rule.operand1) >= rule.operand2;
+				valid = findOperand(rule['operand1']) >= rule['operand2'];
 				break;
 			case '<':
-				valid = findOperand(rule.operand1) < rule.operand2;
+				valid = findOperand(rule['operand1']) < rule['operand2'];
 				break;
 			case '<=':
-				valid = findOperand(rule.operand1) <= rule.operand2;
+				valid = findOperand(rule['operand1']) <= rule['operand2'];
 				break;
 			default:
 				// pass
