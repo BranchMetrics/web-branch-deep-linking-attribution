@@ -944,9 +944,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	if (options['open_app'] || options['open_app'] === null || typeof options['open_app'] === 'undefined') {
 		cleanedData['open_app'] = true;
 	}
-	if (options['append_deeplink_path'] || options['append_deeplink_path'] === null || typeof options['append_deeplink_path'] === 'undefined') {
-		cleanedData['append_deeplink_path'] = true;
-	}
+	cleanedData['append_deeplink_path'] = !!options['append_deeplink_path'];
 
 	var referringLink = self._referringLink();
 	if (referringLink && !options['make_new_link']) {
