@@ -1,5 +1,6 @@
 var request = require('request');
 
+//https://wiki.saucelabs.com/display/DOCS/Platform+Configurator#/
 var safari_browsers = [
 	{
 		browserName: 'safari',
@@ -47,10 +48,36 @@ var firefox_browsers = [
 var ios_browsers = [
 	{
 		browserName: 'iphone',
-		deviceName: 'iPhone Simulator',
+		deviceName: 'iPhone 5',
+		deviceOrientation: 'portrait'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
 		deviceOrientation: 'portrait',
 		platform: 'OS X 10.10',
 		version: '8.4'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '9.0'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '9.1'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '9.2'
 	}
 ];
 
