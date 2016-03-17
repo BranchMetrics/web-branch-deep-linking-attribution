@@ -56,6 +56,34 @@ var ios_browsers = [
 		deviceName: 'iPhone 6',
 		deviceOrientation: 'portrait',
 		platform: 'OS X 10.10',
+		version: '8.0'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '8.1'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '8.2'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '8.3'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
 		version: '8.4'
 	},
 	{
