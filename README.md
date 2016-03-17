@@ -52,7 +52,7 @@ Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetri
 ___
 
 ## Contributing
-Whether you are an avid engineer, a partner, or a Branch employee, we activley welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
+Whether you are an avid engineer, a partner, or a Branch employee, we actively welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
 
 To build the Web SDK, you'll need to run `npm install` to grab the necessary packages, be sure you have [make](http://www.gnu.org/software/make/),
 [python](https://www.python.org/downloads/) (comes with Mac OSX), [perl](http://learn.perl.org/installing/osx.html),
