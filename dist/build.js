@@ -759,12 +759,19 @@ utils.whiteListSessionData = function(a) {
 };
 utils.cleanLinkData = function(a) {
   a.source = "web-sdk";
-  a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
+  var b = a.data || {};
+  b.$canonical_url || (b.$canonical_url = String(window.location));
+  b.$og_title || (b.$og_title = utils.scrapeOpenGraphContent("title"));
+  b.$og_description || (b.$og_description = utils.scrapeOpenGraphContent("description"));
+  b.$og_image_url || (b.$og_image_url = utils.scrapeOpenGraphContent("image"));
+  b.$og_video || (b.$og_video = utils.scrapeOpenGraphContent("video"));
+  "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
   try {
-    safejson.parse(a.data);
-  } catch (b) {
-    a.data = goog.json.serialize(a.data || {});
+    b = safejson.parse(b);
+  } catch (c) {
+    b = goog.json.serialize(b);
   }
+  a.data = b;
   return a;
 };
 utils.clickIdFromLink = function(a) {
@@ -825,6 +832,13 @@ utils.extractDeeplinkPath = function(a) {
   }
   -1 < a.indexOf("://") && (a = a.split("://")[1]);
   return a.substring(a.indexOf("/") + 1);
+};
+utils.scrapeOpenGraphContent = function(a, b) {
+  a = String(a);
+  b = b || null;
+  var c = document.querySelector('meta[property="og:' + a + '"]');
+  c && c.content && (b = c.content);
+  return b;
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -1572,9 +1586,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   if (c.open_app || null === c.open_app || "undefined" === typeof c.open_app) {
     b.open_app = !0;
   }
-  if (c.append_deeplink_path || null === c.append_deeplink_path || "undefined" === typeof c.append_deeplink_path) {
-    b.append_deeplink_path = !0;
-  }
+  b.append_deeplink_path = !!c.append_deeplink_path;
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
