@@ -158,10 +158,12 @@ utils.merge = function(to, from) {
  */
 utils.hashValue = function(key) {
 	try {
-		return utils.getLocationHash().match(new RegExp(key + ':([^&]*)'))[1];
+		var match = utils.getLocationHash().match(new RegExp(key + ':([^&]*)'));
+		if (match && match.length >= 1) {
+			return match[1];
+		}
 	}
 	catch (e) {
-		return undefined;
 	}
 };
 
@@ -205,10 +207,12 @@ utils.mobileUserAgent = function() {
  */
 utils.getParamValue = function(key) {
 	try {
-		return utils.getLocationSearch().substring(1).match(new RegExp(key + '=([^&]*)'))[1];
+		var match = utils.getLocationSearch().substring(1).match(new RegExp(key + '=([^&]*)'));
+		if (match && match.length >= 1) {
+			return match[1];
+		}
 	}
 	catch (e) {
-		return undefined;
 	}
 };
 
@@ -293,6 +297,27 @@ utils.base64encode = function(input) {
 	}
 	return output;
 };
+
+
+/**
+ * Add event listeners to elements, taking older browsers into account
+ */
+utils.addEvent = function(el, eventType, callback, useCapture) {
+	var ret = 0;
+
+	if (typeof el['addEventListener'] === 'function') {
+		ret = el['addEventListener'](eventType, callback, useCapture);
+	}
+	else if (typeof el['attachEvent'] === 'function') {
+		ret = el['attachEvent']('on' + eventType, callback);
+	}
+	else {
+		el['on' + eventType] = callback;
+	}
+
+	return ret;
+};
+
 
 /**
  * Extract the path (the part of the url excluding protocol and domain name) from urls in the forms

@@ -719,6 +719,12 @@ var safejson = {parse:function(a) {
   } catch (b) {
   }
   throw Error("Invalid JSON string: " + a);
+}, stringify:function(a) {
+  try {
+    return "object" === typeof JSON && "function" === typeof JSON.stringify ? JSON.stringify(a) : goog.json.serialize(a);
+  } catch (b) {
+  }
+  throw Error("Could not stringify object");
 }};
 // Input 4
 var task_queue = function() {
@@ -784,8 +790,11 @@ utils.merge = function(a, b) {
 };
 utils.hashValue = function(a) {
   try {
-    return utils.getLocationHash().match(new RegExp(a + ":([^&]*)"))[1];
-  } catch (b) {
+    var b = utils.getLocationHash().match(new RegExp(a + ":([^&]*)"));
+    if (b && 1 <= b.length) {
+      return b[1];
+    }
+  } catch (c) {
   }
 };
 utils.mobileUserAgent = function() {
@@ -794,8 +803,11 @@ utils.mobileUserAgent = function() {
 };
 utils.getParamValue = function(a) {
   try {
-    return utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"))[1];
-  } catch (b) {
+    var b = utils.getLocationSearch().substring(1).match(new RegExp(a + "=([^&]*)"));
+    if (b && 1 <= b.length) {
+      return b[1];
+    }
+  } catch (c) {
   }
 };
 utils.isKey = function(a) {
@@ -818,6 +830,11 @@ utils.base64encode = function(a) {
     ;
   }
   return b;
+};
+utils.addEvent = function(a, b, c, d) {
+  var e = 0;
+  "function" === typeof a.addEventListener ? e = a.addEventListener(b, c, d) : "function" === typeof a.attachEvent ? e = a.attachEvent("on" + b, c) : a["on" + b] = c;
+  return e;
 };
 utils.extractDeeplinkPath = function(a) {
   if (!a) {
@@ -1085,13 +1102,13 @@ Server.prototype.getUrl = function(a, b) {
   "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
   return {data:this.serializeObject(h, ""), url:e};
 };
-Server.prototype.createScript = function(a, b) {
-  var c = document.createElement("script");
-  c.type = "text/javascript";
-  c.async = !0;
-  c.src = a;
-  c.onerror = b;
-  document.getElementsByTagName("head")[0].appendChild(c);
+Server.prototype.createScript = function(a, b, c) {
+  var d = document.createElement("script");
+  d.type = "text/javascript";
+  d.async = !0;
+  d.src = a;
+  a = document.getElementsByTagName("head");
+  !a || 1 > a.length ? "function" === typeof b && b() : (a[0].appendChild(d), "function" === typeof b && utils.addEvent(d, "error", b), "function" === typeof c && utils.addEvent(d, "load", c));
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
@@ -1108,6 +1125,9 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   };
   this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, function() {
     d(Error(utils.messages.blockedByClient), null);
+  }, function() {
+    this.remove();
+    delete window[e];
   });
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e) {
@@ -1572,9 +1592,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   if (c.open_app || null === c.open_app || "undefined" === typeof c.open_app) {
     b.open_app = !0;
   }
-  if (c.append_deeplink_path || null === c.append_deeplink_path || "undefined" === typeof c.append_deeplink_path) {
-    b.append_deeplink_path = !0;
-  }
+  b.append_deeplink_path = !!c.append_deeplink_path;
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
