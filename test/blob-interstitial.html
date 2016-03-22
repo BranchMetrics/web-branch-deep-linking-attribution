@@ -291,11 +291,32 @@
                         </span>
                         </span>
                         </span><span class="review-count">1000</span></div>
-                    <div class="description">Branch Demo app!</div>
+                    <div class="description">Branch View Interstitial!</div>
                 </div>
             </div>
         </div>
     </div>
+<script type="text/javascript">
+
+(function (w, d) {
+    var btnClose = d.getElementById('branch-banner-close');
+    if (btnClose) {
+        btnClose.onclick = function(ev) {
+            w.location.href='branch-cta:\\cancel';
+            ev.preventDefault();
+        };
+    }
+
+    var btnAccept = d.getElementById('branch-mobile-action');
+    if (btnAccept) {
+        btnAccept.onclick = function(ev) {
+            w.location.href='branch-cta:\\accept';
+            ev.preventDefault();
+        };
+    }
+})(window, document);
+
+</script>
 </body>
 
 </html>
