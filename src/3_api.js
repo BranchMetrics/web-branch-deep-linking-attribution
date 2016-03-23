@@ -164,15 +164,27 @@ Server.prototype.getUrl = function(resource, data) {
  * This function is standalone for easy mocking.
  * @param {string} src
  */
-Server.prototype.createScript = function(src, onError) {
+Server.prototype.createScript = function(src, onError, onLoad) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.async = true;
 	script.src = src;
-	// This is not avaiable in all browsers
-	script.onerror = onError;
 
-	document.getElementsByTagName('head')[0].appendChild(script);
+	var heads = document.getElementsByTagName('head');
+	if (!heads || heads.length < 1) {
+		if (typeof onError === 'function') {
+			onError();
+		}
+		return;
+	}
+	heads[0].appendChild(script);
+
+	if (typeof onError === 'function') {
+		utils.addEvent(script, 'error', onError);
+	}
+	if (typeof onLoad === 'function') {
+		utils.addEvent(script, 'load', onLoad);
+	}
 };
 
 var jsonp_callback_index = 0;
@@ -206,10 +218,15 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 
 	this.createScript(
 		requestURL + (requestURL.indexOf('?') < 0 ? '?' : '') +
-		(postData ? postPrefix + postData : '') +
-		(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
-		'&callback=' + callbackString, function() {
+			(postData ? postPrefix + postData : '') +
+			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
+			'&callback=' + callbackString,
+		function onError() {
 			callback(new Error(utils.messages.blockedByClient), null);
+		},
+		function onLoad() {
+			this.remove();
+			delete window[callbackString];
 		});
 };
 
