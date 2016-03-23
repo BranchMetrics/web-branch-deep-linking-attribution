@@ -302,7 +302,7 @@
     var btnClose = d.getElementById('branch-banner-close');
     if (btnClose) {
         btnClose.onclick = function(ev) {
-            w.location.href='branch-cta:\\cancel';
+            w.location.href='branch-cta://cancel';
             ev.preventDefault();
         };
     }
@@ -310,7 +310,7 @@
     var btnAccept = d.getElementById('branch-mobile-action');
     if (btnAccept) {
         btnAccept.onclick = function(ev) {
-            w.location.href='branch-cta:\\accept';
+            w.location.href='branch-cta://accept';
             ev.preventDefault();
         };
     }
