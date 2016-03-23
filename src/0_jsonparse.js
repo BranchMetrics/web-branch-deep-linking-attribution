@@ -20,3 +20,14 @@ safejson.parse = function(sJSON) {
 	throw Error("Invalid JSON string: " + sJSON);
 };
 
+safejson.stringify = function(objJSON) {
+	try {
+		return (typeof JSON === 'object' && typeof JSON.stringify === 'function') ? JSON.stringify(objJSON) : goog.json.serialize(objJSON);
+	}
+	catch (e) {
+
+	}
+
+	throw Error("Could not stringify object");
+};
+
