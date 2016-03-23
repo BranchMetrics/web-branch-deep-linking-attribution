@@ -47,10 +47,24 @@ var firefox_browsers = [
 var ios_browsers = [
 	{
 		browserName: 'iphone',
-		deviceName: 'iPhone Simulator',
+		deviceName: 'iPhone 6',
 		deviceOrientation: 'portrait',
 		platform: 'OS X 10.10',
-		version: '8.4'
+		version: '9.0'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '9.1'
+	},
+	{
+		browserName: 'iphone',
+		deviceName: 'iPhone 6',
+		deviceOrientation: 'portrait',
+		platform: 'OS X 10.10',
+		version: '9.2'
 	}
 ];
 
