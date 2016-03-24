@@ -47,6 +47,8 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 
 If you use Bower or npm, you can run `bower install branch-sdk` or `npm install branch-sdk` respectively to get the SDK.
 
+You can get it with npm at [https://www.npmjs.com/package/branch-sdk](https://www.npmjs.com/package/branch-sdk).
+
 #### Common.JS and RequireJS compatibility
 
 In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
