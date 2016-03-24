@@ -16,6 +16,8 @@ The Branch Web SDK allows you to create and share links with a banner (web only)
 
 This SDK requires only native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as it is 100% native Javascript.
 
+If you use npm, you can run `npm install branch-sdk` to get the SDK.
+
 ### Browser Specific Support
 
 | Chrome | Firefox | Safari | IE |

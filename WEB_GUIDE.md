@@ -45,9 +45,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 
 #### Bower or npm installation
 
-If you use Bower or npm, you can run `bower install branch-sdk` or `npm install branch-sdk` respectively to get the SDK.
-
-You can get it with npm at [https://www.npmjs.com/package/branch-sdk](https://www.npmjs.com/package/branch-sdk).
+If you use npm, you can run `npm install branch-sdk` respectively to get the SDK.
 
 #### Common.JS and RequireJS compatibility
 
