@@ -1,5 +1,5 @@
 // Sauce labs magic, don't worry about it
-var onload = function() {
+function onload() {
 	var runner = mocha.run();
 
 	var failedTests = [];
