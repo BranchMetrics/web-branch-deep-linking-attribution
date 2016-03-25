@@ -22,6 +22,8 @@ goog.addDependency("../../../../../test/2_storage.js", [], ['storage']);
 goog.addDependency("../../../../../test/3_api.js", [], ['utils', 'Server', 'resources', 'storage', 'config']);
 goog.addDependency("../../../../../test/6_branch.js", [], ['utils', 'Branch', 'resources', 'config', 'storage', 'session', 'goog.json']);
 goog.addDependency("../../../../../test/7_integration.js", [], ['config', 'goog.json']);
+goog.addDependency("../../../../../test/blob-banner.js", [], []);
+goog.addDependency("../../../../../test/blob-interstitial.js", [], []);
 goog.addDependency("../../../../../test/saucelabs.js", [], []);
 goog.addDependency("../../../../../test/test-utils.js", [], []);
 goog.addDependency("../../../../../test/web-config.js", ['config'], []);

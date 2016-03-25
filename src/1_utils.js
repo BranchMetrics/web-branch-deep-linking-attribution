@@ -105,20 +105,66 @@ utils.whiteListSessionData = function(data) {
 	};
 };
 
+/**
+ * Abstract away the window.location for better testing
+ */
+utils.getWindowLocation = function() {
+	return String(window.location);
+};
+
 utils.cleanLinkData = function(linkData) {
 	linkData['source'] = 'web-sdk';
-	if (linkData['data'] && linkData['data']['$desktop_url'] !== undefined) {
-		linkData['data']['$desktop_url'] =
-			linkData['data']['$desktop_url']
+	var data = linkData['data'];
+
+	switch (typeof data) {
+		case 'string':
+			try {
+				data = safejson.parse(data);
+			}
+			catch (e) {
+				data = goog.json.parse(data);
+			}
+			break;
+		case 'object':
+			// do nothing:
+			break;
+		default:
+			data = {};
+			break;
+	}
+
+	if (!data['$canonical_url']) {
+		data['$canonical_url'] = utils.getWindowLocation();
+	}
+	if (!data['$og_title']) {
+		data['$og_title'] = utils.scrapeOpenGraphContent('title');
+	}
+	if (!data['$og_description']) {
+		data['$og_description'] = utils.scrapeOpenGraphContent('description');
+	}
+	if (!data['$og_image_url']) {
+		data['$og_image_url'] = utils.scrapeOpenGraphContent('image');
+	}
+	if (!data['$og_video']) {
+		data['$og_video'] = utils.scrapeOpenGraphContent('video');
+	}
+
+	if (typeof data['$desktop_url'] === 'string') {
+		data['$desktop_url'] =
+			data['$desktop_url']
 				.replace(/#r:[a-z0-9-_]+$/i, '')
 				.replace(/([\?\&]_branch_match_id=\d+)/, '');
 	}
+
 	try {
-		safejson.parse(linkData['data']);
+		safejson.parse(data);
 	}
 	catch (e) {
-		linkData['data'] = goog.json.serialize(linkData['data'] || {});
+		data = goog.json.serialize(data);
 	}
+
+	linkData['data'] = data;
+
 	return linkData;
 };
 
@@ -339,3 +385,22 @@ utils.extractDeeplinkPath = function(url) {
 	}
 	return url.substring(url.indexOf('/') + 1);
 };
+
+/**
+ * Search for a particular og tag by name, and return the content, if it exists. The optional
+ * parameter 'content' will be the default value used if the og tag is not found or cannot
+ * be parsed.
+ */
+utils.scrapeOpenGraphContent = function(property, content) {
+	property = String(property);
+	content = content || null;
+
+	var el = document.querySelector('meta[property="og:' + property + '"]');
+	if (el && el.content) {
+		content = el.content;
+	}
+
+	return content;
+};
+
+

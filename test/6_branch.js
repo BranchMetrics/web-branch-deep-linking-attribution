@@ -635,7 +635,9 @@ describe('Branch', function() {
 					'$desktop_url': 'https://cdn.branch.io/example.html',
 					'$og_title': 'Branch Metrics',
 					'$og_description': 'Branch Metrics',
-					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+					'$og_image_url': 'http://branch.io/img/logo_icon_white.png',
+					'$canonical_url': 'https://cdn.branch.io/example.html',
+					'$og_video': null
 				},
 				"sdk": "web" + config.version
 			});
@@ -827,8 +829,23 @@ describe('Branch', function() {
 			open_app: true,
 			append_deeplink_path: true
 		};
+		var windowLocation = 'http://someurl/pluspath';
+		var ogTitle = 'OGTitle';
+		var ogDescription = 'OGDescription';
+		var ogImage = 'OGImage';
+		var ogVideo = 'OGVideo';
+
 
 		beforeEach(function() {
+			sinon.stub(utils, 'getWindowLocation')
+				.returns(windowLocation);
+
+			sinon.stub(utils, 'scrapeOpenGraphContent')
+				.onCall(0).returns(ogTitle)
+				.onCall(1).returns(ogDescription)
+				.onCall(2).returns(ogImage)
+				.onCall(3).returns(ogVideo);
+
 			branch = initBranch(true);
 			requests = [];
 		});
@@ -837,10 +854,23 @@ describe('Branch', function() {
 			if (typeof branch._referringLink.restore === 'function') {
 				branch._referringLink.restore();
 			}
+
+			utils.scrapeOpenGraphContent.restore();
+			utils.getWindowLocation.restore();
 		});
 
 		it('should call v1/deepview endpoint with the right params', function(done) {
 			var assert = testUtils.plan(7, done);
+			var dataString = [
+				'{',
+				'"mydata":"bar",',
+				'"$canonical_url":"' + windowLocation + '",',
+				'"$og_title":"' + ogTitle + '",',
+				'"$og_description":"' + ogDescription + '",',
+				'"$og_image_url":"' + ogImage + '",',
+				'"$og_video":"' + ogVideo + '"',
+				'}'
+			].join('');
 
 			branch.deepview(
 				linkData,
@@ -854,7 +884,7 @@ describe('Branch', function() {
 			requests[0].callback();
 
 			var obj = requests[0].obj;
-			assert.strictEqual(obj.data, '{"mydata":"bar"}', 'data is sent');
+			assert.strictEqual(obj.data, dataString, 'data is sent');
 			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');
 			// assert.strictEqual(obj.append_deeplink_path,

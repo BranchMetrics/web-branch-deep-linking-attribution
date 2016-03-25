@@ -65,11 +65,42 @@ describe('utils', function() {
 	});
 
 	describe('cleanLinkData', function() {
+		var windowLocation = 'http://someurl/pluspath';
+		var ogTitle = 'OGTitle';
+		var ogDescription = 'OGDescription';
+		var ogImage = 'OGImage';
+		var ogVideo = 'OGVideo';
+
+		beforeEach(function() {
+			sinon.stub(utils, 'getWindowLocation')
+				.returns(windowLocation);
+
+			sinon.stub(utils, 'scrapeOpenGraphContent')
+				.onCall(0).returns(ogTitle)
+				.onCall(1).returns(ogDescription)
+				.onCall(2).returns(ogImage)
+				.onCall(3).returns(ogVideo);
+		});
+
+		afterEach(function() {
+			utils.scrapeOpenGraphContent.restore();
+			utils.getWindowLocation.restore();
+		});
+
 		it('should accept empty linkData', function() {
 			var linkData = { };
+			var dataString = [
+				'{',
+				'"$canonical_url":"' + windowLocation + '",',
+				'"$og_title":"' + ogTitle + '",',
+				'"$og_description":"' + ogDescription + '",',
+				'"$og_image_url":"' + ogImage + '",',
+				'"$og_video":"' + ogVideo + '"',
+				'}'
+			].join('');
 			var expectedCleanedLinkData = {
 				source: "web-sdk",
-				data: "{}"
+				data: dataString
 			};
 			assert.deepEqual(
 				utils.cleanLinkData(linkData),
@@ -89,8 +120,19 @@ describe('utils', function() {
 				"field 3": true,
 				field4: null
 			};
+			var dataString = [
+				'{',
+				'"subfield1":"bar",',
+				'"subfield2":false,',
+				'"$canonical_url":"' + windowLocation + '",',
+				'"$og_title":"' + ogTitle + '",',
+				'"$og_description":"' + ogDescription + '",',
+				'"$og_image_url":"' + ogImage + '",',
+				'"$og_video":"' + ogVideo + '"',
+				'}'
+			].join('');
 			var expectedCleanedLinkData = {
-				"data": '{"subfield1":"bar","subfield2":false}',
+				"data": dataString,
 				field1: 12345,
 				field2: "67890",
 				"field 3": true,
@@ -116,8 +158,19 @@ describe('utils', function() {
 				"field 3": true,
 				field4: null
 			};
+			var dataString = [
+				'{',
+				'"subfield1":"bar",',
+				'"subfield2":false,',
+				'"$canonical_url":"' + windowLocation + '",',
+				'"$og_title":"' + ogTitle + '",',
+				'"$og_description":"' + ogDescription + '",',
+				'"$og_image_url":"' + ogImage + '",',
+				'"$og_video":"' + ogVideo + '"',
+				'}'
+			].join('');
 			var expectedCleanedLinkData = {
-				"data": '{"subfield1":"bar","subfield2":false}',
+				"data": dataString,
 				field1: 12345,
 				field2: "67890",
 				"field 3": true,

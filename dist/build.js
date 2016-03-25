@@ -763,14 +763,37 @@ utils.message = function(a, b) {
 utils.whiteListSessionData = function(a) {
   return {data:a.data || null, data_parsed:a.data_parsed || null, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
+utils.getWindowLocation = function() {
+  return String(window.location);
+};
 utils.cleanLinkData = function(a) {
   a.source = "web-sdk";
-  a.data && void 0 !== a.data.$desktop_url && (a.data.$desktop_url = a.data.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
-  try {
-    safejson.parse(a.data);
-  } catch (b) {
-    a.data = goog.json.serialize(a.data || {});
+  var b = a.data;
+  switch(typeof b) {
+    case "string":
+      try {
+        b = safejson.parse(b);
+      } catch (c) {
+        b = goog.json.parse(b);
+      }
+      break;
+    case "object":
+      break;
+    default:
+      b = {};
   }
+  b.$canonical_url || (b.$canonical_url = utils.getWindowLocation());
+  b.$og_title || (b.$og_title = utils.scrapeOpenGraphContent("title"));
+  b.$og_description || (b.$og_description = utils.scrapeOpenGraphContent("description"));
+  b.$og_image_url || (b.$og_image_url = utils.scrapeOpenGraphContent("image"));
+  b.$og_video || (b.$og_video = utils.scrapeOpenGraphContent("video"));
+  "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
+  try {
+    safejson.parse(b);
+  } catch (c) {
+    b = goog.json.serialize(b);
+  }
+  a.data = b;
   return a;
 };
 utils.clickIdFromLink = function(a) {
@@ -842,6 +865,13 @@ utils.extractDeeplinkPath = function(a) {
   }
   -1 < a.indexOf("://") && (a = a.split("://")[1]);
   return a.substring(a.indexOf("/") + 1);
+};
+utils.scrapeOpenGraphContent = function(a, b) {
+  a = String(a);
+  b = b || null;
+  var c = document.querySelector('meta[property="og:' + a + '"]');
+  c && c.content && (b = c.content);
+  return b;
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
