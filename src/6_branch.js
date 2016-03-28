@@ -301,13 +301,14 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
+		var firstSessionData = session.get(self._first);
 		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
 			options.url :
 			null;
 		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
-		var checkHasApp = function(sessionData, cb) {
+		var checkHasApp = function(firstSessionData, cb) {
 			self._api(
 				resources._r,
 				{ "sdk": config.version },
