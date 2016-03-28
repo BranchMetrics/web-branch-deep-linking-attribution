@@ -122,9 +122,12 @@ banner = function(branch, options, linkData, storage) {
 		options['append_deeplink_path'] = options.append_deeplink_path;
 		options['make_new_link'] = options.make_new_link;
 		branch['deepview'](linkData, options);
-		doc.getElementById('branch-mobile-action').onclick = function() {
-			branch['deepviewCta']();
-		};
+		var ctaElement = doc.getElementById('branch-mobile-action');
+		if (ctaElement) {
+			ctaElement.onclick = function() {
+				branch['deepviewCta']();
+			};
+		}
 	}
 	else {
 		doc.getElementById('sms-form').addEventListener('submit', function(ev) {
