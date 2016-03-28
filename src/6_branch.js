@@ -1657,7 +1657,7 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		bannerOptions.showKindle = options['showMobile'];
 	}
 
-	this.setBranchViewData(data);
+	// this.setBranchViewData(data);
 	this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
 	done();
 });
