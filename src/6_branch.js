@@ -314,7 +314,7 @@ Branch.prototype['init'] = wrap(
 				{ "sdk": config.version },
 				function(err, browser_fingerprint_id) {
 					if (browser_fingerprint_id) {
-						currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
+						firstSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
 					}
 				}
 			);
