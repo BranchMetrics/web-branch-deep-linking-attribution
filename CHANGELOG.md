@@ -2,6 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+
 ## [v2.1.2] - 2016-03-29
 - Clean up script tags once a jsonp call completes
 - No longer forces append_deeplink_path to true
