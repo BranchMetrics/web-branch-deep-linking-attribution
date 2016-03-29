@@ -15,7 +15,8 @@ src/3_api.js src/3_banner_utils.js\
 src/4_banner_css.js src/4_banner_html.js\
 src/5_banner.js\
 src/6_branch.js\
-src/7_initialization.js
+src/7_initialization.js\
+src/branch_view.js
 
 EXTERN=src/extern.js
 

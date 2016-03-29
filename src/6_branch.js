@@ -14,6 +14,7 @@ goog.require('storage');
 goog.require('session');
 goog.require('config');
 goog.require('safejson');
+goog.require('branch_view');
 
 /*globals Ti, BranchStorage, require */
 
@@ -397,8 +398,13 @@ Branch.prototype['init'] = wrap(
 						"browser_fingerprint_id": browser_fingerprint_id
 					},
 					function(err, data) {
-						if (data && link_identifier) {
-							data['click_id'] = link_identifier;
+						if (!err && typeof data === 'object') {
+							if (data.hasOwnProperty('branch_view_data')) {
+								branch_view.handleBranchViewData(data['branch_view_data']);
+							}
+							if (link_identifier) {
+								data['click_id'] = link_identifier;
+							}
 						}
 						attachVisibilityEvent();
 						finishInit(err, data);
@@ -612,7 +618,14 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
 		}, metadata || {})
-	}, done);
+	}, function(err, data) {
+		if (!err && typeof data === 'object' && data.hasOwnProperty('branch_view_data')) {
+			branch_view.handleBranchViewData(data['branch_view_data']);
+		}
+		if (typeof done === 'function') {
+			done.apply(this, arguments);
+		}
+	});
 });
 
 /**
