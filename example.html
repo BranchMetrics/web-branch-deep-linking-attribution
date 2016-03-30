@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta content="http://branch.io/img/logo_icon_black.png" property="og:image" />
+	<meta content="Branch Metrics Web SDK Example App" property="og:title" />
+	<meta content="A basic example to demonstrate some of the ways that the Web SDK can be used" property="og:description" />
+	<title>Branch Metrics Web SDK Example App</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<style type="text/css">
+		.btn {
+			margin-top: 5px;
+		}
+		.example-input {
+			width: 125px;
+			display: inline-block;
+			margin-top: 5px;
+			vertical-align: middle;
+		}
+		.radio-input {
+			margin-right: 10px !important;
+			margin-left: 20px !important;
+		}
+		.row {
+			margin-bottom: 30px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row col-lg-8 col-lg-offset-2">
+			<h2>Branch Metrics Web SDK Example</h2>
+		</div>
+		<section>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Session Info</h4>
+				<pre class="info">Reading session from .init()...</pre>
+				<br>
+				<h4>Request</h4>
+				<pre class="request">Click a button!</pre>
+				<br>
+				<h4>Response</h4>
+				<pre class="response">Click a button!</pre>
+			</div>
+		</section>
+		<section>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h3>Methods</h3>
+				<hr>
+				<h4>Session and Identity</h4>
+				<div class="group">
+					<button id="init" class="btn btn-success">.init()</button>
+					<button id="data" class="btn btn-info">.data()</button>
+					<input class="example-input" type="text" id="identityID" class="form-control" placeholder="test@test.com">
+					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
+					<button id="logout" class="btn btn-info">.logout()</button>
+				</div>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Sharing and Tracking</h4>
+				<div class="group">
+					<button id="track" class="btn btn-info">.track()</button>
+					<button id="link" class="btn btn-info">.link()</button>
+					<button id="banner" class="btn btn-info">.banner()</button>
+				</div>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>SMS</h4>
+				<div class="group">
+					<input class="example-input" type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
+					<button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, {})</button>
+					<button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, {make_new_link: true})</button>
+				</div>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Referral</h4>
+				<div class="group">
+					<button id="credits" class="btn btn-info">.credits()</button>
+					<button id="creditHistory" class="btn btn-info">.creditHistory()</button><br><br>
+					<input class="example-input" type="text" id="redeem-amount" class="form-control" placeholder="Credits">
+					<input class="example-input" type="text" id="redeem-bucket" class="form-control" placeholder="from Bucket"><br>
+					<button id="redeem" class="btn btn-info">.redeem()</button>
+				</div>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Codes</h4>
+				<div class="group">
+					<input class="example-input" type="text" id="code-amount" class="form-control" placeholder="Amount">
+					<input class="example-input" type="text" id="code-bucket" class="form-control" placeholder="Bucket">
+					<input class="example-input" type="text" id="code-prefix" class="form-control" placeholder="Prefix">
+					<input class="example-input" type="text" id="code-expiration" class="form-control" placeholder="Expiration"><br><br>
+					<h6>How many times can this code be used?</h6>
+					<input class="radio-input" type="radio" name="code-type" value="1">Unlimted (1)
+					<input class="radio-input" type="radio" name="code-type" value="0">One Time Use (0)<br><br>
+					<h6>Who Gets the Points?</h6>
+					<input class="radio-input" type="radio" name="code-location" value="0">Referree (0)
+					<input class="radio-input" type="radio" name="code-location" value="2">Referrer (2)
+					<input class="radio-input" type="radio" name="code-location" value="3">Both (3)<br><br>
+				</div>
+				<div class="group">
+					<button id="getCode" class="btn btn-info">.getCode()</button>
+				</div>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<div class="group">
+					<input class="example-input" type="text" id="code-input" class="form-control" placeholder="Code"><br>
+					<button id="validateCode" class="btn btn-info">.validateCode()</button>
+					<button id="applyCode" class="btn btn-info">.applyCode()</button>
+				</div>
+			</div>
+		</section>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
+
+		// Note that this example is using the key in two places, here and below
+		branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
+			document.getElementsByClassName('info')[0].innerHTML = JSON.stringify(data);
+		});
+	</script>
+	<script type="text/javascript">
+		var info = $('.info');
+		var request = $('.request');
+		var response = $('.response');
+		var sampleParams = {
+			tags: [ 'tag1', 'tag2' ],
+			channel: 'sample app',
+			feature: 'create link',
+			stage: 'created link',
+			type: 1,
+			data: {
+				mydata: 'bar',
+				'$desktop_url': 'https://cdn.branch.io/example.html',
+				'$og_title': 'Branch Metrics',
+				'$og_description': 'Branch Metrics',
+				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+			}
+		};
+		var getInputVal = function(inputID) {
+			var inputElement = $(inputID);
+			if (!inputElement.val()) {
+				inputElement.parent().addClass('has-error');
+				return '';
+			}
+			else {
+				inputElement.parent().removeClass('has-error');
+			}
+			return inputElement.val();
+		};
+		$('#init').click(function() {
+			request.html('branch.init();');
+			// Note that this example is using the key in two places, here and above
+			branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#data').click(function() {
+			request.html('branch.data();');
+			branch.data(function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#setIdentity').click(function() {
+			var identity = getInputVal('#identityID');
+			request.html("branch.setIdentity('" + identity + "');");
+			branch.setIdentity(identity, function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#logout').click(function() {
+			request.html('branch.logout();');
+			branch.logout(function(err, data) {
+				response.html(err || 'undefined');
+			});
+		});
+		$('#track').click(function() {
+			request.html('branch.track(\'Tracked this event\');');
+			branch.track(
+				'Tracked this event',
+				{
+					'metadata foo': 'metadata bar'
+				},
+				function(err) {
+					response.html(err || 'no error');
+				});
+		});
+		$('#link').click(function() {
+			request.html('branch.link(' + JSON.stringify(sampleParams) + ');');
+			branch.link(sampleParams, function(err, link) {
+				response.html('<a href="' + link + '">' + link + '</a>');
+			});
+		});
+		$('#sendSMS').click(function() {
+			var smsOptions = {};
+			var phone = getInputVal('#SMSNumber');
+			request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
+			branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
+				response.html(err || JSON.stringify(data) || 'undefined');
+			});
+		});
+		$('#sendSMSNew').click(function() {
+			var smsOptions = { make_new_link: true };
+			var phone = getInputVal('#SMSNumber');
+			request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
+			branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
+				response.html(err || JSON.stringify(data) || 'undefined');
+			});
+		});
+		$('#referrals').click(function() {
+			request.html('branch.referrals();');
+			branch.referrals(function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#credits').click(function() {
+			request.html('branch.credits();');
+			branch.credits(function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#creditHistory').click(function() {
+			request.html('branch.creditHistory();');
+			branch.creditHistory(function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#applyCode').click(function() {
+			request.html('branch.applyCode({code: ' + getInputVal('#code-input') + '});');
+			branch.applyCode(getInputVal('#code-input'), 'default', function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#validateCode').click(function() {
+			request.html('branch.validateCode({code: ' + getInputVal('#code-input') + '});');
+			branch.validateCode(getInputVal('#code-input'), 'default', function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#getCode').click(function() {
+			request.html(
+				'branch.getCode({ amount: ' + getInputVal("#code-amount") +
+					', calculation_type: ' + getInputVal("input:radio[name ='code-type']:checked") +
+					', location: ' + getInputVal("input:radio[name ='code-location']:checked") +
+					', bucket: ' + getInputVal("#code-bucket") +
+					', prefix: ' + getInputVal("#code-prefix") +
+					', expiration: ' + getInputVal("#code-expiration") +
+					' });'
+			);
+			branch.getCode({
+				amount: parseInt(getInputVal('#code-amount')),
+				calculation_type: parseInt(getInputVal("input:radio[name ='code-type']:checked")),
+				location: parseInt(getInputVal("input:radio[name ='code-location']:checked")),
+				bucket: getInputVal('#code-bucket'),
+				prefix: getInputVal('#code-prefix'),
+				expiration: getInputVal('#code-expiration')
+			}, function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#redeem').click(function() {
+			request.html(
+				'branch.redeem({amount: ' + getInputVal('#redeem-amount') +
+					', bucket: \'' + getInputVal('#redeem-bucket') +
+					'\'});'
+			);
+			branch.redeem(
+				parseInt(getInputVal('#redeem-amount')),
+				getInputVal('#redeem-bucket'),
+				function(err, data) {
+					response.html(err || JSON.stringify(data));
+				}
+				);
+		});
+		$('#banner').click(function() {
+			request.html(
+				'branch.banner({icon: ' +
+					'"http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png",' +
+					'title: "Branch Demo App",' +
+					'description: "The Branch demo app!",' +
+					'data: {foo: "bar"},' +
+					'reviewCount: 1000,' +
+					'rating: 5,' +
+					'theme: "light",' +
+					'iframe: "true",' +
+					'showMobile: "true",' +
+					'showDesktop: "true",' +
+					'disableHide: "false",' +
+					'forgetHide: "false"' +
+					'});'
+			);
+			branch.banner(
+				{
+					icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+					title: 'Demo App',
+					description: 'Branch Demo app!',
+					openAppButtonText: 'Open',
+					downloadAppButtonText: 'Download',
+					reviewCount: 1000, // Review count
+					rating: 5, // Average rating from 0 to 5 in increments of .5
+					theme: 'light', // Optional, defaults to light, can be 'light' or 'dark'
+					iframe: true, // Show banner in an iframe if CSS on your page is conflicting
+					showMobile: true, // true by default, just set here for an example
+					showDesktop: true, // true by default, just set here for an example
+					disableHide: false, // false by default, just set here for an example
+					forgetHide: false // false by default, just set here for an example
+				}, // Banner Options
+				sampleParams // Link data or string of link
+			);
+			response.html('none');
+		});
+	</script>
+</body>
+</html>
