@@ -177,19 +177,19 @@ banner_css.css = function(options, element) {
 
 	// User agent specific styles
 	var userAgent = utils.mobileUserAgent();
-	if ((userAgent === 'ios' || userAgent === 'ipad') && options.showiOS) {
+	if ((userAgent === 'ios' || userAgent === 'ipad') && options['showiOS']) {
 		style += banner_css.mobile + banner_css.ios;
 	}
-	else if (userAgent === 'android' && options.showAndroid) {
+	else if (userAgent === 'android' && options['showAndroid']) {
 		style += banner_css.mobile + banner_css.android;
 	}
-	else if (userAgent === 'blackberry' && options.showBlackberry) {
+	else if (userAgent === 'blackberry' && options['showBlackberry']) {
 		style += banner_css.mobile + banner_css.blackberry;
 	}
-	else if (userAgent === 'windows_phone' && options.showWindowsPhone) {
+	else if (userAgent === 'windows_phone' && options['showWindowsPhone']) {
 		style += banner_css.mobile + banner_css.windows_phone;
 	}
-	else if (userAgent === 'kindle' && options.showKindle) {
+	else if (userAgent === 'kindle' && options['showKindle']) {
 		style += banner_css.mobile + banner_css.kindle;
 	}
 	else {
@@ -201,9 +201,9 @@ banner_css.css = function(options, element) {
 			style += banner_css.nonie;
 		}
 	}
-	style += options.customCSS;
+	style += options['customCSS'];
 
-	if (options.iframe) {
+	if (options['iframe']) {
 		style += banner_css.inneriframe;
 
 		var iFrameCSS = document.createElement('style');
@@ -211,8 +211,8 @@ banner_css.css = function(options, element) {
 		iFrameCSS.id = 'branch-iframe-css';
 		iFrameCSS.innerHTML = banner_css.iframe +
 			(utils.mobileUserAgent() ?
-				banner_css.iframe_position(options.mobileSticky, options.position) :
-				banner_css.iframe_position(options.desktopSticky, options.position));
+				banner_css.iframe_position(options['mobileSticky'], options['position']) :
+				banner_css.iframe_position(options['desktopSticky'], options['position']));
 		document.head.appendChild(iFrameCSS);
 	}
 
@@ -221,12 +221,12 @@ banner_css.css = function(options, element) {
 	css.id = 'branch-css';
 	css.innerHTML = style;
 
-	var doc = (options.iframe ? element.contentWindow.document : document);
+	var doc = (options['iframe'] ? element.contentWindow.document : document);
 	doc.head.appendChild(css);
-	if (options.position === 'top') {
+	if (options['position'] === 'top') {
 		element.style.top = '-' + banner_utils.bannerHeight;
 	}
-	else if (options.position === 'bottom') {
+	else if (options['position'] === 'bottom') {
 		element.style.bottom = '-' + banner_utils.bannerHeight;
 	}
 };

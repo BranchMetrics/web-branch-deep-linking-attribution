@@ -25,7 +25,7 @@ branch_view.handleBranchViewData = function(branchViewData) {
 	}
 
 
-	var iframeHTML = branchViewData.html;
+	var iframeHTML = branchViewData['html'];
 
 	iframe.contentWindow.document.open();
 	iframe.contentWindow.document.write(iframeHTML);
