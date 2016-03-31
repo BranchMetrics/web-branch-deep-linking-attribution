@@ -309,15 +309,6 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
 		var checkHasApp = function(firstSessionData, cb) {
-			self._api(
-				resources._r,
-				{ "sdk": config.version },
-				function(err, browser_fingerprint_id) {
-					if (browser_fingerprint_id) {
-						firstSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
-					}
-				}
-			);
 			var currentSessionData = sessionData || session.get(self._storage) || {};
 			self._api(
 				resources.hasApp,
@@ -389,6 +380,10 @@ Branch.prototype['init'] = wrap(
 			function(err, browser_fingerprint_id) {
 				if (err) {
 					return finishInit(err, null);
+				}
+				var firstSessionData = session.get(self._first);
+				if (firstSessionData && firstSessionData['browser_fingerprint_id']) {
+					browser_fingerprint_id = firstSessionData['browser_fingerprint_id'];
 				}
 				self._api(
 					resources.open,

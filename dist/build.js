@@ -1496,9 +1496,6 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var e = session.get(d._storage);
   session.get(d._first);
   var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), g = !e || !e.identity_id, k = function(a, b) {
-    d._api(resources._r, {sdk:config.version}, function(b, c) {
-      c && (a.browser_fingerprint_id = c);
-    });
     var c = e || session.get(d._storage) || {};
     d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(a, e) {
       e && !c.has_app && (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
@@ -1531,6 +1528,8 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     if (a) {
       return h(a, null);
     }
+    var c = session.get(d._first);
+    c && c.browser_fingerprint_id && (b = c.browser_fingerprint_id);
     d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
       b && f && (b.click_id = f);
       l();
