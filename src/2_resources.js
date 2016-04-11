@@ -106,7 +106,7 @@ resources.open = {
 };
 
 resources._r = {
-	destination: config.link_service_endpoint,
+	destination: config.app_service_endpoint,
 	endpoint: "/_r",
 	method: utils.httpMethod.GET,
 	jsonp: true,
