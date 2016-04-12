@@ -110,7 +110,9 @@ describe('Integration tests', function() {
 			assert.strictEqual(requests.length, 1, 'Exactly one request was made');
 			assert.strictEqual(
 				requests[0].src,
-				'https://bnc.lt/_r?sdk=web' + config.version +
+				config.app_service_endpoint +
+					'/_r?sdk=web' +
+					config.version +
 					'&callback=branch_callback__' + jsonpCallback.toString(),
 				'The first request has the right .src'
 			);
@@ -213,7 +215,7 @@ describe('Integration tests', function() {
 					{
 						"identity_id": identity_id,
 						"link_click_id": "114750153298026746",
-						"link": "https://bnc.lt/i/4LYQTXE0_k",
+						"link": config.link_service_endpoint + "/i/4LYQTXE0_k",
 						"referring_data_parsed": null
 					},
 					'Expected response returned'
@@ -339,7 +341,7 @@ describe('Integration tests', function() {
 			branch.link(sampleParams, function(err, data) {
 				assert.strictEqual(
 					data,
-					'https://bnc.lt/l/4manXlk0AJ',
+					config.link_service_endpoint + '/l/4manXlk0AJ',
 					'Expect data in branch.link callback'
 				);
 			});
