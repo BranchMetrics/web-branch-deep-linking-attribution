@@ -295,7 +295,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/open',
+					config.api_endpoint + '/v1/open',
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
@@ -327,7 +327,7 @@ describe('Server', function() {
 				);
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/open?&data=' + encodedData +
+					config.api_endpoint + '/v1/open?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
@@ -474,7 +474,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/profile', 'Endpoint correct'
+					config.api_endpoint + '/v1/profile', 'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
 				assert.strictEqual(
@@ -508,7 +508,7 @@ describe('Server', function() {
 				);
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/profile?&data=' + encodedData +
+					config.api_endpoint + '/v1/profile?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
@@ -577,7 +577,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/logout', 'Endpoint correct',
+					config.api_endpoint + '/v1/logout', 'Endpoint correct',
 					'Expected url for the first request'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
@@ -611,7 +611,7 @@ describe('Server', function() {
 				);
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/logout?&data=' + encodedData +
+					config.api_endpoint + '/v1/logout?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
@@ -665,7 +665,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/referrals/' + identity_id +
+					config.api_endpoint + '/v1/referrals/' + identity_id +
 						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						"&identity_id=" + identity_id +
 						"&sdk=web" + config.version +
@@ -688,7 +688,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/referrals/' + identity_id +
+					config.api_endpoint + '/v1/referrals/' + identity_id +
 						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						'&identity_id=' + identity_id +
 						'&sdk=web' + config.version +
@@ -730,7 +730,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/credits/' + identity_id +
+					config.api_endpoint + '/v1/credits/' + identity_id +
 						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						'&identity_id=' + identity_id +
 						'&sdk=web' + config.version +
@@ -752,7 +752,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/credits/' + identity_id +
+					config.api_endpoint + '/v1/credits/' + identity_id +
 						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						'&identity_id=' + identity_id +
 						'&sdk=web' + config.version +
@@ -792,7 +792,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].src,
-					'https://bnc.lt/_r?sdk=web' + config.version +
+					config.app_service_endpoint + '/_r?sdk=web' + config.version +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct');
 				requests[0].callback();
@@ -829,7 +829,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/has-app/' + branch_sample_key +
+					config.api_endpoint + '/v1/has-app/' + branch_sample_key +
 						'?browser_fingerprint_id=' + browser_fingerprint_id,
 					'Endpoint correct'
 				);
@@ -890,7 +890,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/redeem',
+					config.api_endpoint + '/v1/redeem',
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
@@ -925,7 +925,7 @@ describe('Server', function() {
 				);
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/redeem?&data=' + encodedData +
+					config.api_endpoint + '/v1/redeem?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
@@ -1013,7 +1013,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/url',
+					config.api_endpoint + '/v1/url',
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
@@ -1043,7 +1043,7 @@ describe('Server', function() {
 				);
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/url?&data=' + encodedData +
+					config.api_endpoint + '/v1/url?&data=' + encodedData +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
@@ -1119,7 +1119,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://bnc.lt/3hpH54U-58?click=click',
+					config.link_service_endpoint + '/3hpH54U-58?click=click',
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
@@ -1143,7 +1143,8 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].src,
-					'https://bnc.lt/3hpH54U-58?click=click&callback=branch_callback__' +
+					config.link_service_endpoint +
+						'/3hpH54U-58?click=click&callback=branch_callback__' +
 						(server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
@@ -1203,7 +1204,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					'https://api.branch.io/v1/event',
+					config.api_endpoint + '/v1/event',
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'POST', 'Method correct');
@@ -1240,7 +1241,7 @@ describe('Server', function() {
 				));
 				assert.strictEqual(
 					requests[0].src,
-					'https://api.branch.io/v1/event?&data=' + encodedData +
+					config.api_endpoint + '/v1/event?&data=' + encodedData +
 						'&callback=branch_callback__' +
 						(server._jsonp_callback_index - 1),
 					'Endpoint correct'
@@ -1352,7 +1353,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					"https://api.branch.io/v1/credithistory" +
+					config.api_endpoint + '/v1/credithistory' +
 						"?browser_fingerprint_id=" + browser_fingerprint_id +
 						"&identity_id=" + identity_id +
 						"&sdk=web" + config.version +
