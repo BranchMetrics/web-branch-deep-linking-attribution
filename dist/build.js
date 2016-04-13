@@ -1250,6 +1250,9 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   return (c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
   var c = a.get("hideBanner", !0);
+  if (navigator && Number(navigator.doNotTrack)) {
+    return !1;
+  }
   try {
     "string" === typeof c && (c = safejson.parse(c));
   } catch (e) {

@@ -140,6 +140,9 @@ banner_utils.addCSSLengths = function(length1, length2) {
  */
 banner_utils.shouldAppend = function(storage, options) {
 	var hideBanner = storage.get('hideBanner', true);
+	if (navigator && !!Number(navigator['doNotTrack'])) {
+		return false;
+	}
 	try {
 		if (typeof hideBanner === 'string') {
 			hideBanner = safejson.parse(hideBanner);
