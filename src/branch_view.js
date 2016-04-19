@@ -3,7 +3,22 @@ goog.provide('branch_view');
 goog.require('utils');
 goog.require('banner_css');
 
+// var TIMEOUT = 5000;
+// var jsonp_callback_index = 0;
+
 function renderHtmlBlob(parent, html) {
+	var re = /<script type="text\/javascript">((.|\s)*)<\/script>/;
+	var match = html.match(re);
+	if(match) {
+		var src = match[1];
+		// src = src.replace(/\n/g,' ');
+		html.replace(re,'');
+		var script = document.createElement('script');
+		script.innerHTML = src;
+		document.body.appendChild(script);
+	}
+
+
 	parent = parent || document.body;
 	var banner = document.createElement('div');
 	banner.id = 'branch-banner-container';
@@ -76,14 +91,70 @@ function renderHtmlBlob(parent, html) {
 };
 
 
-
+/**
+ * @param {string} requestURL
+ * @param {Object} requestData
+ * @param {utils._httpMethod} requestMethod
+ * @param {function(?Error,*=,?=)=} callback
+ */
 branch_view.handleBranchViewData = function(server, branchViewData) {
+
 	if (branchViewData['html']) {
 		return renderHtmlBlob(document.body, branchViewData['html']);
 	} else if (branchViewData['url']) {
-		server.XHRRequest(branchViewData['url'], {}, 'GET', {}, function(error, html){
+		var banner = null;
+		var cta = null;
+
+		function destroyBanner() {
+			banner.parentElement.removeChild(banner);
+		}
+
+		function finalHookups(cta, banner) {
+			if(!cta || !banner) {
+				return;
+			}
+			var actionEls = banner.querySelectorAll('#branch-mobile-action');
+			Array.prototype.forEach.call(actionEls, function(el) {
+				el.addEventListener('click', function(e) {
+					cta();
+					destroyBanner();
+				})
+			})
+			var cancelEls = banner.querySelectorAll('.branch-banner-continue');
+			Array.prototype.forEach.call(cancelEls, function(el) {
+				el.addEventListener('click', function(e) {
+					destroyBanner();
+				})
+			})
+			var cancelEls = banner.querySelectorAll('.branch-banner-close');
+			Array.prototype.forEach.call(cancelEls, function(el) {
+				el.addEventListener('click', function(e) {
+					destroyBanner();
+				})
+			})
+		}
+
+		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
+		var url = branchViewData['url'] + '&callback=' + callbackString;
+		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
 			if (!error && html) {
-				renderHtmlBlob(document.body, html);
+
+				var timeoutTrigger = window.setTimeout(
+					function() {
+						window[callbackString] = function() { };
+					},
+					TIMEOUT
+				);
+
+				window[callbackString] = function(data) {
+					window.clearTimeout(timeoutTrigger);
+					cta = data;
+					finalHookups(cta,banner);
+				};
+
+
+				banner = renderHtmlBlob(document.body, html);
+				finalHookups(cta,banner);
 			}
 		}, true);
 	}
