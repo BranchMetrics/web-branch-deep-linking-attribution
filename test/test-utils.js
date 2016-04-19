@@ -515,7 +515,8 @@
 					browser_fingerprint_id: browser_fingerprint_id,
 					identity_id: identity_id,
 					sdk: window.sdk_version,
-					session_id: session_id
+					session_id: session_id,
+					_t: browser_fingerprint_id
 				},
 				extra || {}
 			);

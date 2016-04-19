@@ -793,6 +793,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.app_service_endpoint + '/_r?sdk=web' + config.version +
+						'&_t=79336952217731267' +
 						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct');
 				requests[0].callback();

@@ -308,16 +308,21 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 
 		var checkHasApp = function(sessionData, cb) {
+			var params_r = { "sdk": config.version };
+			var currentSessionData = sessionData || session.get(self._storage) || {};
+			var permData = session.get(self._storage, true) || {};
+			if (permData['browser_fingerprint_id']) {
+				params_r['_t'] = permData['browser_fingerprint_id'];
+			}
 			self._api(
 				resources._r,
-				{ "sdk": config.version },
+				params_r,
 				function(err, browser_fingerprint_id) {
 					if (browser_fingerprint_id) {
 						currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
 					}
 				}
 			);
-			var currentSessionData = sessionData || session.get(self._storage) || {};
 			self._api(
 				resources.hasApp,
 				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
@@ -382,9 +387,14 @@ Branch.prototype['init'] = wrap(
 			return;
 		}
 
+		var params_r = { "sdk": config.version };
+		var permData = session.get(self._storage, true) || {};
+		if (permData['browser_fingerprint_id']) {
+			params_r['_t'] = permData['browser_fingerprint_id'];
+		}
 		self._api(
 			resources._r,
-			{ "sdk": config.version },
+			params_r,
 			function(err, browser_fingerprint_id) {
 				if (err) {
 					return finishInit(err, null);
