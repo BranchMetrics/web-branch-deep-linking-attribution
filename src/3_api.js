@@ -236,8 +236,9 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {utils._httpMethod} method
  * @param {BranchStorage} storage
  * @param {function(?Error,*=,?=)=} callback
+ * @param {?boolean} noparse
  */
-Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
+Server.prototype.XHRRequest = function(url, data, method, storage, callback, noparse) {
 	var req = (window.XMLHttpRequest ?
 			new XMLHttpRequest() :
 			new ActiveXObject('Microsoft.XMLHTTP'));
@@ -248,14 +249,21 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback) {
 		callback(new Error(e.error || ('Error in API: ' + req.status)), null, req.status);
 	};
 	req.onreadystatechange = function() {
+		var data;
 		if (req.readyState === 4) {
 			if (req.status === 200) {
-				try {
-					callback(null, safejson.parse(req.responseText), req.status);
+				if (noparse) {
+					data = req.responseText;
 				}
-				catch (e) {
-					callback(null, { }, req.status);
+				else {
+					try {
+						data = safejson.parse(req.responseText);
+					}
+					catch (e) {
+						data = {};
+					}
 				}
+				callback(null, data, req.status);
 			}
 			else if (req.status === 402) {
 				callback(new Error('Not enough credits to redeem.'), null, req.status);

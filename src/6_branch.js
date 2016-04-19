@@ -400,7 +400,7 @@ Branch.prototype['init'] = wrap(
 					function(err, data) {
 						if (!err && typeof data === 'object') {
 							if (data.hasOwnProperty('branch_view_data')) {
-								branch_view.handleBranchViewData(data['branch_view_data']);
+								branch_view.handleBranchViewData(self._server, data['branch_view_data']);
 							}
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
@@ -607,11 +607,12 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 /*** +TOC_HEADING &Event Tracking& ^ALL ***/
 /*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
+	var self = this;
 	if (!metadata) {
 		metadata = { };
 	}
 
-	this._api(resources.event, {
+	self._api(resources.event, {
 		"event": event,
 		"metadata": utils.merge({
 			"url": document.URL,
@@ -620,7 +621,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		}, metadata || {})
 	}, function(err, data) {
 		if (!err && typeof data === 'object' && data.hasOwnProperty('branch_view_data')) {
-			branch_view.handleBranchViewData(data['branch_view_data']);
+			branch_view.handleBranchViewData(self._server, data['branch_view_data']);
 		}
 		if (typeof done === 'function') {
 			done.apply(this, arguments);

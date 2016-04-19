@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta content="http://branch.io/img/logo_icon_black.png" property="og:image" />
+	<meta content="Branch Metrics Web SDK Example App" property="og:title" />
+	<meta content="A basic example to demonstrate some of the ways that the Web SDK can be used" property="og:description" />
+	<title>Branch View - Branch Metrics</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<style type="text/css">
+		.btn {
+			margin-top: 5px;
+		}
+		.example-input {
+			width: 125px;
+			display: inline-block;
+			margin-top: 5px;
+			vertical-align: middle;
+		}
+		.radio-input {
+			margin-right: 10px !important;
+			margin-left: 20px !important;
+		}
+		.row {
+			margin-bottom: 30px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row col-lg-8 col-lg-offset-2">
+			<h2>Branch Metrics Branch View Example</h2>
+		</div>
+		<section>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Old Banner</h4>
+				<div class="group">
+					<button id="banner" class="btn btn-warning">.banner()</button>
+				</div>
+				<hr>
+				<h4>Branch Views - Banners</h4>
+				<div class="group">
+					<button id="track-1i" class="btn btn-info">.track('cyan')</button>
+					<button id="track-2i" class="btn btn-info">.track('magenta')</button>
+					<button id="track-3i" class="btn btn-info">.track('yellow')</button>
+					<button id="track-4i" class="btn btn-info">.track('black')</button>
+				</div>
+				<hr>
+				<h4>Branch Views - Interstitials</h4>
+				<div class="group">
+					<button id="track-1b" class="btn btn-info">.track('red')</button>
+					<button id="track-2b" class="btn btn-info">.track('green')</button>
+					<button id="track-3b" class="btn btn-info">.track('blue')</button>
+					<button id="track-4b" class="btn btn-info">.track('white')</button>
+				</div>
+			</div>
+		</section>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
+
+		// Note that this example is using the key in two places, here and below
+		branch.init('key_test_hdcBLUy1xZ1JD0tKg7qrLcgirFmPPVJc', function(err, data) {
+		});
+	</script>
+	<script type="text/javascript">
+		var sampleParams = {
+			tags: [ 'tag1', 'tag2' ],
+			channel: 'sample app',
+			feature: 'create link',
+			stage: 'created link',
+			type: 1,
+			data: {
+				mydata: 'bar',
+				'$desktop_url': 'https://cdn.branch.io/example.html',
+				'$og_title': 'Branch Metrics',
+				'$og_description': 'Branch Metrics',
+				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+			}
+		};
+		$('#track-1i').click(function() {branch.track('cyan',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-2i').click(function() {branch.track('magenta',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-3i').click(function() {branch.track('yellow',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-4i').click(function() {branch.track('black',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-1b').click(function() {branch.track('red',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-2b').click(function() {branch.track('green',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-3b').click(function() {branch.track('blue',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-4b').click(function() {branch.track('white',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#banner').click(function() {
+			branch.banner(
+				{
+					icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
+					title: 'Demo App',
+					description: 'Branch Demo app!',
+					openAppButtonText: 'Open',
+					downloadAppButtonText: 'Download',
+					reviewCount: 1000, // Review count
+					rating: 5, // Average rating from 0 to 5 in increments of .5
+					theme: 'light', // Optional, defaults to light, can be 'light' or 'dark'
+					iframe: true, // Show banner in an iframe if CSS on your page is conflicting
+					showMobile: true, // true by default, just set here for an example
+					showDesktop: true, // true by default, just set here for an example
+					disableHide: false, // false by default, just set here for an example
+					forgetHide: true // false by default, just set here for an example
+				}, // Banner Options
+				sampleParams // Link data or string of link
+			);
+		});
+	</script>
+</body>
+</html>
