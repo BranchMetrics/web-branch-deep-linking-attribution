@@ -1156,7 +1156,10 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, function() {
     d(Error(utils.messages.blockedByClient), null);
   }, function() {
-    this.remove();
+    try {
+      "function" === typeof this.remove ? this.remove() : this.parentNode.removeChild(this);
+    } catch (a) {
+    }
     delete window[e];
   });
 };
