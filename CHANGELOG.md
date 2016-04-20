@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.1.4] - 2016-04-20
+- Disable banner when a user chooses 'Do Not Track'
+- Persist data through 3rd party calls
+
 ## [v2.1.3] - 2016-04-12
 - Use new https://app.link by default
 
