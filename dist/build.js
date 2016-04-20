@@ -1389,12 +1389,21 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
-  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
-    a.deepviewCta();
-  }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
-    d.preventDefault();
-    sendSMS(f, a, b, c);
-  });
+  if (utils.mobileUserAgent()) {
+    b.open_app = b.open_app;
+    b.append_deeplink_path = b.append_deeplink_path;
+    b.make_new_link = b.make_new_link;
+    a.deepview(c, b);
+    var g = f.getElementById("branch-mobile-action");
+    g && (g.onclick = function() {
+      a.deepviewCta();
+    });
+  } else {
+    f.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(f, a, b, c);
+    });
+  }
   var g = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, h = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, m = f.getElementById("branch-banner-close"), n = function(a) {
     setTimeout(function() {
       banner_utils.removeElement(e);
@@ -1688,6 +1697,7 @@ Branch.prototype.removeListener = function(a) {
 };
 Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
+  c || (c = this._bvData || {});
   var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", 
   iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showBlackberry:"undefined" === typeof b.showBlackberry ? !0 : b.showBlackberry, showWindowsPhone:"undefined" === typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, showDesktop:"undefined" === 
   typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, theme:"string" === typeof b.theme && -1 < utils.bannerThemes.indexOf(b.theme) ? b.theme : utils.bannerThemes[0], buttonBorderColor:b.buttonBorderColor || 
@@ -1696,7 +1706,10 @@ Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
 });
-Branch.prototype.closeBanner = wrap(0, function(a) {
+Branch.prototype.setBranchViewData = wrap(callback_params.NO_CALLBACK, function(a, b) {
+  this._bvData = goog.object.clone(b || {});
+});
+Branch.prototype.closeBanner = wrap(callback_params.NO_CALLBACK, function(a) {
   if (this.closeBannerPointer) {
     var b = this;
     this._publishEvent("willCloseBanner");

@@ -1583,6 +1583,9 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 			typeof options['forgetHide'] !== 'undefined') {
 		options['showAgain'] = options['forgetHide'];
 	}
+	if (!data) {
+		data = this._bvData || {};
+	}
 	var bannerOptions = {
 		icon: options['icon'] || '',
 		title: options['title'] || '',
@@ -1664,11 +1667,16 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		bannerOptions.showKindle = options['showMobile'];
 	}
 
+	// this.setBranchViewData(data);
 	this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
 	done();
 });
 
-Branch.prototype['closeBanner'] = wrap(0, function(done) {
+Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
+	this._bvData = goog.object.clone(data || {});
+});
+
+Branch.prototype['closeBanner'] = wrap(callback_params.NO_CALLBACK, function(done) {
 	if (this.closeBannerPointer) {
 		var self = this;
 		this._publishEvent("willCloseBanner");
