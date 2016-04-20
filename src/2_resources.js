@@ -106,12 +106,13 @@ resources.open = {
 };
 
 resources._r = {
-	destination: config.link_service_endpoint,
+	destination: config.app_service_endpoint,
 	endpoint: "/_r",
 	method: utils.httpMethod.GET,
 	jsonp: true,
 	params: {
-		"sdk": validator(true, validationTypes.STRING)
+		"sdk": validator(true, validationTypes.STRING),
+		"_t": validator(false, branch_id)
 	}
 };
 
@@ -264,6 +265,7 @@ resources.deepview = {
 	method: utils.httpMethod.POST,
 	params: defaults({
 		"campaign": validator(false, validationTypes.STRING),
+		"_t": validator(false, branch_id),
 		"channel": validator(false, validationTypes.STRING),
 		"data": validator(true, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),

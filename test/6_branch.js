@@ -459,7 +459,8 @@ describe('Branch', function() {
 		basicTests('setIdentity', [ 1 ]);
 
 		var expectedRequest = testUtils.params(
-			{ "identity": "test_identity" }
+			{ "identity": "test_identity" },
+			[ "_t" ]
 		);
 		var expectedResponse = {
 			identity_id: '12345',
@@ -486,7 +487,8 @@ describe('Branch', function() {
 		basicTests('setIdentity', [ 1 ]);
 
 		var expectedRequest = testUtils.params(
-			{ "identity": "test_identity" }
+			{ "identity": "test_identity" },
+			[ "_t" ]
 		);
 		var expectedResponse = { };
 		it('should call api with identity', function(done) {
@@ -576,7 +578,7 @@ describe('Branch', function() {
 			requests[0].callback();
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ }),
+				testUtils.params({ }, [ "_t" ]),
 				'All params sent'
 			);
 		});
@@ -606,7 +608,7 @@ describe('Branch', function() {
 				);
 				assert.deepEqual(
 					requests[0].obj,
-					testUtils.params({ }),
+					testUtils.params({ }, [ "_t" ]),
 					'All params sent'
 				);
 				assert.strictEqual(branch.session_id, newSessionId, 'branch session was replaced');
@@ -640,7 +642,7 @@ describe('Branch', function() {
 					'$og_video': null
 				},
 				"sdk": "web" + config.version
-			});
+			}, [ "_t" ]);
 			if (desktopUrlAppend) {
 				val['data']['$desktop_url'] += desktopUrlAppend;
 			}
@@ -706,7 +708,7 @@ describe('Branch', function() {
 				'$og_description': 'Branch Metrics',
 				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 			}
-		});
+		}, [ "_t" ]);
 
 		it('should call SMSLinkSend if a click_id already exists', function(done) {
 			var branch = initBranch(true);
@@ -823,7 +825,7 @@ describe('Branch', function() {
 			feature: 'create link',
 			stage: 'created link',
 			tags: [ 'tag1', 'tag2' ]
-		});
+		}, [ "_t" ]);
 		var options = {
 			make_new_link: true,
 			open_app: true,
@@ -1046,7 +1048,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ }),
+				testUtils.params({ }, [ "_t" ]),
 				'All params sent'
 			);
 		});
@@ -1076,7 +1078,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params(options),
+				testUtils.params(options, [ "_t" ]),
 				'All params sent'
 			);
 		});
@@ -1099,7 +1101,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ "code": expectedResponse }),
+				testUtils.params({ "code": expectedResponse }, [ "_t" ]),
 				'All params sent'
 			);
 		});
@@ -1122,7 +1124,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ "code": expectedResponse }),
+				testUtils.params({ "code": expectedResponse }, [ "_t" ]),
 				'All params sent'
 			);
 		});
@@ -1149,7 +1151,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ }),
+				testUtils.params({ }, [ "_t" ]),
 				'All params sent'
 			);
 		});
@@ -1196,7 +1198,7 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params(options),
+				testUtils.params(options, [ "_t" ]),
 				'All params sent'
 			);
 		});
@@ -1216,7 +1218,7 @@ describe('Branch', function() {
 			requests[0].callback();
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ "amount": 1, "bucket": "testbucket" }),
+				testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ "_t" ]),
 				'All params sent'
 			);
 		});
