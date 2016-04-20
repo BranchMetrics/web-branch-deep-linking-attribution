@@ -2,6 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+
 ## [v2.1.5] - 2016-04-20
 - Fixed an error on some browsers when script tags were cleaned up after jsonp calls
 
