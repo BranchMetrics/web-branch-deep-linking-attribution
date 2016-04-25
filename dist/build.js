@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.1.4"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"http://54.193.112.65", version:"2.2.2"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1160,30 +1160,36 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     delete window[e];
   });
 };
-Server.prototype.XHRRequest = function(a, b, c, d, e) {
-  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  f.ontimeout = function() {
+Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
+  var g = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  g.ontimeout = function() {
     e(Error(utils.messages.timeout), null, 504);
   };
-  f.onerror = function(a) {
-    e(Error(a.error || "Error in API: " + f.status), null, f.status);
+  g.onerror = function(a) {
+    e(Error(a.error || "Error in API: " + g.status), null, g.status);
   };
-  f.onreadystatechange = function() {
-    if (4 === f.readyState) {
-      if (200 === f.status) {
-        try {
-          e(null, safejson.parse(f.responseText), f.status);
-        } catch (a) {
-          e(null, {}, f.status);
+  g.onreadystatechange = function() {
+    var a;
+    if (4 === g.readyState) {
+      if (200 === g.status) {
+        if (f) {
+          a = g.responseText;
+        } else {
+          try {
+            a = safejson.parse(g.responseText);
+          } catch (b) {
+            a = {};
+          }
         }
+        e(null, a, g.status);
       } else {
-        402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
+        402 === g.status ? e(Error("Not enough credits to redeem."), null, g.status) : "4" !== g.status.toString().substring(0, 1) && "5" !== g.status.toString().substring(0, 1) || e(Error("Error in API: " + g.status), null, g.status);
       }
     }
   };
   try {
-    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
-  } catch (g) {
+    g.open(c, a, !0), g.timeout = TIMEOUT, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
+  } catch (k) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
@@ -1424,6 +1430,69 @@ var sendSMS = function(a, b, c, d) {
   return n;
 };
 // Input 14
+var branch_view = {};
+function renderHtmlBlob(a, b) {
+  var c = /<script type="text\/javascript">((.|\s)*)<\/script>/, d = b.match(c);
+  d && (d = d[1], b.replace(c, ""), c = document.createElement("script"), c.innerHTML = d, document.body.appendChild(c));
+  a = a || document.body;
+  var e = document.createElement("div");
+  e.id = "branch-banner-container";
+  e.className = "branch-animation";
+  e.innerHTML = b;
+  a.insertBefore(e, a.firstChild);
+  banner_utils.addClass(e, "branch-banner-is-active");
+  e.marginTop = "76px";
+  setTimeout(function() {
+    e.style.top = "0";
+  }, 100);
+  return e;
+}
+branch_view.handleBranchViewData = function(a, b) {
+  if (b.html) {
+    return renderHtmlBlob(document.body, b.html);
+  }
+  if (b.url) {
+    var c = function(a, b) {
+      if (a && b) {
+        var c = b.querySelectorAll("#branch-mobile-action");
+        Array.prototype.forEach.call(c, function(b) {
+          b.addEventListener("click", function(b) {
+            a();
+            d.parentElement.removeChild(d);
+          });
+        });
+        c = b.querySelectorAll(".branch-banner-continue");
+        Array.prototype.forEach.call(c, function(a) {
+          a.addEventListener("click", function(a) {
+            d.parentElement.removeChild(d);
+          });
+        });
+        c = b.querySelectorAll(".branch-banner-close");
+        Array.prototype.forEach.call(c, function(a) {
+          a.addEventListener("click", function(a) {
+            d.parentElement.removeChild(d);
+          });
+        });
+      }
+    }, d = null, e = null, f = "branch_view_callback__" + jsonp_callback_index++;
+    a.XHRRequest(b.url + "&callback=" + f, {}, "GET", {}, function(a, b) {
+      if (!a && b) {
+        var h = window.setTimeout(function() {
+          window[f] = function() {
+          };
+        }, TIMEOUT);
+        window[f] = function(a) {
+          window.clearTimeout(h);
+          e = a;
+          c(e, d);
+        };
+        d = renderHtmlBlob(document.body, b);
+        c(e, d);
+      }
+    }, !0);
+  }
+};
+// Input 15
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
@@ -1535,7 +1604,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       return k(a, null);
     }
     d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-      b && e && (b.click_id = e);
+      a || "object" !== typeof b || (b.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, b.branch_view_data), e && (b.click_id = e));
       h();
       k(a, b);
     });
@@ -1577,8 +1646,12 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   });
 });
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
+  var d = this;
   c || (c = {});
-  this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
+  d._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, function(b, c) {
+    !b && "object" === typeof c && c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, c.branch_view_data);
+    "function" === typeof a && a.apply(this, arguments);
+  });
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
@@ -1706,7 +1779,7 @@ Branch.prototype.closeBanner = wrap(0, function(a) {
   }
   a();
 });
-// Input 15
+// Input 16
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
