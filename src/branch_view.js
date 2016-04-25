@@ -98,7 +98,9 @@ function renderHtmlBlob(parent, html) {
  * @param {function(?Error,*=,?=)=} callback
  */
 branch_view.handleBranchViewData = function(server, branchViewData) {
-
+	if (document.getElementById('branch-banner-container')) {
+		return;
+	}
 	if (branchViewData['html']) {
 		return renderHtmlBlob(document.body, branchViewData['html']);
 	} else if (branchViewData['url']) {
