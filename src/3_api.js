@@ -225,7 +225,21 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 			callback(new Error(utils.messages.blockedByClient), null);
 		},
 		function onLoad() {
-			this.remove();
+			try {
+				if (typeof this.remove === 'function') {
+					this.remove();
+				}
+				else {
+					// some browsers do not have a 'remove' method
+					// for Element, so fall back
+					this.parentNode.removeChild(this);
+				}
+			}
+			catch (e) {
+				// we're trying to remove the script tag during a
+				// jsonp request, but if that fails, we shouldn't
+				// break anything else...just continue
+			}
 			delete window[callbackString];
 		});
 };
