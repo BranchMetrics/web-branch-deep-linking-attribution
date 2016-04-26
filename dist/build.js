@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"http://54.193.112.65", version:"2.2.2"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"http://54.193.112.65", version:"2.2.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1451,48 +1451,50 @@ function renderHtmlBlob(a, b) {
   return e;
 }
 branch_view.handleBranchViewData = function(a, b) {
-  if (b.html) {
-    return renderHtmlBlob(document.body, b.html);
-  }
-  if (b.url) {
-    var c = function(a, b) {
-      if (a && b) {
-        var c = b.querySelectorAll("#branch-mobile-action");
-        Array.prototype.forEach.call(c, function(b) {
-          b.addEventListener("click", function(b) {
-            a();
-            d.parentElement.removeChild(d);
+  if (!document.getElementById("branch-banner-container")) {
+    if (b.html) {
+      return renderHtmlBlob(document.body, b.html);
+    }
+    if (b.url) {
+      var c = function(a, b) {
+        if (a && b) {
+          var c = b.querySelectorAll("#branch-mobile-action");
+          Array.prototype.forEach.call(c, function(b) {
+            b.addEventListener("click", function(b) {
+              a();
+              d.parentElement.removeChild(d);
+            });
           });
-        });
-        c = b.querySelectorAll(".branch-banner-continue");
-        Array.prototype.forEach.call(c, function(a) {
-          a.addEventListener("click", function(a) {
-            d.parentElement.removeChild(d);
+          c = b.querySelectorAll(".branch-banner-continue");
+          Array.prototype.forEach.call(c, function(a) {
+            a.addEventListener("click", function(a) {
+              d.parentElement.removeChild(d);
+            });
           });
-        });
-        c = b.querySelectorAll(".branch-banner-close");
-        Array.prototype.forEach.call(c, function(a) {
-          a.addEventListener("click", function(a) {
-            d.parentElement.removeChild(d);
+          c = b.querySelectorAll(".branch-banner-close");
+          Array.prototype.forEach.call(c, function(a) {
+            a.addEventListener("click", function(a) {
+              d.parentElement.removeChild(d);
+            });
           });
-        });
-      }
-    }, d = null, e = null, f = "branch_view_callback__" + jsonp_callback_index++;
-    a.XHRRequest(b.url + "&callback=" + f, {}, "GET", {}, function(a, b) {
-      if (!a && b) {
-        var h = window.setTimeout(function() {
-          window[f] = function() {
+        }
+      }, d = null, e = null, f = "branch_view_callback__" + jsonp_callback_index++;
+      a.XHRRequest(b.url + "&callback=" + f, {}, "GET", {}, function(a, b) {
+        if (!a && b) {
+          var h = window.setTimeout(function() {
+            window[f] = function() {
+            };
+          }, TIMEOUT);
+          window[f] = function(a) {
+            window.clearTimeout(h);
+            e = a;
+            c(e, d);
           };
-        }, TIMEOUT);
-        window[f] = function(a) {
-          window.clearTimeout(h);
-          e = a;
+          d = renderHtmlBlob(document.body, b);
           c(e, d);
-        };
-        d = renderHtmlBlob(document.body, b);
-        c(e, d);
-      }
-    }, !0);
+        }
+      }, !0);
+    }
   }
 };
 // Input 15
