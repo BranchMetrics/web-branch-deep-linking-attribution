@@ -32,7 +32,7 @@ echo
 
 echo "Beta builds have been deployed:"
 echo "https://cdn.branch.io/branch-beta-$VERSION.js"
-echo "https://cdn.branch.io/example-beta-$VERSION.html"
-echo "https://cdn.branch.io/event-example-beta-$VERSION.html"
+echo "http://cdn.branch.io/example-beta-$VERSION.html"
+echo "http://cdn.branch.io/event-example-beta-$VERSION.html"
 
 echo

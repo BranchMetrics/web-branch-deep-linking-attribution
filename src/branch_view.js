@@ -97,7 +97,8 @@ function renderHtmlBlob(parent, html) {
  * @param {utils._httpMethod} requestMethod
  * @param {function(?Error,*=,?=)=} callback
  */
-branch_view.handleBranchViewData = function(server, branchViewData) {
+branch_view.handleBranchViewData = function(server, branchViewData, requestData) {
+	requestData = requestData || {};
 	if (document.getElementById('branch-banner-container')) {
 		return;
 	}
@@ -137,7 +138,9 @@ branch_view.handleBranchViewData = function(server, branchViewData) {
 		}
 
 		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
+		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(requestData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
+		url += '&post_data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
 			if (!error && html) {
 

@@ -1450,48 +1450,51 @@ function renderHtmlBlob(a, b) {
   }, 100);
   return e;
 }
-branch_view.handleBranchViewData = function(a, b) {
+branch_view.handleBranchViewData = function(a, b, c) {
+  c = c || {};
   if (!document.getElementById("branch-banner-container")) {
     if (b.html) {
       return renderHtmlBlob(document.body, b.html);
     }
     if (b.url) {
-      var c = function(a, b) {
+      var d = function(a, b) {
         if (a && b) {
           var c = b.querySelectorAll("#branch-mobile-action");
           Array.prototype.forEach.call(c, function(b) {
             b.addEventListener("click", function(b) {
               a();
-              d.parentElement.removeChild(d);
+              e.parentElement.removeChild(e);
             });
           });
           c = b.querySelectorAll(".branch-banner-continue");
           Array.prototype.forEach.call(c, function(a) {
             a.addEventListener("click", function(a) {
-              d.parentElement.removeChild(d);
+              e.parentElement.removeChild(e);
             });
           });
           c = b.querySelectorAll(".branch-banner-close");
           Array.prototype.forEach.call(c, function(a) {
             a.addEventListener("click", function(a) {
-              d.parentElement.removeChild(d);
+              e.parentElement.removeChild(e);
             });
           });
         }
-      }, d = null, e = null, f = "branch_view_callback__" + jsonp_callback_index++;
-      a.XHRRequest(b.url + "&callback=" + f, {}, "GET", {}, function(a, b) {
+      }, e = null, f = null, g = "branch_view_callback__" + jsonp_callback_index++;
+      c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
+      b = b.url + "&callback=" + g;
+      a.XHRRequest(b + ("&post_data=" + c), {}, "GET", {}, function(a, b) {
         if (!a && b) {
-          var h = window.setTimeout(function() {
-            window[f] = function() {
+          var c = window.setTimeout(function() {
+            window[g] = function() {
             };
           }, TIMEOUT);
-          window[f] = function(a) {
-            window.clearTimeout(h);
-            e = a;
-            c(e, d);
+          window[g] = function(a) {
+            window.clearTimeout(c);
+            f = a;
+            d(f, e);
           };
-          d = renderHtmlBlob(document.body, b);
-          c(e, d);
+          e = renderHtmlBlob(document.body, b);
+          d(f, e);
         }
       }, !0);
     }
@@ -1650,11 +1653,12 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     a(null);
   });
 });
-Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
-  var d = this;
+Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
+  var e = this;
   c || (c = {});
-  d._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, function(b, c) {
-    !b && "object" === typeof c && c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, c.branch_view_data);
+  d || (d = {});
+  e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, function(b, c) {
+    !b && "object" === typeof c && c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(e._server, c.branch_view_data, d);
     "function" === typeof a && a.apply(this, arguments);
   });
 });

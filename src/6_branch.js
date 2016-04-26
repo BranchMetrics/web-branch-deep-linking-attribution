@@ -616,10 +616,14 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
  */
 /*** +TOC_HEADING &Event Tracking& ^ALL ***/
 /*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
-Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata) {
+Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata, requestData) {
 	var self = this;
 	if (!metadata) {
 		metadata = { };
+	}
+
+	if (!requestData) {
+		requestData = { };
 	}
 
 	self._api(resources.event, {
@@ -631,7 +635,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		}, metadata || {})
 	}, function(err, data) {
 		if (!err && typeof data === 'object' && data.hasOwnProperty('branch_view_data')) {
-			branch_view.handleBranchViewData(self._server, data['branch_view_data']);
+			branch_view.handleBranchViewData(self._server, data['branch_view_data'], requestData);
 		}
 		if (typeof done === 'function') {
 			done.apply(this, arguments);
