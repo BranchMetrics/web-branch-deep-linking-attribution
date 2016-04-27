@@ -54,6 +54,12 @@
 					<button id="track-3b" class="btn btn-info">.track('blue')</button>
 					<button id="track-4b" class="btn btn-info">.track('white')</button>
 				</div>
+				<h4>Branch Views - Free Form</h4>
+				<div class="group">
+					<label><input id="edit-1c" placeholder="rainbow" /> Custom Event </label>
+					<br/>
+					<button id="track-1c" class="btn btn-info">.track( { the event you entered above } )</button>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -89,6 +95,18 @@
 		$('#track-2b').click(function() {branch.track('green',{'metadata foo': 'metadata bar'},function(err) {});});
 		$('#track-3b').click(function() {branch.track('blue',{'metadata foo': 'metadata bar'},function(err) {});});
 		$('#track-4b').click(function() {branch.track('white',{'metadata foo': 'metadata bar'},function(err) {});});
+		$('#track-1c').click(function() {
+			var eventName = String($('#edit-1c').val());
+			if(typeof eventName.trim === 'function') {
+				eventName = eventName.trim();
+			}
+			if (eventName.length > 0) {
+				branch.track(eventName,{'metadata foo': 'metadata bar'},function(err) {});
+			}
+			else {
+				alert('Enter an alert in the box to fire it off');
+			}
+		});
 		$('#banner').click(function() {
 			branch.banner(
 				{
