@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.1.6] - 2016-04-27
+- Option for whether to respect 'Do Not Track'
+
 ## [v2.1.5] - 2016-04-20
 - Fixed an error on some browsers when script tags were cleaned up after jsonp calls
 

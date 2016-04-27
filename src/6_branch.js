@@ -1650,6 +1650,9 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		forgetHide: typeof options['forgetHide'] === 'number' ?
 			options['forgetHide'] :
 			!!options['forgetHide'],
+		respectDNT: typeof options['respectDNT'] === 'undefined' ?
+			true :
+			options['respectDNT'],
 		position: options['position'] || 'top',
 		customCSS: options['customCSS'] || '',
 		mobileSticky: typeof options['mobileSticky'] === 'undefined' ?
