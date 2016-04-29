@@ -95,6 +95,7 @@ ___
 5. Event Listener
   + [.addListener()](#addlistenerevent-listener)
   + [.removeListener()](#removelistenerlistener)
+  + [.setBranchViewData()](#setBranchViewData)
 
 6. Smart Banner
   + [.banner()](#banneroptions-data)
@@ -959,6 +960,14 @@ would like to remove. *note*: this must be the same reference that was passed to
 Remove the listener from observations, if it is present. Not that this function must be
 passed a referrence to the _same_ function that was passed to `branch.addListener()`, not
 just an identical clone of the function.
+
+
+
+### setBranchViewData(data) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - object of all link data, same as Branch.link()
 
 
 

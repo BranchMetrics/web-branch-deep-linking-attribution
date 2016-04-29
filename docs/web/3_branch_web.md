@@ -860,6 +860,14 @@ just an identical clone of the function.
 
 
 
+### setBranchViewData(data) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - object of all link data, same as Branch.link()
+
+
+
 ### banner(options, data) 
 
 **Parameters**

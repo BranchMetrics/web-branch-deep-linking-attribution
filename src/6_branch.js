@@ -418,8 +418,9 @@ Branch.prototype['init'] = wrap(
 					},
 					function(err, data) {
 						if (!err && typeof data === 'object') {
+							self._branchViewEnabled = !!data.hasOwnProperty('branch_view_enabled');
 							if (data.hasOwnProperty('branch_view_data')) {
-								branch_view.handleBranchViewData(self._server, data['branch_view_data']);
+								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
 								self._storage.set('branch_view_data', goog.json.serialize(data['branch_view_data']));
 							}
 							if (link_identifier) {
@@ -632,10 +633,6 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		metadata = { };
 	}
 
-	if (!requestData) {
-		requestData = { };
-	}
-
 	self._api(resources.event, {
 		"event": event,
 		"metadata": utils.merge({
@@ -644,8 +641,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			"language": navigator.language
 		}, metadata || {})
 	}, function(err, data) {
-		if (!err && typeof data === 'object' && data.hasOwnProperty('branch_view_data')) {
-			branch_view.handleBranchViewData(self._server, data['branch_view_data'], requestData);
+		if (!err && typeof data === 'object') {
+			self._branchViewEnabled = !!data.hasOwnProperty('branch_view_enabled');
+			if (data.hasOwnProperty('branch_view_data')) {
+				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
+			}
 		}
 		if (typeof done === 'function') {
 			done.apply(this, arguments);
@@ -1507,6 +1507,23 @@ Branch.prototype['removeListener'] = function(listener) {
 	}
 };
 
+
+/** =WEB
+ * @function Branch.setBranchViewData
+ * @param {Object} data - _required_ - object of all link data, same as Branch.link()
+ *
+ */
+/*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
+Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
+	data = data || {};
+	try {
+		this._branchViewData = JSON.parse(JSON.stringify(data));
+	}
+	finally {
+		this._branchViewData = this._branchViewData || {};
+	}
+});
+
 /** =WEB
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
@@ -1607,6 +1624,11 @@ Branch.prototype['removeListener'] = function(listener) {
 /*** +TOC_HEADING &Smart Banner& ^WEB ***/
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
+	this['setBranchViewData'](data);
+
+	if (this._branchViewEnabled) {
+		return;
+	}
 	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
 		options['showAgain'] = options['forgetHide'];

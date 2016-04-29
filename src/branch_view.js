@@ -99,6 +99,11 @@ function renderHtmlBlob(parent, html) {
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData) {
 	requestData = requestData || {};
+	requestData['channel'] = requestData['channel'] || 'branch view';
+
+	var cleanedData = utils.cleanLinkData(requestData);
+	cleanedData['open_app'] = true;
+
 	if (document.getElementById('branch-banner-container')) {
 		return;
 	}
@@ -138,7 +143,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData)
 		}
 
 		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
-		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(requestData)));
+		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
 		url += '&post_data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
