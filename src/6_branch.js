@@ -385,15 +385,6 @@ Branch.prototype['init'] = wrap(
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
-			var branchViewData;
-			try {
-				branchViewData = safejson.parse(self._storage.get('branch_view_data')) || null;
-			}
-			catch (e) {
-			}
-			if (branchViewData) {
-				branch_view.handleBranchViewData(self._server, branchViewData);
-			}
 			return;
 		}
 
@@ -421,7 +412,6 @@ Branch.prototype['init'] = wrap(
 							self._branchViewEnabled = !!data.hasOwnProperty('branch_view_enabled');
 							if (data.hasOwnProperty('branch_view_data')) {
 								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
-								self._storage.set('branch_view_data', goog.json.serialize(data['branch_view_data']));
 							}
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
