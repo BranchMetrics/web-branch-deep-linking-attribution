@@ -156,7 +156,7 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 	return {
 		data: this.serializeObject(d, ''),
-		url: url
+		url: url.replace(/^\//, '')
 	};
 };
 
