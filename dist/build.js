@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"http://api.dev.branch.io", version:"2.2.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.qa.branch.io", version:"2.2.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1543,9 +1543,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = task_queue();
-  var a = [], a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"];
-  a.push("pojo");
-  this._storage = new BranchStorage(a);
+  this._storage = new BranchStorage(["session", "cookie", "pojo"]);
   this._server = new Server;
   this._listeners = [];
   this.sdk = "web" + config.version;
@@ -1610,27 +1608,18 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       document[a] || g(null, null);
     }, !1);
   };
-  if (b && b.session_id && !e) {
-    h();
-    g(b, k);
-    var l;
-    try {
-      l = safejson.parse(d._storage.get("branch_view_data")) || null;
-    } catch (m) {
+  b && b.session_id && !e ? (h(), g(b, k), window.setTimeout(function() {
+    d.track("pageview");
+  })) : (b = {sdk:config.version}, c = session.get(d._storage, !0) || {}, c.browser_fingerprint_id && (b._t = c.browser_fingerprint_id), d._api(resources._r, b, function(a, b) {
+    if (a) {
+      return k(a, null);
     }
-    l && branch_view.handleBranchViewData(d._server, l);
-  } else {
-    l = {sdk:config.version}, b = session.get(d._storage, !0) || {}, b.browser_fingerprint_id && (l._t = b.browser_fingerprint_id), d._api(resources._r, l, function(a, b) {
-      if (a) {
-        return k(a, null);
-      }
-      d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-        a || "object" !== typeof b || (d._branchViewEnabled = !!b.hasOwnProperty("branch_view_enabled"), b.hasOwnProperty("branch_view_data") && (branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData), d._storage.set("branch_view_data", goog.json.serialize(b.branch_view_data))), e && (b.click_id = e));
-        h();
-        k(a, b);
-      });
+    d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
+      a || "object" !== typeof b || (d._branchViewEnabled = !!b.hasOwnProperty("branch_view_enabled"), b.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData), e && (b.click_id = e));
+      h();
+      k(a, b);
     });
-  }
+  }));
 }, !0);
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));
@@ -1795,7 +1784,7 @@ Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
     "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
     var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || 
     "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showBlackberry:"undefined" === typeof b.showBlackberry ? !0 : b.showBlackberry, showWindowsPhone:"undefined" === typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, 
-    showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, respectDNT:"undefined" === typeof b.respectDNT ? !0 : b.respectDNT, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, theme:"string" === typeof b.theme && -1 < 
+    showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, respectDNT:"undefined" === typeof b.respectDNT ? !1 : b.respectDNT, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, theme:"string" === typeof b.theme && -1 < 
     utils.bannerThemes.indexOf(b.theme) ? b.theme : utils.bannerThemes[0], buttonBorderColor:b.buttonBorderColor || "", buttonBackgroundColor:b.buttonBackgroundColor || "", buttonFontColor:b.buttonFontColor || "", buttonBorderColorHover:b.buttonBorderColorHover || "", buttonBackgroundColorHover:b.buttonBackgroundColorHover || "", buttonFontColorHover:b.buttonFontColorHover || "", make_new_link:!!b.make_new_link, open_app:!!b.open_app};
     "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile, d.showBlackberry = b.showMobile, d.showWindowsPhone = b.showMobile, d.showKindle = b.showMobile);
     this.closeBannerPointer = banner(this, d, c, this._storage);
