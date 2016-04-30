@@ -116,14 +116,7 @@ Branch = function() {
 	}
 	this._queue = task_queue();
 
-	var storageMethods = [ ];
-	if (utils.mobileUserAgent()) {
-		storageMethods = [ 'local', 'permcookie' ];
-	}
-	else {
-		storageMethods = [ 'session', 'cookie' ];
-	}
-	storageMethods.push('pojo');
+	var storageMethods = [ 'session', 'cookie', 'pojo' ];
 
 	this._storage = new BranchStorage(storageMethods);
 
@@ -385,6 +378,13 @@ Branch.prototype['init'] = wrap(
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
+
+			window.setTimeout(
+				function() {
+					self['track']('pageview');
+				}
+			);
+
 			return;
 		}
 
