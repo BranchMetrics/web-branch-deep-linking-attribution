@@ -374,17 +374,13 @@ Branch.prototype['init'] = wrap(
 					}
 				}, false);
 			}
+
+			self['track']('pageview');
 		};
 
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
 			attachVisibilityEvent();
 			checkHasApp(sessionData, finishInit);
-
-			window.setTimeout(
-				function() {
-					self['track']('pageview');
-				}
-			);
 
 			return;
 		}
@@ -410,7 +406,7 @@ Branch.prototype['init'] = wrap(
 					},
 					function(err, data) {
 						if (!err && typeof data === 'object') {
-							self._branchViewEnabled = !!data.hasOwnProperty('branch_view_enabled');
+							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
 							if (data.hasOwnProperty('branch_view_data')) {
 								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
@@ -634,7 +630,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		}, metadata || {})
 	}, function(err, data) {
 		if (!err && typeof data === 'object') {
-			self._branchViewEnabled = !!data.hasOwnProperty('branch_view_enabled');
+			self._branchViewEnabled = !!data['branch_view_enabled'];
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
 				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);

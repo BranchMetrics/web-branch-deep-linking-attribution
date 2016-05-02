@@ -1609,15 +1609,14 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     b && document.addEventListener(b, function() {
       document[a] || g(null, null);
     }, !1);
-  };
-  b && b.session_id && !e ? (h(), g(b, k), window.setTimeout(function() {
     d.track("pageview");
-  })) : (b = {sdk:config.version}, c = session.get(d._storage, !0) || {}, c.browser_fingerprint_id && (b._t = c.browser_fingerprint_id), d._api(resources._r, b, function(a, b) {
+  };
+  b && b.session_id && !e ? (h(), g(b, k)) : (b = {sdk:config.version}, c = session.get(d._storage, !0) || {}, c.browser_fingerprint_id && (b._t = c.browser_fingerprint_id), d._api(resources._r, b, function(a, b) {
     if (a) {
       return k(a, null);
     }
     d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-      a || "object" !== typeof b || (d._branchViewEnabled = !!b.hasOwnProperty("branch_view_enabled"), d._storage.set("branch_view_enabled", d._branchViewEnabled), b.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData), e && (b.click_id = e));
+      a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), b.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData), e && (b.click_id = e));
       h();
       k(a, b);
     });
@@ -1662,7 +1661,7 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
   var e = this;
   c || (c = {});
   e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, function(b, c) {
-    b || "object" !== typeof c || (e._branchViewEnabled = !!c.hasOwnProperty("branch_view_enabled"), e._storage.set("branch_view_enabled", e._branchViewEnabled), c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData));
+    b || "object" !== typeof c || (e._branchViewEnabled = !!c.branch_view_enabled, e._storage.set("branch_view_enabled", e._branchViewEnabled), c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData));
     "function" === typeof a && a.apply(this, arguments);
   });
 });
