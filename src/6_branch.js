@@ -1512,6 +1512,7 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
 	finally {
 		this._branchViewData = this._branchViewData || {};
 	}
+	done();
 });
 
 /** =WEB
@@ -1618,6 +1619,7 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 	this['setBranchViewData'](data);
 
 	if (this._branchViewEnabled) {
+		done();
 		return;
 	}
 	if (typeof options['showAgain'] === 'undefined' &&
