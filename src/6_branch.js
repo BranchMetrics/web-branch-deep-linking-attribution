@@ -300,6 +300,7 @@ Branch.prototype['init'] = wrap(
 			null;
 		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
+		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 
 		var checkHasApp = function(sessionData, cb) {
 			var params_r = { "sdk": config.version };
@@ -410,6 +411,7 @@ Branch.prototype['init'] = wrap(
 					function(err, data) {
 						if (!err && typeof data === 'object') {
 							self._branchViewEnabled = !!data.hasOwnProperty('branch_view_enabled');
+							self._storage.set('branch_view_enabled', self._branchViewEnabled);
 							if (data.hasOwnProperty('branch_view_data')) {
 								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
 							}
@@ -633,6 +635,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 	}, function(err, data) {
 		if (!err && typeof data === 'object') {
 			self._branchViewEnabled = !!data.hasOwnProperty('branch_view_enabled');
+			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
 				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
 			}

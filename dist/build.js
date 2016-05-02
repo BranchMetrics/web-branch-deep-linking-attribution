@@ -1575,7 +1575,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   b = session.get(d._storage);
-  var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id, g = function(a, b) {
+  var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id;
+  d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
+  var g = function(a, b) {
     var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
     f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
     d._api(resources._r, c, function(a, b) {
@@ -1615,7 +1617,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       return k(a, null);
     }
     d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-      a || "object" !== typeof b || (d._branchViewEnabled = !!b.hasOwnProperty("branch_view_enabled"), b.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData), e && (b.click_id = e));
+      a || "object" !== typeof b || (d._branchViewEnabled = !!b.hasOwnProperty("branch_view_enabled"), d._storage.set("branch_view_enabled", d._branchViewEnabled), b.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData), e && (b.click_id = e));
       h();
       k(a, b);
     });
@@ -1660,7 +1662,7 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
   var e = this;
   c || (c = {});
   e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, function(b, c) {
-    b || "object" !== typeof c || (e._branchViewEnabled = !!c.hasOwnProperty("branch_view_enabled"), c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData));
+    b || "object" !== typeof c || (e._branchViewEnabled = !!c.hasOwnProperty("branch_view_enabled"), e._storage.set("branch_view_enabled", e._branchViewEnabled), c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData));
     "function" === typeof a && a.apply(this, arguments);
   });
 });
@@ -1777,6 +1779,7 @@ Branch.prototype.setBranchViewData = wrap(callback_params.NO_CALLBACK, function(
   } finally {
     this._branchViewData = this._branchViewData || {};
   }
+  a();
 });
 Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
   this.setBranchViewData(c);
@@ -1788,8 +1791,8 @@ Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
     utils.bannerThemes.indexOf(b.theme) ? b.theme : utils.bannerThemes[0], buttonBorderColor:b.buttonBorderColor || "", buttonBackgroundColor:b.buttonBackgroundColor || "", buttonFontColor:b.buttonFontColor || "", buttonBorderColorHover:b.buttonBorderColorHover || "", buttonBackgroundColorHover:b.buttonBackgroundColorHover || "", buttonFontColorHover:b.buttonFontColorHover || "", make_new_link:!!b.make_new_link, open_app:!!b.open_app};
     "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile, d.showBlackberry = b.showMobile, d.showWindowsPhone = b.showMobile, d.showKindle = b.showMobile);
     this.closeBannerPointer = banner(this, d, c, this._storage);
-    a();
   }
+  a();
 });
 Branch.prototype.closeBanner = wrap(0, function(a) {
   if (this.closeBannerPointer) {
