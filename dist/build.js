@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.qa.branch.io", version:"2.2.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.1.6"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -923,7 +923,7 @@ function defaults(a) {
 }
 resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING)}};
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, branch_id)}};
-resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
+resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
 resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
@@ -1130,7 +1130,7 @@ Server.prototype.getUrl = function(a, b) {
     }
   }
   "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
-  return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
+  return {data:this.serializeObject(h, ""), url:e};
 };
 Server.prototype.createScript = function(a, b, c) {
   var d = document.createElement("script");
@@ -1142,7 +1142,7 @@ Server.prototype.createScript = function(a, b, c) {
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
-  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
+  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("api.branch.io") ? "&data=" : "&post_data=";
   b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var g = window.setTimeout(function() {
     window[e] = function() {
@@ -1163,36 +1163,30 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     delete window[e];
   });
 };
-Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
-  var g = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  g.ontimeout = function() {
+Server.prototype.XHRRequest = function(a, b, c, d, e) {
+  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  f.ontimeout = function() {
     e(Error(utils.messages.timeout), null, 504);
   };
-  g.onerror = function(a) {
-    e(Error(a.error || "Error in API: " + g.status), null, g.status);
+  f.onerror = function(a) {
+    e(Error(a.error || "Error in API: " + f.status), null, f.status);
   };
-  g.onreadystatechange = function() {
-    var a;
-    if (4 === g.readyState) {
-      if (200 === g.status) {
-        if (f) {
-          a = g.responseText;
-        } else {
-          try {
-            a = safejson.parse(g.responseText);
-          } catch (b) {
-            a = {};
-          }
+  f.onreadystatechange = function() {
+    if (4 === f.readyState) {
+      if (200 === f.status) {
+        try {
+          e(null, safejson.parse(f.responseText), f.status);
+        } catch (a) {
+          e(null, {}, f.status);
         }
-        e(null, a, g.status);
       } else {
-        402 === g.status ? e(Error("Not enough credits to redeem."), null, g.status) : "4" !== g.status.toString().substring(0, 1) && "5" !== g.status.toString().substring(0, 1) || e(Error("Error in API: " + g.status), null, g.status);
+        402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
   };
   try {
-    g.open(c, a, !0), g.timeout = TIMEOUT, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
-  } catch (k) {
+    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
+  } catch (g) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
@@ -1218,9 +1212,9 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, hasClass:function(a, b) {
   return !!a.className.match(new RegExp("(\\s|^)" + b + "(\\s|$)"));
 }, addClass:function(a, b) {
-  a && !banner_utils.hasClass(a, b) && (a.className += " " + b);
+  banner_utils.hasClass(a, b) || (a.className += " " + b);
 }, removeClass:function(a, b) {
-  a && banner_utils.hasClass(a, b) && (a.className = a.className.replace(new RegExp("(\\s|^)" + b + "(\\s|$)"), " "));
+  banner_utils.hasClass(a, b) && (a.className = a.className.replace(new RegExp("(\\s|^)" + b + "(\\s|$)"), " "));
 }, getDate:function(a) {
   var b = new Date;
   return b.setDate(b.getDate() + a);
@@ -1433,81 +1427,6 @@ var sendSMS = function(a, b, c, d) {
   return n;
 };
 // Input 14
-var branch_view = {};
-function renderHtmlBlob(a, b) {
-  var c = /<script type="text\/javascript">((.|\s)*)<\/script>/, d = b.match(c);
-  d && (d = d[1], b.replace(c, ""), c = document.createElement("script"), c.innerHTML = d, document.body.appendChild(c));
-  a = a || document.body;
-  var e = document.createElement("div");
-  e.id = "branch-banner-container";
-  e.className = "branch-animation";
-  e.innerHTML = b;
-  a.insertBefore(e, a.firstChild);
-  banner_utils.addClass(e, "branch-banner-is-active");
-  e.marginTop = "76px";
-  setTimeout(function() {
-    e.style.top = "0";
-  }, 100);
-  return e;
-}
-branch_view.handleBranchViewData = function(a, b, c) {
-  c = c || {};
-  c.channel = c.channel || "branch view";
-  c = utils.cleanLinkData(c);
-  c.open_app = !0;
-  if (!document.getElementById("branch-banner-container")) {
-    if (b.html) {
-      return renderHtmlBlob(document.body, b.html);
-    }
-    if (b.url) {
-      var d = function(a, b) {
-        if (a && b) {
-          setTimeout(function() {
-            banner_utils.removeClass(b.querySelector("#branch-banner"), "branch-animation-out");
-            banner_utils.addClass(b.querySelector("#branch-banner"), "branch-animation-in");
-          }, 250);
-          var c = b.querySelectorAll("#branch-mobile-action");
-          Array.prototype.forEach.call(c, function(b) {
-            b.addEventListener("click", function(b) {
-              a();
-              e.parentElement.removeChild(e);
-            });
-          });
-          c = b.querySelectorAll(".branch-banner-continue");
-          Array.prototype.forEach.call(c, function(a) {
-            a.addEventListener("click", function(a) {
-              e.parentElement.removeChild(e);
-            });
-          });
-          c = b.querySelectorAll(".branch-banner-close");
-          Array.prototype.forEach.call(c, function(a) {
-            a.addEventListener("click", function(a) {
-              e.parentElement.removeChild(e);
-            });
-          });
-        }
-      }, e = null, f = null, g = "branch_view_callback__" + jsonp_callback_index++;
-      c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
-      b = b.url + "&callback=" + g;
-      a.XHRRequest(b + ("&post_data=" + c), {}, "GET", {}, function(a, b) {
-        if (!a && b) {
-          var c = window.setTimeout(function() {
-            window[g] = function() {
-            };
-          }, TIMEOUT);
-          window[g] = function(a) {
-            window.clearTimeout(c);
-            f = a;
-            d(f, e);
-          };
-          e = renderHtmlBlob(document.body, b);
-          d(f, e);
-        }
-      }, !0);
-    }
-  }
-};
-// Input 15
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
@@ -1547,7 +1466,9 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     return default_branch || (default_branch = new Branch), default_branch;
   }
   this._queue = task_queue();
-  this._storage = new BranchStorage(["session", "cookie", "pojo"]);
+  var a = [], a = utils.mobileUserAgent() ? ["local", "permcookie"] : ["session", "cookie"];
+  a.push("pojo");
+  this._storage = new BranchStorage(a);
   this._server = new Server;
   this._listeners = [];
   this.sdk = "web" + config.version;
@@ -1579,9 +1500,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   b = session.get(d._storage);
-  var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id;
-  d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var g = function(a, b) {
+  var e = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), f = !b || !b.identity_id, g = function(a, b) {
     var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
     f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
     d._api(resources._r, c, function(a, b) {
@@ -1613,14 +1532,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     b && document.addEventListener(b, function() {
       document[a] || g(null, null);
     }, !1);
-    d.track("pageview");
   };
   b && b.session_id && !e ? (h(), g(b, k)) : (b = {sdk:config.version}, c = session.get(d._storage, !0) || {}, c.browser_fingerprint_id && (b._t = c.browser_fingerprint_id), d._api(resources._r, b, function(a, b) {
     if (a) {
       return k(a, null);
     }
     d._api(resources.open, {link_identifier:e, is_referrable:1, browser_fingerprint_id:b}, function(a, b) {
-      a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), b.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData), e && (b.click_id = e));
+      b && e && (b.click_id = e);
       h();
       k(a, b);
     });
@@ -1661,13 +1579,9 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     a(null);
   });
 });
-Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
-  var e = this;
+Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   c || (c = {});
-  e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, function(b, c) {
-    b || "object" !== typeof c || (e._branchViewEnabled = !!c.branch_view_enabled, e._storage.set("branch_view_enabled", e._branchViewEnabled), c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData));
-    "function" === typeof a && a.apply(this, arguments);
-  });
+  this._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {})}, a);
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
@@ -1695,9 +1609,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     if (b) {
       return a(b);
     }
-    var d = c.url;
-    /(bnc.lt\/|app\.link\/)/.test(d) || (d = config.link_service_endpoint + utils.extractDeeplinkPath(d));
-    f._api(resources.linkClick, {link_url:d, click:"click"}, function(b, c) {
+    f._api(resources.linkClick, {link_url:utils.extractDeeplinkPath(c.url), click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }
@@ -1777,26 +1689,14 @@ Branch.prototype.removeListener = function(a) {
     }
   }));
 };
-Branch.prototype.setBranchViewData = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
-  c = c || {};
-  try {
-    this._branchViewData = JSON.parse(JSON.stringify(c));
-  } finally {
-    this._branchViewData = this._branchViewData || {};
-  }
-  a();
-});
 Branch.prototype.banner = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
-  this.setBranchViewData(c);
-  if (!this._branchViewEnabled) {
-    "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
-    var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || 
-    "(999) 999-9999", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showBlackberry:"undefined" === typeof b.showBlackberry ? !0 : b.showBlackberry, showWindowsPhone:"undefined" === typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, 
-    showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, respectDNT:"undefined" === typeof b.respectDNT ? !1 : b.respectDNT, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, theme:"string" === typeof b.theme && -1 < 
-    utils.bannerThemes.indexOf(b.theme) ? b.theme : utils.bannerThemes[0], buttonBorderColor:b.buttonBorderColor || "", buttonBackgroundColor:b.buttonBackgroundColor || "", buttonFontColor:b.buttonFontColor || "", buttonBorderColorHover:b.buttonBorderColorHover || "", buttonBackgroundColorHover:b.buttonBackgroundColorHover || "", buttonFontColorHover:b.buttonFontColorHover || "", make_new_link:!!b.make_new_link, open_app:!!b.open_app};
-    "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile, d.showBlackberry = b.showMobile, d.showWindowsPhone = b.showMobile, d.showKindle = b.showMobile);
-    this.closeBannerPointer = banner(this, d, c, this._storage);
-  }
+  "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
+  var d = {icon:b.icon || "", title:b.title || "", description:b.description || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:b.openAppButtonText || "View in app", downloadAppButtonText:b.downloadAppButtonText || "Download App", sendLinkText:b.sendLinkText || "Send Link", phonePreviewText:b.phonePreviewText || "(999) 999-9999", 
+  iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showBlackberry:"undefined" === typeof b.showBlackberry ? !0 : b.showBlackberry, showWindowsPhone:"undefined" === typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, showDesktop:"undefined" === 
+  typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, respectDNT:"undefined" === typeof b.respectDNT ? !0 : b.respectDNT, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, theme:"string" === typeof b.theme && -1 < utils.bannerThemes.indexOf(b.theme) ? 
+  b.theme : utils.bannerThemes[0], buttonBorderColor:b.buttonBorderColor || "", buttonBackgroundColor:b.buttonBackgroundColor || "", buttonFontColor:b.buttonFontColor || "", buttonBorderColorHover:b.buttonBorderColorHover || "", buttonBackgroundColorHover:b.buttonBackgroundColorHover || "", buttonFontColorHover:b.buttonFontColorHover || "", make_new_link:!!b.make_new_link, open_app:!!b.open_app};
+  "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile, d.showBlackberry = b.showMobile, d.showWindowsPhone = b.showMobile, d.showKindle = b.showMobile);
+  this.closeBannerPointer = banner(this, d, c, this._storage);
   a();
 });
 Branch.prototype.closeBanner = wrap(0, function(a) {
@@ -1809,7 +1709,7 @@ Branch.prototype.closeBanner = wrap(0, function(a) {
   }
   a();
 });
-// Input 16
+// Input 15
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
