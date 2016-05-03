@@ -48,12 +48,18 @@ banner_utils.hasClass = function(element, className) {
 };
 
 banner_utils.addClass = function(element, className) {
+	if (!element) {
+		return;
+	}
 	if (!banner_utils.hasClass(element, className)) {
 		element.className += ' ' + className;
 	}
 };
 
 banner_utils.removeClass = function(element, className) {
+	if (!element) {
+		return;
+	}
 	if (banner_utils.hasClass(element, className)) {
 		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
 		element.className = element.className.replace(reg, ' ');

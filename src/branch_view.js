@@ -121,6 +121,12 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData)
 			if(!cta || !banner) {
 				return;
 			}
+
+			setTimeout(function() {
+				banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
+				banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
+			}, 250);
+
 			var actionEls = banner.querySelectorAll('#branch-mobile-action');
 			Array.prototype.forEach.call(actionEls, function(el) {
 				el.addEventListener('click', function(e) {
@@ -134,7 +140,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData)
 					destroyBanner();
 				})
 			})
-			var cancelEls = banner.querySelectorAll('.branch-banner-close');
+			cancelEls = banner.querySelectorAll('.branch-banner-close');
 			Array.prototype.forEach.call(cancelEls, function(el) {
 				el.addEventListener('click', function(e) {
 					destroyBanner();
