@@ -26,6 +26,7 @@
 5. Event Listener
   + [.addListener()](#addlistenerevent-listener)
   + [.removeListener()](#removelistenerlistener)
+  + [.setBranchViewData()](#setBranchViewData)
 
 6. Smart Banner
   + [.banner()](#banneroptions-data)

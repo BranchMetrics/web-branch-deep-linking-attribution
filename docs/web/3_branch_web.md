@@ -860,6 +860,14 @@ just an identical clone of the function.
 
 
 
+### setBranchViewData(data) 
+
+**Parameters**
+
+**data**: `Object`, _required_ - object of all link data, same as Branch.link()
+
+
+
 ### banner(options, data) 
 
 **Parameters**
@@ -919,6 +927,7 @@ branch.banner({
     iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
+    respectDNT: false,                      // Should we skip showing the banner when a user's settings show 'Do Not Track'?
     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
