@@ -923,7 +923,7 @@ function defaults(a) {
 }
 resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING)}};
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, branch_id)}};
-resources.linkClick = {destination:config.link_service_endpoint, endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
+resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
 resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
 resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
@@ -1130,7 +1130,7 @@ Server.prototype.getUrl = function(a, b) {
     }
   }
   "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
-  return {data:this.serializeObject(h, ""), url:e};
+  return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
 };
 Server.prototype.createScript = function(a, b, c) {
   var d = document.createElement("script");
@@ -1218,9 +1218,9 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
 }, hasClass:function(a, b) {
   return !!a.className.match(new RegExp("(\\s|^)" + b + "(\\s|$)"));
 }, addClass:function(a, b) {
-  banner_utils.hasClass(a, b) || (a.className += " " + b);
+  a && !banner_utils.hasClass(a, b) && (a.className += " " + b);
 }, removeClass:function(a, b) {
-  banner_utils.hasClass(a, b) && (a.className = a.className.replace(new RegExp("(\\s|^)" + b + "(\\s|$)"), " "));
+  a && banner_utils.hasClass(a, b) && (a.className = a.className.replace(new RegExp("(\\s|^)" + b + "(\\s|$)"), " "));
 }, getDate:function(a) {
   var b = new Date;
   return b.setDate(b.getDate() + a);
@@ -1462,6 +1462,10 @@ branch_view.handleBranchViewData = function(a, b, c) {
     if (b.url) {
       var d = function(a, b) {
         if (a && b) {
+          setTimeout(function() {
+            banner_utils.removeClass(b.querySelector("#branch-banner"), "branch-animation-out");
+            banner_utils.addClass(b.querySelector("#branch-banner"), "branch-animation-in");
+          }, 250);
           var c = b.querySelectorAll("#branch-mobile-action");
           Array.prototype.forEach.call(c, function(b) {
             b.addEventListener("click", function(b) {
@@ -1691,7 +1695,9 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     if (b) {
       return a(b);
     }
-    f._api(resources.linkClick, {link_url:utils.extractDeeplinkPath(c.url), click:"click"}, function(b, c) {
+    var d = c.url;
+    /(bnc.lt\/|app\.link\/)/.test(d) || (d = config.link_service_endpoint + utils.extractDeeplinkPath(d));
+    f._api(resources.linkClick, {link_url:d, click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }

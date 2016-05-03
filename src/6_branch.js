@@ -856,10 +856,13 @@ Branch.prototype['sendSMS'] = wrap(
 						return done(err);
 					}
 					var url = data['url'];
+					if (!/(bnc.lt\/|app\.link\/)/.test(url)) {
+						url = config.link_service_endpoint + utils.extractDeeplinkPath(url);
+					}
 					self._api(
 						resources.linkClick,
 						{
-							"link_url": utils.extractDeeplinkPath(url),
+							"link_url": url,
 							"click": "click"
 						},
 						function(err, data) {

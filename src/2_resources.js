@@ -117,7 +117,7 @@ resources._r = {
 };
 
 resources.linkClick = {
-	destination: config.link_service_endpoint,
+	destination: "",
 	endpoint: "",
 	method: utils.httpMethod.GET,
 	queryPart: {
