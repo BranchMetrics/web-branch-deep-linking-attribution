@@ -21,7 +21,7 @@ then
 fi
 
 sed -i -e "s/branch-beta-$VERSION\.js/branch-latest\.min\.js/" example.html
-sed -i -e "s/https\:\/\/cdn\.branch\.io\/branch-beta-$VERSION\.js/dist\/build\.js/" event-example.html
+sed -i -e "s/https\:\/\/cdn\.branch\.io\/branch-beta-$VERSION\.js/dist\/build\.min\.js/" event-example.html
 
 rm -f dist/build.min.js.gz
 
