@@ -345,7 +345,12 @@ Branch.prototype['init'] = wrap(
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
 			}
-			done(err, data && utils.whiteListSessionData(data));
+			try {
+				done(err, data && utils.whiteListSessionData(data));
+			}
+			finally {
+				self['track']('pageview');
+			}
 		};
 
 		var attachVisibilityEvent = function() {
@@ -374,8 +379,6 @@ Branch.prototype['init'] = wrap(
 					}
 				}, false);
 			}
-
-			self['track']('pageview');
 		};
 
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
@@ -1506,7 +1509,7 @@ Branch.prototype['removeListener'] = function(listener) {
  *
  */
 /*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
-Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
+Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
 	data = data || {};
 	try {
 		this._branchViewData = JSON.parse(JSON.stringify(data));
