@@ -57,7 +57,11 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData)
 		var cta = null;
 
 		function destroyBanner() {
-			banner.parentElement.removeChild(banner);
+			banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
+			banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
+			setTimeout(function() {
+				banner.parentElement.removeChild(banner);
+			}, 250);
 		}
 
 		function finalHookups(cta, banner) {
