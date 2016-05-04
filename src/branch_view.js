@@ -98,7 +98,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData)
 		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
 		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
-		url += '&post_data=' + postData;
+		url += '&data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
 			if (!error && html) {
 
