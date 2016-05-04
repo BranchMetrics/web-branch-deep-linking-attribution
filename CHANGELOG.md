@@ -2,9 +2,7 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
-
-## [v2.2.0] - 2016-05-03
+## [v2.2.0] - 2016-05-04
 - Fix for sendSMS issues with subdomains
 - Fix for custom banner styling issues
 - Added ability for custom Branch View display through events 
