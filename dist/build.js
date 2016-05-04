@@ -1495,7 +1495,7 @@ branch_view.handleBranchViewData = function(a, b, c) {
       }, f = null, g = null, h = "branch_view_callback__" + jsonp_callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
       b = b.url + "&callback=" + h;
-      a.XHRRequest(b + ("&post_data=" + c), {}, "GET", {}, function(a, b) {
+      a.XHRRequest(b + ("&data=" + c), {}, "GET", {}, function(a, b) {
         if (!a && b) {
           var c = window.setTimeout(function() {
             window[h] = function() {
@@ -1612,14 +1612,17 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       c.data_parsed = c.data ? safejson.parse(c.data) : null;
     }
     b && (d.init_state = init_states.INIT_FAILED);
-    a(b, c && utils.whiteListSessionData(c));
+    try {
+      a(b, c && utils.whiteListSessionData(c));
+    } finally {
+      d.track("pageview");
+    }
   }, k = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
       document[a] || g(null, null);
     }, !1);
-    d.track("pageview");
   };
   b && b.session_id && !e ? (k(), g(b, h)) : (b = {sdk:config.version}, c = session.get(d._storage, !0) || {}, c.browser_fingerprint_id && (b._t = c.browser_fingerprint_id), d._api(resources._r, b, function(a, b) {
     if (a) {
@@ -1783,10 +1786,10 @@ Branch.prototype.removeListener = function(a) {
     }
   }));
 };
-Branch.prototype.setBranchViewData = wrap(callback_params.NO_CALLBACK, function(a, b, c) {
-  c = c || {};
+Branch.prototype.setBranchViewData = wrap(callback_params.NO_CALLBACK, function(a, b) {
+  b = b || {};
   try {
-    this._branchViewData = JSON.parse(JSON.stringify(c));
+    this._branchViewData = JSON.parse(JSON.stringify(b));
   } finally {
     this._branchViewData = this._branchViewData || {};
   }
