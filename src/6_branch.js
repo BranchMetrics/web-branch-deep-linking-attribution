@@ -412,7 +412,7 @@ Branch.prototype['init'] = wrap(
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
 							if (data.hasOwnProperty('branch_view_data')) {
-								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
+								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage);
 							}
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
@@ -636,7 +636,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._branchViewEnabled = !!data['branch_view_enabled'];
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
-				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData);
+				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage);
 			}
 		}
 		if (typeof done === 'function') {

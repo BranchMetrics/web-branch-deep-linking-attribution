@@ -40,7 +40,7 @@ function renderHtmlBlob(parent, html) {
  * @param {utils._httpMethod} requestMethod
  * @param {function(?Error,*=,?=)=} callback
  */
-branch_view.handleBranchViewData = function(server, branchViewData, requestData) {
+branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage) {
 	requestData = requestData || {};
 	requestData['channel'] = requestData['channel'] || 'branch view';
 
@@ -50,6 +50,11 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData)
 	if (document.getElementById('branch-banner-container')) {
 		return;
 	}
+
+	if (storage.get('hideBanner', true)) {
+		return;
+	}
+
 	if (branchViewData['html']) {
 		return renderHtmlBlob(document.body, branchViewData['html']);
 	} else if (branchViewData['url']) {
@@ -85,12 +90,14 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData)
 			Array.prototype.forEach.call(cancelEls, function(el) {
 				el.addEventListener('click', function(e) {
 					destroyBanner();
+					storage.set('hideBanner', banner_utils.getDate(1), true);
 				})
 			})
 			cancelEls = banner.querySelectorAll('.branch-banner-close');
 			Array.prototype.forEach.call(cancelEls, function(el) {
 				el.addEventListener('click', function(e) {
 					destroyBanner();
+					storage.set('hideBanner', banner_utils.getDate(1), true);
 				})
 			})
 		}
