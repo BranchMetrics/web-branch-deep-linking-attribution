@@ -42,7 +42,7 @@ function renderHtmlBlob(parent, html) {
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage) {
 	requestData = requestData || {};
-	requestData['channel'] = requestData['channel'] || 'branch view';
+	requestData['feature'] = 'journeys';
 
 	var cleanedData = utils.cleanLinkData(requestData);
 	cleanedData['open_app'] = true;

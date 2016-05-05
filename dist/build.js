@@ -1452,7 +1452,7 @@ function renderHtmlBlob(a, b) {
 }
 branch_view.handleBranchViewData = function(a, b, c, d) {
   c = c || {};
-  c.channel = c.channel || "branch view";
+  c.feature = "journeys";
   c = utils.cleanLinkData(c);
   c.open_app = !0;
   if (!document.getElementById("branch-banner-container") && !d.get("hideBanner", !0)) {
