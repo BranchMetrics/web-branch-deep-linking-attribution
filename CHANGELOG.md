@@ -4,6 +4,8 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [VERSION] - unreleased
+
 ## [v2.2.0] - 2016-05-05
 - Fix for sendSMS issues with subdomains
 - Fix for custom banner styling issues
