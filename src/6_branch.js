@@ -860,7 +860,7 @@ Branch.prototype['sendSMS'] = wrap(
 					}
 					var url = data['url'];
 					if (!/(bnc.lt\/|app\.link\/)/.test(url)) {
-						url = config.link_service_endpoint + utils.extractDeeplinkPath(url);
+						url = config.link_service_endpoint + '/' + utils.extractDeeplinkPath(url);
 					}
 					self._api(
 						resources.linkClick,
