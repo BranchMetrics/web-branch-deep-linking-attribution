@@ -22,7 +22,7 @@ branch.banner(
 ```
 ### The Call To Action Text _optional_
 On mobile devices, the app banner show's an option either to download the app if they do not have it installed, or open the app if they have already installed it. Both of these can be customized from their respective defaults of Download app, and View in app.
-When the banner is opened on a desktop devide, a simpel form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
+When the banner is opened on a desktop device, a simple form is shown that allows the user to txt themselves a link to the app. Both the placeholder phone number, and the text in the button can be customzied from their respective defaults of '(999) 999-9999' and 'Send Link'.
 ```js
 branch.banner(
  {
