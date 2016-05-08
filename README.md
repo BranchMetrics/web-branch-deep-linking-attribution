@@ -677,7 +677,7 @@ This function is no longer supported.
 
 **Parameters**
 
-**options**: `Object`, _required_ - contins options for referral code creation.
+**options**: `Object`, _required_ - contains options for referral code creation.
 
 **callback**: `function`, _optional_ - returns an error if unsuccessful
 
