@@ -1398,7 +1398,8 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, e);
   c.channel = c.channel || "app banner";
   var f = b.iframe ? e.contentWindow.document : document;
-  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function() {
+  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, a.deepview(c, b), f.getElementById("branch-mobile-action").onclick = function(b) {
+    b.preventDefault();
     a.deepviewCta();
   }) : f.getElementById("sms-form").addEventListener("submit", function(d) {
     d.preventDefault();
