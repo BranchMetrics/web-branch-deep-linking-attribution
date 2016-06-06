@@ -154,6 +154,11 @@ Server.prototype.getUrl = function(resource, data) {
 	if (resource.endpoint === '/v1/event') {
 		d['metadata'] = JSON.stringify(d['metadata'] || {});
 	}
+
+	if (resource.endpoint === '/v1/open') {
+		d['options'] = JSON.stringify(d['options'] || {});
+	}
+
 	return {
 		data: this.serializeObject(d, ''),
 		url: url.replace(/^\//, '')
