@@ -405,7 +405,8 @@ Branch.prototype['init'] = wrap(
 					{
 						"link_identifier": link_identifier,
 						"is_referrable": 1,
-						"browser_fingerprint_id": browser_fingerprint_id
+						"browser_fingerprint_id": browser_fingerprint_id,
+						"options": options
 					},
 					function(err, data) {
 						if (!err && typeof data === 'object') {
