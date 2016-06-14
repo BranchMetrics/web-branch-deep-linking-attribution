@@ -1099,7 +1099,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 
 /**
  * @function Branch.getCode
- * @param {Object} options - _required_ - contins options for referral code creation.
+ * @param {Object} options - _required_ - contains options for referral code creation.
  * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
  * Create a referral code using the supplied parameters.  The code can be given to other users to
