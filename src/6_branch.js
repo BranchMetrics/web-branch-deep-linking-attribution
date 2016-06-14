@@ -1622,11 +1622,6 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 	this['setBranchViewData'](data);
-
-	if (this._branchViewEnabled) {
-		done();
-		return;
-	}
 	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
 		options['showAgain'] = options['forgetHide'];
