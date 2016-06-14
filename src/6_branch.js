@@ -1100,7 +1100,7 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 
 /**
  * @function Branch.getCode
- * @param {Object} options - _required_ - contins options for referral code creation.
+ * @param {Object} options - _required_ - contains options for referral code creation.
  * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
  *
  * Create a referral code using the supplied parameters.  The code can be given to other users to
@@ -1623,11 +1623,6 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 	this['setBranchViewData'](data);
-
-	if (this._branchViewEnabled) {
-		done();
-		return;
-	}
 	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
 		options['showAgain'] = options['forgetHide'];

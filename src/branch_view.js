@@ -2,18 +2,41 @@
 goog.provide('branch_view');
 goog.require('utils');
 goog.require('banner_css');
+goog.require('safejson');
 
 function renderHtmlBlob(parent, html) {
-	var re = /<script type="text\/javascript">((.|\s)*)<\/script>/;
-	var match = html.match(re);
+	var re, match;
+
+	// journey metadata
+	re = /<script type="application\/json">((.|\s)*?)<\/script>/;
+	match = html.match(re);
 	if(match) {
 		var src = match[1];
-		html.replace(re,'');
+		html = html.replace(re,'');
+
+		var metadata = safejson.parse(src);
+		if (metadata && metadata.injectorSelector) {
+			var parentTrap = document.querySelector(metadata.injectorSelector);
+			if (parentTrap) {
+				parent = parentTrap;
+				parent.innerHTML = '';
+			}
+			else {
+				return null;
+			}
+		}
+	}
+
+	// javascript injection
+	re = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
+	match = html.match(re);
+	if(match) {
+		var src = match[1];
+		html = html.replace(re,'');
 		var script = document.createElement('script');
 		script.innerHTML = src;
 		document.body.appendChild(script);
 	}
-
 
 	parent = parent || document.body;
 	var banner = document.createElement('div');
@@ -23,8 +46,6 @@ function renderHtmlBlob(parent, html) {
 	parent.insertBefore(banner, parent.firstChild);
 
 	banner_utils.addClass(banner, 'branch-banner-is-active');
-	banner.marginTop = '76px';
-
 
 	setTimeout(function() {
 			banner.style.top = '0';
@@ -107,6 +128,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		var url = branchViewData['url'] + '&callback=' + callbackString;
 		url += '&data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
+			var failed = false;
 			if (!error && html) {
 
 				var timeoutTrigger = window.setTimeout(
@@ -118,12 +140,19 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 
 				window[callbackString] = function(data) {
 					window.clearTimeout(timeoutTrigger);
+					if (failed) {
+						return;
+					}
 					cta = data;
 					finalHookups(cta,banner);
 				};
 
 
 				banner = renderHtmlBlob(document.body, html);
+				if (banner === null) {
+					failed = true;
+					return;
+				}
 				finalHookups(cta,banner);
 			}
 		}, true);
