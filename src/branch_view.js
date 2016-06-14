@@ -46,8 +46,6 @@ function renderHtmlBlob(parent, html) {
 	parent.insertBefore(banner, parent.firstChild);
 
 	banner_utils.addClass(banner, 'branch-banner-is-active');
-	// banner.marginTop = '76px';
-
 
 	setTimeout(function() {
 			banner.style.top = '0';
