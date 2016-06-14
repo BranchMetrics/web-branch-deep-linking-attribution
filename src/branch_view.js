@@ -2,18 +2,36 @@
 goog.provide('branch_view');
 goog.require('utils');
 goog.require('banner_css');
+goog.require('safejson');
 
 function renderHtmlBlob(parent, html) {
-	var re = /<script type="text\/javascript">((.|\s)*)<\/script>/;
+	// javascript injection
+	var re = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 	var match = html.match(re);
 	if(match) {
 		var src = match[1];
-		html.replace(re,'');
+		html = html.replace(re,'');
 		var script = document.createElement('script');
 		script.innerHTML = src;
 		document.body.appendChild(script);
 	}
 
+	// journey metadata
+	re = /<script type="application\/json">((.|\s)*?)<\/script>/;
+	match = html.match(re);
+	if(match) {
+		var src = match[1];
+		html = html.replace(re,'');
+
+		var metadata = safejson.parse(src);
+		if (metadata && metadata.injectorSelector) {
+			var parentTrap = document.querySelector(metadata.injectorSelector);
+			if (parentTrap) {
+				parent = parentTrap;
+				parent.innerHTML = '';
+			}
+		}
+	}
 
 	parent = parent || document.body;
 	var banner = document.createElement('div');
