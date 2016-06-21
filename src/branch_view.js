@@ -68,7 +68,9 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	var cleanedData = utils.cleanLinkData(requestData);
 	cleanedData['open_app'] = true;
 
-	if (document.getElementById('branch-banner-container')) {
+	if (document.getElementById('branch-banner') ||
+		document.getElementById('branch-banner-iframe') ||
+		document.getElementById('branch-banner-container')) {
 		return;
 	}
 
