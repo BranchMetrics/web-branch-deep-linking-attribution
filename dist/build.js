@@ -1469,7 +1469,7 @@ branch_view.handleBranchViewData = function(a, b, c, d) {
   c.feature = "journeys";
   c = utils.cleanLinkData(c);
   c.open_app = !0;
-  if (!document.getElementById("branch-banner-container") && !d.get("hideBanner", !0)) {
+  if (!(document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container") || d.get("hideBanner", !0))) {
     if (b.html) {
       return renderHtmlBlob(document.body, b.html);
     }
