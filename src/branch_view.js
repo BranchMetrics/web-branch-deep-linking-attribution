@@ -77,8 +77,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	var placeholder = document.createElement('div');
 	placeholder.id = 'branch-banner';
 	document.body.insertBefore(placeholder, null);
-
-	banner_utils.addClass(banner, 'branch-banner-is-active');
+	banner_utils.addClass(placeholder, 'branch-banner-is-active');
 
 	if (storage.get('hideBanner', true)) {
 		return;
