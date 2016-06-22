@@ -4,7 +4,7 @@ goog.require('utils');
 goog.require('banner_css');
 goog.require('safejson');
 
-function renderHtmlBlob(parent, html) {
+function renderHtmlBlob(parent, html, bannerElement) {
 	var re, match;
 
 	// journey metadata
@@ -43,7 +43,7 @@ function renderHtmlBlob(parent, html) {
 	banner.id = 'branch-banner-container';
 	banner.className = 'branch-animation';
 	banner.innerHTML = html;
-	parent.insertBefore(banner, parent.firstChild);
+	parent.appendChild(banner);
 
 	banner_utils.addClass(banner, 'branch-banner-is-active');
 
@@ -73,6 +73,12 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		document.getElementById('branch-banner-container')) {
 		return;
 	}
+
+	var placeholder = document.createElement('div');
+	placeholder.id = 'branch-banner';
+	document.body.insertBefore(placeholder, null);
+
+	banner_utils.addClass(banner, 'branch-banner-is-active');
 
 	if (storage.get('hideBanner', true)) {
 		return;
@@ -157,6 +163,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 				}
 				finalHookups(cta,banner);
 			}
+			document.body.removeChild(placeholder);
 		}, true);
 	}
 };
