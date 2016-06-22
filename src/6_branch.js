@@ -345,12 +345,29 @@ Branch.prototype['init'] = wrap(
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
 			}
-			try {
-				done(err, data && utils.whiteListSessionData(data));
-			}
-			finally {
-				self['track']('pageview');
-			}
+
+			self._api(resources.event, {
+				"event": 'pageview',
+				"metadata": {
+					"url": document.URL,
+					"user_agent": navigator.userAgent,
+					"language": navigator.language
+				}
+			}, function(err, data) {
+				if (!err && typeof data === 'object') {
+					self._branchViewEnabled = !!data['branch_view_enabled'];
+					self._storage.set('branch_view_enabled', self._branchViewEnabled);
+					if (data.hasOwnProperty('branch_view_data')) {
+						branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage);
+					}
+				}
+				try {
+					done(err, data && utils.whiteListSessionData(data));
+				}
+				catch (e) {
+					// pass
+				}
+			});
 		};
 
 		var attachVisibilityEvent = function() {
