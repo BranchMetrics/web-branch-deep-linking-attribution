@@ -353,12 +353,12 @@ Branch.prototype['init'] = wrap(
 					"user_agent": navigator.userAgent,
 					"language": navigator.language
 				}
-			}, function(err, data) {
-				if (!err && typeof data === 'object') {
-					self._branchViewEnabled = !!data['branch_view_enabled'];
+			}, function(err, eventData) {
+				if (!err && typeof eventData === 'object') {
+					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
-					if (data.hasOwnProperty('branch_view_data')) {
-						branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage);
+					if (eventData.hasOwnProperty('branch_view_data')) {
+						branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage);
 					}
 				}
 				try {

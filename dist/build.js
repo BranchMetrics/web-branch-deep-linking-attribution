@@ -1637,11 +1637,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }, h = function(b, c) {
     c && (c = e(c), session.set(d._storage, c, g), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? safejson.parse(c.data) : null);
     b && (d.init_state = init_states.INIT_FAILED);
-    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(b, c) {
-      b || "object" !== typeof c || (d._branchViewEnabled = !!c.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), c.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, c.branch_view_data, d._branchViewData, d._storage));
+    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(b, e) {
+      b || "object" !== typeof e || (d._branchViewEnabled = !!e.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), e.hasOwnProperty("branch_view_data") && branch_view.handleBranchViewData(d._server, e.branch_view_data, d._branchViewData, d._storage));
       try {
         a(b, c && utils.whiteListSessionData(c));
-      } catch (e) {
+      } catch (f) {
       }
     });
   }, l = function() {
