@@ -1116,57 +1116,8 @@ Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function
 });
 
 /**
- * @function Branch.getCode
- * @param {Object} options - _required_ - contains options for referral code creation.
- * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
- *
- * Create a referral code using the supplied parameters.  The code can be given to other users to
- * enter.  Applying the code will add credits to the referrer, referree or both.
- * The `options` object can containt the following properties:
- *
- * | Key | Value
- * | --- | ---
- * | amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
- * | calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
- * | location | *required* - An integer that determines who gets the credits:  0 for the referree, 2 for the referring user or 3 for both.
- * | bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
- * | prefix | *optional* - A string to be prepended to the code.
- * | expiration | *optional* - A date string that if present, determines the date on which the code expires.
- *
- * ##### Usage
- *
- * branch.getCode(
- *     options,
- *     callback(err,data)
- * );
- *
- * ##### Example
- *
- * ```js
- * branch.getCode(
- *     {
- *       "amount":10,
- *       "bucket":"party",
- *       "calculation_type":1,
- *       "location":2
- *     },
- *     callback (err, data)
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *      "Error message",
- *      {
- *        "referral_code":"AB12CD"
- *      }
- * );
- * ```
- * ___
- *
+ * Removing from documentation
  */
-/*** +TOC_ITEM #getcodeoptions-callback &.getCode()& ^ALL ***/
 Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	data['type'] = 'credit';
 	data['creation_source'] = data['creation_source'] || 2; // EventResponse.CREATION_SOURCE_SDK
@@ -1174,48 +1125,8 @@ Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
 });
 
 /**
- * @function Branch.validateCode
- * @param {string} code - _required_ - the code string to validate.
- * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
- *
- * Validate a referral code before using.
- *
- * ##### Usage
- *
- * ```js
- * branch.validateCode(
- *     code, // The code to validate
- *     callback (err)
- * );
- * ```
- *
- * ##### Example
- *
- * ```js
- * branch.validateCode(
- *     "AB12CD",
- *     function(err) {
- *         if (err) {
- *             console.log(err);
- *         }
- *         else {
- *             console.log("Code is valid");
- *         }
- *     }
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *     "Error message",
- *     callback(err)
- * );
- * ```
- * ___
- *
+ * Removing from documentation
  */
-/*** +TOC_ITEM #validatecodecode-callback &.validateCode()& ^ALL ***/
 Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(
 		resources.validateCode,
@@ -1227,50 +1138,8 @@ Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(d
 });
 
 /**
- * @function Branch.applyCode
- * @param {string} code - _required_ - the code string to apply.
- * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
- *
- * Apply a referral code.
- *
- * ##### Usage
- *
- * ```js
- * branch.applyCode(
- *     code, // The code to apply
- *     callback (err)
- * );
- * ```
- *
- * ##### Example
- *
- * ```js
- * branch.applyCode(
- *     "AB12CD",
- *     function(err) {
- *         if (err) {
- *             console.log(err);
- *         }
- *         else {
- *             console.log("Code applied");
- *         }
- *     }
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *     "Error message",
- *     callback(err)
- * );
- * ```
- * ___
- *
- * ## Credit Functions
- *
+ * Removing from documentation
  */
-/*** +TOC_ITEM #applycodecode-callback &.applyCode()& ^ALL ***/
 Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
 	this._api(
 		resources.applyCode,
@@ -1525,6 +1394,31 @@ Branch.prototype['removeListener'] = function(listener) {
  * @function Branch.setBranchViewData
  * @param {Object} data - _required_ - object of all link data, same as Branch.link()
  *
+ * This function lets you set the deep link data dynamically for a given mobile web Journey. For
+ * example, if you desgin a full page interstitial, and want the deep link data to be custom for each
+ * page, you'd need to use this function to dynamically set the deep link params on page load. Then,
+ * any Journey loaded on that page will inherit these deep link params.
+ *
+ * #### Usage
+ *
+ * ```js
+ * branch.setBranchViewData(
+ *     data // Data for link, same as Branch.link()
+ * );
+ * ```
+ *
+ * ##### Example
+ *
+ * ```js
+ * branch.setBranchViewData({
+ *     tags: ['tag1', 'tag2'],
+ *     data: {
+ *         mydata: 'something',
+ *         foo: 'bar',
+ *         '$deeplink_path': 'open/item/1234'
+ *     }
+ * });
+ * ```
  */
 /*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
 Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
@@ -1542,14 +1436,9 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  * @function Branch.banner
  * @param {Object} options - _required_ - object of all the options to setup the banner
  * @param {Object} data - _required_ - object of all link data, same as Branch.link()
- *
- * **[Formerly `appBanner()`](CHANGELOG.md)**
- *
+ * *
  * Display a smart banner directing the user to your app through a Branch referral link.  The
  * `data` param is the exact same as in `branch.link()`.
- *
- * *Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation
- * of everything you can do!*
  *
  * | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
  * |------------------|----------------------|----------------------|
@@ -1573,17 +1462,10 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  *     description: 'The Branch demo app!',
  *     rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
  *     reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
- *     theme: 'light',                         // Overrides the default color theme of the banner. Possible values 'light' or 'dark'.
  *     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
  *     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
  *     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
  *     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
- *     buttonBorderColor: null,                // Overrides the default button border color
- *     buttonBackgroundColor: null,            // Overrides the default button background color
- *     buttonFontColor: null,                  // Overrides the default button font color
- *     buttonBorderColorHover: null,           // Overrides the default button border color during mouse over
- *     buttonBackgroundColorHover: null,       // Overrides the default button background color during mouse over
- *     buttonFontColorHover: null,             // Overrides the default button font color during mouse over
  *     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
  *     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
  *     showAndroid: true,                      // Should the banner be shown on Android devices?
@@ -1595,10 +1477,8 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  *     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
  *     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
  *     respectDNT: false,                      // Should we skip showing the banner when a user's settings show 'Do Not Track'?
- *     position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
  *     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
  *     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
- *     customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
  *     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
  *     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
  *
@@ -1609,14 +1489,7 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  *     data: {
  *         mydata: 'something',
  *         foo: 'bar',
- *         '$desktop_url': 'http://myappwebsite.com',
- *         '$ios_url': 'http://myappwebsite.com/ios',
- *         '$ipad_url': 'http://myappwebsite.com/ipad',
- *         '$android_url': 'http://myappwebsite.com/android',
- *         '$og_app_id': '12345',
- *         '$og_title': 'My App',
- *         '$og_description': 'My app\'s description.',
- *         '$og_image_url': 'http://myappwebsite.com/image.png'
+ *         '$deeplink_path': 'open/item/1234'
  *     }
  * });
  * ```

@@ -14,21 +14,17 @@
   + [.deepview()](#deepviewdata-options-callback)
   + [.deepviewCta()](#deepviewcta)
 
-4. Referrals and Credits
-  + [.referrals()](#referralscallback)
-  + [.getCode()](#getcodeoptions-callback)
-  + [.validateCode()](#validatecodecode-callback)
-  + [.applyCode()](#applycodecode-callback)
+4. Journeys Web To App
+  + [.setBranchViewData()](#setBranchViewData)
+  + [.banner()](#banneroptions-data)
+
+5. Referrals and Credits
   + [.credits()](#creditscallback)
   + [.creditHistory()](#credithistoryoptions-callback)
   + [.redeem()](#redeemamount-bucket-callback)
 
-5. Event Listener
+6. Event Listener
   + [.addListener()](#addlistenerevent-listener)
   + [.removeListener()](#removelistenerlistener)
-  + [.setBranchViewData()](#setBranchViewData)
-
-6. Smart Banner
-  + [.banner()](#banneroptions-data)
 
 ___
