@@ -1,6 +1,6 @@
-# Branch Metrics Web SDK
+# Branch Web SDK
 
-This README outlines the functionality of the Branch Metrics Web SDK, and how to easily incorporate it into a web app.
+This README outlines the functionality of the Branch Web SDK, and how to easily incorporate it into a web app.
 
 Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
 
@@ -11,6 +11,12 @@ The Branch Web SDK provides an easy way to interact with the Branch API on your 
 To use the Web SDK, you'll need to first initialize it with your Branch Key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
 
 Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
+
+## Using the Sample Web App
+
+We provide a sample web app which demonstrates what Branch Metrics Web SDK can do. The online version can be found at <https://cdn.branch.io/example.html>. Alternatively, you can open `example.html` locally to for the same effect.
+
+To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
 
 ## Installation
 
@@ -30,8 +36,6 @@ This SDK requires native browser Javascript and has been tested in all modern br
 #### Manual installation
 
 _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
-
-**[Formerly App ID](CHANGELOG.md)** Note that for the time being, initializing the Web SDK with an App ID will still work, it is strongly recomended you switch to using your live and test API keys.
 
 ```html
 <script type="text/javascript">
@@ -56,79 +60,13 @@ In addition to working as a standalone library, the Branch SDK works great in Co
 
 You will need to create a [Branch Metrics app](http://branch.io) to obtain your Branch Key (you will have the option to toggle between live and test modes).
 
-Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are gauranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
+Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immidiatley inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are guaranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
 ```js
 branch.init(...);
 branch.banner(...);
 ```
 
 If `branch.init()` fails, all subsequent branch methods will fail.
-
-___
-# Branch Metrics Web SDK
-
-## Using the Sample Web App
-
-We provide a sample web app which demonstrates what Branch Metrics Web SDK can do. The online version can be found at <https://cdn.branch.io/example.html>. Alternatively, you can open `example.html` locally to for the same effect.
-
-To modify this local web app, edit `src/web/example.template.html` first, and then run `make`, which will automatically update `example.html`. Refrain from manually editting `example.html`.
-
-## Overview
-
-The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, is 100% native JavaScript and is only ~9K gzipped.
-
-The Branch Web SDK allows you to create and share links with a banner (web only), over SMS, or your own methods by generating deep links. It also offers event tracking, access to referrals, and management of credits.
-
-### Requirements
-
-This SDK requires only native browser Javascript and has been tested in all modern browsers with sessionStorage capability. No 3rd party libraries are needed to make use of the SDK as it is 100% native Javascript.
-
-If you use npm, you can run `npm install branch-sdk` to get the SDK.
-
-### Browser Specific Support
-
-| Chrome | Firefox | Safari | IE |
-|:--------:|:-------:|:--------:|:--------:|
-| &#10004; |&#10004; | &#10004; | 9, 10, 11 |
-
-#### Specific Browser Support Status
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/branchmetrics.svg)](https://saucelabs.com/u/branchmetrics)
-
-#### Common.JS and RequireJS compatibility
-
-In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
-
-## Commonly Used Features
-
-### App Smart Banner
-While only available for websites and web apps, the app smart banner is one of the most widely used features of the Web SDK. A few short lines of code will produce an automatically
-generated, highly customizeable banner at either the top or bottom of the page it is installed on. The banner automatically styles itself for Android, iOS, and desktop, and generates a mobile deep
-link if on a mobile deive, or displays a "TXT me the app form" if on desktop. If you are looking for a very simple way of getting deeplinking setup on your website - both desktop and mobile - the
-Smart banner is a great start!
-
-Get Started Installing the App Smart Banner for Web [Here](https://dev.branch.io/recipes/app_download_banner/)
-
-![Smart Banner](https://dev.branch.io/img/pages/features/smart-banner/banner2.png)
-
-### Short link generation
-Powerful, customizeable, and easy-to-create deeplinks are what Branch does best. The Web SDK delivers on this promise of providing a simple and powerful function for generating short deep links
-asynchronously: `link()`. The method has all of the same options and parameters available on the public API `POST /v1/url` endpoint, and is called from a robust queueing mechanism and XHRRequest
-implementation with JSONP fallback that is well tested down to IE9, and every major browser.
-
-Get Started Generating Short Deep Links for [Web](https://github.com/BranchMetrics/Web-SDK/blob/master/WEB_GUIDE.md#linkdata-callback)
-
-___
-
-## Contributing
-Whether you are an avid engineer, a partner, or a Branch employee, we actively welcome feature ideas and pull requests! Prior to actually writing code for a feature, it is best to reach out to us first, as we may already have something in the pipeline.
-
-To build the Web SDK, you'll need to run `npm install` to grab the necessary packages, be sure you have [make](http://www.gnu.org/software/make/),
-[python](https://www.python.org/downloads/) (comes with Mac OSX), [perl](http://learn.perl.org/installing/osx.html),
-and the [Google Closure Compiler](https://developers.google.com/closure/compiler/) (Closure compiler is automatically installed when you run `make` the first time.)
-
-For an in-depth guide to working with developing for the Web SDK, refer to the [release documentation](https://github.com/BranchMetrics/Web-SDK/blob/master/RELEASE_DOCUMENTATION.md).
-
 ___
 # Branch Web SDK
 
@@ -150,22 +88,18 @@ ___
   + [.deepview()](#deepviewdata-options-callback)
   + [.deepviewCta()](#deepviewcta)
 
-4. Referrals and Credits
-  + [.referrals()](#referralscallback)
-  + [.getCode()](#getcodeoptions-callback)
-  + [.validateCode()](#validatecodecode-callback)
-  + [.applyCode()](#applycodecode-callback)
+4. Journeys Web To App
+  + [.setBranchViewData()](#setBranchViewData)
+  + [.banner()](#banneroptions-data)
+
+5. Referrals and Credits
   + [.credits()](#creditscallback)
   + [.creditHistory()](#credithistoryoptions-callback)
   + [.redeem()](#redeemamount-bucket-callback)
 
-5. Event Listener
+6. Event Listener
   + [.addListener()](#addlistenerevent-listener)
   + [.removeListener()](#removelistenerlistener)
-  + [.setBranchViewData()](#setBranchViewData)
-
-6. Smart Banner
-  + [.banner()](#banneroptions-data)
 
 ___
 # Global
@@ -538,7 +472,6 @@ ___
 ## Deepview
 
 
-
 ### deepview(data, options, callback) 
 
 **Parameters**
@@ -603,8 +536,6 @@ callback(
 );
 ```
 
-
-
 ### deepviewCta() 
 
 Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
@@ -655,172 +586,9 @@ These reward definitions are created on the dashboard, under the 'Reward Rules' 
 Warning: For a referral program, you should not use unique awards for custom events and redeem
 pre-identify call. This can allow users to cheat the system.
 
-## Retrieve referrals list
-
-
-
-### referrals(callback) 
-
-**Parameters**
-
-**callback**: `function`, _required_ - returns an object with referral data.
-
-**[Formerly `showReferrals()`](CHANGELOG.md)**
-
-This function is no longer supported.
-
-## Referral Codes
-
-
-
-### getCode(options, callback) 
-
-**Parameters**
-
-**options**: `Object`, _required_ - contains options for referral code creation.
-
-**callback**: `function`, _optional_ - returns an error if unsuccessful
-
-Create a referral code using the supplied parameters.  The code can be given to other users to
-enter.  Applying the code will add credits to the referrer, referree or both.
-The `options` object can containt the following properties:
-
-| Key | Value
-| --- | ---
-| amount | *reqruied* - An integer specifying the number of credits added when the code is applied.
-| calculation_type | *required* - An integer of 1 for unlimited uses, or 0 for one use.
-| location | *required* - An integer that determines who gets the credits:  0 for the referree, 2 for the referring user or 3 for both.
-| bucket | *optional* - The bucket to apply the credits to.  Defaults to "default".
-| prefix | *optional* - A string to be prepended to the code.
-| expiration | *optional* - A date string that if present, determines the date on which the code expires.
-
-##### Usage
-
-branch.getCode(
-    options,
-    callback(err,data)
-);
-
-##### Example
-
-```js
-branch.getCode(
-    {
-      "amount":10,
-      "bucket":"party",
-      "calculation_type":1,
-      "location":2
-    },
-    callback (err, data)
-);
-```
-
-##### Callback Format
-```js
-callback(
-     "Error message",
-     {
-       "referral_code":"AB12CD"
-     }
-);
-```
-___
-
-
-
-### validateCode(code, callback) 
-
-**Parameters**
-
-**code**: `string`, _required_ - the code string to validate.
-
-**callback**: `function`, _optional_ - returns an error if unsuccessful
-
-Validate a referral code before using.
-
-##### Usage
-
-```js
-branch.validateCode(
-    code, // The code to validate
-    callback (err)
-);
-```
-
-##### Example
-
-```js
-branch.validateCode(
-    "AB12CD",
-    function(err) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            console.log("Code is valid");
-        }
-    }
-);
-```
-
-##### Callback Format
-```js
-callback(
-    "Error message",
-    callback(err)
-);
-```
-___
-
-
-
-### applyCode(code, callback) 
-
-**Parameters**
-
-**code**: `string`, _required_ - the code string to apply.
-
-**callback**: `function`, _optional_ - returns an error if unsuccessful
-
-Apply a referral code.
-
-##### Usage
-
-```js
-branch.applyCode(
-    code, // The code to apply
-    callback (err)
-);
-```
-
-##### Example
-
-```js
-branch.applyCode(
-    "AB12CD",
-    function(err) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            console.log("Code applied");
-        }
-    }
-);
-```
-
-##### Callback Format
-```js
-callback(
-    "Error message",
-    callback(err)
-);
-```
 ___
 
 ## Credit Functions
-
-
 
 ### credits(callback) 
 
@@ -1028,6 +796,7 @@ Remove the listener from observations, if it is present. Not that this function 
 passed a referrence to the _same_ function that was passed to `branch.addListener()`, not
 just an identical clone of the function.
 
+___
 
 
 ### setBranchViewData(data) 
@@ -1036,7 +805,31 @@ just an identical clone of the function.
 
 **data**: `Object`, _required_ - object of all link data, same as Branch.link()
 
+This function lets you set the deep link data dynamically for a given mobile web Journey. For
+example, if you desgin a full page interstitial, and want the deep link data to be custom for each
+page, you'd need to use this function to dynamically set the deep link params on page load. Then,
+any Journey loaded on that page will inherit these deep link params.
 
+#### Usage
+ 
+```js
+branch.setBranchViewData(
+  data // Data for link, same as Branch.link()
+);
+```
+
+##### Example
+
+```js
+branch.setBranchViewData({
+  tags: ['tag1', 'tag2'],
+  data: {
+    mydata: 'something',
+    foo: 'bar',
+    '$deeplink_path': 'open/item/1234'
+  }
+});
+```
 
 ### banner(options, data) 
 
@@ -1046,13 +839,8 @@ just an identical clone of the function.
 
 **data**: `Object`, _required_ - object of all link data, same as Branch.link()
 
-**[Formerly `appBanner()`](CHANGELOG.md)**
-
 Display a smart banner directing the user to your app through a Branch referral link.  The
 `data` param is the exact same as in `branch.link()`.
-
-*Be sure to checkout the [Smart Banner Guide](SMART_BANNER_GUIDE.md) for a full explanation
-of everything you can do!*
 
 | iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
 |------------------|----------------------|----------------------|
@@ -1076,17 +864,10 @@ branch.banner({
     description: 'The Branch demo app!',
     rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
     reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
-    theme: 'light',                         // Overrides the default color theme of the banner. Possible values 'light' or 'dark'.
     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
     downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
     sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
     phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-    buttonBorderColor: null,                // Overrides the default button border color
-    buttonBackgroundColor: null,            // Overrides the default button background color
-    buttonFontColor: null,                  // Overrides the default button font color
-    buttonBorderColorHover: null,           // Overrides the default button border color during mouse over
-    buttonBackgroundColorHover: null,       // Overrides the default button background color during mouse over
-    buttonFontColorHover: null,             // Overrides the default button font color during mouse over
     showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
     showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
     showAndroid: true,                      // Should the banner be shown on Android devices?
@@ -1098,10 +879,8 @@ branch.banner({
     disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
     forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
     respectDNT: false,                      // Should we skip showing the banner when a user's settings show 'Do Not Track'?
-    position: 'top',                        // Sets the position of the banner, options are: 'top' or 'bottom', and the default is 'top'
     mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
     desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
-    customCSS: '.title { color: #F00; }',   // Add your own custom styles to the banner that load last, and are gauranteed to take precedence, even if you leave the banner in an iframe
     make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
     open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
 
@@ -1112,14 +891,7 @@ branch.banner({
     data: {
         mydata: 'something',
         foo: 'bar',
-        '$desktop_url': 'http://myappwebsite.com',
-        '$ios_url': 'http://myappwebsite.com/ios',
-        '$ipad_url': 'http://myappwebsite.com/ipad',
-        '$android_url': 'http://myappwebsite.com/android',
-        '$og_app_id': '12345',
-        '$og_title': 'My App',
-        '$og_description': 'My app\'s description.',
-        '$og_image_url': 'http://myappwebsite.com/image.png'
+        '$deeplink_path': 'open/item/1234'
     }
 });
 ```
@@ -1139,16 +911,7 @@ branch.closeBanner();
 ```
 
 
-
-
 * * *
-
-
-
-
-
-
-
 
 
 

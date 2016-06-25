@@ -66,7 +66,6 @@ The `iframe` property defaults to true, and can be set to false if you wish for 
 The `disableHide` property defaults to false, and when set to true, removes the close button on the banner.
 The `forgetHide` property defaults to false, and when set to true, will forget if the user has opened the banner previously, and thus will always show the banner to them even if they have closed it in the past. It can also be set to an integer, in which case, it would forget that the user has previously hid the banner after X days.
 The `position` property, defaults to 'top', but can also be set to 'bottom' if you would prefer to show the app banner from the bottom of the screen.
-The `customCSS` property allows you to style the banner, even if it is isolated within an iframe. To assist you with device specific styles, the body element of the banner has one of three classes: `branch-banner-android`, `branch-banner-ios`, or `branch-banner-desktop`.
 The `mobileSticky` property defaults to false, but can be set to true if you want the user to continue to see the app banner as they scroll.
 The `desktopSticky` property defaults to true, but can be set to false if you want the user to only see the app banner when they are scrolled to the top of the page.
 ```js
@@ -82,8 +81,7 @@ branch.banner(
       forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
       position: 'bottom',
       mobileSticky: true,
-      desktopSticky: true,
-      customCSS: '.title { color: #F00; }'
+      desktopSticky: true
  },
  {... link data ...}
 );
