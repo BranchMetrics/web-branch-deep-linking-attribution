@@ -77,6 +77,7 @@ branch.banner(
       description: 'The Branch demo app!',
       // Display preferences
       iframe: false,
+      alwaysShow: false, //Set to true if you want the banner to always appear on the page (regardless of user having the app installed)
       disableHide: true,
       forgetHide: true, // Can also be set to an integer. For example: 10, would forget that the user previously hid the banner after 10 days
       position: 'bottom',
