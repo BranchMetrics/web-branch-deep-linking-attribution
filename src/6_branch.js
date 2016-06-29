@@ -1077,7 +1077,7 @@ Branch.prototype._windowRedirect = function(url) {
  * Warning: For a referral program, you should not use unique awards for custom events and redeem
  * pre-identify call. This can allow users to cheat the system.
  *
- * ## Retrieve referrals list
+ * ___
  *
  */
 /*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
@@ -1098,19 +1098,6 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(don
 	done();
 });
 
-/**
- * @function Branch.referrals
- * @param {function(?Error,Object=)=} callback - _required_ - returns an object with referral data.
- *
- * **[Formerly `showReferrals()`](CHANGELOG.md)**
- *
- * This function is no longer supported.
- *
- * ## Referral Codes
- *
- */
-/*** +TOC_HEADING &Referrals and Credits& ^ALL ***/
-/*** +TOC_ITEM #referralscallback &.referrals()& ^ALL ***/
 Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.referrals, { }, done);
 });
@@ -1176,6 +1163,7 @@ Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done
  * ```
  *
  */
+/*** +TOC_HEADING &Credit Functions& ^ALL ***/
 /*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
 Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(resources.credits, { }, done);
@@ -1403,7 +1391,7 @@ Branch.prototype['removeListener'] = function(listener) {
  *
  * ```js
  * branch.setBranchViewData(
- *     data // Data for link, same as Branch.link()
+ *   data // Data for link, same as Branch.link()
  * );
  * ```
  *
@@ -1411,15 +1399,16 @@ Branch.prototype['removeListener'] = function(listener) {
  *
  * ```js
  * branch.setBranchViewData({
- *     tags: ['tag1', 'tag2'],
- *     data: {
- *         mydata: 'something',
- *         foo: 'bar',
- *         '$deeplink_path': 'open/item/1234'
- *     }
+ *   tags: ['tag1', 'tag2'],
+ *   data: {
+ *     mydata: 'something',
+ *     foo: 'bar',
+ *     '$deeplink_path': 'open/item/1234'
+ *   }
  * });
  * ```
  */
+/*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
 /*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
 Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
 	data = data || {};
@@ -1507,9 +1496,7 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  * ```js
  * branch.closeBanner();
  * ```
- *
  */
-/*** +TOC_HEADING &Smart Banner& ^WEB ***/
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
 	this['setBranchViewData'](data);
