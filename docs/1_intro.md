@@ -2,6 +2,8 @@
 
 This README outlines the functionality of the Branch Web SDK, and how to easily incorporate it into a web app.
 
+Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
+
 ## Overview
 
 The Branch Web SDK provides an easy way to interact with the Branch API on your website or web app. It requires no frameworks, and is only ~13K gzipped.
