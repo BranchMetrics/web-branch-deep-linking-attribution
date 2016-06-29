@@ -51,6 +51,7 @@
 		'referrals',
 		'removeListener',
 		'sendSMS',
+		'setBranchViewData',
 		'setIdentity',
 		'track',
 		'validateCode'
