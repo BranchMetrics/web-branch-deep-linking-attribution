@@ -304,7 +304,8 @@ describe('Server', function() {
 					"browser_fingerprint_id=" + browser_fingerprint_id +
 						"&identity_id=" + identity_id +
 						"&is_referrable=1&sdk=web" + config.version +
-						"&branch_key=" + branch_sample_key,
+						"&branch_key=" + branch_sample_key +
+						"&options=%7B%7D",
 					'Data correct');
 				requests[0].respond(
 					200,
@@ -385,7 +386,8 @@ describe('Server', function() {
 					"browser_fingerprint_id=" + browser_fingerprint_id +
 						"&identity_id=" + identity_id +
 						"&is_referrable=1&sdk=web" + config.version +
-						"&app_id=" + "5680621892404085",
+						"&app_id=" + "5680621892404085" +
+						"&options=%7B%7D",
 					'Data correct');
 			});
 
@@ -1120,7 +1122,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].url,
-					config.link_service_endpoint + '/3hpH54U-58?click=click',
+					'3hpH54U-58?click=click',
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
@@ -1144,8 +1146,7 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 1, 'Request made');
 				assert.strictEqual(
 					requests[0].src,
-					config.link_service_endpoint +
-						'/3hpH54U-58?click=click&callback=branch_callback__' +
+					'3hpH54U-58?click=click&callback=branch_callback__' +
 						(server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);

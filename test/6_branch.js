@@ -51,6 +51,7 @@ describe('Branch', function() {
 					session_id: session_id
 				}
 			);
+			requests[2].callback(null, {});
 			requests = [];
 		}
 
@@ -104,6 +105,7 @@ describe('Branch', function() {
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, expectedResponse);
+			requests[2].callback(null, {});
 
 			assert.deepEqual(requests[0].resource.endpoint, '/_r', 'Request to open made');
 			assert.deepEqual(
@@ -123,12 +125,13 @@ describe('Branch', function() {
 					"link_identifier": undefined,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
-					"sdk": "web" + config.version
+					"sdk": "web" + config.version,
+					"options": undefined
 				},
 				'Request to open params correct'
 			);
 
-			assert.strictEqual(requests.length, 2, '2 requests made');
+			assert.strictEqual(requests.length, 3, '3 requests made');
 		});
 
 		it('should not whitelist referring_link', function(done) {
@@ -152,6 +155,7 @@ describe('Branch', function() {
 
 			requests[0].callback(null, browser_fingerprint_id);
 			requests[1].callback(null, expectedResponse);
+			requests[2].callback(null, {});
 
 			assert.deepEqual(requests[0].resource.endpoint, '/_r', 'Request to open made');
 			assert.deepEqual(
@@ -171,12 +175,13 @@ describe('Branch', function() {
 					"link_identifier": undefined,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
-					"sdk": "web" + config.version
+					"sdk": "web" + config.version,
+					"options": undefined
 				},
 				'Request to open params correct'
 			);
 
-			assert.strictEqual(requests.length, 2, '2 requests made');
+			assert.strictEqual(requests.length, 3, '3 requests made');
 		});
 
 		it('should support being called without a callback', function(done) {
@@ -194,6 +199,7 @@ describe('Branch', function() {
 					identity_id: identity_id
 				}
 			);
+			requests[2].callback(null, {});
 
 			assert(true, 'Succeeded');
 		});
@@ -247,6 +253,7 @@ describe('Branch', function() {
 						something: "else"
 					}
 				);
+				requests[2].callback(null, {});
 
 				assert.deepEqual(
 					requests[1].obj,
@@ -255,7 +262,8 @@ describe('Branch', function() {
 						"link_identifier": '12345',
 						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id,
-						"sdk": "web" + config.version
+						"sdk": "web" + config.version,
+						"options": undefined
 					},
 					'Request to open params correct'
 				);
@@ -295,6 +303,7 @@ describe('Branch', function() {
 							something: "else"
 						}
 					);
+					requests[2].callback(null, {});
 
 					assert.deepEqual(
 						requests[1].obj,
@@ -303,7 +312,8 @@ describe('Branch', function() {
 							"link_identifier": '67890',
 							"is_referrable": 1,
 							"browser_fingerprint_id": browser_fingerprint_id,
-							"sdk": "web" + config.version
+							"sdk": "web" + config.version,
+							"options": undefined
 						},
 						'Request to open params correct'
 					);
@@ -318,7 +328,7 @@ describe('Branch', function() {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err, data) {
-				assert.strictEqual(requests.length, 2, 'two requests made');
+				assert.strictEqual(requests.length, 3, 'three requests made');
 				assert.deepEqual(
 					requests[0].resource.endpoint,
 					'/_r',
@@ -334,6 +344,7 @@ describe('Branch', function() {
 					identity_id: identity_id
 				}
 			);
+			requests[2].callback(null, {});
 		});
 
 		it('should call has_app if session present but no link_identifier from get param',
@@ -355,6 +366,7 @@ describe('Branch', function() {
 					})
 				}
 			);
+			requests[2].callback(null, {});
 
 			requests = [ ];
 			branch = initBranch(false, true);
@@ -397,8 +409,8 @@ describe('Branch', function() {
 				branch = initBranch(false, true);
 				branch.init(branch_sample_key);
 
-				requests[2].callback(null, browser_fingerprint_id);
-				requests[3].callback(
+				requests[3].callback(null, browser_fingerprint_id);
+				requests[4].callback(
 					null,
 					{
 						session_id: session_id,
@@ -411,15 +423,16 @@ describe('Branch', function() {
 						})
 					}
 				);
+				requests[5].callback(null, {});
 
-				assert.strictEqual(requests.length, 4, 'Should make 4 requests');
+				assert.strictEqual(requests.length, 6, 'Should make 6 requests');
 				assert.deepEqual(
-					requests[2].resource.endpoint,
+					requests[3].resource.endpoint,
 					'/_r',
 					'First request should be sent to /_r'
 				);
 				assert.deepEqual(
-					requests[3].resource.endpoint,
+					requests[4].resource.endpoint,
 					'/v1/open',
 					'Second request should be sent to /v1/open'
 				);
@@ -448,6 +461,7 @@ describe('Branch', function() {
 			sandbox.stub(session, 'get', function(storage) {
 				return whitelistedData;
 			});
+
 			branch.data(function(err, res) {
 				assert.strictEqual(err, null, 'No error');
 				assert.deepEqual(res, whitelistedData, 'whitelisted data returned');
@@ -762,7 +776,7 @@ describe('Branch', function() {
 			assert.strictEqual(requests[1].obj.click, 'click', 'the second request is a click');
 			assert.strictEqual(
 				requests[1].obj.link_url,
-				'l/4FPE0v-04H',
+				'https://bnc.lt/l/4FPE0v-04H',
 				'the second request has the correct link url'
 			);
 			requests[1].callback(
@@ -801,7 +815,7 @@ describe('Branch', function() {
 			assert.strictEqual(requests[1].obj.click, 'click', 'the second request is a click');
 			assert.strictEqual(
 				requests[1].obj.link_url,
-				'ZPOc/p1Ej1fHI4n',
+				'https://bnc.lt/ZPOc/p1Ej1fHI4n',
 				'the second request has the correct link url'
 			);
 			requests[1].callback(
