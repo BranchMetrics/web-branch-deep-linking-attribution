@@ -368,6 +368,9 @@ Branch.prototype['init'] = wrap(
 				catch (e) {
 					// pass
 				}
+				finally {
+					self['renderFinalize']();
+				}
 			});
 		};
 
@@ -446,6 +449,16 @@ Branch.prototype['init'] = wrap(
 	},
 	true
 );
+
+
+/**
+ * @function Branch.renderFinalize
+ * ___
+ */
+Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	console.log('renderFinalize');
+	done(null, null);
+});
 
 /**
  * @function Branch.data
@@ -1411,7 +1424,7 @@ Branch.prototype['removeListener'] = function(listener) {
  */
 /*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
 /*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
-Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
+function _setBranchViewData(done, data) {
 	data = data || {};
 	try {
 		this._branchViewData = JSON.parse(JSON.stringify(data));
@@ -1420,7 +1433,8 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
 		this._branchViewData = this._branchViewData || {};
 	}
 	done();
-});
+}
+Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, _setBranchViewData);
 
 /** =WEB
  * @function Branch.banner
@@ -1500,7 +1514,8 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  */
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
-	this['setBranchViewData'](data);
+	_setBranchViewData.call(this, function(){}, data || {});
+
 	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
 		options['showAgain'] = options['forgetHide'];
@@ -1578,7 +1593,8 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
 		buttonFontColorHover: options['buttonFontColorHover'] || '',
 		make_new_link: !!options['make_new_link'],
-		open_app: !!options['open_app']
+		open_app: !!options['open_app'],
+		immediate: !!options['immediate']
 	};
 
 	if (typeof options['showMobile'] !== 'undefined') {
