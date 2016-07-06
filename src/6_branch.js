@@ -344,6 +344,7 @@ Branch.prototype['init'] = wrap(
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
+				return done(err, data && utils.whiteListSessionData(data));
 			}
 
 			self._api(resources.event, {
