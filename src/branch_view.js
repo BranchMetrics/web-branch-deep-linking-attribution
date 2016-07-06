@@ -56,10 +56,10 @@ function renderHtmlBlob(parent, html, bannerElement) {
 
 
 /**
- * @param {string} requestURL
+ * @param {Object} server
+ * @param {Object} branchViewData
  * @param {Object} requestData
- * @param {utils._httpMethod} requestMethod
- * @param {function(?Error,*=,?=)=} callback
+ * @param {Object} storage
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage) {
 	requestData = requestData || {};

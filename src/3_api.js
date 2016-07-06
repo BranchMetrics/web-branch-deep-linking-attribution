@@ -255,7 +255,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {utils._httpMethod} method
  * @param {BranchStorage} storage
  * @param {function(?Error,*=,?=)=} callback
- * @param {?boolean} noparse
+ * @param {?boolean=} noparse
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback, noparse) {
 	var req = (window.XMLHttpRequest ?
