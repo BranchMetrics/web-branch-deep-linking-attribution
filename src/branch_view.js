@@ -66,7 +66,6 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	requestData['feature'] = 'journeys';
 
 	var cleanedData = utils.cleanLinkData(requestData);
-	cleanedData['open_app'] = true;
 
 	if (document.getElementById('branch-banner') ||
 		document.getElementById('branch-banner-iframe') ||
