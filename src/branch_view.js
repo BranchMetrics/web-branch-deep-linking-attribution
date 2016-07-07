@@ -4,8 +4,8 @@ goog.require('utils');
 goog.require('banner_css');
 goog.require('safejson');
 
-function renderHtmlBlob(parent, html, bannerElement) {
-	var re, match;
+function renderHtmlBlob(parent, html, hasApp) {
+	var re, match, ctaText;
 
 	// journey metadata
 	re = /<script type="application\/json">((.|\s)*?)<\/script>/;
@@ -15,6 +15,19 @@ function renderHtmlBlob(parent, html, bannerElement) {
 		html = html.replace(re,'');
 
 		var metadata = safejson.parse(src);
+		if(hasApp) {
+			ctaText = 'OPEN';
+			if(metadata && metadata['ctaText'] && metadata['ctaText']['has_app']) {
+				ctaText = metadata['ctaText']['has_app']
+			}
+		}
+		else {
+			ctaText = 'GET';
+			if(metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
+				ctaText = metadata['ctaText']['no_app'];
+			}
+		}
+
 		if (metadata && metadata.injectorSelector) {
 			var parentTrap = document.querySelector(metadata.injectorSelector);
 			if (parentTrap) {
@@ -43,6 +56,7 @@ function renderHtmlBlob(parent, html, bannerElement) {
 	banner.id = 'branch-banner-container';
 	banner.className = 'branch-animation';
 	banner.innerHTML = html;
+	banner.querySelector('#branch-mobile-action').innerHTML = ctaText;
 	parent.appendChild(banner);
 
 	banner_utils.addClass(banner, 'branch-banner-is-active');
@@ -60,8 +74,9 @@ function renderHtmlBlob(parent, html, bannerElement) {
  * @param {Object} branchViewData
  * @param {Object} requestData
  * @param {Object} storage
+ * @param {Boolean} hasApp
  */
-branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage) {
+branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp) {
 	requestData = requestData || {};
 	requestData['feature'] = 'journeys';
 
@@ -83,7 +98,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	}
 
 	if (branchViewData['html']) {
-		return renderHtmlBlob(document.body, branchViewData['html']);
+		return renderHtmlBlob(document.body, branchViewData['html'], hasApp);
 	} else if (branchViewData['url']) {
 		var banner = null;
 		var cta = null;
@@ -154,7 +169,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 				};
 
 
-				banner = renderHtmlBlob(document.body, html);
+				banner = renderHtmlBlob(document.body, html, hasApp);
 				if (banner === null) {
 					failed = true;
 					return;
