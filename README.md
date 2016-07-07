@@ -40,7 +40,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -67,6 +67,7 @@ branch.banner(...);
 ```
 
 If `branch.init()` fails, all subsequent branch methods will fail.
+
 ___
 # Branch Web SDK
 
@@ -88,18 +89,18 @@ ___
   + [.deepview()](#deepviewdata-options-callback)
   + [.deepviewCta()](#deepviewcta)
 
-4. Journeys Web To App
-  + [.setBranchViewData()](#setBranchViewData)
-  + [.banner()](#banneroptions-data)
-
-5. Referrals and Credits
+4. Credit Functions
   + [.credits()](#creditscallback)
   + [.creditHistory()](#credithistoryoptions-callback)
   + [.redeem()](#redeemamount-bucket-callback)
 
-6. Event Listener
+5. Event Listener
   + [.addListener()](#addlistenerevent-listener)
   + [.removeListener()](#removelistenerlistener)
+
+6. Journeys Web To App
+  + [.setBranchViewData()](#setBranchViewData)
+  + [.banner()](#banneroptions-data)
 
 ___
 # Global
@@ -472,6 +473,7 @@ ___
 ## Deepview
 
 
+
 ### deepview(data, options, callback) 
 
 **Parameters**
@@ -536,6 +538,8 @@ callback(
 );
 ```
 
+
+
 ### deepviewCta() 
 
 Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
@@ -588,7 +592,7 @@ pre-identify call. This can allow users to cheat the system.
 
 ___
 
-## Credit Functions
+
 
 ### credits(callback) 
 
@@ -796,7 +800,6 @@ Remove the listener from observations, if it is present. Not that this function 
 passed a referrence to the _same_ function that was passed to `branch.addListener()`, not
 just an identical clone of the function.
 
-___
 
 
 ### setBranchViewData(data) 
@@ -811,7 +814,7 @@ page, you'd need to use this function to dynamically set the deep link params on
 any Journey loaded on that page will inherit these deep link params.
 
 #### Usage
- 
+
 ```js
 branch.setBranchViewData(
   data // Data for link, same as Branch.link()
@@ -831,6 +834,8 @@ branch.setBranchViewData({
 });
 ```
 
+
+
 ### banner(options, data) 
 
 **Parameters**
@@ -838,7 +843,7 @@ branch.setBranchViewData({
 **options**: `Object`, _required_ - object of all the options to setup the banner
 
 **data**: `Object`, _required_ - object of all link data, same as Branch.link()
-
+*
 Display a smart banner directing the user to your app through a Branch referral link.  The
 `data` param is the exact same as in `branch.link()`.
 
@@ -911,7 +916,16 @@ branch.closeBanner();
 ```
 
 
+
+
 * * *
+
+
+
+
+
+
+
 
 
 

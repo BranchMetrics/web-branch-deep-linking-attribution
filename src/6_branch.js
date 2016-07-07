@@ -359,7 +359,7 @@ Branch.prototype['init'] = wrap(
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
 					if (eventData.hasOwnProperty('branch_view_data')) {
-						branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage);
+						branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
 					}
 				}
 				try {
@@ -434,7 +434,7 @@ Branch.prototype['init'] = wrap(
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
 							if (data.hasOwnProperty('branch_view_data')) {
-								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage);
+								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
 							}
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
@@ -668,7 +668,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._branchViewEnabled = !!data['branch_view_enabled'];
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
-				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage);
+				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
 			}
 		}
 		if (typeof done === 'function') {
