@@ -5,7 +5,7 @@ goog.require('banner_css');
 goog.require('safejson');
 
 function renderHtmlBlob(parent, html, hasApp) {
-	var re, match, ctaText;
+	var re, match, ctaText = hasApp ? 'OPEN' : 'GET';
 
 	// journey metadata
 	re = /<script type="application\/json">((.|\s)*?)<\/script>/;
@@ -15,17 +15,11 @@ function renderHtmlBlob(parent, html, hasApp) {
 		html = html.replace(re,'');
 
 		var metadata = safejson.parse(src);
-		if(hasApp) {
-			ctaText = 'OPEN';
-			if(metadata && metadata['ctaText'] && metadata['ctaText']['has_app']) {
-				ctaText = metadata['ctaText']['has_app']
-			}
+		if(hasApp && metadata && metadata['ctaText'] && metadata['ctaText']['has_app']) {
+			ctaText = metadata['ctaText']['has_app'];
 		}
-		else {
-			ctaText = 'GET';
-			if(metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
-				ctaText = metadata['ctaText']['no_app'];
-			}
+		else if(metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
+			ctaText = metadata['ctaText']['no_app'];
 		}
 
 		if (metadata && metadata.injectorSelector) {
