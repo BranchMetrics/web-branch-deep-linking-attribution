@@ -390,6 +390,8 @@ utils.extractDeeplinkPath = function(url) {
  * Search for a particular og tag by name, and return the content, if it exists. The optional
  * parameter 'content' will be the default value used if the og tag is not found or cannot
  * be parsed.
+ * @param {string} property
+ * @param {string=} content
  */
 utils.scrapeOpenGraphContent = function(property, content) {
 	property = String(property);
