@@ -7,6 +7,7 @@ goog.require('config');
 goog.require('storage');
 goog.require('session');
 goog.require('branch_view');
+goog.require('banner_utils');
 
 goog.require('goog.json'); // jshint unused:false
 
@@ -117,7 +118,6 @@ describe('Branch', function() {
 				},
 				bannerDeeplinkData
 			);
-			branch.closeBanner({ immediate: true });
 
 			// _r
 			requests[0].callback(null, browser_fingerprint_id);
@@ -148,73 +148,9 @@ describe('Branch', function() {
 			assert.strictEqual(requests.length, 4, '4 requests made');
 		});
 
-		it('should attempt to pass deeplink data to a journey in a custom event', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(2, done);
-
-			var bannerDeeplinkData = {
-				tags: ['custom'],
-				data: {
-					mydata: 'From Banner',
-					foo: 'bar',
-					'$deeplink_path': 'open/item/5678'
-				}
-			}
-
-			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
-				assert.strictEqual(data.data.mydata, 'From Banner', 'deep link data was passed by banner');
-			});
-
-			branch.init(branch_sample_key);
-			branch.banner(
-				{
-					immediate: true,
-					disableHide: true,
-					forgetHide: true
-				},
-				bannerDeeplinkData
-			);
-			branch.closeBanner({ immediate: true });
-			branch.track(
-				'tester-event', {
-					'apple': 'seed'
-				}, function(err) {
-			});
-
-			// _r
-			requests[0].callback(null, browser_fingerprint_id);
-
-			// v1/open
-			requests[1].callback(
-				null,
-				{
-					browser_fingerprint_id: browser_fingerprint_id,
-					identity_id: identity_id,
-					session_id: session_id
-				}
-			);
-
-			// v1/event (first time)
-			requests[2].callback(null, {
-				branch_view_enabled: true
-			});
-
-			// v1/event (second time)
-			requests[3].callback(null, {
-				branch_view_enabled: true,
-				branch_view_data: {
-					id: '345',
-					number_of_use: 1000,
-					url: 'http://localhost:8000'
-				}
-			});
-
-			assert.strictEqual(requests.length, 5, '5 requests made');
-		});
-
 		it('should attempt to pass deeplink data to a journey in a page view event', function(done) {
 			var branch = initBranch(false);
-			var assert = testUtils.plan(2, done);
+			var assert = testUtils.plan(1, done);
 
 			var bannerDeeplinkData = {
 				tags: ['custom'],
@@ -226,6 +162,10 @@ describe('Branch', function() {
 			}
 
 			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
+				assert.strictEqual(true, banner_utils.shouldAppend(storage, {
+					forgetHide: true,
+					showiOS: true
+				}), 'branch view should be displayable');
 				assert.strictEqual(data.data.mydata, 'From Banner', 'deep link data was passed by banner');
 			});
 
@@ -238,7 +178,82 @@ describe('Branch', function() {
 				},
 				bannerDeeplinkData
 			);
-			branch.closeBanner({ immediate: true });
+
+			branch.track(
+				'tester-event', {
+					'apple': 'seed'
+				}, function(err) {
+			});
+
+			// _r
+			requests[0].callback(null, browser_fingerprint_id);
+
+			// v1/open
+			requests[1].callback(
+				null,
+				{
+					browser_fingerprint_id: browser_fingerprint_id,
+					identity_id: identity_id,
+					session_id: session_id
+				}
+			);
+
+			// v1/event (first time)
+			setTimeout(function() {
+				requests[2].callback(null, {
+					branch_view_enabled: true,
+					branch_view_data: {
+						id: '345',
+						number_of_use: 1000,
+						// url: 'https://api.branch.io/v1/branchview/key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv/279760304565736467?v=1'
+						url: 'http://localhost:8000'
+					}
+				});
+
+				// v1/event (second time)
+				requests[3].callback(null, {
+					branch_view_enabled: true
+				});
+
+				assert.strictEqual(requests.length, 5, '5 requests made');
+			}, 10);
+		});
+
+		it('should attempt to pass deeplink data to a journey in a custom event', function(done) {
+			var branch = initBranch(false);
+			var assert = testUtils.plan(3, done);
+
+			var bannerDeeplinkData = {
+				tags: ['custom'],
+				data: {
+					mydata: 'From Banner',
+					foo: 'bar',
+					'$deeplink_path': 'open/item/5678'
+				}
+			}
+
+			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
+				var test = banner_utils.shouldAppend(storage, {
+					forgetHide: true,
+					showiOS: true
+				});
+				assert.strictEqual(false, banner_utils.shouldAppend(storage, {
+					forgetHide: true,
+					showiOS: true
+				}), 'branch view should not be displayable');
+				assert.strictEqual(data.data.mydata, 'From Banner', 'deep link data was passed by banner');
+			});
+
+			branch.init(branch_sample_key);
+			branch.banner(
+				{
+					immediate: true,
+					disableHide: true,
+					forgetHide: true
+				},
+				bannerDeeplinkData
+			);
+
 			branch.track(
 				'tester-event', {
 					'apple': 'seed'
@@ -260,20 +275,23 @@ describe('Branch', function() {
 
 			// v1/event (first time)
 			requests[2].callback(null, {
-				branch_view_enabled: true,
-				branch_view_data: {
-					id: '345',
-					number_of_use: 1000,
-					url: 'http://localhost:8000'
-				}
-			});
-
-			// v1/event (second time)
-			requests[3].callback(null, {
 				branch_view_enabled: true
 			});
 
-			assert.strictEqual(requests.length, 5, '5 requests made');
+			setTimeout(function() {
+				// v1/event (second time)
+				requests[3].callback(null, {
+					branch_view_enabled: true,
+					branch_view_data: {
+						id: '345',
+						number_of_use: 1000,
+						// url: 'https://api.branch.io/v1/branchview/key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv/279760304565736467?v=1'
+						url: 'http://localhost:8000'
+					}
+				});
+
+				assert.strictEqual(requests.length, 5, '5 requests made');
+			}, 10);
 		});
 	});
 });

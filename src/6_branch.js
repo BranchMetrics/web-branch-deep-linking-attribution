@@ -359,7 +359,9 @@ Branch.prototype['init'] = wrap(
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
 					if (eventData.hasOwnProperty('branch_view_data')) {
-						branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+						self['renderQueue'](function() {
+							branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+						});
 					}
 				}
 				try {
@@ -434,7 +436,9 @@ Branch.prototype['init'] = wrap(
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
 							if (data.hasOwnProperty('branch_view_data')) {
-								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+								self['renderQueue'](function() {
+									branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+								});
 							}
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
@@ -452,13 +456,21 @@ Branch.prototype['init'] = wrap(
 
 
 /**
- * @function Branch.renderFinalize
- * ___
+ * currently private method, which may be opened to the public in the future
  */
-Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	console.log('renderFinalize');
+Branch.prototype['renderQueue'] = wrap(callback_params.NO_CALLBACK, function(done, render) {
+	render();
 	done(null, null);
 });
+
+
+/**
+ * currently private method, which may be opened to the public in the future
+ */
+Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	done(null, null);
+});
+
 
 /**
  * @function Branch.data
@@ -668,7 +680,9 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._branchViewEnabled = !!data['branch_view_enabled'];
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
-				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+				self['renderQueue'](function() {
+					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+				});
 			}
 		}
 		if (typeof done === 'function') {
@@ -1424,17 +1438,20 @@ Branch.prototype['removeListener'] = function(listener) {
  */
 /*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
 /*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
-function _setBranchViewData(done, data) {
+function _setBranchViewData(context, done, data) {
 	data = data || {};
 	try {
-		this._branchViewData = JSON.parse(JSON.stringify(data));
+		context._branchViewData = JSON.parse(JSON.stringify(data));
 	}
 	finally {
-		this._branchViewData = this._branchViewData || {};
+		context._branchViewData = context._branchViewData || {};
 	}
 	done();
 }
-Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, _setBranchViewData);
+
+Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
+	_setBranchViewData.call(null, this, done, data);
+});
 
 /** =WEB
  * @function Branch.banner
@@ -1514,7 +1531,7 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, _setBr
  */
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
-	_setBranchViewData.call(this, function(){}, data || {});
+	_setBranchViewData.call(null, this, function() {}, data || {});
 
 	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
@@ -1605,17 +1622,23 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		bannerOptions.showKindle = options['showMobile'];
 	}
 
-	this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
+	var self = this;
+	self['renderQueue'](function() {
+		self.closeBannerPointer = banner(self, bannerOptions, data, self._storage);
+	});
+
 	done();
 });
 
 Branch.prototype['closeBanner'] = wrap(0, function(done) {
-	if (this.closeBannerPointer) {
-		var self = this;
-		this._publishEvent("willCloseBanner");
-		this.closeBannerPointer(function() {
-			self._publishEvent("didCloseBanner");
-		});
-	}
+	var self = this;
+	self['renderQueue'](function() {
+		if (self.closeBannerPointer) {
+			self._publishEvent("willCloseBanner");
+			self.closeBannerPointer(function() {
+				self._publishEvent("didCloseBanner");
+			});
+		}
+	});
 	done();
 });
