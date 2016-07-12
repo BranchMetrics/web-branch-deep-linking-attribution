@@ -1083,13 +1083,13 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, d) {
-    "undefined" === typeof d && (d = {});
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+    "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
-      return d.branch_key = b.branch_key, d;
+      return c.branch_key = b.branch_key, c;
     }
     if (b.app_id && f.test(b.app_id)) {
-      return d.app_id = b.app_id, d;
+      return c.app_id = b.app_id, c;
     }
     throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
@@ -1452,18 +1452,15 @@ function renderHtmlBlob(a, b, c) {
   if (e = b.match(d)) {
     e = e[1], b = b.replace(d, ""), c = document.createElement("script"), c.innerHTML = e, document.body.appendChild(c);
   }
-  a = a || document.body;
-  var g = document.createElement("div");
-  g.id = "branch-banner-container";
-  g.className = "branch-animation";
-  g.innerHTML = b;
-  g.querySelector("#branch-mobile-action").innerHTML = f;
-  a.appendChild(g);
-  banner_utils.addClass(g, "branch-banner-is-active");
-  setTimeout(function() {
-    g.style.top = "0";
-  }, 100);
-  return g;
+  c = document.createElement("div");
+  c.id = "branch-banner-container";
+  c.className = "branch-animation";
+  c.innerHTML = b;
+  c.querySelector("#branch-mobile-action").innerHTML = f;
+  a.appendChild(c);
+  banner_utils.addClass(c, "branch-banner-is-active");
+  a === document.body ? a.insertBefore(c, a.firstChild) : a.appendChild(c);
+  return c;
 }
 branch_view.handleBranchViewData = function(a, b, c, d, e) {
   c = c || {};
