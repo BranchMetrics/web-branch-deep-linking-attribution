@@ -55,9 +55,12 @@ function renderHtmlBlob(parent, html, hasApp) {
 
 	banner_utils.addClass(banner, 'branch-banner-is-active');
 
-	setTimeout(function() {
-			banner.style.top = '0';
-	}, 100);
+	if(parent === document.body) {
+		parent.insertBefore(banner, parent.firstChild);
+	}
+	else {
+		parent.appendChild(banner);
+	}
 
 	return banner;
 };
