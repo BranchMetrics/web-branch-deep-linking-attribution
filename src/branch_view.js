@@ -51,13 +51,15 @@ function renderHtmlBlob(parent, html, hasApp) {
 	banner.className = 'branch-animation';
 	banner.innerHTML = html;
 	banner.querySelector('#branch-mobile-action').innerHTML = ctaText;
-	parent.appendChild(banner);
 
 	banner_utils.addClass(banner, 'branch-banner-is-active');
 
-	setTimeout(function() {
-			banner.style.top = '0';
-	}, 100);
+	if(parent === document.body) {
+		parent.insertBefore(banner, parent.firstChild);
+	}
+	else {
+		parent.appendChild(banner);
+	}
 
 	return banner;
 };
