@@ -1452,6 +1452,7 @@ function renderHtmlBlob(a, b, c) {
   if (e = b.match(d)) {
     e = e[1], b = b.replace(d, ""), c = document.createElement("script"), c.innerHTML = e, document.body.appendChild(c);
   }
+  a = a || document.body;
   c = document.createElement("div");
   c.id = "branch-banner-container";
   c.className = "branch-animation";

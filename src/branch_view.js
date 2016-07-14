@@ -51,7 +51,6 @@ function renderHtmlBlob(parent, html, hasApp) {
 	banner.className = 'branch-animation';
 	banner.innerHTML = html;
 	banner.querySelector('#branch-mobile-action').innerHTML = ctaText;
-	parent.appendChild(banner);
 
 	banner_utils.addClass(banner, 'branch-banner-is-active');
 
