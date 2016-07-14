@@ -2,7 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.5.1] - 2016-07-14
+- Add journeys top banner functionality
 
 ## [v2.4.0] - 2016-07-08
 - dynamically generated call to action buttons for journeys
