@@ -1458,7 +1458,6 @@ function renderHtmlBlob(a, b, c) {
   c.className = "branch-animation";
   c.innerHTML = b;
   c.querySelector("#branch-mobile-action").innerHTML = f;
-  a.appendChild(c);
   banner_utils.addClass(c, "branch-banner-is-active");
   a === document.body ? a.insertBefore(c, a.firstChild) : a.appendChild(c);
   return c;
