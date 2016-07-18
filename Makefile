@@ -39,6 +39,7 @@ compiler/compiler.jar:
 	mkdir -p compiler && \
 		wget http://dl.google.com/closure-compiler/compiler-latest.zip && \
 		unzip compiler-latest.zip -d compiler && \
+		mv compiler/closure-compiler-v*.jar compiler/compiler.jar && \
 		rm -f compiler-latest.zip
 
 compiler/library/closure-library-master/closure/goog/**:
