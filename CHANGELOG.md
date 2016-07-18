@@ -4,6 +4,17 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.5.2] - 2016-07-18
+- Attempt to recreate documentation
+
+## [v2.5.1] - 2016-07-14
+- Add journeys top banner functionality
+
+## [v2.4.0] - 2016-07-08
+- dynamically generated call to action buttons for journeys
+- open_app flag no longer set to true
+- updated unit tests
+
 ## [v2.3.0] - 2016-06-24
 - 'options' sent in branch.init()
 - tag injection
