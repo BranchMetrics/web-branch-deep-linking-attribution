@@ -5,7 +5,8 @@ COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() 
 COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --define 'DEBUG=false'
 COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE --define 'DEBUG=true'
 
-SOURCES=$(COMPILER_LIBRARY)/goog/**\
+SOURCES=$(COMPILER_LIBRARY)/goog/base.js\
+$(COMPILER_LIBRARY)/goog/json/json.js\
 src/0_config.js\
 src/0_jsonparse.js\
 src/0_queue.js\
@@ -42,7 +43,13 @@ compiler/compiler.jar:
 		mv compiler/closure-compiler-v*.jar compiler/compiler.jar && \
 		rm -f compiler-latest.zip
 
-compiler/library/closure-library-master/closure/goog/**:
+compiler/library/closure-library-master/closure/goog/base.js:
+	mkdir -p compiler/library && \
+		wget https://github.com/google/closure-library/archive/master.zip && \
+		unzip master.zip -d compiler/library && \
+		rm -f master.zip
+
+compiler/library/closure-library-master/closure/goog/json/json.js:
 	mkdir -p compiler/library && \
 		wget https://github.com/google/closure-library/archive/master.zip && \
 		unzip master.zip -d compiler/library && \
@@ -79,7 +86,7 @@ endif
 docs/web/3_branch_web.md: $(SOURCES)
 	perl -pe 's/\/\*\*\ =CORDOVA/\/\*\*\*/gx' src/6_branch.js > src/3_branch_web.js
 	perl -p -i -e 's/=WEB//gx' src/3_branch_web.js
-	jsdox src/3_branch_web.js --output docs/web
+	npm run builddocs
 	rm src/3_branch_web.js
 
 README.md: docs/1_intro.md docs/1_readme.md docs/web/3_branch_web.md docs/9_footer.md
