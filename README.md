@@ -108,6 +108,9 @@ ___
 
 
 
+**Members:**
+
++ bannerOptions
 
 * * *
 

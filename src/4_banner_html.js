@@ -88,7 +88,7 @@ banner_html.banner = function(options, action) {
  * @param {banner_utils.options} options
  * @param {storage} storage
  */
-banner_html.mobileAction = function(options, storage, branch) {
+banner_html.mobileAction = function(options, storage) {
 	return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' +
 		((session.get(storage) || {})['has_app'] ?
 			options.openAppButtonText :
@@ -181,10 +181,10 @@ banner_html.div = function(options, action) {
  * @param {banner_utils.options} options
  * @param {storage} storage
  */
-banner_html.markup = function(options, storage, branch) {
+banner_html.markup = function(options, storage) {
 	var action = '<div id="branch-sms-form-container">' +
 		(utils.mobileUserAgent() ?
-			banner_html.mobileAction(options, storage, branch) :
+			banner_html.mobileAction(options, storage) :
 			banner_html.desktopAction(options)) +
 		'</div>';
 

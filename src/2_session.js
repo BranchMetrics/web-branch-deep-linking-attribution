@@ -5,9 +5,10 @@ goog.provide('session');
 goog.require('goog.json');
 goog.require('utils');
 goog.require('safejson');
+goog.require('storage');
 
 /**
- * @param {BranchStorage} storage
+ * @param {storage} storage
  * @param {boolean=} first
  * @return {Object}
  */
@@ -22,7 +23,7 @@ session.get = function(storage, first) {
 };
 
 /**
- * @param {BranchStorage} storage
+ * @param {storage} storage
  * @param {Object} data
  * @param {boolean=} first
  */
@@ -34,7 +35,7 @@ session.set = function(storage, data, first) {
 };
 
 /**
- * @param {BranchStorage} storage
+ * @param {storage} storage
  * @param {Object} newData
  */
 session.update = function(storage, newData) {

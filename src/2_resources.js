@@ -9,10 +9,6 @@ goog.provide('resources');
 goog.require('utils');
 goog.require('config');
 
-/**
- * @const
- * @type {Object<*,utils.resource>}
- */
 var resources = { };
 
 /** @enum {number} */

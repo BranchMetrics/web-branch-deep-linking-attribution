@@ -73,6 +73,51 @@ function renderHtmlBlob(parent, html, hasApp) {
  * @param {Boolean} hasApp
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp) {
+	function destroyBanner() {
+		banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
+		banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
+		setTimeout(function() {
+			banner.parentElement.removeChild(banner);
+		}, 250);
+	}
+
+	function finalHookups(cta, banner) {
+		if(!cta || !banner) {
+			return;
+		}
+
+		setTimeout(function() {
+			banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
+			banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
+		}, 250);
+
+		var actionEls = banner.querySelectorAll('#branch-mobile-action');
+		Array.prototype.forEach.call(actionEls, function(el) {
+			el.addEventListener('click', function(e) {
+				cta();
+				destroyBanner();
+			})
+		})
+		var cancelEls = banner.querySelectorAll('.branch-banner-continue');
+		Array.prototype.forEach.call(cancelEls, function(el) {
+			el.addEventListener('click', function(e) {
+				destroyBanner();
+				storage.set('hideBanner', banner_utils.getDate(1), true);
+			})
+		})
+		cancelEls = banner.querySelectorAll('.branch-banner-close');
+		Array.prototype.forEach.call(cancelEls, function(el) {
+			el.addEventListener('click', function(e) {
+				destroyBanner();
+				storage.set('hideBanner', banner_utils.getDate(1), true);
+			})
+		})
+	}
+
+
+	var banner = null;
+	var cta = null;
+
 	requestData = requestData || {};
 	requestData['feature'] = 'journeys';
 
@@ -96,50 +141,6 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	if (branchViewData['html']) {
 		return renderHtmlBlob(document.body, branchViewData['html'], hasApp);
 	} else if (branchViewData['url']) {
-		var banner = null;
-		var cta = null;
-
-		function destroyBanner() {
-			banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
-			banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
-			setTimeout(function() {
-				banner.parentElement.removeChild(banner);
-			}, 250);
-		}
-
-		function finalHookups(cta, banner) {
-			if(!cta || !banner) {
-				return;
-			}
-
-			setTimeout(function() {
-				banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
-				banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
-			}, 250);
-
-			var actionEls = banner.querySelectorAll('#branch-mobile-action');
-			Array.prototype.forEach.call(actionEls, function(el) {
-				el.addEventListener('click', function(e) {
-					cta();
-					destroyBanner();
-				})
-			})
-			var cancelEls = banner.querySelectorAll('.branch-banner-continue');
-			Array.prototype.forEach.call(cancelEls, function(el) {
-				el.addEventListener('click', function(e) {
-					destroyBanner();
-					storage.set('hideBanner', banner_utils.getDate(1), true);
-				})
-			})
-			cancelEls = banner.querySelectorAll('.branch-banner-close');
-			Array.prototype.forEach.call(cancelEls, function(el) {
-				el.addEventListener('click', function(e) {
-					destroyBanner();
-					storage.set('hideBanner', banner_utils.getDate(1), true);
-				})
-			})
-		}
-
 		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
 		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
