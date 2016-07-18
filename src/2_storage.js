@@ -15,7 +15,7 @@ goog.require('utils');
 var COOKIE_MS = 365 * 24 * 60 * 60 * 1000;
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
-/** @typedef {undefined|{get:function(string), set:function(string, (string|boolean)),
+/** @typedef {undefined|{get:function(string, boolean=), set:function(string, (string|boolean), boolean=),
  * remove:function(string), clear:function(), isEnabled:function()}} */
 var storage;
 
