@@ -253,7 +253,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {string} url
  * @param {Object} data
  * @param {utils._httpMethod} method
- * @param {BranchStorage} storage
+ * @param {storage} storage
  * @param {function(?Error,*=,?=)=} callback
  * @param {?boolean=} noparse
  */
@@ -309,7 +309,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 /**
  * @param {utils.resource} resource
  * @param {Object.<string, *>} data
- * @param {BranchStorage} storage
+ * @param {storage} storage
  * @param {function(?Error,*=)=} callback
  */
 Server.prototype.request = function(resource, data, storage, callback) {
