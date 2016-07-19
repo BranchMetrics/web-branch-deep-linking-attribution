@@ -28,9 +28,14 @@ utils.httpMethod = {
 	GET: 'GET'
 };
 
-/** @typedef {{destination: string, endpoint: string, method: utils._httpMethod,
- * params: ?Object.<string, _validator>, queryPart: ?Object.<string, _validator>,
- * jsonp: ?boolean }} */
+/** @typedef {{
+ * destination: string,
+ * endpoint: string,
+ * method: utils._httpMethod,
+ * params: ?Object.<string, _validator>,
+ * queryPart: ?Object.<string, _validator>,
+ * jsonp: ?boolean
+ * }} */
 utils.resource;
 
 /** @typedef {{listener: function(string):null, event: string}} */
@@ -347,6 +352,10 @@ utils.base64encode = function(input) {
 
 /**
  * Add event listeners to elements, taking older browsers into account
+ * @param {Element} el
+ * @param {string} eventType
+ * @param {Function} callback
+ * @param {boolean=} useCapture
  */
 utils.addEvent = function(el, eventType, callback, useCapture) {
 	var ret = 0;
@@ -391,7 +400,7 @@ utils.extractDeeplinkPath = function(url) {
  * parameter 'content' will be the default value used if the og tag is not found or cannot
  * be parsed.
  * @param {string} property
- * @param {string=} content
+ * @param {null|string=} content
  */
 utils.scrapeOpenGraphContent = function(property, content) {
 	property = String(property);

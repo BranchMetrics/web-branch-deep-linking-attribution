@@ -5,7 +5,7 @@ goog.addDependency("../../../../../src/0_jsonparse.js", ['safejson'], ['goog.jso
 goog.addDependency("../../../../../src/0_queue.js", ['task_queue'], []);
 goog.addDependency("../../../../../src/1_utils.js", ['utils'], ['goog.json', 'config', 'safejson']);
 goog.addDependency("../../../../../src/2_resources.js", ['resources'], ['utils', 'config']);
-goog.addDependency("../../../../../src/2_session.js", ['session'], ['goog.json', 'utils', 'safejson']);
+goog.addDependency("../../../../../src/2_session.js", ['session'], ['goog.json', 'utils', 'safejson', 'storage']);
 goog.addDependency("../../../../../src/2_storage.js", ['storage'], ['goog.json', 'utils']);
 goog.addDependency("../../../../../src/3_api.js", ['Server'], ['utils', 'goog.json', 'storage', 'safejson']);
 goog.addDependency("../../../../../src/3_banner_utils.js", ['banner_utils'], ['storage', 'utils', 'safejson']);

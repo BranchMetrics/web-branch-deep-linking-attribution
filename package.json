@@ -6,8 +6,9 @@
 	"precommit": ["lint"],
 	"scripts": {
 		"lint": "./lint.sh",
-	"test": "grunt test"
-	 },
+		"test": "grunt test",
+		"builddocs": "jsdox src/3_branch_web.js --output docs/web"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/BranchMetrics/web-branch-deep-linking.git"

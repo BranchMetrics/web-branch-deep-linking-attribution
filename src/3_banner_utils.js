@@ -6,11 +6,37 @@ goog.require('storage'); // jshint unused:false
 goog.require('utils');
 goog.require('safejson');
 
-/** @typedef {{icon:string, title:string, description:string, openAppButtonText:string,
- * downloadAppButtonText:string, sendLinkText:string, iframe:boolean, showiOS:boolean,
- * showAndroid:boolean, showBlackberry:boolean, showWindowsPhone:boolean,
- * showKindle:boolean, showDesktop:boolean, forgetHide:boolean, disableHide:boolean,
- * make_new_link:boolean}} */
+/** @typedef {{icon:string,
+ * title:string,
+ * buttonBackgroundColor:string,
+ * buttonBackgroundColorHover:string,
+ * buttonBorderColor:string,
+ * buttonBorderColorHover:string,
+ * buttonFontColor:string,
+ * buttonFontColorHover:string,
+ * description:string,
+ * openAppButtonText:string,
+ * downloadAppButtonText:string,
+ * sendLinkText:string,
+ * iframe:boolean,
+ * showiOS:boolean,
+ * showiPad:boolean,
+ * showAndroid:boolean,
+ * showBlackberry:boolean,
+ * showWindowsPhone:boolean,
+ * showKindle:boolean,
+ * showDesktop:boolean,
+ * forgetHide:boolean,
+ * disableHide:boolean,
+ * make_new_link:boolean,
+ * customCSS:string,
+ * mobileSticky:boolean,
+ * desktopSticky:boolean,
+ * position:string,
+ * rating:number,
+ * reviewCount:number,
+ * open_app:boolean,
+ * append_deeplink_path:boolean}} */
 banner_utils.options; // jshint ignore:line
 
 // UI Animation transition speed in ms.

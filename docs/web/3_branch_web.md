@@ -3,6 +3,9 @@
 
 
 
+**Members:**
+
++ bannerOptions
 
 * * *
 

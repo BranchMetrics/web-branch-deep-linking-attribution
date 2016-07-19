@@ -118,7 +118,7 @@ Branch = function() {
 
 	var storageMethods = [ 'session', 'cookie', 'pojo' ];
 
-	this._storage = new BranchStorage(storageMethods);
+	this._storage = /** @type {storage} */ (new BranchStorage(storageMethods));
 
 	this._server = new Server();
 
@@ -273,6 +273,9 @@ Branch.prototype['init'] = wrap(
 		options = (options && typeof options === 'function') ? { } : options;
 
 		var setBranchValues = function(data) {
+			if (data['link_click_id']) {
+				self.link_click_id = data['link_click_id'].toString();
+			}
 			if (data['session_id']) {
 				self.session_id = data['session_id'].toString();
 			}
@@ -1537,81 +1540,77 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 			typeof options['forgetHide'] !== 'undefined') {
 		options['showAgain'] = options['forgetHide'];
 	}
+	/** @type {banner_utils.options} */
 	var bannerOptions = {
-		icon: options['icon'] || '',
-		title: options['title'] || '',
-		description: options['description'] || '',
-		reviewCount: (
+		icon: /** @type {string} */ (options['icon'] || ''),
+		title: /** @type {string} */ (options['title'] || ''),
+		description: /** @type {string} */ (options['description'] || ''),
+		reviewCount: /** @type {number} */ ((
 			typeof options['reviewCount'] === 'number' &&
 			options['reviewCount'] > 0 // force greater than 0
 		) ?
 			Math.floor(options['reviewCount']) : // force no decimal
-			null,
-		rating: (
+			null),
+		rating: /** @type {number} */ ((
 			typeof options['rating'] === 'number' &&
 			options['rating'] <= 5 &&
 			options['rating'] > 0
 		) ?
 			Math.round(options['rating'] * 2) / 2 : // force increments of .5
-			null,
-		openAppButtonText: options['openAppButtonText'] || 'View in app',
-		downloadAppButtonText: options['downloadAppButtonText'] || 'Download App',
-		sendLinkText: options['sendLinkText'] || 'Send Link',
-		phonePreviewText: options['phonePreviewText'] || '(999) 999-9999',
-		iframe: typeof options['iframe'] === 'undefined' ?
+			null),
+		openAppButtonText: /** @type {string} */ (options['openAppButtonText'] || 'View in app'),
+		downloadAppButtonText: /** @type {string} */ (options['downloadAppButtonText'] || 'Download App'),
+		sendLinkText: /** @type {string} */ (options['sendLinkText'] || 'Send Link'),
+		phonePreviewText: /** @type {string} */ (options['phonePreviewText'] || '(999) 999-9999'),
+		iframe: /** @type {boolean} */ (typeof options['iframe'] === 'undefined' ?
 			true :
-			options['iframe'],
-		showiOS: typeof options['showiOS'] === 'undefined' ?
+			options['iframe']),
+		showiOS: /** @type {boolean} */ (typeof options['showiOS'] === 'undefined' ?
 			true :
-			options['showiOS'],
-		showiPad: typeof options['showiPad'] === 'undefined' ?
+			options['showiOS']),
+		showiPad: /** @type {boolean} */ (typeof options['showiPad'] === 'undefined' ?
 			true :
-			options['showiPad'],
-		showAndroid: typeof options['showAndroid'] === 'undefined' ?
+			options['showiPad']),
+		showAndroid: /** @type {boolean} */ (typeof options['showAndroid'] === 'undefined' ?
 			true :
-			options['showAndroid'],
-		showBlackberry: typeof options['showBlackberry'] === 'undefined' ?
+			options['showAndroid']),
+		showBlackberry: /** @type {boolean} */ (typeof options['showBlackberry'] === 'undefined' ?
 			true :
-			options['showBlackberry'],
-		showWindowsPhone: typeof options['showWindowsPhone'] === 'undefined' ?
+			options['showBlackberry']),
+		showWindowsPhone: /** @type {boolean} */ (typeof options['showWindowsPhone'] === 'undefined' ?
 			true :
-			options['showWindowsPhone'],
-		showKindle: typeof options['showKindle'] === 'undefined' ?
+			options['showWindowsPhone']),
+		showKindle: /** @type {boolean} */ (typeof options['showKindle'] === 'undefined' ?
 			true :
-			options['showKindle'],
-		showDesktop: typeof options['showDesktop'] === 'undefined' ?
+			options['showKindle']),
+		showDesktop: /** @type {boolean} */ (typeof options['showDesktop'] === 'undefined' ?
 			true :
-			options['showDesktop'],
-		disableHide: !!options['disableHide'],
-		forgetHide: typeof options['forgetHide'] === 'number' ?
+			options['showDesktop']),
+		disableHide: /** @type {boolean} */ (!!options['disableHide']),
+		forgetHide: /** @type {boolean} */ (typeof options['forgetHide'] === 'number' ?
 			options['forgetHide'] :
-			!!options['forgetHide'],
-		respectDNT: typeof options['respectDNT'] === 'undefined' ?
+			!!options['forgetHide']),
+		respectDNT: /** @type {boolean} */ (typeof options['respectDNT'] === 'undefined' ?
 			false :
-			options['respectDNT'],
-		position: options['position'] || 'top',
-		customCSS: options['customCSS'] || '',
-		mobileSticky: typeof options['mobileSticky'] === 'undefined' ?
+			options['respectDNT']),
+		position: /** @type {string} */ (options['position'] || 'top'),
+		customCSS: /** @type {string} */ (options['customCSS'] || ''),
+		mobileSticky: /** @type {boolean} */ (typeof options['mobileSticky'] === 'undefined' ?
 			false :
-			options['mobileSticky'],
-		desktopSticky: typeof options['desktopSticky'] === 'undefined' ?
+			options['mobileSticky']),
+		desktopSticky: /** @type {boolean} */ (typeof options['desktopSticky'] === 'undefined' ?
 			true :
-			options['desktopSticky'],
-		theme: (
-			typeof options['theme'] === 'string' &&
-			utils.bannerThemes.indexOf(options['theme']) > -1
-		) ?
-			options['theme'] :
-			utils.bannerThemes[0],
-		buttonBorderColor: options['buttonBorderColor'] || '',
-		buttonBackgroundColor: options['buttonBackgroundColor'] || '',
-		buttonFontColor: options['buttonFontColor'] || '',
-		buttonBorderColorHover: options['buttonBorderColorHover'] || '',
-		buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
-		buttonFontColorHover: options['buttonFontColorHover'] || '',
-		make_new_link: !!options['make_new_link'],
-		open_app: !!options['open_app'],
-		immediate: !!options['immediate']
+			options['desktopSticky']),
+		buttonBorderColor: /** @type {string} */ (options['buttonBorderColor'] || ''),
+		buttonBackgroundColor: /** @type {string} */ (options['buttonBackgroundColor'] || ''),
+		buttonFontColor: /** @type {string} */ (options['buttonFontColor'] || ''),
+		buttonBorderColorHover: /** @type {string} */ (options['buttonBorderColorHover'] || ''),
+		buttonBackgroundColorHover: /** @type {string} */ (options['buttonBackgroundColorHover'] || ''),
+		buttonFontColorHover: /** @type {string} */ (options['buttonFontColorHover'] || ''),
+		make_new_link: /** @type {boolean} */ (!!options['make_new_link']),
+		open_app: /** @type {boolean} */ (!!options['open_app']),
+		immediate: /** @type {boolean} */ (!!options['immediate']),
+		append_deeplink_path: /** @type {boolean} */ (!!options['append_deeplink_path'])
 	};
 
 	if (typeof options['showMobile'] !== 'undefined') {
