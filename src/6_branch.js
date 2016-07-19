@@ -362,7 +362,9 @@ Branch.prototype['init'] = wrap(
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
 					if (eventData.hasOwnProperty('branch_view_data')) {
-						branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+						self['renderQueue'](function() {
+							branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+						});
 					}
 				}
 				try {
@@ -370,6 +372,9 @@ Branch.prototype['init'] = wrap(
 				}
 				catch (e) {
 					// pass
+				}
+				finally {
+					self['renderFinalize']();
 				}
 			});
 		};
@@ -434,7 +439,9 @@ Branch.prototype['init'] = wrap(
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
 							if (data.hasOwnProperty('branch_view_data')) {
-								branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+								self['renderQueue'](function() {
+									branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+								});
 							}
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
@@ -449,6 +456,24 @@ Branch.prototype['init'] = wrap(
 	},
 	true
 );
+
+
+/**
+ * currently private method, which may be opened to the public in the future
+ */
+Branch.prototype['renderQueue'] = wrap(callback_params.NO_CALLBACK, function(done, render) {
+	render();
+	done(null, null);
+});
+
+
+/**
+ * currently private method, which may be opened to the public in the future
+ */
+Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	done(null, null);
+});
+
 
 /**
  * @function Branch.data
@@ -658,7 +683,9 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._branchViewEnabled = !!data['branch_view_enabled'];
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
-				branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+				self['renderQueue'](function() {
+					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+				});
 			}
 		}
 		if (typeof done === 'function') {
@@ -1414,15 +1441,19 @@ Branch.prototype['removeListener'] = function(listener) {
  */
 /*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
 /*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
-Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
+function _setBranchViewData(context, done, data) {
 	data = data || {};
 	try {
-		this._branchViewData = JSON.parse(JSON.stringify(data));
+		context._branchViewData = JSON.parse(JSON.stringify(data));
 	}
 	finally {
-		this._branchViewData = this._branchViewData || {};
+		context._branchViewData = context._branchViewData || {};
 	}
 	done();
+}
+
+Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
+	_setBranchViewData.call(null, this, done, data);
 });
 
 /** =WEB
@@ -1503,7 +1534,8 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  */
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
-	this['setBranchViewData'](data);
+	_setBranchViewData.call(null, this, function() {}, data || {});
+
 	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
 		options['showAgain'] = options['forgetHide'];
@@ -1569,12 +1601,6 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		desktopSticky: /** @type {boolean} */ (typeof options['desktopSticky'] === 'undefined' ?
 			true :
 			options['desktopSticky']),
-		theme: (
-			typeof options['theme'] === 'string' &&
-			utils.bannerThemes.indexOf(options['theme']) > -1
-		) ?
-			options['theme'] :
-			utils.bannerThemes[0],
 		buttonBorderColor: /** @type {string} */ (options['buttonBorderColor'] || ''),
 		buttonBackgroundColor: /** @type {string} */ (options['buttonBackgroundColor'] || ''),
 		buttonFontColor: /** @type {string} */ (options['buttonFontColor'] || ''),
@@ -1583,6 +1609,7 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		buttonFontColorHover: /** @type {string} */ (options['buttonFontColorHover'] || ''),
 		make_new_link: /** @type {boolean} */ (!!options['make_new_link']),
 		open_app: /** @type {boolean} */ (!!options['open_app']),
+		immediate: /** @type {boolean} */ (!!options['immediate']),
 		append_deeplink_path: /** @type {boolean} */ (!!options['append_deeplink_path'])
 	};
 
@@ -1594,17 +1621,23 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		bannerOptions.showKindle = options['showMobile'];
 	}
 
-	this.closeBannerPointer = banner(this, bannerOptions, data, this._storage);
+	var self = this;
+	self['renderQueue'](function() {
+		self.closeBannerPointer = banner(self, bannerOptions, data, self._storage);
+	});
+
 	done();
 });
 
 Branch.prototype['closeBanner'] = wrap(0, function(done) {
-	if (this.closeBannerPointer) {
-		var self = this;
-		this._publishEvent("willCloseBanner");
-		this.closeBannerPointer(function() {
-			self._publishEvent("didCloseBanner");
-		});
-	}
+	var self = this;
+	self['renderQueue'](function() {
+		if (self.closeBannerPointer) {
+			self._publishEvent("willCloseBanner");
+			self.closeBannerPointer(function() {
+				self._publishEvent("didCloseBanner");
+			});
+		}
+	});
 	done();
 });

@@ -141,22 +141,13 @@ banner = function(branch, options, linkData, storage) {
 
 	var closeButton = doc.getElementById('branch-banner-close');
 
-	var closeBanner = function(callback) {
-		setTimeout(function() {
-			banner_utils.removeElement(element);
-			banner_utils.removeElement(document.getElementById('branch-css'));
-			callback();
-		}, banner_utils.animationSpeed + banner_utils.animationDelay);
+	var closeBanner = function(closeOptions, callback) {
+		if (typeof closeOptions === 'function') {
+			callback = closeOptions;
+			closeOptions = {};
+		}
+		closeOptions = closeOptions || {};
 
-		setTimeout(function() {
-			if (options.position === 'top') {
-				document.body.style.marginTop = bodyMarginTopInline;
-			}
-			else if (options.position === 'bottom') {
-				document.body.style.marginBottom = bodyMarginBottomInline;
-			}
-			banner_utils.removeClass(document.body, 'branch-banner-is-active');
-		}, banner_utils.animationDelay);
 		if (options.position === 'top') {
 			element.style.top = '-' + banner_utils.bannerHeight;
 		}
@@ -169,6 +160,36 @@ banner = function(branch, options, linkData, storage) {
 		}
 		else {
 			storage.set('hideBanner', true, true);
+		}
+
+		if (closeOptions.immediate) {
+			if (options.position === 'top') {
+				document.body.style.marginTop = bodyMarginTopInline;
+			}
+			else if (options.position === 'bottom') {
+				document.body.style.marginBottom = bodyMarginBottomInline;
+			}
+			banner_utils.removeClass(document.body, 'branch-banner-is-active');
+			banner_utils.removeElement(element);
+			banner_utils.removeElement(document.getElementById('branch-css'));
+			callback();
+		}
+		else {
+			setTimeout(function() {
+				banner_utils.removeElement(element);
+				banner_utils.removeElement(document.getElementById('branch-css'));
+				callback();
+			}, banner_utils.animationSpeed + banner_utils.animationDelay);
+
+			setTimeout(function() {
+				if (options.position === 'top') {
+					document.body.style.marginTop = bodyMarginTopInline;
+				}
+				else if (options.position === 'bottom') {
+					document.body.style.marginBottom = bodyMarginBottomInline;
+				}
+				banner_utils.removeClass(document.body, 'branch-banner-is-active');
+			}, banner_utils.animationDelay);
 		}
 	};
 
@@ -193,7 +214,7 @@ banner = function(branch, options, linkData, storage) {
 			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
 	}
 
-	setTimeout(function() {
+	function onAnimationEnd() {
 		if (options.position === 'top') {
 			element.style.top = '0';
 		}
@@ -201,7 +222,14 @@ banner = function(branch, options, linkData, storage) {
 			element.style.bottom = '0';
 		}
 		branch._publishEvent('didShowBanner');
-	}, banner_utils.animationDelay);
+	}
+
+	if (options.immediate) {
+		onAnimationEnd();
+	}
+	else {
+		setTimeout(onAnimationEnd, banner_utils.animationDelay);
+	}
 
 	return closeBanner;
 };
