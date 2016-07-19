@@ -66,12 +66,15 @@ test/branch-deps.js: $(SOURCES) compiler/library
 		rm test/branch-deps.js.tmp
 
 dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+	mkdir -p dist && \
 	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) > dist/build.js
 
 dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+	mkdir -p dist && \
 	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) > dist/build.min.js
 
 dist/build.min.js.gz: dist/build.min.js
+	mkdir -p dist && \
 	gzip -c dist/build.min.js > dist/build.min.js.gz
 
 example.html: src/web/example.template.html
