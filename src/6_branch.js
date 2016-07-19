@@ -272,6 +272,15 @@ Branch.prototype['init'] = wrap(
 
 		options = (options && typeof options === 'function') ? { } : options;
 
+		var branchViewId = null;
+
+		if (options) {
+			branchViewId = options.branch_view_id || null;
+		}
+		if (!branchViewId) {
+			branchViewId = utils.getParameterByName('_branch_view_id') || null;
+		}
+
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {
 				self.link_click_id = data['link_click_id'].toString();
@@ -361,9 +370,20 @@ Branch.prototype['init'] = wrap(
 				if (!err && typeof eventData === 'object') {
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
-					if (eventData.hasOwnProperty('branch_view_data')) {
+					var branchViewData = null;
+					if (branchViewId) {
+						branchViewData = {
+							id: branchViewId,
+							number_of_use: -1,
+							url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id')
+						};
+					}
+					else if (eventData.hasOwnProperty('branch_view_data')) {
+						branchViewData = eventData['branch_view_data'];
+					}
+					if (branchViewData) {
 						self['renderQueue'](function() {
-							branch_view.handleBranchViewData(self._server, eventData['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+							branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
 						});
 					}
 				}
@@ -438,9 +458,20 @@ Branch.prototype['init'] = wrap(
 						if (!err && typeof data === 'object') {
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
-							if (data.hasOwnProperty('branch_view_data')) {
+							var branchViewData = null;
+							if (branchViewId) {
+								branchViewData = {
+									id: branchViewId,
+									number_of_use: -1,
+									url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id')
+								};
+							}
+							else if (data.hasOwnProperty('branch_view_data')) {
+								branchViewData = data['branch_view_data'];
+							}
+							if (branchViewData) {
 								self['renderQueue'](function() {
-									branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+									branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
 								});
 							}
 							if (link_identifier) {
