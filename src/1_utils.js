@@ -117,6 +117,23 @@ utils.getWindowLocation = function() {
 	return String(window.location);
 };
 
+/**
+ * Find debugging parameters
+ */
+utils.getParameterByName = function(name) {
+	var url;
+	var re;
+	var match;
+	name = name.replace(/[\[\]]/g, '\\$&');
+	url = utils.getWindowLocation();
+	re = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+	match = re.exec(url);
+	if (!match || !match[2]) {
+		return '';
+	}
+	return decodeURIComponent(match[2].replace(/\+/g, ' '));
+};
+
 utils.cleanLinkData = function(linkData) {
 	linkData['source'] = 'web-sdk';
 	var data = linkData['data'];
