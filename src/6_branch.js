@@ -367,10 +367,10 @@ Branch.prototype['init'] = wrap(
 					"language": navigator.language
 				}
 			}, function(err, eventData) {
+				var branchViewData = null;
 				if (!err && typeof eventData === 'object') {
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
-					var branchViewData = null;
 					if (branchViewId) {
 						branchViewData = {
 							id: branchViewId,
@@ -381,11 +381,6 @@ Branch.prototype['init'] = wrap(
 					else if (eventData.hasOwnProperty('branch_view_data')) {
 						branchViewData = eventData['branch_view_data'];
 					}
-					if (branchViewData) {
-						self['renderQueue'](function() {
-							branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
-						});
-					}
 				}
 				try {
 					done(err, data && utils.whiteListSessionData(data));
@@ -394,7 +389,11 @@ Branch.prototype['init'] = wrap(
 					// pass
 				}
 				finally {
-					self['renderFinalize']();
+					if (branchViewData) {
+						self['renderQueue'](function() {
+							branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
+						});
+					}
 				}
 			});
 		};
@@ -455,10 +454,10 @@ Branch.prototype['init'] = wrap(
 						"options": options
 					},
 					function(err, data) {
+						var branchViewData = null;
 						if (!err && typeof data === 'object') {
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
-							var branchViewData = null;
 							if (branchViewId) {
 								branchViewData = {
 									id: branchViewId,
@@ -469,17 +468,17 @@ Branch.prototype['init'] = wrap(
 							else if (data.hasOwnProperty('branch_view_data')) {
 								branchViewData = data['branch_view_data'];
 							}
-							if (branchViewData) {
-								self['renderQueue'](function() {
-									branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
-								});
-							}
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
 							}
 						}
 						attachVisibilityEvent();
 						finishInit(err, data);
+						if (branchViewData) {
+							self['renderQueue'](function() {
+								branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
+							});
+						}
 					}
 				);
 			}
@@ -494,14 +493,6 @@ Branch.prototype['init'] = wrap(
  */
 Branch.prototype['renderQueue'] = wrap(callback_params.NO_CALLBACK, function(done, render) {
 	render();
-	done(null, null);
-});
-
-
-/**
- * currently private method, which may be opened to the public in the future
- */
-Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	done(null, null);
 });
 
