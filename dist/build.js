@@ -296,8 +296,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   goog.moduleLoaderState_ = null;
   for (a = 0;a < c.length;a++) {
     if (f = c[a]) {
-      var k = e.loadFlags[f] || {}, h = goog.needsTranspile_(k.lang);
-      "goog" == k.module || h ? goog.importProcessedScript_(goog.basePath + f, "goog" == k.module, h) : goog.importScript_(goog.basePath + f);
+      var h = e.loadFlags[f] || {}, k = goog.needsTranspile_(h.lang);
+      "goog" == h.module || k ? goog.importProcessedScript_(goog.basePath + f, "goog" == h.module, k) : goog.importScript_(goog.basePath + f);
     } else {
       throw goog.moduleLoaderState_ = g, Error("Undefined script input");
     }
@@ -587,8 +587,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
-      g[k - 2] = arguments[k];
+    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
+      g[h - 2] = arguments[h];
     }
     return b.prototype[c].apply(a, g);
   };
@@ -823,6 +823,12 @@ utils.whiteListSessionData = function(a) {
 utils.getWindowLocation = function() {
   return String(window.location);
 };
+utils.getParameterByName = function(a) {
+  var b;
+  a = a.replace(/[\[\]]/g, "\\$&");
+  b = utils.getWindowLocation();
+  return (a = (new RegExp("[?&]" + a + "(=([^&#]*)|&|#|$)")).exec(b)) && a[2] ? decodeURIComponent(a[2].replace(/\+/g, " ")) : "";
+};
 utils.cleanLinkData = function(a) {
   a.source = "web-sdk";
   var b = a.data;
@@ -899,14 +905,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, k, h = 0;
+  var b = "", c, d, e, f, g, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? k = g = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -1140,7 +1146,7 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
     "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
       return c.branch_key = b.branch_key, c;
@@ -1152,7 +1158,7 @@ Server.prototype.getUrl = function(a, b) {
   };
   if ("/v1/has-app" === a.endpoint) {
     try {
-      a.queryPart = k(b, a.queryPart);
+      a.queryPart = h(b, a.queryPart);
     } catch (l) {
       return {error:l.message};
     }
@@ -1167,7 +1173,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  var h = {};
+  var k = {};
   if ("undefined" !== typeof a.params) {
     for (c in a.params) {
       if (a.params.hasOwnProperty(c)) {
@@ -1175,20 +1181,20 @@ Server.prototype.getUrl = function(a, b) {
           return {error:d};
         }
         d = b[c];
-        "undefined" !== typeof d && "" !== d && null !== d && (h[c] = d);
+        "undefined" !== typeof d && "" !== d && null !== d && (k[c] = d);
       }
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
-      b = k(b, h);
+      b = h(b, k);
     } catch (l) {
       return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
-  "/v1/open" === a.endpoint && (h.options = JSON.stringify(h.options || {}));
-  return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
+  "/v1/event" === a.endpoint && (k.metadata = JSON.stringify(k.metadata || {}));
+  "/v1/open" === a.endpoint && (k.options = JSON.stringify(k.options || {}));
+  return {data:this.serializeObject(k, ""), url:e.replace(/^\//, "")};
 };
 Server.prototype.createScript = function(a, b, c) {
   var d = document.createElement("script");
@@ -1250,7 +1256,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
   };
   try {
     g.open(c, a, !0), g.timeout = TIMEOUT, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
-  } catch (k) {
+  } catch (h) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
@@ -1259,14 +1265,14 @@ Server.prototype.Server_prototype$request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(f.error));
   }
-  var g, k = "";
-  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
-  var h = RETRIES, l = function(a, b, c) {
-    a && 0 < h && "5" === (c || "").toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+  var g, h = "";
+  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
+  var k = RETRIES, l = function(a, b, c) {
+    a && 0 < k && "5" === (c || "").toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       m();
     }, RETRY_DELAY)) : d(a, b);
   }, m = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
   };
   m();
 };
@@ -1293,7 +1299,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, k = function() {
+    }, h = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -1305,11 +1311,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * k();
+      return a * h();
     }, vmin:function(a) {
-      return a * Math.min(k(), g());
+      return a * Math.min(h(), g());
     }, vmax:function(a) {
-      return a * Math.max(k(), g());
+      return a * Math.max(h(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * f;
     }}[b](f), 10);
@@ -1409,24 +1415,24 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 13
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
   }, m = function() {
-    h = a.createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = banner_html.checkmark();
-    k.appendChild(h);
+    k = a.createElement("div");
+    k.className = "branch-icon-wrapper";
+    k.id = "branch-checkmark";
+    k.style = "opacity: 0;";
+    k.innerHTML = banner_html.checkmark();
+    h.appendChild(k);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      h.style.opacity = "1";
+      k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
@@ -1442,7 +1448,7 @@ var sendSMS = function(a, b, c, d) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
       a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
-        k.removeChild(h);
+        h.removeChild(k);
         l();
       }, banner_utils.success_timeout));
     })) : n();
@@ -1467,17 +1473,17 @@ var sendSMS = function(a, b, c, d) {
     d.preventDefault();
     sendSMS(g, a, b, c);
   });
-  var k = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
+  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
     "top" === b.position ? f.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (f.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
-    a.immediate ? ("top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
+    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
       banner_utils.removeElement(f);
       banner_utils.removeElement(document.getElementById("branch-css"));
       c();
     }, banner_utils.animationSpeed + banner_utils.animationDelay), setTimeout(function() {
-      "top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m);
+      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay));
   };
@@ -1489,7 +1495,7 @@ var sendSMS = function(a, b, c, d) {
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, k) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, h) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
   b.immediate ? e() : setTimeout(e, banner_utils.animationDelay);
   return p;
 };
@@ -1523,10 +1529,10 @@ function renderHtmlBlob(a, b, c) {
 }
 branch_view.handleBranchViewData = function(a, b, c, d, e) {
   function f() {
-    banner_utils.addClass(k.querySelector("#branch-banner"), "branch-animation-out");
-    banner_utils.removeClass(k.querySelector("#branch-banner"), "branch-animation-in");
+    banner_utils.addClass(h.querySelector("#branch-banner"), "branch-animation-out");
+    banner_utils.removeClass(h.querySelector("#branch-banner"), "branch-animation-in");
     setTimeout(function() {
-      k.parentElement.removeChild(k);
+      h.parentElement.removeChild(h);
     }, 250);
   }
   function g(a, b) {
@@ -1558,7 +1564,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e) {
       });
     }
   }
-  var k = null, h = null;
+  var h = null, k = null;
   c = c || {};
   c.feature = "journeys";
   c = utils.cleanLinkData(c);
@@ -1583,14 +1589,14 @@ branch_view.handleBranchViewData = function(a, b, c, d, e) {
             }, TIMEOUT);
             window[m] = function(a) {
               window.clearTimeout(d);
-              c || (h = a, g(h, k));
+              c || (k = a, g(k, h));
             };
-            k = renderHtmlBlob(document.body, b, e);
-            if (null === k) {
+            h = renderHtmlBlob(document.body, b, e);
+            if (null === h) {
               c = !0;
               return;
             }
-            g(h, k);
+            g(k, h);
           }
           document.body.removeChild(l);
         }, !0);
@@ -1608,7 +1614,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
@@ -1620,16 +1626,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed)), null);
+          return k(Error(utils.message(utils.messages.initFailed)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -1670,7 +1676,10 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c = c && "function" === typeof c ? {} : c;
-  var e = function(a) {
+  var e = null;
+  c && (e = c.branch_view_id || null);
+  e || (e = utils.getParameterByName("_branch_view_id") || null);
+  var f = function(a) {
     a.link_click_id && (d.link_click_id = a.link_click_id.toString());
     a.session_id && (d.session_id = a.session_id.toString());
     a.identity_id && (d.identity_id = a.identity_id.toString());
@@ -1679,11 +1688,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
-  };
-  b = session.get(d._storage);
-  var f = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), g = !b || !b.identity_id;
+  }, g = session.get(d._storage), h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !g || !g.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var k = function(a, b) {
+  var l = function(a, b) {
     var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
     f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
     d._api(resources._r, c, function(a, b) {
@@ -1693,54 +1700,70 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       c && !e.has_app && (e.has_app = !0, session.update(d._storage, e), d._publishEvent("didDownloadApp"));
       b && b(a, e);
     });
-  }, h = function(b, c) {
-    c && (c = e(c), session.set(d._storage, c, g), d.init_state = init_states.INIT_SUCCEEDED, c.data_parsed = c.data ? safejson.parse(c.data) : null);
-    if (b) {
-      return d.init_state = init_states.INIT_FAILED, a(b, c && utils.whiteListSessionData(c));
+  }, m = function(c, g) {
+    g && (g = f(g), session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data ? safejson.parse(g.data) : null);
+    if (c) {
+      return d.init_state = init_states.INIT_FAILED, a(c, g && utils.whiteListSessionData(g));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(b, e) {
-      b || "object" !== typeof e || (d._branchViewEnabled = !!e.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), e.hasOwnProperty("branch_view_data") && d.renderQueue(function() {
-        branch_view.handleBranchViewData(d._server, e.branch_view_data, d._branchViewData, d._storage, c.has_app);
-      }));
+    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(c, f) {
+      if (!c && "object" === typeof f) {
+        d._branchViewEnabled = !!f.branch_view_enabled;
+        d._storage.set("branch_view_enabled", d._branchViewEnabled);
+        var h = null;
+        e ? h = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id"} : f.hasOwnProperty("branch_view_data") && (h = f.branch_view_data);
+        h && d.renderQueue(function() {
+          branch_view.handleBranchViewData(d._server, h, d._branchViewData, d._storage, g.has_app);
+        });
+      }
       try {
-        a(b, c && utils.whiteListSessionData(c));
-      } catch (f) {
+        a(c, g && utils.whiteListSessionData(g));
+      } catch (k) {
       } finally {
         d.renderFinalize();
       }
     });
-  }, l = function() {
+  }, n = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
-      document[a] || k(null, null);
+      document[a] || l(null, null);
     }, !1);
   };
-  if (b && b.session_id && !f) {
-    l(), k(b, h);
+  if (g && g.session_id && !h) {
+    n(), l(g, m);
   } else {
-    b = {sdk:config.version};
-    var m = session.get(d._storage, !0) || {};
-    m.browser_fingerprint_id && (b._t = m.browser_fingerprint_id);
-    d._api(resources._r, b, function(a, b) {
+    var g = {sdk:config.version}, p = session.get(d._storage, !0) || {};
+    p.browser_fingerprint_id && (g._t = p.browser_fingerprint_id);
+    d._api(resources._r, g, function(a, f) {
       if (a) {
-        return h(a, null);
+        return m(a, null);
       }
-      d._api(resources.open, {link_identifier:f, is_referrable:1, browser_fingerprint_id:b, options:c}, function(a, b) {
-        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), b.hasOwnProperty("branch_view_data") && d.renderQueue(function() {
-          branch_view.handleBranchViewData(d._server, b.branch_view_data, d._branchViewData, d._storage, b.has_app);
-        }), f && (b.click_id = f));
-        l();
-        h(a, b);
+      d._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:f, options:c}, function(a, c) {
+        if (!a && "object" === typeof c) {
+          d._branchViewEnabled = !!c.branch_view_enabled;
+          d._storage.set("branch_view_enabled", d._branchViewEnabled);
+          var f = null;
+          e ? f = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id"} : c.hasOwnProperty("branch_view_data") && (f = c.branch_view_data);
+          f && d.renderQueue(function() {
+            branch_view.handleBranchViewData(d._server, f, d._branchViewData, d._storage, c.has_app);
+          });
+          h && (c.click_id = h);
+        }
+        n();
+        m(a, c);
       });
     });
   }
 }, !0);
 Branch.prototype.renderQueue = wrap(callback_params.NO_CALLBACK, function(a, b) {
-  b();
+  this._renderFinalized ? b() : (this._renderQueue = this._renderQueue || [], this._renderQueue.push(b));
   a(null, null);
 });
 Branch.prototype.renderFinalize = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  this._renderQueue && 0 < this._renderQueue.length && (this._renderQueue.forEach(function(a) {
+    a.call(this);
+  }), delete this._renderQueue);
+  this._renderFinalized = !0;
   a(null, null);
 });
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
