@@ -117,7 +117,10 @@ describe('Integration tests', function() {
 				'The first request has the right .src'
 			);
 		}
+
+		// _r
 		requests[0].callback(browser_fingerprint_id);
+		// v1/open
 		requests[1].respond(
 			200,
 			{ "Content-Type": "application/json" },
@@ -126,14 +129,23 @@ describe('Integration tests', function() {
 				'"browser_fingerprint_id":"79336952217731267", ' +
 				'"link":"https://bnc.lt/i/4LYQTXE0_k", "identity":"Branch","has_app":true }'
 		);
+		// v1/event
+		requests[2].respond(
+			200,
+			{ "Content-Type": "application/json" },
+			JSON.stringify({
+				branch_view_enabled: false
+			}));
+
 		if (assert) {
-			assert.strictEqual(requests.length, 2, 'Exactly two requests were made');
+			assert.strictEqual(requests.length, 3, 'Exactly three requests were made');
 			assert.strictEqual(
 				requests[1].requestBody,
 				'browser_fingerprint_id=' + browser_fingerprint_id +
 					'&identity_id=' + identity_id +
 					'&is_referrable=1&sdk=web' + config.version +
-					'&app_id=' + browser_fingerprint_id,
+					'&app_id=' + browser_fingerprint_id +
+					'&options=%7B%7D',
 				'The second request has the right .requestBody'
 			);
 		}
@@ -223,10 +235,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				'{ "identity_id":' + identity_id +
@@ -254,7 +266,7 @@ describe('Integration tests', function() {
 					'Expect data in branch.data callback'
 				);
 			});
-			assert.strictEqual(requests.length, indexOfLastInitRequest(1));
+			assert.strictEqual(requests.length, indexOfLastInitRequest(2));
 		});
 	});
 
@@ -278,10 +290,10 @@ describe('Integration tests', function() {
 
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify({
@@ -302,10 +314,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				'{ }'
@@ -323,10 +335,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify(testMetadata)
@@ -347,10 +359,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }'
@@ -385,10 +397,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				'{ "install": { "total": 5, "unique": 2 }' +
@@ -407,10 +419,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(200);
+			requests[indexOfLastInitRequest(2)].respond(200);
 		});
 	});
 
@@ -436,10 +448,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify(expectedResponse)
@@ -457,10 +469,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(200);
+			requests[indexOfLastInitRequest(2)].respond(200);
 		});
 	});
 
@@ -474,10 +486,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(200);
+			requests[indexOfLastInitRequest(2)].respond(200);
 		});
 	});
 
@@ -518,10 +530,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				JSON.stringify(expectedResponse)
@@ -545,10 +557,10 @@ describe('Integration tests', function() {
 			});
 			assert.strictEqual(
 				requests.length,
-				indexOfLastInitRequest(2),
+				indexOfLastInitRequest(3),
 				'Expect requests length'
 			);
-			requests[indexOfLastInitRequest(1)].respond(
+			requests[indexOfLastInitRequest(2)].respond(
 				200,
 				{ "Content-Type": "application/json" },
 				'{ "default":"0" }'
