@@ -150,7 +150,7 @@ describe('Branch', function() {
 
 		it('should attempt to pass deeplink data to a journey in a page view event', function(done) {
 			var branch = initBranch(false);
-			var assert = testUtils.plan(1, done);
+			var assert = testUtils.plan(4, done);
 
 			var bannerDeeplinkData = {
 				tags: ['custom'],
@@ -162,6 +162,7 @@ describe('Branch', function() {
 			}
 
 			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
+				assert.isDefined(data, 'user data has been defined');
 				assert.strictEqual(true, banner_utils.shouldAppend(storage, {
 					forgetHide: true,
 					showiOS: true
@@ -221,7 +222,7 @@ describe('Branch', function() {
 
 		it('should attempt to pass deeplink data to a journey in a custom event', function(done) {
 			var branch = initBranch(false);
-			var assert = testUtils.plan(3, done);
+			var assert = testUtils.plan(4, done);
 
 			var bannerDeeplinkData = {
 				tags: ['custom'],
@@ -233,6 +234,7 @@ describe('Branch', function() {
 			}
 
 			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
+				assert.isDefined(data, 'user data has been defined');
 				var test = banner_utils.shouldAppend(storage, {
 					forgetHide: true,
 					showiOS: true
@@ -293,6 +295,73 @@ describe('Branch', function() {
 				assert.strictEqual(requests.length, 5, '5 requests made');
 			}, 10);
 		});
+
+		it('should attempt to pass deeplink data in a banner call from init callback', function(done) {
+			// An existing user with a branch.banner() call during the callback passed into branch.init(),
+			// where a Journey view would be shown. In this case, the data most recently passed to
+			// branch.banner() and stored in the data cache would be sent through to the /v1/branchview
+			// call. It would be combined on the server with data set in the Dashboard.
+			var branch = initBranch(false);
+			var assert = testUtils.plan(4, done);
+
+			var bannerDeeplinkData = {
+				tags: ['custom'],
+				data: {
+					mydata: 'From Banner',
+					foo: 'bar',
+					'$deeplink_path': 'open/item/5678'
+				}
+			}
+
+			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
+				assert.isDefined(data, 'user data has been defined');
+				assert.strictEqual(true, banner_utils.shouldAppend(storage, {
+					forgetHide: true,
+					showiOS: true
+				}), 'branch view should be displayable');
+				assert.strictEqual(data.data.mydata, 'From Banner', 'deep link data was passed by banner');
+			});
+
+			branch.init(branch_sample_key, {}, function onInit(errorMessage, branchData) {
+				branch.banner(
+					{
+						immediate: true,
+						disableHide: true,
+						forgetHide: true
+					},
+					bannerDeeplinkData
+				);
+			});
+
+
+			// _r
+			requests[0].callback(null, browser_fingerprint_id);
+
+			// v1/open
+			requests[1].callback(
+				null,
+				{
+					browser_fingerprint_id: browser_fingerprint_id,
+					identity_id: identity_id,
+					session_id: session_id
+				}
+			);
+
+			// v1/event (first time)
+			setTimeout(function() {
+				requests[2].callback(null, {
+					branch_view_enabled: true,
+					branch_view_data: {
+						id: '345',
+						number_of_use: 1000,
+						url: 'http://localhost:8000'
+					}
+				});
+
+				assert.strictEqual(requests.length, 4, '4 requests made');
+			}, 10);
+		});
+
 	});
 });
 
