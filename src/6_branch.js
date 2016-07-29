@@ -493,7 +493,14 @@ Branch.prototype['init'] = wrap(
  * currently private method, which may be opened to the public in the future
  */
 Branch.prototype['renderQueue'] = wrap(callback_params.NO_CALLBACK, function(done, render) {
-	render();
+	var self = this;
+	if (self._renderFinalized) {
+		render();
+	}
+	else {
+		self._renderQueue = self._renderQueue || [];
+		self._renderQueue.push(render);
+	}
 	done(null, null);
 });
 
@@ -502,6 +509,14 @@ Branch.prototype['renderQueue'] = wrap(callback_params.NO_CALLBACK, function(don
  * currently private method, which may be opened to the public in the future
  */
 Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	var self = this;
+	if (self._renderQueue && self._renderQueue.length > 0) {
+		self._renderQueue.forEach(function(callback) {
+			callback.call(this);
+		});
+		delete self._renderQueue;
+	}
+	self._renderFinalized = true;
 	done(null, null);
 });
 

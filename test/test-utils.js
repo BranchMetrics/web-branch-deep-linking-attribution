@@ -488,6 +488,12 @@
 			}
 		};
 
+		assert.isDefined = function(actual, message) {
+			if (typeof actual === 'undefined' || actual === null) {
+				fail(actual, 'defined', message, '!=', assert.isDefined);
+			}
+		};
+
 		// =========================================================================
 
 		window.branch_sample_key = 'key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS',
@@ -554,10 +560,11 @@
 			'deepEqual',
 			'notDeepEqual',
 			'strictEqual',
-			'notStrinctEqual',
+			'notStrictEqual',
 			'throws',
 			'doesNotThrow',
-			'ifError'
+			'ifError',
+			'isDefined'
 		];
 
 		testUtils.plan = function(n, done) {
