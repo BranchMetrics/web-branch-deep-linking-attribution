@@ -2,6 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [VERSION] - unreleased
+
 ## [v2.6.0] - 2016-08-01
 - Added data merging for Journeys migration
 - Updated the build process to allow for the latest Google Closure
