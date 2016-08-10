@@ -6,6 +6,8 @@ goog.require('resources');
 goog.require('config');
 goog.require('storage');
 goog.require('session');
+goog.require('banner_utils');
+goog.require('banner_html');
 
 goog.require('goog.json'); // jshint unused:false
 
@@ -875,7 +877,7 @@ describe('Branch', function() {
 			utils.getWindowLocation.restore();
 		});
 
-		it('should call v1/deepview endpoint with the right params', function(done) {
+		it('should call v1/deepview endpoint with the right params for branch.deepview() calls', function(done) {
 			var assert = testUtils.plan(7, done);
 			var dataString = [
 				'{',
@@ -908,6 +910,56 @@ describe('Branch', function() {
 			// 	'append_deeplink_path is sent');
 			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
 			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
+			assert.strictEqual(obj.deepview_type, 'deepview', 'deepview_type is sent as \'deepview\'');
+		});
+
+		it('should call v1/deepview endpoint with the right params for branch.banner() calls', function(done) {
+			var assert = testUtils.plan(2, done);
+
+			// we're testing banner, which means we need to be mobile
+			sandbox.stub(utils, 'mobileUserAgent', function(server, branchViewData, data) {
+				return true;
+			});
+
+			// allow the banner to be shown
+			sandbox.stub(banner_utils, 'shouldAppend', function(server, branchViewData, data) {
+				return true;
+			});
+
+			// create a fake banner div so we don't fill up the dom with real banners
+			var bannerDiv = document.createElement('iframe');
+			bannerDiv.src = 'about:blank';
+			bannerDiv.id = 'branch-mobile-action';
+			document.body.appendChild(bannerDiv);
+			sandbox.stub(banner_html, 'markup', function(server, branchViewData, data) {
+				return bannerDiv;
+			});
+
+
+			var bannerDeeplinkData = {
+				tags: [ 'custom' ],
+				data: {
+					mydata: 'From Banner',
+					foo: 'bar',
+					'$deeplink_path': 'open/item/5678'
+				}
+			};
+
+			var banner = branch.banner(
+				{
+					immediate: true,
+					disableHide: true,
+					forgetHide: true
+				},
+				bannerDeeplinkData
+			);
+
+			assert.strictEqual(requests.length, 1, 'exactly one request made');
+
+			var obj = requests[0].obj;
+			assert.strictEqual(obj.deepview_type, 'banner', 'deepview_type is sent as \'banner\'');
+
+			document.body.removeChild(bannerDiv);
 		});
 
 		it('should ignore the referring link if make_new_link is true', function(done) {

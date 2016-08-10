@@ -1046,6 +1046,15 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		options = { };
 	}
 
+	if (typeof options['deepview_type'] === 'undefined') {
+		options['deepview_type'] = 'deepview';
+	}
+	else {
+		// we are currently limited to just 'deepview' or 'banner', but if that changes,
+		// then this line should be removed
+		options['deepview_type'] = 'banner';
+	}
+
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
 	var encodeLinkProperty = function(key, data) {
@@ -1073,6 +1082,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		cleanedData['open_app'] = true;
 	}
 	cleanedData['append_deeplink_path'] = !!options['append_deeplink_path'];
+	cleanedData['deepview_type'] = options['deepview_type'];
 
 	var referringLink = self._referringLink();
 	if (referringLink && !options['make_new_link']) {

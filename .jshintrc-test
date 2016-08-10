@@ -8,7 +8,6 @@
 	"immed": true,
 	"latedef": true,
 	"maxdepth": 3,
-	"maxlen": 100,
 	"mocha": true,
 	"noarg": true,
 	"nocomma": true,

@@ -270,7 +270,8 @@ resources.deepview = {
 		"open_app": validator(false, validationTypes.BOOLEAN),
 		"append_deeplink_path": validator(false, validationTypes.BOOLEAN),
 		"stage": validator(false, validationTypes.STRING),
-		"tags": validator(false, validationTypes.ARRAY)
+		"tags": validator(false, validationTypes.ARRAY),
+		"deepview_type": validator(true, validationTypes.STRING)
 	})
 };
 

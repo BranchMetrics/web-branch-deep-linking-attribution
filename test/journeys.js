@@ -101,7 +101,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(3, done);
 
 			var bannerDeeplinkData = {
-				tags: ['custom'],
+				tags: [ 'custom' ],
 				data: {
 					mydata: 'From Banner',
 					foo: 'bar',
@@ -153,7 +153,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(4, done);
 
 			var bannerDeeplinkData = {
-				tags: ['custom'],
+				tags: [ 'custom' ],
 				data: {
 					mydata: 'From Banner',
 					foo: 'bar',
@@ -225,7 +225,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(4, done);
 
 			var bannerDeeplinkData = {
-				tags: ['custom'],
+				tags: [ 'custom' ],
 				data: {
 					mydata: 'From Banner',
 					foo: 'bar',
@@ -305,7 +305,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(4, done);
 
 			var bannerDeeplinkData = {
-				tags: ['custom'],
+				tags: [ 'custom' ],
 				data: {
 					mydata: 'From Banner',
 					foo: 'bar',
