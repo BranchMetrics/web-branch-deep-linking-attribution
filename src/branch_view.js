@@ -102,18 +102,17 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		Array.prototype.forEach.call(cancelEls, function(el) {
 			el.addEventListener('click', function(e) {
 				destroyBanner();
-				storage.set('hideBanner', banner_utils.getDate(1), true);
+				storage.set('hideBanner'+branchViewData["id"], banner_utils.getDate(1), true);
 			})
 		})
 		cancelEls = banner.querySelectorAll('.branch-banner-close');
 		Array.prototype.forEach.call(cancelEls, function(el) {
 			el.addEventListener('click', function(e) {
 				destroyBanner();
-				storage.set('hideBanner', banner_utils.getDate(1), true);
+				storage.set('hideBanner'+branchViewData["id"], banner_utils.getDate(1), true);
 			})
 		})
 	}
-
 
 	var banner = null;
 	var cta = null;
@@ -133,10 +132,6 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	placeholder.id = 'branch-banner';
 	document.body.insertBefore(placeholder, null);
 	banner_utils.addClass(placeholder, 'branch-banner-is-active');
-
-	if (storage.get('hideBanner', true)) {
-		return;
-	}
 
 	if (branchViewData['html']) {
 		return renderHtmlBlob(document.body, branchViewData['html'], hasApp);

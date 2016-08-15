@@ -98,8 +98,13 @@ var webStorage = function(perm) {
 				storageMethod.setItem(prefix(key), value);
 			}
 		},
-		remove: function(key) {
-			storageMethod.removeItem(prefix(key));
+		remove: function(key, perm_override) {
+			if (perm_override) {
+				localStorage.removeItem(prefix(key));
+			}
+			else {
+				storageMethod.removeItem(prefix(key));
+			}
 		},
 		clear: function() {
 			Object.keys(storageMethod).forEach(function(item) {

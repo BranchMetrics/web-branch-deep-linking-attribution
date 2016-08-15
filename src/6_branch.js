@@ -312,8 +312,8 @@ Branch.prototype['init'] = wrap(
 			null;
 		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
-		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
-
+		// self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
+		self._branchViewEnabled = true;
 		var checkHasApp = function(sessionData, cb) {
 			var params_r = { "sdk": config.version };
 			var currentSessionData = sessionData || session.get(self._storage) || {};
@@ -368,7 +368,8 @@ Branch.prototype['init'] = wrap(
 				}
 			}, function(err, eventData) {
 				if (!err && typeof eventData === 'object') {
-					self._branchViewEnabled = !!eventData['branch_view_enabled'];
+					self._branchViewEnabled = true;
+					// self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
 					var branchViewData = null;
 					if (branchViewId) {
@@ -382,6 +383,15 @@ Branch.prototype['init'] = wrap(
 						branchViewData = eventData['branch_view_data'];
 					}
 					if (branchViewData) {
+						var hideBanner = self._storage.get('hideBanner' + branchViewData["id"], true);
+						if (hideBanner) {
+							if (hideBanner > Date.now()) {
+								return;
+							}
+							else if (hideBanner < Date.now()) {
+								self._storage.remove('hideBanner' + branchViewData["id"], true);
+							}
+						}
 						self['renderQueue'](function() {
 							branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
 						});
