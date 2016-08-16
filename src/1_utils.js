@@ -83,12 +83,20 @@ utils.getLocationHash = function() {
 /**
  * @param {message} message
  * @param {Array.<*>=} params
+ * @param {number=} failCode
+ * @param {string=} failDetails
  * @return {string}
  */
-utils.message = function(message, params) {
+utils.message = function(message, params, failCode, failDetails) {
 	var msg = message.replace(/\$(\d)/g, function(_, place) {
 		return params[parseInt(place, 10) - 1];
 	});
+	if (failCode) {
+		msg += '\n Failure Code:' + failCode;
+	}
+	if (failDetails) {
+		msg += '\n Failure Details:' + failDetails;
+	}
 	if (DEBUG && console) {
 		console.log(msg);
 	}
