@@ -1634,7 +1634,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
   }, g = session.get(d._storage), h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !g || !g.identity_id;
-  d._branchViewEnabled = !0;
+  d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
   var l = function(a, b) {
     var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
     f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
@@ -1652,7 +1652,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }
     d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(c, f) {
       if (!c && "object" === typeof f) {
-        d._branchViewEnabled = !0;
+        d._branchViewEnabled = !!f.branch_view_enabled;
         d._storage.set("branch_view_enabled", d._branchViewEnabled);
         var h = null;
         e ? h = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id"} : f.hasOwnProperty("branch_view_data") && (h = f.branch_view_data);
