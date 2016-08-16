@@ -81,7 +81,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		}, 250);
 	}
 
-	function finalHookups(cta, banner) {
+	function finalHookups(cta, banner, hideBanner) {
 		if(!cta || !banner) {
 			return;
 		}
@@ -102,14 +102,14 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		Array.prototype.forEach.call(cancelEls, function(el) {
 			el.addEventListener('click', function(e) {
 				destroyBanner();
-				storage.set('hideBanner'+branchViewData["id"], banner_utils.getDate(1), true);
+				storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 			})
 		})
 		cancelEls = banner.querySelectorAll('.branch-banner-close');
 		Array.prototype.forEach.call(cancelEls, function(el) {
 			el.addEventListener('click', function(e) {
 				destroyBanner();
-				storage.set('hideBanner'+branchViewData["id"], banner_utils.getDate(1), true);
+				storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 			})
 		})
 	}
@@ -144,6 +144,23 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 			var failed = false;
 			if (!error && html) {
 
+				var dismissPeriod;
+				var re = /<script type="application\/json">((.|\s)*?)<\/script>/;
+				var match = html.match(re);
+
+				if (match) {
+					var src = match[1];
+					var metadata = safejson.parse(src);
+					if (metadata && metadata['dismissPeriod']) {
+						dismissPeriod = metadata['dismissPeriod'];
+					}
+				}
+
+				dismissPeriod = typeof dismissPeriod === 'number' ? dismissPeriod : 7;
+				var hideBanner = dismissPeriod === -1
+					? true
+					: banner_utils.getDate(dismissPeriod)
+
 				var timeoutTrigger = window.setTimeout(
 					function() {
 						window[callbackString] = function() { };
@@ -157,7 +174,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 						return;
 					}
 					cta = data;
-					finalHookups(cta,banner);
+					finalHookups(cta, banner, hideBanner);
 				};
 
 
@@ -166,7 +183,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 					failed = true;
 					return;
 				}
-				finalHookups(cta,banner);
+				finalHookups(cta, banner, hideBanner);
 			}
 			document.body.removeChild(placeholder);
 		}, true);

@@ -385,7 +385,7 @@ Branch.prototype['init'] = wrap(
 					if (branchViewData) {
 						var hideBanner = self._storage.get('hideBanner' + branchViewData["id"], true);
 						if (hideBanner) {
-							if (hideBanner > Date.now()) {
+							if (hideBanner === true || hideBanner > Date.now()) {
 								return;
 							}
 							else if (hideBanner < Date.now()) {

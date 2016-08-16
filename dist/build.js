@@ -1478,31 +1478,31 @@ branch_view.handleBranchViewData = function(a, b, c, d, e) {
       h.parentElement.removeChild(h);
     }, 250);
   }
-  function g(a, c) {
+  function g(a, c, e) {
     if (a && c) {
       setTimeout(function() {
         banner_utils.removeClass(c.querySelector("#branch-banner"), "branch-animation-out");
         banner_utils.addClass(c.querySelector("#branch-banner"), "branch-animation-in");
       }, 250);
-      var e = c.querySelectorAll("#branch-mobile-action");
-      Array.prototype.forEach.call(e, function(b) {
+      var g = c.querySelectorAll("#branch-mobile-action");
+      Array.prototype.forEach.call(g, function(b) {
         b.addEventListener("click", function(b) {
           a();
           f();
         });
       });
-      e = c.querySelectorAll(".branch-banner-continue");
-      Array.prototype.forEach.call(e, function(a) {
+      g = c.querySelectorAll(".branch-banner-continue");
+      Array.prototype.forEach.call(g, function(a) {
         a.addEventListener("click", function(a) {
           f();
-          d.set("hideBanner" + b.id, banner_utils.getDate(1), !0);
+          d.set("hideBanner" + b.id, e, !0);
         });
       });
-      e = c.querySelectorAll(".branch-banner-close");
-      Array.prototype.forEach.call(e, function(a) {
+      g = c.querySelectorAll(".branch-banner-close");
+      Array.prototype.forEach.call(g, function(a) {
         a.addEventListener("click", function(a) {
           f();
-          d.set("hideBanner" + b.id, banner_utils.getDate(1), !0);
+          d.set("hideBanner" + b.id, e, !0);
         });
       });
     }
@@ -1526,20 +1526,23 @@ branch_view.handleBranchViewData = function(a, b, c, d, e) {
       a.XHRRequest(n + ("&data=" + c), {}, "GET", {}, function(a, b) {
         var c = !1;
         if (!a && b) {
-          var d = window.setTimeout(function() {
+          var d, f = b.match(/<script type="application\/json">((.|\s)*?)<\/script>/);
+          f && (f = safejson.parse(f[1])) && f.dismissPeriod && (d = f.dismissPeriod);
+          d = "number" === typeof d ? d : 7;
+          var q = -1 === d ? !0 : banner_utils.getDate(d), n = window.setTimeout(function() {
             window[m] = function() {
             };
           }, TIMEOUT);
           window[m] = function(a) {
-            window.clearTimeout(d);
-            c || (k = a, g(k, h));
+            window.clearTimeout(n);
+            c || (k = a, g(k, h, q));
           };
           h = renderHtmlBlob(document.body, b, e);
           if (null === h) {
             c = !0;
             return;
           }
-          g(k, h);
+          g(k, h, q);
         }
         document.body.removeChild(l);
       }, !0);
@@ -1656,7 +1659,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         if (h) {
           var k = d._storage.get("hideBanner" + h.id, !0);
           if (k) {
-            if (k > Date.now()) {
+            if (!0 === k || k > Date.now()) {
               return;
             }
             k < Date.now() && d._storage.remove("hideBanner" + h.id, !0);
