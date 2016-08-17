@@ -41,6 +41,18 @@ var init_states = {
 	INIT_SUCCEEDED: 3
 };
 
+/**
+ * Enum for the initialization state of the Branch Object
+ * @enum {number}
+ */
+var init_state_fail_codes = {
+	NO_FAILURE: 0,
+	UNKNOWN_CAUSE: 1,
+	OPEN_FAILED: 2,
+	BFP_NOT_FOUND: 3,
+	HAS_APP_FAILED: 4
+};
+
 /***
  * @param {number} parameters
  * @param {function(...?): undefined} func
@@ -90,7 +102,7 @@ var wrap = function(parameters, func, init) {
 					return done(new Error(utils.message(utils.messages.initPending)), null);
 				}
 				else if (self.init_state === init_states.INIT_FAILED) {
-					return done(new Error(utils.message(utils.messages.initFailed)), null);
+					return done(new Error(utils.message(utils.messages.initFailed, self.init_state_fail_code, self.init_state_fail_details)), null);
 				}
 				else if (self.init_state === init_states.NO_INIT || !self.init_state) {
 					return done(new Error(utils.message(utils.messages.nonInit)), null);
@@ -130,6 +142,8 @@ Branch = function() {
 	this.sdk = sdk + config.version;
 
 	this.init_state = init_states.NO_INIT;
+	this.init_state_fail_code = init_state_fail_codes.NO_FAILURE;
+	this.init_state_fail_details = null;
 };
 
 /***
@@ -325,6 +339,10 @@ Branch.prototype['init'] = wrap(
 				resources._r,
 				params_r,
 				function(err, browser_fingerprint_id) {
+					if (err) {
+						self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
+						self.init_state_fail_details = err.message;
+					}
 					if (browser_fingerprint_id) {
 						currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
 					}
@@ -334,13 +352,17 @@ Branch.prototype['init'] = wrap(
 				resources.hasApp,
 				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
 				function(err, has_app) {
-					if (has_app && !currentSessionData['has_app']) {
+					if (err) {
+						self.init_state_fail_code = init_state_fail_codes.HAS_APP_FAILED;
+						self.init_state_fail_details = err.message;
+					}
+					if (!err && has_app && !currentSessionData['has_app']) {
 						currentSessionData['has_app'] = true;
 						session.update(self._storage, currentSessionData);
 						self._publishEvent('didDownloadApp');
 					}
 					if (cb) {
-						cb(err, currentSessionData);
+						cb(null, currentSessionData);
 					}
 				}
 			);
@@ -356,6 +378,11 @@ Branch.prototype['init'] = wrap(
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
+				if (!self.init_state_fail_code) {
+					self.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE;
+					self.init_state_fail_details = err.message;
+				}
+
 				return done(err, data && utils.whiteListSessionData(data));
 			}
 
@@ -444,6 +471,8 @@ Branch.prototype['init'] = wrap(
 			params_r,
 			function(err, browser_fingerprint_id) {
 				if (err) {
+					self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
+					self.init_state_fail_details = err.message;
 					return finishInit(err, null);
 				}
 				self._api(
@@ -455,6 +484,10 @@ Branch.prototype['init'] = wrap(
 						"options": options
 					},
 					function(err, data) {
+						if (err) {
+							self.init_state_fail_code = init_state_fail_codes.OPEN_FAILED;
+							self.init_state_fail_details = err.message;
+						}
 						if (!err && typeof data === 'object') {
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
