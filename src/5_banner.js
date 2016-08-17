@@ -116,16 +116,19 @@ banner = function(branch, options, linkData, storage) {
 	linkData['channel'] = linkData['channel'] || 'app banner';
 
 	var doc = options.iframe ? element.contentWindow.document : document;
-
 	if (utils.mobileUserAgent()) {
 		options['open_app'] = options.open_app;
 		options['append_deeplink_path'] = options.append_deeplink_path;
 		options['make_new_link'] = options.make_new_link;
+		options['deepview_type'] = 'banner';
 		branch['deepview'](linkData, options);
-		doc.getElementById('branch-mobile-action').onclick = function(ev) {
-			ev.preventDefault();
-			branch['deepviewCta']();
-		};
+		var cta = doc.getElementById('branch-mobile-action');
+		if (cta) {
+			cta.onclick = function(ev) {
+				ev.preventDefault();
+				branch['deepviewCta']();
+			};
+		}
 	}
 	else {
 		doc.getElementById('sms-form').addEventListener('submit', function(ev) {
