@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.6.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.7.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -753,12 +753,14 @@ utils.getLocationSearch = function() {
 utils.getLocationHash = function() {
   return window.location.hash;
 };
-utils.message = function(a, b) {
-  var c = a.replace(/\$(\d)/g, function(a, c) {
+utils.message = function(a, b, c, d) {
+  a = a.replace(/\$(\d)/g, function(a, c) {
     return b[parseInt(c, 10) - 1];
   });
-  DEBUG && console && console.log(c);
-  return c;
+  c && (a += "\n Failure Code:" + c);
+  d && (a += "\n Failure Details:" + d);
+  DEBUG && console && console.log(a);
+  return a;
 };
 utils.whiteListSessionData = function(a) {
   return {data:a.data || null, data_parsed:a.data_parsed || null, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
@@ -943,7 +945,7 @@ resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", meth
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
 validationTypes.NUMBER)})};
 resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), _t:validator(!1, branch_id), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), append_deeplink_path:validator(!1, validationTypes.BOOLEAN), 
-stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY)})};
+stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), deepview_type:validator(!0, validationTypes.STRING)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT)})};
 // Input 7
@@ -1089,13 +1091,13 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
-    "undefined" === typeof c && (c = {});
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, d) {
+    "undefined" === typeof d && (d = {});
     if (b.branch_key && g.test(b.branch_key)) {
-      return c.branch_key = b.branch_key, c;
+      return d.branch_key = b.branch_key, d;
     }
     if (b.app_id && f.test(b.app_id)) {
-      return c.app_id = b.app_id, c;
+      return d.app_id = b.app_id, d;
     }
     throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
@@ -1409,13 +1411,23 @@ var sendSMS = function(a, b, c, d) {
   banner_css.css(b, f);
   c.channel = c.channel || "app banner";
   var g = b.iframe ? f.contentWindow.document : document;
-  utils.mobileUserAgent() ? (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, a.deepview(c, b), g.getElementById("branch-mobile-action").onclick = function(b) {
-    b.preventDefault();
-    a.deepviewCta();
-  }) : g.getElementById("sms-form").addEventListener("submit", function(d) {
-    d.preventDefault();
-    sendSMS(g, a, b, c);
-  });
+  if (utils.mobileUserAgent()) {
+    b.open_app = b.open_app;
+    b.append_deeplink_path = b.append_deeplink_path;
+    b.make_new_link = b.make_new_link;
+    b.deepview_type = "banner";
+    a.deepview(c, b);
+    var h = g.getElementById("branch-mobile-action");
+    h && (h.onclick = function(b) {
+      b.preventDefault();
+      a.deepviewCta();
+    });
+  } else {
+    g.getElementById("sms-form").addEventListener("submit", function(d) {
+      d.preventDefault();
+      sendSMS(g, a, b, c);
+    });
+  }
   var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
@@ -1550,7 +1562,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e) {
   }
 };
 // Input 15
-var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, wrap = function(a, b, c) {
+var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, init_state_fail_codes = {NO_FAILURE:0, UNKNOWN_CAUSE:1, OPEN_FAILED:2, BFP_NOT_FOUND:3, HAS_APP_FAILED:4}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
     a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
@@ -1559,12 +1571,12 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var k = function(b, c) {
+      var k = function(b, d) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
           }
-          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, d);
         } finally {
           g();
         }
@@ -1574,7 +1586,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
           return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return k(Error(utils.message(utils.messages.initFailed)), null);
+          return k(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
           return k(Error(utils.message(utils.messages.nonInit)), null);
@@ -1594,6 +1606,8 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
   this._listeners = [];
   this.sdk = "web" + config.version;
   this.init_state = init_states.NO_INIT;
+  this.init_state_fail_code = init_state_fail_codes.NO_FAILURE;
+  this.init_state_fail_details = null;
 };
 Branch.prototype._api = function(a, b, c) {
   this.app_id && (b.app_id = this.app_id);
@@ -1639,16 +1653,18 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
     f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
     d._api(resources._r, c, function(a, b) {
+      a && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message);
       b && (e.browser_fingerprint_id = b);
     });
     d._api(resources.hasApp, {browser_fingerprint_id:e.browser_fingerprint_id}, function(a, c) {
-      c && !e.has_app && (e.has_app = !0, session.update(d._storage, e), d._publishEvent("didDownloadApp"));
-      b && b(a, e);
+      a && (d.init_state_fail_code = init_state_fail_codes.HAS_APP_FAILED, d.init_state_fail_details = a.message);
+      a || !c || e.has_app || (e.has_app = !0, session.update(d._storage, e), d._publishEvent("didDownloadApp"));
+      b && b(null, e);
     });
   }, m = function(c, g) {
     g && (g = f(g), session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data ? safejson.parse(g.data) : null);
     if (c) {
-      return d.init_state = init_states.INIT_FAILED, a(c, g && utils.whiteListSessionData(g));
+      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = c.message), a(c, g && utils.whiteListSessionData(g));
     }
     d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(c, f) {
       if (!c && "object" === typeof f) {
@@ -1690,9 +1706,10 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     p.browser_fingerprint_id && (g._t = p.browser_fingerprint_id);
     d._api(resources._r, g, function(a, f) {
       if (a) {
-        return m(a, null);
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
       d._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:f, options:c}, function(a, c) {
+        a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         if (!a && "object" === typeof c) {
           d._branchViewEnabled = !!c.branch_view_enabled;
           d._storage.set("branch_view_enabled", d._branchViewEnabled);
@@ -1805,6 +1822,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   var d = this;
   c || (c = {});
+  c.deepview_type = "undefined" === typeof c.deepview_type ? "deepview" : "banner";
   var e = config.link_service_endpoint + "/a/" + d.branch_key, f = !0, g;
   for (g in b) {
     b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
@@ -1814,6 +1832,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
     b.open_app = !0;
   }
   b.append_deeplink_path = !!c.append_deeplink_path;
+  b.deepview_type = c.deepview_type;
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
