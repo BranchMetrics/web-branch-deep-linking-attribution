@@ -1571,12 +1571,12 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       }
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var k = function(b, d) {
+      var k = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
           }
-          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, d);
+          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
         } finally {
           g();
         }
@@ -1834,6 +1834,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   b.append_deeplink_path = !!c.append_deeplink_path;
   b.deepview_type = c.deepview_type;
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
+  b.banner_options = c;
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
       return d._deepviewCta = function() {
