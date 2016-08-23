@@ -222,7 +222,10 @@ banner_css.css = function(options, element) {
 	css.innerHTML = style;
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
-	(doc.head || doc.getElementsByTagName("head")[0]).appendChild(css);
+	var controlledHead = (doc.head || doc.getElementsByTagName("head")[0]);
+	if (controlledHead && typeof controlledHead.appendChild === 'function') {
+		controlledHead.appendChild(css);
+	}
 	if (options.position === 'top') {
 		element.style.top = '-' + banner_utils.bannerHeight;
 	}
