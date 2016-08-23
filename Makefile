@@ -46,13 +46,13 @@ compiler/compiler.jar:
 compiler/library/closure-library-master/closure/goog/base.js:
 	mkdir -p compiler/library && \
 		wget https://github.com/google/closure-library/archive/master.zip && \
-		unzip master.zip -d compiler/library && \
+		unzip -o master.zip -d compiler/library && \
 		rm -f master.zip
 
 compiler/library/closure-library-master/closure/goog/json/json.js:
 	mkdir -p compiler/library && \
 		wget https://github.com/google/closure-library/archive/master.zip && \
-		unzip master.zip -d compiler/library && \
+		unzip -o master.zip -d compiler/library && \
 		rm -f master.zip
 
 test/branch-deps.js: $(SOURCES) compiler/library
