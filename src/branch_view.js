@@ -3,65 +3,43 @@ goog.provide('branch_view');
 goog.require('utils');
 goog.require('banner_css');
 goog.require('safejson');
+goog.require('journeys_utils');
+
+function createIframe() {
+
+}
 
 function renderHtmlBlob(parent, html, hasApp) {
-	var re, match, ctaText = hasApp ? 'OPEN' : 'GET';
+	var ctaText = hasApp ? 'OPEN' : 'GET';
+	var divToInject;
 
-	// journey metadata
-	re = /<script type="application\/json">((.|\s)*?)<\/script>/;
-	match = html.match(re);
-	if(match) {
-		var src = match[1];
-		html = html.replace(re,'');
+	// stub
+	var position = 'top';
+	var bannerHeight = '76px';
 
-		var metadata = safejson.parse(src);
-		if(hasApp && metadata && metadata['ctaText'] && metadata['ctaText']['has_app']) {
-			ctaText = metadata['ctaText']['has_app'];
-		}
-		else if(metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
-			ctaText = metadata['ctaText']['no_app'];
-		}
+	journeys_utils.getPositionAndHeight(html);
 
-		if (metadata && metadata.injectorSelector) {
-			var parentTrap = document.querySelector(metadata.injectorSelector);
-			if (parentTrap) {
-				parent = parentTrap;
-				parent.innerHTML = '';
-			}
-			else {
-				return null;
-			}
-		}
+	// Get metadata, css and js from html blob then remove them
+	var metadata = journeys_utils.getMetadata(html);
+	if (metadata) {
+		ctaText = journeys_utils.getCtaText(metadata, hasApp);
+		divToInject = journeys_utils.findInsertionDiv(parent, metadata)
 	}
+	var cssInsideIframe = journeys_utils.getCss(html);
+	journeys_utils.getJsAndAddToParent(html);
+	html = journeys_utils.removeScriptAndCss(html);
 
-	// javascript injection
-	re = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-	match = html.match(re);
-	if(match) {
-		var src = match[1];
-		html = html.replace(re,'');
-		var script = document.createElement('script');
-		script.innerHTML = src;
-		document.body.appendChild(script);
-	}
+	// create iframe element, add html, add css, add ctaText
+	var iframe = journeys_utils.createAndAppendIframe();
+	var iframeHTML = journeys_utils.createIframeInnerHTML(html, utils.mobileUserAgent());
+	journeys_utils.addHtmlToIframe(iframe, iframeHTML);
+	journeys_utils.addIframeOuterCSS(journeys_utils.position, journeys_utils.bannerHeight);
+	journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe, journeys_utils.position, journeys_utils.bannerHeight);
+	journeys_utils.addDynamicCtaText(iframe, ctaText);
 
-	parent = parent || document.body;
-	var banner = document.createElement('div');
-	banner.id = 'branch-banner-container';
-	banner.className = 'branch-animation';
-	banner.innerHTML = html;
-	banner.querySelector('#branch-mobile-action').innerHTML = ctaText;
+	journeys_utils.animateBannerEntrance(iframe);
 
-	banner_utils.addClass(banner, 'branch-banner-is-active');
-
-	if(parent === document.body) {
-		parent.insertBefore(banner, parent.firstChild);
-	}
-	else {
-		parent.appendChild(banner);
-	}
-
-	return banner;
+	return iframe;
 };
 
 
@@ -73,47 +51,6 @@ function renderHtmlBlob(parent, html, hasApp) {
  * @param {Boolean} hasApp
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp) {
-	function destroyBanner() {
-		banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
-		banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
-		setTimeout(function() {
-			banner.parentElement.removeChild(banner);
-		}, 250);
-	}
-
-	function finalHookups(cta, banner, hideBanner) {
-		if(!cta || !banner) {
-			return;
-		}
-
-		setTimeout(function() {
-			banner_utils.removeClass(banner.querySelector('#branch-banner'), 'branch-animation-out');
-			banner_utils.addClass(banner.querySelector('#branch-banner'), 'branch-animation-in');
-		}, 250);
-
-		var actionEls = banner.querySelectorAll('#branch-mobile-action');
-		Array.prototype.forEach.call(actionEls, function(el) {
-			el.addEventListener('click', function(e) {
-				cta();
-				destroyBanner();
-			})
-		})
-		var cancelEls = banner.querySelectorAll('.branch-banner-continue');
-		Array.prototype.forEach.call(cancelEls, function(el) {
-			el.addEventListener('click', function(e) {
-				destroyBanner();
-				storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
-			})
-		})
-		cancelEls = banner.querySelectorAll('.branch-banner-close');
-		Array.prototype.forEach.call(cancelEls, function(el) {
-			el.addEventListener('click', function(e) {
-				destroyBanner();
-				storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
-			})
-		})
-	}
-
 	var banner = null;
 	var cta = null;
 
@@ -144,22 +81,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 			var failed = false;
 			if (!error && html) {
 
-				var dismissPeriod;
-				var re = /<script type="application\/json">((.|\s)*?)<\/script>/;
-				var match = html.match(re);
-
-				if (match) {
-					var src = match[1];
-					var metadata = safejson.parse(src);
-					if (metadata && metadata['dismissPeriod']) {
-						dismissPeriod = metadata['dismissPeriod'];
-					}
-				}
-
-				dismissPeriod = typeof dismissPeriod === 'number' ? dismissPeriod : 7;
-				var hideBanner = dismissPeriod === -1
-					? true
-					: banner_utils.getDate(dismissPeriod)
+				var hideBanner = journeys_utils.findDismissPeriod(html);
 
 				var timeoutTrigger = window.setTimeout(
 					function() {
@@ -174,16 +96,17 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 						return;
 					}
 					cta = data;
-					finalHookups(cta, banner, hideBanner);
-				};
 
+					journeys_utils.finalHookups(branchViewData, storage, cta, banner, hideBanner);
+				};
 
 				banner = renderHtmlBlob(document.body, html, hasApp);
 				if (banner === null) {
 					failed = true;
 					return;
 				}
-				finalHookups(cta, banner, hideBanner);
+
+				journeys_utils.finalHookups(branchViewData, storage, cta, banner, hideBanner);
 			}
 			document.body.removeChild(placeholder);
 		}, true);

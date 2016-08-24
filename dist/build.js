@@ -108,11 +108,11 @@ goog.addDependency = function(a, b, c, d) {
   if (goog.DEPENDENCIES_ENABLED) {
     var e;
     a = a.replace(/\\/g, "/");
-    for (var f = goog.dependencies_, g = 0;e = b[g];g++) {
-      f.nameToPath[e] = a, f.pathIsModule[a] = !!d;
+    for (var g = goog.dependencies_, f = 0;e = b[f];f++) {
+      g.nameToPath[e] = a, g.pathIsModule[a] = !!d;
     }
     for (d = 0;b = c[d];d++) {
-      a in f.requires || (f.requires[a] = {}), f.requires[a][b] = !0;
+      a in g.requires || (g.requires[a] = {}), g.requires[a][b] = !0;
     }
   }
 };
@@ -267,12 +267,12 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:
     if (!(a in e.written || a in e.visited)) {
       e.visited[a] = !0;
       if (a in e.requires) {
-        for (var f in e.requires[a]) {
-          if (!goog.isProvided_(f)) {
-            if (f in e.nameToPath) {
-              b(e.nameToPath[f]);
+        for (var g in e.requires[a]) {
+          if (!goog.isProvided_(g)) {
+            if (g in e.nameToPath) {
+              b(e.nameToPath[g]);
             } else {
-              throw Error("Undefined nameToPath for " + f);
+              throw Error("Undefined nameToPath for " + g);
             }
           }
         }
@@ -283,19 +283,19 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:
   var c = [], d = {}, e = goog.dependencies_;
   b(a);
   for (a = 0;a < c.length;a++) {
-    var f = c[a];
-    goog.dependencies_.written[f] = !0;
+    var g = c[a];
+    goog.dependencies_.written[g] = !0;
   }
-  var g = goog.moduleLoaderState_;
+  var f = goog.moduleLoaderState_;
   goog.moduleLoaderState_ = null;
   for (a = 0;a < c.length;a++) {
-    if (f = c[a]) {
-      e.pathIsModule[f] ? goog.importModule_(goog.basePath + f) : goog.importScript_(goog.basePath + f);
+    if (g = c[a]) {
+      e.pathIsModule[g] ? goog.importModule_(goog.basePath + g) : goog.importScript_(goog.basePath + g);
     } else {
-      throw goog.moduleLoaderState_ = g, Error("Undefined script input");
+      throw goog.moduleLoaderState_ = f, Error("Undefined script input");
     }
   }
-  goog.moduleLoaderState_ = g;
+  goog.moduleLoaderState_ = f;
 }, goog.getPathFromDeps_ = function(a) {
   return a in goog.dependencies_.nameToPath ? goog.dependencies_.nameToPath[a] : null;
 }, goog.findBasePath_(), goog.global.CLOSURE_NO_DEPS || goog.importScript_(goog.basePath + "deps.js"));
@@ -532,11 +532,11 @@ goog.inherits = function(a, b) {
   a.superClass_ = b.prototype;
   a.prototype = new c;
   a.prototype.constructor = a;
-  a.base = function(a, c, f) {
-    for (var g = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
-      g[h - 2] = arguments[h];
+  a.base = function(a, c, g) {
+    for (var f = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
+      f[h - 2] = arguments[h];
     }
-    return b.prototype[c].apply(a, g);
+    return b.prototype[c].apply(a, f);
   };
 };
 goog.base = function(a, b, c) {
@@ -545,21 +545,21 @@ goog.base = function(a, b, c) {
     throw Error("arguments.caller not defined.  goog.base() cannot be used with strict mode code. See http://www.ecma-international.org/ecma-262/5.1/#sec-C");
   }
   if (d.superClass_) {
-    for (var e = Array(arguments.length - 1), f = 1;f < arguments.length;f++) {
-      e[f - 1] = arguments[f];
+    for (var e = Array(arguments.length - 1), g = 1;g < arguments.length;g++) {
+      e[g - 1] = arguments[g];
     }
     return d.superClass_.constructor.apply(a, e);
   }
   e = Array(arguments.length - 2);
-  for (f = 2;f < arguments.length;f++) {
-    e[f - 2] = arguments[f];
+  for (g = 2;g < arguments.length;g++) {
+    e[g - 2] = arguments[g];
   }
-  for (var f = !1, g = a.constructor;g;g = g.superClass_ && g.superClass_.constructor) {
-    if (g.prototype[b] === d) {
-      f = !0;
+  for (var g = !1, f = a.constructor;f;f = f.superClass_ && f.superClass_.constructor) {
+    if (f.prototype[b] === d) {
+      g = !0;
     } else {
-      if (f) {
-        return g.prototype[b].apply(a, e);
+      if (g) {
+        return f.prototype[b].apply(a, e);
       }
     }
   }
@@ -850,14 +850,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, g, f, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
-    f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
+    g = a.charCodeAt(e), 128 > g ? d += String.fromCharCode(g) : (127 < g && 2048 > g ? d += String.fromCharCode(g >> 6 | 192) : (d += String.fromCharCode(g >> 12 | 224), d += String.fromCharCode(g >> 6 & 63 | 128)), d += String.fromCharCode(g & 63 | 128));
   }
   for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), g = c >> 2, c = (c & 3) << 4 | d >> 4, f = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = f = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -1091,13 +1091,13 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, d) {
-    "undefined" === typeof d && (d = {});
-    if (b.branch_key && g.test(b.branch_key)) {
-      return d.branch_key = b.branch_key, d;
+  var c, d, e = a.destination + a.endpoint, g = /^[0-9]{15,20}$/, f = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
+    "undefined" === typeof c && (c = {});
+    if (b.branch_key && f.test(b.branch_key)) {
+      return c.branch_key = b.branch_key, c;
     }
-    if (b.app_id && f.test(b.app_id)) {
-      return d.app_id = b.app_id, d;
+    if (b.app_id && g.test(b.app_id)) {
+      return c.app_id = b.app_id, c;
     }
     throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
@@ -1151,18 +1151,18 @@ Server.prototype.createScript = function(a, b, c) {
 };
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
-  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
+  var e = "branch_callback__" + this._jsonp_callback_index++, g = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
   b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
-  var g = window.setTimeout(function() {
+  var f = window.setTimeout(function() {
     window[e] = function() {
     };
     d(Error(utils.messages.timeout), null, 504);
   }, TIMEOUT);
   window[e] = function(a) {
-    window.clearTimeout(g);
+    window.clearTimeout(f);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, function() {
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? g + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, function() {
     d(Error(utils.messages.blockedByClient), null);
   }, function() {
     try {
@@ -1172,52 +1172,52 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     delete window[e];
   });
 };
-Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
-  var g = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  g.ontimeout = function() {
+Server.prototype.XHRRequest = function(a, b, c, d, e, g) {
+  var f = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  f.ontimeout = function() {
     e(Error(utils.messages.timeout), null, 504);
   };
-  g.onerror = function(a) {
-    e(Error(a.error || "Error in API: " + g.status), null, g.status);
+  f.onerror = function(a) {
+    e(Error(a.error || "Error in API: " + f.status), null, f.status);
   };
-  g.onreadystatechange = function() {
+  f.onreadystatechange = function() {
     var a;
-    if (4 === g.readyState) {
-      if (200 === g.status) {
-        if (f) {
-          a = g.responseText;
+    if (4 === f.readyState) {
+      if (200 === f.status) {
+        if (g) {
+          a = f.responseText;
         } else {
           try {
-            a = safejson.parse(g.responseText);
+            a = safejson.parse(f.responseText);
           } catch (b) {
             a = {};
           }
         }
-        e(null, a, g.status);
+        e(null, a, f.status);
       } else {
-        402 === g.status ? e(Error("Not enough credits to redeem."), null, g.status) : "4" !== g.status.toString().substring(0, 1) && "5" !== g.status.toString().substring(0, 1) || e(Error("Error in API: " + g.status), null, g.status);
+        402 === f.status ? e(Error("Not enough credits to redeem."), null, f.status) : "4" !== f.status.toString().substring(0, 1) && "5" !== f.status.toString().substring(0, 1) || e(Error("Error in API: " + f.status), null, f.status);
       }
     }
   };
   try {
-    g.open(c, a, !0), g.timeout = TIMEOUT, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
+    f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
   } catch (h) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
 Server.prototype.request = function(a, b, c, d) {
-  var e = this, f = this.getUrl(a, b);
-  if (f.error) {
-    return d(Error(f.error));
+  var e = this, g = this.getUrl(a, b);
+  if (g.error) {
+    return d(Error(g.error));
   }
-  var g, h = "";
-  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
+  var f, h = "";
+  "GET" === a.method ? f = g.url + "?" + g.data : (f = g.url, h = g.data);
   var k = RETRIES, l = function(a, b, c) {
     a && 0 < k && "5" === (c || "").toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       m();
     }, RETRY_DELAY)) : d(a, b);
   }, m = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(f, b, a.method, l) : e.XHRRequest(f, h, a.method, c, l);
   };
   m();
 };
@@ -1242,7 +1242,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }
     var b = a.replace(/[0-9,\.]/g, "");
     a = a.match(/\d+/g);
-    var f = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
+    var g = parseInt(0 < a.length ? a[0] : "0", 10), f = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
     }, h = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
@@ -1254,16 +1254,16 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, rem:function(a) {
       return document.documentElement.currentStyle ? a * c(document.documentElement.currentStyle.fontSize) : a * parseFloat(window.getComputedStyle(document.documentElement).fontSize);
     }, vw:function(a) {
-      return a * g();
+      return a * f();
     }, vh:function(a) {
       return a * h();
     }, vmin:function(a) {
-      return a * Math.min(h(), g());
+      return a * Math.min(h(), f());
     }, vmax:function(a) {
-      return a * Math.max(h(), g());
+      return a * Math.max(h(), f());
     }, "%":function() {
-      return document.body.clientWidth / 100 * f;
-    }}[b](f), 10);
+      return document.body.clientWidth / 100 * g;
+    }}[b](g), 10);
   };
   return (c(a) + c(b)).toString() + "px";
 }, shouldAppend:function(a, b) {
@@ -1360,12 +1360,12 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 13
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
-    f.removeAttribute("disabled");
+  var e = a.getElementById("branch-sms-phone"), g = a.getElementById("branch-sms-send"), f = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
+    g.removeAttribute("disabled");
     e.removeAttribute("disabled");
-    f.style.opacity = "1";
+    g.style.opacity = "1";
     e.style.opacity = "1";
-    g.style.opacity = "0";
+    f.style.opacity = "0";
   }, m = function() {
     k = a.createElement("div");
     k.className = "branch-icon-wrapper";
@@ -1373,25 +1373,25 @@ var sendSMS = function(a, b, c, d) {
     k.style = "opacity: 0;";
     k.innerHTML = banner_html.checkmark();
     h.appendChild(k);
-    f.style.opacity = "0";
-    e.style.opacity = "0";
     g.style.opacity = "0";
+    e.style.opacity = "0";
+    f.style.opacity = "0";
     setTimeout(function() {
       k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
     l();
-    f.style.background = "#FFD4D4";
+    g.style.background = "#FFD4D4";
     e.className = "error";
     setTimeout(function() {
-      f.style.background = "#FFFFFF";
+      g.style.background = "#FFFFFF";
       e.className = "";
     }, banner_utils.error_timeout);
   };
   if (e) {
     var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), g.setAttribute("disabled", ""), e.setAttribute("disabled", ""), g.style.opacity = ".4", e.style.opacity = ".4", f.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
       a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
         h.removeChild(k);
         l();
@@ -1400,41 +1400,41 @@ var sendSMS = function(a, b, c, d) {
   }
 }, banner = function(a, b, c, d) {
   function e() {
-    "top" === b.position ? f.style.top = "0" : "bottom" === b.position && (f.style.bottom = "0");
+    "top" === b.position ? g.style.top = "0" : "bottom" === b.position && (g.style.bottom = "0");
     a._publishEvent("didShowBanner");
   }
   if (!banner_utils.shouldAppend(d, b)) {
     return a._publishEvent("willNotShowBanner"), null;
   }
   a._publishEvent("willShowBanner");
-  var f = banner_html.markup(b, d);
-  banner_css.css(b, f);
+  var g = banner_html.markup(b, d);
+  banner_css.css(b, g);
   c.channel = c.channel || "app banner";
-  var g = b.iframe ? f.contentWindow.document : document;
+  var f = b.iframe ? g.contentWindow.document : document;
   if (utils.mobileUserAgent()) {
     b.open_app = b.open_app;
     b.append_deeplink_path = b.append_deeplink_path;
     b.make_new_link = b.make_new_link;
     b.deepview_type = "banner";
     a.deepview(c, b);
-    var h = g.getElementById("branch-mobile-action");
+    var h = f.getElementById("branch-mobile-action");
     h && (h.onclick = function(b) {
       b.preventDefault();
       a.deepviewCta();
     });
   } else {
-    g.getElementById("sms-form").addEventListener("submit", function(d) {
+    f.getElementById("sms-form").addEventListener("submit", function(d) {
       d.preventDefault();
-      sendSMS(g, a, b, c);
+      sendSMS(f, a, b, c);
     });
   }
-  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
+  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
-    "top" === b.position ? f.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (f.style.bottom = "-" + banner_utils.bannerHeight);
+    "top" === b.position ? g.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (g.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
-    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
-      banner_utils.removeElement(f);
+    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(g), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
+      banner_utils.removeElement(g);
       banner_utils.removeElement(document.getElementById("branch-css"));
       c();
     }, banner_utils.animationSpeed + banner_utils.animationDelay), setTimeout(function() {
@@ -1455,130 +1455,194 @@ var sendSMS = function(a, b, c, d) {
   return p;
 };
 // Input 14
+var journeys_utils = {position:"top", bannerHeight:"76px", getPositionAndHeight:function(a) {
+}, getMetadata:function(a) {
+  if (a = a.match(/<script type="application\/json">((.|\s)*?)<\/script>/)) {
+    return safejson.parse(a[1]);
+  }
+}, getCtaText:function(a, b) {
+  var c;
+  b && a && a.ctaText && a.ctaText.has_app ? c = a.ctaText.has_app : a && a.ctaText && a.ctaText.no_app && (c = a.ctaText.no_app);
+  return c;
+}, findInsertionDiv:function(a, b) {
+  if (b && b.injectorSelector) {
+    var c = document.querySelector(b.injectorSelector);
+    return c ? (a = c, a.innerHTML = "", a) : null;
+  }
+}, getCss:function(a) {
+  if (a = a.match(/<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/)) {
+    return a[1];
+  }
+}, getJsAndAddToParent:function(a) {
+  if (a = a.match(/<script type="text\/javascript">((.|\s)*?)<\/script>/)) {
+    a = a[1];
+    var b = document.createElement("script");
+    b.innerHTML = a;
+    document.body.appendChild(b);
+  }
+}, removeScriptAndCss:function(a) {
+  var b = /<script type="application\/json">((.|\s)*?)<\/script>/, c = /<script type="text\/javascript">((.|\s)*?)<\/script>/, d = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/, e = a.match(b), g = a.match(c), f = a.match(d);
+  e && (a = a.replace(b, ""));
+  g && (a = a.replace(c, ""));
+  f && (a = a.replace(d, ""));
+  return a;
+}, createAndAppendIframe:function() {
+  var a = document.createElement("iframe");
+  a.src = "about:blank";
+  a.style.overflow = "hidden";
+  a.scrolling = "no";
+  a.id = "branch-banner-iframe";
+  a.className = "branch-animation";
+  document.body.appendChild(a);
+  return a;
+}, createIframeInnerHTML:function(a, b) {
+  return '<html><head></head><body class="' + ("ios" === b || "ipad" === b ? "branch-banner-ios" : "android" === b ? "branch-banner-android" : "branch-banner-desktop") + '">' + a + "</body></html>";
+}, addHtmlToIframe:function(a, b) {
+  a.contentWindow.document.open();
+  a.contentWindow.document.write(b);
+  a.contentWindow.document.close();
+}, addIframeOuterCSS:function(a, b) {
+  var c = document.createElement("style");
+  c.type = "text/css";
+  c.id = "branch-iframe-css";
+  c.innerHTML = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + b + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { position: " + 
+  ("top" === a ? "absolute" : "fixed") + "; }\n";
+  document.head.appendChild(c);
+}, addIframeInnerCSS:function(a, b, c, d) {
+  d = document.createElement("style");
+  d.type = "text/css";
+  d.id = "branch-css";
+  d.innerHTML = b;
+  a.contentWindow.document.head.appendChild(d);
+  "top" === c ? a.style.top = "-" + banner_utils.bannerHeight : "bottom" === c && (a.style.bottom = "-" + banner_utils.bannerHeight);
+}, addDynamicCtaText:function(a, b) {
+  a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
+}, animateBannerEntrance:function(a) {
+  var b = banner_utils.getBodyStyle("margin-top"), c = banner_utils.getBodyStyle("margin-bottom");
+  banner_utils.addClass(document.body, "branch-banner-is-active");
+  "top" === journeys_utils.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, b) : "bottom" === journeys_utils.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, c));
+  setTimeout(function() {
+    "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
+  }, banner_utils.animationDelay);
+}, findDismissPeriod:function(a) {
+  var b;
+  (a = a.match(/<script type="application\/json">((.|\s)*?)<\/script>/)) && (a = safejson.parse(a[1])) && a.dismissPeriod && (b = a.dismissPeriod);
+  b = "number" === typeof b ? b : 7;
+  return -1 === b ? !0 : banner_utils.getDate(b);
+}, finalHookups:function(a, b, c, d, e) {
+  if (c && d) {
+    var g = d.contentWindow.document, f = g.querySelectorAll("#branch-mobile-action");
+    Array.prototype.forEach.call(f, function(a) {
+      a.addEventListener("click", function(a) {
+        c();
+        journeys_utils.animateBannerExit(d);
+      });
+    });
+    f = g.querySelectorAll(".branch-banner-continue");
+    Array.prototype.forEach.call(f, function(c) {
+      c.addEventListener("click", function(c) {
+        journeys_utils.animateBannerExit(d);
+        b.set("hideBanner" + a.id, e, !0);
+      });
+    });
+    f = g.querySelectorAll(".branch-banner-close");
+    Array.prototype.forEach.call(f, function(c) {
+      c.addEventListener("click", function(c) {
+        journeys_utils.animateBannerExit(d);
+        b.set("hideBanner" + a.id, e, !0);
+      });
+    });
+  }
+}, animateBannerExit:function(a) {
+  a.style.top = "-" + journeys_utils.bannerHeight;
+  setTimeout(function() {
+    banner_utils.removeElement(a);
+    banner_utils.removeElement(document.getElementById("branch-css"));
+  }, banner_utils.animationSpeed + banner_utils.animationDelay);
+  setTimeout(function() {
+    "top" === journeys_utils.position ? document.body.style.marginTop = 0 : "bottom" === journeys_utils.position && (document.body.style.marginBottom = 0);
+    banner_utils.removeClass(document.body, "branch-banner-is-active");
+  }, banner_utils.animationDelay);
+}};
+// Input 15
 var branch_view = {};
+function createIframe() {
+}
 function renderHtmlBlob(a, b, c) {
-  var d, e, f = c ? "OPEN" : "GET";
-  d = /<script type="application\/json">((.|\s)*?)<\/script>/;
-  if (e = b.match(d)) {
-    if (e = e[1], b = b.replace(d, ""), d = safejson.parse(e), c && d && d.ctaText && d.ctaText.has_app ? f = d.ctaText.has_app : d && d.ctaText && d.ctaText.no_app && (f = d.ctaText.no_app), d && d.injectorSelector) {
-      if (a = document.querySelector(d.injectorSelector)) {
-        a.innerHTML = "";
-      } else {
-        return null;
-      }
-    }
-  }
-  d = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-  if (e = b.match(d)) {
-    e = e[1], b = b.replace(d, ""), c = document.createElement("script"), c.innerHTML = e, document.body.appendChild(c);
-  }
-  a = a || document.body;
-  c = document.createElement("div");
-  c.id = "branch-banner-container";
-  c.className = "branch-animation";
-  c.innerHTML = b;
-  c.querySelector("#branch-mobile-action").innerHTML = f;
-  banner_utils.addClass(c, "branch-banner-is-active");
-  a === document.body ? a.insertBefore(c, a.firstChild) : a.appendChild(c);
+  var d = c ? "OPEN" : "GET";
+  journeys_utils.getPositionAndHeight(b);
+  var e = journeys_utils.getMetadata(b);
+  e && (d = journeys_utils.getCtaText(e, c), journeys_utils.findInsertionDiv(a, e));
+  a = journeys_utils.getCss(b);
+  journeys_utils.getJsAndAddToParent(b);
+  b = journeys_utils.removeScriptAndCss(b);
+  c = journeys_utils.createAndAppendIframe();
+  b = journeys_utils.createIframeInnerHTML(b, utils.mobileUserAgent());
+  journeys_utils.addHtmlToIframe(c, b);
+  journeys_utils.addIframeOuterCSS(journeys_utils.position, journeys_utils.bannerHeight);
+  journeys_utils.addIframeInnerCSS(c, a, journeys_utils.position, journeys_utils.bannerHeight);
+  journeys_utils.addDynamicCtaText(c, d);
+  journeys_utils.animateBannerEntrance(c);
   return c;
 }
 branch_view.handleBranchViewData = function(a, b, c, d, e) {
-  function f() {
-    banner_utils.addClass(h.querySelector("#branch-banner"), "branch-animation-out");
-    banner_utils.removeClass(h.querySelector("#branch-banner"), "branch-animation-in");
-    setTimeout(function() {
-      h.parentElement.removeChild(h);
-    }, 250);
-  }
-  function g(a, c, e) {
-    if (a && c) {
-      setTimeout(function() {
-        banner_utils.removeClass(c.querySelector("#branch-banner"), "branch-animation-out");
-        banner_utils.addClass(c.querySelector("#branch-banner"), "branch-animation-in");
-      }, 250);
-      var g = c.querySelectorAll("#branch-mobile-action");
-      Array.prototype.forEach.call(g, function(b) {
-        b.addEventListener("click", function(b) {
-          a();
-          f();
-        });
-      });
-      g = c.querySelectorAll(".branch-banner-continue");
-      Array.prototype.forEach.call(g, function(a) {
-        a.addEventListener("click", function(a) {
-          f();
-          d.set("hideBanner" + b.id, e, !0);
-        });
-      });
-      g = c.querySelectorAll(".branch-banner-close");
-      Array.prototype.forEach.call(g, function(a) {
-        a.addEventListener("click", function(a) {
-          f();
-          d.set("hideBanner" + b.id, e, !0);
-        });
-      });
-    }
-  }
-  var h = null, k = null;
+  var g = null, f = null;
   c = c || {};
   c.feature = "journeys";
   c = utils.cleanLinkData(c);
   if (!(document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container"))) {
-    var l = document.createElement("div");
-    l.id = "branch-banner";
-    document.body.insertBefore(l, null);
-    banner_utils.addClass(l, "branch-banner-is-active");
+    var h = document.createElement("div");
+    h.id = "branch-banner";
+    document.body.insertBefore(h, null);
+    banner_utils.addClass(h, "branch-banner-is-active");
     if (b.html) {
       return renderHtmlBlob(document.body, b.html, e);
     }
     if (b.url) {
-      var m = "branch_view_callback__" + jsonp_callback_index++;
+      var k = "branch_view_callback__" + jsonp_callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
-      var n = b.url + "&callback=" + m;
-      a.XHRRequest(n + ("&data=" + c), {}, "GET", {}, function(a, b) {
-        var c = !1;
-        if (!a && b) {
-          var d, f = b.match(/<script type="application\/json">((.|\s)*?)<\/script>/);
-          f && (f = safejson.parse(f[1])) && f.dismissPeriod && (d = f.dismissPeriod);
-          d = "number" === typeof d ? d : 7;
-          var q = -1 === d ? !0 : banner_utils.getDate(d), n = window.setTimeout(function() {
-            window[m] = function() {
+      var l = b.url + "&callback=" + k;
+      a.XHRRequest(l + ("&data=" + c), {}, "GET", {}, function(a, c) {
+        var l = !1;
+        if (!a && c) {
+          var q = journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
+            window[k] = function() {
             };
           }, TIMEOUT);
-          window[m] = function(a) {
-            window.clearTimeout(n);
-            c || (k = a, g(k, h, q));
+          window[k] = function(a) {
+            window.clearTimeout(r);
+            l || (f = a, journeys_utils.finalHookups(b, d, f, g, q));
           };
-          h = renderHtmlBlob(document.body, b, e);
-          if (null === h) {
-            c = !0;
+          g = renderHtmlBlob(document.body, c, e);
+          if (null === g) {
+            l = !0;
             return;
           }
-          g(k, h, q);
+          journeys_utils.finalHookups(b, d, f, g, q);
         }
-        document.body.removeChild(l);
+        document.body.removeChild(h);
       }, !0);
     }
   }
 };
-// Input 15
+// Input 16
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, init_state_fail_codes = {NO_FAILURE:0, UNKNOWN_CAUSE:1, OPEN_FAILED:2, BFP_NOT_FOUND:3, HAS_APP_FAILED:4}, wrap = function(a, b, c) {
   return function() {
-    var d = this, e, f, g = arguments[arguments.length - 1];
-    a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
+    var d = this, e, g, f = arguments[arguments.length - 1];
+    a === callback_params.NO_CALLBACK || "function" !== typeof f ? (g = function(a) {
       if (a) {
         throw a;
       }
-    }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
-    d._queue(function(g) {
+    }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], g = f);
+    d._queue(function(f) {
       var k = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
           }
-          a === callback_params.CALLBACK_ERR ? f(b) : a === callback_params.CALLBACK_ERR_DATA && f(b, c);
+          a === callback_params.CALLBACK_ERR ? g(b) : a === callback_params.CALLBACK_ERR_DATA && g(b, c);
         } finally {
-          g();
+          f();
         }
       };
       if (!c) {
@@ -1638,7 +1702,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var e = null;
   c && (e = c.branch_view_id || null);
   e || (e = utils.getParameterByName("_branch_view_id") || null);
-  var f = function(a) {
+  var g = function(a) {
     a.link_click_id && (d.link_click_id = a.link_click_id.toString());
     a.session_id && (d.session_id = a.session_id.toString());
     a.identity_id && (d.identity_id = a.identity_id.toString());
@@ -1647,11 +1711,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
-  }, g = session.get(d._storage), h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !g || !g.identity_id;
+  }, f = session.get(d._storage), h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
   var l = function(a, b) {
-    var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
-    f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
+    var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, g = session.get(d._storage, !0) || {};
+    g.browser_fingerprint_id && (c._t = g.browser_fingerprint_id);
     d._api(resources._r, c, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message);
       b && (e.browser_fingerprint_id = b);
@@ -1661,17 +1725,17 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       a || !c || e.has_app || (e.has_app = !0, session.update(d._storage, e), d._publishEvent("didDownloadApp"));
       b && b(null, e);
     });
-  }, m = function(c, g) {
-    g && (g = f(g), session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data ? safejson.parse(g.data) : null);
+  }, m = function(c, f) {
+    f && (f = g(f), session.set(d._storage, f, k), d.init_state = init_states.INIT_SUCCEEDED, f.data_parsed = f.data ? safejson.parse(f.data) : null);
     if (c) {
-      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = c.message), a(c, g && utils.whiteListSessionData(g));
+      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = c.message), a(c, f && utils.whiteListSessionData(f));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(c, f) {
-      if (!c && "object" === typeof f) {
-        d._branchViewEnabled = !!f.branch_view_enabled;
+    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}}, function(c, g) {
+      if (!c && "object" === typeof g) {
+        d._branchViewEnabled = !!g.branch_view_enabled;
         d._storage.set("branch_view_enabled", d._branchViewEnabled);
         var h = null;
-        e ? h = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id"} : f.hasOwnProperty("branch_view_data") && (h = f.branch_view_data);
+        e ? h = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id"} : g.hasOwnProperty("branch_view_data") && (h = g.branch_view_data);
         if (h) {
           var k = d._storage.get("hideBanner" + h.id, !0);
           if (k) {
@@ -1681,12 +1745,12 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
             k < Date.now() && d._storage.remove("hideBanner" + h.id, !0);
           }
           d.renderQueue(function() {
-            branch_view.handleBranchViewData(d._server, h, d._branchViewData, d._storage, g.has_app);
+            branch_view.handleBranchViewData(d._server, h, d._branchViewData, d._storage, f.has_app);
           });
         }
       }
       try {
-        a(c, g && utils.whiteListSessionData(g));
+        a(c, f && utils.whiteListSessionData(f));
       } catch (l) {
       } finally {
         d.renderFinalize();
@@ -1699,12 +1763,12 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       document[a] || l(null, null);
     }, !1);
   };
-  if (g && g.session_id && !h) {
-    n(), l(g, m);
+  if (f && f.session_id && !h) {
+    n(), l(f, m);
   } else {
-    var g = {sdk:config.version}, p = session.get(d._storage, !0) || {};
-    p.browser_fingerprint_id && (g._t = p.browser_fingerprint_id);
-    d._api(resources._r, g, function(a, f) {
+    var f = {sdk:config.version}, p = session.get(d._storage, !0) || {};
+    p.browser_fingerprint_id && (f._t = p.browser_fingerprint_id);
+    d._api(resources._r, f, function(a, f) {
       if (a) {
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
@@ -1789,11 +1853,11 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   function e(c) {
-    f._api(resources.SMSLinkSend, {link_url:c, phone:b}, function(b) {
+    g._api(resources.SMSLinkSend, {link_url:c, phone:b}, function(b) {
       a(b || null);
     });
   }
-  var f = this;
+  var g = this;
   if ("function" === typeof d) {
     d = {};
   } else {
@@ -1803,18 +1867,18 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
   }
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" !== c.channel || (c.channel = "sms");
-  var g = f._referringLink();
-  g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c), function(b, c) {
+  var f = g._referringLink();
+  f && !d.make_new_link ? e(f.substring(f.lastIndexOf("/") + 1, f.length)) : g._api(resources.link, utils.cleanLinkData(c), function(b, c) {
     if (b) {
       return a(b);
     }
     var d = c.url;
     /(bnc.lt\/|app\.link\/)/.test(d) || (d = config.link_service_endpoint + "/" + utils.extractDeeplinkPath(d));
-    f._api(resources.linkClick, {link_url:d, click:"click"}, function(b, c) {
+    g._api(resources.linkClick, {link_url:d, click:"click"}, function(b, c) {
       if (b) {
         return a(b);
       }
-      f._storage.set("click_id", c.click_id);
+      g._storage.set("click_id", c.click_id);
       e(c.click_id);
     });
   });
@@ -1823,9 +1887,9 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   var d = this;
   c || (c = {});
   c.deepview_type = "undefined" === typeof c.deepview_type ? "deepview" : "banner";
-  var e = config.link_service_endpoint + "/a/" + d.branch_key, f = !0, g;
-  for (g in b) {
-    b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
+  var e = config.link_service_endpoint + "/a/" + d.branch_key, g = !0, f;
+  for (f in b) {
+    b.hasOwnProperty(f) && "data" !== f && (g ? (e += "?", g = !1) : e += "&", e += encodeURIComponent(f) + "=" + encodeURIComponent(b[f]));
   }
   b = utils.cleanLinkData(b);
   if (c.open_app || null === c.open_app || "undefined" === typeof c.open_app) {
@@ -1833,7 +1897,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   }
   b.append_deeplink_path = !!c.append_deeplink_path;
   b.deepview_type = c.deepview_type;
-  (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
+  (g = d._referringLink()) && !c.make_new_link && (b.link_click_id = g.substring(g.lastIndexOf("/") + 1, g.length));
   b.banner_options = c;
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
@@ -1929,7 +1993,7 @@ Branch.prototype.closeBanner = wrap(0, function(a) {
   });
   a();
 });
-// Input 16
+// Input 17
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
