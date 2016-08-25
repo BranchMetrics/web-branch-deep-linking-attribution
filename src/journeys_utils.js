@@ -4,19 +4,36 @@ goog.provide('journeys_utils');
 goog.require('banner_utils');
 goog.require('safejson');
 
+// defaults. These will change based on banner info
 journeys_utils.position = 'top';
 journeys_utils.bannerHeight = '76px';
 
+// Regex to find these pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
+journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
+journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
 journeys_utils.setPositionAndHeight = function(html) {
 	var metadata = journeys_utils.getMetadata(html);
 
-	if (metadata) {
-		journeys_utils.bannerHeight = metadata["bannerHeight"] || journeys_utils.bannerHeight;
-		journeys_utils.position = metadata["position"] || journeys_utils.position;
+	if (metadata && metadata['bannerHeight'] && metadata['position']) {
+		journeys_utils.bannerHeight = metadata['bannerHeight'];
+		journeys_utils.position = metadata['position'] || journeys_utils.position;
+	}
+	else {
+		var spacerMatch = html.match(journeys_utils.spacerRe)
+		if (spacerMatch) {
+			journeys_utils.position = 'top';
+			var heightMatch = spacerMatch[1].match(journeys_utils.findMarginRe);
+			if (heightMatch) {
+				journeys_utils.bannerHeight = heightMatch[1];
+			}
+		}
+		else {
+			journeys_utils.position = 'bottom';
+		}
 	}
 }
 
@@ -204,9 +221,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
 
 journeys_utils.findDismissPeriod = function(html) {
 	var dismissPeriod;
-	var re = /<script type="application\/json">((.|\s)*?)<\/script>/;
-	var match = html.match(re);
-
+	var match = html.match(journeys_utils.jsonRe);
 	if (match) {
 		var src = match[1];
 		var metadata = safejson.parse(src);

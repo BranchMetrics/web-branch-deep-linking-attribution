@@ -1300,12 +1300,13 @@ banner_css.css = function(a, b) {
   "ios" !== d && "ipad" !== d || !a.showiOS ? "android" === d && a.showAndroid ? c += banner_css.mobile + banner_css.android : "blackberry" === d && a.showBlackberry ? c += banner_css.mobile + banner_css.blackberry : "windows_phone" === d && a.showWindowsPhone ? c += banner_css.mobile + banner_css.windows_phone : "kindle" === d && a.showKindle ? c += banner_css.mobile + banner_css.kindle : (c += banner_css.desktop, c = window.ActiveXObject ? c + banner_css.ie : c + banner_css.nonie) : c += banner_css.mobile + 
   banner_css.ios;
   c += a.customCSS;
-  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(a.mobileSticky, a.position) : banner_css.iframe_position(a.desktopSticky, a.position)), document.head.appendChild(d));
+  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(a.mobileSticky, a.position) : banner_css.iframe_position(a.desktopSticky, a.position)), (document.head || document.getElementsByTagName("head")[0]).appendChild(d));
   d = document.createElement("style");
   d.type = "text/css";
   d.id = "branch-css";
   d.innerHTML = c;
-  (a.iframe ? b.contentWindow.document : document).head.appendChild(d);
+  c = a.iframe ? b.contentWindow.document : document;
+  (c = c.head || c.getElementsByTagName("head")[0]) && "function" === typeof c.appendChild && c.appendChild(d);
   "top" === a.position ? b.style.top = "-" + banner_utils.bannerHeight : "bottom" === a.position && (b.style.bottom = "-" + banner_utils.bannerHeight);
 };
 // Input 12
@@ -1455,9 +1456,18 @@ var sendSMS = function(a, b, c, d) {
   return p;
 };
 // Input 14
-var journeys_utils = {position:"top", bannerHeight:"76px", jsonRe:/<script type="application\/json">((.|\s)*?)<\/script>/, jsRe:/<script type="text\/javascript">((.|\s)*?)<\/script>/, cssRe:/<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/, setPositionAndHeight:function(a) {
-  if (a = journeys_utils.getMetadata(a)) {
-    journeys_utils.bannerHeight = a.bannerHeight || journeys_utils.bannerHeight, journeys_utils.position = a.position || journeys_utils.position;
+var journeys_utils = {position:"top", bannerHeight:"76px", jsonRe:/<script type="application\/json">((.|\s)*?)<\/script>/, jsRe:/<script type="text\/javascript">((.|\s)*?)<\/script>/, cssRe:/<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/, spacerRe:/#branch-banner-spacer {((.|\s)*?)}/, findMarginRe:/margin-bottom: (.*?);/, setPositionAndHeight:function(a) {
+  var b = journeys_utils.getMetadata(a);
+  if (b && b.bannerHeight && b.position) {
+    journeys_utils.bannerHeight = b.bannerHeight, journeys_utils.position = b.position || journeys_utils.position;
+  } else {
+    if (a = a.match(journeys_utils.spacerRe)) {
+      if (journeys_utils.position = "top", a = a[1].match(journeys_utils.findMarginRe)) {
+        journeys_utils.bannerHeight = a[1];
+      }
+    } else {
+      journeys_utils.position = "bottom";
+    }
   }
 }, getMetadata:function(a) {
   if (a = a.match(journeys_utils.jsonRe)) {
@@ -1530,7 +1540,7 @@ var journeys_utils = {position:"top", bannerHeight:"76px", jsonRe:/<script type=
   }, banner_utils.animationDelay);
 }, findDismissPeriod:function(a) {
   var b;
-  (a = a.match(/<script type="application\/json">((.|\s)*?)<\/script>/)) && (a = safejson.parse(a[1])) && a.dismissPeriod && (b = a.dismissPeriod);
+  (a = a.match(journeys_utils.jsonRe)) && (a = safejson.parse(a[1])) && a.dismissPeriod && (b = a.dismissPeriod);
   b = "number" === typeof b ? b : 7;
   return -1 === b ? !0 : banner_utils.getDate(b);
 }, finalHookups:function(a, b, c, d, e) {
