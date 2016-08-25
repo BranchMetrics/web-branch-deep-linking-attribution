@@ -1455,9 +1455,12 @@ var sendSMS = function(a, b, c, d) {
   return p;
 };
 // Input 14
-var journeys_utils = {position:"top", bannerHeight:"76px", getPositionAndHeight:function(a) {
+var journeys_utils = {position:"top", bannerHeight:"76px", jsonRe:/<script type="application\/json">((.|\s)*?)<\/script>/, jsRe:/<script type="text\/javascript">((.|\s)*?)<\/script>/, cssRe:/<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/, setPositionAndHeight:function(a) {
+  if (a = journeys_utils.getMetadata(a)) {
+    journeys_utils.bannerHeight = a.bannerHeight || journeys_utils.bannerHeight, journeys_utils.position = a.position || journeys_utils.position;
+  }
 }, getMetadata:function(a) {
-  if (a = a.match(/<script type="application\/json">((.|\s)*?)<\/script>/)) {
+  if (a = a.match(journeys_utils.jsonRe)) {
     return safejson.parse(a[1]);
   }
 }, getCtaText:function(a, b) {
@@ -1470,21 +1473,21 @@ var journeys_utils = {position:"top", bannerHeight:"76px", getPositionAndHeight:
     return c ? (a = c, a.innerHTML = "", a) : null;
   }
 }, getCss:function(a) {
-  if (a = a.match(/<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/)) {
+  if (a = a.match(journeys_utils.cssRe)) {
     return a[1];
   }
 }, getJsAndAddToParent:function(a) {
-  if (a = a.match(/<script type="text\/javascript">((.|\s)*?)<\/script>/)) {
+  if (a = a.match(journeys_utils.jsRe)) {
     a = a[1];
     var b = document.createElement("script");
     b.innerHTML = a;
     document.body.appendChild(b);
   }
 }, removeScriptAndCss:function(a) {
-  var b = /<script type="application\/json">((.|\s)*?)<\/script>/, c = /<script type="text\/javascript">((.|\s)*?)<\/script>/, d = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/, e = a.match(b), g = a.match(c), f = a.match(d);
-  e && (a = a.replace(b, ""));
-  g && (a = a.replace(c, ""));
-  f && (a = a.replace(d, ""));
+  var b = a.match(journeys_utils.jsonRe), c = a.match(journeys_utils.jsRe), d = a.match(journeys_utils.cssRe);
+  b && (a = a.replace(journeys_utils.jsonRe, ""));
+  c && (a = a.replace(journeys_utils.jsRe, ""));
+  d && (a = a.replace(journeys_utils.cssRe, ""));
   return a;
 }, createAndAppendIframe:function() {
   var a = document.createElement("iframe");
@@ -1501,26 +1504,27 @@ var journeys_utils = {position:"top", bannerHeight:"76px", getPositionAndHeight:
   a.contentWindow.document.open();
   a.contentWindow.document.write(b);
   a.contentWindow.document.close();
-}, addIframeOuterCSS:function(a, b) {
+}, addIframeOuterCSS:function() {
+  var a = document.createElement("style");
+  a.type = "text/css";
+  a.id = "branch-iframe-css";
+  a.innerHTML = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { position: " + 
+  ("top" === journeys_utils.position ? "absolute" : "fixed") + "; }\n";
+  document.head.appendChild(a);
+}, addIframeInnerCSS:function(a, b) {
   var c = document.createElement("style");
   c.type = "text/css";
-  c.id = "branch-iframe-css";
-  c.innerHTML = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + b + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner-iframe { position: " + 
-  ("top" === a ? "absolute" : "fixed") + "; }\n";
-  document.head.appendChild(c);
-}, addIframeInnerCSS:function(a, b, c, d) {
-  d = document.createElement("style");
-  d.type = "text/css";
-  d.id = "branch-css";
-  d.innerHTML = b;
-  a.contentWindow.document.head.appendChild(d);
-  "top" === c ? a.style.top = "-" + banner_utils.bannerHeight : "bottom" === c && (a.style.bottom = "-" + banner_utils.bannerHeight);
+  c.id = "branch-css";
+  c.innerHTML = b;
+  a.contentWindow.document.head.appendChild(c);
+  "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
 }, addDynamicCtaText:function(a, b) {
   a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
 }, animateBannerEntrance:function(a) {
-  var b = banner_utils.getBodyStyle("margin-top"), c = banner_utils.getBodyStyle("margin-bottom");
+  banner_utils.getBodyStyle("margin-top");
+  banner_utils.getBodyStyle("margin-bottom");
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === journeys_utils.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, b) : "bottom" === journeys_utils.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, c));
+  "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bannerHeight);
   setTimeout(function() {
     "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
   }, banner_utils.animationDelay);
@@ -1554,7 +1558,7 @@ var journeys_utils = {position:"top", bannerHeight:"76px", getPositionAndHeight:
     });
   }
 }, animateBannerExit:function(a) {
-  a.style.top = "-" + journeys_utils.bannerHeight;
+  "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
   setTimeout(function() {
     banner_utils.removeElement(a);
     banner_utils.removeElement(document.getElementById("branch-css"));
@@ -1570,7 +1574,7 @@ function createIframe() {
 }
 function renderHtmlBlob(a, b, c) {
   var d = c ? "OPEN" : "GET";
-  journeys_utils.getPositionAndHeight(b);
+  journeys_utils.setPositionAndHeight(b);
   var e = journeys_utils.getMetadata(b);
   e && (d = journeys_utils.getCtaText(e, c), journeys_utils.findInsertionDiv(a, e));
   a = journeys_utils.getCss(b);

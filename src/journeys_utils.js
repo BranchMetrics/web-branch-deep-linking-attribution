@@ -7,14 +7,22 @@ goog.require('safejson');
 journeys_utils.position = 'top';
 journeys_utils.bannerHeight = '76px';
 
-journeys_utils.getPositionAndHeight = function(html) {
-	
+journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
+journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
+journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
+
+journeys_utils.setPositionAndHeight = function(html) {
+	var metadata = journeys_utils.getMetadata(html);
+
+	if (metadata) {
+		journeys_utils.bannerHeight = metadata["bannerHeight"] || journeys_utils.bannerHeight;
+		journeys_utils.position = metadata["position"] || journeys_utils.position;
+	}
 }
 
 
 journeys_utils.getMetadata = function(html) {
-	var	re = /<script type="application\/json">((.|\s)*?)<\/script>/;
-	var match = html.match(re);
+	var match = html.match(journeys_utils.jsonRe);
 	if(match) {
 		var src = match[1];
 		return safejson.parse(src);
@@ -49,16 +57,14 @@ journeys_utils.findInsertionDiv = function(parent, metadata) {
 }
 
 journeys_utils.getCss = function(html) {
-	var re = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
-	var match = html.match(re);
+	var match = html.match(journeys_utils.cssRe);
 	if (match) {
 		return match[1];
 	}
 }
 
 journeys_utils.getJsAndAddToParent = function(html) {
-	var re = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-	var match = html.match(re);
+	var match = html.match(journeys_utils.jsRe);
 	if(match) {
 		var src = match[1];
 		var script = document.createElement('script');
@@ -68,20 +74,17 @@ journeys_utils.getJsAndAddToParent = function(html) {
 }
 
 journeys_utils.removeScriptAndCss = function(html) {
-	var	jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
-	var jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-	var cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
-	var matchJson = html.match(jsonRe);
-	var matchJs = html.match(jsRe);
-	var matchCss = html.match(cssRe);
+	var matchJson = html.match(journeys_utils.jsonRe);
+	var matchJs = html.match(journeys_utils.jsRe);
+	var matchCss = html.match(journeys_utils.cssRe);
 	if(matchJson) {
-		html = html.replace(jsonRe,'');
+		html = html.replace(journeys_utils.jsonRe,'');
 	}
 	if(matchJs) {
-		html = html.replace(jsRe,'');
+		html = html.replace(journeys_utils.jsRe,'');
 	}
 	if(matchCss) {
-		html = html.replace(cssRe,'');
+		html = html.replace(journeys_utils.cssRe,'');
 	}
 	return html;
 }
@@ -127,7 +130,7 @@ journeys_utils.addHtmlToIframe = function(iframe, iframeHTML) {
 
 
 // need to recreate the banner_css helpers
-journeys_utils.addIframeOuterCSS = function(position, bannerHeight) {
+journeys_utils.addIframeOuterCSS = function() {
 	var iFrameCSS = document.createElement('style');
 	iFrameCSS.type = 'text/css';
 	iFrameCSS.id = 'branch-iframe-css';
@@ -139,19 +142,19 @@ journeys_utils.addIframeOuterCSS = function(position, bannerHeight) {
 			's ease; }\n' +
 		'#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
 			' left: 0; right: 0; border: 0; height: ' +
-			bannerHeight +
+			journeys_utils.bannerHeight +
 			'; z-index: 99999; -webkit-transition: all ' +
 			(banner_utils.animationSpeed / 1000) +
 			's ease; transition: all 0' +
 			(banner_utils.animationSpeed / 1000) +
 			's ease; }\n' + 
 		'#branch-banner-iframe { position: ' +
-			((position === 'top') ? 'absolute' : 'fixed') +
+			((journeys_utils.position === 'top') ? 'absolute' : 'fixed') +
 			'; }\n';
 	document.head.appendChild(iFrameCSS);
 }
 
-journeys_utils.addIframeInnerCSS = function(iframe, innerCSS, position, height) {
+journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	var css = document.createElement('style');
 	css.type = 'text/css';
 	css.id = 'branch-css';
@@ -160,11 +163,11 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS, position, height) 
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);
 
-	if (position === 'top') {
-		iframe.style.top = '-' + banner_utils.bannerHeight;
+	if (journeys_utils.position === 'top') {
+		iframe.style.top = '-' + journeys_utils.bannerHeight;
 	}
-	else if (position === 'bottom') {
-		iframe.style.bottom = '-' + banner_utils.bannerHeight;
+	else if (journeys_utils.position === 'bottom') {
+		iframe.style.bottom = '-' + journeys_utils.bannerHeight;
 	}
 }
 
@@ -181,12 +184,10 @@ journeys_utils.animateBannerEntrance = function(banner) {
 
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 	if (journeys_utils.position === 'top') {
-		document.body.style.marginTop =
-			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
+		document.body.style.marginTop = journeys_utils.bannerHeight;
 	}
 	else if (journeys_utils.position === 'bottom') {
-		document.body.style.marginBottom =
-			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
+		document.body.style.marginBottom = journeys_utils.bannerHeight;
 	}
 
 	function onAnimationEnd() {
@@ -253,7 +254,12 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 }
 
 journeys_utils.animateBannerExit = function(banner) {
-	banner.style.top = '-' + journeys_utils.bannerHeight;
+	if (journeys_utils.position === 'top') {
+		banner.style.top = '-' + journeys_utils.bannerHeight;
+	}
+	else if (journeys_utils.position === 'bottom') {
+		banner.style.bottom = '-' + journeys_utils.bannerHeight;
+	}
 	setTimeout(function() {
 		banner_utils.removeElement(banner);
 		banner_utils.removeElement(document.getElementById('branch-css'));

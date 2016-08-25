@@ -13,11 +13,7 @@ function renderHtmlBlob(parent, html, hasApp) {
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 	var divToInject;
 
-	// stub
-	var position = 'top';
-	var bannerHeight = '76px';
-
-	journeys_utils.getPositionAndHeight(html);
+	journeys_utils.setPositionAndHeight(html);
 
 	// Get metadata, css and js from html blob then remove them
 	var metadata = journeys_utils.getMetadata(html);
