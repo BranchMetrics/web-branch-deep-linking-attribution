@@ -213,7 +213,7 @@ banner_css.css = function(options, element) {
 			(utils.mobileUserAgent() ?
 				banner_css.iframe_position(options.mobileSticky, options.position) :
 				banner_css.iframe_position(options.desktopSticky, options.position));
-		document.head.appendChild(iFrameCSS);
+		(document.head || document.getElementsByTagName("head")[0]).appendChild(iFrameCSS);
 	}
 
 	var css = document.createElement('style');
@@ -222,7 +222,10 @@ banner_css.css = function(options, element) {
 	css.innerHTML = style;
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
-	doc.head.appendChild(css);
+	var controlledHead = (doc.head || doc.getElementsByTagName("head")[0]);
+	if (controlledHead && typeof controlledHead.appendChild === 'function') {
+		controlledHead.appendChild(css);
+	}
 	if (options.position === 'top') {
 		element.style.top = '-' + banner_utils.bannerHeight;
 	}
