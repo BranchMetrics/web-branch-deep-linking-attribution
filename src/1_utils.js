@@ -445,11 +445,18 @@ utils.scrapeOpenGraphContent = function(property, content) {
 utils.scrapeHostedDeepLinkData = function() {
 	var params = {};
 
-	var metas = document.getElementsByTagName("meta");
+	var metas = document.getElementsByTagName('meta');
 
 	for (var i = 0; i < metas.length; i++) {
-		if (metas[i].getAttribute("name").startsWith("branch:deeplink:")) {
-			params[metas[i].getAttribute("name").split(":")[2]] = metas[i].getAttribute("content");
+		if (!metas[i].getAttribute('name') || !metas[i].getAttribute('content')) {
+			continue;
+		}
+
+		var name = metas[i].getAttribute('name');
+		var split = name.split(":");
+
+		if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
+			params[split[2]] = metas[i].getAttribute('content');
 		}
 	}
 
