@@ -1096,6 +1096,8 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		options['deepview_type'] = 'banner';
 	}
 
+	data['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), data['data']);
+
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
 	var encodeLinkProperty = function(key, data) {
@@ -1717,6 +1719,8 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		bannerOptions.showWindowsPhone = options['showMobile'];
 		bannerOptions.showKindle = options['showMobile'];
 	}
+
+	data['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), data['data']);
 
 	var self = this;
 	self['renderQueue'](function() {
