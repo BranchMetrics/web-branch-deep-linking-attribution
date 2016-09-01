@@ -19,14 +19,14 @@ function renderHtmlBlob(parent, html, hasApp) {
 	var metadata = journeys_utils.getMetadata(html);
 	if (metadata) {
 		ctaText = journeys_utils.getCtaText(metadata, hasApp);
-		divToInject = journeys_utils.findInsertionDiv(parent, metadata)
+		divToInject = journeys_utils.findInsertionDiv(parent, metadata);
 	}
 	var cssInsideIframe = journeys_utils.getCss(html);
 	journeys_utils.getJsAndAddToParent(html);
 	html = journeys_utils.removeScriptAndCss(html);
 
 	// create iframe element, add html, add css, add ctaText
-	var iframe = journeys_utils.createAndAppendIframe();
+	var iframe = journeys_utils.createAndAppendIframe(divToInject);
 	var iframeHTML = journeys_utils.createIframeInnerHTML(html, utils.mobileUserAgent());
 	journeys_utils.addHtmlToIframe(iframe, iframeHTML);
 	journeys_utils.addIframeOuterCSS(journeys_utils.position, journeys_utils.bannerHeight);

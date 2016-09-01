@@ -6,9 +6,12 @@ goog.require('safejson');
 
 // defaults. These will change based on banner info
 journeys_utils.position = 'top';
+journeys_utils.sticky = 'absolute';
 journeys_utils.bannerHeight = '76px';
 journeys_utils.isFullPage = false;
+journeys_utils.divToInjectParent = document.body;
 
+// used to set height of full page interstitials
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
 
@@ -22,11 +25,13 @@ journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 journeys_utils.setPositionAndHeight = function(html) {
 	var metadata = journeys_utils.getMetadata(html);
 
-	if (metadata && metadata['bannerHeight'] && metadata['position']) {
+	if (metadata && metadata['bannerHeight'] && metadata['position'] && metadata['sticky']) {
 		journeys_utils.bannerHeight = metadata['bannerHeight'];
-		journeys_utils.position = metadata['position'] || journeys_utils.position;
+		journeys_utils.position = metadata['position'];
+		journeys_utils.sticky = metadata['sticky'];
+
 	}
-	else {
+	else { // to support older banners without proper metadata. Spacer div === top
 		var spacerMatch = html.match(journeys_utils.spacerRe)
 		if (spacerMatch) {
 			journeys_utils.position = 'top';
@@ -34,14 +39,15 @@ journeys_utils.setPositionAndHeight = function(html) {
 			if (heightMatch) {
 				journeys_utils.bannerHeight = heightMatch[1];
 			}
+			journeys_utils.sticky = 'absolute';
 		}
 		else {
 			journeys_utils.position = 'bottom';
+			journeys_utils.sticky = 'fixed';
 		}
 	}
 
-
-
+	// convert full page to fixed pixel height
 	if (journeys_utils.bannerHeight.indexOf('vh') !== -1 || journeys_utils.bannerHeight.indexOf('%') !== -1) {
 		var heightNumber = journeys_utils.bannerHeight.indexOf('vh')
 			? journeys_utils.bannerHeight.slice(0, -2)
@@ -73,12 +79,15 @@ journeys_utils.getCtaText = function(metadata, hasApp) {
 	return ctaText;
 }
 
+// need to find div and parent to properly add margin
 journeys_utils.findInsertionDiv = function(parent, metadata) {
 	if (metadata && metadata.injectorSelector) {
 		var parentTrap = document.querySelector(metadata.injectorSelector);
 		if (parentTrap) {
 			parent = parentTrap;
 			parent.innerHTML = '';
+			journeys_utils.divToInjectParent = parent.parentElement;
+			journeys_utils.position = 'top';
 			return parent;
 		}
 		else {
@@ -104,6 +113,7 @@ journeys_utils.getJsAndAddToParent = function(html) {
 	}
 }
 
+// remove everything from html blob except html
 journeys_utils.removeScriptAndCss = function(html) {
 	var matchJson = html.match(journeys_utils.jsonRe);
 	var matchJs = html.match(journeys_utils.jsRe);
@@ -120,13 +130,15 @@ journeys_utils.removeScriptAndCss = function(html) {
 	return html;
 }
 
-journeys_utils.createAndAppendIframe = function() {
+// for now always append to body. Later we will support inserting
+journeys_utils.createAndAppendIframe = function(divToInject) {
 	var iframe = document.createElement('iframe');
 	iframe.src = 'about:blank'; // solves CORS issues, test in IE
 	iframe.style.overflow = 'hidden';
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
+
 	document.body.appendChild(iframe);
 
 	return iframe;
@@ -159,21 +171,41 @@ journeys_utils.addHtmlToIframe = function(iframe, iframeHTML) {
 	iframe.contentWindow.document.close();
 }
 
-
-// need to recreate the banner_css helpers
+// this is the css that positions iframe on the page
 journeys_utils.addIframeOuterCSS = function() {
 	var iFrameCSS = document.createElement('style');
 	iFrameCSS.type = 'text/css';
 	iFrameCSS.id = 'branch-iframe-css';
+
+	var bodyMargin = '';
+	var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
+	if (bodyMarginTopComputed) { bodyMarginTopComputed = +bodyMarginTopComputed.slice(0, -2); }
+	var bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom');
+	if (bodyMarginBottomComputed) { bodyMarginBottomComputed = +bodyMarginBottomComputed.slice(0, -2); }
+	var bannerMarginNumber = +journeys_utils.bannerHeight.slice(0, -2);
+
+	if (journeys_utils.position === 'top') {
+		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopComputed;
+		bodyMargin = 'margin-top: ' + calculatedBodyMargin + 'px';
+	}
+	else if (journeys_utils.position === 'bottom') {
+		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomComputed;
+		bodyMargin = 'margin-bottom: ' + calculatedBodyMargin + 'px';
+	}
+
+	// adds margin to the parent of div being inserted into
+	if (journeys_utils.divToInjectParent !== document.body) {
+		journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight
+	}
+
 	iFrameCSS.innerHTML = 	
 		'body { -webkit-transition: all ' +
 			(banner_utils.animationSpeed * 1.5 / 1000) +
 			's ease; transition: all 0' +
 			(banner_utils.animationSpeed * 1.5 / 1000) +
 			's ease; ' +
-			(journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
-				(journeys_utils.bannerHeight) +
-			' }\n' +
+			(bodyMargin) +
+			'; }\n' +
 		'#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
 			' left: 0; right: 0; border: 0; height: ' +
 			journeys_utils.bannerHeight +
@@ -183,7 +215,7 @@ journeys_utils.addIframeOuterCSS = function() {
 			(banner_utils.animationSpeed / 1000) +
 			's ease; }\n' + 
 		'#branch-banner-iframe { position: ' +
-			((journeys_utils.position === 'top') ? 'absolute' : 'fixed') +
+			(journeys_utils.sticky) +
 			'; }\n' + 
 		'@media only screen and (orientation: landscape) { ' +
 			'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) + 
@@ -195,6 +227,7 @@ journeys_utils.addIframeOuterCSS = function() {
 	document.head.appendChild(iFrameCSS);
 }
 
+// this adds the css that was previously stripped from html blob
 journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	var css = document.createElement('style');
 	css.type = 'text/css';
