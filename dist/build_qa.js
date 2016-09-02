@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.7.0"};
+var config = {app_service_endpoint:"https://qa.branchtest.link", link_service_endpoint:"https://qa.bnc.lt", api_endpoint:"https://api.qa.branch.io", version:"2.7.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1928,7 +1928,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
       return a(b);
     }
     var d = c.url;
-    /(bnc.lt\/|app\.link\/)/.test(d) || (d = config.link_service_endpoint + "/" + utils.extractDeeplinkPath(d));
+    /(bnc.lt\/|(qa\.branchtest|app)\.link\/)/.test(d) || (d = config.link_service_endpoint + "/" + utils.extractDeeplinkPath(d));
     f._api(resources.linkClick, {link_url:d, click:"click"}, function(b, c) {
       if (b) {
         return a(b);

@@ -199,12 +199,12 @@ journeys_utils.addIframeOuterCSS = function() {
 	// adds margin to the parent of div being inserted into
 	if (journeys_utils.divToInjectParent !== document.body) {
 		// dont want to add margin for full page fixed
-		var isNavBarFixed;
+		var isFixedNavFullPage;
 		var computedParentStyle = window.getComputedStyle(journeys_utils.divToInjectParent);
 		if (computedParentStyle) {
-			isNavBarFixed = computedParentStyle.getPropertyValue('position') === 'fixed';
+			isFixedNavFullPage = journeys_utils.isFUllPage && computedParentStyle.getPropertyValue('position') === 'fixed';
 		}
-		if (!isNavBarFixed) {
+		if (!isFixedNavFullPage) {
 			journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight
 		}
 	}
