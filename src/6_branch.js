@@ -1132,8 +1132,6 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		);
 	}
 
-	cleanedData['banner_options'] = options;
-
 	this._api(resources.deepview, cleanedData, function(err, data) {
 		if (err) {
 			self._deepviewCta = function() {

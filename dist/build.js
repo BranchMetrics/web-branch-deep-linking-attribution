@@ -1634,8 +1634,8 @@ function renderHtmlBlob(a, b, c) {
   e = journeys_utils.createAndAppendIframe(e);
   b = journeys_utils.createIframeInnerHTML(b, utils.mobileUserAgent());
   journeys_utils.addHtmlToIframe(e, b);
-  journeys_utils.addIframeOuterCSS(journeys_utils.position, journeys_utils.bannerHeight);
-  journeys_utils.addIframeInnerCSS(e, a, journeys_utils.position, journeys_utils.bannerHeight);
+  journeys_utils.addIframeOuterCSS();
+  journeys_utils.addIframeInnerCSS(e, a);
   journeys_utils.addDynamicCtaText(e, d);
   journeys_utils.animateBannerEntrance(e);
   return e;
@@ -1953,7 +1953,6 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   b.append_deeplink_path = !!c.append_deeplink_path;
   b.deepview_type = c.deepview_type;
   (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
-  b.banner_options = c;
   this._api(resources.deepview, b, function(b, c) {
     if (b) {
       return d._deepviewCta = function() {

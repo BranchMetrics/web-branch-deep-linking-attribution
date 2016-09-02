@@ -29,8 +29,8 @@ function renderHtmlBlob(parent, html, hasApp) {
 	var iframe = journeys_utils.createAndAppendIframe(divToInject);
 	var iframeHTML = journeys_utils.createIframeInnerHTML(html, utils.mobileUserAgent());
 	journeys_utils.addHtmlToIframe(iframe, iframeHTML);
-	journeys_utils.addIframeOuterCSS(journeys_utils.position, journeys_utils.bannerHeight);
-	journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe, journeys_utils.position, journeys_utils.bannerHeight);
+	journeys_utils.addIframeOuterCSS();
+	journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 	journeys_utils.addDynamicCtaText(iframe, ctaText);
 
 	journeys_utils.animateBannerEntrance(iframe);
