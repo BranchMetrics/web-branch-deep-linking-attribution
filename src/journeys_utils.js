@@ -15,6 +15,10 @@ journeys_utils.divToInjectParent = document.body;
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
 
+// calculated later to determine how far to push down body content
+journeys_utils.bodyMarginTop = 0;
+journeys_utils.bodyMarginBottom = 0;
+
 // Regex to find these pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
@@ -87,7 +91,6 @@ journeys_utils.findInsertionDiv = function(parent, metadata) {
 			parent = parentTrap;
 			parent.innerHTML = '';
 			journeys_utils.divToInjectParent = parent.parentElement;
-			journeys_utils.position = 'top';
 			return parent;
 		}
 		else {
@@ -178,24 +181,32 @@ journeys_utils.addIframeOuterCSS = function() {
 	iFrameCSS.id = 'branch-iframe-css';
 
 	var bodyMargin = '';
-	var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
-	if (bodyMarginTopComputed) { bodyMarginTopComputed = +bodyMarginTopComputed.slice(0, -2); }
-	var bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom');
-	if (bodyMarginBottomComputed) { bodyMarginBottomComputed = +bodyMarginBottomComputed.slice(0, -2); }
+	journeys_utils.bodyMarginTop = banner_utils.getBodyStyle('margin-top');
+	var bodyMarginTopNumber = +journeys_utils.bodyMarginTop.slice(0, -2);
+	journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle('margin-bottom');
+	var bodyMarginBottomNumber = +journeys_utils.bodyMarginBottom.slice(0, -2);
 	var bannerMarginNumber = +journeys_utils.bannerHeight.slice(0, -2);
 
 	if (journeys_utils.position === 'top') {
-		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopComputed;
+		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
 		bodyMargin = 'margin-top: ' + calculatedBodyMargin + 'px';
 	}
 	else if (journeys_utils.position === 'bottom') {
-		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomComputed;
+		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
 		bodyMargin = 'margin-bottom: ' + calculatedBodyMargin + 'px';
 	}
 
 	// adds margin to the parent of div being inserted into
 	if (journeys_utils.divToInjectParent !== document.body) {
-		journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight
+		// dont want to add margin for full page fixed
+		var isNavBarFixed;
+		var computedParentStyle = window.getComputedStyle(journeys_utils.divToInjectParent);
+		if (computedParentStyle) {
+			isNavBarFixed = computedParentStyle.getPropertyValue('position') === 'fixed';
+		}
+		if (!isNavBarFixed) {
+			journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight
+		}
 	}
 
 	iFrameCSS.innerHTML = 	
@@ -251,18 +262,7 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 }
 
 journeys_utils.animateBannerEntrance = function(banner) {
-	var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
-	var bodyMarginTopInline = document.body.style.marginTop;
-	var bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom');
-	var bodyMarginBottomInline = document.body.style.marginBottom;
-
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
-	// if (journeys_utils.position === 'top') {
-	// 	document.body.style.marginTop = journeys_utils.bannerHeight;
-	// }
-	// else if (journeys_utils.position === 'bottom') {
-	// 	document.body.style.marginBottom = journeys_utils.bannerHeight;
-	// }
 
 	function onAnimationEnd() {
 		if (journeys_utils.position === 'top') {
@@ -339,11 +339,15 @@ journeys_utils.animateBannerExit = function(banner) {
 
 	setTimeout(function() {
 		if (journeys_utils.position === 'top') {
-			document.body.style.marginTop = 0;
+			document.body.style.marginTop = journeys_utils.bodyMarginTop;
 		}
 		else if (journeys_utils.position === 'bottom') {
-			document.body.style.marginBottom = 0;
+			document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 		}
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 	}, banner_utils.animationDelay);
+
+	if (journeys_utils.divToInjectParent !== document.body) {
+		journeys_utils.divToInjectParent.style.marginTop = 0;
+	}	
 }
