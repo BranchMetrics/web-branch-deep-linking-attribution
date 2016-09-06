@@ -1460,6 +1460,7 @@ var journeys_utils = {position:"top", sticky:"absolute", bannerHeight:"76px", is
 journeys_utils.divToInjectParent = document.body;
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
+window.innerHeight < window.innerWidth && (journeys_utils.windowHeight = window.innerWidth, journeys_utils.windowWidth = window.innerHeight);
 journeys_utils.bodyMarginTop = 0;
 journeys_utils.bodyMarginBottom = 0;
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;

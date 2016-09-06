@@ -14,17 +14,24 @@ journeys_utils.divToInjectParent = document.body;
 // used to set height of full page interstitials
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
+// if the device is landscape
+if (window.innerHeight < window.innerWidth) {
+	journeys_utils.windowHeight = window.innerWidth;
+	journeys_utils.windowWidth = window.innerHeight;
+}
 
 // calculated later to determine how far to push down body content
 journeys_utils.bodyMarginTop = 0;
 journeys_utils.bodyMarginBottom = 0;
 
-// Regex to find these pieces of the html blob
+// Regex to find pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
+
+
 
 journeys_utils.setPositionAndHeight = function(html) {
 	var metadata = journeys_utils.getMetadata(html);
@@ -33,7 +40,6 @@ journeys_utils.setPositionAndHeight = function(html) {
 		journeys_utils.bannerHeight = metadata['bannerHeight'];
 		journeys_utils.position = metadata['position'];
 		journeys_utils.sticky = metadata['sticky'];
-
 	}
 	else { // to support older banners without proper metadata. Spacer div === top
 		var spacerMatch = html.match(journeys_utils.spacerRe)
