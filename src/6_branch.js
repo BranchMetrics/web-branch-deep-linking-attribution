@@ -418,7 +418,15 @@ Branch.prototype['init'] = wrap(
 							}
 						}
 						self['renderQueue'](function() {
-							branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
+							var requestData = self._branchViewData || {};
+
+							if (!requestData['data']) {
+								requestData['data'] = {};
+							}
+
+							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
+
+							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app']);
 						});
 					}
 				}
