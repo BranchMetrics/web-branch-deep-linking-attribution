@@ -32,7 +32,14 @@ journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
 
-
+/***
+ * @function journeys_utils.setPositionAndHeight
+ * @param {string} html
+ * 
+ * Uses template metadata to set bannerHeight, position, and sticky properties
+ * To support old banners, searches the html blob to determine these properties
+ * For full page banners, gets view width/height to set fixed pixel values
+ */
 journeys_utils.setPositionAndHeight = function(html) {
 	var metadata = journeys_utils.getMetadata(html);
 
@@ -67,7 +74,10 @@ journeys_utils.setPositionAndHeight = function(html) {
 	} 
 }
 
-
+/***
+ * @function journeys_utils.getMetadata
+ * @param {string} html
+ */
 journeys_utils.getMetadata = function(html) {
 	var match = html.match(journeys_utils.jsonRe);
 	if(match) {
@@ -76,6 +86,11 @@ journeys_utils.getMetadata = function(html) {
 	}
 }
 
+/***
+ * @function journeys_utils.getCtaText
+ * @param {Object} metadata
+ * @param {Boolean} hasApp
+ */
 journeys_utils.getCtaText = function(metadata, hasApp) {
 	var ctaText;
 
@@ -89,10 +104,14 @@ journeys_utils.getCtaText = function(metadata, hasApp) {
 	return ctaText;
 }
 
-// need to find div and parent to properly add margin
+/***
+ * @function journeys_utils.findInsertionDiv
+ * @param {Object} parent - A dom element or document.body
+ * @param {Object} metadata
+ */
 journeys_utils.findInsertionDiv = function(parent, metadata) {
-	if (metadata && metadata.injectorSelector) {
-		var parentTrap = document.querySelector(metadata.injectorSelector);
+	if (metadata && metadata['injectorSelector']) {
+		var parentTrap = document.querySelector(metadata['injectorSelector']);
 		if (parentTrap) {
 			parent = parentTrap;
 			parent.innerHTML = '';
@@ -105,6 +124,10 @@ journeys_utils.findInsertionDiv = function(parent, metadata) {
 	}
 }
 
+/***
+ * @function journeys_utils.getCss
+ * @param {string} html
+ */
 journeys_utils.getCss = function(html) {
 	var match = html.match(journeys_utils.cssRe);
 	if (match) {
@@ -112,6 +135,12 @@ journeys_utils.getCss = function(html) {
 	}
 }
 
+/***
+ * @function journeys_utils.getJsAndAddToParent
+ * @param {string} html
+ * 
+ * take the js from template and add to document.body
+ */
 journeys_utils.getJsAndAddToParent = function(html) {
 	var match = html.match(journeys_utils.jsRe);
 	if(match) {
@@ -122,7 +151,13 @@ journeys_utils.getJsAndAddToParent = function(html) {
 	}
 }
 
-// remove everything from html blob except html
+/***
+ * @function journeys_utils.removeScriptAndCss
+ * @param {string} html
+ *
+ * After extracting js and css from html blob, we should remove it.
+ * We will use the remaining html to add to iframe
+ */
 journeys_utils.removeScriptAndCss = function(html) {
 	var matchJson = html.match(journeys_utils.jsonRe);
 	var matchJs = html.match(journeys_utils.jsRe);
@@ -139,7 +174,9 @@ journeys_utils.removeScriptAndCss = function(html) {
 	return html;
 }
 
-// for now always append to body. Later we will support inserting
+/***
+ * @function journeys_utils.createAndAppendIframe
+ */
 journeys_utils.createAndAppendIframe = function() {
 	var iframe = document.createElement('iframe');
 	iframe.src = 'about:blank'; // solves CORS issues, test in IE
@@ -153,6 +190,11 @@ journeys_utils.createAndAppendIframe = function() {
 	return iframe;
 }
 
+/***
+ * @function journeys_utils.createIframeInnerHTML
+ * @param {string} html
+ * @param {string} userAgent
+ */
 journeys_utils.createIframeInnerHTML = function(html, userAgent) {
 	var bodyClass;
 	if (userAgent === 'ios' || userAgent === 'ipad') {
@@ -174,13 +216,23 @@ journeys_utils.createIframeInnerHTML = function(html, userAgent) {
 	return iframeHTML;
 }
 
+/***
+ * @function journeys_utils.addHtmlToIframe
+ * @param {Object} iframe - iframe node created in previous step
+ * @param {string} iframeHTML
+ */
 journeys_utils.addHtmlToIframe = function(iframe, iframeHTML) {
 	iframe.contentWindow.document.open();
 	iframe.contentWindow.document.write(iframeHTML);
 	iframe.contentWindow.document.close();
 }
 
-// this is the css that positions iframe on the page
+/***
+ * @function journeys_utils.addIframeOuterCSS
+ *
+ * Creates a style element on document.body and adds CSS that will determine
+ * banner position, height and sticky. 
+ */
 journeys_utils.addIframeOuterCSS = function() {
 	var iFrameCSS = document.createElement('style');
 	iFrameCSS.type = 'text/css';
@@ -244,7 +296,13 @@ journeys_utils.addIframeOuterCSS = function() {
 	document.head.appendChild(iFrameCSS);
 }
 
-// this adds the css that was previously stripped from html blob
+/***
+ * @function journeys_utils.addIframeInnerCSS
+ * @param {Object} iframe - iframe node
+ * @param {string} innerCSS
+ *
+ * Adds css that was stripped from html blob to the iframe element
+ */
 journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	var css = document.createElement('style');
 	css.type = 'text/css';
@@ -262,11 +320,20 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	}
 }
 
+/***
+ * @function journeys_utils.addDynamicCtaText
+ * @param {Object} iframe
+ * @param {string} ctaText
+ */
 journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 	var doc = iframe.contentWindow.document;
 	doc.getElementById('branch-mobile-action').innerHTML = ctaText;
 }
 
+/***
+ * @function journeys_utils.animateBannerEntrance
+ * @param {Object} banner
+ */
 journeys_utils.animateBannerEntrance = function(banner) {
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 
@@ -282,6 +349,12 @@ journeys_utils.animateBannerEntrance = function(banner) {
 	setTimeout(onAnimationEnd, banner_utils.animationDelay);
 }
 
+/***
+ * @function journeys_utils.findDismissPeriod
+ * @param {string} html
+ *
+ * Checks template metadata to dermine how long to not show banner when dismissed
+ */
 journeys_utils.findDismissPeriod = function(html) {
 	var dismissPeriod;
 	var match = html.match(journeys_utils.jsonRe);
@@ -301,6 +374,16 @@ journeys_utils.findDismissPeriod = function(html) {
 	return hideBanner
 }
 
+/***
+ * @function journeys_utils.finalHookups
+ * @param {Object} branchViewData
+ * @param {Object} storage
+ * @param {function()} cta
+ * @param {Object} banner
+ * @param {number} hideBanner - how long to hide the banner for when dismissed
+ * 
+ * hooks up the call to action and dismiss buttons
+ */
 journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hideBanner) {
 	if(!cta || !banner) {
 		return;
@@ -331,6 +414,10 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	})
 }
 
+/***
+ * @function journeys_utils.animateBannerExit
+ * @param {Object} banner
+ */
 journeys_utils.animateBannerExit = function(banner) {
 	if (journeys_utils.position === 'top') {
 		banner.style.top = '-' + journeys_utils.bannerHeight;

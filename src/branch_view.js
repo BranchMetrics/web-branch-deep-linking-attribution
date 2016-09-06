@@ -5,7 +5,11 @@ goog.require('banner_css');
 goog.require('safejson');
 goog.require('journeys_utils');
 
-
+/**
+ * @param {Object} parent
+ * @param {string} html
+ * @param {Boolean} hasApp
+ */
 function renderHtmlBlob(parent, html, hasApp) {
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
