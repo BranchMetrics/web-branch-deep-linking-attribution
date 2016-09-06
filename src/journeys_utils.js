@@ -134,7 +134,7 @@ journeys_utils.removeScriptAndCss = function(html) {
 }
 
 // for now always append to body. Later we will support inserting
-journeys_utils.createAndAppendIframe = function(divToInject) {
+journeys_utils.createAndAppendIframe = function() {
 	var iframe = document.createElement('iframe');
 	iframe.src = 'about:blank'; // solves CORS issues, test in IE
 	iframe.style.overflow = 'hidden';
