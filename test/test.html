@@ -6,6 +6,7 @@
 </head>
 <body>
 	<div id="mocha"></div>
+	<div class="test"></div>
 	<link rel="stylesheet" type="text/css" href="../node_modules/mocha/mocha.css" />
 	<link rel="stylesheet" type="text/css" href="mocha.css" />
 	<script src="../compiler/library/closure-library-master/closure/goog/base.js"></script>
@@ -24,6 +25,7 @@
 		goog.require('resources');
 		goog.require('storage');
 		goog.require('session');
+		goog.require('journeys_utils');
 	</script>
 
 	<script type="text/javascript" src="0_queue.js"></script>
@@ -31,6 +33,7 @@
 	<script type="text/javascript" src="2_storage.js"></script>
 	<script type="text/javascript" src="3_api.js"></script>
 	<script type="text/javascript" src="6_branch.js"></script>
+	<script type="text/javascript" src="journeys_utils.js"></script>
 	<!-- just add others here -->
 
 	<script type="text/javascript" src="saucelabs.js"></script>
