@@ -1091,13 +1091,13 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, d) {
-    "undefined" === typeof d && (d = {});
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
+    "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
-      return d.branch_key = b.branch_key, d;
+      return c.branch_key = b.branch_key, c;
     }
     if (b.app_id && f.test(b.app_id)) {
-      return d.app_id = b.app_id, d;
+      return c.app_id = b.app_id, c;
     }
     throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
   };
@@ -1456,113 +1456,230 @@ var sendSMS = function(a, b, c, d) {
   return p;
 };
 // Input 14
-var branch_view = {};
-function renderHtmlBlob(a, b, c) {
-  var d, e, f = c ? "OPEN" : "GET";
-  d = /<script type="application\/json">((.|\s)*?)<\/script>/;
-  if (e = b.match(d)) {
-    if (e = e[1], b = b.replace(d, ""), d = safejson.parse(e), c && d && d.ctaText && d.ctaText.has_app ? f = d.ctaText.has_app : d && d.ctaText && d.ctaText.no_app && (f = d.ctaText.no_app), d && d.injectorSelector) {
-      if (a = document.querySelector(d.injectorSelector)) {
-        a.innerHTML = "";
-      } else {
-        return null;
+var journeys_utils = {position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1};
+journeys_utils.divToInjectParent = document.body;
+journeys_utils.windowHeight = window.innerHeight;
+journeys_utils.windowWidth = window.innerWidth;
+window.innerHeight < window.innerWidth && (journeys_utils.windowHeight = window.innerWidth, journeys_utils.windowWidth = window.innerHeight);
+journeys_utils.bodyMarginTop = 0;
+journeys_utils.bodyMarginBottom = 0;
+journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
+journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
+journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
+journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
+journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
+journeys_utils.setPositionAndHeight = function(a) {
+  var b = journeys_utils.getMetadata(a);
+  if (b && b.bannerHeight && b.position && b.sticky) {
+    journeys_utils.bannerHeight = b.bannerHeight, journeys_utils.position = b.position, journeys_utils.sticky = b.sticky;
+  } else {
+    if (a = a.match(journeys_utils.spacerRe)) {
+      journeys_utils.position = "top";
+      if (a = a[1].match(journeys_utils.findMarginRe)) {
+        journeys_utils.bannerHeight = a[1];
       }
+      journeys_utils.sticky = "absolute";
+    } else {
+      journeys_utils.position = "bottom", journeys_utils.sticky = "fixed";
     }
   }
-  d = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-  if (e = b.match(d)) {
-    e = e[1], b = b.replace(d, ""), c = document.createElement("script"), c.innerHTML = e, document.body.appendChild(c);
+  if (-1 !== journeys_utils.bannerHeight.indexOf("vh") || -1 !== journeys_utils.bannerHeight.indexOf("%")) {
+    a = journeys_utils.bannerHeight.indexOf("vh") ? journeys_utils.bannerHeight.slice(0, -2) : journeys_utils.bannerHeight.slice(0, -1), journeys_utils.bannerHeight = a / 100 * journeys_utils.windowHeight + "px", journeys_utils.isFUllPage = !0;
   }
-  a = a || document.body;
-  c = document.createElement("div");
-  c.id = "branch-banner-container";
-  c.className = "branch-animation";
+};
+journeys_utils.getMetadata = function(a) {
+  if (a = a.match(journeys_utils.jsonRe)) {
+    return safejson.parse(a[1]);
+  }
+};
+journeys_utils.getCtaText = function(a, b) {
+  var c;
+  b && a && a.ctaText && a.ctaText.has_app ? c = a.ctaText.has_app : a && a.ctaText && a.ctaText.no_app && (c = a.ctaText.no_app);
+  return c;
+};
+journeys_utils.findInsertionDiv = function(a, b) {
+  if (b && b.injectorSelector) {
+    var c = document.querySelector(b.injectorSelector);
+    return c ? (a = c, a.innerHTML = "", journeys_utils.divToInjectParent = a.parentElement, a) : null;
+  }
+};
+journeys_utils.getCss = function(a) {
+  if (a = a.match(journeys_utils.cssRe)) {
+    return a[1];
+  }
+};
+journeys_utils.getJsAndAddToParent = function(a) {
+  if (a = a.match(journeys_utils.jsRe)) {
+    a = a[1];
+    var b = document.createElement("script");
+    b.innerHTML = a;
+    document.body.appendChild(b);
+  }
+};
+journeys_utils.removeScriptAndCss = function(a) {
+  var b = a.match(journeys_utils.jsonRe), c = a.match(journeys_utils.jsRe), d = a.match(journeys_utils.cssRe);
+  b && (a = a.replace(journeys_utils.jsonRe, ""));
+  c && (a = a.replace(journeys_utils.jsRe, ""));
+  d && (a = a.replace(journeys_utils.cssRe, ""));
+  return a;
+};
+journeys_utils.createAndAppendIframe = function() {
+  var a = document.createElement("iframe");
+  a.src = "about:blank";
+  a.style.overflow = "hidden";
+  a.scrolling = "no";
+  a.id = "branch-banner-iframe";
+  a.className = "branch-animation";
+  document.body.appendChild(a);
+  return a;
+};
+journeys_utils.createIframeInnerHTML = function(a, b) {
+  return '<html><head></head><body class="' + ("ios" === b || "ipad" === b ? "branch-banner-ios" : "android" === b ? "branch-banner-android" : "branch-banner-desktop") + '">' + a + "</body></html>";
+};
+journeys_utils.addHtmlToIframe = function(a, b) {
+  a.contentWindow.document.open();
+  a.contentWindow.document.write(b);
+  a.contentWindow.document.close();
+};
+journeys_utils.addIframeOuterCSS = function() {
+  var a = document.createElement("style");
+  a.type = "text/css";
+  a.id = "branch-iframe-css";
+  var b = "";
+  journeys_utils.bodyMarginTop = banner_utils.getBodyStyle("margin-top");
+  var c = +journeys_utils.bodyMarginTop.slice(0, -2);
+  journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle("margin-bottom");
+  var d = +journeys_utils.bodyMarginBottom.slice(0, -2), e = +journeys_utils.bannerHeight.slice(0, -2);
+  "top" === journeys_utils.position ? b = "margin-top: " + (+e + c) + "px" : "bottom" === journeys_utils.position && (b = "margin-bottom: " + (+e + d) + "px");
+  if (journeys_utils.divToInjectParent !== document.body) {
+    var f;
+    (c = window.getComputedStyle(journeys_utils.divToInjectParent)) && (f = journeys_utils.isFUllPage && "fixed" === c.getPropertyValue("position"));
+    f || (journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight);
+  }
+  a.innerHTML = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; " + b + "; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + 
+  "s ease; }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFUllPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFUllPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }";
+  document.head.appendChild(a);
+};
+journeys_utils.addIframeInnerCSS = function(a, b) {
+  var c = document.createElement("style");
+  c.type = "text/css";
+  c.id = "branch-css";
   c.innerHTML = b;
-  c.querySelector("#branch-mobile-action").innerHTML = f;
-  banner_utils.addClass(c, "branch-banner-is-active");
-  a === document.body ? a.insertBefore(c, a.firstChild) : a.appendChild(c);
+  a.contentWindow.document.head.appendChild(c);
+  "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
+};
+journeys_utils.addDynamicCtaText = function(a, b) {
+  a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
+};
+journeys_utils.animateBannerEntrance = function(a) {
+  banner_utils.addClass(document.body, "branch-banner-is-active");
+  setTimeout(function() {
+    "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
+  }, banner_utils.animationDelay);
+};
+journeys_utils.findDismissPeriod = function(a) {
+  var b;
+  (a = a.match(journeys_utils.jsonRe)) && (a = safejson.parse(a[1])) && a.dismissPeriod && (b = a.dismissPeriod);
+  b = "number" === typeof b ? b : 7;
+  return -1 === b ? !0 : banner_utils.getDate(b);
+};
+journeys_utils.finalHookups = function(a, b, c, d, e) {
+  if (c && d) {
+    var f = d.contentWindow.document, g = f.querySelectorAll("#branch-mobile-action");
+    Array.prototype.forEach.call(g, function(a) {
+      a.addEventListener("click", function(a) {
+        c();
+        journeys_utils.animateBannerExit(d);
+      });
+    });
+    g = f.querySelectorAll(".branch-banner-continue");
+    Array.prototype.forEach.call(g, function(c) {
+      c.addEventListener("click", function(c) {
+        journeys_utils.animateBannerExit(d);
+        b.set("hideBanner" + a.id, e, !0);
+      });
+    });
+    g = f.querySelectorAll(".branch-banner-close");
+    Array.prototype.forEach.call(g, function(c) {
+      c.addEventListener("click", function(c) {
+        journeys_utils.animateBannerExit(d);
+        b.set("hideBanner" + a.id, e, !0);
+      });
+    });
+  }
+};
+journeys_utils.animateBannerExit = function(a) {
+  "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
+  setTimeout(function() {
+    banner_utils.removeElement(a);
+    banner_utils.removeElement(document.getElementById("branch-css"));
+  }, banner_utils.animationSpeed + banner_utils.animationDelay);
+  setTimeout(function() {
+    "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bodyMarginTop : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bodyMarginBottom);
+    banner_utils.removeClass(document.body, "branch-banner-is-active");
+  }, banner_utils.animationDelay);
+  journeys_utils.divToInjectParent !== document.body && (journeys_utils.divToInjectParent.style.marginTop = 0);
+};
+// Input 15
+var branch_view = {};
+function renderHtmlBlob(a, b, c) {
+  var d = c ? "OPEN" : "GET";
+  journeys_utils.setPositionAndHeight(b);
+  var e = journeys_utils.getMetadata(b);
+  e && (d = journeys_utils.getCtaText(e, c), journeys_utils.findInsertionDiv(a, e));
+  a = journeys_utils.getCss(b);
+  journeys_utils.getJsAndAddToParent(b);
+  b = journeys_utils.removeScriptAndCss(b);
+  c = journeys_utils.createAndAppendIframe();
+  b = journeys_utils.createIframeInnerHTML(b, utils.mobileUserAgent());
+  journeys_utils.addHtmlToIframe(c, b);
+  journeys_utils.addIframeOuterCSS();
+  journeys_utils.addIframeInnerCSS(c, a);
+  journeys_utils.addDynamicCtaText(c, d);
+  journeys_utils.animateBannerEntrance(c);
   return c;
 }
 branch_view.handleBranchViewData = function(a, b, c, d, e) {
-  function f() {
-    banner_utils.addClass(h.querySelector("#branch-banner"), "branch-animation-out");
-    banner_utils.removeClass(h.querySelector("#branch-banner"), "branch-animation-in");
-    setTimeout(function() {
-      h.parentElement.removeChild(h);
-    }, 250);
-  }
-  function g(a, c, e) {
-    if (a && c) {
-      setTimeout(function() {
-        banner_utils.removeClass(c.querySelector("#branch-banner"), "branch-animation-out");
-        banner_utils.addClass(c.querySelector("#branch-banner"), "branch-animation-in");
-      }, 250);
-      var g = c.querySelectorAll("#branch-mobile-action");
-      Array.prototype.forEach.call(g, function(b) {
-        b.addEventListener("click", function(b) {
-          a();
-          f();
-        });
-      });
-      g = c.querySelectorAll(".branch-banner-continue");
-      Array.prototype.forEach.call(g, function(a) {
-        a.addEventListener("click", function(a) {
-          f();
-          d.set("hideBanner" + b.id, e, !0);
-        });
-      });
-      g = c.querySelectorAll(".branch-banner-close");
-      Array.prototype.forEach.call(g, function(a) {
-        a.addEventListener("click", function(a) {
-          f();
-          d.set("hideBanner" + b.id, e, !0);
-        });
-      });
-    }
-  }
-  var h = null, k = null;
+  var f = null, g = null;
   c = c || {};
   c.feature = "journeys";
   c = utils.cleanLinkData(c);
   if (!(document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container"))) {
-    var l = document.createElement("div");
-    l.id = "branch-banner";
-    document.body.insertBefore(l, null);
-    banner_utils.addClass(l, "branch-banner-is-active");
+    var h = document.createElement("div");
+    h.id = "branch-banner";
+    document.body.insertBefore(h, null);
+    banner_utils.addClass(h, "branch-banner-is-active");
     if (b.html) {
       return renderHtmlBlob(document.body, b.html, e);
     }
     if (b.url) {
-      var m = "branch_view_callback__" + jsonp_callback_index++;
+      var k = "branch_view_callback__" + jsonp_callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
-      var n = b.url + "&callback=" + m;
-      a.XHRRequest(n + ("&data=" + c), {}, "GET", {}, function(a, b) {
-        var c = !1;
-        if (!a && b) {
-          var d, f = b.match(/<script type="application\/json">((.|\s)*?)<\/script>/);
-          f && (f = safejson.parse(f[1])) && f.dismissPeriod && (d = f.dismissPeriod);
-          d = "number" === typeof d ? d : 7;
-          var q = -1 === d ? !0 : banner_utils.getDate(d), n = window.setTimeout(function() {
-            window[m] = function() {
+      var l = b.url + "&callback=" + k;
+      a.XHRRequest(l + ("&data=" + c), {}, "GET", {}, function(a, c) {
+        var l = !1;
+        if (!a && c) {
+          var q = journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
+            window[k] = function() {
             };
           }, TIMEOUT);
-          window[m] = function(a) {
-            window.clearTimeout(n);
-            c || (k = a, g(k, h, q));
+          window[k] = function(a) {
+            window.clearTimeout(r);
+            l || (g = a, journeys_utils.finalHookups(b, d, g, f, q));
           };
-          h = renderHtmlBlob(document.body, b, e);
-          if (null === h) {
-            c = !0;
+          f = renderHtmlBlob(document.body, c, e);
+          if (null === f) {
+            l = !0;
             return;
           }
-          g(k, h, q);
+          journeys_utils.finalHookups(b, d, g, f, q);
         }
-        document.body.removeChild(l);
+        document.body.removeChild(h);
       }, !0);
     }
   }
 };
-// Input 15
+// Input 16
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, init_state_fail_codes = {NO_FAILURE:0, UNKNOWN_CAUSE:1, OPEN_FAILED:2, BFP_NOT_FOUND:3, HAS_APP_FAILED:4}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
@@ -1930,7 +2047,7 @@ Branch.prototype.closeBanner = wrap(0, function(a) {
   });
   a();
 });
-// Input 16
+// Input 17
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
