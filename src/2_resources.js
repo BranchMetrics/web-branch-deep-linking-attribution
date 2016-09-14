@@ -98,7 +98,8 @@ resources.open = {
 		"is_referrable": validator(true, validationTypes.NUMBER),
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),
-		"options": validator(false, validationTypes.OBJECT)
+		"options": validator(false, validationTypes.OBJECT),
+		"initial_referrer": validator(false, validationTypes.STRING)
 	}
 };
 
@@ -290,6 +291,7 @@ resources.event = {
 	method: utils.httpMethod.POST,
 	params: defaults({
 		"event": validator(true, validationTypes.STRING),
-		"metadata": validator(true, validationTypes.OBJECT)
+		"metadata": validator(true, validationTypes.OBJECT),
+		"initial_referrer": validator(false, validationTypes.STRING)
 	})
 };

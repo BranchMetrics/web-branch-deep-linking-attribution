@@ -391,7 +391,8 @@ Branch.prototype['init'] = wrap(
 					"url": document.URL,
 					"user_agent": navigator.userAgent,
 					"language": navigator.language
-				}
+				},
+				"initial_referrer": document.referrer
 			}, function(err, eventData) {
 				if (!err && typeof eventData === 'object') {
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
@@ -497,7 +498,8 @@ Branch.prototype['init'] = wrap(
 						"link_identifier": link_identifier,
 						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id,
-						"options": options
+						"options": options,
+						"initial_referrer": document.referrer
 					},
 					function(err, data) {
 						if (err) {
@@ -772,7 +774,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			"url": document.URL,
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
-		}, metadata || {})
+		}, metadata || {}),
+		"initial_referrer": document.referrer
 	}, function(err, data) {
 		if (!err && typeof data === 'object') {
 			self._branchViewEnabled = !!data['branch_view_enabled'];
