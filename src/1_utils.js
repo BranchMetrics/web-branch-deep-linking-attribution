@@ -439,4 +439,28 @@ utils.scrapeOpenGraphContent = function(property, content) {
 	return content;
 };
 
+/**
+ * Search for hosted deep link data on the page, as outlined here https://dev.branch.io/getting-started/hosted-deep-link-data/guide/#adding-metatags-to-your-site
+ */
+utils.scrapeHostedDeepLinkData = function() {
+	var params = {};
+
+	var metas = document.getElementsByTagName('meta');
+
+	for (var i = 0; i < metas.length; i++) {
+		if (!metas[i].getAttribute('name') || !metas[i].getAttribute('content')) {
+			continue;
+		}
+
+		var name = metas[i].getAttribute('name');
+		var split = name.split(":");
+
+		if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
+			params[split[2]] = metas[i].getAttribute('content');
+		}
+	}
+
+	return params;
+};
+
 

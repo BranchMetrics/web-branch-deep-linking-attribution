@@ -858,6 +858,9 @@ describe('Branch', function() {
 			sinon.stub(utils, 'getWindowLocation')
 				.returns(windowLocation);
 
+			sinon.stub(utils, 'scrapeHostedDeepLinkData')
+				.returns({});
+
 			sinon.stub(utils, 'scrapeOpenGraphContent')
 				.onCall(0).returns(ogTitle)
 				.onCall(1).returns(ogDescription)
@@ -874,6 +877,7 @@ describe('Branch', function() {
 			}
 
 			utils.scrapeOpenGraphContent.restore();
+			utils.scrapeHostedDeepLinkData.restore();
 			utils.getWindowLocation.restore();
 		});
 

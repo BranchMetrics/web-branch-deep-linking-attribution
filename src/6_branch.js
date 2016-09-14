@@ -418,7 +418,15 @@ Branch.prototype['init'] = wrap(
 							}
 						}
 						self['renderQueue'](function() {
-							branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
+							var requestData = self._branchViewData || {};
+
+							if (!requestData['data']) {
+								requestData['data'] = {};
+							}
+
+							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
+
+							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app']);
 						});
 					}
 				}
@@ -1096,6 +1104,8 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		options['deepview_type'] = 'banner';
 	}
 
+	data['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), data['data']);
+
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
 	var encodeLinkProperty = function(key, data) {
@@ -1719,6 +1729,8 @@ Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, op
 		bannerOptions.showWindowsPhone = options['showMobile'];
 		bannerOptions.showKindle = options['showMobile'];
 	}
+
+	data['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), data['data']);
 
 	var self = this;
 	self['renderQueue'](function() {
