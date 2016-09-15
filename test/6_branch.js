@@ -125,7 +125,7 @@ describe('Branch', function() {
 				{
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
-					"initial_referrer": "http://localhost:8000/test/test.html",
+					"initial_referrer": "",
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
@@ -133,7 +133,6 @@ describe('Branch', function() {
 				},
 				'Request to open params correct'
 			);
-
 			assert.strictEqual(requests.length, 3, '3 requests made');
 		});
 
@@ -176,7 +175,7 @@ describe('Branch', function() {
 				{
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
-					"initial_referrer": "http://localhost:8000/test/test.html",
+					"initial_referrer": "",
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
@@ -264,7 +263,7 @@ describe('Branch', function() {
 					{
 						"branch_key": branch_sample_key,
 						"link_identifier": '12345',
-						"initial_referrer": "http://localhost:8000/test/test.html",
+						"initial_referrer": "",
 						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id,
 						"sdk": "web" + config.version,
@@ -315,7 +314,7 @@ describe('Branch', function() {
 						{
 							"branch_key": branch_sample_key,
 							"link_identifier": '67890',
-							"initial_referrer": "http://localhost:8000/test/test.html",
+							"initial_referrer": "",
 							"is_referrable": 1,
 							"browser_fingerprint_id": browser_fingerprint_id,
 							"sdk": "web" + config.version,
@@ -546,12 +545,13 @@ describe('Branch', function() {
 				"session_id": session_id,
 				"browser_fingerprint_id": browser_fingerprint_id,
 				"sdk": "web" + config.version,
-				"initial_referrer": "http://localhost:8000/test/test.html"
+				"initial_referrer": ""
 			};
 			expectedRequest.identity_id = identity_id;
 
 			assert.strictEqual(requests.length, 1, 'Request made');
 			requests[0].callback(null);
+
 			assert.deepEqual(requests[0].obj, expectedRequest, 'Expected request sent');
 		});
 
@@ -576,7 +576,7 @@ describe('Branch', function() {
 				"session_id": session_id,
 				"browser_fingerprint_id": browser_fingerprint_id,
 				"sdk": "web" + config.version,
-				"initial_referrer": "http://localhost:8000/test/test.html"
+				"initial_referrer": ""
 			};
 			expectedRequest.identity_id = identity_id;
 
