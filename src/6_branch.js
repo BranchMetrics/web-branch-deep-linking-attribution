@@ -1224,7 +1224,7 @@ Branch.prototype._windowRedirect = function(url) {
  *
  */
 /*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
-Branch.prototype['deepviewCta'] = wrap(callback_params.NO_CALLBACK, function(done) {
+Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
 		throw new Error('Cannot call Deepview CTA, please call branch.deepview() first.');
 	}
@@ -1564,7 +1564,7 @@ function _setBranchViewData(context, done, data) {
 	done();
 }
 
-Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, function(done, data) {
+Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, function(done, data) {
 	_setBranchViewData.call(null, this, done, data);
 });
 
@@ -1645,7 +1645,7 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.NO_CALLBACK, functi
  * ```
  */
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
-Branch.prototype['banner'] = wrap(callback_params.NO_CALLBACK, function(done, options, data) {
+Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
 	_setBranchViewData.call(null, this, function() {}, data || {});
 
 	if (typeof options['showAgain'] === 'undefined' &&
