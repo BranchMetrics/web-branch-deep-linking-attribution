@@ -125,7 +125,7 @@ describe('Branch', function() {
 				{
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
-					"initial_referrer": "",
+					"initial_referrer": document.referrer,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
@@ -175,7 +175,7 @@ describe('Branch', function() {
 				{
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
-					"initial_referrer": "",
+					"initial_referrer": document.referrer,
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
@@ -263,7 +263,7 @@ describe('Branch', function() {
 					{
 						"branch_key": branch_sample_key,
 						"link_identifier": '12345',
-						"initial_referrer": "",
+						"initial_referrer": document.referrer,
 						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id,
 						"sdk": "web" + config.version,
@@ -314,7 +314,7 @@ describe('Branch', function() {
 						{
 							"branch_key": branch_sample_key,
 							"link_identifier": '67890',
-							"initial_referrer": "",
+							"initial_referrer": document.referrer,
 							"is_referrable": 1,
 							"browser_fingerprint_id": browser_fingerprint_id,
 							"sdk": "web" + config.version,
@@ -545,7 +545,7 @@ describe('Branch', function() {
 				"session_id": session_id,
 				"browser_fingerprint_id": browser_fingerprint_id,
 				"sdk": "web" + config.version,
-				"initial_referrer": ""
+				"initial_referrer": document.referrer
 			};
 			expectedRequest.identity_id = identity_id;
 
@@ -576,7 +576,7 @@ describe('Branch', function() {
 				"session_id": session_id,
 				"browser_fingerprint_id": browser_fingerprint_id,
 				"sdk": "web" + config.version,
-				"initial_referrer": ""
+				"initial_referrer": document.referrer
 			};
 			expectedRequest.identity_id = identity_id;
 
