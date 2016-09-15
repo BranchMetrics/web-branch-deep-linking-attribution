@@ -125,6 +125,7 @@ describe('Branch', function() {
 				{
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
+					"initial_referrer": "http://localhost:8000/test/test.html",
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
@@ -175,6 +176,7 @@ describe('Branch', function() {
 				{
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
+					"initial_referrer": "http://localhost:8000/test/test.html",
 					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
@@ -262,6 +264,7 @@ describe('Branch', function() {
 					{
 						"branch_key": branch_sample_key,
 						"link_identifier": '12345',
+						"initial_referrer": "http://localhost:8000/test/test.html",
 						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id,
 						"sdk": "web" + config.version,
@@ -312,6 +315,7 @@ describe('Branch', function() {
 						{
 							"branch_key": branch_sample_key,
 							"link_identifier": '67890',
+							"initial_referrer": "http://localhost:8000/test/test.html",
 							"is_referrable": 1,
 							"browser_fingerprint_id": browser_fingerprint_id,
 							"sdk": "web" + config.version,
@@ -541,7 +545,8 @@ describe('Branch', function() {
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
 				"browser_fingerprint_id": browser_fingerprint_id,
-				"sdk": "web" + config.version
+				"sdk": "web" + config.version,
+				"initial_referrer": "http://localhost:8000/test/test.html"
 			};
 			expectedRequest.identity_id = identity_id;
 
@@ -570,7 +575,8 @@ describe('Branch', function() {
 				"branch_key": branch_sample_key,
 				"session_id": session_id,
 				"browser_fingerprint_id": browser_fingerprint_id,
-				"sdk": "web" + config.version
+				"sdk": "web" + config.version,
+				"initial_referrer": "http://localhost:8000/test/test.html"
 			};
 			expectedRequest.identity_id = identity_id;
 
