@@ -66,7 +66,7 @@ var wrap = function(parameters, func, init) {
 		var lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== 'function') {
 			callback = function(err) {
-
+				return;
 			};
 			args = Array.prototype.slice.call(arguments);
 		}
