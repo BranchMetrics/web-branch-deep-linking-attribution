@@ -61,7 +61,7 @@ describe('Branch', function() {
 	}
 
 	function basicTests(call, params) {
-		it('should fail if branch not initialized', function(done) {
+		it('should silently fail if branch not initialized', function(done) {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(params.length * 2, done);
 
@@ -70,14 +70,12 @@ describe('Branch', function() {
 				branch[call].apply(branch, p.concat(function(err) {
 					assert.strictEqual(err.message, 'Branch SDK not initialized');
 				}));
-				assert.throws(function() {
-					branch[call].apply(branch, p);
-				}, 'Branch SDK not initialized');
 			}
 
 			for (var i = 0; i < params.length; i++) {
 				basicTest(params[i]);
 			}
+			done();
 		});
 	}
 
