@@ -1019,7 +1019,6 @@ Branch.prototype['sendSMS'] = wrap(
 							if (err) {
 								return done(err);
 							}
-							self._storage.set('click_id', data['click_id']);
 							sendSMS(data['click_id']);
 						}
 					);
