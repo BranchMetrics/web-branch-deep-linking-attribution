@@ -1646,7 +1646,8 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, funct
  */
 /*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
-	_setBranchViewData.call(null, this, function() {}, data || {});
+	data = data || {};
+	_setBranchViewData.call(null, this, function() {}, data);
 
 	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
