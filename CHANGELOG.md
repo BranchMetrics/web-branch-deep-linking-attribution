@@ -2,7 +2,12 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.9.0] - 2016-09-22
+- Add hosted data scraper
+- Allow callbacks for all public methods
+- Silently fail and log when init fails
+- Fallback if no data in banner call
+- Stop caching click_id on sendSMS call
 
 ## [v2.8.0] - 2016-09-12
 - Support journeys iframes
