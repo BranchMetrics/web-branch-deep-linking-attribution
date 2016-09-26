@@ -441,6 +441,7 @@ utils.scrapeOpenGraphContent = function(property, content) {
 
 /**
  * Search for hosted deep link data on the page, as outlined here https://dev.branch.io/getting-started/hosted-deep-link-data/guide/#adding-metatags-to-your-site
+ * Also searches for applink tags, i.e. <meta property="al:ios:url" content="applinks://docs" />
  */
 utils.scrapeHostedDeepLinkData = function() {
 	var params = {};
@@ -448,19 +449,29 @@ utils.scrapeHostedDeepLinkData = function() {
 	var metas = document.getElementsByTagName('meta');
 
 	for (var i = 0; i < metas.length; i++) {
-		if (!metas[i].getAttribute('name') || !metas[i].getAttribute('content')) {
+		if (!metas[i].getAttribute('name') && !metas[i].getAttribute('property') || !metas[i].getAttribute('content')) {
 			continue;
 		}
 
-		var name = metas[i].getAttribute('name');
-		var split = name.split(":");
+		if (metas[i].getAttribute('name')) {
+			var name = metas[i].getAttribute('name');
+			var split = name.split(':');
 
-		if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
-			params[split[2]] = metas[i].getAttribute('content');
+			if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
+				params[split[2]] = metas[i].getAttribute('content');
+			}
+		}
+		else if (metas[i].getAttribute('property')) {
+			var property = metas[i].getAttribute('property');
+
+			if (property === 'al:ios:url') {
+				params['$ios_deeplink_path'] = metas[i].getAttribute('content');
+			}
+			else if (property === 'al:android:url') {
+				params['$android_deeplink_path'] = metas[i].getAttribute('content');
+			}
 		}
 	}
 
 	return params;
 };
-
-
