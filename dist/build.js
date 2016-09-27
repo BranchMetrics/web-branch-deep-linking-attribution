@@ -1229,7 +1229,7 @@ Server.prototype.request = function(a, b, c, d) {
     c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
   };
   m();
-  "/v1/deepview" == a.endpoint && (window.branch.__deepviewRequestForReplay = m);
+  "/v1/deepview" === a.endpoint && (window.branch.__deepviewRequestForReplay = m);
 };
 // Input 10
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {

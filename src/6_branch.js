@@ -464,7 +464,7 @@ Branch.prototype['init'] = wrap(
 				document.addEventListener(changeEvent, function() {
 					if (!document[hidden]) {
 						checkHasApp(null, null);
-						if (self.__deepviewRequestForReplay) {
+						if (typeof self.__deepviewRequestForReplay === 'function') {
 							self.__deepviewRequestForReplay();
 						}
 					}

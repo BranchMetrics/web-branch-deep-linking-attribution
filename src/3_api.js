@@ -358,6 +358,9 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	makeRequest();
 
 	if (resource.endpoint === '/v1/deepview') {
-		window['branch'].__deepviewRequestForReplay = makeRequest;
+		try {
+			window['branch'].__deepviewRequestForReplay = makeRequest;
+		}
+		catch (e) { }
 	}
 };
