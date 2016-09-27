@@ -465,10 +465,10 @@ utils.scrapeHostedDeepLinkData = function() {
 			var property = metas[i].getAttribute('property');
 
 			if (property === 'al:ios:url') {
-				params['$ios_deeplink_path'] = metas[i].getAttribute('content');
+				params['$ios_deeplink_path'] = utils.extractDeeplinkPath(metas[i].getAttribute('content'));
 			}
 			else if (property === 'al:android:url') {
-				params['$android_deeplink_path'] = metas[i].getAttribute('content');
+				params['$android_deeplink_path'] = utils.extractDeeplinkPath(metas[i].getAttribute('content'));
 			}
 		}
 	}
