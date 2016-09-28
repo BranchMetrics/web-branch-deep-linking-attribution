@@ -427,6 +427,8 @@ utils.extractDeeplinkPath = function(url) {
  * Extract the path (the part of the url excluding protocol and domain name) from urls in the forms
  * of:
  * - "AppName://some/path
+ * - some/path
+ * - /some/path
  *
  * and returns (for the above sample input cases):
  * - "some/path"
@@ -439,6 +441,9 @@ utils.extractMobileDeeplinkPath = function(url) {
 	}
 	if (url.indexOf('://') > -1) {
 		url = url.split('://')[1];
+	}
+	else if (url.charAt(0) === '/') {
+		url = url.slice(1);
 	}
 	return url;
 };

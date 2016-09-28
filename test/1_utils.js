@@ -364,6 +364,16 @@ describe('utils', function() {
 			}
 		});
 
+		it('should return a deeplink path if "/" is prepended', function() {
+			if (testUtils.go('#test:extractDeeplinkPath')) {
+				assert.strictEqual(
+					'abc/def/',
+					utils.extractDeeplinkPath('/abc/def/'),
+					'should extract deeplink path'
+				);
+			}
+		});
+
 		it('should return empty string if there is no deeplink path', function() {
 			if (testUtils.go('#test:extractDeeplinkPath')) {
 				assert.strictEqual(
