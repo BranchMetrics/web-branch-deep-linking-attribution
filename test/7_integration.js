@@ -141,16 +141,16 @@ describe('Integration tests', function() {
 			assert.strictEqual(requests.length, 3, 'Exactly three requests were made');
 
 			// hack to get tests to pass with different referring urls
-			var initial_referrer_regex = /&initial_referrer=([^\.]+)&app_id/;
-			var initial_referrer = initial_referrer_regex.exec(requests[1].requestBody);
-			var initialReferrerStr = initial_referrer ? '&initial_referrer=' + initial_referrer[1] : '';
+			var start = requests[1].requestBody.indexOf('&initial_referrer=');
+			var end = requests[1].requestBody.indexOf('&app_id=');
+			var initial_referrer = start > -1 ? requests[1].requestBody.slice(start, end) : '';
 
 			assert.strictEqual(
 				requests[1].requestBody,
 				'browser_fingerprint_id=' + browser_fingerprint_id +
 					'&identity_id=' + identity_id +
 					'&is_referrable=1&sdk=web' + config.version +
-					initialReferrerStr +
+					initial_referrer +
 					'&app_id=' + browser_fingerprint_id +
 					'&options=%7B%7D',
 				'The second request has the right .requestBody'
