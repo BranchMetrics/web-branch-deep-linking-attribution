@@ -424,6 +424,26 @@ utils.extractDeeplinkPath = function(url) {
 };
 
 /**
+ * Extract the path (the part of the url excluding protocol and domain name) from urls in the forms
+ * of:
+ * - "AppName://some/path
+ *
+ * and returns (for the above sample input cases):
+ * - "some/path"
+ *
+ * @param {string} url
+ */
+utils.extractMobileDeeplinkPath = function(url) {
+	if (!url) {
+		return null;
+	}
+	if (url.indexOf('://') > -1) {
+		url = url.split('://')[1];
+	}
+	return url;
+};
+
+/**
  * Search for a particular og tag by name, and return the content, if it exists. The optional
  * parameter 'content' will be the default value used if the og tag is not found or cannot
  * be parsed.
@@ -468,10 +488,10 @@ utils.scrapeHostedDeepLinkData = function() {
 			var property = metas[i].getAttribute('property');
 
 			if (property === 'al:ios:url') {
-				params['$ios_deeplink_path'] = utils.extractDeeplinkPath(metas[i].getAttribute('content'));
+				params['$ios_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
 			}
 			else if (property === 'al:android:url') {
-				params['$android_deeplink_path'] = utils.extractDeeplinkPath(metas[i].getAttribute('content'));
+				params['$android_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
 			}
 		}
 	}
