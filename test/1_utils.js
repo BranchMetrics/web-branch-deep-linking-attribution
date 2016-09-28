@@ -30,6 +30,28 @@ describe('utils', function() {
 			};
 			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
 		});
+		it('should handle an non-object for first argument', function() {
+			var obj1 = null;
+			var obj2 = {
+				"simple": "object",
+				"nested": {
+					"object": "here"
+				}
+			};
+			var expectedMerged = {
+				"simple": "object",
+				"nested": {
+					"object": "here"
+				}
+			};
+			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
+		});
+		it('should handle an non-object for second argument', function() {
+			var obj1 = { "simple": "object" };
+			var obj2 = null;
+			var expectedMerged = { "simple": "object" };
+			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
+		});
 	});
 
 	describe('whiteListSessionData', function() {

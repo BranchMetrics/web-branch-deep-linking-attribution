@@ -217,7 +217,10 @@ utils.processReferringLink = function(link) {
  * @param {Object} from
  */
 utils.merge = function(to, from) {
-	if (typeof from === 'undefined') {
+	if (!to || typeof to !== 'object') {
+		to = {};
+	}
+	if (!from || typeof from !== 'object') {
 		return to;
 	}
 

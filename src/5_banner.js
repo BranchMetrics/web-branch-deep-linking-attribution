@@ -130,11 +130,22 @@ banner = function(branch, options, linkData, storage) {
 			};
 		}
 	}
-	else {
+	else if (doc.getElementById('sms-form')) {
 		doc.getElementById('sms-form').addEventListener('submit', function(ev) {
 			ev.preventDefault();
 			sendSMS(doc, branch, options, linkData);
 		});
+	}
+	else {
+		element.onload = function() {
+			doc = element.contentWindow.document;
+			if (doc.getElementById('sms-form')) {
+				doc.getElementById('sms-form').addEventListener('submit', function(ev) {
+					ev.preventDefault();
+					sendSMS(doc, branch, options, linkData);
+				});
+			}
+		};
 	}
 
 	var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');

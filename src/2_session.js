@@ -39,7 +39,10 @@ session.set = function(storage, data, first) {
  * @param {Object} newData
  */
 session.update = function(storage, newData) {
-	var currentData = session.get(storage);
+	if (!newData) {
+		return;
+	}
+	var currentData = session.get(storage) || {};
 	var data = utils.merge(currentData, newData);
 	storage.set('branch_session', goog.json.serialize(data));
 };
