@@ -345,40 +345,40 @@ describe('utils', function() {
 	});
 	describe('extractMobileDeeplinkPath', function() {
 		it('should return deeplink path mobile scheme url', function() {
-			if (testUtils.go('#test:extractDeeplinkPath')) {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
 				assert.strictEqual(
 					'abc/def/',
-					utils.extractDeeplinkPath('AppName://abc/def/'),
+					utils.extractMobileDeeplinkPath('AppName://abc/def/'),
 					'should extract deeplink path'
 				);
 			}
 		});
 
 		it('should return deeplink path if no protocol is given', function() {
-			if (testUtils.go('#test:extractDeeplinkPath')) {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
 				assert.strictEqual(
 					'abc/def/',
-					utils.extractDeeplinkPath('abc/def/'),
+					utils.extractMobileDeeplinkPath('abc/def/'),
 					'should extract deeplink path'
 				);
 			}
 		});
 
 		it('should return a deeplink path if "/" is prepended', function() {
-			if (testUtils.go('#test:extractDeeplinkPath')) {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
 				assert.strictEqual(
 					'abc/def/',
-					utils.extractDeeplinkPath('/abc/def/'),
+					utils.extractMobileDeeplinkPath('/abc/def/'),
 					'should extract deeplink path'
 				);
 			}
 		});
 
 		it('should return empty string if there is no deeplink path', function() {
-			if (testUtils.go('#test:extractDeeplinkPath')) {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
 				assert.strictEqual(
 					'',
-					utils.extractDeeplinkPath('AppName://'),
+					utils.extractMobileDeeplinkPath('AppName://'),
 					'should extract deeplink path as empty string'
 				);
 			}
