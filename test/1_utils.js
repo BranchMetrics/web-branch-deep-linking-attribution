@@ -384,4 +384,26 @@ describe('utils', function() {
 			}
 		});
 	});
+	describe('scrapeHostedDeepLinkData', function() {
+		it('should return an object', function() {
+			assert.strictEqual(
+				'object',
+				typeof utils.scrapeHostedDeepLinkData(),
+				'should return an object type'
+			);
+		});
+		it('should find applink and branch hosted data on page', function() {
+			var expected = {
+				productId: '1234',
+				productName: 'shoes',
+				$ios_deeplink_path: 'monster/view/ios',
+				$android_deeplink_path: 'monster/view/android'
+			};
+			assert.deepEqual(
+				expected,
+				utils.scrapeHostedDeepLinkData(),
+				'should return an object with data'
+			);
+		});
+	});
 });

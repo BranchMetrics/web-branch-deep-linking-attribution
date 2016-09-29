@@ -473,7 +473,6 @@ utils.scrapeOpenGraphContent = function(property, content) {
  */
 utils.scrapeHostedDeepLinkData = function() {
 	var params = {};
-
 	var metas = document.getElementsByTagName('meta');
 
 	for (var i = 0; i < metas.length; i++) {
@@ -481,22 +480,22 @@ utils.scrapeHostedDeepLinkData = function() {
 			continue;
 		}
 
-		if (metas[i].getAttribute('name')) {
-			var name = metas[i].getAttribute('name');
-			var split = name.split(':');
+		var name = metas[i].getAttribute('name');
+		var property = metas[i].getAttribute('property');
+		// name takes precendence over propery
+		var nameOrProperty = name || property;
+
+		if (nameOrProperty === 'al:ios:url') {
+			params['$ios_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+		else if (nameOrProperty === 'al:android:url') {
+			params['$android_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+		else {
+			var split = nameOrProperty.split(':');
 
 			if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
 				params[split[2]] = metas[i].getAttribute('content');
-			}
-		}
-		else if (metas[i].getAttribute('property')) {
-			var property = metas[i].getAttribute('property');
-
-			if (property === 'al:ios:url') {
-				params['$ios_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
-			}
-			else if (property === 'al:android:url') {
-				params['$android_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
 			}
 		}
 	}
