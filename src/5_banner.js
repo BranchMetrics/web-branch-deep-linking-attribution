@@ -211,7 +211,7 @@ banner = function(branch, options, linkData, storage) {
 		closeButton.onclick = function(ev) {
 			ev.preventDefault();
 			branch._publishEvent('willCloseBanner');
-			closeBanner(function() {
+			closeBanner({}, function() {
 				branch._publishEvent('didCloseBanner');
 			});
 		};
