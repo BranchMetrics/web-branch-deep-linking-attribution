@@ -57,7 +57,7 @@ var retrieveValue = function(value) {
 var webStorage = function(perm) {
 	var storageMethod;
 	try {
-		storageMethod = perm ? localStorage : sessionStorage;
+		storageMethod = perm && localStorage ? localStorage : sessionStorage;
 	}
 	catch (err) {
 		return {
@@ -85,13 +85,13 @@ var webStorage = function(perm) {
 		},
 		get: function(key, perm_override) {
 			return retrieveValue(
-				perm_override ?
+				perm_override && localStorage ?
 					localStorage.getItem(prefix(key)) :
 					storageMethod.getItem(prefix(key))
 			);
 		},
 		set: function(key, value, perm_override) {
-			if (perm_override) {
+			if (perm_override && localStorage) {
 				localStorage.setItem(prefix(key), value);
 			}
 			else {
@@ -99,7 +99,7 @@ var webStorage = function(perm) {
 			}
 		},
 		remove: function(key, perm_override) {
-			if (perm_override) {
+			if (perm_override && localStorage) {
 				localStorage.removeItem(prefix(key));
 			}
 			else {
