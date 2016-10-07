@@ -148,12 +148,12 @@ describe('Integration tests', function() {
 			}, {});
 
 			var expectedObj = {
-				app_id: "79336952217731267",
-				browser_fingerprint_id: "79336952217731267",
-				identity_id: "98807509250212101",
+				app_id: browser_fingerprint_id,
+				browser_fingerprint_id: browser_fingerprint_id,
+				identity_id: identity_id,
 				is_referrable: "1",
 				options: "%7B%7D",
-				sdk: "web2.9.0"
+				sdk: 'web' + config.version
 			};
 
 			if (requestObj.initial_referrer) {
