@@ -46,7 +46,7 @@ function renderHtmlBlob(parent, html, hasApp) {
  * @param {Object} storage
  * @param {Boolean} hasApp
  */
-branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp) {
+branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag) {
 	var banner = null;
 	var cta = null;
 
@@ -77,7 +77,9 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 			var failed = false;
 			if (!error && html) {
 
-				var hideBanner = journeys_utils.findDismissPeriod(html);
+				var hideBanner = !testFlag
+					? journeys_utils.findDismissPeriod(html)
+					: 0;
 
 				var timeoutTrigger = window.setTimeout(
 					function() {

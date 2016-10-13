@@ -382,7 +382,6 @@ Branch.prototype['init'] = wrap(
 
 				return done(err, data && utils.whiteListSessionData(data));
 			}
-
 			self._api(resources.event, {
 				"event": 'pageview',
 				"metadata": {
@@ -396,19 +395,21 @@ Branch.prototype['init'] = wrap(
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
 					var branchViewData = null;
-					if (branchViewId) {
+					var testFlag = null;
+					if (branchViewId && utils.mobileUserAgent()) {
 						branchViewData = {
 							id: branchViewId,
 							number_of_use: -1,
-							url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id')
+							url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data.browser_fingerprint_id)
 						};
+						testFlag = true;
 					}
 					else if (eventData.hasOwnProperty('branch_view_data')) {
 						branchViewData = eventData['branch_view_data'];
 					}
 					if (branchViewData) {
 						var hideBanner = self._storage.get('hideBanner' + branchViewData["id"], true);
-						if (hideBanner) {
+						if (hideBanner && !testFlag) {
 							if (hideBanner === true || hideBanner > Date.now()) {
 								return;
 							}
@@ -424,8 +425,7 @@ Branch.prototype['init'] = wrap(
 							}
 
 							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
-
-							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app']);
+							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag);
 						});
 					}
 				}
@@ -507,22 +507,7 @@ Branch.prototype['init'] = wrap(
 						if (!err && typeof data === 'object') {
 							self._branchViewEnabled = !!data['branch_view_enabled'];
 							self._storage.set('branch_view_enabled', self._branchViewEnabled);
-							var branchViewData = null;
-							if (branchViewId) {
-								branchViewData = {
-									id: branchViewId,
-									number_of_use: -1,
-									url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id')
-								};
-							}
-							else if (data.hasOwnProperty('branch_view_data')) {
-								branchViewData = data['branch_view_data'];
-							}
-							if (branchViewData) {
-								self['renderQueue'](function() {
-									branch_view.handleBranchViewData(self._server, branchViewData, self._branchViewData, self._storage, data['has_app']);
-								});
-							}
+
 							if (link_identifier) {
 								data['click_id'] = link_identifier;
 							}
