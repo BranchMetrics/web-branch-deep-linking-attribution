@@ -464,6 +464,9 @@ Branch.prototype['init'] = wrap(
 				document.addEventListener(changeEvent, function() {
 					if (!document[hidden]) {
 						checkHasApp(null, null);
+						if (typeof self._deepviewRequestForReplay === 'function') {
+							self._deepviewRequestForReplay();
+						}
 					}
 				}, false);
 			}
@@ -1144,20 +1147,24 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	cleanedData['banner_options'] = options;
 
-	this._api(resources.deepview, cleanedData, function(err, data) {
-		if (err) {
-			self._deepviewCta = function() {
-				self._windowRedirect(fallbackUrl);
-			};
-			return done(err);
-		}
+	self._deepviewRequestForReplay = goog.bind(this._api, self,
+		resources.deepview, cleanedData,
+		function (err, data) {
+			if (err) {
+				self._deepviewCta = function() {
+					self._windowRedirect(fallbackUrl);
+				};
+				return done(err);
+			}
 
-		if (typeof data === 'function') {
-			self._deepviewCta = data;
-		}
+			if (typeof data === 'function') {
+				self._deepviewCta = data;
+			}
 
-		done(null);
-	});
+			done(null);
+		});
+
+	self._deepviewRequestForReplay();
 });
 
 Branch.prototype._windowRedirect = function(url) {
