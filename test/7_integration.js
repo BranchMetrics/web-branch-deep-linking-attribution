@@ -139,13 +139,30 @@ describe('Integration tests', function() {
 
 		if (assert) {
 			assert.strictEqual(requests.length, 3, 'Exactly three requests were made');
-			assert.strictEqual(
-				requests[1].requestBody,
-				'browser_fingerprint_id=' + browser_fingerprint_id +
-					'&identity_id=' + identity_id +
-					'&is_referrable=1&sdk=web' + config.version +
-					'&app_id=' + browser_fingerprint_id +
-					'&options=%7B%7D',
+
+			var params = requests[1].requestBody.split('&');
+			var requestObj = params.reduce(function(a, b) {
+				var pair = b.split('=');
+				a[pair[0]] = pair[1];
+				return a;
+			}, {});
+
+			var expectedObj = {
+				app_id: browser_fingerprint_id,
+				browser_fingerprint_id: browser_fingerprint_id,
+				identity_id: identity_id,
+				is_referrable: "1",
+				options: "%7B%7D",
+				sdk: 'web' + config.version
+			};
+
+			if (requestObj.initial_referrer) {
+				expectedObj.initial_referrer = requestObj.initial_referrer;
+			}
+
+			assert.deepEqual(
+				requestObj,
+				expectedObj,
 				'The second request has the right .requestBody'
 			);
 		}

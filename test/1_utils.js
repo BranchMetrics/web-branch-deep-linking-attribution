@@ -30,6 +30,28 @@ describe('utils', function() {
 			};
 			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
 		});
+		it('should handle an non-object for first argument', function() {
+			var obj1 = null;
+			var obj2 = {
+				"simple": "object",
+				"nested": {
+					"object": "here"
+				}
+			};
+			var expectedMerged = {
+				"simple": "object",
+				"nested": {
+					"object": "here"
+				}
+			};
+			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
+		});
+		it('should handle an non-object for second argument', function() {
+			var obj1 = { "simple": "object" };
+			var obj2 = null;
+			var expectedMerged = { "simple": "object" };
+			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
+		});
 	});
 
 	describe('whiteListSessionData', function() {
@@ -319,6 +341,69 @@ describe('utils', function() {
 					'should extract deeplink path as empty string'
 				);
 			}
+		});
+	});
+	describe('extractMobileDeeplinkPath', function() {
+		it('should return deeplink path mobile scheme url', function() {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
+				assert.strictEqual(
+					'abc/def/',
+					utils.extractMobileDeeplinkPath('AppName://abc/def/'),
+					'should extract deeplink path'
+				);
+			}
+		});
+
+		it('should return deeplink path if no protocol is given', function() {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
+				assert.strictEqual(
+					'abc/def/',
+					utils.extractMobileDeeplinkPath('abc/def/'),
+					'should extract deeplink path'
+				);
+			}
+		});
+
+		it('should return a deeplink path if "/" is prepended', function() {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
+				assert.strictEqual(
+					'abc/def/',
+					utils.extractMobileDeeplinkPath('/abc/def/'),
+					'should extract deeplink path'
+				);
+			}
+		});
+
+		it('should return empty string if there is no deeplink path', function() {
+			if (testUtils.go('#test:extractMobileDeeplinkPath')) {
+				assert.strictEqual(
+					'',
+					utils.extractMobileDeeplinkPath('AppName://'),
+					'should extract deeplink path as empty string'
+				);
+			}
+		});
+	});
+	describe('scrapeHostedDeepLinkData', function() {
+		it('should return an object', function() {
+			assert.strictEqual(
+				'object',
+				typeof utils.scrapeHostedDeepLinkData(),
+				'should return an object type'
+			);
+		});
+		it('should find applink and branch hosted data on page', function() {
+			var expected = {
+				productId: '1234',
+				productName: 'shoes',
+				$ios_deeplink_path: 'monster/view/ios',
+				$android_deeplink_path: 'monster/view/android'
+			};
+			assert.deepEqual(
+				expected,
+				utils.scrapeHostedDeepLinkData(),
+				'should return an object with data'
+			);
 		});
 	});
 });

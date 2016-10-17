@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.10.0] - 2016-09-29
+- Include applinks in scraper
+- Minor bug fixes
+
 ## [v2.9.0] - 2016-09-22
 - Add hosted data scraper
 - Allow callbacks for all public methods

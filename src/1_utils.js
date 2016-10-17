@@ -217,7 +217,10 @@ utils.processReferringLink = function(link) {
  * @param {Object} from
  */
 utils.merge = function(to, from) {
-	if (typeof from === 'undefined') {
+	if (!to || typeof to !== 'object') {
+		to = {};
+	}
+	if (!from || typeof from !== 'object') {
 		return to;
 	}
 
@@ -421,6 +424,31 @@ utils.extractDeeplinkPath = function(url) {
 };
 
 /**
+ * Extract the path (the part of the url excluding protocol and domain name) from urls in the forms
+ * of:
+ * - "AppName://some/path
+ * - some/path
+ * - /some/path
+ *
+ * and returns (for the above sample input cases):
+ * - "some/path"
+ *
+ * @param {string} url
+ */
+utils.extractMobileDeeplinkPath = function(url) {
+	if (!url) {
+		return null;
+	}
+	if (url.indexOf('://') > -1) {
+		url = url.split('://')[1];
+	}
+	else if (url.charAt(0) === '/') {
+		url = url.slice(1);
+	}
+	return url;
+};
+
+/**
  * Search for a particular og tag by name, and return the content, if it exists. The optional
  * parameter 'content' will be the default value used if the og tag is not found or cannot
  * be parsed.
@@ -441,26 +469,36 @@ utils.scrapeOpenGraphContent = function(property, content) {
 
 /**
  * Search for hosted deep link data on the page, as outlined here https://dev.branch.io/getting-started/hosted-deep-link-data/guide/#adding-metatags-to-your-site
+ * Also searches for applink tags, i.e. <meta property="al:ios:url" content="applinks://docs" />
  */
 utils.scrapeHostedDeepLinkData = function() {
 	var params = {};
-
 	var metas = document.getElementsByTagName('meta');
 
 	for (var i = 0; i < metas.length; i++) {
-		if (!metas[i].getAttribute('name') || !metas[i].getAttribute('content')) {
+		if (!metas[i].getAttribute('name') && !metas[i].getAttribute('property') || !metas[i].getAttribute('content')) {
 			continue;
 		}
 
 		var name = metas[i].getAttribute('name');
-		var split = name.split(":");
+		var property = metas[i].getAttribute('property');
+		// name takes precendence over propery
+		var nameOrProperty = name || property;
 
-		if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
-			params[split[2]] = metas[i].getAttribute('content');
+		if (nameOrProperty === 'al:ios:url') {
+			params['$ios_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+		else if (nameOrProperty === 'al:android:url') {
+			params['$android_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+		else {
+			var split = nameOrProperty.split(':');
+
+			if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
+				params[split[2]] = metas[i].getAttribute('content');
+			}
 		}
 	}
 
 	return params;
 };
-
-
