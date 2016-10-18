@@ -768,7 +768,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
 				self['renderQueue'](function() {
-					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app']);
+					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false);
 				});
 			}
 		}
@@ -1134,7 +1134,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	self._deepviewRequestForReplay = goog.bind(this._api, self,
 		resources.deepview, cleanedData,
-		function (err, data) {
+		function(err, data) {
 			if (err) {
 				self._deepviewCta = function() {
 					self._windowRedirect(fallbackUrl);
