@@ -1752,7 +1752,7 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * @param {string} androidPackageName - _optional_ - Android App's package name
  * @param {string} androidURL - _optional_ - A custom scheme for your Android App such as: 'example/home/cupertino/12345' where 'example' is the App's URI scheme and 'home/cupertino/12345' routes to unique content the App
  * @param {string} iosAppStoreId - _optional_ - iTunes App Store ID for your iOS App 
- * @param {string} iosUrl - _optional_ - A custom scheme for your iOS App such as: 'example/home/cupertino/12345'
+ * @param {string} iosURL - _optional_ - A custom scheme for your iOS App such as: 'example/home/cupertino/12345'
  * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
  *
  * This function generates and inserts Firebase App Indexing tags between the <head></head> section of your webpage. 
@@ -1761,7 +1761,7 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * Resultant Firebase App Indexing tags will have the following format:
  *
  * <link rel="alternate" href="androidapp://{androidPackageName}/{androidURL}?{branch_tracking_params}"/>
- * <link rel="alternate" href="ios-app://{iosAppStoreId}/{iosUrl}?{branch_tracking_params}"/>
+ * <link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params}"/>
  *
  * Note: If optional parameters above are not specified then Branch will try to build App Indexing tags using your webpage's App Links tags.
  * Also, if optional parameters are specified but App Indexing tags are already present on the webpage then, Branch will ignore what is passed into .autoAppIndex() 
@@ -1780,7 +1780,7 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * ```js
  * branch.autoAppIndex({ 
  *     iosAppId:'123456789',
- *     iosUrl:'example/home/cupertino/12345',
+ *     iosURL:'example/home/cupertino/12345',
  *     androidPackageName:'com.somecompany.app',
  *     androidURL:'example/home/cupertino/12345'
  * }, function(err) { console.log(err); });

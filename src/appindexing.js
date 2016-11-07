@@ -36,7 +36,7 @@ appindexing.checkOptions = function(options) {
 		appindexing.state['androidDetailsComplete'] = true;
 		appindexing.addAppIndexingTag('android', options);
 	}
-	if (options.hasOwnProperty('iosAppId') && options.hasOwnProperty('iosUrl') && typeof options['iosAppId']!==undefined && typeof options['iosUrl']!==undefined){
+	if (options.hasOwnProperty('iosAppId') && options.hasOwnProperty('iosURL') && typeof options['iosAppId']!==undefined && typeof options['iosURL']!==undefined){
 		appindexing.state['iOSDetailsComplete'] = true;
 		appindexing.addAppIndexingTag('iOS', options);
 	}
@@ -50,7 +50,7 @@ appindexing.checkAppLinks = function(type, options) {
 			options['iosAppId'] = metaTags[counter].getAttribute('content');
 		}
 		if (type=='iOS' && metaTags[counter].getAttribute('property') === 'al:ios:url') {
-			options['iosUrl'] = metaTags[counter].getAttribute('content').replace('://','/');
+			options['iosURL'] = metaTags[counter].getAttribute('content').replace('://','/');
 		}
 		if (type=='android' && metaTags[counter].getAttribute('property') === 'al:android:package') {
 			options['androidPackageName'] = metaTags[counter].getAttribute('content');
@@ -78,7 +78,7 @@ appindexing.addAppIndexingTag = function(type, options) {
 		appindexing.state['addedAndroidTagDom'] = true;
 	} 
 	if (type == 'iOS' && appindexing.state['iOSDetailsComplete'] === true && appindexing.state['addediOSTagDom'] === false) {
-		href = 'ios-app://' + options['iosAppId'] + '/' + options['iosUrl'];
+		href = 'ios-app://' + options['iosAppId'] + '/' + options['iosURL'];
 		href = appindexing.addBranchTrackingParams(href);
 		appindexing.writeToDOM(href);
 		appindexing.state['addediOSTagDom'] = true;
