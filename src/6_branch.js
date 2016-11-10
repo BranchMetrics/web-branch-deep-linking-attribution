@@ -1771,10 +1771,9 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * <link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params}"/>
  *
  * Note: If optional parameters above are not specified, Branch will try to build Firebase App Indexing tags using your page's App Links tags.
- * Also, if optional parameters are specified but Firebase App Indexing tags already exist on your webpage then, Branch will ignore parameters above 
- * and append Branch tracking params to the end of existing tags.
+ * Also, if optional parameters are specified but Firebase App Indexing tags already exist then, Branch will ignore them and append Branch tracking params to the end of the existing tags.
  *
- * Analytics related to Google's attempts to index your App via this method can be found from Source Analytics in Dashboard where 'channel' is 'Firebase App Indexing' and 'feature' is 'Auto App Indexing' 
+ * Analytics related to Google's attempts to index your App via this method can be found from Source Analytics in Dashboard where 'channel' equals 'Firebase App Indexing' and 'feature' equals 'Auto App Indexing'.
  *
  * ##### Usage
  * ```js
