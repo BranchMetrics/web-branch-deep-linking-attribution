@@ -12,8 +12,9 @@ goog.addDependency("../../../../../src/3_banner_utils.js", ['banner_utils'], ['s
 goog.addDependency("../../../../../src/4_banner_css.js", ['banner_css'], ['banner_utils', 'utils']);
 goog.addDependency("../../../../../src/4_banner_html.js", ['banner_html'], ['banner_utils', 'utils', 'session', 'storage']);
 goog.addDependency("../../../../../src/5_banner.js", ['banner'], ['utils', 'banner_utils', 'banner_css', 'banner_html']);
-goog.addDependency("../../../../../src/6_branch.js", ['Branch'], ['goog.json', 'utils', 'resources', 'Server', 'banner', 'task_queue', 'storage', 'session', 'config', 'safejson', 'branch_view']);
+goog.addDependency("../../../../../src/6_branch.js", ['Branch'], ['goog.json', 'utils', 'resources', 'Server', 'banner', 'task_queue', 'storage', 'session', 'config', 'safejson', 'branch_view', 'appindexing']);
 goog.addDependency("../../../../../src/7_initialization.js", ['branch_instance'], ['Branch', 'config']);
+goog.addDependency("../../../../../src/appindexing.js", ['appindexing'], ['goog.json', 'utils']);
 goog.addDependency("../../../../../src/branch_view.js", ['branch_view'], ['utils', 'banner_css', 'safejson', 'journeys_utils']);
 goog.addDependency("../../../../../src/extern.js", [], []);
 goog.addDependency("../../../../../src/journeys_utils.js", ['journeys_utils'], ['banner_utils', 'safejson']);

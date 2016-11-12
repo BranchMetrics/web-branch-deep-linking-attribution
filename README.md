@@ -102,6 +102,9 @@ ___
   + [.setBranchViewData()](#setBranchViewData)
   + [.banner()](#banneroptions-data)
 
+7. Firebase App Indexing
+  + [.autoAppIndex()](#autoAppIndex-callback)
+
 ___
 # Global
 
@@ -917,6 +920,56 @@ closing the banner is very simple by calling `Branch.closeBanner()`.
 ```js
 branch.closeBanner();
 ```
+
+
+
+### autoAppIndex(data, callback) 
+
+**Parameters**
+
+**data**: `Object`, _optional_ - Information on how to build your App Indexing tags for your webpage
+
+**callback**: `function`, _optional_ - Returns an error string if unsuccessful
+
+This function generates and inserts Firebase App Indexing tags between the <head></head> section of your webpage. 
+Once inserted, these tags will help Google index and surface content from your App in Google Search.
+
+Listed below are optional parameters which can be used to build your page's App Indexing Tags:
+
+| Key | Value
+| --- | ---
+| "androidPackageName" | Android App's package name
+| "androidURL" | A custom scheme for your Android App such as: 'example/home/cupertino/12345' where 'example' is the App's URI scheme and 'home/cupertino/12345' routes to unique content the App
+| "iosAppStoreId" | iTunes App Store ID for your iOS App 
+| "iosURL" | A custom scheme for your iOS App such as: 'example/home/cupertino/12345'
+
+Resultant Firebase App Indexing tags will have the following format:
+
+<link rel="alternate" href="androidapp://{androidPackageName}/{androidURL}?{branch_tracking_params}"/>
+<link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params}"/>
+
+Note: If optional parameters above are not specified, Branch will try to build Firebase App Indexing tags using your page's App Links tags.
+Also, if optional parameters are specified but Firebase App Indexing tags already exist then, Branch will ignore them and append Branch tracking params to the end of the existing tags.
+
+Analytics related to Google's attempts to index your App via this method can be found from Source Analytics in Dashboard where 'channel' equals 'Firebase App Indexing' and 'feature' equals 'Auto App Indexing'.
+
+##### Usage
+```js
+branch.autoAppIndex(
+    data,
+    callback (err)
+);
+```
+##### Example
+```js 
+branch.autoAppIndex({ 
+    iosAppId:'123456789',
+    iosURL:'example/home/cupertino/12345',
+    androidPackageName:'com.somecompany.app',
+    androidURL:'example/home/cupertino/12345'
+}, function(err) { console.log(err); });
+```
+___
 
 
 

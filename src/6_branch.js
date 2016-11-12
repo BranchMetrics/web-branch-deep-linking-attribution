@@ -1753,7 +1753,7 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * @param {Object} data - _optional_ - Information on how to build your App Indexing tags for your webpage
  * @param {function(?Error)=} callback - _optional_ - Returns an error string if unsuccessful
  *
- * This function generates and inserts Firebase App Indexing tags between the <head></head> section of your webpage. 
+ * This function generates and inserts Firebase App Indexing tags between the <head></head> section of your webpage.
  * Once inserted, these tags will help Google index and surface content from your App in Google Search.
  *
  * Listed below are optional parameters which can be used to build your page's App Indexing Tags:
@@ -1762,9 +1762,9 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * | --- | ---
  * | "androidPackageName" | Android App's package name
  * | "androidURL" | A custom scheme for your Android App such as: 'example/home/cupertino/12345' where 'example' is the App's URI scheme and 'home/cupertino/12345' routes to unique content the App
- * | "iosAppStoreId" | iTunes App Store ID for your iOS App 
+ * | "iosAppStoreId" | iTunes App Store ID for your iOS App
  * | "iosURL" | A custom scheme for your iOS App such as: 'example/home/cupertino/12345'
- * 
+ *
  * Resultant Firebase App Indexing tags will have the following format:
  *
  * <link rel="alternate" href="androidapp://{androidPackageName}/{androidURL}?{branch_tracking_params}"/>
@@ -1783,13 +1783,14 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * );
  * ```
  * ##### Example
- * ```js 
- * branch.autoAppIndex({ 
+ * ```js
+ * branch.autoAppIndex({
  *     iosAppId:'123456789',
  *     iosURL:'example/home/cupertino/12345',
  *     androidPackageName:'com.somecompany.app',
  *     androidURL:'example/home/cupertino/12345'
  * }, function(err) { console.log(err); });
+ * ```
  * ___
  */
 /*** +TOC_HEADING &Firebase App Indexing& ^ALL ***/
@@ -1799,12 +1800,12 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
 	options = options || {};
 	appindexing.updateAppIndexingTagsIfPresent();
 
-	if (!appindexing.state['iOSAppIndexingTagsPresent'] || 
+	if (!appindexing.state['iOSAppIndexingTagsPresent'] ||
 		!appindexing.state['androidAppIndexingTagsPresent']) {
 
 		appindexing.insertAppIndexingTagsFromConfig(options);
 
-		if (!appindexing.state['androidDetailsComplete']) { 
+		if (!appindexing.state['androidDetailsComplete']) {
 			appindexing.populateConfigFromAppLinksTags('android', options);
 		}
 		if (!appindexing.state['iOSDetailsComplete']) {
