@@ -1545,7 +1545,7 @@ Branch.prototype['removeListener'] = function(listener) {
 function _setBranchViewData(context, done, data) {
 	data = data || {};
 	try {
-		context._branchViewData = JSON.parse(JSON.stringify(data));
+		context._branchViewData = safejson.parse(safejson.stringify(data));
 	}
 	finally {
 		context._branchViewData = context._branchViewData || {};

@@ -152,11 +152,11 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	if (resource.endpoint === '/v1/event') {
-		d['metadata'] = JSON.stringify(d['metadata'] || {});
+		d['metadata'] = safejson.stringify(d['metadata'] || {});
 	}
 
 	if (resource.endpoint === '/v1/open') {
-		d['options'] = JSON.stringify(d['options'] || {});
+		d['options'] = safejson.stringify(d['options'] || {});
 	}
 
 	return {
