@@ -11,7 +11,7 @@ goog.require('goog.json');
 safejson.parse = function(sJSON) {
 	sJSON = String(sJSON);
 	try {
-		return (typeof JSON === 'object' && typeof JSON.parse === 'function') ? JSON.parse(sJSON) : goog.json.parse(sJSON);
+		return JSON.parse(sJSON);
 	}
 	catch (e) {
 
