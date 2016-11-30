@@ -710,12 +710,12 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.11.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.12.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
   try {
-    return "object" === typeof JSON && "function" === typeof JSON.parse ? JSON.parse(a) : goog.json.parse(a);
+    return JSON.parse(a);
   } catch (b) {
   }
   throw Error("Invalid JSON string: " + a);
@@ -1156,8 +1156,8 @@ Server.prototype.getUrl = function(a, b) {
       return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (h.metadata = JSON.stringify(h.metadata || {}));
-  "/v1/open" === a.endpoint && (h.options = JSON.stringify(h.options || {}));
+  "/v1/event" === a.endpoint && (h.metadata = safejson.stringify(h.metadata || {}));
+  "/v1/open" === a.endpoint && (h.options = safejson.stringify(h.options || {}));
   return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
 };
 Server.prototype.createScript = function(a, b, c) {
@@ -2031,7 +2031,7 @@ Branch.prototype.removeListener = function(a) {
 function _setBranchViewData(a, b, c) {
   c = c || {};
   try {
-    a._branchViewData = JSON.parse(JSON.stringify(c));
+    a._branchViewData = safejson.parse(safejson.stringify(c));
   } finally {
     a._branchViewData = a._branchViewData || {};
   }
