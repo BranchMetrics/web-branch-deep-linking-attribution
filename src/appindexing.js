@@ -1,17 +1,60 @@
 'use strict';
 goog.provide('appindexing');
 
-goog.require('goog.json');
+goog.require('safejson');
 goog.require('utils');
 
 
 appindexing.state = {};
 appindexing.state['androidAppIndexingTagsPresent'] = false;
-appindexing.state['iOSAppIndexingTagsPresent'] = false;
+appindexing.state['iosAppIndexingTagsPresent'] = false;
 appindexing.state['androidDetailsComplete'] = false;
-appindexing.state['iOSDetailsComplete'] = false;
-appindexing.state['addediOSTagDom'] = false;
-appindexing.state['addedAndroidTagDom'] = false;
+appindexing.state['iosDetailsComplete'] = false;
+
+appindexing.options = {};
+
+
+/** Builds the 'href' attribute of the 'link' element for insertion into the webpage **/
+function addAppIndexingTag(type) {
+	var href;
+	if (type === 'android' && appindexing.state['androidDetailsComplete']) {
+		href = 'android-app://' + appindexing.options['androidPackageName'] + '/' + appindexing.options['androidURL'];
+		href = 	addBranchTrackingParams(href);
+		writeToDOM(href);
+	} 
+	if (type === 'ios' && appindexing.state['iosDetailsComplete']) {
+		href = 'ios-app://' + appindexing.options['iosAppId'] + '/' + appindexing.options['iosURL'];
+		href = addBranchTrackingParams(href);
+		writeToDOM(href);
+	}
+};
+
+/** Updates the 'href' attribute of a 'link' element to include Branch Tracking params. */
+function addBranchTrackingParams(href) {
+
+	var branchTrackingParams = { "channel": "Firebase App Indexing", "feature": "Auto App Indexing", "$canonical_url": utils.getWindowLocation() }
+	if (typeof appindexing.options["data"] === "object"){
+		for (var key in appindexing.options["data"]) {
+			if (appindexing.options["data"].hasOwnProperty(key) && 
+				!branchTrackingParams.hasOwnProperty(key)) {
+
+				branchTrackingParams[key] = appindexing.options["data"][key];
+			}
+		}
+	}
+
+	var appendQueryStringUsing = (href.indexOf('?') > -1) ? '&' : '?';
+
+	return href + appendQueryStringUsing + 'link_click_id=a-' + btoa(safejson.stringify(branchTrackingParams));
+};
+
+/** Modifies the page's HTML to insert App Indexing tags between the <head></head> section of the webpage */
+function writeToDOM(href) {
+	var linkElement = document.createElement('link');
+	linkElement.setAttribute('rel', 'alternate');
+	linkElement.setAttribute('href', href);
+	document.head.appendChild(linkElement);
+};
 
 /** Scans through all 'link' tags then updates their 'href' values for those that contain 
  * "ios-app" or "android-app" to include Branch tracking parameters.
@@ -30,38 +73,37 @@ appindexing.updateAppIndexingTagsIfPresent = function() {
 
 		if (!currLinkTagHref) { continue; }
 
+
 		if (currLinkTagHref.includes('ios-app')) {
-			appindexing.state['iOSAppIndexingTagsPresent'] = true;
-			currLinkTag.setAttribute('href',  appindexing.addBranchTrackingParams(currLinkTagHref));
+			appindexing.state['iosAppIndexingTagsPresent'] = true;
+			currLinkTag.setAttribute('href',  addBranchTrackingParams(currLinkTagHref));
 		}
 		if (currLinkTagHref.includes('android-app')) {
 			appindexing.state['androidAppIndexingTagsPresent'] = true;
-			currLinkTag.setAttribute('href',  appindexing.addBranchTrackingParams(currLinkTagHref));
+			currLinkTag.setAttribute('href',  addBranchTrackingParams(currLinkTagHref));
 		}
 	}
 };
 
 /** Checks whether config contains appropriate per platform params. For Android, config needs to contain
-  * both androidPackageName and androidURL. For iOS both, iosAppId and iosURL. Once config is correctly set for
-  * iOS or Android, an App Indexing tag is built and inserted into the webpage.
+  * both androidPackageName and androidURL. For ios both, iosAppId and iosURL. Once config is correctly set for
+  * ios or Android, an App Indexing tag is built and inserted into the webpage.
   * (Stage 2)
   */
-appindexing.insertAppIndexingTagsFromConfig = function(options) {
-	if (options.hasOwnProperty('androidPackageName') &&
-		options.hasOwnProperty('androidURL') &&
-		typeof options['androidPackageName'] !== undefined &&
-		typeof options['androidURL'] !== undefined) {
+appindexing.insertAppIndexingTagsFromConfig = function(type) {
 
+	if (type === 'android' && 
+		typeof appindexing.options['androidPackageName'] === 'string' &&
+		typeof appindexing.options['androidURL'] === 'string' ) {
 		appindexing.state['androidDetailsComplete'] = true;
-		appindexing.addAppIndexingTag('android', options);
+		addAppIndexingTag('android');
 	}
-	if (options.hasOwnProperty('iosAppId') && 
-		options.hasOwnProperty('iosURL') && 
-		typeof options['iosAppId'] !== undefined && 
-		typeof options['iosURL'] !== undefined) {
-
-		appindexing.state['iOSDetailsComplete'] = true;
-		appindexing.addAppIndexingTag('iOS', options);
+	
+	if (type === 'ios' && 
+		typeof appindexing.options['iosAppId'] === 'string' &&
+		typeof appindexing.options['iosURL'] === 'string' ) {
+		appindexing.state['iosDetailsComplete'] = true;
+		addAppIndexingTag('ios');
 	}
 };
 
@@ -70,61 +112,25 @@ appindexing.insertAppIndexingTagsFromConfig = function(options) {
   * Once config is built it is validated and then if appropriate, App Indexing tags are built and inserted into the webpage.
   * (Stage 3)
  */
-appindexing.populateConfigFromAppLinksTags = function(type, options) {
+appindexing.populateConfigFromAppLinksTags = function(type) {
 	var metaTags = document.getElementsByTagName('meta');
 
 	for (var counter = 0; counter < metaTags.length; counter++) {
-		if (type=='iOS' && metaTags[counter].getAttribute('property') === 'al:ios:app_store_id') {
-			options['iosAppId'] = metaTags[counter].getAttribute('content');
+
+		var currMetaTag = metaTags[counter];
+
+		if (type === 'ios' && currMetaTag.getAttribute('property') === 'al:ios:app_store_id') {
+			appindexing.options['iosAppId'] = currMetaTag.getAttribute('content');
 		}
-		if (type=='iOS' && metaTags[counter].getAttribute('property') === 'al:ios:url') {
-			options['iosURL'] = metaTags[counter].getAttribute('content').replace('://','/');
+		if (type === 'ios' && currMetaTag.getAttribute('property') === 'al:ios:url') {
+			appindexing.options['iosURL'] = currMetaTag.getAttribute('content').replace('://','/');
 		}
-		if (type=='android' && metaTags[counter].getAttribute('property') === 'al:android:package') {
-			options['androidPackageName'] = metaTags[counter].getAttribute('content');
+		if (type === 'android' && currMetaTag.getAttribute('property') === 'al:android:package') {
+			appindexing.options['androidPackageName'] = currMetaTag.getAttribute('content');
 		}
-		if (type=='android' && metaTags[counter].getAttribute('property') === 'al:android:url') {
-			options['androidURL'] = metaTags[counter].getAttribute('content').replace('://','/');
+		if (type === 'android' && currMetaTag.getAttribute('property') === 'al:android:url') {
+			appindexing.options['androidURL'] = currMetaTag.getAttribute('content').replace('://','/');
 		}
 	}
-	appindexing.insertAppIndexingTagsFromConfig(options);
-};
-
-/** Updates the 'href' attribute of a 'link' element to include Branch Tracking params. */
-appindexing.addBranchTrackingParams = function(href) {
-	var branchTrackingParams = { "channel": "Firebase App Indexing", "feature": "Auto App Indexing", "$canonical_url": utils.getWindowLocation() }
-	var appendQueryStringUsing = (href.indexOf('?') > -1) ? '&' : '?';
-
-	return href + appendQueryStringUsing + 'link_click_id=a-' + btoa(safejson.stringify(branchTrackingParams));
-};
-
-/** Builds the 'href' attribute of the 'link' element for insertion into the webpage **/
-appindexing.addAppIndexingTag = function(type, options) {
-	var href;
-	if (type === 'android' && 
-		appindexing.state['androidDetailsComplete'] && 
-		!appindexing.state['addedAndroidTagDom']) {
-
-		href = 'android-app://' + options['androidPackageName'] + '/' + options['androidURL'];
-		href = 	appindexing.addBranchTrackingParams(href);
-		appindexing.writeToDOM(href);
-		appindexing.state['addedAndroidTagDom'] = true;
-	} 
-	if (type == 'iOS' && 
-		appindexing.state['iOSDetailsComplete'] && 
-		!appindexing.state['addediOSTagDom']) {
-
-		href = 'ios-app://' + options['iosAppId'] + '/' + options['iosURL'];
-		href = appindexing.addBranchTrackingParams(href);
-		appindexing.writeToDOM(href);
-		appindexing.state['addediOSTagDom'] = true;
-	}
-};
-
-/** Modifies the page's HTML to insert App Indexing tags between the <head></head> section of the webpage */
-appindexing.writeToDOM = function(href) {
-	var linkElement = document.createElement('link');
-	linkElement.setAttribute('rel', 'alternate');
-	linkElement.setAttribute('href', href);
-	document.head.appendChild(linkElement);
+	appindexing.insertAppIndexingTagsFromConfig(type);
 };

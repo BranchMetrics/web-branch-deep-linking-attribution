@@ -823,7 +823,7 @@ branch.closeBanner();
 
 **callback**: `function`, _optional_ - Returns an error string if unsuccessful
 
-This function generates and inserts Firebase App Indexing tags between the <head></head> section of your webpage. 
+This function generates and inserts Firebase App Indexing tags between the `<head></head>` section of your webpage.
 Once inserted, these tags will help Google index and surface content from your App in Google Search.
 
 Listed below are optional parameters which can be used to build your page's App Indexing Tags:
@@ -831,19 +831,20 @@ Listed below are optional parameters which can be used to build your page's App 
 | Key | Value
 | --- | ---
 | "androidPackageName" | Android App's package name
-| "androidURL" | A custom scheme for your Android App such as: 'example/home/cupertino/12345' where 'example' is the App's URI scheme and 'home/cupertino/12345' routes to unique content the App
-| "iosAppStoreId" | iTunes App Store ID for your iOS App 
-| "iosURL" | A custom scheme for your iOS App such as: 'example/home/cupertino/12345'
+| "androidURL" | A custom scheme for your Android App such as: `example/home/cupertino/12345` where `example` is the App's URI scheme and `home/cupertino/12345` routes to unique content the App
+| "iosAppStoreId" | iTunes App Store ID for your iOS App
+| "iosURL" | A custom scheme for your iOS App such as: `example/home/cupertino/12345`
+| "data" | Any additional deep link data that you would like to pass to your App.
 
 Resultant Firebase App Indexing tags will have the following format:
-
-<link rel="alternate" href="androidapp://{androidPackageName}/{androidURL}?{branch_tracking_params}"/>
-<link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params}"/>
-
+```
+<link rel="alternate" href="android-app://{androidPackageName}/{androidURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
+<link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
+```
 Note: If optional parameters above are not specified, Branch will try to build Firebase App Indexing tags using your page's App Links tags.
-Also, if optional parameters are specified but Firebase App Indexing tags already exist then, Branch will ignore them and append Branch tracking params to the end of the existing tags.
+Alternatively, if optional parameters are specified but Firebase App Indexing tags already exist on your webpage then Branch will append Branch tracking params to the end of these tags and ignore what is passed into `Branch.autoAppIndex()`.
 
-Analytics related to Google's attempts to index your App via this method can be found from Source Analytics in Dashboard where 'channel' equals 'Firebase App Indexing' and 'feature' equals 'Auto App Indexing'.
+Analytics related to Google's attempts to index your App's content via this method can be found from Source Analytics in Dashboard where `channel` is `Firebase App Indexing` and `feature` is `Auto App Indexing`.
 
 ##### Usage
 ```js
@@ -853,14 +854,14 @@ branch.autoAppIndex(
 );
 ```
 ##### Example
-```js 
-branch.autoAppIndex({ 
+```js
+branch.autoAppIndex({
     iosAppId:'123456789',
     iosURL:'example/home/cupertino/12345',
     androidPackageName:'com.somecompany.app',
-    androidURL:'example/home/cupertino/12345'
+    androidURL:'example/home/cupertino/12345',
+    data:{"walkScore":62, "transitScore":62}
 }, function(err) { console.log(err); });
-```
 ___
 
 
