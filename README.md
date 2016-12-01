@@ -103,7 +103,7 @@ ___
   + [.banner()](#banneroptions-data)
 
 7. Firebase App Indexing
-  + [.autoAppIndex()](#autoAppIndex-callback)
+  + [.autoAppIndex()](#autoappindex)
 
 ___
 # Global
@@ -968,8 +968,9 @@ branch.autoAppIndex({
     iosURL:'example/home/cupertino/12345',
     androidPackageName:'com.somecompany.app',
     androidURL:'example/home/cupertino/12345',
-    data:{"walkScore":62, "transitScore":62}
+    data:{"walkScore":65, "transitScore":50}
 }, function(err) { console.log(err); });
+```
 ___
 
 

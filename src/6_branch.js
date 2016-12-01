@@ -1790,12 +1790,13 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  *     iosURL:'example/home/cupertino/12345',
  *     androidPackageName:'com.somecompany.app',
  *     androidURL:'example/home/cupertino/12345',
- *     data:{"walkScore":62, "transitScore":62}
+ *     data:{"walkScore":65, "transitScore":50}
  * }, function(err) { console.log(err); });
+ * ```
  * ___
  */
 /*** +TOC_HEADING &Firebase App Indexing& ^ALL ***/
-/*** +TOC_ITEM #autoAppIndex-callback &.autoAppIndex()& ^ALL ***/
+/*** +TOC_ITEM #autoappindex &.autoAppIndex()& ^ALL ***/
 Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(done, options) {
 	var self = this;
 	options = options || {};

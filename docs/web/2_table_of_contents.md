@@ -28,6 +28,6 @@
   + [.banner()](#banneroptions-data)
 
 7. Firebase App Indexing
-  + [.autoAppIndex()](#autoAppIndex-callback)
+  + [.autoAppIndex()](#autoappindex)
 
 ___
