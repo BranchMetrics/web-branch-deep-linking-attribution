@@ -831,10 +831,10 @@ Listed below are optional parameters which can be used to build your page's App 
 | Key | Value
 | --- | ---
 | "androidPackageName" | Android App's package name
-| "androidURL" | A custom scheme for your Android App such as: `example/home/cupertino/12345` where `example` is the App's URI scheme and `home/cupertino/12345` routes to unique content the App
+| "androidURL" | A custom scheme for your Android App such as: `example/home/cupertino/12345` where `example` is the App's URI scheme and `home/cupertino/12345` routes to unique content in the App
 | "iosAppStoreId" | iTunes App Store ID for your iOS App
 | "iosURL" | A custom scheme for your iOS App such as: `example/home/cupertino/12345`
-| "data" | Any additional deep link data that you would like to pass to your App.
+| "data" | Any additional deep link data that you would like to pass to your App
 
 Resultant Firebase App Indexing tags will have the following format:
 ```
@@ -842,7 +842,7 @@ Resultant Firebase App Indexing tags will have the following format:
 <link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
 ```
 Note: If optional parameters above are not specified, Branch will try to build Firebase App Indexing tags using your page's App Links tags.
-Alternatively, if optional parameters are specified but Firebase App Indexing tags already exist on your webpage then Branch will append Branch tracking params to the end of these tags and ignore what is passed into `Branch.autoAppIndex()`.
+Alternatively, if optional parameters are specified but Firebase App Indexing tags already exist on your webpage then Branch tracking params will be appended to the end of these tags and ignore what is passed into `Branch.autoAppIndex()`.
 
 Analytics related to Google's attempts to index your App's content via this method can be found from Source Analytics in Dashboard where `channel` is `Firebase App Indexing` and `feature` is `Auto App Indexing`.
 

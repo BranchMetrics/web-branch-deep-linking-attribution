@@ -33,12 +33,13 @@ function addAppIndexingTag(type) {
 function addBranchTrackingParams(href) {
 
 	var branchTrackingParams = { "channel": "Firebase App Indexing", "feature": "Auto App Indexing", "$canonical_url": utils.getWindowLocation() }
-	if (typeof appindexing.options["data"] === "object"){
-		for (var key in appindexing.options["data"]) {
-			if (appindexing.options["data"].hasOwnProperty(key) && 
+	
+	if (typeof appindexing.options['data'] === 'object') {
+		for (var key in appindexing.options['data']) {
+			if (appindexing.options['data'].hasOwnProperty(key) && 
 				!branchTrackingParams.hasOwnProperty(key)) {
 
-				branchTrackingParams[key] = appindexing.options["data"][key];
+				branchTrackingParams[key] = appindexing.options['data'][key];
 			}
 		}
 	}
