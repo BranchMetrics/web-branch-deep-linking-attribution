@@ -32,7 +32,7 @@ function addAppIndexingTag(type) {
 /** Updates the 'href' attribute of a 'link' element to include Branch Tracking params. */
 function addBranchTrackingParams(href) {
 
-	var branchTrackingParams = { "channel": "Firebase App Indexing", "feature": "Auto App Indexing", "$canonical_url": utils.getWindowLocation() }
+	var branchTrackingParams = { "~channel": "Firebase App Indexing", "~feature": "Auto App Indexing", "$canonical_url": utils.getWindowLocation() }
 	
 	if (typeof appindexing.options['data'] === 'object') {
 		for (var key in appindexing.options['data']) {
