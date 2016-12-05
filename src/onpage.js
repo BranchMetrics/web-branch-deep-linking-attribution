@@ -35,6 +35,7 @@
 	[
 		'addListener',
 		'applyCode',
+		'autoAppIndex',
 		'banner',
 		'closeBanner',
 		'creditHistory',
