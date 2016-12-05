@@ -3,8 +3,8 @@
  */
 'use strict';
 goog.provide('Branch');
-
 goog.require('goog.json'); // jshint unused:false
+
 goog.require('utils');
 goog.require('resources');
 goog.require('Server');
@@ -15,6 +15,7 @@ goog.require('session');
 goog.require('config');
 goog.require('safejson');
 goog.require('branch_view');
+goog.require('appindexing');
 
 /*globals Ti, BranchStorage, require */
 
@@ -1744,4 +1745,84 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
 		}
 	});
 	done();
+});
+
+/**
+ * @function Branch.autoAppIndex
+ *
+ * @param {Object} data - _optional_ - Information on how to build your App Indexing tags for your webpage
+ * @param {function(?Error)=} callback - _optional_ - Returns an error string if unsuccessful
+ *
+ * This function generates and inserts Firebase App Indexing tags between the `<head></head>` section of your webpage.
+ * Once inserted, these tags will help Google index and surface content from your App in Google Search.
+ *
+ * Listed below are optional parameters which can be used to build your page's App Indexing Tags:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | "androidPackageName" | Android App's package name
+ * | "androidURL" | A custom scheme for your Android App such as: `example/home/cupertino/12345` where `example` is the App's URI scheme and `home/cupertino/12345` routes to unique content in the App
+ * | "iosAppStoreId" | iTunes App Store ID for your iOS App
+ * | "iosURL" | A custom scheme for your iOS App such as: `example/home/cupertino/12345`
+ * | "data" | Any additional deep link data that you would like to pass to your App
+ *
+ * Resultant Firebase App Indexing tags will have the following format:
+ *```
+ * <link rel="alternate" href="android-app://{androidPackageName}/{androidURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
+ * <link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
+ *```
+ * Note: If optional parameters above are not specified, Branch will try to build Firebase App Indexing tags using your page's App Links tags.
+ * Alternatively, if optional parameters are specified but Firebase App Indexing tags already exist on your webpage then Branch tracking params will be appended to the end of these tags and ignore what is passed into `Branch.autoAppIndex()`.
+ *
+ * Analytics related to Google's attempts to index your App's content via this method can be found from Source Analytics in Dashboard where `channel` is `Firebase App Indexing` and `feature` is `Auto App Indexing`.
+ *
+ * ##### Usage
+ * ```js
+ * branch.autoAppIndex(
+ *     data,
+ *     callback (err)
+ * );
+ * ```
+ * ##### Example
+ * ```js
+ * branch.autoAppIndex({
+ *     iosAppId:'123456789',
+ *     iosURL:'example/home/cupertino/12345',
+ *     androidPackageName:'com.somecompany.app',
+ *     androidURL:'example/home/cupertino/12345',
+ *     data:{"walkScore":65, "transitScore":50}
+ * }, function(err) { console.log(err); });
+ * ```
+ * ___
+ */
+/*** +TOC_HEADING &Firebase App Indexing& ^ALL ***/
+/*** +TOC_ITEM #autoappindex &.autoAppIndex()& ^ALL ***/
+Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(done, options) {
+	var self = this;
+	options = options || {};
+
+	appindexing.updateAppIndexingTagsIfPresent();
+
+	appindexing.options = options;
+
+	if (!appindexing.state['androidAppIndexingTagsPresent']) {
+		appindexing.insertAppIndexingTagsFromConfig('android');
+		if (!appindexing.state['androidDetailsComplete']) {
+			appindexing.populateConfigFromAppLinksTags('android');
+		}
+	}
+
+	if (!appindexing.state['iosAppIndexingTagsPresent']) {
+		appindexing.insertAppIndexingTagsFromConfig('ios');
+		if (!appindexing.state['iosDetailsComplete']) {
+			appindexing.populateConfigFromAppLinksTags('ios');
+		}
+	}
+
+	if (!appindexing.state['iosDetailsComplete'] && !appindexing.state['androidDetailsComplete']) {
+		done('Firebase App Indexing tags were not added to your webpage. Please check your configuration.');
+	}
+	else {
+		done(null);
+	}
 });
