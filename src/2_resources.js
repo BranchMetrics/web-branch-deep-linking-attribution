@@ -253,7 +253,7 @@ resources.link = {
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY),
 		"type": validator(false, validationTypes.NUMBER),
-		"source": validator(true, validationTypes.STRING)
+		"source": validator(false, validationTypes.STRING)
 	})
 };
 
