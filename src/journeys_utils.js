@@ -9,6 +9,7 @@ journeys_utils.position = 'top';
 journeys_utils.sticky = 'absolute';
 journeys_utils.bannerHeight = '76px';
 journeys_utils.isFullPage = false;
+journeys_utils.isHalfPage = false;
 journeys_utils.divToInjectParent = document.body;
 
 // used to set height of full page interstitials
@@ -70,7 +71,12 @@ journeys_utils.setPositionAndHeight = function(html) {
 			? journeys_utils.bannerHeight.slice(0, -2)
 			: journeys_utils.bannerHeight.slice(0, -1);
 		journeys_utils.bannerHeight = (heightNumber/100) * journeys_utils.windowHeight + 'px';
-		journeys_utils.isFUllPage = true;
+		if (heightNumber < 100) {
+			journeys_utils.isHalfPage = true;
+		}
+		else {
+			journeys_utils.isFUllPage = true;
+		}
 	} 
 }
 
@@ -311,6 +317,15 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);
+
+	// if banner is partial height with relative units, we need to make sure
+	// it fills the entire height of the iframe
+	if (journeys_utils.isHalfPage) {
+		var content = doc.getElementsByClassName('branch-banner-content')[0];
+		if (content) {
+			content.style.height = '100vh';
+		}
+	}
 
 	if (journeys_utils.position === 'top') {
 		iframe.style.top = '-' + journeys_utils.bannerHeight;
