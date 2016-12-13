@@ -320,7 +320,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 
 	// if banner is partial height with relative units, we need to make sure
 	// it fills the entire height of the iframe
-	if (journeys_utils.isHalfPage) {
+	if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
 		var content = doc.getElementsByClassName('branch-banner-content')[0];
 		if (content) {
 			content.style.height = journeys_utils.bannerHeight;
