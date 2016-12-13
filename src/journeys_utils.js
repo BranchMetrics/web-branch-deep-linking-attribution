@@ -75,7 +75,7 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.isHalfPage = true;
 		}
 		else {
-			journeys_utils.isFUllPage = true;
+			journeys_utils.isFullPage = true;
 		}
 	} 
 }
@@ -266,7 +266,7 @@ journeys_utils.addIframeOuterCSS = function() {
 		var isFixedNavFullPage;
 		var computedParentStyle = window.getComputedStyle(journeys_utils.divToInjectParent);
 		if (computedParentStyle) {
-			isFixedNavFullPage = journeys_utils.isFUllPage && computedParentStyle.getPropertyValue('position') === 'fixed';
+			isFixedNavFullPage = journeys_utils.isFullPage && computedParentStyle.getPropertyValue('position') === 'fixed';
 		}
 		if (!isFixedNavFullPage) {
 			journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight
@@ -294,10 +294,10 @@ journeys_utils.addIframeOuterCSS = function() {
 			'; }\n' + 
 		'@media only screen and (orientation: landscape) { ' +
 			'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) + 
-				(journeys_utils.isFUllPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
+				(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
 				'; }\n' + 
 			'#branch-banner-iframe { height: ' +
-				(journeys_utils.isFUllPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
+				(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
 				'; }';
 	document.head.appendChild(iFrameCSS);
 }
