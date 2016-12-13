@@ -252,7 +252,8 @@ resources.link = {
 		"identity_id": validator(true, branch_id),
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY),
-		"type": validator(false, validationTypes.NUMBER)
+		"type": validator(false, validationTypes.NUMBER),
+		"source": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -272,7 +273,8 @@ resources.deepview = {
 		"append_deeplink_path": validator(false, validationTypes.BOOLEAN),
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY),
-		"deepview_type": validator(true, validationTypes.STRING)
+		"deepview_type": validator(true, validationTypes.STRING),
+		"source": validator(true, validationTypes.STRING)		
 	})
 };
 
