@@ -323,7 +323,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	if (journeys_utils.isHalfPage) {
 		var content = doc.getElementsByClassName('branch-banner-content')[0];
 		if (content) {
-			content.style.height = '100vh';
+			content.style.height = journeys_utils.bannerHeight;
 		}
 	}
 
