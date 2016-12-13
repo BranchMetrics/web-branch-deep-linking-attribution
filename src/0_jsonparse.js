@@ -1,12 +1,5 @@
-/**
- * The default goog.json.parse uses eval. We don't want that.
- */
 'use strict';
-
 goog.provide('safejson');
-
-/*jshint unused:false*/
-goog.require('goog.json');
 
 safejson.parse = function(sJSON) {
 	sJSON = String(sJSON);
@@ -22,7 +15,7 @@ safejson.parse = function(sJSON) {
 
 safejson.stringify = function(objJSON) {
 	try {
-		return (typeof JSON === 'object' && typeof JSON.stringify === 'function') ? JSON.stringify(objJSON) : goog.json.serialize(objJSON);
+		return JSON.stringify(objJSON);
 	}
 	catch (e) {
 

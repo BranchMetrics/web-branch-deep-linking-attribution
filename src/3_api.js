@@ -6,7 +6,6 @@
 
 goog.provide('Server');
 goog.require('utils');
-goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 goog.require('safejson');
 
@@ -205,7 +204,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 
 	var postPrefix = (requestURL.indexOf('branch.io') >= 0) ? '&data=' : '&post_data=';
 	var postData = (requestMethod === 'POST') ?
-		encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
+		encodeURIComponent(utils.base64encode(safejson.stringify(requestData))) :
 		'';
 
 	var timeoutTrigger = window.setTimeout(
@@ -276,7 +275,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 				}
 				else {
 					try {
-						data = safejson.parse(req.responseText);
+						data = JSON.parse(req.responseText);
 					}
 					catch (e) {
 						data = {};

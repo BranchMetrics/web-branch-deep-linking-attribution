@@ -2,7 +2,6 @@
 goog.provide('session');
 
 /*jshint unused:false*/
-goog.require('goog.json');
 goog.require('utils');
 goog.require('safejson');
 goog.require('storage');
@@ -28,9 +27,9 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
-	storage.set('branch_session', goog.json.serialize(data));
+	storage.set('branch_session', safejson.stringify(data));
 	if (first) {
-		storage.set('branch_session_first', goog.json.serialize(data), true);
+		storage.set('branch_session_first', safejson.stringify(data), true);
 	}
 };
 
@@ -44,5 +43,5 @@ session.update = function(storage, newData) {
 	}
 	var currentData = session.get(storage) || {};
 	var data = utils.merge(currentData, newData);
-	storage.set('branch_session', goog.json.serialize(data));
+	storage.set('branch_session', safejson.stringify(data));
 };
