@@ -9,6 +9,7 @@ journeys_utils.position = 'top';
 journeys_utils.sticky = 'absolute';
 journeys_utils.bannerHeight = '76px';
 journeys_utils.isFullPage = false;
+journeys_utils.isHalfPage = false;
 journeys_utils.divToInjectParent = document.body;
 
 // used to set height of full page interstitials
@@ -70,7 +71,12 @@ journeys_utils.setPositionAndHeight = function(html) {
 			? journeys_utils.bannerHeight.slice(0, -2)
 			: journeys_utils.bannerHeight.slice(0, -1);
 		journeys_utils.bannerHeight = (heightNumber/100) * journeys_utils.windowHeight + 'px';
-		journeys_utils.isFUllPage = true;
+		if (heightNumber < 100) {
+			journeys_utils.isHalfPage = true;
+		}
+		else {
+			journeys_utils.isFullPage = true;
+		}
 	} 
 }
 
@@ -260,7 +266,7 @@ journeys_utils.addIframeOuterCSS = function() {
 		var isFixedNavFullPage;
 		var computedParentStyle = window.getComputedStyle(journeys_utils.divToInjectParent);
 		if (computedParentStyle) {
-			isFixedNavFullPage = journeys_utils.isFUllPage && computedParentStyle.getPropertyValue('position') === 'fixed';
+			isFixedNavFullPage = journeys_utils.isFullPage && computedParentStyle.getPropertyValue('position') === 'fixed';
 		}
 		if (!isFixedNavFullPage) {
 			journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight
@@ -288,10 +294,10 @@ journeys_utils.addIframeOuterCSS = function() {
 			'; }\n' + 
 		'@media only screen and (orientation: landscape) { ' +
 			'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) + 
-				(journeys_utils.isFUllPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
+				(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
 				'; }\n' + 
 			'#branch-banner-iframe { height: ' +
-				(journeys_utils.isFUllPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
+				(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
 				'; }';
 	document.head.appendChild(iFrameCSS);
 }
@@ -311,6 +317,15 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);
+
+	// if banner is partial height with relative units, we need to make sure
+	// it fills the entire height of the iframe
+	if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
+		var content = doc.getElementsByClassName('branch-banner-content')[0];
+		if (content) {
+			content.style.height = journeys_utils.bannerHeight;
+		}
+	}
 
 	if (journeys_utils.position === 'top') {
 		iframe.style.top = '-' + journeys_utils.bannerHeight;
