@@ -274,7 +274,7 @@ resources.deepview = {
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY),
 		"deepview_type": validator(true, validationTypes.STRING),
-		"source": validator(true, validationTypes.STRING)		
+		"source": validator(true, validationTypes.STRING)
 	})
 };
 

@@ -3,7 +3,6 @@
  */
 'use strict';
 goog.provide('Branch');
-goog.require('goog.json'); // jshint unused:false
 
 goog.require('utils');
 goog.require('resources');
@@ -66,7 +65,7 @@ var wrap = function(parameters, func, init) {
 		var callback;
 		var lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== 'function') {
-			callback = function(err) {
+			callback = function() {
 				return;
 			};
 			args = Array.prototype.slice.call(arguments);
@@ -1098,7 +1097,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
 	var encodeLinkProperty = function(key, data) {
-		return encodeURIComponent(utils.base64encode(goog.json.serialize(data[key])));
+		return encodeURIComponent(utils.base64encode(safejson.stringify(data[key])));
 	};
 
 	for (var key in data) {
