@@ -70,7 +70,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		return renderHtmlBlob(document.body, branchViewData['html'], hasApp);
 	} else if (branchViewData['url']) {
 		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
-		var postData = encodeURIComponent(utils.base64encode(safejson.stringify(cleanedData)));
+		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
 		url += '&data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
