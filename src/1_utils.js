@@ -4,6 +4,8 @@
 'use strict';
 
 goog.provide('utils');
+/*jshint unused:false*/
+goog.require('goog.json');
 goog.require('config');
 goog.require('safejson');
 
@@ -146,7 +148,12 @@ utils.cleanLinkData = function(linkData) {
 
 	switch (typeof data) {
 		case 'string':
-			data = safejson.parse(data);
+			try {
+				data = safejson.parse(data);
+			}
+			catch (e) {
+				data = goog.json.parse(data);
+			}
 			break;
 		case 'object':
 			// do nothing:
@@ -179,7 +186,12 @@ utils.cleanLinkData = function(linkData) {
 				.replace(/([\?\&]_branch_match_id=\d+)/, '');
 	}
 
-	data = safejson.stringify(data);
+	try {
+		safejson.parse(data);
+	}
+	catch (e) {
+		data = goog.json.serialize(data);
+	}
 
 	linkData['data'] = data;
 
