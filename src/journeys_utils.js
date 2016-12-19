@@ -281,7 +281,7 @@ journeys_utils.addIframeOuterCSS = function() {
 			's ease; ' +
 			(bodyMargin) +
 			'; }\n' +
-		'#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
+		'#branch-banner-iframe { min-width:100%;' +
 			' left: 0; right: 0; border: 0; height: ' +
 			journeys_utils.bannerHeight +
 			'; z-index: 99999; -webkit-transition: all ' +
