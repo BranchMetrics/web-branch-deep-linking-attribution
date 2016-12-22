@@ -615,8 +615,103 @@ goog.tagUnsealableClass = function(a) {
 };
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = "goog_defineClass_legacy_unsealable";
 // Input 1
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.14.0"};
+goog.json = {};
+goog.json.USE_NATIVE_JSON = !1;
+goog.json.isValid = function(a) {
+  return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
+};
+goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
+  a = String(a);
+  if (goog.json.isValid(a)) {
+    try {
+      return eval("(" + a + ")");
+    } catch (b) {
+    }
+  }
+  throw Error("Invalid JSON string: " + a);
+};
+goog.json.unsafeParse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
+  return eval("(" + a + ")");
+};
+goog.json.serialize = goog.json.USE_NATIVE_JSON ? goog.global.JSON.stringify : function(a, b) {
+  return (new goog.json.Serializer(b)).serialize(a);
+};
+goog.json.Serializer = function(a) {
+  this.replacer_ = a;
+};
+goog.json.Serializer.prototype.serialize = function(a) {
+  var b = [];
+  this.serializeInternal(a, b);
+  return b.join("");
+};
+goog.json.Serializer.prototype.serializeInternal = function(a, b) {
+  if (null == a) {
+    b.push("null");
+  } else {
+    if ("object" == typeof a) {
+      if (goog.isArray(a)) {
+        this.serializeArray(a, b);
+        return;
+      }
+      if (a instanceof String || a instanceof Number || a instanceof Boolean) {
+        a = a.valueOf();
+      } else {
+        this.serializeObject_(a, b);
+        return;
+      }
+    }
+    switch(typeof a) {
+      case "string":
+        this.serializeString_(a, b);
+        break;
+      case "number":
+        this.serializeNumber_(a, b);
+        break;
+      case "boolean":
+        b.push(String(a));
+        break;
+      case "function":
+        b.push("null");
+        break;
+      default:
+        throw Error("Unknown type: " + typeof a);;
+    }
+  }
+};
+goog.json.Serializer.charToJsonCharCache_ = {'"':'\\"', "\\":"\\\\", "/":"\\/", "\b":"\\b", "\f":"\\f", "\n":"\\n", "\r":"\\r", "\t":"\\t", "\x0B":"\\u000b"};
+goog.json.Serializer.charsToReplace_ = /\uffff/.test("\uffff") ? /[\\\"\x00-\x1f\x7f-\uffff]/g : /[\\\"\x00-\x1f\x7f-\xff]/g;
+goog.json.Serializer.prototype.serializeString_ = function(a, b) {
+  b.push('"', a.replace(goog.json.Serializer.charsToReplace_, function(a) {
+    var b = goog.json.Serializer.charToJsonCharCache_[a];
+    b || (b = "\\u" + (a.charCodeAt(0) | 65536).toString(16).substr(1), goog.json.Serializer.charToJsonCharCache_[a] = b);
+    return b;
+  }), '"');
+};
+goog.json.Serializer.prototype.serializeNumber_ = function(a, b) {
+  b.push(isFinite(a) && !isNaN(a) ? String(a) : "null");
+};
+goog.json.Serializer.prototype.serializeArray = function(a, b) {
+  var c = a.length;
+  b.push("[");
+  for (var d = "", e = 0;e < c;e++) {
+    b.push(d), d = a[e], this.serializeInternal(this.replacer_ ? this.replacer_.call(a, String(e), d) : d, b), d = ",";
+  }
+  b.push("]");
+};
+goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
+  b.push("{");
+  var c = "", d;
+  for (d in a) {
+    if (Object.prototype.hasOwnProperty.call(a, d)) {
+      var e = a[d];
+      "function" != typeof e && (b.push(c), this.serializeString_(d, b), b.push(":"), this.serializeInternal(this.replacer_ ? this.replacer_.call(a, d, e) : e, b), c = ",");
+    }
+  }
+  b.push("}");
+};
 // Input 2
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.15.0"};
+// Input 3
 var safejson = {parse:function(a) {
   a = String(a);
   try {
@@ -626,12 +721,12 @@ var safejson = {parse:function(a) {
   throw Error("Invalid JSON string: " + a);
 }, stringify:function(a) {
   try {
-    return JSON.stringify(a);
+    return "object" === typeof JSON && "function" === typeof JSON.stringify ? JSON.stringify(a) : goog.json.serialize(a);
   } catch (b) {
   }
   throw Error("Could not stringify object");
 }};
-// Input 3
+// Input 4
 var task_queue = function() {
   var a = [], b = function() {
     if (a.length) {
@@ -646,7 +741,7 @@ var task_queue = function() {
     1 === a.length && b();
   };
 };
-// Input 4
+// Input 5
 var utils = {}, DEBUG = !0, message;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
@@ -684,7 +779,11 @@ utils.cleanLinkData = function(a) {
   var b = a.data;
   switch(typeof b) {
     case "string":
-      b = safejson.parse(b);
+      try {
+        b = safejson.parse(b);
+      } catch (c) {
+        b = goog.json.parse(b);
+      }
       break;
     case "object":
       break;
@@ -697,7 +796,11 @@ utils.cleanLinkData = function(a) {
   b.$og_image_url || (b.$og_image_url = utils.scrapeOpenGraphContent("image"));
   b.$og_video || (b.$og_video = utils.scrapeOpenGraphContent("video"));
   "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
-  b = safejson.stringify(b);
+  try {
+    safejson.parse(b);
+  } catch (c) {
+    b = goog.json.serialize(b);
+  }
   a.data = b;
   return a;
 };
@@ -795,7 +898,7 @@ utils.scrapeHostedDeepLinkData = function() {
   }
   return a;
 };
-// Input 5
+// Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
@@ -862,7 +965,7 @@ resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", 
 stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), deepview_type:validator(!0, validationTypes.STRING), source:validator(!0, validationTypes.STRING)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)})};
-// Input 6
+// Input 7
 var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
     var c = this[a[b]], c = "function" === typeof c ? c() : c;
@@ -970,7 +1073,7 @@ BranchStorage.prototype.pojo = {getAll:function() {
 }, isEnabled:function() {
   return !0;
 }};
-// Input 7
+// Input 8
 var session = {get:function(a, b) {
   try {
     return safejson.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
@@ -978,15 +1081,15 @@ var session = {get:function(a, b) {
     return null;
   }
 }, set:function(a, b, c) {
-  a.set("branch_session", safejson.stringify(b));
-  c && a.set("branch_session_first", safejson.stringify(b), !0);
+  a.set("branch_session", goog.json.serialize(b));
+  c && a.set("branch_session_first", goog.json.serialize(b), !0);
 }, update:function(a, b) {
   if (b) {
     var c = session.get(a) || {}, c = utils.merge(c, b);
-    a.set("branch_session", safejson.stringify(c));
+    a.set("branch_session", goog.json.serialize(c));
   }
 }};
-// Input 8
+// Input 9
 var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5E3, Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
@@ -1068,7 +1171,7 @@ Server.prototype.createScript = function(a, b, c) {
 var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
   var e = "branch_callback__" + this._jsonp_callback_index++, g = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
-  b = "POST" === c ? encodeURIComponent(utils.base64encode(safejson.stringify(b))) : "";
+  b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
   var f = window.setTimeout(function() {
     window[e] = function() {
     };
@@ -1104,7 +1207,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, g) {
           a = f.responseText;
         } else {
           try {
-            a = JSON.parse(f.responseText);
+            a = safejson.parse(f.responseText);
           } catch (b) {
             a = {};
           }
@@ -1137,7 +1240,7 @@ Server.prototype.request = function(a, b, c, d) {
   };
   m();
 };
-// Input 9
+// Input 10
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2E3, success_timeout:3E3, removeElement:function(a) {
   a && a.parentNode.removeChild(a);
 }, hasClass:function(a, b) {
@@ -1196,7 +1299,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   "number" === typeof d && (d = !1);
   return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (c || d) && (b.showDesktop && !utils.mobileUserAgent() || b.showAndroid && "android" === utils.mobileUserAgent() || b.showiPad && "ipad" === utils.mobileUserAgent() || b.showiOS && "ios" === utils.mobileUserAgent() || b.showBlackberry && "blackberry" === utils.mobileUserAgent() || b.showWindowsPhone && "windows_phone" === utils.mobileUserAgent() || b.showKindle && "kindle" === utils.mobileUserAgent());
 }};
-// Input 10
+// Input 11
 var banner_css = {banner:function(a) {
   return ".branch-banner-is-active { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 
   1E3 + "s ease; }\n#branch-banner .button{ border: 1px solid " + (a.buttonBorderColor || ("dark" === a.theme ? "transparent" : "#ccc")) + "; background: " + (a.buttonBackgroundColor || "#fff") + "; color: " + (a.buttonFontColor || "#000") + "; cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; margin-left: 5px; font-weight: 400; text-decoration: none;  border-radius: 4px; padding: 6px 12px; transition: all .2s ease;}\n#branch-banner .button:hover {  border: 1px solid " + (a.buttonBorderColorHover || 
@@ -1225,7 +1328,7 @@ banner_css.css = function(a, b) {
   (c = c.head || c.getElementsByTagName("head")[0]) && "function" === typeof c.appendChild && c.appendChild(d);
   "top" === a.position ? b.style.top = "-" + banner_utils.bannerHeight : "bottom" === a.position && (b.style.bottom = "-" + banner_utils.bannerHeight);
 };
-// Input 11
+// Input 12
 var banner_html = {banner:function(a, b) {
   var c = '<div class="content' + (a.theme ? " theme-" + a.theme : "") + '"><div class="right">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + "</div>", d;
   if (a.rating || a.reviewCount) {
@@ -1275,7 +1378,7 @@ var banner_html = {banner:function(a, b) {
   var c = '<div id="branch-sms-form-container">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
 }};
-// Input 12
+// Input 13
 var sendSMS = function(a, b, c, d) {
   var e = a.getElementById("branch-sms-phone"), g = a.getElementById("branch-sms-send"), f = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     g.removeAttribute("disabled");
@@ -1377,9 +1480,8 @@ var sendSMS = function(a, b, c, d) {
   b.immediate ? e() : setTimeout(e, banner_utils.animationDelay);
   return p;
 };
-// Input 13
-var journeys_utils = {position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1};
-journeys_utils.divToInjectParent = document.body;
+// Input 14
+var journeys_utils = {position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[]};
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
 window.innerHeight < window.innerWidth && (journeys_utils.windowHeight = window.innerWidth, journeys_utils.windowWidth = window.innerHeight);
@@ -1421,8 +1523,12 @@ journeys_utils.getCtaText = function(a, b) {
 };
 journeys_utils.findInsertionDiv = function(a, b) {
   if (b && b.injectorSelector) {
-    var c = document.querySelector(b.injectorSelector);
-    return c ? (a = c, a.innerHTML = "", journeys_utils.divToInjectParent = a.parentElement, a) : null;
+    var c = document.querySelectorAll(b.injectorSelector);
+    if (c) {
+      for (var d = 0;d < c.length;d++) {
+        journeys_utils.divToInjectParents.push(c[d].parentElement);
+      }
+    }
   }
 };
 journeys_utils.getCss = function(a) {
@@ -1473,11 +1579,11 @@ journeys_utils.addIframeOuterCSS = function() {
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle("margin-bottom");
   var d = +journeys_utils.bodyMarginBottom.slice(0, -2), e = +journeys_utils.bannerHeight.slice(0, -2);
   "top" === journeys_utils.position ? b = "margin-top: " + (+e + c) + "px" : "bottom" === journeys_utils.position && (b = "margin-bottom: " + (+e + d) + "px");
-  if (journeys_utils.divToInjectParent !== document.body) {
-    var g;
-    (c = window.getComputedStyle(journeys_utils.divToInjectParent)) && (g = journeys_utils.isFullPage && "fixed" === c.getPropertyValue("position"));
-    g || (journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight);
-  }
+  journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
+    var b, c = window.getComputedStyle(a);
+    c && (b = journeys_utils.isFullPage && "fixed" === c.getPropertyValue("position"));
+    b || (a.style.marginTop = journeys_utils.bannerHeight);
+  });
   a.innerHTML = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1E3 + "s ease; " + b + "; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1E3 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1E3 + 
   "s ease; }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }";
   document.head.appendChild(a);
@@ -1546,9 +1652,11 @@ journeys_utils.animateBannerExit = function(a) {
     "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bodyMarginTop : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bodyMarginBottom);
     banner_utils.removeClass(document.body, "branch-banner-is-active");
   }, banner_utils.animationDelay);
-  journeys_utils.divToInjectParent !== document.body && (journeys_utils.divToInjectParent.style.marginTop = 0);
+  journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
+    a.style.marginTop = 0;
+  });
 };
-// Input 14
+// Input 15
 var branch_view = {};
 function renderHtmlBlob(a, b, c) {
   var d = c ? "OPEN" : "GET";
@@ -1582,7 +1690,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, g) {
     }
     if (b.url) {
       var l = "branch_view_callback__" + jsonp_callback_index++;
-      c = encodeURIComponent(utils.base64encode(safejson.stringify(c)));
+      c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
       var m = b.url + "&callback=" + l;
       a.XHRRequest(m + ("&data=" + c), {}, "GET", {}, function(a, c) {
         var q = !1;
@@ -1607,7 +1715,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, g) {
     }
   }
 };
-// Input 15
+// Input 16
 var appindexing = {state:{}};
 appindexing.state.androidAppIndexingTagsPresent = !1;
 appindexing.state.iosAppIndexingTagsPresent = !1;
@@ -1658,11 +1766,11 @@ appindexing.populateConfigFromAppLinksTags = function(a) {
   }
   appindexing.insertAppIndexingTagsFromConfig(a);
 };
-// Input 16
+// Input 17
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, init_state_fail_codes = {NO_FAILURE:0, UNKNOWN_CAUSE:1, OPEN_FAILED:2, BFP_NOT_FOUND:3, HAS_APP_FAILED:4}, wrap = function(a, b, c) {
   return function() {
     var d = this, e, g, f = arguments[arguments.length - 1];
-    a === callback_params.NO_CALLBACK || "function" !== typeof f ? (g = function() {
+    a === callback_params.NO_CALLBACK || "function" !== typeof f ? (g = function(a) {
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], g = f);
     d._queue(function(f) {
       var h = function(b, c) {
@@ -2028,7 +2136,7 @@ Branch.prototype.autoAppIndex = wrap(callback_params.CALLBACK_ERR, function(a, b
   appindexing.state.iosAppIndexingTagsPresent || (appindexing.insertAppIndexingTagsFromConfig("ios"), appindexing.state.iosDetailsComplete || appindexing.populateConfigFromAppLinksTags("ios"));
   appindexing.state.iosDetailsComplete || appindexing.state.androidDetailsComplete ? a(null) : a("Firebase App Indexing tags were not added to your webpage. Please check your configuration.");
 });
-// Input 17
+// Input 18
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0;i < queue.length;i++) {
