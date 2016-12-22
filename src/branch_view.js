@@ -38,6 +38,16 @@ function renderHtmlBlob(parent, html, hasApp) {
 	return iframe;
 };
 
+function getBrowserLanguageCode() {
+	var code;
+	try {
+		code = (navigator.language || navigator.browserLanguage || 'en').split('-').shift().toLowerCase();
+	}
+	catch (e) {
+		code = 'en';
+	}
+	return code;
+}
 
 /**
  * @param {Object} server
@@ -72,6 +82,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
 		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
+		url += '&_lan=' + getBrowserLanguageCode();
 		url += '&data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
 			var failed = false;
