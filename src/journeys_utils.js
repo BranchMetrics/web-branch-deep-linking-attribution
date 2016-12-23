@@ -271,6 +271,8 @@ journeys_utils.addIframeOuterCSS = function() {
 		})
 	}
 
+
+
 	iFrameCSS.innerHTML = 	
 		'body { -webkit-transition: all ' +
 			(banner_utils.animationSpeed * 1.5 / 1000) +
@@ -331,6 +333,17 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	else if (journeys_utils.position === 'bottom') {
 		iframe.style.bottom = '-' + journeys_utils.bannerHeight;
 	}
+
+	// remove box shadow if no content background color
+	try {
+		var content = doc.getElementsByClassName('branch-banner-content')[0]
+		var contentComputedStyle = window.getComputedStyle(content)
+		var bg = contentComputedStyle.getPropertyValue('background-color')
+		var arr = bg.split(', ')
+		if (arr[3] && arr[3].charAt(0) === '0') {
+			iframe.style.boxShadow = "none";
+		}
+	} catch() {};
 }
 
 /***
