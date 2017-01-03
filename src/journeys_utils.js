@@ -335,15 +335,18 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	}
 
 	// remove box shadow if no content background color
+	// this is to allow floating button to work
 	try {
+		// get computed background-color of .branch-banner-content
 		var content = doc.getElementsByClassName('branch-banner-content')[0]
 		var contentComputedStyle = window.getComputedStyle(content)
 		var bg = contentComputedStyle.getPropertyValue('background-color')
 		var arr = bg.split(', ')
-		if (arr[3] && arr[3].charAt(0) === '0') {
+		// if the alpha === 0, remove the box shadow
+		if (arr[3] && parseInt(arr[3], 10)) {
 			iframe.style.boxShadow = "none";
 		}
-	} catch() {};
+	} catch(err) {};
 }
 
 /***
