@@ -427,7 +427,7 @@ with the user sending an sms.
 along with the `data` object in the original link. Therefore, it is unneccessary for the
 `data()` method to be called to check for an already existing link. If a link already
 exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link.
-If this behaivior is not desired, set `make_new_link: true` in the `options` object argument
+If this behavior is not desired, set `make_new_link: true` in the `options` object argument
 of `sendSMS`, and `sendSMS` will always make a new link.
 
 **Supports international SMS**.
