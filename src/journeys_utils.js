@@ -271,8 +271,6 @@ journeys_utils.addIframeOuterCSS = function() {
 		})
 	}
 
-
-
 	iFrameCSS.innerHTML = 	
 		'body { -webkit-transition: all ' +
 			(banner_utils.animationSpeed * 1.5 / 1000) +
