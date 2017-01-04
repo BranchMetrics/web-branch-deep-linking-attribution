@@ -426,8 +426,11 @@ Branch.prototype['init'] = wrap(
 							}
 
 							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
-							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag);
+							branch_view.handleBranchViewData(self, self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag);
 						});
+					}
+					else if (!branchViewData) {
+						self._publishEvent('willNotShowJourney');
 					}
 				}
 				try {
@@ -769,7 +772,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
 				self['renderQueue'](function() {
-					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false);
+					branch_view.handleBranchViewData(self, self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false);
 				});
 			}
 		}
