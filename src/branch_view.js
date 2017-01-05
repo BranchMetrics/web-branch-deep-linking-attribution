@@ -11,7 +11,7 @@ goog.require('journeys_utils');
  * @param {Boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
-	journeys_utils.refToBranchObj._publishEvent('willShowJourney');
+	journeys_utils.branch._publishEvent('willShowJourney');
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
@@ -48,8 +48,8 @@ function renderHtmlBlob(parent, html, hasApp) {
  * @param {Object} storage
  * @param {Boolean} hasApp
  */
-branch_view.handleBranchViewData = function(refToBranchObj, server, branchViewData, requestData, storage, hasApp, testFlag) {
-    journeys_utils.refToBranchObj = refToBranchObj;
+branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag, branch) {
+    journeys_utils.branch = branch;
 
 	var banner = null;
 	var cta = null;

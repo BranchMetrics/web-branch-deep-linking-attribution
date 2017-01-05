@@ -784,13 +784,22 @@ branch.addListener(listener);
 - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
 - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
      events will be emitted.
-- *didShowBanner*: Smart banner animation started and was is being shown to the user.
+- *didShowBanner*: Smart banner animation started and is being shown to the user.
 - *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
 - *didCloseBanner*: Smart banner close animation started, and is closing.
 - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
 - *sendBannerSMSError*: `sendSMS()` error returned.
 - *didSendBannerSMS*: SMS successfully sent.
 - *didDownloadApp*: User installed app, and banner text updated.
+
+#### Available `Journey` Events:
+- *willShowJourney*: Journey is about to be shown.
+- *didShowJourney*: Journey's entrance animation has completed and it is being shown to the user.
+- *willNotShowJourney*: Journey will not be shown and no other events will be emitted.
+- *didClickJourneyCTA*: User clicked on Journey's CTA button.
+- *didClickJourneyClose*: User clicked on Journey's close button.
+- *willCloseJourney*: Journey close animation has started.
+- *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
 
 
 

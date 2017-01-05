@@ -426,7 +426,7 @@ Branch.prototype['init'] = wrap(
 							}
 
 							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
-							branch_view.handleBranchViewData(self, self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag);
+							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag, self);
 						});
 					}
 					else if (!branchViewData) {
@@ -772,7 +772,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
 				self['renderQueue'](function() {
-					branch_view.handleBranchViewData(self, self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false);
+					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false, self);
 				});
 			}
 		}
@@ -1468,7 +1468,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
  * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
  * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
  *      events will be emitted.
- * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
+ * - *didShowBanner*: Smart banner animation started and is being shown to the user.
  * - *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
  * - *didCloseBanner*: Smart banner close animation started, and is closing.
  * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
@@ -1476,6 +1476,14 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
  * - *didSendBannerSMS*: SMS successfully sent.
  * - *didDownloadApp*: User installed app, and banner text updated.
  *
+ * #### Available `Journey` Events:
+ * - *willShowJourney*: Journey is about to be shown.
+ * - *didShowJourney*: Journey's entrance animation has completed and it is being shown to the user.
+ * - *willNotShowJourney*: Journey will not be shown and no other events will be emitted.
+ * - *didClickJourneyCTA*: User clicked on Journey's CTA button.
+ * - *didClickJourneyClose*: User clicked on Journey's close button.
+ * - *willCloseJourney*: Journey close animation has started.
+ * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/

@@ -32,7 +32,7 @@ journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/sty
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
-journeys_utils.refToBranchObj = null;
+journeys_utils.branch = null;
 
 /***
  * @function journeys_utils.setPositionAndHeight
@@ -360,7 +360,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
 		else if (journeys_utils.position === 'bottom') {
 			banner.style.bottom = '0';
 		}
-        journeys_utils.refToBranchObj._publishEvent('didShowJourney');
+        journeys_utils.branch._publishEvent('didShowJourney');
 	}
 	setTimeout(onAnimationEnd, banner_utils.animationDelay);
 }
@@ -410,23 +410,23 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	var actionEls = doc.querySelectorAll('#branch-mobile-action');
 	Array.prototype.forEach.call(actionEls, function(el) {
 		el.addEventListener('click', function(e) {
-			cta();
-			journeys_utils.refToBranchObj._publishEvent('didClickJourneyCTA');
+            journeys_utils.branch._publishEvent('didClickJourneyCTA');
+            cta();
 			journeys_utils.animateBannerExit(banner);
 		})
 	})
 	var cancelEls = doc.querySelectorAll('.branch-banner-continue');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-			journeys_utils.animateBannerExit(banner);
-            journeys_utils.refToBranchObj._publishEvent('didClickJourneyContinueCTA');
+            journeys_utils.branch._publishEvent('didClickJourneyContinue');
+            journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
 	})
 	cancelEls = doc.querySelectorAll('.branch-banner-close');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-            journeys_utils.refToBranchObj._publishEvent('didClickJourneyClose');
+            journeys_utils.branch._publishEvent('didClickJourneyClose');
             journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
@@ -444,11 +444,11 @@ journeys_utils.animateBannerExit = function(banner) {
 	else if (journeys_utils.position === 'bottom') {
 		banner.style.bottom = '-' + journeys_utils.bannerHeight;
 	}
-    journeys_utils.refToBranchObj._publishEvent('willCloseJourney');
+    journeys_utils.branch._publishEvent('willCloseJourney');
 	setTimeout(function() {
 		banner_utils.removeElement(banner);
 		banner_utils.removeElement(document.getElementById('branch-css'));
-        journeys_utils.refToBranchObj._publishEvent('didCloseJourney');
+        journeys_utils.branch._publishEvent('didCloseJourney');
 	}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 	setTimeout(function() {
