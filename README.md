@@ -31,7 +31,7 @@ This SDK requires native browser Javascript and has been tested in all modern br
 
 ### Branch Key (formerly App ID)
 
-### Quick Install 
+### Quick Install
 
 #### Manual installation
 
@@ -117,7 +117,7 @@ ___
 
 * * *
 
-### init(branch_key, options, callback) 
+### init(branch_key, options, callback)
 
 **Parameters**
 
@@ -171,7 +171,7 @@ ___
 
 
 
-### data(callback) 
+### data(callback)
 
 **Parameters**
 
@@ -188,7 +188,7 @@ ___
 
 
 
-### first(callback) 
+### first(callback)
 
 **Parameters**
 
@@ -206,7 +206,7 @@ ___
 
 
 
-### setIdentity(identity, callback) 
+### setIdentity(identity, callback)
 
 **Parameters**
 
@@ -246,7 +246,7 @@ ___
 
 
 
-### logout(callback) 
+### logout(callback)
 
 **Parameters**
 
@@ -271,7 +271,7 @@ ___
 
 
 
-### track(event, metadata, callback) 
+### track(event, metadata, callback)
 
 **Parameters**
 
@@ -306,7 +306,7 @@ ___
 
 
 
-### link(data, callback) 
+### link(data, callback)
 
 **Parameters**
 
@@ -400,7 +400,7 @@ callback(
 
 
 
-### sendSMS(phone, linkData, options, callback) 
+### sendSMS(phone, linkData, options, callback)
 
 **Parameters**
 
@@ -427,7 +427,7 @@ with the user sending an sms.
 along with the `data` object in the original link. Therefore, it is unneccessary for the
 `data()` method to be called to check for an already existing link. If a link already
 exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link.
-If this behaivior is not desired, set `make_new_link: true` in the `options` object argument
+If this behavior is not desired, set `make_new_link: true` in the `options` object argument
 of `sendSMS`, and `sendSMS` will always make a new link.
 
 **Supports international SMS**.
@@ -480,7 +480,7 @@ ___
 
 
 
-### deepview(data, options, callback) 
+### deepview(data, options, callback)
 
 **Parameters**
 
@@ -546,7 +546,7 @@ callback(
 
 
 
-### deepviewCta() 
+### deepviewCta()
 
 Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
 finished. If the `branch.deepview()` call is finished with no error, when `branch.deepviewCta()` is called,
@@ -600,7 +600,7 @@ ___
 
 
 
-### credits(callback) 
+### credits(callback)
 
 **Parameters**
 
@@ -630,7 +630,7 @@ callback(
 
 
 
-### creditHistory(options, callback) 
+### creditHistory(options, callback)
 
 **Parameters**
 
@@ -709,7 +709,7 @@ ___
 
 
 
-### redeem(amount, bucket, callback) 
+### redeem(amount, bucket, callback)
 
 **Parameters**
 
@@ -753,7 +753,7 @@ ___
 
 
 
-### addListener(event, listener) 
+### addListener(event, listener)
 
 **Parameters**
 
@@ -784,7 +784,7 @@ branch.addListener(listener);
 - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
 - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
      events will be emitted.
-- *didShowBanner*: Smart banner animation started and is being shown to the user.
+- *didShowBanner*: Smart banner animation started and was is being shown to the user.
 - *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
 - *didCloseBanner*: Smart banner close animation started, and is closing.
 - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
@@ -792,18 +792,9 @@ branch.addListener(listener);
 - *didSendBannerSMS*: SMS successfully sent.
 - *didDownloadApp*: User installed app, and banner text updated.
 
-#### Available `Journey` Events:
-- *willShowJourney*: Journey is about to be shown.
-- *didShowJourney*: Journey's entrance animation has completed and it is being shown to the user.
-- *willNotShowJourney*: Journey will not be shown and no other events will be emitted.
-- *didClickJourneyCTA*: User clicked on Journey's CTA button.
-- *didClickJourneyClose*: User clicked on Journey's close button.
-- *willCloseJourney*: Journey close animation has started.
-- *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
 
 
-
-### removeListener(listener) 
+### removeListener(listener)
 
 **Parameters**
 
@@ -817,7 +808,7 @@ just an identical clone of the function.
 
 
 
-### setBranchViewData(data) 
+### setBranchViewData(data)
 
 **Parameters**
 
@@ -851,7 +842,7 @@ branch.setBranchViewData({
 
 
 
-### banner(options, data) 
+### banner(options, data)
 
 **Parameters**
 
@@ -932,7 +923,7 @@ branch.closeBanner();
 
 
 
-### autoAppIndex(data, callback) 
+### autoAppIndex(data, callback)
 
 **Parameters**
 
