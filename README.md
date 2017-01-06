@@ -31,7 +31,7 @@ This SDK requires native browser Javascript and has been tested in all modern br
 
 ### Branch Key (formerly App ID)
 
-### Quick Install
+### Quick Install 
 
 #### Manual installation
 
@@ -117,7 +117,7 @@ ___
 
 * * *
 
-### init(branch_key, options, callback)
+### init(branch_key, options, callback) 
 
 **Parameters**
 
@@ -171,7 +171,7 @@ ___
 
 
 
-### data(callback)
+### data(callback) 
 
 **Parameters**
 
@@ -188,7 +188,7 @@ ___
 
 
 
-### first(callback)
+### first(callback) 
 
 **Parameters**
 
@@ -206,7 +206,7 @@ ___
 
 
 
-### setIdentity(identity, callback)
+### setIdentity(identity, callback) 
 
 **Parameters**
 
@@ -246,7 +246,7 @@ ___
 
 
 
-### logout(callback)
+### logout(callback) 
 
 **Parameters**
 
@@ -271,7 +271,7 @@ ___
 
 
 
-### track(event, metadata, callback)
+### track(event, metadata, callback) 
 
 **Parameters**
 
@@ -306,7 +306,7 @@ ___
 
 
 
-### link(data, callback)
+### link(data, callback) 
 
 **Parameters**
 
@@ -400,7 +400,7 @@ callback(
 
 
 
-### sendSMS(phone, linkData, options, callback)
+### sendSMS(phone, linkData, options, callback) 
 
 **Parameters**
 
@@ -480,7 +480,7 @@ ___
 
 
 
-### deepview(data, options, callback)
+### deepview(data, options, callback) 
 
 **Parameters**
 
@@ -546,7 +546,7 @@ callback(
 
 
 
-### deepviewCta()
+### deepviewCta() 
 
 Perform the branch deepview CTA (call to action) on mobile after `branch.deepview()` call is
 finished. If the `branch.deepview()` call is finished with no error, when `branch.deepviewCta()` is called,
@@ -600,7 +600,7 @@ ___
 
 
 
-### credits(callback)
+### credits(callback) 
 
 **Parameters**
 
@@ -630,7 +630,7 @@ callback(
 
 
 
-### creditHistory(options, callback)
+### creditHistory(options, callback) 
 
 **Parameters**
 
@@ -709,7 +709,7 @@ ___
 
 
 
-### redeem(amount, bucket, callback)
+### redeem(amount, bucket, callback) 
 
 **Parameters**
 
@@ -753,7 +753,7 @@ ___
 
 
 
-### addListener(event, listener)
+### addListener(event, listener) 
 
 **Parameters**
 
@@ -794,7 +794,7 @@ branch.addListener(listener);
 
 
 
-### removeListener(listener)
+### removeListener(listener) 
 
 **Parameters**
 
@@ -808,7 +808,7 @@ just an identical clone of the function.
 
 
 
-### setBranchViewData(data)
+### setBranchViewData(data) 
 
 **Parameters**
 
@@ -842,7 +842,7 @@ branch.setBranchViewData({
 
 
 
-### banner(options, data)
+### banner(options, data) 
 
 **Parameters**
 
@@ -923,7 +923,7 @@ branch.closeBanner();
 
 
 
-### autoAppIndex(data, callback)
+### autoAppIndex(data, callback) 
 
 **Parameters**
 
