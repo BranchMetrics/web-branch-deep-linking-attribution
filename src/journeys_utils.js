@@ -10,7 +10,7 @@ journeys_utils.sticky = 'absolute';
 journeys_utils.bannerHeight = '76px';
 journeys_utils.isFullPage = false;
 journeys_utils.isHalfPage = false;
-journeys_utils.divToInjectParent = document.body;
+journeys_utils.divToInjectParents = [];
 
 // used to set height of full page interstitials
 journeys_utils.windowHeight = window.innerHeight;
@@ -117,15 +117,11 @@ journeys_utils.getCtaText = function(metadata, hasApp) {
  */
 journeys_utils.findInsertionDiv = function(parent, metadata) {
 	if (metadata && metadata['injectorSelector']) {
-		var parentTrap = document.querySelector(metadata['injectorSelector']);
-		if (parentTrap) {
-			parent = parentTrap;
-			parent.innerHTML = '';
-			journeys_utils.divToInjectParent = parent.parentElement;
-			return parent;
-		}
-		else {
-			return null;
+		var injectors = document.querySelectorAll(metadata['injectorSelector']);
+		if (injectors) {
+			for(var i = 0; i < injectors.length; i++) {
+				journeys_utils.divToInjectParents.push(injectors[i].parentElement);
+			}
 		}
 	}
 }
@@ -261,16 +257,18 @@ journeys_utils.addIframeOuterCSS = function() {
 	}
 
 	// adds margin to the parent of div being inserted into
-	if (journeys_utils.divToInjectParent !== document.body) {
+	if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
 		// dont want to add margin for full page fixed
-		var isFixedNavFullPage;
-		var computedParentStyle = window.getComputedStyle(journeys_utils.divToInjectParent);
-		if (computedParentStyle) {
-			isFixedNavFullPage = journeys_utils.isFullPage && computedParentStyle.getPropertyValue('position') === 'fixed';
-		}
-		if (!isFixedNavFullPage) {
-			journeys_utils.divToInjectParent.style.marginTop = journeys_utils.bannerHeight
-		}
+		journeys_utils.divToInjectParents.forEach(function(parent) {
+			var isFixedNavFullPage;
+			var computedParentStyle = window.getComputedStyle(parent);
+			if (computedParentStyle) {
+				isFixedNavFullPage = journeys_utils.isFullPage && computedParentStyle.getPropertyValue('position') === 'fixed';
+			}
+			if (!isFixedNavFullPage) {
+				parent.style.marginTop = journeys_utils.bannerHeight;
+			}
+		})
 	}
 
 	iFrameCSS.innerHTML = 	
@@ -333,6 +331,20 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	else if (journeys_utils.position === 'bottom') {
 		iframe.style.bottom = '-' + journeys_utils.bannerHeight;
 	}
+
+	// remove box shadow if no content background color
+	// this is to allow floating button to work
+	try {
+		// get computed background-color of .branch-banner-content
+		var content = doc.getElementsByClassName('branch-banner-content')[0]
+		var contentComputedStyle = window.getComputedStyle(content)
+		var bg = contentComputedStyle.getPropertyValue('background-color')
+		var arr = bg.split(', ')
+		// if the alpha === 0, remove the box shadow
+		if (arr[3] && parseInt(arr[3], 10)) {
+			iframe.style.boxShadow = "none";
+		}
+	} catch(err) {};
 }
 
 /***
@@ -455,7 +467,9 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 	}, banner_utils.animationDelay);
 
-	if (journeys_utils.divToInjectParent !== document.body) {
-		journeys_utils.divToInjectParent.style.marginTop = 0;
-	}	
+	if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
+		journeys_utils.divToInjectParents.forEach(function(parent) {
+			parent.style.marginTop = 0;
+		})
+	}
 }

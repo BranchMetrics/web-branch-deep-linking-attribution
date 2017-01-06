@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.15.0] - 2016-12-22
+- journeys support multiple branch-journeys-top divs
+
 ## [v2.14.0] - 2016-12-15
 - add creation source to link payload
 - support partial height smart banners

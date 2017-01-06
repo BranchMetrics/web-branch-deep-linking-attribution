@@ -395,8 +395,12 @@ Branch.prototype['init'] = wrap(
 				if (!err && typeof eventData === 'object') {
 					self._branchViewEnabled = !!eventData['branch_view_enabled'];
 					self._storage.set('branch_view_enabled', self._branchViewEnabled);
-					var branchViewData = null;
-					var testFlag = null;
+
+					var branchViewData;
+					var testFlag;
+					var dismissTimeStamp;
+					var hideBanner;
+
 					if (branchViewId && utils.mobileUserAgent()) {
 						branchViewData = {
 							id: branchViewId,
@@ -407,17 +411,19 @@ Branch.prototype['init'] = wrap(
 					}
 					else if (eventData.hasOwnProperty('branch_view_data')) {
 						branchViewData = eventData['branch_view_data'];
-					}
-					if (branchViewData) {
-						var hideBanner = self._storage.get('hideBanner' + branchViewData["id"], true);
-						if (hideBanner && !testFlag) {
-							if (hideBanner === true || hideBanner > Date.now()) {
-								return;
-							}
-							else if (hideBanner < Date.now()) {
-								self._storage.remove('hideBanner' + branchViewData["id"], true);
-							}
+
+						// check storage to see dismiss timestamp
+						dismissTimeStamp = self._storage.get('hideBanner' + branchViewData["id"], true);
+
+						if (dismissTimeStamp < Date.now()) {
+							self._storage.remove('hideBanner' + branchViewData["id"], true);
 						}
+						else if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
+							hideBanner = true;
+						}
+					}
+
+					if (branchViewData && !hideBanner) {
 						self['renderQueue'](function() {
 							var requestData = self._branchViewData || {};
 
@@ -899,7 +905,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * along with the `data` object in the original link. Therefore, it is unneccessary for the
  * `data()` method to be called to check for an already existing link. If a link already
  * exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link.
- * If this behaivior is not desired, set `make_new_link: true` in the `options` object argument
+ * If this behavior is not desired, set `make_new_link: true` in the `options` object argument
  * of `sendSMS`, and `sendSMS` will always make a new link.
  *
  * **Supports international SMS**.
