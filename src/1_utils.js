@@ -119,6 +119,42 @@ utils.whiteListSessionData = function(data) {
 };
 
 /**
+ * @param {Object} sessionData
+ * @return {utils.journeysLanguageData}
+ */
+utils.whiteListJourneysLanguageData = function(sessionData) {
+	var re = /^\$journeys_\S+$/;
+	var data = sessionData['data'];
+	var retData = {};
+
+	switch (typeof data) {
+		case 'string':
+			try {
+				data = safejson.parse(data);
+			}
+			catch (e) {
+				data = goog.json.parse(data);
+			}
+			break;
+		case 'object':
+			// do nothing:
+			break;
+		default:
+			data = {};
+			break;
+	}
+
+	Object.keys(data).forEach(function(key) {
+		var found = re.test(key);
+		if (found) {
+			retData[key] = data[key];
+		}
+	});
+
+	return retData;
+};
+
+/**
  * Abstract away the window.location for better testing
  */
 utils.getWindowLocation = function() {

@@ -432,6 +432,8 @@ Branch.prototype['init'] = wrap(
 							}
 
 							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
+							requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(self._storage) || {}), requestData['data']);
+
 							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag);
 						});
 					}
