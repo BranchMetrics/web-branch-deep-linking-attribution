@@ -432,8 +432,11 @@ Branch.prototype['init'] = wrap(
 							}
 
 							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
-							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag);
+							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag, self);
 						});
+					}
+					else if (!branchViewData) {
+						self._publishEvent('willNotShowJourney');
 					}
 				}
 				try {
@@ -775,7 +778,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			self._storage.set('branch_view_enabled', self._branchViewEnabled);
 			if (data.hasOwnProperty('branch_view_data')) {
 				self['renderQueue'](function() {
-					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false);
+					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false, self);
 				});
 			}
 		}
@@ -1471,7 +1474,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
  * - *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
  * - *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
  *      events will be emitted.
- * - *didShowBanner*: Smart banner animation started and was is being shown to the user.
+ * - *didShowBanner*: Smart banner animation started and is being shown to the user.
  * - *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
  * - *didCloseBanner*: Smart banner close animation started, and is closing.
  * - *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
@@ -1479,6 +1482,14 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
  * - *didSendBannerSMS*: SMS successfully sent.
  * - *didDownloadApp*: User installed app, and banner text updated.
  *
+ * #### Available `Journey` Events:
+ * - *willShowJourney*: Journey is about to be shown.
+ * - *didShowJourney*: Journey's entrance animation has completed and it is being shown to the user.
+ * - *willNotShowJourney*: Journey will not be shown and no other events will be emitted.
+ * - *didClickJourneyCTA*: User clicked on Journey's CTA button.
+ * - *didClickJourneyClose*: User clicked on Journey's close button.
+ * - *willCloseJourney*: Journey close animation has started.
+ * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
@@ -1768,14 +1779,14 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * | --- | ---
  * | "androidPackageName" | Android App's package name
  * | "androidURL" | A custom scheme for your Android App such as: `example/home/cupertino/12345` where `example` is the App's URI scheme and `home/cupertino/12345` routes to unique content in the App
- * | "iosAppStoreId" | iTunes App Store ID for your iOS App
+ * | "iosAppId" | iTunes App Store ID for your iOS App
  * | "iosURL" | A custom scheme for your iOS App such as: `example/home/cupertino/12345`
  * | "data" | Any additional deep link data that you would like to pass to your App
  *
  * Resultant Firebase App Indexing tags will have the following format:
  *```
  * <link rel="alternate" href="android-app://{androidPackageName}/{androidURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
- * <link rel="alternate" href="ios-app://{iosAppStoreId}/{iosURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
+ * <link rel="alternate" href="ios-app://{iosAppId}/{iosURL}?{branch_tracking_params_and_additional_deep_link_data}"/>
  *```
  * Note: If optional parameters above are not specified, Branch will try to build Firebase App Indexing tags using your page's App Links tags.
  * Alternatively, if optional parameters are specified but Firebase App Indexing tags already exist on your webpage then Branch tracking params will be appended to the end of these tags and ignore what is passed into `Branch.autoAppIndex()`.
