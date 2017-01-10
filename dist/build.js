@@ -533,8 +533,8 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, g) {
-    for (var f = Array(arguments.length - 2), k = 2;k < arguments.length;k++) {
-      f[k - 2] = arguments[k];
+    for (var f = Array(arguments.length - 2), h = 2;h < arguments.length;h++) {
+      f[h - 2] = arguments[h];
     }
     return b.prototype[c].apply(a, f);
   };
@@ -710,7 +710,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.15.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.16.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -851,14 +851,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, g, f, k, h = 0;
+  var b = "", c, d, e, g, f, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     g = a.charCodeAt(e), 128 > g ? d += String.fromCharCode(g) : (127 < g && 2048 > g ? d += String.fromCharCode(g >> 6 | 192) : (d += String.fromCharCode(g >> 12 | 224), d += String.fromCharCode(g >> 6 & 63 | 128)), d += String.fromCharCode(g & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), g = c >> 2, c = (c & 3) << 4 | d >> 4, f = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? k = f = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k)
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), g = c >> 2, c = (c & 3) << 4 | d >> 4, f = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = f = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h)
     ;
   }
   return b;
@@ -1110,7 +1110,7 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, g = /^[0-9]{15,20}$/, f = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+  var c, d, e = a.destination + a.endpoint, g = /^[0-9]{15,20}$/, f = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
     "undefined" === typeof c && (c = {});
     if (b.branch_key && f.test(b.branch_key)) {
       return c.branch_key = b.branch_key, c;
@@ -1122,7 +1122,7 @@ Server.prototype.getUrl = function(a, b) {
   };
   if ("/v1/has-app" === a.endpoint) {
     try {
-      a.queryPart = k(b, a.queryPart);
+      a.queryPart = h(b, a.queryPart);
     } catch (l) {
       return {error:l.message};
     }
@@ -1137,7 +1137,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  var h = {};
+  var k = {};
   if ("undefined" !== typeof a.params) {
     for (c in a.params) {
       if (a.params.hasOwnProperty(c)) {
@@ -1145,20 +1145,20 @@ Server.prototype.getUrl = function(a, b) {
           return {error:d};
         }
         d = b[c];
-        "undefined" !== typeof d && "" !== d && null !== d && (h[c] = d);
+        "undefined" !== typeof d && "" !== d && null !== d && (k[c] = d);
       }
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
-      b = k(b, h);
+      b = h(b, k);
     } catch (l) {
       return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (h.metadata = safejson.stringify(h.metadata || {}));
-  "/v1/open" === a.endpoint && (h.options = safejson.stringify(h.options || {}));
-  return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
+  "/v1/event" === a.endpoint && (k.metadata = safejson.stringify(k.metadata || {}));
+  "/v1/open" === a.endpoint && (k.options = safejson.stringify(k.options || {}));
+  return {data:this.serializeObject(k, ""), url:e.replace(/^\//, "")};
 };
 Server.prototype.createScript = function(a, b, c) {
   var d = document.createElement("script");
@@ -1220,7 +1220,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, g) {
   };
   try {
     f.open(c, a, !0), f.timeout = TIMEOUT, f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), f.send(b);
-  } catch (k) {
+  } catch (h) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
@@ -1229,14 +1229,14 @@ Server.prototype.request = function(a, b, c, d) {
   if (g.error) {
     return d(Error(g.error));
   }
-  var f, k = "";
-  "GET" === a.method ? f = g.url + "?" + g.data : (f = g.url, k = g.data);
-  var h = RETRIES, l = function(a, b, c) {
-    a && 0 < h && "5" === (c || "").toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+  var f, h = "";
+  "GET" === a.method ? f = g.url + "?" + g.data : (f = g.url, h = g.data);
+  var k = RETRIES, l = function(a, b, c) {
+    a && 0 < k && "5" === (c || "").toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       m();
     }, RETRY_DELAY)) : d(a, b);
   }, m = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(f, b, a.method, l) : e.XHRRequest(f, k, a.method, c, l);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(f, b, a.method, l) : e.XHRRequest(f, h, a.method, c, l);
   };
   m();
 };
@@ -1263,7 +1263,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var g = parseInt(0 < a.length ? a[0] : "0", 10), f = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, k = function() {
+    }, h = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -1275,11 +1275,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * f();
     }, vh:function(a) {
-      return a * k();
+      return a * h();
     }, vmin:function(a) {
-      return a * Math.min(k(), f());
+      return a * Math.min(h(), f());
     }, vmax:function(a) {
-      return a * Math.max(k(), f());
+      return a * Math.max(h(), f());
     }, "%":function() {
       return document.body.clientWidth / 100 * g;
     }}[b](g), 10);
@@ -1380,24 +1380,24 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 13
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), g = a.getElementById("branch-sms-send"), f = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+  var e = a.getElementById("branch-sms-phone"), g = a.getElementById("branch-sms-send"), f = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
     g.removeAttribute("disabled");
     e.removeAttribute("disabled");
     g.style.opacity = "1";
     e.style.opacity = "1";
     f.style.opacity = "0";
   }, m = function() {
-    h = a.createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = banner_html.checkmark();
-    k.appendChild(h);
+    k = a.createElement("div");
+    k.className = "branch-icon-wrapper";
+    k.id = "branch-checkmark";
+    k.style = "opacity: 0;";
+    k.innerHTML = banner_html.checkmark();
+    h.appendChild(k);
     g.style.opacity = "0";
     e.style.opacity = "0";
     f.style.opacity = "0";
     setTimeout(function() {
-      h.style.opacity = "1";
+      k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
@@ -1413,7 +1413,7 @@ var sendSMS = function(a, b, c, d) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), g.setAttribute("disabled", ""), e.setAttribute("disabled", ""), g.style.opacity = ".4", e.style.opacity = ".4", f.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
       a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
-        k.removeChild(h);
+        h.removeChild(k);
         l();
       }, banner_utils.success_timeout));
     })) : n();
@@ -1437,8 +1437,8 @@ var sendSMS = function(a, b, c, d) {
     b.make_new_link = b.make_new_link;
     b.deepview_type = "banner";
     a.deepview(c, b);
-    var k = f.getElementById("branch-mobile-action");
-    k && (k.onclick = function(b) {
+    var h = f.getElementById("branch-mobile-action");
+    h && (h.onclick = function(b) {
       b.preventDefault();
       a.deepviewCta();
     });
@@ -1454,17 +1454,17 @@ var sendSMS = function(a, b, c, d) {
       });
     };
   }
-  var k = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), p = function(a, c) {
+  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = f.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
     "top" === b.position ? g.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (g.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
-    a.immediate ? ("top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(g), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
+    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(g), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
       banner_utils.removeElement(g);
       banner_utils.removeElement(document.getElementById("branch-css"));
       c();
     }, banner_utils.animationSpeed + banner_utils.animationDelay), setTimeout(function() {
-      "top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m);
+      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay));
   };
@@ -1476,7 +1476,7 @@ var sendSMS = function(a, b, c, d) {
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, k) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, h) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
   b.immediate ? e() : setTimeout(e, banner_utils.animationDelay);
   return p;
 };
@@ -1492,6 +1492,7 @@ journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
+journeys_utils.branch = null;
 journeys_utils.setPositionAndHeight = function(a) {
   var b = journeys_utils.getMetadata(a);
   if (b && b.bannerHeight && b.position && b.sticky) {
@@ -1596,11 +1597,15 @@ journeys_utils.addIframeInnerCSS = function(a, b) {
   var d = a.contentWindow.document;
   d.head.appendChild(c);
   if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
-    if (c = d.getElementsByClassName("branch-banner-content")[0]) {
-      c.style.height = journeys_utils.bannerHeight;
-    }
+    var e = d.getElementsByClassName("branch-banner-content")[0];
+    e && (e.style.height = journeys_utils.bannerHeight);
   }
   "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
+  try {
+    var e = d.getElementsByClassName("branch-banner-content")[0], g = window.getComputedStyle(e).getPropertyValue("background-color").split(", ");
+    g[3] && parseInt(g[3], 10) && (a.style.boxShadow = "none");
+  } catch (f) {
+  }
 };
 journeys_utils.addDynamicCtaText = function(a, b) {
   a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
@@ -1609,6 +1614,7 @@ journeys_utils.animateBannerEntrance = function(a) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
   setTimeout(function() {
     "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
+    journeys_utils.branch._publishEvent("didShowJourney");
   }, banner_utils.animationDelay);
 };
 journeys_utils.findDismissPeriod = function(a) {
@@ -1622,6 +1628,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     var g = d.contentWindow.document, f = g.querySelectorAll("#branch-mobile-action");
     Array.prototype.forEach.call(f, function(a) {
       a.addEventListener("click", function(a) {
+        journeys_utils.branch._publishEvent("didClickJourneyCTA");
         c();
         journeys_utils.animateBannerExit(d);
       });
@@ -1629,6 +1636,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     f = g.querySelectorAll(".branch-banner-continue");
     Array.prototype.forEach.call(f, function(c) {
       c.addEventListener("click", function(c) {
+        journeys_utils.branch._publishEvent("didClickJourneyContinue");
         journeys_utils.animateBannerExit(d);
         b.set("hideBanner" + a.id, e, !0);
       });
@@ -1636,6 +1644,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     f = g.querySelectorAll(".branch-banner-close");
     Array.prototype.forEach.call(f, function(c) {
       c.addEventListener("click", function(c) {
+        journeys_utils.branch._publishEvent("didClickJourneyClose");
         journeys_utils.animateBannerExit(d);
         b.set("hideBanner" + a.id, e, !0);
       });
@@ -1644,9 +1653,11 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
 };
 journeys_utils.animateBannerExit = function(a) {
   "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
+  journeys_utils.branch._publishEvent("willCloseJourney");
   setTimeout(function() {
     banner_utils.removeElement(a);
     banner_utils.removeElement(document.getElementById("branch-css"));
+    journeys_utils.branch._publishEvent("didCloseJourney");
   }, banner_utils.animationSpeed + banner_utils.animationDelay);
   setTimeout(function() {
     "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bodyMarginTop : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bodyMarginBottom);
@@ -1659,6 +1670,7 @@ journeys_utils.animateBannerExit = function(a) {
 // Input 15
 var branch_view = {};
 function renderHtmlBlob(a, b, c) {
+  journeys_utils.branch._publishEvent("willShowJourney");
   var d = c ? "OPEN" : "GET";
   journeys_utils.setPositionAndHeight(b);
   var e = journeys_utils.getMetadata(b);
@@ -1675,42 +1687,43 @@ function renderHtmlBlob(a, b, c) {
   journeys_utils.animateBannerEntrance(c);
   return c;
 }
-branch_view.handleBranchViewData = function(a, b, c, d, e, g) {
-  var f = null, k = null;
+branch_view.handleBranchViewData = function(a, b, c, d, e, g, f) {
+  journeys_utils.branch = f;
+  var h = null, k = null;
   c = c || {};
   c.feature = "journeys";
   c = utils.cleanLinkData(c);
   if (!(document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container"))) {
-    var h = document.createElement("div");
-    h.id = "branch-banner";
-    document.body.insertBefore(h, null);
-    banner_utils.addClass(h, "branch-banner-is-active");
+    var l = document.createElement("div");
+    l.id = "branch-banner";
+    document.body.insertBefore(l, null);
+    banner_utils.addClass(l, "branch-banner-is-active");
     if (b.html) {
       return renderHtmlBlob(document.body, b.html, e);
     }
     if (b.url) {
-      var l = "branch_view_callback__" + jsonp_callback_index++;
+      var m = "branch_view_callback__" + jsonp_callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
-      var m = b.url + "&callback=" + l;
-      a.XHRRequest(m + ("&data=" + c), {}, "GET", {}, function(a, c) {
-        var q = !1;
+      f = b.url + "&callback=" + m;
+      a.XHRRequest(f + ("&data=" + c), {}, "GET", {}, function(a, c) {
+        var f = !1;
         if (!a && c) {
-          var r = g ? 0 : journeys_utils.findDismissPeriod(c), m = window.setTimeout(function() {
-            window[l] = function() {
+          var q = g ? 0 : journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
+            window[m] = function() {
             };
           }, TIMEOUT);
-          window[l] = function(a) {
-            window.clearTimeout(m);
-            q || (k = a, journeys_utils.finalHookups(b, d, k, f, r));
+          window[m] = function(a) {
+            window.clearTimeout(r);
+            f || (k = a, journeys_utils.finalHookups(b, d, k, h, q));
           };
-          f = renderHtmlBlob(document.body, c, e);
-          if (null === f) {
-            q = !0;
+          h = renderHtmlBlob(document.body, c, e);
+          if (null === h) {
+            f = !0;
             return;
           }
-          journeys_utils.finalHookups(b, d, k, f, r);
+          journeys_utils.finalHookups(b, d, k, h, q);
         }
-        document.body.removeChild(h);
+        document.body.removeChild(l);
       }, !0);
     }
   }
@@ -1773,7 +1786,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     a === callback_params.NO_CALLBACK || "function" !== typeof f ? (g = function(a) {
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], g = f);
     d._queue(function(f) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
@@ -1785,16 +1798,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
+          return k(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -1849,7 +1862,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
-  }, f = session.get(d._storage), k = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), h = !f || !f.identity_id;
+  }, f = session.get(d._storage), h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
   var l = function(a, b) {
     var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
@@ -1864,7 +1877,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       b && b(null, e);
     });
   }, m = function(c, f) {
-    f && (f = g(f), session.set(d._storage, f, h), d.init_state = init_states.INIT_SUCCEEDED, f.data_parsed = f.data ? safejson.parse(f.data) : null);
+    f && (f = g(f), session.set(d._storage, f, k), d.init_state = init_states.INIT_SUCCEEDED, f.data_parsed = f.data ? safejson.parse(f.data) : null);
     if (c) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = c.message), a(c, f && utils.whiteListSessionData(f));
     }
@@ -1872,27 +1885,30 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       if (!c && "object" === typeof g) {
         d._branchViewEnabled = !!g.branch_view_enabled;
         d._storage.set("branch_view_enabled", d._branchViewEnabled);
-        var h = null, k = null;
-        e && utils.mobileUserAgent() ? (h = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id&_t=" + f.browser_fingerprint_id}, k = !0) : g.hasOwnProperty("branch_view_data") && (h = g.branch_view_data);
-        if (h) {
-          var l = d._storage.get("hideBanner" + h.id, !0);
-          if (l && !k) {
-            if (!0 === l || l > Date.now()) {
-              return;
+        var h, k, l, m;
+        if (e && utils.mobileUserAgent()) {
+          h = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id&_t=" + f.browser_fingerprint_id}, k = !0;
+        } else {
+          if (g.hasOwnProperty("branch_view_data")) {
+            if (h = g.branch_view_data, l = d._storage.get("hideBanner" + h.id, !0), l < Date.now()) {
+              d._storage.remove("hideBanner" + h.id, !0);
+            } else {
+              if (!0 === l || l > Date.now()) {
+                m = !0, d._publishEvent("willNotShowJourney");
+              }
             }
-            l < Date.now() && d._storage.remove("hideBanner" + h.id, !0);
           }
-          d.renderQueue(function() {
-            var a = d._branchViewData || {};
-            a.data || (a.data = {});
-            a.data = utils.merge(utils.scrapeHostedDeepLinkData(), a.data);
-            branch_view.handleBranchViewData(d._server, h, a, d._storage, f.has_app, k);
-          });
         }
+        h && !m ? d.renderQueue(function() {
+          var a = d._branchViewData || {};
+          a.data || (a.data = {});
+          a.data = utils.merge(utils.scrapeHostedDeepLinkData(), a.data);
+          branch_view.handleBranchViewData(d._server, h, a, d._storage, f.has_app, k, d);
+        }) : h || d._publishEvent("willNotShowJourney");
       }
       try {
         a(c, f && utils.whiteListSessionData(f));
-      } catch (m) {
+      } catch (n) {
       } finally {
         d.renderFinalize();
       }
@@ -1904,7 +1920,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       document[a] || (l(null, null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
     }, !1);
   };
-  if (f && f.session_id && !k) {
+  if (f && f.session_id && !h) {
     n(), l(f, m);
   } else {
     var f = {sdk:config.version}, p = session.get(d._storage, !0) || {};
@@ -1913,9 +1929,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       if (a) {
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
-      d._api(resources.open, {link_identifier:k, is_referrable:1, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
+      d._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), k && (b.click_id = k));
+        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
         n();
         m(a, b);
       });
@@ -1973,7 +1989,7 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
   c || (c = {});
   e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {}), initial_referrer:document.referrer}, function(b, c) {
     b || "object" !== typeof c || (e._branchViewEnabled = !!c.branch_view_enabled, e._storage.set("branch_view_enabled", e._branchViewEnabled), c.hasOwnProperty("branch_view_data") && e.renderQueue(function() {
-      branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData, e._storage, c.has_app, !1);
+      branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData, e._storage, c.has_app, !1, e);
     }));
     "function" === typeof a && a.apply(this, arguments);
   });
