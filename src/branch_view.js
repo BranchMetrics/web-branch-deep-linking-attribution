@@ -11,6 +11,8 @@ goog.require('journeys_utils');
  * @param {Boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
+	journeys_utils.branch._publishEvent('willShowJourney');
+
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
 	journeys_utils.setPositionAndHeight(html);
@@ -56,7 +58,9 @@ function getBrowserLanguageCode() {
  * @param {Object} storage
  * @param {Boolean} hasApp
  */
-branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag) {
+branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag, branch) {
+    journeys_utils.branch = branch;
+
 	var banner = null;
 	var cta = null;
 
