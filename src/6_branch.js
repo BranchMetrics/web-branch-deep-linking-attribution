@@ -289,6 +289,7 @@ Branch.prototype['init'] = wrap(
 
 		if (options) {
 			branchViewId = options.branch_view_id || null;
+			self.user_language = options.user_language || utils.getBrowserLanguageCode();
 		}
 		if (!branchViewId) {
 			branchViewId = utils.getParameterByName('_branch_view_id') || null;

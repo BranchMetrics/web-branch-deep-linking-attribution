@@ -120,7 +120,7 @@ utils.whiteListSessionData = function(data) {
 
 /**
  * @param {Object} sessionData
- * @return {utils.journeysLanguageData}
+ * @return {Object} retData
  */
 utils.whiteListJourneysLanguageData = function(sessionData) {
 	var re = /^\$journeys_\S+$/;
@@ -537,4 +537,19 @@ utils.scrapeHostedDeepLinkData = function() {
 	}
 
 	return params;
+};
+
+
+/**
+ * @return {string} code
+ */
+utils.getBrowserLanguageCode = function() {
+	var code;
+	try {
+		code = (navigator.language || navigator.browserLanguage || 'en').split(/[^a-z^A-Z0-9-]/).shift().toLowerCase();
+	}
+	catch (e) {
+		code = 'en';
+	}
+	return code;
 };
