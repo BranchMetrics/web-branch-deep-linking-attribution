@@ -40,7 +40,6 @@ function renderHtmlBlob(parent, html, hasApp) {
 	return iframe;
 };
 
-
 /**
  * @param {Object} server
  * @param {Object} branchViewData
@@ -76,6 +75,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		var callbackString = 'branch_view_callback__' + (jsonp_callback_index++);
 		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
+		url += '&_lan=' + (branch.user_language || utils.getBrowserLanguageCode());
 		url += '&data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
 			var failed = false;

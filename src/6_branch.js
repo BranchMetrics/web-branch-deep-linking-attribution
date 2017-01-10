@@ -289,6 +289,7 @@ Branch.prototype['init'] = wrap(
 
 		if (options) {
 			branchViewId = options.branch_view_id || null;
+			self.user_language = options.user_language || utils.getBrowserLanguageCode();
 		}
 		if (!branchViewId) {
 			branchViewId = utils.getParameterByName('_branch_view_id') || null;
@@ -433,6 +434,8 @@ Branch.prototype['init'] = wrap(
 							}
 
 							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
+							requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(self._storage) || {}), requestData['data']);
+
 							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag, self);
 						});
 					}

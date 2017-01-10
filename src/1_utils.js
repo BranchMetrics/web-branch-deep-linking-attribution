@@ -119,6 +119,42 @@ utils.whiteListSessionData = function(data) {
 };
 
 /**
+ * @param {Object} sessionData
+ * @return {Object} retData
+ */
+utils.whiteListJourneysLanguageData = function(sessionData) {
+	var re = /^\$journeys_\S+$/;
+	var data = sessionData['data'];
+	var retData = {};
+
+	switch (typeof data) {
+		case 'string':
+			try {
+				data = safejson.parse(data);
+			}
+			catch (e) {
+				data = goog.json.parse(data);
+			}
+			break;
+		case 'object':
+			// do nothing:
+			break;
+		default:
+			data = {};
+			break;
+	}
+
+	Object.keys(data).forEach(function(key) {
+		var found = re.test(key);
+		if (found) {
+			retData[key] = data[key];
+		}
+	});
+
+	return retData;
+};
+
+/**
  * Abstract away the window.location for better testing
  */
 utils.getWindowLocation = function() {
@@ -501,4 +537,19 @@ utils.scrapeHostedDeepLinkData = function() {
 	}
 
 	return params;
+};
+
+
+/**
+ * @return {string} code
+ */
+utils.getBrowserLanguageCode = function() {
+	var code;
+	try {
+		code = (navigator.language || navigator.browserLanguage || 'en').split(/[^a-z^A-Z0-9-]/).shift().toLowerCase();
+	}
+	catch (e) {
+		code = 'en';
+	}
+	return code;
 };
