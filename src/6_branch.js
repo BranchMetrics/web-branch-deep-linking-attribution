@@ -420,6 +420,7 @@ Branch.prototype['init'] = wrap(
 						}
 						else if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
 							hideBanner = true;
+							self._publishEvent('willNotShowJourney');
 						}
 					}
 
