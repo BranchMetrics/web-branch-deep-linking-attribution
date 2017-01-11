@@ -342,7 +342,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 		var bg = contentComputedStyle.getPropertyValue('background-color')
 		var arr = bg.split(', ')
 		// if the alpha === 0, remove the box shadow
-		if (arr[3] && parseInt(arr[3], 10)) {
+		if (arr[3] && parseFloat(arr[3]) === 0) {
 			iframe.style.boxShadow = "none";
 		}
 	} catch(err) {};
