@@ -286,9 +286,11 @@ Branch.prototype['init'] = wrap(
 		options = (options && typeof options === 'function') ? { } : options;
 
 		var branchViewId = null;
+		var no_journeys = null;
 
 		if (options) {
 			branchViewId = options.branch_view_id || null;
+			no_journeys = options.no_journeys || null;
 			self.user_language = options.user_language || utils.getBrowserLanguageCode();
 		}
 		if (!branchViewId) {
@@ -425,7 +427,7 @@ Branch.prototype['init'] = wrap(
 						}
 					}
 
-					if (branchViewData && !hideBanner) {
+					if (branchViewData && !hideBanner && !no_journeys) {
 						self['renderQueue'](function() {
 							var requestData = self._branchViewData || {};
 
