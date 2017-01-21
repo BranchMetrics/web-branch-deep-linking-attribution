@@ -16,6 +16,7 @@ goog.require('config');
 goog.require('safejson');
 goog.require('branch_view');
 goog.require('appindexing');
+goog.require('journeys_utils');
 
 /*globals Ti, BranchStorage, require */
 
@@ -1496,6 +1497,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
  * - *didClickJourneyClose*: User clicked on Journey's close button.
  * - *willCloseJourney*: Journey close animation has started.
  * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
+ * - *didCallJourneyClose*: Emitted when developer calls `branch.closeJourney()` to dismiss Journey.
  */
 /*** +TOC_HEADING &Event Listener& ^WEB ***/
 /*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
@@ -1579,6 +1581,30 @@ function _setBranchViewData(context, done, data) {
 
 Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, function(done, data) {
 	_setBranchViewData.call(null, this, done, data);
+});
+
+/** =WEB
+ * ### closeJourney()
+ *
+ * #### Closing a Journey Programmatically
+ *
+ * Journeys include a close button the user can click, but you may want to close the
+ * Journey with a timeout, or via some other user interaction with your web app. In this case,
+ * closing the Journey is very simple by calling `Branch.closeJourney()`.
+ *
+ * ##### Usage
+ * ```js
+ * branch.closeJourney();
+ * ```
+ */
+/*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
+/*** +TOC_ITEM #closeJourney &.closeJourney()& ^WEB ***/
+Branch.prototype['closeJourney'] = wrap(0, function(done) {
+	if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
+		journeys_utils.branch._publishEvent('didCallJourneyClose');
+		journeys_utils.animateBannerExit(journeys_utils.banner);
+	}
+	done();
 });
 
 /** =WEB
