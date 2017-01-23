@@ -65,8 +65,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		return;
 	}
 
-	// in some cases, css from a previous banner will remain.
-	// this code removes any leftover css
+	// this code removes any leftover css from previous banner
 	var branchCSS = document.getElementById('branch-iframe-css')
 	if (branchCSS) {
 		branchCSS.parentElement.removeChild(branchCSS)
