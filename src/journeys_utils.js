@@ -473,9 +473,16 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 	}, banner_utils.animationDelay);
 
+	// remove margin if the banner was injected
 	if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
 		journeys_utils.divToInjectParents.forEach(function(parent) {
 			parent.style.marginTop = 0;
 		})
+	}
+
+	// remove CSS that was added to the document body
+	var branchCSS = document.getElementById('branch-iframe-css')
+	if (branchCSS) {
+		branchCSS.parentElement.removeChild(branchCSS)
 	}
 }

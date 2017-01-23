@@ -58,10 +58,17 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 
 	var cleanedData = utils.cleanLinkData(requestData);
 
+	// if banner already exists, don't add another
 	if (document.getElementById('branch-banner') ||
 		document.getElementById('branch-banner-iframe') ||
 		document.getElementById('branch-banner-container')) {
 		return;
+	}
+
+	// this code removes any leftover css from previous banner
+	var branchCSS = document.getElementById('branch-iframe-css')
+	if (branchCSS) {
+		branchCSS.parentElement.removeChild(branchCSS)
 	}
 
 	var placeholder = document.createElement('div');
