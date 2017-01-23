@@ -2,7 +2,9 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.17.0] - 2017-01-23
+- Allow no_journeys option
+- Remove document.body CSS when banner is closed
 
 ## [v2.16.1] - 2017-01-10
 - fix bug in floating button support
