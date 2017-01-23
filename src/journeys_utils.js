@@ -416,6 +416,8 @@ journeys_utils.findDismissPeriod = function(html) {
  * hooks up the call to action and dismiss buttons
  */
 journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hideBanner) {
+	journeys_utils.banner = banner;
+
 	if(!cta || !banner) {
 		return;
 	}

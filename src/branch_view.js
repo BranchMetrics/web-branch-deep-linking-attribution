@@ -108,8 +108,6 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 					return;
 				}
 
-				journeys_utils.banner = banner;
-
 				journeys_utils.finalHookups(branchViewData, storage, cta, banner, hideBanner);
 			}
 			document.body.removeChild(placeholder);

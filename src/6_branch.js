@@ -1594,16 +1594,22 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, funct
  *
  * ##### Usage
  * ```js
- * branch.closeJourney();
+ * branch.closeJourney(function(err) { console.log(err); });
  * ```
  */
 /*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
 /*** +TOC_ITEM #closeJourney &.closeJourney()& ^WEB ***/
-Branch.prototype['closeJourney'] = wrap(0, function(done) {
-	if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
-		journeys_utils.branch._publishEvent('didCallJourneyClose');
-		journeys_utils.animateBannerExit(journeys_utils.banner);
-	}
+Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(done) {
+	var self = this;
+	self['renderQueue'](function() {
+		if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
+			self._publishEvent('didCallJourneyClose');
+			journeys_utils.animateBannerExit(journeys_utils.banner);
+		}
+		else {
+			return done('Journey already dismissed.');
+		}
+	});
 	done();
 });
 
