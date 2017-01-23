@@ -58,7 +58,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 
 	var cleanedData = utils.cleanLinkData(requestData);
 
-	// if banner already exists, don't add another on
+	// if banner already exists, don't add another
 	if (document.getElementById('branch-banner') ||
 		document.getElementById('branch-banner-iframe') ||
 		document.getElementById('branch-banner-container')) {
