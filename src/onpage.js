@@ -38,6 +38,7 @@
 		'autoAppIndex',
 		'banner',
 		'closeBanner',
+		'closeJourney',
 		'creditHistory',
 		'credits',
 		'data',
