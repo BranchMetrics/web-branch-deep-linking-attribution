@@ -33,6 +33,8 @@ journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
 journeys_utils.branch = null;
+journeys_utils.banner = null;
+journeys_utils.isJourneyDisplayed = false;
 
 /***
  * @function journeys_utils.setPositionAndHeight
@@ -373,6 +375,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
 			banner.style.bottom = '0';
 		}
         journeys_utils.branch._publishEvent('didShowJourney');
+		journeys_utils.isJourneyDisplayed = true;
 	}
 	setTimeout(onAnimationEnd, banner_utils.animationDelay);
 }
@@ -413,6 +416,8 @@ journeys_utils.findDismissPeriod = function(html) {
  * hooks up the call to action and dismiss buttons
  */
 journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hideBanner) {
+	journeys_utils.banner = banner;
+
 	if(!cta || !banner) {
 		return;
 	}
@@ -471,6 +476,7 @@ journeys_utils.animateBannerExit = function(banner) {
 		}
 
         journeys_utils.branch._publishEvent('didCloseJourney');
+        journeys_utils.isJourneyDisplayed = false;
 	}, banner_utils.animationSpeed + banner_utils.animationDelay);
 
 	setTimeout(function() {
