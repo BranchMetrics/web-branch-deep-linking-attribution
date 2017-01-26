@@ -463,8 +463,18 @@ journeys_utils.animateBannerExit = function(banner) {
 	}
     journeys_utils.branch._publishEvent('willCloseJourney');
 	setTimeout(function() {
+		// remove banner, branch-css, and branch-iframe-css
 		banner_utils.removeElement(banner);
 		banner_utils.removeElement(document.getElementById('branch-css'));
+		banner_utils.removeElement(document.getElementById('branch-iframe-css'));		
+
+		// remove margin from all elements with branch injection div
+		if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
+			journeys_utils.divToInjectParents.forEach(function(parent) {
+				parent.style.marginTop = 0;
+			})
+		}
+
         journeys_utils.branch._publishEvent('didCloseJourney');
         journeys_utils.isJourneyDisplayed = false;
 	}, banner_utils.animationSpeed + banner_utils.animationDelay);
@@ -479,16 +489,4 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 	}, banner_utils.animationDelay);
 
-	// remove margin if the banner was injected
-	if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
-		journeys_utils.divToInjectParents.forEach(function(parent) {
-			parent.style.marginTop = 0;
-		})
-	}
-
-	// remove CSS that was added to the document body
-	var branchCSS = document.getElementById('branch-iframe-css')
-	if (branchCSS) {
-		branchCSS.parentElement.removeChild(branchCSS)
-	}
 }
