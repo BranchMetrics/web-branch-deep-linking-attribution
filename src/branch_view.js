@@ -116,7 +116,6 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	}
 };
 
-
 function determineBannerExists() {
 	// if banner already exists, don't add another
 	if (document.getElementById('branch-banner') ||
@@ -213,5 +212,3 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 		journeyProperties['branch']._publishEvent('willNotShowJourney');
 	}
 }
-
-
