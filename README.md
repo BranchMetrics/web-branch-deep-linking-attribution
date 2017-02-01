@@ -99,7 +99,7 @@ ___
   + [.removeListener()](#removelistenerlistener)
 
 6. Journeys Web To App
-  + [.setBranchViewData()](#setBranchViewData)
+  + [.setBranchViewData()](#setbranchviewdatadata)
   + [.banner()](#banneroptions-data)
 
 7. Firebase App Indexing
@@ -882,6 +882,7 @@ branch.banner({
     icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
     title: 'Branch Demo App',
     description: 'The Branch demo app!',
+    element: document.body,                 // The element to append the iFrame or div to. Must be an instance of HTMLElement.
     rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
     reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
     openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
