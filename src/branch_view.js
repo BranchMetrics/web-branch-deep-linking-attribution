@@ -126,7 +126,7 @@ function checkPreviousBanner() {
 	return false;
 }
 
-//builds data for a Journey in test mode
+// builds data for a Journey in test mode
 function buildJourneyTestData(branchViewId, branch_key, data){
 	return {
 		id: branchViewId,
@@ -135,7 +135,7 @@ function buildJourneyTestData(branchViewId, branch_key, data){
 	}
 }
 
-//checks to see if user dismissed Journey previously and whether it should remain dismissed
+// checks to see if user dismissed Journey previously and whether it should remain dismissed
 function isJourneyDismissed(branchViewData, branch) {
 
 	// check storage to see dismiss timestamp
@@ -151,7 +151,7 @@ function isJourneyDismissed(branchViewData, branch) {
 	return hideJourney;
 }
 
-//builds an object that contains data from setBranchViewData() call, hosted deep link data and language data
+// builds an object that contains data from setBranchViewData() call, hosted deep link data and language data
 function compileRequestData(branch) {
 		var requestData = branch._branchViewData || {};
 

@@ -484,7 +484,6 @@ Branch.prototype['init'] = wrap(
 );
 
 
-
 /**
  * currently private method, which may be opened to the public in the future
  */
