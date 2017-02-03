@@ -708,13 +708,10 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 /*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata, options) {
 	var self = this;
-	if (!metadata) {
-		metadata = { };
-	}
 
-	if (!options) {
-		options = { };
-	}
+	metadata = metadata || {};
+
+	options = options || {};
 
 	self._api(resources.event, {
 		"event": event,
@@ -722,13 +719,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			"url": document.URL,
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
-		}, metadata || {}),
+		}, metadata),
 		"initial_referrer": document.referrer
 	}, function(err, data) {
 		if (!err && typeof data === 'object' && event === 'pageview') {
-			self['renderQueue'](function() {
-				branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
-			});
+			branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
 		}
 		if (typeof done === 'function') {
 			done.apply(this, arguments);

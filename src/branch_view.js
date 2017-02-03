@@ -174,11 +174,11 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	}
 
 	var branchViewId = null;
-	var no_journeys = false;
-	var hideJourney = false;
+	var no_journeys = null;
+	var hideJourney = null;
 	var branchViewData = null;
 	var requestData = null;
-	var testFlag = false;
+	var testFlag = null;
 
 	if (options) {
 		branchViewId = options.branch_view_id || null;
