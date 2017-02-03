@@ -726,15 +726,10 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		}, metadata || {}),
 		"initial_referrer": document.referrer
 	}, function(err, data) {
-		if (!err && typeof data === 'object') {
-			if (data.hasOwnProperty('branch_view_data')) {
-				self['renderQueue'](function() {
-					branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
-				});
-			}
-			else if (event === 'pageview') {
-				self._publishEvent('willNotShowJourney');
-			}
+		if (!err && typeof data === 'object' && event === 'pageview') {
+			self['renderQueue'](function() {
+				branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
+			});
 		}
 		if (typeof done === 'function') {
 			done.apply(this, arguments);

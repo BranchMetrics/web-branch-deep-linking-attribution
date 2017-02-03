@@ -116,7 +116,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	}
 };
 
-function determineBannerExists() {
+function checkPreviousBanner() {
 	// if banner already exists, don't add another
 	if (document.getElementById('branch-banner') ||
 		document.getElementById('branch-banner-iframe') ||
@@ -126,42 +126,42 @@ function determineBannerExists() {
 	return false;
 }
 
-function initJourneyInTestMode(journeyProperties) {
-	journeyProperties['branchViewData'] = {};
-	journeyProperties['branchViewData']['id'] = journeyProperties['branchViewId'];
-	journeyProperties['branchViewData']['number_of_use'] = -1;
-	journeyProperties['branchViewData']['url'] = (config.api_endpoint + '/v1/branchview/' + journeyProperties['branch_key'] + '/' + journeyProperties['branchViewId'] + '?_a=audience_rule_id&_t=' + journeyProperties['data']['browser_fingerprint_id']);
-	journeyProperties['branchViewData']['testFlag'] = true;
+//builds data for a Journey in test mode
+function buildJourneyTestData(branchViewId, branch_key, data){
+	return {
+		id: branchViewId,
+		number_of_use: -1,
+		url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data.browser_fingerprint_id)
+	}
 }
 
-function processJourneyDismissal(journeyProperties) {
-
-	journeyProperties['branchViewData'] = journeyProperties['eventData']['branch_view_data'];
+//checks to see if user dismissed Journey previously and whether it should remain dismissed
+function isJourneyDismissed(branchViewData, branch) {
 
 	// check storage to see dismiss timestamp
-	journeyProperties['dismissTimeStamp'] = journeyProperties['branch']['_storage'].get('hideBanner' + journeyProperties['branchViewData']['id'], true);
+	var dismissTimeStamp = branch._storage.get('hideBanner' + branchViewData["id"], true);
+	var hideJourney = false;
 
-	if (journeyProperties['dismissTimeStamp'] < Date.now()) {
-		journeyProperties['branch']['_storage'].remove('hideBanner' + journeyProperties['branchViewData']['id'], true);
+	if (dismissTimeStamp < Date.now()) {
+		branch._storage.remove('hideBanner' + branchViewData["id"], true);
 	}
-	else if (journeyProperties['dismissTimeStamp'] === true || journeyProperties['dismissTimeStamp']  > Date.now()) {
-		journeyProperties['hideBanner']  = true;
-		journeyProperties['branch']._publishEvent('willNotShowJourney');
+	else if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
+		hideJourney = true;
 	}
+	return hideJourney;
 }
 
-function displayJourney(journeyProperties) {
-	journeyProperties['branch']['renderQueue'](function() {
-		var requestData = journeyProperties['branch']['_branchViewData'] || {};
+//builds an object that contains data from setBranchViewData() call, hosted deep link data and language data
+function compileRequestData(branch) {
+		var requestData = branch._branchViewData || {};
+
 		if (!requestData['data']) {
 			requestData['data'] = {};
 		}
+
 		requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
-		requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(journeyProperties['branch']['_storage']) || {}), requestData['data']);
-
-		branch_view.handleBranchViewData(journeyProperties['branch']['_server'], journeyProperties['branchViewData'], requestData, journeyProperties['branch']['_storage'], journeyProperties['data']['has_app'], journeyProperties['testFlag'], journeyProperties['branch']);
-	});
-
+		requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
+		return requestData;
 }
 
 branch_view.initJourney = function(branch_key, data, eventData, options, branch) {
@@ -169,12 +169,16 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	branch._branchViewEnabled = !!eventData['branch_view_enabled'];
 	branch._storage.set('branch_view_enabled', branch._branchViewEnabled);
 
-	if (determineBannerExists()) {
+	if (checkPreviousBanner()) {
 		return;
 	}
 
 	var branchViewId = null;
-	var no_journeys = null;
+	var no_journeys = false;
+	var hideJourney = false;
+	var branchViewData = null;
+	var requestData = null;
+	var testFlag = false;
 
 	if (options) {
 		branchViewId = options.branch_view_id || null;
@@ -182,33 +186,27 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 		branch.user_language = options.user_language || utils.getBrowserLanguageCode();
 	}
 
-	var journeyProperties = {};
-	journeyProperties['branch_key'] = branch_key;
-	journeyProperties['branchViewId'] = branchViewId;
-	journeyProperties['data'] = data;
-	journeyProperties['eventData'] = eventData;
-	journeyProperties['no_journeys'] = no_journeys;
-	journeyProperties['branch'] = branch;
-	journeyProperties['testFlag'] = false;
-	journeyProperties['dismissTimeStamp'] = null;
-	journeyProperties['hideBanner'] = false;
+	branchViewId = branchViewId || utils.getParameterByName('_branch_view_id') || null;
 
-	journeyProperties['branchViewId'] = journeyProperties['branchViewId'] || utils.getParameterByName('_branch_view_id') || null;
-
-	if (journeyProperties['branchViewId'] && utils.mobileUserAgent()) {
-		initJourneyInTestMode(journeyProperties);
+	if (branchViewId && utils.mobileUserAgent()) {
+		testFlag = true;
+		branchViewData = buildJourneyTestData(branchViewId, branch_key, data);
 	}
 
-	if (!journeyProperties['testFlag']) {
-		if (journeyProperties['eventData'].hasOwnProperty('branch_view_data')) {
-			processJourneyDismissal(journeyProperties);
+	if (!branchViewData) {
+		if (eventData.hasOwnProperty('branch_view_data')) {
+			branchViewData = eventData['branch_view_data'];
+			hideJourney = isJourneyDismissed(branchViewData, branch);
 		}
 	}
 
-	if (journeyProperties['branchViewData'] && !journeyProperties['hideBanner'] && !journeyProperties['no_journeys']) {
-		displayJourney(journeyProperties);
+	if (branchViewData && !hideJourney && !no_journeys) {
+		branch['renderQueue'](function() {
+			requestData = compileRequestData(branch);
+			branch_view.handleBranchViewData(branch._server, branchViewData, requestData, branch._storage, data['has_app'], testFlag, branch);
+		});
 	}
 	else {
-		journeyProperties['branch']._publishEvent('willNotShowJourney');
+		branch._publishEvent('willNotShowJourney');
 	}
 }
