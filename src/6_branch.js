@@ -286,18 +286,6 @@ Branch.prototype['init'] = wrap(
 
 		options = (options && typeof options === 'function') ? { } : options;
 
-		var branchViewId = null;
-		var no_journeys = null;
-
-		if (options) {
-			branchViewId = options.branch_view_id || null;
-			no_journeys = options.no_journeys || null;
-			self.user_language = options.user_language || utils.getBrowserLanguageCode();
-		}
-		if (!branchViewId) {
-			branchViewId = utils.getParameterByName('_branch_view_id') || null;
-		}
-
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {
 				self.link_click_id = data['link_click_id'].toString();
@@ -397,54 +385,7 @@ Branch.prototype['init'] = wrap(
 				"initial_referrer": document.referrer
 			}, function(err, eventData) {
 				if (!err && typeof eventData === 'object') {
-					self._branchViewEnabled = !!eventData['branch_view_enabled'];
-					self._storage.set('branch_view_enabled', self._branchViewEnabled);
-
-					var branchViewData;
-					var testFlag;
-					var dismissTimeStamp;
-					var hideBanner;
-
-					if (branchViewId && utils.mobileUserAgent()) {
-						branchViewData = {
-							id: branchViewId,
-							number_of_use: -1,
-							url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data.browser_fingerprint_id)
-						};
-						testFlag = true;
-					}
-					else if (eventData.hasOwnProperty('branch_view_data')) {
-						branchViewData = eventData['branch_view_data'];
-
-						// check storage to see dismiss timestamp
-						dismissTimeStamp = self._storage.get('hideBanner' + branchViewData["id"], true);
-
-						if (dismissTimeStamp < Date.now()) {
-							self._storage.remove('hideBanner' + branchViewData["id"], true);
-						}
-						else if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
-							hideBanner = true;
-							self._publishEvent('willNotShowJourney');
-						}
-					}
-
-					if (branchViewData && !hideBanner && !no_journeys) {
-						self['renderQueue'](function() {
-							var requestData = self._branchViewData || {};
-
-							if (!requestData['data']) {
-								requestData['data'] = {};
-							}
-
-							requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
-							requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(self._storage) || {}), requestData['data']);
-
-							branch_view.handleBranchViewData(self._server, branchViewData, requestData, self._storage, data['has_app'], testFlag, self);
-						});
-					}
-					else if (!branchViewData) {
-						self._publishEvent('willNotShowJourney');
-					}
+					branch_view.initJourney(branch_key, data, eventData, options, self);
 				}
 				try {
 					done(err, data && utils.whiteListSessionData(data));
@@ -765,11 +706,12 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
  */
 /*** +TOC_HEADING &Event Tracking& ^ALL ***/
 /*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
-Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata, requestData) {
+Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata, options) {
 	var self = this;
-	if (!metadata) {
-		metadata = { };
-	}
+
+	metadata = metadata || {};
+
+	options = options || {};
 
 	self._api(resources.event, {
 		"event": event,
@@ -777,17 +719,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			"url": document.URL,
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
-		}, metadata || {}),
+		}, metadata),
 		"initial_referrer": document.referrer
 	}, function(err, data) {
-		if (!err && typeof data === 'object') {
-			self._branchViewEnabled = !!data['branch_view_enabled'];
-			self._storage.set('branch_view_enabled', self._branchViewEnabled);
-			if (data.hasOwnProperty('branch_view_data')) {
-				self['renderQueue'](function() {
-					branch_view.handleBranchViewData(self._server, data['branch_view_data'], self._branchViewData, self._storage, data['has_app'], false, self);
-				});
-			}
+		if (!err && typeof data === 'object' && event === 'pageview') {
+			branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
 		}
 		if (typeof done === 'function') {
 			done.apply(this, arguments);
