@@ -8,7 +8,7 @@ goog.require('journeys_utils');
 /**
  * @param {Object} parent
  * @param {string} html
- * @param {Boolean} hasApp
+ * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
 	journeys_utils.branch._publishEvent('willShowJourney');
@@ -45,8 +45,9 @@ function renderHtmlBlob(parent, html, hasApp) {
  * @param {Object} branchViewData
  * @param {Object} requestData
  * @param {Object} storage
- * @param {Boolean} hasApp
- * @param {Boolean} testFlag
+ * @param {boolean} hasApp
+ * @param {boolean} testFlag
+ * @param {Object} branch
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag, branch) {
 	journeys_utils.branch = branch;
@@ -178,7 +179,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	var hideJourney = null;
 	var branchViewData = null;
 	var requestData = null;
-	var testFlag = null;
+	var testFlag = false;
 
 	if (options) {
 		branchViewId = options.branch_view_id || null;

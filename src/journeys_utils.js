@@ -98,7 +98,7 @@ journeys_utils.getMetadata = function(html) {
 /***
  * @function journeys_utils.getCtaText
  * @param {Object} metadata
- * @param {Boolean} hasApp
+ * @param {boolean} hasApp
  */
 journeys_utils.getCtaText = function(metadata, hasApp) {
 	var ctaText;
