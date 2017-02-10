@@ -2,7 +2,11 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.18.0] - 2017-02-10
+- add closeJourney method
+- add ability to initialize a new journey without page change
+- remove branch css with delay
+- refactor journeys initialization
 
 ## [v2.17.0] - 2017-01-23
 - Allow no_journeys option
