@@ -138,7 +138,7 @@ banner_html.iframe = function(options, action) {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
-	document.body.appendChild(iframe);
+	(options.element || document.body).appendChild(iframe);
 
 	var bodyClass;
 	var userAgent = utils.mobileUserAgent();
@@ -172,7 +172,7 @@ banner_html.div = function(options, action) {
 	banner.id = 'branch-banner';
 	banner.className = 'branch-animation';
 	banner.innerHTML = banner_html.banner(options, action);
-	document.body.appendChild(banner);
+	(options.element || document.body).appendChild(banner);
 
 	return banner;
 };
