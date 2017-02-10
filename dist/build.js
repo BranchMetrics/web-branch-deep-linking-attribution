@@ -908,7 +908,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.17.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.18.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1719,6 +1719,8 @@ journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/sty
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 journeys_utils.branch = null;
+journeys_utils.banner = null;
+journeys_utils.isJourneyDisplayed = !1;
 journeys_utils.setPositionAndHeight = function(a) {
   var b = journeys_utils.getMetadata(a);
   if (b && b.bannerHeight && b.position && b.sticky) {
@@ -1841,6 +1843,7 @@ journeys_utils.animateBannerEntrance = function(a) {
   setTimeout(function() {
     "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
     journeys_utils.branch._publishEvent("didShowJourney");
+    journeys_utils.isJourneyDisplayed = !0;
   }, banner_utils.animationDelay);
 };
 journeys_utils.findDismissPeriod = function(a) {
@@ -1850,6 +1853,7 @@ journeys_utils.findDismissPeriod = function(a) {
   return -1 === b ? !0 : banner_utils.getDate(b);
 };
 journeys_utils.finalHookups = function(a, b, c, d, e) {
+  journeys_utils.banner = d;
   if (c && d) {
     var f = d.contentWindow.document, g = f.querySelectorAll("#branch-mobile-action");
     Array.prototype.forEach.call(g, function(a) {
@@ -1883,17 +1887,17 @@ journeys_utils.animateBannerExit = function(a) {
   setTimeout(function() {
     banner_utils.removeElement(a);
     banner_utils.removeElement(document.getElementById("branch-css"));
+    banner_utils.removeElement(document.getElementById("branch-iframe-css"));
+    journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
+      a.style.marginTop = 0;
+    });
     journeys_utils.branch._publishEvent("didCloseJourney");
+    journeys_utils.isJourneyDisplayed = !1;
   }, banner_utils.animationSpeed + banner_utils.animationDelay);
   setTimeout(function() {
     "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bodyMarginTop : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bodyMarginBottom);
     banner_utils.removeClass(document.body, "branch-banner-is-active");
   }, banner_utils.animationDelay);
-  journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
-    a.style.marginTop = 0;
-  });
-  var b = document.getElementById("branch-iframe-css");
-  b && b.parentElement.removeChild(b);
 };
 // Input 15
 var branch_view = {};
@@ -1921,42 +1925,77 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
   c = c || {};
   c.feature = "journeys";
   c = utils.cleanLinkData(c);
-  if (!(document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container"))) {
-    var l = document.getElementById("branch-iframe-css");
-    l && l.parentElement.removeChild(l);
-    var m = document.createElement("div");
-    m.id = "branch-banner";
-    document.body.insertBefore(m, null);
-    banner_utils.addClass(m, "branch-banner-is-active");
-    if (b.html) {
-      return renderHtmlBlob(document.body, b.html, e);
-    }
-    if (b.url) {
-      var n = "branch_view_callback__" + jsonp_callback_index++;
-      c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
-      l = b.url + "&callback=" + n;
-      l += "&_lan=" + (g.user_language || utils.getBrowserLanguageCode());
-      a.XHRRequest(l + ("&data=" + c), {}, "GET", {}, function(a, c) {
-        var g = !1;
-        if (!a && c) {
-          var l = f ? 0 : journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
-            window[n] = function() {
-            };
-          }, TIMEOUT);
-          window[n] = function(a) {
-            window.clearTimeout(r);
-            g || (h = a, journeys_utils.finalHookups(b, d, h, k, l));
+  (g = document.getElementById("branch-iframe-css")) && g.parentElement.removeChild(g);
+  var l = document.createElement("div");
+  l.id = "branch-banner";
+  document.body.insertBefore(l, null);
+  banner_utils.addClass(l, "branch-banner-is-active");
+  if (b.html) {
+    return renderHtmlBlob(document.body, b.html, e);
+  }
+  if (b.url) {
+    var m = "branch_view_callback__" + jsonp_callback_index++;
+    c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
+    g = b.url + "&callback=" + m;
+    g += "&_lan=" + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode());
+    a.XHRRequest(g + ("&data=" + c), {}, "GET", {}, function(a, c) {
+      var g = !1;
+      if (!a && c) {
+        var p = f ? 0 : journeys_utils.findDismissPeriod(c), q = window.setTimeout(function() {
+          window[m] = function() {
           };
-          k = renderHtmlBlob(document.body, c, e);
-          if (null === k) {
-            g = !0;
-            return;
-          }
-          journeys_utils.finalHookups(b, d, h, k, l);
+        }, TIMEOUT);
+        window[m] = function(a) {
+          window.clearTimeout(q);
+          g || (h = a, journeys_utils.finalHookups(b, d, h, k, p));
+        };
+        k = renderHtmlBlob(document.body, c, e);
+        if (null === k) {
+          g = !0;
+          return;
         }
-        document.body.removeChild(m);
-      }, !0);
+        journeys_utils.finalHookups(b, d, h, k, p);
+      }
+      document.body.removeChild(l);
+    }, !0);
+  }
+};
+function checkPreviousBanner() {
+  return document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container") ? !0 : !1;
+}
+function buildJourneyTestData(a, b, c) {
+  return {id:a, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + a + "?_a=audience_rule_id&_t=" + c.browser_fingerprint_id};
+}
+function isJourneyDismissed(a, b) {
+  var c = b._storage.get("hideBanner" + a.id, !0), d = !1;
+  if (c < Date.now()) {
+    b._storage.remove("hideBanner" + a.id, !0);
+  } else {
+    if (!0 === c || c > Date.now()) {
+      d = !0;
     }
+  }
+  return d;
+}
+function compileRequestData(a) {
+  var b = a._branchViewData || {};
+  b.data || (b.data = {});
+  b.data = utils.merge(utils.scrapeHostedDeepLinkData(), b.data);
+  b.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), b.data);
+  return b;
+}
+branch_view.initJourney = function(a, b, c, d, e) {
+  e._branchViewEnabled = !!c.branch_view_enabled;
+  e._storage.set("branch_view_enabled", e._branchViewEnabled);
+  if (!checkPreviousBanner()) {
+    var f = null, g = null, k = null, h = null, l = null, m = !1;
+    d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode());
+    (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, h = buildJourneyTestData(f, a, b));
+    !h && c.hasOwnProperty("branch_view_data") && (h = c.branch_view_data, k = isJourneyDismissed(h, e));
+    !h || k || g ? e._publishEvent("willNotShowJourney") : e.renderQueue(function() {
+      l = compileRequestData(e);
+      branch_view.handleBranchViewData(e._server, h, l, e._storage, b.has_app, m, e);
+    });
   }
 };
 // Input 16
@@ -2081,10 +2120,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c = c && "function" === typeof c ? {} : c;
-  var e = null, f = null;
-  c && (e = c.branch_view_id || null, f = c.no_journeys || null, d.user_language = c.user_language || utils.getBrowserLanguageCode());
-  e || (e = utils.getParameterByName("_branch_view_id") || null);
-  var g = function(a) {
+  var e = function(a) {
     a.link_click_id && (d.link_click_id = a.link_click_id.toString());
     a.session_id && (d.session_id = a.session_id.toString());
     a.identity_id && (d.identity_id = a.identity_id.toString());
@@ -2093,9 +2129,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
-  }, k = session.get(d._storage), h = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), l = !k || !k.identity_id;
+  }, f = session.get(d._storage), g = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var m = function(a, b) {
+  var h = function(a, b) {
     var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
     f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
     d._api(resources._r, c, function(a, b) {
@@ -2107,65 +2143,41 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       a || !c || e.has_app || (e.has_app = !0, session.update(d._storage, e), d._publishEvent("didDownloadApp"));
       b && b(null, e);
     });
-  }, n = function(c, h) {
-    h && (h = g(h), session.set(d._storage, h, l), d.init_state = init_states.INIT_SUCCEEDED, h.data_parsed = h.data ? safejson.parse(h.data) : null);
-    if (c) {
-      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = c.message), a(c, h && utils.whiteListSessionData(h));
+  }, l = function(f, g) {
+    g && (g = e(g), session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data ? safejson.parse(g.data) : null);
+    if (f) {
+      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, g && utils.whiteListSessionData(g));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, initial_referrer:document.referrer}, function(c, g) {
-      if (!c && "object" === typeof g) {
-        d._branchViewEnabled = !!g.branch_view_enabled;
-        d._storage.set("branch_view_enabled", d._branchViewEnabled);
-        var k, l, m, n;
-        if (e && utils.mobileUserAgent()) {
-          k = {id:e, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + e + "?_a=audience_rule_id&_t=" + h.browser_fingerprint_id}, l = !0;
-        } else {
-          if (g.hasOwnProperty("branch_view_data")) {
-            if (k = g.branch_view_data, m = d._storage.get("hideBanner" + k.id, !0), m < Date.now()) {
-              d._storage.remove("hideBanner" + k.id, !0);
-            } else {
-              if (!0 === m || m > Date.now()) {
-                n = !0, d._publishEvent("willNotShowJourney");
-              }
-            }
-          }
-        }
-        !k || n || f ? k || d._publishEvent("willNotShowJourney") : d.renderQueue(function() {
-          var a = d._branchViewData || {};
-          a.data || (a.data = {});
-          a.data = utils.merge(utils.scrapeHostedDeepLinkData(), a.data);
-          a.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(d._storage) || {}), a.data);
-          branch_view.handleBranchViewData(d._server, k, a, d._storage, h.has_app, l, d);
-        });
-      }
+    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, initial_referrer:document.referrer}, function(e, f) {
+      e || "object" !== typeof f || branch_view.initJourney(b, g, f, c, d);
       try {
-        a(c, h && utils.whiteListSessionData(h));
-      } catch (t) {
+        a(e, g && utils.whiteListSessionData(g));
+      } catch (r) {
       } finally {
         d.renderFinalize();
       }
     });
-  }, p = function() {
+  }, m = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
-      document[a] || (m(null, null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
+      document[a] || (h(null, null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
     }, !1);
   };
-  if (k && k.session_id && !h) {
-    p(), m(k, n);
+  if (f && f.session_id && !g) {
+    m(), h(f, l);
   } else {
-    var k = {sdk:config.version}, q = session.get(d._storage, !0) || {};
-    q.browser_fingerprint_id && (k._t = q.browser_fingerprint_id);
-    d._api(resources._r, k, function(a, b) {
+    var f = {sdk:config.version}, n = session.get(d._storage, !0) || {};
+    n.browser_fingerprint_id && (f._t = n.browser_fingerprint_id);
+    d._api(resources._r, f, function(a, b) {
       if (a) {
-        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, n(a, null);
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, l(a, null);
       }
-      d._api(resources.open, {link_identifier:h, is_referrable:1, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
+      d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
-        p();
-        n(a, b);
+        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), g && (b.click_id = g));
+        m();
+        l(a, b);
       });
     });
   }
@@ -2218,11 +2230,10 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
 });
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   var e = this;
-  c || (c = {});
-  e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c || {}), initial_referrer:document.referrer}, function(b, c) {
-    b || "object" !== typeof c || (e._branchViewEnabled = !!c.branch_view_enabled, e._storage.set("branch_view_enabled", e._branchViewEnabled), c.hasOwnProperty("branch_view_data") && e.renderQueue(function() {
-      branch_view.handleBranchViewData(e._server, c.branch_view_data, e._branchViewData, e._storage, c.has_app, !1, e);
-    }));
+  c = c || {};
+  d = d || {};
+  e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c), initial_referrer:document.referrer}, function(c, g) {
+    c || "object" !== typeof g || "pageview" !== b || branch_view.initJourney(e.branch_key, session.get(e._storage), g, d, e);
     "function" === typeof a && a.apply(this, arguments);
   });
 });
@@ -2349,6 +2360,17 @@ function _setBranchViewData(a, b, c) {
 }
 Branch.prototype.setBranchViewData = wrap(callback_params.CALLBACK_ERR, function(a, b) {
   _setBranchViewData.call(null, this, a, b);
+});
+Branch.prototype.closeJourney = wrap(callback_params.CALLBACK_ERR, function(a) {
+  var b = this;
+  b.renderQueue(function() {
+    if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
+      b._publishEvent("didCallJourneyClose"), journeys_utils.animateBannerExit(journeys_utils.banner);
+    } else {
+      return a("Journey already dismissed.");
+    }
+  });
+  a();
 });
 Branch.prototype.banner = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   c = c || {};

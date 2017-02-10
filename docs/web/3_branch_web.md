@@ -692,6 +692,7 @@ branch.addListener(listener);
 - *didClickJourneyClose*: User clicked on Journey's close button.
 - *willCloseJourney*: Journey close animation has started.
 - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
+- *didCallJourneyClose*: Emitted when developer calls `branch.closeJourney()` to dismiss Journey.
 
 
 

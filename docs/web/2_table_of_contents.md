@@ -25,9 +25,12 @@
 
 6. Journeys Web To App
   + [.setBranchViewData()](#setBranchViewData)
+
+7. Journeys Web To App
+  + [.closeJourney()](#closeJourney)
   + [.banner()](#banneroptions-data)
 
-7. Firebase App Indexing
+8. Firebase App Indexing
   + [.autoAppIndex()](#autoappindex)
 
 ___
