@@ -1817,3 +1817,34 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
 		done(null);
 	}
 });
+
+Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, metadata, commerce_data) {
+	var self = this;
+
+	metadata = metadata || {};
+
+	commerce_data = commerce_data || {};
+
+	var invalidKeys = utils.validateCommerceData(commerce_data);
+
+	if (invalidKeys["root"].length || invalidKeys["products"].length) {
+		done(utils.buildErrorMessageForCommerceData(invalidKeys));
+	}
+
+	self._api(resources.commerceEvent, {
+		"event": 'purchase',
+		"metadata":utils.merge({
+			"url": document.URL,
+			"user_agent": navigator.userAgent,
+			"language": navigator.language
+		}, metadata),
+		"initial_referrer": document.referrer,
+		"commerce_data": commerce_data
+	}, function(err, eventData) {
+		if (err){
+			done(err);
+		}
+	});
+
+	done(null);
+});
