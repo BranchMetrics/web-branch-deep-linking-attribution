@@ -1841,10 +1841,6 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 		"initial_referrer": document.referrer,
 		"commerce_data": commerce_data
 	}, function(err, eventData) {
-		if (err){
-			done(err);
-		}
+		done(err || null);
 	});
-
-	done(null);
 });
