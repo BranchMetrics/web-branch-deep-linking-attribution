@@ -555,59 +555,47 @@ utils.getBrowserLanguageCode = function() {
 };
 
 /**
- * Returns the difference between two arrays. 
+ * Returns the difference between two arrays.
  */
 utils.calculateDiffBetweenArrays = function(original, toCheck) {
 	var diff = [];
 	toCheck.forEach(function(element) {
-		if(original.indexOf(element) == -1) {
+		if (original.indexOf(element) === -1) {
 			diff.push(element);
 		}
 	});
-
 	return diff;
-}
+};
 
-/** 
+/**
  * Validates the commerce-data object passed into branch.trackCommerceEvent().
  * If there are invalid keys present then it will report back what those keys are.
  * Note: The keys below are optional.
  */
 utils.validateCommerceData = function(commerceData) {
-	var allowedInRoot = ['common', 'type', 'transaction_id', 'currency', 'revenue', 'revenue_in_usd', 'exchange_rate', 'shipping', 'tax', 'coupon', 'affiliation', 'persona', 'products'];
-	var allowedInProducts = ['sku', 'name', 'price', 'quantity', 'brand', 'category', 'variant'];
+	var allowedInRoot = [ 'common', 'type', 'transaction_id', 'currency', 'revenue', 'revenue_in_usd', 'exchange_rate', 'shipping', 'tax', 'coupon', 'affiliation', 'persona', 'products' ];
+	var allowedInProducts = [ 'sku', 'name', 'price', 'quantity', 'brand', 'category', 'variant' ];
 
 	var invalidKeys = {
 		root: utils.calculateDiffBetweenArrays(allowedInRoot, Object.keys(commerceData)),
 		products: []
-	}
+	};
 
-	if(commerceData.hasOwnProperty('products')) {
+	if (commerceData.hasOwnProperty('products')) {
 		commerceData["products"].forEach(function(product) {
-			utils.merge(invalidKeys["products"], utils.calculateDiffBetweenArrays(allowedInProducts, Object.keys(product)));
+			invalidKeys['products'] = invalidKeys['products'].concat(utils.calculateDiffBetweenArrays(allowedInProducts, Object.keys(product)));
 		});
 	}
-
 	return invalidKeys;
-}
+};
 
-/** 
- * Builds an error message if partner provides invalid keys to commerce_data
- */
-utils.buildErrorMessageForCommerceData = function(invalidKeys) {
-	var errMessage = 'Please remove the following keys from ';
+utils.validCommerceEvents = [ 'purchase' ];
 
-	if (invalidKeys['root'].length) {
-		errMessage += 'the root of commerce_data: ' + invalidKeys['root'].join(', ');
-	}
+/** @type {Object<string,message>} */
+utils.commerceEventMessages = {
+	missingPurchaseEvent: 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
+	missingCommerceData: 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
+	invalidKeysForRoot: 'Please remove the following keys from the root of commerce_data: ',
+	invalidKeysForProducts: 'Please remove the following keys from commerce_data.products: '
+};
 
-	if (invalidKeys['root'].length && invalidKeys['products'].length) {
-		errMessage += '. In addition, please remove the following keys from commerce_data.products: ' + invalidKeys['products'].join(', ') + '.';
-	}
-
-	else if (invalidKeys['products'].length) {
-		errMessage += 'commerce_data.products: ' + invalidKeys['products'].join(', ');
-	}
-
-	return errMessage;
-}

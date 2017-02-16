@@ -153,7 +153,7 @@ Server.prototype.getUrl = function(resource, data) {
 
 	if (resource.endpoint === '/v1/event') {
 		d['metadata'] = safejson.stringify(d['metadata'] || {});
-		if (d.hasOwnProperty('commerce_data')){
+		if (d.hasOwnProperty('commerce_data')) {
 			d['commerce_data'] = safejson.stringify(d['commerce_data'] || {});
 		}
 	}
@@ -285,7 +285,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 						data = {};
 					}
 				}
- 				callback(null, data, req.status);
+				callback(null, data, req.status);
 			}
 			else if (req.status === 402) {
 				callback(new Error('Not enough credits to redeem.'), null, req.status);
