@@ -1861,7 +1861,7 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
  * };
  *
  * var metadata =  { "foo": "bar" };
- *W
+ *
  * branch.trackCommerceEvent('purchase', commerce_data, metadata, function(err) {
  *     if(err) {
  *          throw err;
