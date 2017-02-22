@@ -1820,7 +1820,7 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
 
 /**
  * @function Branch.trackCommerceEvent
- * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently 	support 'purchase' events.
+ * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events.
  * @param {Object} commerce_data - _required_ - Data that describes the commerce event.
  * @param {Object} metadata - _optional_ - metadata you may want add to the event.
  * @param {function(?Error)=} callback - _optional_
@@ -1828,7 +1828,7 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
  * Sends a user commerce event to the server.
  *
  * Use commerce events to track when a user purchases an item in your online store,
- * makes an in-app purchase, or buys a subscription.  The commerce events are tracked in
+ * makes an in-app purchase, or buys a subscription. The commerce events are tracked in
  * the Branch dashboard along with your other events so you can judge the effectiveness of
  * campaigns and other analytics.
  *
@@ -1861,10 +1861,10 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
  * };
  *
  * var metadata =  { "foo": "bar" };
- *
+ *W
  * branch.trackCommerceEvent('purchase', commerce_data, metadata, function(err) {
- *     if(err){
- *          console.log(err);
+ *     if(err) {
+ *          throw err;
  *     }
  * });
  * ```
@@ -1873,37 +1873,27 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
 /*** +TOC_ITEM #trackcommerceevent &.trackCommerceEvent()& ^WEB ***/
 Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, event, commerce_data, metadata) {
 	var self = this;
+	self['renderQueue'](function() {
 
-	metadata = metadata || {};
+		metadata = metadata || {};
 
-	if (!event || typeof event !== 'string' || utils.validCommerceEvents.indexOf(event.toLowerCase()) === -1) {
-		return done(utils.commerceEventMessages.missingPurchaseEvent);
-	}
+		var validationError = utils.validateCommerceEventParams(event, commerce_data);
+		if (validationError) {
+			return done(new Error(validationError));
+		}
 
-	if (!commerce_data || typeof commerce_data !== 'object' || Object.keys(commerce_data).length === 0) {
-		return done(utils.commerceEventMessages.missingCommerceData);
-	}
-
-	var invalidKeys = utils.validateCommerceData(commerce_data);
-
-	if (invalidKeys["root"].length) {
-		return done(utils.commerceEventMessages.invalidKeysForRoot + invalidKeys['root'].join(', '));
-	}
-
-	else if (invalidKeys["products"].length) {
-		return done(utils.commerceEventMessages.invalidKeysForProducts + invalidKeys['products'].join(', '));
-	}
-
-	self._api(resources.commerceEvent, {
-		"event": event,
-		"metadata":utils.merge({
-			"url": document.URL,
-			"user_agent": navigator.userAgent,
-			"language": navigator.language
-		}, metadata),
-		"initial_referrer": document.referrer,
-		"commerce_data": commerce_data
-	}, function(err, data) {
-		done(err || null);
+		self._api(resources.commerceEvent, {
+			"event": event,
+			"metadata": utils.merge({
+				"url": document.URL,
+				"user_agent": navigator.userAgent,
+				"language": navigator.language
+			}, metadata),
+			"initial_referrer": document.referrer,
+			"commerce_data": commerce_data
+		}, function(err, data) {
+			done(err || null);
+		});
 	});
+	done();
 });
