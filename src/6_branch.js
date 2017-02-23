@@ -1817,3 +1817,81 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
 		done(null);
 	}
 });
+
+/**
+ * @function Branch.trackCommerceEvent
+ * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events.
+ * @param {Object} commerce_data - _required_ - Data that describes the commerce event.
+ * @param {Object} metadata - _optional_ - metadata you may want add to the event.
+ * @param {function(?Error)=} callback - _optional_
+ *
+ * Sends a user commerce event to the server.
+ *
+ * Use commerce events to track when a user purchases an item in your online store,
+ * makes an in-app purchase, or buys a subscription. The commerce events are tracked in
+ * the Branch dashboard along with your other events so you can judge the effectiveness of
+ * campaigns and other analytics.
+ *
+ * ##### Usage
+ *
+ * ```js
+ * branch.trackCommerceEvent(
+ *     event,
+ *     commerce_data,
+ *     metadata,
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Example
+ *
+ * ```js
+ * var commerce_data = {
+ *     "revenue": 50.0,
+ *     "currency": "USD",
+ *     "transaction_id": "foo-transaction-id",
+ *     "shipping": 0.0,
+ *     "tax": 5.0,
+ *     "affiliation": "foo-affiliation",
+ *     "products": [
+ *          { "sku": "foo-sku-1", "name": "foo-item-1", "price": 45.00, "quantity": 1, "brand": "foo-brand",
+ *            "category": "Electronics", "variant": "foo-variant-1"},
+ *          { "sku": "foo-sku-2", "price": 2.50, "quantity": 2}
+ *      ],
+ * };
+ *
+ * var metadata =  { "foo": "bar" };
+ *
+ * branch.trackCommerceEvent('purchase', commerce_data, metadata, function(err) {
+ *     if(err) {
+ *          throw err;
+ *     }
+ * });
+ * ```
+ */
+/*** +TOC_HEADING &Revenue Analytics& ^WEB ***/
+/*** +TOC_ITEM #trackcommerceevent &.trackCommerceEvent()& ^WEB ***/
+Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, event, commerce_data, metadata) {
+	var self = this;
+	self['renderQueue'](function() {
+
+		var validationError = utils.validateCommerceEventParams(event, commerce_data);
+		if (validationError) {
+			return done(new Error(validationError));
+		}
+
+		self._api(resources.commerceEvent, {
+			"event": event,
+			"metadata": utils.merge({
+				"url": document.URL,
+				"user_agent": navigator.userAgent,
+				"language": navigator.language
+			}, metadata || {}),
+			"initial_referrer": document.referrer,
+			"commerce_data": commerce_data
+		}, function(err, data) {
+			done(err || null);
+		});
+	});
+	done();
+});

@@ -56,7 +56,8 @@
 		'setBranchViewData',
 		'setIdentity',
 		'track',
-		'validateCode'
+		'validateCode',
+		'trackCommerceEvent'
 	],
 	0
 );

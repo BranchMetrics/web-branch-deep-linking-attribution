@@ -153,6 +153,9 @@ Server.prototype.getUrl = function(resource, data) {
 
 	if (resource.endpoint === '/v1/event') {
 		d['metadata'] = safejson.stringify(d['metadata'] || {});
+		if (d.hasOwnProperty('commerce_data')) {
+			d['commerce_data'] = safejson.stringify(d['commerce_data'] || {});
+		}
 	}
 
 	if (resource.endpoint === '/v1/open') {

@@ -553,3 +553,89 @@ utils.getBrowserLanguageCode = function() {
 	}
 	return code;
 };
+
+/**
+ * Returns an array which contains the difference in elements between the 'original' and 'toCheck' arrays.
+ * If there is no difference, an empty array will be returned.
+ */
+utils.calculateDiffBetweenArrays = function(original, toCheck) {
+	var diff = [];
+	toCheck.forEach(function(element) {
+		if (original.indexOf(element) === -1) {
+			diff.push(element);
+		}
+	});
+	return diff;
+};
+
+var validCommerceEvents = [ 'purchase' ];
+
+var commerceEventMessages = {
+	missingPurchaseEvent: 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
+	missingCommerceData: 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
+	invalidKeysForRoot: 'Please remove the following keys from the root of commerce_data: ',
+	invalidKeysForProducts: 'Please remove the following keys from commerce_data.products: ',
+	invalidProductListType: 'commerce_data.products must be an array of objects',
+	invalidProductType: 'Each product in the products list must be an object'
+};
+
+/**
+ * Validates the commerce-data object passed into branch.trackCommerceEvent().
+ * If there are invalid keys present then it will report back what those keys are.
+ * Note: The keys below are optional.
+ */
+var validateCommerceDataKeys = function(commerceData) {
+	var allowedInRoot = [ 'common', 'type', 'transaction_id', 'currency', 'revenue', 'revenue_in_usd', 'exchange_rate', 'shipping', 'tax', 'coupon', 'affiliation', 'persona', 'products' ];
+	var allowedInProducts = [ 'sku', 'name', 'price', 'quantity', 'brand', 'category', 'variant' ];
+
+	var invalidKeysInRoot = utils.calculateDiffBetweenArrays(allowedInRoot, Object.keys(commerceData));
+	if (invalidKeysInRoot.length) {
+		return commerceEventMessages['invalidKeysForRoot'] + invalidKeysInRoot.join(', ');
+	}
+
+	var invalidKeysForProducts = [];
+	var invalidProductType;
+	if (commerceData.hasOwnProperty('products')) {
+		// make sure products is an array
+		if (!Array.isArray(commerceData['products'])) {
+			return commerceEventMessages['invalidProductListType'];
+		}
+		commerceData['products'].forEach(function(product) {
+			// all product entries must be objects
+			if (typeof product !== 'object') {
+				invalidProductType = commerceEventMessages['invalidProductType'];
+			}
+			invalidKeysForProducts = invalidKeysForProducts.concat(utils.calculateDiffBetweenArrays(allowedInProducts, Object.keys(product)));
+		});
+
+		if (invalidProductType) {
+			return invalidProductType;
+		}
+
+		if (invalidKeysForProducts.length) {
+			return commerceEventMessages['invalidKeysForProducts'] + invalidKeysForProducts.join(', ');
+		}
+	}
+
+	return null;
+};
+
+/**
+ * Returns an error message if the partner passes in an invalid event or commerce_data to branch.trackCommerceEvent()
+ */
+utils.validateCommerceEventParams = function(event, commerce_data) {
+	if (!event || typeof event !== 'string' || validCommerceEvents.indexOf(event.toLowerCase()) === -1) {
+		return commerceEventMessages.missingPurchaseEvent;
+	}
+
+	if (!commerce_data || typeof commerce_data !== 'object' || Object.keys(commerce_data).length === 0) {
+		return commerceEventMessages.missingCommerceData;
+	}
+
+	var invalidKeysMessage = validateCommerceDataKeys(commerce_data);
+	if (invalidKeysMessage) {
+		return invalidKeysMessage;
+	}
+
+	return null;
+};
