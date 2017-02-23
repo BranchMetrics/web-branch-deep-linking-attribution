@@ -1875,8 +1875,6 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 	var self = this;
 	self['renderQueue'](function() {
 
-		metadata = metadata || {};
-
 		var validationError = utils.validateCommerceEventParams(event, commerce_data);
 		if (validationError) {
 			return done(new Error(validationError));
@@ -1888,7 +1886,7 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 				"url": document.URL,
 				"user_agent": navigator.userAgent,
 				"language": navigator.language
-			}, metadata),
+			}, metadata || {}),
 			"initial_referrer": document.referrer,
 			"commerce_data": commerce_data
 		}, function(err, data) {

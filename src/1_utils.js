@@ -568,59 +568,59 @@ utils.calculateDiffBetweenArrays = function(original, toCheck) {
 	return diff;
 };
 
+var validCommerceEvents = [ 'purchase' ];
+
+var commerceEventMessages = {
+	missingPurchaseEvent: 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
+	missingCommerceData: 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
+	invalidKeysForRoot: 'Please remove the following keys from the root of commerce_data: ',
+	invalidKeysForProducts: 'Please remove the following keys from commerce_data.products: '
+};
+
 /**
  * Validates the commerce-data object passed into branch.trackCommerceEvent().
  * If there are invalid keys present then it will report back what those keys are.
  * Note: The keys below are optional.
  */
-utils.validateCommerceDataKeys = function(commerceData) {
+var validateCommerceDataKeys = function(commerceData) {
 	var allowedInRoot = [ 'common', 'type', 'transaction_id', 'currency', 'revenue', 'revenue_in_usd', 'exchange_rate', 'shipping', 'tax', 'coupon', 'affiliation', 'persona', 'products' ];
 	var allowedInProducts = [ 'sku', 'name', 'price', 'quantity', 'brand', 'category', 'variant' ];
 
-	var invalidKeys = {
-		root: utils.calculateDiffBetweenArrays(allowedInRoot, Object.keys(commerceData)),
-		products: []
-	};
+	var invalidKeysInRoot = utils.calculateDiffBetweenArrays(allowedInRoot, Object.keys(commerceData));
+	if (invalidKeysInRoot.length) {
+		return commerceEventMessages['invalidKeysForRoot'] + invalidKeysInRoot.join(', ');
+	}
 
+	var invalidKeysForProducts = [];
 	if (commerceData.hasOwnProperty('products')) {
 		commerceData['products'].forEach(function(product) {
-			invalidKeys['products'] = invalidKeys['products'].concat(utils.calculateDiffBetweenArrays(allowedInProducts, Object.keys(product)));
+			invalidKeysForProducts = invalidKeysForProducts.concat(utils.calculateDiffBetweenArrays(allowedInProducts, Object.keys(product)));
 		});
+
+		if (invalidKeysForProducts.length) {
+			return commerceEventMessages['invalidKeysForProducts'] + invalidKeysForProducts.join(', ');
+		}
 	}
-	return invalidKeys;
+
+	return null;
 };
 
 /**
  * Returns an error message if the partner passes in an invalid event or commerce_data to branch.trackCommerceEvent()
  */
 utils.validateCommerceEventParams = function(event, commerce_data) {
-	if (!event || typeof event !== 'string' || utils.validCommerceEvents.indexOf(event.toLowerCase()) === -1) {
-		return utils.commerceEventMessages.missingPurchaseEvent;
+	if (!event || typeof event !== 'string' || validCommerceEvents.indexOf(event.toLowerCase()) === -1) {
+		return commerceEventMessages.missingPurchaseEvent;
 	}
 
 	if (!commerce_data || typeof commerce_data !== 'object' || Object.keys(commerce_data).length === 0) {
-		return utils.commerceEventMessages.missingCommerceData;
+		return commerceEventMessages.missingCommerceData;
 	}
 
-	var invalidKeys = utils.validateCommerceDataKeys(commerce_data);
-
-	if (invalidKeys['root'].length) {
-		return utils.commerceEventMessages.invalidKeysForRoot + invalidKeys['root'].join(', ');
-	}
-
-	else if (invalidKeys['products'].length) {
-		return utils.commerceEventMessages.invalidKeysForProducts + invalidKeys['products'].join(', ');
+	var invalidKeysMessage = validateCommerceDataKeys(commerce_data);
+	if (invalidKeysMessage) {
+		return invalidKeysMessage;
 	}
 
 	return null;
-};
-
-utils.validCommerceEvents = [ 'purchase' ];
-
-/** @type {Object<string,message>} */
-utils.commerceEventMessages = {
-	missingPurchaseEvent: 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
-	missingCommerceData: 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
-	invalidKeysForRoot: 'Please remove the following keys from the root of commerce_data: ',
-	invalidKeysForProducts: 'Please remove the following keys from commerce_data.products: '
 };
