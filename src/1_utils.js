@@ -574,7 +574,9 @@ var commerceEventMessages = {
 	missingPurchaseEvent: 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
 	missingCommerceData: 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
 	invalidKeysForRoot: 'Please remove the following keys from the root of commerce_data: ',
-	invalidKeysForProducts: 'Please remove the following keys from commerce_data.products: '
+	invalidKeysForProducts: 'Please remove the following keys from commerce_data.products: ',
+	invalidProductListType: 'commerce_data.products must be an array of objects',
+	invalidProductType: 'Each product in the products list must be an object'
 };
 
 /**
@@ -592,10 +594,23 @@ var validateCommerceDataKeys = function(commerceData) {
 	}
 
 	var invalidKeysForProducts = [];
+	var invalidProductType;
 	if (commerceData.hasOwnProperty('products')) {
+		// make sure products is an array
+		if (!Array.isArray(commerceData['products'])) {
+			return commerceEventMessages['invalidProductListType'];
+		}
 		commerceData['products'].forEach(function(product) {
+			// all product entries must be objects
+			if (typeof product !== 'object') {
+				invalidProductType = commerceEventMessages['invalidProductType'];
+			}
 			invalidKeysForProducts = invalidKeysForProducts.concat(utils.calculateDiffBetweenArrays(allowedInProducts, Object.keys(product)));
 		});
+
+		if (invalidProductType) {
+			return invalidProductType;
+		}
 
 		if (invalidKeysForProducts.length) {
 			return commerceEventMessages['invalidKeysForProducts'] + invalidKeysForProducts.join(', ');
