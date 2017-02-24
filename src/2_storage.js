@@ -117,7 +117,7 @@ var webStorage = function(perm) {
 			try {
 				storageMethod.setItem('test', '');
 				storageMethod.removeItem('test');
-				return /\[native code\]/.test(storageMethod.clear.toString());
+				return /\[native code\]/.test(storageMethod.setItem.toString());
 			}
 			catch (err) {
 				return false;
