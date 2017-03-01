@@ -138,18 +138,15 @@ function buildJourneyTestData(branchViewId, branch_key, data){
 
 // checks to see if user dismissed Journey previously and whether it should remain dismissed
 function isJourneyDismissed(branchViewData, branch) {
-
 	// check storage to see dismiss timestamp
 	var dismissTimeStamp = branch._storage.get('hideBanner' + branchViewData["id"], true);
-	var hideJourney = false;
 
-	if (dismissTimeStamp < Date.now()) {
-		branch._storage.remove('hideBanner' + branchViewData["id"], true);
+	if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
+		return true;
 	}
-	else if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
-		hideJourney = true;
-	}
-	return hideJourney;
+
+	branch._storage.remove('hideBanner' + branchViewData["id"], true);
+	return false;
 }
 
 // builds an object that contains data from setBranchViewData() call, hosted deep link data and language data
