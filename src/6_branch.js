@@ -378,7 +378,7 @@ Branch.prototype['init'] = wrap(
 			self._api(resources.event, {
 				"event": 'pageview',
 				"metadata": {
-					"url": document.URL,
+					"url": utils.getWindowLocation(),
 					"user_agent": navigator.userAgent,
 					"language": navigator.language
 				},
