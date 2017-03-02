@@ -1519,10 +1519,9 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, funct
 	_setBranchViewData.call(null, this, done, data);
 });
 
-/** =WEB
- * ### closeJourney()
- *
- * #### Closing a Journey Programmatically
+/**
+ * @function Branch.closeJourney
+ * @param {function(?Error)=} callback - _optional_
  *
  * Journeys include a close button the user can click, but you may want to close the
  * Journey with a timeout, or via some other user interaction with your web app. In this case,
@@ -1532,9 +1531,10 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, funct
  * ```js
  * branch.closeJourney(function(err) { console.log(err); });
  * ```
+ * ___
+ *
  */
-/*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
-/*** +TOC_ITEM #closeJourney &.closeJourney()& ^WEB ***/
+/*** +TOC_ITEM #closejourney &.closeJourney()& ^WEB ***/
 Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	var self = this;
 	self['renderQueue'](function() {
@@ -1823,7 +1823,7 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
  * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events.
  * @param {Object} commerce_data - _required_ - Data that describes the commerce event.
  * @param {Object} metadata - _optional_ - metadata you may want add to the event.
- * @param {function(?Error)=} callback - _optional_
+ * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
  *
  * Sends a user commerce event to the server.
  *

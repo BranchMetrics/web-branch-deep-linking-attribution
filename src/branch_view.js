@@ -179,9 +179,9 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	var testFlag = false;
 
 	if (options) {
-		branchViewId = options.branch_view_id || null;
-		no_journeys = options.no_journeys || null;
-		branch.user_language = options.user_language || utils.getBrowserLanguageCode();
+		branchViewId = options['branch_view_id'] || null;
+		no_journeys = options['no_journeys'] || null;
+		branch.user_language = options['user_language'] || utils.getBrowserLanguageCode();
 	}
 
 	branchViewId = branchViewId || utils.getParameterByName('_branch_view_id') || null;
