@@ -571,12 +571,12 @@ utils.calculateDiffBetweenArrays = function(original, toCheck) {
 var validCommerceEvents = [ 'purchase' ];
 
 var commerceEventMessages = {
-	missingPurchaseEvent: 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
-	missingCommerceData: 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
-	invalidKeysForRoot: 'Please remove the following keys from the root of commerce_data: ',
-	invalidKeysForProducts: 'Please remove the following keys from commerce_data.products: ',
-	invalidProductListType: 'commerce_data.products must be an array of objects',
-	invalidProductType: 'Each product in the products list must be an object'
+	'missingPurchaseEvent': 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
+	'missingCommerceData': 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
+	'invalidKeysForRoot': 'Please remove the following keys from the root of commerce_data: ',
+	'invalidKeysForProducts': 'Please remove the following keys from commerce_data.products: ',
+	'invalidProductListType': 'commerce_data.products must be an array of objects',
+	'invalidProductType': 'Each product in the products list must be an object'
 };
 
 /**
@@ -625,11 +625,11 @@ var validateCommerceDataKeys = function(commerceData) {
  */
 utils.validateCommerceEventParams = function(event, commerce_data) {
 	if (!event || typeof event !== 'string' || validCommerceEvents.indexOf(event.toLowerCase()) === -1) {
-		return commerceEventMessages.missingPurchaseEvent;
+		return commerceEventMessages['missingPurchaseEvent'];
 	}
 
 	if (!commerce_data || typeof commerce_data !== 'object' || Object.keys(commerce_data).length === 0) {
-		return commerceEventMessages.missingCommerceData;
+		return commerceEventMessages['missingCommerceData'];
 	}
 
 	var invalidKeysMessage = validateCommerceDataKeys(commerce_data);
