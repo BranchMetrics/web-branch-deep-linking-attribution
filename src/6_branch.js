@@ -358,6 +358,17 @@ Branch.prototype['init'] = wrap(
 			);
 		};
 
+		var checkForMicroData = function() {
+			var pageHasMicroData = false;
+			try {
+				pageHasMicroData = !!((document.querySelectorAll('*[itemtype^="http://schema.org"]')||[]).length);
+			}
+			catch (err) {
+				pageHasMicroData = false;
+			}
+			return pageHasMicroData;
+		};
+
 		var finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
@@ -380,7 +391,8 @@ Branch.prototype['init'] = wrap(
 				"metadata": {
 					"url": utils.getWindowLocation(),
 					"user_agent": navigator.userAgent,
-					"language": navigator.language
+					"language": navigator.language,
+					"page_has_microdata": checkForMicroData()
 				},
 				"initial_referrer": document.referrer
 			}, function(err, eventData) {
