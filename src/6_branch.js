@@ -1832,12 +1832,12 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
 
 /**
  * @function Branch.trackCommerceEvent
- * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events.
- * @param {Object} commerce_data - _required_ - Data that describes the commerce event.
- * @param {Object} metadata - _optional_ - metadata you may want add to the event.
+ * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events
+ * @param {Object} commerce_data - _required_ - Data that describes the commerce event
+ * @param {Object} metadata - _optional_ - metadata you may want add to the event
  * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
  *
- * Sends a user commerce event to the server.
+ * Sends a user commerce event to the server
  *
  * Use commerce events to track when a user purchases an item in your online store,
  * makes an in-app purchase, or buys a subscription. The commerce events are tracked in
@@ -1880,6 +1880,7 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
  *     }
  * });
  * ```
+ * ___
  */
 /*** +TOC_HEADING &Revenue Analytics& ^WEB ***/
 /*** +TOC_ITEM #trackcommerceevent &.trackCommerceEvent()& ^WEB ***/
