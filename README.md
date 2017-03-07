@@ -40,7 +40,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -100,13 +100,14 @@ ___
 
 6. Journeys Web To App
   + [.setBranchViewData()](#setBranchViewData)
-
-7. Journeys Web To App
-  + [.closeJourney()](#closeJourney)
+  + [.closeJourney()](#closejourney)
   + [.banner()](#banneroptions-data)
 
-8. Firebase App Indexing
+7. Firebase App Indexing
   + [.autoAppIndex()](#autoappindex)
+
+8. Revenue Analytics
+  + [.trackCommerceEvent()](#trackcommerceevent)
 
 ___
 # Global
@@ -855,6 +856,24 @@ branch.setBranchViewData({
 
 
 
+### closeJourney(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_
+
+Journeys include a close button the user can click, but you may want to close the
+Journey with a timeout, or via some other user interaction with your web app. In this case,
+closing the Journey is very simple by calling `Branch.closeJourney()`.
+
+##### Usage
+```js
+branch.closeJourney(function(err) { console.log(err); });
+```
+___
+
+
+
 ### banner(options, data) 
 
 **Parameters**
@@ -983,6 +1002,65 @@ branch.autoAppIndex({
     androidURL:'example/home/cupertino/12345',
     data:{"walkScore":65, "transitScore":50}
 }, function(err) { console.log(err); });
+```
+___
+
+
+
+### trackCommerceEvent(event, commerce_data, metadata, callback) 
+
+**Parameters**
+
+**event**: `String`, _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events
+
+**commerce_data**: `Object`, _required_ - Data that describes the commerce event
+
+**metadata**: `Object`, _optional_ - metadata you may want add to the event
+
+**callback**: `function`, _optional_ - Returns an error if unsuccessful
+
+Sends a user commerce event to the server
+
+Use commerce events to track when a user purchases an item in your online store,
+makes an in-app purchase, or buys a subscription. The commerce events are tracked in
+the Branch dashboard along with your other events so you can judge the effectiveness of
+campaigns and other analytics.
+
+##### Usage
+
+```js
+branch.trackCommerceEvent(
+    event,
+    commerce_data,
+    metadata,
+    callback (err)
+);
+```
+
+##### Example
+
+```js
+var commerce_data = {
+    "revenue": 50.0,
+    "currency": "USD",
+    "transaction_id": "foo-transaction-id",
+    "shipping": 0.0,
+    "tax": 5.0,
+    "affiliation": "foo-affiliation",
+    "products": [
+         { "sku": "foo-sku-1", "name": "foo-item-1", "price": 45.00, "quantity": 1, "brand": "foo-brand",
+           "category": "Electronics", "variant": "foo-variant-1"},
+         { "sku": "foo-sku-2", "price": 2.50, "quantity": 2}
+     ],
+};
+
+var metadata =  { "foo": "bar" };
+
+branch.trackCommerceEvent('purchase', commerce_data, metadata, function(err) {
+    if(err) {
+         throw err;
+    }
+});
 ```
 ___
 

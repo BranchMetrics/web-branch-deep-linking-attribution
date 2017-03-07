@@ -908,7 +908,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.18.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.19.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1124,6 +1124,47 @@ utils.getBrowserLanguageCode = function() {
   }
   return a;
 };
+utils.calculateDiffBetweenArrays = function(a, b) {
+  var c = [];
+  b.forEach(function(b) {
+    -1 === a.indexOf(b) && c.push(b);
+  });
+  return c;
+};
+var validCommerceEvents = ["purchase"], commerceEventMessages = {missingPurchaseEvent:"event name is either missing, of the wrong type or not valid. Please specify 'purchase' as the event name.", missingCommerceData:"commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.", invalidKeysForRoot:"Please remove the following keys from the root of commerce_data: ", invalidKeysForProducts:"Please remove the following keys from commerce_data.products: ", 
+invalidProductListType:"commerce_data.products must be an array of objects", invalidProductType:"Each product in the products list must be an object"}, validateCommerceDataKeys = function(a) {
+  var b = "sku name price quantity brand category variant".split(" "), c = utils.calculateDiffBetweenArrays("common type transaction_id currency revenue revenue_in_usd exchange_rate shipping tax coupon affiliation persona products".split(" "), Object.keys(a));
+  if (c.length) {
+    return commerceEventMessages.invalidKeysForRoot + c.join(", ");
+  }
+  var d = [], e;
+  if (a.hasOwnProperty("products")) {
+    if (!Array.isArray(a.products)) {
+      return commerceEventMessages.invalidProductListType;
+    }
+    a.products.forEach(function(a) {
+      "object" !== typeof a && (e = commerceEventMessages.invalidProductType);
+      d = d.concat(utils.calculateDiffBetweenArrays(b, Object.keys(a)));
+    });
+    if (e) {
+      return e;
+    }
+    if (d.length) {
+      return commerceEventMessages.invalidKeysForProducts + d.join(", ");
+    }
+  }
+  return null;
+};
+utils.validateCommerceEventParams = function(a, b) {
+  if (!a || "string" !== typeof a || -1 === validCommerceEvents.indexOf(a.toLowerCase())) {
+    return commerceEventMessages.missingPurchaseEvent;
+  }
+  if (!b || "object" !== typeof b || 0 === Object.keys(b).length) {
+    return commerceEventMessages.missingCommerceData;
+  }
+  var c = validateCommerceDataKeys(b);
+  return c ? c : null;
+};
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
@@ -1191,6 +1232,7 @@ resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", 
 stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), deepview_type:validator(!0, validationTypes.STRING), source:validator(!0, validationTypes.STRING)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)})};
+resources.commerceEvent = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), commerce_data:validator(!0, validationTypes.OBJECT)})};
 // Input 7
 var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
@@ -1382,7 +1424,7 @@ Server.prototype.getUrl = function(a, b) {
       return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (h.metadata = safejson.stringify(h.metadata || {}));
+  "/v1/event" === a.endpoint && (h.metadata = safejson.stringify(h.metadata || {}), h.hasOwnProperty("commerce_data") && (h.commerce_data = safejson.stringify(h.commerce_data || {})));
   "/v1/open" === a.endpoint && (h.options = safejson.stringify(h.options || {}));
   return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
 };
@@ -1941,20 +1983,20 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
     a.XHRRequest(g + ("&data=" + c), {}, "GET", {}, function(a, c) {
       var g = !1;
       if (!a && c) {
-        var p = f ? 0 : journeys_utils.findDismissPeriod(c), q = window.setTimeout(function() {
+        var q = f ? 0 : journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
           window[m] = function() {
           };
         }, TIMEOUT);
         window[m] = function(a) {
-          window.clearTimeout(q);
-          g || (h = a, journeys_utils.finalHookups(b, d, h, k, p));
+          window.clearTimeout(r);
+          g || (h = a, journeys_utils.finalHookups(b, d, h, k, q));
         };
         k = renderHtmlBlob(document.body, c, e);
         if (null === k) {
           g = !0;
           return;
         }
-        journeys_utils.finalHookups(b, d, h, k, p);
+        journeys_utils.finalHookups(b, d, h, k, q);
       }
       document.body.removeChild(l);
     }, !0);
@@ -1967,15 +2009,12 @@ function buildJourneyTestData(a, b, c) {
   return {id:a, number_of_use:-1, url:config.api_endpoint + "/v1/branchview/" + b + "/" + a + "?_a=audience_rule_id&_t=" + c.browser_fingerprint_id};
 }
 function isJourneyDismissed(a, b) {
-  var c = b._storage.get("hideBanner" + a.id, !0), d = !1;
-  if (c < Date.now()) {
-    b._storage.remove("hideBanner" + a.id, !0);
-  } else {
-    if (!0 === c || c > Date.now()) {
-      d = !0;
-    }
+  var c = b._storage.get("hideBanner" + a.id, !0);
+  if (!0 === c || c > Date.now()) {
+    return !0;
   }
-  return d;
+  b._storage.remove("hideBanner" + a.id, !0);
+  return !1;
 }
 function compileRequestData(a) {
   var b = a._branchViewData || {};
@@ -2143,21 +2182,29 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       a || !c || e.has_app || (e.has_app = !0, session.update(d._storage, e), d._publishEvent("didDownloadApp"));
       b && b(null, e);
     });
-  }, l = function(f, g) {
+  }, l = function() {
+    var a = !1;
+    try {
+      a = !!(document.querySelectorAll('*[itemtype^="http://schema.org"]') || []).length;
+    } catch (q) {
+      a = !1;
+    }
+    return a;
+  }, m = function(f, g) {
     g && (g = e(g), session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data ? safejson.parse(g.data) : null);
     if (f) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, g && utils.whiteListSessionData(g));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, initial_referrer:document.referrer}, function(e, f) {
+    d._api(resources.event, {event:"pageview", metadata:{url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:l()}, initial_referrer:document.referrer}, function(e, f) {
       e || "object" !== typeof f || branch_view.initJourney(b, g, f, c, d);
       try {
         a(e, g && utils.whiteListSessionData(g));
-      } catch (r) {
+      } catch (t) {
       } finally {
         d.renderFinalize();
       }
     });
-  }, m = function() {
+  }, n = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
@@ -2165,19 +2212,19 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }, !1);
   };
   if (f && f.session_id && !g) {
-    m(), h(f, l);
+    n(), h(f, m);
   } else {
-    var f = {sdk:config.version}, n = session.get(d._storage, !0) || {};
-    n.browser_fingerprint_id && (f._t = n.browser_fingerprint_id);
+    var f = {sdk:config.version}, p = session.get(d._storage, !0) || {};
+    p.browser_fingerprint_id && (f._t = p.browser_fingerprint_id);
     d._api(resources._r, f, function(a, b) {
       if (a) {
-        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, l(a, null);
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
       d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), g && (b.click_id = g));
-        m();
-        l(a, b);
+        n();
+        m(a, b);
       });
     });
   }
@@ -2405,6 +2452,19 @@ Branch.prototype.autoAppIndex = wrap(callback_params.CALLBACK_ERR, function(a, b
   appindexing.state.androidAppIndexingTagsPresent || (appindexing.insertAppIndexingTagsFromConfig("android"), appindexing.state.androidDetailsComplete || appindexing.populateConfigFromAppLinksTags("android"));
   appindexing.state.iosAppIndexingTagsPresent || (appindexing.insertAppIndexingTagsFromConfig("ios"), appindexing.state.iosDetailsComplete || appindexing.populateConfigFromAppLinksTags("ios"));
   appindexing.state.iosDetailsComplete || appindexing.state.androidDetailsComplete ? a(null) : a("Firebase App Indexing tags were not added to your webpage. Please check your configuration.");
+});
+Branch.prototype.trackCommerceEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
+  var e = this;
+  e.renderQueue(function() {
+    var f = utils.validateCommerceEventParams(b, c);
+    if (f) {
+      return a(Error(f));
+    }
+    e._api(resources.commerceEvent, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, d || {}), initial_referrer:document.referrer, commerce_data:c}, function(b, c) {
+      a(b || null);
+    });
+  });
+  a();
 });
 // Input 18
 var branch_instance = new Branch;
