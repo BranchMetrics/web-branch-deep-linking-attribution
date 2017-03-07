@@ -2,7 +2,10 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.19.0] - 2017-03-07
+- add ability to track commerce events
+- fix for 'no_journeys' not being respected when passed in as an option to branch.init() 
+- other minor bug fixes
 
 ## [v2.18.0] - 2017-02-10
 - add closeJourney method
