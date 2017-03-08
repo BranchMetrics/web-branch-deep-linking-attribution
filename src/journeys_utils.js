@@ -366,6 +366,9 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
  */
 journeys_utils.animateBannerEntrance = function(banner) {
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
+	if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
+		banner_utils.addClass(document.body, 'branch-banner-no-scroll');
+	}
 
 	function onAnimationEnd() {
 		if (journeys_utils.position === 'top') {
@@ -487,6 +490,7 @@ journeys_utils.animateBannerExit = function(banner) {
 			document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 		}
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
+		banner_utils.removeClass(document.body, 'branch-banner-no-scroll');
 	}, banner_utils.animationDelay);
 
 }
