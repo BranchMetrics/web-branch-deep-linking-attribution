@@ -1,5 +1,7 @@
+COMPILER_VERSION=20170218
+CLOSURE_LIBRARY_VERSION=20170218
 COMPILER=java -jar compiler/compiler.jar
-COMPILER_LIBRARY=compiler/library/closure-library-master/closure
+COMPILER_LIBRARY=compiler/library/closure-library-$(CLOSURE_LIBRARY_VERSION)/closure
 
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --only_closure_dependencies --closure_entry_point branch_instance
 COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --define 'DEBUG=false'
@@ -40,22 +42,22 @@ release: clean all dist/build.min.js.gz
 # Download closure compiler if none is found
 compiler/compiler.jar:
 	mkdir -p compiler && \
-		wget http://dl.google.com/closure-compiler/compiler-20170218.zip && \
-		unzip -o compiler-20170218.zip -d compiler && \
+		wget http://dl.google.com/closure-compiler/compiler-$(COMPILER_VERSION).zip && \
+		unzip -o compiler-$(COMPILER_VERSION).zip -d compiler && \
 		mv compiler/closure-compiler-v*.jar compiler/compiler.jar && \
-		rm -f compiler-20170218.zip
+		rm -f compiler-$(COMPILER_VERSION).zip
 
-compiler/library/closure-library-master/closure/goog/base.js:
+compiler/library/closure-library-$(CLOSURE_LIBRARY_VERSION)/closure/goog/base.js:
 	mkdir -p compiler/library && \
-		wget https://github.com/google/closure-library/archive/master.zip && \
-		unzip -o master.zip -d compiler/library && \
-		rm -f master.zip
+		wget https://github.com/google/closure-library/archive/v$(CLOSURE_LIBRARY_VERSION).zip && \
+		unzip -o v$(CLOSURE_LIBRARY_VERSION).zip -d compiler/library && \
+		rm -f v$(CLOSURE_LIBRARY_VERSION).zip
 
-compiler/library/closure-library-master/closure/goog/json/json.js:
+compiler/library/closure-library-$(CLOSURE_LIBRARY_VERSION)/closure/goog/json/json.js:
 	mkdir -p compiler/library && \
-		wget https://github.com/google/closure-library/archive/master.zip && \
-		unzip -o master.zip -d compiler/library && \
-		rm -f master.zip
+		wget https://github.com/google/closure-library/archive/v$(CLOSURE_LIBRARY_VERSION).zip && \
+		unzip -o v$(CLOSURE_LIBRARY_VERSION).zip -d compiler/library && \
+		rm -f v$(CLOSURE_LIBRARY_VERSION).zip
 
 test/branch-deps.js: $(SOURCES) compiler/library
 	python $(COMPILER_LIBRARY)/bin/calcdeps.py \
