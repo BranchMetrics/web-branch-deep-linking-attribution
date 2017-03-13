@@ -40,10 +40,10 @@ release: clean all dist/build.min.js.gz
 # Download closure compiler if none is found
 compiler/compiler.jar:
 	mkdir -p compiler && \
-		wget http://dl.google.com/closure-compiler/compiler-latest.zip && \
-		unzip -o compiler-latest.zip -d compiler && \
+		wget http://dl.google.com/closure-compiler/compiler-20170218.zip && \
+		unzip -o compiler-20170218.zip -d compiler && \
 		mv compiler/closure-compiler-v*.jar compiler/compiler.jar && \
-		rm -f compiler-latest.zip
+		rm -f compiler-20170218.zip
 
 compiler/library/closure-library-master/closure/goog/base.js:
 	mkdir -p compiler/library && \
