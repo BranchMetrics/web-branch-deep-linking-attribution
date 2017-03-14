@@ -172,7 +172,11 @@ banner_utils.addCSSLengths = function(length1, length2) {
  */
 banner_utils.shouldAppend = function(storage, options) {
 	var hideBanner = storage.get('hideBanner', true);
-
+	
+	if (options.alwaysShow && options.alwaysShow == true){
+		return true;	
+	}
+	
 	if (options.respectDNT && navigator && !!Number(navigator['doNotTrack'])) {
 		return false;
 	}
