@@ -2,7 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.20.0] - 2017-03-16
+- no scroll class for full page fixed journeys
 
 ## [v2.19.0] - 2017-03-07
 - add ability to track commerce events
