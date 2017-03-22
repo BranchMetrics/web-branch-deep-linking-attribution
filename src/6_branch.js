@@ -1263,7 +1263,10 @@ Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done
 /*** +TOC_HEADING &Credit Functions& ^ALL ***/
 /*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
 Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	this._api(resources.credits, { }, done);
+	this._api(resources.credits, {
+		"branch_key": this.branch_key,
+		"identity": this.identity
+	}, done);
 });
 
 /**

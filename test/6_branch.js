@@ -1207,7 +1207,7 @@ describe('Branch', function() {
 	describe('credits', function() {
 		basicTests('credits', [ 0 ]);
 
-		it('should call api with identity_id', function(done) {
+		it('should call api with identity', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
@@ -1216,16 +1216,27 @@ describe('Branch', function() {
 				"other bucket": 9
 			};
 
+			var expectedResponseSetIdentity = {
+				identity_id: '12345',
+				link: 'url',
+				referring_data: '{ }',
+				referring_identity: '12345'
+			};
+
+			branch.setIdentity('foo', function(err, res) {});
+			requests[0].callback(null, expectedResponseSetIdentity);
+
 			branch.credits(function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
 				assert.strictEqual(err, null, 'No error');
 			});
 
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
+			assert.strictEqual(requests.length, 2, 'Request made');
+			requests[1].callback(null, expectedResponse);
+
 			assert.deepEqual(
-				requests[0].obj,
-				testUtils.params({ }, [ "_t" ]),
+				requests[1].obj,
+				testUtils.params({ identity: 'foo', identity_id: "12345" }, [ "_t" ]),
 				'All params sent'
 			);
 		});
