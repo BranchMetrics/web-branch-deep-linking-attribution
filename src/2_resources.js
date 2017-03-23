@@ -222,8 +222,8 @@ resources.credits = {
 	endpoint: "/v1/credits",
 	method: utils.httpMethod.GET,
 	params: defaults({
-		"branch_key":validator(true, validationTypes.STRING),
-		"identity":validator(true, validationTypes.STRING)
+		"branch_key": validator(true, validationTypes.STRING),
+		"identity": validator(true, validationTypes.STRING)
 	})
 };
 
