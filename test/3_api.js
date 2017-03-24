@@ -749,7 +749,7 @@ describe('Server', function() {
 
 				for (var i = 0; i < queryParamsAfterSplit.length; i++) {
 					var queryParam = queryParamsAfterSplit[i].split('=');
-					assert.strictEqual(requiredParms.hasOwnProperty(queryParam[0]), true, 'Missing required query param');
+					assert.strictEqual(queryParam[0], requiredParms.hasOwnProperty(queryParam[0]) ? queryParam[0] : undefined, 'Query param not found in expected query param list');
 					assert.strictEqual(queryParam[1], requiredParms[queryParam[0]], 'Values do not match');
 				}
 
@@ -787,7 +787,7 @@ describe('Server', function() {
 
 				for (var i = 0; i < queryParamsAfterSplit.length; i++) {
 					var queryParam = queryParamsAfterSplit[i].split('=');
-					assert.strictEqual(requiredParms.hasOwnProperty(queryParam[0]), true, 'Missing required query param');
+					assert.strictEqual(queryParam[0], requiredParms.hasOwnProperty(queryParam[0]) ? queryParam[0] : undefined, 'Query param not found in expected query param list');
 					assert.strictEqual(queryParam[1], requiredParms[queryParam[0]], 'Values do not match');
 				}
 
