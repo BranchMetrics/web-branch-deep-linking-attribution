@@ -302,10 +302,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"browser_fingerprint_id=" + browser_fingerprint_id +
-						"&identity_id=" + identity_id +
-						"&is_referrable=1&sdk=web" + config.version +
-						"&branch_key=" + branch_sample_key +
-						"&options=%7B%7D",
+					"&identity_id=" + identity_id +
+					"&is_referrable=1&sdk=web" + config.version +
+					"&branch_key=" + branch_sample_key +
+					"&options=%7B%7D",
 					'Data correct');
 				requests[0].respond(
 					200,
@@ -329,7 +329,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.api_endpoint + '/v1/open?&data=' + encodedData +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
+					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 
@@ -384,10 +384,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"browser_fingerprint_id=" + browser_fingerprint_id +
-						"&identity_id=" + identity_id +
-						"&is_referrable=1&sdk=web" + config.version +
-						"&app_id=" + "5680621892404085" +
-						"&options=%7B%7D",
+					"&identity_id=" + identity_id +
+					"&is_referrable=1&sdk=web" + config.version +
+					"&app_id=" + "5680621892404085" +
+					"&options=%7B%7D",
 					'Data correct');
 			});
 
@@ -482,11 +482,11 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
-						"&identity=test_id" +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
-						"&sdk=web" + config.version +
-						"&session_id=" + session_id +
-						"&branch_key=" + branch_sample_key,
+					"&identity=test_id" +
+					"&browser_fingerprint_id=" + browser_fingerprint_id +
+					"&sdk=web" + config.version +
+					"&session_id=" + session_id +
+					"&branch_key=" + branch_sample_key,
 					'Params correct'
 				);
 
@@ -511,7 +511,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.api_endpoint + '/v1/profile?&data=' + encodedData +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
+					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 
@@ -586,10 +586,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"session_id=" + session_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
-						"&identity_id=" + identity_id +
-						"&sdk=web" + config.version +
-						"&branch_key=" + branch_sample_key,
+					"&browser_fingerprint_id=" + browser_fingerprint_id +
+					"&identity_id=" + identity_id +
+					"&sdk=web" + config.version +
+					"&branch_key=" + branch_sample_key,
 					'Expected request body for the first request'
 				);
 
@@ -614,7 +614,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.api_endpoint + '/v1/logout?&data=' + encodedData +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
+					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 				requests[0].callback();
@@ -668,10 +668,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].url,
 					config.api_endpoint + '/v1/referrals/' + identity_id +
-						"?browser_fingerprint_id=" + browser_fingerprint_id +
-						"&identity_id=" + identity_id +
-						"&sdk=web" + config.version +
-						'&session_id=' + session_id,
+					"?browser_fingerprint_id=" + browser_fingerprint_id +
+					"&identity_id=" + identity_id +
+					"&sdk=web" + config.version +
+					'&session_id=' + session_id,
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
@@ -691,11 +691,11 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.api_endpoint + '/v1/referrals/' + identity_id +
-						"?browser_fingerprint_id=" + browser_fingerprint_id +
-						'&identity_id=' + identity_id +
-						'&sdk=web' + config.version +
-						'&session_id=' + session_id +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
+					"?browser_fingerprint_id=" + browser_fingerprint_id +
+					'&identity_id=' + identity_id +
+					'&sdk=web' + config.version +
+					'&session_id=' + session_id +
+					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 				requests[0].callback();
@@ -724,22 +724,36 @@ describe('Server', function() {
 				storage.clear();
 			});
 
-			it('should pass in identity_id', function(done) {
+			it('should pass in identity', function(done) {
 				storage['set']('use_jsonp', false);
-				var assert = testUtils.plan(4, done);
-				server.request(resources.credits, testUtils.params({ }), storage, assert.done);
-
+				var assert = testUtils.plan(17, done);
+				server.request(resources.credits, testUtils.params({ "identity":"foo" }), storage, assert.done);
 				assert.strictEqual(requests.length, 1, 'Request made');
-				assert.strictEqual(
-					requests[0].url,
-					config.api_endpoint + '/v1/credits/' + identity_id +
-						"?browser_fingerprint_id=" + browser_fingerprint_id +
-						'&identity_id=' + identity_id +
-						'&sdk=web' + config.version +
-						'&session_id=' + session_id,
-					'Endpoint correct');
-				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 
+				var urlAfterSplit = requests[0].url.split('?');
+				assert.strictEqual(urlAfterSplit.length, 2, 'Request URL does not contain required query params');
+				assert.strictEqual(urlAfterSplit[0], config.api_endpoint + '/v1/credits', 'Credit endpoint does not match');
+
+				var queryParamsAfterSplit = urlAfterSplit[1].split('&'); // query params from URL
+
+				var requiredParms = {
+					"branch_key": branch_sample_key,
+					"identity": "foo",
+					"browser_fingerprint_id": browser_fingerprint_id,
+					"sdk": "web" + config.version,
+					"session_id": session_id,
+					"identity_id": identity_id
+				};
+
+				assert.strictEqual(queryParamsAfterSplit.length, Object.keys(requiredParms).length, 'Number of query params are not the same');
+
+				for (var i = 0; i < queryParamsAfterSplit.length; i++) {
+					var queryParam = queryParamsAfterSplit[i].split('=');
+					assert.strictEqual(queryParam[0], requiredParms.hasOwnProperty(queryParam[0]) ? queryParam[0] : undefined, 'Query param not found in expected query param list');
+					assert.strictEqual(queryParam[1], requiredParms[queryParam[0]], 'Values do not match');
+				}
+
+				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
 				requests[0].respond(
 					200,
 					{ "Content-Type": "application/json" },
@@ -748,32 +762,48 @@ describe('Server', function() {
 			});
 
 			it('should pass as a jsonp request', function(done) {
-				var assert = testUtils.plan(3, done);
+				var assert = testUtils.plan(18, done);
 				storage['set']('use_jsonp', true);
-				server.request(resources.credits, testUtils.params({ }), storage, assert.done);
+				server.request(resources.credits, testUtils.params({ "identity":"foo" }), storage, assert.done);
 				assert.strictEqual(requests.length, 1, 'Request made');
-				assert.strictEqual(
-					requests[0].src,
-					config.api_endpoint + '/v1/credits/' + identity_id +
-						"?browser_fingerprint_id=" + browser_fingerprint_id +
-						'&identity_id=' + identity_id +
-						'&sdk=web' + config.version +
-						'&session_id=' + session_id +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
-					'Endpoint correct');
+
+				var urlAfterSplit = requests[0].src.split('?');
+				assert.strictEqual(urlAfterSplit.length, 2, 'Request URL does not contain required query params');
+				assert.strictEqual(urlAfterSplit[0], config.api_endpoint + '/v1/credits', 'Credit endpoint does not match');
+
+				var queryParamsAfterSplit = urlAfterSplit[1].split('&');
+
+				var requiredParms = {
+					"branch_key": branch_sample_key,
+					"identity": "foo",
+					"browser_fingerprint_id": browser_fingerprint_id,
+					"sdk": "web" + config.version,
+					"session_id": session_id,
+					"identity_id": identity_id,
+					"callback": 'branch_callback__' + (server._jsonp_callback_index - 1)
+				};
+
+				assert.strictEqual(queryParamsAfterSplit.length, Object.keys(requiredParms).length, 'Number of query params are not the same');
+
+				for (var i = 0; i < queryParamsAfterSplit.length; i++) {
+					var queryParam = queryParamsAfterSplit[i].split('=');
+					assert.strictEqual(queryParam[0], requiredParms.hasOwnProperty(queryParam[0]) ? queryParam[0] : undefined, 'Query param not found in expected query param list');
+					assert.strictEqual(queryParam[1], requiredParms[queryParam[0]], 'Values do not match');
+				}
+
 				requests[0].callback();
 			});
 
-			it('should fail without identity_id', function(done) {
+			it('should fail without branch_key', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(
 					resources.credits,
-					testUtils.params({ }, [ 'identity_id' ]),
+					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
 						assert.strictEqual(
 							err.message,
-							"API request /v1/credits missing parameter identity_id"
+							"API request /v1/credits missing parameter branch_key"
 						);
 					}
 				);
@@ -795,8 +825,8 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.app_service_endpoint + '/_r?sdk=web' + config.version +
-						'&_t=79336952217731267' +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
+					'&_t=79336952217731267' +
+					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct');
 				requests[0].callback();
 			});
@@ -833,7 +863,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].url,
 					config.api_endpoint + '/v1/has-app/' + branch_sample_key +
-						'?browser_fingerprint_id=' + browser_fingerprint_id,
+					'?browser_fingerprint_id=' + browser_fingerprint_id,
 					'Endpoint correct'
 				);
 			});
@@ -900,12 +930,12 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"amount=1" +
-						"&bucket=testbucket" +
-						"&identity_id=" + identity_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
-						"&sdk=web" + config.version +
-						"&session_id=" + session_id +
-						"&branch_key=" + branch_sample_key
+					"&bucket=testbucket" +
+					"&identity_id=" + identity_id +
+					"&browser_fingerprint_id=" + browser_fingerprint_id +
+					"&sdk=web" + config.version +
+					"&session_id=" + session_id +
+					"&branch_key=" + branch_sample_key
 				);
 
 				requests[0].respond(
@@ -929,7 +959,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.api_endpoint + '/v1/redeem?&data=' + encodedData +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
+					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 
@@ -1023,10 +1053,10 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"identity_id=" + identity_id +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
-						"&sdk=web" + config.version +
-						"&session_id=" + session_id +
-						"&branch_key=" + branch_sample_key
+					"&browser_fingerprint_id=" + browser_fingerprint_id +
+					"&sdk=web" + config.version +
+					"&session_id=" + session_id +
+					"&branch_key=" + branch_sample_key
 				);
 
 				requests[0].respond(
@@ -1047,7 +1077,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.api_endpoint + '/v1/url?&data=' + encodedData +
-						'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
+					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 				requests[0].callback();
@@ -1147,7 +1177,7 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					'3hpH54U-58?click=click&callback=branch_callback__' +
-						(server._jsonp_callback_index - 1),
+					(server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 				requests[0].callback();
@@ -1182,10 +1212,10 @@ describe('Server', function() {
 
 		describe('/v1/event', function() {
 			var metadata = {
-					"url": "testurl",
-					"user_agent": "test_agent",
-					"language": "test_language"
-				};
+				"url": "testurl",
+				"user_agent": "test_agent",
+				"language": "test_language"
+			};
 			var metadataString = '&metadata=' + encodeURIComponent(JSON.stringify(metadata));
 			beforeEach(function() {
 				requests = [];
@@ -1213,11 +1243,11 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].requestBody,
 					"event=testevent" + metadataString +
-						"&browser_fingerprint_id=" + browser_fingerprint_id +
-						"&identity_id=" + identity_id +
-						"&sdk=web" + config.version +
-						"&session_id=" + session_id +
-						"&branch_key=" + branch_sample_key
+					"&browser_fingerprint_id=" + browser_fingerprint_id +
+					"&identity_id=" + identity_id +
+					"&sdk=web" + config.version +
+					"&session_id=" + session_id +
+					"&branch_key=" + branch_sample_key
 				);
 
 				requests[0].respond(
@@ -1244,8 +1274,8 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].src,
 					config.api_endpoint + '/v1/event?&data=' + encodedData +
-						'&callback=branch_callback__' +
-						(server._jsonp_callback_index - 1),
+					'&callback=branch_callback__' +
+					(server._jsonp_callback_index - 1),
 					'Endpoint correct'
 				);
 				requests[0].callback();
@@ -1356,11 +1386,11 @@ describe('Server', function() {
 				assert.strictEqual(
 					requests[0].url,
 					config.api_endpoint + '/v1/credithistory' +
-						"?browser_fingerprint_id=" + browser_fingerprint_id +
-						"&identity_id=" + identity_id +
-						"&sdk=web" + config.version +
-						"&session_id=" + session_id +
-						"&branch_key=" + branch_sample_key,
+					"?browser_fingerprint_id=" + browser_fingerprint_id +
+					"&identity_id=" + identity_id +
+					"&sdk=web" + config.version +
+					"&session_id=" + session_id +
+					"&branch_key=" + branch_sample_key,
 					'Endpoint correct'
 				);
 				assert.strictEqual(requests[0].method, 'GET', 'Method correct');
@@ -1369,11 +1399,11 @@ describe('Server', function() {
 					200,
 					{ "Content-Type": "application/json" },
 					'[{"transaction":{' +
-						'"id":"63317099967152399","bucket":"default","type":0,"amount":5' +
-						',"date":"2014-11-18T18:09:59.600Z"},' +
-						'"event":{"name":"web session start","metadata":{}},' +
-						'"referrer":"Branch",' +
-						'"referree":null}]'
+					'"id":"63317099967152399","bucket":"default","type":0,"amount":5' +
+					',"date":"2014-11-18T18:09:59.600Z"},' +
+					'"event":{"name":"web session start","metadata":{}},' +
+					'"referrer":"Branch",' +
+					'"referree":null}]'
 				);
 			});
 		});

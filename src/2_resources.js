@@ -221,10 +221,10 @@ resources.credits = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/credits",
 	method: utils.httpMethod.GET,
-	queryPart: {
-		"identity_id": validator(true, branch_id)
-	},
-	params: defaults({ })
+	params: defaults({
+		"branch_key": validator(true, validationTypes.STRING),
+		"identity": validator(true, validationTypes.STRING)
+	})
 };
 
 resources.redeem = {
