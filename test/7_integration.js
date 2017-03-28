@@ -54,6 +54,8 @@ describe('Integration tests', function() {
 	beforeEach(function() {
 		clearBranchStorage();
 		testUtils.go('');
+		branch.branch_key = 'branch_sample_key';
+		branch.identity = 'foo';
 		branch.identity_id = identity_id.toString();
 		branch.device_fingerprint_id = identity_id.toString();
 	});
