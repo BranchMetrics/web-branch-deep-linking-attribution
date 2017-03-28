@@ -1651,9 +1651,9 @@ Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, o
 	}
 	/** @type {banner_utils.options} */
 	var bannerOptions = {
-		icon: /** @type {string} */ (options['icon'] || ''),
-		title: /** @type {string} */ (options['title'] || ''),
-		description: /** @type {string} */ (options['description'] || ''),
+		icon: /** @type {string} */ (utils.cleanBannerText(options['icon']) || ''),
+		title: /** @type {string} */ (utils.cleanBannerText(options['title']) || ''),
+		description: /** @type {string} */ (utils.cleanBannerText(options['description']) || ''),
 		reviewCount: /** @type {number} */ ((
 			typeof options['reviewCount'] === 'number' &&
 			options['reviewCount'] > 0 // force greater than 0
@@ -1667,10 +1667,10 @@ Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, o
 		) ?
 			Math.round(options['rating'] * 2) / 2 : // force increments of .5
 			null),
-		openAppButtonText: /** @type {string} */ (options['openAppButtonText'] || 'View in app'),
-		downloadAppButtonText: /** @type {string} */ (options['downloadAppButtonText'] || 'Download App'),
-		sendLinkText: /** @type {string} */ (options['sendLinkText'] || 'Send Link'),
-		phonePreviewText: /** @type {string} */ (options['phonePreviewText'] || '(999) 999-9999'),
+		openAppButtonText: /** @type {string} */ (utils.cleanBannerText(options['openAppButtonText']) || 'View in app'),
+		downloadAppButtonText: /** @type {string} */ (utils.cleanBannerText(options['downloadAppButtonText']) || 'Download App'),
+		sendLinkText: /** @type {string} */ (utils.cleanBannerText(options['sendLinkText']) || 'Send Link'),
+		phonePreviewText: /** @type {string} */ (utils.cleanBannerText(options['phonePreviewText']) || '(999) 999-9999'),
 		iframe: /** @type {boolean} */ (typeof options['iframe'] === 'undefined' ?
 			true :
 			options['iframe']),

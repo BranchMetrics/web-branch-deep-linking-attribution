@@ -639,3 +639,12 @@ utils.validateCommerceEventParams = function(event, commerce_data) {
 
 	return null;
 };
+
+utils.cleanBannerText = function(string) {
+	if (!string) {
+		return null;
+	}
+
+	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
