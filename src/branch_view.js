@@ -5,6 +5,16 @@ goog.require('banner_css');
 goog.require('safejson');
 goog.require('journeys_utils');
 
+function checkPreviousBanner() {
+	// if banner already exists, don't add another
+	if (document.getElementById('branch-banner') ||
+		document.getElementById('branch-banner-iframe') ||
+		document.getElementById('branch-banner-container')) {
+		return true;
+	}
+	return false;
+}
+
 /**
  * @param {Object} parent
  * @param {string} html
@@ -50,6 +60,9 @@ function renderHtmlBlob(parent, html, hasApp) {
  * @param {Object} branch
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag, branch) {
+	if (checkPreviousBanner()) {
+		return;
+	}
 	journeys_utils.branch = branch;
 
 	var banner = null;
@@ -116,16 +129,6 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		}, true);
 	}
 };
-
-function checkPreviousBanner() {
-	// if banner already exists, don't add another
-	if (document.getElementById('branch-banner') ||
-		document.getElementById('branch-banner-iframe') ||
-		document.getElementById('branch-banner-container')) {
-		return true;
-	}
-	return false;
-}
 
 // builds data for a Journey in test mode
 function buildJourneyTestData(branchViewId, branch_key, data){
