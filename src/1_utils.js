@@ -127,6 +127,10 @@ utils.whiteListJourneysLanguageData = function(sessionData) {
 	var data = sessionData['data'];
 	var retData = {};
 
+	if (!data) {
+		return {};
+	}
+
 	switch (typeof data) {
 		case 'string':
 			try {
