@@ -170,10 +170,6 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	branch._branchViewEnabled = !!eventData['branch_view_enabled'];
 	branch._storage.set('branch_view_enabled', branch._branchViewEnabled);
 
-	if (checkPreviousBanner()) {
-		return;
-	}
-
 	var branchViewId = null;
 	var no_journeys = null;
 	var hideJourney = null;
