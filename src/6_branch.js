@@ -1467,7 +1467,7 @@ Branch.prototype['addListener'] = function(event, listener) {
 
 /** =WEB
  * @function Branch.removeListener
- * @param {function(String, Object)} listener - _required_ - Reference to the listening function you
+ * @param {function(String)} listener - _required_ - Reference to the listening function you
  * would like to remove. *note*: this must be the same reference that was passed to
  * `branch.addListener()`, not an identical clone of the function.
  *
