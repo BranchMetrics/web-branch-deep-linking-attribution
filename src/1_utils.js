@@ -645,7 +645,7 @@ utils.validateCommerceEventParams = function(event, commerce_data) {
 };
 
 utils.cleanBannerText = function(string) {
-	if (!string) {
+	if (typeof string !== 'string') {
 		return null;
 	}
 
