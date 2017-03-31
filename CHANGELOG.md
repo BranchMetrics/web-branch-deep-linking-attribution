@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.21.0] - 2017-03-29
+- fix branch.credits() bug
+- fix null session data bug
+
 ## [v2.20.0] - 2017-03-16
 - no scroll class for full page fixed journeys
 

@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.20.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.21.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -981,6 +981,9 @@ utils.whiteListSessionData = function(a) {
 };
 utils.whiteListJourneysLanguageData = function(a) {
   var b = /^\$journeys_\S+$/, c = a.data, d = {};
+  if (!c) {
+    return {};
+  }
   switch(typeof c) {
     case "string":
       try {
@@ -1240,7 +1243,7 @@ resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", meth
 resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, branch_id), identity:validator(!0, validationTypes.STRING)})};
 resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:defaults({})};
 resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:defaults({begin_after_id:validator(!1, branch_id), bucket:validator(!1, validationTypes.STRING), direction:validator(!1, validationTypes.NUMBER), length:validator(!1, validationTypes.NUMBER), link_click_id:validator(!1, branch_id)})};
-resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, branch_id)}, params:defaults({})};
+resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, params:defaults({branch_key:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, branch_id)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
 validationTypes.NUMBER), source:validator(!1, validationTypes.STRING)})};
@@ -2393,7 +2396,7 @@ Branch.prototype.applyCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
   this._api(resources.applyCode, {code:b}, a);
 });
 Branch.prototype.credits = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  this._api(resources.credits, {}, a);
+  this._api(resources.credits, {branch_key:this.branch_key, identity:this.identity}, a);
 });
 Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   this._api(resources.creditHistory, b || {}, a);

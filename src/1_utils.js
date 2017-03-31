@@ -38,7 +38,7 @@ utils.httpMethod = {
  * }} */
 utils.resource;
 
-/** @typedef {{listener: function(string):null, event: string}} */
+/** @typedef {{listener: function(string, Object):null, event: string, data: Object}} */
 utils.listener;
 
 /* jshint ignore:end */
@@ -126,6 +126,10 @@ utils.whiteListJourneysLanguageData = function(sessionData) {
 	var re = /^\$journeys_\S+$/;
 	var data = sessionData['data'];
 	var retData = {};
+
+	if (!data) {
+		return {};
+	}
 
 	switch (typeof data) {
 		case 'string':

@@ -5,13 +5,23 @@ goog.require('banner_css');
 goog.require('safejson');
 goog.require('journeys_utils');
 
+function checkPreviousBanner() {
+	// if banner already exists, don't add another
+	if (document.getElementById('branch-banner') ||
+		document.getElementById('branch-banner-iframe') ||
+		document.getElementById('branch-banner-container')) {
+		return true;
+	}
+	return false;
+}
+
 /**
  * @param {Object} parent
  * @param {string} html
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
-	journeys_utils.branch._publishEvent('willShowJourney');
+	journeys_utils.branch._publishEvent('willShowJourney', { banner_id: journeys_utils.branchViewId });
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
@@ -50,6 +60,9 @@ function renderHtmlBlob(parent, html, hasApp) {
  * @param {Object} branch
  */
 branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag, branch) {
+	if (checkPreviousBanner()) {
+		return;
+	}
 	journeys_utils.branch = branch;
 
 	var banner = null;
@@ -117,16 +130,6 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	}
 };
 
-function checkPreviousBanner() {
-	// if banner already exists, don't add another
-	if (document.getElementById('branch-banner') ||
-		document.getElementById('branch-banner-iframe') ||
-		document.getElementById('branch-banner-container')) {
-		return true;
-	}
-	return false;
-}
-
 // builds data for a Journey in test mode
 function buildJourneyTestData(branchViewId, branch_key, data){
 	return {
@@ -167,10 +170,6 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	branch._branchViewEnabled = !!eventData['branch_view_enabled'];
 	branch._storage.set('branch_view_enabled', branch._branchViewEnabled);
 
-	if (checkPreviousBanner()) {
-		return;
-	}
-
 	var branchViewId = null;
 	var no_journeys = null;
 	var hideJourney = null;
@@ -199,6 +198,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	}
 
 	if (branchViewData && !hideJourney && !no_journeys) {
+		journeys_utils.branchViewId = branchViewData.id;
 		branch['renderQueue'](function() {
 			requestData = compileRequestData(branch);
 			branch_view.handleBranchViewData(branch._server, branchViewData, requestData, branch._storage, data['has_app'], testFlag, branch);
