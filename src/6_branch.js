@@ -210,11 +210,12 @@ Branch.prototype._referringLink = function() {
 /***
  * @function Branch._publishEvent
  * @param {string} event
+ * @param {Object} data - _optional_ - data to pass into listener callback.
  */
-Branch.prototype._publishEvent = function(event) {
+Branch.prototype._publishEvent = function(event, data) {
 	for (var i = 0; i < this._listeners.length; i++) {
 		if (!this._listeners[i].event || this._listeners[i].event === event) {
-			this._listeners[i].listener(event);
+			this._listeners[i].listener(event, data);
 		}
 	}
 };
@@ -1408,8 +1409,8 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
  * @function Branch.addListener
  * @param {String} event - _optional_ - Specify which events you would like to listen for. If
  * not defined, the observer will recieve all events.
- * @param {function(String)} listener - _required_ - Listeneing function that will recieves an
- * event as a string.
+ * @param {function(String, Object)} listener - _required_ - Listening function that will recieves an
+ * event as a string and optional data as an object.
  *
  * The Branch Web SDK includes a simple event listener, that currently only publishes events for
  * `Branch.banner()` events.
@@ -1419,7 +1420,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
  * ##### Example
  *
  * ```js
- * var listener = function(event) { console.log(event); }
+ * var listener = function(event, data) { console.log(event, data); }
  *
  * // Specify an event to listen for
  * branch.addListener('willShowBanner', listener);
@@ -1554,7 +1555,7 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 	var self = this;
 	self['renderQueue'](function() {
 		if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
-			self._publishEvent('didCallJourneyClose');
+			self._publishEvent('didCallJourneyClose', { banner_id: journeys_utils.branchViewId });
 			journeys_utils.animateBannerExit(journeys_utils.banner);
 		}
 		else {

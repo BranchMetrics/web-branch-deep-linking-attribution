@@ -21,7 +21,7 @@ function checkPreviousBanner() {
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
-	journeys_utils.branch._publishEvent('willShowJourney');
+	journeys_utils.branch._publishEvent('willShowJourney', { banner_id: journeys_utils.branchViewId });
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
@@ -198,6 +198,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	}
 
 	if (branchViewData && !hideJourney && !no_journeys) {
+		journeys_utils.branchViewId = branchViewData.id;
 		branch['renderQueue'](function() {
 			requestData = compileRequestData(branch);
 			branch_view.handleBranchViewData(branch._server, branchViewData, requestData, branch._storage, data['has_app'], testFlag, branch);
