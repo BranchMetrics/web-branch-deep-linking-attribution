@@ -38,7 +38,7 @@ utils.httpMethod = {
  * }} */
 utils.resource;
 
-/** @typedef {{listener: function(string, Object):null, event: string, data: Object}} */
+/** @typedef {{listener: function(string, Object):null, event: string}} */
 utils.listener;
 
 /* jshint ignore:end */
