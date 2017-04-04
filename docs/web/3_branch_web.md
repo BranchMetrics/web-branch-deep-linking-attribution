@@ -652,8 +652,8 @@ ___
 **event**: `String`, _optional_ - Specify which events you would like to listen for. If
 not defined, the observer will recieve all events.
 
-**listener**: `function`, _required_ - Listeneing function that will recieves an
-event as a string.
+**listener**: `function`, _required_ - Listening function that will recieves an
+event as a string and optional data as an object.
 
 The Branch Web SDK includes a simple event listener, that currently only publishes events for
 `Branch.banner()` events.
@@ -663,7 +663,7 @@ SDK functionality.
 ##### Example
 
 ```js
-var listener = function(event) { console.log(event); }
+var listener = function(event, data) { console.log(event, data); }
 
 // Specify an event to listen for
 branch.addListener('willShowBanner', listener);
