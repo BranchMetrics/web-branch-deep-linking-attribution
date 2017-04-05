@@ -21,7 +21,7 @@ function checkPreviousBanner() {
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
-	journeys_utils.branch._publishEvent('willShowJourney', { banner_id: journeys_utils.branchViewId });
+	journeys_utils.branch._publishEvent('willShowJourney', { 'banner_id': journeys_utils.branchViewId });
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
