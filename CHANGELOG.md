@@ -2,7 +2,8 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.22.1] - 2017-04-05
+- event listener minification fix
 
 ## [v2.22.0] - 2017-04-04
 - prevent multiple journeys
