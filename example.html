@@ -51,6 +51,10 @@
 				<h4>Session and Identity</h4>
 				<div class="group">
 					<button id="init" class="btn btn-success">.init()</button>
+					<button id="init-options" class="btn btn-success">.init(key, { link_identifier }, callback)</button>
+					<input class="example-input" type="text" id="link_identifier" class="form-control" placeholder="link_identifier">
+				</div>
+				<div class="group">
 					<button id="data" class="btn btn-info">.data()</button>
 					<input class="example-input" type="text" id="identityID" class="form-control" placeholder="test@test.com">
 					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
@@ -125,6 +129,10 @@
 		var info = $('.info');
 		var request = $('.request');
 		var response = $('.response');
+		var desktop_url = window.location.href;
+		if (desktop_url.indexOf('?') > - 1) {
+			desktop_url = desktop_url.substring(0, window.location.href.indexOf('?'));
+		}
 		var sampleParams = {
 			tags: [ 'tag1', 'tag2' ],
 			channel: 'sample app',
@@ -133,7 +141,7 @@
 			type: 1,
 			data: {
 				mydata: 'bar',
-				'$desktop_url': 'https://cdn.branch.io/example.html',
+				'$desktop_url': desktop_url || 'https://cdn.branch.io/example.html',
 				'$og_title': 'Branch Metrics',
 				'$og_description': 'Branch Metrics',
 				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
@@ -154,6 +162,14 @@
 			request.html('branch.init();');
 			// Note that this example is using the key in two places, here and above
 			branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#init-options').click(function() {
+			request.html('branch.init(key, { link_identifier: \'link_identifier\' }, callback);');
+			var link_identifier = getInputVal('#link_identifier');;
+			// Note that this example is using the key in two places, here and above
+			branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', { link_identifier: link_identifier }, function(err, data) {
 				response.html(err || JSON.stringify(data));
 			});
 		});
