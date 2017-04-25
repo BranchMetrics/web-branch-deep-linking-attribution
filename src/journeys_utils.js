@@ -390,7 +390,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
  * Checks template metadata to dermine how long to not show banner when dismissed
  */
 journeys_utils.findDismissPeriod = function(html) {
-	// defalt dismiss period to 1 week
+	// default dismiss period to 1 week
 	var dismissPeriod = 7;
 
 	var match = html.match(journeys_utils.jsonRe);
