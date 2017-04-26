@@ -393,7 +393,9 @@ Branch.prototype['init'] = wrap(
 					"url": utils.getWindowLocation(),
 					"user_agent": navigator.userAgent,
 					"language": navigator.language,
-					"page_has_microdata": checkForMicroData()
+					"page_has_microdata": checkForMicroData(),
+					"screen_width": window.screen.width ? window.screen.width : 0,
+					"screen_height": window.screen.height ? window.screen.height : 0
 				},
 				"initial_referrer": document.referrer
 			}, function(err, eventData) {
