@@ -110,7 +110,8 @@ resources._r = {
 	jsonp: true,
 	params: {
 		"sdk": validator(true, validationTypes.STRING),
-		"_t": validator(false, branch_id)
+		"_t": validator(false, branch_id),
+		"branch_key": validator(true, validationTypes.STRING)
 	}
 };
 

@@ -320,7 +320,7 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(sessionData, cb) {
-			var params_r = { "sdk": config.version };
+			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 			var currentSessionData = sessionData || session.get(self._storage) || {};
 			var permData = session.get(self._storage, true) || {};
 			if (permData['browser_fingerprint_id']) {
