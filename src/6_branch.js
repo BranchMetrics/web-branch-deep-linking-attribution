@@ -470,7 +470,6 @@ Branch.prototype['init'] = wrap(
 					resources.open,
 					{
 						"link_identifier": link_identifier,
-						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id,
 						"options": options,
 						"initial_referrer": document.referrer

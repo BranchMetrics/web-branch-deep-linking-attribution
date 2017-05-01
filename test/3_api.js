@@ -288,7 +288,7 @@ describe('Server', function() {
 				var assert = testUtils.plan(5, done);
 				server.request(
 					resources.open,
-					testUtils.params({ "is_referrable": 1 }),
+					testUtils.params({ }),
 					storage,
 					assert.done
 				);
@@ -303,7 +303,7 @@ describe('Server', function() {
 					requests[0].requestBody,
 					"browser_fingerprint_id=" + browser_fingerprint_id +
 					"&identity_id=" + identity_id +
-					"&is_referrable=1&sdk=web" + config.version +
+					"&sdk=web" + config.version +
 					"&branch_key=" + branch_sample_key +
 					"&options=%7B%7D",
 					'Data correct');
@@ -319,7 +319,7 @@ describe('Server', function() {
 
 				var assert = testUtils.plan(3, done);
 
-				var completeParams = testUtils.params({ "is_referrable": 1 });
+				var completeParams = testUtils.params({ });
 				server.request(resources.open, completeParams, storage, assert.done);
 				assert.strictEqual(requests.length, 1, 'Request made');
 
@@ -336,27 +336,11 @@ describe('Server', function() {
 				requests[0].callback();
 			});
 
-			it('should fail without is_referrable', function(done) {
-				var assert = testUtils.plan(2, done);
-				server.request(
-					resources.open,
-					testUtils.params({ }),
-					storage,
-					function(err) {
-						assert.strictEqual(
-							err.message,
-							"API request /v1/open missing parameter is_referrable"
-						);
-					}
-				);
-				assert.strictEqual(requests.length, 0, 'No request made');
-			});
-
 			it('should fail without branch_key', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(
 					resources.open,
-					testUtils.params({ "is_referrable": 1 }, [ 'branch_key' ]),
+					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
 						assert.strictEqual(
@@ -374,7 +358,7 @@ describe('Server', function() {
 				server.request(
 					resources.open,
 					testUtils.params(
-						{ "app_id": "5680621892404085", "is_referrable": 1 },
+						{ "app_id": "5680621892404085" },
 						[ 'branch_key' ]
 					),
 					storage,
@@ -385,7 +369,7 @@ describe('Server', function() {
 					requests[0].requestBody,
 					"browser_fingerprint_id=" + browser_fingerprint_id +
 					"&identity_id=" + identity_id +
-					"&is_referrable=1&sdk=web" + config.version +
+					"&sdk=web" + config.version +
 					"&app_id=" + "5680621892404085" +
 					"&options=%7B%7D",
 					'Data correct');
@@ -395,7 +379,7 @@ describe('Server', function() {
 				var assert = testUtils.plan(2, done);
 				server.request(
 					resources.open,
-					testUtils.params({ is_referrable: 1 }, [ 'browser_fingerprint_id' ]),
+					testUtils.params({ }, [ 'browser_fingerprint_id' ]),
 					storage,
 					function(err) {
 						assert.strictEqual(
@@ -412,7 +396,7 @@ describe('Server', function() {
 				var assert = testUtils.plan(2, done);
 				server.request(
 					resources.open,
-					testUtils.params({ "branch_key": "ahd&7393j", "is_referrable": 1 }),
+					testUtils.params({ "branch_key": "ahd&7393j" }),
 					storage,
 					function(err) {
 						assert.strictEqual(
@@ -428,7 +412,7 @@ describe('Server', function() {
 				var assert = testUtils.plan(2, done);
 				server.request(
 					resources.open,
-					testUtils.params({ "link_identifier": 45433, "is_referrable": 1 }),
+					testUtils.params({ "link_identifier": 45433 }),
 					storage,
 					function(err) {
 						assert.strictEqual(
@@ -440,21 +424,6 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
-			it('should fail with is_referrable as string, not number', function(done) {
-				var assert = testUtils.plan(2, done);
-				server.request(
-					resources.open,
-					testUtils.params({ "is_referrable": "1" }),
-					storage,
-					function(err) {
-						assert.strictEqual(
-							err.message,
-							"API request /v1/open, parameter is_referrable is not a number"
-						);
-					}
-				);
-				assert.strictEqual(requests.length, 0, 'No request made');
-			});
 		});
 
 		describe('/v1/profile', function() {

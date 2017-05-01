@@ -95,7 +95,6 @@ resources.open = {
 	params: {
 		"browser_fingerprint_id": validator(true, branch_id),
 		"identity_id": validator(false, branch_id),
-		"is_referrable": validator(true, validationTypes.NUMBER),
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),
 		"options": validator(false, validationTypes.OBJECT),
