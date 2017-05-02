@@ -452,7 +452,7 @@ Branch.prototype['init'] = wrap(
 			return;
 		}
 
-		var params_r = { "sdk": config.version };
+		var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 		var permData = session.get(self._storage, true) || {};
 		if (permData['browser_fingerprint_id']) {
 			params_r['_t'] = permData['browser_fingerprint_id'];
