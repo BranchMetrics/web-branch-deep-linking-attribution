@@ -786,7 +786,6 @@ describe('Server', function() {
 				storage.clear();
 			});
 
-			// branch_key is actually not required here
 			it('should pass in sdk', function(done) {
 				var assert = testUtils.plan(3, done);
 				server.request(resources._r, testUtils.params(), storage, assert.done);
@@ -795,6 +794,7 @@ describe('Server', function() {
 					requests[0].src,
 					config.app_service_endpoint + '/_r?sdk=web' + config.version +
 					'&_t=79336952217731267' +
+					'&branch_key=' + branch_sample_key +
 					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
 					'Endpoint correct');
 				requests[0].callback();

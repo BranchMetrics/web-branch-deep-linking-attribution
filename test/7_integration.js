@@ -115,6 +115,8 @@ describe('Integration tests', function() {
 				config.app_service_endpoint +
 					'/_r?sdk=web' +
 					config.version +
+					'&branch_key=' +
+					branch.branch_key +
 					'&callback=branch_callback__' + jsonpCallback.toString(),
 				'The first request has the right .src'
 			);
