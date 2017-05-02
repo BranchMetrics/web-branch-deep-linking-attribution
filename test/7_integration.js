@@ -153,7 +153,6 @@ describe('Integration tests', function() {
 				app_id: browser_fingerprint_id,
 				browser_fingerprint_id: browser_fingerprint_id,
 				identity_id: identity_id,
-				is_referrable: "1",
 				options: "%7B%7D",
 				sdk: 'web' + config.version
 			};

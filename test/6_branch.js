@@ -124,7 +124,6 @@ describe('Branch', function() {
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
 					"initial_referrer": requests[1].obj.initial_referrer,
-					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
 					"options": undefined
@@ -174,7 +173,6 @@ describe('Branch', function() {
 					"branch_key": branch_sample_key,
 					"link_identifier": undefined,
 					"initial_referrer": requests[1].obj.initial_referrer,
-					"is_referrable": 1,
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"sdk": "web" + config.version,
 					"options": undefined
@@ -262,7 +260,6 @@ describe('Branch', function() {
 						"branch_key": branch_sample_key,
 						"link_identifier": '12345',
 						"initial_referrer": requests[1].obj.initial_referrer,
-						"is_referrable": 1,
 						"browser_fingerprint_id": browser_fingerprint_id,
 						"sdk": "web" + config.version,
 						"options": undefined
@@ -313,7 +310,6 @@ describe('Branch', function() {
 							"branch_key": branch_sample_key,
 							"link_identifier": '67890',
 							"initial_referrer": requests[1].obj.initial_referrer,
-							"is_referrable": 1,
 							"browser_fingerprint_id": browser_fingerprint_id,
 							"sdk": "web" + config.version,
 							"options": undefined
