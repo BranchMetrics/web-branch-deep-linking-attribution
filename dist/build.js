@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.22.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.23.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1235,8 +1235,8 @@ function defaults(a) {
   var b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
   return utils.merge(a, b);
 }
-resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), is_referrable:validator(!0, validationTypes.NUMBER), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)}};
-resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, branch_id)}};
+resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)}};
+resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, branch_id), branch_key:validator(!0, validationTypes.STRING)}};
 resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
 resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
@@ -1912,9 +1912,10 @@ journeys_utils.animateBannerEntrance = function(a) {
   }, banner_utils.animationDelay);
 };
 journeys_utils.findDismissPeriod = function(a) {
-  var b;
-  (a = a.match(journeys_utils.jsonRe)) && (a = safejson.parse(a[1])) && a.dismissPeriod && (b = a.dismissPeriod);
-  b = "number" === typeof b ? b : 7;
+  var b = 7;
+  if (a = a.match(journeys_utils.jsonRe)) {
+    a = safejson.parse(a[1]) || {}, "number" === typeof a.dismissPeriod && (b = a.dismissPeriod);
+  }
   return -1 === b ? !0 : banner_utils.getDate(b);
 };
 journeys_utils.finalHookups = function(a, b, c, d, e) {
@@ -2195,7 +2196,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   }, f = session.get(d._storage), g = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
   var h = function(a, b) {
-    var c = {sdk:config.version}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
+    var c = {sdk:config.version, branch_key:d.branch_key}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
     f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
     d._api(resources._r, c, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message);
@@ -2219,7 +2220,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     if (f) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, g && utils.whiteListSessionData(g));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:l()}, initial_referrer:document.referrer}, function(e, f) {
+    d._api(resources.event, {event:"pageview", metadata:{url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:l(), screen_width:screen.width || -1, screen_height:screen.height || -1}, initial_referrer:document.referrer}, function(e, f) {
       e || "object" !== typeof f || branch_view.initJourney(b, g, f, c, d);
       try {
         a(e, g && utils.whiteListSessionData(g));
@@ -2238,13 +2239,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   if (f && f.session_id && !g) {
     n(), h(f, m);
   } else {
-    var f = {sdk:config.version}, p = session.get(d._storage, !0) || {};
+    var f = {sdk:config.version, branch_key:d.branch_key}, p = session.get(d._storage, !0) || {};
     p.browser_fingerprint_id && (f._t = p.browser_fingerprint_id);
     d._api(resources._r, f, function(a, b) {
       if (a) {
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
-      d._api(resources.open, {link_identifier:g, is_referrable:1, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
+      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), g && (b.click_id = g));
         n();
