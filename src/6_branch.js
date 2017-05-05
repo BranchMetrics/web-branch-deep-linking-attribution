@@ -1520,7 +1520,7 @@ Branch.prototype['removeListener'] = function(listener) {
  * ```
  */
 /*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
-/*** +TOC_ITEM #setBranchViewData &.setBranchViewData()& ^WEB ***/
+/*** +TOC_ITEM #setbranchviewdatadata &.setBranchViewData()& ^WEB ***/
 function _setBranchViewData(context, done, data) {
 	data = data || {};
 	try {
@@ -1551,7 +1551,7 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, funct
  * ___
  *
  */
-/*** +TOC_ITEM #closejourney &.closeJourney()& ^WEB ***/
+/*** +TOC_ITEM #closejourneycallback &.closeJourney()& ^WEB ***/
 Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	var self = this;
 	self['renderQueue'](function() {
@@ -1804,7 +1804,7 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * ___
  */
 /*** +TOC_HEADING &Firebase App Indexing& ^ALL ***/
-/*** +TOC_ITEM #autoappindex &.autoAppIndex()& ^ALL ***/
+/*** +TOC_ITEM #autoappindexdata-callback &.autoAppIndex()& ^ALL ***/
 Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(done, options) {
 	var self = this;
 	options = options || {};
@@ -1888,7 +1888,7 @@ Branch.prototype['autoAppIndex'] = wrap(callback_params.CALLBACK_ERR, function(d
  * ___
  */
 /*** +TOC_HEADING &Revenue Analytics& ^WEB ***/
-/*** +TOC_ITEM #trackcommerceevent &.trackCommerceEvent()& ^WEB ***/
+/*** +TOC_ITEM #trackcommerceeventevent-commerce_data-metadata-callback &.trackCommerceEvent()& ^WEB ***/
 Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, event, commerce_data, metadata) {
 	var self = this;
 	self['renderQueue'](function() {
