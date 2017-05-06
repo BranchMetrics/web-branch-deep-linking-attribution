@@ -24,14 +24,14 @@
   + [.removeListener()](#removelistenerlistener)
 
 6. Journeys Web To App
-  + [.setBranchViewData()](#setBranchViewData)
-  + [.closeJourney()](#closejourney)
+  + [.setBranchViewData()](#setbranchviewdatadata)
+  + [.closeJourney()](#closejourneycallback)
   + [.banner()](#banneroptions-data)
 
 7. Firebase App Indexing
-  + [.autoAppIndex()](#autoappindex)
+  + [.autoAppIndex()](#autoappindexdata-callback)
 
 8. Revenue Analytics
-  + [.trackCommerceEvent()](#trackcommerceevent)
+  + [.trackCommerceEvent()](#trackcommerceeventevent-commerce_data-metadata-callback)
 
 ___
