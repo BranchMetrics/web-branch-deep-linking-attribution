@@ -296,6 +296,8 @@ Branch.prototype['init'] = wrap(
 			}
 			if (data['identity_id']) {
 				self.identity_id = data['identity_id'].toString();
+				// to make acceptable for utils.whiteListSessionData
+				data['identity'] = self.identity_id;
 			}
 			if (data['link']) {
 				self.sessionLink = data['link'];
