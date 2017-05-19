@@ -285,17 +285,6 @@ journeys_utils.addIframeOuterCSS = function() {
 		})
 	}
 
-	document.body.style.transition = "";
-	journeys_utils.journeyDismissed = false;
-
-	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
-	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
-
-	if (journeys_utils.entryAnimationDisabled) {
-		bodyAnimationStyle = '';
-		iframeAnimationStyle = '';
-	}
-
 	if (journeys_utils.previousPosition === "top" &&
 		journeys_utils.previousPosition !== journeys_utils.position &&
 		journeys_utils.exitAnimationDisabledPreviously &&
@@ -305,10 +294,21 @@ journeys_utils.addIframeOuterCSS = function() {
 		journeys_utils.previousDivToInjectParents.forEach(function (parent) {
 			parent.style.marginTop = 0;
 		});
+	}
 
-		journeys_utils.exitAnimationDisabledPreviously = false;
-		journeys_utils.previousPosition = '';
-		journeys_utils.previousDivToInjectParents = [];
+	journeys_utils.exitAnimationDisabledPreviously = false;
+	journeys_utils.previousPosition = '';
+	journeys_utils.previousDivToInjectParents = [];
+	journeys_utils.journeyDismissed = false;
+
+	document.body.style.transition = "";
+
+	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
+	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
+
+	if (journeys_utils.entryAnimationDisabled) {
+		bodyAnimationStyle = '';
+		iframeAnimationStyle = '';
 	}
 
 	iFrameCSS.innerHTML = 'body { ' + bodyAnimationStyle + (bodyMargin) + '; }\n' +
