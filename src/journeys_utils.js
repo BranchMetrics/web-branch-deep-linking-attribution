@@ -129,9 +129,8 @@ journeys_utils.getCtaText = function(metadata, hasApp) {
  * @param {Object} metadata
  */
 journeys_utils.findInsertionDiv = function(parent, metadata) {
-	if (journeys_utils.divToInjectParents.length != 0) {
-		journeys_utils.divToInjectParents = [];
-	}
+	journeys_utils.divToInjectParents = [];
+
 	if (metadata && metadata['injectorSelector']) {
 		var injectors = document.querySelectorAll(metadata['injectorSelector']);
 		if (injectors) {
