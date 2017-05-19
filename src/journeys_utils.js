@@ -38,8 +38,13 @@ journeys_utils.isJourneyDisplayed = false;
 
 journeys_utils.exitAnimationDisabled = false;
 journeys_utils.entryAnimationDisabled = false;
+journeys_utils.journeyDismissed = false;
 journeys_utils.animationSpeed = 250;
 journeys_utils.animationDelay = 20;
+
+journeys_utils.exitAnimationDisabledPreviously = false;
+journeys_utils.previousPosition = '';
+journeys_utils.previousDivToInjectParents = [];
 
 /***
  * @function journeys_utils.setPositionAndHeight
@@ -124,6 +129,9 @@ journeys_utils.getCtaText = function(metadata, hasApp) {
  * @param {Object} metadata
  */
 journeys_utils.findInsertionDiv = function(parent, metadata) {
+	if (journeys_utils.divToInjectParents.length != 0) {
+		journeys_utils.divToInjectParents = [];
+	}
 	if (metadata && metadata['injectorSelector']) {
 		var injectors = document.querySelectorAll(metadata['injectorSelector']);
 		if (injectors) {
@@ -278,31 +286,44 @@ journeys_utils.addIframeOuterCSS = function() {
 		})
 	}
 
+	document.body.style.transition = "";
+	journeys_utils.journeyDismissed = false;
+
 	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
 	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
-
-	document.body.style.transition = '';
-	document.getElementById('branch-banner-iframe').style.transition = '';
 
 	if (journeys_utils.entryAnimationDisabled) {
 		bodyAnimationStyle = '';
 		iframeAnimationStyle = '';
 	}
+
+	if (journeys_utils.previousPosition === "top" &&
+		journeys_utils.previousPosition !== journeys_utils.position &&
+		journeys_utils.exitAnimationDisabledPreviously &&
+		journeys_utils.previousDivToInjectParents &&
+		journeys_utils.previousDivToInjectParents.length > 0) {
+
+		journeys_utils.previousDivToInjectParents.forEach(function (parent) {
+			parent.style.marginTop = 0;
+		});
+
+		journeys_utils.exitAnimationDisabledPreviously = false;
+		journeys_utils.previousPosition = '';
+		journeys_utils.previousDivToInjectParents = [];
+	}
+
 	iFrameCSS.innerHTML = 'body { ' + bodyAnimationStyle + (bodyMargin) + '; }\n' +
 	 '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
 	 ' left: 0; right: 0; border: 0; height: ' +
-	 journeys_utils.bannerHeight +
-	 '; z-index: 99999; ' + iframeAnimationStyle  + ' }\n' +
+	 journeys_utils.bannerHeight + '; z-index: 99999; ' +
+	 iframeAnimationStyle  + ' }\n' +
 	 '#branch-banner-iframe { position: ' +
-	 (journeys_utils.sticky) +
-	 '; }\n' +
+	 (journeys_utils.sticky) + '; }\n' +
 	 '@media only screen and (orientation: landscape) { ' +
 	 'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
-	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
-	 '; }\n' +
+	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
 	 '#branch-banner-iframe { height: ' +
-	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
-	 '; }';
+	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
 
 	document.head.appendChild(iFrameCSS);
 }
@@ -444,6 +465,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
             journeys_utils.branch._publishEvent('didClickJourneyContinue', { 'banner_id': journeys_utils.branchViewId });
+            journeys_utils.journeyDismissed = true;
             journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
@@ -452,6 +474,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
             journeys_utils.branch._publishEvent('didClickJourneyClose', { 'banner_id': journeys_utils.branchViewId });
+            journeys_utils.journeyDismissed = true;
             journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
@@ -463,12 +486,9 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
  * @param {Object} banner
  */
 journeys_utils.animateBannerExit = function(banner) {
-
-	if (!journeys_utils.exitAnimationDisabled) {
-		if (journeys_utils.entryAnimationDisabled) { // we know for sure that these classes don't exist
-			document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
-			document.getElementById('branch-banner-iframe').style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
-		}
+	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) { // we know for sure that transitions have not been added
+		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
+		document.getElementById('branch-banner-iframe').style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
 	}
 
 	if (journeys_utils.position === 'top') {
@@ -479,6 +499,7 @@ journeys_utils.animateBannerExit = function(banner) {
 	}
 
     journeys_utils.branch._publishEvent('willCloseJourney', { 'banner_id': journeys_utils.branchViewId });
+	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
 	setTimeout(function() {
 		// remove banner, branch-css, and branch-iframe-css
 		banner_utils.removeElement(banner);
@@ -486,15 +507,20 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner_utils.removeElement(document.getElementById('branch-iframe-css'));		
 
 		// remove margin from all elements with branch injection div
-		if (!journeys_utils.exitAnimationDisabled && journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
+		if ((!journeys_utils.exitAnimationDisabled || journeys_utils.journeyDismissed) &&
+			journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
 			journeys_utils.divToInjectParents.forEach(function(parent) {
 				parent.style.marginTop = 0;
 			})
+		} else {
+			journeys_utils.exitAnimationDisabledPreviously = journeys_utils.exitAnimationDisabled;
+			journeys_utils.previousPosition = journeys_utils.position;
+			journeys_utils.previousDivToInjectParents = journeys_utils.divToInjectParents;
 		}
 
         journeys_utils.branch._publishEvent('didCloseJourney', { 'banner_id': journeys_utils.branchViewId });
         journeys_utils.isJourneyDisplayed = false;
-	}, journeys_utils.animationSpeed + journeys_utils.animationDelay);
+	}, speedAndDelay);
 
 	setTimeout(function() {
 		if (journeys_utils.position === 'top') {
