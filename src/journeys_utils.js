@@ -36,12 +36,12 @@ journeys_utils.branch = null;
 journeys_utils.banner = null;
 journeys_utils.isJourneyDisplayed = false;
 
-journeys_utils.exitAnimationDisabled = false;
-journeys_utils.entryAnimationDisabled = false;
-journeys_utils.journeyDismissed = false;
 journeys_utils.animationSpeed = 250;
 journeys_utils.animationDelay = 20;
 
+journeys_utils.exitAnimationDisabled = false;
+journeys_utils.entryAnimationDisabled = false;
+journeys_utils.journeyDismissed = false;
 journeys_utils.exitAnimationDisabledPreviously = false;
 journeys_utils.previousPosition = '';
 journeys_utils.previousDivToInjectParents = [];
@@ -291,6 +291,8 @@ journeys_utils.addIframeOuterCSS = function() {
 		journeys_utils.previousDivToInjectParents &&
 		journeys_utils.previousDivToInjectParents.length > 0) {
 
+		// when a Journey's exit animation is disabled the code below removes leftover space at the top of the page
+		// if the next Journey appears at the bottom
 		journeys_utils.previousDivToInjectParents.forEach(function (parent) {
 			parent.style.marginTop = 0;
 		});
@@ -455,26 +457,27 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	var actionEls = doc.querySelectorAll('#branch-mobile-action');
 	Array.prototype.forEach.call(actionEls, function(el) {
 		el.addEventListener('click', function(e) {
-            journeys_utils.branch._publishEvent('didClickJourneyCTA', { 'banner_id': journeys_utils.branchViewId });
-            cta();
-			journeys_utils.animateBannerExit(banner);
+            	journeys_utils.branch._publishEvent('didClickJourneyCTA', { 'banner_id': journeys_utils.branchViewId });
+            	journeys_utils.journeyDismissed = true;
+            	cta();
+            	journeys_utils.animateBannerExit(banner);
 		})
 	})
 	var cancelEls = doc.querySelectorAll('.branch-banner-continue');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-            journeys_utils.branch._publishEvent('didClickJourneyContinue', { 'banner_id': journeys_utils.branchViewId });
-            journeys_utils.journeyDismissed = true;
-            journeys_utils.animateBannerExit(banner);
+			journeys_utils.branch._publishEvent('didClickJourneyContinue', { 'banner_id': journeys_utils.branchViewId });
+			journeys_utils.journeyDismissed = true;
+			journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
 	})
 	cancelEls = doc.querySelectorAll('.branch-banner-close');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-            journeys_utils.branch._publishEvent('didClickJourneyClose', { 'banner_id': journeys_utils.branchViewId });
-            journeys_utils.journeyDismissed = true;
-            journeys_utils.animateBannerExit(banner);
+            	journeys_utils.branch._publishEvent('didClickJourneyClose', { 'banner_id': journeys_utils.branchViewId });
+            	journeys_utils.journeyDismissed = true;
+            	journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
 	})
@@ -485,7 +488,8 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
  * @param {Object} banner
  */
 journeys_utils.animateBannerExit = function(banner) {
-	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) { // we know for sure that transitions have not been added
+
+	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
 		document.getElementById('branch-banner-iframe').style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
 	}
@@ -507,7 +511,8 @@ journeys_utils.animateBannerExit = function(banner) {
 
 		// remove margin from all elements with branch injection div
 		if ((!journeys_utils.exitAnimationDisabled || journeys_utils.journeyDismissed) &&
-			journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
+			journeys_utils.divToInjectParents &&
+			journeys_utils.divToInjectParents.length > 0) {
 			journeys_utils.divToInjectParents.forEach(function(parent) {
 				parent.style.marginTop = 0;
 			})
@@ -517,19 +522,17 @@ journeys_utils.animateBannerExit = function(banner) {
 			journeys_utils.previousDivToInjectParents = journeys_utils.divToInjectParents;
 		}
 
-        journeys_utils.branch._publishEvent('didCloseJourney', { 'banner_id': journeys_utils.branchViewId });
-        journeys_utils.isJourneyDisplayed = false;
-	}, speedAndDelay);
-
-	setTimeout(function() {
 		if (journeys_utils.position === 'top') {
 			document.body.style.marginTop = journeys_utils.bodyMarginTop;
 		}
 		else if (journeys_utils.position === 'bottom') {
 			document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 		}
+
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 		banner_utils.removeClass(document.body, 'branch-banner-no-scroll');
-	}, journeys_utils.animationDelay);
 
+        	journeys_utils.branch._publishEvent('didCloseJourney', { 'banner_id': journeys_utils.branchViewId });
+        	journeys_utils.isJourneyDisplayed = false;
+	}, speedAndDelay);
 }
