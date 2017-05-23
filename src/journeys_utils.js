@@ -36,6 +36,21 @@ journeys_utils.branch = null;
 journeys_utils.banner = null;
 journeys_utils.isJourneyDisplayed = false;
 
+journeys_utils.animationSpeed = 250;
+journeys_utils.animationDelay = 20;
+
+// options to control a Journey's animations
+journeys_utils.exitAnimationDisabled = false;
+journeys_utils.entryAnimationDisabled = false;
+
+// set to true when user taps on Journey's close icon, continue button or CTA
+journeys_utils.journeyDismissed = false;
+
+// properties used to determine the removal of additional whitespace above Journey if position changes from 'top' to 'bottom'
+journeys_utils.exitAnimationDisabledPreviously = false;
+journeys_utils.previousPosition = '';
+journeys_utils.previousDivToInjectParents = [];
+
 /***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
@@ -119,6 +134,8 @@ journeys_utils.getCtaText = function(metadata, hasApp) {
  * @param {Object} metadata
  */
 journeys_utils.findInsertionDiv = function(parent, metadata) {
+	journeys_utils.divToInjectParents = [];
+
 	if (metadata && metadata['injectorSelector']) {
 		var injectors = document.querySelectorAll(metadata['injectorSelector']);
 		if (injectors) {
@@ -258,9 +275,8 @@ journeys_utils.addIframeOuterCSS = function() {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
 		bodyMargin = 'margin-bottom: ' + calculatedBodyMargin + 'px';
 	}
-
 	// adds margin to the parent of div being inserted into
-	if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
+	if (journeys_utils.divToInjectParents.length > 0) {
 		// dont want to add margin for full page fixed
 		journeys_utils.divToInjectParents.forEach(function(parent) {
 			var isFixedNavFullPage;
@@ -274,32 +290,51 @@ journeys_utils.addIframeOuterCSS = function() {
 		})
 	}
 
-	iFrameCSS.innerHTML = 	
-		'body { -webkit-transition: all ' +
-			(banner_utils.animationSpeed * 1.5 / 1000) +
-			's ease; transition: all 0' +
-			(banner_utils.animationSpeed * 1.5 / 1000) +
-			's ease; ' +
-			(bodyMargin) +
-			'; }\n' +
-		'#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
-			' left: 0; right: 0; border: 0; height: ' +
-			journeys_utils.bannerHeight +
-			'; z-index: 99999; -webkit-transition: all ' +
-			(banner_utils.animationSpeed / 1000) +
-			's ease; transition: all 0' +
-			(banner_utils.animationSpeed / 1000) +
-			's ease; }\n' + 
-		'#branch-banner-iframe { position: ' +
-			(journeys_utils.sticky) +
-			'; }\n' + 
-		'@media only screen and (orientation: landscape) { ' +
-			'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) + 
-				(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
-				'; }\n' + 
-			'#branch-banner-iframe { height: ' +
-				(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) +
-				'; }';
+	// determines the removal of additional whitespace above Journey if position changes from 'top' to 'bottom'
+	if (journeys_utils.previousPosition === "top" &&
+		journeys_utils.previousPosition !== journeys_utils.position &&
+		journeys_utils.exitAnimationDisabledPreviously &&
+		journeys_utils.previousDivToInjectParents &&
+		journeys_utils.previousDivToInjectParents.length > 0) {
+
+		journeys_utils.previousDivToInjectParents.forEach(function (parent) {
+			parent.style.marginTop = 0;
+		});
+	}
+
+	// resets properties to related to the case above
+	// note: these properties are set in journeys_utils.animateBannerExit()
+	journeys_utils.exitAnimationDisabledPreviously = false;
+	journeys_utils.previousPosition = '';
+	journeys_utils.previousDivToInjectParents = [];
+
+	journeys_utils.journeyDismissed = false;
+
+	// removes left over body transition from previous Journey
+	document.body.style.transition = "";
+
+	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
+	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
+
+	// if entry animation is disabled, then don't animate Journey entry
+	if (journeys_utils.entryAnimationDisabled) {
+		bodyAnimationStyle = '';
+		iframeAnimationStyle = '';
+	}
+
+	iFrameCSS.innerHTML = 'body { ' + bodyAnimationStyle + (bodyMargin) + '; }\n' +
+	 '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
+	 ' left: 0; right: 0; border: 0; height: ' +
+	 journeys_utils.bannerHeight + '; z-index: 99999; ' +
+	 iframeAnimationStyle  + ' }\n' +
+	 '#branch-banner-iframe { position: ' +
+	 (journeys_utils.sticky) + '; }\n' +
+	 '@media only screen and (orientation: landscape) { ' +
+	 'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
+	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
+	 '#branch-banner-iframe { height: ' +
+	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
+
 	document.head.appendChild(iFrameCSS);
 }
 
@@ -380,14 +415,14 @@ journeys_utils.animateBannerEntrance = function(banner) {
         journeys_utils.branch._publishEvent('didShowJourney', { 'banner_id': journeys_utils.branchViewId });
 		journeys_utils.isJourneyDisplayed = true;
 	}
-	setTimeout(onAnimationEnd, banner_utils.animationDelay);
+	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
 }
 
 /***
  * @function journeys_utils.findDismissPeriod
  * @param {string} html
  *
- * Checks template metadata to dermine how long to not show banner when dismissed
+ * Checks template metadata to determine how long to not show banner when dismissed
  */
 journeys_utils.findDismissPeriod = function(html) {
 	// default dismiss period to 1 week
@@ -431,24 +466,27 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	var actionEls = doc.querySelectorAll('#branch-mobile-action');
 	Array.prototype.forEach.call(actionEls, function(el) {
 		el.addEventListener('click', function(e) {
-            journeys_utils.branch._publishEvent('didClickJourneyCTA', { 'banner_id': journeys_utils.branchViewId });
-            cta();
-			journeys_utils.animateBannerExit(banner);
+            	journeys_utils.branch._publishEvent('didClickJourneyCTA', { 'banner_id': journeys_utils.branchViewId });
+            	journeys_utils.journeyDismissed = true;
+            	cta();
+            	journeys_utils.animateBannerExit(banner);
 		})
 	})
 	var cancelEls = doc.querySelectorAll('.branch-banner-continue');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-            journeys_utils.branch._publishEvent('didClickJourneyContinue', { 'banner_id': journeys_utils.branchViewId });
-            journeys_utils.animateBannerExit(banner);
+			journeys_utils.branch._publishEvent('didClickJourneyContinue', { 'banner_id': journeys_utils.branchViewId });
+			journeys_utils.journeyDismissed = true;
+			journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
 	})
 	cancelEls = doc.querySelectorAll('.branch-banner-close');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-            journeys_utils.branch._publishEvent('didClickJourneyClose', { 'banner_id': journeys_utils.branchViewId });
-            journeys_utils.animateBannerExit(banner);
+            	journeys_utils.branch._publishEvent('didClickJourneyClose', { 'banner_id': journeys_utils.branchViewId });
+            	journeys_utils.journeyDismissed = true;
+            	journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
 		})
 	})
@@ -459,13 +497,22 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
  * @param {Object} banner
  */
 journeys_utils.animateBannerExit = function(banner) {
+	// adds transition for Journey exit if it doesn't exist
+	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
+		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
+		document.getElementById('branch-banner-iframe').style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
+	}
+
 	if (journeys_utils.position === 'top') {
 		banner.style.top = '-' + journeys_utils.bannerHeight;
 	}
 	else if (journeys_utils.position === 'bottom') {
 		banner.style.bottom = '-' + journeys_utils.bannerHeight;
 	}
+
     journeys_utils.branch._publishEvent('willCloseJourney', { 'banner_id': journeys_utils.branchViewId });
+	// removes timeout if animation is disabled or uses default timeout
+	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
 	setTimeout(function() {
 		// remove banner, branch-css, and branch-iframe-css
 		banner_utils.removeElement(banner);
@@ -473,25 +520,29 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner_utils.removeElement(document.getElementById('branch-iframe-css'));		
 
 		// remove margin from all elements with branch injection div
-		if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
+		if ((!journeys_utils.exitAnimationDisabled || journeys_utils.journeyDismissed) &&
+			journeys_utils.divToInjectParents &&
+			journeys_utils.divToInjectParents.length > 0) {
 			journeys_utils.divToInjectParents.forEach(function(parent) {
 				parent.style.marginTop = 0;
 			})
+		} else {
+			journeys_utils.exitAnimationDisabledPreviously = journeys_utils.exitAnimationDisabled;
+			journeys_utils.previousPosition = journeys_utils.position;
+			journeys_utils.previousDivToInjectParents = journeys_utils.divToInjectParents;
 		}
 
-        journeys_utils.branch._publishEvent('didCloseJourney', { 'banner_id': journeys_utils.branchViewId });
-        journeys_utils.isJourneyDisplayed = false;
-	}, banner_utils.animationSpeed + banner_utils.animationDelay);
-
-	setTimeout(function() {
 		if (journeys_utils.position === 'top') {
 			document.body.style.marginTop = journeys_utils.bodyMarginTop;
 		}
 		else if (journeys_utils.position === 'bottom') {
 			document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 		}
+
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 		banner_utils.removeClass(document.body, 'branch-banner-no-scroll');
-	}, banner_utils.animationDelay);
 
+        	journeys_utils.branch._publishEvent('didCloseJourney', { 'banner_id': journeys_utils.branchViewId });
+        	journeys_utils.isJourneyDisplayed = false;
+	}, speedAndDelay);
 }
