@@ -39,9 +39,14 @@ journeys_utils.isJourneyDisplayed = false;
 journeys_utils.animationSpeed = 250;
 journeys_utils.animationDelay = 20;
 
+// options to control a Journey's animations
 journeys_utils.exitAnimationDisabled = false;
 journeys_utils.entryAnimationDisabled = false;
+
+// set to true when user taps on Journey's close icon, continue button or CTA
 journeys_utils.journeyDismissed = false;
+
+// properties used to determine the removal of additional whitespace above Journey if position changes from 'top' to 'bottom'
 journeys_utils.exitAnimationDisabledPreviously = false;
 journeys_utils.previousPosition = '';
 journeys_utils.previousDivToInjectParents = [];
@@ -271,7 +276,7 @@ journeys_utils.addIframeOuterCSS = function() {
 		bodyMargin = 'margin-bottom: ' + calculatedBodyMargin + 'px';
 	}
 	// adds margin to the parent of div being inserted into
-	if (journeys_utils.divToInjectParents && journeys_utils.divToInjectParents.length > 0) {
+	if (journeys_utils.divToInjectParents.length > 0) {
 		// dont want to add margin for full page fixed
 		journeys_utils.divToInjectParents.forEach(function(parent) {
 			var isFixedNavFullPage;
@@ -285,29 +290,33 @@ journeys_utils.addIframeOuterCSS = function() {
 		})
 	}
 
+	// determines the removal of additional whitespace above Journey if position changes from 'top' to 'bottom'
 	if (journeys_utils.previousPosition === "top" &&
 		journeys_utils.previousPosition !== journeys_utils.position &&
 		journeys_utils.exitAnimationDisabledPreviously &&
 		journeys_utils.previousDivToInjectParents &&
 		journeys_utils.previousDivToInjectParents.length > 0) {
 
-		// when a Journey's exit animation is disabled the code below removes leftover space at the top of the page
-		// if the next Journey appears at the bottom
 		journeys_utils.previousDivToInjectParents.forEach(function (parent) {
 			parent.style.marginTop = 0;
 		});
 	}
 
+	// resets properties to related to the case above
+	// note: these properties are set in journeys_utils.animateBannerExit()
 	journeys_utils.exitAnimationDisabledPreviously = false;
 	journeys_utils.previousPosition = '';
 	journeys_utils.previousDivToInjectParents = [];
+
 	journeys_utils.journeyDismissed = false;
 
+	// removes left over body transition from previous Journey
 	document.body.style.transition = "";
 
 	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
 	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 
+	// if entry animation is disabled, then don't animate Journey entry
 	if (journeys_utils.entryAnimationDisabled) {
 		bodyAnimationStyle = '';
 		iframeAnimationStyle = '';
@@ -488,7 +497,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
  * @param {Object} banner
  */
 journeys_utils.animateBannerExit = function(banner) {
-
+	// adds transition for Journey exit if it doesn't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
 		document.getElementById('branch-banner-iframe').style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
@@ -502,6 +511,7 @@ journeys_utils.animateBannerExit = function(banner) {
 	}
 
     journeys_utils.branch._publishEvent('willCloseJourney', { 'banner_id': journeys_utils.branchViewId });
+	// removes timeout if animation is disabled or uses default timeout
 	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
 	setTimeout(function() {
 		// remove banner, branch-css, and branch-iframe-css
