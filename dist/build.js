@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.23.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1785,6 +1785,14 @@ journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 journeys_utils.branch = null;
 journeys_utils.banner = null;
 journeys_utils.isJourneyDisplayed = !1;
+journeys_utils.animationSpeed = 250;
+journeys_utils.animationDelay = 20;
+journeys_utils.exitAnimationDisabled = !1;
+journeys_utils.entryAnimationDisabled = !1;
+journeys_utils.journeyDismissed = !1;
+journeys_utils.exitAnimationDisabledPreviously = !1;
+journeys_utils.previousPosition = "";
+journeys_utils.previousDivToInjectParents = [];
 journeys_utils.setPositionAndHeight = function(a) {
   var b = journeys_utils.getMetadata(a);
   if (b && b.bannerHeight && b.position && b.sticky) {
@@ -1815,6 +1823,7 @@ journeys_utils.getCtaText = function(a, b) {
   return c;
 };
 journeys_utils.findInsertionDiv = function(a, b) {
+  journeys_utils.divToInjectParents = [];
   if (b && b.injectorSelector) {
     var c = document.querySelectorAll(b.injectorSelector);
     if (c) {
@@ -1872,13 +1881,24 @@ journeys_utils.addIframeOuterCSS = function() {
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle("margin-bottom");
   var d = +journeys_utils.bodyMarginBottom.slice(0, -2), e = +journeys_utils.bannerHeight.slice(0, -2);
   "top" === journeys_utils.position ? b = "margin-top: " + (+e + c) + "px" : "bottom" === journeys_utils.position && (b = "margin-bottom: " + (+e + d) + "px");
-  journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
+  0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
     var b, c = window.getComputedStyle(a);
     c && (b = journeys_utils.isFullPage && "fixed" === c.getPropertyValue("position"));
     b || (a.style.marginTop = journeys_utils.bannerHeight);
   });
-  a.innerHTML = "body { -webkit-transition: all " + 1.5 * banner_utils.animationSpeed / 1000 + "s ease; transition: all 0" + 1.5 * banner_utils.animationSpeed / 1000 + "s ease; " + b + "; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; -webkit-transition: all " + banner_utils.animationSpeed / 1000 + "s ease; transition: all 0" + banner_utils.animationSpeed / 1000 + 
-  "s ease; }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }";
+  "top" === journeys_utils.previousPosition && journeys_utils.previousPosition !== journeys_utils.position && journeys_utils.exitAnimationDisabledPreviously && journeys_utils.previousDivToInjectParents && 0 < journeys_utils.previousDivToInjectParents.length && journeys_utils.previousDivToInjectParents.forEach(function(a) {
+    a.style.marginTop = 0;
+  });
+  journeys_utils.exitAnimationDisabledPreviously = !1;
+  journeys_utils.previousPosition = "";
+  journeys_utils.previousDivToInjectParents = [];
+  journeys_utils.journeyDismissed = !1;
+  document.body.style.transition = "";
+  c = "-webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; ";
+  d = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;";
+  journeys_utils.entryAnimationDisabled && (d = c = "");
+  a.innerHTML = "body { " + c + b + "; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + d + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : 
+  journeys_utils.bannerHeight) + "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }";
   document.head.appendChild(a);
 };
 journeys_utils.addIframeInnerCSS = function(a, b) {
@@ -1909,7 +1929,7 @@ journeys_utils.animateBannerEntrance = function(a) {
     "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
     journeys_utils.branch._publishEvent("didShowJourney", {banner_id:journeys_utils.branchViewId});
     journeys_utils.isJourneyDisplayed = !0;
-  }, banner_utils.animationDelay);
+  }, journeys_utils.animationDelay);
 };
 journeys_utils.findDismissPeriod = function(a) {
   var b = 7;
@@ -1925,6 +1945,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     Array.prototype.forEach.call(g, function(a) {
       a.addEventListener("click", function(a) {
         journeys_utils.branch._publishEvent("didClickJourneyCTA", {banner_id:journeys_utils.branchViewId});
+        journeys_utils.journeyDismissed = !0;
         c();
         journeys_utils.animateBannerExit(d);
       });
@@ -1933,6 +1954,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     Array.prototype.forEach.call(g, function(c) {
       c.addEventListener("click", function(c) {
         journeys_utils.branch._publishEvent("didClickJourneyContinue", {banner_id:journeys_utils.branchViewId});
+        journeys_utils.journeyDismissed = !0;
         journeys_utils.animateBannerExit(d);
         b.set("hideBanner" + a.id, e, !0);
       });
@@ -1941,6 +1963,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     Array.prototype.forEach.call(g, function(c) {
       c.addEventListener("click", function(c) {
         journeys_utils.branch._publishEvent("didClickJourneyClose", {banner_id:journeys_utils.branchViewId});
+        journeys_utils.journeyDismissed = !0;
         journeys_utils.animateBannerExit(d);
         b.set("hideBanner" + a.id, e, !0);
       });
@@ -1948,23 +1971,22 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
   }
 };
 journeys_utils.animateBannerExit = function(a) {
+  journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled && (document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", document.getElementById("branch-banner-iframe").style.transition = "all 0" + journeys_utils.animationSpeed / 1000 + "s ease");
   "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
   journeys_utils.branch._publishEvent("willCloseJourney", {banner_id:journeys_utils.branchViewId});
   setTimeout(function() {
     banner_utils.removeElement(a);
     banner_utils.removeElement(document.getElementById("branch-css"));
     banner_utils.removeElement(document.getElementById("branch-iframe-css"));
-    journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
+    (!journeys_utils.exitAnimationDisabled || journeys_utils.journeyDismissed) && journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length ? journeys_utils.divToInjectParents.forEach(function(a) {
       a.style.marginTop = 0;
-    });
-    journeys_utils.branch._publishEvent("didCloseJourney", {banner_id:journeys_utils.branchViewId});
-    journeys_utils.isJourneyDisplayed = !1;
-  }, banner_utils.animationSpeed + banner_utils.animationDelay);
-  setTimeout(function() {
+    }) : (journeys_utils.exitAnimationDisabledPreviously = journeys_utils.exitAnimationDisabled, journeys_utils.previousPosition = journeys_utils.position, journeys_utils.previousDivToInjectParents = journeys_utils.divToInjectParents);
     "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bodyMarginTop : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bodyMarginBottom);
     banner_utils.removeClass(document.body, "branch-banner-is-active");
     banner_utils.removeClass(document.body, "branch-banner-no-scroll");
-  }, banner_utils.animationDelay);
+    journeys_utils.branch._publishEvent("didCloseJourney", {banner_id:journeys_utils.branchViewId});
+    journeys_utils.isJourneyDisplayed = !1;
+  }, journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay);
 };
 // Input 15
 var branch_view = {};
@@ -2054,7 +2076,7 @@ branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
   var f = null, g = null, k = null, h = null, l = null, m = !1;
-  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode());
+  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1);
   (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, h = buildJourneyTestData(f, a, b));
   !h && c.hasOwnProperty("branch_view_data") && (h = c.branch_view_data, k = isJourneyDismissed(h, e));
   !h || k || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = h.id, e.renderQueue(function() {
