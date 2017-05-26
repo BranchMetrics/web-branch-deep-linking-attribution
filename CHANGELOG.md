@@ -2,7 +2,9 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.24.0] - 2017-06-26
+- allow no animation for journeys
+- fix table of contents
 
 ## [v2.23.0] - 2017-05-03
 - remove is_referrable flag
