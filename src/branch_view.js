@@ -70,6 +70,10 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 
 	requestData = requestData || {};
 	requestData['feature'] = 'journeys';
+	var link_click_id = utils.clickIdFromLink(branch._referringLink());
+	if (link_click_id) {
+		requestData['link_click_id'] = link_click_id;
+	}
 
 	var cleanedData = utils.cleanLinkData(requestData);
 
