@@ -17,10 +17,10 @@ banner_html.banner = function(options, action) {
 		'</div>' +
 		'<div class="left">' +
 			(!options.disableHide ?
-				'<div id="branch-banner-close" class="branch-animation">&times;</div>' :
+				'<div id="branch-banner-close" class="branch-animation" aria-label="Close">&times;</div>' :
 				'') +
 			'<div class="icon">' +
-				'<img src="' + options.icon + '">' +
+				'<img src="' + options.icon + '" alt="Application icon">' +
 			'</div>' +
 			'<div class="details vertically-align-middle">' +
 				'<div class="title">' + options.title + '</div>' +
@@ -102,7 +102,7 @@ banner_html.desktopAction = function(options) {
 	'</div>' +
 	'<div id="branch-sms-block">' +
 		'<form id="sms-form">' +
-			'<input type="phone" class="branch-animation" name="branch-sms-phone"' +
+			'<input type="phone" aria-label="Enter phone number" class="branch-animation" name="branch-sms-phone"' +
 			' id="branch-sms-phone" placeholder="' +
 			options.phonePreviewText +
 			'">' +
