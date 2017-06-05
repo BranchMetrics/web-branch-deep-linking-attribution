@@ -199,7 +199,7 @@ var cookies = function(perm) {
 			}
 		},
 		isEnabled: function() {
-			return navigator.cookieEnabled;
+			return navigator && navigator.cookieEnabled;
 		}
 	};
 };
