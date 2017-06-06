@@ -312,7 +312,7 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	// removes left over body transition from previous Journey
 	document.body.style.transition = "";
-
+	document.body.style.marginTop = "";
 	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
 	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 
