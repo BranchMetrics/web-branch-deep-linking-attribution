@@ -8,6 +8,7 @@ goog.require('storage');
 goog.require('session');
 goog.require('banner_utils');
 goog.require('banner_html');
+goog.require('safejson');
 
 goog.require('goog.json'); // jshint unused:false
 
@@ -447,8 +448,9 @@ describe('Branch', function() {
 		it('should return whitelisted session storage data', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(2, done);
+			var data = safejson.stringify({ 'key_1': 'value_1' });
 			var whitelistedData = {
-				'data': 'data',
+				'data': data,
 				'referring_identity': 'referring_user',
 				'identity': 'identity',
 				'has_app': false,
