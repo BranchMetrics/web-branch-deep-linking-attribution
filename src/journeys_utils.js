@@ -168,6 +168,7 @@ journeys_utils.getJsAndAddToParent = function(html) {
 	if(match) {
 		var src = match[1];
 		var script = document.createElement('script');
+		script.id = 'branch-journey-cta';
 		script.innerHTML = src;
 		document.body.appendChild(script);
 	}
@@ -517,7 +518,8 @@ journeys_utils.animateBannerExit = function(banner) {
 		// remove banner, branch-css, and branch-iframe-css
 		banner_utils.removeElement(banner);
 		banner_utils.removeElement(document.getElementById('branch-css'));
-		banner_utils.removeElement(document.getElementById('branch-iframe-css'));		
+		banner_utils.removeElement(document.getElementById('branch-iframe-css'));
+		banner_utils.removeElement(document.getElementById('branch-journey-cta'));
 
 		// remove margin from all elements with branch injection div
 		if ((!journeys_utils.exitAnimationDisabled || journeys_utils.journeyDismissed) &&
