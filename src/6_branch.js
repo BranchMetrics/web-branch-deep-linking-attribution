@@ -316,7 +316,10 @@ Branch.prototype['init'] = wrap(
 		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
 			options.url :
 			null;
-		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
+		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
+			options['branch_match_id'] :
+			null;
+		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r') || branchMatchIdFromOptions);
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(sessionData, cb) {
