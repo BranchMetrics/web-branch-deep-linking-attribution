@@ -323,6 +323,58 @@ describe('Branch', function() {
 			}
 		);
 
+		it(
+			'should store in session and call open with link_identifier from options',
+			function(done) {
+				if (testUtils.go('?')) {
+					var branch = initBranch(false);
+					var assert = testUtils.plan(3, done);
+
+					branch.init(branch_sample_key, { link_identifier: 67890 }, function(err, data) {
+						assert.strictEqual(
+							JSON.parse(localStorage.getItem('branch_session_first')).click_id,
+							'67890',
+							'get param match id stored in local storage'
+						);
+						assert.strictEqual(
+							utils.mobileUserAgent() ?
+								'67890' :
+								JSON.parse(sessionStorage.getItem('branch_session')).click_id,
+							'67890',
+							'get param match id saved in session storage'
+						);
+					});
+
+					requests[0].callback(null, browser_fingerprint_id);
+					requests[1].callback(
+						null,
+						{
+							session_id: "1234",
+							something: "else"
+						}
+					);
+					requests[2].callback(null, {});
+
+					assert.deepEqual(
+						requests[1].obj,
+						{
+							"branch_key": branch_sample_key,
+							"link_identifier": '67890',
+							"initial_referrer": requests[1].obj.initial_referrer,
+							"is_referrable": 1,
+							"browser_fingerprint_id": browser_fingerprint_id,
+							"sdk": "web" + config.version,
+							"options": undefined
+						},
+						'Request to open params correct'
+					);
+				}
+				else {
+					done();
+				}
+			}
+		);
+
 		it('should not call has_app if no session present', function(done) {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(2, done);

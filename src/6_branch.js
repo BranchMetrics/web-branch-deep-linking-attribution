@@ -223,7 +223,7 @@ Branch.prototype._publishEvent = function(event, data) {
 /**
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
- * @param {Object=} options - _optional_ - { }.
+ * @param {Object=} options - _optional_ - options: link_identifier, pass down a _branch_match_id instead of using window.location.
  * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
  * session data.
  *
@@ -316,7 +316,7 @@ Branch.prototype['init'] = wrap(
 		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
 			options.url :
 			null;
-		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
+		var link_identifier = ((options || {}).link_identifier || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(sessionData, cb) {
