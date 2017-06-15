@@ -242,6 +242,16 @@ Branch.prototype._publishEvent = function(event, data) {
  * **Useful Tip**: The init function returns a data object where you can read
  * the link the user was referred by.
  *
+ * Properties available in the options object:
+ *
+ * | Key | Value
+ * | --- | ---
+ * | branch_match_id | *optional* - `string`. The current user's browser-fingerprint-id. The value of this parameter should be the same as the value of ?_branch_match_id (automatically appended by Branch after a link click). _Only necessary if ?_branch_match_id is lost due to multiple redirects in your flow_.
+ * | branch_view_id | *optional* - `string`. If you would like to test how Journeys render on your page before activating them, you can set the value of this parameter to the id of the view you are testing. _Only necessary when testing a view related to a Journey_.
+ * | no_journeys | *optional* - `boolean`. When true, prevents Journeys from appearing on current page.
+ * | disable_entry_animation | *optional* - `boolean`. When true, prevents a Journeys entry animation.
+ * | disable_exit_animation | *optional* - `boolean`. When true, prevents a Journeys exit animation.
+ *
  * ##### Usage
  * ```js
  * branch.init(
@@ -316,7 +326,10 @@ Branch.prototype['init'] = wrap(
 		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
 			options.url :
 			null;
-		var link_identifier = (utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
+		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
+			options['branch_match_id'] :
+			null;
+		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(sessionData, cb) {
