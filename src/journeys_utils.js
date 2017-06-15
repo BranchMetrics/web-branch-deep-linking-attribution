@@ -269,12 +269,13 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	if (journeys_utils.position === 'top') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
-		bodyMargin = 'margin-top: ' + calculatedBodyMargin + 'px';
+		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
 	}
 	else if (journeys_utils.position === 'bottom') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
-		bodyMargin = 'margin-bottom: ' + calculatedBodyMargin + 'px';
+		document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
 	}
+
 	// adds margin to the parent of div being inserted into
 	if (journeys_utils.divToInjectParents.length > 0) {
 		// dont want to add margin for full page fixed
@@ -312,7 +313,6 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	// removes left over body transition from previous Journey
 	document.body.style.transition = "";
-	document.body.style.marginTop = "";
 	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
 	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 
@@ -322,7 +322,7 @@ journeys_utils.addIframeOuterCSS = function() {
 		iframeAnimationStyle = '';
 	}
 
-	iFrameCSS.innerHTML = 'body { ' + bodyAnimationStyle + (bodyMargin) + '; }\n' +
+	iFrameCSS.innerHTML = 'body { ' + bodyAnimationStyle + '; }\n' +
 	 '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
 	 ' left: 0; right: 0; border: 0; height: ' +
 	 journeys_utils.bannerHeight + '; z-index: 99999; ' +
