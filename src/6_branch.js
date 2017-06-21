@@ -560,6 +560,7 @@ Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, fun
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(session.get(this._storage));
 	data['referring_link'] = this._referringLink();
+	data['data_parsed'] = data && data['data'] ? safejson.parse(data['data']) : null;
 	done(null, data);
 });
 
