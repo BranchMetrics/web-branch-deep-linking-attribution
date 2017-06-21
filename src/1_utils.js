@@ -109,8 +109,8 @@ utils.message = function(message, params, failCode, failDetails) {
  */
 utils.whiteListSessionData = function(data) {
 	return {
-		'data': data['data'] || null,
-		'data_parsed': data['data_parsed'] || null,
+		'data': data['data'] || "",
+		'data_parsed': data['data_parsed'] || {},
 		'has_app': data['has_app'] || null,
 		'identity': data['identity'] || null,
 		'referring_identity': data['referring_identity'] || null,

@@ -389,7 +389,7 @@ Branch.prototype['init'] = wrap(
 				session.set(self._storage, data, freshInstall);
 
 				self.init_state = init_states.INIT_SUCCEEDED;
-				data['data_parsed'] = data['data'] ? safejson.parse(data['data']) : null;
+				data['data_parsed'] = data['data'] && data["data"].length !== 0 ? safejson.parse(data['data']) : {};
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
@@ -459,9 +459,10 @@ Branch.prototype['init'] = wrap(
 		};
 
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
+			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
+			session.update(self._storage, { "data": "" });
 			attachVisibilityEvent();
-			checkHasApp(sessionData, finishInit);
-
+			checkHasApp(null, finishInit);
 			return;
 		}
 
