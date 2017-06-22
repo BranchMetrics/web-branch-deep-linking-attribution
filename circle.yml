@@ -7,11 +7,11 @@ dependencies:
   post:
     # Closure Compiler
     - mkdir -p compiler
-    - stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-latest.zip && unzip -o compiler-latest.zip -d compiler)
+    - stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-20170218.zip && unzip -o compiler-20170218.zip -d compiler)
 
     # Closure compiler library
     - mkdir -p compiler/library
-    - stat compiler/library/closure-library-master || (wget https://github.com/google/closure-library/archive/master.zip && unzip -o master.zip -d compiler/library)
+    - stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library)
 
     # Node, Sauce, Phantom, and JSlint deps
     - npm install
