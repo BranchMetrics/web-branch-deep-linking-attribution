@@ -153,7 +153,7 @@ function isJourneyDismissed(branchViewData, branch) {
 }
 
 // builds an object that contains data from setBranchViewData() call, hosted deep link data and language data
-function compileRequestData(branch) {
+function compileRequestData(branch, linkClickId) {
 		var requestData = branch._branchViewData || {};
 
 		if (!requestData['data']) {
@@ -162,7 +162,19 @@ function compileRequestData(branch) {
 
 		requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
 		requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
+		if (linkClickId) { // linkClickId can be null so ignore passing linkClickId to v1/branchview if it is
+			requestData['data'] = utils.merge({'link_click_id': linkClickId}, requestData['data']);
+		}
 		return requestData;
+}
+
+function fetchLinkClickId(referringLink) {
+	if (referringLink) {
+		return referringLink.substring(
+			referringLink.lastIndexOf('/') + 1, referringLink.length
+		);
+	}
+	return null;
 }
 
 branch_view.initJourney = function(branch_key, data, eventData, options, branch) {
@@ -202,7 +214,12 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	if (branchViewData && !hideJourney && !no_journeys) {
 		journeys_utils.branchViewId = branchViewData.id;
 		branch['renderQueue'](function() {
-			requestData = compileRequestData(branch);
+			var makeNewLink = options && options['make_new_link'] || false;
+			var linkClickId = null;
+			if (!makeNewLink) {
+				linkClickId = fetchLinkClickId(branch._referringLink());
+			}
+			requestData = compileRequestData(branch, linkClickId);
 			branch_view.handleBranchViewData(branch._server, branchViewData, requestData, branch._storage, data['has_app'], testFlag, branch);
 		});
 	}
