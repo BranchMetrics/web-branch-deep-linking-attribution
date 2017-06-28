@@ -389,7 +389,7 @@ Branch.prototype['init'] = wrap(
 				session.set(self._storage, data, freshInstall);
 
 				self.init_state = init_states.INIT_SUCCEEDED;
-				data['data_parsed'] = data['data'] && data["data"].length !== 0 ? safejson.parse(data['data']) : {};
+				data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
@@ -561,7 +561,7 @@ Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, fun
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(session.get(this._storage));
 	data['referring_link'] = this._referringLink();
-	data['data_parsed'] = data['data'] && data["data"].length !== 0 ? safejson.parse(data['data']) : {};
+	data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 	done(null, data);
 });
 
