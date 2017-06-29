@@ -332,9 +332,9 @@ Branch.prototype['init'] = wrap(
 		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
-		var checkHasApp = function(sessionData, cb) {
+		var checkHasApp = function(cb) {
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
-			var currentSessionData = sessionData || session.get(self._storage) || {};
+			var currentSessionData = session.get(self._storage) || {};
 			var permData = session.get(self._storage, true) || {};
 			if (permData['browser_fingerprint_id']) {
 				params_r['_t'] = permData['browser_fingerprint_id'];
@@ -449,7 +449,7 @@ Branch.prototype['init'] = wrap(
 			if (changeEvent) {
 				document.addEventListener(changeEvent, function() {
 					if (!document[hidden]) {
-						checkHasApp(null, null);
+						checkHasApp(null);
 						if (typeof self._deepviewRequestForReplay === 'function') {
 							self._deepviewRequestForReplay();
 						}
@@ -462,7 +462,7 @@ Branch.prototype['init'] = wrap(
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
 			attachVisibilityEvent();
-			checkHasApp(null, finishInit);
+			checkHasApp(finishInit);
 			return;
 		}
 
