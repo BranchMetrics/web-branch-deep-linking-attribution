@@ -311,31 +311,42 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	journeys_utils.journeyDismissed = false;
 
-	// removes left over body transition from previous Journey
-	document.body.style.transition = "";
-	var bodyAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; ';
-	var iframeAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
-
-	// if entry animation is disabled, then don't animate Journey entry
-	if (journeys_utils.entryAnimationDisabled) {
-		bodyAnimationStyle = '';
-		iframeAnimationStyle = '';
-	}
-
-	iFrameCSS.innerHTML = 'body { ' + bodyAnimationStyle + '; }\n' +
-	 '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
-	 ' left: 0; right: 0; border: 0; height: ' +
-	 journeys_utils.bannerHeight + '; z-index: 99999; ' +
-	 iframeAnimationStyle  + ' }\n' +
-	 '#branch-banner-iframe { position: ' +
-	 (journeys_utils.sticky) + '; }\n' +
-	 '@media only screen and (orientation: landscape) { ' +
-	 'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
-	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
-	 '#branch-banner-iframe { height: ' +
-	 (journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
+	iFrameCSS.innerHTML = generateIframeOuterCSS();
 
 	document.head.appendChild(iFrameCSS);
+}
+
+function generateIframeOuterCSS() {
+	var bodyWebkitTransitionStyle = '';
+	var iFrameAnimationStyle = '';
+
+	// Resets previous transition styles
+	document.body.style.transition = '';
+	if (document.getElementById('branch-banner-iframe')) {
+		document.getElementById('branch-banner-iframe').style.transition = '';
+	}
+
+	// If entry animation is not disabled, then animate Journey entry
+	if (!journeys_utils.entryAnimationDisabled) {
+		bodyWebkitTransitionStyle = 'body { -webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n';
+		document.body.style.transition = 'all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease';
+		iFrameAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; ' +
+						'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
+	}
+
+	var css = bodyWebkitTransitionStyle ? bodyWebkitTransitionStyle : ''; // add if we need to
+	css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
+	' left: 0; right: 0; border: 0; height: ' +
+	journeys_utils.bannerHeight + '; z-index: 99999; ' +
+	iFrameAnimationStyle  + ' }\n' +
+	'#branch-banner-iframe { position: ' +
+	(journeys_utils.sticky) + '; }\n' +
+	'@media only screen and (orientation: landscape) { ' +
+	'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
+	(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
+	'#branch-banner-iframe { height: ' +
+	(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
+	return css;
 }
 
 /***
@@ -497,10 +508,19 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
  * @param {Object} banner
  */
 journeys_utils.animateBannerExit = function(banner) {
-	// adds transition for Journey exit if it doesn't exist
+	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
 		document.getElementById('branch-banner-iframe').style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
+
+		// ensure that -webkit-transition styles get applied as well
+		var iFrameOutterCSSBackup = document.getElementById('branch-iframe-css').innerHTML + '\n';
+		iFrameOutterCSSBackup += 'body { -webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n';
+		iFrameOutterCSSBackup += '#branch-banner-iframe { -webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; }\n';
+		// in order for updated styles to get applied, we have to remove all branch-iframe-css styles
+		document.getElementById('branch-iframe-css').innerHTML = "";
+		//re-add them here for changes to take effect
+		document.getElementById('branch-iframe-css').innerHTML = iFrameOutterCSSBackup;
 	}
 
 	if (journeys_utils.position === 'top') {
