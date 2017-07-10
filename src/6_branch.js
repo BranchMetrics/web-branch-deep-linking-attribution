@@ -332,9 +332,9 @@ Branch.prototype['init'] = wrap(
 		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
-		var checkHasApp = function(sessionData, cb) {
+		var checkHasApp = function(cb) {
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
-			var currentSessionData = sessionData || session.get(self._storage) || {};
+			var currentSessionData = session.get(self._storage) || {};
 			var permData = session.get(self._storage, true) || {};
 			if (permData['browser_fingerprint_id']) {
 				params_r['_t'] = permData['browser_fingerprint_id'];
@@ -389,7 +389,7 @@ Branch.prototype['init'] = wrap(
 				session.set(self._storage, data, freshInstall);
 
 				self.init_state = init_states.INIT_SUCCEEDED;
-				data['data_parsed'] = data['data'] ? safejson.parse(data['data']) : null;
+				data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 			}
 			if (err) {
 				self.init_state = init_states.INIT_FAILED;
@@ -449,7 +449,7 @@ Branch.prototype['init'] = wrap(
 			if (changeEvent) {
 				document.addEventListener(changeEvent, function() {
 					if (!document[hidden]) {
-						checkHasApp(null, null);
+						checkHasApp(null);
 						if (typeof self._deepviewRequestForReplay === 'function') {
 							self._deepviewRequestForReplay();
 						}
@@ -459,9 +459,10 @@ Branch.prototype['init'] = wrap(
 		};
 
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
+			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
+			session.update(self._storage, { "data": "" });
 			attachVisibilityEvent();
-			checkHasApp(sessionData, finishInit);
-
+			checkHasApp(finishInit);
 			return;
 		}
 
@@ -560,7 +561,7 @@ Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, fun
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var data = utils.whiteListSessionData(session.get(this._storage));
 	data['referring_link'] = this._referringLink();
-	data['data_parsed'] = data && data['data'] ? safejson.parse(data['data']) : null;
+	data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 	done(null, data);
 });
 
