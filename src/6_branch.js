@@ -323,9 +323,7 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
-		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
-			options.url :
-			utils.getWindowLocation();
+		var url = options && options.url || utils.getWindowLocation();
 		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
