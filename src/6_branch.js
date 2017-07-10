@@ -323,9 +323,7 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
-		var url = (options && typeof options.url !== 'undefined' && options.url !== null) ?
-			options.url :
-			null;
+		var url = options && options.url || utils.getWindowLocation();
 		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
@@ -403,7 +401,7 @@ Branch.prototype['init'] = wrap(
 			self._api(resources.event, {
 				"event": 'pageview',
 				"metadata": {
-					"url": utils.getWindowLocation(),
+					"url": url,
 					"user_agent": navigator.userAgent,
 					"language": navigator.language,
 					"page_has_microdata": checkForMicroData(),
