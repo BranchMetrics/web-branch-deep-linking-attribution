@@ -153,16 +153,19 @@ function isJourneyDismissed(branchViewData, branch) {
 }
 
 // builds an object that contains data from setBranchViewData() call, hosted deep link data and language data
-function compileRequestData(branch) {
-		var requestData = branch._branchViewData || {};
+function compileRequestData(branch, makeNewLink) {
+	var requestData = branch._branchViewData || {};
 
-		if (!requestData['data']) {
-			requestData['data'] = {};
-		}
+	if (!requestData['data']) {
+		requestData['data'] = {};
+	}
 
-		requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
-		requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
-		return requestData;
+	var linkClickId = !makeNewLink ? utils.clickIdFromLink(branch._referringLink()) : null;
+
+	requestData['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), requestData['data']);
+	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
+	requestData['data'] = linkClickId ? utils.merge({'link_click_id': linkClickId}, requestData['data']) : requestData['data'];
+	return requestData;
 }
 
 branch_view.initJourney = function(branch_key, data, eventData, options, branch) {
@@ -176,6 +179,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	var branchViewData = null;
 	var requestData = null;
 	var testFlag = false;
+	var makeNewLink = false;
 
 	if (options) {
 		branchViewId = options['branch_view_id'] || null;
@@ -183,6 +187,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 		branch.user_language = options['user_language'] || utils.getBrowserLanguageCode();
 		journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
+		makeNewLink = options['make_new_link'] || false;
 	}
 
 	branchViewId = branchViewId || utils.getParameterByName('_branch_view_id') || null;
@@ -202,7 +207,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	if (branchViewData && !hideJourney && !no_journeys) {
 		journeys_utils.branchViewId = branchViewData.id;
 		branch['renderQueue'](function() {
-			requestData = compileRequestData(branch);
+			requestData = compileRequestData(branch, makeNewLink);
 			branch_view.handleBranchViewData(branch._server, branchViewData, requestData, branch._storage, data['has_app'], testFlag, branch);
 		});
 	}
