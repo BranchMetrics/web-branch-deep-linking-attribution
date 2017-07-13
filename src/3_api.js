@@ -195,8 +195,6 @@ Server.prototype.createScript = function(src, onError, onLoad) {
 	}
 };
 
-var jsonp_callback_index = 0;
-
 /**
  * @param {string} requestURL
  * @param {Object} requestData
