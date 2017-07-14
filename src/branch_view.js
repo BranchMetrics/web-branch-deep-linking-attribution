@@ -89,6 +89,8 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 	if (branchViewData['html']) {
 		return renderHtmlBlob(document.body, branchViewData['html'], hasApp);
 	} else if (branchViewData['url']) {
+		// we need to pass the callback_index to v1/branchview and increment it so that we prevent auto-deeplinking
+		// from occurring more than once
 		var callbackString = 'branch_view_callback__' + (branch_view.callback_index++);
 		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
