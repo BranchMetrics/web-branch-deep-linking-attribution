@@ -93,7 +93,7 @@ endif
 docs/web/3_branch_web.md: $(SOURCES)
 	perl -pe 's/\/\*\*\ =CORDOVA/\/\*\*\*/gx' src/6_branch.js > src/3_branch_web.js
 	perl -p -i -e 's/=WEB//gx' src/3_branch_web.js
-	npm run builddocs
+	jsdox src/3_branch_web.js --output docs/web
 	rm src/3_branch_web.js
 
 README.md: docs/1_intro.md docs/1_readme.md docs/web/3_branch_web.md docs/9_footer.md
