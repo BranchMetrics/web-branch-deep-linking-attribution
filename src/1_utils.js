@@ -652,3 +652,12 @@ utils.cleanBannerText = function(string) {
 	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 
+utils.openGraphDataAsObject = function() {
+	return {
+		'$og_title': utils.scrapeOpenGraphContent('title'),
+		'$og_description': utils.scrapeOpenGraphContent('description'),
+		'$og_image_url': utils.scrapeOpenGraphContent('image'),
+		'$og_video': utils.scrapeOpenGraphContent('video')
+	};
+};
+

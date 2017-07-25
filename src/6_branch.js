@@ -406,7 +406,9 @@ Branch.prototype['init'] = wrap(
 					"language": navigator.language,
 					"page_has_microdata": checkForMicroData(),
 					"screen_width": screen.width || -1,
-					"screen_height": screen.height || -1
+					"screen_height": screen.height || -1,
+					"og_data": utils.openGraphDataAsObject(),
+					"hosted_deeplink_data": utils.scrapeHostedDeepLinkData()
 				},
 				"initial_referrer": document.referrer
 			}, function(err, eventData) {
