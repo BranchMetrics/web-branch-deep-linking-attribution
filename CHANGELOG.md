@@ -7,7 +7,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Fixes body margin issues related to hiding and showing a Journey
 - Provides the ability to pass _branch_match_id through branch.init() options dictionary
 - Removes leftover CTA script after hiding a Journey
-- Resets session data when _branch_match_id is not not available
+- Resets session data when _branch_match_id is not available
 - Provides the ability to pass a custom "url" as part of branch.init() options dictionary to trigger a Journey's filter
 - Ensures that the referring Branch link is passed through Journey CTA by default.
 
