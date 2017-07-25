@@ -177,8 +177,8 @@ describe('Integration tests', function() {
 			branchInit(assert, function(err, data) {
 				assert.deepEqual(data,
 					{
-						data: "",
-						data_parsed: {},
+						data: null,
+						data_parsed: null,
 						has_app: true,
 						identity: "Branch",
 						referring_identity: null,
@@ -276,8 +276,8 @@ describe('Integration tests', function() {
 				assert.deepEqual(
 					data,
 					{
-						data: "",
-						data_parsed: {},
+						data: null,
+						data_parsed: null,
 						has_app: true,
 						identity: "Branch",
 						referring_identity: null,
