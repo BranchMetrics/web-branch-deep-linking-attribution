@@ -397,8 +397,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   goog.moduleLoaderState_ = null;
   for (a = 0;a < c.length;a++) {
     if (f = c[a]) {
-      var k = e.loadFlags[f] || {}, h = goog.needsTranspile_(k.lang || "es3");
-      "goog" == k.module || h ? goog.importProcessedScript_(goog.basePath + f, "goog" == k.module, h) : goog.importScript_(goog.basePath + f);
+      var h = e.loadFlags[f] || {}, k = goog.needsTranspile_(h.lang || "es3");
+      "goog" == h.module || k ? goog.importProcessedScript_(goog.basePath + f, "goog" == h.module, k) : goog.importScript_(goog.basePath + f);
     } else {
       throw goog.moduleLoaderState_ = g, Error("Undefined script input");
     }
@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -977,7 +977,7 @@ utils.message = function(a, b, c, d) {
   return a;
 };
 utils.whiteListSessionData = function(a) {
-  return {data:a.data || null, data_parsed:a.data_parsed || null, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
+  return {data:a.data || "", data_parsed:a.data_parsed || {}, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
 utils.whiteListJourneysLanguageData = function(a) {
   var b = /^\$journeys_\S+$/, c = a.data, d = {};
@@ -1088,14 +1088,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, k, h = 0;
+  var b = "", c, d, e, f, g, h, k = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;h < a.length;) {
-    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? k = g = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k);
+  for (a = d;k < a.length;) {
+    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h);
   }
   return b;
 };
@@ -1400,7 +1400,7 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
     "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
       return c.branch_key = b.branch_key, c;
@@ -1412,7 +1412,7 @@ Server.prototype.getUrl = function(a, b) {
   };
   if ("/v1/has-app" === a.endpoint) {
     try {
-      a.queryPart = k(b, a.queryPart);
+      a.queryPart = h(b, a.queryPart);
     } catch (l) {
       return {error:l.message};
     }
@@ -1427,7 +1427,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  var h = {};
+  var k = {};
   if ("undefined" !== typeof a.params) {
     for (c in a.params) {
       if (a.params.hasOwnProperty(c)) {
@@ -1435,20 +1435,20 @@ Server.prototype.getUrl = function(a, b) {
           return {error:d};
         }
         d = b[c];
-        "undefined" !== typeof d && "" !== d && null !== d && (h[c] = d);
+        "undefined" !== typeof d && "" !== d && null !== d && (k[c] = d);
       }
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
-      b = k(b, h);
+      b = h(b, k);
     } catch (l) {
       return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (h.metadata = safejson.stringify(h.metadata || {}), h.hasOwnProperty("commerce_data") && (h.commerce_data = safejson.stringify(h.commerce_data || {})));
-  "/v1/open" === a.endpoint && (h.options = safejson.stringify(h.options || {}));
-  return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
+  "/v1/event" === a.endpoint && (k.metadata = safejson.stringify(k.metadata || {}), k.hasOwnProperty("commerce_data") && (k.commerce_data = safejson.stringify(k.commerce_data || {})));
+  "/v1/open" === a.endpoint && (k.options = safejson.stringify(k.options || {}));
+  return {data:this.serializeObject(k, ""), url:e.replace(/^\//, "")};
 };
 Server.prototype.createScript = function(a, b, c) {
   var d = document.createElement("script");
@@ -1476,7 +1476,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   }, function() {
     try {
       "function" === typeof this.remove ? this.remove() : this.parentNode.removeChild(this);
-    } catch (k) {
+    } catch (h) {
     }
     delete window[e];
   });
@@ -1498,7 +1498,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
         } else {
           try {
             a = safejson.parse(g.responseText);
-          } catch (h) {
+          } catch (k) {
             a = {};
           }
         }
@@ -1510,7 +1510,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
   };
   try {
     g.open(c, a, !0), g.timeout = TIMEOUT, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
-  } catch (k) {
+  } catch (h) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
@@ -1519,14 +1519,14 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(f.error));
   }
-  var g, k = "";
-  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, k = f.data);
-  var h = RETRIES, l = function(a, b, c) {
-    a && 0 < h && "5" === (c || "").toString().substring(0, 1) ? (h--, window.setTimeout(function() {
+  var g, h = "";
+  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
+  var k = RETRIES, l = function(a, b, c) {
+    a && 0 < k && "5" === (c || "").toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       m();
     }, RETRY_DELAY)) : d(a, b);
   }, m = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, k, a.method, c, l);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
   };
   m();
 };
@@ -1553,7 +1553,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var d = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, k = function() {
+    }, h = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -1565,11 +1565,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * k();
+      return a * h();
     }, vmin:function(a) {
-      return a * Math.min(k(), g());
+      return a * Math.min(h(), g());
     }, vmax:function(a) {
-      return a * Math.max(k(), g());
+      return a * Math.max(h(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * d;
     }}[b](d), 10);
@@ -1620,7 +1620,7 @@ banner_css.css = function(a, b) {
 };
 // Input 12
 var banner_html = {banner:function(a, b) {
-  var c = '<div class="content' + (a.theme ? " theme-" + a.theme : "") + '"><div class="right">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation">&times;</div>') + '<div class="icon"><img src="' + a.icon + '"></div><div class="details vertically-align-middle"><div class="title">' + a.title + "</div>", d;
+  var c = '<div class="content' + (a.theme ? " theme-" + a.theme : "") + '"><div class="right">' + b + '</div><div class="left">' + (a.disableHide ? "" : '<div id="branch-banner-close" class="branch-animation" aria-label="Close">&times;</div>') + '<div class="icon"><img src="' + a.icon + '" alt="Application icon"></div><div class="details vertically-align-middle"><div class="title">' + a.title + "</div>", d;
   if (a.rating || a.reviewCount) {
     if (a.rating) {
       d = "";
@@ -1641,7 +1641,7 @@ var banner_html = {banner:function(a, b) {
 }, mobileAction:function(a, b) {
   return '<a id="branch-mobile-action" class="button" href="#" target="_parent">' + ((session.get(b) || {}).has_app ? a.openAppButtonText : a.downloadAppButtonText) + "</a>";
 }, desktopAction:function(a) {
-  return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation button">' + a.sendLinkText + "</button></form></div>";
+  return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;"><div id="branch-spinner"></div></div><div id="branch-sms-block"><form id="sms-form"><input type="phone" aria-label="Enter phone number" class="branch-animation" name="branch-sms-phone" id="branch-sms-phone" placeholder="' + a.phonePreviewText + '"><button type="submit" id="branch-sms-send" class="branch-animation button">' + a.sendLinkText + "</button></form></div>";
 }, checkmark:function() {
   return window.ActiveXObject ? '<span class="checkmark">&#x2713;</span>' : '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5" enable-background="new 0 0 98.5 98.5" xml:space="preserve"><path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10" d="M81.7,17.8C73.5,9.3,62,4,49.2,4C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3"/></svg>';
 }, iframe:function(a, b) {
@@ -1670,24 +1670,24 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 13
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
   }, m = function() {
-    h = a.createElement("div");
-    h.className = "branch-icon-wrapper";
-    h.id = "branch-checkmark";
-    h.style = "opacity: 0;";
-    h.innerHTML = banner_html.checkmark();
-    k.appendChild(h);
+    k = a.createElement("div");
+    k.className = "branch-icon-wrapper";
+    k.id = "branch-checkmark";
+    k.style = "opacity: 0;";
+    k.innerHTML = banner_html.checkmark();
+    h.appendChild(k);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      h.style.opacity = "1";
+      k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
@@ -1703,7 +1703,7 @@ var sendSMS = function(a, b, c, d) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
       a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
-        k.removeChild(h);
+        h.removeChild(k);
         l();
       }, banner_utils.success_timeout));
     })) : n();
@@ -1727,8 +1727,8 @@ var sendSMS = function(a, b, c, d) {
     b.make_new_link = b.make_new_link;
     b.deepview_type = "banner";
     a.deepview(c, b);
-    var k = g.getElementById("branch-mobile-action");
-    k && (k.onclick = function(b) {
+    var h = g.getElementById("branch-mobile-action");
+    h && (h.onclick = function(b) {
       b.preventDefault();
       a.deepviewCta();
     });
@@ -1744,17 +1744,17 @@ var sendSMS = function(a, b, c, d) {
       });
     };
   }
-  var k = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
+  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
     "top" === b.position ? f.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (f.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
-    a.immediate ? ("top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
+    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
       banner_utils.removeElement(f);
       banner_utils.removeElement(document.getElementById("branch-css"));
       c();
     }, banner_utils.animationSpeed + banner_utils.animationDelay), setTimeout(function() {
-      "top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m);
+      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay));
   };
@@ -1766,7 +1766,7 @@ var sendSMS = function(a, b, c, d) {
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, k) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, h) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
   b.immediate ? e() : setTimeout(e, banner_utils.animationDelay);
   return p;
 };
@@ -1842,6 +1842,7 @@ journeys_utils.getJsAndAddToParent = function(a) {
   if (a = a.match(journeys_utils.jsRe)) {
     a = a[1];
     var b = document.createElement("script");
+    b.id = "branch-journey-cta";
     b.innerHTML = a;
     document.body.appendChild(b);
   }
@@ -1875,12 +1876,11 @@ journeys_utils.addIframeOuterCSS = function() {
   var a = document.createElement("style");
   a.type = "text/css";
   a.id = "branch-iframe-css";
-  var b = "";
   journeys_utils.bodyMarginTop = banner_utils.getBodyStyle("margin-top");
-  var c = +journeys_utils.bodyMarginTop.slice(0, -2);
+  var b = +journeys_utils.bodyMarginTop.slice(0, -2);
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle("margin-bottom");
-  var d = +journeys_utils.bodyMarginBottom.slice(0, -2), e = +journeys_utils.bannerHeight.slice(0, -2);
-  "top" === journeys_utils.position ? b = "margin-top: " + (+e + c) + "px" : "bottom" === journeys_utils.position && (b = "margin-bottom: " + (+e + d) + "px");
+  var c = +journeys_utils.bodyMarginBottom.slice(0, -2), d = +journeys_utils.bannerHeight.slice(0, -2);
+  "top" === journeys_utils.position ? document.body.style.marginTop = (+d + b).toString() + "px" : "bottom" === journeys_utils.position && (document.body.style.marginBottom = (+d + c).toString() + "px");
   0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
     var b, c = window.getComputedStyle(a);
     c && (b = journeys_utils.isFullPage && "fixed" === c.getPropertyValue("position"));
@@ -1893,14 +1893,17 @@ journeys_utils.addIframeOuterCSS = function() {
   journeys_utils.previousPosition = "";
   journeys_utils.previousDivToInjectParents = [];
   journeys_utils.journeyDismissed = !1;
-  document.body.style.transition = "";
-  c = "-webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; ";
-  d = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;";
-  journeys_utils.entryAnimationDisabled && (d = c = "");
-  a.innerHTML = "body { " + c + b + "; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + d + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : 
-  journeys_utils.bannerHeight) + "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }";
+  a.innerHTML = generateIframeOuterCSS();
   document.head.appendChild(a);
 };
+function generateIframeOuterCSS() {
+  var a = "", b = "";
+  document.body.style.transition = "";
+  document.getElementById("branch-banner-iframe") && (document.getElementById("branch-banner-iframe").style.transition = "");
+  journeys_utils.entryAnimationDisabled || (a = "body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n", document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", b = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;");
+  return (a ? a : "") + ("#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + b + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + 
+  "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }");
+}
 journeys_utils.addIframeInnerCSS = function(a, b) {
   var c = document.createElement("style");
   c.type = "text/css";
@@ -1971,13 +1974,20 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
   }
 };
 journeys_utils.animateBannerExit = function(a) {
-  journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled && (document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", document.getElementById("branch-banner-iframe").style.transition = "all 0" + journeys_utils.animationSpeed / 1000 + "s ease");
+  if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
+    document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease";
+    document.getElementById("branch-banner-iframe").style.transition = "all 0" + journeys_utils.animationSpeed / 1000 + "s ease";
+    var b = document.getElementById("branch-iframe-css").innerHTML + "\n", b = b + ("body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n"), b = b + ("#branch-banner-iframe { -webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; }\n");
+    document.getElementById("branch-iframe-css").innerHTML = "";
+    document.getElementById("branch-iframe-css").innerHTML = b;
+  }
   "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
   journeys_utils.branch._publishEvent("willCloseJourney", {banner_id:journeys_utils.branchViewId});
   setTimeout(function() {
     banner_utils.removeElement(a);
     banner_utils.removeElement(document.getElementById("branch-css"));
     banner_utils.removeElement(document.getElementById("branch-iframe-css"));
+    banner_utils.removeElement(document.getElementById("branch-journey-cta"));
     (!journeys_utils.exitAnimationDisabled || journeys_utils.journeyDismissed) && journeys_utils.divToInjectParents && 0 < journeys_utils.divToInjectParents.length ? journeys_utils.divToInjectParents.forEach(function(a) {
       a.style.marginTop = 0;
     }) : (journeys_utils.exitAnimationDisabledPreviously = journeys_utils.exitAnimationDisabled, journeys_utils.previousPosition = journeys_utils.position, journeys_utils.previousDivToInjectParents = journeys_utils.divToInjectParents);
@@ -2014,7 +2024,7 @@ function renderHtmlBlob(a, b, c) {
 branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
   if (!checkPreviousBanner()) {
     journeys_utils.branch = g;
-    var k = null, h = null;
+    var h = null, k = null;
     c = c || {};
     c.feature = "journeys";
     c = utils.cleanLinkData(c);
@@ -2034,20 +2044,20 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
       a.XHRRequest(g + ("&data=" + c), {}, "GET", {}, function(a, c) {
         var g = !1;
         if (!a && c) {
-          var q = f ? 0 : journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
+          var r = f ? 0 : journeys_utils.findDismissPeriod(c), t = window.setTimeout(function() {
             window[m] = function() {
             };
           }, TIMEOUT);
           window[m] = function(a) {
-            window.clearTimeout(r);
-            g || (h = a, journeys_utils.finalHookups(b, d, h, k, q));
+            window.clearTimeout(t);
+            g || (k = a, journeys_utils.finalHookups(b, d, k, h, r));
           };
-          k = renderHtmlBlob(document.body, c, e);
-          if (null === k) {
+          h = renderHtmlBlob(document.body, c, e);
+          if (null === h) {
             g = !0;
             return;
           }
-          journeys_utils.finalHookups(b, d, h, k, q);
+          journeys_utils.finalHookups(b, d, k, h, r);
         }
         document.body.removeChild(l);
       }, !0);
@@ -2065,23 +2075,25 @@ function isJourneyDismissed(a, b) {
   b._storage.remove("hideBanner" + a.id, !0);
   return !1;
 }
-function compileRequestData(a) {
-  var b = a._branchViewData || {};
-  b.data || (b.data = {});
-  b.data = utils.merge(utils.scrapeHostedDeepLinkData(), b.data);
-  b.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), b.data);
-  return b;
+function compileRequestData(a, b) {
+  var c = a._branchViewData || {};
+  c.data || (c.data = {});
+  var d = b ? null : utils.clickIdFromLink(a._referringLink());
+  c.data = utils.merge(utils.scrapeHostedDeepLinkData(), c.data);
+  c.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), c.data);
+  c.data = d ? utils.merge({link_click_id:d}, c.data) : c.data;
+  return c;
 }
 branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
-  var f = null, g = null, k = null, h = null, l = null, m = !1;
-  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1);
-  (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, h = buildJourneyTestData(f, a, b));
-  !h && c.hasOwnProperty("branch_view_data") && (h = c.branch_view_data, k = isJourneyDismissed(h, e));
-  !h || k || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = h.id, e.renderQueue(function() {
-    l = compileRequestData(e);
-    branch_view.handleBranchViewData(e._server, h, l, e._storage, b.has_app, m, e);
+  var f = null, g = null, h = null, k = null, l = null, m = !1, n = !1;
+  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, n = d.make_new_link || !1);
+  (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, k = buildJourneyTestData(f, a, b));
+  !k && c.hasOwnProperty("branch_view_data") && (k = c.branch_view_data, h = isJourneyDismissed(k, e));
+  !k || h || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = k.id, e.renderQueue(function() {
+    l = compileRequestData(e, n);
+    branch_view.handleBranchViewData(e._server, k, l, e._storage, b.has_app, m, e);
   }));
 };
 // Input 16
@@ -2142,7 +2154,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
@@ -2154,16 +2166,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
+          return k(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -2215,63 +2227,63 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
-  }, f = session.get(d._storage), g = utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
+  }, f = session.get(d._storage), g = c && c.url || utils.getWindowLocation(), h = (c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null) || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var h = function(a, b) {
-    var c = {sdk:config.version, branch_key:d.branch_key}, e = a || session.get(d._storage) || {}, f = session.get(d._storage, !0) || {};
-    f.browser_fingerprint_id && (c._t = f.browser_fingerprint_id);
-    d._api(resources._r, c, function(a, b) {
+  var l = function(a) {
+    var b = {sdk:config.version, branch_key:d.branch_key}, c = session.get(d._storage) || {}, e = session.get(d._storage, !0) || {};
+    e.browser_fingerprint_id && (b._t = e.browser_fingerprint_id);
+    d._api(resources._r, b, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message);
-      b && (e.browser_fingerprint_id = b);
+      b && (c.browser_fingerprint_id = b);
     });
-    d._api(resources.hasApp, {browser_fingerprint_id:e.browser_fingerprint_id}, function(a, c) {
-      a && (d.init_state_fail_code = init_state_fail_codes.HAS_APP_FAILED, d.init_state_fail_details = a.message);
-      a || !c || e.has_app || (e.has_app = !0, session.update(d._storage, e), d._publishEvent("didDownloadApp"));
-      b && b(null, e);
+    d._api(resources.hasApp, {browser_fingerprint_id:c.browser_fingerprint_id}, function(b, e) {
+      b && (d.init_state_fail_code = init_state_fail_codes.HAS_APP_FAILED, d.init_state_fail_details = b.message);
+      b || !e || c.has_app || (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
+      a && a(null, c);
     });
-  }, l = function() {
+  }, m = function() {
     var a = !1;
     try {
       a = !!(document.querySelectorAll('*[itemtype^="http://schema.org"]') || []).length;
-    } catch (q) {
+    } catch (t) {
       a = !1;
     }
     return a;
-  }, m = function(f, g) {
-    g && (g = e(g), session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data ? safejson.parse(g.data) : null);
+  }, n = function(f, h) {
+    h && (h = e(h), session.set(d._storage, h, k), d.init_state = init_states.INIT_SUCCEEDED, h.data_parsed = h.data && 0 !== h.data.length ? safejson.parse(h.data) : {});
     if (f) {
-      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, g && utils.whiteListSessionData(g));
+      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, h && utils.whiteListSessionData(h));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:l(), screen_width:screen.width || -1, screen_height:screen.height || -1}, initial_referrer:document.referrer}, function(e, f) {
-      e || "object" !== typeof f || branch_view.initJourney(b, g, f, c, d);
+    d._api(resources.event, {event:"pageview", metadata:{url:g, user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:m(), screen_width:screen.width || -1, screen_height:screen.height || -1}, initial_referrer:document.referrer}, function(e, f) {
+      e || "object" !== typeof f || branch_view.initJourney(b, h, f, c, d);
       try {
-        a(e, g && utils.whiteListSessionData(g));
-      } catch (t) {
+        a(e, h && utils.whiteListSessionData(h));
+      } catch (u) {
       } finally {
         d.renderFinalize();
       }
     });
-  }, n = function() {
+  }, p = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && document.addEventListener(b, function() {
-      document[a] || (h(null, null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
+      document[a] || (l(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
     }, !1);
   };
-  if (f && f.session_id && !g) {
-    n(), h(f, m);
+  if (f && f.session_id && !h) {
+    session.update(d._storage, {data:""}), p(), l(n);
   } else {
-    var f = {sdk:config.version, branch_key:d.branch_key}, p = session.get(d._storage, !0) || {};
-    p.browser_fingerprint_id && (f._t = p.browser_fingerprint_id);
+    var f = {sdk:config.version, branch_key:d.branch_key}, q = session.get(d._storage, !0) || {};
+    q.browser_fingerprint_id && (f._t = q.browser_fingerprint_id);
     d._api(resources._r, f, function(a, b) {
       if (a) {
-        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, n(a, null);
       }
-      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
+      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), g && (b.click_id = g));
-        n();
-        m(a, b);
+        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
+        p();
+        n(a, b);
       });
     });
   }
@@ -2290,6 +2302,7 @@ Branch.prototype.renderFinalize = wrap(callback_params.CALLBACK_ERR_DATA, functi
 Branch.prototype.data = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = utils.whiteListSessionData(session.get(this._storage));
   b.referring_link = this._referringLink();
+  b.data_parsed = b.data && 0 !== b.data.length ? safejson.parse(b.data) : {};
   a(null, b);
 });
 Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
