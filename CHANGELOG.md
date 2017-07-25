@@ -2,7 +2,14 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.24.1] - 2017-07-25
+- Includes data_parsed key as part of branch.data() response
+- Fixes body margin issues related to hiding and showing a Journey
+- Provides the ability to pass _branch_match_id through branch.init() options dictionary
+- Removes leftover CTA script after hiding a Journey
+- Resets session data when _branch_match_id is not not available
+- Provides the ability to pass a custom "url" as part of branch.init() options dictionary to trigger a Journey's filter
+- Ensures that the referring Branch link is passed through Journey CTA by default. Pass make_new_link : true to override to this behavior
 
 ## [v2.24.0] - 2017-06-26
 - allow no animation for journeys
