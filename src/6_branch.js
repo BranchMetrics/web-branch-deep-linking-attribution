@@ -332,8 +332,25 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(cb) {
+			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 			var currentSessionData = session.get(self._storage) || {};
-
+			var permData = session.get(self._storage, true) || {};
+			if (permData['browser_fingerprint_id']) {
+				params_r['_t'] = permData['browser_fingerprint_id'];
+			}
+			self._api(
+				resources._r,
+				params_r,
+				function(err, browser_fingerprint_id) {
+					if (err) {
+						self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
+						self.init_state_fail_details = err.message;
+					}
+					if (browser_fingerprint_id) {
+						currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
+					}
+				}
+			);
 			self._api(
 				resources.hasApp,
 				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
@@ -466,6 +483,7 @@ Branch.prototype['init'] = wrap(
 						self.init_state_fail_details = err.message;
 						return finishInit(err, null);
 					}
+
 					self._api(
 						resources.open,
 						{

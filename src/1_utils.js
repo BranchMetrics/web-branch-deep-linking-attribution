@@ -219,6 +219,7 @@ utils.cleanLinkData = function(linkData) {
 		data['$og_video'] = utils.scrapeOpenGraphContent('video');
 	}
 
+
 	if (typeof data['$desktop_url'] === 'string') {
 		data['$desktop_url'] =
 			data['$desktop_url']
@@ -698,7 +699,7 @@ utils.openGraphDataAsObject = function() {
 };
 
 utils.appendBfpToLinkUrl = function(url, bfp) {
-	if (typeof url !== 'string') {
+	if (!url) {
 		return null;
 	}
 	if (!bfp) {

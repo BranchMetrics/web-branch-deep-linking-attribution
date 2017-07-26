@@ -126,6 +126,7 @@ describe('Branch', function() {
 					"link_identifier": undefined,
 					"initial_referrer": requests[1].obj.initial_referrer,
 					"browser_fingerprint_id": browser_fingerprint_id,
+					"alternative_browser_fingerprint_id": undefined,
 					"sdk": "web" + config.version,
 					"options": undefined
 				},
@@ -175,6 +176,7 @@ describe('Branch', function() {
 					"link_identifier": undefined,
 					"initial_referrer": requests[1].obj.initial_referrer,
 					"browser_fingerprint_id": browser_fingerprint_id,
+					"alternative_browser_fingerprint_id": undefined,
 					"sdk": "web" + config.version,
 					"options": undefined
 				},
@@ -261,7 +263,8 @@ describe('Branch', function() {
 						"branch_key": branch_sample_key,
 						"link_identifier": '12345',
 						"initial_referrer": requests[1].obj.initial_referrer,
-						"browser_fingerprint_id": browser_fingerprint_id,
+						"browser_fingerprint_id": '12345',
+						"alternative_browser_fingerprint_id": undefined,
 						"sdk": "web" + config.version,
 						"options": undefined
 					},
@@ -311,7 +314,8 @@ describe('Branch', function() {
 							"branch_key": branch_sample_key,
 							"link_identifier": '67890',
 							"initial_referrer": requests[1].obj.initial_referrer,
-							"browser_fingerprint_id": browser_fingerprint_id,
+							"browser_fingerprint_id": '67890',
+							"alternative_browser_fingerprint_id": undefined,
 							"sdk": "web" + config.version,
 							"options": undefined
 						},
@@ -371,6 +375,7 @@ describe('Branch', function() {
 			requests = [ ];
 			branch = initBranch(false, true);
 			branch.init(branch_sample_key);
+
 			assert.strictEqual(requests.length, 2, 'Should make 2 requests');
 			assert.deepEqual(
 				requests[0].resource.endpoint,
@@ -677,12 +682,12 @@ describe('Branch', function() {
 			"url": "https://bnc.lt/l/3HZMytU-BW"
 		};
 
-		it('should call api with serialized data and return link', function(done) {
+		it('should call api with serialized data and return link with browser_fingerprint_id appended', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 			branch.link(expectedRequest(), function(err, link) {
 				assert.strictEqual(err, null, 'No error');
-				assert.strictEqual(link, expectedResponse['url'], 'link returned');
+				assert.strictEqual(link, expectedResponse['url'] + '?_t=79336952217731267', 'link returned');
 			});
 			assert.strictEqual(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);
@@ -908,6 +913,7 @@ describe('Branch', function() {
 			requests[0].callback();
 
 			var obj = requests[0].obj;
+
 			assert.strictEqual(obj.data, dataString, 'data is sent');
 			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');

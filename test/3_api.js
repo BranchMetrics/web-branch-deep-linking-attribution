@@ -375,22 +375,6 @@ describe('Server', function() {
 					'Data correct');
 			});
 
-			it('should fail without browser_fingerprint_id', function(done) {
-				var assert = testUtils.plan(2, done);
-				server.request(
-					resources.open,
-					testUtils.params({ }, [ 'browser_fingerprint_id' ]),
-					storage,
-					function(err) {
-						assert.strictEqual(
-							err.message,
-							"API request /v1/open missing parameter browser_fingerprint_id"
-						);
-					}
-				);
-				assert.strictEqual(requests.length, 0, 'No request made');
-			});
-
 			// param format and type tests
 			it('should fail with incorrect branch_key format', function(done) {
 				var assert = testUtils.plan(2, done);
