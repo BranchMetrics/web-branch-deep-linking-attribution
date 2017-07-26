@@ -697,3 +697,13 @@ utils.openGraphDataAsObject = function() {
 	};
 };
 
+utils.appendBfpToLinkUrl = function(url, bfp) {
+	if (typeof url !== 'string') {
+		return null;
+	}
+	if (!bfp) {
+		return url;
+	}
+
+	return url + '?_t=' + bfp;
+};
