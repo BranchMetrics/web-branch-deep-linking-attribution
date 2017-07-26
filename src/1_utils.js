@@ -706,5 +706,11 @@ utils.appendBfpToLinkUrl = function(url, bfp) {
 		return url;
 	}
 
-	return url + '?_t=' + bfp;
+	var operator = '?';
+
+	if (url.indexOf('?') > -1) {
+		operator = '&';
+	}
+
+	return url + operator + '_t=' + bfp;
 };
