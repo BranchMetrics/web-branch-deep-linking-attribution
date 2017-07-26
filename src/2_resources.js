@@ -94,7 +94,7 @@ resources.open = {
 	method: utils.httpMethod.POST,
 	params: {
 		"browser_fingerprint_id": validator(false, branch_id),
-		"alt_browser_fingerprint_id": validator(false, branch_id),
+		"alternative_browser_fingerprint_id": validator(false, branch_id),
 		"identity_id": validator(false, branch_id),
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),

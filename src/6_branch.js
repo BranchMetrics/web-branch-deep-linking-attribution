@@ -338,19 +338,21 @@ Branch.prototype['init'] = wrap(
 			if (permData['browser_fingerprint_id']) {
 				params_r['_t'] = permData['browser_fingerprint_id'];
 			}
-			self._api(
-				resources._r,
-				params_r,
-				function(err, browser_fingerprint_id) {
-					if (err) {
-						self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
-						self.init_state_fail_details = err.message;
+			if (!utils.isSafari11OrGreater()) {
+				self._api(
+					resources._r,
+					params_r,
+					function(err, browser_fingerprint_id) {
+						if (err) {
+							self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
+							self.init_state_fail_details = err.message;
+						}
+						if (browser_fingerprint_id) {
+							currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
+						}
 					}
-					if (browser_fingerprint_id) {
-						currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
-					}
-				}
-			);
+				);
+			}
 			self._api(
 				resources.hasApp,
 				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
