@@ -869,10 +869,10 @@ describe('Branch', function() {
 				.returns({});
 
 			sinon.stub(utils, 'scrapeOpenGraphContent')
-				.onCall(0).returns(ogTitle)
-				.onCall(1).returns(ogDescription)
-				.onCall(2).returns(ogImage)
-				.onCall(3).returns(ogVideo);
+				.onCall(4).returns(ogTitle)
+				.onCall(5).returns(ogDescription)
+				.onCall(6).returns(ogImage)
+				.onCall(7).returns(ogVideo);
 
 			branch = initBranch(true);
 			requests = [];
