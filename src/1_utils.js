@@ -345,11 +345,10 @@ function isGreaterThanVersion(ua, v) {
 
 /**
  * Returns true if browser is safari version 11 or greater
- * @param {string?} - option user agent string for testing purposes
  * @return {boolean}
  */
-utils.isSafari11OrGreater = function(ua) {
-	ua = ua || navigator.userAgent;
+utils.isSafari11OrGreater = function() {
+	var ua = navigator.userAgent;
 	var isSafari = isSafariBrowser(ua);
 
 	if (isSafari) {

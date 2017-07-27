@@ -408,6 +408,18 @@ describe('utils', function() {
 	});
 
 	describe('isSafari11OrGreater', function() {
+		var originalUa = navigator.userAgent;
+
+		function setUserAgent(ua) {
+			navigator.__defineGetter__("userAgent", function() {
+				return ua;
+			});
+		}
+
+		afterEach(function() {
+			setUserAgent(originalUa);
+		});
+
 		var popularBrowsers = [
 			'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36',
 			'Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)',
@@ -454,7 +466,8 @@ describe('utils', function() {
 		it('should return false for non safari browsers', function() {
 			var isSafari11 = false;
 			popularBrowsers.forEach(function(ua) {
-				if (utils.isSafari11OrGreater(ua)) {
+				setUserAgent(ua);
+				if (utils.isSafari11OrGreater()) {
 					isSafari11 = true;
 				}
 			});
@@ -478,7 +491,8 @@ describe('utils', function() {
 		it('should return true for safari 11 browsers', function() {
 			var isSafari11 = true;
 			safari11.forEach(function(ua) {
-				if (!utils.isSafari11OrGreater(ua)) {
+				setUserAgent(ua);
+				if (!utils.isSafari11OrGreater()) {
 					isSafari11 = false;
 				}
 			});

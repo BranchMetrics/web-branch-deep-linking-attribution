@@ -177,8 +177,8 @@ describe('Integration tests', function() {
 			branchInit(assert, function(err, data) {
 				assert.deepEqual(data,
 					{
-						data: null,
-						data_parsed: null,
+						data: "",
+						data_parsed: {},
 						has_app: true,
 						identity: "Branch",
 						referring_identity: null,
@@ -276,8 +276,8 @@ describe('Integration tests', function() {
 				assert.deepEqual(
 					data,
 					{
-						data: null,
-						data_parsed: null,
+						data: "",
+						data_parsed: {},
 						has_app: true,
 						identity: "Branch",
 						referring_identity: null,
@@ -373,7 +373,7 @@ describe('Integration tests', function() {
 			branch.link(sampleParams, function(err, data) {
 				assert.strictEqual(
 					data,
-					config.link_service_endpoint + '/l/4manXlk0AJ',
+					config.link_service_endpoint + '/l/4manXlk0AJ?_t=79336952217731267',
 					'Expect data in branch.link callback'
 				);
 			});
