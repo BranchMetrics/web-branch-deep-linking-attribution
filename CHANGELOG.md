@@ -2,6 +2,10 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
+## [v2.24.1] - 2017-07-28
+- Journeys automatically opens the app if installed
+- The SDK sends up additional information as part of 'pageview' event in .init()
+
 ## [v2.24.1] - 2017-07-25
 - Includes data_parsed key as part of branch.data() response
 - Fixes body margin issues related to hiding and showing a Journey
