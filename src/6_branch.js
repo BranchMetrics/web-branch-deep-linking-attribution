@@ -251,7 +251,7 @@ Branch.prototype._publishEvent = function(event, data) {
  * | no_journeys | *optional* - `boolean`. When true, prevents Journeys from appearing on current page.
  * | disable_entry_animation | *optional* - `boolean`. When true, prevents a Journeys entry animation.
  * | disable_exit_animation | *optional* - `boolean`. When true, prevents a Journeys exit animation.
- * | open_app | *optional* - `boolean`. Whether to try to open the app passively through Journeys (as opposed to opening it upon user clicking); defaults to true.
+ * | open_app | *optional* - `boolean`. Whether to try to open the app passively through Journeys (as opposed to opening it upon user clicking); defaults to false.
  *
  * ##### Usage
  * ```js

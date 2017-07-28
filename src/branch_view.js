@@ -185,7 +185,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	var requestData = null;
 	var testFlag = false;
 	var makeNewLink = false;
-	var openApp = true;
+	var openApp = false;
 
 	if (options) {
 		branchViewId = options['branch_view_id'] || null;
@@ -195,7 +195,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 		makeNewLink = options['make_new_link'] || false;
 		// openApp defaults to true unless user specifies otherwise
-		openApp = options['open_app'] === false ? false : true;
+		openApp = options['open_app'] || false;
 	}
 
 	branchViewId = branchViewId || utils.getParameterByName('_branch_view_id') || null;
