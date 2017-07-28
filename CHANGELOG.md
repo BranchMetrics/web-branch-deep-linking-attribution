@@ -3,7 +3,7 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v2.24.3] - 2017-07-28
-- Allow user to control automatically opening the app through Journeys
+- Allows user to control auto opening of the app through Journeys. Defaults to false (reverts behavior of v2.24.2).
 
 ## [v2.24.2] - 2017-07-28
 - Journeys automatically opens the app if installed
