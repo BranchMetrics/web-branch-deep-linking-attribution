@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.2"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1186,6 +1186,9 @@ utils.validateCommerceEventParams = function(a, b) {
 };
 utils.cleanBannerText = function(a) {
   return "string" !== typeof a ? null : a.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+utils.openGraphDataAsObject = function() {
+  return {$og_title:utils.scrapeOpenGraphContent("title"), $og_description:utils.scrapeOpenGraphContent("description"), $og_image_url:utils.scrapeOpenGraphContent("image"), $og_video:utils.scrapeOpenGraphContent("video")};
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -1458,7 +1461,6 @@ Server.prototype.createScript = function(a, b, c) {
   a = document.getElementsByTagName("head");
   !a || 1 > a.length ? "function" === typeof b && b() : (a[0].appendChild(d), "function" === typeof b && utils.addEvent(d, "error", b), "function" === typeof c && utils.addEvent(d, "load", c));
 };
-var jsonp_callback_index = 0;
 Server.prototype.jsonpRequest = function(a, b, c, d) {
   var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
   b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
@@ -1999,7 +2001,7 @@ journeys_utils.animateBannerExit = function(a) {
   }, journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay);
 };
 // Input 15
-var branch_view = {};
+var branch_view = {callback_index:1};
 function checkPreviousBanner() {
   return document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container") ? !0 : !1;
 }
@@ -2037,7 +2039,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
       return renderHtmlBlob(document.body, b.html, e);
     }
     if (b.url) {
-      var m = "branch_view_callback__" + jsonp_callback_index++;
+      var m = "branch_view_callback__" + branch_view.callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
       g = b.url + "&callback=" + m;
       g += "&_lan=" + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode());
@@ -2075,24 +2077,24 @@ function isJourneyDismissed(a, b) {
   b._storage.remove("hideBanner" + a.id, !0);
   return !1;
 }
-function compileRequestData(a, b) {
-  var c = a._branchViewData || {};
-  c.data || (c.data = {});
-  var d = b ? null : utils.clickIdFromLink(a._referringLink());
-  c.data = utils.merge(utils.scrapeHostedDeepLinkData(), c.data);
-  c.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), c.data);
-  c.data = d ? utils.merge({link_click_id:d}, c.data) : c.data;
-  return c;
+function compileRequestData(a, b, c) {
+  var d = a._branchViewData || {};
+  d.data || (d.data = {});
+  b = b ? null : utils.clickIdFromLink(a._referringLink());
+  d.data = utils.merge(utils.scrapeHostedDeepLinkData(), d.data);
+  d.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), d.data);
+  d.data = b ? utils.merge({link_click_id:b}, d.data) : d.data;
+  return d = utils.merge({open_app:c}, d);
 }
 branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
-  var f = null, g = null, h = null, k = null, l = null, m = !1, n = !1;
-  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, n = d.make_new_link || !1);
+  var f = null, g = null, h = null, k = null, l = null, m = !1, n = !1, p = !0;
+  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, n = d.make_new_link || !1, p = !1 === d.open_app ? !1 : !0);
   (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, k = buildJourneyTestData(f, a, b));
   !k && c.hasOwnProperty("branch_view_data") && (k = c.branch_view_data, h = isJourneyDismissed(k, e));
   !k || h || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = k.id, e.renderQueue(function() {
-    l = compileRequestData(e, n);
+    l = compileRequestData(e, n, p);
     branch_view.handleBranchViewData(e._server, k, l, e._storage, b.has_app, m, e);
   }));
 };
@@ -2254,7 +2256,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     if (f) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, h && utils.whiteListSessionData(h));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:g, user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:m(), screen_width:screen.width || -1, screen_height:screen.height || -1}, initial_referrer:document.referrer}, function(e, f) {
+    d._api(resources.event, {event:"pageview", metadata:{url:g, user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:m(), screen_width:screen.width || -1, screen_height:screen.height || -1, og_data:utils.openGraphDataAsObject(), hosted_deeplink_data:utils.scrapeHostedDeepLinkData()}, initial_referrer:document.referrer}, function(e, f) {
       e || "object" !== typeof f || branch_view.initJourney(b, h, f, c, d);
       try {
         a(e, h && utils.whiteListSessionData(h));
