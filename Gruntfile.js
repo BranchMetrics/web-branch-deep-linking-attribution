@@ -145,8 +145,6 @@ module.exports = function(grunt) {
 					urls: test_urls,
 					maxRetries: 3,
 					testname: 'Web SDK Tests',
-					pollInterval: 10000,
-					statusCheckAttempts: 100,
 					browsers: [].concat(
 						safari_browsers,
 						chrome_browsers,
