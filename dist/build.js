@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.2"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.3"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2089,8 +2089,8 @@ function compileRequestData(a, b, c) {
 branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
-  var f = null, g = null, h = null, k = null, l = null, m = !1, n = !1, p = !0;
-  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, n = d.make_new_link || !1, p = !1 === d.open_app ? !1 : !0);
+  var f = null, g = null, h = null, k = null, l = null, m = !1, n = !1, p = !1;
+  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, n = d.make_new_link || !1, p = d.open_app || !1);
   (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, k = buildJourneyTestData(f, a, b));
   !k && c.hasOwnProperty("branch_view_data") && (k = c.branch_view_data, h = isJourneyDismissed(k, e));
   !k || h || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = k.id, e.renderQueue(function() {
