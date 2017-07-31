@@ -19,11 +19,11 @@ var chrome_browsers = [
 	// 	platform: 'Windows 10',
 	// 	version: '43.0'
 	// },
-	{
-		browserName: 'chrome',
-		platform: 'Linux',
-		version: '42.0'
-	}
+	// {
+	// 	browserName: 'chrome',
+	// 	platform: 'Linux',
+	// 	version: '42.0'
+	// }
 ];
 
 var firefox_browsers = [
@@ -37,11 +37,11 @@ var firefox_browsers = [
 	// 	platform: 'OS X 10.10',
 	// 	version: '39.0'
 	// },
-	{
-		browserName: 'firefox',
-		platform: 'Linux',
-		version: '38.0'
-	}
+	// {
+	// 	browserName: 'firefox',
+	// 	platform: 'Linux',
+	// 	version: '38.0'
+	// }
 ];
 
 var ios_browsers = [
@@ -59,13 +59,13 @@ var ios_browsers = [
 	// 	platform: 'OS X 10.10',
 	// 	version: '9.1'
 	// },
-	{
-		browserName: 'iphone',
-		deviceName: 'iPhone 6',
-		deviceOrientation: 'portrait',
-		platform: 'OS X 10.10',
-		version: '9.2'
-	}
+	// {
+	// 	browserName: 'iphone',
+	// 	deviceName: 'iPhone 6',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'OS X 10.10',
+	// 	version: '9.2'
+	// }
 ];
 
 var android_browsers = [
@@ -104,13 +104,13 @@ var android_browsers = [
 	// 	platform: 'Linux',
 	// 	version: '4.1'
 	// },
-	{
-		browserName: 'android',
-		deviceName: 'HTC Evo 3D Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.0'
-	}
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'HTC Evo 3D Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.0'
+	// }
 ];
 
 var ie_browsers = [
@@ -124,11 +124,11 @@ var ie_browsers = [
 	// 	platform: 'Windows 8.1',
 	// 	version: '11.0'
 	// },
-	{
-		browserName: 'internet explorer',
-		platform: 'Windows 7',
-		version: '10.0'
-	}
+	// {
+	// 	browserName: 'internet explorer',
+	// 	platform: 'Windows 7',
+	// 	version: '10.0'
+	// }
 ];
 
 var test_urls = [
