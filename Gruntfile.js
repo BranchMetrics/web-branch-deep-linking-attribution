@@ -14,11 +14,11 @@ var chrome_browsers = [
 		platform: 'OS X 10.10',
 		version: '44.0'
 	},
-	{
-		browserName: 'chrome',
-		platform: 'Windows 10',
-		version: '43.0'
-	},
+	// {
+	// 	browserName: 'chrome',
+	// 	platform: 'Windows 10',
+	// 	version: '43.0'
+	// },
 	{
 		browserName: 'chrome',
 		platform: 'Linux',
@@ -32,11 +32,11 @@ var firefox_browsers = [
 		platform: 'Windows 10',
 		version: '40.0'
 	},
-	{
-		browserName: 'firefox',
-		platform: 'OS X 10.10',
-		version: '39.0'
-	},
+	// {
+	// 	browserName: 'firefox',
+	// 	platform: 'OS X 10.10',
+	// 	version: '39.0'
+	// },
 	{
 		browserName: 'firefox',
 		platform: 'Linux',
@@ -52,13 +52,13 @@ var ios_browsers = [
 		platform: 'OS X 10.10',
 		version: '9.0'
 	},
-	{
-		browserName: 'iphone',
-		deviceName: 'iPhone 6',
-		deviceOrientation: 'portrait',
-		platform: 'OS X 10.10',
-		version: '9.1'
-	},
+	// {
+	// 	browserName: 'iphone',
+	// 	deviceName: 'iPhone 6',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'OS X 10.10',
+	// 	version: '9.1'
+	// },
 	{
 		browserName: 'iphone',
 		deviceName: 'iPhone 6',
@@ -76,34 +76,34 @@ var android_browsers = [
 		platform: 'Linux',
 		version: '5.1'
 	},
-	{
-		browserName: 'android',
-		deviceName: 'Google Nexus 7 HD Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.4'
-	},
-	{
-		browserName: 'android',
-		deviceName: 'Google Nexus 7C Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.3'
-	},
-	{
-		browserName: 'android',
-		deviceName: 'LG Nexus 4 Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.2'
-	},
-	{
-		browserName: 'android',
-		deviceName: 'HTC One X Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.1'
-	},
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'Google Nexus 7 HD Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.4'
+	// },
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'Google Nexus 7C Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.3'
+	// },
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'LG Nexus 4 Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.2'
+	// },
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'HTC One X Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.1'
+	// },
 	{
 		browserName: 'android',
 		deviceName: 'HTC Evo 3D Emulator',
@@ -119,11 +119,11 @@ var ie_browsers = [
 		platform: 'Windows 10',
 		version: '11.0'
 	},
-	{
-		browserName: 'internet explorer',
-		platform: 'Windows 8.1',
-		version: '11.0'
-	},
+	// {
+	// 	browserName: 'internet explorer',
+	// 	platform: 'Windows 8.1',
+	// 	version: '11.0'
+	// },
 	{
 		browserName: 'internet explorer',
 		platform: 'Windows 7',
