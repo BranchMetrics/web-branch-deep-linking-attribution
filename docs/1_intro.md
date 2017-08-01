@@ -1,5 +1,9 @@
 # Branch Web SDK
 
+[![GitHub release](https://img.shields.io/github/tag/BranchMetrics/web-branch-deep-linking.svg)]()
+[![CircleCI](https://img.shields.io/circleci/project/github/BranchMetrics/web-branch-deep-linking.svg)]()
+[![npm](https://img.shields.io/npm/dw/branch-sdk.svg)]()
+
 This README outlines the functionality of the Branch Web SDK, and how to easily incorporate it into a web app.
 
 Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
