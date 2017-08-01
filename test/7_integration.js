@@ -371,12 +371,10 @@ describe('Integration tests', function() {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 
-			var storageBfd = JSON.parse(sessionStorage.getItem('branch_session')).browser_fingerprint_id;
-
 			branch.link(sampleParams, function(err, data) {
 				assert.strictEqual(
-					data + '?_t=' + storageBfd,
-					config.link_service_endpoint + '/l/4manXlk0AJ?_t=79336952217731267',
+					data,
+					config.link_service_endpoint + '/l/4manXlk0AJ',
 					'Expect data in branch.link callback'
 				);
 			});

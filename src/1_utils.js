@@ -697,20 +697,3 @@ utils.openGraphDataAsObject = function() {
 		'$og_video': utils.scrapeOpenGraphContent('video')
 	};
 };
-
-utils.appendBfpToLinkUrl = function(url, bfp) {
-	if (!url) {
-		return null;
-	}
-	if (!bfp) {
-		return url;
-	}
-
-	var operator = '?';
-
-	if (url.indexOf('?') > -1) {
-		operator = '&';
-	}
-
-	return url + operator + '_t=' + bfp;
-};

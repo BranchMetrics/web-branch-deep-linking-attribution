@@ -779,7 +779,7 @@ describe('Branch', function() {
 			var assert = testUtils.plan(4, done);
 			branch.link(expectedRequest(), function(err, link) {
 				assert.strictEqual(err, null, 'No error');
-				assert.strictEqual(link, expectedResponse['url'] + '?_t=79336952217731267', 'link returned');
+				assert.strictEqual(link, expectedResponse['url'], 'link returned');
 			});
 			assert.strictEqual(requests.length, 1, 'Request made');
 			requests[0].callback(null, expectedResponse);

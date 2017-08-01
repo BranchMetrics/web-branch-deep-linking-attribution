@@ -500,31 +500,4 @@ describe('utils', function() {
 			assert.strictEqual(isSafari11, true, 'should return true for all browsers');
 		});
 	});
-
-	describe('appendBfpToLinkUrl', function() {
-		it('should return null if link is undefined', function() {
-			assert.strictEqual(
-				null,
-				utils.appendBfpToLinkUrl(),
-				'should return null'
-			);
-		});
-		it('should return the url if bfp is undefined', function() {
-			var testUrl = 'https://test.app.link/abc';
-			assert.strictEqual(
-				testUrl,
-				utils.appendBfpToLinkUrl(testUrl),
-				'should return the url passed in'
-			);
-		});
-		it('should append bfp to end of link', function() {
-			var testUrl = 'https://test.app.link/abc';
-			var expectedUrl = 'https://test.app.link/abc?_t=123';
-			assert.strictEqual(
-				expectedUrl,
-				utils.appendBfpToLinkUrl(testUrl, '123'),
-				'should return url with _t appended'
-			);
-		});
-	});
 });

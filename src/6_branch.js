@@ -889,14 +889,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	var self = this;
 	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
-		var url = data && data['url'];
-		var localSessionData = session.get(self._storage, true) || {};
-
-		url = utils.appendBfpToLinkUrl(url, localSessionData['browser_fingerprint_id']);
-
-		done(err, url);
+		done(err, data && data['url']);
 	});
 });
 
