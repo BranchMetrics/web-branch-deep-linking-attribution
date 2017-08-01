@@ -1,6 +1,6 @@
 # Branch Web SDK
 
-[![GitHub release](https://img.shields.io/github/tag/BranchMetrics/web-branch-deep-linking.svg)]()
+[![GitHub tag](https://img.shields.io/github/tag/BranchMetrics/web-branch-deep-linking.svg)]()
 [![CircleCI](https://img.shields.io/circleci/project/github/BranchMetrics/web-branch-deep-linking.svg)]()
 [![npm](https://img.shields.io/npm/dw/branch-sdk.svg)]()
 
