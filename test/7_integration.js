@@ -370,9 +370,12 @@ describe('Integration tests', function() {
 		it('should make three requests and return short link', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
+
+			var storageBfd = JSON.parse(sessionStorage.getItem('branch_session')).browser_fingerprint_id;
+
 			branch.link(sampleParams, function(err, data) {
 				assert.strictEqual(
-					data,
+					data + '?_t=' + storageBfd,
 					config.link_service_endpoint + '/l/4manXlk0AJ?_t=79336952217731267',
 					'Expect data in branch.link callback'
 				);
