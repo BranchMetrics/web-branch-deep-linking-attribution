@@ -14,16 +14,16 @@ var chrome_browsers = [
 		platform: 'OS X 10.10',
 		version: '44.0'
 	},
-	{
-		browserName: 'chrome',
-		platform: 'Windows 10',
-		version: '43.0'
-	},
-	{
-		browserName: 'chrome',
-		platform: 'Linux',
-		version: '42.0'
-	}
+	// {
+	// 	browserName: 'chrome',
+	// 	platform: 'Windows 10',
+	// 	version: '43.0'
+	// },
+	// {
+	// 	browserName: 'chrome',
+	// 	platform: 'Linux',
+	// 	version: '42.0'
+	// }
 ];
 
 var firefox_browsers = [
@@ -32,16 +32,16 @@ var firefox_browsers = [
 		platform: 'Windows 10',
 		version: '40.0'
 	},
-	{
-		browserName: 'firefox',
-		platform: 'OS X 10.10',
-		version: '39.0'
-	},
-	{
-		browserName: 'firefox',
-		platform: 'Linux',
-		version: '38.0'
-	}
+	// {
+	// 	browserName: 'firefox',
+	// 	platform: 'OS X 10.10',
+	// 	version: '39.0'
+	// },
+	// {
+	// 	browserName: 'firefox',
+	// 	platform: 'Linux',
+	// 	version: '38.0'
+	// }
 ];
 
 var ios_browsers = [
@@ -52,20 +52,20 @@ var ios_browsers = [
 		platform: 'OS X 10.10',
 		version: '9.0'
 	},
-	{
-		browserName: 'iphone',
-		deviceName: 'iPhone 6',
-		deviceOrientation: 'portrait',
-		platform: 'OS X 10.10',
-		version: '9.1'
-	},
-	{
-		browserName: 'iphone',
-		deviceName: 'iPhone 6',
-		deviceOrientation: 'portrait',
-		platform: 'OS X 10.10',
-		version: '9.2'
-	}
+	// {
+	// 	browserName: 'iphone',
+	// 	deviceName: 'iPhone 6',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'OS X 10.10',
+	// 	version: '9.1'
+	// },
+	// {
+	// 	browserName: 'iphone',
+	// 	deviceName: 'iPhone 6',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'OS X 10.10',
+	// 	version: '9.2'
+	// }
 ];
 
 var android_browsers = [
@@ -76,41 +76,41 @@ var android_browsers = [
 		platform: 'Linux',
 		version: '5.1'
 	},
-	{
-		browserName: 'android',
-		deviceName: 'Google Nexus 7 HD Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.4'
-	},
-	{
-		browserName: 'android',
-		deviceName: 'Google Nexus 7C Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.3'
-	},
-	{
-		browserName: 'android',
-		deviceName: 'LG Nexus 4 Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.2'
-	},
-	{
-		browserName: 'android',
-		deviceName: 'HTC One X Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.1'
-	},
-	{
-		browserName: 'android',
-		deviceName: 'HTC Evo 3D Emulator',
-		deviceOrientation: 'portrait',
-		platform: 'Linux',
-		version: '4.0'
-	}
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'Google Nexus 7 HD Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.4'
+	// },
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'Google Nexus 7C Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.3'
+	// },
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'LG Nexus 4 Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.2'
+	// },
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'HTC One X Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.1'
+	// },
+	// {
+	// 	browserName: 'android',
+	// 	deviceName: 'HTC Evo 3D Emulator',
+	// 	deviceOrientation: 'portrait',
+	// 	platform: 'Linux',
+	// 	version: '4.0'
+	// }
 ];
 
 var ie_browsers = [
@@ -119,16 +119,16 @@ var ie_browsers = [
 		platform: 'Windows 10',
 		version: '11.0'
 	},
-	{
-		browserName: 'internet explorer',
-		platform: 'Windows 8.1',
-		version: '11.0'
-	},
-	{
-		browserName: 'internet explorer',
-		platform: 'Windows 7',
-		version: '10.0'
-	}
+	// {
+	// 	browserName: 'internet explorer',
+	// 	platform: 'Windows 8.1',
+	// 	version: '11.0'
+	// },
+	// {
+	// 	browserName: 'internet explorer',
+	// 	platform: 'Windows 7',
+	// 	version: '10.0'
+	// }
 ];
 
 var test_urls = [
@@ -145,7 +145,8 @@ module.exports = function(grunt) {
 					urls: test_urls,
 					maxRetries: 3,
 					testname: 'Web SDK Tests',
-					statusCheckAttempts: -1,
+					pollInterval: 30000, // check every 30 seconds
+					statusCheckAttempts: -1, // try forever
 					browsers: [].concat(
 						safari_browsers,
 						chrome_browsers,
