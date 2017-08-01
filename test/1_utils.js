@@ -467,7 +467,7 @@ describe('utils', function() {
 			var isSafari11 = false;
 			popularBrowsers.forEach(function(ua) {
 				setUserAgent(ua);
-				if (utils.isSafari11OrGreater()) {
+				if (navigator.userAgent === ua && utils.isSafari11OrGreater()) {
 					isSafari11 = true;
 				}
 			});
@@ -492,7 +492,7 @@ describe('utils', function() {
 			var isSafari11 = true;
 			safari11.forEach(function(ua) {
 				setUserAgent(ua);
-				if (!utils.isSafari11OrGreater()) {
+				if (navigator.userAgent === ua && !utils.isSafari11OrGreater()) {
 					isSafari11 = false;
 				}
 			});
