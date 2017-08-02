@@ -860,11 +860,11 @@ describe('Branch', function() {
 			sinon.stub(utils, 'getWindowLocation')
 				.returns(windowLocation);
 
-			sinon.stub(utils, 'scrapeHostedDeepLinkData')
+			sinon.stub(utils, 'getHostedDeepLinkData')
 				.returns({});
 
 			// check starting with 4th call since first four are called by openGraphDataAsObject
-			sinon.stub(utils, 'scrapeOpenGraphContent')
+			sinon.stub(utils, 'getOpenGraphContent')
 				.onCall(4).returns(ogTitle)
 				.onCall(5).returns(ogDescription)
 				.onCall(6).returns(ogImage)
@@ -879,8 +879,8 @@ describe('Branch', function() {
 				branch._referringLink.restore();
 			}
 
-			utils.scrapeOpenGraphContent.restore();
-			utils.scrapeHostedDeepLinkData.restore();
+			utils.getOpenGraphContent.restore();
+			utils.getHostedDeepLinkData.restore();
 			utils.getWindowLocation.restore();
 		});
 
