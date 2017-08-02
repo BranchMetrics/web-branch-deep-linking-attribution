@@ -409,7 +409,9 @@ Branch.prototype['init'] = wrap(
 					"screen_width": screen.width || -1,
 					"screen_height": screen.height || -1,
 					"og_data": utils.openGraphDataAsObject(),
-					"hosted_deeplink_data": utils.scrapeHostedDeepLinkData()
+					"hosted_deeplink_data": utils.scrapeHostedDeepLinkData(),
+					"title": utils.scrapeTitle(),
+					"description": utils.scrapeDescription()
 				},
 				"initial_referrer": document.referrer
 			}, function(err, eventData) {

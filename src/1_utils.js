@@ -661,3 +661,12 @@ utils.openGraphDataAsObject = function() {
 	};
 };
 
+utils.scrapeTitle = function() {
+	var tags = document.getElementsByTagName([ 'title' ]);
+	return tags.length > 0 ? tags[0].innerText : '';
+};
+
+utils.scrapeDescription = function() {
+	var el = document.querySelector('meta[name="description"]');
+	return el && el.content ? el.content : '';
+};
