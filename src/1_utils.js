@@ -662,7 +662,7 @@ utils.openGraphDataAsObject = function() {
 };
 
 utils.scrapeTitle = function() {
-	var tags = document.getElementsByTagName([ 'title' ]);
+	var tags = document.getElementsByTagName('title');
 	return tags.length > 0 ? tags[0].innerText : '';
 };
 
