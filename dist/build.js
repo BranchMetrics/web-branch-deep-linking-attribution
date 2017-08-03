@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.24.3"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.25.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1069,6 +1069,26 @@ utils.hashValue = function(a) {
 utils.mobileUserAgent = function() {
   var a = navigator.userAgent;
   return a.match(/android/i) ? "android" : a.match(/ipad/i) ? "ipad" : a.match(/i(os|p(hone|od))/i) ? "ios" : a.match(/\(BB[1-9][0-9]*\;/i) ? "blackberry" : a.match(/Windows Phone/i) ? "windows_phone" : a.match(/Kindle/i) || a.match(/Silk/i) || a.match(/KFTT/i) || a.match(/KFOT/i) || a.match(/KFJWA/i) || a.match(/KFJWI/i) || a.match(/KFSOWI/i) || a.match(/KFTHWA/i) || a.match(/KFTHWI/i) || a.match(/KFAPWA/i) || a.match(/KFAPWI/i) ? "kindle" : !1;
+};
+function isSafariBrowser(a) {
+  return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(a);
+}
+function isGreaterThanVersion(a, b) {
+  b = b || 11;
+  var c = /version\/([^ ]*)/i.exec(a);
+  if (c && c[1]) {
+    try {
+      if (parseFloat(c[1]) >= b) {
+        return !0;
+      }
+    } catch (d) {
+    }
+  }
+  return !1;
+}
+utils.isSafari11OrGreater = function() {
+  var a = navigator.userAgent;
+  return isSafariBrowser(a) ? isGreaterThanVersion(a, 11) : !1;
 };
 utils.getParamValue = function(a) {
   try {
@@ -1238,7 +1258,7 @@ function defaults(a) {
   var b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
   return utils.merge(a, b);
 }
-resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)}};
+resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!1, branch_id), alternative_browser_fingerprint_id:validator(!1, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)}};
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, branch_id), branch_key:validator(!0, validationTypes.STRING)}};
 resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
@@ -2234,7 +2254,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var l = function(a) {
     var b = {sdk:config.version, branch_key:d.branch_key}, c = session.get(d._storage) || {}, e = session.get(d._storage, !0) || {};
     e.browser_fingerprint_id && (b._t = e.browser_fingerprint_id);
-    d._api(resources._r, b, function(a, b) {
+    utils.isSafari11OrGreater() || d._api(resources._r, b, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message);
       b && (c.browser_fingerprint_id = b);
     });
@@ -2277,11 +2297,16 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   } else {
     var f = {sdk:config.version, branch_key:d.branch_key}, q = session.get(d._storage, !0) || {};
     q.browser_fingerprint_id && (f._t = q.browser_fingerprint_id);
-    d._api(resources._r, f, function(a, b) {
+    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || q.browser_fingerprint_id, alternative_browser_fingerprint_id:q.browser_fingerprint_id, options:c, initial_referrer:document.referrer}, function(a, b) {
+      a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
+      a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
+      p();
+      n(a, b);
+    }) : d._api(resources._r, f, function(a, b) {
       if (a) {
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, n(a, null);
       }
-      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:b, options:c, initial_referrer:document.referrer}, function(a, b) {
+      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || b, alternative_browser_fingerprint_id:q.browser_fingerprint_id, options:c, initial_referrer:document.referrer}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
         p();
