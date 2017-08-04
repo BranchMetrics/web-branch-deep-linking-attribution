@@ -219,6 +219,7 @@ utils.cleanLinkData = function(linkData) {
 		data['$og_video'] = utils.getOpenGraphContent('video');
 	}
 
+
 	if (typeof data['$desktop_url'] === 'string') {
 		data['$desktop_url'] =
 			data['$desktop_url']
@@ -318,6 +319,42 @@ utils.mobileUserAgent = function() {
 	) {
 		return "kindle";
 	}
+	return false;
+};
+
+function isSafariBrowser(ua) {
+	return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+}
+
+function isGreaterThanVersion(ua, v) {
+	v = v || 11;
+
+	var match = /version\/([^ ]*)/i.exec(ua);
+	if (match && match[1]) {
+		try {
+			var version = parseFloat(match[1]);
+			if (version >= v) {
+				return true;
+			}
+		} catch (e) {
+			return false;
+		}
+	}
+	return false;
+}
+
+/**
+ * Returns true if browser is safari version 11 or greater
+ * @return {boolean}
+ */
+utils.isSafari11OrGreater = function() {
+	var ua = navigator.userAgent;
+	var isSafari = isSafariBrowser(ua);
+
+	if (isSafari) {
+		return isGreaterThanVersion(ua, 11);
+	}
+
 	return false;
 };
 

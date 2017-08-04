@@ -80,7 +80,16 @@ describe('Branch', function() {
 		});
 	}
 
+	var originalUa = navigator.userAgent;
+	function setUserAgent(ua) {
+		navigator.__defineGetter__("userAgent", function() {
+			return ua;
+		});
+	}
+
+
 	afterEach(function() {
+		setUserAgent(originalUa);
 		sandbox.restore();
 	});
 
@@ -126,6 +135,7 @@ describe('Branch', function() {
 					"link_identifier": undefined,
 					"initial_referrer": requests[1].obj.initial_referrer,
 					"browser_fingerprint_id": browser_fingerprint_id,
+					"alternative_browser_fingerprint_id": undefined,
 					"sdk": "web" + config.version,
 					"options": undefined
 				},
@@ -175,6 +185,7 @@ describe('Branch', function() {
 					"link_identifier": undefined,
 					"initial_referrer": requests[1].obj.initial_referrer,
 					"browser_fingerprint_id": browser_fingerprint_id,
+					"alternative_browser_fingerprint_id": undefined,
 					"sdk": "web" + config.version,
 					"options": undefined
 				},
@@ -261,7 +272,8 @@ describe('Branch', function() {
 						"branch_key": branch_sample_key,
 						"link_identifier": '12345',
 						"initial_referrer": requests[1].obj.initial_referrer,
-						"browser_fingerprint_id": browser_fingerprint_id,
+						"browser_fingerprint_id": '12345',
+						"alternative_browser_fingerprint_id": undefined,
 						"sdk": "web" + config.version,
 						"options": undefined
 					},
@@ -311,7 +323,8 @@ describe('Branch', function() {
 							"branch_key": branch_sample_key,
 							"link_identifier": '67890',
 							"initial_referrer": requests[1].obj.initial_referrer,
-							"browser_fingerprint_id": browser_fingerprint_id,
+							"browser_fingerprint_id": '67890',
+							"alternative_browser_fingerprint_id": undefined,
 							"sdk": "web" + config.version,
 							"options": undefined
 						},
@@ -371,6 +384,7 @@ describe('Branch', function() {
 			requests = [ ];
 			branch = initBranch(false, true);
 			branch.init(branch_sample_key);
+
 			assert.strictEqual(requests.length, 2, 'Should make 2 requests');
 			assert.deepEqual(
 				requests[0].resource.endpoint,
@@ -440,6 +454,89 @@ describe('Branch', function() {
 			else {
 				assert.fail();
 			}
+		});
+
+		it('should not call _r if userAgent is safari 11 or greater',	function(done) {
+			var safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
+			setUserAgent(safari11Ua);
+			if (navigator.userAgent !== safari11Ua) {
+				return done();
+			}
+
+			var branch = initBranch(false);
+			var assert = testUtils.plan(1, done);
+
+
+			branch.init(branch_sample_key);
+
+			requests[0].callback(
+				null,
+				{
+					session_id: "1234",
+					something: "else"
+				}
+			);
+			requests[1].callback(null, {});
+
+
+			assert.deepEqual(
+				requests[0].resource.endpoint,
+				'/v1/open',
+				'First request should be sent to /v1/open'
+			);
+
+			assert.deepEqual(
+				requests[0].obj,
+				{
+					"branch_key": branch_sample_key,
+					"link_identifier": undefined,
+					"initial_referrer": requests[0].obj.initial_referrer,
+					"browser_fingerprint_id": undefined,
+					"alternative_browser_fingerprint_id": undefined,
+					"sdk": "web" + config.version,
+					"options": undefined
+				},
+				'Request to open params correct'
+			);
+		});
+
+		it('should not call _r if session present but no link_identifier and safari 11 or greater',
+			function(done) {
+			var safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
+			setUserAgent(safari11Ua);
+			if (navigator.userAgent !== safari11Ua) {
+				return done();
+			}
+
+			var branch = initBranch(false);
+			var assert = testUtils.plan(2, done);
+
+			branch.init(branch_sample_key);
+			requests[0].callback(
+				null,
+				{
+					session_id: session_id,
+					browser_fingerprint_id: undefined,
+					identity_id: identity_id,
+					data: JSON.stringify({
+						'$desktop_url': window.location.protocol + "//" +
+										window.location.host +
+										window.location.pathname
+					})
+				}
+			);
+			requests[1].callback(null, {});
+
+			requests = [ ];
+			branch = initBranch(false, true);
+			branch.init(branch_sample_key);
+
+			assert.strictEqual(requests.length, 1, 'Should make 2 requests');
+			assert.deepEqual(
+				requests[0].resource.endpoint,
+				'/v1/has-app',
+				'Second request should be sent to /v1/has-app'
+			);
 		});
 
 	});
@@ -677,7 +774,7 @@ describe('Branch', function() {
 			"url": "https://bnc.lt/l/3HZMytU-BW"
 		};
 
-		it('should call api with serialized data and return link', function(done) {
+		it('should call api with serialized data and return link with browser_fingerprint_id appended', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 			branch.link(expectedRequest(), function(err, link) {
@@ -909,6 +1006,7 @@ describe('Branch', function() {
 			requests[0].callback();
 
 			var obj = requests[0].obj;
+
 			assert.strictEqual(obj.data, dataString, 'data is sent');
 			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');

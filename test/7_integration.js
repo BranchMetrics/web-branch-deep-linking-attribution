@@ -370,6 +370,7 @@ describe('Integration tests', function() {
 		it('should make three requests and return short link', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
+
 			branch.link(sampleParams, function(err, data) {
 				assert.strictEqual(
 					data,
