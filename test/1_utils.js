@@ -97,7 +97,7 @@ describe('utils', function() {
 			sinon.stub(utils, 'getWindowLocation')
 				.returns(windowLocation);
 
-			sinon.stub(utils, 'scrapeOpenGraphContent')
+			sinon.stub(utils, 'getOpenGraphContent')
 				.onCall(0).returns(ogTitle)
 				.onCall(1).returns(ogDescription)
 				.onCall(2).returns(ogImage)
@@ -105,7 +105,7 @@ describe('utils', function() {
 		});
 
 		afterEach(function() {
-			utils.scrapeOpenGraphContent.restore();
+			utils.getOpenGraphContent.restore();
 			utils.getWindowLocation.restore();
 		});
 
@@ -384,11 +384,11 @@ describe('utils', function() {
 			}
 		});
 	});
-	describe('scrapeHostedDeepLinkData', function() {
+	describe('getHostedDeepLinkData', function() {
 		it('should return an object', function() {
 			assert.strictEqual(
 				'object',
-				typeof utils.scrapeHostedDeepLinkData(),
+				typeof utils.getHostedDeepLinkData(),
 				'should return an object type'
 			);
 		});
@@ -401,7 +401,7 @@ describe('utils', function() {
 			};
 			assert.deepEqual(
 				expected,
-				utils.scrapeHostedDeepLinkData(),
+				utils.getHostedDeepLinkData(),
 				'should return an object with data'
 			);
 		});

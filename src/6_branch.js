@@ -411,7 +411,10 @@ Branch.prototype['init'] = wrap(
 					"screen_width": screen.width || -1,
 					"screen_height": screen.height || -1,
 					"og_data": utils.openGraphDataAsObject(),
-					"hosted_deeplink_data": utils.scrapeHostedDeepLinkData()
+					"hosted_deeplink_data": utils.getHostedDeepLinkData(),
+					"title": utils.getTitle(),
+					"description": utils.getDescription(),
+					"canonical_url": utils.getCanonicalURL()
 				},
 				"initial_referrer": document.referrer
 			}, function(err, eventData) {
@@ -1110,7 +1113,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		options['deepview_type'] = 'banner';
 	}
 
-	data['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), data['data']);
+	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
 
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
@@ -1783,7 +1786,7 @@ Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, o
 		bannerOptions.showKindle = options['showMobile'];
 	}
 
-	data['data'] = utils.merge(utils.scrapeHostedDeepLinkData(), data['data']);
+	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
 
 	var self = this;
 	self['renderQueue'](function() {

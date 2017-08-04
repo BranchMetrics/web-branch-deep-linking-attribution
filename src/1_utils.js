@@ -207,16 +207,16 @@ utils.cleanLinkData = function(linkData) {
 		data['$canonical_url'] = utils.getWindowLocation();
 	}
 	if (!data['$og_title']) {
-		data['$og_title'] = utils.scrapeOpenGraphContent('title');
+		data['$og_title'] = utils.getOpenGraphContent('title');
 	}
 	if (!data['$og_description']) {
-		data['$og_description'] = utils.scrapeOpenGraphContent('description');
+		data['$og_description'] = utils.getOpenGraphContent('description');
 	}
 	if (!data['$og_image_url']) {
-		data['$og_image_url'] = utils.scrapeOpenGraphContent('image');
+		data['$og_image_url'] = utils.getOpenGraphContent('image');
 	}
 	if (!data['$og_video']) {
-		data['$og_video'] = utils.scrapeOpenGraphContent('video');
+		data['$og_video'] = utils.getOpenGraphContent('video');
 	}
 
 
@@ -532,7 +532,7 @@ utils.extractMobileDeeplinkPath = function(url) {
  * @param {string} property
  * @param {null|string=} content
  */
-utils.scrapeOpenGraphContent = function(property, content) {
+utils.getOpenGraphContent = function(property, content) {
 	property = String(property);
 	content = content || null;
 
@@ -548,7 +548,7 @@ utils.scrapeOpenGraphContent = function(property, content) {
  * Search for hosted deep link data on the page, as outlined here https://dev.branch.io/getting-started/hosted-deep-link-data/guide/#adding-metatags-to-your-site
  * Also searches for applink tags, i.e. <meta property="al:ios:url" content="applinks://docs" />
  */
-utils.scrapeHostedDeepLinkData = function() {
+utils.getHostedDeepLinkData = function() {
 	var params = {};
 	var metas = document.getElementsByTagName('meta');
 
@@ -691,9 +691,24 @@ utils.cleanBannerText = function(string) {
 
 utils.openGraphDataAsObject = function() {
 	return {
-		'$og_title': utils.scrapeOpenGraphContent('title'),
-		'$og_description': utils.scrapeOpenGraphContent('description'),
-		'$og_image_url': utils.scrapeOpenGraphContent('image'),
-		'$og_video': utils.scrapeOpenGraphContent('video')
+		'$og_title': utils.getOpenGraphContent('title'),
+		'$og_description': utils.getOpenGraphContent('description'),
+		'$og_image_url': utils.getOpenGraphContent('image'),
+		'$og_video': utils.getOpenGraphContent('video')
 	};
+};
+
+utils.getTitle = function() {
+	var tags = document.getElementsByTagName('title');
+	return tags.length > 0 ? tags[0].innerText : null;
+};
+
+utils.getDescription = function() {
+	var el = document.querySelector('meta[name="description"]');
+	return el && el.content ? el.content : null;
+};
+
+utils.getCanonicalURL = function() {
+	var el = document.querySelector('link[rel="canonical"]');
+	return el && el.href ? el.href : null;
 };
