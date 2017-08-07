@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.25.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.25.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1028,10 +1028,10 @@ utils.cleanLinkData = function(a) {
       b = {};
   }
   b.$canonical_url || (b.$canonical_url = utils.getWindowLocation());
-  b.$og_title || (b.$og_title = utils.scrapeOpenGraphContent("title"));
-  b.$og_description || (b.$og_description = utils.scrapeOpenGraphContent("description"));
-  b.$og_image_url || (b.$og_image_url = utils.scrapeOpenGraphContent("image"));
-  b.$og_video || (b.$og_video = utils.scrapeOpenGraphContent("video"));
+  b.$og_title || (b.$og_title = utils.getOpenGraphContent("title"));
+  b.$og_description || (b.$og_description = utils.getOpenGraphContent("description"));
+  b.$og_image_url || (b.$og_image_url = utils.getOpenGraphContent("image"));
+  b.$og_video || (b.$og_video = utils.getOpenGraphContent("video"));
   "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
   try {
     safejson.parse(b);
@@ -1138,14 +1138,14 @@ utils.extractMobileDeeplinkPath = function(a) {
   -1 < a.indexOf("://") ? a = a.split("://")[1] : "/" === a.charAt(0) && (a = a.slice(1));
   return a;
 };
-utils.scrapeOpenGraphContent = function(a, b) {
+utils.getOpenGraphContent = function(a, b) {
   a = String(a);
   b = b || null;
   var c = document.querySelector('meta[property="og:' + a + '"]');
   c && c.content && (b = c.content);
   return b;
 };
-utils.scrapeHostedDeepLinkData = function() {
+utils.getHostedDeepLinkData = function() {
   for (var a = {}, b = document.getElementsByTagName("meta"), c = 0;c < b.length;c++) {
     if ((b[c].getAttribute("name") || b[c].getAttribute("property")) && b[c].getAttribute("content")) {
       var d = b[c].getAttribute("name"), e = b[c].getAttribute("property"), d = d || e;
@@ -1207,8 +1207,34 @@ utils.validateCommerceEventParams = function(a, b) {
 utils.cleanBannerText = function(a) {
   return "string" !== typeof a ? null : a.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
+utils.getTitle = function() {
+  var a = document.getElementsByTagName("title");
+  return 0 < a.length ? a[0].innerText : null;
+};
+utils.getDescription = function() {
+  var a = document.querySelector('meta[name="description"]');
+  return a && a.content ? a.content : null;
+};
+utils.getCanonicalURL = function() {
+  var a = document.querySelector('link[rel="canonical"]');
+  return a && a.href ? a.href : null;
+};
+utils.addPropertyIfNotNull = function(a, b, c) {
+  if (c) {
+    if ("object" === typeof c && 0 === Object.keys(c).length) {
+      return a;
+    }
+    a[b] = c;
+  }
+  return a;
+};
 utils.openGraphDataAsObject = function() {
-  return {$og_title:utils.scrapeOpenGraphContent("title"), $og_description:utils.scrapeOpenGraphContent("description"), $og_image_url:utils.scrapeOpenGraphContent("image"), $og_video:utils.scrapeOpenGraphContent("video")};
+  var a = {}, a = utils.addPropertyIfNotNull(a, "$og_title", utils.getOpenGraphContent("title")), a = utils.addPropertyIfNotNull(a, "$og_description", utils.getOpenGraphContent("description")), a = utils.addPropertyIfNotNull(a, "$og_image_url", utils.getOpenGraphContent("image"));
+  return (a = utils.addPropertyIfNotNull(a, "$og_video", utils.getOpenGraphContent("video"))) && 0 < Object.keys(a).length ? a : null;
+};
+utils.getAdditionalMetadata = function() {
+  var a = {}, a = utils.addPropertyIfNotNull(a, "og_data", utils.openGraphDataAsObject()), a = utils.addPropertyIfNotNull(a, "hosted_deeplink_data", utils.getHostedDeepLinkData()), a = utils.addPropertyIfNotNull(a, "title", utils.getTitle()), a = utils.addPropertyIfNotNull(a, "description", utils.getDescription());
+  return (a = utils.addPropertyIfNotNull(a, "canonical_url", utils.getCanonicalURL())) && 0 < Object.keys(a).length ? a : null;
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -2101,7 +2127,7 @@ function compileRequestData(a, b, c) {
   var d = a._branchViewData || {};
   d.data || (d.data = {});
   b = b ? null : utils.clickIdFromLink(a._referringLink());
-  d.data = utils.merge(utils.scrapeHostedDeepLinkData(), d.data);
+  d.data = utils.merge(utils.getHostedDeepLinkData(), d.data);
   d.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), d.data);
   d.data = b ? utils.merge({link_click_id:b}, d.data) : d.data;
   return d = utils.merge({open_app:c}, d);
@@ -2276,7 +2302,8 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     if (f) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, h && utils.whiteListSessionData(h));
     }
-    d._api(resources.event, {event:"pageview", metadata:{url:g, user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:m(), screen_width:screen.width || -1, screen_height:screen.height || -1, og_data:utils.openGraphDataAsObject(), hosted_deeplink_data:utils.scrapeHostedDeepLinkData()}, initial_referrer:document.referrer}, function(e, f) {
+    var l = utils.getAdditionalMetadata();
+    d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, page_has_microdata:m(), screen_width:screen.width || -1, screen_height:screen.height || -1}, l || {}), initial_referrer:document.referrer}, function(e, f) {
       e || "object" !== typeof f || branch_view.initJourney(b, h, f, c, d);
       try {
         a(e, h && utils.whiteListSessionData(h));
@@ -2411,7 +2438,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   var d = this;
   c || (c = {});
   c.deepview_type = "undefined" === typeof c.deepview_type ? "deepview" : "banner";
-  b.data = utils.merge(utils.scrapeHostedDeepLinkData(), b.data);
+  b.data = utils.merge(utils.getHostedDeepLinkData(), b.data);
   var e = config.link_service_endpoint + "/a/" + d.branch_key, f = !0, g;
   for (g in b) {
     b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
@@ -2516,7 +2543,7 @@ Branch.prototype.banner = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, showDesktop:"undefined" === typeof b.showDesktop ? !0 : b.showDesktop, disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, respectDNT:"undefined" === typeof b.respectDNT ? !1 : b.respectDNT, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, 
   desktopSticky:"undefined" === typeof b.desktopSticky ? !0 : b.desktopSticky, buttonBorderColor:b.buttonBorderColor || "", buttonBackgroundColor:b.buttonBackgroundColor || "", buttonFontColor:b.buttonFontColor || "", buttonBorderColorHover:b.buttonBorderColorHover || "", buttonBackgroundColorHover:b.buttonBackgroundColorHover || "", buttonFontColorHover:b.buttonFontColorHover || "", make_new_link:!!b.make_new_link, open_app:!!b.open_app, immediate:!!b.immediate, append_deeplink_path:!!b.append_deeplink_path};
   "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile, d.showBlackberry = b.showMobile, d.showWindowsPhone = b.showMobile, d.showKindle = b.showMobile);
-  c.data = utils.merge(utils.scrapeHostedDeepLinkData(), c.data);
+  c.data = utils.merge(utils.getHostedDeepLinkData(), c.data);
   var e = this;
   e.renderQueue(function() {
     e.closeBannerPointer = banner(e, d, c, e._storage);
