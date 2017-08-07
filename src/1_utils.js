@@ -689,15 +689,6 @@ utils.cleanBannerText = function(string) {
 	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 
-utils.openGraphDataAsObject = function() {
-	return {
-		'$og_title': utils.getOpenGraphContent('title'),
-		'$og_description': utils.getOpenGraphContent('description'),
-		'$og_image_url': utils.getOpenGraphContent('image'),
-		'$og_video': utils.getOpenGraphContent('video')
-	};
-};
-
 utils.getTitle = function() {
 	var tags = document.getElementsByTagName('title');
 	return tags.length > 0 ? tags[0].innerText : null;
@@ -711,4 +702,34 @@ utils.getDescription = function() {
 utils.getCanonicalURL = function() {
 	var el = document.querySelector('link[rel="canonical"]');
 	return el && el.href ? el.href : null;
+};
+
+utils.addPropertyIfNotNull = function(obj, key, value) {
+	if (value) {
+		if (typeof value === "object" && Object.keys(value).length === 0) {
+			return obj;
+		}
+		obj[key] = value;
+	}
+	return obj;
+};
+
+utils.openGraphDataAsObject = function() {
+	var ogData = {};
+	ogData = utils.addPropertyIfNotNull(ogData, '$og_title', utils.getOpenGraphContent('title'));
+	ogData = utils.addPropertyIfNotNull(ogData, '$og_description', utils.getOpenGraphContent('description'));
+	ogData = utils.addPropertyIfNotNull(ogData, '$og_image_url', utils.getOpenGraphContent('image'));
+	ogData = utils.addPropertyIfNotNull(ogData, '$og_video', utils.getOpenGraphContent('video'));
+	return ogData && Object.keys(ogData).length > 0 ? ogData : null;
+};
+
+
+utils.getAdditionalMetadata = function() {
+	var metadata = {};
+	metadata = utils.addPropertyIfNotNull(metadata, "og_data", utils.openGraphDataAsObject());
+	metadata = utils.addPropertyIfNotNull(metadata, "hosted_deeplink_data", utils.getHostedDeepLinkData());
+	metadata = utils.addPropertyIfNotNull(metadata, "title", utils.getTitle());
+	metadata = utils.addPropertyIfNotNull(metadata, "description", utils.getDescription());
+	metadata = utils.addPropertyIfNotNull(metadata, "canonical_url", utils.getCanonicalURL());
+	return metadata && Object.keys(metadata).length > 0 ? metadata : null;
 };
