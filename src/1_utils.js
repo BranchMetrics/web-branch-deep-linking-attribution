@@ -690,12 +690,25 @@ utils.cleanBannerText = function(string) {
 };
 
 utils.openGraphDataAsObject = function() {
-	return {
-		'$og_title': utils.getOpenGraphContent('title'),
-		'$og_description': utils.getOpenGraphContent('description'),
-		'$og_image_url': utils.getOpenGraphContent('image'),
-		'$og_video': utils.getOpenGraphContent('video')
-	};
+	var openGraphData = {};
+	var title = utils.getOpenGraphContent('title');
+	var description = utils.getOpenGraphContent('description');
+	var image_url = utils.getOpenGraphContent('image');
+	var video = utils.getOpenGraphContent('video');
+
+	if (title) {
+		openGraphData['$og_title'] = title;
+	}
+	if (description) {
+		openGraphData['$og_description'] = description;
+	}
+	if (image_url) {
+		openGraphData['$og_image_url'] = image_url;
+	}
+	if (video) {
+		openGraphData['$og_video'] = video;
+	}
+	return openGraphData && Object.keys(openGraphData).length > 0 ? openGraphData : null;
 };
 
 utils.getTitle = function() {
@@ -711,4 +724,27 @@ utils.getDescription = function() {
 utils.getCanonicalURL = function() {
 	var el = document.querySelector('link[rel="canonical"]');
 	return el && el.href ? el.href : null;
+};
+
+utils.cleanAdditionalMetadata = function(metadata) {
+	for (var key in metadata) {
+		if (metadata.hasOwnProperty(key) &&
+			metadata[key] === null ||
+			(typeof metadata[key] === "object" &&
+			Object.keys(metadata[key]).length === 0)) {
+			delete metadata[key];
+		}
+	}
+	return metadata && Object.keys(metadata).length > 0 ? metadata : null;
+};
+
+utils.getAdditionalMetadata = function() {
+	var additionalMetadata = {
+		"og_data": utils.openGraphDataAsObject(),
+		"hosted_deeplink_data": utils.getHostedDeepLinkData(),
+		"title": utils.getTitle(),
+		"description": utils.getDescription(),
+		"canonical_url": utils.getCanonicalURL()
+	};
+	return utils.cleanAdditionalMetadata(additionalMetadata);
 };
