@@ -401,21 +401,19 @@ Branch.prototype['init'] = wrap(
 
 				return done(err, data && utils.whiteListSessionData(data));
 			}
+
+			var additionalMetadata = utils.getAdditionalMetadata();
+
 			self._api(resources.event, {
 				"event": 'pageview',
-				"metadata": {
+				"metadata": utils.merge({
 					"url": url,
 					"user_agent": navigator.userAgent,
 					"language": navigator.language,
 					"page_has_microdata": checkForMicroData(),
 					"screen_width": screen.width || -1,
-					"screen_height": screen.height || -1,
-					"og_data": utils.openGraphDataAsObject(),
-					"hosted_deeplink_data": utils.getHostedDeepLinkData(),
-					"title": utils.getTitle(),
-					"description": utils.getDescription(),
-					"canonical_url": utils.getCanonicalURL()
-				},
+					"screen_height": screen.height || -1
+				}, additionalMetadata || {}),
 				"initial_referrer": document.referrer
 			}, function(err, eventData) {
 				if (!err && typeof eventData === 'object') {
