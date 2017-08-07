@@ -2,10 +2,11 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
+## [v2.25.1] - 2017-08-07
+- Sends up additional page metadata as part of pageview event
 
 ## [v2.25.0] - 2017-08-03
-- preparation for safari 11 browser updates
+- Preparation for safari 11 browser updates
 
 ## [v2.24.3] - 2017-07-28
 - Allows user to control auto opening of the app through Journeys. Defaults to false (reverts behavior of v2.24.2).
