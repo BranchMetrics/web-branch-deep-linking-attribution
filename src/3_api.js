@@ -323,7 +323,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 			endpoint: resource.endpoint,
 			data: data
 		};
-		return callback(new Error(JSON.stringify(errorObj)));
+		return callback(new Error(safejson.stringify(errorObj)));
 	}
 
 	var url;

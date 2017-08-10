@@ -5,6 +5,7 @@ goog.require('Server');
 goog.require('resources');
 goog.require('storage'); // jshint unused:false
 goog.require('config');
+goog.require('safejson');
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 
@@ -343,7 +344,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/open missing parameter branch_key or app_id"
@@ -384,7 +385,7 @@ describe('Server', function() {
 					testUtils.params({ "branch_key": "ahd&7393j" }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/open missing parameter branch_key or app_id"
@@ -401,7 +402,7 @@ describe('Server', function() {
 					testUtils.params({ "link_identifier": 45433 }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/open, parameter link_identifier is not a string"
@@ -477,7 +478,7 @@ describe('Server', function() {
 			it('should fail without identity', function(done) {
 				var assert = testUtils.plan(2, done);
 				server.request(resources.profile, testUtils.params(), storage, function(err) {
-					err = JSON.parse(err.message);
+					err = safejson.parse(err.message);
 					assert.strictEqual(
 						err.message,
 						"API request /v1/profile missing parameter identity",
@@ -494,7 +495,7 @@ describe('Server', function() {
 					testUtils.params({ "identity": "test_id" }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/profile missing parameter branch_key or app_id",
@@ -512,7 +513,7 @@ describe('Server', function() {
 					testUtils.params({ identity: 'foo' }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/profile missing parameter identity_id",
@@ -586,7 +587,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/logout missing parameter branch_key or app_id"
@@ -603,7 +604,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'session_id' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/logout missing parameter session_id"
@@ -669,7 +670,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/referrals missing parameter identity_id"
@@ -763,7 +764,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/credits missing parameter branch_key"
@@ -801,7 +802,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'sdk' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(err.message, "API request /_r missing parameter sdk");
 					}
 				);
@@ -842,7 +843,7 @@ describe('Server', function() {
 					),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/has-app missing parameter browser_fingerprint_id"
@@ -859,7 +860,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key', 'identity_id', 'sdk', 'session_id' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/has-app missing parameter branch_key or app_id"
@@ -939,7 +940,7 @@ describe('Server', function() {
 					testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter branch_key or app_id"
@@ -956,7 +957,7 @@ describe('Server', function() {
 					testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter identity_id"
@@ -973,7 +974,7 @@ describe('Server', function() {
 					testUtils.params({ "bucket": "testbucket" }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter amount"
@@ -990,7 +991,7 @@ describe('Server', function() {
 					testUtils.params({ "amount": 1 }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/redeem missing parameter bucket"
@@ -1060,7 +1061,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'branch_key' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/url missing parameter branch_key or app_id"
@@ -1077,7 +1078,7 @@ describe('Server', function() {
 					testUtils.params({ }, [ 'identity_id' ]),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/url missing parameter identity_id"
@@ -1095,7 +1096,7 @@ describe('Server', function() {
 					testUtils.params({ "tags": "Hello, I'm not an array." }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/url, parameter tags is not an array"
@@ -1163,7 +1164,7 @@ describe('Server', function() {
 					testUtils.params({ "click": "click" }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(err.message, "API request  missing parameter link_url");
 					}
 				);
@@ -1177,7 +1178,7 @@ describe('Server', function() {
 					testUtils.params({ "link_url": "3hpH54U-58" }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(err.message, "API request  missing parameter click");
 					}
 				);
@@ -1266,7 +1267,7 @@ describe('Server', function() {
 					),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/event missing parameter branch_key or app_id"
@@ -1286,7 +1287,7 @@ describe('Server', function() {
 					),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/event missing parameter session_id"
@@ -1303,7 +1304,7 @@ describe('Server', function() {
 					testUtils.params({ "metadata": metadata }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/event missing parameter event"
@@ -1320,7 +1321,7 @@ describe('Server', function() {
 					testUtils.params({ "event": "testevent" }),
 					storage,
 					function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/event missing parameter metadata"
@@ -1340,7 +1341,7 @@ describe('Server', function() {
 						"event": "testevent"
 					}),
 					storage, function(err) {
-						err = JSON.parse(err.message);
+						err = safejson.parse(err.message);
 						assert.strictEqual(
 							err.message,
 							"API request /v1/event, parameter metadata is not an object"
