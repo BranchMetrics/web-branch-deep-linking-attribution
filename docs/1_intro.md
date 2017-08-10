@@ -1,6 +1,6 @@
 # Branch Web SDK
 
-NOTE: If you are using a version older than 2.25.1 please update your WEBSDK to the latest version.
+NOTE: Please update to the latest version at your earliest convenience. v2.25.1 patches a critical bug in anticipation of iOS 11.
 
 This README outlines the functionality of the Branch Web SDK, and how to easily incorporate it into a web app.
 
