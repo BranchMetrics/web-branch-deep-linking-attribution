@@ -318,7 +318,12 @@ Server.prototype.request = function(resource, data, storage, callback) {
 
 	var u = this.getUrl(resource, data);
 	if (u.error) {
-		return callback(new Error(u.error));
+		var errorObj = {
+			message: u.error,
+			endpoint: resource.endpoint,
+			data: data
+		};
+		return callback(new Error(JSON.stringify(errorObj)));
 	}
 
 	var url;

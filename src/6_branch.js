@@ -367,7 +367,7 @@ Branch.prototype['init'] = wrap(
 						self._publishEvent('didDownloadApp');
 					}
 					if (cb) {
-						cb(null, currentSessionData);
+						cb(err, currentSessionData);
 					}
 				}
 			);
