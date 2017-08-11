@@ -27,8 +27,7 @@ dependencies:
 
 test:
   override:
-#    - grunt test
-    - echo "No Tests."    
+    - grunt test
 
 deployment:
   all:
