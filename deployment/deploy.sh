@@ -1,6 +1,6 @@
 #/bin/bash
 
-# Expects a commit pushed with this exact format:
+# Expects a commit pushed with these items:
 #
 # version: x.y.z
 # Changelog: 
@@ -43,9 +43,7 @@ echo "Extracted version $VERSION "
 #sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
 #perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
 
-echo "Bumping versions"
-
-# Bump up version
+echo "Bumping versions ..."
 sed -i -e "s/version = '.*';$/version = '$VERSION';/" src/0_config.js
 sed -i -e "s/version = '.*';$/version = '$VERSION';/" test/web-config.js
 
@@ -55,6 +53,7 @@ sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" package.json
 sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" bower.json
 sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
 
+echo "make release ..."
 make release
 
 #chmod 600 ~/deploy/Key.pem
@@ -68,7 +67,6 @@ make release
 #git tag $VERSION
 
 if [ "$CIRCLE_BRANCH" == 'production' ]; then
-  # Push to s3
   echo "Pushing to S3: branch-cdn"
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
@@ -81,7 +79,6 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
   aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /*.min.js
 
 elif [ "$CIRCLE_BRANCH" == 'master' ]; then
-  # Backup S3 bucket
   echo "Pushing to S3: branch-builds"
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
@@ -94,23 +91,27 @@ else
     exit 0
 fi	
 
-# Publish to npm
+#echo "npm publish ..."
 #npm publish
 
 # Reset
+echo "make clean ..."
 make clean
 make
 
 # Cleaning up backup files
+echo "Cleaning up backup files ..."
 rm -f bower.json-e CHANGELOG.md-e package.json-e src/0_config.js-e test/web-config.js-e
 
+#echo "Pushing changes back to repo ..."
 #git push 
 #git push origin $VERSION
 
-# Send an update to slack channels 
-echo "Sending update to slack"
-#slackcli -t $SLACK_TOKEN -h int-eng -m "$CIRCLE_USERNAME Deploying WedSDK v$VERSION" -u websdk-deploy -i http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
-slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
+# Send an update to slack channels
+DEPLOY_IMG=http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
+echo "Sending update to slack ..."
+#slackcli -t $SLACK_TOKEN -h int-eng -m "$CIRCLE_USERNAME Deploying WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
+slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
 
 # Exit prompts
 
