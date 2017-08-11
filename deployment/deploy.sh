@@ -78,7 +78,7 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
   # Invalidate cache at CDN
   echo "Invalidating cloudfrond distribution for WebSDK ..."
   aws configure set preview.cloudfront true
-  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /*.min.js
+  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /
 
 elif [ "$CIRCLE_BRANCH" == 'master' ]; then
   echo "Pushing to S3: branch-builds ..."
