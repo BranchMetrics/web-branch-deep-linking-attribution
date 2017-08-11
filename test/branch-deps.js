@@ -22,7 +22,7 @@ goog.addDependency("../../../../../src/onpage.js", [], []);
 goog.addDependency("../../../../../test/0_queue.js", [], ['task_queue']);
 goog.addDependency("../../../../../test/1_utils.js", [], ['utils']);
 goog.addDependency("../../../../../test/2_storage.js", [], ['storage']);
-goog.addDependency("../../../../../test/3_api.js", [], ['utils', 'Server', 'resources', 'storage', 'config']);
+goog.addDependency("../../../../../test/3_api.js", [], ['utils', 'Server', 'resources', 'storage', 'config', 'safejson']);
 goog.addDependency("../../../../../test/6_branch.js", [], ['utils', 'Branch', 'resources', 'config', 'storage', 'session', 'banner_utils', 'banner_html', 'safejson', 'goog.json']);
 goog.addDependency("../../../../../test/7_integration.js", [], ['config', 'goog.json']);
 goog.addDependency("../../../../../test/blob-banner.js", [], []);
