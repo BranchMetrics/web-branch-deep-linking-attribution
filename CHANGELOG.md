@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [v2.25.2] - 2017-08-11
+- Adds additional error logging
+
 ## [v2.25.1] - 2017-08-07
 - Sends additional page metadata as part of pageview event
 
