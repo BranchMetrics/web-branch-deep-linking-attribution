@@ -1,7 +1,7 @@
 ---
 machine:
   node:
-    version: 0.10.31
+    version: 6.11.2
 
 dependencies:
   post:
@@ -15,16 +15,21 @@ dependencies:
 
     # Node, Sauce, Phantom, and JSlint deps
     - npm install
+    - npm install -g jsdox
     - mocha-phantomjs --help || npm install -g mocha-phantomjs
     - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
     - tar -xzf sc-latest-linux.tar.gz
     - jscs --help || npm install -g jscs
     - jshint -v || npm install -g jshint
     - which grunt 2>&1 >/dev/null || npm install -g grunt-cli
-  cache_directories:
-    - "~/nvm/v0.10.31"
-    - compiler
 
 test:
   override:
     - grunt test
+
+deployment:
+  all:
+    branch: [master, production]
+    commands:
+      - npm install -g slack-cli
+      - deployment/deploy.sh
