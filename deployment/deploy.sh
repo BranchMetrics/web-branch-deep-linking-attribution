@@ -21,7 +21,7 @@ fi
 
 echo "Extracted version $VERSION "
 
-# Put this back in once we figure out a push strategy
+# ToDo: Enable this section after adding public deploy key to build project
 #CHANGELOG=$(cat $GIT_COMMIT_MSG | awk '/Changelog/{y=1;next}y')
 #
 #INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
@@ -56,6 +56,8 @@ sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
 echo "make release ..."
 make release
 
+
+# ToDo: Enable this section after adding public deploy key to build project
 #chmod 600 ~/deploy/Key.pem
 #git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
 #git config --global push.default simple
@@ -67,19 +69,19 @@ make release
 #git tag $VERSION
 
 if [ "$CIRCLE_BRANCH" == 'production' ]; then
-  echo "Pushing to S3: branch-cdn"
+  echo "Pushing to S3: branch-cdn ..."
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read
   aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
   
   # Invalidate cache at CDN
-  echo "Invalidating cloudfrond distribution for WebSDK"
+  echo "Invalidating cloudfrond distribution for WebSDK ..."
   aws configure set preview.cloudfront true
   aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /*.min.js
 
 elif [ "$CIRCLE_BRANCH" == 'master' ]; then
-  echo "Pushing to S3: branch-builds"
+  echo "Pushing to S3: branch-builds ..."
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
@@ -115,7 +117,7 @@ slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE
 
 # Exit prompts
 
-echo "Done script."
+echo "Done script ..."
 echo "Please update the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/_initialization.md"
 
 echo "Check the following links are valid:"
