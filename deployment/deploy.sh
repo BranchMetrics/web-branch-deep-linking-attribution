@@ -46,14 +46,14 @@ echo "Extracted version $VERSION "
 echo "Bumping versions"
 
 # Bump up version
-sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" src/0_config.js
-sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" test/web-config.js
+sed -i -e "s/version = '.*';$/version = '$VERSION';/" src/0_config.js
+sed -i -e "s/version = '.*';$/version = '$VERSION';/" test/web-config.js
 
-sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" package.json
-sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION_NO_V\"/" package.json
+sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" package.json
+sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" package.json
 
-sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION_NO_V\",/" bower.json
-sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION_NO_V\"/" bower.json
+sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" bower.json
+sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
 
 make release
 
