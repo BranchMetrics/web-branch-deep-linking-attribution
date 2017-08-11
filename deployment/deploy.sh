@@ -67,24 +67,31 @@ make release
 #git add $HOME/$CIRCLE_PROJECT_REPONAME/CHANGELOG.md
 #git tag $VERSION
 
-# Push to s3
-echo "Pushing to S3"
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read
-aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
+if [ "$CIRCLE_BRANCH" == 'production' ]; then
+  # Push to s3
+  echo "Pushing to S3: branch-cdn"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read
+  aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
+  
+  # Invalidate cache at CDN
+  echo "Invalidating cloudfrond distribution for WebSDK"
+  aws configure set preview.cloudfront true
+  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /*.min.js
 
-# Invalidate cache at CDN
-echo "Invalidating cloudfrond distribution for WebSDK"
-aws configure set preview.cloudfront true
-aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /*.min.js
+elif [ "$CIRCLE_BRANCH" == 'test-deploy' ]; then
+  # Backup S3 bucket
+  echo "Pushing to S3: branch-builds"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
+  aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
 
-# Backup S3 bucket
-echo "Pushing to backup S3"
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
-aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
+else
+    echo "No associated bucket to $CIRCLE_BRANCH - not Deploying"
+    exit 0
+fi	
 
 # Publish to npm
 #npm publish
@@ -102,7 +109,7 @@ rm -f bower.json-e CHANGELOG.md-e package.json-e src/0_config.js-e test/web-conf
 # Send an update to slack channels 
 echo "Sending update to slack"
 #slackcli -t $SLACK_TOKEN -h int-eng -m "$CIRCLE_USERNAME Deploying WedSDK v$VERSION" -u websdk-deploy -i http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
-slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK v$VERSION" -u websdk-deploy -i http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
+slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
 
 # Exit prompts
 
