@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.25.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.25.2"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1565,7 +1565,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
 Server.prototype.request = function(a, b, c, d) {
   var e = this, f = this.getUrl(a, b);
   if (f.error) {
-    return d(Error(f.error));
+    return d(Error(safejson.stringify({message:f.error, endpoint:a.endpoint, data:b})));
   }
   var g, h = "";
   "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);

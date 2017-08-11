@@ -1,5 +1,7 @@
 # Branch Web SDK
 
+NOTE: For all users that are on a version earlier than v2.25.0 please update to the latest version. v2.25.0 patches a critical bug in anticipation of iOS 11.
+
 This README outlines the functionality of the Branch Web SDK, and how to easily incorporate it into a web app.
 
 Live demo: [https://cdn.branch.io/example.html](https://cdn.branch.io/example.html)
@@ -29,12 +31,11 @@ This SDK requires native browser Javascript and has been tested in all modern br
 | ------ | ------- | ------ | ---------- |
 |    &#10004;   |    &#10004;    |   &#10004;    |  9, 10, 11 |
 
-### Branch Key (formerly App ID)
-
 ### Quick Install 
 
-#### Manual installation
+#### Recommended Installation
 
+Add the following script within your `<head>` tags:
 _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
 ```html
@@ -48,9 +49,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 </script>
 ```
 
-#### Bower or npm installation
-
-If you use Bower or npm, you can run `bower install branch-sdk` or `npm install branch-sdk` respectively to get the SDK.
+You can also get the sdk via npm or bower (branch-sdk)
 
 #### Common.JS and RequireJS compatibility
 
