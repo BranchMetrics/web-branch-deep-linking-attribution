@@ -25,39 +25,41 @@ echo "Extracted version $VERSION "
 CHANGELOG=$(echo "$GIT_COMMIT_MSG" | awk '/Changelog/{y=1;next}y')
 INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
 
-if [ -z "$CHANGELOG" ]; then
-    echo "Changelog not found in commit message - Not deploying"
-    exit 0
-fi
-
-echo -en "Extracted Changelog:\n$INSERT\n$CHANGELOG\n"
-
-cat <<EOF >add.txt
-
-$INSERT
-$CHANGELOG
-EOF
-
-# Update CHANGELOG.md
-sed -i '.bak' '/\#\# \[VERSION\] - unreleased/r add.txt' CHANGELOG.md
-
-sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
-perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
-
-echo "Bumping versions ..."
-sed -i -e "s/version = '.*';$/version = '$VERSION';/" src/0_config.js
-sed -i -e "s/version = '.*';$/version = '$VERSION';/" test/web-config.js
-
-sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" package.json
-sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" package.json
-
-sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" bower.json
-sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
-
-echo "make release ..."
-make release
+#if [ -z "$CHANGELOG" ]; then
+#    echo "Changelog not found in commit message - Not deploying"
+#    exit 0
+#fi
+#
+#echo -en "Extracted Changelog:\n$INSERT\n$CHANGELOG\n"
+#
+#cat <<EOF >add.txt
+#
+#$INSERT
+#$CHANGELOG
+#EOF
+#
+## Update CHANGELOG.md
+#sed -i '/\#\# \[VERSION\] - unreleased/r add.txt' CHANGELOG.md
+#
+#sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
+#perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
+#
+#echo "Bumping versions ..."
+#sed -i -e "s/version = '.*';$/version = '$VERSION';/" src/0_config.js
+#sed -i -e "s/version = '.*';$/version = '$VERSION';/" test/web-config.js
+#
+#sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" package.json
+#sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" package.json
+#
+#sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" bower.json
+#sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
+#
+#echo "make release ..."
+#make release
 
 echo "Commiting changes back to repo"
+git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
+git config --global push.default simple
 git commit -am "Pushing release $VERSION [ci skip]"
 git tag v$VERSION
 
