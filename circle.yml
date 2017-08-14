@@ -29,7 +29,7 @@ test:
 
 deployment:
   all:
-    branch: [master, production, deploy-websdk]
+    branch: [master, production]
     commands:
       - npm install -g slack-cli
       - deployment/deploy.sh

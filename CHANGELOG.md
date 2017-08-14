@@ -4,9 +4,6 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
-## [2.25.2] - 2017-08-14
-- remove
-
 ## [v2.25.2] - 2017-08-11
 - Adds additional error logging
 

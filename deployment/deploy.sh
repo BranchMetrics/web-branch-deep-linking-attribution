@@ -86,7 +86,7 @@ elif [ "$CIRCLE_BRANCH" == 'master' ]; then
 
 else
     echo "No associated bucket to $CIRCLE_BRANCH - not Deploying"
-#    exit 0
+    exit 0
 fi	
 
 echo "npm publish ..."
@@ -104,8 +104,9 @@ git push origin $CIRCLE_BRANCH
 # Send an update to slack channels
 DEPLOY_IMG=http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
 echo "Sending update to slack ..."
+#uncomment to send updates to int-eng
 #slackcli -t $SLACK_TOKEN -h int-eng -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
-#slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
+slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
 
 # Exit prompts
 echo "Done script ..."
