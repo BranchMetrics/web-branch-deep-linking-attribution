@@ -21,27 +21,28 @@ fi
 
 echo "Extracted version $VERSION "
 
-# ToDo: Enable this section after adding public deploy key to build project
-#CHANGELOG=$(cat $GIT_COMMIT_MSG | awk '/Changelog/{y=1;next}y')
-#
-#INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
-#
-#if [ -z "$CHANGELOG" ]; then
-#    echo "Changelog not found in commit message - exiting"
-#    exit 1
-#fi
-#
-#cat <<EOF >add.txt
-#
-#$INSERT
-#$CHANGELOG
-#EOF
+CHANGELOG=$(cat $GIT_COMMIT_MSG | awk '/Changelog/{y=1;next}y')
 
-## Update CHANGELOG.md
-#sed -i '.bak' '/\#\# \[VERSION\] - unreleased/r add.txt' CHANGELOG.md
+INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
 
-#sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
-#perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
+if [ -z "$CHANGELOG" ]; then
+    echo "Changelog not found in commit message - Not deploying"
+    exit 0
+fi
+
+echo -en "Extracted Changelog:\n$INSERT\n$CHANGELOG\n"
+
+cat <<EOF >add.txt
+
+$INSERT
+$CHANGELOG
+EOF
+
+# Update CHANGELOG.md
+sed -i '.bak' '/\#\# \[VERSION\] - unreleased/r add.txt' CHANGELOG.md
+
+sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
+perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
 
 echo "Bumping versions ..."
 sed -i -e "s/version = '.*';$/version = '$VERSION';/" src/0_config.js
@@ -56,17 +57,9 @@ sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
 echo "make release ..."
 make release
 
-
-# ToDo: Enable this section after adding public deploy key to build project
-#chmod 600 ~/deploy/Key.pem
-#git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
-#git config --global push.default simple
-
-#echo "Commiting changes back to repo"
-#git add dist/build.min.js.gz
-#git commit -am "Tagging release $VERSION [ci skip]"
-#git add $HOME/$CIRCLE_PROJECT_REPONAME/CHANGELOG.md
-#git tag $VERSION
+echo "Commiting changes back to repo"
+git commit -am "Tagging release $VERSION [ci skip]"
+git tag v$VERSION
 
 if [ "$CIRCLE_BRANCH" == 'production' ]; then
   echo "Pushing to S3: branch-cdn ..."
@@ -93,27 +86,24 @@ else
     exit 0
 fi	
 
-#echo "npm publish ..."
+echo "npm publish ..."
 #npm publish
 
 # Reset
 echo "make clean ..."
 make clean
 make
+git commit -am "Resetting to HEAD"
 
-# Cleaning up backup files
-echo "Cleaning up backup files ..."
-rm -f bower.json-e CHANGELOG.md-e package.json-e src/0_config.js-e test/web-config.js-e
-
-#echo "Pushing changes back to repo ..."
-#git push 
-#git push origin $VERSION
+echo "Pushing changes back to repo ..."
+git push origin master
+git push origin v$VERSION
 
 # Send an update to slack channels
 DEPLOY_IMG=http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
 echo "Sending update to slack ..."
-#slackcli -t $SLACK_TOKEN -h int-eng -m "$CIRCLE_USERNAME Deploying WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
-slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
+#slackcli -t $SLACK_TOKEN -h int-eng -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
+#slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
 
 # Exit prompts
 
