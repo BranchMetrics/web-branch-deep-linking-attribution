@@ -23,7 +23,6 @@ fi
 echo "Extracted version $VERSION "
 
 CHANGELOG=$(echo "$GIT_COMMIT_MSG" | awk '/Changelog/{y=1;next}y')
-
 INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
 
 if [ -z "$CHANGELOG" ]; then
