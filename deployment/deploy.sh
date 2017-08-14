@@ -59,7 +59,6 @@ echo "Commiting changes back to repo"
 git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
 git config --global push.default simple
 git commit -am "Pushing release $VERSION [ci skip]"
-git tag v$VERSION
 
 if [ "$CIRCLE_BRANCH" == 'production' ]; then
   echo "Pushing to S3: branch-cdn ..."
@@ -101,7 +100,6 @@ git commit -am "Resetting to HEAD [ci skip]"
 
 echo "Pushing changes back to repo ..."
 git push origin $CIRCLE_BRANCH
-git push origin v$VERSION
 
 # Send an update to slack channels
 DEPLOY_IMG=http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
