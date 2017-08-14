@@ -1,6 +1,7 @@
 #/bin/bash
 
-# Expects a commit pushed with these items:
+# To trigger a deploy push a 
+# commit with these items:
 #
 # version: x.y.z
 # Changelog: 
@@ -21,7 +22,7 @@ fi
 
 echo "Extracted version $VERSION "
 
-CHANGELOG=$(cat $GIT_COMMIT_MSG | awk '/Changelog/{y=1;next}y')
+CHANGELOG=$(echo "$GIT_COMMIT_MSG" | awk '/Changelog/{y=1;next}y')
 
 INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
 
