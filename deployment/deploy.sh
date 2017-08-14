@@ -59,7 +59,7 @@ echo "make release ..."
 make release
 
 echo "Commiting changes back to repo"
-git commit -am "Tagging release $VERSION [ci skip]"
+git commit -am "Pushing release $VERSION [ci skip]"
 git tag v$VERSION
 
 if [ "$CIRCLE_BRANCH" == 'production' ]; then
@@ -73,6 +73,10 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
   echo "Invalidating cloudfrond distribution for WebSDK ..."
   aws configure set preview.cloudfront true
   aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /
+
+  echo "Pushing tags"
+  git tag v$VERSION
+  git push origin v$VERSION
 
 elif [ "$CIRCLE_BRANCH" == 'master' ]; then
   echo "Pushing to S3: branch-builds ..."
@@ -97,7 +101,7 @@ make
 git commit -am "Resetting to HEAD"
 
 echo "Pushing changes back to repo ..."
-git push origin master
+git push origin $CIRCLE_BRANCH
 git push origin v$VERSION
 
 # Send an update to slack channels
