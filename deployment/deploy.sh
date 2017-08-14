@@ -57,43 +57,43 @@ INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
 #echo "make release ..."
 #make release
 
-echo "Commiting changes back to repo"
-git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
-git config --global push.default simple
-git commit -am "Pushing release $VERSION [ci skip]"
-git tag v$VERSION
-
-if [ "$CIRCLE_BRANCH" == 'production' ]; then
-  echo "Pushing to S3: branch-cdn ..."
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read
-  aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
-  
-  # Invalidate cache at CDN
-  echo "Invalidating cloudfrond distribution for WebSDK ..."
-  aws configure set preview.cloudfront true
-  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /
-
-  echo "Pushing tags"
-  git tag v$VERSION
-  git push origin v$VERSION
-
-elif [ "$CIRCLE_BRANCH" == 'master' ]; then
-  echo "Pushing to S3: branch-builds ..."
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
-  aws s3 cp --content-type="text/javascript" dist/build.js s3://branch-builds/websdk/branch.js --acl public-read
-  aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
-
-else
-    echo "No associated bucket to $CIRCLE_BRANCH - not Deploying"
-    exit 0
-fi	
-
-echo "npm publish ..."
-#npm publish
+#echo "Commiting changes back to repo"
+#git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
+#git config --global push.default simple
+#git commit -am "Pushing release $VERSION [ci skip]"
+#git tag v$VERSION
+#
+#if [ "$CIRCLE_BRANCH" == 'production' ]; then
+#  echo "Pushing to S3: branch-cdn ..."
+#  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
+#  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
+#  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read
+#  aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
+#  
+#  # Invalidate cache at CDN
+#  echo "Invalidating cloudfrond distribution for WebSDK ..."
+#  aws configure set preview.cloudfront true
+#  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /
+#
+#  echo "Pushing tags"
+#  git tag v$VERSION
+#  git push origin v$VERSION
+#
+#elif [ "$CIRCLE_BRANCH" == 'master' ]; then
+#  echo "Pushing to S3: branch-builds ..."
+#  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
+#  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
+#  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
+#  aws s3 cp --content-type="text/javascript" dist/build.js s3://branch-builds/websdk/branch.js --acl public-read
+#  aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
+#
+#else
+#    echo "No associated bucket to $CIRCLE_BRANCH - not Deploying"
+##    exit 0
+#fi	
+#
+#echo "npm publish ..."
+##npm publish
 
 # Reset
 echo "make clean ..."
