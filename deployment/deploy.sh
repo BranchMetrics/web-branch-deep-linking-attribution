@@ -32,12 +32,12 @@ fi
 
 echo -en "Extracted Changelog:\n$INSERT\n$CHANGELOG\n"
 
-cat <<EOF >add.txt
+cat <<EOF >~/add.txt
 $CHANGELOG
 EOF
 
 # Update CHANGELOG.md
-sed -i '/\#\# \[VERSION\] - unreleased/r add.txt' CHANGELOG.md
+sed -i '/\#\# \[VERSION\] - unreleased/r ~/add.txt' CHANGELOG.md
 
 sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
 perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
