@@ -72,9 +72,12 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
   aws configure set preview.cloudfront true
   aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /
 
-  echo "Pushing tags"
+  echo "Pushing git tags"
   git tag v$VERSION
   git push origin v$VERSION
+
+  echo "npm publish ..."
+  npm publish
 
 elif [ "$CIRCLE_BRANCH" == 'master' ]; then
   echo "Pushing to S3: branch-builds ..."
@@ -87,10 +90,7 @@ elif [ "$CIRCLE_BRANCH" == 'master' ]; then
 else
     echo "No associated bucket to $CIRCLE_BRANCH - not Deploying"
     exit 0
-fi	
-
-echo "npm publish ..."
-npm publish
+fi
 
 # Reset
 echo "make clean ..."
@@ -107,6 +107,12 @@ echo "Sending update to slack ..."
 #uncomment to send updates to int-eng
 #slackcli -t $SLACK_TOKEN -h int-eng -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
 slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE_BRANCH v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
+
+# Rollbar updates
+if [ "$CIRCLE_BRANCH" == 'production' ] || [ "$CIRCLE_BRANCH" == 'master' ] ; then
+    pip install requests
+    rollbar.py
+fi
 
 # Exit prompts
 echo "Done script ..."
