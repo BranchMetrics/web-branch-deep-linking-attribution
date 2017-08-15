@@ -90,7 +90,7 @@ else
 fi	
 
 echo "npm publish ..."
-#npm publish
+npm publish
 
 # Reset
 echo "make clean ..."
