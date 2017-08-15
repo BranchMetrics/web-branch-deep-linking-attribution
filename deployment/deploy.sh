@@ -111,7 +111,7 @@ slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME Deployed WedSDK:$CIRCLE
 # Rollbar updates
 if [ "$CIRCLE_BRANCH" == 'production' ] || [ "$CIRCLE_BRANCH" == 'master' ] ; then
     pip install requests
-    rollbar.py
+    deployment/rollbar.py
 fi
 
 # Exit prompts
