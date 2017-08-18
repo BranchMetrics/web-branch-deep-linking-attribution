@@ -733,3 +733,44 @@ utils.getAdditionalMetadata = function() {
 	metadata = utils.addPropertyIfNotNull(metadata, "canonical_url", utils.getCanonicalURL());
 	return metadata && Object.keys(metadata).length > 0 ? metadata : null;
 };
+
+// v2/event utility functions
+
+var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_CONTENT', 'VIEW_CONTENT_LIST', 'RATE', 'SHARE_CONTENT', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENTS' ];
+var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description', 'product_categories' ];
+
+var isStandardEvent = function(eventName) {
+	return BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1 ? true : false;
+};
+
+utils.determineV2Endpoint = function(eventName) {
+	return isStandardEvent(eventName) ? 'STANDARD' : 'CUSTOM';
+};
+
+utils.extractEventAndCustomData = function(eventAndCustomData) {
+
+	if (!eventAndCustomData || Object.keys(eventAndCustomData).length === 0) {
+		return null;
+	}
+	var customDataKeys = utils.calculateDiffBetweenArrays(BRANCH_STANDARD_EVENT_DATA, Object.keys(eventAndCustomData));
+	var customData = {};
+	var eventData = Object.assign({}, eventAndCustomData);
+
+	for (var i = 0; i < customDataKeys.length; i++) {
+		var key = customDataKeys[i];
+		customData[key] = eventData[key];
+		delete eventData[key];
+	}
+
+	return {
+		custom_data: customData,
+		event_data: eventData
+	};
+};
+
+utils.validateParameterType = function(parameter, type) {
+	if (type === "array") {
+		return Array.isArray(parameter);
+	}
+	return typeof parameter === type && !Array.isArray(parameter);
+};

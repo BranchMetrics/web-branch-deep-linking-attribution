@@ -310,3 +310,30 @@ resources.commerceEvent = {
 		"commerce_data": validator(true, validationTypes.OBJECT)
 	})
 };
+
+// v2/event endpoints
+
+resources.logStandardEvent = {
+	destination: config.api_endpoint,
+	endpoint: "/v2/event/standard",
+	method: utils.httpMethod.POST,
+	params: defaults({
+		"name": validator(true, validationTypes.STRING),
+		"custom_data": validator(false, validationTypes.STRING),
+		"event_data": validator(false, validationTypes.STRING),
+		"content_items": validator(false, validationTypes.STRING)
+	})
+};
+
+resources.logCustomEvent = {
+	destination: config.api_endpoint,
+	endpoint: "/v2/event/custom",
+	method: utils.httpMethod.POST,
+	params: defaults({
+		"name": validator(true, validationTypes.STRING),
+		"custom_data": validator(false, validationTypes.STRING),
+		"event_data": validator(false, validationTypes.STRING),
+		"content_items": validator(false, validationTypes.STRING)
+	})
+};
+

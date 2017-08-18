@@ -57,7 +57,8 @@
 		'setIdentity',
 		'track',
 		'validateCode',
-		'trackCommerceEvent'
+		'trackCommerceEvent',
+		'logEvent'
 	],
 	0
 );
