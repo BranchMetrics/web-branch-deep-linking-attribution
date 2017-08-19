@@ -740,31 +740,30 @@ var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'I
 var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description', 'product_categories' ];
 
 var isStandardEvent = function(eventName) {
-	return BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1 ? true : false;
+	return BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
 };
 
-utils.determineV2Endpoint = function(eventName) {
+utils.determineV2EventType = function(eventName) {
 	return isStandardEvent(eventName) ? 'STANDARD' : 'CUSTOM';
 };
 
-utils.extractEventAndCustomData = function(eventAndCustomData) {
+utils.separateEventAndCustomData = function(eventAndCustomData) {
 
 	if (!eventAndCustomData || Object.keys(eventAndCustomData).length === 0) {
 		return null;
 	}
 	var customDataKeys = utils.calculateDiffBetweenArrays(BRANCH_STANDARD_EVENT_DATA, Object.keys(eventAndCustomData));
 	var customData = {};
-	var eventData = Object.assign({}, eventAndCustomData);
 
 	for (var i = 0; i < customDataKeys.length; i++) {
 		var key = customDataKeys[i];
-		customData[key] = eventData[key];
-		delete eventData[key];
+		customData[key] = eventAndCustomData[key];
+		delete eventAndCustomData[key];
 	}
 
 	return {
 		custom_data: customData,
-		event_data: eventData
+		event_data: eventAndCustomData
 	};
 };
 

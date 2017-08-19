@@ -1968,21 +1968,20 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 /*
  logEvent() documentation
  */
-Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done) {
-	var self = this;
-	var name = arguments && utils.validateParameterType(arguments[1], 'string') ? arguments[1] : null;
-	var eventAndCustomData = arguments && utils.validateParameterType(arguments[2], 'object') ? arguments[2] : null;
-	var contentItems = arguments && utils.validateParameterType(arguments[3], 'array') ? arguments[3] : null;
+Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventAndCustomData, contentItems) {
+	name = name && utils.validateParameterType(name, 'string') ? name : null;
+	eventAndCustomData = eventAndCustomData && utils.validateParameterType(eventAndCustomData, 'object') ? eventAndCustomData : null;
+	contentItems = contentItems && utils.validateParameterType(contentItems, 'array') ? contentItems : null;
 
-	var endpoint = utils.determineV2Endpoint(name);
-	var extractedEventAndCustomData = utils.extractEventAndCustomData(eventAndCustomData);
+	var endpoint = utils.determineV2EventType(name);
+	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventAndCustomData);
 
 	var eventCallback = function(err, data) {
 		return done(err || null);
 	};
 
 	if (endpoint === 'STANDARD') {
-		self._api(resources.logStandardEvent, {
+		this._api(resources.logStandardEvent, {
 			"name": name,
 			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['custom_data'] || {}),
 			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
@@ -1990,7 +1989,7 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done)
 		}, eventCallback);
 	}
 	else {
-		self._api(resources.logCustomEvent, {
+		this._api(resources.logCustomEvent, {
 			"name": name,
 			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
 			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['event_data'] || {}),

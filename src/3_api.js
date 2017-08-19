@@ -290,6 +290,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 			}
 			else if (req.status.toString().substring(0, 1) === '4' ||
 					req.status.toString().substring(0, 1) === '5') {
+				// Server returns helpful information when a partner sends up incorrect fields in logEvent().
+				// This information appears in req.responseText.
 				if (req.responseURL && req.responseURL.includes("v2/event")) {
 					callback(req.responseText, null, req.status);
 				}

@@ -500,4 +500,76 @@ describe('utils', function() {
 			assert.strictEqual(isSafari11, true, 'should return true for all browsers');
 		});
 	});
+	describe('separateEventAndCustomData ', function() {
+		it('extracted custom and event data should equal initial objects', function() {
+			var event_data = {
+				"transaction_id": "1AB23456C7890123D",
+				"revenue": 6.00,
+				"currency": "USD",
+				"shipping": 3.00,
+				"tax": 3.00,
+				"coupon": "8891701",
+				"affiliation": "xyz_affiliation",
+				"search_query": "boat shoes sperrys",
+				"description": "Sperry Authentic Original",
+				"product_categories": "Apparel & Accessories"
+			};
+
+			var custom_data = {
+				"custom_key_1": "custom_val_1",
+				"custom_key_2": "custom_val_2",
+				"custom_key_3": "custom_val_3"
+			};
+
+			var event_and_custom_data = {};
+
+			utils.merge(event_and_custom_data, event_data);
+			utils.merge(event_and_custom_data, custom_data);
+
+			var extractedEventAndCustomData = utils.separateEventAndCustomData(event_and_custom_data);
+			assert.deepEqual(
+				event_data,
+				extractedEventAndCustomData['event_data'],
+				'extracted event_data should equal initial event_data'
+			);
+			assert.deepEqual(
+				custom_data,
+				extractedEventAndCustomData['custom_data'],
+				'extracted custom_data should equal initial custom_data'
+			);
+		});
+
+		it('should return STANDARD for standard events and CUSTOM for custom events', function() {
+			var standardEvent = 'ADD_TO_WISHLIST';
+			var customEvent = 'ADD_TO_WISHLISTT';
+			assert.strictEqual('STANDARD',
+				utils.determineV2EventType(standardEvent),
+				'should return STANDARD');
+			assert.strictEqual('CUSTOM',
+				utils.determineV2EventType(customEvent),
+				'should return CUSTOM');
+		});
+
+		it('should return true or false for a given parameter and type to validate against', function() {
+			var parameter1 = {};
+			var parameter2 = [];
+			var parameter3 = "test";
+			var type1 = "object";
+			var type2 = "array";
+			var type3 = "string";
+			var type4 = "array";
+			assert.strictEqual(true,
+				utils.validateParameterType(parameter1, type1),
+				'should return true');
+			assert.strictEqual(true,
+				utils.validateParameterType(parameter2, type2),
+				'should return true');
+			assert.strictEqual(true,
+				utils.validateParameterType(parameter3, type3),
+				'should return true');
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter1, type4),
+				'should return false');
+		});
+	});
 });
