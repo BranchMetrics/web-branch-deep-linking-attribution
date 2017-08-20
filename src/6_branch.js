@@ -1969,32 +1969,21 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
  logEvent() documentation
  */
 Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventAndCustomData, contentItems) {
-	name = name && utils.validateParameterType(name, 'string') ? name : null;
-	eventAndCustomData = eventAndCustomData && utils.validateParameterType(eventAndCustomData, 'object') ? eventAndCustomData : null;
-	contentItems = contentItems && utils.validateParameterType(contentItems, 'array') ? contentItems : null;
-
-	var endpoint = utils.determineV2EventType(name);
+	name = utils.validateParameterType(name, 'string') ? name : null;
+	eventAndCustomData = utils.validateParameterType(eventAndCustomData, 'object') ? eventAndCustomData : null;
+	contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
 	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventAndCustomData);
-
-	var eventCallback = function(err, data) {
+	var endpoint = resources.logCustomEvent;
+	if (utils.isStandardEvent(name)) {
+		endpoint = resources.logStandardEvent;
+	}
+	this._api(endpoint, {
+		"name": name,
+		"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['custom_data'] || {}),
+		"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
+		"content_items": safejson.stringify(contentItems || [])
+	}, function(err, data) {
 		return done(err || null);
-	};
-
-	if (endpoint === 'STANDARD') {
-		this._api(resources.logStandardEvent, {
-			"name": name,
-			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['custom_data'] || {}),
-			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
-			"content_items": safejson.stringify(contentItems || [])
-		}, eventCallback);
-	}
-	else {
-		this._api(resources.logCustomEvent, {
-			"name": name,
-			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
-			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['event_data'] || {}),
-			"content_items": safejson.stringify(contentItems || [])
-		}, eventCallback);
-	}
+	});
 });
 

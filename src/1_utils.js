@@ -739,12 +739,8 @@ utils.getAdditionalMetadata = function() {
 var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_CONTENT', 'VIEW_CONTENT_LIST', 'RATE', 'SHARE_CONTENT', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENTS' ];
 var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description', 'product_categories' ];
 
-var isStandardEvent = function(eventName) {
+utils.isStandardEvent = function(eventName) {
 	return BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
-};
-
-utils.determineV2EventType = function(eventName) {
-	return isStandardEvent(eventName) ? 'STANDARD' : 'CUSTOM';
 };
 
 utils.separateEventAndCustomData = function(eventAndCustomData) {
@@ -768,6 +764,9 @@ utils.separateEventAndCustomData = function(eventAndCustomData) {
 };
 
 utils.validateParameterType = function(parameter, type) {
+	if (!parameter || !type) {
+		return false;
+	}
 	if (type === "array") {
 		return Array.isArray(parameter);
 	}

@@ -539,18 +539,19 @@ describe('utils', function() {
 			);
 		});
 
-		it('should return STANDARD for standard events and CUSTOM for custom events', function() {
+		it('utils.isStandardEvent() should return true for standard events and false for custom events', function() {
 			var standardEvent = 'ADD_TO_WISHLIST';
 			var customEvent = 'ADD_TO_WISHLISTT';
-			assert.strictEqual('STANDARD',
-				utils.determineV2EventType(standardEvent),
-				'should return STANDARD');
-			assert.strictEqual('CUSTOM',
-				utils.determineV2EventType(customEvent),
-				'should return CUSTOM');
+
+			assert.strictEqual(true,
+				utils.isStandardEvent(standardEvent),
+				'should return true for ADD_TO_WISHLIST');
+			assert.strictEqual(false,
+				utils.isStandardEvent(customEvent),
+				'should return false for ADD_TO_WISHLISTT');
 		});
 
-		it('should return true or false for a given parameter and type to validate against', function() {
+		it('should return true or false for a given parameter and type', function() {
 			var parameter1 = {};
 			var parameter2 = [];
 			var parameter3 = "test";
@@ -558,6 +559,12 @@ describe('utils', function() {
 			var type2 = "array";
 			var type3 = "string";
 			var type4 = "array";
+			assert.strictEqual(false,
+				utils.validateParameterType(null, type1),
+				'should return false');
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter1, null),
+				'should return false');
 			assert.strictEqual(true,
 				utils.validateParameterType(parameter1, type1),
 				'should return true');
