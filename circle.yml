@@ -31,7 +31,7 @@ test:
 
 deployment:
   all:
-    branch: [master, production, testing]
+    branch: [master, production]
     commands:
       - npm install -g slack-cli
       - deployment/deploy.sh

@@ -131,7 +131,7 @@ EOF
 # Master Deploy
 #--------------------------------------------------------------------------------------------
 
-elif [ "$CIRCLE_BRANCH" == 'testing' ]; then
+elif [ "$CIRCLE_BRANCH" == 'master' ]; then
 
   echo -en "${GREEN}QA Release...${NC}\n"
 
