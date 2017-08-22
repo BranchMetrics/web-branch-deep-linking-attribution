@@ -8,14 +8,18 @@
 
 set -e
 
-echo "make release ..."
-make release
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
 #--------------------------------------------------------------------------------------------
 # Production Deploy
 #--------------------------------------------------------------------------------------------
 
 if [ "$CIRCLE_BRANCH" == 'production' ]; then
+  
+  echo -en "${GREEN}Production Release...${NC}\n"
+
   GIT_COMMIT_MSG=$(git log --format=%B -n 1 $CIRCLE_SHA1)
   
   VERSION=$(echo "$GIT_COMMIT_MSG" | grep version | cut -f 2 -d " ")
@@ -27,7 +31,7 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
       exit 0
   fi
   
-  echo "Extracted version $VERSION "
+  echo -en "${GREEN}Extracted version $VERSION ${NC}\n"
  
   # Expect a Changelog in commit message
   CHANGELOG=$(echo "$GIT_COMMIT_MSG" | awk '/Changelog/{y=1;next}y')
@@ -38,7 +42,7 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
       exit 0
   fi
 
-  echo -en "Extracted Changelog:\n$INSERT\n$CHANGELOG\n"
+  echo -en "${GREEN}Extracted Changelog:\n$INSERT\n$CHANGELOG\n${NC}\n"
 
 cat <<EOF >~/add.txt
 $CHANGELOG
@@ -50,7 +54,7 @@ EOF
   sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
   perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
  
-  echo "Bumping versions ..."
+  echo -en "${GREEN}Bumping versions ...${NC}\n"
   sed -i -e "s/version = '.*';$/version = '$VERSION';/" src/0_config.js
   sed -i -e "s/version = '.*';$/version = '$VERSION';/" test/web-config.js
   
@@ -60,43 +64,43 @@ EOF
   sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" bower.json
   sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
 
-  echo "make release ..."
+  echo -en "${GREEN}make release...${NC}\n"
   make release
 
-  echo "Commiting changes back to repo"
+  echo -en "${GREEN}Commiting changes back to repo${NC}\n"
   git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
   git config --global push.default simple
   git commit -am "Pushing release $VERSION [ci skip]"
 
-  echo "Pushing to S3: branch-cdn ..."
+  echo -en "${GREEN}Pushing to S3: branch-cdn ...${NC}\n"
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read
   aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
   
   # Invalidate cache at CDN
-  echo "Invalidating cloudfrond distribution for WebSDK ..."
+  echo -en "${GREEN}Invalidating cloudfrond distribution for WebSDK ...${NC}\n"
   aws configure set preview.cloudfront true
   aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /
 
-  echo "Pushing git tags"
+  echo -en "${GREEN}Pushing git tags${NC}\n"
   git tag v$VERSION
   git push origin v$VERSION
 
-  echo "npm publish ..."
+  echo -en "${GREEN}npm publish ...${NC}\n"
   npm publish
 
   # Reset
-  echo "make clean ..."
+  echo -en "${GREEN}make clean ...${NC}\n"
   make clean
   make
   git commit -am "Resetting to HEAD [ci skip]"
 
-  echo "Updating production files ..."
+  echo -en "${GREEN}Updating production files ...${NC}\n"
   git push origin $CIRCLE_BRANCH
 
   # Push back to master
-  echo "Updating Master files ..."
+  echo -en "${GREEN}Updating Master files ...${NC}\n"
   rm -rf /tmp/$CIRCLE_PROJECT_REPONAME
   git clone git@github.com:BranchMetrics/$CIRCLE_PROJECT_REPONAME.git /tmp/$CIRCLE_PROJECT_REPONAME
 
@@ -111,7 +115,7 @@ EOF
   # Send an update to slack channels
 
   DEPLOY_IMG=http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
-  echo "Sending update to slack ..."
+  echo -en "${GREEN}Sending update to slack ...${NC}\n"
   #uncomment to send updates to int-eng
   #slackcli -t $SLACK_TOKEN -h int-eng -m $MESSAGE -u websdk-deploy -i $DEPLOY_IMG
   slackcli -t $SLACK_TOKEN -h web-sdk -m $MESSAGE -u websdk-deploy -i $DEPLOY_IMG
@@ -129,10 +133,12 @@ EOF
 
 elif [ "$CIRCLE_BRANCH" == 'master' ]; then
 
-  echo "make release ..."
+  echo -en "${GREEN}QA Release...${NC}\n"
+
+  echo -en "${GREEN}make release ...${NC}\n"
   make release
 
-  echo "Pushing to S3: branch-builds ..."
+  echo -en "${GREEN}Pushing to S3: branch-builds ...${NC}\n"
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
@@ -140,7 +146,7 @@ elif [ "$CIRCLE_BRANCH" == 'master' ]; then
   aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
 
 else
-    echo "No associated bucket to $CIRCLE_BRANCH - not Deploying"
+    echo -en "${GREEN}No associated bucket to $CIRCLE_BRANCH - not Deploying${NC}\n"
     exit 0
 fi
 
@@ -151,5 +157,5 @@ if [ "$CIRCLE_BRANCH" == 'production' ] || [ "$CIRCLE_BRANCH" == 'master' ] ; th
 fi
 
 # Exit prompts
-echo "Done script ..."
+echo -en "${GREEN}Done script ...${NC}\n"
 
