@@ -407,6 +407,87 @@ describe('utils', function() {
 		});
 	});
 
+	describe('removePropertiesFromObject', function() {
+		it('remove two properties from an object', function() {
+			var keysToRemove = [ "productId", "productName" ];
+			var original = {
+				productId: '1234',
+				productName: 'shoes',
+				$ios_deeplink_path: 'monster/view/ios',
+				$android_deeplink_path: 'monster/view/android'
+			};
+			var expected = {
+				$ios_deeplink_path: 'monster/view/ios',
+				$android_deeplink_path: 'monster/view/android'
+			};
+			utils.removePropertiesFromObject(original, keysToRemove);
+			assert.deepEqual(
+				original,
+				expected,
+				'original and expected objects should be equal'
+			);
+		});
+		it('remove two properties from an object but keysToRemove is of wrong type', function() {
+			var keysToRemove = "productId, productName";
+			var original = {
+				productId: '1234',
+				productName: 'shoes',
+				$ios_deeplink_path: 'monster/view/ios',
+				$android_deeplink_path: 'monster/view/android'
+			};
+			var expected = Object.assign({}, original);
+			utils.removePropertiesFromObject(original, keysToRemove);
+			assert.deepEqual(
+				original,
+				expected,
+				'original and expected objects should be equal'
+			);
+		});
+		it('remove two properties from an object but object is an array', function() {
+			var keysToRemove = [ "productId", "productName" ];
+			var original = [
+				'productId: 1234',
+				'productName: shoes',
+				'$ios_deeplink_path: monster/view/ios',
+				'$android_deeplink_path: monster/view/android'
+			];
+			var expected = original.slice();
+			utils.removePropertiesFromObject(original, keysToRemove);
+			assert.deepEqual(
+				original,
+				expected,
+				'original and expected objects should be equal'
+			);
+		});
+		it('remove two properties from an object but object is null', function() {
+			var keysToRemove = [ "productId", "productName" ];
+			var original = null;
+			var expected = null;
+			utils.removePropertiesFromObject(original, keysToRemove);
+			assert.deepEqual(
+				original,
+				expected,
+				'original and expected objects should be equal'
+			);
+		});
+		it('remove two properties from an object but keysToRemove is null', function() {
+			var keysToRemove = null;
+			var original = {
+				productId: '1234',
+				productName: 'shoes',
+				$ios_deeplink_path: 'monster/view/ios',
+				$android_deeplink_path: 'monster/view/android'
+			};
+			var expected = Object.assign({}, original);
+			utils.removePropertiesFromObject(original, keysToRemove);
+			assert.deepEqual(
+				original,
+				expected,
+				'original and expected objects should be equal'
+			);
+		});
+	});
+
 	describe('isSafari11OrGreater', function() {
 		var originalUa = navigator.userAgent;
 

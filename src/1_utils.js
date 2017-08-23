@@ -733,3 +733,15 @@ utils.getAdditionalMetadata = function() {
 	metadata = utils.addPropertyIfNotNull(metadata, "canonical_url", utils.getCanonicalURL());
 	return metadata && Object.keys(metadata).length > 0 ? metadata : null;
 };
+
+utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
+	if (objectToModify && typeof objectToModify === "object" && !Array.isArray(objectToModify) &&
+		Object.keys(objectToModify).length > 0 && keysToRemove && Array.isArray(keysToRemove) &&
+		keysToRemove.length > 0) {
+		for (var key in objectToModify) {
+			if (objectToModify.hasOwnProperty(key) && keysToRemove.indexOf(key) > -1) {
+				delete objectToModify[key];
+			}
+		}
+	}
+};
