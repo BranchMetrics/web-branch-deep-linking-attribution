@@ -23,12 +23,12 @@ function checkPreviousBanner() {
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
+	journeys_utils.setJourneyLinkData(html);
 	journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
 	journeys_utils.setPositionAndHeight(html);
-	journeys_utils.setJourneyLinkData(html);
 	// Get metadata, css and js from html blob then remove them
 	var metadata = journeys_utils.getMetadata(html);
 	if (metadata) {
