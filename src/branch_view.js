@@ -23,12 +23,12 @@ function checkPreviousBanner() {
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
-	journeys_utils.branch._publishEvent('willShowJourney', { 'banner_id': journeys_utils.branchViewId });
+	journeys_utils.setJourneyLinkData(html);
+	journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
 	journeys_utils.setPositionAndHeight(html);
-
 	// Get metadata, css and js from html blob then remove them
 	var metadata = journeys_utils.getMetadata(html);
 	if (metadata) {
@@ -194,7 +194,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 		journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 		makeNewLink = options['make_new_link'] || false;
-		// openApp defaults to true unless user specifies otherwise
+		// openApp defaults to false unless user specifies otherwise
 		openApp = options['open_app'] || false;
 	}
 

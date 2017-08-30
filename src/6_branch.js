@@ -1608,7 +1608,7 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 	var self = this;
 	self['renderQueue'](function() {
 		if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
-			self._publishEvent('didCallJourneyClose', { 'banner_id': journeys_utils.branchViewId });
+			self._publishEvent('didCallJourneyClose', journeys_utils.journeyLinkData);
 			journeys_utils.animateBannerExit(journeys_utils.banner);
 		}
 		else {

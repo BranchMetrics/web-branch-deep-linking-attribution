@@ -31,6 +31,7 @@ journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
+journeys_utils.journeyLinkDataRe =  /<script id="journeyLinkData" type="application\/json">((.|\s)*?)<\/script>/;
 
 journeys_utils.branch = null;
 journeys_utils.banner = null;
@@ -50,6 +51,9 @@ journeys_utils.journeyDismissed = false;
 journeys_utils.exitAnimationDisabledPreviously = false;
 journeys_utils.previousPosition = '';
 journeys_utils.previousDivToInjectParents = [];
+
+// holds data from Journey that is currently being viewed & data from setBranchViewData()
+journeys_utils.journeyLinkData = null;
 
 /***
  * @function journeys_utils.setPositionAndHeight
@@ -185,6 +189,8 @@ journeys_utils.removeScriptAndCss = function(html) {
 	var matchJson = html.match(journeys_utils.jsonRe);
 	var matchJs = html.match(journeys_utils.jsRe);
 	var matchCss = html.match(journeys_utils.cssRe);
+	var matchJourneyLinkData = html.match(journeys_utils.journeyLinkDataRe);
+
 	if(matchJson) {
 		html = html.replace(journeys_utils.jsonRe,'');
 	}
@@ -194,6 +200,10 @@ journeys_utils.removeScriptAndCss = function(html) {
 	if(matchCss) {
 		html = html.replace(journeys_utils.cssRe,'');
 	}
+	if (matchJourneyLinkData) {
+		html = html.replace(journeys_utils.journeyLinkDataRe, '');
+	}
+
 	return html;
 }
 
@@ -424,7 +434,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
 		else if (journeys_utils.position === 'bottom') {
 			banner.style.bottom = '0';
 		}
-        journeys_utils.branch._publishEvent('didShowJourney', { 'banner_id': journeys_utils.branchViewId });
+        journeys_utils.branch._publishEvent('didShowJourney', journeys_utils.journeyLinkData);
 		journeys_utils.isJourneyDisplayed = true;
 	}
 	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
@@ -478,7 +488,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	var actionEls = doc.querySelectorAll('#branch-mobile-action');
 	Array.prototype.forEach.call(actionEls, function(el) {
 		el.addEventListener('click', function(e) {
-            	journeys_utils.branch._publishEvent('didClickJourneyCTA', { 'banner_id': journeys_utils.branchViewId });
+            	journeys_utils.branch._publishEvent('didClickJourneyCTA', journeys_utils.journeyLinkData);
             	journeys_utils.journeyDismissed = true;
             	cta();
             	journeys_utils.animateBannerExit(banner);
@@ -487,7 +497,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	var cancelEls = doc.querySelectorAll('.branch-banner-continue');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-			journeys_utils.branch._publishEvent('didClickJourneyContinue', { 'banner_id': journeys_utils.branchViewId });
+			journeys_utils.branch._publishEvent('didClickJourneyContinue', journeys_utils.journeyLinkData);
 			journeys_utils.journeyDismissed = true;
 			journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
@@ -496,7 +506,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 	cancelEls = doc.querySelectorAll('.branch-banner-close');
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-            	journeys_utils.branch._publishEvent('didClickJourneyClose', { 'banner_id': journeys_utils.branchViewId });
+            	journeys_utils.branch._publishEvent('didClickJourneyClose', journeys_utils.journeyLinkData);
             	journeys_utils.journeyDismissed = true;
             	journeys_utils.animateBannerExit(banner);
 			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
@@ -531,7 +541,7 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner.style.bottom = '-' + journeys_utils.bannerHeight;
 	}
 
-    journeys_utils.branch._publishEvent('willCloseJourney', { 'banner_id': journeys_utils.branchViewId });
+    journeys_utils.branch._publishEvent('willCloseJourney', journeys_utils.journeyLinkData);
 	// removes timeout if animation is disabled or uses default timeout
 	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
 	setTimeout(function() {
@@ -564,7 +574,22 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 		banner_utils.removeClass(document.body, 'branch-banner-no-scroll');
 
-        	journeys_utils.branch._publishEvent('didCloseJourney', { 'banner_id': journeys_utils.branchViewId });
+        	journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
         	journeys_utils.isJourneyDisplayed = false;
 	}, speedAndDelay);
+}
+
+journeys_utils.setJourneyLinkData = function(html) {
+	var data = { 'banner_id': journeys_utils.branchViewId };
+	var match = html.match(journeys_utils.journeyLinkDataRe);
+	if (match) {
+		var src = match[1];
+		var linkData = safejson.parse(src);
+		if (linkData) {
+			var journeyLinkDataPropertiesToFilterOut = ['browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id'];
+			utils.removePropertiesFromObject(linkData['journey_link_data'], journeyLinkDataPropertiesToFilterOut)
+			data = utils.merge(data, linkData);
+		}
+	}
+	journeys_utils.journeyLinkData = data;
 }
