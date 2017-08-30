@@ -22,8 +22,10 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
 
   GIT_COMMIT_MSG=$(git log --format=%B -n 1 $CIRCLE_SHA1)
   
-  VERSION=$(echo "$GIT_COMMIT_MSG" | grep version | cut -f 2 -d " ")
-  
+  VER=$(echo "$GIT_COMMIT_MSG" | grep version | cut -f 2 -d " ")
+ 
+  VERSION=$(echo $VER|tr -d '\r')
+ 
   DATE=$(date "+%Y-%m-%d")
   
   if [[ "$GIT_COMMIT_MSG" != *"version"* ]]; then
@@ -31,25 +33,25 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
       exit 0
   fi
   
-  echo -en "${GREEN}Extracted version $VERSION ${NC}\n"
+  echo -en "${GREEN} Extracted version $VERSION ${NC}\n"
  
   # Expect a Changelog in commit message
   CHANGELOG=$(echo "$GIT_COMMIT_MSG" | awk '/Changelog/{y=1;next}y')
-  INSERT="\n## [v$VERSION] - $date\n$CHANGELOG"
+  INSERT="## [v$VERSION] - $DATE"
 
   if [ -z "$CHANGELOG" ]; then
       echo "Changelog not found in commit message - Not deploying"
       exit 0
   fi
 
-  echo -en "${GREEN}Extracted Changelog:\n$INSERT\n$CHANGELOG\n${NC}\n"
+  echo -en "\n${GREEN}Extracted Changelog:\n$INSERT\n$CHANGELOG\n${NC}\n"
 
-cat <<EOF >~/add.txt
+cat <<EOF >add.txt
 $CHANGELOG
 EOF
 
   # Update CHANGELOG.md
-  sed -i '/\#\# \[VERSION\] - unreleased/r ~/add.txt' CHANGELOG.md
+  sed -i '/\#\# \[VERSION\] - unreleased/r add.txt' CHANGELOG.md
 
   sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
   perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
@@ -66,6 +68,8 @@ EOF
 
   echo -en "${GREEN}make release...${NC}\n"
   make release
+
+  rm add.txt
 
   echo -en "${GREEN}Commiting changes back to repo${NC}\n"
   git config --global user.email "buildbot@branch.io" && git config --global user.name "Build Bot"
