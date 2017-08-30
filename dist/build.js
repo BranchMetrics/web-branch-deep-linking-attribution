@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.25.2"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.26.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1235,6 +1235,13 @@ utils.openGraphDataAsObject = function() {
 utils.getAdditionalMetadata = function() {
   var a = {}, a = utils.addPropertyIfNotNull(a, "og_data", utils.openGraphDataAsObject()), a = utils.addPropertyIfNotNull(a, "hosted_deeplink_data", utils.getHostedDeepLinkData()), a = utils.addPropertyIfNotNull(a, "title", utils.getTitle()), a = utils.addPropertyIfNotNull(a, "description", utils.getDescription());
   return (a = utils.addPropertyIfNotNull(a, "canonical_url", utils.getCanonicalURL())) && 0 < Object.keys(a).length ? a : null;
+};
+utils.removePropertiesFromObject = function(a, b) {
+  if (a && "object" === typeof a && !Array.isArray(a) && 0 < Object.keys(a).length && b && Array.isArray(b) && 0 < b.length) {
+    for (var c in a) {
+      a.hasOwnProperty(c) && -1 < b.indexOf(c) && delete a[c];
+    }
+  }
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -1830,6 +1837,7 @@ journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
+journeys_utils.journeyLinkDataRe = /<script id="journeyLinkData" type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.branch = null;
 journeys_utils.banner = null;
 journeys_utils.isJourneyDisplayed = !1;
@@ -1841,6 +1849,7 @@ journeys_utils.journeyDismissed = !1;
 journeys_utils.exitAnimationDisabledPreviously = !1;
 journeys_utils.previousPosition = "";
 journeys_utils.previousDivToInjectParents = [];
+journeys_utils.journeyLinkData = null;
 journeys_utils.setPositionAndHeight = function(a) {
   var b = journeys_utils.getMetadata(a);
   if (b && b.bannerHeight && b.position && b.sticky) {
@@ -1896,10 +1905,11 @@ journeys_utils.getJsAndAddToParent = function(a) {
   }
 };
 journeys_utils.removeScriptAndCss = function(a) {
-  var b = a.match(journeys_utils.jsonRe), c = a.match(journeys_utils.jsRe), d = a.match(journeys_utils.cssRe);
+  var b = a.match(journeys_utils.jsonRe), c = a.match(journeys_utils.jsRe), d = a.match(journeys_utils.cssRe), e = a.match(journeys_utils.journeyLinkDataRe);
   b && (a = a.replace(journeys_utils.jsonRe, ""));
   c && (a = a.replace(journeys_utils.jsRe, ""));
   d && (a = a.replace(journeys_utils.cssRe, ""));
+  e && (a = a.replace(journeys_utils.journeyLinkDataRe, ""));
   return a;
 };
 journeys_utils.createAndAppendIframe = function() {
@@ -1978,7 +1988,7 @@ journeys_utils.animateBannerEntrance = function(a) {
   journeys_utils.isFullPage && "fixed" === journeys_utils.sticky && banner_utils.addClass(document.body, "branch-banner-no-scroll");
   setTimeout(function() {
     "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
-    journeys_utils.branch._publishEvent("didShowJourney", {banner_id:journeys_utils.branchViewId});
+    journeys_utils.branch._publishEvent("didShowJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !0;
   }, journeys_utils.animationDelay);
 };
@@ -1995,7 +2005,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     var f = d.contentWindow.document, g = f.querySelectorAll("#branch-mobile-action");
     Array.prototype.forEach.call(g, function(a) {
       a.addEventListener("click", function(a) {
-        journeys_utils.branch._publishEvent("didClickJourneyCTA", {banner_id:journeys_utils.branchViewId});
+        journeys_utils.branch._publishEvent("didClickJourneyCTA", journeys_utils.journeyLinkData);
         journeys_utils.journeyDismissed = !0;
         c();
         journeys_utils.animateBannerExit(d);
@@ -2004,7 +2014,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     g = f.querySelectorAll(".branch-banner-continue");
     Array.prototype.forEach.call(g, function(c) {
       c.addEventListener("click", function(c) {
-        journeys_utils.branch._publishEvent("didClickJourneyContinue", {banner_id:journeys_utils.branchViewId});
+        journeys_utils.branch._publishEvent("didClickJourneyContinue", journeys_utils.journeyLinkData);
         journeys_utils.journeyDismissed = !0;
         journeys_utils.animateBannerExit(d);
         b.set("hideBanner" + a.id, e, !0);
@@ -2013,7 +2023,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e) {
     g = f.querySelectorAll(".branch-banner-close");
     Array.prototype.forEach.call(g, function(c) {
       c.addEventListener("click", function(c) {
-        journeys_utils.branch._publishEvent("didClickJourneyClose", {banner_id:journeys_utils.branchViewId});
+        journeys_utils.branch._publishEvent("didClickJourneyClose", journeys_utils.journeyLinkData);
         journeys_utils.journeyDismissed = !0;
         journeys_utils.animateBannerExit(d);
         b.set("hideBanner" + a.id, e, !0);
@@ -2030,7 +2040,7 @@ journeys_utils.animateBannerExit = function(a) {
     document.getElementById("branch-iframe-css").innerHTML = b;
   }
   "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
-  journeys_utils.branch._publishEvent("willCloseJourney", {banner_id:journeys_utils.branchViewId});
+  journeys_utils.branch._publishEvent("willCloseJourney", journeys_utils.journeyLinkData);
   setTimeout(function() {
     banner_utils.removeElement(a);
     banner_utils.removeElement(document.getElementById("branch-css"));
@@ -2042,9 +2052,18 @@ journeys_utils.animateBannerExit = function(a) {
     "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bodyMarginTop : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bodyMarginBottom);
     banner_utils.removeClass(document.body, "branch-banner-is-active");
     banner_utils.removeClass(document.body, "branch-banner-no-scroll");
-    journeys_utils.branch._publishEvent("didCloseJourney", {banner_id:journeys_utils.branchViewId});
+    journeys_utils.branch._publishEvent("didCloseJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !1;
   }, journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay);
+};
+journeys_utils.setJourneyLinkData = function(a) {
+  var b = {banner_id:journeys_utils.branchViewId};
+  if (a = a.match(journeys_utils.journeyLinkDataRe)) {
+    if (a = safejson.parse(a[1])) {
+      utils.removePropertiesFromObject(a.journey_link_data, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b = utils.merge(b, a);
+    }
+  }
+  journeys_utils.journeyLinkData = b;
 };
 // Input 15
 var branch_view = {callback_index:1};
@@ -2052,7 +2071,8 @@ function checkPreviousBanner() {
   return document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container") ? !0 : !1;
 }
 function renderHtmlBlob(a, b, c) {
-  journeys_utils.branch._publishEvent("willShowJourney", {banner_id:journeys_utils.branchViewId});
+  journeys_utils.setJourneyLinkData(b);
+  journeys_utils.branch._publishEvent("willShowJourney", journeys_utils.journeyLinkData);
   var d = c ? "OPEN" : "GET";
   journeys_utils.setPositionAndHeight(b);
   var e = journeys_utils.getMetadata(b);
@@ -2526,7 +2546,7 @@ Branch.prototype.closeJourney = wrap(callback_params.CALLBACK_ERR, function(a) {
   var b = this;
   b.renderQueue(function() {
     if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
-      b._publishEvent("didCallJourneyClose", {banner_id:journeys_utils.branchViewId}), journeys_utils.animateBannerExit(journeys_utils.banner);
+      b._publishEvent("didCallJourneyClose", journeys_utils.journeyLinkData), journeys_utils.animateBannerExit(journeys_utils.banner);
     } else {
       return a("Journey already dismissed.");
     }
