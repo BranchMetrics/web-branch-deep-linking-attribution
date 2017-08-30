@@ -85,7 +85,7 @@ EOF
   # Invalidate cache at CDN
   echo -en "${GREEN}Invalidating cloudfrond distribution for WebSDK ...${NC}\n"
   aws configure set preview.cloudfront true
-  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js
+  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js /example.html /branch-v2.0.0.min.js
 
   echo -en "${GREEN}Pushing git tags${NC}\n"
   git tag v$VERSION
