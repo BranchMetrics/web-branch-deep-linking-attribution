@@ -584,7 +584,12 @@ journeys_utils.setJourneyLinkData = function(html) {
 	var match = html.match(journeys_utils.journeyLinkDataRe);
 	if (match) {
 		var src = match[1];
-		var linkData = safejson.parse(src);
+		var linkData = '';
+		try {
+			linkData = safejson.parse(src);
+		}
+		catch (e) {
+		}
 		if (linkData) {
 			var journeyLinkDataPropertiesToFilterOut = ['browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id'];
 			utils.removePropertiesFromObject(linkData['journey_link_data'], journeyLinkDataPropertiesToFilterOut)
