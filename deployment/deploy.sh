@@ -85,7 +85,7 @@ EOF
   # Invalidate cache at CDN
   echo -en "${GREEN}Invalidating cloudfrond distribution for WebSDK ...${NC}\n"
   aws configure set preview.cloudfront true
-  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /
+  aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js /example.html /branch-v2.0.0.min.js
 
   echo -en "${GREEN}Pushing git tags${NC}\n"
   git tag v$VERSION
@@ -114,15 +114,13 @@ EOF
   git push origin master
   popd
 
-  MESSAGE="$CIRCLE_USERNAME deployed WebSDK v$VERSION"
-
   # Send an update to slack channels
 
   DEPLOY_IMG=http://workshops.lewagon.org/assets/landing-2/deploy-button-5068ec2c575492ba428569111afe3ce6.jpg
   echo -en "${GREEN}Sending update to slack ...${NC}\n"
   #uncomment to send updates to int-eng
   #slackcli -t $SLACK_TOKEN -h int-eng -m $MESSAGE -u websdk-deploy -i $DEPLOY_IMG
-  slackcli -t $SLACK_TOKEN -h web-sdk -m $MESSAGE -u websdk-deploy -i $DEPLOY_IMG
+  slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME deployed WebSDK v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
   
   echo "Please update the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/_initialization.md"
 
