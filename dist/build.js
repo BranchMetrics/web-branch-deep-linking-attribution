@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.26.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.26.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2059,9 +2059,13 @@ journeys_utils.animateBannerExit = function(a) {
 journeys_utils.setJourneyLinkData = function(a) {
   var b = {banner_id:journeys_utils.branchViewId};
   if (a = a.match(journeys_utils.journeyLinkDataRe)) {
-    if (a = safejson.parse(a[1])) {
-      utils.removePropertiesFromObject(a.journey_link_data, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b = utils.merge(b, a);
+    a = a[1];
+    var c = "";
+    try {
+      c = safejson.parse(a);
+    } catch (d) {
     }
+    c && (utils.removePropertiesFromObject(c.journey_link_data, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b = utils.merge(b, c));
   }
   journeys_utils.journeyLinkData = b;
 };

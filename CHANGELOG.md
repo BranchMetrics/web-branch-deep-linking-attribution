@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.26.1] - 2017-08-31
+- added check to ensure Journey link data is valid JSON
+
 ## [2.26.0] - 2017-08-30
 - adds Journey Link data to event listeners
 
