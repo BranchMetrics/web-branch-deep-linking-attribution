@@ -758,8 +758,8 @@ utils.separateEventAndCustomData = function(eventAndCustomData) {
 	}
 
 	return {
-		custom_data: customData,
-		event_data: eventAndCustomData
+		"custom_data": customData,
+		"event_data": eventAndCustomData
 	};
 };
 
@@ -771,4 +771,21 @@ utils.validateParameterType = function(parameter, type) {
 		return Array.isArray(parameter);
 	}
 	return typeof parameter === type && !Array.isArray(parameter);
+};
+
+// Originally used by logEvent() to send fields related to user's visit and device
+// Requires a reference to the branch object
+utils.getUserData = function(branch) {
+	var user_data = {};
+	user_data = utils.addPropertyIfNotNull(user_data, "http_origin", document.URL);
+	user_data = utils.addPropertyIfNotNull(user_data, "user_agent", navigator.userAgent);
+	user_data = utils.addPropertyIfNotNull(user_data, "language", navigator.language);
+	user_data = utils.addPropertyIfNotNull(user_data, "screen_width", screen.width);
+	user_data = utils.addPropertyIfNotNull(user_data, "screen_height", screen.height);
+	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
+	user_data = utils.addPropertyIfNotNull(user_data, "identity_id", branch.identity_id);
+	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
+	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
+	user_data = utils.addPropertyIfNotNull(user_data, "sdk", branch.sdk);
+	return user_data;
 };

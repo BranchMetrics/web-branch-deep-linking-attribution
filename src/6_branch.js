@@ -1979,7 +1979,8 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	}
 	this._api(endpoint, {
 		"name": name,
-		"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['custom_data'] || {}),
+		"user_data": safejson.stringify(utils.getUserData(this)),
+		"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
 		"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
 		"content_items": safejson.stringify(contentItems || [])
 	}, function(err, data) {
