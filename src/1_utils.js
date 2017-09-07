@@ -192,7 +192,7 @@ utils.cleanLinkData = function(linkData) {
 				data = safejson.parse(data);
 			}
 			catch (e) {
-				data = {};
+				data = { '_bncNoEval': true };
 			}
 			break;
 		case 'object':
