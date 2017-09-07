@@ -373,17 +373,6 @@ Branch.prototype['init'] = wrap(
 			);
 		};
 
-		var checkForMicroData = function() {
-			var pageHasMicroData = false;
-			try {
-				pageHasMicroData = !!((document.querySelectorAll('*[itemtype^="http://schema.org"]')||[]).length);
-			}
-			catch (err) {
-				pageHasMicroData = false;
-			}
-			return pageHasMicroData;
-		};
-
 		var finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
@@ -410,7 +399,6 @@ Branch.prototype['init'] = wrap(
 					"url": url,
 					"user_agent": navigator.userAgent,
 					"language": navigator.language,
-					"page_has_microdata": checkForMicroData(),
 					"screen_width": screen.width || -1,
 					"screen_height": screen.height || -1
 				}, additionalMetadata || {}),
