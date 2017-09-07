@@ -137,7 +137,7 @@ utils.whiteListJourneysLanguageData = function(sessionData) {
 				data = safejson.parse(data);
 			}
 			catch (e) {
-				data = goog.json.parse(data);
+				data = {};
 			}
 			break;
 		case 'object':
@@ -192,7 +192,7 @@ utils.cleanLinkData = function(linkData) {
 				data = safejson.parse(data);
 			}
 			catch (e) {
-				data = goog.json.parse(data);
+				data = {};
 			}
 			break;
 		case 'object':
