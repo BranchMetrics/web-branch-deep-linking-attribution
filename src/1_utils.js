@@ -773,8 +773,8 @@ utils.validateParameterType = function(parameter, type) {
 	return typeof parameter === type && !Array.isArray(parameter);
 };
 
-// Originally used by logEvent() to send fields related to user's visit and device
-// Requires a reference to the branch object
+// Used by logEvent() to send fields related to user's visit and device to v2/event standard and custom
+// Requires a reference to the branch object to access information such as browser_fingerprint_id
 utils.getUserData = function(branch) {
 	var user_data = {};
 	user_data = utils.addPropertyIfNotNull(user_data, "http_origin", document.URL);
