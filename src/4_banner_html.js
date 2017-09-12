@@ -32,7 +32,7 @@ banner_html.banner = function(options, action) {
 									var stars = "";
 									for (var i = 0; i < 5; i++) {
 										stars += '<span class="star">' +
-												'<svg class="star" fill="#555555" height="12" viewBox="3 2 20 19" width="12" xmlns="http://www.w3.org/2000/svg">' +
+												'<svg class="star" fill="#555555" height="12" viewBox="3 2 20 19" width="12">' +
 												'<path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/>' +
 												'<path d="M0 0h24v24H0z" fill="none"/>' +
 												'<foreignObject display="none">' +
@@ -42,7 +42,7 @@ banner_html.banner = function(options, action) {
 										if (options.rating > i) {
 											stars += (i + 1 > options.rating && options.rating % 1) ?
 												'<span class="half">' +
-													'<svg fill="#555555" height="12" viewBox="3 2 20 19" width="12" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+													'<svg fill="#555555" height="12" viewBox="3 2 20 19" width="12">' +
 													'<defs>' +
 													'<path d="M0 0h24v24H0V0z" id="a"/>' +
 													'</defs>' +
@@ -117,8 +117,7 @@ banner_html.checkmark = function() {
 		return '<span class="checkmark">&#x2713;</span>';
 	}
 	else {
-		return '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' +
-			' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.5 98.5"' +
+		return '<svg version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 98.5 98.5"' +
 			' enable-background="new 0 0 98.5 98.5" xml:space="preserve">' +
 			'<path class="checkmark" fill="none" stroke-width="8" stroke-miterlimit="10"' +
 			' d="M81.7,17.8C73.5,9.3,62,4,49.2,4' +

@@ -4,6 +4,16 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.27.0] - 2017-09-08
+- Removes eval() call from compiled SDK
+- Removes xmlns attribute from SVG tags
+
+## [2.26.1] - 2017-08-31
+- added check to ensure Journey link data is valid JSON
+
+## [2.26.0] - 2017-08-30
+- adds Journey Link data to event listeners
+
 ## [v2.25.2] - 2017-08-11
 - Adds additional error logging
 
