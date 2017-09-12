@@ -804,7 +804,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * @param {Array} content_items - _optional_
  * @param {function(?Error)=} callback - _optional_
  *
- * Register commerce events, content events, user lifecycle events and custom events via logEvent().
+ * Register commerce events, content events, user lifecycle events and custom events via logEvent()
+ *
  * The guides below provide information about what keys can be sent when triggering these event types:
  *
  * - [Logging Commerce Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-commerce-events)
@@ -814,7 +815,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *
  * Notes:
  * - logEvent() sends user_data automatically so there is no need to manually provide this data
- * - event_data and custom_data is merged within the same object
+ * - Provide event_data and custom_data as part of the same object
  *
  * ##### Usage
  * ```js
