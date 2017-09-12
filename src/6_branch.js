@@ -798,6 +798,131 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 });
 
 /**
+ * @function Branch.logEvent
+ * @param {String} event - _required_
+ * @param {Object} event_data_and_custom_data - _optional_
+ * @param {Array} content_items - _optional_
+ * @param {function(?Error)=} callback - _optional_
+ *
+ * Register commerce events, content events, user lifecycle events and custom events via logEvent().
+ * The guides below provide information about what keys can be sent when triggering these event types:
+ *
+ * - [Logging Commerce Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-commerce-events)
+ * - [Logging Content Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-content-events)
+ * - [Logging User Lifecycle](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-user-lifecycle-events)
+ * - [Logging Custom Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-custom-events)
+ *
+ * Notes:
+ * - logEvent() sends user_data automatically so there is no need to manually provide this data
+ * - event_data and custom_data is merged within the same object
+ *
+ * ##### Usage
+ * ```js
+ * branch.logEvent(
+ *     event,
+ *     event_data_and_custom_data,
+ *     content_items,
+ *     callback (err)
+ * );
+ * ```
+ * ##### Example
+ * ```js
+ *var event_and_custom_data = {
+ *    "transaction_id": "tras_Id_1232343434",
+ *    "currency": "USD",
+ *    "revenue": 180.2,
+ *    "shipping": 10.5,
+ *    "tax": 13.5,
+ *    "coupon": "promo-1234",
+ *    "affiliation": "high_fi",
+ *    "description": "Preferred purchase",
+ *    "purchase_loc": "Palo Alto",
+ *    "store_pickup": "unavailable"
+ *};
+ *
+ *var content_items = [
+ *{
+ *    "$content_schema": "COMMERCE_PRODUCT",
+ *    "$og_title": "Nike Shoe",
+ *    "$og_description": "Start loving your steps",
+ *    "$og_image_url": "http://example.com/img1.jpg",
+ *    "$canonical_identifier": "nike/1234",
+ *    "$publicly_indexable": false,
+ *    "$price": 101.2,
+ *    "$locally_indexable": true,
+ *    "$quantity": 1,
+ *    "$sku": "1101123445",
+ *    "$product_name": "Runner",
+ *    "$product_brand": "Nike",
+ *    "$product_category": "Sporting Goods",
+ *    "$product_variant": "XL",
+ *    "$rating_average": 4.2,
+ *    "$rating_count": 5,
+ *    "$rating_max": 2.2,
+ *    "$creation_timestamp": 1499892854966,
+ *    "$exp_date": 1499892854966,
+ *    "$keywords": [ "sneakers", "shoes" ],
+ *    "$address_street": "230 South LaSalle Street",
+ *    "$address_city": "Chicago",
+ *    "$address_region": "IL",
+ *    "$address_country": "US",
+ *    "$address_postal_code": "60604",
+ *    "$latitude": 12.07,
+ *    "$longitude": -97.5,
+ *    "$image_captions": [ "my_img_caption1", "my_img_caption_2" ],
+ *    "$condition": "NEW",
+ *    "$custom_fields": "{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}"
+ *},
+ *{
+ *    "$og_title": "Nike Woolen Sox",
+ *    "$canonical_identifier": "nike/5324",
+ *    "$og_description": "Fine combed woolen sox for those who love your foot",
+ *    "$publicly_indexable": false,
+ *    "$price": 80.2,
+ *    "$locally_indexable": true,
+ *    "$quantity": 5,
+ *    "$sku": "110112467",
+ *    "$product_name": "Woolen Sox",
+ *    "$product_brand": "Nike",
+ *    "$product_category": "Apparel & Accessories",
+ *    "$product_variant": "Xl",
+ *    "$rating_average": 3.3,
+ *    "$rating_count": 5,
+ *    "$rating_max": 2.8,
+ *    "$creation_timestamp": 1499892854966
+ *}];
+ *
+ *branch.logEvent(
+ *    "PURCHASE",
+ *    event_and_custom_data,
+ *    content_items,
+ *    function(err) { console.log(err); }
+ *);
+ * ```
+ * ___
+ */
+/*** +TOC_ITEM #logevent-callback &.logEvent()& ^ALL ***/
+Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventAndCustomData, contentItems) {
+	name = utils.validateParameterType(name, 'string') ? name : null;
+	eventAndCustomData = utils.validateParameterType(eventAndCustomData, 'object') ? eventAndCustomData : null;
+	contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
+	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventAndCustomData);
+	var endpoint = resources.logCustomEvent;
+	if (utils.isStandardEvent(name)) {
+		endpoint = resources.logStandardEvent;
+	}
+	this._api(endpoint, {
+		"name": name,
+		"user_data": safejson.stringify(utils.getUserData(this)),
+		"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
+		"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
+		"content_items": safejson.stringify(contentItems || [])
+	}, function(err, data) {
+		return done(err || null);
+	});
+});
+
+/**
  * @function Branch.link
  * @param {Object} data - _required_ - link data and metadata.
  * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep
@@ -1965,26 +2090,5 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 	});
 	done();
 });
-/*
- logEvent() documentation
- */
-Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventAndCustomData, contentItems) {
-	name = utils.validateParameterType(name, 'string') ? name : null;
-	eventAndCustomData = utils.validateParameterType(eventAndCustomData, 'object') ? eventAndCustomData : null;
-	contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
-	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventAndCustomData);
-	var endpoint = resources.logCustomEvent;
-	if (utils.isStandardEvent(name)) {
-		endpoint = resources.logStandardEvent;
-	}
-	this._api(endpoint, {
-		"name": name,
-		"user_data": safejson.stringify(utils.getUserData(this)),
-		"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
-		"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
-		"content_items": safejson.stringify(contentItems || [])
-	}, function(err, data) {
-		return done(err || null);
-	});
-});
+
 
