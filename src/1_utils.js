@@ -734,9 +734,21 @@ utils.getAdditionalMetadata = function() {
 	return metadata && Object.keys(metadata).length > 0 ? metadata : null;
 };
 
+utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
+	if (objectToModify && typeof objectToModify === "object" && !Array.isArray(objectToModify) &&
+		Object.keys(objectToModify).length > 0 && keysToRemove && Array.isArray(keysToRemove) &&
+		keysToRemove.length > 0) {
+		for (var key in objectToModify) {
+			if (objectToModify.hasOwnProperty(key) && keysToRemove.indexOf(key) > -1) {
+				delete objectToModify[key];
+			}
+		}
+	}
+};
+
 // v2/event utility functions
 
-var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_CONTENT', 'VIEW_CONTENT_LIST', 'RATE', 'SHARE_CONTENT', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENTS' ];
+var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_ITEM', 'VIEW_ITEMS', 'RATE', 'SHARE', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENTS' ];
 var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description', 'product_categories' ];
 
 utils.isStandardEvent = function(eventName) {
@@ -789,3 +801,4 @@ utils.getUserData = function(branch) {
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk", branch.sdk);
 	return user_data;
 };
+

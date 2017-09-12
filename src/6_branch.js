@@ -814,7 +814,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * - [Logging Custom Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-custom-events)
  *
  * Notes:
- * - logEvent() sends user_data automatically so there is no need to manually provide this data
+ * - logEvent() sends user_data automatically so there is no need to manually send this data
  * - Provide event_data and custom_data as part of the same object
  *
  * ##### Usage
