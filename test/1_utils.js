@@ -544,8 +544,7 @@ describe('utils', function() {
 				"coupon": "8891701",
 				"affiliation": "xyz_affiliation",
 				"search_query": "boat shoes sperrys",
-				"description": "Sperry Authentic Original",
-				"product_categories": "Apparel & Accessories"
+				"description": "Sperry Authentic Original"
 			};
 
 			var custom_data = {

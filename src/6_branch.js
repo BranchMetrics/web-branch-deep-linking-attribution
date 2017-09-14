@@ -891,11 +891,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * ___
  */
 /*** +TOC_ITEM #logevent-callback &.logEvent()& ^ALL ***/
-Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventAndCustomData, contentItems) {
+Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventData, contentItems) {
 	name = utils.validateParameterType(name, 'string') ? name : null;
-	eventAndCustomData = utils.validateParameterType(eventAndCustomData, 'object') ? eventAndCustomData : null;
+	eventData = utils.validateParameterType(eventData, 'object') ? eventData : null;
 	contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
-	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventAndCustomData);
+	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
 	var endpoint = resources.logCustomEvent;
 	if (utils.isStandardEvent(name)) {
 		endpoint = resources.logStandardEvent;
