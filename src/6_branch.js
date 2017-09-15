@@ -768,7 +768,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 	options = options || {};
 
 	if (event === "pageview") {
-		// For targeting Journeys based on hosted deep link data
+		// Provides a way to target Journeys based on hosted deep link data
 		metadata = utils.addPropertyIfNotNull(metadata, "hosted_deeplink_data", utils.getHostedDeepLinkData());
 	}
 
