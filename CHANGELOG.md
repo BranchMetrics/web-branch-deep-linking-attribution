@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.27.1] - 2017-09-15
+- Removes an additional xmlns attribute from SVG tag
+
 ## [2.27.0] - 2017-09-08
 - Removes eval() call from compiled SDK
 - Removes xmlns attribute from SVG tags
