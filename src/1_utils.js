@@ -73,11 +73,11 @@ utils.bannerThemes = [
  * Getters for location.search and location.hash, so that we can stub this for testing
  */
 utils.getLocationSearch = function() {
-	return window.location.search;
+	return window.top.location.search;
 };
 
 utils.getLocationHash = function() {
-	return window.location.hash;
+	return window.top.location.hash;
 };
 
 /**
@@ -162,7 +162,7 @@ utils.whiteListJourneysLanguageData = function(sessionData) {
  * Abstract away the window.location for better testing
  */
 utils.getWindowLocation = function() {
-	return String(window.location);
+	return utils.is_iframe ? document.referrer : String(window.location);
 };
 
 /**
@@ -745,3 +745,8 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 		}
 	}
 };
+
+utils.is_iframe = function() {
+	return window.self !== window.top;
+};
+

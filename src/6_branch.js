@@ -392,7 +392,6 @@ Branch.prototype['init'] = wrap(
 			}
 
 			var additionalMetadata = utils.getAdditionalMetadata();
-
 			self._api(resources.event, {
 				"event": 'pageview',
 				"metadata": utils.merge({
@@ -775,7 +774,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 	self._api(resources.event, {
 		"event": event,
 		"metadata": utils.merge({
-			"url": document.URL,
+			"url": utils.getWindowLocation(),
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
 		}, metadata),
@@ -1165,7 +1164,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 });
 
 Branch.prototype._windowRedirect = function(url) {
-	window.location = url;
+	window.top.location = url;
 };
 
 /**
