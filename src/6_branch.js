@@ -1104,6 +1104,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	}
 
 	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
+	data = utils.is_iframe() ? utils.merge({ 'is_iframe': true }, data) : data;
 
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;

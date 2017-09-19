@@ -168,9 +168,9 @@ function compileRequestData(branch, makeNewLink, openApp) {
 
 	requestData['data'] = utils.merge(utils.getHostedDeepLinkData(), requestData['data']);
 	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
-	requestData['data'] = linkClickId ? utils.merge({'link_click_id': linkClickId}, requestData['data']) : requestData['data'];
+	requestData['data'] = linkClickId ? utils.merge({ 'link_click_id': linkClickId }, requestData['data']) : requestData['data'];
 	requestData = utils.merge({ 'open_app': openApp }, requestData);
-	requestData = utils.is_iframe() ? utils.merge({'is_iframe': true}, requestData) : requestData;
+	requestData = utils.is_iframe() ? utils.merge({ 'is_iframe': true }, requestData) : requestData;
 	return requestData;
 }
 
