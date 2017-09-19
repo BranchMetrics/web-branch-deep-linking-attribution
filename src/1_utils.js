@@ -162,7 +162,7 @@ utils.whiteListJourneysLanguageData = function(sessionData) {
  * Abstract away the window.location for better testing
  */
 utils.getWindowLocation = function() {
-	return utils.is_iframe ? document.referrer : String(window.location);
+	return utils.is_iframe() ? document.referrer : String(window.location);
 };
 
 /**
