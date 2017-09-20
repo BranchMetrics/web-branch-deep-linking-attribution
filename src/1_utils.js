@@ -746,29 +746,27 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 	}
 };
 
-// Helpful functions for iFrames
-
-// Checks if page loading the WebSDK is in an iFrame
+// Checks if page is in an iFrame
 utils.isIframe = function() {
 	return window.self !== window.top;
 };
 
-// Checks if the page loading the WebSDK is on the same domain as its top most window
+// Checks if page is on the same domain as its top most window
 // Will throw a cross-origin frame access error if it is not
 utils.isSameOriginFrame = function() {
-	var sameOriginTest = "true"; // required for minification
+	var sameOriginTest = "true"; // without this minification of function doesn't work correctly
 	try {
 		if (window.top.location.search) {
-			sameOriginTest = "true"; // required for minification
+			sameOriginTest = "true"; // without this minification of function doesn't work correctly
 		}
 	}
 	catch (err) {
 		return false;
 	}
-	return (sameOriginTest === "true"); // required for minification
+	return (sameOriginTest === "true"); // without this minification of function doesn't work correctly
 };
 
-// Checks if page loading WebSDK is in an iFrame and on the same domain as its top most window
+// Checks if page is in an iFrame and on the same domain as its top most window
 utils.isIframeAndFromSameOrigin = function() {
 	return utils.isIframe() && utils.isSameOriginFrame();
 };
