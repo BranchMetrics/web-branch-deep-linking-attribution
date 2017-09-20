@@ -73,11 +73,11 @@ utils.bannerThemes = [
  * Getters for location.search and location.hash, so that we can stub this for testing
  */
 utils.getLocationSearch = function() {
-	return window.top.location.search;
+	return utils.isIframeAndFromSameOrigin() ? window.top.location.search : window.location.search;
 };
 
 utils.getLocationHash = function() {
-	return window.top.location.hash;
+	return utils.isIframeAndFromSameOrigin() ? window.top.location.hash : window.location.hash;
 };
 
 /**
@@ -162,7 +162,7 @@ utils.whiteListJourneysLanguageData = function(sessionData) {
  * Abstract away the window.location for better testing
  */
 utils.getWindowLocation = function() {
-	return utils.is_iframe() ? document.referrer : String(window.location);
+	return utils.isIframe() ? document.referrer : String(window.location);
 };
 
 /**
@@ -746,7 +746,40 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 	}
 };
 
-utils.is_iframe = function() {
+// Helpful functions for iFrames
+
+// Checks if page loading the WebSDK is in an iFrame
+utils.isIframe = function() {
 	return window.self !== window.top;
+};
+
+// Checks if the page loading the WebSDK is on the same domain as its top most window
+// Will throw a cross-origin frame access error if it is not
+utils.isSameOriginFrame = function() {
+	var sameOriginTest = "true"; // required for minification
+	try {
+		if (window.top.location.search) {
+			sameOriginTest = "true"; // required for minification
+		}
+	}
+	catch (err) {
+		return false;
+	}
+	return (sameOriginTest === "true"); // required for minification
+};
+
+// Checks if page loading WebSDK is in an iFrame and on the same domain as its top most window
+utils.isIframeAndFromSameOrigin = function() {
+	return utils.isIframe() && utils.isSameOriginFrame();
+};
+
+utils.getInitialReferrer = function(referringLink) {
+	if (referringLink) {
+		return referringLink;
+	}
+	if (utils.isIframe()) {
+		return utils.isSameOriginFrame() ? window.top.document.referrer : "";
+	}
+	return document.referrer;
 };
 

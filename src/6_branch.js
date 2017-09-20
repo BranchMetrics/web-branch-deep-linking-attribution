@@ -401,7 +401,7 @@ Branch.prototype['init'] = wrap(
 					"screen_width": screen.width || -1,
 					"screen_height": screen.height || -1
 				}, additionalMetadata || {}),
-				"initial_referrer": document.referrer
+				"initial_referrer": utils.getInitialReferrer(self._referringLink())
 			}, function(err, eventData) {
 				if (!err && typeof eventData === 'object') {
 					branch_view.initJourney(branch_key, data, eventData, options, self);
@@ -452,6 +452,7 @@ Branch.prototype['init'] = wrap(
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
+			session.update(self._storage, { "referring_link": "" });
 			attachVisibilityEvent();
 			checkHasApp(finishInit);
 			return;
@@ -481,7 +482,7 @@ Branch.prototype['init'] = wrap(
 							"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
 							"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 							"options": options,
-							"initial_referrer": document.referrer
+							"initial_referrer": utils.getInitialReferrer(self._referringLink())
 						},
 						function(err, data) {
 							if (err) {
@@ -511,7 +512,7 @@ Branch.prototype['init'] = wrap(
 					"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
 					"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 					"options": options,
-					"initial_referrer": document.referrer
+					"initial_referrer": utils.getInitialReferrer(self._referringLink())
 				},
 				function(err, data) {
 					if (err) {
@@ -778,7 +779,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
 		}, metadata),
-		"initial_referrer": document.referrer
+		"initial_referrer": utils.getInitialReferrer(self._referringLink())
 	}, function(err, data) {
 		if (!err && typeof data === 'object' && event === 'pageview') {
 			branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
@@ -1104,7 +1105,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	}
 
 	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
-	data = utils.is_iframe() ? utils.merge({ 'is_iframe': true }, data) : data;
+	data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
 
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
@@ -1950,7 +1951,7 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 				"user_agent": navigator.userAgent,
 				"language": navigator.language
 			}, metadata || {}),
-			"initial_referrer": document.referrer,
+			"initial_referrer": utils.getInitialReferrer(self._referringLink()),
 			"commerce_data": commerce_data
 		}, function(err, data) {
 			done(err || null);
