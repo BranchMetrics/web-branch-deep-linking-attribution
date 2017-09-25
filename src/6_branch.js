@@ -252,6 +252,10 @@ Branch.prototype._publishEvent = function(event, data) {
  * | disable_entry_animation | *optional* - `boolean`. When true, prevents a Journeys entry animation.
  * | disable_exit_animation | *optional* - `boolean`. When true, prevents a Journeys exit animation.
  * | open_app | *optional* - `boolean`. Whether to try to open the app passively through Journeys (as opposed to opening it upon user clicking); defaults to false.
+ * | retries | *optional* - `integer`. Value specifying the number of times that a Branch API call can be re-attempted. Default 2.
+ * | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
+ * | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
+ *
  *
  * ##### Usage
  * ```js
@@ -297,6 +301,9 @@ Branch.prototype['init'] = wrap(
 		}
 
 		options = (options && typeof options === 'function') ? { } : options;
+		utils.retries = options && options['retries'] && Number.isInteger(options['retries']) ? options['retries'] : utils.retries;
+		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
+		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
 
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {

@@ -108,7 +108,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 					function() {
 						window[callbackString] = function() { };
 					},
-					TIMEOUT
+					utils.timeout
 				);
 
 				window[callbackString] = function(data) {
