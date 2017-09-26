@@ -139,7 +139,7 @@ function buildJourneyTestData(branchViewId, branch_key, data){
 	return {
 		id: branchViewId,
 		number_of_use: -1,
-		url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data.browser_fingerprint_id)
+		url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data['browser_fingerprint_id'])
 	}
 }
 
