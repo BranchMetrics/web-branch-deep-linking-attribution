@@ -162,13 +162,13 @@ var cookies = function(perm) {
 			return returnCookieObject;
 		},
 		get: function(key) {
-			var keyEQ = prefix(key) + '=';
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i];
-				cookie = cookie.substring(1, cookie.length);
-				if (cookie.indexOf(keyEQ) === 0) {
-					return retrieveValue(cookie.substring(keyEQ.length, cookie.length));
+				var cookie = cookieArray[i].trim();
+				var firstEqualSign = cookie.indexOf("=");
+				var cookieName = cookie.substring(0, firstEqualSign);
+				if (key === cookieName) {
+					return cookie.substring(firstEqualSign + 1, cookie.length);
 				}
 			}
 			return null;
