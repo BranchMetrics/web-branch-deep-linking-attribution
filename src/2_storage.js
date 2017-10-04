@@ -136,32 +136,34 @@ BranchStorage.prototype['session'] = function() {
 	return webStorage(false);
 };
 
-var cookies = function(perm) {
+var cookies = function() {
 	var setCookie = function(key, value) {
-		var expires = '';
-		if (perm) {
-			var date = new Date();
-			date.setTime(date.getTime() + COOKIE_MS);
-			expires = '; branch_expiration_date=' + date.toGMTString() +
-				'; expires=' + date.toGMTString();
+		document.cookie = key + '=' + value + '; path=/';
+	};
+	var removeCookie = function(key, ignorePrefix) {
+		var expires = 'Thu, 01 Jan 1970 00:00:01 GMT';
+		if (ignorePrefix) {
+			document.cookie = key + '=; expires=' + expires + '; path=/';
 		}
-		document.cookie = key + '=' + value + expires + '; path=/';
+		else {
+			document.cookie = prefix(key) + '=; expires=' + expires + '; path=/';
+		}
 	};
 	return {
 		getAll: function() {
-			var cookieArray = document.cookie.split(';');
 			var returnCookieObject = { };
+			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i].replace(' ', '');
-				cookie = cookie.substring(0, cookie.length);
-				if (cookie.indexOf(BRANCH_KEY_PREFIX) !== -1) {
-					var splitCookie = cookie.split('=');
-					returnCookieObject[trimPrefix(splitCookie[0])] = retrieveValue(splitCookie[1]);
-				}
+				var cookie = cookieArray[i].trim();
+				var firstEqualSign = cookie.indexOf("=");
+				var cookieName = trimPrefix(cookie.substring(0, firstEqualSign));
+				var cookieValue = cookie.substring(firstEqualSign + 1, cookie.length);
+				returnCookieObject[cookieName] = cookieValue;
 			}
 			return returnCookieObject;
 		},
 		get: function(key) {
+			key = prefix(key);
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
 				var cookie = cookieArray[i].trim();
@@ -177,25 +179,15 @@ var cookies = function(perm) {
 			setCookie(prefix(key), value);
 		},
 		remove: function(key) {
-			var expires = '';
-			document.cookie = prefix(key) + '=; expires=' + expires + '; path=/';
+			removeCookie(key, false);
 		},
 		clear: function() {
-			var deleteCookie = function(cookie) {
-				document.cookie = cookie.substring(0, cookie.indexOf('=')) + '=;expires=-1;path=/';
-			};
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i];
-				cookie = cookie.substring(1, cookie.length);
-				if (cookie.indexOf(BRANCH_KEY_PREFIX) !== -1) {
-					if (!perm && cookie.indexOf('branch_expiration_date=') === -1) {
-						deleteCookie(cookie);
-					}
-					else if (perm && cookie.indexOf('branch_expiration_date=') > 0) {
-						deleteCookie(cookie);
-					}
-				}
+				var cookie = cookieArray[i].trim();
+				var firstEqualSign = cookie.indexOf("=");
+				var cookieName = cookie.substring(0, firstEqualSign);
+				removeCookie(cookieName, true);
 			}
 		},
 		isEnabled: function() {
@@ -205,11 +197,7 @@ var cookies = function(perm) {
 };
 
 BranchStorage.prototype['cookie'] = function() {
-	return cookies(false);
-};
-
-BranchStorage.prototype['permcookie'] = function() {
-	return cookies(true);
+	return cookies();
 };
 
 /** @type storage */
