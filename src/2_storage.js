@@ -54,6 +54,23 @@ var retrieveValue = function(value) {
 	return value;
 };
 
+var hasBranchPrefix = function(key) {
+	return key.indexOf(BRANCH_KEY_PREFIX) === 0;
+};
+
+var isBranchCookie = function(key) {
+	return key === 'branch_session' || key === 'branch_session_first' || hasBranchPrefix(key);
+};
+
+var processCookie = function(row) {
+	var cookie = row.trim();
+	var firstEqualSign = cookie.indexOf("=");
+	return {
+		name: cookie.substring(0, firstEqualSign),
+		value: retrieveValue(cookie.substring(firstEqualSign + 1, cookie.length))
+	};
+};
+
 var webStorage = function(perm) {
 	var storageMethod;
 	try {
@@ -140,25 +157,22 @@ var cookies = function() {
 	var setCookie = function(key, value) {
 		document.cookie = key + '=' + value + '; path=/';
 	};
-	var removeCookie = function(key, ignorePrefix) {
+	var removeCookie = function(key, addPrefix) {
 		var expires = 'Thu, 01 Jan 1970 00:00:01 GMT';
-		if (ignorePrefix) {
-			document.cookie = key + '=; expires=' + expires + '; path=/';
+		if (addPrefix) {
+			key = prefix(key);
 		}
-		else {
-			document.cookie = prefix(key) + '=; expires=' + expires + '; path=/';
-		}
+		document.cookie = key + '=; expires=' + expires + '; path=/';
 	};
 	return {
 		getAll: function() {
 			var returnCookieObject = { };
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i].trim();
-				var firstEqualSign = cookie.indexOf("=");
-				var cookieName = trimPrefix(cookie.substring(0, firstEqualSign));
-				var cookieValue = cookie.substring(firstEqualSign + 1, cookie.length);
-				returnCookieObject[cookieName] = cookieValue;
+				var cookie = processCookie(cookieArray[i]);
+				if (cookie && cookie.hasOwnProperty('name') && cookie.hasOwnProperty('value') && isBranchCookie(cookie['name'])) {
+					returnCookieObject[trimPrefix(cookie['name'])] = cookie['value'];
+				}
 			}
 			return returnCookieObject;
 		},
@@ -166,11 +180,9 @@ var cookies = function() {
 			key = prefix(key);
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i].trim();
-				var firstEqualSign = cookie.indexOf("=");
-				var cookieName = cookie.substring(0, firstEqualSign);
-				if (key === cookieName) {
-					return cookie.substring(firstEqualSign + 1, cookie.length);
+				var cookie = processCookie(cookieArray[i]);
+				if (cookie && cookie.hasOwnProperty('name') && cookie.hasOwnProperty('value') && cookie['name'] === key) {
+					return cookie['value'];
 				}
 			}
 			return null;
@@ -179,15 +191,15 @@ var cookies = function() {
 			setCookie(prefix(key), value);
 		},
 		remove: function(key) {
-			removeCookie(key, false);
+			removeCookie(key, true);
 		},
 		clear: function() {
 			var cookieArray = document.cookie.split(';');
 			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i].trim();
-				var firstEqualSign = cookie.indexOf("=");
-				var cookieName = cookie.substring(0, firstEqualSign);
-				removeCookie(cookieName, true);
+				var cookie = processCookie(cookieArray[i]);
+				if (cookie && cookie.hasOwnProperty('name') && isBranchCookie(cookie['name'])) {
+					removeCookie(cookie['name'], false);
+				}
 			}
 		},
 		isEnabled: function() {
