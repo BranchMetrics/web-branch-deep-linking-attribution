@@ -10,12 +10,6 @@ goog.require('goog.json');
 goog.require('storage'); // jshint unused:false
 goog.require('safejson');
 
-/*globals Ti */
-
-var RETRIES = 2;
-var RETRY_DELAY = 200;
-var TIMEOUT = 5000;
-
 /**
  * @class Server
  * @constructor
@@ -214,7 +208,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 			window[callbackString] = function() { };
 			callback(new Error(utils.messages.timeout), null, 504);
 		},
-		TIMEOUT
+		utils.timeout
 	);
 
 	window[callbackString] = function(data) {
@@ -297,7 +291,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 
 	try {
 		req.open(method, url, true);
-		req.timeout = TIMEOUT;
+		req.timeout = utils.timeout;
 		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		req.send(data);
 	}
@@ -337,7 +331,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	}
 
 	// How many times to retry the request if the initial attempt fails
-	var retries = RETRIES;
+	var retries = utils.retries;
 	// If request fails, retry after X miliseconds
 	/***
 	 * @type {function(?Error,*=): ?undefined}
@@ -347,7 +341,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 			retries--;
 			window.setTimeout(function() {
 				makeRequest();
-			}, RETRY_DELAY);
+			}, utils.retry_delay);
 		}
 		else {
 			callback(err, data);
