@@ -252,6 +252,10 @@ Branch.prototype._publishEvent = function(event, data) {
  * | disable_entry_animation | *optional* - `boolean`. When true, prevents a Journeys entry animation.
  * | disable_exit_animation | *optional* - `boolean`. When true, prevents a Journeys exit animation.
  * | open_app | *optional* - `boolean`. Whether to try to open the app passively through Journeys (as opposed to opening it upon user clicking); defaults to false.
+ * | retries | *optional* - `integer`. Value specifying the number of times that a Branch API call can be re-attempted. Default 2.
+ * | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
+ * | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
+ *
  *
  * ##### Usage
  * ```js
@@ -297,6 +301,9 @@ Branch.prototype['init'] = wrap(
 		}
 
 		options = (options && typeof options === 'function') ? { } : options;
+		utils.retries = options && options['retries'] && Number.isInteger(options['retries']) ? options['retries'] : utils.retries;
+		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
+		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
 
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {
@@ -392,7 +399,6 @@ Branch.prototype['init'] = wrap(
 			}
 
 			var additionalMetadata = utils.getAdditionalMetadata();
-
 			self._api(resources.event, {
 				"event": 'pageview',
 				"metadata": utils.merge({
@@ -402,7 +408,7 @@ Branch.prototype['init'] = wrap(
 					"screen_width": screen.width || -1,
 					"screen_height": screen.height || -1
 				}, additionalMetadata || {}),
-				"initial_referrer": document.referrer
+				"initial_referrer": utils.getInitialReferrer(self._referringLink())
 			}, function(err, eventData) {
 				if (!err && typeof eventData === 'object') {
 					branch_view.initJourney(branch_key, data, eventData, options, self);
@@ -453,6 +459,7 @@ Branch.prototype['init'] = wrap(
 		if (sessionData && sessionData['session_id'] && !link_identifier) {
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
+			session.update(self._storage, { "referring_link": "" });
 			attachVisibilityEvent();
 			checkHasApp(finishInit);
 			return;
@@ -482,7 +489,7 @@ Branch.prototype['init'] = wrap(
 							"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
 							"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 							"options": options,
-							"initial_referrer": document.referrer
+							"initial_referrer": utils.getInitialReferrer(self._referringLink())
 						},
 						function(err, data) {
 							if (err) {
@@ -512,7 +519,7 @@ Branch.prototype['init'] = wrap(
 					"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
 					"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 					"options": options,
-					"initial_referrer": document.referrer
+					"initial_referrer": utils.getInitialReferrer(self._referringLink())
 				},
 				function(err, data) {
 					if (err) {
@@ -767,14 +774,19 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 
 	options = options || {};
 
+	if (event === "pageview") {
+		// Provides a way to target Journeys based on hosted deep link data
+		metadata = utils.addPropertyIfNotNull(metadata, "hosted_deeplink_data", utils.getHostedDeepLinkData());
+	}
+
 	self._api(resources.event, {
 		"event": event,
 		"metadata": utils.merge({
-			"url": document.URL,
+			"url": utils.getWindowLocation(),
 			"user_agent": navigator.userAgent,
 			"language": navigator.language
 		}, metadata),
-		"initial_referrer": document.referrer
+		"initial_referrer": utils.getInitialReferrer(self._referringLink())
 	}, function(err, data) {
 		if (!err && typeof data === 'object' && event === 'pageview') {
 			branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
@@ -1226,6 +1238,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	}
 
 	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
+	data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
 
 	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
 	var first = true;
@@ -1286,7 +1299,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 });
 
 Branch.prototype._windowRedirect = function(url) {
-	window.location = url;
+	window.top.location = url;
 };
 
 /**
@@ -2071,7 +2084,7 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 				"user_agent": navigator.userAgent,
 				"language": navigator.language
 			}, metadata || {}),
-			"initial_referrer": document.referrer,
+			"initial_referrer": utils.getInitialReferrer(self._referringLink()),
 			"commerce_data": commerce_data
 		}, function(err, data) {
 			done(err || null);

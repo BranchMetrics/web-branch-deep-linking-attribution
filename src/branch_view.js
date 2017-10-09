@@ -108,7 +108,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 					function() {
 						window[callbackString] = function() { };
 					},
-					TIMEOUT
+					utils.timeout
 				);
 
 				window[callbackString] = function(data) {
@@ -139,7 +139,7 @@ function buildJourneyTestData(branchViewId, branch_key, data){
 	return {
 		id: branchViewId,
 		number_of_use: -1,
-		url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data.browser_fingerprint_id)
+		url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data['browser_fingerprint_id'])
 	}
 }
 
@@ -168,8 +168,9 @@ function compileRequestData(branch, makeNewLink, openApp) {
 
 	requestData['data'] = utils.merge(utils.getHostedDeepLinkData(), requestData['data']);
 	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
-	requestData['data'] = linkClickId ? utils.merge({'link_click_id': linkClickId}, requestData['data']) : requestData['data'];
+	requestData['data'] = linkClickId ? utils.merge({ 'link_click_id': linkClickId }, requestData['data']) : requestData['data'];
 	requestData = utils.merge({ 'open_app': openApp }, requestData);
+	requestData = utils.isIframe() ? utils.merge({ 'is_iframe': true }, requestData) : requestData;
 	return requestData;
 }
 

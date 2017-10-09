@@ -590,25 +590,43 @@ describe('utils', function() {
 			var type1 = "object";
 			var type2 = "array";
 			var type3 = "string";
-			var type4 = "array";
 			assert.strictEqual(false,
 				utils.validateParameterType(null, type1),
 				'should return false');
 			assert.strictEqual(false,
 				utils.validateParameterType(parameter1, null),
 				'should return false');
+
 			assert.strictEqual(true,
 				utils.validateParameterType(parameter1, type1),
 				'should return true');
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter1, type2),
+				'should return false');
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter1, type3),
+				'should return false');
+
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter2, type1),
+				'should return false');
 			assert.strictEqual(true,
 				utils.validateParameterType(parameter2, type2),
 				'should return true');
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter2, type3),
+				'should return false');
+
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter3, type1),
+				'should return false');
+			assert.strictEqual(false,
+				utils.validateParameterType(parameter3, type2),
+				'should return false');
 			assert.strictEqual(true,
 				utils.validateParameterType(parameter3, type3),
 				'should return true');
-			assert.strictEqual(false,
-				utils.validateParameterType(parameter1, type4),
-				'should return false');
+
 		});
 	});
 });
