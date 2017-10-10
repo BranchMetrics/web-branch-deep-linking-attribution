@@ -395,10 +395,10 @@ describe('utils', function() {
 		});
 		it('should find applink and branch hosted data on page', function() {
 			var expected = {
-				productId: '1234',
-				productName: 'shoes',
-				$ios_deeplink_path: 'monster/view/ios',
-				$android_deeplink_path: 'monster/view/android'
+				watch_brand: 'Hamilton',
+				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
+				$ios_deeplink_path: 'applinks/hamilton/khaki/iphone',
+				$android_deeplink_path: 'applinks/hamilton/khaki/android'
 			};
 			assert.deepEqual(
 				expected,

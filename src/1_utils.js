@@ -546,12 +546,19 @@ utils.getOpenGraphContent = function(property, content) {
 
 /**
  * Search for hosted deep link data on the page, as outlined here https://dev.branch.io/getting-started/hosted-deep-link-data/guide/#adding-metatags-to-your-site
- * Also searches for applink tags, i.e. <meta property="al:ios:url" content="applinks://docs" />
+ * Also searches for twitter and applinks tags, i.e. <meta property="al:ios:url" content="applinks://docs" />, <meta name="twitter:app:url:googleplay" content="twitter://docs">
  */
 utils.getHostedDeepLinkData = function() {
 	var params = {};
 	var metas = document.getElementsByTagName('meta');
-
+	var deeplinkPaths = { // keeps track of various deeplink paths encountered when parsing page's meta tags
+		'hostedIOS': null,
+		'hostedAndroid': null,
+		'applinksIOS': null,
+		'applinksAndroid': null,
+		'twitterIOS': null,
+		'twitterAndroid': null
+	};
 	for (var i = 0; i < metas.length; i++) {
 		if (!metas[i].getAttribute('name') && !metas[i].getAttribute('property') || !metas[i].getAttribute('content')) {
 			continue;
@@ -559,24 +566,66 @@ utils.getHostedDeepLinkData = function() {
 
 		var name = metas[i].getAttribute('name');
 		var property = metas[i].getAttribute('property');
-		// name takes precendence over propery
+		// name takes precedence over property
 		var nameOrProperty = name || property;
 
-		if (nameOrProperty === 'al:ios:url') {
-			params['$ios_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
-		}
-		else if (nameOrProperty === 'al:android:url') {
-			params['$android_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
-		}
-		else {
-			var split = nameOrProperty.split(':');
+		var split = nameOrProperty.split(':');
 
-			if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
+		if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
+			if (split[2] === '$ios_deeplink_path') { // Deeplink path detected from hosted deep link data
+				deeplinkPaths['hostedIOS'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+			}
+			else if (split[2] === '$android_deeplink_path') {
+				deeplinkPaths['hostedAndroid'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+			}
+			else { // Add all other hosted deeplink data key/values to params without needing special treatment
 				params[split[2]] = metas[i].getAttribute('content');
 			}
 		}
+		if (nameOrProperty === 'al:ios:url') { // Deeplink path detected from App Links meta tag
+			deeplinkPaths['applinksIOS'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+		if (nameOrProperty === 'twitter:app:url:iphone') { // Deeplink path detected from Twitter meta tag
+			deeplinkPaths['twitterIOS'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+		if (nameOrProperty === 'al:android:url') {
+			deeplinkPaths['applinksAndroid'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+		if (nameOrProperty === 'twitter:app:url:googleplay') {
+			deeplinkPaths['twitterAndroid'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
+		}
+	}
+	/* Prioritize deeplink path from:
+	*  1. Hosted deeplink data
+	*  2. App Links meta tag
+	*  3. Then Twitter meta tag
+	*/
+	if (deeplinkPaths['hostedIOS']) {
+		params['$ios_deeplink_path'] = deeplinkPaths['hostedIOS'];
+	}
+	else if (deeplinkPaths['applinksIOS']) {
+		params['$ios_deeplink_path'] = deeplinkPaths['applinksIOS'];
+	}
+	else if (deeplinkPaths['twitterIOS']) {
+		params['$ios_deeplink_path'] = deeplinkPaths['twitterIOS'];
 	}
 
+	if (deeplinkPaths['hostedAndroid']) {
+		params['$android_deeplink_path'] = deeplinkPaths['hostedAndroid'];
+	}
+	else if (deeplinkPaths['applinksAndroid']) {
+		params['$android_deeplink_path'] = deeplinkPaths['applinksAndroid'];
+	}
+	else if (deeplinkPaths['twitterAndroid']) {
+		params['$android_deeplink_path'] = deeplinkPaths['twitterAndroid'];
+	}
+
+	// If $ios_deeplink_path and $android_deeplink_path are the same, set a $deeplink_path as well
+	if (params.hasOwnProperty('$ios_deeplink_path') &&
+		params.hasOwnProperty('$android_deeplink_path') &&
+		params['$ios_deeplink_path'] === params['$android_deeplink_path']) {
+		params['$deeplink_path'] = params['$ios_deeplink_path'];
+	}
 	return params;
 };
 
