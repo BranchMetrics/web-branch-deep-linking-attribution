@@ -998,9 +998,7 @@ Branch.prototype['sendSMS'] = wrap(
 
 		var referringLink = self._referringLink();
 		if (referringLink && !options['make_new_link']) {
-			sendSMS(referringLink.substring(
-				referringLink.lastIndexOf('/') + 1, referringLink.length
-			));
+			sendSMS(utils.clickIdFromLink(referringLink));
 		}
 		else {
 			self._api(
@@ -1145,9 +1143,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	var referringLink = self._referringLink();
 	if (referringLink && !options['make_new_link']) {
-		cleanedData['link_click_id'] = referringLink.substring(
-			referringLink.lastIndexOf('/') + 1, referringLink.length
-		);
+		cleanedData['link_click_id'] = utils.clickIdFromLink(referringLink);
 	}
 
 	cleanedData['banner_options'] = options;

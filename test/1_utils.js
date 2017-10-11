@@ -478,6 +478,41 @@ describe('utils', function() {
 		});
 	});
 
+	describe('clickIdFromLink', function() {
+		it('If "http://example.com:3000?test=test" is passed in, ?test=test should be returned"', function() {
+			var expected = "?test=test";
+			assert.strictEqual(
+				expected,
+				utils.clickIdFromLink("http://example.com:3000?test=test"),
+				'should be equal'
+			);
+		});
+		it('If "http://example.com:3000/?test=test" is passed in, ?test=test should be returned"', function() {
+			var expected = "?test=test";
+			assert.strictEqual(
+				expected,
+				utils.clickIdFromLink("http://example.com:3000/?test=test"),
+				'should be equal'
+			);
+		});
+		it('If "http://example.com:3000/c/clickid?search=test#hash" is passed in, clickid?search=test should be returned"', function() {
+			var expected = "clickid?search=test";
+			assert.strictEqual(
+				expected,
+				utils.clickIdFromLink("http://example.com:3000/c/clickid?search=test#hash"),
+				'should be equal'
+			);
+		});
+		it('If "http://example.com:3000/c/clickid/?search=test#hash" is passed in, clickid?search=test should be returned"', function() {
+			var expected = "clickid?search=test";
+			assert.strictEqual(
+				expected,
+				utils.clickIdFromLink("http://example.com:3000/c/clickid/?search=test#hash"),
+				'should be equal'
+			);
+		});
+	});
+
 	describe('setJourneyLinkData', function() {
 		it('should set journeys_utils.journeyLinkData with bannerid and journey link data', function() {
 			var html = '<script id="journeyLinkData" type="application/json">' +

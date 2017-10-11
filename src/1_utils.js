@@ -247,7 +247,13 @@ utils.cleanLinkData = function(linkData) {
  * @param {String} link
  */
 utils.clickIdFromLink = function(link) {
-	return link ? link.substring(link.lastIndexOf('/') + 1, link.length) : null;
+	var elem = document.createElement("a");
+	elem.href = link;
+	var tester = function(data) {
+		return data !== "";
+	};
+	var pathname = elem.pathname ? elem.pathname.split('/').filter(tester) : null;
+	return Array.isArray(pathname) && pathname.length > 0 ? pathname[ pathname.length - 1 ] + elem.search : elem.search;
 };
 
 /**
