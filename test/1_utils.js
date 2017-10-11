@@ -397,56 +397,56 @@ describe('utils', function() {
 			var expected = {
 				watch_brand: 'Hamilton',
 				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
-				$ios_deeplink_path: 'applinks/hamilton/khaki/iphone',
+				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
 				$android_deeplink_path: 'twitter/hamilton/khaki/android'
 			};
 			assert.deepEqual(
 				expected,
 				utils.getHostedDeepLinkData(),
-				'should return an object with data'
+				'should be equal'
 			);
 		});
 		it('$ios_deeplink_path and $android_deeplink_path should be formed from hosted metadata', function() {
 			var params = { "$key1":"val1", "$key2":"val2" };
-			var deeplinkPaths = { "hostedIOS":"hosteddld/iphone", "hostedAndroid":"hosteddld/android", "applinksIOS":"appllinks/iphone", "applinksAndroid":"applinks/android", "twitterIOS":"twitter/iphone", "twitterAndroid":"twitter/android" };
+			var deeplinkPaths = { "hostedIOS":"hosteddld/ios", "hostedAndroid":"hosteddld/android", "applinksIOS":"appllinks/ios", "applinksAndroid":"applinks/android", "twitterIOS":"twitter/ios", "twitterAndroid":"twitter/android" };
 			var expected = {
 				"$key1":"val1",
 				"$key2":"val2",
-				"$ios_deeplink_path":"hosteddld/iphone",
+				"$ios_deeplink_path":"hosteddld/ios",
 				"$android_deeplink_path":"hosteddld/android"
 			};
 			assert.deepEqual(
 				expected,
 				utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
-				'should return an object with data'
+				'should be equal'
 			);
 		});
 		it('$ios_deeplink_path should be formed from applinks tag and $android_deeplink_path from hosted metadata tag', function() {
 			var params = { "$key1":"val1", "$key2":"val2" };
-			var deeplinkPaths = { "hostedIOS":null, "hostedAndroid":"hosteddld/android", "applinksIOS":"appllinks/iphone", "applinksAndroid":"applinks/android", "twitterIOS":"twitter/iphone", "twitterAndroid":"twitter/android" };
+			var deeplinkPaths = { "hostedIOS":null, "hostedAndroid":"hosteddld/android", "applinksIOS":"appllinks/ios", "applinksAndroid":"applinks/android", "twitterIOS":"twitter/ios", "twitterAndroid":"twitter/android" };
 			var expected = {
 				"$key1":"val1",
 				"$key2":"val2",
-				"$ios_deeplink_path":"appllinks/iphone",
+				"$ios_deeplink_path":"appllinks/ios",
 				"$android_deeplink_path":"hosteddld/android"
 			};
 			assert.deepEqual(
 				expected,
 				utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
-				'should return an object with data'
+				'should be equal'
 			);
 		});
 		it('$ios_deeplink_path and $android_deeplink_path should be formed from twitter tags', function() {
 			var params = {};
-			var deeplinkPaths = { "twitterIOS":"twitter/iphone", "twitterAndroid":"twitter/android" };
+			var deeplinkPaths = { "twitterIOS":"twitter/ios", "twitterAndroid":"twitter/android" };
 			var expected = {
-				"$ios_deeplink_path":"twitter/iphone",
+				"$ios_deeplink_path":"twitter/ios",
 				"$android_deeplink_path":"twitter/android"
 			};
 			assert.deepEqual(
 				expected,
 				utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
-				'should return an object with data'
+				'should be equal'
 			);
 		});
 		it('$ios_deeplink_path and $android_deeplink_path should be formed from twitter tags. $deeplink_path should also be present', function() {
@@ -460,7 +460,7 @@ describe('utils', function() {
 			assert.deepEqual(
 				expected,
 				utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
-				'should return an object with data'
+				'should be equal'
 			);
 		});
 		it('Original key:value pairs in params should be present', function() {
@@ -473,7 +473,7 @@ describe('utils', function() {
 			assert.deepEqual(
 				expected,
 				utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
-				'should return an object with data'
+				'should be equal'
 			);
 		});
 	});
