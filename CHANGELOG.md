@@ -4,6 +4,14 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.28.0] - 2017-09-27
+- Adds support for iFrames and SafeFrames
+- Fixes a deep linking bug with Journeys in test mode
+- Adds hosted deep link data to request parameters when firing a 'pageview' event
+
+## [2.27.1] - 2017-09-15
+- Removes an additional xmlns attribute from SVG tag
+
 ## [2.27.0] - 2017-09-08
 - Removes eval() call from compiled SDK
 - Removes xmlns attribute from SVG tags

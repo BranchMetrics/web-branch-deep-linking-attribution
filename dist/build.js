@@ -924,7 +924,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.27.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.28.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -962,10 +962,10 @@ utils.messages = {missingParam:"API request $1 missing parameter $2", invalidTyp
 blockedByClient:"Request blocked by client, probably adblock", missingUrl:"Required argument: URL, is missing"};
 utils.bannerThemes = ["light", "dark"];
 utils.getLocationSearch = function() {
-  return window.location.search;
+  return utils.isIframeAndFromSameOrigin() ? window.top.location.search : window.location.search;
 };
 utils.getLocationHash = function() {
-  return window.location.hash;
+  return utils.isIframeAndFromSameOrigin() ? window.top.location.hash : window.location.hash;
 };
 utils.message = function(a, b, c, d) {
   a = a.replace(/\$(\d)/g, function(a, c) {
@@ -1003,7 +1003,7 @@ utils.whiteListJourneysLanguageData = function(a) {
   return d;
 };
 utils.getWindowLocation = function() {
-  return String(window.location);
+  return utils.isIframe() ? document.referrer : String(window.location);
 };
 utils.getParameterByName = function(a) {
   var b;
@@ -1242,6 +1242,24 @@ utils.removePropertiesFromObject = function(a, b) {
       a.hasOwnProperty(c) && -1 < b.indexOf(c) && delete a[c];
     }
   }
+};
+utils.isIframe = function() {
+  return window.self !== window.top;
+};
+utils.isSameOriginFrame = function() {
+  var a = "true";
+  try {
+    window.top.location.search && (a = "true");
+  } catch (b) {
+    return !1;
+  }
+  return "true" === a;
+};
+utils.isIframeAndFromSameOrigin = function() {
+  return utils.isIframe() && utils.isSameOriginFrame();
+};
+utils.getInitialReferrer = function(a) {
+  return a ? a : utils.isIframe() ? utils.isSameOriginFrame() ? window.top.document.referrer : "" : document.referrer;
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -1681,7 +1699,7 @@ var banner_html = {banner:function(a, b) {
       d = "";
       for (var e = 0;5 > e;e++) {
         d += '<span class="star"><svg class="star" fill="#555555" height="12" viewBox="3 2 20 19" width="12"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/><path d="M0 0h24v24H0z" fill="none"/><foreignObject display="none"><span class="star">\u2606</span></foreignObject></svg>', a.rating > e && (d += e + 1 > a.rating && a.rating % 1 ? '<span class="half"><svg fill="#555555" height="12" viewBox="3 2 20 19" width="12"><defs><path d="M0 0h24v24H0V0z" id="a"/></defs><clipPath id="b"><use overflow="visible" xlink:href="#a"/></clipPath><path clip-path="url(#b)" d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4V6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg><foreignObject display="none"><span class="half">\u2605</span></foreignObject></span>' : 
-        '<span class="full"><svg fill="#555555" height="12" viewBox="3 2 20 19" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/><path d="M0 0h24v24H0z" fill="none"/><foreignObject display="none"><span class="full">\u2605</span></foreignObject></svg> </span>'), d += "</span>";
+        '<span class="full"><svg fill="#555555" height="12" viewBox="3 2 20 19" width="12"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/><path d="M0 0h24v24H0z" fill="none"/><foreignObject display="none"><span class="full">\u2605</span></foreignObject></svg> </span>'), d += "</span>";
       }
       d = '<span class="stars">' + d + "</span>";
     } else {
@@ -2153,7 +2171,8 @@ function compileRequestData(a, b, c) {
   d.data = utils.merge(utils.getHostedDeepLinkData(), d.data);
   d.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), d.data);
   d.data = b ? utils.merge({link_click_id:b}, d.data) : d.data;
-  return d = utils.merge({open_app:c}, d);
+  d = utils.merge({open_app:c}, d);
+  return d = utils.isIframe() ? utils.merge({is_iframe:!0}, d) : d;
 }
 branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
@@ -2318,7 +2337,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, h && utils.whiteListSessionData(h));
     }
     var l = utils.getAdditionalMetadata();
-    d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, l || {}), initial_referrer:document.referrer}, function(e, f) {
+    d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, l || {}), initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(e, f) {
       e || "object" !== typeof f || branch_view.initJourney(b, h, f, c, d);
       try {
         a(e, h && utils.whiteListSessionData(h));
@@ -2335,11 +2354,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }, !1);
   };
   if (f && f.session_id && !h) {
-    session.update(d._storage, {data:""}), p(), l(m);
+    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), p(), l(m);
   } else {
     var f = {sdk:config.version, branch_key:d.branch_key}, n = session.get(d._storage, !0) || {};
     n.browser_fingerprint_id && (f._t = n.browser_fingerprint_id);
-    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || n.browser_fingerprint_id, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:document.referrer}, function(a, b) {
+    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || n.browser_fingerprint_id, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
       a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
       p();
@@ -2348,7 +2367,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       if (a) {
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
-      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || b, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:document.referrer}, function(a, b) {
+      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || b, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
         p();
@@ -2408,7 +2427,8 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
   var e = this;
   c = c || {};
   d = d || {};
-  e._api(resources.event, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, c), initial_referrer:document.referrer}, function(c, g) {
+  "pageview" === b && (c = utils.addPropertyIfNotNull(c, "hosted_deeplink_data", utils.getHostedDeepLinkData()));
+  e._api(resources.event, {event:b, metadata:utils.merge({url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language}, c), initial_referrer:utils.getInitialReferrer(e._referringLink())}, function(c, g) {
     c || "object" !== typeof g || "pageview" !== b || branch_view.initJourney(e.branch_key, session.get(e._storage), g, d, e);
     "function" === typeof a && a.apply(this, arguments);
   });
@@ -2454,6 +2474,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   c || (c = {});
   c.deepview_type = "undefined" === typeof c.deepview_type ? "deepview" : "banner";
   b.data = utils.merge(utils.getHostedDeepLinkData(), b.data);
+  b = utils.isIframe() ? utils.merge({is_iframe:!0}, b) : b;
   var e = config.link_service_endpoint + "/a/" + d.branch_key, f = !0, g;
   for (g in b) {
     b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
@@ -2478,7 +2499,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   d._deepviewRequestForReplay();
 });
 Branch.prototype._windowRedirect = function(a) {
-  window.location = a;
+  window.top.location = a;
 };
 Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
   if ("undefined" === typeof this._deepviewCta) {
@@ -2589,7 +2610,7 @@ Branch.prototype.trackCommerceEvent = wrap(callback_params.CALLBACK_ERR, functio
     if (f) {
       return a(Error(f));
     }
-    e._api(resources.commerceEvent, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, d || {}), initial_referrer:document.referrer, commerce_data:c}, function(b, c) {
+    e._api(resources.commerceEvent, {event:b, metadata:utils.merge({url:document.URL, user_agent:navigator.userAgent, language:navigator.language}, d || {}), initial_referrer:utils.getInitialReferrer(e._referringLink()), commerce_data:c}, function(b, c) {
       a(b || null);
     });
   });
