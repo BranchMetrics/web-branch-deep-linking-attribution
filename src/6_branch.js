@@ -322,7 +322,7 @@ Branch.prototype['init'] = wrap(
 				data['referring_link'] = utils.processReferringLink(data['referring_link']);
 			}
 			if (!data['click_id'] && data['referring_link']) {
-				data['click_id'] = utils.clickIdFromLink(data['referring_link']);
+				data['click_id'] = utils.getClickIdAndSearchStringFromLink(data['referring_link']);
 			}
 
 			self.browser_fingerprint_id = data['browser_fingerprint_id'];
@@ -998,9 +998,7 @@ Branch.prototype['sendSMS'] = wrap(
 
 		var referringLink = self._referringLink();
 		if (referringLink && !options['make_new_link']) {
-			sendSMS(referringLink.substring(
-				referringLink.lastIndexOf('/') + 1, referringLink.length
-			));
+			sendSMS(utils.getClickIdAndSearchStringFromLink(referringLink));
 		}
 		else {
 			self._api(
@@ -1145,9 +1143,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	var referringLink = self._referringLink();
 	if (referringLink && !options['make_new_link']) {
-		cleanedData['link_click_id'] = referringLink.substring(
-			referringLink.lastIndexOf('/') + 1, referringLink.length
-		);
+		cleanedData['link_click_id'] = utils.getClickIdAndSearchStringFromLink(referringLink);
 	}
 
 	cleanedData['banner_options'] = options;

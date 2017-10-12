@@ -164,7 +164,7 @@ function compileRequestData(branch, makeNewLink, openApp) {
 		requestData['data'] = {};
 	}
 
-	var linkClickId = !makeNewLink ? utils.clickIdFromLink(branch._referringLink()) : null;
+	var linkClickId = !makeNewLink ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
 
 	requestData['data'] = utils.merge(utils.getHostedDeepLinkData(), requestData['data']);
 	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
