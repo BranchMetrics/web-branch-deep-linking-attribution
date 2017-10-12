@@ -478,12 +478,68 @@ describe('utils', function() {
 		});
 	});
 
-	describe('clickIdFromLink', function() {
+	describe('getClickIdAndSearchStringFromLink', function() {
+		it('If /123abc is passed in, 123abc should be returned"', function() {
+			var expected = "123abc";
+			assert.strictEqual(
+				expected,
+				utils.getClickIdAndSearchStringFromLink("/123abc"),
+				'should be equal'
+			);
+		});
+		it('If /c/123abc is passed in, 123abc should be returned"', function() {
+			var expected = "123abc";
+			assert.strictEqual(
+				expected,
+				utils.getClickIdAndSearchStringFromLink("/c/123abc"),
+				'should be equal'
+			);
+		});
+		it('If /c/123abc?key1=val1 is passed in, 123abc?key1=val1 should be returned"', function() {
+			var expected = "123abc?key1=val1";
+			assert.strictEqual(
+				expected,
+				utils.getClickIdAndSearchStringFromLink("/c/123abc?key1=val1"),
+				'should be equal'
+			);
+		});
+		it('If {} is passed in, "" should be returned"', function() {
+			var expected = "";
+			assert.strictEqual(
+				expected,
+				utils.getClickIdAndSearchStringFromLink(""),
+				'should be equal'
+			);
+		});
+		it('If "" is passed in, "" should be returned"', function() {
+			var expected = "";
+			assert.strictEqual(
+				expected,
+				utils.getClickIdAndSearchStringFromLink(""),
+				'should be equal'
+			);
+		});
+		it('If undefined is passed in, "" should be returned"', function() {
+			var expected = "";
+			assert.strictEqual(
+				expected,
+				utils.getClickIdAndSearchStringFromLink(undefined),
+				'should be equal'
+			);
+		});
+		it('If null is passed in, "" should be returned"', function() {
+			var expected = "";
+			assert.strictEqual(
+				expected,
+				utils.getClickIdAndSearchStringFromLink(null),
+				'should be equal'
+			);
+		});
 		it('If "http://example.com:3000?test=test" is passed in, ?test=test should be returned"', function() {
 			var expected = "?test=test";
 			assert.strictEqual(
 				expected,
-				utils.clickIdFromLink("http://example.com:3000?test=test"),
+				utils.getClickIdAndSearchStringFromLink("http://example.com:3000?test=test"),
 				'should be equal'
 			);
 		});
@@ -491,7 +547,7 @@ describe('utils', function() {
 			var expected = "?test=test";
 			assert.strictEqual(
 				expected,
-				utils.clickIdFromLink("http://example.com:3000/?test=test"),
+				utils.getClickIdAndSearchStringFromLink("http://example.com:3000/?test=test"),
 				'should be equal'
 			);
 		});
@@ -499,7 +555,7 @@ describe('utils', function() {
 			var expected = "clickid?search=test";
 			assert.strictEqual(
 				expected,
-				utils.clickIdFromLink("http://example.com:3000/c/clickid?search=test#hash"),
+				utils.getClickIdAndSearchStringFromLink("http://example.com:3000/c/clickid?search=test#hash"),
 				'should be equal'
 			);
 		});
@@ -507,7 +563,7 @@ describe('utils', function() {
 			var expected = "clickid?search=test";
 			assert.strictEqual(
 				expected,
-				utils.clickIdFromLink("http://example.com:3000/c/clickid/?search=test#hash"),
+				utils.getClickIdAndSearchStringFromLink("http://example.com:3000/c/clickid/?search=test#hash"),
 				'should be equal'
 			);
 		});

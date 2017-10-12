@@ -246,14 +246,17 @@ utils.cleanLinkData = function(linkData) {
 /**
  * @param {String} link
  */
-utils.clickIdFromLink = function(link) {
+utils.getClickIdAndSearchStringFromLink = function(link) {
+	if (!link || typeof link !== "string") {
+		return "";
+	}
 	var elem = document.createElement("a");
 	elem.href = link;
-	var tester = function(data) {
+	function notEmpty(data) {
 		return data !== "";
-	};
-	var pathname = elem.pathname ? elem.pathname.split('/').filter(tester) : null;
-	return Array.isArray(pathname) && pathname.length > 0 ? pathname[ pathname.length - 1 ] + elem.search : elem.search;
+	}
+	var pathname = elem.pathname && elem.pathname.split('/').filter(notEmpty);
+	return Array.isArray(pathname) && pathname.length ? pathname[ pathname.length - 1 ] + elem.search : elem.search;
 };
 
 /**
