@@ -92,6 +92,16 @@ $jscomp.polyfill("String.prototype.includes", function(a) {
     return -1 !== $jscomp.checkStringArgs(this, a, "includes").indexOf(a, c || 0);
   };
 }, "es6-impl", "es3");
+$jscomp.polyfill("Number.isFinite", function(a) {
+  return a ? a : function(a) {
+    return "number" !== typeof a ? !1 : !isNaN(a) && Infinity !== a && -Infinity !== a;
+  };
+}, "es6-impl", "es3");
+$jscomp.polyfill("Number.isInteger", function(a) {
+  return a ? a : function(a) {
+    return Number.isFinite(a) ? a === Math.floor(a) : !1;
+  };
+}, "es6-impl", "es3");
 var COMPILED = !0, goog = goog || {};
 goog.global = this;
 goog.isDef = function(a) {
@@ -924,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.28.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.29.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -957,6 +967,9 @@ var task_queue = function() {
 };
 // Input 5
 var utils = {}, DEBUG = !0, message;
+utils.retries = 2;
+utils.retry_delay = 200;
+utils.timeout = 5000;
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
 blockedByClient:"Request blocked by client, probably adblock", missingUrl:"Required argument: URL, is missing"};
@@ -1041,8 +1054,17 @@ utils.cleanLinkData = function(a) {
   a.data = b;
   return a;
 };
-utils.clickIdFromLink = function(a) {
-  return a ? a.substring(a.lastIndexOf("/") + 1, a.length) : null;
+utils.getClickIdAndSearchStringFromLink = function(a) {
+  function b(a) {
+    return "" !== a;
+  }
+  if (!a || "string" !== typeof a) {
+    return "";
+  }
+  var c = document.createElement("a");
+  c.href = a;
+  a = c.pathname && c.pathname.split("/").filter(b);
+  return Array.isArray(a) && a.length ? a[a.length - 1] + c.search : c.search;
 };
 utils.processReferringLink = function(a) {
   return a ? "http" !== a.substring(0, 4) ? config.link_service_endpoint + a : a : null;
@@ -1145,14 +1167,35 @@ utils.getOpenGraphContent = function(a, b) {
   c && c.content && (b = c.content);
   return b;
 };
-utils.getHostedDeepLinkData = function() {
-  for (var a = {}, b = document.getElementsByTagName("meta"), c = 0;c < b.length;c++) {
-    if ((b[c].getAttribute("name") || b[c].getAttribute("property")) && b[c].getAttribute("content")) {
-      var d = b[c].getAttribute("name"), e = b[c].getAttribute("property"), d = d || e;
-      "al:ios:url" === d ? a.$ios_deeplink_path = utils.extractMobileDeeplinkPath(b[c].getAttribute("content")) : "al:android:url" === d ? a.$android_deeplink_path = utils.extractMobileDeeplinkPath(b[c].getAttribute("content")) : (d = d.split(":"), 3 === d.length && "branch" === d[0] && "deeplink" === d[1] && (a[d[2]] = b[c].getAttribute("content")));
+utils.prioritizeDeeplinkPaths = function(a, b) {
+  if (!b || "object" !== typeof b || 0 === Object.keys(b).length) {
+    return a;
+  }
+  b.hostedIOS ? a.$ios_deeplink_path = b.hostedIOS : b.applinksIOS ? a.$ios_deeplink_path = b.applinksIOS : b.twitterIOS && (a.$ios_deeplink_path = b.twitterIOS);
+  b.hostedAndroid ? a.$android_deeplink_path = b.hostedAndroid : b.applinksAndroid ? a.$android_deeplink_path = b.applinksAndroid : b.twitterAndroid && (a.$android_deeplink_path = b.twitterAndroid);
+  a.hasOwnProperty("$ios_deeplink_path") && a.hasOwnProperty("$android_deeplink_path") && a.$ios_deeplink_path === a.$android_deeplink_path && (a.$deeplink_path = a.$ios_deeplink_path);
+  return a;
+};
+utils.processHostedDeepLinkData = function(a) {
+  var b = {};
+  if (!a || 0 === a.length) {
+    return b;
+  }
+  for (var c = {hostedIOS:null, hostedAndroid:null, applinksIOS:null, applinksAndroid:null, twitterIOS:null, twitterAndroid:null}, d = 0;d < a.length;d++) {
+    if ((a[d].getAttribute("name") || a[d].getAttribute("property")) && a[d].getAttribute("content")) {
+      var e = a[d].getAttribute("name"), f = a[d].getAttribute("property"), e = e || f, f = e.split(":");
+      3 === f.length && "branch" === f[0] && "deeplink" === f[1] && ("$ios_deeplink_path" === f[2] ? c.hostedIOS = utils.extractMobileDeeplinkPath(a[d].getAttribute("content")) : "$android_deeplink_path" === f[2] ? c.hostedAndroid = utils.extractMobileDeeplinkPath(a[d].getAttribute("content")) : b[f[2]] = a[d].getAttribute("content"));
+      "al:ios:url" === e && (c.applinksIOS = utils.extractMobileDeeplinkPath(a[d].getAttribute("content")));
+      "twitter:app:url:iphone" === e && (c.twitterIOS = utils.extractMobileDeeplinkPath(a[d].getAttribute("content")));
+      "al:android:url" === e && (c.applinksAndroid = utils.extractMobileDeeplinkPath(a[d].getAttribute("content")));
+      "twitter:app:url:googleplay" === e && (c.twitterAndroid = utils.extractMobileDeeplinkPath(a[d].getAttribute("content")));
     }
   }
-  return a;
+  return utils.prioritizeDeeplinkPaths(b, c);
+};
+utils.getHostedDeepLinkData = function() {
+  var a = document.getElementsByTagName("meta");
+  return utils.processHostedDeepLinkData(a);
 };
 utils.getBrowserLanguageCode = function() {
   var a;
@@ -1343,6 +1386,14 @@ var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, Branc
   return a.replace(BRANCH_KEY_PREFIX, "");
 }, retrieveValue = function(a) {
   return "true" === a ? !0 : "false" === a ? !1 : a;
+}, hasBranchPrefix = function(a) {
+  return 0 === a.indexOf(BRANCH_KEY_PREFIX);
+}, isBranchCookie = function(a) {
+  return "branch_session" === a || "branch_session_first" === a || hasBranchPrefix(a);
+}, processCookie = function(a) {
+  a = a.trim();
+  var b = a.indexOf("=");
+  return {name:a.substring(0, b), value:retrieveValue(a.substring(b + 1, a.length))};
 }, webStorage = function(a) {
   var b;
   try {
@@ -1385,44 +1436,42 @@ BranchStorage.prototype.local = function() {
 BranchStorage.prototype.session = function() {
   return webStorage(!1);
 };
-var cookies = function(a) {
+var cookies = function() {
+  var a = function(a, c) {
+    c && (a = prefix(a));
+    document.cookie = a + "=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/";
+  };
   return {getAll:function() {
-    for (var a = document.cookie.split(";"), c = {}, d = 0;d < a.length;d++) {
-      var e = a[d].replace(" ", ""), e = e.substring(0, e.length);
-      -1 !== e.indexOf(BRANCH_KEY_PREFIX) && (e = e.split("="), c[trimPrefix(e[0])] = retrieveValue(e[1]));
+    for (var a = {}, c = document.cookie.split(";"), d = 0;d < c.length;d++) {
+      var e = processCookie(c[d]);
+      e && e.hasOwnProperty("name") && e.hasOwnProperty("value") && isBranchCookie(e.name) && (a[trimPrefix(e.name)] = e.value);
     }
-    return c;
+    return a;
   }, get:function(a) {
-    a = prefix(a) + "=";
+    a = prefix(a);
     for (var b = document.cookie.split(";"), d = 0;d < b.length;d++) {
-      var e = b[d], e = e.substring(1, e.length);
-      if (0 === e.indexOf(a)) {
-        return retrieveValue(e.substring(a.length, e.length));
+      var e = processCookie(b[d]);
+      if (e && e.hasOwnProperty("name") && e.hasOwnProperty("value") && e.name === a) {
+        return e.value;
       }
     }
     return null;
-  }, set:function(b, c) {
-    var d = prefix(b), e = "";
-    a && (e = new Date, e.setTime(e.getTime() + COOKIE_MS), e = "; branch_expiration_date=" + e.toGMTString() + "; expires=" + e.toGMTString());
-    document.cookie = d + "=" + c + e + "; path=/";
-  }, remove:function(a) {
-    document.cookie = prefix(a) + "=; expires=; path=/";
+  }, set:function(a, c) {
+    var b = prefix(a);
+    document.cookie = b + "=" + c + "; path=/";
+  }, remove:function(b) {
+    a(b, !0);
   }, clear:function() {
-    for (var b = function(a) {
-      document.cookie = a.substring(0, a.indexOf("=")) + "=;expires=-1;path=/";
-    }, c = document.cookie.split(";"), d = 0;d < c.length;d++) {
-      var e = c[d], e = e.substring(1, e.length);
-      -1 !== e.indexOf(BRANCH_KEY_PREFIX) && (a || -1 !== e.indexOf("branch_expiration_date=") ? a && 0 < e.indexOf("branch_expiration_date=") && b(e) : b(e));
+    for (var b = document.cookie.split(";"), c = 0;c < b.length;c++) {
+      var d = processCookie(b[c]);
+      d && d.hasOwnProperty("name") && isBranchCookie(d.name) && a(d.name, !1);
     }
   }, isEnabled:function() {
     return navigator.cookieEnabled;
   }};
 };
 BranchStorage.prototype.cookie = function() {
-  return cookies(!1);
-};
-BranchStorage.prototype.permcookie = function() {
-  return cookies(!0);
+  return cookies();
 };
 BranchStorage.prototype.pojo = {getAll:function() {
   return this._store;
@@ -1454,7 +1503,7 @@ var session = {get:function(a, b) {
   }
 }};
 // Input 9
-var RETRIES = 2, RETRY_DELAY = 200, TIMEOUT = 5000, Server = function() {
+var Server = function() {
 };
 Server.prototype._jsonp_callback_index = 0;
 Server.prototype.serializeObject = function(a, b) {
@@ -1539,7 +1588,7 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
     window[e] = function() {
     };
     d(Error(utils.messages.timeout), null, 504);
-  }, TIMEOUT);
+  }, utils.timeout);
   window[e] = function(a) {
     window.clearTimeout(g);
     d(null, a);
@@ -1582,7 +1631,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
     }
   };
   try {
-    g.open(c, a, !0), g.timeout = TIMEOUT, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
+    g.open(c, a, !0), g.timeout = utils.timeout, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
   } catch (h) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
@@ -1594,10 +1643,10 @@ Server.prototype.request = function(a, b, c, d) {
   }
   var g, h = "";
   "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
-  var k = RETRIES, l = function(a, b, c) {
+  var k = utils.retries, l = function(a, b, c) {
     a && 0 < k && "5" === (c || "").toString().substring(0, 1) ? (k--, window.setTimeout(function() {
       m();
-    }, RETRY_DELAY)) : d(a, b);
+    }, utils.retry_delay)) : d(a, b);
   }, m = function() {
     c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
   };
@@ -2136,7 +2185,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
           var q = f ? 0 : journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
             window[m] = function() {
             };
-          }, TIMEOUT);
+          }, utils.timeout);
           window[m] = function(a) {
             window.clearTimeout(r);
             g || (k = a, journeys_utils.finalHookups(b, d, k, h, q));
@@ -2167,7 +2216,7 @@ function isJourneyDismissed(a, b) {
 function compileRequestData(a, b, c) {
   var d = a._branchViewData || {};
   d.data || (d.data = {});
-  b = b ? null : utils.clickIdFromLink(a._referringLink());
+  b = b ? null : utils.getClickIdAndSearchStringFromLink(a._referringLink());
   d.data = utils.merge(utils.getHostedDeepLinkData(), d.data);
   d.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), d.data);
   d.data = b ? utils.merge({link_click_id:b}, d.data) : d.data;
@@ -2308,13 +2357,16 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c = c && "function" === typeof c ? {} : c;
+  utils.retries = c && c.retries && Number.isInteger(c.retries) ? c.retries : utils.retries;
+  utils.retry_delay = c && c.retry_delay && Number.isInteger(c.retry_delay) ? c.retry_delay : utils.retry_delay;
+  utils.timeout = c && c.timeout && Number.isInteger(c.timeout) ? c.timeout : utils.timeout;
   var e = function(a) {
     a.link_click_id && (d.link_click_id = a.link_click_id.toString());
     a.session_id && (d.session_id = a.session_id.toString());
     a.identity_id && (d.identity_id = a.identity_id.toString());
     a.link && (d.sessionLink = a.link);
     a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
-    !a.click_id && a.referring_link && (a.click_id = utils.clickIdFromLink(a.referring_link));
+    !a.click_id && a.referring_link && (a.click_id = utils.getClickIdAndSearchStringFromLink(a.referring_link));
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
   }, f = session.get(d._storage), g = c && c.url || utils.getWindowLocation(), h = (c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null) || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
@@ -2455,7 +2507,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
   d.make_new_link = d.make_new_link || !1;
   c.channel && "app banner" !== c.channel || (c.channel = "sms");
   var g = f._referringLink();
-  g && !d.make_new_link ? e(g.substring(g.lastIndexOf("/") + 1, g.length)) : f._api(resources.link, utils.cleanLinkData(c), function(b, c) {
+  g && !d.make_new_link ? e(utils.getClickIdAndSearchStringFromLink(g)) : f._api(resources.link, utils.cleanLinkData(c), function(b, c) {
     if (b) {
       return a(b);
     }
@@ -2485,7 +2537,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   }
   b.append_deeplink_path = !!c.append_deeplink_path;
   b.deepview_type = c.deepview_type;
-  (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = f.substring(f.lastIndexOf("/") + 1, f.length));
+  (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = utils.getClickIdAndSearchStringFromLink(f));
   b.banner_options = c;
   d._deepviewRequestForReplay = goog.bind(this._api, d, resources.deepview, b, function(b, c) {
     if (b) {
