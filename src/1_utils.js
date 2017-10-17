@@ -16,6 +16,10 @@ var DEBUG = true;
 /** @typedef {string} */
 var message;
 
+utils.retries = 2; // Value specifying the number of times that a Branch API call can be re-attempted.
+utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
+utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
+
 /** @typedef {{data:?string, referring_identity:?string, identity:?string, has_app:?boolean}} */
 utils.sessionData;
 
@@ -242,8 +246,17 @@ utils.cleanLinkData = function(linkData) {
 /**
  * @param {String} link
  */
-utils.clickIdFromLink = function(link) {
-	return link ? link.substring(link.lastIndexOf('/') + 1, link.length) : null;
+utils.getClickIdAndSearchStringFromLink = function(link) {
+	if (!link || typeof link !== "string") {
+		return "";
+	}
+	var elem = document.createElement("a");
+	elem.href = link;
+	function notEmpty(data) {
+		return data !== "";
+	}
+	var pathname = elem.pathname && elem.pathname.split('/').filter(notEmpty);
+	return Array.isArray(pathname) && pathname.length ? pathname[ pathname.length - 1 ] + elem.search : elem.search;
 };
 
 /**
@@ -545,39 +558,105 @@ utils.getOpenGraphContent = function(property, content) {
 };
 
 /**
- * Search for hosted deep link data on the page, as outlined here https://dev.branch.io/getting-started/hosted-deep-link-data/guide/#adding-metatags-to-your-site
- * Also searches for applink tags, i.e. <meta property="al:ios:url" content="applinks://docs" />
+ * Used by utils.processHostedDeepLinkData() to prioritize deeplink paths found from various sources.
+ * Returned params may include $ios_deeplink_path, $android_deeplink_path and $deeplink_path.
  */
-utils.getHostedDeepLinkData = function() {
-	var params = {};
-	var metas = document.getElementsByTagName('meta');
+utils.prioritizeDeeplinkPaths = function(params, deeplinkPaths) {
+	if (!deeplinkPaths || typeof deeplinkPaths !== "object" || Object.keys(deeplinkPaths).length === 0) {
+		return params;
+	}
 
-	for (var i = 0; i < metas.length; i++) {
-		if (!metas[i].getAttribute('name') && !metas[i].getAttribute('property') || !metas[i].getAttribute('content')) {
+	if (deeplinkPaths['hostedIOS']) {
+		params['$ios_deeplink_path'] = deeplinkPaths['hostedIOS'];
+	}
+	else if (deeplinkPaths['applinksIOS']) {
+		params['$ios_deeplink_path'] = deeplinkPaths['applinksIOS'];
+	}
+	else if (deeplinkPaths['twitterIOS']) {
+		params['$ios_deeplink_path'] = deeplinkPaths['twitterIOS'];
+	}
+
+	if (deeplinkPaths['hostedAndroid']) {
+		params['$android_deeplink_path'] = deeplinkPaths['hostedAndroid'];
+	}
+	else if (deeplinkPaths['applinksAndroid']) {
+		params['$android_deeplink_path'] = deeplinkPaths['applinksAndroid'];
+	}
+	else if (deeplinkPaths['twitterAndroid']) {
+		params['$android_deeplink_path'] = deeplinkPaths['twitterAndroid'];
+	}
+
+	// If $ios_deeplink_path and $android_deeplink_path are the same, set a $deeplink_path as well
+	if (params.hasOwnProperty('$ios_deeplink_path') &&
+		params.hasOwnProperty('$android_deeplink_path') &&
+		params['$ios_deeplink_path'] === params['$android_deeplink_path']) {
+		params['$deeplink_path'] = params['$ios_deeplink_path'];
+	}
+	return params;
+};
+/**
+ * Used by utils.getHostedDeepLinkData() to process page metadata.
+ */
+utils.processHostedDeepLinkData = function(metadata) {
+	var params = {};
+	if (!metadata || metadata.length === 0) {
+		return params;
+	}
+	var deeplinkPaths = { // keeps track of deeplink paths encountered when parsing page's meta tags
+		'hostedIOS': null,
+		'hostedAndroid': null,
+		'applinksIOS': null,
+		'applinksAndroid': null,
+		'twitterIOS': null,
+		'twitterAndroid': null
+	};
+
+	for (var i = 0; i < metadata.length; i++) {
+		if (!metadata[i].getAttribute('name') && !metadata[i].getAttribute('property') || !metadata[i].getAttribute('content')) {
 			continue;
 		}
 
-		var name = metas[i].getAttribute('name');
-		var property = metas[i].getAttribute('property');
-		// name takes precendence over propery
+		var name = metadata[i].getAttribute('name');
+		var property = metadata[i].getAttribute('property');
+		// name takes precedence over property
 		var nameOrProperty = name || property;
 
-		if (nameOrProperty === 'al:ios:url') {
-			params['$ios_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
-		}
-		else if (nameOrProperty === 'al:android:url') {
-			params['$android_deeplink_path'] = utils.extractMobileDeeplinkPath(metas[i].getAttribute('content'));
-		}
-		else {
-			var split = nameOrProperty.split(':');
+		var split = nameOrProperty.split(':');
 
-			if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
-				params[split[2]] = metas[i].getAttribute('content');
+		if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
+			if (split[2] === '$ios_deeplink_path') { // Deeplink path detected from hosted deep link data
+				deeplinkPaths['hostedIOS'] = utils.extractMobileDeeplinkPath(metadata[i].getAttribute('content'));
+			}
+			else if (split[2] === '$android_deeplink_path') {
+				deeplinkPaths['hostedAndroid'] = utils.extractMobileDeeplinkPath(metadata[i].getAttribute('content'));
+			}
+			else { // Add all other hosted deeplink data key/values to params without needing special treatment
+				params[split[2]] = metadata[i].getAttribute('content');
 			}
 		}
+		if (nameOrProperty === 'al:ios:url') { // Deeplink path detected from App Links meta tag
+			deeplinkPaths['applinksIOS'] = utils.extractMobileDeeplinkPath(metadata[i].getAttribute('content'));
+		}
+		if (nameOrProperty === 'twitter:app:url:iphone') { // Deeplink path detected from Twitter meta tag
+			deeplinkPaths['twitterIOS'] = utils.extractMobileDeeplinkPath(metadata[i].getAttribute('content'));
+		}
+		if (nameOrProperty === 'al:android:url') {
+			deeplinkPaths['applinksAndroid'] = utils.extractMobileDeeplinkPath(metadata[i].getAttribute('content'));
+		}
+		if (nameOrProperty === 'twitter:app:url:googleplay') {
+			deeplinkPaths['twitterAndroid'] = utils.extractMobileDeeplinkPath(metadata[i].getAttribute('content'));
+		}
 	}
+	return utils.prioritizeDeeplinkPaths(params, deeplinkPaths);
+};
 
-	return params;
+/**
+ * Search for hosted deep link data on the page, as outlined here https://dev.branch.io/getting-started/hosted-deep-link-data/guide/#adding-metatags-to-your-site.
+ * Also searches for twitter and applinks tags, i.e. <meta property="al:ios:url" content="applinks://docs" />, <meta name="twitter:app:url:googleplay" content="twitter://docs">.
+ */
+utils.getHostedDeepLinkData = function() {
+	var metadata = document.getElementsByTagName('meta');
+	return utils.processHostedDeepLinkData(metadata);
 };
 
 
