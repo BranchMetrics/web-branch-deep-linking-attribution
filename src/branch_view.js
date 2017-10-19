@@ -196,6 +196,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 		makeNewLink = options['make_new_link'] || false;
 		// openApp defaults to false unless user specifies otherwise
+		// Note: Will only work for Journeys that don't have Auto-Open toggle in Journey template editor
 		openApp = options['open_app'] || false;
 	}
 
