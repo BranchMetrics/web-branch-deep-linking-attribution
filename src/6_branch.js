@@ -872,7 +872,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *    "$longitude": -97.5,
  *    "$image_captions": [ "my_img_caption1", "my_img_caption_2" ],
  *    "$condition": "NEW",
- *    "$custom_fields": "{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}"
+ *    "$custom_fields": {"foo1":"bar1","foo2":"bar2"}
  *},
  *{
  *    "$og_title": "Nike Woolen Sox",
@@ -906,21 +906,29 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventData, contentItems) {
 	name = utils.validateParameterType(name, 'string') ? name : null;
 	eventData = utils.validateParameterType(eventData, 'object') ? eventData : null;
-	contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
-	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
-	var endpoint = resources.logCustomEvent;
+
 	if (utils.isStandardEvent(name)) {
-		endpoint = resources.logStandardEvent;
+		contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
+		var extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
+		this._api(resources.logStandardEvent,
+			{ "name": name,
+			"user_data": safejson.stringify(utils.getUserData(this)),
+			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
+			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
+			"content_items": safejson.stringify(contentItems || [])
+		}, function(err, data) {
+			return done(err || null);
+		});
 	}
-	this._api(endpoint, {
-		"name": name,
-		"user_data": safejson.stringify(utils.getUserData(this)),
-		"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
-		"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
-		"content_items": safejson.stringify(contentItems || [])
-	}, function(err, data) {
-		return done(err || null);
-	});
+	else {
+		this._api(resources.logCustomEvent,
+			{ "name": name,
+			"user_data": safejson.stringify(utils.getUserData(this)),
+			"custom_data": safejson.stringify(utils.convertObjectValuesToString(eventData) || {})
+		}, function(err, data) {
+			return done(err || null);
+		});
+	}
 });
 
 /**

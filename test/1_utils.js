@@ -407,6 +407,32 @@ describe('utils', function() {
 			);
 		});
 	});
+	describe('convertObjectValuesToString', function() {
+		it('should return an object with string values', function() {
+			var initial = {
+				key1: 1,
+				key2: 2
+			};
+			var expected = {
+				key1: "1",
+				key2: "2"
+			};
+			assert.deepEqual(
+				expected,
+				utils.convertObjectValuesToString(initial),
+				"objects values are not strings"
+			);
+		});
+		it('should return undefined', function() {
+			var initial = {};
+			assert.deepEqual(
+				undefined,
+				utils.convertObjectValuesToString(initial),
+				"return value is not undefined"
+			);
+		});
+	});
+
 
 	describe('setJourneyLinkData', function() {
 		it('should set journeys_utils.journeyLinkData with bannerid and journey link data', function() {

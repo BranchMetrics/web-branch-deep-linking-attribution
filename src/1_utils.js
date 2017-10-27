@@ -586,15 +586,21 @@ utils.getHostedDeepLinkData = function() {
 
 
 /**
- * @return {string} code
+ * Returns the user's preferred language
  */
 utils.getBrowserLanguageCode = function() {
 	var code;
 	try {
-		code = (navigator.language || navigator.browserLanguage || 'en').split(/[^a-z^A-Z0-9-]/).shift().toLowerCase();
+		if (navigator.languages && navigator.languages.length>0) {
+			code = navigator.languages[0];
+		}
+		else if (navigator.language) {
+			code = navigator.language;
+		}
+		code = code.substring(0, 2).toUpperCase();
 	}
 	catch (e) {
-		code = 'en';
+		code = null;
 	}
 	return code;
 };
@@ -772,9 +778,8 @@ utils.separateEventAndCustomData = function(eventAndCustomData) {
 		customData[key] = eventAndCustomData[key];
 		delete eventAndCustomData[key];
 	}
-
 	return {
-		"custom_data": customData,
+		"custom_data": utils.convertObjectValuesToString(customData),
 		"event_data": eventAndCustomData
 	};
 };
@@ -795,14 +800,14 @@ utils.getUserData = function(branch) {
 	var user_data = {};
 	user_data = utils.addPropertyIfNotNull(user_data, "http_origin", document.URL);
 	user_data = utils.addPropertyIfNotNull(user_data, "user_agent", navigator.userAgent);
-	user_data = utils.addPropertyIfNotNull(user_data, "language", navigator.language);
+	user_data = utils.addPropertyIfNotNull(user_data, "language", utils.getBrowserLanguageCode());
 	user_data = utils.addPropertyIfNotNull(user_data, "screen_width", screen.width);
 	user_data = utils.addPropertyIfNotNull(user_data, "screen_height", screen.height);
 	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
-	user_data = utils.addPropertyIfNotNull(user_data, "identity_id", branch.identity_id);
 	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
 	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
-	user_data = utils.addPropertyIfNotNull(user_data, "sdk", branch.sdk);
+	user_data = utils.addPropertyIfNotNull(user_data, "sdk", "web");
+	user_data = utils.addPropertyIfNotNull(user_data, "sdk_version", config.version);
 	return user_data;
 };
 
@@ -839,5 +844,18 @@ utils.getInitialReferrer = function(referringLink) {
 		return utils.isSameOriginFrame() ? window.top.document.referrer : "";
 	}
 	return document.referrer;
+};
+
+// Required for logEvent()'s custom_data object - values must be converted to string
+utils.convertObjectValuesToString = function(objectToConvert) {
+	if (!utils.validateParameterType(objectToConvert, 'object') || Object.keys(objectToConvert).length === 0) {
+		return;
+	}
+	for (var key in objectToConvert) {
+		if (objectToConvert.hasOwnProperty(key)) {
+			objectToConvert[key] = objectToConvert[key].toString();
+		}
+	}
+	return objectToConvert;
 };
 
