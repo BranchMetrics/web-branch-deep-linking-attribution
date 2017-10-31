@@ -817,7 +817,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * - logEvent() sends user_data automatically so there is no need to manually send this data
  * - Provide event_data and custom_data as part of the same object
  *
- * ##### Usage
+ * ##### Usage for Commerce, Content & User Lifecycle Events
  * ```js
  * branch.logEvent(
  *     event,
@@ -826,7 +826,15 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *     callback (err)
  * );
  * ```
- * ##### Example
+ * ##### Usage for Custom Events
+ * ```js
+ * branch.logEvent(
+ *     event,
+ *     custom_data,
+ *     callback (err)
+ * );
+ * ```
+ * ##### Example -- How to log a Commerce Event
  * ```js
  *var event_and_custom_data = {
  *    "transaction_id": "tras_Id_1232343434",
