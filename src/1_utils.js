@@ -928,7 +928,7 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 	}
 	for (var key in objectToConvert) {
 		if (objectToConvert.hasOwnProperty(key)) {
-			objectToConvert[key] = objectToConvert[key].toString();
+			objectToConvert[key] = utils.validateParameterType(objectToConvert[key], 'object') || utils.validateParameterType(objectToConvert[key], 'array') ? safejson.stringify(objectToConvert[key]) : objectToConvert[key].toString();
 		}
 	}
 	return objectToConvert;

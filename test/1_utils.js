@@ -569,7 +569,7 @@ describe('utils', function() {
 		});
 	});
 	describe('convertObjectValuesToString', function() {
-		it('should return an object with string values', function() {
+		it('a simple object\'s values should be stringified', function() {
 			var initial = {
 				key1: 1,
 				key2: 2
@@ -577,6 +577,28 @@ describe('utils', function() {
 			var expected = {
 				key1: "1",
 				key2: "2"
+			};
+			assert.deepEqual(
+				expected,
+				utils.convertObjectValuesToString(initial),
+				"objects values are not strings"
+			);
+		});
+		it('a complex object\'s values should be stringified', function() {
+			var initial = {
+				"revenue": 123,
+				"currency": "USD",
+				"custom_key_0": { "sku": "foo-sku-7", "price": 8.50, "quantity": 4 },
+				"custom_key_1": [
+					{ "sku": "foo-sku-7", "price": 8.50, "quantity": 4 },
+					'testing'
+				]
+			};
+			var expected = {
+				"revenue":"123",
+				"currency":"USD",
+				"custom_key_0":"{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4}",
+				"custom_key_1": "[{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4},\"testing\"]"
 			};
 			assert.deepEqual(
 				expected,
