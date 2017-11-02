@@ -4,6 +4,11 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.29.0] - 2017-10-17
+- Adds retries, retry_delay and timeout options to .init() 
+- Automatically generates $ios_deeplink_path, $android_deeplink_path, $deeplink_path from twitter:app:url:iphone and twitter:app:url:googleplay Meta tags
+- Fixes cookie storage bug for users in Safari private mode
+
 ## [2.28.0] - 2017-09-27
 - Adds support for iFrames and SafeFrames
 - Fixes a deep linking bug with Journeys in test mode

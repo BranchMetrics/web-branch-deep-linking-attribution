@@ -164,7 +164,7 @@ function compileRequestData(branch, makeNewLink, openApp) {
 		requestData['data'] = {};
 	}
 
-	var linkClickId = !makeNewLink ? utils.clickIdFromLink(branch._referringLink()) : null;
+	var linkClickId = !makeNewLink ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
 
 	requestData['data'] = utils.merge(utils.getHostedDeepLinkData(), requestData['data']);
 	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
@@ -196,6 +196,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 		makeNewLink = options['make_new_link'] || false;
 		// openApp defaults to false unless user specifies otherwise
+		// Note: Will only work for Journeys that don't have Auto-Open toggle in Journey template editor
 		openApp = options['open_app'] || false;
 	}
 
