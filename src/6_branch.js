@@ -812,11 +812,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * - [Logging User Lifecycle](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-user-lifecycle-events)
  * - [Logging Custom Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-custom-events)
  *
- * Notes:
- * - logEvent() sends user_data automatically so there is no need to manually send this data
- * - Provide event_data and custom_data as part of the same object
- *
- * ##### Usage for Commerce, Content & User Lifecycle Events
+ * ##### Usage for Commerce, Content & User Lifecycle "Standard Events"
  * ```js
  * branch.logEvent(
  *     event,
@@ -825,7 +821,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *     callback (err)
  * );
  * ```
- * ##### Usage for Custom Events
+ * ##### Usage for "Custom Events"
  * ```js
  * branch.logEvent(
  *     event,
@@ -833,6 +829,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *     callback (err)
  * );
  * ```
+ * ##### Notes:
+ * - logEvent() sends user_data automatically
+ * - When firing Standard Events, send custom and event data as part of the same object
+ * - Custom Events do not contain content items and event data
+ *
  * ##### Example -- How to log a Commerce Event
  * ```js
  *var event_and_custom_data = {
