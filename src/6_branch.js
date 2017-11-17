@@ -912,7 +912,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * ```
  * ___
  */
-/*** +TOC_ITEM #logevent-callback &.logEvent()& ^ALL ***/
+/*** +TOC_ITEM #logeventevent-event_data_and_custom_data-content_items-callback &.logEvent()& ^ALL ***/
 Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventData, contentItems) {
 	name = utils.validateParameterType(name, 'string') ? name : null;
 	eventData = utils.validateParameterType(eventData, 'object') ? eventData : null;

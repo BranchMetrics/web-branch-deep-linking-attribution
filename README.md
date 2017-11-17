@@ -81,7 +81,7 @@ ___
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)
-  + [.logEvent()](#logevent-callback)
+  + [.logEvent()](#logeventevent-event_data_and_custom_data-content_items-callback)
 
 3. Deep Linking
   + [.link()](#linkdata-callback)
