@@ -94,7 +94,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		var callbackString = 'branch_view_callback__' + (branch_view.callback_index++);
 		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
 		var url = branchViewData['url'] + '&callback=' + callbackString;
-		url += '&_lan=' + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode());
+		url += '&_lan=' + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode() || 'en');
 		url += '&data=' + postData;
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
 			var failed = false;
@@ -191,11 +191,12 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	if (options) {
 		branchViewId = options['branch_view_id'] || null;
 		no_journeys = options['no_journeys'] || null;
-		branch.user_language = options['user_language'] || utils.getBrowserLanguageCode();
+		branch.user_language = options['user_language'] || utils.getBrowserLanguageCode() || 'en';
 		journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 		makeNewLink = options['make_new_link'] || false;
 		// openApp defaults to false unless user specifies otherwise
+		// Note: Will only work for Journeys that don't have Auto-Open toggle in Journey template editor
 		openApp = options['open_app'] || false;
 	}
 

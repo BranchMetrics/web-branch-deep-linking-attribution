@@ -661,15 +661,21 @@ utils.getHostedDeepLinkData = function() {
 
 
 /**
- * @return {string} code
+ * Returns the user's preferred language
  */
 utils.getBrowserLanguageCode = function() {
 	var code;
 	try {
-		code = (navigator.language || navigator.browserLanguage || 'en').split(/[^a-z^A-Z0-9-]/).shift().toLowerCase();
+		if (navigator.languages && navigator.languages.length>0) {
+			code = navigator.languages[0];
+		}
+		else if (navigator.language) {
+			code = navigator.language;
+		}
+		code = code.substring(0, 2).toUpperCase();
 	}
 	catch (e) {
-		code = 'en';
+		code = null;
 	}
 	return code;
 };
@@ -825,6 +831,61 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 	}
 };
 
+// v2/event utility functions
+
+var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_ITEM', 'VIEW_ITEMS', 'RATE', 'SHARE', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENT' ];
+var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description' ];
+
+utils.isStandardEvent = function(eventName) {
+	return BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
+};
+
+utils.separateEventAndCustomData = function(eventAndCustomData) {
+
+	if (!eventAndCustomData || Object.keys(eventAndCustomData).length === 0) {
+		return null;
+	}
+	var customDataKeys = utils.calculateDiffBetweenArrays(BRANCH_STANDARD_EVENT_DATA, Object.keys(eventAndCustomData));
+	var customData = {};
+
+	for (var i = 0; i < customDataKeys.length; i++) {
+		var key = customDataKeys[i];
+		customData[key] = eventAndCustomData[key];
+		delete eventAndCustomData[key];
+	}
+	return {
+		"custom_data": utils.convertObjectValuesToString(customData),
+		"event_data": eventAndCustomData
+	};
+};
+
+utils.validateParameterType = function(parameter, type) {
+	if (!parameter || !type) {
+		return false;
+	}
+	if (type === "array") {
+		return Array.isArray(parameter);
+	}
+	return typeof parameter === type && !Array.isArray(parameter);
+};
+
+// Used by logEvent() to send fields related to user's visit and device to v2/event standard and custom
+// Requires a reference to the branch object to access information such as browser_fingerprint_id
+utils.getUserData = function(branch) {
+	var user_data = {};
+	user_data = utils.addPropertyIfNotNull(user_data, "http_origin", document.URL);
+	user_data = utils.addPropertyIfNotNull(user_data, "user_agent", navigator.userAgent);
+	user_data = utils.addPropertyIfNotNull(user_data, "language", utils.getBrowserLanguageCode());
+	user_data = utils.addPropertyIfNotNull(user_data, "screen_width", screen.width);
+	user_data = utils.addPropertyIfNotNull(user_data, "screen_height", screen.height);
+	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
+	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
+	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
+	user_data = utils.addPropertyIfNotNull(user_data, "sdk", "web");
+	user_data = utils.addPropertyIfNotNull(user_data, "sdk_version", config.version);
+	return user_data;
+};
+
 // Checks if page is in an iFrame
 utils.isIframe = function() {
 	return window.self !== window.top;
@@ -858,5 +919,18 @@ utils.getInitialReferrer = function(referringLink) {
 		return utils.isSameOriginFrame() ? window.top.document.referrer : "";
 	}
 	return document.referrer;
+};
+
+// Required for logEvent()'s custom_data object - values must be converted to string
+utils.convertObjectValuesToString = function(objectToConvert) {
+	if (!utils.validateParameterType(objectToConvert, 'object') || Object.keys(objectToConvert).length === 0) {
+		return;
+	}
+	for (var key in objectToConvert) {
+		if (objectToConvert.hasOwnProperty(key)) {
+			objectToConvert[key] = utils.validateParameterType(objectToConvert[key], 'object') || utils.validateParameterType(objectToConvert[key], 'array') ? safejson.stringify(objectToConvert[key]) : objectToConvert[key].toString();
+		}
+	}
+	return objectToConvert;
 };
 
