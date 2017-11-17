@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.30.0] - 2017-11-17
+- Adds ability to register commerce events, content events, user lifecycle events and custom events via logEvent()
+
 ## [2.29.0] - 2017-10-17
 - Adds retries, retry_delay and timeout options to .init() 
 - Automatically generates $ios_deeplink_path, $android_deeplink_path, $deeplink_path from twitter:app:url:iphone and twitter:app:url:googleplay Meta tags

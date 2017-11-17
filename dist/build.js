@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.29.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.30.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1200,9 +1200,9 @@ utils.getHostedDeepLinkData = function() {
 utils.getBrowserLanguageCode = function() {
   var a;
   try {
-    a = (navigator.language || navigator.browserLanguage || "en").split(/[^a-z^A-Z0-9-]/).shift().toLowerCase();
+    navigator.languages && 0 < navigator.languages.length ? a = navigator.languages[0] : navigator.language && (a = navigator.language), a = a.substring(0, 2).toUpperCase();
   } catch (b) {
-    a = "en";
+    a = null;
   }
   return a;
 };
@@ -1286,6 +1286,29 @@ utils.removePropertiesFromObject = function(a, b) {
     }
   }
 };
+var BRANCH_STANDARD_EVENTS = "ADD_TO_CART ADD_TO_WISHLIST VIEW_CART INITIATE_PURCHASE ADD_PAYMENT_INFO PURCHASE SPEND_CREDITS SEARCH VIEW_ITEM VIEW_ITEMS RATE SHARE COMPLETE_REGISTRATION COMPLETE_TUTORIAL ACHIEVE_LEVEL UNLOCK_ACHIEVEMENT".split(" "), BRANCH_STANDARD_EVENT_DATA = "transaction_id revenue currency shipping tax coupon affiliation search_query description".split(" ");
+utils.isStandardEvent = function(a) {
+  return -1 < BRANCH_STANDARD_EVENTS.indexOf(a);
+};
+utils.separateEventAndCustomData = function(a) {
+  if (!a || 0 === Object.keys(a).length) {
+    return null;
+  }
+  for (var b = utils.calculateDiffBetweenArrays(BRANCH_STANDARD_EVENT_DATA, Object.keys(a)), c = {}, d = 0;d < b.length;d++) {
+    var e = b[d];
+    c[e] = a[e];
+    delete a[e];
+  }
+  return {custom_data:utils.convertObjectValuesToString(c), event_data:a};
+};
+utils.validateParameterType = function(a, b) {
+  return a && b ? "array" === b ? Array.isArray(a) : typeof a === b && !Array.isArray(a) : !1;
+};
+utils.getUserData = function(a) {
+  var b = {}, b = utils.addPropertyIfNotNull(b, "http_origin", document.URL), b = utils.addPropertyIfNotNull(b, "user_agent", navigator.userAgent), b = utils.addPropertyIfNotNull(b, "language", utils.getBrowserLanguageCode()), b = utils.addPropertyIfNotNull(b, "screen_width", screen.width), b = utils.addPropertyIfNotNull(b, "screen_height", screen.height), b = utils.addPropertyIfNotNull(b, "http_referrer", document.referrer), b = utils.addPropertyIfNotNull(b, "browser_fingerprint_id", a.browser_fingerprint_id), 
+  b = utils.addPropertyIfNotNull(b, "developer_identity", a.identity), b = utils.addPropertyIfNotNull(b, "sdk", "web");
+  return b = utils.addPropertyIfNotNull(b, "sdk_version", config.version);
+};
 utils.isIframe = function() {
   return window.self !== window.top;
 };
@@ -1303,6 +1326,14 @@ utils.isIframeAndFromSameOrigin = function() {
 };
 utils.getInitialReferrer = function(a) {
   return a ? a : utils.isIframe() ? utils.isSameOriginFrame() ? window.top.document.referrer : "" : document.referrer;
+};
+utils.convertObjectValuesToString = function(a) {
+  if (utils.validateParameterType(a, "object") && 0 !== Object.keys(a).length) {
+    for (var b in a) {
+      a.hasOwnProperty(b) && (a[b] = utils.validateParameterType(a[b], "object") || utils.validateParameterType(a[b], "array") ? safejson.stringify(a[b]) : a[b].toString());
+    }
+    return a;
+  }
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -1372,6 +1403,8 @@ stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)})};
 resources.commerceEvent = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), commerce_data:validator(!0, validationTypes.OBJECT)})};
+resources.logStandardEvent = {destination:config.api_endpoint, endpoint:"/v2/event/standard", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING)}};
+resources.logCustomEvent = {destination:config.api_endpoint, endpoint:"/v2/event/custom", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING)}};
 // Input 7
 var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
@@ -1626,7 +1659,13 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
         }
         e(null, a, g.status);
       } else {
-        402 === g.status ? e(Error("Not enough credits to redeem."), null, g.status) : "4" !== g.status.toString().substring(0, 1) && "5" !== g.status.toString().substring(0, 1) || e(Error("Error in API: " + g.status), null, g.status);
+        if (402 === g.status) {
+          e(Error("Not enough credits to redeem."), null, g.status);
+        } else {
+          if ("4" === g.status.toString().substring(0, 1) || "5" === g.status.toString().substring(0, 1)) {
+            g.responseURL && g.responseURL.includes("v2/event") ? e(g.responseText, null, g.status) : e(Error("Error in API: " + g.status), null, g.status);
+          }
+        }
       }
     }
   };
@@ -2178,7 +2217,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
       var m = "branch_view_callback__" + branch_view.callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
       g = b.url + "&callback=" + m;
-      g += "&_lan=" + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode());
+      g += "&_lan=" + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode() || "en");
       a.XHRRequest(g + ("&data=" + c), {}, "GET", {}, function(a, c) {
         var g = !1;
         if (!a && c) {
@@ -2227,7 +2266,7 @@ branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
   var f = null, g = null, h = null, k = null, l = null, m = !1, p = !1, n = !1;
-  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, p = d.make_new_link || !1, n = d.open_app || !1);
+  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode() || "en", journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, p = d.make_new_link || !1, n = d.open_app || !1);
   (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, k = buildJourneyTestData(f, a, b));
   !k && c.hasOwnProperty("branch_view_data") && (k = c.branch_view_data, h = isJourneyDismissed(k, e));
   !k || h || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = k.id, e.renderQueue(function() {
@@ -2483,6 +2522,15 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
   e._api(resources.event, {event:b, metadata:utils.merge({url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language}, c), initial_referrer:utils.getInitialReferrer(e._referringLink())}, function(c, g) {
     c || "object" !== typeof g || "pageview" !== b || branch_view.initJourney(e.branch_key, session.get(e._storage), g, d, e);
     "function" === typeof a && a.apply(this, arguments);
+  });
+});
+Branch.prototype.logEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
+  b = utils.validateParameterType(b, "string") ? b : null;
+  c = utils.validateParameterType(c, "object") ? c : null;
+  utils.isStandardEvent(b) ? (d = utils.validateParameterType(d, "array") ? d : null, c = utils.separateEventAndCustomData(c), this._api(resources.logStandardEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(c && c.custom_data || {}), event_data:safejson.stringify(c && c.event_data || {}), content_items:safejson.stringify(d || [])}, function(b, c) {
+    return a(b || null);
+  })) : this._api(resources.logCustomEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(utils.convertObjectValuesToString(c) || {})}, function(b, c) {
+    return a(b || null);
   });
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
