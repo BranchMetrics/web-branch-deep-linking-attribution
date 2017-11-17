@@ -7,6 +7,7 @@
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)
+  + [.logEvent()](#logevent-callback)
 
 3. Deep Linking
   + [.link()](#linkdata-callback)
