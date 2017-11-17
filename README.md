@@ -41,7 +41,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -81,6 +81,7 @@ ___
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)
+  + [.logEvent()](#logeventevent-event_data_and_custom_data-content_items-callback)
 
 3. Deep Linking
   + [.link()](#linkdata-callback)
@@ -155,7 +156,6 @@ Properties available in the options object:
 | no_journeys | *optional* - `boolean`. When true, prevents Journeys from appearing on current page.
 | disable_entry_animation | *optional* - `boolean`. When true, prevents a Journeys entry animation.
 | disable_exit_animation | *optional* - `boolean`. When true, prevents a Journeys exit animation.
-| open_app | *optional* - `boolean`. Whether to try to open the app passively through Journeys (as opposed to opening it upon user clicking); defaults to false.
 | retries | *optional* - `integer`. Value specifying the number of times that a Branch API call can be re-attempted. Default 2.
 | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
 | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
@@ -321,6 +321,129 @@ ___
 # Deeplinking Methods
 
 ## Creating a deep linking link
+
+
+
+### logEvent(event, event_data_and_custom_data, content_items, callback) 
+
+**Parameters**
+
+**event**: `String`, _required_
+
+**event_data_and_custom_data**: `Object`, _optional_
+
+**content_items**: `Array`, _optional_
+
+**callback**: `function`, _optional_
+
+Register commerce events, content events, user lifecycle events and custom events via logEvent()
+
+##### NOTE: If this is the first time you are integrating our new event tracking feature via logEvent(), please use the latest Branch WebSDK snippet from the [Installation section](https://github.com/BranchMetrics/web-branch-deep-linking#quick-install). This has been updated in v2.30.0 of our SDK.
+
+The guides below provide information about what keys can be sent when triggering these event types:
+
+- [Logging Commerce Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-commerce-events)
+- [Logging Content Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-content-events)
+- [Logging User Lifecycle](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-user-lifecycle-events)
+- [Logging Custom Events](https://github.com/BranchMetrics/branch-deep-linking-public-api/blob/dfe601286f7b01a6951d6952fc833220e97d80c0/README.md#logging-custom-events)
+
+##### Usage for Commerce, Content & User Lifecycle "Standard Events"
+```js
+branch.logEvent(
+    event,
+    event_data_and_custom_data,
+    content_items,
+    callback (err)
+);
+```
+##### Usage for "Custom Events"
+```js
+branch.logEvent(
+    event,
+    custom_data,
+    callback (err)
+);
+```
+##### Notes:
+- logEvent() sends user_data automatically
+- When firing Standard Events, send custom and event data as part of the same object
+- Custom Events do not contain content items and event data
+
+##### Example -- How to log a Commerce Event
+```js
+var event_and_custom_data = {
+   "transaction_id": "tras_Id_1232343434",
+   "currency": "USD",
+   "revenue": 180.2,
+   "shipping": 10.5,
+   "tax": 13.5,
+   "coupon": "promo-1234",
+   "affiliation": "high_fi",
+   "description": "Preferred purchase",
+   "purchase_loc": "Palo Alto",
+   "store_pickup": "unavailable"
+};
+
+var content_items = [
+{
+   "$content_schema": "COMMERCE_PRODUCT",
+   "$og_title": "Nike Shoe",
+   "$og_description": "Start loving your steps",
+   "$og_image_url": "http://example.com/img1.jpg",
+   "$canonical_identifier": "nike/1234",
+   "$publicly_indexable": false,
+   "$price": 101.2,
+   "$locally_indexable": true,
+   "$quantity": 1,
+   "$sku": "1101123445",
+   "$product_name": "Runner",
+   "$product_brand": "Nike",
+   "$product_category": "Sporting Goods",
+   "$product_variant": "XL",
+   "$rating_average": 4.2,
+   "$rating_count": 5,
+   "$rating_max": 2.2,
+   "$creation_timestamp": 1499892854966,
+   "$exp_date": 1499892854966,
+   "$keywords": [ "sneakers", "shoes" ],
+   "$address_street": "230 South LaSalle Street",
+   "$address_city": "Chicago",
+   "$address_region": "IL",
+   "$address_country": "US",
+   "$address_postal_code": "60604",
+   "$latitude": 12.07,
+   "$longitude": -97.5,
+   "$image_captions": [ "my_img_caption1", "my_img_caption_2" ],
+   "$condition": "NEW",
+   "$custom_fields": {"foo1":"bar1","foo2":"bar2"}
+},
+{
+   "$og_title": "Nike Woolen Sox",
+   "$canonical_identifier": "nike/5324",
+   "$og_description": "Fine combed woolen sox for those who love your foot",
+   "$publicly_indexable": false,
+   "$price": 80.2,
+   "$locally_indexable": true,
+   "$quantity": 5,
+   "$sku": "110112467",
+   "$product_name": "Woolen Sox",
+   "$product_brand": "Nike",
+   "$product_category": "Apparel & Accessories",
+   "$product_variant": "Xl",
+   "$rating_average": 3.3,
+   "$rating_count": 5,
+   "$rating_max": 2.8,
+   "$creation_timestamp": 1499892854966
+}];
+
+branch.logEvent(
+   "PURCHASE",
+   event_and_custom_data,
+   content_items,
+   function(err) { console.log(err); }
+);
+```
+___
 
 
 
