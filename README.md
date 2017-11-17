@@ -318,10 +318,6 @@ callback("Error message");
 ```
 ___
 
-# Deeplinking Methods
-
-## Creating a deep linking link
-
 
 
 ### logEvent(event, event_data_and_custom_data, content_items, callback) 

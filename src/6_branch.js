@@ -758,11 +758,6 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
  * callback("Error message");
  * ```
  * ___
- *
- * # Deeplinking Methods
- *
- * ## Creating a deep linking link
- *
  */
 /*** +TOC_HEADING &Event Tracking& ^ALL ***/
 /*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
