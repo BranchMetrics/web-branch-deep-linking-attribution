@@ -743,6 +743,7 @@ describe('utils', function() {
 		});
 	});
 	describe('separateEventAndCustomData ', function() {
+
 		it('extracted custom and event data should equal initial objects', function() {
 			var event_data = {
 				"transaction_id": "1AB23456C7890123D",
@@ -840,6 +841,26 @@ describe('utils', function() {
 	});
 
 	describe('mergeMetadataFromInitToHostedMetadata', function() {
+		it('Prioritize metadata keys from init', function() {
+			var additionalMetadata = {};
+			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
+			var userSuppliedMetadata = { watch_brand: 'Seiko',
+				type: 'Presage'
+			};
+			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
+			var expected = {
+				watch_brand: 'Seiko',
+				type: 'Presage',
+				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
+				$android_deeplink_path: 'twitter/hamilton/khaki/android'
+			};
+			assert.deepEqual(
+				expected,
+				additionalMetadata['hosted_deeplink_data'],
+				'should be equal'
+			);
+		});
+
 		it('additionalMetadata[\'hosted_deeplink_data\'] should contain correct entries', function() {
 			var additionalMetadata = {};
 			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
@@ -858,6 +879,7 @@ describe('utils', function() {
 				'should be equal'
 			);
 		});
+
 		it('additionalMetadata[\'hosted_deeplink_data\'] should contain correct entries', function() {
 			var additionalMetadata = {};
 			var userSuppliedMetadata = { productA: '12345' };
