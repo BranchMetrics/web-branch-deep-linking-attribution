@@ -934,3 +934,15 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 	return objectToConvert;
 };
 
+// Adds user-supplied metadata object from init to additionalMetadata['hosted_deeplink_data'] for Journeys targeting
+utils.addMetadataFromInitToHostedMetadata = function(metadataFromInit, additionalMetadata) {
+	if (metadataFromInit && Object.keys(metadataFromInit).length > 0 && additionalMetadata) {
+		if (additionalMetadata['hosted_deeplink_data'] && Object.keys(additionalMetadata['hosted_deeplink_data']).length > 0) {
+			utils.merge(additionalMetadata['hosted_deeplink_data'], metadataFromInit);
+		}
+		else {
+			additionalMetadata['hosted_deeplink_data'] = metadataFromInit;
+		}
+	}
+};
+

@@ -838,4 +838,47 @@ describe('utils', function() {
 
 		});
 	});
+
+	describe('mergeMetadataFromInitToHostedMetadata', function() {
+		it('additionalMetadata[\'hosted_deeplink_data\'] should contain correct entries', function() {
+			var additionalMetadata = {};
+			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
+			var userSuppliedMetadata = { productA: '12345' };
+			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
+			var expected = {
+				watch_brand: 'Hamilton',
+				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
+				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
+				$android_deeplink_path: 'twitter/hamilton/khaki/android',
+				productA: '12345'
+			};
+			assert.deepEqual(
+				expected,
+				additionalMetadata['hosted_deeplink_data'],
+				'should be equal'
+			);
+		});
+		it('additionalMetadata[\'hosted_deeplink_data\'] should contain correct entries', function() {
+			var additionalMetadata = {};
+			var userSuppliedMetadata = { productA: '12345' };
+			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
+			var expected = { productA: '12345' };
+			assert.deepEqual(
+				expected,
+				additionalMetadata['hosted_deeplink_data'],
+				'should be equal'
+			);
+		});
+
+		it('additionalMetadata should not have changed; length should be the same', function() {
+			var additionalMetadata = {};
+			var userSuppliedMetadata = {};
+			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
+			assert.strictEqual(
+				0,
+				Object.keys(additionalMetadata).length,
+				'should be equal'
+			);
+		});
+	});
 });
