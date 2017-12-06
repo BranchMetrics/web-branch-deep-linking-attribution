@@ -254,7 +254,7 @@ Branch.prototype._publishEvent = function(event, data) {
  * | retries | *optional* - `integer`. Value specifying the number of times that a Branch API call can be re-attempted. Default 2.
  * | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
  * | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
- *
+ * | metadata | *optional* - `object`. Key-value pairs used to target Journeys users via the "is viewing a page with metadata data key" filter.
  *
  * ##### Usage
  * ```js
@@ -299,7 +299,7 @@ Branch.prototype['init'] = wrap(
 			self.app_id = branch_key;
 		}
 
-		options = (options && typeof options === 'function') ? { } : options;
+		options = options && utils.validateParameterType(options, 'object') ? options : { };
 		utils.retries = options && options['retries'] && Number.isInteger(options['retries']) ? options['retries'] : utils.retries;
 		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
@@ -398,6 +398,14 @@ Branch.prototype['init'] = wrap(
 			}
 
 			var additionalMetadata = utils.getAdditionalMetadata();
+			var metadata = utils.validateParameterType(options['metadata'], "object") ? options['metadata'] : null;
+			if (metadata) {
+				var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], metadata);
+				if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
+					additionalMetadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
+				}
+			}
+
 			self._api(resources.event, {
 				"event": 'pageview',
 				"metadata": utils.merge({
@@ -769,8 +777,10 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 	options = options || {};
 
 	if (event === "pageview") {
-		// Provides a way to target Journeys based on hosted deep link data
-		metadata = utils.addPropertyIfNotNull(metadata, "hosted_deeplink_data", utils.getHostedDeepLinkData());
+		var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
+		if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
+			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
+		}
 	}
 
 	self._api(resources.event, {
