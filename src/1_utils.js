@@ -936,9 +936,9 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 
 // Merges user supplied metadata to hosted deep link data for additional Journeys user targeting
 utils.mergeHostedDeeplinkData = function(hostedDeepLinkData, metadata) {
-	var hostedDeepLinkDataClone = hostedDeepLinkData ? Object.assign({}, hostedDeepLinkData) : {};
+	var hostedDeepLinkDataClone = hostedDeepLinkData ? utils.merge({}, hostedDeepLinkData) : {};
 	if (metadata && Object.keys(metadata).length > 0) {
-		return Object.keys(hostedDeepLinkDataClone).length > 0 ? utils.merge(hostedDeepLinkDataClone, metadata) : Object.assign({}, metadata);
+		return Object.keys(hostedDeepLinkDataClone).length > 0 ? utils.merge(hostedDeepLinkDataClone, metadata) : utils.merge({}, metadata);
 	}
 	return hostedDeepLinkDataClone;
 };

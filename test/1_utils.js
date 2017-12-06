@@ -841,7 +841,7 @@ describe('utils', function() {
 	});
 
 	describe('mergeMetadataFromInitToHostedMetadata', function() {
-		it('Overrides previous hosted_deeplink_data keys via user supplied metadata object', function() {
+		it('override previous hosted_deeplink_data keys via user-supplied metadata object', function() {
 			var additionalMetadata = {};
 			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
 			var userSuppliedMetadata = { watch_brand: 'Seiko',
@@ -861,7 +861,7 @@ describe('utils', function() {
 			);
 		});
 
-		it('Merges hosted_deeplink_data and user supplied metadata', function() {
+		it('merge hosted_deeplink_data and user-supplied metadata', function() {
 			var additionalMetadata = {};
 			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
 			var userSuppliedMetadata = { productA: '12345' };
@@ -880,7 +880,7 @@ describe('utils', function() {
 			);
 		});
 
-		it('Tests without hosted_deeplink_data', function() {
+		it('tests with metadata and without hosted_deeplink_data', function() {
 			var additionalMetadata = {};
 			var userSuppliedMetadata = { productA: '12345' };
 			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
@@ -892,7 +892,7 @@ describe('utils', function() {
 			);
 		});
 
-		it('Ensures that additionalMetadata[\'hosted_deeplink_data\'] does not get mutated', function() {
+		it('ensure that additionalMetadata[\'hosted_deeplink_data\'] does not get mutated', function() {
 			var additionalData = { 'root_key': '1234' };
 			additionalData['hosted_deeplink_data'] = { productA: '12345' };
 			var userSuppliedMetadata = { productB: '12345' };
@@ -905,7 +905,7 @@ describe('utils', function() {
 			);
 		});
 
-		it('Ensures that userSuppliedMetadata does not get mutated', function() {
+		it('ensure that userSuppliedMetadata does not get mutated', function() {
 			var additionalData = {};
 			additionalData['hosted_deeplink_data'] = { productA: '12345' };
 			var userSuppliedMetadata = { productB: '12345' };
