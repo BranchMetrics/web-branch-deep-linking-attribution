@@ -841,13 +841,13 @@ describe('utils', function() {
 	});
 
 	describe('mergeMetadataFromInitToHostedMetadata', function() {
-		it('Prioritize metadata keys from init', function() {
+		it('Overrides previous hosted_deeplink_data keys via user supplied metadata object', function() {
 			var additionalMetadata = {};
 			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
 			var userSuppliedMetadata = { watch_brand: 'Seiko',
 				type: 'Presage'
 			};
-			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
+			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
 			var expected = {
 				watch_brand: 'Seiko',
 				type: 'Presage',
@@ -856,16 +856,16 @@ describe('utils', function() {
 			};
 			assert.deepEqual(
 				expected,
-				additionalMetadata['hosted_deeplink_data'],
+				response,
 				'should be equal'
 			);
 		});
 
-		it('additionalMetadata[\'hosted_deeplink_data\'] should contain correct entries', function() {
+		it('Merges hosted_deeplink_data and user supplied metadata', function() {
 			var additionalMetadata = {};
 			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
 			var userSuppliedMetadata = { productA: '12345' };
-			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
+			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
 			var expected = {
 				watch_brand: 'Hamilton',
 				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
@@ -875,30 +875,45 @@ describe('utils', function() {
 			};
 			assert.deepEqual(
 				expected,
-				additionalMetadata['hosted_deeplink_data'],
+				response,
 				'should be equal'
 			);
 		});
 
-		it('additionalMetadata[\'hosted_deeplink_data\'] should contain correct entries', function() {
+		it('Tests without hosted_deeplink_data', function() {
 			var additionalMetadata = {};
 			var userSuppliedMetadata = { productA: '12345' };
-			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
+			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
 			var expected = { productA: '12345' };
 			assert.deepEqual(
 				expected,
-				additionalMetadata['hosted_deeplink_data'],
+				response,
 				'should be equal'
 			);
 		});
 
-		it('additionalMetadata should not have changed; length should be the same', function() {
-			var additionalMetadata = {};
-			var userSuppliedMetadata = {};
-			utils.addMetadataFromInitToHostedMetadata(userSuppliedMetadata, additionalMetadata);
-			assert.strictEqual(
-				0,
-				Object.keys(additionalMetadata).length,
+		it('Ensures that additionalMetadata[\'hosted_deeplink_data\'] does not get mutated', function() {
+			var additionalData = { 'root_key': '1234' };
+			additionalData['hosted_deeplink_data'] = { productA: '12345' };
+			var userSuppliedMetadata = { productB: '12345' };
+			utils.mergeHostedDeeplinkData(additionalData['hosted_deeplink_data'], userSuppliedMetadata);
+			var expected = { 'root_key': '1234', 'hosted_deeplink_data': { productA: '12345' } };
+			assert.deepEqual(
+				expected,
+				additionalData,
+				'should be equal'
+			);
+		});
+
+		it('Ensures that userSuppliedMetadata does not get mutated', function() {
+			var additionalData = {};
+			additionalData['hosted_deeplink_data'] = { productA: '12345' };
+			var userSuppliedMetadata = { productB: '12345' };
+			utils.mergeHostedDeeplinkData(additionalData['hosted_deeplink_data'], userSuppliedMetadata);
+			var expected = { productB: '12345' };
+			assert.deepEqual(
+				expected,
+				userSuppliedMetadata,
 				'should be equal'
 			);
 		});

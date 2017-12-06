@@ -299,7 +299,7 @@ Branch.prototype['init'] = wrap(
 			self.app_id = branch_key;
 		}
 
-		options = (options && typeof options === 'function') ? { } : options;
+		options = options && utils.validateParameterType(options, 'object') ? options : { };
 		utils.retries = options && options['retries'] && Number.isInteger(options['retries']) ? options['retries'] : utils.retries;
 		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
@@ -398,10 +398,12 @@ Branch.prototype['init'] = wrap(
 			}
 
 			var additionalMetadata = utils.getAdditionalMetadata();
-			var metadataFromInit = options && options['metadata'] && utils.validateParameterType(options['metadata'], "object") && Object.keys(options['metadata']).length > 0 ? options['metadata'] : null;
-			if (metadataFromInit) {
-				additionalMetadata = additionalMetadata || {};
-				utils.addMetadataFromInitToHostedMetadata(metadataFromInit, additionalMetadata);
+			var metadata = utils.validateParameterType(options['metadata'], "object") ? options['metadata'] : null;
+			if (metadata) {
+				var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], metadata);
+				if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
+					additionalMetadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
+				}
 			}
 
 			self._api(resources.event, {
@@ -775,10 +777,10 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 	options = options || {};
 
 	if (event === "pageview") {
-		// Allows user to target Journeys users via metadata passed into .track()
-		var hostedDeeplinkData = utils.getHostedDeepLinkData();
-		utils.merge(hostedDeeplinkData, metadata); // merge metadata keys into hostedDeeplinkData for Journeys targeting
-		metadata = utils.addPropertyIfNotNull(metadata, "hosted_deeplink_data", hostedDeeplinkData);
+		var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
+		if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
+			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
+		}
 	}
 
 	self._api(resources.event, {

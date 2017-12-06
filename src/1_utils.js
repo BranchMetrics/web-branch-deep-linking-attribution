@@ -816,7 +816,7 @@ utils.getAdditionalMetadata = function() {
 	metadata = utils.addPropertyIfNotNull(metadata, "title", utils.getTitle());
 	metadata = utils.addPropertyIfNotNull(metadata, "description", utils.getDescription());
 	metadata = utils.addPropertyIfNotNull(metadata, "canonical_url", utils.getCanonicalURL());
-	return metadata && Object.keys(metadata).length > 0 ? metadata : null;
+	return metadata && Object.keys(metadata).length > 0 ? metadata : {};
 };
 
 utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
@@ -934,15 +934,12 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 	return objectToConvert;
 };
 
-// Adds user-supplied metadata object from init to additionalMetadata['hosted_deeplink_data'] for Journeys targeting
-utils.addMetadataFromInitToHostedMetadata = function(metadataFromInit, additionalMetadata) {
-	if (metadataFromInit && Object.keys(metadataFromInit).length > 0 && additionalMetadata) {
-		if (additionalMetadata['hosted_deeplink_data'] && Object.keys(additionalMetadata['hosted_deeplink_data']).length > 0) {
-			utils.merge(additionalMetadata['hosted_deeplink_data'], metadataFromInit);
-		}
-		else {
-			additionalMetadata['hosted_deeplink_data'] = metadataFromInit;
-		}
+// Merges user supplied metadata to hosted deep link data for additional Journeys user targeting
+utils.mergeHostedDeeplinkData = function(hostedDeepLinkData, metadata) {
+	var hostedDeepLinkDataClone = hostedDeepLinkData ? Object.assign({}, hostedDeepLinkData) : {};
+	if (metadata && Object.keys(metadata).length > 0) {
+		return Object.keys(hostedDeepLinkDataClone).length > 0 ? utils.merge(hostedDeepLinkDataClone, metadata) : Object.assign({}, metadata);
 	}
+	return hostedDeepLinkDataClone;
 };
 
