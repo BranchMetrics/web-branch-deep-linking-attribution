@@ -1434,7 +1434,7 @@ describe('Branch', function() {
 				1,
 				'one listener listening with no event specified'
 			);
-			assert.strictEqual(listenerFired, 1, 'observer fired once');
+			assert.strictEqual(listenerFired, 2, 'historically, observer fired twice');
 		});
 	});
 

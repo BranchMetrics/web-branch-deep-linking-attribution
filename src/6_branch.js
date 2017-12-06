@@ -1655,6 +1655,7 @@ Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, a
 Branch.prototype['addListener'] = function(event, listener) {
 	if (typeof event === 'function' && listener === undefined) {
 		listener = event;
+		event = null;
 	}
 	if (listener) {
 		this._listeners.push({
