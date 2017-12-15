@@ -191,7 +191,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	if (options) {
 		branchViewId = options['branch_view_id'] || null;
 		no_journeys = options['no_journeys'] || null;
-		branch.user_language = options['user_language'] || utils.getBrowserLanguageCode() || 'en';
+		branch.user_language = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase(); // language should be lowercase for Journeys
 		journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 		makeNewLink = options['make_new_link'] || false;
