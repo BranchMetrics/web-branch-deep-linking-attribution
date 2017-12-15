@@ -4,6 +4,7 @@ goog.require('utils');
 goog.require('banner_css');
 goog.require('safejson');
 goog.require('journeys_utils');
+goog.require('session');
 
 branch_view.callback_index = 1;
 
@@ -165,11 +166,14 @@ function compileRequestData(branch, makeNewLink, openApp) {
 	}
 
 	var linkClickId = !makeNewLink ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
+	var session = session.get(branch._storage) || {};
+	var has_app = session.hasOwnProperty('has_app') ? session['has_app'] : false;
 
 	requestData['data'] = utils.merge(utils.getHostedDeepLinkData(), requestData['data']);
-	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
+	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session || {}), requestData['data']);
 	requestData['data'] = linkClickId ? utils.merge({ 'link_click_id': linkClickId }, requestData['data']) : requestData['data'];
 	requestData = utils.merge({ 'open_app': openApp }, requestData);
+	requestData = utils.merge({ 'has_app_websdk': has_app }, requestData);
 	requestData = utils.isIframe() ? utils.merge({ 'is_iframe': true }, requestData) : requestData;
 	return requestData;
 }
