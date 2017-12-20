@@ -4,6 +4,11 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.31.0] - 2017-12-20
+- Pass metadata into branch.init() for Journeys targeting 
+- Fixes bug related to listening for all events in Smart Banner and Journeys
+- Fixes bug related to showing different languages in Journeys
+
 ## [2.30.0] - 2017-11-17
 - Adds ability to register commerce events, content events, user lifecycle events and custom events via logEvent()
 

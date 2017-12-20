@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.30.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.31.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1277,7 +1277,7 @@ utils.openGraphDataAsObject = function() {
 };
 utils.getAdditionalMetadata = function() {
   var a = {}, a = utils.addPropertyIfNotNull(a, "og_data", utils.openGraphDataAsObject()), a = utils.addPropertyIfNotNull(a, "hosted_deeplink_data", utils.getHostedDeepLinkData()), a = utils.addPropertyIfNotNull(a, "title", utils.getTitle()), a = utils.addPropertyIfNotNull(a, "description", utils.getDescription());
-  return (a = utils.addPropertyIfNotNull(a, "canonical_url", utils.getCanonicalURL())) && 0 < Object.keys(a).length ? a : null;
+  return (a = utils.addPropertyIfNotNull(a, "canonical_url", utils.getCanonicalURL())) && 0 < Object.keys(a).length ? a : {};
 };
 utils.removePropertiesFromObject = function(a, b) {
   if (a && "object" === typeof a && !Array.isArray(a) && 0 < Object.keys(a).length && b && Array.isArray(b) && 0 < b.length) {
@@ -1334,6 +1334,10 @@ utils.convertObjectValuesToString = function(a) {
     }
     return a;
   }
+};
+utils.mergeHostedDeeplinkData = function(a, b) {
+  var c = a ? utils.merge({}, a) : {};
+  return b && 0 < Object.keys(b).length ? 0 < Object.keys(c).length ? utils.merge(c, b) : utils.merge({}, b) : c;
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -2256,17 +2260,20 @@ function compileRequestData(a, b, c) {
   var d = a._branchViewData || {};
   d.data || (d.data = {});
   b = b ? null : utils.getClickIdAndSearchStringFromLink(a._referringLink());
+  a = session.get(a._storage) || {};
+  var e = a.hasOwnProperty("has_app") ? a.has_app : !1;
   d.data = utils.merge(utils.getHostedDeepLinkData(), d.data);
-  d.data = utils.merge(utils.whiteListJourneysLanguageData(session.get(a._storage) || {}), d.data);
+  d.data = utils.merge(utils.whiteListJourneysLanguageData(a || {}), d.data);
   d.data = b ? utils.merge({link_click_id:b}, d.data) : d.data;
   d = utils.merge({open_app:c}, d);
+  d = utils.merge({has_app_websdk:e}, d);
   return d = utils.isIframe() ? utils.merge({is_iframe:!0}, d) : d;
 }
 branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
   var f = null, g = null, h = null, k = null, l = null, m = !1, p = !1, n = !1;
-  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = d.user_language || utils.getBrowserLanguageCode() || "en", journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, p = d.make_new_link || !1, n = d.open_app || !1);
+  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = (d.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, p = d.make_new_link || !1, n = d.open_app || !1);
   (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, k = buildJourneyTestData(f, a, b));
   !k && c.hasOwnProperty("branch_view_data") && (k = c.branch_view_data, h = isJourneyDismissed(k, e));
   !k || h || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = k.id, e.renderQueue(function() {
@@ -2395,7 +2402,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
-  c = c && "function" === typeof c ? {} : c;
+  c = c && utils.validateParameterType(c, "object") ? c : {};
   utils.retries = c && c.retries && Number.isInteger(c.retries) ? c.retries : utils.retries;
   utils.retry_delay = c && c.retry_delay && Number.isInteger(c.retry_delay) ? c.retry_delay : utils.retry_delay;
   utils.timeout = c && c.timeout && Number.isInteger(c.timeout) ? c.timeout : utils.timeout;
@@ -2427,7 +2434,8 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     if (f) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, h && utils.whiteListSessionData(h));
     }
-    var l = utils.getAdditionalMetadata();
+    var l = utils.getAdditionalMetadata(), m = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
+    m && (m = utils.mergeHostedDeeplinkData(l.hosted_deeplink_data, m)) && 0 < Object.keys(m).length && (l.hosted_deeplink_data = m);
     d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, l || {}), initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(e, f) {
       e || "object" !== typeof f || branch_view.initJourney(b, h, f, c, d);
       try {
@@ -2518,9 +2526,12 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
   var e = this;
   c = c || {};
   d = d || {};
-  "pageview" === b && (c = utils.addPropertyIfNotNull(c, "hosted_deeplink_data", utils.getHostedDeepLinkData()));
-  e._api(resources.event, {event:b, metadata:utils.merge({url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language}, c), initial_referrer:utils.getInitialReferrer(e._referringLink())}, function(c, g) {
-    c || "object" !== typeof g || "pageview" !== b || branch_view.initJourney(e.branch_key, session.get(e._storage), g, d, e);
+  if ("pageview" === b) {
+    var f = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), c);
+    f && 0 < Object.keys(f).length && (c.hosted_deeplink_data = f);
+  }
+  e._api(resources.event, {event:b, metadata:utils.merge({url:utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language}, c), initial_referrer:utils.getInitialReferrer(e._referringLink())}, function(c, f) {
+    c || "object" !== typeof f || "pageview" !== b || branch_view.initJourney(e.branch_key, session.get(e._storage), f, d, e);
     "function" === typeof a && a.apply(this, arguments);
   });
 });
@@ -2636,7 +2647,7 @@ Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   });
 });
 Branch.prototype.addListener = function(a, b) {
-  "function" === typeof a && void 0 === b && (b = a);
+  "function" === typeof a && void 0 === b && (b = a, a = null);
   b && this._listeners.push({listener:b, event:a || null});
 };
 Branch.prototype.removeListener = function(a) {
