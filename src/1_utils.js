@@ -816,7 +816,7 @@ utils.getAdditionalMetadata = function() {
 	metadata = utils.addPropertyIfNotNull(metadata, "title", utils.getTitle());
 	metadata = utils.addPropertyIfNotNull(metadata, "description", utils.getDescription());
 	metadata = utils.addPropertyIfNotNull(metadata, "canonical_url", utils.getCanonicalURL());
-	return metadata && Object.keys(metadata).length > 0 ? metadata : null;
+	return metadata && Object.keys(metadata).length > 0 ? metadata : {};
 };
 
 utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
@@ -932,5 +932,14 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 		}
 	}
 	return objectToConvert;
+};
+
+// Merges user supplied metadata to hosted deep link data for additional Journeys user targeting
+utils.mergeHostedDeeplinkData = function(hostedDeepLinkData, metadata) {
+	var hostedDeepLinkDataClone = hostedDeepLinkData ? utils.merge({}, hostedDeepLinkData) : {};
+	if (metadata && Object.keys(metadata).length > 0) {
+		return Object.keys(hostedDeepLinkDataClone).length > 0 ? utils.merge(hostedDeepLinkDataClone, metadata) : utils.merge({}, metadata);
+	}
+	return hostedDeepLinkDataClone;
 };
 

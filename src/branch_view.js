@@ -165,11 +165,14 @@ function compileRequestData(branch, makeNewLink, openApp) {
 	}
 
 	var linkClickId = !makeNewLink ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
+	var sessionStorage = session.get(branch._storage) || {};
+	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
 
 	requestData['data'] = utils.merge(utils.getHostedDeepLinkData(), requestData['data']);
-	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(session.get(branch._storage) || {}), requestData['data']);
+	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(sessionStorage || {}), requestData['data']);
 	requestData['data'] = linkClickId ? utils.merge({ 'link_click_id': linkClickId }, requestData['data']) : requestData['data'];
 	requestData = utils.merge({ 'open_app': openApp }, requestData);
+	requestData = utils.merge({ 'has_app_websdk': has_app }, requestData);
 	requestData = utils.isIframe() ? utils.merge({ 'is_iframe': true }, requestData) : requestData;
 	return requestData;
 }
@@ -191,7 +194,7 @@ branch_view.initJourney = function(branch_key, data, eventData, options, branch)
 	if (options) {
 		branchViewId = options['branch_view_id'] || null;
 		no_journeys = options['no_journeys'] || null;
-		branch.user_language = options['user_language'] || utils.getBrowserLanguageCode() || 'en';
+		branch.user_language = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase(); // language should be lowercase for Journeys
 		journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
 		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 		makeNewLink = options['make_new_link'] || false;

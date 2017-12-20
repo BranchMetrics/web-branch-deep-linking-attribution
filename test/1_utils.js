@@ -743,6 +743,7 @@ describe('utils', function() {
 		});
 	});
 	describe('separateEventAndCustomData ', function() {
+
 		it('extracted custom and event data should equal initial objects', function() {
 			var event_data = {
 				"transaction_id": "1AB23456C7890123D",
@@ -836,6 +837,85 @@ describe('utils', function() {
 				utils.validateParameterType(parameter3, type3),
 				'should return true');
 
+		});
+	});
+
+	describe('mergeMetadataFromInitToHostedMetadata', function() {
+		it('override previous hosted_deeplink_data keys via user-supplied metadata object', function() {
+			var additionalMetadata = {};
+			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
+			var userSuppliedMetadata = { watch_brand: 'Seiko',
+				type: 'Presage'
+			};
+			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
+			var expected = {
+				watch_brand: 'Seiko',
+				type: 'Presage',
+				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
+				$android_deeplink_path: 'twitter/hamilton/khaki/android'
+			};
+			assert.deepEqual(
+				expected,
+				response,
+				'should be equal'
+			);
+		});
+
+		it('merge hosted_deeplink_data and user-supplied metadata', function() {
+			var additionalMetadata = {};
+			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
+			var userSuppliedMetadata = { productA: '12345' };
+			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
+			var expected = {
+				watch_brand: 'Hamilton',
+				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
+				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
+				$android_deeplink_path: 'twitter/hamilton/khaki/android',
+				productA: '12345'
+			};
+			assert.deepEqual(
+				expected,
+				response,
+				'should be equal'
+			);
+		});
+
+		it('tests with metadata and without hosted_deeplink_data', function() {
+			var additionalMetadata = {};
+			var userSuppliedMetadata = { productA: '12345' };
+			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
+			var expected = { productA: '12345' };
+			assert.deepEqual(
+				expected,
+				response,
+				'should be equal'
+			);
+		});
+
+		it('ensure that additionalMetadata[\'hosted_deeplink_data\'] does not get mutated', function() {
+			var additionalData = { 'root_key': '1234' };
+			additionalData['hosted_deeplink_data'] = { productA: '12345' };
+			var userSuppliedMetadata = { productB: '12345' };
+			utils.mergeHostedDeeplinkData(additionalData['hosted_deeplink_data'], userSuppliedMetadata);
+			var expected = { 'root_key': '1234', 'hosted_deeplink_data': { productA: '12345' } };
+			assert.deepEqual(
+				expected,
+				additionalData,
+				'should be equal'
+			);
+		});
+
+		it('ensure that userSuppliedMetadata does not get mutated', function() {
+			var additionalData = {};
+			additionalData['hosted_deeplink_data'] = { productA: '12345' };
+			var userSuppliedMetadata = { productB: '12345' };
+			utils.mergeHostedDeeplinkData(additionalData['hosted_deeplink_data'], userSuppliedMetadata);
+			var expected = { productB: '12345' };
+			assert.deepEqual(
+				expected,
+				userSuppliedMetadata,
+				'should be equal'
+			);
 		});
 	});
 });
