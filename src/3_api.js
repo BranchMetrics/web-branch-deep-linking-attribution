@@ -196,6 +196,11 @@ Server.prototype.createScript = function(src, onError, onLoad) {
  * @param {function(?Error,*=,?=)=} callback
  */
 Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
+
+	// Ensures correct behavior for auto deep linking in iOS 11, Safari
+	if (this._jsonp_callback_index === 0 && utils.isSafari11OrGreater()) {
+		this._jsonp_callback_index++;
+	}
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('branch.io') >= 0) ? '&data=' : '&post_data=';
