@@ -196,6 +196,15 @@ Server.prototype.createScript = function(src, onError, onLoad) {
  * @param {function(?Error,*=,?=)=} callback
  */
 Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
+
+	/* On iOS 11-Safari when a partner calls .deepview() and uses $uri_redirect_mode: 2,
+	   they will not get transported into the app (if installed) on pageload because
+	   callbackString will evaluate to branch_callback_0. The backend expects branch_callback_1
+	   for auto-open to work. This is why we have the fix below.
+	*/
+	if (this._jsonp_callback_index === 0 && utils.isSafari11OrGreater()) {
+		this._jsonp_callback_index++;
+	}
 	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
 	var postPrefix = (requestURL.indexOf('branch.io') >= 0) ? '&data=' : '&post_data=';
