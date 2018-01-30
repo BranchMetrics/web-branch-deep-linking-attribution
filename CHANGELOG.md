@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.32.0] - 2018-01-30
+- Fixes bug where WebSDK deepviews do not show URI scheme popup on initial page load when open_app is true in Safari on iOS 11
+
 ## [2.31.0] - 2017-12-20
 - Pass metadata into branch.init() for Journeys targeting 
 - Fixes bug related to listening for all events in Smart Banner and Journeys
