@@ -36,14 +36,14 @@ This SDK requires native browser Javascript and has been tested in all modern br
 #### Recommended Installation
 
 Add the following script within your `<head>` tags:
-_Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
+_Be sure to replace `BRANCH_KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
 ```html
 <script type="text/javascript">
 
 	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent".split(" "), 0);
 
-	branch.init('BRANCH KEY', function(err, data) {
+	branch.init('BRANCH_KEY', function(err, data) {
     	// callback to handle err or data
 	});
 </script>
