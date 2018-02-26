@@ -1753,7 +1753,6 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 	done();
 });
 
-/*** +TOC_ITEM #banneroptions-data &.banner()& ^WEB ***/
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
 	data = data || {};
 	_setBranchViewData.call(null, this, function() {}, data);
