@@ -1471,9 +1471,9 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
 
 /**
  * @function Branch.creditHistory
- * @param {Object} options - _optional_ - options controlling the returned history.
+ * @param {Object} options - _optional_ - options controlling the returned history
  * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history
- * data.
+ * data
  *
  * This call will retrieve the entire history of credits and redemptions from the individual user.
  * Properties available in the `options` object:
