@@ -101,7 +101,6 @@ ___
 6. Journeys Web To App
   + [.setBranchViewData()](#setbranchviewdatadata)
   + [.closeJourney()](#closejourneycallback)
-  + [.banner()](#banneroptions-data)
 
 7. Firebase App Indexing
   + [.autoAppIndex()](#autoappindexdata-callback)
@@ -901,7 +900,7 @@ not defined, the observer will recieve all events.
 event as a string and optional data as an object.
 
 The Branch Web SDK includes a simple event listener, that currently only publishes events for
-`Branch.banner()` events.
+Journeys events.
 Future development will include the ability to subscribe to events related to all other Web
 SDK functionality.
 
@@ -911,23 +910,11 @@ SDK functionality.
 var listener = function(event, data) { console.log(event, data); }
 
 // Specify an event to listen for
-branch.addListener('willShowBanner', listener);
+branch.addListener('willShowJourney', listener);
 
 // Listen for all events
 branch.addListener(listener);
 ```
-
-#### Available `Branch.banner()` Events:
-- *willShowBanner*: `banner()` called, and the smart banner is about to be shown.
-- *willNotShowBanner*: `banner()` called, and the smart banner will not be shown. No more
-     events will be emitted.
-- *didShowBanner*: Smart banner animation started and is being shown to the user.
-- *willCloseBanner*: `closeBanner()` called, and the smart banner will close.
-- *didCloseBanner*: Smart banner close animation started, and is closing.
-- *willSendBannerSMS*: Phone number in correct format, and will attempt to send SMS.
-- *sendBannerSMSError*: `sendSMS()` error returned.
-- *didSendBannerSMS*: SMS successfully sent.
-- *didDownloadApp*: User installed app, and banner text updated.
 
 #### Available `Journey` Events:
 - *willShowJourney*: Journey is about to be shown.
@@ -1004,87 +991,6 @@ closing the Journey is very simple by calling `Branch.closeJourney()`.
 branch.closeJourney(function(err) { console.log(err); });
 ```
 ___
-
-
-
-### banner(options, data) 
-
-**Parameters**
-
-**options**: `Object`, _required_ - object of all the options to setup the banner
-
-**data**: `Object`, _required_ - object of all link data, same as Branch.link()
-*
-Display a smart banner directing the user to your app through a Branch referral link.  The
-`data` param is the exact same as in `branch.link()`.
-
-| iOS Smart Banner | Android Smart Banner | Desktop Smart Banner |
-|------------------|----------------------|----------------------|
-| ![iOS Smart Banner](docs/images/ios-web-sdk-banner-1.0.0.png) | ![Android Smart Banner](docs/images/android-web-sdk-banner-1.0.0.png) | ![Desktop Smart Banner](docs/images/desktop-web-sdk-banner-1.0.0.png) |
-
-#### Usage
-
-```js
-branch.banner(
-    options, // Banner options: See example for all available options
-    data // Data for link, same as Branch.link()
-);
-```
-
-##### Example
-
-```js
-branch.banner({
-    icon: 'http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png',
-    title: 'Branch Demo App',
-    description: 'The Branch demo app!',
-    rating: 5,                              // Displays a star rating out of 5. Supports half stars through increments of .5
-    reviewCount: 1500,                      // Amount of reviews your app has received next to the star rating
-    openAppButtonText: 'Open',              // Text to show on button if the user has the app installed
-    downloadAppButtonText: 'Download',      // Text to show on button if the user does not have the app installed
-    sendLinkText: 'Send Link',              // Text to show on desktop button to allow users to text themselves the app
-    phonePreviewText: '+44 9999-9999',      // The default phone placeholder is a US format number, localize the placeholder number with a custom placeholder with this option
-    showiOS: true,                          // Should the banner be shown on iOS devices (both iPhones and iPads)?
-    showiPad: true,                         // Should the banner be shown on iPads (this overrides showiOS)?
-    showAndroid: true,                      // Should the banner be shown on Android devices?
-    showBlackberry: true,                   // Should the banner be shown on Blackberry devices?
-    showWindowsPhone: true,                 // Should the banner be shown on Windows Phone devices?
-    showKindle: true,                       // Should the banner be shown on Kindle devices?
-    showDesktop: true,                      // Should the banner be shown on desktop devices?
-    iframe: true,                           // Show banner in an iframe, recomended to isolate Branch banner CSS
-    disableHide: false,                     // Should the user have the ability to hide the banner? (show's X on left side)
-    forgetHide: false,                      // Should we show the banner after the user closes it? Can be set to true, or an integer to show again after X days
-    respectDNT: false,                      // Should we skip showing the banner when a user's settings show 'Do Not Track'?
-    mobileSticky: false,                    // Determines whether the mobile banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to false *this property only applies when the banner position is 'top'
-    desktopSticky: true,                    // Determines whether the desktop banner will be set `position: fixed;` (sticky) or `position: absolute;`, defaults to true *this property only applies when the banner position is 'top'
-    make_new_link: false,                   // Should the banner create a new link, even if a link already exists?
-    open_app: false,                        // Should the banner try to open the app passively (without the user actively clicking) on load?
-
-}, {
-    tags: ['tag1', 'tag2'],
-    feature: 'dashboard',
-    stage: 'new user',
-    data: {
-        mydata: 'something',
-        foo: 'bar',
-        '$deeplink_path': 'open/item/1234'
-    }
-});
-```
-___
-
-### closeBanner()
-
-#### Closing the App Banner Programmatically
-
-The App Banner includes a close button the user can click, but you may want to close the
-banner with a timeout, or via some other user interaction with your web app. In this case,
-closing the banner is very simple by calling `Branch.closeBanner()`.
-
-##### Usage
-```js
-branch.closeBanner();
-```
 
 
 

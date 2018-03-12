@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.33.0] - 2018-03-12
+- removes Smart Banner docs from WebSDK
+
 ## [2.32.0] - 2018-01-30
 - Fixes bug where WebSDK deepviews do not show URI scheme popup on initial page load when open_app is true in Safari on iOS 11
 
