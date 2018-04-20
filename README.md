@@ -14,6 +14,8 @@ To use the Web SDK, you'll need to first initialize it with your Branch Key foun
 
 Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
 
+Yes. Branch uses Twilio to send SMS messages, which means SMS will be delivered all around the world. However, please note that the number the SMS has to be delivered to, must be in the same country the SMS is being sent from.
+
 ## Using the Sample Web App
 
 We provide a sample web app which demonstrates what Branch Metrics Web SDK can do. The online version can be found at <https://cdn.branch.io/example.html>. Alternatively, you can open `example.html` locally to for the same effect.
