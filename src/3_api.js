@@ -363,6 +363,12 @@ Server.prototype.request = function(resource, data, storage, callback) {
 			callback(err, data);
 		}
 	};
+
+	if (utils.gdpr.tracking_disabled && utils.gdpr.shouldBlockRequestInGDPRMode(url, data)) {
+		// If partners call functions that reach-out to blocked endpoints after init() finishes, then we should return an error with a message
+		return utils.gdpr.allow_errors_in_callback ? done(new Error(utils.messages.trackingDisabled), null, 300) : done(null, {}, 200);
+	}
+
 	var makeRequest = function() {
 		if (storage.get('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);

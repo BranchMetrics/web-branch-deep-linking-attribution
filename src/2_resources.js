@@ -35,7 +35,11 @@ var _validator;
  */
 function validator(required, type) {
 	return function(endpoint, param, data) {
-		// Must ensure data is not a number before doing a !data otherwise the number can't be 0.
+		// Ignores request validation when tracking is disabled because information will be intentionally missing from requests
+		if (utils.gdpr.tracking_disabled) {
+			return false;
+		}
+		// Ensure data is not a number before doing a !data otherwise the number can't be 0.
 		if ((typeof data !== 'number') && !data) {
 			if (required) {
 				return utils.message(utils.messages.missingParam, [ endpoint, param ]);

@@ -183,6 +183,10 @@ Branch.prototype._api = function(resource, obj, callback) {
 			this.browser_fingerprint_id) {
 		obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
 	}
+	// Adds tracking_disabled to every request when enabled
+	if (utils.gdpr.tracking_disabled) {
+		obj['tracking_disabled'] = utils.gdpr.tracking_disabled;
+	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
@@ -255,7 +259,7 @@ Branch.prototype._publishEvent = function(event, data) {
  * | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
  * | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
  * | metadata | *optional* - `object`. Key-value pairs used to target Journeys users via the "is viewing a page with metadata key" filter.
- *
+ * | disable_tracking | *optional* - `boolean`. true or false depending on whether the user would like to remain private or not.
  * ##### Usage
  * ```js
  * branch.init(
@@ -300,9 +304,20 @@ Branch.prototype['init'] = wrap(
 		}
 
 		options = options && utils.validateParameterType(options, 'object') ? options : { };
+		self.init_options = options;
+
 		utils.retries = options && options['retries'] && Number.isInteger(options['retries']) ? options['retries'] : utils.retries;
 		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
+
+		utils.gdpr.tracking_disabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
+
+		if (utils.gdpr.tracking_disabled) {
+			utils.cleanApplicationSessionAndCookieStorage(self);
+		}
+		else {
+			utils.gdpr.allow_errors_in_callback = false;
+		}
 
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {
@@ -382,8 +397,9 @@ Branch.prototype['init'] = wrap(
 		var finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
-				session.set(self._storage, data, freshInstall);
-
+				if (!utils.gdpr.tracking_disabled) {
+					session.set(self._storage, data, freshInstall);
+				}
 				self.init_state = init_states.INIT_SUCCEEDED;
 				data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 			}
@@ -417,11 +433,15 @@ Branch.prototype['init'] = wrap(
 				}, additionalMetadata || {}),
 				"initial_referrer": utils.getInitialReferrer(self._referringLink())
 			}, function(err, eventData) {
-				if (!err && typeof eventData === 'object') {
+				// disables Journeys temporarily in GDPR mode
+				if (!utils.gdpr.tracking_disabled && !err && typeof eventData === 'object') {
 					branch_view.initJourney(branch_key, data, eventData, options, self);
 				}
 				try {
 					done(err, data && utils.whiteListSessionData(data));
+					if (utils.gdpr.tracking_disabled) {
+						utils.gdpr.allow_errors_in_callback = true;
+					}
 				}
 				catch (e) {
 					// pass
@@ -488,7 +508,6 @@ Branch.prototype['init'] = wrap(
 						self.init_state_fail_details = err.message;
 						return finishInit(err, null);
 					}
-
 					self._api(
 						resources.open,
 						{
@@ -504,9 +523,10 @@ Branch.prototype['init'] = wrap(
 								self.init_state_fail_details = err.message;
 							}
 							if (!err && typeof data === 'object') {
-								self._branchViewEnabled = !!data['branch_view_enabled'];
-								self._storage.set('branch_view_enabled', self._branchViewEnabled);
-
+								if (data['branch_view_enabled']) {
+									self._branchViewEnabled = !!data['branch_view_enabled'];
+									self._storage.set('branch_view_enabled', self._branchViewEnabled);
+								}
 								if (link_identifier) {
 									data['click_id'] = link_identifier;
 								}
@@ -534,9 +554,10 @@ Branch.prototype['init'] = wrap(
 						self.init_state_fail_details = err.message;
 					}
 					if (!err && typeof data === 'object') {
-						self._branchViewEnabled = !!data['branch_view_enabled'];
-						self._storage.set('branch_view_enabled', self._branchViewEnabled);
-
+						if (data['branch_view_enabled']) {
+							self._branchViewEnabled = !!data['branch_view_enabled'];
+							self._storage.set('branch_view_enabled', self._branchViewEnabled);
+						}
 						if (link_identifier) {
 							data['click_id'] = link_identifier;
 						}
@@ -792,7 +813,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		}, metadata),
 		"initial_referrer": utils.getInitialReferrer(self._referringLink())
 	}, function(err, data) {
-		if (!err && typeof data === 'object' && event === 'pageview') {
+		// disables Journeys temporarily in GDPR mode
+		if (!utils.gdpr.tracking_disabled && !err && typeof data === 'object' && event === 'pageview') {
 			branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
 		}
 		if (typeof done === 'function') {
@@ -1301,9 +1323,12 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		resources.deepview, cleanedData,
 		function(err, data) {
 			if (err) {
-				self._deepviewCta = function() {
-					self._windowRedirect(fallbackUrl);
-				};
+				// ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
+				if (!utils.gdpr.tracking_disabled) {
+					self._deepviewCta = function() {
+						self._windowRedirect(fallbackUrl);
+					};
+				}
 				return done(err);
 			}
 
@@ -2021,6 +2046,44 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 			done(err || null);
 		});
 	});
+	done();
+});
+
+/**
+ * @function Branch.disableTracking
+ * @param {Boolean} disableTracking - _required_ - true or false depending on whether the user would like to remain private or not
+ *
+ * Allows User to Remain Private
+ *
+ * This will prevent any Branch requests from being sent across the network, except for the case of deep linking.
+ * If someone clicks a Branch link, but has expressed not to be tracked, we will return deep linking data back to the
+ * client but without tracking information.
+ *
+ * In do-not-track mode, you will still be able to create links and display Journeys however, they will not have identifiable
+ * information associated to them. You can change this behavior at any time, by calling the aforementioned function.
+ * This information will be saved and persisted.
+ * ___
+ */
+/*** +TOC_HEADING &User Privacy& ^WEB ***/
+/*** +TOC_ITEM #disableTrackingdisableTracking &.disableTracking()& ^WEB ***/
+Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, function(done, disableTracking) {
+	var self = this;
+	if (disableTracking === false) {
+		utils.gdpr.tracking_disabled = false;
+		utils.gdpr.allow_errors_in_callback = false;
+		if (self.branch_key && self.init_options) {
+			if (self.init_options['tracking_disabled'] === true) {
+				delete self.init_options['tracking_disabled'];
+			}
+			self['init'](self.branch_key, self.init_options);
+		}
+	}
+	else {
+		utils.cleanApplicationSessionAndCookieStorage(self);
+		utils.gdpr.tracking_disabled = true;
+		utils.gdpr.allow_errors_in_callback = true;
+		self['closeJourney']();
+	}
 	done();
 });
 

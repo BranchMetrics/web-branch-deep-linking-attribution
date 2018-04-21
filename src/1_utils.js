@@ -20,6 +20,73 @@ utils.retries = 2; // Value specifying the number of times that a Branch API cal
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
 utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
 
+utils.gdpr = {
+	tracking_disabled: false,
+	white_listed_endpoints_with_data: {
+		'/v1/open': { 'link_identifier':'\\d+' }
+	},
+	allow_errors_in_callback: false
+};
+
+// Used by 3_api.js to determine whether a request should be blocked
+utils.gdpr.shouldBlockRequestInGDPRMode = function(url, requestData) {
+
+	var urlParser = document.createElement('a');
+	urlParser.href = url;
+	var urlPath = urlParser.pathname;
+
+	if (urlPath && utils.gdpr.white_listed_endpoints_with_data.hasOwnProperty(urlPath) === false
+	) {
+		return true;
+	}
+	else if (
+		urlPath &&
+		utils.gdpr.white_listed_endpoints_with_data.hasOwnProperty(urlPath) &&
+		Object.keys(utils.gdpr.white_listed_endpoints_with_data[urlPath]).length > 0) {
+		if (!requestData) {
+			return true;
+		}
+		// ensures that additional request params are available in request data
+		var requiredParametersForRequest = utils.gdpr.white_listed_endpoints_with_data[urlPath];
+		for (var key in requiredParametersForRequest) {
+			var requiredParametersRegex = new RegExp(requiredParametersForRequest[key]);
+			if (!requestData.hasOwnProperty(key) || !requiredParametersRegex.test(requestData[key])) {
+				return true;
+			}
+		}
+	}
+	return false;
+};
+
+// Removes PII when a user disables tracking
+utils.cleanApplicationSessionAndCookieStorage = function(branch) {
+	if (branch) {
+		// clears PII from global Branch object
+		var self = branch;
+		self.device_fingerprint_id = null;
+		self.sessionLink = null;
+		self.session_id = null;
+		self.identity_id = null;
+		self.identity = null;
+		self.browser_fingerprint_id = null;
+
+		if (self._deepviewCta) {
+			delete self._deepviewCta;
+		}
+		if (self._deepviewRequestForReplay) {
+			delete self._deepviewRequestForReplay;
+		}
+		self._storage.remove('branch_view_enabled');
+		var data = {};
+		// Sets an empty object for branch_session and branch_session_first in local/sessionStorage
+		session.set(self._storage, data, true);
+	}
+
+	// Attempts to delete _s cookie
+	var expires = 'Thu, 01 Jan 1970 00:00:01 GMT';
+	document.cookie = '_s' + '=; expires=' + expires + '; path=/;';
+};
+
 /** @typedef {{data:?string, referring_identity:?string, identity:?string, has_app:?boolean}} */
 utils.sessionData;
 
@@ -55,12 +122,13 @@ utils.messages = {
 	initPending: 'Branch SDK initialization pending' +
 		' and a Branch method was called outside of the queue order',
 	initFailed: 'Branch SDK initialization failed, so further methods cannot be called',
-	existingInit: 'Branch SDK already initilized',
+	existingInit: 'Branch SDK already initialized',
 	missingAppId: 'Missing Branch app ID',
 	callBranchInitFirst: 'Branch.init must be called first',
 	timeout: 'Request timed out',
 	blockedByClient: 'Request blocked by client, probably adblock',
-	missingUrl: 'Required argument: URL, is missing'
+	missingUrl: 'Required argument: URL, is missing',
+	trackingDisabled: 'Requested operation cannot be completed since tracking is disabled'
 };
 
 /**

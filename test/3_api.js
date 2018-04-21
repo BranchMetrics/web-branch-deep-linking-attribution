@@ -1388,5 +1388,60 @@ describe('Server', function() {
 				);
 			});
 		});
+		describe('API tests for GDPR mode', function() {
+			it('Tests a request to v1/event with invalid data, tracking disabled and error callback disabled :: no requests should be made, no errors in callback', function(done) {
+				// This simulates a request being made from branch.init()
+				var assert = testUtils.plan(3, done);
+				utils.gdpr.tracking_disabled = true;
+				utils.gdpr.allow_errors_in_callback = false;
+				server.request(
+					resources.event,
+					testUtils.params({
+						"name": "xyz"
+					}),
+					storage, function(err, data) {
+						assert.deepEqual({}, data, "data correct");
+						assert.deepEqual(null, null, "error correct");
+					}
+				);
+				assert.strictEqual(requests.length, 0, 'No request made');
+			});
+			it('Tests a v1/event request with bogus data, tracking disabled and error callback enabled :: no requests should be made, error should be present in callback', function(done) {
+				// This simulates a call to branch.track() after branch is initialized
+				var assert = testUtils.plan(2, done);
+				utils.gdpr.tracking_disabled = true;
+				utils.gdpr.allow_errors_in_callback = true;
+				server.request(
+					resources.event,
+					testUtils.params({
+						"name": "xyz"
+					}),
+					storage, function(err, data) {
+						assert.strictEqual(
+							err.message,
+							"Requested operation cannot be completed since tracking is disabled",
+							"Error message correct"
+						);
+						assert.deepEqual(null, null, 'data correct');
+					}
+				);
+				assert.strictEqual(requests.length, 0, 'No request made');
+			});
+			it('Tests a v1/open request, includes correct data, tracking disabled and error callback enabled :: request should go through', function(done) {
+				// This simulates a call to v1/open as part of the Branch initialization process
+				var assert = testUtils.plan(1, done);
+				utils.gdpr.tracking_disabled = true;
+				utils.gdpr.allow_errors_in_callback = false;
+				localStorage.setItem('branch_session', {});
+				server.request(
+					resources.open,
+					testUtils.params({
+						"link_identifier": "1111111111"
+					}),
+					storage, assert.done
+				);
+				assert.strictEqual(requests.length, 1, 'Request made');
+			});
+		});
 	});
 });
