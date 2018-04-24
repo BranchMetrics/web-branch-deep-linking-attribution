@@ -1071,6 +1071,8 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  *
  * **Supports international SMS**.
  *
+ * Please note that the destination phone number needs to be from the same country the SMS is being sent from.
+ *
  * #### Usage
  * ```js
  * branch.sendSMS(
