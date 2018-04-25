@@ -24,8 +24,7 @@ function checkPreviousBanner() {
  */
 function renderHtmlBlob(parent, html, hasApp) {
 	journeys_utils.setJourneyLinkData(html);
-	journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
-
+	
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
 	journeys_utils.setPositionAndHeight(html);
@@ -46,6 +45,8 @@ function renderHtmlBlob(parent, html, hasApp) {
 	journeys_utils.addIframeOuterCSS();
 	journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 	journeys_utils.addDynamicCtaText(iframe, ctaText);
+
+	journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
 
 	journeys_utils.animateBannerEntrance(iframe);
 
