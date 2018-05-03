@@ -23,7 +23,9 @@ utils.timeout = 5000; // Duration in milliseconds that the system should wait fo
 utils.gdpr = {
 	tracking_disabled: false,
 	white_listed_endpoints_with_data: {
-		'/v1/open': { 'link_identifier':'\\d+' }
+		'/v1/open': { 'link_identifier':'\\d+' },
+		'/v1/event': { 'event': 'pageview' },
+		'/v1/branchview': {}
 	},
 	allow_errors_in_callback: false
 };
@@ -81,10 +83,7 @@ utils.cleanApplicationSessionAndCookieStorage = function(branch) {
 		// Sets an empty object for branch_session and branch_session_first in local/sessionStorage
 		session.set(self._storage, data, true);
 	}
-
-	// Attempts to delete _s cookie
-	var expires = 'Thu, 01 Jan 1970 00:00:01 GMT';
-	document.cookie = '_s' + '=; expires=' + expires + '; path=/;';
+	// a user will need to explicitly opt out from _s cookie
 };
 
 /** @typedef {{data:?string, referring_identity:?string, identity:?string, has_app:?boolean}} */

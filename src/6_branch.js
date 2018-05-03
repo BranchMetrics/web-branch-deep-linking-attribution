@@ -433,8 +433,7 @@ Branch.prototype['init'] = wrap(
 				}, additionalMetadata || {}),
 				"initial_referrer": utils.getInitialReferrer(self._referringLink())
 			}, function(err, eventData) {
-				// disables Journeys temporarily in GDPR mode
-				if (!utils.gdpr.tracking_disabled && !err && typeof eventData === 'object') {
+				if (!err && typeof eventData === 'object') {
 					branch_view.initJourney(branch_key, data, eventData, options, self);
 				}
 				try {
@@ -813,8 +812,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		}, metadata),
 		"initial_referrer": utils.getInitialReferrer(self._referringLink())
 	}, function(err, data) {
-		// disables Journeys temporarily in GDPR mode
-		if (!utils.gdpr.tracking_disabled && !err && typeof data === 'object' && event === 'pageview') {
+		if (!err && typeof data === 'object' && event === 'pageview') {
 			branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
 		}
 		if (typeof done === 'function') {
@@ -2079,10 +2077,11 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 		}
 	}
 	else {
-		utils.cleanApplicationSessionAndCookieStorage(self);
-		utils.gdpr.tracking_disabled = true;
-		utils.gdpr.allow_errors_in_callback = true;
 		self['closeJourney']();
+		// If we want the re-initialization step below to potentially re-show a Journey, then we'll have to listen for
+		// 'didCloseJourney' event to fire before we re-initialize
+		self.init_options['tracking_disabled'] = true;
+		self['init'](self.branch_key, self.init_options);
 	}
 	done();
 });

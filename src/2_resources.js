@@ -103,7 +103,8 @@ resources.open = {
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),
 		"options": validator(false, validationTypes.OBJECT),
-		"initial_referrer": validator(false, validationTypes.STRING)
+		"initial_referrer": validator(false, validationTypes.STRING),
+		"tracking_disabled": validator(false, validationTypes.BOOLEAN)
 	}
 };
 
@@ -299,7 +300,8 @@ resources.event = {
 	params: defaults({
 		"event": validator(true, validationTypes.STRING),
 		"metadata": validator(true, validationTypes.OBJECT),
-		"initial_referrer": validator(false, validationTypes.STRING)
+		"initial_referrer": validator(false, validationTypes.STRING),
+		"tracking_disabled": validator(false, validationTypes.BOOLEAN)
 	})
 };
 

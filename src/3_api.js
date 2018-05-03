@@ -326,6 +326,22 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
 
+	// Removes PII from request data in case fields flow in from cascading requests
+	if (utils.gdpr.tracking_disabled) {
+		if (data.hasOwnProperty("browser_fingerprint_id")) {
+			delete data['browser_fingerprint_id'];
+		}
+		if (data.hasOwnProperty("alternative_browser_fingerprint_id")) {
+			delete data['alternative_browser_fingerprint_id'];
+		}
+		if (data.hasOwnProperty("identity_id")) {
+			delete data['identity_id'];
+		}
+		if (data.hasOwnProperty("session_id")) {
+			delete data['session_id'];
+		}
+	}
+
 	var u = this.getUrl(resource, data);
 	if (u.error) {
 		var errorObj = {
