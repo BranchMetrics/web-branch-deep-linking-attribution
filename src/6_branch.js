@@ -471,14 +471,18 @@ Branch.prototype['init'] = wrap(
 				changeEvent = 'webkitvisibilitychange';
 			}
 			if (changeEvent) {
-				document.addEventListener(changeEvent, function() {
-					if (!document[hidden]) {
-						checkHasApp(null);
-						if (typeof self._deepviewRequestForReplay === 'function') {
-							self._deepviewRequestForReplay();
+				// Ensures that we add a change-event-listener exactly once in-case re-initialization occurs through branch.trackingDisabled(false)
+				if (!self.changeEventListenerAdded) {
+					self.changeEventListenerAdded = true;
+					document.addEventListener(changeEvent, function() {
+						if (!document[hidden]) {
+							checkHasApp(null);
+							if (typeof self._deepviewRequestForReplay === 'function') {
+								self._deepviewRequestForReplay();
+							}
 						}
-					}
-				}, false);
+					}, false);
+				}
 			}
 		};
 
@@ -2066,7 +2070,7 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 /*** +TOC_ITEM #disableTrackingdisableTracking &.disableTracking()& ^WEB ***/
 Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, function(done, disableTracking) {
 	var self = this;
-	if (disableTracking === false) {
+	if (disableTracking === false || disableTracking === "false") {
 		utils.gdpr.tracking_disabled = false;
 		utils.gdpr.allow_errors_in_callback = false;
 		if (self.branch_key && self.init_options) {
@@ -2076,14 +2080,12 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 			self['init'](self.branch_key, self.init_options);
 		}
 	}
-	else {
+	else if (disableTracking === undefined || disableTracking === true || disableTracking === "true") {
+		utils.cleanApplicationSessionAndCookieStorage(self);
+		utils.gdpr.tracking_disabled = true;
+		utils.gdpr.allow_errors_in_callback = true;
 		self['closeJourney']();
-		// If we want the re-initialization step below to potentially re-show a Journey, then we'll have to listen for
-		// 'didCloseJourney' event to fire before we re-initialize
-		self.init_options['tracking_disabled'] = true;
-		self['init'](self.branch_key, self.init_options);
+		// Branch will not re-initialize
 	}
 	done();
 });
-
-
