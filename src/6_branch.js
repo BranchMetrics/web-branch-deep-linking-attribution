@@ -184,8 +184,8 @@ Branch.prototype._api = function(resource, obj, callback) {
 		obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
 	}
 	// Adds tracking_disabled to every post request when enabled
-	if (utils.gdpr.tracking_disabled) {
-		obj['tracking_disabled'] = utils.gdpr.tracking_disabled;
+	if (utils.userPreferences.trackingDisabled) {
+		obj['tracking_disabled'] = utils.userPreferences.trackingDisabled;
 	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
@@ -310,13 +310,13 @@ Branch.prototype['init'] = wrap(
 		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
 
-		utils.gdpr.tracking_disabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
+		utils.userPreferences.trackingDisabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
 
-		if (utils.gdpr.tracking_disabled) {
-			utils.cleanApplicationSessionAndCookieStorage(self);
+		if (utils.userPreferences.trackingDisabled) {
+			utils.cleanApplicationAndSessionStorage(self);
 		}
 		else {
-			utils.gdpr.allow_errors_in_callback = false;
+			utils.userPreferences.allowErrorsInCallback = false;
 		}
 
 		var setBranchValues = function(data) {
@@ -397,7 +397,7 @@ Branch.prototype['init'] = wrap(
 		var finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
-				if (!utils.gdpr.tracking_disabled) {
+				if (!utils.userPreferences.trackingDisabled) {
 					session.set(self._storage, data, freshInstall);
 				}
 				self.init_state = init_states.INIT_SUCCEEDED;
@@ -438,8 +438,8 @@ Branch.prototype['init'] = wrap(
 				}
 				try {
 					done(err, data && utils.whiteListSessionData(data));
-					if (utils.gdpr.tracking_disabled) {
-						utils.gdpr.allow_errors_in_callback = true;
+					if (utils.userPreferences.trackingDisabled) {
+						utils.userPreferences.allowErrorsInCallback = true;
 					}
 				}
 				catch (e) {
@@ -1326,7 +1326,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		function(err, data) {
 			if (err) {
 				// ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
-				if (!utils.gdpr.tracking_disabled) {
+				if (!utils.userPreferences.trackingDisabled) {
 					self._deepviewCta = function() {
 						self._windowRedirect(fallbackUrl);
 					};
@@ -2075,8 +2075,8 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 /*** +TOC_ITEM #disableTrackingdisableTracking &.disableTracking()& ^WEB ***/
 Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, function(done, disableTracking) {
 	if (disableTracking === false || disableTracking === "false") {
-		utils.gdpr.tracking_disabled = false;
-		utils.gdpr.allow_errors_in_callback = false;
+		utils.userPreferences.trackingDisabled = false;
+		utils.userPreferences.allowErrorsInCallback = false;
 		if (this.branch_key && this.init_options) {
 			if (this.init_options['tracking_disabled'] === true) {
 				delete this.init_options['tracking_disabled'];
@@ -2085,9 +2085,9 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 		}
 	}
 	else if (disableTracking === undefined || disableTracking === true || disableTracking === "true") {
-		utils.cleanApplicationSessionAndCookieStorage(this);
-		utils.gdpr.tracking_disabled = true;
-		utils.gdpr.allow_errors_in_callback = true;
+		utils.cleanApplicationAndSessionStorage(this);
+		utils.userPreferences.trackingDisabled = true;
+		utils.userPreferences.allowErrorsInCallback = true;
 		this['closeJourney']();
 		// Branch will not re-initialize
 	}

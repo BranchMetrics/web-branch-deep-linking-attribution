@@ -1388,12 +1388,12 @@ describe('Server', function() {
 				);
 			});
 		});
-		describe('API tests for GDPR mode', function() {
+		describe('API tests for trackingDisabled mode', function() {
 			it('Tests a request to v1/event with invalid data, tracking disabled and error callback disabled :: no requests should be made, no errors in callback', function(done) {
 				// This simulates a request being made from branch.init()
 				var assert = testUtils.plan(3, done);
-				utils.gdpr.tracking_disabled = true;
-				utils.gdpr.allow_errors_in_callback = false;
+				utils.userPreferences.trackingDisabled = true;
+				utils.userPreferences.allowErrorsInCallback = false;
 				server.request(
 					resources.event,
 					testUtils.params({
@@ -1409,8 +1409,8 @@ describe('Server', function() {
 			it('Tests a v1/event request with bogus data, tracking disabled and error callback enabled :: no requests should be made, error should be present in callback', function(done) {
 				// This simulates a call to branch.track() after branch is initialized
 				var assert = testUtils.plan(2, done);
-				utils.gdpr.tracking_disabled = true;
-				utils.gdpr.allow_errors_in_callback = true;
+				utils.userPreferences.trackingDisabled = true;
+				utils.userPreferences.allowErrorsInCallback = true;
 				server.request(
 					resources.event,
 					testUtils.params({
@@ -1430,8 +1430,8 @@ describe('Server', function() {
 			it('Tests a v1/open request, includes correct data, tracking disabled and error callback enabled :: request should go through', function(done) {
 				// This simulates a call to v1/open as part of the Branch initialization process
 				var assert = testUtils.plan(1, done);
-				utils.gdpr.tracking_disabled = true;
-				utils.gdpr.allow_errors_in_callback = false;
+				utils.userPreferences.trackingDisabled = true;
+				utils.userPreferences.allowErrorsInCallback = false;
 				localStorage.setItem('branch_session', {});
 				server.request(
 					resources.open,

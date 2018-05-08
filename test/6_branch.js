@@ -1438,7 +1438,7 @@ describe('Branch', function() {
 		});
 	});
 
-	describe('GDPR tests for Branch object', function() {
+	describe('disableTracking() tests', function() {
 		it('Flow with branch.init(), branch.disableTracking(true), branch.disableTracking(false)', function(done) {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(9, done);

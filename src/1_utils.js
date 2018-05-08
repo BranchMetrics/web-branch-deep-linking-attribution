@@ -20,18 +20,18 @@ utils.retries = 2; // Value specifying the number of times that a Branch API cal
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
 utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
 
-utils.gdpr = {
-	tracking_disabled: false,
-	white_listed_endpoints_with_data: {
+utils.userPreferences = {
+	trackingDisabled: false,
+	whiteListedEndpointsWithData: {
 		'/v1/open': { 'link_identifier':'\\d+' },
 		'/v1/event': { 'event': 'pageview' },
 		'/v1/branchview': {}
 	},
-	allow_errors_in_callback: false
+	allowErrorsInCallback: false
 };
 
 // Used by 3_api.js to determine whether a request should be blocked
-utils.gdpr.shouldBlockRequestInGDPRMode = function(url, requestData) {
+utils.userPreferences.shouldBlockRequest = function(url, requestData) {
 
 	var urlParser = document.createElement('a');
 	urlParser.href = url;
@@ -43,7 +43,7 @@ utils.gdpr.shouldBlockRequestInGDPRMode = function(url, requestData) {
 		urlPath = '/' + urlPath;
 	}
 
-	var whiteListedEndpointWithData = utils.gdpr.white_listed_endpoints_with_data[urlPath];
+	var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
 
 	if (!whiteListedEndpointWithData) {
 		return true;
@@ -66,7 +66,7 @@ utils.gdpr.shouldBlockRequestInGDPRMode = function(url, requestData) {
 };
 
 // Removes PII when a user disables tracking
-utils.cleanApplicationSessionAndCookieStorage = function(branch) {
+utils.cleanApplicationAndSessionStorage = function(branch) {
 	if (branch) {
 		// clears PII from global Branch object
 		branch.device_fingerprint_id = null;

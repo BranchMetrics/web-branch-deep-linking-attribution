@@ -327,7 +327,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
 
 	// Removes PII from request data in case fields flow in from cascading requests
-	if (utils.gdpr.tracking_disabled) {
+	if (utils.userPreferences.trackingDisabled) {
 		if (data.hasOwnProperty("browser_fingerprint_id")) {
 			delete data['browser_fingerprint_id'];
 		}
@@ -380,9 +380,9 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		}
 	};
 
-	if (utils.gdpr.tracking_disabled && utils.gdpr.shouldBlockRequestInGDPRMode(url, data)) {
+	if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(url, data)) {
 		// If partners call functions that reach-out to blocked endpoints after init() finishes, then we should return an error with a message
-		return utils.gdpr.allow_errors_in_callback ? done(new Error(utils.messages.trackingDisabled), null, 300) : done(null, {}, 200);
+		return utils.userPreferences.allowErrorsInCallback ? done(new Error(utils.messages.trackingDisabled), null, 300) : done(null, {}, 200);
 	}
 
 	var makeRequest = function() {
