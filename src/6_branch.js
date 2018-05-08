@@ -183,7 +183,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 			this.browser_fingerprint_id) {
 		obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
 	}
-	// Adds tracking_disabled to every request when enabled
+	// Adds tracking_disabled to every post request when enabled
 	if (utils.gdpr.tracking_disabled) {
 		obj['tracking_disabled'] = utils.gdpr.tracking_disabled;
 	}
@@ -259,7 +259,7 @@ Branch.prototype._publishEvent = function(event, data) {
  * | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
  * | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
  * | metadata | *optional* - `object`. Key-value pairs used to target Journeys users via the "is viewing a page with metadata key" filter.
- * | disable_tracking | *optional* - `boolean`. true or false depending on whether the user would like to remain private or not.
+ * | tracking_disabled | *optional* - `boolean`. true disables tracking
  * ##### Usage
  * ```js
  * branch.init(
@@ -2053,7 +2053,12 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 
 /**
  * @function Branch.disableTracking
- * @param {Boolean} disableTracking - _required_ - true or false depending on whether the user would like to remain private or not
+ * @param {Boolean} disableTracking - _optional_ - true disables tracking and false re-enables tracking.
+ *
+ * ##### Notes:
+ * - disableTracking() without a parameter is a shorthand for disableTracking(true).
+ * - If a call to disableTracking(false) is made, the WebSDK will re-initialize. Additionally, if tracking_disabled: true is passed
+ *   as an option to init(), it will be removed during the reinitialization process.
  *
  * Allows User to Remain Private
  *
@@ -2063,28 +2068,27 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
  *
  * In do-not-track mode, you will still be able to create links and display Journeys however, they will not have identifiable
  * information associated to them. You can change this behavior at any time, by calling the aforementioned function.
- * This information will be saved and persisted.
+ * The do-not-track mode state is persistent: it is saved for the user across browser sessions for the web site.
  * ___
  */
 /*** +TOC_HEADING &User Privacy& ^WEB ***/
 /*** +TOC_ITEM #disableTrackingdisableTracking &.disableTracking()& ^WEB ***/
 Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, function(done, disableTracking) {
-	var self = this;
 	if (disableTracking === false || disableTracking === "false") {
 		utils.gdpr.tracking_disabled = false;
 		utils.gdpr.allow_errors_in_callback = false;
-		if (self.branch_key && self.init_options) {
-			if (self.init_options['tracking_disabled'] === true) {
-				delete self.init_options['tracking_disabled'];
+		if (this.branch_key && this.init_options) {
+			if (this.init_options['tracking_disabled'] === true) {
+				delete this.init_options['tracking_disabled'];
 			}
-			self['init'](self.branch_key, self.init_options);
+			this['init'](this.branch_key, this.init_options);
 		}
 	}
 	else if (disableTracking === undefined || disableTracking === true || disableTracking === "true") {
-		utils.cleanApplicationSessionAndCookieStorage(self);
+		utils.cleanApplicationSessionAndCookieStorage(this);
 		utils.gdpr.tracking_disabled = true;
 		utils.gdpr.allow_errors_in_callback = true;
-		self['closeJourney']();
+		this['closeJourney']();
 		// Branch will not re-initialize
 	}
 	done();

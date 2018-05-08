@@ -37,22 +37,27 @@ utils.gdpr.shouldBlockRequestInGDPRMode = function(url, requestData) {
 	urlParser.href = url;
 	var urlPath = urlParser.pathname;
 
-	if (urlPath && utils.gdpr.white_listed_endpoints_with_data.hasOwnProperty(urlPath) === false
-	) {
+	// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
+	// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
+	if (urlPath[0] != '/') {
+		urlPath = '/' + urlPath;
+	}
+
+	var whiteListedEndpointWithData = utils.gdpr.white_listed_endpoints_with_data[urlPath];
+
+	if (!whiteListedEndpointWithData) {
 		return true;
 	}
 	else if (
-		urlPath &&
-		utils.gdpr.white_listed_endpoints_with_data.hasOwnProperty(urlPath) &&
-		Object.keys(utils.gdpr.white_listed_endpoints_with_data[urlPath]).length > 0) {
+		whiteListedEndpointWithData &&
+		Object.keys(whiteListedEndpointWithData).length > 0) {
 		if (!requestData) {
 			return true;
 		}
-		// ensures that additional request params are available in request data
-		var requiredParametersForRequest = utils.gdpr.white_listed_endpoints_with_data[urlPath];
-		for (var key in requiredParametersForRequest) {
-			var requiredParametersRegex = new RegExp(requiredParametersForRequest[key]);
-			if (!requestData.hasOwnProperty(key) || !requiredParametersRegex.test(requestData[key])) {
+		// Ensures that required request parameters are available in request data
+		for (var key in whiteListedEndpointWithData) {
+			var requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
+			if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
 				return true;
 			}
 		}
@@ -64,24 +69,23 @@ utils.gdpr.shouldBlockRequestInGDPRMode = function(url, requestData) {
 utils.cleanApplicationSessionAndCookieStorage = function(branch) {
 	if (branch) {
 		// clears PII from global Branch object
-		var self = branch;
-		self.device_fingerprint_id = null;
-		self.sessionLink = null;
-		self.session_id = null;
-		self.identity_id = null;
-		self.identity = null;
-		self.browser_fingerprint_id = null;
+		branch.device_fingerprint_id = null;
+		branch.sessionLink = null;
+		branch.session_id = null;
+		branch.identity_id = null;
+		branch.identity = null;
+		branch.browser_fingerprint_id = null;
 
-		if (self._deepviewCta) {
-			delete self._deepviewCta;
+		if (branch._deepviewCta) {
+			delete branch._deepviewCta;
 		}
-		if (self._deepviewRequestForReplay) {
-			delete self._deepviewRequestForReplay;
+		if (branch._deepviewRequestForReplay) {
+			delete branch._deepviewRequestForReplay;
 		}
-		self._storage.remove('branch_view_enabled');
+		branch._storage.remove('branch_view_enabled');
 		var data = {};
 		// Sets an empty object for branch_session and branch_session_first in local/sessionStorage
-		session.set(self._storage, data, true);
+		session.set(branch._storage, data, true);
 	}
 	// a user will need to explicitly opt out from _s cookie
 };

@@ -918,7 +918,7 @@ describe('utils', function() {
 			);
 		});
 	});
-	describe('Tests for urils.gdpr.shouldBlockRequestInGDPRMode()', function() {
+	describe('Tests for utils.gdpr.shouldBlockRequestInGDPRMode()', function() {
 		it('should return true with v1/bogus as url endpoint', function() {
 			assert.strictEqual(true, utils.gdpr.shouldBlockRequestInGDPRMode('https://api.branch.io/v1/bogus'));
 		});
@@ -929,7 +929,7 @@ describe('utils', function() {
 			assert.strictEqual(false, utils.gdpr.shouldBlockRequestInGDPRMode('https://api.branch.io/v1/open', { link_identifier: '111111111111' }));
 		});
 		it('should return true with v1/xyz as url endpoint and with bogus request data', function() {
-			assert.strictEqual(true, utils.gdpr.shouldBlockRequestInGDPRMode('https://api.branch.io/v1/', { link_identifier: '111111111111' }));
+			assert.strictEqual(true, utils.gdpr.shouldBlockRequestInGDPRMode('https://api.branch.io/v1/xyz', { link_identifier: '111111111111' }));
 		});
 	});
 });
