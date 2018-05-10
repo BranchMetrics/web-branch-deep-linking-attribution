@@ -35,7 +35,11 @@ var _validator;
  */
 function validator(required, type) {
 	return function(endpoint, param, data) {
-		// Must ensure data is not a number before doing a !data otherwise the number can't be 0.
+		// Ignores request validation when tracking is disabled because information will be intentionally missing from requests
+		if (utils.userPreferences.trackingDisabled) {
+			return false;
+		}
+		// Ensure data is not a number before doing a !data otherwise the number can't be 0.
 		if ((typeof data !== 'number') && !data) {
 			if (required) {
 				return utils.message(utils.messages.missingParam, [ endpoint, param ]);
@@ -99,7 +103,8 @@ resources.open = {
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),
 		"options": validator(false, validationTypes.OBJECT),
-		"initial_referrer": validator(false, validationTypes.STRING)
+		"initial_referrer": validator(false, validationTypes.STRING),
+		"tracking_disabled": validator(false, validationTypes.BOOLEAN)
 	}
 };
 
@@ -295,7 +300,8 @@ resources.event = {
 	params: defaults({
 		"event": validator(true, validationTypes.STRING),
 		"metadata": validator(true, validationTypes.OBJECT),
-		"initial_referrer": validator(false, validationTypes.STRING)
+		"initial_referrer": validator(false, validationTypes.STRING),
+		"tracking_disabled": validator(false, validationTypes.BOOLEAN)
 	})
 };
 

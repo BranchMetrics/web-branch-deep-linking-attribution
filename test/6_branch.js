@@ -1438,6 +1438,48 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('disableTracking() tests', function() {
+		it('Flow with branch.init(), branch.disableTracking(true), branch.disableTracking(false)', function(done) {
+			var branch = initBranch(false);
+			var assert = testUtils.plan(9, done);
+			branch.init(branch_sample_key, function(err, data) {
+				assert.strictEqual(err, null, 'No error');
+			});
+			requests[0].callback(null, browser_fingerprint_id);
+			requests[1].callback(
+				null,
+				{
+					session_id: "1234",
+					something: "else"
+				}
+			);
+			requests[2].callback(null, {});
+
+			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
+			assert.strictEqual("false", sessionStorage.getItem('BRANCH_WEBSDK_KEYbranch_view_enabled'), 'branch_view_enabled is false in session storage');
+			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+
+			branch.disableTracking(true);
+			assert.strictEqual("{}", sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
+			assert.strictEqual(null, sessionStorage.getItem('BRANCH_WEBSDK_KEYbranch_view_enabled'), 'branch_view_enabled should not be in session storage');
+			assert.strictEqual("{}", localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+
+			branch.disableTracking(false);
+			requests[3].callback(null, browser_fingerprint_id);
+			requests[4].callback(
+				null,
+				{
+					session_id: "1234",
+					something: "else"
+				}
+			);
+			requests[5].callback(null, {});
+			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
+			assert.strictEqual("false", sessionStorage.getItem('BRANCH_WEBSDK_KEYbranch_view_enabled'), 'branch_view_enabled is false in session storage');
+			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+		});
+	});
+
 	/*
 	describe.fail('Queueing used correctly', function() {
 		it('Should wait to call track after init', function(done) {

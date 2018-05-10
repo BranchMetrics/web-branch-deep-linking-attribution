@@ -239,7 +239,7 @@ describe('utils', function() {
 		it('should produce a Branch SDK already init message', function() {
 			assert.strictEqual(
 				utils.message(utils.messages.existingInit),
-				'Branch SDK already initilized',
+				'Branch SDK already initialized',
 				'Expected Branch SDK already initialized message produced'
 			);
 		});
@@ -916,6 +916,20 @@ describe('utils', function() {
 				userSuppliedMetadata,
 				'should be equal'
 			);
+		});
+	});
+	describe('Tests for utils.userPreferences.shouldBlockRequest()', function() {
+		it('should return true with v1/bogus as url endpoint', function() {
+			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/bogus'));
+		});
+		it('should return true with v1/open as url endpoint and no request data provided', function() {
+			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/open'));
+		});
+		it('should return false with v1/open as url endpoint and valid request data provided', function() {
+			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/open', { link_identifier: '111111111111' }));
+		});
+		it('should return true with v1/xyz as url endpoint and with bogus request data', function() {
+			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/xyz', { link_identifier: '111111111111' }));
 		});
 	});
 });

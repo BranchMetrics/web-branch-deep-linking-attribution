@@ -58,7 +58,8 @@
 		'track',
 		'validateCode',
 		'trackCommerceEvent',
-		'logEvent'
+		'logEvent',
+		'disableTracking'
 	],
 	0
 );

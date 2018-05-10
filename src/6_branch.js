@@ -183,6 +183,10 @@ Branch.prototype._api = function(resource, obj, callback) {
 			this.browser_fingerprint_id) {
 		obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
 	}
+	// Adds tracking_disabled to every post request when enabled
+	if (utils.userPreferences.trackingDisabled) {
+		obj['tracking_disabled'] = utils.userPreferences.trackingDisabled;
+	}
 
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
@@ -255,7 +259,7 @@ Branch.prototype._publishEvent = function(event, data) {
  * | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
  * | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
  * | metadata | *optional* - `object`. Key-value pairs used to target Journeys users via the "is viewing a page with metadata key" filter.
- *
+ * | tracking_disabled | *optional* - `boolean`. true disables tracking
  * ##### Usage
  * ```js
  * branch.init(
@@ -300,9 +304,20 @@ Branch.prototype['init'] = wrap(
 		}
 
 		options = options && utils.validateParameterType(options, 'object') ? options : { };
+		self.init_options = options;
+
 		utils.retries = options && options['retries'] && Number.isInteger(options['retries']) ? options['retries'] : utils.retries;
 		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
+
+		utils.userPreferences.trackingDisabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
+
+		if (utils.userPreferences.trackingDisabled) {
+			utils.cleanApplicationAndSessionStorage(self);
+		}
+		else {
+			utils.userPreferences.allowErrorsInCallback = false;
+		}
 
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {
@@ -382,8 +397,9 @@ Branch.prototype['init'] = wrap(
 		var finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
-				session.set(self._storage, data, freshInstall);
-
+				if (!utils.userPreferences.trackingDisabled) {
+					session.set(self._storage, data, freshInstall);
+				}
 				self.init_state = init_states.INIT_SUCCEEDED;
 				data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 			}
@@ -422,6 +438,9 @@ Branch.prototype['init'] = wrap(
 				}
 				try {
 					done(err, data && utils.whiteListSessionData(data));
+					if (utils.userPreferences.trackingDisabled) {
+						utils.userPreferences.allowErrorsInCallback = true;
+					}
 				}
 				catch (e) {
 					// pass
@@ -452,14 +471,18 @@ Branch.prototype['init'] = wrap(
 				changeEvent = 'webkitvisibilitychange';
 			}
 			if (changeEvent) {
-				document.addEventListener(changeEvent, function() {
-					if (!document[hidden]) {
-						checkHasApp(null);
-						if (typeof self._deepviewRequestForReplay === 'function') {
-							self._deepviewRequestForReplay();
+				// Ensures that we add a change-event-listener exactly once in-case re-initialization occurs through branch.trackingDisabled(false)
+				if (!self.changeEventListenerAdded) {
+					self.changeEventListenerAdded = true;
+					document.addEventListener(changeEvent, function() {
+						if (!document[hidden]) {
+							checkHasApp(null);
+							if (typeof self._deepviewRequestForReplay === 'function') {
+								self._deepviewRequestForReplay();
+							}
 						}
-					}
-				}, false);
+					}, false);
+				}
 			}
 		};
 
@@ -488,7 +511,6 @@ Branch.prototype['init'] = wrap(
 						self.init_state_fail_details = err.message;
 						return finishInit(err, null);
 					}
-
 					self._api(
 						resources.open,
 						{
@@ -504,9 +526,10 @@ Branch.prototype['init'] = wrap(
 								self.init_state_fail_details = err.message;
 							}
 							if (!err && typeof data === 'object') {
-								self._branchViewEnabled = !!data['branch_view_enabled'];
-								self._storage.set('branch_view_enabled', self._branchViewEnabled);
-
+								if (data['branch_view_enabled']) {
+									self._branchViewEnabled = !!data['branch_view_enabled'];
+									self._storage.set('branch_view_enabled', self._branchViewEnabled);
+								}
 								if (link_identifier) {
 									data['click_id'] = link_identifier;
 								}
@@ -534,9 +557,10 @@ Branch.prototype['init'] = wrap(
 						self.init_state_fail_details = err.message;
 					}
 					if (!err && typeof data === 'object') {
-						self._branchViewEnabled = !!data['branch_view_enabled'];
-						self._storage.set('branch_view_enabled', self._branchViewEnabled);
-
+						if (data['branch_view_enabled']) {
+							self._branchViewEnabled = !!data['branch_view_enabled'];
+							self._storage.set('branch_view_enabled', self._branchViewEnabled);
+						}
 						if (link_identifier) {
 							data['click_id'] = link_identifier;
 						}
@@ -1303,9 +1327,12 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		resources.deepview, cleanedData,
 		function(err, data) {
 			if (err) {
-				self._deepviewCta = function() {
-					self._windowRedirect(fallbackUrl);
-				};
+				// ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
+				if (!utils.userPreferences.trackingDisabled) {
+					self._deepviewCta = function() {
+						self._windowRedirect(fallbackUrl);
+					};
+				}
 				return done(err);
 			}
 
@@ -2026,4 +2053,46 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 	done();
 });
 
-
+/**
+ * @function Branch.disableTracking
+ * @param {Boolean} disableTracking - _optional_ - true disables tracking and false re-enables tracking.
+ *
+ * ##### Notes:
+ * - disableTracking() without a parameter is a shorthand for disableTracking(true).
+ * - If a call to disableTracking(false) is made, the WebSDK will re-initialize. Additionally, if tracking_disabled: true is passed
+ *   as an option to init(), it will be removed during the reinitialization process.
+ *
+ * Allows User to Remain Private
+ *
+ * This will prevent any Branch requests from being sent across the network, except for the case of deep linking.
+ * If someone clicks a Branch link, but has expressed not to be tracked, we will return deep linking data back to the
+ * client but without tracking information.
+ *
+ * In do-not-track mode, you will still be able to create links and display Journeys however, they will not have identifiable
+ * information associated to them. You can change this behavior at any time, by calling the aforementioned function.
+ * The do-not-track mode state is persistent: it is saved for the user across browser sessions for the web site.
+ * ___
+ */
+/*** +TOC_HEADING &User Privacy& ^WEB ***/
+/*** +TOC_ITEM #disableTrackingdisableTracking &.disableTracking()& ^WEB ***/
+Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, function(done, disableTracking) {
+	if (disableTracking === false || disableTracking === "false") {
+		utils.userPreferences.trackingDisabled = false;
+		utils.userPreferences.allowErrorsInCallback = false;
+		if (this.branch_key && this.init_options) {
+			if (this.init_options['tracking_disabled'] === true) {
+				delete this.init_options['tracking_disabled'];
+			}
+			this['init'](this.branch_key, this.init_options);
+		}
+	}
+	else if (disableTracking === undefined || disableTracking === true || disableTracking === "true") {
+		utils.cleanApplicationAndSessionStorage(this);
+		utils.userPreferences.trackingDisabled = true;
+		utils.userPreferences.allowErrorsInCallback = true;
+		this['closeBanner']();
+		this['closeJourney']();
+		// Branch will not re-initialize
+	}
+	done();
+});
