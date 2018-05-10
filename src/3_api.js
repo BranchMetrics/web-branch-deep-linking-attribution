@@ -328,17 +328,11 @@ Server.prototype.request = function(resource, data, storage, callback) {
 
 	// Removes PII from request data in case fields flow in from cascading requests
 	if (utils.userPreferences.trackingDisabled) {
-		if (data.hasOwnProperty("browser_fingerprint_id")) {
-			delete data['browser_fingerprint_id'];
-		}
-		if (data.hasOwnProperty("alternative_browser_fingerprint_id")) {
-			delete data['alternative_browser_fingerprint_id'];
-		}
-		if (data.hasOwnProperty("identity_id")) {
-			delete data['identity_id'];
-		}
-		if (data.hasOwnProperty("session_id")) {
-			delete data['session_id'];
+		var PII = [ 'browser_fingerprint_id', 'alternative_browser_fingerprint_id', 'identity_id', 'session_id' ];
+		for (var index = 0; index < PII.length; index++) {
+			if (data.hasOwnProperty(PII[index])) {
+				delete data[PII[index]];
+			}
 		}
 	}
 

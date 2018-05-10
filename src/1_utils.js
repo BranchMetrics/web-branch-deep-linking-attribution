@@ -27,42 +27,38 @@ utils.userPreferences = {
 		'/v1/event': { 'event': 'pageview' },
 		'/v1/branchview': {}
 	},
-	allowErrorsInCallback: false
-};
+	allowErrorsInCallback: false,
+	shouldBlockRequest: function(url, requestData) {
+		// Used by 3_api.js to determine whether a request should be blocked
+		var urlParser = document.createElement('a');
+		urlParser.href = url;
+		var urlPath = urlParser.pathname;
 
-// Used by 3_api.js to determine whether a request should be blocked
-utils.userPreferences.shouldBlockRequest = function(url, requestData) {
+		// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
+		// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
+		if (urlPath[0] != '/') {
+			urlPath = '/' + urlPath;
+		}
 
-	var urlParser = document.createElement('a');
-	urlParser.href = url;
-	var urlPath = urlParser.pathname;
+		var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
 
-	// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
-	// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
-	if (urlPath[0] != '/') {
-		urlPath = '/' + urlPath;
-	}
-
-	var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
-
-	if (!whiteListedEndpointWithData) {
-		return true;
-	}
-	else if (
-		whiteListedEndpointWithData &&
-		Object.keys(whiteListedEndpointWithData).length > 0) {
-		if (!requestData) {
+		if (!whiteListedEndpointWithData) {
 			return true;
 		}
-		// Ensures that required request parameters are available in request data
-		for (var key in whiteListedEndpointWithData) {
-			var requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
-			if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
+		else if (Object.keys(whiteListedEndpointWithData).length > 0) {
+			if (!requestData) {
 				return true;
 			}
+			// Ensures that required request parameters are available in request data
+			for (var key in whiteListedEndpointWithData) {
+				var requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
+				if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
+					return true;
+				}
+			}
 		}
+		return false;
 	}
-	return false;
 };
 
 // Removes PII when a user disables tracking
