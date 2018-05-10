@@ -2088,6 +2088,7 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 		utils.cleanApplicationAndSessionStorage(this);
 		utils.userPreferences.trackingDisabled = true;
 		utils.userPreferences.allowErrorsInCallback = true;
+		this['closeBanner']();
 		this['closeJourney']();
 		// Branch will not re-initialize
 	}
