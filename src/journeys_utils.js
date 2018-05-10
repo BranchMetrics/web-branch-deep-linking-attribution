@@ -55,6 +55,9 @@ journeys_utils.previousDivToInjectParents = [];
 // holds data from Journey that is currently being viewed & data from setBranchViewData()
 journeys_utils.journeyLinkData = null;
 
+// Nonce value to allow for CSP whitelisting
+journeys_utils.nonce = '';
+
 /***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
@@ -173,6 +176,11 @@ journeys_utils.getJsAndAddToParent = function(html) {
 		var src = match[1];
 		var script = document.createElement('script');
 		script.id = 'branch-journey-cta';
+		if (journeys_utils.nonce !== '') {
+			var nonce = document.createAttribute('nonce');
+			nonce.value = journeys_utils.nonce.indexOf('nonce-') == -1 ? 'nonce-' + journeys_utils.nonce : journeys_utils.nonce;
+			script.setAttributeNode(nonce);
+		}
 		script.innerHTML = src;
 		document.body.appendChild(script);
 	}
