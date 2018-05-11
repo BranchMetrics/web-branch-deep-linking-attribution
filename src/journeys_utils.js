@@ -178,7 +178,7 @@ journeys_utils.getJsAndAddToParent = function(html) {
 		script.id = 'branch-journey-cta';
 		if (journeys_utils.nonce !== '') {
 			var nonce = document.createAttribute('nonce');
-			nonce.value = journeys_utils.nonce.indexOf('nonce-') == -1 ? 'nonce-' + journeys_utils.nonce : journeys_utils.nonce;
+			nonce.value = journeys_utils.nonce;
 			script.setAttributeNode(nonce);
 		}
 		script.innerHTML = src;
