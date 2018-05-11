@@ -311,12 +311,10 @@ Branch.prototype['init'] = wrap(
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
 
 		utils.userPreferences.trackingDisabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
+		utils.userPreferences.allowErrorsInCallback = false;
 
 		if (utils.userPreferences.trackingDisabled) {
 			utils.cleanApplicationAndSessionStorage(self);
-		}
-		else {
-			utils.userPreferences.allowErrorsInCallback = false;
 		}
 
 		var setBranchValues = function(data) {
