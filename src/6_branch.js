@@ -1060,8 +1060,12 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
  */
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
-Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
+Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, linkData) {
+	this._api(resources.link, utils.cleanLinkData(linkData), function(err, data) {
+		if (err) {
+			// if an error occurs or if tracking is disabled then return a dynamic link
+			return done(null, utils.generateDynamicBNCLink(this.branch_key, linkData));
+		}
 		done(err, data && data['url']);
 	});
 });
@@ -1283,26 +1287,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
 	data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
 
-	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
-	var first = true;
-	var encodeLinkProperty = function(key, data) {
-		return encodeURIComponent(utils.base64encode(goog.json.serialize(data[key])));
-	};
-
-	for (var key in data) {
-		if (data.hasOwnProperty(key)) {
-			if (key !== 'data') {
-				if (first) {
-					fallbackUrl += '?';
-					first = false;
-				}
-				else {
-					fallbackUrl += '&';
-				}
-				fallbackUrl += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
-			}
-		}
-	}
+	var fallbackUrl = utils.generateDynamicBNCLink(this.branch_key, data);
 
 	var cleanedData = utils.cleanLinkData(data);
 

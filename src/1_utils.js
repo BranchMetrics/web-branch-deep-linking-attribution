@@ -61,6 +61,42 @@ utils.userPreferences = {
 	}
 };
 
+utils.generateDynamicBNCLink = function(branchKey, data) {
+	if (!branchKey && !data) {
+		return;
+	}
+	if (typeof data["data"] !== "string") {
+		data = utils.cleanLinkData(data);
+	}
+	var addKeyAndValueToUrl = function(fallbackUrl, tagName, tagData) {
+		var first = fallbackUrl[fallbackUrl.length - 1] === "?";
+		var modifiedFallbackURL = first ? fallbackUrl + tagName : fallbackUrl + "&" + tagName;
+		modifiedFallbackURL += "=";
+		return tagName === "data" ? modifiedFallbackURL + encodeURIComponent(utils.base64encode(tagData)) : modifiedFallbackURL + encodeURIComponent(tagData);
+	};
+
+	var fallbackUrl = config.link_service_endpoint + '/a/' + branchKey + '?';
+	var topLevelKeys = [ "tags", "alias", "channel", "feature", "stage", "campaign", "type", "duration", "sdk", "source", "data" ];
+	for (var i = 0; i < topLevelKeys.length; i++) {
+		var key = topLevelKeys[i];
+		var value = data[key];
+		if (value) {
+			if (key === "tags" && Array.isArray(value)) {
+				for (var index = 0; index < value.length; index++) {
+					fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value[index]);
+				}
+			}
+			else if (key === "data" && typeof value === "object" && Object.keys(value).length > 0) {
+				fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value);
+			}
+			else if (typeof value === "string" && value.length > 0 || typeof value === "number") {
+				fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value);
+			}
+		}
+	}
+	return fallbackUrl;
+};
+
 // Removes PII when a user disables tracking
 utils.cleanApplicationAndSessionStorage = function(branch) {
 	if (branch) {
@@ -263,6 +299,7 @@ utils.cleanLinkData = function(linkData) {
 				data = safejson.parse(data);
 			}
 			catch (e) {
+				console.log(e);
 				data = { '_bncNoEval': true };
 			}
 			break;
