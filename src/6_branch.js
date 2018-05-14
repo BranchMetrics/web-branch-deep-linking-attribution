@@ -1060,13 +1060,15 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
  */
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
-Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, linkData) {
-	this._api(resources.link, utils.cleanLinkData(linkData), function(err, data) {
+Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
+	var dataCopy = Object.assign({}, data);
+	var keyCopy = this.branch_key;
+	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
 		if (err) {
 			// if an error occurs or if tracking is disabled then return a dynamic link
-			return done(null, utils.generateDynamicBNCLink(this.branch_key, linkData));
+			return done(null, utils.generateDynamicBNCLink(keyCopy, dataCopy));
 		}
-		done(err, data && data['url']);
+		done(null, data && data['url']);
 	});
 });
 

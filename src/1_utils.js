@@ -65,7 +65,7 @@ utils.generateDynamicBNCLink = function(branchKey, data) {
 	if (!branchKey && !data) {
 		return;
 	}
-	if (typeof data["data"] !== "string") {
+	if (!data["data"] || typeof data["data"] !== "string") {
 		data = utils.cleanLinkData(data);
 	}
 	var addKeyAndValueToUrl = function(fallbackUrl, tagName, tagData) {
@@ -299,7 +299,6 @@ utils.cleanLinkData = function(linkData) {
 				data = safejson.parse(data);
 			}
 			catch (e) {
-				console.log(e);
 				data = { '_bncNoEval': true };
 			}
 			break;
