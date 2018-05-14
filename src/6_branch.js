@@ -1061,7 +1061,7 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	var dataCopy = Object.assign({}, data);
+	var dataCopy = utils.merge({}, data);
 	var keyCopy = this.branch_key;
 	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
 		if (err) {
