@@ -800,7 +800,11 @@ describe('Branch', function() {
 				}
 				assert.strictEqual(hostWithoutPort, "bnc.lt", "Dynamic BNC link's host correct");
 				// making sure that this test doesn't fail in IE10
-				assert.strictEqual(urlParser.pathname.replace('/', ''), "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
+				var pathName = urlParser.pathname;
+				if (pathName[0] === '/') {
+					pathName = pathName.substring(1, pathName.length);
+				}
+				assert.strictEqual(pathName, "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
 
 				var queryParams = urlParser.search.replace('?', '');
 				queryParams = queryParams.split('&');
@@ -1228,7 +1232,11 @@ describe('Branch', function() {
 				}
 				assert.strictEqual(hostWithoutPort, "bnc.lt", "Dynamic BNC link's host correct");
 				// making sure that this test doesn't fail in IE10
-				assert.strictEqual(urlParser.pathname.replace('/', ''), "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
+				var pathName = urlParser.pathname;
+				if (pathName[0] === '/') {
+					pathName = pathName.substring(1, pathName.length);
+				}
+				assert.strictEqual(pathName, "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
 
 				var queryParams = urlParser.search.replace('?', '');
 				queryParams = queryParams.split('&');
