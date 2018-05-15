@@ -831,24 +831,24 @@ describe('Branch', function() {
 					}
 				}
 				// jshint maxdepth:5
-				for (var k in expectedQueryParams) {
-					if (expectedQueryParams.hasOwnProperty(k)) {
-						assert.strictEqual(true, actual.hasOwnProperty(k), "property exists in dynamic bnc link");
-						var val = decodeURIComponent(actual[k]);
-						if (k === 'data') {
-							val = atob(val);
-							val = JSON.parse(val);
-							assert.deepEqual(expectedQueryParams['data'], val, 'data object appended correctly to dynamic BNC link');
+				for (var property in expectedQueryParams) {
+					if (expectedQueryParams.hasOwnProperty(property)) {
+						assert.strictEqual(true, actual.hasOwnProperty(property), "property exists in dynamic bnc link");
+						var valActual = decodeURIComponent(actual[property]);
+						if (property === 'data') {
+							valActual = atob(valActual);
+							valActual = JSON.parse(valActual);
+							assert.deepEqual(expectedQueryParams['data'], valActual, 'data object appended correctly to dynamic BNC link');
 						}
-						else if (k === 'tags') {
-							val = val.split(',');
-							for (var t = 0; t < expectedQueryParams[k].length; t++) {
-								var valueExists = expectedQueryParams[k].indexOf(val[t]) > -1;
+						else if (property === 'tags') {
+							valActual = valActual.split(',');
+							for (var t = 0; t < expectedQueryParams[property].length; t++) {
+								var valueExists = expectedQueryParams[property].indexOf(valActual[t]) > -1;
 								assert.strictEqual(true, valueExists, 'tag is correctly appended to dynamic bnc.lt link');
 							}
 						}
 						else {
-							assert.strictEqual(expectedQueryParams[k], val, 'property\'s value exists in dynamic bnc link');
+							assert.strictEqual(expectedQueryParams[property], valActual, 'property\'s value exists in dynamic bnc link');
 						}
 					}
 				}
@@ -1195,7 +1195,7 @@ describe('Branch', function() {
 		});
 
 		it('should return err and use the right fallback when the req has err', function(done) {
-			var assert = testUtils.plan(30, done);
+			var assert = testUtils.plan(3, done);
 
 			sandbox.stub(branch, '_windowRedirect', function(url) {
 				assert(false, 'redirect should not happen unless explicitly called');
@@ -1241,21 +1241,20 @@ describe('Branch', function() {
 				var actual = {};
 				for (var i = 0; i < queryParams.length; i++) {
 					var keyValuePair = queryParams[i].split('=');
-					var key = keyValuePair[0];
 					var value = decodeURIComponent(keyValuePair[1]);
-					actual[key] = value;
+					actual[keyValuePair[0]] = value;
 				}
-				for (var z in expectedQueryParams) {
-					if (expectedQueryParams.hasOwnProperty(z)) {
-						assert.strictEqual(true, actual.hasOwnProperty(z), "property exists in dynamic bnc link");
-						var valueFromActual = decodeURIComponent(actual[z]);
-						if (z === 'data') {
-							valueFromActual = atob(valueFromActual);
-							valueFromActual = JSON.parse(valueFromActual);
-							assert.deepEqual(expectedQueryParams['data'], valueFromActual, 'data object appended correctly to dynamic BNC link');
+				for (var key in expectedQueryParams) {
+					if (expectedQueryParams.hasOwnProperty(key)) {
+						assert.strictEqual(true, actual.hasOwnProperty(key), "property exists in dynamic bnc link");
+						var actualVal = decodeURIComponent(actual[key]);
+						if (key === 'data') {
+							actualVal = atob(actualVal);
+							actualVal = JSON.parse(actualVal);
+							assert.deepEqual(expectedQueryParams['data'], actualVal, 'data object appended correctly to dynamic BNC link');
 						}
 						else {
-							assert.strictEqual(expectedQueryParams[z], valueFromActual, 'property\'s value exists in dynamic bnc link');
+							assert.strictEqual(expectedQueryParams[key], actualVal, 'property\'s value exists in dynamic bnc link');
 						}
 					}
 				}
