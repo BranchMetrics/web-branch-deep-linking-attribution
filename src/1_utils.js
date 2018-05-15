@@ -72,7 +72,7 @@ utils.generateDynamicBNCLink = function(branchKey, data) {
 		var first = fallbackUrl[fallbackUrl.length - 1] === "?";
 		var modifiedFallbackURL = first ? fallbackUrl + tagName : fallbackUrl + "&" + tagName;
 		modifiedFallbackURL += "=";
-		return tagName === "data" ? modifiedFallbackURL + encodeURIComponent(utils.base64encode(tagData)) : modifiedFallbackURL + encodeURIComponent(tagData);
+		return modifiedFallbackURL + encodeURIComponent(tagData);
 	};
 
 	var fallbackUrl = config.link_service_endpoint + '/a/' + branchKey + '?';
@@ -86,10 +86,10 @@ utils.generateDynamicBNCLink = function(branchKey, data) {
 					fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value[index]);
 				}
 			}
-			else if (key === "data" && typeof value === "object" && Object.keys(value).length > 0) {
-				fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value);
-			}
 			else if (typeof value === "string" && value.length > 0 || typeof value === "number") {
+				if (key === "data" && typeof value === "string") {
+					value = utils.base64encode(value);
+				}
 				fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value);
 			}
 		}
