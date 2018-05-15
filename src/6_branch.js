@@ -1061,8 +1061,14 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	this._api(resources.link, utils.cleanLinkData(data), function(err, data) {
-		done(err, data && data['url']);
+	var linkData = utils.cleanLinkData(data);
+	var keyCopy = this.branch_key;
+	this._api(resources.link, linkData, function(err, data) {
+		if (err) {
+			// if an error occurs or if tracking is disabled then return a dynamic link
+			return done(null, utils.generateDynamicBNCLink(keyCopy, linkData));
+		}
+		done(null, data && data['url']);
 	});
 });
 
@@ -1285,28 +1291,8 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
 	data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
 
-	var fallbackUrl = config.link_service_endpoint + '/a/' + self.branch_key;
-	var first = true;
-	var encodeLinkProperty = function(key, data) {
-		return encodeURIComponent(utils.base64encode(goog.json.serialize(data[key])));
-	};
-
-	for (var key in data) {
-		if (data.hasOwnProperty(key)) {
-			if (key !== 'data') {
-				if (first) {
-					fallbackUrl += '?';
-					first = false;
-				}
-				else {
-					fallbackUrl += '&';
-				}
-				fallbackUrl += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
-			}
-		}
-	}
-
 	var cleanedData = utils.cleanLinkData(data);
+	var fallbackUrl = utils.generateDynamicBNCLink(this.branch_key, cleanedData);
 
 	if (options['open_app'] || options['open_app'] === null || typeof options['open_app'] === 'undefined') {
 		cleanedData['open_app'] = true;

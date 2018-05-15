@@ -787,6 +787,80 @@ describe('Branch', function() {
 			assert.deepEqual(requests[0].obj, expectedRequest(true, true), 'All params sent');
 		});
 
+		it('an error should be returned causing .link() to return a bnc.lt long link', function(done) {
+			var branch = initBranch(true);
+			var assert = testUtils.plan(20, done);
+			branch.link(expectedRequest(), function(err, link) {
+				var urlParser = document.createElement("a");
+				urlParser.href = link;
+				assert.strictEqual(urlParser.protocol, "https:", "Dynamic BNC link's protocol is correct");
+				var hostWithoutPort = urlParser.host;
+				if (hostWithoutPort.indexOf(':') > -1) {
+					hostWithoutPort = hostWithoutPort.substring(0, hostWithoutPort.indexOf(':'));
+				}
+				assert.strictEqual(hostWithoutPort, "bnc.lt", "Dynamic BNC link's host correct");
+				// making sure that this test doesn't fail in IE10
+				var pathName = urlParser.pathname;
+				if (pathName[0] === '/') {
+					pathName = pathName.substring(1, pathName.length);
+				}
+				assert.strictEqual(pathName, "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
+
+				var queryParams = urlParser.search.replace('?', '');
+				queryParams = queryParams.split('&');
+
+				var expectedQueryParams = {
+					tags: [ 'tag1', 'tag2' ],
+					channel: 'sample app',
+					feature: 'create link',
+					stage: 'created link',
+					type: "1",
+					sdk: 'web2.33.1',
+					source: 'web-sdk',
+					data: { "mydata":"bar", "$desktop_url":"https://cdn.branch.io/example.html", "$og_title":"Branch Metrics", "$og_description":"Branch Metrics", "$og_image_url":"http://branch.io/img/logo_icon_white.png", "$canonical_url":"https://cdn.branch.io/example.html", "$og_video":null }
+				};
+				var actual = {};
+				for (var i = 0; i < queryParams.length; i++) {
+					var keyValuePair = queryParams[i].split('=');
+					var key = keyValuePair[0];
+					var value = decodeURIComponent(keyValuePair[1]);
+					if (key === 'tags') {
+						if (!actual[key]) {
+							actual[key] = [];
+						}
+						actual[key].push(value);
+					}
+					else {
+						actual[key] = value;
+					}
+				}
+				// jshint maxdepth:5
+				for (var property in expectedQueryParams) {
+					if (expectedQueryParams.hasOwnProperty(property)) {
+						assert.strictEqual(true, actual.hasOwnProperty(property), "property exists in dynamic bnc link");
+						var valActual = decodeURIComponent(actual[property]);
+						if (property === 'data') {
+							valActual = atob(valActual);
+							valActual = JSON.parse(valActual);
+							assert.deepEqual(expectedQueryParams['data'], valActual, 'data object appended correctly to dynamic BNC link');
+						}
+						else if (property === 'tags') {
+							valActual = valActual.split(',');
+							for (var t = 0; t < expectedQueryParams[property].length; t++) {
+								var valueExists = expectedQueryParams[property].indexOf(valActual[t]) > -1;
+								assert.strictEqual(true, valueExists, 'tag is correctly appended to dynamic bnc.lt link');
+							}
+						}
+						else {
+							assert.strictEqual(expectedQueryParams[property], valActual, 'property\'s value exists in dynamic bnc link');
+						}
+					}
+				}
+			});
+			assert.strictEqual(requests.length, 1, 'Request made');
+			requests[0].callback(new Error('error message abc'));
+		});
+
 		it('should add source = "web-sdk" to link data', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(2, done);
@@ -1125,7 +1199,7 @@ describe('Branch', function() {
 		});
 
 		it('should return err and use the right fallback when the req has err', function(done) {
-			var assert = testUtils.plan(2, done);
+			var assert = testUtils.plan(3, done);
 
 			sandbox.stub(branch, '_windowRedirect', function(url) {
 				assert(false, 'redirect should not happen unless explicitly called');
@@ -1133,7 +1207,10 @@ describe('Branch', function() {
 
 			branch.deepview(
 				{
-					"abc": "def"
+					channel: 'testChannel',
+					data: {
+						akey: 'aval'
+					}
 				},
 				{},
 				function(err) {
@@ -1145,12 +1222,50 @@ describe('Branch', function() {
 			if (typeof branch._windowRedirect.restore === 'function') {
 				branch._windowRedirect.restore();
 			}
-			sandbox.stub(branch, '_windowRedirect', function(url) {
-				assert.strictEqual(
-					url,
-					'https://bnc.lt/a/' + window.branch_sample_key + '?abc=def',
-					'rediretion happened'
-				);
+			sandbox.stub(branch, '_windowRedirect', function(link) {
+				var urlParser = document.createElement("a");
+				urlParser.href = link;
+				assert.strictEqual(urlParser.protocol, "https:", "Dynamic BNC link's protocol is correct");
+				var hostWithoutPort = urlParser.host;
+				if (hostWithoutPort.indexOf(':') > -1) {
+					hostWithoutPort = hostWithoutPort.substring(0, hostWithoutPort.indexOf(':'));
+				}
+				assert.strictEqual(hostWithoutPort, "bnc.lt", "Dynamic BNC link's host correct");
+				// making sure that this test doesn't fail in IE10
+				var pathName = urlParser.pathname;
+				if (pathName[0] === '/') {
+					pathName = pathName.substring(1, pathName.length);
+				}
+				assert.strictEqual(pathName, "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
+
+				var queryParams = urlParser.search.replace('?', '');
+				queryParams = queryParams.split('&');
+
+				var expectedQueryParams = {
+					channel: 'testChannel',
+					source: 'web-sdk',
+					data: { "$canonical_url":"http://someurl/pluspath", "$og_title":"OGTitle", "$og_description":"OGDescription", "$og_image_url": "OGImage", "$og_video":"OGVideo", "akey": "aval" }
+				};
+				var actual = {};
+				for (var i = 0; i < queryParams.length; i++) {
+					var keyValuePair = queryParams[i].split('=');
+					var value = decodeURIComponent(keyValuePair[1]);
+					actual[keyValuePair[0]] = value;
+				}
+				for (var key in expectedQueryParams) {
+					if (expectedQueryParams.hasOwnProperty(key)) {
+						assert.strictEqual(true, actual.hasOwnProperty(key), "property exists in dynamic bnc link");
+						var actualVal = decodeURIComponent(actual[key]);
+						if (key === 'data') {
+							actualVal = atob(actualVal);
+							actualVal = JSON.parse(actualVal);
+							assert.deepEqual(expectedQueryParams['data'], actualVal, 'data object appended correctly to dynamic BNC link');
+						}
+						else {
+							assert.strictEqual(expectedQueryParams[key], actualVal, 'property\'s value exists in dynamic bnc link');
+						}
+					}
+				}
 			});
 			branch._deepviewCta(); // redirection happens now
 
