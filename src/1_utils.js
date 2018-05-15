@@ -65,9 +65,6 @@ utils.generateDynamicBNCLink = function(branchKey, data) {
 	if (!branchKey && !data) {
 		return;
 	}
-	if (!data["data"] || typeof data["data"] !== "string") {
-		data = utils.cleanLinkData(data);
-	}
 	var addKeyAndValueToUrl = function(fallbackUrl, tagName, tagData) {
 		var first = fallbackUrl[fallbackUrl.length - 1] === "?";
 		var modifiedFallbackURL = first ? fallbackUrl + tagName : fallbackUrl + "&" + tagName;
