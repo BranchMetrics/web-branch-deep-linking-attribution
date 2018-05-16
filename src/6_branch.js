@@ -1393,7 +1393,7 @@ Branch.prototype._windowRedirect = function(url) {
 /*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
-		throw new Error('Cannot call Deepview CTA, please call branch.deepview() first.');
+		return done();
 	}
 	if (window.event) {
 		if (window.event.preventDefault) {
