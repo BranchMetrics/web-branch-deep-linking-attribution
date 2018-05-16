@@ -1282,16 +1282,16 @@ describe('Branch', function() {
 			branch = initBranch(true);
 		});
 
-		it('should throw an error if branch._deepviewCta is undefined', function(done) {
-			var assert = testUtils.plan(2, done);
+		it('should not throw an error if branch._deepviewCta is undefined', function(done) {
+			var assert = testUtils.plan(1, done);
 			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
 			try {
 				branch.deepviewCta();
 			} catch (e) {
 				assert.strictEqual(
-					e.message,
-					'Cannot call Deepview CTA, please call branch.deepview() first.',
-					'expected error'
+					e,
+					null,
+					'un-expected error'
 				);
 			}
 		});
