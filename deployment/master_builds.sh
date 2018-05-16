@@ -31,4 +31,8 @@ if [ "$CIRCLE_BRANCH" == 'master' ]; then
   aws s3 cp --content-type="text/javascript" dist/build.js s3://branch-builds/websdk/branch.js --acl public-read
   aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
 
+else
+
+  echo -en "${GREEN}Not master .. skipping${NC}\n"
+
 fi
