@@ -1285,22 +1285,34 @@ describe('Branch', function() {
 		it('should throw an error if branch._deepviewCta is undefined', function(done) {
 			var assert = testUtils.plan(2, done);
 			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
-			try {
-				branch.deepviewCta();
-			} catch (e) {
+			branch.deepviewCta(function(err) {
 				assert.strictEqual(
-					e.message,
-					'Cannot call Deepview CTA, please call branch.deepview() first.',
-					'expected error'
+					err.message,
+					'Cannot call Deepview CTA, please call branch.deepview() first',
+					'error returned through callback correctly in normal operation'
 				);
-			}
+			});
+		});
+
+		it('should throw an error if tracking is disabled and branch._deepviewCta is undefined', function(done) {
+			var assert = testUtils.plan(2, done);
+			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
+			branch.disableTracking();
+			branch.deepviewCta(function(err) {
+				assert.strictEqual(
+					err.message,
+					'Requested operation cannot be completed since tracking is disabled',
+					'error returned through callback correctly when tracking is disabled'
+				);
+			});
 		});
 
 		it('should not throw an error if branch._deepviewCta is a function', function(done) {
 			var assert = testUtils.plan(1, done);
 			branch._deepviewCta = function() {};
-			branch.deepviewCta();
-			assert(true, 'no error');
+			branch.deepviewCta(function(err) {
+				assert.strictEqual(err, undefined, 'no error should be present in callback');
+			});
 		});
 	});
 
