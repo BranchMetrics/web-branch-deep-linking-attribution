@@ -309,6 +309,7 @@ Branch.prototype['init'] = wrap(
 		utils.retries = options && options['retries'] && Number.isInteger(options['retries']) ? options['retries'] : utils.retries;
 		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
+		journeys_utils.nonce = options && options['nonce'] ? options['nonce'] : journeys_utils.nonce;
 
 		utils.userPreferences.trackingDisabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
 		utils.userPreferences.allowErrorsInCallback = false;
