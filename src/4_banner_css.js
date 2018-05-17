@@ -209,6 +209,11 @@ banner_css.css = function(options, element) {
 		var iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
+		if (utils.nonce !== '') {
+			var nonce = document.createAttribute('nonce');
+			nonce.value = utils.nonce;
+			iFrameCSS.setAttributeNode(nonce);
+		}
 		iFrameCSS.innerHTML = banner_css.iframe +
 			(utils.mobileUserAgent() ?
 				banner_css.iframe_position(options.mobileSticky, options.position) :
@@ -220,6 +225,11 @@ banner_css.css = function(options, element) {
 	css.type = 'text/css';
 	css.id = 'branch-css';
 	css.innerHTML = style;
+	if (utils.nonce !== '') {
+		var nonce = document.createAttribute('nonce');
+		nonce.value = utils.nonce;
+		css.setAttributeNode(nonce);
+	}
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
 	var controlledHead = (doc.head || doc.getElementsByTagName("head")[0]);

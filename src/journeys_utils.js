@@ -3,6 +3,7 @@ goog.provide('journeys_utils');
 
 goog.require('banner_utils');
 goog.require('safejson');
+goog.require('utils');
 
 // defaults. These will change based on banner info
 journeys_utils.position = 'top';
@@ -54,9 +55,6 @@ journeys_utils.previousDivToInjectParents = [];
 
 // holds data from Journey that is currently being viewed & data from setBranchViewData()
 journeys_utils.journeyLinkData = null;
-
-// Nonce value to allow for CSP whitelisting
-journeys_utils.nonce = '';
 
 /***
  * @function journeys_utils.setPositionAndHeight
@@ -176,9 +174,9 @@ journeys_utils.getJsAndAddToParent = function(html) {
 		var src = match[1];
 		var script = document.createElement('script');
 		script.id = 'branch-journey-cta';
-		if (journeys_utils.nonce !== '') {
+		if (utils.nonce !== '') {
 			var nonce = document.createAttribute('nonce');
-			nonce.value = journeys_utils.nonce;
+			nonce.value = utils.nonce;
 			script.setAttributeNode(nonce);
 		}
 		script.innerHTML = src;
@@ -225,6 +223,12 @@ journeys_utils.createAndAppendIframe = function() {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
+
+	if (utils.nonce !== '') {
+		var nonce = document.createAttribute('nonce');
+		nonce.value = utils.nonce;
+		iframe.setAttributeNode(nonce);
+	}
 
 	document.body.appendChild(iframe);
 
@@ -332,6 +336,12 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	iFrameCSS.innerHTML = generateIframeOuterCSS();
 
+	if (utils.nonce !== '') {
+		var nonce = document.createAttribute('nonce');
+		nonce.value = utils.nonce;
+		iFrameCSS.setAttributeNode(nonce);
+	}
+
 	document.head.appendChild(iFrameCSS);
 }
 
@@ -380,6 +390,12 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	css.type = 'text/css';
 	css.id = 'branch-css';
 	css.innerHTML = innerCSS;
+
+	if (utils.nonce !== '') {
+		var nonce = document.createAttribute('nonce');
+		nonce.value = utils.nonce;
+		css.setAttributeNode(nonce);
+	}
 
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);

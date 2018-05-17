@@ -19,6 +19,7 @@ var message;
 utils.retries = 2; // Value specifying the number of times that a Branch API call can be re-attempted.
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
 utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
+utils.nonce = ''; // Nonce value to allow for CSP whitelisting
 
 /** @typedef {{data:?string, referring_identity:?string, identity:?string, has_app:?boolean}} */
 utils.sessionData;
