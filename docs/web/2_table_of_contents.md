@@ -34,4 +34,7 @@
 8. Revenue Analytics
   + [.trackCommerceEvent()](#trackcommerceeventevent-commerce_data-metadata-callback)
 
+9. User Privacy
+  + [.disableTracking()](#disableTrackingdisableTracking)
+
 ___

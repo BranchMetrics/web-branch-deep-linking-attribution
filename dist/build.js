@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.33.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.34.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -970,9 +970,53 @@ var utils = {}, DEBUG = !0, message;
 utils.retries = 2;
 utils.retry_delay = 200;
 utils.timeout = 5000;
+utils.userPreferences = {trackingDisabled:!1, whiteListedEndpointsWithData:{"/v1/open":{link_identifier:"\\d+"}, "/v1/event":{event:"pageview"}, "/v1/branchview":{}}, allowErrorsInCallback:!1, shouldBlockRequest:function(a, b) {
+  var c = document.createElement("a");
+  c.href = a;
+  c = c.pathname;
+  "/" != c[0] && (c = "/" + c);
+  c = utils.userPreferences.whiteListedEndpointsWithData[c];
+  if (!c) {
+    return !0;
+  }
+  if (0 < Object.keys(c).length) {
+    if (!b) {
+      return !0;
+    }
+    for (var d in c) {
+      var e = new RegExp(c[d]);
+      if (!b.hasOwnProperty(d) || !e.test(b[d])) {
+        return !0;
+      }
+    }
+  }
+  return !1;
+}};
+utils.generateDynamicBNCLink = function(a, b) {
+  if (a || b) {
+    for (var c = config.link_service_endpoint + "/a/" + a + "?", d = "tags alias channel feature stage campaign type duration sdk source data".split(" "), e = 0;e < d.length;e++) {
+      var f = d[e], g = b[f];
+      if (g) {
+        if ("tags" === f && Array.isArray(g)) {
+          for (var h = 0;h < g.length;h++) {
+            c = ("?" === c[c.length - 1] ? c + f : c + "&" + f) + "=" + encodeURIComponent(g[h]);
+          }
+        } else {
+          if ("string" === typeof g && 0 < g.length || "number" === typeof g) {
+            "data" === f && "string" === typeof g && (g = utils.base64encode(g)), c = ("?" === c[c.length - 1] ? c + f : c + "&" + f) + "=" + encodeURIComponent(g);
+          }
+        }
+      }
+    }
+    return c;
+  }
+};
+utils.cleanApplicationAndSessionStorage = function(a) {
+  a && (a.device_fingerprint_id = null, a.sessionLink = null, a.session_id = null, a.identity_id = null, a.identity = null, a.browser_fingerprint_id = null, a._deepviewCta && delete a._deepviewCta, a._deepviewRequestForReplay && delete a._deepviewRequestForReplay, a._storage.remove("branch_view_enabled"), session.set(a._storage, {}, !0));
+};
 utils.httpMethod = {POST:"POST", GET:"GET"};
-utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initilized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
-blockedByClient:"Request blocked by client, probably adblock", missingUrl:"Required argument: URL, is missing"};
+utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initialized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
+blockedByClient:"Request blocked by client, probably adblock", missingUrl:"Required argument: URL, is missing", trackingDisabled:"Requested operation cannot be completed since tracking is disabled", deepviewNotCalled:"Cannot call Deepview CTA, please call branch.deepview() first"};
 utils.bannerThemes = ["light", "dark"];
 utils.getLocationSearch = function() {
   return utils.isIframeAndFromSameOrigin() ? window.top.location.search : window.location.search;
@@ -1343,6 +1387,9 @@ utils.mergeHostedDeeplinkData = function(a, b) {
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
   return function(c, d, e) {
+    if (utils.userPreferences.trackingDisabled) {
+      return !1;
+    }
     if ("number" === typeof e || e) {
       if (b === validationTypes.OBJECT) {
         if ("object" !== typeof e) {
@@ -1387,7 +1434,7 @@ function defaults(a) {
   var b = {browser_fingerprint_id:validator(!0, branch_id), identity_id:validator(!0, branch_id), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, branch_id)};
   return utils.merge(a, b);
 }
-resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!1, branch_id), alternative_browser_fingerprint_id:validator(!1, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)}};
+resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!1, branch_id), alternative_browser_fingerprint_id:validator(!1, branch_id), identity_id:validator(!1, branch_id), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN)}};
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, branch_id), branch_key:validator(!0, validationTypes.STRING)}};
 resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
@@ -1405,7 +1452,7 @@ validationTypes.NUMBER), source:validator(!1, validationTypes.STRING)})};
 resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), _t:validator(!1, branch_id), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), append_deeplink_path:validator(!1, validationTypes.BOOLEAN), 
 stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), deepview_type:validator(!0, validationTypes.STRING), source:validator(!0, validationTypes.STRING)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
-resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING)})};
+resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN)})};
 resources.commerceEvent = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), commerce_data:validator(!0, validationTypes.OBJECT)})};
 resources.logStandardEvent = {destination:config.api_endpoint, endpoint:"/v2/event/standard", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING)}};
 resources.logCustomEvent = {destination:config.api_endpoint, endpoint:"/v2/event/custom", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING)}};
@@ -1573,8 +1620,8 @@ Server.prototype.getUrl = function(a, b) {
   if ("/v1/has-app" === a.endpoint) {
     try {
       a.queryPart = h(b, a.queryPart);
-    } catch (l) {
-      return {error:l.message};
+    } catch (m) {
+      return {error:m.message};
     }
   }
   if ("undefined" !== typeof a.queryPart) {
@@ -1602,8 +1649,8 @@ Server.prototype.getUrl = function(a, b) {
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
       b = h(b, k);
-    } catch (l) {
-      return {error:l.message};
+    } catch (m) {
+      return {error:m.message};
     }
   }
   "/v1/event" === a.endpoint && (k.metadata = safejson.stringify(k.metadata || {}), k.hasOwnProperty("commerce_data") && (k.commerce_data = safejson.stringify(k.commerce_data || {})));
@@ -1681,20 +1728,30 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
   }
 };
 Server.prototype.request = function(a, b, c, d) {
-  var e = this, f = this.getUrl(a, b);
+  var e = this;
+  if (utils.userPreferences.trackingDisabled) {
+    for (var f = ["browser_fingerprint_id", "alternative_browser_fingerprint_id", "identity_id", "session_id"], g = 0;g < f.length;g++) {
+      b.hasOwnProperty(f[g]) && delete b[f[g]];
+    }
+  }
+  f = this.getUrl(a, b);
   if (f.error) {
     return d(Error(safejson.stringify({message:f.error, endpoint:a.endpoint, data:b})));
   }
-  var g, h = "";
-  "GET" === a.method ? g = f.url + "?" + f.data : (g = f.url, h = f.data);
-  var k = utils.retries, l = function(a, b, c) {
-    a && 0 < k && "5" === (c || "").toString().substring(0, 1) ? (k--, window.setTimeout(function() {
-      m();
+  var h, k = "";
+  "GET" === a.method ? h = f.url + "?" + f.data : (h = f.url, k = f.data);
+  var m = utils.retries, l = function(a, b, c) {
+    a && 0 < m && "5" === (c || "").toString().substring(0, 1) ? (m--, window.setTimeout(function() {
+      n();
     }, utils.retry_delay)) : d(a, b);
-  }, m = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(g, b, a.method, l) : e.XHRRequest(g, h, a.method, c, l);
   };
-  m();
+  if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(h, b)) {
+    return utils.userPreferences.allowErrorsInCallback ? l(Error(utils.messages.trackingDisabled), null, 300) : l(null, {}, 200);
+  }
+  var n = function() {
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(h, b, a.method, l) : e.XHRRequest(h, k, a.method, c, l);
+  };
+  n();
 };
 // Input 10
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2000, success_timeout:3000, removeElement:function(a) {
@@ -1835,13 +1892,13 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 13
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, m = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, m = function() {
+  }, l = function() {
     k = a.createElement("div");
     k.className = "branch-icon-wrapper";
     k.id = "branch-checkmark";
@@ -1855,8 +1912,8 @@ var sendSMS = function(a, b, c, d) {
       k.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, p = function() {
-    l();
+  }, n = function() {
+    m();
     f.style.background = "#FFD4D4";
     e.className = "error";
     setTimeout(function() {
@@ -1865,13 +1922,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var n = e.value;
-    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), p()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+    var p = e.value;
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), l(), setTimeout(function() {
         h.removeChild(k);
-        l();
+        m();
       }, banner_utils.success_timeout));
-    })) : p();
+    })) : n();
   }
 }, banner = function(a, b, c, d) {
   function e() {
@@ -1909,31 +1966,31 @@ var sendSMS = function(a, b, c, d) {
       });
     };
   }
-  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, p = g.getElementById("branch-banner-close"), n = function(a, c) {
+  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, m = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
     "top" === b.position ? f.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (f.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
-    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
+    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = l), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
       banner_utils.removeElement(f);
       banner_utils.removeElement(document.getElementById("branch-css"));
       c();
     }, banner_utils.animationSpeed + banner_utils.animationDelay), setTimeout(function() {
-      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = m);
+      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = l);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay));
   };
-  p && (p.onclick = function(b) {
+  n && (n.onclick = function(b) {
     b.preventDefault();
     a._publishEvent("willCloseBanner");
-    n({}, function() {
+    p({}, function() {
       a._publishEvent("didCloseBanner");
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, h) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, h) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, m));
   b.immediate ? e() : setTimeout(e, banner_utils.animationDelay);
-  return n;
+  return p;
 };
 // Input 14
 var journeys_utils = {position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[]};
@@ -2211,27 +2268,27 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
     c.feature = "journeys";
     c = utils.cleanLinkData(c);
     (g = document.getElementById("branch-iframe-css")) && g.parentElement.removeChild(g);
-    var l = document.createElement("div");
-    l.id = "branch-banner";
-    document.body.insertBefore(l, null);
-    banner_utils.addClass(l, "branch-banner-is-active");
+    var m = document.createElement("div");
+    m.id = "branch-banner";
+    document.body.insertBefore(m, null);
+    banner_utils.addClass(m, "branch-banner-is-active");
     if (b.html) {
       return renderHtmlBlob(document.body, b.html, e);
     }
     if (b.url) {
-      var m = "branch_view_callback__" + branch_view.callback_index++;
+      var l = "branch_view_callback__" + branch_view.callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
-      g = b.url + "&callback=" + m;
+      g = b.url + "&callback=" + l;
       g += "&_lan=" + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode() || "en");
       a.XHRRequest(g + ("&data=" + c), {}, "GET", {}, function(a, c) {
         var g = !1;
         if (!a && c) {
-          var q = f ? 0 : journeys_utils.findDismissPeriod(c), r = window.setTimeout(function() {
-            window[m] = function() {
+          var q = f ? 0 : journeys_utils.findDismissPeriod(c), n = window.setTimeout(function() {
+            window[l] = function() {
             };
           }, utils.timeout);
-          window[m] = function(a) {
-            window.clearTimeout(r);
+          window[l] = function(a) {
+            window.clearTimeout(n);
             g || (k = a, journeys_utils.finalHookups(b, d, k, h, q));
           };
           h = renderHtmlBlob(document.body, c, e);
@@ -2241,7 +2298,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
           }
           journeys_utils.finalHookups(b, d, k, h, q);
         }
-        document.body.removeChild(l);
+        document.body.removeChild(m);
       }, !0);
     }
   }
@@ -2268,18 +2325,19 @@ function compileRequestData(a, b, c) {
   d.data = b ? utils.merge({link_click_id:b}, d.data) : d.data;
   d = utils.merge({open_app:c}, d);
   d = utils.merge({has_app_websdk:e}, d);
-  return d = utils.isIframe() ? utils.merge({is_iframe:!0}, d) : d;
+  d = utils.isIframe() ? utils.merge({is_iframe:!0}, d) : d;
+  return d = utils.userPreferences.trackingDisabled ? utils.merge({tracking_disabled:!0}, d) : d;
 }
 branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
-  var f = null, g = null, h = null, k = null, l = null, m = !1, p = !1, n = !1;
-  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = (d.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, p = d.make_new_link || !1, n = d.open_app || !1);
-  (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, k = buildJourneyTestData(f, a, b));
+  var f = null, g = null, h = null, k = null, m = null, l = !1, n = !1, p = !1;
+  d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = (d.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, n = d.make_new_link || !1, p = d.open_app || !1);
+  (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (l = !0, k = buildJourneyTestData(f, a, b));
   !k && c.hasOwnProperty("branch_view_data") && (k = c.branch_view_data, h = isJourneyDismissed(k, e));
   !k || h || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = k.id, e.renderQueue(function() {
-    l = compileRequestData(e, p, n);
-    branch_view.handleBranchViewData(e._server, k, l, e._storage, b.has_app, m, e);
+    m = compileRequestData(e, n, p);
+    branch_view.handleBranchViewData(e._server, k, m, e._storage, b.has_app, l, e);
   }));
 };
 // Input 16
@@ -2340,7 +2398,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var k = function(b, c) {
+      var h = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
@@ -2352,16 +2410,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
-          return k(Error(utils.message(utils.messages.initPending)), null);
+          return h(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return k(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
+          return h(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
-          return k(Error(utils.message(utils.messages.nonInit)), null);
+          return h(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(k);
+      e.unshift(h);
       b.apply(d, e);
     });
   };
@@ -2386,6 +2444,7 @@ Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id);
   (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
   (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
+  utils.userPreferences.trackingDisabled && (b.tracking_disabled = utils.userPreferences.trackingDisabled);
   return this._server.request(a, b, this._storage, function(a, b) {
     c(a, b);
   });
@@ -2404,9 +2463,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
   c = c && utils.validateParameterType(c, "object") ? c : {};
+  d.init_options = c;
   utils.retries = c && c.retries && Number.isInteger(c.retries) ? c.retries : utils.retries;
   utils.retry_delay = c && c.retry_delay && Number.isInteger(c.retry_delay) ? c.retry_delay : utils.retry_delay;
   utils.timeout = c && c.timeout && Number.isInteger(c.timeout) ? c.timeout : utils.timeout;
+  utils.userPreferences.trackingDisabled = c && c.tracking_disabled && !0 === c.tracking_disabled ? !0 : !1;
+  utils.userPreferences.allowErrorsInCallback = !1;
+  utils.userPreferences.trackingDisabled && utils.cleanApplicationAndSessionStorage(d);
   var e = function(a) {
     a.link_click_id && (d.link_click_id = a.link_click_id.toString());
     a.session_id && (d.session_id = a.session_id.toString());
@@ -2418,7 +2481,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     return a;
   }, f = session.get(d._storage), g = c && c.url || utils.getWindowLocation(), h = (c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null) || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var l = function(a) {
+  var m = function(a) {
     var b = {sdk:config.version, branch_key:d.branch_key}, c = session.get(d._storage) || {}, e = session.get(d._storage, !0) || {};
     e.browser_fingerprint_id && (b._t = e.browser_fingerprint_id);
     utils.isSafari11OrGreater() || d._api(resources._r, b, function(a, b) {
@@ -2430,48 +2493,48 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       b || !e || c.has_app || (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
       a && a(null, c);
     });
-  }, m = function(f, h) {
-    h && (h = e(h), session.set(d._storage, h, k), d.init_state = init_states.INIT_SUCCEEDED, h.data_parsed = h.data && 0 !== h.data.length ? safejson.parse(h.data) : {});
+  }, l = function(f, h) {
+    h && (h = e(h), utils.userPreferences.trackingDisabled || session.set(d._storage, h, k), d.init_state = init_states.INIT_SUCCEEDED, h.data_parsed = h.data && 0 !== h.data.length ? safejson.parse(h.data) : {});
     if (f) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, h && utils.whiteListSessionData(h));
     }
-    var l = utils.getAdditionalMetadata(), m = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
-    m && (m = utils.mergeHostedDeeplinkData(l.hosted_deeplink_data, m)) && 0 < Object.keys(m).length && (l.hosted_deeplink_data = m);
-    d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, l || {}), initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(e, f) {
+    var m = utils.getAdditionalMetadata(), l = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
+    l && (l = utils.mergeHostedDeeplinkData(m.hosted_deeplink_data, l)) && 0 < Object.keys(l).length && (m.hosted_deeplink_data = l);
+    d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, m || {}), initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(e, f) {
       e || "object" !== typeof f || branch_view.initJourney(b, h, f, c, d);
       try {
-        a(e, h && utils.whiteListSessionData(h));
-      } catch (t) {
+        a(e, h && utils.whiteListSessionData(h)), utils.userPreferences.trackingDisabled && (utils.userPreferences.allowErrorsInCallback = !0);
+      } catch (r) {
       } finally {
         d.renderFinalize();
       }
     });
-  }, p = function() {
+  }, n = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
-    b && document.addEventListener(b, function() {
-      document[a] || (l(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
-    }, !1);
+    b && !d.changeEventListenerAdded && (d.changeEventListenerAdded = !0, document.addEventListener(b, function() {
+      document[a] || (m(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
+    }, !1));
   };
   if (f && f.session_id && !h) {
-    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), p(), l(m);
+    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), n(), m(l);
   } else {
-    var f = {sdk:config.version, branch_key:d.branch_key}, n = session.get(d._storage, !0) || {};
-    n.browser_fingerprint_id && (f._t = n.browser_fingerprint_id);
-    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || n.browser_fingerprint_id, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
+    var f = {sdk:config.version, branch_key:d.branch_key}, p = session.get(d._storage, !0) || {};
+    p.browser_fingerprint_id && (f._t = p.browser_fingerprint_id);
+    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || p.browser_fingerprint_id, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-      a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
-      p();
-      m(a, b);
+      a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), h && (b.click_id = h));
+      n();
+      l(a, b);
     }) : d._api(resources._r, f, function(a, b) {
       if (a) {
-        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, l(a, null);
       }
-      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || b, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
+      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || b, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-        a || "object" !== typeof b || (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled), h && (b.click_id = h));
-        p();
-        m(a, b);
+        a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), h && (b.click_id = h));
+        n();
+        l(a, b);
       });
     });
   }
@@ -2546,8 +2609,12 @@ Branch.prototype.logEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c,
   });
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  this._api(resources.link, utils.cleanLinkData(b), function(b, d) {
-    a(b, d && d.url);
+  var c = utils.cleanLinkData(b), d = this.branch_key;
+  this._api(resources.link, c, function(b, f) {
+    if (b) {
+      return a(null, utils.generateDynamicBNCLink(d, c));
+    }
+    a(null, f && f.url);
   });
 });
 Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
@@ -2587,23 +2654,21 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   c.deepview_type = "undefined" === typeof c.deepview_type ? "deepview" : "banner";
   b.data = utils.merge(utils.getHostedDeepLinkData(), b.data);
   b = utils.isIframe() ? utils.merge({is_iframe:!0}, b) : b;
-  var e = config.link_service_endpoint + "/a/" + d.branch_key, f = !0, g;
-  for (g in b) {
-    b.hasOwnProperty(g) && "data" !== g && (f ? (e += "?", f = !1) : e += "&", e += encodeURIComponent(g) + "=" + encodeURIComponent(b[g]));
-  }
   b = utils.cleanLinkData(b);
+  var e = utils.generateDynamicBNCLink(this.branch_key, b);
   if (c.open_app || null === c.open_app || "undefined" === typeof c.open_app) {
     b.open_app = !0;
   }
   b.append_deeplink_path = !!c.append_deeplink_path;
   b.deepview_type = c.deepview_type;
-  (f = d._referringLink()) && !c.make_new_link && (b.link_click_id = utils.getClickIdAndSearchStringFromLink(f));
+  var f = d._referringLink();
+  f && !c.make_new_link && (b.link_click_id = utils.getClickIdAndSearchStringFromLink(f));
   b.banner_options = c;
   d._deepviewRequestForReplay = goog.bind(this._api, d, resources.deepview, b, function(b, c) {
     if (b) {
-      return d._deepviewCta = function() {
+      return utils.userPreferences.trackingDisabled || (d._deepviewCta = function() {
         d._windowRedirect(e);
-      }, a(b);
+      }), a(b);
     }
     "function" === typeof c && (d._deepviewCta = c);
     a(null);
@@ -2615,7 +2680,7 @@ Branch.prototype._windowRedirect = function(a) {
 };
 Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
   if ("undefined" === typeof this._deepviewCta) {
-    throw Error("Cannot call Deepview CTA, please call branch.deepview() first.");
+    return utils.userPreferences.trackingDisabled ? a(Error(utils.messages.trackingDisabled), null) : a(Error(utils.messages.deepviewNotCalled), null);
   }
   window.event && (window.event.preventDefault ? window.event.preventDefault() : window.event.returnValue = !1);
   this._publishEvent("didDeepviewCTA");
@@ -2726,6 +2791,16 @@ Branch.prototype.trackCommerceEvent = wrap(callback_params.CALLBACK_ERR, functio
       a(b || null);
     });
   });
+  a();
+});
+Branch.prototype.disableTracking = wrap(callback_params.CALLBACK_ERR, function(a, b) {
+  if (!1 === b || "false" === b) {
+    utils.userPreferences.trackingDisabled = !1, utils.userPreferences.allowErrorsInCallback = !1, this.branch_key && this.init_options && (!0 === this.init_options.tracking_disabled && delete this.init_options.tracking_disabled, this.init(this.branch_key, this.init_options));
+  } else {
+    if (void 0 === b || !0 === b || "true" === b) {
+      utils.cleanApplicationAndSessionStorage(this), utils.userPreferences.trackingDisabled = !0, utils.userPreferences.allowErrorsInCallback = !0, this.closeBanner(), this.closeJourney();
+    }
+  }
   a();
 });
 // Input 18

@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.34.0] - 2018-05-19
+- Introduces a disableTracking() function to allow your customers to remain private when surfing your site with the WebSDK integrated. It includes the ability to show Journeys without personally identifiable information associated to it.
+- Fixes a bug where the WebSDK stops working when calling branch.deepviewCta() if branch.deepview() was not called previously.
+
 ## [2.33.1] - 2018-03-12
 - No new changes introduced. This release addresses a build process failure from v2.33.0.
 
