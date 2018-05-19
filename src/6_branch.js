@@ -1368,6 +1368,14 @@ Branch.prototype._windowRedirect = function(url) {
  *
  * // You can call this function any time after branch.deepview() is finished by simply:
  * branch.deepviewCta();
+ *
+ * When debugging, please call branch.deepviewCta() with an error callback like so:
+ *
+ * branch.deepviewCta(function(err) {
+ * 	if (err) {
+ * 		console.log(err);
+ * 	}
+ * });
  * ```
  *
  * ___
@@ -1393,7 +1401,8 @@ Branch.prototype._windowRedirect = function(url) {
 /*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
-		throw new Error('Cannot call Deepview CTA, please call branch.deepview() first.');
+		return utils.userPreferences.trackingDisabled ? done(new Error(utils.messages.trackingDisabled), null) :
+		done(new Error(utils.messages.deepviewNotCalled), null);
 	}
 	if (window.event) {
 		if (window.event.preventDefault) {
