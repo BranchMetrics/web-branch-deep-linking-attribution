@@ -815,7 +815,7 @@ describe('Branch', function() {
 					feature: 'create link',
 					stage: 'created link',
 					type: "1",
-					sdk: 'web2.33.1',
+					sdk: 'web' + config.version,
 					source: 'web-sdk',
 					data: { "mydata":"bar", "$desktop_url":"https://cdn.branch.io/example.html", "$og_title":"Branch Metrics", "$og_description":"Branch Metrics", "$og_image_url":"http://branch.io/img/logo_icon_white.png", "$canonical_url":"https://cdn.branch.io/example.html", "$og_video":null }
 				};
