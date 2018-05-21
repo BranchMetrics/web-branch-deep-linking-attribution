@@ -44,30 +44,6 @@ var firefox_browsers = [
 	// }
 ];
 
-var ios_browsers = [
-	{
-		browserName: 'iphone',
-		deviceName: 'iPhone 6',
-		deviceOrientation: 'portrait',
-		platform: 'OS X 10.10',
-		version: '9.0'
-	},
-	// {
-	// 	browserName: 'iphone',
-	// 	deviceName: 'iPhone 6',
-	// 	deviceOrientation: 'portrait',
-	// 	platform: 'OS X 10.10',
-	// 	version: '9.1'
-	// },
-	// {
-	// 	browserName: 'iphone',
-	// 	deviceName: 'iPhone 6',
-	// 	deviceOrientation: 'portrait',
-	// 	platform: 'OS X 10.10',
-	// 	version: '9.2'
-	// }
-];
-
 var android_browsers = [
 	{
 		browserName: 'android',
@@ -152,7 +128,6 @@ module.exports = function(grunt) {
 						chrome_browsers,
 						// firefox_browsers,
 						android_browsers,
-						ios_browsers,
 						ie_browsers)
 				}
 			},
