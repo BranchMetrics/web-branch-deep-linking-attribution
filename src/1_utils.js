@@ -20,6 +20,105 @@ utils.retries = 2; // Value specifying the number of times that a Branch API cal
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
 utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
 
+utils.userPreferences = {
+	trackingDisabled: false,
+	whiteListedEndpointsWithData: {
+		'/v1/open': { 'link_identifier':'\\d+' },
+		'/v1/event': { 'event': 'pageview' },
+		'/v1/branchview': {}
+	},
+	allowErrorsInCallback: false,
+	shouldBlockRequest: function(url, requestData) {
+		// Used by 3_api.js to determine whether a request should be blocked
+		var urlParser = document.createElement('a');
+		urlParser.href = url;
+		var urlPath = urlParser.pathname;
+
+		// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
+		// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
+		if (urlPath[0] != '/') {
+			urlPath = '/' + urlPath;
+		}
+
+		var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
+
+		if (!whiteListedEndpointWithData) {
+			return true;
+		}
+		else if (Object.keys(whiteListedEndpointWithData).length > 0) {
+			if (!requestData) {
+				return true;
+			}
+			// Ensures that required request parameters are available in request data
+			for (var key in whiteListedEndpointWithData) {
+				var requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
+				if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+};
+
+utils.generateDynamicBNCLink = function(branchKey, data) {
+	if (!branchKey && !data) {
+		return;
+	}
+	var addKeyAndValueToUrl = function(fallbackUrl, tagName, tagData) {
+		var first = fallbackUrl[fallbackUrl.length - 1] === "?";
+		var modifiedFallbackURL = first ? fallbackUrl + tagName : fallbackUrl + "&" + tagName;
+		modifiedFallbackURL += "=";
+		return modifiedFallbackURL + encodeURIComponent(tagData);
+	};
+
+	var fallbackUrl = config.link_service_endpoint + '/a/' + branchKey + '?';
+	var topLevelKeys = [ "tags", "alias", "channel", "feature", "stage", "campaign", "type", "duration", "sdk", "source", "data" ];
+	for (var i = 0; i < topLevelKeys.length; i++) {
+		var key = topLevelKeys[i];
+		var value = data[key];
+		if (value) {
+			if (key === "tags" && Array.isArray(value)) {
+				for (var index = 0; index < value.length; index++) {
+					fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value[index]);
+				}
+			}
+			else if (typeof value === "string" && value.length > 0 || typeof value === "number") {
+				if (key === "data" && typeof value === "string") {
+					value = utils.base64encode(value);
+				}
+				fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value);
+			}
+		}
+	}
+	return fallbackUrl;
+};
+
+// Removes PII when a user disables tracking
+utils.cleanApplicationAndSessionStorage = function(branch) {
+	if (branch) {
+		// clears PII from global Branch object
+		branch.device_fingerprint_id = null;
+		branch.sessionLink = null;
+		branch.session_id = null;
+		branch.identity_id = null;
+		branch.identity = null;
+		branch.browser_fingerprint_id = null;
+
+		if (branch._deepviewCta) {
+			delete branch._deepviewCta;
+		}
+		if (branch._deepviewRequestForReplay) {
+			delete branch._deepviewRequestForReplay;
+		}
+		branch._storage.remove('branch_view_enabled');
+		var data = {};
+		// Sets an empty object for branch_session and branch_session_first in local/sessionStorage
+		session.set(branch._storage, data, true);
+	}
+	// a user will need to explicitly opt out from _s cookie
+};
+
 /** @typedef {{data:?string, referring_identity:?string, identity:?string, has_app:?boolean}} */
 utils.sessionData;
 
@@ -55,12 +154,14 @@ utils.messages = {
 	initPending: 'Branch SDK initialization pending' +
 		' and a Branch method was called outside of the queue order',
 	initFailed: 'Branch SDK initialization failed, so further methods cannot be called',
-	existingInit: 'Branch SDK already initilized',
+	existingInit: 'Branch SDK already initialized',
 	missingAppId: 'Missing Branch app ID',
 	callBranchInitFirst: 'Branch.init must be called first',
 	timeout: 'Request timed out',
 	blockedByClient: 'Request blocked by client, probably adblock',
-	missingUrl: 'Required argument: URL, is missing'
+	missingUrl: 'Required argument: URL, is missing',
+	trackingDisabled: 'Requested operation cannot be completed since tracking is disabled',
+	deepviewNotCalled: 'Cannot call Deepview CTA, please call branch.deepview() first'
 };
 
 /**

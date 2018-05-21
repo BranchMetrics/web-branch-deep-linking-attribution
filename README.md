@@ -14,8 +14,6 @@ To use the Web SDK, you'll need to first initialize it with your Branch Key foun
 
 Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
 
-Yes. Branch uses Twilio to send SMS messages, which means SMS will be delivered all around the world. However, please note that the number the SMS has to be delivered to, must be in the same country the SMS is being sent from.
-
 ## Using the Sample Web App
 
 We provide a sample web app which demonstrates what Branch Metrics Web SDK can do. The online version can be found at <https://cdn.branch.io/example.html>. Alternatively, you can open `example.html` locally to for the same effect.
@@ -43,7 +41,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -110,6 +108,9 @@ ___
 8. Revenue Analytics
   + [.trackCommerceEvent()](#trackcommerceeventevent-commerce_data-metadata-callback)
 
+9. User Privacy
+  + [.disableTracking()](#disableTrackingdisableTracking)
+
 ___
 # Global
 
@@ -161,7 +162,7 @@ Properties available in the options object:
 | retry_delay | *optional* - `integer `. Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API. Default 200 ms.
 | timeout | *optional* - `integer`. Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out. Default 5000 ms.
 | metadata | *optional* - `object`. Key-value pairs used to target Journeys users via the "is viewing a page with metadata key" filter.
-
+| tracking_disabled | *optional* - `boolean`. true disables tracking
 ##### Usage
 ```js
 branch.init(
@@ -570,6 +571,8 @@ of `sendSMS`, and `sendSMS` will always make a new link.
 
 **Supports international SMS**.
 
+Please note that the destination phone number needs to be from the same country the SMS is being sent from.
+
 #### Usage
 ```js
 branch.sendSMS(
@@ -715,6 +718,14 @@ branch.deepview(data, option, function(err) {
 
 // You can call this function any time after branch.deepview() is finished by simply:
 branch.deepviewCta();
+
+When debugging, please call branch.deepviewCta() with an error callback like so:
+
+branch.deepviewCta(function(err) {
+	if (err) {
+		console.log(err);
+	}
+});
 ```
 
 ___
@@ -1103,6 +1114,30 @@ branch.trackCommerceEvent('purchase', commerce_data, metadata, function(err) {
     }
 });
 ```
+___
+
+
+
+### disableTracking(disableTracking) 
+
+**Parameters**
+
+**disableTracking**: `Boolean`, _optional_ - true disables tracking and false re-enables tracking.
+
+##### Notes:
+- disableTracking() without a parameter is a shorthand for disableTracking(true).
+- If a call to disableTracking(false) is made, the WebSDK will re-initialize. Additionally, if tracking_disabled: true is passed
+  as an option to init(), it will be removed during the reinitialization process.
+
+Allows User to Remain Private
+
+This will prevent any Branch requests from being sent across the network, except for the case of deep linking.
+If someone clicks a Branch link, but has expressed not to be tracked, we will return deep linking data back to the
+client but without tracking information.
+
+In do-not-track mode, you will still be able to create links and display Journeys however, they will not have identifiable
+information associated to them. You can change this behavior at any time, by calling the aforementioned function.
+The do-not-track mode state is persistent: it is saved for the user across browser sessions for the web site.
 ___
 
 

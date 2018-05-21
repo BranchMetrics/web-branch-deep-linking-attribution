@@ -175,6 +175,7 @@ function compileRequestData(branch, makeNewLink, openApp) {
 	requestData = utils.merge({ 'open_app': openApp }, requestData);
 	requestData = utils.merge({ 'has_app_websdk': has_app }, requestData);
 	requestData = utils.isIframe() ? utils.merge({ 'is_iframe': true }, requestData) : requestData;
+	requestData = utils.userPreferences.trackingDisabled ? utils.merge({ 'tracking_disabled': true }, requestData) : requestData;
 	return requestData;
 }
 
