@@ -1045,3 +1045,9 @@ utils.mergeHostedDeeplinkData = function(hostedDeepLinkData, metadata) {
 	return hostedDeepLinkDataClone;
 };
 
+// Creates a nonce attribute with the value stored in utils.nonce
+utils.createNonceAttribute = function() {
+	var nonce = document.createAttribute('nonce');
+	nonce.value = utils.nonce;
+	return nonce;
+}

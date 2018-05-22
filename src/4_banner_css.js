@@ -210,8 +210,7 @@ banner_css.css = function(options, element) {
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
 		if (utils.nonce !== '') {
-			var nonce = document.createAttribute('nonce');
-			nonce.value = utils.nonce;
+			var nonce = utils.createNonceAttribute();
 			iFrameCSS.setAttributeNode(nonce);
 		}
 		iFrameCSS.innerHTML = banner_css.iframe +
@@ -226,8 +225,7 @@ banner_css.css = function(options, element) {
 	css.id = 'branch-css';
 	css.innerHTML = style;
 	if (utils.nonce !== '') {
-		var nonce = document.createAttribute('nonce');
-		nonce.value = utils.nonce;
+		var nonce = utils.createNonceAttribute();
 		css.setAttributeNode(nonce);
 	}
 

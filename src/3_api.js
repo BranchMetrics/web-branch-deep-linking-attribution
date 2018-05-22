@@ -173,8 +173,7 @@ Server.prototype.createScript = function(src, onError, onLoad) {
 	script.src = src;
 
 	if (utils.nonce !== '') {
-		var nonce = document.createAttribute('nonce');
-		nonce.value = utils.nonce;
+		var nonce = utils.createNonceAttribute();
 		script.setAttributeNode(nonce);
 	}
 

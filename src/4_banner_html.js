@@ -138,8 +138,7 @@ banner_html.iframe = function(options, action) {
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
 	if (utils.nonce !== '') {
-		var nonce = document.createAttribute('nonce');
-		nonce.value = utils.nonce;
+		var nonce = utils.createNonceAttribute();
 		iframe.setAttributeNode(nonce);
 	}
 	document.body.appendChild(iframe);

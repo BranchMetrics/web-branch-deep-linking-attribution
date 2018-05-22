@@ -175,8 +175,7 @@ journeys_utils.getJsAndAddToParent = function(html) {
 		var script = document.createElement('script');
 		script.id = 'branch-journey-cta';
 		if (utils.nonce !== '') {
-			var nonce = document.createAttribute('nonce');
-			nonce.value = utils.nonce;
+			var nonce = utils.createNonceAttribute();
 			script.setAttributeNode(nonce);
 		}
 		script.innerHTML = src;
@@ -225,8 +224,7 @@ journeys_utils.createAndAppendIframe = function() {
 	iframe.className = 'branch-animation';
 
 	if (utils.nonce !== '') {
-		var nonce = document.createAttribute('nonce');
-		nonce.value = utils.nonce;
+		var nonce = utils.createNonceAttribute();
 		iframe.setAttributeNode(nonce);
 	}
 
@@ -337,8 +335,7 @@ journeys_utils.addIframeOuterCSS = function() {
 	iFrameCSS.innerHTML = generateIframeOuterCSS();
 
 	if (utils.nonce !== '') {
-		var nonce = document.createAttribute('nonce');
-		nonce.value = utils.nonce;
+		var nonce = utils.createNonceAttribute();
 		iFrameCSS.setAttributeNode(nonce);
 	}
 
@@ -392,8 +389,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	css.innerHTML = innerCSS;
 
 	if (utils.nonce !== '') {
-		var nonce = document.createAttribute('nonce');
-		nonce.value = utils.nonce;
+		var nonce = utils.createNonceAttribute();
 		css.setAttributeNode(nonce);
 	}
 
