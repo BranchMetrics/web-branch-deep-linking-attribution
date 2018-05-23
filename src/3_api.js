@@ -172,10 +172,7 @@ Server.prototype.createScript = function(src, onError, onLoad) {
 	script.async = true;
 	script.src = src;
 
-	if (utils.nonce !== '') {
-		var nonce = utils.createNonceAttribute();
-		script.setAttributeNode(nonce);
-	}
+	utils.addNonceAttribute(script);
 
 	var heads = document.getElementsByTagName('head');
 	if (!heads || heads.length < 1) {

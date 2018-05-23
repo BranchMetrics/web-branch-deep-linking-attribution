@@ -209,10 +209,7 @@ banner_css.css = function(options, element) {
 		var iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
-		if (utils.nonce !== '') {
-			var nonce = utils.createNonceAttribute();
-			iFrameCSS.setAttributeNode(nonce);
-		}
+		utils.addNonceAttribute(iFrameCSS);
 		iFrameCSS.innerHTML = banner_css.iframe +
 			(utils.mobileUserAgent() ?
 				banner_css.iframe_position(options.mobileSticky, options.position) :
@@ -224,10 +221,7 @@ banner_css.css = function(options, element) {
 	css.type = 'text/css';
 	css.id = 'branch-css';
 	css.innerHTML = style;
-	if (utils.nonce !== '') {
-		var nonce = utils.createNonceAttribute();
-		css.setAttributeNode(nonce);
-	}
+	utils.addNonceAttribute(css);
 
 	var doc = (options.iframe ? element.contentWindow.document : document);
 	var controlledHead = (doc.head || doc.getElementsByTagName("head")[0]);

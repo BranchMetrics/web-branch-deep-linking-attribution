@@ -174,10 +174,7 @@ journeys_utils.getJsAndAddToParent = function(html) {
 		var src = match[1];
 		var script = document.createElement('script');
 		script.id = 'branch-journey-cta';
-		if (utils.nonce !== '') {
-			var nonce = utils.createNonceAttribute();
-			script.setAttributeNode(nonce);
-		}
+		utils.addNonceAttribute(script);
 		script.innerHTML = src;
 		document.body.appendChild(script);
 	}
@@ -222,11 +219,7 @@ journeys_utils.createAndAppendIframe = function() {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
-
-	if (utils.nonce !== '') {
-		var nonce = utils.createNonceAttribute();
-		iframe.setAttributeNode(nonce);
-	}
+	utils.addNonceAttribute(iframe);
 
 	document.body.appendChild(iframe);
 
@@ -334,10 +327,7 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	iFrameCSS.innerHTML = generateIframeOuterCSS();
 
-	if (utils.nonce !== '') {
-		var nonce = utils.createNonceAttribute();
-		iFrameCSS.setAttributeNode(nonce);
-	}
+	utils.addNonceAttribute(iFrameCSS);
 
 	document.head.appendChild(iFrameCSS);
 }
@@ -388,10 +378,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	css.id = 'branch-css';
 	css.innerHTML = innerCSS;
 
-	if (utils.nonce !== '') {
-		var nonce = utils.createNonceAttribute();
-		css.setAttributeNode(nonce);
-	}
+	utils.addNonceAttribute(css);
 
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);
