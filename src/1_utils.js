@@ -1050,5 +1050,4 @@ utils.addNonceAttribute = function(element) {
 	if (utils.nonce !== '') {
 		element.setAttribute('nonce', utils.nonce);
 	}
-	console.log(element.attributes);
 }
