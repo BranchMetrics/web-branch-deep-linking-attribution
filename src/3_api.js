@@ -172,6 +172,8 @@ Server.prototype.createScript = function(src, onError, onLoad) {
 	script.async = true;
 	script.src = src;
 
+	utils.addNonceAttribute(script);
+
 	var heads = document.getElementsByTagName('head');
 	if (!heads || heads.length < 1) {
 		if (typeof onError === 'function') {

@@ -3,6 +3,7 @@ goog.provide('journeys_utils');
 
 goog.require('banner_utils');
 goog.require('safejson');
+goog.require('utils');
 
 // defaults. These will change based on banner info
 journeys_utils.position = 'top';
@@ -173,6 +174,7 @@ journeys_utils.getJsAndAddToParent = function(html) {
 		var src = match[1];
 		var script = document.createElement('script');
 		script.id = 'branch-journey-cta';
+		utils.addNonceAttribute(script);
 		script.innerHTML = src;
 		document.body.appendChild(script);
 	}
@@ -217,6 +219,7 @@ journeys_utils.createAndAppendIframe = function() {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
+	utils.addNonceAttribute(iframe);
 
 	document.body.appendChild(iframe);
 
@@ -324,6 +327,8 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	iFrameCSS.innerHTML = generateIframeOuterCSS();
 
+	utils.addNonceAttribute(iFrameCSS);
+
 	document.head.appendChild(iFrameCSS);
 }
 
@@ -372,6 +377,8 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	css.type = 'text/css';
 	css.id = 'branch-css';
 	css.innerHTML = innerCSS;
+
+	utils.addNonceAttribute(css);
 
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);
