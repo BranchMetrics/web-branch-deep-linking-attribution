@@ -20,6 +20,16 @@ utils.retries = 2; // Value specifying the number of times that a Branch API cal
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
 utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
 
+// Properties and function related to calculating Branch request roundtrip time
+utils.instrumentation = {};
+utils.currentRequestBrttTag = "";
+utils.calculateBrtt = function(startTime) {
+	if (!startTime || typeof startTime !== "number") {
+		return null;
+	}
+	return (Date.now() - startTime).toString();
+};
+
 utils.userPreferences = {
 	trackingDisabled: false,
 	whiteListedEndpointsWithData: {
