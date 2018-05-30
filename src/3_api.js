@@ -227,7 +227,6 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 
 	window[callbackString] = function(data) {
 		window.clearTimeout(timeoutTrigger);
-		utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 		callback(null, data);
 	};
 
@@ -237,7 +236,6 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
 			'&callback=' + callbackString,
 		function onError() {
-			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			callback(new Error(utils.messages.blockedByClient), null);
 		},
 		function onLoad() {
@@ -280,13 +278,12 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
 	req.onerror = function(e) {
-		utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 		callback(new Error(e.error || ('Error in API: ' + req.status)), null, req.status);
 	};
 	req.onreadystatechange = function() {
 		var data;
-		utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 		if (req.readyState === 4) {
+			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
 				if (noparse) {
 					data = req.responseText;
