@@ -78,6 +78,9 @@ Server.prototype.getUrl = function(resource, data) {
 			destinationObject['app_id'] = data['app_id'];
 			return destinationObject;
 		}
+		else if (data['instrumentation']) {
+			destinationObject['instrumentation'] = data['instrumentation'];
+		}
 		else {
 			throw Error(utils.message(
 				utils.messages.missingParam,
@@ -198,7 +201,8 @@ Server.prototype.createScript = function(src, onError, onLoad) {
  * @param {function(?Error,*=,?=)=} callback
  */
 Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
-
+	var brtt = Date.now();
+	var brttTag = utils.currentRequestBrttTag;
 	/* On iOS 11-Safari when a partner calls .deepview() and uses $uri_redirect_mode: 2,
 	   they will not get transported into the app (if installed) on pageload because
 	   callbackString will evaluate to branch_callback_0. The backend expects branch_callback_1
@@ -217,6 +221,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 	var timeoutTrigger = window.setTimeout(
 		function() {
 			window[callbackString] = function() { };
+			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			callback(new Error(utils.messages.timeout), null, 504);
 		},
 		utils.timeout
@@ -236,6 +241,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 			callback(new Error(utils.messages.blockedByClient), null);
 		},
 		function onLoad() {
+			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			try {
 				if (typeof this.remove === 'function') {
 					this.remove();
@@ -264,10 +270,13 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {?boolean=} noparse
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback, noparse) {
+	var brtt = Date.now();
+	var brttTag = utils.currentRequestBrttTag;
 	var req = (window.XMLHttpRequest ?
 			new XMLHttpRequest() :
 			new ActiveXObject('Microsoft.XMLHTTP'));
 	req.ontimeout = function() {
+		utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
 	req.onerror = function(e) {
@@ -276,6 +285,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 	req.onreadystatechange = function() {
 		var data;
 		if (req.readyState === 4) {
+			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
 				if (noparse) {
 					data = req.responseText;
@@ -327,6 +337,12 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
  */
 Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
+	utils.currentRequestBrttTag = resource.endpoint + '-brtt';
+	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 0) {
+		delete utils.instrumentation['-brtt'];
+		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));
+		utils.instrumentation = {};
+	}
 
 	// Removes PII from request data in case fields flow in from cascading requests
 	if (utils.userPreferences.trackingDisabled) {

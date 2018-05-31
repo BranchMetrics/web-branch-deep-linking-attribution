@@ -97,6 +97,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 		var url = branchViewData['url'] + '&callback=' + callbackString;
 		url += '&_lan=' + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode() || 'en');
 		url += '&data=' + postData;
+		utils.currentRequestBrttTag = '/v1/branchview-brtt';
 		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
 			var failed = false;
 			if (!error && html) {
