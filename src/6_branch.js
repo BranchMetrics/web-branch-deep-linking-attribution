@@ -261,7 +261,7 @@ Branch.prototype._publishEvent = function(event, data) {
  * | metadata | *optional* - `object`. Key-value pairs used to target Journeys users via the "is viewing a page with metadata key" filter.
  * | nonce | *optional* - `string`. A nonce value that will be added to branch-journey-cta injected script. Used to allow that script from a Content Security Policy.
  * | tracking_disabled | *optional* - `boolean`. true disables tracking
- * 
+ *
  * ##### Usage
  * ```js
  * branch.init(
@@ -800,6 +800,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 	metadata = metadata || {};
 
 	options = options || {};
+
+	utils.nonce = options['nonce'] ? options['nonce'] : utils.nonce;
 
 	if (event === "pageview") {
 		var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
