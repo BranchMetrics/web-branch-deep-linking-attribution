@@ -27,14 +27,21 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
   VERSION=$(echo $VER|tr -d '\r')
  
   DATE=$(date "+%Y-%m-%d")
-  
+ 
   if [[ "$GIT_COMMIT_MSG" != *"version"* ]]; then
       echo "Version not found in commit message - Not deploying"
       exit 0
   fi
-  
-  echo -en "${GREEN} Extracted version $VERSION ${NC}\n"
  
+  VER_REG='^([0-9]+\.){0,2}(\*|[0-9]+)$'
+
+  if [[ $VERSION =~ $VER_REG ]]; then
+     echo -en "${GREEN} Extracted version $VERSION ${NC}\n"
+  else
+     echo -en "${RED}ERROR: Wrong version input: '$VERSION' - Exiting Build ${NC}\n"
+     exit 1
+  fi
+
   # Expect a Changelog in commit message
   CHANGELOG=$(echo "$GIT_COMMIT_MSG" | awk '/Changelog/{y=1;next}y')
   INSERT="## [v$VERSION] - $DATE"
