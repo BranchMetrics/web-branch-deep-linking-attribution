@@ -137,6 +137,8 @@ banner_html.iframe = function(options, action) {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
+	utils.addNonceAttribute(iframe);
+
 	document.body.appendChild(iframe);
 
 	var bodyClass;

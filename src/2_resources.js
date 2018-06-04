@@ -259,7 +259,8 @@ resources.link = {
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY),
 		"type": validator(false, validationTypes.NUMBER),
-		"source": validator(false, validationTypes.STRING)
+		"source": validator(false, validationTypes.STRING),
+		"instrumentation": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -289,7 +290,8 @@ resources.hasApp = {
 	endpoint: "/v1/has-app",
 	method: utils.httpMethod.GET,
 	params: {
-		"browser_fingerprint_id": validator(true, branch_id)
+		"browser_fingerprint_id": validator(true, branch_id),
+		"instrumentation": validator(false, validationTypes.STRING)
 	}
 };
 
