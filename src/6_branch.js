@@ -775,7 +775,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
  *
  * This function allows you to track any event with supporting metadata.
  * The `metadata` parameter is a formatted JSON object that can contain
- * any data and has limitless hierarchy.
+ * any data and has limitless hierarchy
  *
  * ##### Usage
  * ```js
