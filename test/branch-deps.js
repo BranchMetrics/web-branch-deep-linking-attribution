@@ -16,7 +16,7 @@ goog.addDependency("../../../../../src/7_initialization.js", ['branch_instance']
 goog.addDependency("../../../../../src/appindexing.js", ['appindexing'], ['safejson', 'utils']);
 goog.addDependency("../../../../../src/branch_view.js", ['branch_view'], ['utils', 'banner_css', 'safejson', 'journeys_utils']);
 goog.addDependency("../../../../../src/extern.js", [], []);
-goog.addDependency("../../../../../src/journeys_utils.js", ['journeys_utils'], ['banner_utils', 'safejson']);
+goog.addDependency("../../../../../src/journeys_utils.js", ['journeys_utils'], ['banner_utils', 'safejson', 'utils']);
 goog.addDependency("../../../../../src/onpage.js", [], []);
 goog.addDependency("../../../../../test/web-config.js", ['config'], []);
 goog.addDependency("../../../../../test/0_queue.js", [], ['task_queue']);

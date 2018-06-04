@@ -407,8 +407,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   goog.moduleLoaderState_ = null;
   for (a = 0;a < c.length;a++) {
     if (f = c[a]) {
-      var h = e.loadFlags[f] || {}, k = goog.needsTranspile_(h.lang || "es3");
-      "goog" == h.module || k ? goog.importProcessedScript_(goog.basePath + f, "goog" == h.module, k) : goog.importScript_(goog.basePath + f);
+      var k = e.loadFlags[f] || {}, h = goog.needsTranspile_(k.lang || "es3");
+      "goog" == k.module || h ? goog.importProcessedScript_(goog.basePath + f, "goog" == k.module, h) : goog.importScript_(goog.basePath + f);
     } else {
       throw goog.moduleLoaderState_ = g, Error("Undefined script input");
     }
@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.34.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"v2.35.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -970,6 +970,12 @@ var utils = {}, DEBUG = !0, message;
 utils.retries = 2;
 utils.retry_delay = 200;
 utils.timeout = 5000;
+utils.nonce = "";
+utils.instrumentation = {};
+utils.currentRequestBrttTag = "";
+utils.calculateBrtt = function(a) {
+  return a && "number" === typeof a ? (Date.now() - a).toString() : null;
+};
 utils.userPreferences = {trackingDisabled:!1, whiteListedEndpointsWithData:{"/v1/open":{link_identifier:"\\d+"}, "/v1/event":{event:"pageview"}, "/v1/branchview":{}}, allowErrorsInCallback:!1, shouldBlockRequest:function(a, b) {
   var c = document.createElement("a");
   c.href = a;
@@ -998,8 +1004,8 @@ utils.generateDynamicBNCLink = function(a, b) {
       var f = d[e], g = b[f];
       if (g) {
         if ("tags" === f && Array.isArray(g)) {
-          for (var h = 0;h < g.length;h++) {
-            c = ("?" === c[c.length - 1] ? c + f : c + "&" + f) + "=" + encodeURIComponent(g[h]);
+          for (var k = 0;k < g.length;k++) {
+            c = ("?" === c[c.length - 1] ? c + f : c + "&" + f) + "=" + encodeURIComponent(g[k]);
           }
         } else {
           if ("string" === typeof g && 0 < g.length || "number" === typeof g) {
@@ -1174,14 +1180,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h);
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? k = g = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k);
   }
   return b;
 };
@@ -1383,6 +1389,9 @@ utils.mergeHostedDeeplinkData = function(a, b) {
   var c = a ? utils.merge({}, a) : {};
   return b && 0 < Object.keys(b).length ? 0 < Object.keys(c).length ? utils.merge(c, b) : utils.merge({}, b) : c;
 };
+utils.addNonceAttribute = function(a) {
+  "" !== utils.nonce && a.setAttribute("nonce", utils.nonce);
+};
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
@@ -1448,10 +1457,10 @@ resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credit
 resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, params:defaults({branch_key:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
 resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, branch_id)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, branch_id), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
-validationTypes.NUMBER), source:validator(!1, validationTypes.STRING)})};
+validationTypes.NUMBER), source:validator(!1, validationTypes.STRING), instrumentation:validator(!1, validationTypes.STRING)})};
 resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), _t:validator(!1, branch_id), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), append_deeplink_path:validator(!1, validationTypes.BOOLEAN), 
 stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), deepview_type:validator(!0, validationTypes.STRING), source:validator(!0, validationTypes.STRING)})};
-resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id)}};
+resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, branch_id), instrumentation:validator(!1, validationTypes.STRING)}};
 resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN)})};
 resources.commerceEvent = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), commerce_data:validator(!0, validationTypes.OBJECT)})};
 resources.logStandardEvent = {destination:config.api_endpoint, endpoint:"/v2/event/standard", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING)}};
@@ -1607,7 +1616,7 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
     "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
       return c.branch_key = b.branch_key, c;
@@ -1615,13 +1624,17 @@ Server.prototype.getUrl = function(a, b) {
     if (b.app_id && f.test(b.app_id)) {
       return c.app_id = b.app_id, c;
     }
-    throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
+    if (b.instrumentation) {
+      c.instrumentation = b.instrumentation;
+    } else {
+      throw Error(utils.message(utils.messages.missingParam, [a.endpoint, "branch_key or app_id"]));
+    }
   };
   if ("/v1/has-app" === a.endpoint) {
     try {
-      a.queryPart = h(b, a.queryPart);
-    } catch (m) {
-      return {error:m.message};
+      a.queryPart = k(b, a.queryPart);
+    } catch (l) {
+      return {error:l.message};
     }
   }
   if ("undefined" !== typeof a.queryPart) {
@@ -1634,7 +1647,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  var k = {};
+  var h = {};
   if ("undefined" !== typeof a.params) {
     for (c in a.params) {
       if (a.params.hasOwnProperty(c)) {
@@ -1642,93 +1655,100 @@ Server.prototype.getUrl = function(a, b) {
           return {error:d};
         }
         d = b[c];
-        "undefined" !== typeof d && "" !== d && null !== d && (k[c] = d);
+        "undefined" !== typeof d && "" !== d && null !== d && (h[c] = d);
       }
     }
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
-      b = h(b, k);
-    } catch (m) {
-      return {error:m.message};
+      b = k(b, h);
+    } catch (l) {
+      return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (k.metadata = safejson.stringify(k.metadata || {}), k.hasOwnProperty("commerce_data") && (k.commerce_data = safejson.stringify(k.commerce_data || {})));
-  "/v1/open" === a.endpoint && (k.options = safejson.stringify(k.options || {}));
-  return {data:this.serializeObject(k, ""), url:e.replace(/^\//, "")};
+  "/v1/event" === a.endpoint && (h.metadata = safejson.stringify(h.metadata || {}), h.hasOwnProperty("commerce_data") && (h.commerce_data = safejson.stringify(h.commerce_data || {})));
+  "/v1/open" === a.endpoint && (h.options = safejson.stringify(h.options || {}));
+  return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
 };
 Server.prototype.createScript = function(a, b, c) {
   var d = document.createElement("script");
   d.type = "text/javascript";
   d.async = !0;
   d.src = a;
+  utils.addNonceAttribute(d);
   a = document.getElementsByTagName("head");
   !a || 1 > a.length ? "function" === typeof b && b() : (a[0].appendChild(d), "function" === typeof b && utils.addEvent(d, "error", b), "function" === typeof c && utils.addEvent(d, "load", c));
 };
 Server.prototype.jsonpRequest = function(a, b, c, d) {
+  var e = Date.now(), f = utils.currentRequestBrttTag;
   0 === this._jsonp_callback_index && utils.isSafari11OrGreater() && this._jsonp_callback_index++;
-  var e = "branch_callback__" + this._jsonp_callback_index++, f = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
+  var g = "branch_callback__" + this._jsonp_callback_index++, k = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
   b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
-  var g = window.setTimeout(function() {
-    window[e] = function() {
+  var h = window.setTimeout(function() {
+    window[g] = function() {
     };
+    utils.addPropertyIfNotNull(utils.instrumentation, f, utils.calculateBrtt(e));
     d(Error(utils.messages.timeout), null, 504);
   }, utils.timeout);
-  window[e] = function(a) {
-    window.clearTimeout(g);
+  window[g] = function(a) {
+    window.clearTimeout(h);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? f + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + e, function() {
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? k + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + g, function() {
     d(Error(utils.messages.blockedByClient), null);
   }, function() {
+    utils.addPropertyIfNotNull(utils.instrumentation, f, utils.calculateBrtt(e));
     try {
       "function" === typeof this.remove ? this.remove() : this.parentNode.removeChild(this);
-    } catch (h) {
+    } catch (l) {
     }
-    delete window[e];
+    delete window[g];
   });
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
-  var g = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
-  g.ontimeout = function() {
+  var g = Date.now(), k = utils.currentRequestBrttTag, h = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  h.ontimeout = function() {
+    utils.addPropertyIfNotNull(utils.instrumentation, k, utils.calculateBrtt(g));
     e(Error(utils.messages.timeout), null, 504);
   };
-  g.onerror = function(a) {
-    e(Error(a.error || "Error in API: " + g.status), null, g.status);
+  h.onerror = function(a) {
+    e(Error(a.error || "Error in API: " + h.status), null, h.status);
   };
-  g.onreadystatechange = function() {
+  h.onreadystatechange = function() {
     var a;
-    if (4 === g.readyState) {
-      if (200 === g.status) {
+    if (4 === h.readyState) {
+      if (utils.addPropertyIfNotNull(utils.instrumentation, k, utils.calculateBrtt(g)), 200 === h.status) {
         if (f) {
-          a = g.responseText;
+          a = h.responseText;
         } else {
           try {
-            a = safejson.parse(g.responseText);
-          } catch (k) {
+            a = safejson.parse(h.responseText);
+          } catch (m) {
             a = {};
           }
         }
-        e(null, a, g.status);
+        e(null, a, h.status);
       } else {
-        if (402 === g.status) {
-          e(Error("Not enough credits to redeem."), null, g.status);
+        if (402 === h.status) {
+          e(Error("Not enough credits to redeem."), null, h.status);
         } else {
-          if ("4" === g.status.toString().substring(0, 1) || "5" === g.status.toString().substring(0, 1)) {
-            g.responseURL && g.responseURL.includes("v2/event") ? e(g.responseText, null, g.status) : e(Error("Error in API: " + g.status), null, g.status);
+          if ("4" === h.status.toString().substring(0, 1) || "5" === h.status.toString().substring(0, 1)) {
+            h.responseURL && h.responseURL.includes("v2/event") ? e(h.responseText, null, h.status) : e(Error("Error in API: " + h.status), null, h.status);
           }
         }
       }
     }
   };
   try {
-    g.open(c, a, !0), g.timeout = utils.timeout, g.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), g.send(b);
-  } catch (h) {
+    h.open(c, a, !0), h.timeout = utils.timeout, h.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), h.send(b);
+  } catch (l) {
     d.set("use_jsonp", !0), this.jsonpRequest(a, b, c, e);
   }
 };
 Server.prototype.request = function(a, b, c, d) {
   var e = this;
+  utils.currentRequestBrttTag = a.endpoint + "-brtt";
+  ("/v1/url" === a.endpoint || "/v1/has-app" === a.endpoint) && 0 < Object.keys(utils.instrumentation).length && (delete utils.instrumentation["-brtt"], b.instrumentation = safejson.stringify(utils.merge({}, utils.instrumentation)), utils.instrumentation = {});
   if (utils.userPreferences.trackingDisabled) {
     for (var f = ["browser_fingerprint_id", "alternative_browser_fingerprint_id", "identity_id", "session_id"], g = 0;g < f.length;g++) {
       b.hasOwnProperty(f[g]) && delete b[f[g]];
@@ -1738,18 +1758,18 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(safejson.stringify({message:f.error, endpoint:a.endpoint, data:b})));
   }
-  var h, k = "";
-  "GET" === a.method ? h = f.url + "?" + f.data : (h = f.url, k = f.data);
-  var m = utils.retries, l = function(a, b, c) {
-    a && 0 < m && "5" === (c || "").toString().substring(0, 1) ? (m--, window.setTimeout(function() {
+  var k, h = "";
+  "GET" === a.method ? k = f.url + "?" + f.data : (k = f.url, h = f.data);
+  var l = utils.retries, m = function(a, b, c) {
+    a && 0 < l && "5" === (c || "").toString().substring(0, 1) ? (l--, window.setTimeout(function() {
       n();
     }, utils.retry_delay)) : d(a, b);
   };
-  if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(h, b)) {
-    return utils.userPreferences.allowErrorsInCallback ? l(Error(utils.messages.trackingDisabled), null, 300) : l(null, {}, 200);
+  if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(k, b)) {
+    return utils.userPreferences.allowErrorsInCallback ? m(Error(utils.messages.trackingDisabled), null, 300) : m(null, {}, 200);
   }
   var n = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(h, b, a.method, l) : e.XHRRequest(h, k, a.method, c, l);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(k, b, a.method, m) : e.XHRRequest(k, h, a.method, c, m);
   };
   n();
 };
@@ -1776,7 +1796,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var d = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, h = function() {
+    }, k = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -1788,11 +1808,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * h();
+      return a * k();
     }, vmin:function(a) {
-      return a * Math.min(h(), g());
+      return a * Math.min(k(), g());
     }, vmax:function(a) {
-      return a * Math.max(h(), g());
+      return a * Math.max(k(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * d;
     }}[b](d), 10);
@@ -1832,11 +1852,12 @@ banner_css.css = function(a, b) {
   "ios" !== d && "ipad" !== d || !a.showiOS ? "android" === d && a.showAndroid ? c += banner_css.mobile + banner_css.android : "blackberry" === d && a.showBlackberry ? c += banner_css.mobile + banner_css.blackberry : "windows_phone" === d && a.showWindowsPhone ? c += banner_css.mobile + banner_css.windows_phone : "kindle" === d && a.showKindle ? c += banner_css.mobile + banner_css.kindle : (c += banner_css.desktop, c = window.ActiveXObject ? c + banner_css.ie : c + banner_css.nonie) : c += banner_css.mobile + 
   banner_css.ios;
   c += a.customCSS;
-  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", d.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(a.mobileSticky, a.position) : banner_css.iframe_position(a.desktopSticky, a.position)), (document.head || document.getElementsByTagName("head")[0]).appendChild(d));
+  a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", utils.addNonceAttribute(d), d.innerHTML = banner_css.iframe + (utils.mobileUserAgent() ? banner_css.iframe_position(a.mobileSticky, a.position) : banner_css.iframe_position(a.desktopSticky, a.position)), (document.head || document.getElementsByTagName("head")[0]).appendChild(d));
   d = document.createElement("style");
   d.type = "text/css";
   d.id = "branch-css";
   d.innerHTML = c;
+  utils.addNonceAttribute(d);
   c = a.iframe ? b.contentWindow.document : document;
   (c = c.head || c.getElementsByTagName("head")[0]) && "function" === typeof c.appendChild && c.appendChild(d);
   "top" === a.position ? b.style.top = "-" + banner_utils.bannerHeight : "bottom" === a.position && (b.style.bottom = "-" + banner_utils.bannerHeight);
@@ -1873,6 +1894,7 @@ var banner_html = {banner:function(a, b) {
   c.scrolling = "no";
   c.id = "branch-banner-iframe";
   c.className = "branch-animation";
+  utils.addNonceAttribute(c);
   document.body.appendChild(c);
   var d = utils.mobileUserAgent(), d = '<html><head></head><body class="' + ("ios" === d || "ipad" === d ? "branch-banner-ios" : "android" === d ? "branch-banner-android" : "branch-banner-desktop") + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
   c.contentWindow.document.open();
@@ -1892,28 +1914,28 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 13
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, m = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
-  }, l = function() {
-    k = a.createElement("div");
-    k.className = "branch-icon-wrapper";
-    k.id = "branch-checkmark";
-    k.style = "opacity: 0;";
-    k.innerHTML = banner_html.checkmark();
-    h.appendChild(k);
+  }, m = function() {
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      k.style.opacity = "1";
+      h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
-    m();
+    l();
     f.style.background = "#FFD4D4";
     e.className = "error";
     setTimeout(function() {
@@ -1924,9 +1946,9 @@ var sendSMS = function(a, b, c, d) {
   if (e) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), l(), setTimeout(function() {
-        h.removeChild(k);
-        m();
+      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+        k.removeChild(h);
+        l();
       }, banner_utils.success_timeout));
     })) : n();
   }
@@ -1949,8 +1971,8 @@ var sendSMS = function(a, b, c, d) {
     b.make_new_link = b.make_new_link;
     b.deepview_type = "banner";
     a.deepview(c, b);
-    var h = g.getElementById("branch-mobile-action");
-    h && (h.onclick = function(b) {
+    var k = g.getElementById("branch-mobile-action");
+    k && (k.onclick = function(b) {
       b.preventDefault();
       a.deepviewCta();
     });
@@ -1966,17 +1988,17 @@ var sendSMS = function(a, b, c, d) {
       });
     };
   }
-  var h = banner_utils.getBodyStyle("margin-top"), k = document.body.style.marginTop, m = banner_utils.getBodyStyle("margin-bottom"), l = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
+  var k = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
     "top" === b.position ? f.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (f.style.bottom = "-" + banner_utils.bannerHeight);
     "number" === typeof b.forgetHide ? d.set("hideBanner", banner_utils.getDate(b.forgetHide), !0) : d.set("hideBanner", !0, !0);
-    a.immediate ? ("top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = l), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
+    a.immediate ? ("top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m), banner_utils.removeClass(document.body, "branch-banner-is-active"), banner_utils.removeElement(f), banner_utils.removeElement(document.getElementById("branch-css")), c()) : (setTimeout(function() {
       banner_utils.removeElement(f);
       banner_utils.removeElement(document.getElementById("branch-css"));
       c();
     }, banner_utils.animationSpeed + banner_utils.animationDelay), setTimeout(function() {
-      "top" === b.position ? document.body.style.marginTop = k : "bottom" === b.position && (document.body.style.marginBottom = l);
+      "top" === b.position ? document.body.style.marginTop = h : "bottom" === b.position && (document.body.style.marginBottom = m);
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay));
   };
@@ -1988,7 +2010,7 @@ var sendSMS = function(a, b, c, d) {
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, h) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, m));
+  "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, k) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
   b.immediate ? e() : setTimeout(e, banner_utils.animationDelay);
   return p;
 };
@@ -2067,6 +2089,7 @@ journeys_utils.getJsAndAddToParent = function(a) {
     a = a[1];
     var b = document.createElement("script");
     b.id = "branch-journey-cta";
+    utils.addNonceAttribute(b);
     b.innerHTML = a;
     document.body.appendChild(b);
   }
@@ -2086,6 +2109,7 @@ journeys_utils.createAndAppendIframe = function() {
   a.scrolling = "no";
   a.id = "branch-banner-iframe";
   a.className = "branch-animation";
+  utils.addNonceAttribute(a);
   document.body.appendChild(a);
   return a;
 };
@@ -2119,6 +2143,7 @@ journeys_utils.addIframeOuterCSS = function() {
   journeys_utils.previousDivToInjectParents = [];
   journeys_utils.journeyDismissed = !1;
   a.innerHTML = generateIframeOuterCSS();
+  utils.addNonceAttribute(a);
   document.head.appendChild(a);
 };
 function generateIframeOuterCSS() {
@@ -2134,6 +2159,7 @@ journeys_utils.addIframeInnerCSS = function(a, b) {
   c.type = "text/css";
   c.id = "branch-css";
   c.innerHTML = b;
+  utils.addNonceAttribute(c);
   var d = a.contentWindow.document;
   d.head.appendChild(c);
   if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
@@ -2243,7 +2269,6 @@ function checkPreviousBanner() {
 }
 function renderHtmlBlob(a, b, c) {
   journeys_utils.setJourneyLinkData(b);
-  journeys_utils.branch._publishEvent("willShowJourney", journeys_utils.journeyLinkData);
   var d = c ? "OPEN" : "GET";
   journeys_utils.setPositionAndHeight(b);
   var e = journeys_utils.getMetadata(b);
@@ -2257,48 +2282,50 @@ function renderHtmlBlob(a, b, c) {
   journeys_utils.addIframeOuterCSS();
   journeys_utils.addIframeInnerCSS(c, a);
   journeys_utils.addDynamicCtaText(c, d);
+  journeys_utils.branch._publishEvent("willShowJourney", journeys_utils.journeyLinkData);
   journeys_utils.animateBannerEntrance(c);
   return c;
 }
 branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
   if (!checkPreviousBanner()) {
     journeys_utils.branch = g;
-    var h = null, k = null;
+    var k = null, h = null;
     c = c || {};
     c.feature = "journeys";
     c = utils.cleanLinkData(c);
     (g = document.getElementById("branch-iframe-css")) && g.parentElement.removeChild(g);
-    var m = document.createElement("div");
-    m.id = "branch-banner";
-    document.body.insertBefore(m, null);
-    banner_utils.addClass(m, "branch-banner-is-active");
+    var l = document.createElement("div");
+    l.id = "branch-banner";
+    document.body.insertBefore(l, null);
+    banner_utils.addClass(l, "branch-banner-is-active");
     if (b.html) {
       return renderHtmlBlob(document.body, b.html, e);
     }
     if (b.url) {
-      var l = "branch_view_callback__" + branch_view.callback_index++;
+      var m = "branch_view_callback__" + branch_view.callback_index++;
       c = encodeURIComponent(utils.base64encode(goog.json.serialize(c)));
-      g = b.url + "&callback=" + l;
+      g = b.url + "&callback=" + m;
       g += "&_lan=" + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode() || "en");
+      utils.currentRequestBrttTag = "/v1/branchview-brtt";
       a.XHRRequest(g + ("&data=" + c), {}, "GET", {}, function(a, c) {
         var g = !1;
         if (!a && c) {
           var q = f ? 0 : journeys_utils.findDismissPeriod(c), n = window.setTimeout(function() {
-            window[l] = function() {
+            window[m] = function() {
             };
           }, utils.timeout);
-          window[l] = function(a) {
+          window[m] = function(a) {
             window.clearTimeout(n);
-            g || (k = a, journeys_utils.finalHookups(b, d, k, h, q));
+            g || (h = a, journeys_utils.finalHookups(b, d, h, k, q));
           };
-          h = renderHtmlBlob(document.body, c, e);
-          if (null === h) {
+          k = renderHtmlBlob(document.body, c, e);
+          if (null === k) {
             g = !0;
             return;
           }
-          journeys_utils.finalHookups(b, d, k, h, q);
+          journeys_utils.finalHookups(b, d, h, k, q);
         }
-        document.body.removeChild(m);
+        document.body.removeChild(l);
       }, !0);
     }
   }
@@ -2331,13 +2358,13 @@ function compileRequestData(a, b, c) {
 branch_view.initJourney = function(a, b, c, d, e) {
   e._branchViewEnabled = !!c.branch_view_enabled;
   e._storage.set("branch_view_enabled", e._branchViewEnabled);
-  var f = null, g = null, h = null, k = null, m = null, l = !1, n = !1, p = !1;
+  var f = null, g = null, k = null, h = null, l = null, m = !1, n = !1, p = !1;
   d && (f = d.branch_view_id || null, g = d.no_journeys || null, e.user_language = (d.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase(), journeys_utils.entryAnimationDisabled = d.disable_entry_animation || !1, journeys_utils.exitAnimationDisabled = d.disable_exit_animation || !1, n = d.make_new_link || !1, p = d.open_app || !1);
-  (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (l = !0, k = buildJourneyTestData(f, a, b));
-  !k && c.hasOwnProperty("branch_view_data") && (k = c.branch_view_data, h = isJourneyDismissed(k, e));
-  !k || h || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = k.id, e.renderQueue(function() {
-    m = compileRequestData(e, n, p);
-    branch_view.handleBranchViewData(e._server, k, m, e._storage, b.has_app, l, e);
+  (f = f || utils.getParameterByName("_branch_view_id") || null) && utils.mobileUserAgent() && (m = !0, h = buildJourneyTestData(f, a, b));
+  !h && c.hasOwnProperty("branch_view_data") && (h = c.branch_view_data, k = isJourneyDismissed(h, e));
+  !h || k || g ? e._publishEvent("willNotShowJourney") : (journeys_utils.branchViewId = h.id, e.renderQueue(function() {
+    l = compileRequestData(e, n, p);
+    branch_view.handleBranchViewData(e._server, h, l, e._storage, b.has_app, m, e);
   }));
 };
 // Input 16
@@ -2467,6 +2494,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.retries = c && c.retries && Number.isInteger(c.retries) ? c.retries : utils.retries;
   utils.retry_delay = c && c.retry_delay && Number.isInteger(c.retry_delay) ? c.retry_delay : utils.retry_delay;
   utils.timeout = c && c.timeout && Number.isInteger(c.timeout) ? c.timeout : utils.timeout;
+  utils.nonce = c && c.nonce ? c.nonce : utils.nonce;
   utils.userPreferences.trackingDisabled = c && c.tracking_disabled && !0 === c.tracking_disabled ? !0 : !1;
   utils.userPreferences.allowErrorsInCallback = !1;
   utils.userPreferences.trackingDisabled && utils.cleanApplicationAndSessionStorage(d);
@@ -2479,9 +2507,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     !a.click_id && a.referring_link && (a.click_id = utils.getClickIdAndSearchStringFromLink(a.referring_link));
     d.browser_fingerprint_id = a.browser_fingerprint_id;
     return a;
-  }, f = session.get(d._storage), g = c && c.url || utils.getWindowLocation(), h = (c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null) || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !f || !f.identity_id;
+  }, f = session.get(d._storage), g = c && c.url || utils.getWindowLocation(), k = (c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null) || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), h = !f || !f.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var m = function(a) {
+  var l = function(a) {
     var b = {sdk:config.version, branch_key:d.branch_key}, c = session.get(d._storage) || {}, e = session.get(d._storage, !0) || {};
     e.browser_fingerprint_id && (b._t = e.browser_fingerprint_id);
     utils.isSafari11OrGreater() || d._api(resources._r, b, function(a, b) {
@@ -2493,17 +2521,17 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       b || !e || c.has_app || (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
       a && a(null, c);
     });
-  }, l = function(f, h) {
-    h && (h = e(h), utils.userPreferences.trackingDisabled || session.set(d._storage, h, k), d.init_state = init_states.INIT_SUCCEEDED, h.data_parsed = h.data && 0 !== h.data.length ? safejson.parse(h.data) : {});
+  }, m = function(f, k) {
+    k && (k = e(k), utils.userPreferences.trackingDisabled || session.set(d._storage, k, h), d.init_state = init_states.INIT_SUCCEEDED, k.data_parsed = k.data && 0 !== k.data.length ? safejson.parse(k.data) : {});
     if (f) {
-      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, h && utils.whiteListSessionData(h));
+      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = f.message), a(f, k && utils.whiteListSessionData(k));
     }
-    var m = utils.getAdditionalMetadata(), l = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
-    l && (l = utils.mergeHostedDeeplinkData(m.hosted_deeplink_data, l)) && 0 < Object.keys(l).length && (m.hosted_deeplink_data = l);
-    d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, m || {}), initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(e, f) {
-      e || "object" !== typeof f || branch_view.initJourney(b, h, f, c, d);
+    var l = utils.getAdditionalMetadata(), m = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
+    m && (m = utils.mergeHostedDeeplinkData(l.hosted_deeplink_data, m)) && 0 < Object.keys(m).length && (l.hosted_deeplink_data = m);
+    d._api(resources.event, {event:"pageview", metadata:utils.merge({url:g, user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, l || {}), initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(e, f) {
+      e || "object" !== typeof f || branch_view.initJourney(b, k, f, c, d);
       try {
-        a(e, h && utils.whiteListSessionData(h)), utils.userPreferences.trackingDisabled && (utils.userPreferences.allowErrorsInCallback = !0);
+        a(e, k && utils.whiteListSessionData(k)), utils.userPreferences.trackingDisabled && (utils.userPreferences.allowErrorsInCallback = !0);
       } catch (r) {
       } finally {
         d.renderFinalize();
@@ -2513,28 +2541,28 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && !d.changeEventListenerAdded && (d.changeEventListenerAdded = !0, document.addEventListener(b, function() {
-      document[a] || (m(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
+      document[a] || (l(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
     }, !1));
   };
-  if (f && f.session_id && !h) {
-    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), n(), m(l);
+  if (f && f.session_id && !k) {
+    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), n(), l(m);
   } else {
     var f = {sdk:config.version, branch_key:d.branch_key}, p = session.get(d._storage, !0) || {};
     p.browser_fingerprint_id && (f._t = p.browser_fingerprint_id);
-    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || p.browser_fingerprint_id, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
+    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:k, browser_fingerprint_id:k || p.browser_fingerprint_id, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-      a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), h && (b.click_id = h));
+      a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), k && (b.click_id = k));
       n();
-      l(a, b);
+      m(a, b);
     }) : d._api(resources._r, f, function(a, b) {
       if (a) {
-        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, l(a, null);
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
-      d._api(resources.open, {link_identifier:h, browser_fingerprint_id:h || b, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
+      d._api(resources.open, {link_identifier:k, browser_fingerprint_id:k || b, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-        a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), h && (b.click_id = h));
+        a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), k && (b.click_id = k));
         n();
-        l(a, b);
+        m(a, b);
       });
     });
   }
@@ -2590,6 +2618,7 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
   var e = this;
   c = c || {};
   d = d || {};
+  utils.nonce = d.nonce ? d.nonce : utils.nonce;
   if ("pageview" === b) {
     var f = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), c);
     f && 0 < Object.keys(f).length && (c.hosted_deeplink_data = f);
