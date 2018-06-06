@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.36.0] - 2018-06-06
+- Added journey-load-time metric to instrumentation object
+
 ## [2.35.1] - 2018-06-04
 - No new changes introduced. This release addresses a build process failure from v2.35.0.
 

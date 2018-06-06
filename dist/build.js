@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.35.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.36.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -972,6 +972,12 @@ utils.retry_delay = 200;
 utils.timeout = 5000;
 utils.nonce = "";
 utils.instrumentation = {};
+utils.navigationTimingAPIEnabled = function() {
+  return !!(window.performance && window.performance.timing && window.performance.timing.navigationStart);
+};
+utils.timeSinceNavigationStart = function() {
+  return (Date.now() - window.performance.timing.navigationStart) / 1000;
+};
 utils.currentRequestBrttTag = "";
 utils.calculateBrtt = function(a) {
   return a && "number" === typeof a ? (Date.now() - a).toString() : null;
@@ -2324,6 +2330,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
             return;
           }
           journeys_utils.finalHookups(b, d, h, k, q);
+          utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart());
         }
         document.body.removeChild(l);
       }, !0);
