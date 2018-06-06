@@ -130,6 +130,10 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 				}
 
 				journeys_utils.finalHookups(branchViewData, storage, cta, banner, hideBanner);
+
+				if (utils.navigationTimingAPIEnabled) {
+					utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
+				}
 			}
 			document.body.removeChild(placeholder);
 		}, true);
