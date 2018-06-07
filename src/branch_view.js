@@ -24,7 +24,7 @@ function checkPreviousBanner() {
  */
 function renderHtmlBlob(parent, html, hasApp) {
 	journeys_utils.setJourneyLinkData(html);
-	
+
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
 	journeys_utils.setPositionAndHeight(html);
@@ -73,6 +73,7 @@ branch_view.handleBranchViewData = function(server, branchViewData, requestData,
 
 	requestData = requestData || {};
 	requestData['feature'] = 'journeys';
+	requestData['initial_referrer'] = utils.getInitialReferrer(branch._referringLink());
 
 	var cleanedData = utils.cleanLinkData(requestData);
 
