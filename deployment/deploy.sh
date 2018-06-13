@@ -84,9 +84,9 @@ EOF
   git commit -am "Pushing release $VERSION [ci skip]"
 
   echo -en "${GREEN}Pushing to S3: branch-cdn ...${NC}\n"
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read --cache-control "no-cache"
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read --cache-control "no-cache"
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read --cache-control "no-cache"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read --cache-control "max-age=604800"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read --cache-control "max-age=604800"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read --cache-control "max-age=604800"
   aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
 
   # Pushing to QA builds
