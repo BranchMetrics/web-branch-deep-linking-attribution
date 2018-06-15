@@ -55,6 +55,10 @@ You can also get the sdk via npm or bower (branch-sdk)
 
 In addition to working as a standalone library, the Branch SDK works great in CommonJS environments (browserify, webpack) as well as RequireJS environments (RequireJS/AMD). Just `require('branch')` or `define(['branch'], function(branch) { ... });` to get started!
 
+#### Web SDK Version Pinning
+
+If you'd like to pin the Web SDK to a specific version, you can do so by replacing `https://cdn.branch.io/branch-latest.min.js` with the versioned referenced in the Web SDK (right after `src=`). `latest` should b swapped for the version number named as `XX.XX.X`. For example, if you wanted to pin against version 2.36 of the SDK, you would use `https://cdn.branch.io/branch-2.36.0.min.js`.
+
 ### Initialization
 
 You will need to create a [Branch Metrics app](http://branch.io) to obtain your Branch Key (you will have the option to toggle between live and test modes).
