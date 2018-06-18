@@ -27,9 +27,7 @@ EXTERN=src/extern.js
 
 VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/$$1/')
 
-ONPAGE_RELEASE=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="https://cdn.branch.io/branch-latest.min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
-ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="dist/build.min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
-ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
+BRANCH_SCRIPT=$(subst ",\",$(shell perl -pe '' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
 
 .PHONY: clean
 
@@ -83,9 +81,13 @@ dist/build.min.js.gz: dist/build.min.js
 
 example.html: src/web/example.template.html
 ifeq ($(MAKECMDGOALS), release)
-	perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > example.html
+	perl -pe 'BEGIN{$$a="https://cdn.branch.io/branch-latest.min.js"}; s#SCRIPT_URL_HERE#$$a#' src/web/example.template.html > example.tmp.html
+	perl -pe 'BEGIN{$$a="$(BRANCH_SCRIPT)"}; s#// INSERT INIT CODE#$$a#' example.tmp.html > example.html
+	rm example.tmp.html
 else
-	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > example.html
+	perl -pe 'BEGIN{$$a="dist/build.min.js"}; s#SCRIPT_URL_HERE#$$a#' src/web/example.template.html > example.tmp.html
+	perl -pe 'BEGIN{$$a="$(BRANCH_SCRIPT)"}; s#// INSERT INIT CODE#$$a#' example.tmp.html > example.html
+	rm example.tmp.html
 endif
 
 # Documentation
@@ -99,9 +101,9 @@ docs/web/3_branch_web.md: $(SOURCES)
 README.md: docs/1_intro.md docs/1_readme.md docs/web/3_branch_web.md docs/9_footer.md
 	perl build_utils/toc_generator.pl src/6_branch.js docs/web/2_table_of_contents.md WEB
 	cat docs/1_intro.md docs/1_readme.md docs/web/1_reference_intro.md docs/web/2_table_of_contents.md docs/web/3_branch_web.md docs/9_footer.md | \
-		perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' > README.md
+		perl -pe 'BEGIN{$$a="$(BRANCH_SCRIPT)"}; s#// INSERT INIT CODE#$$a#' > README.md
 
 # integration test page
 
 test/integration-test.html: test/integration-test.template.html
-	perl -pe 'BEGIN{$$a="$(ONPAGE_TEST)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html
+	perl -pe 'BEGIN{$$a="$(BRANCH_SCRIPT)"}; s#// INSERT INIT CODE#$$a#' test/integration-test.template.html > test/integration-test.html

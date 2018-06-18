@@ -8,22 +8,16 @@
  */
 'use strict';
 
-(function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
+(function(root, branchStr, createCallback, branchSdk, funcs, i) {
 	if (!root[branchStr] || !root[branchStr]._q) {
 		while (i < funcs.length) {
 			createCallback(branchSdk, funcs[i++]);
 		}
 
-		scriptTag = doc.createElement(scriptStr);
-		scriptTag.async = 1;
-		scriptTag.src = 'SCRIPT_URL_HERE';
-		firstScript = doc.getElementsByTagName(scriptStr)[0];
-		firstScript.parentNode.insertBefore(scriptTag, firstScript);
-
 		root[branchStr] = branchSdk;
 	}
 })(
-	window, document, 'script', 'branch', function(branch, name) {
+	window, 'branch', function(branch, name) {
 		branch[name] = function() {
 			branch._q.push([ name, arguments ]);
 		};

@@ -35,10 +35,11 @@ This SDK requires native browser Javascript and has been tested in all modern br
 
 #### Recommended Installation
 
-Add the following script within your `<head>` tags:
+Add the following scripts within your `<head>` tag:
 _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [account dashboard](https://dashboard.branch.io/#/settings)._
 
 ```html
+<script src="https://cdn.branch.io/branch-latest.min.js" async></script>
 <script type="text/javascript">
 
 	// INSERT INIT CODE
