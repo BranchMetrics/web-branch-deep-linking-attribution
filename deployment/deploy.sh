@@ -84,10 +84,18 @@ EOF
   git commit -am "Pushing release $VERSION [ci skip]"
 
   echo -en "${GREEN}Pushing to S3: branch-cdn ...${NC}\n"
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read --cache-control "no-cache"
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read --cache-control "no-cache"
-  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read --cache-control "no-cache"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --acl public-read --cache-control "max-age=300"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --acl public-read --cache-control "max-age=300"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-v2.0.0.min.js --acl public-read --cache-control "max-age=300"
   aws s3 cp example.html s3://branch-cdn/example.html --acl public-read
+
+  # Pushing to QA builds
+  echo -en "${GREEN}Pushing to S3: branch-builds ...${NC}\n"
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-$VERSION.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-latest.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
+  aws s3 cp --content-type="text/javascript" dist/build.js s3://branch-builds/websdk/branch.js --acl public-read
+  aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
   
   # Invalidate cache at CDN
   echo -en "${GREEN}Invalidating cloudfrond distribution for WebSDK ...${NC}\n"
