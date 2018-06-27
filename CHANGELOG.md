@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.37.0] - 2018-06-27
+- Adds referring link to branchview data
+
 ## [2.36.0] - 2018-06-06
 - Added journey-load-time metric to instrumentation object
 

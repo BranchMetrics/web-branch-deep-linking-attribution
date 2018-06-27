@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.36.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.37.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2298,6 +2298,7 @@ branch_view.handleBranchViewData = function(a, b, c, d, e, f, g) {
     var k = null, h = null;
     c = c || {};
     c.feature = "journeys";
+    c.initial_referrer = utils.getInitialReferrer(g._referringLink());
     c = utils.cleanLinkData(c);
     (g = document.getElementById("branch-iframe-css")) && g.parentElement.removeChild(g);
     var l = document.createElement("div");
