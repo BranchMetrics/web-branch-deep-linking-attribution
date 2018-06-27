@@ -9,7 +9,7 @@
 'use strict';
 
 (function(root, branchStr, createCallback, branchSdk, funcs, i) {
-	if (!root[branchStr] || !root[branchStr]._q) {
+	if (!root[branchStr]) {
 		while (i < funcs.length) {
 			createCallback(branchSdk, funcs[i++]);
 		}
