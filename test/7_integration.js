@@ -325,6 +325,26 @@ describe('Integration tests', function() {
 		});
 	});
 
+	describe('getBrowserFingerprintId', function() {
+		it('it should return browser-fingerprint-id with value 79336952217731267', function(done) {
+			var assert = testUtils.plan(numberOfAsserts(1), done);
+			branchInit();
+			branch.getBrowserFingerprintId(function(err, data) {
+				assert.strictEqual("79336952217731267", data, 'expected browser-fingerprint-id returned correctly (79336952217731267)');
+				done();
+			});
+		});
+		it('with tracking disabled, it should return browser-fingerprint-id with value null', function(done) {
+			var assert = testUtils.plan(numberOfAsserts(1), done);
+			branchInit();
+			branch.disableTracking();
+			branch.getBrowserFingerprintId(function(err, data) {
+				assert.strictEqual(null, data, 'expected browser-fingerprint-id returned correctly (null)');
+				done();
+			});
+		});
+	});
+
 	describe('track', function() {
 		it('should make two requests and return undefined, no metadata', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);
