@@ -28,7 +28,7 @@ dependencies:
 test:
   override:
     - deployment/master_builds.sh
-    - grunt test
+    - deployment/test.sh
 
 deployment:
   all:
