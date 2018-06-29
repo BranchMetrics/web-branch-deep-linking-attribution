@@ -59,7 +59,8 @@
 		'validateCode',
 		'trackCommerceEvent',
 		'logEvent',
-		'disableTracking'
+		'disableTracking',
+		'getBrowserFingerprintId'
 	],
 	0
 );
