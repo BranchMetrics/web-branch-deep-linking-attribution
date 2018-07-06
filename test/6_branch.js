@@ -1037,10 +1037,10 @@ describe('Branch', function() {
 
 			// check starting with 4th call since first four are called by openGraphDataAsObject
 			sinon.stub(utils, 'getOpenGraphContent')
-				.onCall(4).returns(ogTitle)
-				.onCall(5).returns(ogDescription)
-				.onCall(6).returns(ogImage)
-				.onCall(7).returns(ogVideo);
+				.onCall(8).returns(ogTitle)
+				.onCall(9).returns(ogDescription)
+				.onCall(10).returns(ogImage)
+				.onCall(11).returns(ogVideo);
 
 			branch = initBranch(true);
 			requests = [];
