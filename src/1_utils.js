@@ -41,8 +41,7 @@ utils.userPreferences = {
 	trackingDisabled: false,
 	whiteListedEndpointsWithData: {
 		'/v1/open': { 'link_identifier':'\\d+' },
-		'/v1/event': { 'event': 'pageview' },
-		'/v1/branchview': {}
+		'/v1/pageview': { 'event': 'pageview' }
 	},
 	allowErrorsInCallback: false,
 	shouldBlockRequest: function(url, requestData) {
@@ -353,7 +352,10 @@ utils.cleanLinkData = function(linkData) {
 		safejson.parse(data);
 	}
 	catch (e) {
-		data = goog.json.serialize(data);
+		// no need to serialize for v1/pageview call
+		if (linkData['event'] !== 'pageview') {
+			data = goog.json.serialize(data);
+		}
 	}
 
 	linkData['data'] = data;
@@ -1066,4 +1068,14 @@ utils.addNonceAttribute = function(element) {
 	if (utils.nonce !== '') {
 		element.setAttribute('nonce', utils.nonce);
 	}
+};
+
+utils.buildMetadataForPageview = function(options, additionalMetadata) {
+	return utils.merge({
+		"url": options && options.url || utils.getWindowLocation(),
+		"user_agent": navigator.userAgent,
+		"language": navigator.language,
+		"screen_width": screen.width || -1,
+		"screen_height": screen.height || -1
+	}, additionalMetadata || {});
 };

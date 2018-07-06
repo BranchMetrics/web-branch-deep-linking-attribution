@@ -53,103 +53,6 @@ function renderHtmlBlob(parent, html, hasApp) {
 	return iframe;
 };
 
-/**
- * @param {Object} server
- * @param {Object} branchViewData
- * @param {Object} requestData
- * @param {Object} storage
- * @param {boolean} hasApp
- * @param {boolean} testFlag
- * @param {Object} branch
- */
-branch_view.handleBranchViewData = function(server, branchViewData, requestData, storage, hasApp, testFlag, branch) {
-	if (checkPreviousBanner()) {
-		return;
-	}
-	journeys_utils.branch = branch;
-
-	var banner = null;
-	var cta = null;
-
-	requestData = requestData || {};
-	requestData['feature'] = 'journeys';
-	requestData['initial_referrer'] = utils.getInitialReferrer(branch._referringLink());
-
-	var cleanedData = utils.cleanLinkData(requestData);
-
-	// this code removes any leftover css from previous banner
-	var branchCSS = document.getElementById('branch-iframe-css')
-	if (branchCSS) {
-		branchCSS.parentElement.removeChild(branchCSS)
-	}
-
-	var placeholder = document.createElement('div');
-	placeholder.id = 'branch-banner';
-	document.body.insertBefore(placeholder, null);
-	banner_utils.addClass(placeholder, 'branch-banner-is-active');
-
-	if (branchViewData['html']) {
-		return renderHtmlBlob(document.body, branchViewData['html'], hasApp);
-	} else if (branchViewData['url']) {
-		// we need to pass the callback_index to v1/branchview and increment it so that we prevent auto-deeplinking
-		// from occurring more than once
-		var callbackString = 'branch_view_callback__' + (branch_view.callback_index++);
-		var postData = encodeURIComponent(utils.base64encode(goog.json.serialize(cleanedData)));
-		var url = branchViewData['url'] + '&callback=' + callbackString;
-		url += '&_lan=' + (journeys_utils.branch.user_language || utils.getBrowserLanguageCode() || 'en');
-		url += '&data=' + postData;
-		utils.currentRequestBrttTag = '/v1/branchview-brtt';
-		server.XHRRequest(url, {}, 'GET', {}, function(error, html){
-			var failed = false;
-			if (!error && html) {
-
-				var hideBanner = !testFlag
-					? journeys_utils.findDismissPeriod(html)
-					: 0;
-
-				var timeoutTrigger = window.setTimeout(
-					function() {
-						window[callbackString] = function() { };
-					},
-					utils.timeout
-				);
-
-				window[callbackString] = function(data) {
-					window.clearTimeout(timeoutTrigger);
-					if (failed) {
-						return;
-					}
-					cta = data;
-
-					journeys_utils.finalHookups(branchViewData, storage, cta, banner, hideBanner);
-				};
-
-				banner = renderHtmlBlob(document.body, html, hasApp);
-				if (banner === null) {
-					failed = true;
-					return;
-				}
-
-				journeys_utils.finalHookups(branchViewData, storage, cta, banner, hideBanner);
-
-				if (utils.navigationTimingAPIEnabled) {
-					utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
-				}
-			}
-			document.body.removeChild(placeholder);
-		}, true);
-	}
-};
-
-// builds data for a Journey in test mode
-function buildJourneyTestData(branchViewId, branch_key, data){
-	return {
-		id: branchViewId,
-		number_of_use: -1,
-		url: (config.api_endpoint + '/v1/branchview/' + branch_key + '/' + branchViewId + '?_a=audience_rule_id&_t=' + data['browser_fingerprint_id'])
-	}
-}
-
 // checks to see if user dismissed Journey previously and whether it should remain dismissed
 function isJourneyDismissed(branchViewData, branch) {
 	// check storage to see dismiss timestamp
@@ -163,76 +66,159 @@ function isJourneyDismissed(branchViewData, branch) {
 	return false;
 }
 
-// builds an object that contains data from setBranchViewData() call, hosted deep link data and language data
-function compileRequestData(branch, makeNewLink, openApp) {
-	var requestData = branch._branchViewData || {};
-
-	if (!requestData['data']) {
-		requestData['data'] = {};
+branch_view.shouldDisplayJourney = function(eventResponse, options, testModeEnabled) {
+	if (
+		checkPreviousBanner() ||
+		!utils.mobileUserAgent()
+	) {
+		return false;
 	}
 
-	var linkClickId = !makeNewLink ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
+	if (testModeEnabled) {
+		return true;
+	}
+
+	if (
+		!eventResponse['branch_view_data']['id'] ||
+		isJourneyDismissed(eventResponse['branch_view_data'], journeys_utils.branch) ||
+		options['no_journeys']
+	) {
+		return false;
+	}
+
+	return true;
+};
+
+branch_view.incrementAnalytics = function(branchviewData) {
+	journeys_utils.branch._api(
+		resources.pageview,
+		{
+			"event": "pageview",
+			"journey_displayed": true,
+			"audience_rule_id": branchviewData['audience_rule_id'],
+			"branch_view_id": branchviewData['branch_view_id']
+		},
+		function (err, data) {
+			// do nothing with response
+		}
+	);
+};
+
+branch_view.displayJourney = function(html, requestData, templateId, eventData, testModeEnabled) {
+	journeys_utils.branchViewId = templateId;
+
+	// this code removes any leftover css from previous banner
+	var branchCSS = document.getElementById('branch-iframe-css')
+	if (branchCSS) {
+		branchCSS.parentElement.removeChild(branchCSS)
+	}
+
+	var placeholder = document.createElement('div');
+	placeholder.id = 'branch-banner';
+	document.body.insertBefore(placeholder, null);
+	banner_utils.addClass(placeholder, 'branch-banner-is-active');
+
+	var failed = false;
+	var callbackString = requestData['callback_string'];
+	var banner = null;
+	var cta = null;
+	var storage = journeys_utils.branch._storage;
+
+
+	if (html) {
+
+		var hideBanner = !testModeEnabled
+			? journeys_utils.findDismissPeriod(html)
+			: 0;
+
+		var timeoutTrigger = window.setTimeout(
+			function() {
+				window[callbackString] = function() { };
+			},
+			utils.timeout
+		);
+
+		window[callbackString] = function(data) {
+			window.clearTimeout(timeoutTrigger);
+			if (failed) {
+				return;
+			}
+			cta = data;
+
+			journeys_utils.finalHookups(templateId, storage, cta, banner, hideBanner);
+		};
+
+		banner = renderHtmlBlob(document.body, html, requestData['has_app_websdk']);
+		journeys_utils.banner = banner;
+
+
+		if (banner === null) {
+			failed = true;
+			return;
+		}
+
+		journeys_utils.finalHookups(templateId, storage, cta, banner, hideBanner);
+
+		if (utils.navigationTimingAPIEnabled) {
+			utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
+		}
+
+	}
+
+	document.body.removeChild(placeholder);
+
+	if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
+		branch_view.incrementAnalytics(eventData['branch_view_data']);
+	}
+};
+
+branch_view.buildJourneyRequestData = function(metadata, options, branch) {
+
+	journeys_utils.branch = branch;
+
+	if (!options) {
+		options = {};
+	}
+
+	if (!metadata) {
+		metadata = {};
+	}
+
+	// starts object off with data from setBranchViewData() call
+	var obj = branch._branchViewData || {};
 	var sessionStorage = session.get(branch._storage) || {};
 	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
+	var userLanguage = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase() || null;
+	var initialReferrer = utils.getInitialReferrer(branch._referringLink());
+	var branchViewId = options['branch_view_id'] || utils.getParameterByName('_branch_view_id') || null;
+	var linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
 
-	requestData['data'] = utils.merge(utils.getHostedDeepLinkData(), requestData['data']);
-	requestData['data'] = utils.merge(utils.whiteListJourneysLanguageData(sessionStorage || {}), requestData['data']);
-	requestData['data'] = linkClickId ? utils.merge({ 'link_click_id': linkClickId }, requestData['data']) : requestData['data'];
-	requestData = utils.merge({ 'open_app': openApp }, requestData);
-	requestData = utils.merge({ 'has_app_websdk': has_app }, requestData);
-	requestData = utils.isIframe() ? utils.merge({ 'is_iframe': true }, requestData) : requestData;
-	requestData = utils.userPreferences.trackingDisabled ? utils.merge({ 'tracking_disabled': true }, requestData) : requestData;
-	return requestData;
-}
+	// adds root level keys for v1/event
+	obj.event = 'pageview';
+	obj.metadata = metadata;
+	obj = utils.addPropertyIfNotNull(obj, 'initial_referrer', initialReferrer);
 
-branch_view.initJourney = function(branch_key, data, eventData, options, branch) {
+	// adds root level keys for v1/branchview
+	obj = utils.addPropertyIfNotNull(obj, 'branch_view_id', branchViewId);
+	obj = utils.addPropertyIfNotNull(obj, 'no_journeys', options['no_journeys']);
+	obj = utils.addPropertyIfNotNull(obj, 'is_iframe', utils.isIframe());
+	obj['user_language'] = userLanguage;
+	obj['open_app'] = options['open_app'] || false;
+	obj['has_app_websdk'] = has_app;
+	obj.source = 'web-sdk';
+	obj.feature = 'journeys';
+	obj['callback_string'] = 'branch_view_callback__' + (branch_view.callback_index++);
 
-	branch._branchViewEnabled = !!eventData['branch_view_enabled'];
-	branch._storage.set('branch_view_enabled', branch._branchViewEnabled);
-
-	var branchViewId = null;
-	var no_journeys = null;
-	var hideJourney = null;
-	var branchViewData = null;
-	var requestData = null;
-	var testFlag = false;
-	var makeNewLink = false;
-	var openApp = false;
-
-	if (options) {
-		branchViewId = options['branch_view_id'] || null;
-		no_journeys = options['no_journeys'] || null;
-		branch.user_language = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase(); // language should be lowercase for Journeys
-		journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
-		journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
-		makeNewLink = options['make_new_link'] || false;
-		// openApp defaults to false unless user specifies otherwise
-		// Note: Will only work for Journeys that don't have Auto-Open toggle in Journey template editor
-		openApp = options['open_app'] || false;
+	if (!obj.data) {
+		obj.data = {};
 	}
 
-	branchViewId = branchViewId || utils.getParameterByName('_branch_view_id') || null;
-
-	if (branchViewId && utils.mobileUserAgent()) {
-		testFlag = true;
-		branchViewData = buildJourneyTestData(branchViewId, branch_key, data);
+	// builds data object for v1/branchview
+	obj.data = utils.merge(utils.getHostedDeepLinkData(), obj.data);
+	obj.data = utils.merge(utils.whiteListJourneysLanguageData(sessionStorage || {}), obj.data);
+	if (linkClickId) {
+		obj.data['link_click_id'] = linkClickId;
 	}
-
-	if (!branchViewData) {
-		if (eventData.hasOwnProperty('branch_view_data')) {
-			branchViewData = eventData['branch_view_data'];
-			hideJourney = isJourneyDismissed(branchViewData, branch);
-		}
-	}
-
-	if (branchViewData && !hideJourney && !no_journeys) {
-		journeys_utils.branchViewId = branchViewData.id;
-		branch['renderQueue'](function() {
-			requestData = compileRequestData(branch, makeNewLink, openApp);
-			branch_view.handleBranchViewData(branch._server, branchViewData, requestData, branch._storage, data['has_app'], testFlag, branch);
-		});
-	}
-	else {
-		branch._publishEvent('willNotShowJourney');
-	}
-}
+	obj = utils.cleanLinkData(obj);
+	return obj;
+};

@@ -155,6 +155,11 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
+	if (resource.endpoint === '/v1/pageview') {
+		d['metadata'] = safejson.stringify(d['metadata'] || {});
+		d['data'] = safejson.stringify(d['data'] || {});
+	}
+
 	if (resource.endpoint === '/v1/open') {
 		d['options'] = safejson.stringify(d['options'] || {});
 	}

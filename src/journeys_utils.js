@@ -475,7 +475,7 @@ journeys_utils.findDismissPeriod = function(html) {
 
 /***
  * @function journeys_utils.finalHookups
- * @param {Object} branchViewData
+ * @param {string} templateId
  * @param {Object} storage
  * @param {function()} cta
  * @param {Object} banner
@@ -483,8 +483,7 @@ journeys_utils.findDismissPeriod = function(html) {
  * 
  * hooks up the call to action and dismiss buttons
  */
-journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hideBanner) {
-	journeys_utils.banner = banner;
+journeys_utils.finalHookups = function(templateId, storage, cta, banner, hideBanner) {
 
 	if(!cta || !banner) {
 		return;
@@ -507,7 +506,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
 			journeys_utils.branch._publishEvent('didClickJourneyContinue', journeys_utils.journeyLinkData);
 			journeys_utils.journeyDismissed = true;
 			journeys_utils.animateBannerExit(banner);
-			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
+			storage.set('hideBanner' + templateId, hideBanner, true);
 		})
 	})
 	cancelEls = doc.querySelectorAll('.branch-banner-close');
@@ -516,7 +515,7 @@ journeys_utils.finalHookups = function(branchViewData, storage, cta, banner, hid
             	journeys_utils.branch._publishEvent('didClickJourneyClose', journeys_utils.journeyLinkData);
             	journeys_utils.journeyDismissed = true;
             	journeys_utils.animateBannerExit(banner);
-			storage.set('hideBanner' + branchViewData["id"], hideBanner, true);
+			storage.set('hideBanner' + templateId, hideBanner, true);
 		})
 	})
 }
