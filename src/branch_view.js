@@ -83,6 +83,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, testModeEnab
 		isJourneyDismissed(eventResponse['branch_view_data'], journeys_utils.branch) ||
 		options['no_journeys']
 	) {
+		branch_view.callback_index = 1;
 		return false;
 	}
 
