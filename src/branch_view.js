@@ -195,8 +195,8 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	var linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
 
 	// adds root level keys for v1/event
-	obj.event = 'pageview';
-	obj.metadata = metadata;
+	obj['event'] = 'pageview';
+	obj['metadata'] = metadata;
 	obj = utils.addPropertyIfNotNull(obj, 'initial_referrer', initialReferrer);
 
 	// adds root level keys for v1/branchview
@@ -206,8 +206,7 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	obj['user_language'] = userLanguage;
 	obj['open_app'] = options['open_app'] || false;
 	obj['has_app_websdk'] = has_app;
-	obj.source = 'web-sdk';
-	obj.feature = 'journeys';
+	obj['feature'] = 'journeys';
 	obj['callback_string'] = 'branch_view_callback__' + (branch_view.callback_index++);
 
 	if (!obj.data) {
