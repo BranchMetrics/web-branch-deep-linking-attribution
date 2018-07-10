@@ -342,7 +342,7 @@ describe('Branch', function() {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err, data) {
-				assert.strictEqual(requests.length, 3, 'three requests made');
+				assert.strictEqual(requests.length, 2, 'two requests made');
 				assert.deepEqual(
 					requests[0].resource.endpoint,
 					'/_r',
