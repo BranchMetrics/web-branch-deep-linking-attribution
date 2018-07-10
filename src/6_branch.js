@@ -414,6 +414,9 @@ Branch.prototype['init'] = wrap(
 				return done(err, data && utils.whiteListSessionData(data));
 			}
 
+			done(err, data && utils.whiteListSessionData(data));
+			self['renderFinalize']();
+
 			var additionalMetadata = utils.getAdditionalMetadata();
 			var metadata = utils.validateParameterType(options['metadata'], "object") ? options['metadata'] : null;
 			if (metadata) {
@@ -427,42 +430,39 @@ Branch.prototype['init'] = wrap(
 				options,
 				self
 			);
-
-			self._api(
-				resources.pageview,
-				requestData,
-				function(err, pageViewResponse) {
-					if (!err && typeof pageViewResponse === "object" && pageViewResponse['template']) {
-						var journeyInTestMode = requestData['branch_view_id'] ? true : false;
-						if (branch_view.shouldDisplayJourney(
-								pageViewResponse['event_data'],
-								options,
-								journeyInTestMode
-							)
-						) {
-							branch_view.displayJourney(
-								pageViewResponse['template'],
-								requestData,
-								requestData['branch_view_id'] || pageViewResponse['event_data']['branch_view_data']['id'],
-								pageViewResponse['event_data'],
-								journeyInTestMode
-							);
+			self['renderQueue'](function() {
+				self._api(
+					resources.pageview,
+					requestData,
+					function(err, pageViewResponse) {
+						if (!err && typeof pageViewResponse === "object" && pageViewResponse['template']) {
+							var journeyInTestMode = requestData['branch_view_id'] ? true : false;
+							if (branch_view.shouldDisplayJourney(
+									pageViewResponse['event_data'],
+									options,
+									journeyInTestMode
+								)
+							) {
+								branch_view.displayJourney(
+									pageViewResponse['template'],
+									requestData,
+									requestData['branch_view_id'] || pageViewResponse['event_data']['branch_view_data']['id'],
+									pageViewResponse['event_data'],
+									journeyInTestMode
+								);
+							}
+						}
+						try {
+							if (utils.userPreferences.trackingDisabled) {
+								utils.userPreferences.allowErrorsInCallback = true;
+							}
+						}
+						catch (e) {
+							// pass
 						}
 					}
-					try {
-						done(err, data && utils.whiteListSessionData(data));
-						if (utils.userPreferences.trackingDisabled) {
-							utils.userPreferences.allowErrorsInCallback = true;
-						}
-					}
-					catch (e) {
-						// pass
-					}
-					finally {
-						self['renderFinalize']();
-					}
-				}
-			);
+				);
+			});
 		};
 		var attachVisibilityEvent = function() {
 			var hidden;

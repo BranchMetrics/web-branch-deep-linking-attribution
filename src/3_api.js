@@ -119,7 +119,7 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	var d = { };
-	if (typeof resource.params !== 'undefined') {
+	if (typeof resource.params !== 'undefined' && resource.endpoint !== '/v1/pageview') {
 		for (k in resource.params) {
 			if (resource.params.hasOwnProperty(k)) {
 				err = resource.params[k](resource.endpoint, k, data[k]);
@@ -135,6 +135,11 @@ Server.prototype.getUrl = function(resource, data) {
 				}
 			}
 		}
+	}
+	else if (resource.endpoint === '/v1/pageview') {
+		// /v1/pageview requires custom keys to be available in the post body due
+		// to .setBranchViewData() call so the logic above won't work
+		utils.merge(d, data);
 	}
 
 	if (resource.method === 'POST' || resource.endpoint === '/v1/credithistory') {
