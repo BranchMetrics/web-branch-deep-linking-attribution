@@ -161,8 +161,9 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	if (resource.endpoint === '/v1/pageview') {
-		d['metadata'] = safejson.stringify(d['metadata'] || {});
-		d['data'] = safejson.stringify(d['data'] || {});
+		if (d['metadata']) {
+			d['metadata'] = safejson.stringify(d['metadata'] || {});
+		}
 	}
 
 	if (resource.endpoint === '/v1/open') {

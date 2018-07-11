@@ -352,10 +352,7 @@ utils.cleanLinkData = function(linkData) {
 		safejson.parse(data);
 	}
 	catch (e) {
-		// no need to serialize for v1/pageview call
-		if (linkData['event'] !== 'pageview') {
-			data = goog.json.serialize(data);
-		}
+		data = goog.json.serialize(data);
 	}
 
 	linkData['data'] = data;
