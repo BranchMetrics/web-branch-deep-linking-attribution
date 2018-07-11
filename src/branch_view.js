@@ -66,7 +66,7 @@ function isJourneyDismissed(branchViewData, branch) {
 	return false;
 }
 
-branch_view.shouldDisplayJourney = function(eventResponse, options, testModeEnabled) {
+branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
 	if (
 		checkPreviousBanner() ||
 		!utils.mobileUserAgent()
@@ -74,7 +74,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, testModeEnab
 		return false;
 	}
 
-	if (testModeEnabled) {
+	if (journeyInTestMode) {
 		return true;
 	}
 
@@ -83,6 +83,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, testModeEnab
 		isJourneyDismissed(eventResponse['branch_view_data'], journeys_utils.branch) ||
 		options['no_journeys']
 	) {
+		// resets the callback index so that auto-open works the next time a Journey is rendered
 		branch_view.callback_index = 1;
 		return false;
 	}
@@ -90,14 +91,14 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, testModeEnab
 	return true;
 };
 
-branch_view.incrementAnalytics = function(branchviewData) {
+branch_view.incrementAnalytics = function(branchViewData) {
 	journeys_utils.branch._api(
 		resources.pageview,
 		{
 			"event": "pageview",
 			"journey_displayed": true,
-			"audience_rule_id": branchviewData['audience_rule_id'],
-			"branch_view_id": branchviewData['branch_view_id']
+			"audience_rule_id": branchViewData['audience_rule_id'],
+			"branch_view_id": branchViewData['branch_view_id']
 		},
 		function (err, data) {
 			// do nothing with response
@@ -221,4 +222,14 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	}
 	obj = utils.cleanLinkData(obj);
 	return obj;
+};
+
+branch_view.getMetadataForPageviewEvent = function(options, additionalMetadata) {
+	return utils.merge({
+		"url": options && options.url || utils.getWindowLocation(),
+		"user_agent": navigator.userAgent,
+		"language": navigator.language,
+		"screen_width": screen.width || -1,
+		"screen_height": screen.height || -1
+	}, additionalMetadata || {});
 };

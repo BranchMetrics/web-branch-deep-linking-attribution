@@ -1070,12 +1070,3 @@ utils.addNonceAttribute = function(element) {
 	}
 };
 
-utils.buildMetadataForPageview = function(options, additionalMetadata) {
-	return utils.merge({
-		"url": options && options.url || utils.getWindowLocation(),
-		"user_agent": navigator.userAgent,
-		"language": navigator.language,
-		"screen_width": screen.width || -1,
-		"screen_height": screen.height || -1
-	}, additionalMetadata || {});
-};

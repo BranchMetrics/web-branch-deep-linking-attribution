@@ -414,8 +414,15 @@ Branch.prototype['init'] = wrap(
 				return done(err, data && utils.whiteListSessionData(data));
 			}
 
-			done(err, data && utils.whiteListSessionData(data));
-			self['renderFinalize']();
+			try {
+				done(err, data && utils.whiteListSessionData(data));
+			}
+			catch (e) {
+				// pass
+			}
+			finally {
+				self['renderFinalize']();
+			}
 
 			var additionalMetadata = utils.getAdditionalMetadata();
 			var metadata = utils.validateParameterType(options['metadata'], "object") ? options['metadata'] : null;
@@ -426,7 +433,7 @@ Branch.prototype['init'] = wrap(
 				}
 			}
 			var requestData = branch_view.buildJourneyRequestData(
-				utils.buildMetadataForPageview(options, additionalMetadata),
+				branch_view.getMetadataForPageviewEvent(options, additionalMetadata),
 				options,
 				self
 			);
@@ -452,13 +459,8 @@ Branch.prototype['init'] = wrap(
 								);
 							}
 						}
-						try {
-							if (utils.userPreferences.trackingDisabled) {
-								utils.userPreferences.allowErrorsInCallback = true;
-							}
-						}
-						catch (e) {
-							// pass
+						if (utils.userPreferences.trackingDisabled) {
+							utils.userPreferences.allowErrorsInCallback = true;
 						}
 					}
 				);
@@ -848,9 +850,10 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		}
 
 		var requestData = branch_view.buildJourneyRequestData(
-			utils.buildMetadataForPageview(options, metadata),
+			branch_view.getMetadataForPageviewEvent(options, metadata),
 			options,
-			self);
+			self
+		);
 
 		self._api(resources.pageview,
 			requestData,
