@@ -348,8 +348,17 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
  */
 Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
-	utils.currentRequestBrttTag = resource.endpoint + '-brtt';
-	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 0) {
+
+	if (resource.endpoint === "/v1/pageview" && data && data['journey_displayed']) {
+		// special case for pageview endpoint
+		utils.currentRequestBrttTag = resource.endpoint + '-1-brtt';
+	}
+	else {
+		utils.currentRequestBrttTag = resource.endpoint + '-brtt';
+	}
+
+	// appends instrumentation object to /v1/url or /v1/has-app request
+	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];
 		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));
 		utils.instrumentation = {};

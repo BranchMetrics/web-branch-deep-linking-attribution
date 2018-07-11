@@ -294,6 +294,10 @@ Branch.prototype['init'] = wrap(
 	callback_params.CALLBACK_ERR_DATA,
 	function(done, branch_key, options) {
 
+		if (utils.navigationTimingAPIEnabled) {
+			utils.instrumentation['init-began-at'] = utils.timeSinceNavigationStart();
+		}
+
 		var self = this;
 
 		self.init_state = init_states.INIT_PENDING;
