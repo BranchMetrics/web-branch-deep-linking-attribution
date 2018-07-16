@@ -59,7 +59,7 @@ journeys_utils.journeyLinkData = null;
 /***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
- * 
+ *
  * Uses template metadata to set bannerHeight, position, and sticky properties
  * To support old banners, searches the html blob to determine these properties
  * For full page banners, gets view width/height to set fixed pixel values
@@ -100,7 +100,7 @@ journeys_utils.setPositionAndHeight = function(html) {
 		else {
 			journeys_utils.isFullPage = true;
 		}
-	} 
+	}
 }
 
 /***
@@ -165,7 +165,7 @@ journeys_utils.getCss = function(html) {
 /***
  * @function journeys_utils.getJsAndAddToParent
  * @param {string} html
- * 
+ *
  * take the js from template and add to document.body
  */
 journeys_utils.getJsAndAddToParent = function(html) {
@@ -267,7 +267,7 @@ journeys_utils.addHtmlToIframe = function(iframe, iframeHTML) {
  * @function journeys_utils.addIframeOuterCSS
  *
  * Creates a style element on document.body and adds CSS that will determine
- * banner position, height and sticky. 
+ * banner position, height and sticky.
  */
 journeys_utils.addIframeOuterCSS = function() {
 	var iFrameCSS = document.createElement('style');
@@ -449,22 +449,16 @@ journeys_utils.animateBannerEntrance = function(banner) {
 
 /***
  * @function journeys_utils.findDismissPeriod
- * @param {string} html
+ * @param {Object} metadata
  *
  * Checks template metadata to determine how long to not show banner when dismissed
  */
-journeys_utils.findDismissPeriod = function(html) {
+journeys_utils.findDismissPeriod = function(metadata) {
 	// default dismiss period to 1 week
 	var dismissPeriod = 7;
 
-	var match = html.match(journeys_utils.jsonRe);
-	if (match) {
-		var src = match[1];
-		var metadata = safejson.parse(src) || {};
-
-		if (typeof metadata['dismissPeriod'] === 'number') {
-			dismissPeriod = metadata['dismissPeriod'];
-		}
+	if (typeof metadata['dismissPeriod'] === 'number') {
+		dismissPeriod = metadata['dismissPeriod'];
 	}
 
 	// dismissPeriod of -1 dismisses banner forever
@@ -480,10 +474,10 @@ journeys_utils.findDismissPeriod = function(html) {
  * @param {function()} cta
  * @param {Object} banner
  * @param {number} hideBanner - how long to hide the banner for when dismissed
- * 
+ *
  * hooks up the call to action and dismiss buttons
  */
-journeys_utils.finalHookups = function(templateId, storage, cta, banner, hideBanner) {
+journeys_utils.finalHookups = function(templateId, storage, cta, banner, metadata, testModeEnabled) {
 
 	if(!cta || !banner) {
 		return;
@@ -500,24 +494,30 @@ journeys_utils.finalHookups = function(templateId, storage, cta, banner, hideBan
             	journeys_utils.animateBannerExit(banner);
 		})
 	})
-	var cancelEls = doc.querySelectorAll('.branch-banner-continue');
+	journeys_utils._setupDismissBehavior('.branch-banner-continue', 'didClickJourneyContinue', storage, banner, templateId, metadata, testModeEnabled);
+	journeys_utils._setupDismissBehavior('.branch-banner-close', 'didClickJourneyClose', storage, banner, templateId, metadata, testModeEnabled);
+}
+
+journeys_utils._setupDismissBehavior = function(cssSelector, eventName, storage, banner, templateId, metadata, testModeEnabled) {
+	var cancelEls = doc.querySelectorAll(cssSelector);
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-			journeys_utils.branch._publishEvent('didClickJourneyContinue', journeys_utils.journeyLinkData);
-			journeys_utils.journeyDismissed = true;
-			journeys_utils.animateBannerExit(banner);
-			storage.set('hideBanner' + templateId, hideBanner, true);
-		})
-	})
-	cancelEls = doc.querySelectorAll('.branch-banner-close');
-	Array.prototype.forEach.call(cancelEls, function(el) {
-		el.addEventListener('click', function(e) {
-            	journeys_utils.branch._publishEvent('didClickJourneyClose', journeys_utils.journeyLinkData);
-            	journeys_utils.journeyDismissed = true;
-            	journeys_utils.animateBannerExit(banner);
-			storage.set('hideBanner' + templateId, hideBanner, true);
-		})
-	})
+			journeys_utils._handleJourneyDismiss(eventName, storage, banner, templateId, metadata, testModeEnabled);
+		});
+	});
+}
+
+journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, templateId, metadata, testModeEnabled) {
+	var hideBanner = !testModeEnabled
+		? journeys_utils.findDismissPeriod(metadata)
+		: 0;
+	journeys_utils.branch._publishEvent(eventName, journeys_utils.journeyLinkData);
+	journeys_utils.journeyDismissed = true;
+	journeys_utils.animateBannerExit(banner);
+	storage.set('hideBanner' + templateId, hideBanner, true);
+	if (metadata['dismissRedirect']) {
+		window.location = metadata['dismissRedirect'];
+	}
 }
 
 /***

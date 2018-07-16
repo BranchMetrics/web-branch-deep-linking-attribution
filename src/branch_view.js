@@ -129,9 +129,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 
 	if (html) {
 
-		var hideBanner = !testModeEnabled
-			? journeys_utils.findDismissPeriod(html)
-			: 0;
+		var metadata = journeys_utils.getMetadata(html) || {};
 
 		var timeoutTrigger = window.setTimeout(
 			function() {
@@ -147,7 +145,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 			}
 			cta = data;
 
-			journeys_utils.finalHookups(templateId, storage, cta, banner, hideBanner);
+			journeys_utils.finalHookups(templateId, storage, cta, banner, metadata, testModeEnabled);
 		};
 
 		banner = renderHtmlBlob(document.body, html, requestData['has_app_websdk']);
@@ -159,7 +157,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 			return;
 		}
 
-		journeys_utils.finalHookups(templateId, storage, cta, banner, hideBanner);
+		journeys_utils.finalHookups(templateId, storage, cta, banner, metadata, testModeEnabled);
 
 		if (utils.navigationTimingAPIEnabled) {
 			utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
