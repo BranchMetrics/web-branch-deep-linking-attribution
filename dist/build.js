@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.37.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.38.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2621,6 +2621,10 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
     session.update(b._storage, d);
     a(null);
   });
+});
+Branch.prototype.getBrowserFingerprintId = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  var b = session.get(this._storage, !0) || {};
+  a(null, b.browser_fingerprint_id || null);
 });
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   var e = this;
