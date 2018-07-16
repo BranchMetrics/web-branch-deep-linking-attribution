@@ -1,6 +1,6 @@
 {
 	"name": "branch-sdk",
-	"version": "2.37.0",
+	"version": "2.39.0",
 	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
 	"main": "dist/build.min.js",
 	"precommit": ["lint"],
@@ -35,5 +35,5 @@
 	"dependencies": {
 		"request": "^2.55.0"
 	},
-	"build": "2.37.0"
+	"build": "2.39.0"
 }

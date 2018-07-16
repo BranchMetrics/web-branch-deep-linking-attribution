@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.39.0] - 2018-07-16
+- Introduces a getBrowserFingerprintId() function which returns the current user's browser-fingerprint-id.
+
 ## [2.37.0] - 2018-06-27
 - Adds referring link to branchview data
 

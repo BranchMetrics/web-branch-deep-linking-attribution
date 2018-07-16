@@ -41,7 +41,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -78,6 +78,7 @@ ___
   + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
+  + [.getBrowserFingerprintId()](#getbrowserfingerprintidcallback)
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)
@@ -109,7 +110,7 @@ ___
   + [.trackCommerceEvent()](#trackcommerceeventevent-commerce_data-metadata-callback)
 
 9. User Privacy
-  + [.disableTracking()](#disableTrackingdisableTracking)
+  + [.disableTracking()](#disabletrackingdisabletracking)
 
 ___
 # Global
@@ -287,6 +288,30 @@ branch.logout(
 ```js
 callback(
      "Error message"
+);
+```
+___
+
+
+
+### getBrowserFingerprintId(callback) 
+
+**Parameters**
+
+**callback**: `function`, callback to read a user's browser-fingerprint-id
+
+Returns the current user's browser-fingerprint-id. If tracking is disabled then 'null' is returned.
+
+##### Usage
+```js
+branch.getBrowserFingerprintId(function(err, data) { console.log(data); });
+
+*
+##### Callback Format
+```js
+callback(
+     null,
+     '79336952217731267', // browser-fingerprint-id, stored in `localStorage`.
 );
 ```
 ___

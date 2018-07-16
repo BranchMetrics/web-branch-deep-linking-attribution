@@ -4,6 +4,7 @@
   + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
+  + [.getBrowserFingerprintId()](#getbrowserfingerprintidcallback)
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)
@@ -35,6 +36,6 @@
   + [.trackCommerceEvent()](#trackcommerceeventevent-commerce_data-metadata-callback)
 
 9. User Privacy
-  + [.disableTracking()](#disableTrackingdisableTracking)
+  + [.disableTracking()](#disabletrackingdisabletracking)
 
 ___
