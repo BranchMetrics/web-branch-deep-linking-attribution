@@ -498,6 +498,18 @@ journeys_utils.finalHookups = function(templateId, storage, cta, banner, metadat
 	journeys_utils._setupDismissBehavior('.branch-banner-close', 'didClickJourneyClose', storage, banner, templateId, metadata, testModeEnabled);
 }
 
+/**
+ * @function journeys_utils._setupDismissBehavior
+ * @param  {string} cssSelector
+ * @param  {string} eventName
+ * @param  {Object} storage
+ * @param  {Object} banner
+ * @param  {string} templateId
+ * @param  {Object} metadata
+ * @param  {boolean} testModeEnabled
+ *
+ * Attach callbacks for dismiss elements on journey
+ */
 journeys_utils._setupDismissBehavior = function(cssSelector, eventName, storage, banner, templateId, metadata, testModeEnabled) {
 	var cancelEls = doc.querySelectorAll(cssSelector);
 	Array.prototype.forEach.call(cancelEls, function(el) {
