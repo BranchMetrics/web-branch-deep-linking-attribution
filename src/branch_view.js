@@ -71,6 +71,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 		checkPreviousBanner() ||
 		!utils.mobileUserAgent()
 	) {
+		journeys_utils.branch._publishEvent('willNotShowJourney');
 		return false;
 	}
 
@@ -85,6 +86,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 	) {
 		// resets the callback index so that auto-open works the next time a Journey is rendered
 		branch_view.callback_index = 1;
+		journeys_utils.branch._publishEvent('willNotShowJourney');
 		return false;
 	}
 
