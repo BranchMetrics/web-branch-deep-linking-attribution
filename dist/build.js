@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.39.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.40.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -976,7 +976,7 @@ utils.navigationTimingAPIEnabled = function() {
   return !!(window.performance && window.performance.timing && window.performance.timing.navigationStart);
 };
 utils.timeSinceNavigationStart = function() {
-  return (Date.now() - window.performance.timing.navigationStart) / 1000;
+  return (Date.now() - window.performance.timing.navigationStart).toString();
 };
 utils.currentRequestBrttTag = "";
 utils.calculateBrtt = function(a) {
@@ -1754,7 +1754,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
 Server.prototype.request = function(a, b, c, d) {
   var e = this;
   utils.currentRequestBrttTag = a.endpoint + "-brtt";
-  ("/v1/url" === a.endpoint || "/v1/has-app" === a.endpoint) && 0 < Object.keys(utils.instrumentation).length && (delete utils.instrumentation["-brtt"], b.instrumentation = safejson.stringify(utils.merge({}, utils.instrumentation)), utils.instrumentation = {});
+  ("/v1/url" === a.endpoint || "/v1/has-app" === a.endpoint) && 1 < Object.keys(utils.instrumentation).length && (delete utils.instrumentation["-brtt"], b.instrumentation = safejson.stringify(utils.merge({}, utils.instrumentation)), utils.instrumentation = {});
   if (utils.userPreferences.trackingDisabled) {
     for (var f = ["browser_fingerprint_id", "alternative_browser_fingerprint_id", "identity_id", "session_id"], g = 0;g < f.length;g++) {
       b.hasOwnProperty(f[g]) && delete b[f[g]];
@@ -2494,6 +2494,7 @@ Branch.prototype._publishEvent = function(a, b) {
   }
 };
 Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c) {
+  utils.navigationTimingAPIEnabled && (utils.instrumentation["init-began-at"] = utils.timeSinceNavigationStart());
   var d = this;
   d.init_state = init_states.INIT_PENDING;
   utils.isKey(b) ? d.branch_key = b : d.app_id = b;
