@@ -28,7 +28,7 @@ utils.navigationTimingAPIEnabled = function() {
 };
 utils.timeSinceNavigationStart = function() {
 	// in milliseconds
-	return (Date.now() - window.performance.timing.navigationStart);
+	return (Date.now() - window.performance.timing.navigationStart).toString();
 };
 utils.currentRequestBrttTag = "";
 utils.calculateBrtt = function(startTime) {
