@@ -338,7 +338,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
 	utils.currentRequestBrttTag = resource.endpoint + '-brtt';
-	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 0) {
+	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];
 		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));
 		utils.instrumentation = {};
