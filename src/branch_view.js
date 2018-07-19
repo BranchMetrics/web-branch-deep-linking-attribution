@@ -95,7 +95,6 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 
 	if (
 		!eventResponse['branch_view_data']['id'] ||
-		isJourneyDismissed(eventResponse['branch_view_data'], journeys_utils.branch) ||
 		options['no_journeys'] ||
 		_areJourneysDismissedGlobally(journeys_utils.branch)
 	) {
