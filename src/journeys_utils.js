@@ -467,6 +467,20 @@ journeys_utils.findDismissPeriod = function(metadata) {
 		: banner_utils.getDate(dismissPeriod);
 }
 
+journeys_utils._addSecondsToDate(seconds) {
+	var currentDate = new Date();
+	return currentDate.setSeconds(currentDate.getSeconds() + seconds);
+}
+
+journeys_utils._findGlobalDismissPeriod = function(metadata) {
+	var globalDismissPeriod = metadata['globalDismissPeriod'];
+	if (typeof globalDismissPeriod === 'number') {
+		return globalDismissPeriod === -1
+			? true
+			: journeys_utils._addSecondsToDate(globalDismissPeriod);
+	}
+}
+
 /***
  * @function journeys_utils.finalHookups
  * @param {string} templateId
@@ -523,14 +537,24 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 	var hideBanner = !testModeEnabled
 		? journeys_utils.findDismissPeriod(metadata)
 		: 0;
+	var globalDismissPeriod = !testModeEnabled
+		? journeys_utils._findGlobalDismissPeriod(metadata)
+		: 0;
 	journeys_utils.branch._publishEvent(eventName, journeys_utils.journeyLinkData);
 	journeys_utils.journeyDismissed = true;
 	journeys_utils.animateBannerExit(banner);
 	storage.set('hideBanner' + templateId, hideBanner, true);
+	if (globalDismissPeriod !== undefined) {
+		storage.set('globalJourneysDismiss', globalDismissPeriod, true);
+	}
 	if (metadata['dismissRedirect']) {
 		window.location = metadata['dismissRedirect'];
 	}
 }
+
+// journeys_utils._setDismissData = function() {
+//
+// }
 
 /***
  * @function journeys_utils.animateBannerExit

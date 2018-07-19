@@ -66,6 +66,21 @@ function isJourneyDismissed(branchViewData, branch) {
 	return false;
 }
 
+/**
+ * Checks if a journey should show based on dismiss time
+ * @param       {Object} branch
+ * @return      {boolean}
+ */
+function _areJourneysDismissedGlobally(branch) {
+	var globalDismissEndTimestamp = branch._storage.get('globalJourneysDismiss', true);
+
+	if (globalDismissEndTimestamp === true || globalDismissEndTimestamp > Date.now()) {
+		return true;
+	}
+
+	return false;
+}
+
 branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
 	if (
 		checkPreviousBanner() ||
@@ -81,7 +96,8 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 	if (
 		!eventResponse['branch_view_data']['id'] ||
 		isJourneyDismissed(eventResponse['branch_view_data'], journeys_utils.branch) ||
-		options['no_journeys']
+		options['no_journeys'] ||
+		_areJourneysDismissedGlobally(journeys_utils.branch)
 	) {
 		// resets the callback index so that auto-open works the next time a Journey is rendered
 		branch_view.callback_index = 1;
