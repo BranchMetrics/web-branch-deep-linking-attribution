@@ -188,6 +188,9 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 		metadata = {};
 	}
 
+	journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
+	journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
+
 	// starts object off with data from setBranchViewData() call
 	var obj = branch._branchViewData || {};
 	var sessionStorage = session.get(branch._storage) || {};
