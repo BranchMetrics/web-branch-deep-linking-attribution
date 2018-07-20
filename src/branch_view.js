@@ -121,8 +121,9 @@ branch_view.incrementAnalytics = function(branchViewData) {
 	);
 };
 
-branch_view.displayJourney = function(html, requestData, templateId, eventData, testModeEnabled) {
+branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled) {
 	journeys_utils.branchViewId = templateId;
+	var audienceRuleId = branchViewData['audience_rule_id'];
 
 	// this code removes any leftover css from previous banner
 	var branchCSS = document.getElementById('branch-iframe-css')
@@ -160,7 +161,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 			}
 			cta = data;
 
-			journeys_utils.finalHookups(templateId, storage, cta, banner, metadata, testModeEnabled);
+			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled);
 		};
 
 		banner = renderHtmlBlob(document.body, html, requestData['has_app_websdk']);
@@ -172,7 +173,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 			return;
 		}
 
-		journeys_utils.finalHookups(templateId, storage, cta, banner, metadata, testModeEnabled);
+		journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled);
 
 		if (utils.navigationTimingAPIEnabled) {
 			utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
@@ -183,7 +184,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 	document.body.removeChild(placeholder);
 
 	if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
-		branch_view.incrementAnalytics(eventData['branch_view_data']);
+		branch_view.incrementAnalytics(branchViewData);
 	}
 };
 

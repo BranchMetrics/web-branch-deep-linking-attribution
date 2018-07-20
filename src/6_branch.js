@@ -458,7 +458,7 @@ Branch.prototype['init'] = wrap(
 									pageViewResponse['template'],
 									requestData,
 									requestData['branch_view_id'] || pageViewResponse['event_data']['branch_view_data']['id'],
-									pageViewResponse['event_data'],
+									pageViewResponse['event_data']['branch_view_data'],
 									journeyInTestMode
 								);
 							}
@@ -875,7 +875,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 							pageviewResponse['template'],
 							requestData,
 							requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
-							pageviewResponse['event_data'],
+							pageviewResponse['event_data']['branch_view_data'],
 							journeyInTestMode
 						);
 					}

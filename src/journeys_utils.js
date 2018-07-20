@@ -484,6 +484,7 @@ journeys_utils._findGlobalDismissPeriod = function(metadata) {
 /***
  * @function journeys_utils.finalHookups
  * @param {string} templateId
+ * @param {string} audienceRuleId
  * @param {Object} storage
  * @param {function()} cta
  * @param {Object} banner
@@ -491,7 +492,7 @@ journeys_utils._findGlobalDismissPeriod = function(metadata) {
  *
  * hooks up the call to action and dismiss buttons
  */
-journeys_utils.finalHookups = function(templateId, storage, cta, banner, metadata, testModeEnabled) {
+journeys_utils.finalHookups = function(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled) {
 
 	if(!cta || !banner) {
 		return;
@@ -508,8 +509,8 @@ journeys_utils.finalHookups = function(templateId, storage, cta, banner, metadat
             	journeys_utils.animateBannerExit(banner);
 		})
 	})
-	journeys_utils._setupDismissBehavior('.branch-banner-continue', 'didClickJourneyContinue', storage, banner, templateId, metadata, testModeEnabled);
-	journeys_utils._setupDismissBehavior('.branch-banner-close', 'didClickJourneyClose', storage, banner, templateId, metadata, testModeEnabled);
+	journeys_utils._setupDismissBehavior('.branch-banner-continue', 'didClickJourneyContinue', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled);
+	journeys_utils._setupDismissBehavior('.branch-banner-close', 'didClickJourneyClose', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled);
 }
 
 /**
@@ -524,16 +525,25 @@ journeys_utils.finalHookups = function(templateId, storage, cta, banner, metadat
  *
  * Attach callbacks for dismiss elements on journey
  */
-journeys_utils._setupDismissBehavior = function(cssSelector, eventName, storage, banner, templateId, metadata, testModeEnabled) {
+journeys_utils._setupDismissBehavior = function(cssSelector, eventName, storage, banner, templateId, audienceRuleId, metadata, testModeEnabled) {
 	var cancelEls = doc.querySelectorAll(cssSelector);
 	Array.prototype.forEach.call(cancelEls, function(el) {
 		el.addEventListener('click', function(e) {
-			journeys_utils._handleJourneyDismiss(eventName, storage, banner, templateId, metadata, testModeEnabled);
+			journeys_utils._handleJourneyDismiss(eventName, storage, banner, templateId, audienceRuleId, metadata, testModeEnabled);
 		});
 	});
 }
 
-journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, templateId, metadata, testModeEnabled) {
+journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId) {
+	var journeyDismissals = storage.get('journeyDismissals', true) || {};
+	journeyDismissals['audienceRuleId'] = {
+		view_id: templateId,
+		dismiss_time: Date.now()
+	};
+	storage.set('journeyDismissals', journeyDismissals, true);
+}
+
+journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, templateId, audienceRuleId, metadata, testModeEnabled) {
 	var hideBanner = !testModeEnabled
 		? journeys_utils.findDismissPeriod(metadata)
 		: 0;
@@ -547,14 +557,11 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 	if (globalDismissPeriod !== undefined) {
 		storage.set('globalJourneysDismiss', globalDismissPeriod, true);
 	}
+	journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
 	if (metadata['dismissRedirect']) {
 		window.location = metadata['dismissRedirect'];
 	}
 }
-
-// journeys_utils._setDismissData = function() {
-//
-// }
 
 /***
  * @function journeys_utils.animateBannerExit
