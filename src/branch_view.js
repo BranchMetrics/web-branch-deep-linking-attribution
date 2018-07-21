@@ -53,19 +53,6 @@ function renderHtmlBlob(parent, html, hasApp) {
 	return iframe;
 };
 
-// checks to see if user dismissed Journey previously and whether it should remain dismissed
-function isJourneyDismissed(branchViewData, branch) {
-	// check storage to see dismiss timestamp
-	var dismissTimeStamp = branch._storage.get('hideBanner' + branchViewData["id"], true);
-
-	if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
-		return true;
-	}
-
-	branch._storage.remove('hideBanner' + branchViewData["id"], true);
-	return false;
-}
-
 /**
  * Checks if a journey should show based on dismiss time
  * @param       {Object} branch
@@ -78,6 +65,7 @@ function _areJourneysDismissedGlobally(branch) {
 		return true;
 	}
 
+	branch._storage.remove('globalJourneysDismiss', true);
 	return false;
 }
 
@@ -204,6 +192,7 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	var obj = branch._branchViewData || {};
 	var sessionStorage = session.get(branch._storage) || {};
 	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
+	var journeyDismissals = branch._storage.get('journeyDismissals', true);
 	var userLanguage = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase() || null;
 	var initialReferrer = utils.getInitialReferrer(branch._referringLink());
 	var branchViewId = options['branch_view_id'] || utils.getParameterByName('_branch_view_id') || null;
@@ -218,6 +207,7 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	obj = utils.addPropertyIfNotNull(obj, 'branch_view_id', branchViewId);
 	obj = utils.addPropertyIfNotNull(obj, 'no_journeys', options['no_journeys']);
 	obj = utils.addPropertyIfNotNull(obj, 'is_iframe', utils.isIframe());
+	obj = utils.addPropertyIfNotNull(obj, 'journey_dismissals', journeyDismissals);
 	obj['user_language'] = userLanguage;
 	obj['open_app'] = options['open_app'] || false;
 	obj['has_app_websdk'] = has_app;

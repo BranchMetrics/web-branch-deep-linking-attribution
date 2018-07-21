@@ -365,7 +365,16 @@ resources.pageview = {
 		"data": validator(false, validationTypes.OBJECT),
 		"callback_string": validator(false, validationTypes.STRING),
 		"journey_displayed": validator(false, validationTypes.BOOLEAN),
-		"audience_rule_id": validator(false, validationTypes.STRING)
+		"audience_rule_id": validator(false, validationTypes.STRING),
+		"journey_dismissals": validator(false, validationTypes.OBJECT)
 	})
 };
 
+resources.dismiss = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/dismiss",
+	method: utils.httpMethod.POST,
+	params: defaults({
+		"journey_dismissals": validator(false, validationTypes.OBJECT)
+	})
+};
