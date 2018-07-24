@@ -119,7 +119,7 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	var d = { };
-	if (typeof resource.params !== 'undefined') {
+	if (typeof resource.params !== 'undefined' && resource.endpoint !== '/v1/pageview') {
 		for (k in resource.params) {
 			if (resource.params.hasOwnProperty(k)) {
 				err = resource.params[k](resource.endpoint, k, data[k]);
@@ -135,6 +135,11 @@ Server.prototype.getUrl = function(resource, data) {
 				}
 			}
 		}
+	}
+	else if (resource.endpoint === '/v1/pageview') {
+		// /v1/pageview requires custom keys to be available in the post body due
+		// to .setBranchViewData() call so the logic above won't work
+		utils.merge(d, data);
 	}
 
 	if (resource.method === 'POST' || resource.endpoint === '/v1/credithistory') {
@@ -152,6 +157,12 @@ Server.prototype.getUrl = function(resource, data) {
 		d['metadata'] = safejson.stringify(d['metadata'] || {});
 		if (d.hasOwnProperty('commerce_data')) {
 			d['commerce_data'] = safejson.stringify(d['commerce_data'] || {});
+		}
+	}
+
+	if (resource.endpoint === '/v1/pageview') {
+		if (d['metadata']) {
+			d['metadata'] = safejson.stringify(d['metadata'] || {});
 		}
 	}
 
@@ -337,7 +348,15 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
  */
 Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
-	utils.currentRequestBrttTag = resource.endpoint + '-brtt';
+
+	if (resource.endpoint === "/v1/pageview" && data && data['journey_displayed']) {
+		// special case for pageview endpoint
+		utils.currentRequestBrttTag = resource.endpoint + '-1-brtt';
+	}
+	else {
+		utils.currentRequestBrttTag = resource.endpoint + '-brtt';
+	}
+
 	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];
 		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));

@@ -342,7 +342,7 @@ describe('Branch', function() {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err, data) {
-				assert.strictEqual(requests.length, 3, 'three requests made');
+				assert.strictEqual(requests.length, 2, 'two requests made');
 				assert.deepEqual(
 					requests[0].resource.endpoint,
 					'/_r',
@@ -1037,10 +1037,10 @@ describe('Branch', function() {
 
 			// check starting with 4th call since first four are called by openGraphDataAsObject
 			sinon.stub(utils, 'getOpenGraphContent')
-				.onCall(4).returns(ogTitle)
-				.onCall(5).returns(ogDescription)
-				.onCall(6).returns(ogImage)
-				.onCall(7).returns(ogVideo);
+				.onCall(8).returns(ogTitle)
+				.onCall(9).returns(ogDescription)
+				.onCall(10).returns(ogImage)
+				.onCall(11).returns(ogVideo);
 
 			branch = initBranch(true);
 			requests = [];
@@ -1079,7 +1079,6 @@ describe('Branch', function() {
 
 			assert.strictEqual(requests.length, 1, 'exactly one request made');
 			requests[0].callback();
-
 			var obj = requests[0].obj;
 
 			assert.strictEqual(obj.data, dataString, 'data is sent');
@@ -1568,7 +1567,7 @@ describe('Branch', function() {
 	describe('disableTracking() tests', function() {
 		it('Flow with branch.init(), branch.disableTracking(true), branch.disableTracking(false)', function(done) {
 			var branch = initBranch(false);
-			var assert = testUtils.plan(9, done);
+			var assert = testUtils.plan(6, done);
 			branch.init(branch_sample_key, function(err, data) {
 				assert.strictEqual(err, null, 'No error');
 			});
@@ -1583,12 +1582,10 @@ describe('Branch', function() {
 			requests[2].callback(null, {});
 
 			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual("false", sessionStorage.getItem('BRANCH_WEBSDK_KEYbranch_view_enabled'), 'branch_view_enabled is false in session storage');
 			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
 
 			branch.disableTracking(true);
 			assert.strictEqual("{}", sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual(null, sessionStorage.getItem('BRANCH_WEBSDK_KEYbranch_view_enabled'), 'branch_view_enabled should not be in session storage');
 			assert.strictEqual("{}", localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
 
 			branch.disableTracking(false);
@@ -1602,7 +1599,6 @@ describe('Branch', function() {
 			);
 			requests[5].callback(null, {});
 			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual("false", sessionStorage.getItem('BRANCH_WEBSDK_KEYbranch_view_enabled'), 'branch_view_enabled is false in session storage');
 			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
 		});
 	});

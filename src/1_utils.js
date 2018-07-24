@@ -42,8 +42,7 @@ utils.userPreferences = {
 	trackingDisabled: false,
 	whiteListedEndpointsWithData: {
 		'/v1/open': { 'link_identifier':'\\d+' },
-		'/v1/event': { 'event': 'pageview' },
-		'/v1/branchview': {}
+		'/v1/pageview': { 'event': 'pageview' }
 	},
 	allowErrorsInCallback: false,
 	shouldBlockRequest: function(url, requestData) {
@@ -1068,3 +1067,4 @@ utils.addNonceAttribute = function(element) {
 		element.setAttribute('nonce', utils.nonce);
 	}
 };
+
