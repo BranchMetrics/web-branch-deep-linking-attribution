@@ -350,7 +350,6 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
-		var url = options && options.url || utils.getWindowLocation();
 		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
@@ -418,6 +417,16 @@ Branch.prototype['init'] = wrap(
 				return done(err, data && utils.whiteListSessionData(data));
 			}
 
+			try {
+				done(err, data && utils.whiteListSessionData(data));
+			}
+			catch (e) {
+				// pass
+			}
+			finally {
+				self['renderFinalize']();
+			}
+
 			var additionalMetadata = utils.getAdditionalMetadata();
 			var metadata = utils.validateParameterType(options['metadata'], "object") ? options['metadata'] : null;
 			if (metadata) {
@@ -426,36 +435,40 @@ Branch.prototype['init'] = wrap(
 					additionalMetadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 				}
 			}
-
-			self._api(resources.event, {
-				"event": 'pageview',
-				"metadata": utils.merge({
-					"url": url,
-					"user_agent": navigator.userAgent,
-					"language": navigator.language,
-					"screen_width": screen.width || -1,
-					"screen_height": screen.height || -1
-				}, additionalMetadata || {}),
-				"initial_referrer": utils.getInitialReferrer(self._referringLink())
-			}, function(err, eventData) {
-				if (!err && typeof eventData === 'object') {
-					branch_view.initJourney(branch_key, data, eventData, options, self);
-				}
-				try {
-					done(err, data && utils.whiteListSessionData(data));
-					if (utils.userPreferences.trackingDisabled) {
-						utils.userPreferences.allowErrorsInCallback = true;
+			var requestData = branch_view.buildJourneyRequestData(
+				branch_view.getMetadataForPageviewEvent(options, additionalMetadata),
+				options,
+				self
+			);
+			self['renderQueue'](function() {
+				self._api(
+					resources.pageview,
+					requestData,
+					function(err, pageViewResponse) {
+						if (!err && typeof pageViewResponse === "object" && pageViewResponse['template']) {
+							var journeyInTestMode = requestData['branch_view_id'] ? true : false;
+							if (branch_view.shouldDisplayJourney(
+									pageViewResponse['event_data'],
+									options,
+									journeyInTestMode
+								)
+							) {
+								branch_view.displayJourney(
+									pageViewResponse['template'],
+									requestData,
+									requestData['branch_view_id'] || pageViewResponse['event_data']['branch_view_data']['id'],
+									pageViewResponse['event_data'],
+									journeyInTestMode
+								);
+							}
+						}
+						if (utils.userPreferences.trackingDisabled) {
+							utils.userPreferences.allowErrorsInCallback = true;
+						}
 					}
-				}
-				catch (e) {
-					// pass
-				}
-				finally {
-					self['renderFinalize']();
-				}
+				);
 			});
 		};
-
 		var attachVisibilityEvent = function() {
 			var hidden;
 			var changeEvent;
@@ -838,24 +851,56 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
 			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 		}
-	}
 
-	self._api(resources.event, {
-		"event": event,
-		"metadata": utils.merge({
-			"url": utils.getWindowLocation(),
-			"user_agent": navigator.userAgent,
-			"language": navigator.language
-		}, metadata),
-		"initial_referrer": utils.getInitialReferrer(self._referringLink())
-	}, function(err, data) {
-		if (!err && typeof data === 'object' && event === 'pageview') {
-			branch_view.initJourney(self.branch_key, session.get(self._storage), data, options, self);
-		}
-		if (typeof done === 'function') {
-			done.apply(this, arguments);
-		}
-	});
+		var requestData = branch_view.buildJourneyRequestData(
+			branch_view.getMetadataForPageviewEvent(options, metadata),
+			options,
+			self
+		);
+
+		self._api(resources.pageview,
+			requestData,
+			function(err, pageviewResponse) {
+				if (!err && typeof pageviewResponse === "object" && pageviewResponse['template']) {
+					var journeyInTestMode = requestData['branch_view_id'] ? true : false;
+					if (branch_view.shouldDisplayJourney
+						(
+							pageviewResponse['event_data'],
+							options,
+							journeyInTestMode
+						)
+					) {
+						branch_view.displayJourney(
+							pageviewResponse['template'],
+							requestData,
+							requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
+							pageviewResponse['event_data'],
+							journeyInTestMode
+						);
+					}
+				}
+				if (typeof done === 'function') {
+					done.apply(this, arguments);
+				}
+			}
+		);
+
+	}
+	else {
+		self._api(resources.event, {
+			"event": event,
+			"metadata": utils.merge({
+				"url": utils.getWindowLocation(),
+				"user_agent": navigator.userAgent,
+				"language": navigator.language
+			}, metadata),
+			"initial_referrer": utils.getInitialReferrer(self._referringLink())
+		}, function(err, data) {
+			if (typeof done === 'function') {
+				done.apply(this, arguments);
+			}
+		});
+	}
 });
 
 /**
