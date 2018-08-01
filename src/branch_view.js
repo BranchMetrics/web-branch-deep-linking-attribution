@@ -67,11 +67,11 @@ function isJourneyDismissed(branchViewData, branch) {
 }
 
 branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
-	if (
-		checkPreviousBanner() ||
-		!utils.mobileUserAgent()
+	if (  checkPreviousBanner() ||
+		!utils.mobileUserAgent() ||
+		!eventResponse['event_data'] ||
+		!eventResponse['template']
 	) {
-		journeys_utils.branch._publishEvent('willNotShowJourney');
 		return false;
 	}
 
@@ -80,16 +80,14 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 	}
 
 	if (
-		!eventResponse['branch_view_data']['id'] ||
-		isJourneyDismissed(eventResponse['branch_view_data'], journeys_utils.branch) ||
+		!eventResponse['event_data']['branch_view_data']['id'] ||
+		isJourneyDismissed(eventResponse['event_data']['branch_view_data'], journeys_utils.branch) ||
 		options['no_journeys']
 	) {
 		// resets the callback index so that auto-open works the next time a Journey is rendered
 		branch_view.callback_index = 1;
-		journeys_utils.branch._publishEvent('willNotShowJourney');
 		return false;
 	}
-
 	return true;
 };
 
