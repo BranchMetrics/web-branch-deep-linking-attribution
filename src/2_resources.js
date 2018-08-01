@@ -375,6 +375,12 @@ resources.dismiss = {
 	endpoint: "/v1/dismiss",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"journey_dismissals": validator(false, validationTypes.OBJECT)
+		"callback_string": validator(false, validationTypes.STRING),
+		"data": validator(false, validationTypes.STRING),
+		"initial_referrer": validator(false, validationTypes.STRING),
+		"journey_dismissals": validator(false, validationTypes.STRING),
+		"metadata": validator(false, validationTypes.OBJECT),
+		"tracking_disabled": validator(false, validationTypes.BOOLEAN),
+		"user_language": validator(false, validationTypes.STRING)
 	})
 };

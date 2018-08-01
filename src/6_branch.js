@@ -436,8 +436,8 @@ Branch.prototype['init'] = wrap(
 					additionalMetadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 				}
 			}
-			var requestData = branch_view.buildJourneyRequestData(
-				branch_view.getMetadataForPageviewEvent(options, additionalMetadata),
+			var requestData = branch_view._buildJourneyRequestData(
+				journeys_utils._getMetadataForPageviewEvent(options, additionalMetadata),
 				options,
 				self
 			);
@@ -853,8 +853,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 		}
 
-		var requestData = branch_view.buildJourneyRequestData(
-			branch_view.getMetadataForPageviewEvent(options, metadata),
+		var requestData = branch_view._buildJourneyRequestData(
+			journeys_utils._getMetadataForPageviewEvent(options, metadata),
 			options,
 			self
 		);

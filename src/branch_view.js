@@ -5,8 +5,6 @@ goog.require('banner_css');
 goog.require('safejson');
 goog.require('journeys_utils');
 
-branch_view.callback_index = 1;
-
 function checkPreviousBanner() {
 	// if banner already exists, don't add another
 	if (document.getElementById('branch-banner') ||
@@ -83,7 +81,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 
 	if (
 		!eventResponse['branch_view_data']['id'] ||
-		options['no_journeys'] ||
+		(options && options['no_journeys']) ||
 		_areJourneysDismissedGlobally(journeys_utils.branch)
 	) {
 		// resets the callback index so that auto-open works the next time a Journey is rendered
@@ -149,7 +147,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 			}
 			cta = data;
 
-			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled);
+			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
 		};
 
 		banner = renderHtmlBlob(document.body, html, requestData['has_app_websdk']);
@@ -161,7 +159,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 			return;
 		}
 
-		journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled);
+		journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
 
 		if (utils.navigationTimingAPIEnabled) {
 			utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
@@ -176,7 +174,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	}
 };
 
-branch_view.buildJourneyRequestData = function(metadata, options, branch) {
+branch_view._buildJourneyRequestData = function(metadata, options, branch) {
 
 	journeys_utils.branch = branch;
 
@@ -212,7 +210,7 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	obj['open_app'] = options['open_app'] || false;
 	obj['has_app_websdk'] = has_app;
 	obj['feature'] = 'journeys';
-	obj['callback_string'] = 'branch_view_callback__' + (branch_view.callback_index++);
+	obj['callback_string'] = 'branch_view_callback__' + (journeys_utils._callback_index++);
 
 	if (!obj.data) {
 		obj.data = {};
@@ -226,14 +224,4 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	}
 	obj = utils.cleanLinkData(obj);
 	return obj;
-};
-
-branch_view.getMetadataForPageviewEvent = function(options, additionalMetadata) {
-	return utils.merge({
-		"url": options && options.url || utils.getWindowLocation(),
-		"user_agent": navigator.userAgent,
-		"language": navigator.language,
-		"screen_width": screen.width || -1,
-		"screen_height": screen.height || -1
-	}, additionalMetadata || {});
 };
