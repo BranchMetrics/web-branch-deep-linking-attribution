@@ -583,7 +583,7 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 				if (!err && typeof data === "object" && data['template']) {
 					if (branch_view.shouldDisplayJourney
 						(
-							data['event_data'],
+							data,
 							null,
 							false
 						)

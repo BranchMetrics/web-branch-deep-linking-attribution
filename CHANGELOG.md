@@ -4,6 +4,15 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.41.0] - 2018-07-26
+- Refactored Journeys to improve performance.
+
+## [2.40.0] - 2018-07-18
+- Introduces "init-began-at" metric within instrumentation object.
+
+## [2.39.0] - 2018-07-16
+- Introduces a getBrowserFingerprintId() function which returns the current user's browser-fingerprint-id.
+
 ## [2.37.0] - 2018-06-27
 - Adds referring link to branchview data
 

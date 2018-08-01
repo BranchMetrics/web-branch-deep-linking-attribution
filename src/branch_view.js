@@ -68,9 +68,10 @@ function _areJourneysDismissedGlobally(branch) {
 }
 
 branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
-	if (
-		checkPreviousBanner() ||
-		!utils.mobileUserAgent()
+	if (	checkPreviousBanner() ||
+		!utils.mobileUserAgent() ||
+		!eventResponse['event_data'] ||
+		!eventResponse['template']
 	) {
 		return false;
 	}
@@ -80,7 +81,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 	}
 
 	if (
-		!eventResponse['branch_view_data']['id'] ||
+		!eventResponse['event_data']['branch_view_data']['id'] ||
 		(options && options['no_journeys']) ||
 		_areJourneysDismissedGlobally(journeys_utils.branch)
 	) {
@@ -88,7 +89,6 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 		branch_view.callback_index = 1;
 		return false;
 	}
-
 	return true;
 };
 
@@ -185,6 +185,9 @@ branch_view._buildJourneyRequestData = function(metadata, options, branch) {
 	if (!metadata) {
 		metadata = {};
 	}
+
+	journeys_utils.entryAnimationDisabled = options['disable_entry_animation'] || false;
+	journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 
 	// starts object off with data from setBranchViewData() call
 	var obj = branch._branchViewData || {};

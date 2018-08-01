@@ -357,7 +357,6 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		utils.currentRequestBrttTag = resource.endpoint + '-brtt';
 	}
 
-	// appends instrumentation object to /v1/url or /v1/has-app request
 	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];
 		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));

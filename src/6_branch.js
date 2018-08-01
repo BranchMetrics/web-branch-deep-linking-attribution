@@ -350,7 +350,6 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
-		var url = options && options.url || utils.getWindowLocation();
 		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
@@ -445,22 +444,25 @@ Branch.prototype['init'] = wrap(
 				self._api(
 					resources.pageview,
 					requestData,
-					function(err, pageViewResponse) {
-						if (!err && typeof pageViewResponse === "object" && pageViewResponse['template']) {
+					function(err, pageviewResponse) {
+						if (!err && typeof pageviewResponse === "object") {
 							var journeyInTestMode = requestData['branch_view_id'] ? true : false;
 							if (branch_view.shouldDisplayJourney(
-									pageViewResponse['event_data'],
+									pageviewResponse,
 									options,
 									journeyInTestMode
 								)
 							) {
 								branch_view.displayJourney(
-									pageViewResponse['template'],
+									pageviewResponse['template'],
 									requestData,
-									requestData['branch_view_id'] || pageViewResponse['event_data']['branch_view_data']['id'],
-									pageViewResponse['event_data']['branch_view_data'],
+									requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
+									pageviewResponse['event_data']['branch_view_data'],
 									journeyInTestMode
 								);
+							}
+							else {
+								journeys_utils.branch._publishEvent('willNotShowJourney');
 							}
 						}
 						if (utils.userPreferences.trackingDisabled) {
@@ -858,15 +860,14 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			options,
 			self
 		);
-
 		self._api(resources.pageview,
 			requestData,
 			function(err, pageviewResponse) {
-				if (!err && typeof pageviewResponse === "object" && pageviewResponse['template']) {
+				if (!err && typeof pageviewResponse === "object") {
 					var journeyInTestMode = requestData['branch_view_id'] ? true : false;
 					if (branch_view.shouldDisplayJourney
 						(
-							pageviewResponse['event_data'],
+							pageviewResponse,
 							options,
 							journeyInTestMode
 						)
@@ -878,6 +879,9 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 							pageviewResponse['event_data']['branch_view_data'],
 							journeyInTestMode
 						);
+					}
+					else {
+						journeys_utils.branch._publishEvent('willNotShowJourney');
 					}
 				}
 				if (typeof done === 'function') {
