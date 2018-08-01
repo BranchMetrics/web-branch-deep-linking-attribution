@@ -67,7 +67,7 @@ function isJourneyDismissed(branchViewData, branch) {
 }
 
 branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
-	if (  checkPreviousBanner() ||
+	if (	checkPreviousBanner() ||
 		!utils.mobileUserAgent() ||
 		!eventResponse['event_data'] ||
 		!eventResponse['template']
