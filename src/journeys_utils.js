@@ -540,8 +540,8 @@ journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId
 	var journeyDismissals = storage.get('journeyDismissals', true);
 	journeyDismissals = journeyDismissals ? safejson.parse(journeyDismissals) : {};
 	journeyDismissals[audienceRuleId] = {
-		view_id: templateId,
-		dismiss_time: Date.now()
+		"view_id": templateId,
+		"dismiss_time": Date.now()
 	};
 	storage.set('journeyDismissals', safejson.stringify(journeyDismissals), true);
 	return journeyDismissals;
