@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.42.0] - 2018-08-07
+- Bug fix for publishing willNotShowJourney
+
 ## [2.41.0] - 2018-07-26
 - Refactored Journeys to improve performance.
 

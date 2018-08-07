@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.41.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.42.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2305,7 +2305,7 @@ function isJourneyDismissed(a, b) {
   return !1;
 }
 branch_view.shouldDisplayJourney = function(a, b, c) {
-  return checkPreviousBanner() || !utils.mobileUserAgent() ? (journeys_utils.branch._publishEvent("willNotShowJourney"), !1) : c ? !0 : !a.branch_view_data.id || isJourneyDismissed(a.branch_view_data, journeys_utils.branch) || b.no_journeys ? (branch_view.callback_index = 1, journeys_utils.branch._publishEvent("willNotShowJourney"), !1) : !0;
+  return !checkPreviousBanner() && utils.mobileUserAgent() && a.event_data && a.template ? c ? !0 : !a.event_data.branch_view_data.id || isJourneyDismissed(a.event_data.branch_view_data, journeys_utils.branch) || b.no_journeys ? (branch_view.callback_index = 1, !1) : !0 : !1;
 };
 branch_view.incrementAnalytics = function(a) {
   journeys_utils.branch._api(resources.pageview, {event:"pageview", journey_displayed:!0, audience_rule_id:a.audience_rule_id, branch_view_id:a.branch_view_id}, function(a, c) {
@@ -2542,9 +2542,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     var n = branch_view.buildJourneyRequestData(branch_view.getMetadataForPageviewEvent(c, g), c, d);
     d.renderQueue(function() {
       d._api(resources.pageview, n, function(a, b) {
-        if (!a && "object" === typeof b && b.template) {
+        if (!a && "object" === typeof b) {
           var d = n.branch_view_id ? !0 : !1;
-          branch_view.shouldDisplayJourney(b.event_data, c, d) && branch_view.displayJourney(b.template, n, n.branch_view_id || b.event_data.branch_view_data.id, b.event_data, d);
+          branch_view.shouldDisplayJourney(b, c, d) ? branch_view.displayJourney(b.template, n, n.branch_view_id || b.event_data.branch_view_data.id, b.event_data, d) : journeys_utils.branch._publishEvent("willNotShowJourney");
         }
         utils.userPreferences.trackingDisabled && (utils.userPreferences.allowErrorsInCallback = !0);
       });
@@ -2639,9 +2639,9 @@ Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d)
     (b = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), c)) && 0 < Object.keys(b).length && (c.hosted_deeplink_data = b);
     var e = branch_view.buildJourneyRequestData(branch_view.getMetadataForPageviewEvent(d, c), d, this);
     this._api(resources.pageview, e, function(b, c) {
-      if (!b && "object" === typeof c && c.template) {
+      if (!b && "object" === typeof c) {
         var f = e.branch_view_id ? !0 : !1;
-        branch_view.shouldDisplayJourney(c.event_data, d, f) && branch_view.displayJourney(c.template, e, e.branch_view_id || c.event_data.branch_view_data.id, c.event_data, f);
+        branch_view.shouldDisplayJourney(c, d, f) ? branch_view.displayJourney(c.template, e, e.branch_view_id || c.event_data.branch_view_data.id, c.event_data, f) : journeys_utils.branch._publishEvent("willNotShowJourney");
       }
       "function" === typeof a && a.apply(this, arguments);
     });
