@@ -449,26 +449,6 @@ journeys_utils.animateBannerEntrance = function(banner) {
 	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
 }
 
-/***
- * @function journeys_utils.findDismissPeriod
- * @param {Object} metadata
- *
- * Checks template metadata to determine how long to not show banner when dismissed
- */
-journeys_utils.findDismissPeriod = function(metadata) {
-	// default dismiss period to 1 week
-	var dismissPeriod = 7;
-
-	if (typeof metadata['dismissPeriod'] === 'number') {
-		dismissPeriod = metadata['dismissPeriod'];
-	}
-
-	// dismissPeriod of -1 dismisses banner forever
-	return dismissPeriod === -1
-		? true
-		: banner_utils.getDate(dismissPeriod);
-}
-
 journeys_utils._addSecondsToDate = function(seconds) {
 	var currentDate = new Date();
 	return currentDate.setSeconds(currentDate.getSeconds() + seconds);
