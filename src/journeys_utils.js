@@ -555,30 +555,34 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 	if (metadata['dismissRedirect']) {
 		window.location = metadata['dismissRedirect'];
 	} else {
-		var requestData = journeys_utils._getDismissObject(branch_view);
-		journeys_utils.branch._api(
-			resources.dismiss,
-			requestData,
-			function (err, data) {
-				if (!err && typeof data === "object" && data['template']) {
-					if (branch_view.shouldDisplayJourney
-						(
-							data,
-							null,
-							false
-						)
-					) {
-						branch_view.displayJourney(
-							data['template'],
-							requestData,
-							requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
-							data['event_data']['branch_view_data'],
-							false
-						);
+		var listener = function() {
+			journeys_utils.branch.removeListener(listener);
+			var requestData = journeys_utils._getDismissObject(branch_view);
+			journeys_utils.branch._api(
+				resources.dismiss,
+				requestData,
+				function (err, data) {
+					if (!err && typeof data === "object" && data['template']) {
+						if (branch_view.shouldDisplayJourney
+							(
+								data,
+								null,
+								false
+							)
+						) {
+							branch_view.displayJourney(
+								data['template'],
+								requestData,
+								requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
+								data['event_data']['branch_view_data'],
+								false
+							);
+						}
 					}
 				}
-			}
-		);
+			);
+		};
+		journeys_utils.branch.addListener('branch_internal_event_didCloseJourney', listener);
 	}
 }
 
@@ -595,8 +599,9 @@ journeys_utils._getMetadataForPageviewEvent = function(options, additionalMetada
 /***
  * @function journeys_utils.animateBannerExit
  * @param {Object} banner
+ * @param {boolean=} dismissedJourneyProgrammatically
  */
-journeys_utils.animateBannerExit = function(banner) {
+journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatically) {
 	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
@@ -653,6 +658,9 @@ journeys_utils.animateBannerExit = function(banner) {
 		banner_utils.removeClass(document.body, 'branch-banner-no-scroll');
 
         	journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
+        	if (!dismissedJourneyProgrammatically) {
+			journeys_utils.branch._publishEvent('branch_internal_event_didCloseJourney', journeys_utils.journeyLinkData);
+		}
         	journeys_utils.isJourneyDisplayed = false;
 	}, speedAndDelay);
 }
