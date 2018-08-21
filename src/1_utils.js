@@ -42,7 +42,8 @@ utils.userPreferences = {
 	trackingDisabled: false,
 	whiteListedEndpointsWithData: {
 		'/v1/open': { 'link_identifier':'\\d+' },
-		'/v1/pageview': { 'event': 'pageview' }
+		'/v1/pageview': { 'event': 'pageview' },
+		'/v1/dismiss': {}
 	},
 	allowErrorsInCallback: false,
 	shouldBlockRequest: function(url, requestData) {

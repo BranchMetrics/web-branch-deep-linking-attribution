@@ -119,7 +119,7 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	var d = { };
-	if (typeof resource.params !== 'undefined' && resource.endpoint !== '/v1/pageview') {
+	if (typeof resource.params !== 'undefined' && resource.endpoint !== '/v1/pageview' && resource.endpoint !== '/v1/dismiss') {
 		for (k in resource.params) {
 			if (resource.params.hasOwnProperty(k)) {
 				err = resource.params[k](resource.endpoint, k, data[k]);
@@ -136,8 +136,8 @@ Server.prototype.getUrl = function(resource, data) {
 			}
 		}
 	}
-	else if (resource.endpoint === '/v1/pageview') {
-		// /v1/pageview requires custom keys to be available in the post body due
+	else if (resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss') {
+		// /v1/pageview and v1/dismiss require custom keys to be available in the post body due
 		// to .setBranchViewData() call so the logic above won't work
 		utils.merge(d, data);
 	}
@@ -160,7 +160,7 @@ Server.prototype.getUrl = function(resource, data) {
 		}
 	}
 
-	if (resource.endpoint === '/v1/pageview') {
+	if (resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss') {
 		if (d['metadata']) {
 			d['metadata'] = safejson.stringify(d['metadata'] || {});
 		}

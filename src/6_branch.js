@@ -435,10 +435,11 @@ Branch.prototype['init'] = wrap(
 					additionalMetadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 				}
 			}
-			var requestData = branch_view._buildJourneyRequestData(
-				journeys_utils._getMetadataForPageviewEvent(options, additionalMetadata),
+			var requestData = branch_view._getPageviewRequestData(
+				journeys_utils._getPageviewMetadata(options, additionalMetadata),
 				options,
-				self
+				self,
+				false
 			);
 			self['renderQueue'](function() {
 				self._api(
@@ -855,10 +856,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 		}
 
-		var requestData = branch_view._buildJourneyRequestData(
-			journeys_utils._getMetadataForPageviewEvent(options, metadata),
+		var requestData = branch_view._getPageviewRequestData(
+			journeys_utils._getPageviewMetadata(options, metadata),
 			options,
-			self
+			self,
+			false
 		);
 		self._api(resources.pageview,
 			requestData,

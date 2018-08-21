@@ -375,12 +375,23 @@ resources.dismiss = {
 	endpoint: "/v1/dismiss",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"callback_string": validator(false, validationTypes.STRING),
-		"data": validator(false, validationTypes.STRING),
-		"initial_referrer": validator(false, validationTypes.STRING),
-		"journey_dismissals": validator(false, validationTypes.STRING),
+		"event": validator(true, validationTypes.STRING),
 		"metadata": validator(false, validationTypes.OBJECT),
+		"initial_referrer": validator(false, validationTypes.STRING),
 		"tracking_disabled": validator(false, validationTypes.BOOLEAN),
-		"user_language": validator(false, validationTypes.STRING)
+		"branch_view_id": validator(false, validationTypes.STRING),
+		"no_journeys": validator(false, validationTypes.BOOLEAN),
+		"user_language": validator(false, validationTypes.STRING),
+		"open_app": validator(false, validationTypes.BOOLEAN),
+		"has_app_websdk": validator(false, validationTypes.BOOLEAN),
+		"source": validator(false, validationTypes.STRING),
+		"feature": validator(false, validationTypes.STRING),
+		"is_iframe": validator(false, validationTypes.BOOLEAN),
+		"data": validator(false, validationTypes.OBJECT),
+		"callback_string": validator(false, validationTypes.STRING),
+		"journey_displayed": validator(false, validationTypes.BOOLEAN),
+		"audience_rule_id": validator(false, validationTypes.STRING),
+		"journey_dismissals": validator(false, validationTypes.OBJECT)
 	})
 };
+
