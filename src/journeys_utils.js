@@ -527,17 +527,18 @@ journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId
 	return journeyDismissals;
 }
 
-journeys_utils._getDismissObject = function(branch_view) {
+journeys_utils._getDismissRequestData = function(branch_view) {
 	var metadata = {};
 	var hostedDeeplinkData = utils.getHostedDeepLinkData();
 	if (hostedDeeplinkData && Object.keys(hostedDeeplinkData).length > 0) {
 		metadata['hosted_deeplink_data'] = hostedDeeplinkData;
 	}
 
-	return branch_view._buildJourneyRequestData(
-		journeys_utils._getMetadataForPageviewEvent(null, metadata),
+	return branch_view._getPageviewRequestData(
+		journeys_utils._getPageviewMetadata(null, metadata),
 		null,
-		journeys_utils.branch
+		journeys_utils.branch,
+		true
 	);
 }
 
@@ -551,13 +552,13 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 	if (globalDismissPeriod !== undefined) {
 		storage.set('globalJourneysDismiss', globalDismissPeriod, true);
 	}
-	var journeyDismissals = journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
+	journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
 	if (metadata['dismissRedirect']) {
 		window.location = metadata['dismissRedirect'];
 	} else {
 		var listener = function() {
 			journeys_utils.branch.removeListener(listener);
-			var requestData = journeys_utils._getDismissObject(branch_view);
+			var requestData = journeys_utils._getDismissRequestData(branch_view);
 			journeys_utils.branch._api(
 				resources.dismiss,
 				requestData,
@@ -586,7 +587,7 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 	}
 }
 
-journeys_utils._getMetadataForPageviewEvent = function(options, additionalMetadata) {
+journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
 	return utils.merge({
 		"url": options && options.url || utils.getWindowLocation(),
 		"user_agent": navigator.userAgent,

@@ -92,7 +92,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 	return true;
 };
 
-branch_view.incrementAnalytics = function(branchViewData) {
+branch_view.incrementPageviewAnalytics = function(branchViewData) {
 	journeys_utils.branch._api(
 		resources.pageview,
 		{
@@ -170,11 +170,11 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	document.body.removeChild(placeholder);
 
 	if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
-		branch_view.incrementAnalytics(branchViewData);
+		branch_view.incrementPageviewAnalytics(branchViewData);
 	}
 };
 
-branch_view._buildJourneyRequestData = function(metadata, options, branch) {
+branch_view._getPageviewRequestData = function(metadata, options, branch, isDismissEvent) {
 
 	journeys_utils.branch = branch;
 
@@ -190,7 +190,7 @@ branch_view._buildJourneyRequestData = function(metadata, options, branch) {
 	journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 
 	// starts object off with data from setBranchViewData() call
-	var obj = branch._branchViewData || {};
+	var obj = utils.merge({}, branch._branchViewData);
 	var sessionStorage = session.get(branch._storage) || {};
 	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
 	var journeyDismissals = branch._storage.get('journeyDismissals', true);
@@ -200,7 +200,7 @@ branch_view._buildJourneyRequestData = function(metadata, options, branch) {
 	var linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
 
 	// adds root level keys for v1/event
-	obj['event'] = 'pageview';
+	obj['event'] = !isDismissEvent ? 'pageview' : 'dismiss';
 	obj['metadata'] = metadata;
 	obj = utils.addPropertyIfNotNull(obj, 'initial_referrer', initialReferrer);
 
