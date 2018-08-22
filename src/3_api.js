@@ -119,6 +119,7 @@ Server.prototype.getUrl = function(resource, data) {
 	}
 
 	var d = { };
+	// TODO: Add validation for v1/pageview and v1/dismiss, move setBranchViewData into a separate location so that it is isolated
 	if (typeof resource.params !== 'undefined' && resource.endpoint !== '/v1/pageview' && resource.endpoint !== '/v1/dismiss') {
 		for (k in resource.params) {
 			if (resource.params.hasOwnProperty(k)) {
