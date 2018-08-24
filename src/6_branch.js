@@ -435,10 +435,11 @@ Branch.prototype['init'] = wrap(
 					additionalMetadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 				}
 			}
-			var requestData = branch_view.buildJourneyRequestData(
-				branch_view.getMetadataForPageviewEvent(options, additionalMetadata),
+			var requestData = branch_view._getPageviewRequestData(
+				journeys_utils._getPageviewMetadata(options, additionalMetadata),
 				options,
-				self
+				self,
+				false
 			);
 			self['renderQueue'](function() {
 				self._api(
@@ -457,7 +458,7 @@ Branch.prototype['init'] = wrap(
 									pageviewResponse['template'],
 									requestData,
 									requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
-									pageviewResponse['event_data'],
+									pageviewResponse['event_data']['branch_view_data'],
 									journeyInTestMode
 								);
 							}
@@ -855,10 +856,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 		}
 
-		var requestData = branch_view.buildJourneyRequestData(
-			branch_view.getMetadataForPageviewEvent(options, metadata),
+		var requestData = branch_view._getPageviewRequestData(
+			journeys_utils._getPageviewMetadata(options, metadata),
 			options,
-			self
+			self,
+			false
 		);
 		self._api(resources.pageview,
 			requestData,
@@ -876,7 +878,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 							pageviewResponse['template'],
 							requestData,
 							requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
-							pageviewResponse['event_data'],
+							pageviewResponse['event_data']['branch_view_data'],
 							journeyInTestMode
 						);
 					}
@@ -1851,7 +1853,7 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 	self['renderQueue'](function() {
 		if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
 			self._publishEvent('didCallJourneyClose', journeys_utils.journeyLinkData);
-			journeys_utils.animateBannerExit(journeys_utils.banner);
+			journeys_utils.animateBannerExit(journeys_utils.banner, true);
 		}
 		else {
 			return done('Journey already dismissed.');
