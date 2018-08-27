@@ -6,7 +6,6 @@ jobs:
     steps:
     - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
-    - setup_remote_docker
     - run: nvm install 6.11.2 | nvm use 6.11.2
     - run: pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH
     # Closure Compiler
@@ -28,7 +27,7 @@ jobs:
     - run: deployment/test.sh
     - run: pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH
     - run: npm install -g slack-cli
-    # Runs when merging into master and production
+    # Runs when merging into master or production
     - run: deployment/deploy.sh
 workflows:
   version: 2
