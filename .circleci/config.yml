@@ -1,12 +1,14 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/BranchMetrics/web-branch-deep-linking
+    working_directory: ~/web-branch-deep-linking
     machine: true
     steps:
     - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
-    - run: nvm install 6.11.2 | nvm use 6.11.2
+    - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+    - run: nvm install 6.11.2
+    - run: nvm use 6.11.2
     - run: pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH
     # Closure Compiler
     - run: mkdir -p compiler
@@ -29,6 +31,7 @@ jobs:
     - run: npm install -g slack-cli
     # Runs when merging into master or production
     - run: deployment/deploy.sh
+
 workflows:
   version: 2
   build-and-deploy:
