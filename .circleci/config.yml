@@ -7,6 +7,8 @@ jobs:
     - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
     - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+    - run: export NVM_DIR="/opt/circleci/.nvm"
+           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
     - run: nvm install 6.11.2
     - run: nvm use 6.11.2
     - run: pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH
