@@ -1,0 +1,36 @@
+version: 2
+jobs:
+	build:
+        working_directory: ~/BranchMetrics/web-branch-deep-linking
+        docker:
+            image: circleci/node:6.11.2
+		steps:
+            - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+			- checkout
+			- setup_remote_docker
+			- run: pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH
+			# Closure Compiler 
+			- run: mkdir -p compiler
+			- run: stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-20170218.zip && unzip -o compiler-20170218.zip -d compiler)
+			# Closure compiler library
+			- run: mkdir -p compiler/library
+			- run: stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library)
+			# Node, Sauce, Phantom, and JSlint deps
+			- run: npm install
+			- run: npm install -g jsdox
+			- run: mocha-phantomjs --help || npm install -g mocha-phantomjs
+			- run: wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate
+			- run: tar -xzf sc-4.3.13-linux.tar.gz
+			- run: jscs --help || npm install -g jscs
+			- run: jshint -v || npm install -g jshint
+			- run: which grunt 2>&1 >/dev/null || npm install -g grunt-cli
+			- run: deployment/master_builds.sh
+            - run: deployment/test.sh
+            - run: pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH
+            - run: npm install -g slack-cli
+            - run: deployment/deploy.sh
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
