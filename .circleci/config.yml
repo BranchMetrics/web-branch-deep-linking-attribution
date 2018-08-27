@@ -10,6 +10,7 @@ jobs:
     - run: export NVM_DIR="/opt/circleci/.nvm";
            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
            export PATH=/opt/circleci:$PATH;
+           source "$NVM_DIR/nvm.sh";
     - run: nvm install 6.11.2
     - run: nvm use 6.11.2
     - run: pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH
