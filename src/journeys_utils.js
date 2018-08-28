@@ -549,41 +549,44 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 	journeys_utils.branch._publishEvent(eventName, journeys_utils.journeyLinkData);
 	journeys_utils.journeyDismissed = true;
 	journeys_utils.animateBannerExit(banner);
-	if (globalDismissPeriod !== undefined) {
-		storage.set('globalJourneysDismiss', globalDismissPeriod, true);
-	}
-	journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
-	if (metadata['dismissRedirect']) {
-		window.location = metadata['dismissRedirect'];
-	} else {
-		var listener = function() {
-			journeys_utils.branch.removeListener(listener);
-			var requestData = journeys_utils._getDismissRequestData(branch_view);
-			journeys_utils.branch._api(
-				resources.dismiss,
-				requestData,
-				function (err, data) {
-					if (!err && typeof data === "object" && data['template']) {
-						if (branch_view.shouldDisplayJourney
-							(
-								data,
-								null,
-								false
-							)
-						) {
-							branch_view.displayJourney(
-								data['template'],
-								requestData,
-								requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
-								data['event_data']['branch_view_data'],
-								false
-							);
+
+	if (!testModeEnabled) {
+		if (globalDismissPeriod !== undefined) {
+			storage.set('globalJourneysDismiss', globalDismissPeriod, true);
+		}
+		journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
+		if (metadata['dismissRedirect']) {
+			window.location = metadata['dismissRedirect'];
+		} else {
+			var listener = function () {
+				journeys_utils.branch.removeListener(listener);
+				var requestData = journeys_utils._getDismissRequestData(branch_view);
+				journeys_utils.branch._api(
+					resources.dismiss,
+					requestData,
+					function (err, data) {
+						if (!err && typeof data === "object" && data['template']) {
+							if (branch_view.shouldDisplayJourney
+								(
+									data,
+									null,
+									false
+								)
+							) {
+								branch_view.displayJourney(
+									data['template'],
+									requestData,
+									requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
+									data['event_data']['branch_view_data'],
+									false
+								);
+							}
 						}
 					}
-				}
-			);
-		};
-		journeys_utils.branch.addListener('branch_internal_event_didCloseJourney', listener);
+				);
+			};
+			journeys_utils.branch.addListener('branch_internal_event_didCloseJourney', listener);
+		}
 	}
 }
 
