@@ -35,7 +35,6 @@ jobs:
            pip install awscli --upgrade --user && export PATH=/home/circleci/.local/bin:$PATH ;
            sudo npm install -g slack-cli ;
     # Run deployment scripts
-    - run: deployment/master_builds.sh
     - run: deployment/test.sh
     # Runs when merging into master or production
     - run: deployment/deploy.sh
