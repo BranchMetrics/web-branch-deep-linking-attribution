@@ -5,8 +5,6 @@ goog.require('banner_css');
 goog.require('safejson');
 goog.require('journeys_utils');
 
-branch_view.callback_index = 1;
-
 function checkPreviousBanner() {
 	// if banner already exists, don't add another
 	if (document.getElementById('branch-banner') ||
@@ -53,16 +51,19 @@ function renderHtmlBlob(parent, html, hasApp) {
 	return iframe;
 };
 
-// checks to see if user dismissed Journey previously and whether it should remain dismissed
-function isJourneyDismissed(branchViewData, branch) {
-	// check storage to see dismiss timestamp
-	var dismissTimeStamp = branch._storage.get('hideBanner' + branchViewData["id"], true);
+/**
+ * Checks if a journey should show based on dismiss time
+ * @param       {Object} branch
+ * @return      {boolean}
+ */
+function _areJourneysDismissedGlobally(branch) {
+	var globalDismissEndTimestamp = branch._storage.get('globalJourneysDismiss', true);
 
-	if (dismissTimeStamp === true || dismissTimeStamp > Date.now()) {
+	if (globalDismissEndTimestamp === true || globalDismissEndTimestamp > Date.now()) {
 		return true;
 	}
 
-	branch._storage.remove('hideBanner' + branchViewData["id"], true);
+	branch._storage.remove('globalJourneysDismiss', true);
 	return false;
 }
 
@@ -81,8 +82,8 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 
 	if (
 		!eventResponse['event_data']['branch_view_data']['id'] ||
-		isJourneyDismissed(eventResponse['event_data']['branch_view_data'], journeys_utils.branch) ||
-		options['no_journeys']
+		(options && options['no_journeys']) ||
+		_areJourneysDismissedGlobally(journeys_utils.branch)
 	) {
 		// resets the callback index so that auto-open works the next time a Journey is rendered
 		branch_view.callback_index = 1;
@@ -91,7 +92,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 	return true;
 };
 
-branch_view.incrementAnalytics = function(branchViewData) {
+branch_view.incrementPageviewAnalytics = function(branchViewData) {
 	journeys_utils.branch._api(
 		resources.pageview,
 		{
@@ -106,8 +107,9 @@ branch_view.incrementAnalytics = function(branchViewData) {
 	);
 };
 
-branch_view.displayJourney = function(html, requestData, templateId, eventData, testModeEnabled) {
+branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled) {
 	journeys_utils.branchViewId = templateId;
+	var audienceRuleId = branchViewData['audience_rule_id'];
 
 	// this code removes any leftover css from previous banner
 	var branchCSS = document.getElementById('branch-iframe-css')
@@ -129,9 +131,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 
 	if (html) {
 
-		var hideBanner = !testModeEnabled
-			? journeys_utils.findDismissPeriod(html)
-			: 0;
+		var metadata = journeys_utils.getMetadata(html) || {};
 
 		var timeoutTrigger = window.setTimeout(
 			function() {
@@ -147,7 +147,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 			}
 			cta = data;
 
-			journeys_utils.finalHookups(templateId, storage, cta, banner, hideBanner);
+			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
 		};
 
 		banner = renderHtmlBlob(document.body, html, requestData['has_app_websdk']);
@@ -159,7 +159,7 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 			return;
 		}
 
-		journeys_utils.finalHookups(templateId, storage, cta, banner, hideBanner);
+		journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
 
 		if (utils.navigationTimingAPIEnabled) {
 			utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
@@ -170,11 +170,11 @@ branch_view.displayJourney = function(html, requestData, templateId, eventData, 
 	document.body.removeChild(placeholder);
 
 	if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
-		branch_view.incrementAnalytics(eventData['branch_view_data']);
+		branch_view.incrementPageviewAnalytics(branchViewData);
 	}
 };
 
-branch_view.buildJourneyRequestData = function(metadata, options, branch) {
+branch_view._getPageviewRequestData = function(metadata, options, branch, isDismissEvent) {
 
 	journeys_utils.branch = branch;
 
@@ -190,16 +190,17 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 
 	// starts object off with data from setBranchViewData() call
-	var obj = branch._branchViewData || {};
+	var obj = utils.merge({}, branch._branchViewData);
 	var sessionStorage = session.get(branch._storage) || {};
 	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
+	var journeyDismissals = branch._storage.get('journeyDismissals', true);
 	var userLanguage = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase() || null;
 	var initialReferrer = utils.getInitialReferrer(branch._referringLink());
 	var branchViewId = options['branch_view_id'] || utils.getParameterByName('_branch_view_id') || null;
 	var linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
 
 	// adds root level keys for v1/event
-	obj['event'] = 'pageview';
+	obj['event'] = !isDismissEvent ? 'pageview' : 'dismiss';
 	obj['metadata'] = metadata;
 	obj = utils.addPropertyIfNotNull(obj, 'initial_referrer', initialReferrer);
 
@@ -207,11 +208,12 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	obj = utils.addPropertyIfNotNull(obj, 'branch_view_id', branchViewId);
 	obj = utils.addPropertyIfNotNull(obj, 'no_journeys', options['no_journeys']);
 	obj = utils.addPropertyIfNotNull(obj, 'is_iframe', utils.isIframe());
+	obj = utils.addPropertyIfNotNull(obj, 'journey_dismissals', journeyDismissals);
 	obj['user_language'] = userLanguage;
 	obj['open_app'] = options['open_app'] || false;
 	obj['has_app_websdk'] = has_app;
 	obj['feature'] = 'journeys';
-	obj['callback_string'] = 'branch_view_callback__' + (branch_view.callback_index++);
+	obj['callback_string'] = 'branch_view_callback__' + (journeys_utils._callback_index++);
 
 	if (!obj.data) {
 		obj.data = {};
@@ -225,14 +227,4 @@ branch_view.buildJourneyRequestData = function(metadata, options, branch) {
 	}
 	obj = utils.cleanLinkData(obj);
 	return obj;
-};
-
-branch_view.getMetadataForPageviewEvent = function(options, additionalMetadata) {
-	return utils.merge({
-		"url": options && options.url || utils.getWindowLocation(),
-		"user_agent": navigator.userAgent,
-		"language": navigator.language,
-		"screen_width": screen.width || -1,
-		"screen_height": screen.height || -1
-	}, additionalMetadata || {});
 };
