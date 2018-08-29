@@ -24,11 +24,11 @@ jobs:
            jshint -v || sudo npm install -g jshint ;
            which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
     # Installing Java
-  - run: sudo su -c 'echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list'
-  - run: |
-      sudo rm -rf /var/lib/apt/lists/*
-      sudo apt-get update
-      sudo apt install -t jessie-backports openjdk-8-jre-headless ca-certificates-java
+    - run: sudo su -c 'echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list'
+    - run: |
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo apt-get update
+          sudo apt install -t jessie-backports openjdk-8-jre-headless ca-certificates-java
     # Install aws cli
     - run: sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev ;
            curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
