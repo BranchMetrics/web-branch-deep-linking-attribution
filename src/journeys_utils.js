@@ -221,6 +221,7 @@ journeys_utils.createAndAppendIframe = function() {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
+	iframe.title = 'Branch Banner'
 	iframe.setAttribute('aria-label', 'Branch Banner');
 	utils.addNonceAttribute(iframe);
 
