@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.43.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.44.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2122,6 +2122,8 @@ journeys_utils.createAndAppendIframe = function() {
   a.scrolling = "no";
   a.id = "branch-banner-iframe";
   a.className = "branch-animation";
+  a.title = "Branch Banner";
+  a.setAttribute("aria-label", "Branch Banner");
   utils.addNonceAttribute(a);
   document.body.appendChild(a);
   return a;

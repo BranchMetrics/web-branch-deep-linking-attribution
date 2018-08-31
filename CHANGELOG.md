@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.44.0] - 2018-08-31
+- Allows screen readers to be able to detect and read Journeys iFrame
+
 ## [2.43.0] - 2018-08-29
 - Introduces Journeys dismissal functionality
 
