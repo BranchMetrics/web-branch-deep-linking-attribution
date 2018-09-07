@@ -1,0 +1,46 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/web-branch-deep-linking
+    docker:
+    - image: circleci/node:6.11.2
+    steps:
+    - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+    - checkout
+    - setup_remote_docker
+    # Closure Compiler
+    - run: mkdir -p compiler ;
+           stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-20170218.zip && unzip -o compiler-20170218.zip -d compiler) ;
+    # Closure compiler library
+    - run: mkdir -p compiler/library ;
+           stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library) ;
+    # Node, Sauce, Phantom, and JSlint deps
+    - run: npm install ;
+           sudo npm install -g jsdox ;
+           mocha-phantomjs --help || sudo npm install -g mocha-phantomjs ;
+           wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate ;
+           tar -xzf sc-4.3.13-linux.tar.gz ;
+           jscs --help || sudo npm install -g jscs ;
+           jshint -v || sudo npm install -g jshint ;
+           which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
+    # Installing Java
+    - run: sudo su -c 'echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list'
+    - run: |
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo apt-get update
+          sudo apt install -t jessie-backports openjdk-8-jre-headless ca-certificates-java
+    # Install aws cli
+    - run: sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev ;
+           curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
+           pip install awscli --upgrade --user && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
+           sudo npm install -g slack-cli ;
+    # Run deployment scripts
+    - run: deployment/test.sh
+    # Runs when merging into master or production
+    - run: deployment/deploy.sh
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
