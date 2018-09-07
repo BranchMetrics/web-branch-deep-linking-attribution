@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.45.0] - 2018-09-07
+- Introduces circle-ci 2 deploy process
+
 ## [2.44.0] - 2018-08-31
 - Allows screen readers to be able to detect and read Journeys iFrame
 
