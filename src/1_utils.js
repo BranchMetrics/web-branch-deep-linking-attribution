@@ -922,6 +922,7 @@ utils.openGraphDataAsObject = function() {
 	ogData = utils.addPropertyIfNotNull(ogData, '$og_description', utils.getOpenGraphContent('description'));
 	ogData = utils.addPropertyIfNotNull(ogData, '$og_image_url', utils.getOpenGraphContent('image'));
 	ogData = utils.addPropertyIfNotNull(ogData, '$og_video', utils.getOpenGraphContent('video'));
+	ogData = utils.addPropertyIfNotNull(ogData, '$og_type', utils.getOpenGraphContent('type'));
 	return ogData && Object.keys(ogData).length > 0 ? ogData : null;
 };
 
