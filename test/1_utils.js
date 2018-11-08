@@ -393,6 +393,16 @@ describe('utils', function() {
 				'should return an object type'
 			);
 		});
+		it('should return OG tags', function() {
+			var expected = {
+				$og_type:'product'
+			};
+			assert.deepEqual(
+				expected,
+				utils.openGraphDataAsObject(),
+				'should be equal'
+			);
+		});
 		it('should find applink, twitter and branch hosted data on page', function() {
 			var expected = {
 				watch_brand: 'Hamilton',
