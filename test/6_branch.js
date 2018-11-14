@@ -1564,6 +1564,22 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('isJourneyDisplayed() test', function() {
+		it('should return true if Journey is displayed', function(done) {
+			var branch = journeys_utils.branch;
+			var banner = document.createElement('iframe');
+
+			journeys_utils.banner = banner;
+			journeys_utils.isJourneyDisplayed = true;
+
+			branch.isJourneyDisplayed(function(err, isJourneyDisplayed) {
+				assert.strictEqual(err, null, 'No error');
+				assert.strictEqual(isJourneyDisplayed, true, 'the Journey is displayed');
+			});
+			done();
+		});
+	});
+
 	describe('disableTracking() tests', function() {
 		it('Flow with branch.init(), branch.disableTracking(true), branch.disableTracking(false)', function(done) {
 			var branch = initBranch(false);
@@ -1664,4 +1680,3 @@ describe('Branch', function() {
 	});
 */
 });
-

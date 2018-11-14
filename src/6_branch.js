@@ -788,6 +788,39 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 });
 
 /**
+ * @function Branch.isJourneyDisplayed
+ * @param {function(?Error, data=)=} callback - callback to check if a Journey banner is active or not
+ *
+ * Returns the current Journey banner state.
+ *
+ * ##### Usage
+ * ```js
+ * branch.isJourneyDisplayed(function(err, data) { console.log(data); });
+ *
+ * *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *      null,
+ *      true,
+ * );
+ * ```
+ * ___
+ *
+ */
+/*** +TOC_ITEM #isJourneyDisplayedcallback &.isJourneyDisplayed()& ^ALL ***/
+Branch.prototype['isJourneyDisplayed'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	var isActive = false;
+	if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
+		isActive = true;
+	}
+	else {
+		isActive = false;
+	}
+	done(null, isActive);
+});
+
+/**
  * @function Branch.getBrowserFingerprintId
  * @param {function(?Error, data=)=} callback - callback to read a user's browser-fingerprint-id
  *
