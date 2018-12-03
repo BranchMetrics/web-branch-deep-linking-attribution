@@ -1035,12 +1035,12 @@ describe('Branch', function() {
 			sinon.stub(utils, 'getHostedDeepLinkData')
 				.returns({});
 
-			// check starting with 4th call since first four are called by openGraphDataAsObject
+			// check starting with 5th call since first five are called by openGraphDataAsObject
 			sinon.stub(utils, 'getOpenGraphContent')
-				.onCall(8).returns(ogTitle)
-				.onCall(9).returns(ogDescription)
-				.onCall(10).returns(ogImage)
-				.onCall(11).returns(ogVideo);
+				.onCall(9).returns(ogTitle)
+				.onCall(10).returns(ogDescription)
+				.onCall(11).returns(ogImage)
+				.onCall(12).returns(ogVideo);
 
 			branch = initBranch(true);
 			requests = [];
