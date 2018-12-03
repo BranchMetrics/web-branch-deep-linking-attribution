@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.47.0] - 2018-12-03
+- Scrapes og:type tag and makes it available on Journeys CTA link
+
 ## [2.46.0] - 2018-09-18
 - Fixes a bug with feature detection for window.performance api
 

@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.46.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.47.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1326,8 +1326,8 @@ utils.addPropertyIfNotNull = function(a, b, c) {
   return a;
 };
 utils.openGraphDataAsObject = function() {
-  var a = {}, a = utils.addPropertyIfNotNull(a, "$og_title", utils.getOpenGraphContent("title")), a = utils.addPropertyIfNotNull(a, "$og_description", utils.getOpenGraphContent("description")), a = utils.addPropertyIfNotNull(a, "$og_image_url", utils.getOpenGraphContent("image"));
-  return (a = utils.addPropertyIfNotNull(a, "$og_video", utils.getOpenGraphContent("video"))) && 0 < Object.keys(a).length ? a : null;
+  var a = {}, a = utils.addPropertyIfNotNull(a, "$og_title", utils.getOpenGraphContent("title")), a = utils.addPropertyIfNotNull(a, "$og_description", utils.getOpenGraphContent("description")), a = utils.addPropertyIfNotNull(a, "$og_image_url", utils.getOpenGraphContent("image")), a = utils.addPropertyIfNotNull(a, "$og_video", utils.getOpenGraphContent("video"));
+  return (a = utils.addPropertyIfNotNull(a, "$og_type", utils.getOpenGraphContent("type"))) && 0 < Object.keys(a).length ? a : null;
 };
 utils.getAdditionalMetadata = function() {
   var a = {}, a = utils.addPropertyIfNotNull(a, "og_data", utils.openGraphDataAsObject()), a = utils.addPropertyIfNotNull(a, "hosted_deeplink_data", utils.getHostedDeepLinkData()), a = utils.addPropertyIfNotNull(a, "title", utils.getTitle()), a = utils.addPropertyIfNotNull(a, "description", utils.getDescription());
