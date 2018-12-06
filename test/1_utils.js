@@ -103,8 +103,8 @@ describe('utils', function() {
 				.onCall(0).returns(ogTitle)
 				.onCall(1).returns(ogDescription)
 				.onCall(2).returns(ogImage)
-       				.onCall(3).returns(ogVideo)
-        			.onCall(4).returns(ogType);
+				.onCall(3).returns(ogVideo)
+				.onCall(4).returns(ogType);
 		});
 
 		afterEach(function() {
