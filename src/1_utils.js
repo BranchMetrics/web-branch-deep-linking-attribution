@@ -340,6 +340,9 @@ utils.cleanLinkData = function(linkData) {
 		data['$og_video'] = utils.getOpenGraphContent('video');
 	}
 
+	if (!data['$og_type']) {
+		data['$og_type'] = utils.getOpenGraphContent('type');
+	}
 
 	if (typeof data['$desktop_url'] === 'string') {
 		data['$desktop_url'] =

@@ -755,7 +755,8 @@ describe('Branch', function() {
 					'$og_description': 'Branch Metrics',
 					'$og_image_url': 'http://branch.io/img/logo_icon_white.png',
 					'$canonical_url': 'https://cdn.branch.io/example.html',
-					'$og_video': null
+          '$og_video': null,
+          '$og_type': 'product'
 				},
 				"sdk": "web" + config.version
 			}, [ "_t" ]);
@@ -817,7 +818,7 @@ describe('Branch', function() {
 					type: "1",
 					sdk: 'web' + config.version,
 					source: 'web-sdk',
-					data: { "mydata":"bar", "$desktop_url":"https://cdn.branch.io/example.html", "$og_title":"Branch Metrics", "$og_description":"Branch Metrics", "$og_image_url":"http://branch.io/img/logo_icon_white.png", "$canonical_url":"https://cdn.branch.io/example.html", "$og_video":null }
+					data: { "mydata":"bar", "$desktop_url":"https://cdn.branch.io/example.html", "$og_title":"Branch Metrics", "$og_description":"Branch Metrics", "$og_image_url":"http://branch.io/img/logo_icon_white.png", "$canonical_url":"https://cdn.branch.io/example.html", "$og_video":null, "$og_type":"product" }
 				};
 				var actual = {};
 				for (var i = 0; i < queryParams.length; i++) {
@@ -1026,7 +1027,7 @@ describe('Branch', function() {
 		var ogDescription = 'OGDescription';
 		var ogImage = 'OGImage';
 		var ogVideo = 'OGVideo';
-
+		var ogType = 'OGType';
 
 		beforeEach(function() {
 			sinon.stub(utils, 'getWindowLocation')
@@ -1035,12 +1036,13 @@ describe('Branch', function() {
 			sinon.stub(utils, 'getHostedDeepLinkData')
 				.returns({});
 
-			// check starting with 5th call since first five are called by openGraphDataAsObject
+			// check starting with 10th call since first 9 are called by openGraphDataAsObject
 			sinon.stub(utils, 'getOpenGraphContent')
-				.onCall(9).returns(ogTitle)
-				.onCall(10).returns(ogDescription)
-				.onCall(11).returns(ogImage)
-				.onCall(12).returns(ogVideo);
+				.onCall(10).returns(ogTitle)
+				.onCall(11).returns(ogDescription)
+				.onCall(12).returns(ogImage)
+				.onCall(13).returns(ogVideo)
+				.onCall(14).returns(ogType);
 
 			branch = initBranch(true);
 			requests = [];
@@ -1065,7 +1067,8 @@ describe('Branch', function() {
 				'"$og_title":"' + ogTitle + '",',
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
-				'"$og_video":"' + ogVideo + '"',
+				'"$og_video":"' + ogVideo + '",',
+        '"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 
@@ -1243,7 +1246,7 @@ describe('Branch', function() {
 				var expectedQueryParams = {
 					channel: 'testChannel',
 					source: 'web-sdk',
-					data: { "$canonical_url":"http://someurl/pluspath", "$og_title":"OGTitle", "$og_description":"OGDescription", "$og_image_url": "OGImage", "$og_video":"OGVideo", "akey": "aval" }
+					data: { "$canonical_url":"http://someurl/pluspath", "$og_title":"OGTitle", "$og_description":"OGDescription", "$og_image_url": "OGImage", "$og_video":"OGVideo", "$og_type":"OGType", "akey": "aval" }
 				};
 				var actual = {};
 				for (var i = 0; i < queryParams.length; i++) {
@@ -1664,4 +1667,3 @@ describe('Branch', function() {
 	});
 */
 });
-

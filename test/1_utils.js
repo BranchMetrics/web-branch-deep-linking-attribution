@@ -92,7 +92,8 @@ describe('utils', function() {
 		var ogTitle = 'OGTitle';
 		var ogDescription = 'OGDescription';
 		var ogImage = 'OGImage';
-		var ogVideo = 'OGVideo';
+    var ogVideo = 'OGVideo';
+    var ogType = 'OGType';
 
 		beforeEach(function() {
 			sinon.stub(utils, 'getWindowLocation')
@@ -102,7 +103,8 @@ describe('utils', function() {
 				.onCall(0).returns(ogTitle)
 				.onCall(1).returns(ogDescription)
 				.onCall(2).returns(ogImage)
-				.onCall(3).returns(ogVideo);
+        .onCall(3).returns(ogVideo)
+        .onCall(4).returns(ogType);
 		});
 
 		afterEach(function() {
@@ -118,7 +120,8 @@ describe('utils', function() {
 				'"$og_title":"' + ogTitle + '",',
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
-				'"$og_video":"' + ogVideo + '"',
+        '"$og_video":"' + ogVideo + '",',
+        '"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 			var expectedCleanedLinkData = {
@@ -151,7 +154,8 @@ describe('utils', function() {
 				'"$og_title":"' + ogTitle + '",',
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
-				'"$og_video":"' + ogVideo + '"',
+        '"$og_video":"' + ogVideo + '",',
+        '"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 			var expectedCleanedLinkData = {
@@ -189,7 +193,8 @@ describe('utils', function() {
 				'"$og_title":"' + ogTitle + '",',
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
-				'"$og_video":"' + ogVideo + '"',
+				'"$og_video":"' + ogVideo + '",',
+        '"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 			var expectedCleanedLinkData = {
