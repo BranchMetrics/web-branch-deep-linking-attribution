@@ -755,8 +755,8 @@ describe('Branch', function() {
 					'$og_description': 'Branch Metrics',
 					'$og_image_url': 'http://branch.io/img/logo_icon_white.png',
 					'$canonical_url': 'https://cdn.branch.io/example.html',
-          '$og_video': null,
-          '$og_type': 'product'
+					'$og_video': null,
+					'$og_type': 'product'
 				},
 				"sdk": "web" + config.version
 			}, [ "_t" ]);
@@ -1068,7 +1068,7 @@ describe('Branch', function() {
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
 				'"$og_video":"' + ogVideo + '",',
-        '"$og_type":"' + ogType + '"',
+				'"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 
