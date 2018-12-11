@@ -92,8 +92,8 @@ describe('utils', function() {
 		var ogTitle = 'OGTitle';
 		var ogDescription = 'OGDescription';
 		var ogImage = 'OGImage';
-    		var ogVideo = 'OGVideo';
-    		var ogType = 'OGType';
+		var ogVideo = 'OGVideo';
+		var ogType = 'OGType';
 
 		beforeEach(function() {
 			sinon.stub(utils, 'getWindowLocation')
@@ -120,8 +120,8 @@ describe('utils', function() {
 				'"$og_title":"' + ogTitle + '",',
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
-        			'"$og_video":"' + ogVideo + '",',
-        			'"$og_type":"' + ogType + '"',
+				'"$og_video":"' + ogVideo + '",',
+				'"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 			var expectedCleanedLinkData = {
@@ -154,8 +154,8 @@ describe('utils', function() {
 				'"$og_title":"' + ogTitle + '",',
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
-        			'"$og_video":"' + ogVideo + '",',
-        			'"$og_type":"' + ogType + '"',
+				'"$og_video":"' + ogVideo + '",',
+				'"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 			var expectedCleanedLinkData = {
@@ -194,7 +194,7 @@ describe('utils', function() {
 				'"$og_description":"' + ogDescription + '",',
 				'"$og_image_url":"' + ogImage + '",',
 				'"$og_video":"' + ogVideo + '",',
-        			'"$og_type":"' + ogType + '"',
+				'"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
 			var expectedCleanedLinkData = {
