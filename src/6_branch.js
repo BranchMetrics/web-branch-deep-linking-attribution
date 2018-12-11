@@ -225,126 +225,6 @@ Branch.prototype._publishEvent = function(event, data) {
 };
 
 /**
- * @function Branch.deepview
- * @param {Object} data - _required_ - object of all link data, same as branch.link().
- * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if
- * one already exists_. *open_app*, _whether to try to open the app passively (as opposed to
- * opening it upon user clicking); defaults to true_
- * }.
- * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
- *
- * Turns the current page into a "deepview" – a preview of app content. This gives the page two
- * special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
- * installed on their phone, we will try to open the app automaticaly and deeplink them to this
- * content (this can be toggled off by turning open_app to false, but this is not recommended),
- * and (2) provides a callback to open the app directly, accessible as `branch.deepviewCta()`;
- * you'll want to have a button on your web page that says something like "View in app", which
- * calls this function.
- *
- * See [this tutorial](https://blog.branch.io/how-to-deep-link-from-your-mobile-website) for a full
- * guide on how to use the deepview functionality of the Web SDK.
- *
- * #### Usage
- * ```js
- * branch.deepview(
- *     data,
- *     options,
- *     callback (err)
- * );
- * ```
- *
- * #### Example
- * ```js
- * branch.deepview(
- *     {
- *         channel: 'facebook',
- *         data: {
- *             mydata: 'content of my data',
- *             foo: 'bar',
- *             '$deeplink_path': 'item_id=12345'
- *         },
- *         feature: 'dashboard',
- *         stage: 'new user',
- *         tags: [ 'tag1', 'tag2' ],
- *     },
- *     {
- *         make_new_link: true,
- *         open_app: true
- *     },
- *     function(err) {
- *         console.log(err || 'no error');
- *     }
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *     "Error message"
- * );
- * ```
- *
- */
-/*** +TOC_ITEM #deepviewdata-options-callback &.deepview()& ^ALL ***/
-Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done, data, options) {
-	var self = this;
-
-	if (!options) {
-		options = { };
-	}
-
-	if (typeof options['deepview_type'] === 'undefined') {
-		options['deepview_type'] = 'deepview';
-	}
-	else {
-		// we are currently limited to just 'deepview' or 'banner', but if that changes,
-		// then this line should be removed
-		options['deepview_type'] = 'banner';
-	}
-
-	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
-	data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
-
-	var cleanedData = utils.cleanLinkData(data);
-	var fallbackUrl = utils.generateDynamicBNCLink(this.branch_key, cleanedData);
-
-	if (options['open_app'] || options['open_app'] === null || typeof options['open_app'] === 'undefined') {
-		cleanedData['open_app'] = true;
-	}
-	cleanedData['append_deeplink_path'] = !!options['append_deeplink_path'];
-	cleanedData['deepview_type'] = options['deepview_type'];
-
-	var referringLink = self._referringLink();
-	if (referringLink && !options['make_new_link']) {
-		cleanedData['link_click_id'] = utils.getClickIdAndSearchStringFromLink(referringLink);
-	}
-
-	cleanedData['banner_options'] = options;
-
-	self._deepviewRequestForReplay = goog.bind(this._api, self,
-		resources.deepview, cleanedData,
-		function(err, data) {
-			if (err) {
-				// ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
-				if (!utils.userPreferences.trackingDisabled) {
-					self._deepviewCta = function() {
-						self._windowRedirect(fallbackUrl);
-					};
-				}
-				return done(err);
-			}
-
-			if (typeof data === 'function') {
-				self._deepviewCta = data;
-			}
-
-			done(null);
-		});
-
-	self._deepviewRequestForReplay();
-});
-
-/**
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
  * @param {Object=} options - _optional_ - { }.
@@ -1425,6 +1305,131 @@ Branch.prototype['sendSMS'] = wrap(
 		}
 	}
 );
+
+/**
+ * @function Branch.deepview
+ * @param {Object} data - _required_ - object of all link data, same as branch.link().
+ * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if
+ * one already exists_. *open_app*, _whether to try to open the app passively (as opposed to
+ * opening it upon user clicking); defaults to true_
+ * }.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
+ *
+ * Turns the current page into a "deepview" – a preview of app content. This gives the page two
+ * special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
+ * installed on their phone, we will try to open the app automaticaly and deeplink them to this
+ * content (this can be toggled off by turning open_app to false, but this is not recommended),
+ * and (2) provides a callback to open the app directly, accessible as `branch.deepviewCta()`;
+ * you'll want to have a button on your web page that says something like "View in app", which
+ * calls this function.
+ *
+ * See [this tutorial](https://blog.branch.io/how-to-deep-link-from-your-mobile-website) for a full
+ * guide on how to use the deepview functionality of the Web SDK.
+ *
+ * #### Usage
+ * ```js
+ * branch.deepview(
+ *     data,
+ *     options,
+ *     callback (err)
+ * );
+ * ```
+ *
+ * #### Example
+ * ```js
+ * branch.deepview(
+ *     {
+ *         channel: 'facebook',
+ *         data: {
+ *             mydata: 'content of my data',
+ *             foo: 'bar',
+ *             '$deeplink_path': 'item_id=12345'
+ *         },
+ *         feature: 'dashboard',
+ *         stage: 'new user',
+ *         tags: [ 'tag1', 'tag2' ],
+ *     },
+ *     {
+ *         make_new_link: true,
+ *         open_app: true
+ *     },
+ *     function(err) {
+ *         console.log(err || 'no error');
+ *     }
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message"
+ * );
+ * ```
+ *
+ */
+/*** +TOC_ITEM #deepviewdata-options-callback &.deepview()& ^ALL ***/
+Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done, data, options) {
+	var self = this;
+
+	if (!options) {
+		options = { };
+	}
+
+	if (typeof options['deepview_type'] === 'undefined') {
+		options['deepview_type'] = 'deepview';
+	}
+	else {
+		// we are currently limited to just 'deepview' or 'banner', but if that changes,
+		// then this line should be removed
+		options['deepview_type'] = 'banner';
+	}
+
+	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
+	data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
+
+	var cleanedData = utils.cleanLinkData(data);
+	var fallbackUrl = utils.generateDynamicBNCLink(this.branch_key, cleanedData);
+
+	if (options['open_app'] || options['open_app'] === null || typeof options['open_app'] === 'undefined') {
+		cleanedData['open_app'] = true;
+	}
+	cleanedData['append_deeplink_path'] = !!options['append_deeplink_path'];
+	cleanedData['deepview_type'] = options['deepview_type'];
+
+	var referringLink = self._referringLink();
+	if (referringLink && !options['make_new_link']) {
+		cleanedData['link_click_id'] = utils.getClickIdAndSearchStringFromLink(referringLink);
+	}
+
+	cleanedData['banner_options'] = options;
+
+	// TODO: read from options['auto_branchify'] instead
+	if (utils.getParamValue('branchify_url') && self._referringLink()) {
+		cleanedData['auto_branchify'] = true;
+	}
+
+	self._deepviewRequestForReplay = goog.bind(this._api, self,
+		resources.deepview, cleanedData,
+		function(err, data) {
+			if (err) {
+				// ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
+				if (!utils.userPreferences.trackingDisabled) {
+					self._deepviewCta = function() {
+						self._windowRedirect(fallbackUrl);
+					};
+				}
+				return done(err);
+			}
+
+			if (typeof data === 'function') {
+				self._deepviewCta = data;
+			}
+
+			done(null);
+		});
+
+	self._deepviewRequestForReplay();
+});
 
 Branch.prototype._windowRedirect = function(url) {
 	window.top.location = url;
