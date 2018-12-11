@@ -582,8 +582,8 @@ Branch.prototype['init'] = wrap(
 									journeyInTestMode
 								);
 							}
-							// TODO: check for Branchify URL and Twitter referrer
-							else if (self._referringLink()) {
+							// TODO: check for Twitter referrer, try to use a decision from backend to make this change dynamic without web sdk
+							else if (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink()) {
 								var linkOptions = {
 									make_new_link: false,
 									open_app: true
