@@ -582,13 +582,16 @@ Branch.prototype['init'] = wrap(
 									journeyInTestMode
 								);
 							}
-							else {
-								console.log('referringLink: ' + self._referringLink());
+							// TODO: check for Branchify URL and Twitter referrer
+							else if (self._referringLink()) {
 								var linkOptions = {
 									make_new_link: false,
 									open_app: true
 								};
 								this['branch']['deepview']({}, linkOptions);
+								journeys_utils.branch._publishEvent('willNotShowJourney');
+							}
+							else {
 								journeys_utils.branch._publishEvent('willNotShowJourney');
 							}
 						}
