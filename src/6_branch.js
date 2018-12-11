@@ -465,8 +465,9 @@ Branch.prototype['init'] = wrap(
 							// TODO: check for Twitter referrer, try to use a decision from backend to make this change dynamic without web sdk
 							else if (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink()) {
 								var linkOptions = {
-									make_new_link: false,
-									open_app: true
+									'make_new_link': false,
+									'open_app': true,
+									'auto_branchify': true
 								};
 								this['branch']['deepview']({}, linkOptions);
 								journeys_utils.branch._publishEvent('willNotShowJourney');
@@ -1404,7 +1405,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	cleanedData['banner_options'] = options;
 
 	// TODO: read from options['auto_branchify'] instead
-	if (utils.getParamValue('branchify_url') && self._referringLink()) {
+	if (options['auto_branchify']) {
 		cleanedData['auto_branchify'] = true;
 	}
 
