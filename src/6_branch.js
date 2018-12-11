@@ -2165,7 +2165,6 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
 /*** +TOC_HEADING &User Privacy& ^WEB ***/
 /*** +TOC_ITEM #disabletrackingdisabletracking &.disableTracking()& ^WEB ***/
 Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, function(done, disableTracking) {
-	console.log('disableTracking');
 	if (disableTracking === false || disableTracking === "false") {
 		utils.userPreferences.trackingDisabled = false;
 		utils.userPreferences.allowErrorsInCallback = false;
@@ -2180,8 +2179,6 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 		utils.cleanApplicationAndSessionStorage(this);
 		utils.userPreferences.trackingDisabled = true;
 		utils.userPreferences.allowErrorsInCallback = true;
-		console.log('this: ' + Object.keys(this));
-		console.log('closeBanner: ' + this['closeBanner']);
 		this['closeBanner']();
 		this['closeJourney']();
 		// Branch will not re-initialize
