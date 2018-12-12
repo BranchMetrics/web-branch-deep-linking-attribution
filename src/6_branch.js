@@ -1404,7 +1404,6 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 
 	cleanedData['banner_options'] = options;
 
-	// TODO: read from options['auto_branchify'] instead
 	if (options['auto_branchify']) {
 		cleanedData['auto_branchify'] = true;
 	}
