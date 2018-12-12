@@ -462,7 +462,7 @@ Branch.prototype['init'] = wrap(
 									journeyInTestMode
 								);
 							}
-							else if (pageviewResponse.auto_branchify || (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink())) {
+							else if (pageviewResponse['auto_branchify'] || (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink())) {
 								var linkOptions = {
 									'make_new_link': false,
 									'open_app': true,
