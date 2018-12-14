@@ -462,16 +462,15 @@ Branch.prototype['init'] = wrap(
 									journeyInTestMode
 								);
 							}
-							else if (pageviewResponse['auto_branchify'] || (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink())) {
-								var linkOptions = {
-									'make_new_link': false,
-									'open_app': true,
-									'auto_branchify': true
-								};
-								this['branch']['deepview']({}, linkOptions);
-								journeys_utils.branch._publishEvent('willNotShowJourney');
-							}
 							else {
+								if (pageviewResponse['auto_branchify'] || (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink())) {
+									var linkOptions = {
+										'make_new_link': false,
+										'open_app': true,
+										'auto_branchify': true
+									};
+									this['branch']['deepview']({}, linkOptions);
+								}
 								journeys_utils.branch._publishEvent('willNotShowJourney');
 							}
 						}
