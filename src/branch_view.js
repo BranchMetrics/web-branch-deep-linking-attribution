@@ -225,8 +225,9 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	if (linkClickId) {
 		obj.data['link_click_id'] = linkClickId;
 	}
-	if (sessionStorage['data'] && JSON.parse(sessionStorage['data'])['+referrer']) {
-		obj.data['+referrer'] = JSON.parse(sessionStorage['data'])['+referrer'];
+	var linkData = JSON.parse(sessionStorage['data']);
+	if (sessionStorage['data'] && linkData['+referrer']) {
+		obj.data['+referrer'] = linkData['+referrer'];
 	}
 	obj = utils.cleanLinkData(obj);
 	return obj;
