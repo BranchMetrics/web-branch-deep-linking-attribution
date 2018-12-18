@@ -463,6 +463,14 @@ Branch.prototype['init'] = wrap(
 								);
 							}
 							else {
+								if (pageviewResponse['auto_branchify'] || (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink())) {
+									var linkOptions = {
+										'make_new_link': false,
+										'open_app': true,
+										'auto_branchify': true
+									};
+									this['branch']['deepview']({}, linkOptions);
+								}
 								journeys_utils.branch._publishEvent('willNotShowJourney');
 							}
 						}
@@ -508,7 +516,7 @@ Branch.prototype['init'] = wrap(
 			}
 		};
 
-		if (sessionData && sessionData['session_id'] && !link_identifier) {
+		if (sessionData && sessionData['session_id'] && !link_identifier && !utils.getParamValue('branchify_url')) {
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
 			session.update(self._storage, { "referring_link": "" });
@@ -1393,6 +1401,10 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	}
 
 	cleanedData['banner_options'] = options;
+
+	if (options['auto_branchify']) {
+		cleanedData['auto_branchify'] = true;
+	}
 
 	self._deepviewRequestForReplay = goog.bind(this._api, self,
 		resources.deepview, cleanedData,
