@@ -4,6 +4,11 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.48.0] - 2018-12-19
+- Fixes og:type scraping bug in Journeys CTA
+- Re-adds api2 support
+- Adds support for Auto-Branchify Deep Linking
+
 ## [2.47.1] - 2018-12-03
 - Reverting back to using api.branch.io for requests
 

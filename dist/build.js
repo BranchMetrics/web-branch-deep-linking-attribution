@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api.branch.io", version:"2.47.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.48.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1099,6 +1099,7 @@ utils.cleanLinkData = function(a) {
   b.$og_description || (b.$og_description = utils.getOpenGraphContent("description"));
   b.$og_image_url || (b.$og_image_url = utils.getOpenGraphContent("image"));
   b.$og_video || (b.$og_video = utils.getOpenGraphContent("video"));
+  b.$og_type || (b.$og_type = utils.getOpenGraphContent("type"));
   "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?\&]_branch_match_id=\d+)/, ""));
   try {
     safejson.parse(b);
@@ -2397,6 +2398,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   e.data = utils.merge(utils.getHostedDeepLinkData(), e.data);
   e.data = utils.merge(utils.whiteListJourneysLanguageData(f || {}), e.data);
   c && (e.data.link_click_id = c);
+  (a = f.data ? JSON.parse(f.data) : null) && a["+referrer"] && (e.data["+referrer"] = a["+referrer"]);
   return e = utils.cleanLinkData(e);
 };
 // Input 16
@@ -2542,9 +2544,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     return a;
   };
   b = session.get(d._storage);
-  var f = (c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null) || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), g = !b || !b.identity_id;
+  var f = c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null, g = f || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !b || !b.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var k = function(a) {
+  var h = function(a) {
     var b = {sdk:config.version, branch_key:d.branch_key}, c = session.get(d._storage) || {}, e = session.get(d._storage, !0) || {};
     e.browser_fingerprint_id && (b._t = e.browser_fingerprint_id);
     utils.isSafari11OrGreater() || d._api(resources._r, b, function(a, b) {
@@ -2556,56 +2558,56 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       b || !e || c.has_app || (c.has_app = !0, session.update(d._storage, c), d._publishEvent("didDownloadApp"));
       a && a(null, c);
     });
-  }, h = function(b, f) {
-    f && (f = e(f), utils.userPreferences.trackingDisabled || session.set(d._storage, f, g), d.init_state = init_states.INIT_SUCCEEDED, f.data_parsed = f.data && 0 !== f.data.length ? safejson.parse(f.data) : {});
+  }, l = function(b, g) {
+    g && (g = e(g), utils.userPreferences.trackingDisabled || session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data && 0 !== g.data.length ? safejson.parse(g.data) : {});
     if (b) {
-      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = b.message), a(b, f && utils.whiteListSessionData(f));
+      return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = b.message), a(b, g && utils.whiteListSessionData(g));
     }
     try {
-      a(b, f && utils.whiteListSessionData(f));
+      a(b, g && utils.whiteListSessionData(g));
     } catch (r) {
     } finally {
       d.renderFinalize();
     }
-    var h = utils.getAdditionalMetadata(), k = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
-    k && (k = utils.mergeHostedDeeplinkData(h.hosted_deeplink_data, k)) && 0 < Object.keys(k).length && (h.hosted_deeplink_data = k);
-    var l = branch_view._getPageviewRequestData(journeys_utils._getPageviewMetadata(c, h), c, d, !1);
+    var h = utils.getAdditionalMetadata(), l = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
+    l && (l = utils.mergeHostedDeeplinkData(h.hosted_deeplink_data, l)) && 0 < Object.keys(l).length && (h.hosted_deeplink_data = l);
+    var m = branch_view._getPageviewRequestData(journeys_utils._getPageviewMetadata(c, h), c, d, !1);
     d.renderQueue(function() {
-      d._api(resources.pageview, l, function(a, b) {
+      d._api(resources.pageview, m, function(a, b) {
         if (!a && "object" === typeof b) {
-          var d = l.branch_view_id ? !0 : !1;
-          branch_view.shouldDisplayJourney(b, c, d) ? branch_view.displayJourney(b.template, l, l.branch_view_id || b.event_data.branch_view_data.id, b.event_data.branch_view_data, d) : journeys_utils.branch._publishEvent("willNotShowJourney");
+          var e = m.branch_view_id ? !0 : !1;
+          branch_view.shouldDisplayJourney(b, c, e) ? branch_view.displayJourney(b.template, m, m.branch_view_id || b.event_data.branch_view_data.id, b.event_data.branch_view_data, e) : ((b.auto_branchify || !f && utils.getParamValue("branchify_url") && d._referringLink()) && this.branch.deepview({}, {make_new_link:!1, open_app:!0, auto_branchify:!0}), journeys_utils.branch._publishEvent("willNotShowJourney"));
         }
         utils.userPreferences.trackingDisabled && (utils.userPreferences.allowErrorsInCallback = !0);
       });
     });
-  }, l = function() {
+  }, m = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && !d.changeEventListenerAdded && (d.changeEventListenerAdded = !0, document.addEventListener(b, function() {
-      document[a] || (k(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
+      document[a] || (h(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
     }, !1));
   };
-  if (b && b.session_id && !f) {
-    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), l(), k(h);
+  if (b && b.session_id && !g && !utils.getParamValue("branchify_url")) {
+    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), m(), h(l);
   } else {
     b = {sdk:config.version, branch_key:d.branch_key};
-    var m = session.get(d._storage, !0) || {};
-    m.browser_fingerprint_id && (b._t = m.browser_fingerprint_id);
-    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:f, browser_fingerprint_id:f || m.browser_fingerprint_id, alternative_browser_fingerprint_id:m.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
+    var n = session.get(d._storage, !0) || {};
+    n.browser_fingerprint_id && (b._t = n.browser_fingerprint_id);
+    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || n.browser_fingerprint_id, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-      a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), f && (b.click_id = f));
-      l();
-      h(a, b);
+      a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
+      m();
+      l(a, b);
     }) : d._api(resources._r, b, function(a, b) {
       if (a) {
-        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, h(a, null);
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, l(a, null);
       }
-      d._api(resources.open, {link_identifier:f, browser_fingerprint_id:f || b, alternative_browser_fingerprint_id:m.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
+      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || b, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink())}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-        a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), f && (b.click_id = f));
-        l();
-        h(a, b);
+        a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
+        m();
+        l(a, b);
       });
     });
   }
@@ -2746,6 +2748,7 @@ Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c)
   var f = d._referringLink();
   f && !c.make_new_link && (b.link_click_id = utils.getClickIdAndSearchStringFromLink(f));
   b.banner_options = c;
+  c.auto_branchify && (b.auto_branchify = !0);
   d._deepviewRequestForReplay = goog.bind(this._api, d, resources.deepview, b, function(b, c) {
     if (b) {
       return utils.userPreferences.trackingDisabled || (d._deepviewCta = function() {
