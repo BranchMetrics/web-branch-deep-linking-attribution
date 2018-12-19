@@ -38,7 +38,7 @@ jobs:
     - run: deployment/test.sh
     # Runs when merging into master or production
     - run: |
-           pip uninstall urllib3; pip install urllib3==1.22 --user
+           pip uninstall -y urllib3; pip install urllib3==1.22 --user
            deployment/deploy.sh
 
 workflows:
