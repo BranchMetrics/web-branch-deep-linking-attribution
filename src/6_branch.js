@@ -459,7 +459,8 @@ Branch.prototype['init'] = wrap(
 									requestData,
 									requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
 									pageviewResponse['event_data']['branch_view_data'],
-									journeyInTestMode
+									journeyInTestMode,
+									pageviewResponse['journey_link_data']
 								);
 							}
 							else {
@@ -887,7 +888,8 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 							requestData,
 							requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
 							pageviewResponse['event_data']['branch_view_data'],
-							journeyInTestMode
+							journeyInTestMode,
+							pageviewResponse['journey_link_data']
 						);
 					}
 					else {
