@@ -34,7 +34,6 @@ journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
-journeys_utils.journeyLinkDataRe =  /<script id="journeyLinkData" type="application\/json">((.|\s)*?)<\/script>/;
 
 journeys_utils.branch = null;
 journeys_utils.banner = null;
@@ -193,7 +192,6 @@ journeys_utils.removeScriptAndCss = function(html) {
 	var matchJson = html.match(journeys_utils.jsonRe);
 	var matchJs = html.match(journeys_utils.jsRe);
 	var matchCss = html.match(journeys_utils.cssRe);
-	var matchJourneyLinkData = html.match(journeys_utils.journeyLinkDataRe);
 
 	if(matchJson) {
 		html = html.replace(journeys_utils.jsonRe,'');
@@ -203,9 +201,6 @@ journeys_utils.removeScriptAndCss = function(html) {
 	}
 	if(matchCss) {
 		html = html.replace(journeys_utils.cssRe,'');
-	}
-	if (matchJourneyLinkData) {
-		html = html.replace(journeys_utils.journeyLinkDataRe, '');
 	}
 
 	return html;
@@ -580,7 +575,8 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 									requestData,
 									requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
 									data['event_data']['branch_view_data'],
-									false
+									false,
+									data['journey_link_data']
 								);
 							}
 						}
@@ -671,22 +667,12 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	}, speedAndDelay);
 }
 
-journeys_utils.setJourneyLinkData = function(html) {
+journeys_utils.setJourneyLinkData = function(linkData) {
 	var data = { 'banner_id': journeys_utils.branchViewId };
-	var match = html.match(journeys_utils.journeyLinkDataRe);
-	if (match) {
-		var src = match[1];
-		var linkData = '';
-		try {
-			linkData = safejson.parse(src);
-		}
-		catch (e) {
-		}
-		if (linkData) {
-			var journeyLinkDataPropertiesToFilterOut = ['browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id'];
-			utils.removePropertiesFromObject(linkData['journey_link_data'], journeyLinkDataPropertiesToFilterOut)
-			data = utils.merge(data, linkData);
-		}
-	}
+	if (linkData) {
+		var journeyLinkDataPropertiesToFilterOut = ['browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id'];
+		utils.removePropertiesFromObject(linkData, journeyLinkDataPropertiesToFilterOut);
+		data = utils.merge(data, linkData);
+    }
 	journeys_utils.journeyLinkData = data;
 }

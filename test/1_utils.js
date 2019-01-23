@@ -634,16 +634,27 @@ describe('utils', function() {
 
 	describe('setJourneyLinkData', function() {
 		it('should set journeys_utils.journeyLinkData with bannerid and journey link data', function() {
-			var html = '<script id="journeyLinkData" type="application/json">' +
-				'{"journey_link_data":{"open_app":false,"data":{"a":"b"},"tags":["Top_View"],"source":"web-sdk","feature":"journeys","app_id":"408352930148667465","browser_fingerprint_id":"429360597355859736","campaign":"campaign_name (2)"}}' +
-				'</script>';
-			journeys_utils.branchViewId = "428699261402931211";
-			journeys_utils.setJourneyLinkData(html);
-			var expected = { "banner_id":"428699261402931211",
-					"journey_link_data":{ "data":{ "a":"b" },
+			var journeyLinkData = {
+				"banner_id":"428699261402931211",
+				"journey_link_data":{
+					"data":{ "a":"b" },
 					"tags":[ "Top_View" ],
 					"feature":"journeys",
-					"campaign":"campaign_name (2)" } };
+					"campaign":"campaign_name (2)"
+				}
+			};
+
+			journeys_utils.branchViewId = "428699261402931211";
+			journeys_utils.setJourneyLinkData(journeyLinkData);
+			var expected = {
+				"banner_id":"428699261402931211",
+				"journey_link_data":{
+					"data":{ "a":"b" },
+					"tags":[ "Top_View" ],
+					"feature":"journeys",
+					"campaign":"campaign_name (2)"
+				}
+			};
 
 			assert.deepEqual(
 				expected,
