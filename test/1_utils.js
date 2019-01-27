@@ -634,14 +634,14 @@ describe('utils', function() {
 
 	describe('setJourneyLinkData', function() {
 		it('should set journeys_utils.journeyLinkData with bannerid and journey link data', function() {
-			var ctaLinKData = {
+			var ctaLinkData = {
 				"data":{ "a":"b" },
 				"tags":[ "Top_View" ],
 				"feature":"journeys",
 				"campaign":"campaign_name (2)"
 			};
 			journeys_utils.branchViewId = "428699261402931211";
-			journeys_utils.setJourneyLinkData(ctaLinKData);
+			journeys_utils.setJourneyLinkData(ctaLinkData);
 			var expected = {
 				"banner_id": "428699261402931211",
 				"journey_link_data":{
