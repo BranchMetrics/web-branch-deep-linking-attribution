@@ -21,7 +21,6 @@ function checkPreviousBanner() {
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp) {
-	journeys_utils.setJourneyLinkData(html);
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
@@ -107,8 +106,11 @@ branch_view.incrementPageviewAnalytics = function(branchViewData) {
 	);
 };
 
-branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled) {
+branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled, journeyLinkData) {
+
 	journeys_utils.branchViewId = templateId;
+	journeys_utils.setJourneyLinkData(journeyLinkData);
+
 	var audienceRuleId = branchViewData['audience_rule_id'];
 
 	// this code removes any leftover css from previous banner
