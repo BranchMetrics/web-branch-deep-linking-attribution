@@ -14,6 +14,7 @@ journeys_utils.bannerHeight = '76px';
 journeys_utils.isFullPage = false;
 journeys_utils.isHalfPage = false;
 journeys_utils.divToInjectParents = [];
+journeys_utils.isSafeAreaEnabled = false;
 
 // used to set height of full page interstitials
 journeys_utils.windowHeight = window.innerHeight;
@@ -457,23 +458,32 @@ journeys_utils._isSafeAreaRequired = function(journeyLinkData) {
 	return false;
 }
 
-journeys_utils._dynamicallyRepositionBanner = function() {
-	// disable Journey animation to avoid lag when repositioning the banner 
-	document.getElementById('branch-banner-iframe').style.transition = "all 0s"
-	// make sure on the first journey load the position is correct
-	journeys_utils._resetJourneysBannerPosition(false, true);
-	// resize listener for Safari in-app webview resize due to bottom/top nav bar
-	window.addEventListener("resize", function () {
+journeys_utils.resizeListener = function () {
+	if (journeys_utils.isSafeAreaEnabled) {
 		journeys_utils._resetJourneysBannerPosition(false);
-	});
-	// scroll listener for bottom overscrolling edge case
-	window.addEventListener("scroll", function () {
+	}
+}
+
+journeys_utils.scrollListener = function () {
+	if (journeys_utils.isSafeAreaEnabled) {
 		if (window.pageYOffset > window.innerHeight) {
 			journeys_utils._resetJourneysBannerPosition(true);
 		} else {
 			journeys_utils._resetJourneysBannerPosition(false);
 		}
-	});
+	}
+}
+
+journeys_utils._dynamicallyRepositionBanner = function() {
+	journeys_utils.isSafeAreaEnabled = true;
+	// disable Journey animation to avoid lag when repositioning the banner 
+	document.getElementById('branch-banner-iframe').style.transition = "all 0s"
+	// make sure on the first journey load the position is correct
+	journeys_utils._resetJourneysBannerPosition(false, true);
+	// resize listener for Safari in-app webview resize due to bottom/top nav bar
+	window.addEventListener("resize", journeys_utils.resizeListener());
+	// scroll listener for bottom overscrolling edge case
+	window.addEventListener("scroll", journeys_utils.scrollListener());
 }
 
 journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling, checkIfPageAlreadyScrollingOnFirstLoad) {
@@ -729,6 +739,13 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 		banner_utils.removeClass(document.body, 'branch-banner-no-scroll');
+
+		// clear any safe area listeners on banner closing
+		if (journeys_utils.isSafeAreaEnabled) {
+			journeys_utils.isSafeAreaEnabled = false;
+			window.removeEventListener("resize", journeys_utils.resizeListener());
+			window.removeEventListener("scroll", journeys_utils.scrollListener());
+		}
 
         	journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
         	if (!dismissedJourneyProgrammatically) {
