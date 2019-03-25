@@ -458,13 +458,13 @@ journeys_utils._isSafeAreaRequired = function(journeyLinkData) {
 	return false;
 }
 
-journeys_utils.resizeListener = function () {
+journeys_utils._resizeListener = function () {
 	if (journeys_utils.isSafeAreaEnabled) {
 		journeys_utils._resetJourneysBannerPosition(false);
 	}
 }
 
-journeys_utils.scrollListener = function () {
+journeys_utils._scrollListener = function () {
 	if (journeys_utils.isSafeAreaEnabled) {
 		if (window.pageYOffset > window.innerHeight) {
 			journeys_utils._resetJourneysBannerPosition(true);
@@ -481,9 +481,9 @@ journeys_utils._dynamicallyRepositionBanner = function() {
 	// make sure on the first journey load the position is correct
 	journeys_utils._resetJourneysBannerPosition(false, true);
 	// resize listener for Safari in-app webview resize due to bottom/top nav bar
-	window.addEventListener("resize", journeys_utils.resizeListener());
+	window.addEventListener("resize", journeys_utils._resizeListener);
 	// scroll listener for bottom overscrolling edge case
-	window.addEventListener("scroll", journeys_utils.scrollListener());
+	window.addEventListener("scroll", journeys_utils._scrollListener);
 }
 
 journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling, checkIfPageAlreadyScrollingOnFirstLoad) {
@@ -743,8 +743,8 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		// clear any safe area listeners on banner closing
 		if (journeys_utils.isSafeAreaEnabled) {
 			journeys_utils.isSafeAreaEnabled = false;
-			window.removeEventListener("resize", journeys_utils.resizeListener());
-			window.removeEventListener("scroll", journeys_utils.scrollListener());
+			window.removeEventListener("resize", journeys_utils.resizeListener);
+			window.removeEventListener("scroll", journeys_utils.scrollListener);
 		}
 
         	journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
