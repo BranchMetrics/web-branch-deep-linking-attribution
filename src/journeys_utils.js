@@ -438,12 +438,83 @@ journeys_utils.animateBannerEntrance = function(banner) {
 			banner.style.top = '0';
 		}
 		else if (journeys_utils.position === 'bottom') {
-			banner.style.bottom = '0';
+			if(!journeys_utils._isSafeAreaRequired(journeys_utils.journeyLinkData)) {
+				banner.style.bottom = '0';
+			} else {
+				journeys_utils._dynamicallyRepositionBanner(banner);
+			}
 		}
         journeys_utils.branch._publishEvent('didShowJourney', journeys_utils.journeyLinkData);
 		journeys_utils.isJourneyDisplayed = true;
 	}
 	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
+}
+
+journeys_utils._isSafeAreaRequired = function(journeyLinkData) {
+	if (journeyLinkData['safeAreaRequired'] && journeys_utils._detectSafeAreaDevices()) {
+		return true;
+	}
+	return false;
+}
+
+journeys_utils._dynamicallyRepositionBanner = function() {
+	// disable Journey animation to avoid lag when repositioning the banner 
+	document.getElementById('branch-banner-iframe').style.transition = "all 0s"
+	// make sure on the first journey load the position is correct
+	journeys_utils._resetJourneysBannerPosition(false, true);
+	// resize listener for Safari in-app webview resize due to bottom/top nav bar
+	window.addEventListener("resize", function () {
+		journeys_utils._resetJourneysBannerPosition(false);
+	});
+	// scroll listener for bottom overscrolling edge case
+	window.addEventListener("scroll", function () {
+		if (window.pageYOffset > window.innerHeight) {
+			journeys_utils._resetJourneysBannerPosition(true);
+		} else {
+			journeys_utils._resetJourneysBannerPosition(false);
+		}
+	});
+}
+
+journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling, checkIfPageAlreadyScrollingOnFirstLoad) {
+	var bannerIFrame = document.getElementById('branch-banner-iframe');
+	var bannerHeight = bannerIFrame.offsetHeight;
+	var bannerTopDistance = bannerIFrame.offsetTop;
+	var windowHeight = window.innerHeight;
+
+	// on first load check if the page is already scrolling
+	if(checkIfPageAlreadyScrollingOnFirstLoad) {
+		if(window.pageYOffset !== 0) {
+			bannerIFrame.style.bottom = '0';
+			return false;
+		}
+	}
+
+	if (!isPageBottomOverScrolling) {
+		// always keep banner top location equal to the height specified
+		if ((windowHeight - bannerTopDistance) != bannerHeight) {
+			bannerIFrame.style.top = "" + (windowHeight - bannerHeight) + "px";
+		}
+	} else {
+		// bottom overscrolling is usually equivalent to half the banner size 
+		bannerIFrame.style.top = (windowHeight - bannerHeight) + (bannerHeight / 2) + "px";
+	}
+}
+
+// generic method to detect which devices should call journey_utls._dynamicallyRepositionBanner()
+journeys_utils._detectSafeAreaDevices = function() {
+	var isFormFactoriOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	var ratio = window.devicePixelRatio || 1;
+	var screen = {
+		width: journeys_utils.windowWidth * ratio,
+		height: journeys_utils.windowHeight * ratio
+	};
+
+	// iPhone X Detection
+	if (isFormFactoriOS && screen.width == 1125 && screen.height === 2436) {
+		return true;
+	}
+	return false;
 }
 
 journeys_utils._addSecondsToDate = function(seconds) {
