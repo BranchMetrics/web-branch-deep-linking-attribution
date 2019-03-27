@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/web-branch-deep-linking
     docker:
-    - image: circleci/node:6.11.2
+    - image: circleci/node:6.11.2-stretch
     steps:
     - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
@@ -24,13 +24,13 @@ jobs:
            jshint -v || sudo npm install -g jshint ;
            which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
     # Installing Java
-    - run: sudo su -c 'echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list'
+    # - run: sudo su -c 'echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list'
     - run: |
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
-          sudo apt install -t jessie-backports openjdk-8-jre-headless ca-certificates-java
+          sudo apt install -t openjdk-8-jre-headless ca-certificates-java
     # Install aws cli
-    - run: sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev ;
+    - run: sudo apt-get install -qq -y python-pip libpython-dev ;
            curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
            pip install awscli --upgrade --user && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
            sudo npm install -g slack-cli ;
