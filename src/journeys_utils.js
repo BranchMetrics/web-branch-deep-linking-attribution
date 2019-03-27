@@ -442,7 +442,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
 			if(!journeys_utils._isSafeAreaRequired(journeys_utils.journeyLinkData)) {
 				banner.style.bottom = '0';
 			} else {
-				journeys_utils._dynamicallyRepositionBanner(banner);
+				journeys_utils._dynamicallyRepositionBanner();
 			}
 		}
         journeys_utils.branch._publishEvent('didShowJourney', journeys_utils.journeyLinkData);
@@ -460,16 +460,16 @@ journeys_utils._isSafeAreaRequired = function(journeyLinkData) {
 
 journeys_utils._resizeListener = function () {
 	if (journeys_utils.isSafeAreaEnabled) {
-		journeys_utils._resetJourneysBannerPosition(false);
+		journeys_utils._resetJourneysBannerPosition(false, false);
 	}
 }
 
 journeys_utils._scrollListener = function () {
 	if (journeys_utils.isSafeAreaEnabled) {
 		if (window.pageYOffset > window.innerHeight) {
-			journeys_utils._resetJourneysBannerPosition(true);
+			journeys_utils._resetJourneysBannerPosition(true, false);
 		} else {
-			journeys_utils._resetJourneysBannerPosition(false);
+			journeys_utils._resetJourneysBannerPosition(false, false);
 		}
 	}
 }
@@ -743,8 +743,8 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		// clear any safe area listeners on banner closing
 		if (journeys_utils.isSafeAreaEnabled) {
 			journeys_utils.isSafeAreaEnabled = false;
-			window.removeEventListener("resize", journeys_utils.resizeListener);
-			window.removeEventListener("scroll", journeys_utils.scrollListener);
+			window.removeEventListener("resize", journeys_utils._resizeListener);
+			window.removeEventListener("scroll", journeys_utils._scrollListener);
 		}
 
         	journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
