@@ -439,7 +439,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
 			banner.style.top = '0';
 		}
 		else if (journeys_utils.position === 'bottom') {
-			if(!journeys_utils._isSafeAreaRequired(journeys_utils.journeyLinkData)) {
+			if(!journeys_utils.journeyLinkData.journey_link_data['safeAreaRequired']) {
 				banner.style.bottom = '0';
 			} else {
 				journeys_utils._dynamicallyRepositionBanner();
@@ -449,13 +449,6 @@ journeys_utils.animateBannerEntrance = function(banner) {
 		journeys_utils.isJourneyDisplayed = true;
 	}
 	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
-}
-
-journeys_utils._isSafeAreaRequired = function(journeyLinkData) {
-	if (journeyLinkData['safeAreaRequired'] && journeys_utils._detectSafeAreaDevices()) {
-		return true;
-	}
-	return false;
 }
 
 journeys_utils._resizeListener = function () {
@@ -509,22 +502,6 @@ journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling
 		// bottom overscrolling is usually equivalent to half the banner size 
 		bannerIFrame.style.top = (windowHeight - bannerHeight) + (bannerHeight / 2) + "px";
 	}
-}
-
-// generic method to detect which devices should call journey_utls._dynamicallyRepositionBanner()
-journeys_utils._detectSafeAreaDevices = function() {
-	var isFormFactoriOS = !!navigator.platform.match(/iPhone|iPod|iPad/);
-	var ratio = window.devicePixelRatio || 1;
-	var screen = {
-		width: journeys_utils.windowWidth * ratio,
-		height: journeys_utils.windowHeight * ratio
-	};
-
-	// iPhone X Detection
-	if (isFormFactoriOS && screen.width == 1125 && screen.height === 2436) {
-		return true;
-	}
-	return false;
 }
 
 journeys_utils._addSecondsToDate = function(seconds) {
@@ -675,7 +652,8 @@ journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
 		"user_agent": navigator.userAgent,
 		"language": navigator.language,
 		"screen_width": screen.width || -1,
-		"screen_height": screen.height || -1
+		"screen_height": screen.height || -1,
+		"window_device_pixel_ratio": window.devicePixelRatio || 1
 	}, additionalMetadata || {});
 };
 
