@@ -513,7 +513,7 @@ journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling
 
 // generic method to detect which devices should call journey_utls._dynamicallyRepositionBanner()
 journeys_utils._detectSafeAreaDevices = function() {
-	var isFormFactoriOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	var isFormFactoriOS = !!navigator.platform.match(/iPhone|iPod|iPad/);
 	var ratio = window.devicePixelRatio || 1;
 	var screen = {
 		width: journeys_utils.windowWidth * ratio,
