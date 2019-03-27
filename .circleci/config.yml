@@ -28,7 +28,7 @@ jobs:
     - run: |
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
-          sudo apt install -t openjdk-8-jre-headless ca-certificates-java
+          sudo apt install -t openjdk-8-jdk-headless
     # Install aws cli
     - run: sudo apt-get install -qq -y python-pip libpython-dev ;
            curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
