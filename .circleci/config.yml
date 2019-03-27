@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/web-branch-deep-linking
     docker:
-    - image: circleci/node:6.11.2-stretch
+    - image: circleci/node:6.11.5
     steps:
     - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
@@ -28,7 +28,7 @@ jobs:
     - run: |
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
-          sudo apt install -t openjdk-8-jdk-headless
+          sudo apt install -t openjdk-8-jre-headless ca-certificates-java
     # Install aws cli
     - run: sudo apt-get install -qq -y python-pip libpython-dev ;
            curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
