@@ -14,6 +14,7 @@ journeys_utils.bannerHeight = '76px';
 journeys_utils.isFullPage = false;
 journeys_utils.isHalfPage = false;
 journeys_utils.divToInjectParents = [];
+journeys_utils.isSafeAreaEnabled = false; 
 
 // used to set height of full page interstitials
 journeys_utils.windowHeight = window.innerHeight;
@@ -438,12 +439,69 @@ journeys_utils.animateBannerEntrance = function(banner) {
 			banner.style.top = '0';
 		}
 		else if (journeys_utils.position === 'bottom') {
-			banner.style.bottom = '0';
+			if(!journeys_utils.journeyLinkData.journey_link_data['safeAreaRequired']) {
+				banner.style.bottom = '0';
+			} else {
+				journeys_utils._dynamicallyRepositionBanner();
+			}
 		}
         journeys_utils.branch._publishEvent('didShowJourney', journeys_utils.journeyLinkData);
 		journeys_utils.isJourneyDisplayed = true;
 	}
 	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
+}
+
+journeys_utils._resizeListener = function () {
+	if (journeys_utils.isSafeAreaEnabled) {
+		journeys_utils._resetJourneysBannerPosition(false, false);
+	}
+}
+
+journeys_utils._scrollListener = function () {
+	if (journeys_utils.isSafeAreaEnabled) {
+		if (window.pageYOffset > window.innerHeight) {
+			journeys_utils._resetJourneysBannerPosition(true, false);
+		} else {
+			journeys_utils._resetJourneysBannerPosition(false, false);
+		}
+	}
+}
+
+journeys_utils._dynamicallyRepositionBanner = function() {
+	journeys_utils.isSafeAreaEnabled = true;
+	// disable Journey animation to avoid lag when repositioning the banner 
+	document.getElementById('branch-banner-iframe').style.transition = "all 0s"
+	// make sure on the first journey load the position is correct
+	journeys_utils._resetJourneysBannerPosition(false, true);
+	// resize listener for Safari in-app webview resize due to bottom/top nav bar
+	window.addEventListener("resize", journeys_utils._resizeListener);
+	// scroll listener for bottom overscrolling edge case
+	window.addEventListener("scroll", journeys_utils._scrollListener);
+}
+
+journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling, checkIfPageAlreadyScrollingOnFirstLoad) {
+	var bannerIFrame = document.getElementById('branch-banner-iframe');
+	var bannerHeight = bannerIFrame.offsetHeight;
+	var bannerTopDistance = bannerIFrame.offsetTop;
+	var windowHeight = window.innerHeight;
+
+	// on first load check if the page is already scrolling
+	if(checkIfPageAlreadyScrollingOnFirstLoad) {
+		if(window.pageYOffset !== 0) {
+			bannerIFrame.style.bottom = '0';
+			return false;
+		}
+	}
+
+	if (!isPageBottomOverScrolling) {
+		// always keep banner top location equal to the height specified
+		if ((windowHeight - bannerTopDistance) != bannerHeight) {
+			bannerIFrame.style.top = "" + (windowHeight - bannerHeight) + "px";
+		}
+	} else {
+		// bottom overscrolling is usually equivalent to half the banner size 
+		bannerIFrame.style.top = (windowHeight - bannerHeight) + (bannerHeight / 2) + "px";
+	}
 }
 
 journeys_utils._addSecondsToDate = function(seconds) {
@@ -594,7 +652,8 @@ journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
 		"user_agent": navigator.userAgent,
 		"language": navigator.language,
 		"screen_width": screen.width || -1,
-		"screen_height": screen.height || -1
+		"screen_height": screen.height || -1,
+		"window_device_pixel_ratio": window.devicePixelRatio || 1
 	}, additionalMetadata || {});
 };
 
@@ -659,6 +718,12 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
 		banner_utils.removeClass(document.body, 'branch-banner-no-scroll');
 
+		// clear any safe area listeners on banner closing
+		if (journeys_utils.isSafeAreaEnabled) {
+			journeys_utils.isSafeAreaEnabled = false;
+			window.removeEventListener("resize", journeys_utils._resizeListener);
+			window.removeEventListener("scroll", journeys_utils._scrollListener);
+		}
         	journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
         	if (!dismissedJourneyProgrammatically) {
 			journeys_utils.branch._publishEvent('branch_internal_event_didCloseJourney', journeys_utils.journeyLinkData);
