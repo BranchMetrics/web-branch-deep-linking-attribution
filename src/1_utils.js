@@ -952,11 +952,11 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 	}
 };
 
-utils.getPropertyValueByNameFromObject = function(object, name) {
-	if (object && typeof object === "object") {
-		for (var key in object) {
-			if (object.hasOwnProperty(key) && key===name) {
-				return object[key];
+utils.getPropertyValueByNameFromObj = function(objectToSearch, name) {
+	if (objectToSearch && typeof objectToSearch === "object") {
+		for (var key in objectToSearch) {
+			if (objectToSearch.hasOwnProperty(key) && key===name) {
+				return objectToSearch[key];
 			}
 		}
 	}
