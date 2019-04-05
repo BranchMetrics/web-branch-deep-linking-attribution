@@ -439,7 +439,7 @@ journeys_utils.animateBannerEntrance = function(banner) {
 			banner.style.top = '0';
 		}
 		else if (journeys_utils.position === 'bottom') {
-			var safeAreaRequired = utils.getPropertyValueByNameFromObject(journeys_utils.journeyLinkData['journey_link_data'], 'safeAreaRequired') || false;
+			var safeAreaRequired = utils.getPropertyValueByNameFromObj(journeys_utils.journeyLinkData['journey_link_data'], 'safeAreaRequired') || false;
 			if(!safeAreaRequired) {
 				banner.style.bottom = '0';
 			} else {
