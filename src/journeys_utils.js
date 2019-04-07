@@ -439,8 +439,8 @@ journeys_utils.animateBannerEntrance = function(banner) {
 			banner.style.top = '0';
 		}
 		else if (journeys_utils.position === 'bottom') {
-			var safeAreaRequired = utils.getPropertyValueByNameFromObj(journeys_utils.journeyLinkData['journey_link_data'], 'safeAreaRequired') || false;
-			if(!safeAreaRequired) {
+			// check if safeAreaRequired is true or not
+			if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
 				banner.style.bottom = '0';
 			} else {
 				journeys_utils._dynamicallyRepositionBanner();

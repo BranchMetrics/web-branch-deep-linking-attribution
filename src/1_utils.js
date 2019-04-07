@@ -952,16 +952,6 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 	}
 };
 
-utils.getPropertyValueByNameFromObj = function(objectToSearch, name) {
-	if (objectToSearch && typeof objectToSearch === "object") {
-		for (var key in objectToSearch) {
-			if (objectToSearch.hasOwnProperty(key) && key===name) {
-				return objectToSearch[key];
-			}
-		}
-	}
-}
-
 // v2/event utility functions
 
 var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_ITEM', 'VIEW_ITEMS', 'RATE', 'SHARE', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENT' ];
