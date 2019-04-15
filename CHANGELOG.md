@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.49.1] - 2019-04-15
+- INTENG-4678: Adding support for Journey bottom banners for iPhone X browsers with safe areas
+
 ## [2.49.0] - 2019-01-30
 - Reads journey_link_data property from /v1/pageview response versus reading it from Journeys template.
 

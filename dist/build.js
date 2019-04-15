@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.49.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.49.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2027,7 +2027,7 @@ var sendSMS = function(a, b, c, d) {
   return p;
 };
 // Input 14
-var journeys_utils = {_callback_index:1, position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[]};
+var journeys_utils = {_callback_index:1, position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[], isSafeAreaEnabled:!1};
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
 window.innerHeight < window.innerWidth && (journeys_utils.windowHeight = window.innerWidth, journeys_utils.windowWidth = window.innerHeight);
@@ -2192,10 +2192,30 @@ journeys_utils.animateBannerEntrance = function(a) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
   journeys_utils.isFullPage && "fixed" === journeys_utils.sticky && banner_utils.addClass(document.body, "branch-banner-no-scroll");
   setTimeout(function() {
-    "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (a.style.bottom = "0");
+    "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.bottom = "0" : journeys_utils._dynamicallyRepositionBanner());
     journeys_utils.branch._publishEvent("didShowJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !0;
   }, journeys_utils.animationDelay);
+};
+journeys_utils._resizeListener = function() {
+  journeys_utils.isSafeAreaEnabled && journeys_utils._resetJourneysBannerPosition(!1, !1);
+};
+journeys_utils._scrollListener = function() {
+  journeys_utils.isSafeAreaEnabled && (window.pageYOffset > window.innerHeight ? journeys_utils._resetJourneysBannerPosition(!0, !1) : journeys_utils._resetJourneysBannerPosition(!1, !1));
+};
+journeys_utils._dynamicallyRepositionBanner = function() {
+  journeys_utils.isSafeAreaEnabled = !0;
+  document.getElementById("branch-banner-iframe").style.transition = "all 0s";
+  journeys_utils._resetJourneysBannerPosition(!1, !0);
+  window.addEventListener("resize", journeys_utils._resizeListener);
+  window.addEventListener("scroll", journeys_utils._scrollListener);
+};
+journeys_utils._resetJourneysBannerPosition = function(a, b) {
+  var c = document.getElementById("branch-banner-iframe"), d = c.offsetHeight, e = c.offsetTop, f = window.innerHeight;
+  if (b && 0 !== window.pageYOffset) {
+    return c.style.bottom = "0", !1;
+  }
+  a ? c.style.top = f - d + d / 2 + "px" : f - e != d && (c.style.top = "" + (f - d) + "px");
 };
 journeys_utils._addSecondsToDate = function(a) {
   var b = new Date;
@@ -2262,7 +2282,7 @@ journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, k) {
   }
 };
 journeys_utils._getPageviewMetadata = function(a, b) {
-  return utils.merge({url:a && a.url || utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1}, b || {});
+  return utils.merge({url:a && a.url || utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1, window_device_pixel_ratio:window.devicePixelRatio || 1}, b || {});
 };
 journeys_utils.animateBannerExit = function(a, b) {
   if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
@@ -2285,6 +2305,7 @@ journeys_utils.animateBannerExit = function(a, b) {
     "top" === journeys_utils.position ? document.body.style.marginTop = journeys_utils.bodyMarginTop : "bottom" === journeys_utils.position && (document.body.style.marginBottom = journeys_utils.bodyMarginBottom);
     banner_utils.removeClass(document.body, "branch-banner-is-active");
     banner_utils.removeClass(document.body, "branch-banner-no-scroll");
+    journeys_utils.isSafeAreaEnabled && (journeys_utils.isSafeAreaEnabled = !1, window.removeEventListener("resize", journeys_utils._resizeListener), window.removeEventListener("scroll", journeys_utils._scrollListener));
     journeys_utils.branch._publishEvent("didCloseJourney", journeys_utils.journeyLinkData);
     b || journeys_utils.branch._publishEvent("branch_internal_event_didCloseJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !1;
