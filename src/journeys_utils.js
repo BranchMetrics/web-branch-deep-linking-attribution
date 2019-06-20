@@ -14,7 +14,7 @@ journeys_utils.bannerHeight = '76px';
 journeys_utils.isFullPage = false;
 journeys_utils.isHalfPage = false;
 journeys_utils.divToInjectParents = [];
-journeys_utils.isSafeAreaEnabled = false; 
+journeys_utils.isSafeAreaEnabled = false;
 
 // used to set height of full page interstitials
 journeys_utils.windowHeight = window.innerHeight;
@@ -33,6 +33,7 @@ journeys_utils.bodyMarginBottom = 0;
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
+journeys_utils.iframeCssRe = /<style type="text\/css" id="branch-iframe-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
@@ -118,6 +119,17 @@ journeys_utils.getMetadata = function(html) {
 }
 
 /***
+ * @function journeys_utils.getIframeCss
+ * @param {string} html
+ */
+journeys_utils.getIframeCss = function(html) {
+	var match = html.match(journeys_utils.iframeCssRe);
+	if (match) {
+		return match[1];
+	}
+}
+
+/***
  * @function journeys_utils.getCtaText
  * @param {Object} metadata
  * @param {boolean} hasApp
@@ -193,6 +205,7 @@ journeys_utils.removeScriptAndCss = function(html) {
 	var matchJson = html.match(journeys_utils.jsonRe);
 	var matchJs = html.match(journeys_utils.jsRe);
 	var matchCss = html.match(journeys_utils.cssRe);
+	var matchIframeCss = html.match(journeys_utils.iframeCssRe);
 
 	if(matchJson) {
 		html = html.replace(journeys_utils.jsonRe,'');
@@ -202,6 +215,9 @@ journeys_utils.removeScriptAndCss = function(html) {
 	}
 	if(matchCss) {
 		html = html.replace(journeys_utils.cssRe,'');
+	}
+	if(matchIframeCss) {
+		html = html.replace(journeys_utils.iframeCssRe, '');
 	}
 
 	return html;
@@ -269,7 +285,7 @@ journeys_utils.addHtmlToIframe = function(iframe, iframeHTML) {
  * Creates a style element on document.body and adds CSS that will determine
  * banner position, height and sticky.
  */
-journeys_utils.addIframeOuterCSS = function() {
+journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	var iFrameCSS = document.createElement('style');
 	iFrameCSS.type = 'text/css';
 	iFrameCSS.id = 'branch-iframe-css';
@@ -281,7 +297,8 @@ journeys_utils.addIframeOuterCSS = function() {
 	var bodyMarginBottomNumber = +journeys_utils.bodyMarginBottom.slice(0, -2);
 	var bannerMarginNumber = +journeys_utils.bannerHeight.slice(0, -2);
 
-	if (journeys_utils.position === 'top') {
+	if (cssIframeContainer) {}
+	else if (journeys_utils.position === 'top') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
 		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
 	}
@@ -325,7 +342,11 @@ journeys_utils.addIframeOuterCSS = function() {
 
 	journeys_utils.journeyDismissed = false;
 
-	iFrameCSS.innerHTML = generateIframeOuterCSS();
+	if (cssIframeContainer) {
+		iFrameCSS.innerHTML = cssIframeContainer;
+	} else {
+		iFrameCSS.innerHTML = generateIframeOuterCSS();
+	}
 
 	utils.addNonceAttribute(iFrameCSS);
 
@@ -428,25 +449,30 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
  * @function journeys_utils.animateBannerEntrance
  * @param {Object} banner
  */
-journeys_utils.animateBannerEntrance = function(banner) {
+journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 	if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
 		banner_utils.addClass(document.body, 'branch-banner-no-scroll');
 	}
 
 	function onAnimationEnd() {
-		if (journeys_utils.position === 'top') {
-			banner.style.top = '0';
-		}
-		else if (journeys_utils.position === 'bottom') {
-			// check if safeAreaRequired is true or not
-			if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
-				banner.style.bottom = '0';
-			} else {
-				journeys_utils._dynamicallyRepositionBanner();
+		if (cssIframeContainer) {
+			banner.style.top = null;
+			banner.style.bottom = null;
+		} else {
+			if (journeys_utils.position === 'top') {
+				banner.style.top = '0';
+			}
+			else if (journeys_utils.position === 'bottom') {
+				// check if safeAreaRequired is true or not
+				if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
+					banner.style.bottom = '0';
+				} else {
+					journeys_utils._dynamicallyRepositionBanner();
+				}
 			}
 		}
-        journeys_utils.branch._publishEvent('didShowJourney', journeys_utils.journeyLinkData);
+		journeys_utils.branch._publishEvent('didShowJourney', journeys_utils.journeyLinkData);
 		journeys_utils.isJourneyDisplayed = true;
 	}
 	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
@@ -470,7 +496,7 @@ journeys_utils._scrollListener = function () {
 
 journeys_utils._dynamicallyRepositionBanner = function() {
 	journeys_utils.isSafeAreaEnabled = true;
-	// disable Journey animation to avoid lag when repositioning the banner 
+	// disable Journey animation to avoid lag when repositioning the banner
 	document.getElementById('branch-banner-iframe').style.transition = "all 0s"
 	// make sure on the first journey load the position is correct
 	journeys_utils._resetJourneysBannerPosition(false, true);
@@ -500,7 +526,7 @@ journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling
 			bannerIFrame.style.top = "" + (windowHeight - bannerHeight) + "px";
 		}
 	} else {
-		// bottom overscrolling is usually equivalent to half the banner size 
+		// bottom overscrolling is usually equivalent to half the banner size
 		bannerIFrame.style.top = (windowHeight - bannerHeight) + (bannerHeight / 2) + "px";
 	}
 }
