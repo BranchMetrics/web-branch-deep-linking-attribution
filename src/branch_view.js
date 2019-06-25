@@ -33,19 +33,20 @@ function renderHtmlBlob(parent, html, hasApp) {
 	}
 	var cssInsideIframe = journeys_utils.getCss(html);
 	journeys_utils.getJsAndAddToParent(html);
+	var cssIframeContainer = journeys_utils.getIframeCss(html);
 	html = journeys_utils.removeScriptAndCss(html);
 
 	// create iframe element, add html, add css, add ctaText
 	var iframe = journeys_utils.createAndAppendIframe();
 	var iframeHTML = journeys_utils.createIframeInnerHTML(html, utils.mobileUserAgent());
 	journeys_utils.addHtmlToIframe(iframe, iframeHTML);
-	journeys_utils.addIframeOuterCSS();
+	journeys_utils.addIframeOuterCSS(cssIframeContainer);
 	journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 	journeys_utils.addDynamicCtaText(iframe, ctaText);
 
 	journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
 
-	journeys_utils.animateBannerEntrance(iframe);
+	journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
 
 	return iframe;
 };
