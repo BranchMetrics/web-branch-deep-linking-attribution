@@ -1,4 +1,4 @@
-# Branch Web SDK
+# Branch Web SDK 
 
 NOTES:
 
