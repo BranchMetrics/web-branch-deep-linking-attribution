@@ -355,6 +355,7 @@ Branch.prototype['init'] = wrap(
 			null;
 		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !sessionData || !sessionData['identity_id'];
+
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(cb) {
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
@@ -549,7 +550,8 @@ Branch.prototype['init'] = wrap(
 							"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
 							"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 							"options": options,
-							"initial_referrer": utils.getInitialReferrer(self._referringLink())
+							"initial_referrer": utils.getInitialReferrer(self._referringLink()),
+							"current_url": utils.getCurrentUrl()
 						},
 						function(err, data) {
 							if (err) {
@@ -580,7 +582,8 @@ Branch.prototype['init'] = wrap(
 					"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
 					"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 					"options": options,
-					"initial_referrer": utils.getInitialReferrer(self._referringLink())
+					"initial_referrer": utils.getInitialReferrer(self._referringLink()),
+					"current_url": utils.getCurrentUrl()
 				},
 				function(err, data) {
 					if (err) {
