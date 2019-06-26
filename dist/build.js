@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.49.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.50.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2036,6 +2036,7 @@ journeys_utils.bodyMarginBottom = 0;
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
+journeys_utils.iframeCssRe = /<style type="text\/css" id="branch-iframe-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 journeys_utils.branch = null;
@@ -2074,6 +2075,11 @@ journeys_utils.getMetadata = function(a) {
     return safejson.parse(a[1]);
   }
 };
+journeys_utils.getIframeCss = function(a) {
+  if (a = a.match(journeys_utils.iframeCssRe)) {
+    return a[1];
+  }
+};
 journeys_utils.getCtaText = function(a, b) {
   var c;
   b && a && a.ctaText && a.ctaText.has_app ? c = a.ctaText.has_app : a && a.ctaText && a.ctaText.no_app && (c = a.ctaText.no_app);
@@ -2106,10 +2112,11 @@ journeys_utils.getJsAndAddToParent = function(a) {
   }
 };
 journeys_utils.removeScriptAndCss = function(a) {
-  var b = a.match(journeys_utils.jsonRe), c = a.match(journeys_utils.jsRe), d = a.match(journeys_utils.cssRe);
+  var b = a.match(journeys_utils.jsonRe), c = a.match(journeys_utils.jsRe), d = a.match(journeys_utils.cssRe), e = a.match(journeys_utils.iframeCssRe);
   b && (a = a.replace(journeys_utils.jsonRe, ""));
   c && (a = a.replace(journeys_utils.jsRe, ""));
   d && (a = a.replace(journeys_utils.cssRe, ""));
+  e && (a = a.replace(journeys_utils.iframeCssRe, ""));
   return a;
 };
 journeys_utils.createAndAppendIframe = function() {
@@ -2133,15 +2140,15 @@ journeys_utils.addHtmlToIframe = function(a, b) {
   a.contentWindow.document.write(b);
   a.contentWindow.document.close();
 };
-journeys_utils.addIframeOuterCSS = function() {
-  var a = document.createElement("style");
-  a.type = "text/css";
-  a.id = "branch-iframe-css";
+journeys_utils.addIframeOuterCSS = function(a) {
+  var b = document.createElement("style");
+  b.type = "text/css";
+  b.id = "branch-iframe-css";
   journeys_utils.bodyMarginTop = banner_utils.getBodyStyle("margin-top");
-  var b = +journeys_utils.bodyMarginTop.slice(0, -2);
+  var c = +journeys_utils.bodyMarginTop.slice(0, -2);
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle("margin-bottom");
-  var c = +journeys_utils.bodyMarginBottom.slice(0, -2), d = +journeys_utils.bannerHeight.slice(0, -2);
-  "top" === journeys_utils.position ? document.body.style.marginTop = (+d + b).toString() + "px" : "bottom" === journeys_utils.position && (document.body.style.marginBottom = (+d + c).toString() + "px");
+  var d = +journeys_utils.bodyMarginBottom.slice(0, -2), e = +journeys_utils.bannerHeight.slice(0, -2);
+  a || ("top" === journeys_utils.position ? document.body.style.marginTop = (+e + c).toString() + "px" : "bottom" === journeys_utils.position && (document.body.style.marginBottom = (+e + d).toString() + "px"));
   0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
     var b, c = window.getComputedStyle(a);
     c && (b = journeys_utils.isFullPage && "fixed" === c.getPropertyValue("position"));
@@ -2154,9 +2161,9 @@ journeys_utils.addIframeOuterCSS = function() {
   journeys_utils.previousPosition = "";
   journeys_utils.previousDivToInjectParents = [];
   journeys_utils.journeyDismissed = !1;
-  a.innerHTML = generateIframeOuterCSS();
-  utils.addNonceAttribute(a);
-  document.head.appendChild(a);
+  b.innerHTML = a ? a : generateIframeOuterCSS();
+  utils.addNonceAttribute(b);
+  document.head.appendChild(b);
 };
 function generateIframeOuterCSS() {
   var a = "", b = "";
@@ -2188,11 +2195,11 @@ journeys_utils.addIframeInnerCSS = function(a, b) {
 journeys_utils.addDynamicCtaText = function(a, b) {
   a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
 };
-journeys_utils.animateBannerEntrance = function(a) {
+journeys_utils.animateBannerEntrance = function(a, b) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
   journeys_utils.isFullPage && "fixed" === journeys_utils.sticky && banner_utils.addClass(document.body, "branch-banner-no-scroll");
   setTimeout(function() {
-    "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.bottom = "0" : journeys_utils._dynamicallyRepositionBanner());
+    b ? (a.style.top = null, a.style.bottom = null) : "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.bottom = "0" : journeys_utils._dynamicallyRepositionBanner());
     journeys_utils.branch._publishEvent("didShowJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !0;
   }, journeys_utils.animationDelay);
@@ -2328,16 +2335,17 @@ function renderHtmlBlob(a, b, c) {
   e && (d = journeys_utils.getCtaText(e, c), journeys_utils.findInsertionDiv(a, e));
   a = journeys_utils.getCss(b);
   journeys_utils.getJsAndAddToParent(b);
+  c = journeys_utils.getIframeCss(b);
   b = journeys_utils.removeScriptAndCss(b);
-  c = journeys_utils.createAndAppendIframe();
+  e = journeys_utils.createAndAppendIframe();
   b = journeys_utils.createIframeInnerHTML(b, utils.mobileUserAgent());
-  journeys_utils.addHtmlToIframe(c, b);
-  journeys_utils.addIframeOuterCSS();
-  journeys_utils.addIframeInnerCSS(c, a);
-  journeys_utils.addDynamicCtaText(c, d);
+  journeys_utils.addHtmlToIframe(e, b);
+  journeys_utils.addIframeOuterCSS(c);
+  journeys_utils.addIframeInnerCSS(e, a);
+  journeys_utils.addDynamicCtaText(e, d);
   journeys_utils.branch._publishEvent("willShowJourney", journeys_utils.journeyLinkData);
-  journeys_utils.animateBannerEntrance(c);
-  return c;
+  journeys_utils.animateBannerEntrance(e, c);
+  return e;
 }
 function _areJourneysDismissedGlobally(a) {
   var b = a._storage.get("globalJourneysDismiss", !0);
