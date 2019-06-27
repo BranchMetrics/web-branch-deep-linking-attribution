@@ -104,8 +104,7 @@ resources.open = {
 		"sdk": validator(false, validationTypes.STRING),
 		"options": validator(false, validationTypes.OBJECT),
 		"initial_referrer": validator(false, validationTypes.STRING),
-		"tracking_disabled": validator(false, validationTypes.BOOLEAN),
-		"current_url": validator(false, validationTypes.STRING)
+		"tracking_disabled": validator(false, validationTypes.BOOLEAN)
 	}
 };
 
