@@ -549,7 +549,8 @@ Branch.prototype['init'] = wrap(
 							"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
 							"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 							"options": options,
-							"initial_referrer": utils.getInitialReferrer(self._referringLink())
+							"initial_referrer": utils.getInitialReferrer(self._referringLink()),
+							"current_url": utils.getCurrentUrl()
 						},
 						function(err, data) {
 							if (err) {
@@ -580,7 +581,8 @@ Branch.prototype['init'] = wrap(
 					"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
 					"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 					"options": options,
-					"initial_referrer": utils.getInitialReferrer(self._referringLink())
+					"initial_referrer": utils.getInitialReferrer(self._referringLink()),
+					"current_url": utils.getCurrentUrl()
 				},
 				function(err, data) {
 					if (err) {
