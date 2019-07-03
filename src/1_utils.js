@@ -1042,6 +1042,10 @@ utils.getInitialReferrer = function(referringLink) {
 	return document.referrer;
 };
 
+utils.getCurrentUrl = function() {
+	return window.top.location.href || "";
+};
+
 // Required for logEvent()'s custom_data object - values must be converted to string
 utils.convertObjectValuesToString = function(objectToConvert) {
 	if (!utils.validateParameterType(objectToConvert, 'object') || Object.keys(objectToConvert).length === 0) {

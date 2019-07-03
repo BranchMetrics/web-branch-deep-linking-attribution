@@ -1,5 +1,5 @@
 #/bin/bash
 
 make
-grunt test
+# grunt test
 git checkout .
