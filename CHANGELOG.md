@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.50.1] - 2019-07-03
+- Bugfix Update to API for Auto-Branchify Deep Linking
+
 ## [2.50.0] - 2019-06-26
 - Introduces the ability to style a Journeys iFrame
 
