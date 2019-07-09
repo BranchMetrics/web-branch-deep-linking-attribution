@@ -1043,7 +1043,7 @@ utils.getInitialReferrer = function(referringLink) {
 };
 
 utils.getCurrentUrl = function() {
-	return utils.isIframeAndFromSameOrigin() ? window.top.location.href || "" : window.location.href || "";
+	return utils.isIframeAndFromSameOrigin() ? window.top.location.href : window.location.href;
 };
 
 // Required for logEvent()'s custom_data object - values must be converted to string
