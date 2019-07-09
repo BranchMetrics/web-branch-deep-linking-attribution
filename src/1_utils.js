@@ -1045,9 +1045,8 @@ utils.getInitialReferrer = function(referringLink) {
 utils.getCurrentUrl = function() {
 	if (utils.isIframeAndFromSameOrigin()) {
 		return window.top.location.href || "";
-	} else if (utils.isIframe) {
-		return "";
-	} else {
+	}
+	else {
 		return window.location.href || "";
 	}
 };
