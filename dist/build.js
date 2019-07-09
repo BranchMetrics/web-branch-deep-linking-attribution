@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.50.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.50.2"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1383,7 +1383,7 @@ utils.getInitialReferrer = function(a) {
   return a ? a : utils.isIframe() ? utils.isSameOriginFrame() ? window.top.document.referrer : "" : document.referrer;
 };
 utils.getCurrentUrl = function() {
-  return window.top.location.href || "";
+  return utils.isIframeAndFromSameOrigin() ? window.top.location.href : window.location.href;
 };
 utils.convertObjectValuesToString = function(a) {
   if (utils.validateParameterType(a, "object") && 0 !== Object.keys(a).length) {
