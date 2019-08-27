@@ -1029,29 +1029,36 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *    "$creation_timestamp": 1499892854966
  *}];
  *
+ * var optional_customer_event_alias = "event alias";
+ *
  *branch.logEvent(
  *    "PURCHASE",
  *    event_and_custom_data,
  *    content_items,
+ *    optional_customer_event_alias,
  *    function(err) { console.log(err); }
  *);
  * ```
  * ___
  */
 /*** +TOC_ITEM #logeventevent-event_data_and_custom_data-content_items-callback &.logEvent()& ^ALL ***/
-Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventData, contentItems) {
+Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventData, contentItems, customer_event_alias) {
 	name = utils.validateParameterType(name, 'string') ? name : null;
 	eventData = utils.validateParameterType(eventData, 'object') ? eventData : null;
+	customer_event_alias = utils.validateParameterType(customer_event_alias, 'string') ? customer_event_alias : null;
 
 	if (utils.isStandardEvent(name)) {
 		contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
 		var extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
-		this._api(resources.logStandardEvent,
-			{ "name": name,
+		this._api(
+		resources.logStandardEvent,
+		{
+			"name": name,
 			"user_data": safejson.stringify(utils.getUserData(this)),
 			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
 			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
-			"content_items": safejson.stringify(contentItems || [])
+			"content_items": safejson.stringify(contentItems || []),
+			"customer_event_alias": customer_event_alias
 		}, function(err, data) {
 			return done(err || null);
 		});
