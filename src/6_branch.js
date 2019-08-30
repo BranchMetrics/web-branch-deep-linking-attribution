@@ -927,6 +927,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * @param {String} event - _required_
  * @param {Object} event_data_and_custom_data - _optional_
  * @param {Array} content_items - _optional_
+ * @param {String} customer_event_alias - _optional_
  * @param {function(?Error)=} callback - _optional_
  *
  * Register commerce events, content events, user lifecycle events and custom events via logEvent()
@@ -946,6 +947,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *     event,
  *     event_data_and_custom_data,
  *     content_items,
+ *     customer_event_alias,
  *     callback (err)
  * );
  * ```
@@ -1029,13 +1031,13 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  *    "$creation_timestamp": 1499892854966
  *}];
  *
- * var optional_customer_event_alias = "event alias";
+ * var customer_event_alias = "event alias";
  *
  *branch.logEvent(
  *    "PURCHASE",
  *    event_and_custom_data,
  *    content_items,
- *    optional_customer_event_alias,
+ *    customer_event_alias,
  *    function(err) { console.log(err); }
  *);
  * ```
