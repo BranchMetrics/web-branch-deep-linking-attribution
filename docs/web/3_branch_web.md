@@ -234,7 +234,7 @@ ___
 
 
 
-### logEvent(event, event_data_and_custom_data, content_items, callback) 
+### logEvent(event, event_data_and_custom_data, content_items, customer_event_alias, callback) 
 
 **Parameters**
 
@@ -243,6 +243,8 @@ ___
 **event_data_and_custom_data**: `Object`, _optional_
 
 **content_items**: `Array`, _optional_
+
+**customer_event_alias**: `String`, _optional_
 
 **callback**: `function`, _optional_
 
@@ -263,6 +265,7 @@ branch.logEvent(
     event,
     event_data_and_custom_data,
     content_items,
+    customer_event_alias,
     callback (err)
 );
 ```
@@ -346,10 +349,13 @@ var content_items = [
    "$creation_timestamp": 1499892854966
 }];
 
+var customer_event_alias = "event alias";
+
 branch.logEvent(
    "PURCHASE",
    event_and_custom_data,
    content_items,
+   customer_event_alias,
    function(err) { console.log(err); }
 );
 ```

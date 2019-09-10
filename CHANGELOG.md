@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.51.0] - 2019-09-10
+- Adds ability to pass customer_event_alias when logging standard events
+
 ## [2.50.2] - 2019-07-09
 - DOMException Fix PR #646
 
