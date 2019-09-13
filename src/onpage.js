@@ -60,7 +60,9 @@
 		'trackCommerceEvent',
 		'logEvent',
 		'disableTracking',
-		'getBrowserFingerprintId'
+		'getBrowserFingerprintId',
+		'crossPlatformIds',
+		'lastAttributedTouchData'
 	],
 	0
 );

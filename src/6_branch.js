@@ -2192,3 +2192,30 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 	}
 	done();
 });
+
+Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	this._api(
+		resources.crossPlatformIds,
+		{
+			"user_data": safejson.stringify(utils.getUserData(this))
+		},
+		function(err, data) {
+			return done(err || null, data || null);
+		}
+	);
+});
+
+Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, attribution_window) {
+	attribution_window = utils.validateParameterType(attribution_window, 'number') ? attribution_window : null;
+	var userData = utils.getUserData(this);
+	utils.addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
+	this._api(
+		resources.lastAttributedTouchData,
+		{
+			"user_data": safejson.stringify(userData)
+		},
+		function(err, data) {
+			return done(err || null, data || null);
+		}
+	);
+});
