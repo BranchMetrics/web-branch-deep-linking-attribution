@@ -855,8 +855,7 @@ Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, f
  * @param {number} attribution_window - the number of days to look up attribution data for
  * @param {function(?Error, Object=)=} callback - _optional_ - callback to read last attributed touch data
  *
- * Returns last attributed touch data for current user. Last attributed touch data has the information associated
- * with that user's last viewed impression or clicked link.
+ * Returns last attributed touch data for current user. Last attributed touch data has the information associated with that user's last viewed impression or clicked link.
  *
  * ##### Usage
  * ```js
