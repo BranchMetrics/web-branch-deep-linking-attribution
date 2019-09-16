@@ -826,6 +826,62 @@ Branch.prototype['getBrowserFingerprintId'] = wrap(callback_params.CALLBACK_ERR_
 });
 
 /**
+ * @function Branch.crossPlatformIds
+ * @param {function(?Error, Object=)=} callback - _optional_ - callback to read CPIDs
+ *
+ * Returns CPIDs for current user.
+ *
+ * ##### Usage
+ * ```js
+ *  branch.crossPlatformIds(
+ *     callback (err, data)
+ * );
+ *
+/*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL ***/
+Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	this._api(
+		resources.crossPlatformIds,
+		{
+			"user_data": safejson.stringify(utils.getUserData(this))
+		},
+		function(err, data) {
+			return done(err || null, data || null);
+		}
+	);
+});
+
+/**
+ * @function Branch.lastAttributedTouchData
+ * @param {number} attribution_window - the number of days to look up attribution data for
+ * @param {function(?Error, Object=)=} callback - _optional_ - callback to read last attributed touch data
+ *
+ * Returns last attributed touch data for current user. Last attributed touch data has the information associated
+ * with that user's last viewed impression or clicked link.
+ *
+ * ##### Usage
+ * ```js
+ * branch.lastAttributedTouchData(
+ *     attribution_window,
+ *     callback (err, data)
+ * );
+ *
+/*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL ***/
+Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, attribution_window) {
+	attribution_window = utils.validateParameterType(attribution_window, 'number') ? attribution_window : null;
+	var userData = utils.getUserData(this);
+	utils.addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
+	this._api(
+		resources.lastAttributedTouchData,
+		{
+			"user_data": safejson.stringify(userData)
+		},
+		function(err, data) {
+			return done(err || null, data || null);
+		}
+	);
+});
+
+/**
  * @function Branch.track
  * @param {string} event - _required_ - name of the event to be tracked.
  * @param {Object=} metadata - _optional_ - object of event metadata.
@@ -2191,31 +2247,4 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 		// Branch will not re-initialize
 	}
 	done();
-});
-
-Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	this._api(
-		resources.crossPlatformIds,
-		{
-			"user_data": safejson.stringify(utils.getUserData(this))
-		},
-		function(err, data) {
-			return done(err || null, data || null);
-		}
-	);
-});
-
-Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, attribution_window) {
-	attribution_window = utils.validateParameterType(attribution_window, 'number') ? attribution_window : null;
-	var userData = utils.getUserData(this);
-	utils.addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
-	this._api(
-		resources.lastAttributedTouchData,
-		{
-			"user_data": safejson.stringify(userData)
-		},
-		function(err, data) {
-			return done(err || null, data || null);
-		}
-	);
 });
