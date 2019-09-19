@@ -280,7 +280,7 @@ Branch.prototype._publishEvent = function(event, data) {
  *           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  *           has_app:            true,                         // Does the user have the app installed already?
  *           identity:           'BranchUser',                 // Unique string that identifies the user
- *           referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+ *           ~referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
  *      }
  * );
  * ```
