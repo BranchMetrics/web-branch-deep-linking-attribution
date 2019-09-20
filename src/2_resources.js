@@ -397,3 +397,20 @@ resources.dismiss = {
 	})
 };
 
+resources.crossPlatformIds = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/cpid",
+	method: utils.httpMethod.POST,
+	params: {
+		"user_data": validator(true, validationTypes.STRING)
+	}
+};
+
+resources.lastAttributedTouchData = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/cpid/latd",
+	method: utils.httpMethod.POST,
+	params: {
+		"user_data": validator(true, validationTypes.STRING)
+	}
+};
