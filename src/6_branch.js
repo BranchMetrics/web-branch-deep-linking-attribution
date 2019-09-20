@@ -845,7 +845,7 @@ Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, f
 			"user_data": safejson.stringify(utils.getUserData(this))
 		},
 		function(err, data) {
-			return done(err || null, data || null);
+			return done(err || null, data && data['user_data'] || null);
 		}
 	);
 });
