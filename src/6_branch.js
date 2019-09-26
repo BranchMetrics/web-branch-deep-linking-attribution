@@ -807,8 +807,8 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
  * ##### Usage
  * ```js
  * branch.getBrowserFingerprintId(function(err, data) { console.log(data); });
+ * ```
  *
- * *
  * ##### Callback Format
  * ```js
  * callback(
@@ -836,7 +836,10 @@ Branch.prototype['getBrowserFingerprintId'] = wrap(callback_params.CALLBACK_ERR_
  *  branch.crossPlatformIds(
  *     callback (err, data)
  * );
+ * ```
+ * ___
  *
+ */
 /*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL ***/
 Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(
@@ -863,7 +866,10 @@ Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, f
  *     attribution_window,
  *     callback (err, data)
  * );
+ * ```
+ * ___
  *
+ */
 /*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL ***/
 Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, attribution_window) {
 	attribution_window = utils.validateParameterType(attribution_window, 'number') ? attribution_window : null;
