@@ -280,7 +280,7 @@ Branch.prototype._publishEvent = function(event, data) {
  *           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
  *           has_app:            true,                         // Does the user have the app installed already?
  *           identity:           'BranchUser',                 // Unique string that identifies the user
- *           referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+ *           ~referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
  *      }
  * );
  * ```
@@ -823,6 +823,61 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 Branch.prototype['getBrowserFingerprintId'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var permData = session.get(this._storage, true) || {};
 	done(null, permData['browser_fingerprint_id'] || null);
+});
+
+/**
+ * @function Branch.crossPlatformIds
+ * @param {function(?Error, Object=)=} callback - _optional_ - callback to read CPIDs
+ *
+ * Returns CPIDs for current user.
+ *
+ * ##### Usage
+ * ```js
+ *  branch.crossPlatformIds(
+ *     callback (err, data)
+ * );
+ *
+/*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL ***/
+Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
+	this._api(
+		resources.crossPlatformIds,
+		{
+			"user_data": safejson.stringify(utils.getUserData(this))
+		},
+		function(err, data) {
+			return done(err || null, data && data['user_data'] || null);
+		}
+	);
+});
+
+/**
+ * @function Branch.lastAttributedTouchData
+ * @param {number} attribution_window - the number of days to look up attribution data for
+ * @param {function(?Error, Object=)=} callback - _optional_ - callback to read last attributed touch data
+ *
+ * Returns last attributed touch data for current user. Last attributed touch data has the information associated with that user's last viewed impression or clicked link.
+ *
+ * ##### Usage
+ * ```js
+ * branch.lastAttributedTouchData(
+ *     attribution_window,
+ *     callback (err, data)
+ * );
+ *
+/*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL ***/
+Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, attribution_window) {
+	attribution_window = utils.validateParameterType(attribution_window, 'number') ? attribution_window : null;
+	var userData = utils.getUserData(this);
+	utils.addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
+	this._api(
+		resources.lastAttributedTouchData,
+		{
+			"user_data": safejson.stringify(userData)
+		},
+		function(err, data) {
+			return done(err || null, data || null);
+		}
+	);
 });
 
 /**
