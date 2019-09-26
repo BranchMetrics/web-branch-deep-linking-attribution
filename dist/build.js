@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.51.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1478,6 +1478,8 @@ resources.pageview = {destination:config.api_endpoint, endpoint:"/v1/pageview", 
 validationTypes.BOOLEAN), has_app_websdk:validator(!1, validationTypes.BOOLEAN), source:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), is_iframe:validator(!1, validationTypes.BOOLEAN), data:validator(!1, validationTypes.OBJECT), callback_string:validator(!1, validationTypes.STRING), journey_displayed:validator(!1, validationTypes.BOOLEAN), audience_rule_id:validator(!1, validationTypes.STRING), journey_dismissals:validator(!1, validationTypes.OBJECT)})};
 resources.dismiss = {destination:config.api_endpoint, endpoint:"/v1/dismiss", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), branch_view_id:validator(!1, validationTypes.STRING), no_journeys:validator(!1, validationTypes.BOOLEAN), user_language:validator(!1, validationTypes.STRING), open_app:validator(!1, 
 validationTypes.BOOLEAN), has_app_websdk:validator(!1, validationTypes.BOOLEAN), source:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), is_iframe:validator(!1, validationTypes.BOOLEAN), data:validator(!1, validationTypes.OBJECT), callback_string:validator(!1, validationTypes.STRING), journey_displayed:validator(!1, validationTypes.BOOLEAN), audience_rule_id:validator(!1, validationTypes.STRING), journey_dismissals:validator(!1, validationTypes.OBJECT)})};
+resources.crossPlatformIds = {destination:config.api_endpoint, endpoint:"/v1/cpid", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING)}};
+resources.lastAttributedTouchData = {destination:config.api_endpoint, endpoint:"/v1/cpid/latd", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING)}};
 // Input 7
 var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
@@ -2685,6 +2687,19 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
 Branch.prototype.getBrowserFingerprintId = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = session.get(this._storage, !0) || {};
   a(null, b.browser_fingerprint_id || null);
+});
+Branch.prototype.crossPlatformIds = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
+  this._api(resources.crossPlatformIds, {user_data:safejson.stringify(utils.getUserData(this))}, function(b, c) {
+    return a(b || null, c && c.user_data || null);
+  });
+});
+Branch.prototype.lastAttributedTouchData = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
+  b = utils.validateParameterType(b, "number") ? b : null;
+  var c = utils.getUserData(this);
+  utils.addPropertyIfNotNull(c, "attribution_window", b);
+  this._api(resources.lastAttributedTouchData, {user_data:safejson.stringify(c)}, function(b, c) {
+    return a(b || null, c || null);
+  });
 });
 Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   c = c || {};

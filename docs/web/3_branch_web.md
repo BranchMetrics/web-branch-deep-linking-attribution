@@ -69,7 +69,7 @@ callback(
           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
           has_app:            true,                         // Does the user have the app installed already?
           identity:           'BranchUser',                 // Unique string that identifies the user
-          referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+          ~referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
      }
 );
 ```
@@ -200,6 +200,45 @@ callback(
 );
 ```
 ___
+
+
+
+### crossPlatformIds(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_ - callback to read CPIDs
+
+Returns CPIDs for current user.
+
+##### Usage
+```js
+ branch.crossPlatformIds(
+    callback (err, data)
+);
+
+/*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL
+
+
+
+### lastAttributedTouchData(attribution_window, callback) 
+
+**Parameters**
+
+**attribution_window**: `number`, the number of days to look up attribution data for
+
+**callback**: `function`, _optional_ - callback to read last attributed touch data
+
+Returns last attributed touch data for current user. Last attributed touch data has the information associated with that user's last viewed impression or clicked link.
+
+##### Usage
+```js
+branch.lastAttributedTouchData(
+    attribution_window,
+    callback (err, data)
+);
+
+/*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL
 
 
 

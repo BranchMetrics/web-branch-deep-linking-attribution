@@ -5,6 +5,8 @@
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
   + [.getBrowserFingerprintId()](#getbrowserfingerprintidcallback)
+  + [.crossPlatformIds()](#crossPlatformIdscallback)
+  + [.lastAttributedTouchData()](#lastAttributedTouchDataattribution_window-callback)
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)

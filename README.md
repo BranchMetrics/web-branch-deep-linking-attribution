@@ -49,7 +49,7 @@ _Be sure to replace `BRANCH KEY` with your actual Branch Key found in your [acco
 ```html
 <script type="text/javascript">
 
-	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId".split(" "), 0);
+	(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData".split(" "), 0);
 
 	branch.init('BRANCH KEY', function(err, data) {
     	// callback to handle err or data
@@ -87,6 +87,8 @@ ___
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
   + [.getBrowserFingerprintId()](#getbrowserfingerprintidcallback)
+  + [.crossPlatformIds()](#crossPlatformIdscallback)
+  + [.lastAttributedTouchData()](#lastAttributedTouchDataattribution_window-callback)
 
 2. Event Tracking
   + [.track()](#trackevent-metadata-callback)
@@ -192,7 +194,7 @@ callback(
           referring_identity: '12345',                      // If the user was referred from a link, and the link was created by a user with an identity, that identity is here.
           has_app:            true,                         // Does the user have the app installed already?
           identity:           'BranchUser',                 // Unique string that identifies the user
-          referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
+          ~referring_link:     'https://bnc.lt/c/jgg75-Gjd3' // The referring link click, if available.
      }
 );
 ```
@@ -323,6 +325,45 @@ callback(
 );
 ```
 ___
+
+
+
+### crossPlatformIds(callback) 
+
+**Parameters**
+
+**callback**: `function`, _optional_ - callback to read CPIDs
+
+Returns CPIDs for current user.
+
+##### Usage
+```js
+ branch.crossPlatformIds(
+    callback (err, data)
+);
+
+/*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL
+
+
+
+### lastAttributedTouchData(attribution_window, callback) 
+
+**Parameters**
+
+**attribution_window**: `number`, the number of days to look up attribution data for
+
+**callback**: `function`, _optional_ - callback to read last attributed touch data
+
+Returns last attributed touch data for current user. Last attributed touch data has the information associated with that user's last viewed impression or clicked link.
+
+##### Usage
+```js
+branch.lastAttributedTouchData(
+    attribution_window,
+    callback (err, data)
+);
+
+/*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL
 
 
 
