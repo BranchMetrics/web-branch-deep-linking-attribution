@@ -315,8 +315,8 @@ Returns the current user's browser-fingerprint-id. If tracking is disabled then 
 ##### Usage
 ```js
 branch.getBrowserFingerprintId(function(err, data) { console.log(data); });
+```
 
-*
 ##### Callback Format
 ```js
 callback(
@@ -341,8 +341,8 @@ Returns CPIDs for current user.
  branch.crossPlatformIds(
     callback (err, data)
 );
-
-/*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL
+```
+___
 
 
 
@@ -362,8 +362,8 @@ branch.lastAttributedTouchData(
     attribution_window,
     callback (err, data)
 );
-
-/*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL
+```
+___
 
 
 
