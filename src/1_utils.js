@@ -428,7 +428,7 @@ function isMacintoshDesktop(ua) {
 	return ua && ua.indexOf('Macintosh') > -1;
 }
 
-function isGreaterThanVersion(ua, v) {
+function isGTEVersion(ua, v) {
 	v = v || 11;
 
 	var match = /version\/([^ ]*)/i.exec(ua);
@@ -449,7 +449,7 @@ function isSafari13OrGreateriPad(ua) {
 	return ua &&
 		isSafariBrowser(ua) &&
 		isMacintoshDesktop(ua) &&
-		isGreaterThanVersion(ua, 13) &&
+		isGTEVersion(ua, 13) &&
 		screen.height > screen.width;
 }
 
@@ -498,7 +498,7 @@ utils.isSafari11OrGreater = function() {
 	var isSafari = isSafariBrowser(ua);
 
 	if (isSafari) {
-		return isGreaterThanVersion(ua, 11);
+		return isGTEVersion(ua, 11);
 	}
 
 	return false;
