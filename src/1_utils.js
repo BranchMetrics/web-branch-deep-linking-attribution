@@ -420,12 +420,46 @@ utils.hashValue = function(key) {
 	}
 };
 
+function isSafariBrowser(ua) {
+	return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+}
+
+function isMacintoshDesktop(ua) {
+	return ua && ua.indexOf('Macintosh') > -1;
+}
+
+function isGreaterThanVersion(ua, v) {
+	v = v || 11;
+
+	var match = /version\/([^ ]*)/i.exec(ua);
+	if (match && match[1]) {
+		try {
+			var version = parseFloat(match[1]);
+			if (version >= v) {
+				return true;
+			}
+		} catch (e) {
+			return false;
+		}
+	}
+	return false;
+}
+
+function isSafari13OrGreateriPad(ua) {
+	return ua &&
+		isSafariBrowser(ua) &&
+		isMacintoshDesktop(ua) &&
+		isGreaterThanVersion(ua, 13) &&
+		screen.height > screen.width;
+}
+
 utils.mobileUserAgent = function() {
 	var ua = navigator.userAgent;
 	if (ua.match(/android/i)) {
 		return 'android';
 	}
-	if (ua.match(/ipad/i)) {
+	if (ua.match(/ipad/i) ||
+		isSafari13OrGreateriPad(ua)) {
 		return 'ipad';
 	}
 	if (ua.match(/i(os|p(hone|od))/i)) {
@@ -454,27 +488,6 @@ utils.mobileUserAgent = function() {
 	}
 	return false;
 };
-
-function isSafariBrowser(ua) {
-	return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
-}
-
-function isGreaterThanVersion(ua, v) {
-	v = v || 11;
-
-	var match = /version\/([^ ]*)/i.exec(ua);
-	if (match && match[1]) {
-		try {
-			var version = parseFloat(match[1]);
-			if (version >= v) {
-				return true;
-			}
-		} catch (e) {
-			return false;
-		}
-	}
-	return false;
-}
 
 /**
  * Returns true if browser is safari version 11 or greater
