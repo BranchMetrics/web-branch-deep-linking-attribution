@@ -910,7 +910,7 @@ utils.getCanonicalURL = function() {
 };
 
 utils.addPropertyIfNotNull = function(obj, key, value) {
-	if (value) {
+	if (value !== null && value !== undefined) {
 		if (typeof value === "object" && Object.keys(value).length === 0) {
 			return obj;
 		}
@@ -981,7 +981,7 @@ utils.separateEventAndCustomData = function(eventAndCustomData) {
 };
 
 utils.validateParameterType = function(parameter, type) {
-	if (!parameter || !type) {
+	if (!type) {
 		return false;
 	}
 	if (type === "array") {
