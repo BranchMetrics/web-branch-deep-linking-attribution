@@ -1235,7 +1235,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	this._api(resources.link, linkData, function(err, data) {
 		if (err) {
 			// if an error occurs or if tracking is disabled then return a dynamic link
-			return done(null, utils.generateDynamicBNCLink(keyCopy, linkData));
+			return done(err, utils.generateDynamicBNCLink(keyCopy, linkData));
 		}
 		done(null, data && data['url']);
 	});
