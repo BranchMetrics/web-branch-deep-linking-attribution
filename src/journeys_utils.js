@@ -609,19 +609,23 @@ journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId
 	return journeyDismissals;
 }
 
-journeys_utils._getDismissRequestData = function(branch_view) {
+journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) {
 	var metadata = {};
 	var hostedDeeplinkData = utils.getHostedDeepLinkData();
 	if (hostedDeeplinkData && Object.keys(hostedDeeplinkData).length > 0) {
 		metadata['hosted_deeplink_data'] = hostedDeeplinkData;
 	}
 
-	return branch_view._getPageviewRequestData(
+	var dismissRequestData = branch_view._getPageviewRequestData(
 		journeys_utils._getPageviewMetadata(null, metadata),
 		null,
 		journeys_utils.branch,
 		true
 	);
+	
+	utils.addPropertyIfNotNull(dismissRequestData, 'dismissal_source', dismissal_source);
+
+	return dismissRequestData;
 }
 
 journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view) {
@@ -642,7 +646,7 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 		} else {
 			var listener = function () {
 				journeys_utils.branch.removeListener(listener);
-				var requestData = journeys_utils._getDismissRequestData(branch_view);
+				var requestData = journeys_utils._getDismissRequestData(branch_view, utils.dismissEventToSourceMapping[eventName]);
 				journeys_utils.branch._api(
 					resources.dismiss,
 					requestData,

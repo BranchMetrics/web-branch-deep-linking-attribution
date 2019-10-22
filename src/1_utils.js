@@ -36,6 +36,11 @@ utils.calculateBrtt = function(startTime) {
 	return (Date.now() - startTime).toString();
 };
 
+utils.dismissEventToSourceMapping = {
+	'didClickJourneyClose': 'Button(X)',
+	'didClickJourneyContinue': 'Dismiss Journey text'
+};
+
 utils.userPreferences = {
 	trackingDisabled: false,
 	whiteListedEndpointsWithData: {

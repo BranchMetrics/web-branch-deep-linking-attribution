@@ -393,7 +393,8 @@ resources.dismiss = {
 		"callback_string": validator(false, validationTypes.STRING),
 		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
-		"journey_dismissals": validator(false, validationTypes.OBJECT)
+		"journey_dismissals": validator(false, validationTypes.OBJECT),
+		"dismissal_source": validator(false, validationTypes.STRING)
 	})
 };
 
