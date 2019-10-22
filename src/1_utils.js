@@ -910,7 +910,7 @@ utils.getCanonicalURL = function() {
 };
 
 utils.addPropertyIfNotNull = function(obj, key, value) {
-	if (value) {
+	if (value !== null && value !== undefined) {
 		if (typeof value === "object" && Object.keys(value).length === 0) {
 			return obj;
 		}
@@ -954,7 +954,7 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 
 // v2/event utility functions
 
-var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_ITEM', 'VIEW_ITEMS', 'RATE', 'SHARE', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENT' ];
+var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_ITEM', 'VIEW_ITEMS', 'RATE', 'SHARE', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENT', 'LOGIN' ];
 var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description' ];
 
 utils.isStandardEvent = function(eventName) {
@@ -981,7 +981,7 @@ utils.separateEventAndCustomData = function(eventAndCustomData) {
 };
 
 utils.validateParameterType = function(parameter, type) {
-	if (!parameter || !type) {
+	if (!type) {
 		return false;
 	}
 	if (type === "array") {
