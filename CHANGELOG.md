@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.52.1] - 2019-10-22
+- Surfaces error in callback for .link() call
+- Fixes a bug associated to passing in a 0 attribution window for .lastAttributedTouchData()
+
 ## [2.52.0] - 2019-09-26
 - Introduces CPID/Last Attributed Touch Data functions
 

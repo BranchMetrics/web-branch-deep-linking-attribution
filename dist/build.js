@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1318,7 +1318,7 @@ utils.getCanonicalURL = function() {
   return a && a.href ? a.href : null;
 };
 utils.addPropertyIfNotNull = function(a, b, c) {
-  if (c) {
+  if (null !== c && void 0 !== c) {
     if ("object" === typeof c && 0 === Object.keys(c).length) {
       return a;
     }
@@ -1341,7 +1341,7 @@ utils.removePropertiesFromObject = function(a, b) {
     }
   }
 };
-var BRANCH_STANDARD_EVENTS = "ADD_TO_CART ADD_TO_WISHLIST VIEW_CART INITIATE_PURCHASE ADD_PAYMENT_INFO PURCHASE SPEND_CREDITS SEARCH VIEW_ITEM VIEW_ITEMS RATE SHARE COMPLETE_REGISTRATION COMPLETE_TUTORIAL ACHIEVE_LEVEL UNLOCK_ACHIEVEMENT".split(" "), BRANCH_STANDARD_EVENT_DATA = "transaction_id revenue currency shipping tax coupon affiliation search_query description".split(" ");
+var BRANCH_STANDARD_EVENTS = "ADD_TO_CART ADD_TO_WISHLIST VIEW_CART INITIATE_PURCHASE ADD_PAYMENT_INFO PURCHASE SPEND_CREDITS SEARCH VIEW_ITEM VIEW_ITEMS RATE SHARE COMPLETE_REGISTRATION COMPLETE_TUTORIAL ACHIEVE_LEVEL UNLOCK_ACHIEVEMENT LOGIN".split(" "), BRANCH_STANDARD_EVENT_DATA = "transaction_id revenue currency shipping tax coupon affiliation search_query description".split(" ");
 utils.isStandardEvent = function(a) {
   return -1 < BRANCH_STANDARD_EVENTS.indexOf(a);
 };
@@ -1357,7 +1357,7 @@ utils.separateEventAndCustomData = function(a) {
   return {custom_data:utils.convertObjectValuesToString(c), event_data:a};
 };
 utils.validateParameterType = function(a, b) {
-  return a && b ? "array" === b ? Array.isArray(a) : typeof a === b && !Array.isArray(a) : !1;
+  return b ? "array" === b ? Array.isArray(a) : typeof a === b && !Array.isArray(a) : !1;
 };
 utils.getUserData = function(a) {
   var b = {}, b = utils.addPropertyIfNotNull(b, "http_origin", document.URL), b = utils.addPropertyIfNotNull(b, "user_agent", navigator.userAgent), b = utils.addPropertyIfNotNull(b, "language", utils.getBrowserLanguageCode()), b = utils.addPropertyIfNotNull(b, "screen_width", screen.width), b = utils.addPropertyIfNotNull(b, "screen_height", screen.height), b = utils.addPropertyIfNotNull(b, "http_referrer", document.referrer), b = utils.addPropertyIfNotNull(b, "browser_fingerprint_id", a.browser_fingerprint_id), 
@@ -2735,7 +2735,7 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
   var c = utils.cleanLinkData(b), d = this.branch_key;
   this._api(resources.link, c, function(b, f) {
     if (b) {
-      return a(null, utils.generateDynamicBNCLink(d, c));
+      return a(b, utils.generateDynamicBNCLink(d, c));
     }
     a(null, f && f.url);
   });
