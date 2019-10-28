@@ -621,12 +621,12 @@ describe('utils', function() {
 				"objects values are not strings"
 			);
 		});
-		it('should return undefined', function() {
+		it('should return empty object', function() {
 			var initial = {};
 			assert.deepEqual(
-				undefined,
+				{},
 				utils.convertObjectValuesToString(initial),
-				"return value is not undefined"
+				"should return empty object"
 			);
 		});
 	});
