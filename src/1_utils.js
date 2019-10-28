@@ -971,7 +971,7 @@ var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'I
 var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description' ];
 
 utils.isStandardEvent = function(eventName) {
-	return BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
+	return eventName && BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
 };
 
 utils.separateEventAndCustomData = function(eventAndCustomData) {
@@ -994,7 +994,7 @@ utils.separateEventAndCustomData = function(eventAndCustomData) {
 };
 
 utils.validateParameterType = function(parameter, type) {
-	if (!type) {
+	if (!type || (parameter === null && type === 'object')) {
 		return false;
 	}
 	if (type === "array") {
@@ -1062,7 +1062,7 @@ utils.getCurrentUrl = function() {
 // Required for logEvent()'s custom_data object - values must be converted to string
 utils.convertObjectValuesToString = function(objectToConvert) {
 	if (!utils.validateParameterType(objectToConvert, 'object') || Object.keys(objectToConvert).length === 0) {
-		return;
+		return {};
 	}
 	for (var key in objectToConvert) {
 		if (objectToConvert.hasOwnProperty(key)) {
