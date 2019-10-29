@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.52.2] - 2019-10-29
+- Fixes a bug with a type validation function that is used in logEvent()
+- Adds the ability to identify an iPad running iOS 13 in Safari
+
 ## [2.52.1] - 2019-10-22
 - Surfaces error in callback for .link() call
 - Fixes a bug associated to passing in a 0 attribution window for .lastAttributedTouchData()

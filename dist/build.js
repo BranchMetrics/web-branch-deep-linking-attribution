@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.1"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.2"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1143,14 +1143,13 @@ utils.hashValue = function(a) {
   } catch (c) {
   }
 };
-utils.mobileUserAgent = function() {
-  var a = navigator.userAgent;
-  return a.match(/android/i) ? "android" : a.match(/ipad/i) ? "ipad" : a.match(/i(os|p(hone|od))/i) ? "ios" : a.match(/\(BB[1-9][0-9]*\;/i) ? "blackberry" : a.match(/Windows Phone/i) ? "windows_phone" : a.match(/Kindle/i) || a.match(/Silk/i) || a.match(/KFTT/i) || a.match(/KFOT/i) || a.match(/KFJWA/i) || a.match(/KFJWI/i) || a.match(/KFSOWI/i) || a.match(/KFTHWA/i) || a.match(/KFTHWI/i) || a.match(/KFAPWA/i) || a.match(/KFAPWI/i) ? "kindle" : !1;
-};
 function isSafariBrowser(a) {
   return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(a);
 }
-function isGreaterThanVersion(a, b) {
+function isMacintoshDesktop(a) {
+  return a && -1 < a.indexOf("Macintosh");
+}
+function isGTEVersion(a, b) {
   b = b || 11;
   var c = /version\/([^ ]*)/i.exec(a);
   if (c && c[1]) {
@@ -1163,9 +1162,16 @@ function isGreaterThanVersion(a, b) {
   }
   return !1;
 }
+function isSafari13OrGreateriPad(a) {
+  return a && isSafariBrowser(a) && isMacintoshDesktop(a) && isGTEVersion(a, 13) && screen.height > screen.width;
+}
+utils.mobileUserAgent = function() {
+  var a = navigator.userAgent;
+  return a.match(/android/i) ? "android" : a.match(/ipad/i) || isSafari13OrGreateriPad(a) ? "ipad" : a.match(/i(os|p(hone|od))/i) ? "ios" : a.match(/\(BB[1-9][0-9]*\;/i) ? "blackberry" : a.match(/Windows Phone/i) ? "windows_phone" : a.match(/Kindle/i) || a.match(/Silk/i) || a.match(/KFTT/i) || a.match(/KFOT/i) || a.match(/KFJWA/i) || a.match(/KFJWI/i) || a.match(/KFSOWI/i) || a.match(/KFTHWA/i) || a.match(/KFTHWI/i) || a.match(/KFAPWA/i) || a.match(/KFAPWI/i) ? "kindle" : !1;
+};
 utils.isSafari11OrGreater = function() {
   var a = navigator.userAgent;
-  return isSafariBrowser(a) ? isGreaterThanVersion(a, 11) : !1;
+  return isSafariBrowser(a) ? isGTEVersion(a, 11) : !1;
 };
 utils.getParamValue = function(a) {
   try {
@@ -1343,7 +1349,7 @@ utils.removePropertiesFromObject = function(a, b) {
 };
 var BRANCH_STANDARD_EVENTS = "ADD_TO_CART ADD_TO_WISHLIST VIEW_CART INITIATE_PURCHASE ADD_PAYMENT_INFO PURCHASE SPEND_CREDITS SEARCH VIEW_ITEM VIEW_ITEMS RATE SHARE COMPLETE_REGISTRATION COMPLETE_TUTORIAL ACHIEVE_LEVEL UNLOCK_ACHIEVEMENT LOGIN".split(" "), BRANCH_STANDARD_EVENT_DATA = "transaction_id revenue currency shipping tax coupon affiliation search_query description".split(" ");
 utils.isStandardEvent = function(a) {
-  return -1 < BRANCH_STANDARD_EVENTS.indexOf(a);
+  return a && -1 < BRANCH_STANDARD_EVENTS.indexOf(a);
 };
 utils.separateEventAndCustomData = function(a) {
   if (!a || 0 === Object.keys(a).length) {
@@ -1357,7 +1363,7 @@ utils.separateEventAndCustomData = function(a) {
   return {custom_data:utils.convertObjectValuesToString(c), event_data:a};
 };
 utils.validateParameterType = function(a, b) {
-  return b ? "array" === b ? Array.isArray(a) : typeof a === b && !Array.isArray(a) : !1;
+  return !b || null === a && "object" === b ? !1 : "array" === b ? Array.isArray(a) : typeof a === b && !Array.isArray(a);
 };
 utils.getUserData = function(a) {
   var b = {}, b = utils.addPropertyIfNotNull(b, "http_origin", document.URL), b = utils.addPropertyIfNotNull(b, "user_agent", navigator.userAgent), b = utils.addPropertyIfNotNull(b, "language", utils.getBrowserLanguageCode()), b = utils.addPropertyIfNotNull(b, "screen_width", screen.width), b = utils.addPropertyIfNotNull(b, "screen_height", screen.height), b = utils.addPropertyIfNotNull(b, "http_referrer", document.referrer), b = utils.addPropertyIfNotNull(b, "browser_fingerprint_id", a.browser_fingerprint_id), 
@@ -1386,12 +1392,13 @@ utils.getCurrentUrl = function() {
   return utils.isIframeAndFromSameOrigin() ? window.top.location.href : window.location.href;
 };
 utils.convertObjectValuesToString = function(a) {
-  if (utils.validateParameterType(a, "object") && 0 !== Object.keys(a).length) {
-    for (var b in a) {
-      a.hasOwnProperty(b) && (a[b] = utils.validateParameterType(a[b], "object") || utils.validateParameterType(a[b], "array") ? safejson.stringify(a[b]) : a[b].toString());
-    }
-    return a;
+  if (!utils.validateParameterType(a, "object") || 0 === Object.keys(a).length) {
+    return {};
   }
+  for (var b in a) {
+    a.hasOwnProperty(b) && (a[b] = utils.validateParameterType(a[b], "object") || utils.validateParameterType(a[b], "array") ? safejson.stringify(a[b]) : a[b].toString());
+  }
+  return a;
 };
 utils.mergeHostedDeeplinkData = function(a, b) {
   var c = a ? utils.merge({}, a) : {};
@@ -2727,7 +2734,7 @@ Branch.prototype.logEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c,
   e = utils.validateParameterType(e, "string") ? e : null;
   utils.isStandardEvent(b) ? (d = utils.validateParameterType(d, "array") ? d : null, c = utils.separateEventAndCustomData(c), this._api(resources.logStandardEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(c && c.custom_data || {}), event_data:safejson.stringify(c && c.event_data || {}), content_items:safejson.stringify(d || []), customer_event_alias:e}, function(b, c) {
     return a(b || null);
-  })) : this._api(resources.logCustomEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(utils.convertObjectValuesToString(c) || {})}, function(b, c) {
+  })) : this._api(resources.logCustomEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(utils.convertObjectValuesToString(c || {}))}, function(b, c) {
     return a(b || null);
   });
 });
