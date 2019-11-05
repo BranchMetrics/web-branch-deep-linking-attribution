@@ -3,7 +3,7 @@
  */
 goog.provide('config');
 
-config.app_service_endpoint = 'https://app.link';
-config.link_service_endpoint = 'https://bnc.lt';
-config.api_endpoint = 'https://api2.branch.io';
+config.app_service_endpoint = 'http://tvqr7-external-services.branchbeta.link';
+config.link_service_endpoint = 'http://external-services.link.beta.branch.io/';
+config.api_endpoint = 'http://external-services.api.beta.branch.io/';
 config.version = '2.52.2';
