@@ -105,7 +105,9 @@ resources.open = {
 		"options": validator(false, validationTypes.OBJECT),
 		"initial_referrer": validator(false, validationTypes.STRING),
 		"tracking_disabled": validator(false, validationTypes.BOOLEAN),
-		"current_url": validator(false, validationTypes.STRING)
+		"current_url": validator(false, validationTypes.STRING),
+		"screen_height": validator(false, validationTypes.NUMBER),
+		"screen_width": validator(false, validationTypes.NUMBER)
 	}
 };
 

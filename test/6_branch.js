@@ -137,7 +137,10 @@ describe('Branch', function() {
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"alternative_browser_fingerprint_id": undefined,
 					"sdk": "web" + config.version,
-					"options": { }
+					"options": { },
+					"current_url": utils.getCurrentUrl(),
+					"screen_height": utils.getScreenHeight(),
+					"screen_width": utils.getScreenWidth()
 				},
 				'Request to open params correct'
 			);
@@ -188,7 +191,10 @@ describe('Branch', function() {
 					"browser_fingerprint_id": browser_fingerprint_id,
 					"alternative_browser_fingerprint_id": undefined,
 					"sdk": "web" + config.version,
-					"options": { }
+					"options": { },
+					"current_url": utils.getCurrentUrl(),
+					"screen_height": utils.getScreenHeight(),
+					"screen_width": utils.getScreenWidth()
 				},
 				'Request to open params correct'
 			);
@@ -276,7 +282,10 @@ describe('Branch', function() {
 						"browser_fingerprint_id": '12345',
 						"alternative_browser_fingerprint_id": undefined,
 						"sdk": "web" + config.version,
-						"options": { }
+						"options": { },
+						"current_url": utils.getCurrentUrl(),
+						"screen_height": utils.getScreenHeight(),
+						"screen_width": utils.getScreenWidth()
 					},
 					'Request to open params correct'
 				);
@@ -327,7 +336,10 @@ describe('Branch', function() {
 							"browser_fingerprint_id": '67890',
 							"alternative_browser_fingerprint_id": undefined,
 							"sdk": "web" + config.version,
-							"options": { }
+							"options": { },
+							"current_url": utils.getCurrentUrl(),
+							"screen_height": utils.getScreenHeight(),
+							"screen_width": utils.getScreenWidth()
 						},
 						'Request to open params correct'
 					);
@@ -495,7 +507,10 @@ describe('Branch', function() {
 					"browser_fingerprint_id": undefined,
 					"alternative_browser_fingerprint_id": undefined,
 					"sdk": "web" + config.version,
-					"options": { }
+					"options": { },
+					"current_url": utils.getCurrentUrl(),
+					"screen_height": utils.getScreenHeight(),
+					"screen_width": utils.getScreenWidth()
 				},
 				'Request to open params correct'
 			);

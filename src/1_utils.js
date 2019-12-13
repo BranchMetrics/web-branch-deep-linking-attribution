@@ -1003,6 +1003,14 @@ utils.validateParameterType = function(parameter, type) {
 	return typeof parameter === type && !Array.isArray(parameter);
 };
 
+utils.getScreenHeight = function() {
+	return screen.height || 0;
+};
+
+utils.getScreenWidth = function() {
+	return screen.width || 0;
+};
+
 // Used by logEvent() to send fields related to user's visit and device to v2/event standard and custom
 // Requires a reference to the branch object to access information such as browser_fingerprint_id
 utils.getUserData = function(branch) {
@@ -1010,8 +1018,8 @@ utils.getUserData = function(branch) {
 	user_data = utils.addPropertyIfNotNull(user_data, "http_origin", document.URL);
 	user_data = utils.addPropertyIfNotNull(user_data, "user_agent", navigator.userAgent);
 	user_data = utils.addPropertyIfNotNull(user_data, "language", utils.getBrowserLanguageCode());
-	user_data = utils.addPropertyIfNotNull(user_data, "screen_width", screen.width);
-	user_data = utils.addPropertyIfNotNull(user_data, "screen_height", screen.height);
+	user_data = utils.addPropertyIfNotNull(user_data, "screen_width", utils.getScreenWidth());
+	user_data = utils.addPropertyIfNotNull(user_data, "screen_height", utils.getScreenHeight());
 	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
 	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
 	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
