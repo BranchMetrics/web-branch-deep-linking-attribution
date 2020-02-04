@@ -80,14 +80,12 @@ function validator(required, type) {
 	};
 }
 
-var branch_id = /^[0-9]{15,20}$/;
-
 function defaults(obj) {
 	var def = {
-		"browser_fingerprint_id": validator(true, branch_id),
-		"identity_id": validator(true, branch_id),
+		"browser_fingerprint_id": validator(true, validationTypes.STRING),
+		"identity_id": validator(true, validationTypes.STRING),
 		"sdk": validator(true, validationTypes.STRING),
-		"session_id": validator(true, branch_id)
+		"session_id": validator(true, validationTypes.STRING)
 	};
 	return utils.merge(obj, def);
 }
@@ -97,9 +95,9 @@ resources.open = {
 	endpoint: "/v1/open",
 	method: utils.httpMethod.POST,
 	params: {
-		"browser_fingerprint_id": validator(false, branch_id),
-		"alternative_browser_fingerprint_id": validator(false, branch_id),
-		"identity_id": validator(false, branch_id),
+		"browser_fingerprint_id": validator(false, validationTypes.STRING),
+		"alternative_browser_fingerprint_id": validator(false, validationTypes.STRING),
+		"identity_id": validator(false, validationTypes.STRING),
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),
 		"options": validator(false, validationTypes.OBJECT),
@@ -118,7 +116,7 @@ resources._r = {
 	jsonp: true,
 	params: {
 		"sdk": validator(true, validationTypes.STRING),
-		"_t": validator(false, branch_id),
+		"_t": validator(false, validationTypes.STRING),
 		"branch_key": validator(true, validationTypes.STRING)
 	}
 };
@@ -189,7 +187,7 @@ resources.logout = {
 	endpoint: "/v1/logout",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"session_id": validator(true, branch_id)
+		"session_id": validator(true, validationTypes.STRING)
 	})
 };
 
@@ -198,7 +196,7 @@ resources.profile = {
 	endpoint: "/v1/profile",
 	method: utils.httpMethod.POST,
 	params: defaults({
-		"identity_id": validator(true, branch_id),
+		"identity_id": validator(true, validationTypes.STRING),
 		"identity": validator(true, validationTypes.STRING)
 	})
 };
@@ -208,7 +206,7 @@ resources.referrals = {
 	endpoint: "/v1/referrals",
 	method: utils.httpMethod.GET,
 	queryPart: {
-		"identity_id": validator(true, branch_id)
+		"identity_id": validator(true, validationTypes.STRING)
 	},
 	params: defaults({ })
 };
@@ -218,11 +216,11 @@ resources.creditHistory = {
 	endpoint: "/v1/credithistory",
 	method: utils.httpMethod.GET,
 	params: defaults({
-		"begin_after_id": validator(false, branch_id),
+		"begin_after_id": validator(false, validationTypes.STRING),
 		"bucket": validator(false, validationTypes.STRING),
 		"direction": validator(false, validationTypes.NUMBER),
 		"length": validator(false, validationTypes.NUMBER),
-		"link_click_id": validator(false, branch_id)
+		"link_click_id": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -243,7 +241,7 @@ resources.redeem = {
 	params: defaults({
 		"amount": validator(true, validationTypes.NUMBER),
 		"bucket": validator(true, validationTypes.STRING),
-		"identity_id": validator(true, branch_id)
+		"identity_id": validator(true, validationTypes.STRING)
 	})
 };
 
@@ -258,7 +256,7 @@ resources.link = {
 		"channel": validator(false, validationTypes.STRING),
 		"data": validator(false, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),
-		"identity_id": validator(true, branch_id),
+		"identity_id": validator(true, validationTypes.STRING),
 		"stage": validator(false, validationTypes.STRING),
 		"tags": validator(false, validationTypes.ARRAY),
 		"type": validator(false, validationTypes.NUMBER),
@@ -274,7 +272,7 @@ resources.deepview = {
 	method: utils.httpMethod.POST,
 	params: defaults({
 		"campaign": validator(false, validationTypes.STRING),
-		"_t": validator(false, branch_id),
+		"_t": validator(false, validationTypes.STRING),
 		"channel": validator(false, validationTypes.STRING),
 		"data": validator(true, validationTypes.STRING),
 		"feature": validator(false, validationTypes.STRING),
@@ -293,7 +291,7 @@ resources.hasApp = {
 	endpoint: "/v1/has-app",
 	method: utils.httpMethod.GET,
 	params: {
-		"browser_fingerprint_id": validator(true, branch_id),
+		"browser_fingerprint_id": validator(true, validationTypes.STRING),
 		"instrumentation": validator(false, validationTypes.STRING)
 	}
 };
@@ -395,7 +393,8 @@ resources.dismiss = {
 		"callback_string": validator(false, validationTypes.STRING),
 		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
-		"journey_dismissals": validator(false, validationTypes.OBJECT)
+		"journey_dismissals": validator(false, validationTypes.OBJECT),
+		"dismissal_source": validator(false, validationTypes.STRING)
 	})
 };
 
