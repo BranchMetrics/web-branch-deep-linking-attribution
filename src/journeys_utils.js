@@ -623,6 +623,53 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 		true
 	);
 
+	if (
+		journeys_utils.journeyLinkData &&
+		journeys_utils.journeyLinkData["journey_link_data"]
+	) {
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"journey_id",
+			journeys_utils.journeyLinkData["journey_link_data"]["journey_id"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"journey_name",
+			journeys_utils.journeyLinkData["journey_link_data"]["journey_name"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"view_id",
+			journeys_utils.journeyLinkData["journey_link_data"]["view_id"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"view_name",
+			journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"channel",
+			journeys_utils.journeyLinkData["journey_link_data"]["channel"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"campaign",
+			journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
+		);
+		try {
+			utils.addPropertyIfNotNull(
+				dismissRequestData,
+				"tags",
+				JSON.stringify(
+					journeys_utils.journeyLinkData["journey_link_data"]["tags"]
+				)
+			);
+		} catch (e) {
+			dismissRequestData["tags"] = JSON.stringify([]);
+		}
+	}
+
 	utils.addPropertyIfNotNull(dismissRequestData, 'dismissal_source', dismissal_source);
 
 	return dismissRequestData;
@@ -647,19 +694,6 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 			var listener = function () {
 				journeys_utils.branch.removeListener(listener);
 				var requestData = journeys_utils._getDismissRequestData(branch_view, utils.dismissEventToSourceMapping[eventName]);
-				if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data']) {
-					utils.addPropertyIfNotNull(requestData, 'journey_id', journeys_utils.journeyLinkData['journey_link_data']['journey_id']);
-					utils.addPropertyIfNotNull(requestData, 'journey_name', journeys_utils.journeyLinkData['journey_link_data']['journey_name']);
-					utils.addPropertyIfNotNull(requestData, 'view_id', journeys_utils.journeyLinkData['journey_link_data']['view_id']);
-					utils.addPropertyIfNotNull(requestData, 'view_name', journeys_utils.journeyLinkData['journey_link_data']['view_name']);
-					utils.addPropertyIfNotNull(requestData, 'channel', journeys_utils.journeyLinkData['journey_link_data']['channel']);
-					utils.addPropertyIfNotNull(requestData, 'campaign', journeys_utils.journeyLinkData['journey_link_data']['campaign']);
-					try {
-						utils.addPropertyIfNotNull(requestData, 'tags', JSON.stringify(journeys_utils.journeyLinkData['journey_link_data']['tags']));
-					} catch (e) {
-						requestData['tags'] = JSON.stringify([]);
-					}
-				}
 				journeys_utils.branch._api(
 					resources.dismiss,
 					requestData,
