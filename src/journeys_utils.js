@@ -566,10 +566,10 @@ journeys_utils.finalHookups = function(templateId, audienceRuleId, storage, cta,
 	var actionEls = doc.querySelectorAll('#branch-mobile-action');
 	Array.prototype.forEach.call(actionEls, function(el) {
 		el.addEventListener('click', function(e) {
-            	journeys_utils.branch._publishEvent('didClickJourneyCTA', journeys_utils.journeyLinkData);
-            	journeys_utils.journeyDismissed = true;
-            	cta();
-            	journeys_utils.animateBannerExit(banner);
+			journeys_utils.branch._publishEvent('didClickJourneyCTA', journeys_utils.journeyLinkData);
+			journeys_utils.journeyDismissed = true;
+			cta();
+			journeys_utils.animateBannerExit(banner);
 		})
 	})
 	journeys_utils._setupDismissBehavior('.branch-banner-continue', 'didClickJourneyContinue', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view);
@@ -622,7 +622,54 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 		journeys_utils.branch,
 		true
 	);
-	
+
+	if (
+		journeys_utils.journeyLinkData &&
+		journeys_utils.journeyLinkData["journey_link_data"]
+	) {
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"journey_id",
+			journeys_utils.journeyLinkData["journey_link_data"]["journey_id"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"journey_name",
+			journeys_utils.journeyLinkData["journey_link_data"]["journey_name"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"view_id",
+			journeys_utils.journeyLinkData["journey_link_data"]["view_id"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"view_name",
+			journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"channel",
+			journeys_utils.journeyLinkData["journey_link_data"]["channel"]
+		);
+		utils.addPropertyIfNotNull(
+			dismissRequestData,
+			"campaign",
+			journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
+		);
+		try {
+			utils.addPropertyIfNotNull(
+				dismissRequestData,
+				"tags",
+				JSON.stringify(
+					journeys_utils.journeyLinkData["journey_link_data"]["tags"]
+				)
+			);
+		} catch (e) {
+			dismissRequestData["tags"] = JSON.stringify([]);
+		}
+	}
+
 	utils.addPropertyIfNotNull(dismissRequestData, 'dismissal_source', dismissal_source);
 
 	return dismissRequestData;
@@ -716,7 +763,7 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		banner.style.bottom = '-' + journeys_utils.bannerHeight;
 	}
 
-    journeys_utils.branch._publishEvent('willCloseJourney', journeys_utils.journeyLinkData);
+	journeys_utils.branch._publishEvent('willCloseJourney', journeys_utils.journeyLinkData);
 	// removes timeout if animation is disabled or uses default timeout
 	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
 	setTimeout(function() {
@@ -755,11 +802,11 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 			window.removeEventListener("resize", journeys_utils._resizeListener);
 			window.removeEventListener("scroll", journeys_utils._scrollListener);
 		}
-        	journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
-        	if (!dismissedJourneyProgrammatically) {
+		journeys_utils.branch._publishEvent('didCloseJourney', journeys_utils.journeyLinkData);
+		if (!dismissedJourneyProgrammatically) {
 			journeys_utils.branch._publishEvent('branch_internal_event_didCloseJourney', journeys_utils.journeyLinkData);
 		}
-        	journeys_utils.isJourneyDisplayed = false;
+		journeys_utils.isJourneyDisplayed = false;
 	}, speedAndDelay);
 };
 
@@ -768,8 +815,8 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 	if (linkData && typeof linkData === "object" && Object.keys(linkData).length > 0) {
 		var journeyLinkDataPropertiesToFilterOut = ['browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id'];
 		utils.removePropertiesFromObject(linkData, journeyLinkDataPropertiesToFilterOut);
-        data['journey_link_data'] = {};
-        utils.merge(data['journey_link_data'], linkData);
-    }
+		data['journey_link_data'] = {};
+		utils.merge(data['journey_link_data'], linkData);
+	}
 	journeys_utils.journeyLinkData = data;
 };
