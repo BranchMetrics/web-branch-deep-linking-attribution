@@ -2287,6 +2287,19 @@ journeys_utils._getDismissRequestData = function(a, b) {
   var c = {}, d = utils.getHostedDeepLinkData();
   d && 0 < Object.keys(d).length && (c.hosted_deeplink_data = d);
   c = a._getPageviewRequestData(journeys_utils._getPageviewMetadata(null, c), null, journeys_utils.branch, !0);
+  if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data) {
+    utils.addPropertyIfNotNull(c, "journey_id", journeys_utils.journeyLinkData.journey_link_data.journey_id);
+    utils.addPropertyIfNotNull(c, "journey_name", journeys_utils.journeyLinkData.journey_link_data.journey_name);
+    utils.addPropertyIfNotNull(c, "view_id", journeys_utils.journeyLinkData.journey_link_data.view_id);
+    utils.addPropertyIfNotNull(c, "view_name", journeys_utils.journeyLinkData.journey_link_data.view_name);
+    utils.addPropertyIfNotNull(c, "channel", journeys_utils.journeyLinkData.journey_link_data.channel);
+    utils.addPropertyIfNotNull(c, "campaign", journeys_utils.journeyLinkData.journey_link_data.campaign);
+    try {
+      utils.addPropertyIfNotNull(c, "tags", JSON.stringify(journeys_utils.journeyLinkData.journey_link_data.tags));
+    } catch (e) {
+      c.tags = JSON.stringify([]);
+    }
+  }
   utils.addPropertyIfNotNull(c, "dismissal_source", b);
   return c;
 };
@@ -2681,6 +2694,8 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
     c.identity_id = e.identity_id ? e.identity_id.toString() : null;
     c.sessionLink = e.link;
     c.identity = b;
+    console.log(b);
+    e.developer_identity = b;
     e.referring_data_parsed = e.referring_data ? safejson.parse(e.referring_data) : null;
     session.update(c._storage, e);
     a(null, e);

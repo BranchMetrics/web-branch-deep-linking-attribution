@@ -735,8 +735,10 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 
 			data = data || { };
 			self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
-			self.sessionLink = data['link'];
+			self.sessionLink = data['link'];			
+
 			self.identity = identity;
+			data['developer_identity'] = identity;	
 
 			data['referring_data_parsed'] = data['referring_data'] ?
 				safejson.parse(data['referring_data']) :
