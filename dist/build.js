@@ -2694,7 +2694,6 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
     c.identity_id = e.identity_id ? e.identity_id.toString() : null;
     c.sessionLink = e.link;
     c.identity = b;
-    console.log(b);
     e.developer_identity = b;
     e.referring_data_parsed = e.referring_data ? safejson.parse(e.referring_data) : null;
     session.update(c._storage, e);
@@ -2706,7 +2705,7 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, function(c, d) {
     c && a(c);
     d = d || {};
-    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, developer_identity:d.developer_identity, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
     b.sessionLink = d.link;
     b.session_id = d.session_id;
     b.identity_id = d.identity_id;
