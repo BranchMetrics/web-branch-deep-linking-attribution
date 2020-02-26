@@ -788,6 +788,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"click_id": null,
 			"link_click_id": null,
 			"identity": null,
+			"developer_identity": data['developer_identity'],
 			"session_id": data['session_id'],
 			"identity_id": data['identity_id'],
 			"link": data['link'],
