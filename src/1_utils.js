@@ -134,7 +134,6 @@ utils.cleanApplicationAndSessionStorage = function(branch) {
 		}
 		branch._storage.remove('branch_view_enabled');
 		var data = {};
-		console.log(4444)
 		// Sets an empty object for branch_session and branch_session_first in local/sessionStorage
 		session.set(branch._storage, data, true);
 	}
@@ -234,16 +233,7 @@ utils.message = function(message, params, failCode, failDetails) {
  * @param {Object} data
  * @return {utils.sessionData}
  */
-utils.whiteListSessionData = function(data) {
-	console.log({
-		'data': data['data'] || "",
-		'data_parsed': data['data_parsed'] || {},
-		'has_app': data['has_app'] || null,
-		'identity': data['identity'] || null,
-		'developer_identity': data['developer_identity'] || null,
-		'referring_identity': data['referring_identity'] || null,
-		'referring_link': data['referring_link'] || null
-	})
+utils.whiteListSessionData = function(data) {	
 	return {
 		'data': data['data'] || "",
 		'data_parsed': data['data_parsed'] || {},
