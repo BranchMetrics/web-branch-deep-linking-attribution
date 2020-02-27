@@ -78,6 +78,22 @@ $jscomp.polyfill = function(a, b, c, d) {
     b != d && null != b && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
   }
 };
+$jscomp.owns = function(a, b) {
+  return Object.prototype.hasOwnProperty.call(a, b);
+};
+$jscomp.polyfill("Object.assign", function(a) {
+  return a ? a : function(a, c) {
+    for (var b = 1;b < arguments.length;b++) {
+      var e = arguments[b];
+      if (e) {
+        for (var f in e) {
+          $jscomp.owns(e, f) && (a[f] = e[f]);
+        }
+      }
+    }
+    return a;
+  };
+}, "es6-impl", "es3");
 $jscomp.checkStringArgs = function(a, b, c) {
   if (null == a) {
     throw new TypeError("The 'this' value for String.prototype." + c + " must not be null or undefined");
@@ -1023,7 +1039,7 @@ utils.generateDynamicBNCLink = function(a, b) {
   }
 };
 utils.cleanApplicationAndSessionStorage = function(a) {
-  a && (a.device_fingerprint_id = null, a.sessionLink = null, a.session_id = null, a.identity_id = null, a.identity = null, a.browser_fingerprint_id = null, a._deepviewCta && delete a._deepviewCta, a._deepviewRequestForReplay && delete a._deepviewRequestForReplay, a._storage.remove("branch_view_enabled"), session.set(a._storage, {}, !0));
+  a && (a.device_fingerprint_id = null, a.sessionLink = null, a.session_id = null, a.identity_id = null, a.identity = null, a.browser_fingerprint_id = null, a._deepviewCta && delete a._deepviewCta, a._deepviewRequestForReplay && delete a._deepviewRequestForReplay, a._storage.remove("branch_view_enabled"), console.log(4444), session.set(a._storage, {}, !0));
 };
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initialized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
@@ -1045,7 +1061,8 @@ utils.message = function(a, b, c, d) {
   return a;
 };
 utils.whiteListSessionData = function(a) {
-  return {data:a.data || "", data_parsed:a.data_parsed || {}, has_app:a.has_app || null, identity:a.identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
+  console.log({data:a.data || "", data_parsed:a.data_parsed || {}, has_app:a.has_app || null, identity:a.identity || null, developer_identity:a.developer_identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null});
+  return {data:a.data || "", data_parsed:a.data_parsed || {}, has_app:a.has_app || null, identity:a.developer_identity || null, developer_identity:a.developer_identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
 utils.whiteListJourneysLanguageData = function(a) {
   var b = /^\$journeys_\S+$/, c = a.data, d = {};
@@ -1616,12 +1633,24 @@ var session = {get:function(a, b) {
     return null;
   }
 }, set:function(a, b, c) {
+  console.log(b);
   a.set("branch_session", goog.json.serialize(b));
   c && a.set("branch_session_first", goog.json.serialize(b), !0);
 }, update:function(a, b) {
   if (b) {
     var c = session.get(a) || {}, c = utils.merge(c, b);
     a.set("branch_session", goog.json.serialize(c));
+  }
+}, path:function(a, b, c, d) {
+  var e = function(a) {
+    var d = {};
+    return a = Object.assign({}, a, (d[b] = c, d));
+  };
+  if (d) {
+    var f = safejson.parse(a.get("branch_session_first", !0));
+    f && a.set("branch_session_first", goog.json.serialize(e(f)), !0);
+  } else {
+    d = safejson.parse(a.get("branch_session", !1)), f && a.set("branch_session", goog.json.serialize(e(d)));
   }
 }};
 // Input 9
@@ -2591,6 +2620,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     a.link_click_id && (d.link_click_id = a.link_click_id.toString());
     a.session_id && (d.session_id = a.session_id.toString());
     a.identity_id && (d.identity_id = a.identity_id.toString());
+    a.developer_identity && (d.identity = a.developer_identity.toString(), d.developer_identity = a.developer_identity.toString());
     a.link && (d.sessionLink = a.link);
     a.referring_link && (a.referring_link = utils.processReferringLink(a.referring_link));
     !a.click_id && a.referring_link && (a.click_id = utils.getClickIdAndSearchStringFromLink(a.referring_link));
@@ -2613,7 +2643,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       a && a(null, c);
     });
   }, l = function(b, g) {
-    g && (g = e(g), utils.userPreferences.trackingDisabled || session.set(d._storage, g, k), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data && 0 !== g.data.length ? safejson.parse(g.data) : {});
+    g && (g = e(g), utils.userPreferences.trackingDisabled || (k && (g.identity = d.identity, g.developer_identity = d.developer_identity), console.log(g), session.set(d._storage, g, k)), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data && 0 !== g.data.length ? safejson.parse(g.data) : {});
     if (b) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = b.message), a(b, g && utils.whiteListSessionData(g));
     }
@@ -2643,11 +2673,12 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }, !1));
   };
   if (b && b.session_id && !g && !utils.getParamValue("branchify_url")) {
-    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), m(), h(l);
+    console.log(b), session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), m(), h(l);
   } else {
     b = {sdk:config.version, branch_key:d.branch_key};
     var n = session.get(d._storage, !0) || {};
     n.browser_fingerprint_id && (b._t = n.browser_fingerprint_id);
+    n.developer_identity && (d.developer_identity = n.developer_identity, d.identity = n.developer_identity);
     utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || n.browser_fingerprint_id, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
       a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
@@ -2696,7 +2727,9 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
     c.identity = b;
     e.developer_identity = b;
     e.referring_data_parsed = e.referring_data ? safejson.parse(e.referring_data) : null;
-    session.update(c._storage, e);
+    console.log(c._storage);
+    session.path(c._storage, "developer_identity", b, !0);
+    session.path(c._storage, "identity", b, !0);
     a(null, e);
   });
 });
@@ -2705,11 +2738,11 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, function(c, d) {
     c && a(c);
     d = d || {};
-    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, developer_identity:d.developer_identity, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:d.developer_identity, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
     b.sessionLink = d.link;
     b.session_id = d.session_id;
     b.identity_id = d.identity_id;
-    b.identity = d.identity;
+    b.identity = d.identity || d.developer_identity;
     session.update(b._storage, d);
     a(null);
   });

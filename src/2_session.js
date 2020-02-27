@@ -28,6 +28,7 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
+	console.log(data)
 	storage.set('branch_session', goog.json.serialize(data));
 	if (first) {
 		storage.set('branch_session_first', goog.json.serialize(data), true);
@@ -46,3 +47,27 @@ session.update = function(storage, newData) {
 	var data = utils.merge(currentData, newData);
 	storage.set('branch_session', goog.json.serialize(data));
 };
+
+session.path = function(storage, key, value, druable){
+
+	const path = (session) =>{
+		session = Object.assign({}, session, {
+			[key]: value
+		})
+
+		return session;
+	}
+
+	if(!druable){
+		const session = safejson.parse(storage.get('branch_session', false))
+		if(sessionFirst){
+			storage.set('branch_session', goog.json.serialize(path(session)));		
+		}
+		return;
+	}
+
+	const sessionFirst = safejson.parse(storage.get('branch_session_first', true))
+	if(sessionFirst){
+		storage.set('branch_session_first', goog.json.serialize(path(sessionFirst)), true);	
+	}
+}

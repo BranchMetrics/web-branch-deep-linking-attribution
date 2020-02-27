@@ -334,6 +334,10 @@ Branch.prototype['init'] = wrap(
 			if (data['identity_id']) {
 				self.identity_id = data['identity_id'].toString();
 			}
+			if (data['developer_identity']) {
+				self.identity = data['developer_identity'].toString();
+				self.developer_identity = data['developer_identity'].toString();
+			}
 			if (data['link']) {
 				self.sessionLink = data['link'];
 			}
@@ -350,6 +354,7 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
+	
 		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
@@ -357,12 +362,14 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(cb) {
+			
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 			var currentSessionData = session.get(self._storage) || {};
 			var permData = session.get(self._storage, true) || {};
 			if (permData['browser_fingerprint_id']) {
 				params_r['_t'] = permData['browser_fingerprint_id'];
 			}
+
 			if (!utils.isSafari11OrGreater()) {
 				self._api(
 					resources._r,
@@ -399,9 +406,17 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var finishInit = function(err, data) {
+
 			if (data) {
 				data = setBranchValues(data);
+								
 				if (!utils.userPreferences.trackingDisabled) {
+
+					if(freshInstall){
+						data["identity"] = self.identity; 
+						data["developer_identity"] = self.developer_identity; 
+					}
+					console.log(data)
 					session.set(self._storage, data, freshInstall);
 				}
 				self.init_state = init_states.INIT_SUCCEEDED;
@@ -516,8 +531,11 @@ Branch.prototype['init'] = wrap(
 				}
 			}
 		};
-
 		if (sessionData && sessionData['session_id'] && !link_identifier && !utils.getParamValue('branchify_url')) {
+			
+			
+			console.log(sessionData)
+
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
 			session.update(self._storage, { "referring_link": "" });
@@ -530,6 +548,11 @@ Branch.prototype['init'] = wrap(
 		var permData = session.get(self._storage, true) || {};
 		if (permData['browser_fingerprint_id']) {
 			params_r['_t'] = permData['browser_fingerprint_id'];
+		}
+
+		if (permData['developer_identity']) {
+			self.developer_identity = permData['developer_identity'];
+			self.identity = permData['developer_identity'];
 		}
 
 		if (!utils.isSafari11OrGreater()) {
@@ -559,7 +582,7 @@ Branch.prototype['init'] = wrap(
 								self.init_state_fail_code = init_state_fail_codes.OPEN_FAILED;
 								self.init_state_fail_details = err.message;
 							}
-							if (!err && typeof data === 'object') {
+							if (!err && typeof data === 'object') {						
 								if (data['branch_view_enabled']) {
 									self._branchViewEnabled = !!data['branch_view_enabled'];
 									self._storage.set('branch_view_enabled', self._branchViewEnabled);
@@ -743,8 +766,10 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 			data['referring_data_parsed'] = data['referring_data'] ?
 				safejson.parse(data['referring_data']) :
 				null;
-			session.update(self._storage, data);
-
+			///TODO Hack update in lokal store 
+			console.log(self._storage)
+			session.path(self._storage, "developer_identity", identity, true)
+			session.path(self._storage, "identity", identity, true)
 			done(null, data);
 		}
 	);
@@ -787,8 +812,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
-			"identity": null,
-			"developer_identity": data['developer_identity'],
+			"identity": data['developer_identity'],		
 			"session_id": data['session_id'],
 			"identity_id": data['identity_id'],
 			"link": data['link'],
@@ -798,7 +822,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.sessionLink = data['link'];
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
-		self.identity = data['identity'];
+		self.identity = data['identity'] || data['developer_identity'];
 		session.update(self._storage, data);
 
 		done(null);
