@@ -47,26 +47,22 @@ session.update = function(storage, newData) {
 	storage.set('branch_session', goog.json.serialize(data));
 };
 
-session.path = function(storage, key, value, druable){
+session.path = function(storage, data, druable){
 
-	const path = (session) =>{
-		session = Object.assign({}, session, {
-			[key]: value
-		})
-
-		return session;
+	const merge = (source, patch) =>{
+		return utils.merge(source, patch);;
 	}
 
 	const session = safejson.parse(storage.get('branch_session', false))
-	
+
 	if(sessionFirst){
-		storage.set('branch_session', goog.json.serialize(path(session)));		
+		storage.set('branch_session', goog.json.serialize(merge(session, data)));		
 	}
 
 	if(druable){
 		const sessionFirst = safejson.parse(storage.get('branch_session_first', true))
 		if(sessionFirst){
-			storage.set('branch_session_first', goog.json.serialize(path(sessionFirst)), true);	
+			storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);	
 		}
 	}	
 }
