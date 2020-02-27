@@ -605,6 +605,19 @@ utils.base64encode = function(input) {
 	return output;
 };
 
+/**
+ * Check if a String is a BASE64 encoded value
+ * @param {string} str 
+ */
+utils.isBase64Encoded = function(str) {
+	if (typeof str != "string") { return false; }
+	if (str ==='' || str.trim() ==='') { return false; }
+    try {
+        return btoa(atob(str)) === str;
+    } catch (err) {
+        return false;
+    }
+} 
 
 /**
  * Add event listeners to elements, taking older browsers into account
