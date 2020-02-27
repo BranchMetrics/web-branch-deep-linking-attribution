@@ -334,9 +334,8 @@ Branch.prototype['init'] = wrap(
 			if (data['identity_id']) {
 				self.identity_id = data['identity_id'].toString();
 			}
-			if (data['developer_identity']) {
-				self.identity = data['developer_identity'].toString();
-				self.developer_identity = data['developer_identity'].toString();
+			if (data['identity']) {
+				self.identity = data['identity'].toString();
 			}
 			if (data['link']) {
 				self.sessionLink = data['link'];
@@ -405,20 +404,23 @@ Branch.prototype['init'] = wrap(
 			);
 		};
 
+		var restoreIdentityOnInstall = function(data) {
+			if(freshInstall){
+				data["identity"] = self.identity;  
+			}
+			return data;
+		}
+
 		var finishInit = function(err, data) {
 
 			if (data) {
-				data = setBranchValues(data);
-								
-				if (!utils.userPreferences.trackingDisabled) {
+				data = setBranchValues(data);			
 
-					if(freshInstall){
-						data["identity"] = self.identity; 
-						data["developer_identity"] = self.developer_identity; 
-					}
-					console.log(data)
+				if (!utils.userPreferences.trackingDisabled) {					
+					data = restoreIdentityOnInstall(data);
 					session.set(self._storage, data, freshInstall);
 				}
+
 				self.init_state = init_states.INIT_SUCCEEDED;
 				data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 			}
@@ -532,10 +534,6 @@ Branch.prototype['init'] = wrap(
 			}
 		};
 		if (sessionData && sessionData['session_id'] && !link_identifier && !utils.getParamValue('branchify_url')) {
-			
-			
-			console.log(sessionData)
-
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
 			session.update(self._storage, { "referring_link": "" });
@@ -546,13 +544,13 @@ Branch.prototype['init'] = wrap(
 
 		var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 		var permData = session.get(self._storage, true) || {};
+
 		if (permData['browser_fingerprint_id']) {
 			params_r['_t'] = permData['browser_fingerprint_id'];
 		}
 
-		if (permData['developer_identity']) {
-			self.developer_identity = permData['developer_identity'];
-			self.identity = permData['developer_identity'];
+		if (permData['identity']) {
+			self.identity = permData['identity'];
 		}
 
 		if (!utils.isSafari11OrGreater()) {
@@ -766,9 +764,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 			data['referring_data_parsed'] = data['referring_data'] ?
 				safejson.parse(data['referring_data']) :
 				null;
-			///TODO Hack update in lokal store 
-			console.log(self._storage)
-			session.path(self._storage, "developer_identity", identity, true)
+
 			session.path(self._storage, "identity", identity, true)
 			done(null, data);
 		}
@@ -812,7 +808,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
-			"identity": data['developer_identity'],		
+			"identity": data['identity'],		
 			"session_id": data['session_id'],
 			"identity_id": data['identity_id'],
 			"link": data['link'],
@@ -822,7 +818,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.sessionLink = data['link'];
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
-		self.identity = data['identity'] || data['developer_identity'];
+		self.identity = data['identity'];
 		session.update(self._storage, data);
 
 		done(null);
