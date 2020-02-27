@@ -50,17 +50,16 @@ session.update = function(storage, newData) {
 session.path = function(storage, data, druable){
 
 	const merge = (source, patch) =>{
-		return utils.merge(source, patch);;
+		return utils.merge(source, patch);
 	}
 
-	const session = safejson.parse(storage.get('branch_session', false))
-
-	if(sessionFirst){
+	const session = storage.get('branch_session', false) || {}
+	if(session){
 		storage.set('branch_session', goog.json.serialize(merge(session, data)));		
 	}
 
 	if(druable){
-		const sessionFirst = safejson.parse(storage.get('branch_session_first', true))
+		const sessionFirst = storage.get('branch_session_first', true) || {}
 		if(sessionFirst){
 			storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);	
 		}
