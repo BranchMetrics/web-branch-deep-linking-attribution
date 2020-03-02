@@ -1023,7 +1023,7 @@ utils.generateDynamicBNCLink = function(a, b) {
   }
 };
 utils.cleanApplicationAndSessionStorage = function(a) {
-  a && (a.device_fingerprint_id = null, a.sessionLink = null, a.session_id = null, a.identity_id = null, a.identity = null, a.browser_fingerprint_id = null, a._deepviewCta && delete a._deepviewCta, a._deepviewRequestForReplay && delete a._deepviewRequestForReplay, a._storage.remove("branch_view_enabled"), console.log(4444), session.set(a._storage, {}, !0));
+  a && (a.device_fingerprint_id = null, a.sessionLink = null, a.session_id = null, a.identity_id = null, a.identity = null, a.browser_fingerprint_id = null, a._deepviewCta && delete a._deepviewCta, a._deepviewRequestForReplay && delete a._deepviewRequestForReplay, a._storage.remove("branch_view_enabled"), session.set(a._storage, {}, !0));
 };
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initialized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
@@ -1045,7 +1045,6 @@ utils.message = function(a, b, c, d) {
   return a;
 };
 utils.whiteListSessionData = function(a) {
-  console.log({data:a.data || "", data_parsed:a.data_parsed || {}, has_app:a.has_app || null, identity:a.identity || null, developer_identity:a.developer_identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null});
   return {data:a.data || "", data_parsed:a.data_parsed || {}, has_app:a.has_app || null, identity:a.developer_identity || null, developer_identity:a.developer_identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
 utils.whiteListJourneysLanguageData = function(a) {
@@ -1462,7 +1461,7 @@ function validator(a, b) {
   };
 }
 function defaults(a) {
-  var b = {browser_fingerprint_id:validator(!0, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, validationTypes.STRING)};
+  var b = {browser_fingerprint_id:validator(!0, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), sdk:validator(!0, validationTypes.STRING), session_id:validator(!0, validationTypes.STRING), developer_identity:validator(!0, validationTypes.STRING)};
   return utils.merge(a, b);
 }
 resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!1, validationTypes.STRING), alternative_browser_fingerprint_id:validator(!1, validationTypes.STRING), identity_id:validator(!1, validationTypes.STRING), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, 
@@ -1624,10 +1623,10 @@ var session = {get:function(a, b) {
     var c = session.get(a) || {}, c = utils.merge(c, b);
     a.set("branch_session", goog.json.serialize(c));
   }
-}, path:function(a, b, c) {
-  var d = safejson.parse(a.get("branch_session", !1));
-  d && a.set("branch_session", goog.json.serialize(utils.merge(d, b)));
-  c && (c = safejson.parse(a.get("branch_session_first", !0))) && a.set("branch_session_first", goog.json.serialize(utils.merge(c, b)), !0);
+}, patch:function(a, b, c) {
+  var d = a.get("branch_session", !1) || {};
+  a.set("branch_session", goog.json.serialize(utils.merge(d, b)));
+  c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(utils.merge(c, b)), !0));
 }};
 // Input 9
 var Server = function() {
@@ -2561,6 +2560,7 @@ Branch.prototype._api = function(a, b, c) {
   this.branch_key && (b.branch_key = this.branch_key);
   (a.params && a.params.session_id || a.queryPart && a.queryPart.session_id) && this.session_id && (b.session_id = this.session_id);
   (a.params && a.params.identity_id || a.queryPart && a.queryPart.identity_id) && this.identity_id && (b.identity_id = this.identity_id);
+  (a.params && a.params.developer_identity || a.queryPart && a.queryPart.developer_identity) && this.developer_identity && (b.developer_identity = this.developer_identity);
   (a.params && a.params.link_click_id || a.queryPart && a.queryPart.link_click_id) && this.link_click_id && (b.link_click_id = this.link_click_id);
   (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
   (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
@@ -2706,7 +2706,7 @@ Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(
     c.identity = b;
     e.developer_identity = b;
     e.referring_data_parsed = e.referring_data ? safejson.parse(e.referring_data) : null;
-    session.path(c._storage, {identity:b}, !0);
+    session.patch(c._storage, {identity:b}, !0);
     a(null, e);
   });
 });

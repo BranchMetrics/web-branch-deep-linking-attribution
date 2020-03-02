@@ -85,7 +85,9 @@ function defaults(obj) {
 		"browser_fingerprint_id": validator(true, validationTypes.STRING),
 		"identity_id": validator(true, validationTypes.STRING),
 		"sdk": validator(true, validationTypes.STRING),
-		"session_id": validator(true, validationTypes.STRING)
+		"session_id": validator(true, validationTypes.STRING),
+		"developer_identity": validator(true, validationTypes.STRING)
+		//TODO JW Identiy as Parameter
 	};
 	return utils.merge(obj, def);
 }
@@ -106,6 +108,7 @@ resources.open = {
 		"current_url": validator(false, validationTypes.STRING),
 		"screen_height": validator(false, validationTypes.NUMBER),
 		"screen_width": validator(false, validationTypes.NUMBER)
+		//TODO JW Identiy as Parameter
 	}
 };
 

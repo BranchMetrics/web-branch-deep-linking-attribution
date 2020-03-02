@@ -152,6 +152,7 @@ Branch = function() {
  * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
+	
 	if (this.app_id) {
 		obj['app_id'] = this.app_id;
 	}
@@ -167,6 +168,11 @@ Branch.prototype._api = function(resource, obj, callback) {
 			(resource.queryPart && resource.queryPart['identity_id'])) &&
 			this.identity_id) {
 		obj['identity_id'] = this.identity_id;
+	}
+	if (((resource.params && resource.params['developer_identity']) ||
+		(resource.queryPart && resource.queryPart['developer_identity'])) &&
+		this.developer_identity) {
+	obj['developer_identity'] = this.developer_identity;
 	}
 	if (((resource.params && resource.params['link_click_id']) ||
 			(resource.queryPart && resource.queryPart['link_click_id'])) &&
@@ -574,6 +580,7 @@ Branch.prototype['init'] = wrap(
 							"current_url": utils.getCurrentUrl(),
 							"screen_height": utils.getScreenHeight(),
 							"screen_width": utils.getScreenWidth()
+							//TOO
 						},
 						function(err, data) {
 							if (err) {
@@ -765,7 +772,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 				safejson.parse(data['referring_data']) :
 				null;
 
-			session.path(self._storage, {"identity": identity}, true)
+			session.patch(self._storage, {"identity": identity}, true)
 			done(null, data);
 		}
 	);

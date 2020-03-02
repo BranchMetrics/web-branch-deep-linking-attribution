@@ -47,7 +47,7 @@ session.update = function(storage, newData) {
 	storage.set('branch_session', goog.json.serialize(data));
 };
 
-session.path = function(storage, data, druable){
+session.patch = function(storage, data, druable){
 
 	const merge = (source, patch) =>{
 		return utils.merge(source, patch);
