@@ -63,13 +63,13 @@ session.patch = function(storage, data, updateLocalStorage){
 	}
 
 	const session = storage.get('branch_session', false) || {}
-	if(session){
+	if(session === true){
 		storage.set('branch_session', goog.json.serialize(merge(session, data)));		
 	}
 
 	if(updateLocalStorage){
 		const sessionFirst = storage.get('branch_session_first', true) || {}
-		if(sessionFirst){
+		if(sessionFirst === true){
 			storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);	
 		}
 	}	
