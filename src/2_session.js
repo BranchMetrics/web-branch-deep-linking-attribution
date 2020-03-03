@@ -51,7 +51,7 @@ session.update = function(storage, newData) {
 };
 
 /**
- * Patch a field in localStorage or sesstionStorage or both. 
+ * Patches a field in localStorage or sessionStorage or both. 
  * @param {storage} storage
  * @param {Object} data
  * @param {boolean=} druable
