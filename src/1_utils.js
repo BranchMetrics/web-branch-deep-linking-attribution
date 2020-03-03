@@ -1042,6 +1042,7 @@ utils.getUserData = function(branch) {
 	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
 	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
 	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
+	user_data = utils.addPropertyIfNotNull(user_data, "identity", branch.identity);
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk", "web");
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk_version", config.version);
 	return user_data;

@@ -8,36 +8,6 @@ goog.require('safejson');
 goog.require('storage');
 
 /**
- * Encodes BFP in data object with Base64 encoding.
- * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
- * @param {Object} data 
- */
-function encodeBFPs(data) {
-	if (data && !utils.isBase64Encoded(data["browser_fingerprint_id"])) {
-		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
-	}
-	if (data && !utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
-		data["alternative_browser_fingerprint_id"] = btoa(data["alternative_browser_fingerprint_id"]);
-	}
-	return data;
-}
-
-/**
- * Decodes BFPs in data object from Base64 encoding.
- * BFP is supposed to be Base64 encoded when stored in local storage/cookie. 
- * @param {Object} data
- */
-function decodeBFPs(data) {
-	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
-		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
-	}
-	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
-		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
-	}
-	return data;
-}
-
-/**
  * @param {storage} storage
  * @param {boolean=} first
  * @return {Object}
@@ -46,7 +16,7 @@ session.get = function(storage, first) {
 	var sessionString = first ? 'branch_session_first' : 'branch_session';
 	try {
 		let data = safejson.parse(storage.get(sessionString, first)) || null;
-		return decodeBFPs(data);
+		return session.decodeBFPs(data);
 	}
 	catch (e) {
 		return null;
@@ -59,7 +29,7 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
-	data = encodeBFP(data);
+	data = session.encodeBFPs(data);
 	storage.set('branch_session', goog.json.serialize(data));
 	if (first) {
 		storage.set('branch_session_first', goog.json.serialize(data), true);
@@ -76,7 +46,7 @@ session.update = function(storage, newData) {
 	}
 	var currentData = session.get(storage) || {};
 	var data = goog.json.serialize(utils.merge(currentData, newData));
-	data = encodeBFPs(data);
+	data = session.encodeBFPs(data);
 	storage.set('branch_session', data);
 };
 
@@ -103,4 +73,34 @@ session.patch = function(storage, data, updateLocalStorage){
 			storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);	
 		}
 	}	
+}
+
+/**
+ * Encodes BFP in data object with Base64 encoding.
+ * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
+ * @param {Object} data 
+ */
+session.encodeBFPs = function (data) {
+	if (data && !utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
+	}
+	if (data && !utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+		data["alternative_browser_fingerprint_id"] = btoa(data["alternative_browser_fingerprint_id"]);
+	}
+	return data;
+}
+
+/**
+ * Decodes BFPs in data object from Base64 encoding.
+ * BFP is supposed to be Base64 encoded when stored in local storage/cookie. 
+ * @param {Object} data
+ */
+session.decodeBFPs = function (data) {
+	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
+	}
+	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
+	}
+	return data;
 }

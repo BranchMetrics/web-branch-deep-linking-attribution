@@ -169,11 +169,21 @@ Branch.prototype._api = function(resource, obj, callback) {
 			this.identity_id) {
 		obj['identity_id'] = this.identity_id;
 	}
-	if (((resource.params && resource.params['developer_identity']) ||
-		(resource.queryPart && resource.queryPart['developer_identity'])) &&
-		this.developer_identity) {
-	obj['developer_identity'] = this.developer_identity;
+
+	if (resource.endpoint.indexOf("/v1/") < 0){
+		if (((resource.params && resource.params['developer_identity']) ||
+			(resource.queryPart && resource.queryPart['developer_identity'])) &&
+			this.identity) {
+	   		obj['developer_identity'] = this.identity;
+		}
+	}else{
+		if (((resource.params && resource.params['identity']) ||
+			(resource.queryPart && resource.queryPart['identity'])) &&
+			this.identity) {
+			obj['identity'] = this.identity;
+		}
 	}
+
 	if (((resource.params && resource.params['link_click_id']) ||
 			(resource.queryPart && resource.queryPart['link_click_id'])) &&
 			this.link_click_id) {
