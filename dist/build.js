@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.5"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.6"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2287,6 +2287,19 @@ journeys_utils._getDismissRequestData = function(a, b) {
   var c = {}, d = utils.getHostedDeepLinkData();
   d && 0 < Object.keys(d).length && (c.hosted_deeplink_data = d);
   c = a._getPageviewRequestData(journeys_utils._getPageviewMetadata(null, c), null, journeys_utils.branch, !0);
+  if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data) {
+    utils.addPropertyIfNotNull(c, "journey_id", journeys_utils.journeyLinkData.journey_link_data.journey_id);
+    utils.addPropertyIfNotNull(c, "journey_name", journeys_utils.journeyLinkData.journey_link_data.journey_name);
+    utils.addPropertyIfNotNull(c, "view_id", journeys_utils.journeyLinkData.journey_link_data.view_id);
+    utils.addPropertyIfNotNull(c, "view_name", journeys_utils.journeyLinkData.journey_link_data.view_name);
+    utils.addPropertyIfNotNull(c, "channel", journeys_utils.journeyLinkData.journey_link_data.channel);
+    utils.addPropertyIfNotNull(c, "campaign", journeys_utils.journeyLinkData.journey_link_data.campaign);
+    try {
+      utils.addPropertyIfNotNull(c, "tags", JSON.stringify(journeys_utils.journeyLinkData.journey_link_data.tags));
+    } catch (e) {
+      c.tags = JSON.stringify([]);
+    }
+  }
   utils.addPropertyIfNotNull(c, "dismissal_source", b);
   return c;
 };
