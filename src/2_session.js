@@ -29,7 +29,7 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
-	data = encodeBFP(data);
+	data = encodeBFPs(data);
 	storage.set('branch_session', goog.json.serialize(data));
 	if (first) {
 		storage.set('branch_session_first', goog.json.serialize(data), true);
@@ -44,9 +44,9 @@ session.update = function(storage, newData) {
 	if (!newData) {
 		return;
 	}
-	var currentData = session.get(storage) || {};
+	newData = encodeBFPs(newData);
+	var currentData = encodeBFPs(session.get(storage)) || {};
 	var data = goog.json.serialize(utils.merge(currentData, newData));
-	data = encodeBFPs(data);
 	storage.set('branch_session', data);
 };
 
