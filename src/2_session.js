@@ -56,10 +56,12 @@ session.update = function(storage, newData) {
  * @param {Object} data 
  */
 function encodeBFPs(data) {
-	if (data && !utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+	if (data && data["browser_fingerprint_id"] 
+		&& !utils.isBase64Encoded(data["browser_fingerprint_id"])) {
 		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
 	}
-	if (data && !utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+	if (data && data["alternative_browser_fingerprint_id"]
+		&& !utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
 		data["alternative_browser_fingerprint_id"] = btoa(data["alternative_browser_fingerprint_id"]);
 	}
 	return data;
@@ -74,8 +76,8 @@ function decodeBFPs(data) {
 	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
 		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
 	}
-	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
-		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
+	if (data && utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+		data["alternative_browser_fingerprint_id"] = atob(data["alternative_browser_fingerprint_id"]);
 	}
 	return data;
 }
