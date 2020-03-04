@@ -4,7 +4,6 @@
   + [.first()](#firstcallback)
   + [.setIdentity()](#setidentityidentity-callback)
   + [.logout()](#logoutcallback)
-  + [.getBrowserFingerprintId()](#getbrowserfingerprintidcallback)
   + [.crossPlatformIds()](#crossPlatformIdscallback)
   + [.lastAttributedTouchData()](#lastAttributedTouchDataattribution_window-callback)
 

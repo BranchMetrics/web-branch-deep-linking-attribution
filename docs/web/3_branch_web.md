@@ -179,30 +179,6 @@ ___
 
 
 
-### getBrowserFingerprintId(callback) 
-
-**Parameters**
-
-**callback**: `function`, callback to read a user's browser-fingerprint-id
-
-Returns the current user's browser-fingerprint-id. If tracking is disabled then 'null' is returned.
-
-##### Usage
-```js
-branch.getBrowserFingerprintId(function(err, data) { console.log(data); });
-```
-
-##### Callback Format
-```js
-callback(
-     null,
-     '79336952217731267', // browser-fingerprint-id, stored in `localStorage`.
-);
-```
-___
-
-
-
 ### crossPlatformIds(callback) 
 
 **Parameters**
