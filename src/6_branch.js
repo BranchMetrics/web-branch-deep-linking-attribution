@@ -802,28 +802,6 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	});
 });
 
-/**
- * @function Branch.getBrowserFingerprintId
- * @param {function(?Error, data=)=} callback - callback to read a user's browser-fingerprint-id
- *
- * Returns the current user's browser-fingerprint-id. If tracking is disabled then 'null' is returned.
- *
- * ##### Usage
- * ```js
- * branch.getBrowserFingerprintId(function(err, data) { console.log(data); });
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *      null,
- *      '79336952217731267', // browser-fingerprint-id, stored in `localStorage`.
- * );
- * ```
- * ___
- *
- */
-/*** +TOC_ITEM #getbrowserfingerprintidcallback &.getBrowserFingerprintId()& ^ALL ***/
 Branch.prototype['getBrowserFingerprintId'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	var permData = session.get(this._storage, true) || {};
 	done(null, permData['browser_fingerprint_id'] || null);
