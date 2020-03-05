@@ -589,8 +589,7 @@ Branch.prototype['init'] = wrap(
 							"initial_referrer": utils.getInitialReferrer(self._referringLink()),
 							"current_url": utils.getCurrentUrl(),
 							"screen_height": utils.getScreenHeight(),
-							"screen_width": utils.getScreenWidth()
-							//TOO
+							"screen_width": utils.getScreenWidth()							
 						},
 						function(err, data) {
 							if (err) {
