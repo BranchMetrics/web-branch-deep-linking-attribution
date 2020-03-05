@@ -16,7 +16,7 @@ session.get = function(storage, first) {
 	var sessionString = first ? 'branch_session_first' : 'branch_session';
 	try {
 		let data = safejson.parse(storage.get(sessionString, first)) || null;
-		return decodeBFPs(data);
+		return session.decodeBFPs(data);
 	}
 	catch (e) {
 		return null;
@@ -29,7 +29,7 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
-	data = encodeBFP(data);
+	data = session.encodeBFPs(data);
 	storage.set('branch_session', goog.json.serialize(data));
 	if (first) {
 		storage.set('branch_session_first', goog.json.serialize(data), true);
@@ -46,16 +46,37 @@ session.update = function(storage, newData) {
 	}
 	var currentData = session.get(storage) || {};
 	var data = goog.json.serialize(utils.merge(currentData, newData));
-	data = encodeBFPs(data);
+	data = session.encodeBFPs(data);
 	storage.set('branch_session', data);
 };
+
+/**
+ * Patches a field in localStorage or sessionStorage or both. 
+ * @param {storage} storage
+ * @param {Object} data
+ * @param {boolean=} druable
+ */
+session.patch = function(storage, data, updateLocalStorage){
+
+	const merge = (source, patch) =>{
+		return utils.merge(source, patch);
+	}
+
+	const session = storage.get('branch_session', false) || {}
+	storage.set('branch_session', goog.json.serialize(merge(session, data)));		
+
+	if (updateLocalStorage){
+		const sessionFirst = storage.get('branch_session_first', true) || {}
+		storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);	
+	}	
+}
 
 /**
  * Encodes BFP in data object with Base64 encoding.
  * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
  * @param {Object} data 
  */
-function encodeBFPs(data) {
+session.encodeBFPs = function (data) {
 	if (data && !utils.isBase64Encoded(data["browser_fingerprint_id"])) {
 		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
 	}
@@ -70,7 +91,7 @@ function encodeBFPs(data) {
  * BFP is supposed to be Base64 encoded when stored in local storage/cookie. 
  * @param {Object} data
  */
-function decodeBFPs(data) {
+session.decodeBFPs = function (data) {
 	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
 		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
 	}

@@ -233,12 +233,13 @@ utils.message = function(message, params, failCode, failDetails) {
  * @param {Object} data
  * @return {utils.sessionData}
  */
-utils.whiteListSessionData = function(data) {
+utils.whiteListSessionData = function(data) {	
 	return {
 		'data': data['data'] || "",
 		'data_parsed': data['data_parsed'] || {},
 		'has_app': data['has_app'] || null,
-		'identity': data['identity'] || null,
+		'identity': data['developer_identity'] || null,
+		'developer_identity': data['developer_identity'] || null,
 		'referring_identity': data['referring_identity'] || null,
 		'referring_link': data['referring_link'] || null
 	};
@@ -1041,6 +1042,7 @@ utils.getUserData = function(branch) {
 	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
 	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
 	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
+	user_data = utils.addPropertyIfNotNull(user_data, "identity", branch.identity);
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk", "web");
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk_version", config.version);
 	return user_data;
