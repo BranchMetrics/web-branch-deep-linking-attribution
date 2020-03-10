@@ -610,7 +610,7 @@ journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId
 }
 
 journeys_utils.decodeSymbols = function (str) {
-	if (str == undefined) {
+	if (str === undefined || str === null) {
 		return null;
 	}
 	return str
