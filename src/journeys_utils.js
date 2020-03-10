@@ -609,6 +609,16 @@ journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId
 	return journeyDismissals;
 }
 
+journeys_utils.decodeSymbols = function (str) {
+	if (str == undefined) {
+		return null;
+	}
+	return str
+		.replace(/&lt;/g, "<")
+		.replace(/&gt;/g, ">")
+		.replace(/&amp;/g, "&");
+}
+
 journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) {
 	var metadata = {};
 	var hostedDeeplinkData = utils.getHostedDeepLinkData();
@@ -635,7 +645,7 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"journey_name",
-			journeys_utils.journeyLinkData["journey_link_data"]["journey_name"]
+			journeys_utils.decodeSymbols(journeys_utils.journeyLinkData["journey_link_data"]["journey_name"])
 		);
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
@@ -645,17 +655,23 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"view_name",
-			journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
+			journeys_utils.decodeSymbols(
+				journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
+			)
 		);
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"channel",
-			journeys_utils.journeyLinkData["journey_link_data"]["channel"]
+			journeys_utils.decodeSymbols(
+				journeys_utils.journeyLinkData["journey_link_data"]["channel"]
+			)
 		);
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"campaign",
-			journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
+			journeys_utils.decodeSymbols(
+				journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
+			)
 		);
 		try {
 			utils.addPropertyIfNotNull(
