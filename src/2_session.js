@@ -58,7 +58,7 @@ session.update = function(storage, newData) {
  */
 session.patch = function(storage, data, updateLocalStorage){
 
-	const merge = (source, patch) =>{
+	const merge = (source, patch) => {
 		const result = Object.assign({}, JSON.parse(source, patch));
 		return result;
 	};
