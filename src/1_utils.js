@@ -607,6 +607,17 @@ utils.base64encode = function(input) {
 };
 
 /**
+ * Decode Base64 if the string is encoded
+ * @param {string} str
+ */
+utils.base64Decode = function(str) {
+	if (utils.isBase64Encoded(str)) {
+		return atob(str);
+	}
+	return str;
+}
+
+/**
  * Check if a String is a BASE64 encoded value
  * @param {string} str 
  */
@@ -619,6 +630,38 @@ utils.isBase64Encoded = function(str) {
         return false;
     }
 } 
+
+/**
+ * Encodes BFP in data object with Base64 encoding.
+ * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
+ * @param {Object} data 
+ */
+utils.encodeBFPs = function(data) {
+	if (data && data["browser_fingerprint_id"]
+		&& !utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
+	}
+	if (data && data["alternative_browser_fingerprint_id"]
+		&& !utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+		data["alternative_browser_fingerprint_id"] = btoa(data["alternative_browser_fingerprint_id"]);
+	}
+	return data;
+}
+
+/**
+ * Decodes BFPs in data object from Base64 encoding.
+ * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
+ * @param {Object} data
+ */
+utils.decodeBFPs = function (data) {
+	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
+	}
+	if (data && utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+		data["alternative_browser_fingerprint_id"] = atob(data["alternative_browser_fingerprint_id"]);
+	}
+	return data;
+}
 
 /**
  * Add event listeners to elements, taking older browsers into account
