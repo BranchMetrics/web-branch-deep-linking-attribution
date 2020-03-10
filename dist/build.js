@@ -78,6 +78,22 @@ $jscomp.polyfill = function(a, b, c, d) {
     b != d && null != b && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
   }
 };
+$jscomp.owns = function(a, b) {
+  return Object.prototype.hasOwnProperty.call(a, b);
+};
+$jscomp.polyfill("Object.assign", function(a) {
+  return a ? a : function(a, c) {
+    for (var b = 1;b < arguments.length;b++) {
+      var e = arguments[b];
+      if (e) {
+        for (var f in e) {
+          $jscomp.owns(e, f) && (a[f] = e[f]);
+        }
+      }
+    }
+    return a;
+  };
+}, "es6-impl", "es3");
 $jscomp.checkStringArgs = function(a, b, c) {
   if (null == a) {
     throw new TypeError("The 'this' value for String.prototype." + c + " must not be null or undefined");
@@ -1203,6 +1219,9 @@ utils.base64encode = function(a) {
   }
   return b;
 };
+utils.base64Decode = function(a) {
+  return utils.isBase64Encoded(a) ? atob(a) : a;
+};
 utils.isBase64Encoded = function(a) {
   if ("string" != typeof a || "" === a || "" === a.trim()) {
     return !1;
@@ -1212,6 +1231,16 @@ utils.isBase64Encoded = function(a) {
   } catch (b) {
     return !1;
   }
+};
+utils.encodeBFPs = function(a) {
+  a && a.browser_fingerprint_id && !utils.isBase64Encoded(a.browser_fingerprint_id) && (a.browser_fingerprint_id = btoa(a.browser_fingerprint_id));
+  a && a.alternative_browser_fingerprint_id && !utils.isBase64Encoded(a.alternative_browser_fingerprint_id) && (a.alternative_browser_fingerprint_id = btoa(a.alternative_browser_fingerprint_id));
+  return a;
+};
+utils.decodeBFPs = function(a) {
+  a && utils.isBase64Encoded(a.browser_fingerprint_id) && (a.browser_fingerprint_id = atob(a.browser_fingerprint_id));
+  a && utils.isBase64Encoded(a.alternative_browser_fingerprint_id) && (a.alternative_browser_fingerprint_id = atob(a.alternative_browser_fingerprint_id));
+  return a;
 };
 utils.addEvent = function(a, b, c, d) {
   var e = 0;
@@ -1544,9 +1573,9 @@ var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, Branc
     for (d in b) {
       0 === d.indexOf(BRANCH_KEY_PREFIX) && (null === a && (a = {}), a[trimPrefix(d)] = retrieveValue(b.getItem(d)));
     }
-    return a;
+    return utils.decodeBFPs(a);
   }, get:function(a, d) {
-    return retrieveValue(d && localStorage ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
+    return "browser_fingerprint_id" == a || "alternative_browser_fingerprint_id" == a ? d && localStorage ? utils.base64Decode(localStorage.getItem(prefix(a))) : utils.base64Decode(b.getItem(prefix(a))) : retrieveValue(d && localStorage ? localStorage.getItem(prefix(a)) : b.getItem(prefix(a)));
   }, set:function(a, d, e) {
     e && localStorage ? localStorage.setItem(prefix(a), d) : b.setItem(prefix(a), d);
   }, remove:function(a, d) {
@@ -1623,31 +1652,25 @@ BranchStorage.prototype.pojo = {getAll:function() {
 var session = {get:function(a, b) {
   try {
     var c = safejson.parse(a.get(b ? "branch_session_first" : "branch_session", b)) || null;
-    return session.decodeBFPs(c);
+    return utils.decodeBFPs(c);
   } catch (d) {
     return null;
   }
 }, set:function(a, b, c) {
-  b = session.encodeBFPs(b);
+  b = utils.encodeBFPs(b);
   a.set("branch_session", goog.json.serialize(b));
   c && a.set("branch_session_first", goog.json.serialize(b), !0);
 }, update:function(a, b) {
   if (b) {
-    var c = session.get(a) || {}, c = goog.json.serialize(utils.merge(c, b)), c = session.encodeBFPs(c);
+    var c = session.get(a) || {}, c = goog.json.serialize(utils.encodeBFPs(utils.merge(c, b)));
     a.set("branch_session", c);
   }
 }, patch:function(a, b, c) {
-  var d = a.get("branch_session", !1) || {};
-  a.set("branch_session", goog.json.serialize(utils.merge(d, b)));
-  c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(utils.merge(c, b)), !0));
-}, encodeBFPs:function(a) {
-  a && a.browser_fingerprint_id && !utils.isBase64Encoded(a.browser_fingerprint_id) && (a.browser_fingerprint_id = btoa(a.browser_fingerprint_id));
-  a && a.alternative_browser_fingerprint_id && !utils.isBase64Encoded(a.alternative_browser_fingerprint_id) && (a.alternative_browser_fingerprint_id = btoa(a.alternative_browser_fingerprint_id));
-  return a;
-}, decodeBFPs:function(a) {
-  a && utils.isBase64Encoded(a.browser_fingerprint_id) && (a.browser_fingerprint_id = atob(a.browser_fingerprint_id));
-  a && utils.isBase64Encoded(a.alternative_browser_fingerprint_id) && (a.alternative_browser_fingerprint_id = atob(a.alternative_browser_fingerprint_id));
-  return a;
+  var d = function(a, b) {
+    return Object.assign({}, JSON.parse(a), b);
+  }, e = a.get("branch_session", !1) || {};
+  a.set("branch_session", goog.json.serialize(d(e, b)));
+  c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(d(c, b)), !0));
 }};
 // Input 9
 var Server = function() {

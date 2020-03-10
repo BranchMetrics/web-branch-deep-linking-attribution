@@ -57,12 +57,12 @@ session.update = function(storage, newData) {
  */
 session.patch = function(storage, data, updateLocalStorage){
 
-	const merge = (source, patch) => {
-		const result = Object.assign({}, JSON.parse(source, patch));
+	var merge = (source, patch) => {
+		var result = Object.assign({}, JSON.parse(source), patch);
 		return result;
 	};
 
-	const session = storage.get('branch_session', false) || {};
+	var session = storage.get('branch_session', false) || {};
 	storage.set('branch_session', goog.json.serialize(merge(session, data)));
 
 	if (updateLocalStorage){
