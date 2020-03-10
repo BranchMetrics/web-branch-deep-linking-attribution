@@ -129,8 +129,7 @@ resources.linkClick = {
 		"link_url": validator(true, validationTypes.STRING)
 	},
 	params: {
-		"click": validator(true, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
+		"click": validator(true, validationTypes.STRING)
 	}
 };
 
@@ -143,8 +142,7 @@ resources.SMSLinkSend = {
 	},
 	params: {
 		"sdk": validator(false, validationTypes.STRING),
-		"phone": validator(true, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
+		"phone": validator(true, validationTypes.STRING)
 	}
 };
 
@@ -160,8 +158,7 @@ resources.getCode = {
 		"expiration": validator(false, validationTypes.STRING),
 		"location": validator(true, validationTypes.NUMBER),
 		"prefix": validator(false, validationTypes.STRING),
-		"type": validator(true, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
+		"type": validator(true, validationTypes.STRING)
 	})
 };
 
@@ -172,7 +169,7 @@ resources.validateCode = {
 	queryPart: {
 		"code": validator(true, validationTypes.STRING)
 	},
-	params: defaults({ "identity": validator(true, validationTypes.STRING) })
+	params: defaults({ })
 };
 
 resources.applyCode = {
@@ -182,7 +179,7 @@ resources.applyCode = {
 	queryPart: {
 		"code": validator(true, validationTypes.STRING)
 	},
-	params: defaults({ "identity": validator(true, validationTypes.STRING) })
+	params: defaults({ })
 };
 
 resources.logout = {
@@ -211,7 +208,7 @@ resources.referrals = {
 	queryPart: {
 		"identity_id": validator(true, validationTypes.STRING)
 	},
-	params: defaults({ "identity": validator(true, validationTypes.STRING) })
+	params: defaults({ })
 };
 
 resources.creditHistory = {
@@ -223,8 +220,7 @@ resources.creditHistory = {
 		"bucket": validator(false, validationTypes.STRING),
 		"direction": validator(false, validationTypes.NUMBER),
 		"length": validator(false, validationTypes.NUMBER),
-		"link_click_id": validator(false, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
+		"link_click_id": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -245,8 +241,7 @@ resources.redeem = {
 	params: defaults({
 		"amount": validator(true, validationTypes.NUMBER),
 		"bucket": validator(true, validationTypes.STRING),
-		"identity_id": validator(true, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
+		"identity_id": validator(true, validationTypes.STRING)
 	})
 };
 
@@ -266,8 +261,7 @@ resources.link = {
 		"tags": validator(false, validationTypes.ARRAY),
 		"type": validator(false, validationTypes.NUMBER),
 		"source": validator(false, validationTypes.STRING),
-		"instrumentation": validator(false, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
+		"instrumentation": validator(false, validationTypes.STRING)
 	})
 };
 
@@ -311,8 +305,7 @@ resources.event = {
 		"event": validator(true, validationTypes.STRING),
 		"metadata": validator(true, validationTypes.OBJECT),
 		"initial_referrer": validator(false, validationTypes.STRING),
-		"tracking_disabled": validator(false, validationTypes.BOOLEAN),
-		"identity": validator(true, validationTypes.STRING)
+		"tracking_disabled": validator(false, validationTypes.BOOLEAN)
 	})
 };
 
@@ -324,8 +317,7 @@ resources.commerceEvent = {
 		"event": validator(true, validationTypes.STRING),
 		"metadata": validator(false, validationTypes.OBJECT),
 		"initial_referrer": validator(false, validationTypes.STRING),
-		"commerce_data": validator(true, validationTypes.OBJECT),
-		"identity": validator(true, validationTypes.STRING)
+		"commerce_data": validator(true, validationTypes.OBJECT)
 	})
 };
 
@@ -341,8 +333,7 @@ resources.logStandardEvent = {
 		"custom_data": validator(false, validationTypes.STRING),
 		"event_data": validator(false, validationTypes.STRING),
 		"content_items": validator(false, validationTypes.STRING),
-		"customer_event_alias": validator(false, validationTypes.STRING),
-		"developer_identity": validator(true, validationTypes.STRING)
+		"customer_event_alias": validator(false, validationTypes.STRING)
 	}
 };
 
@@ -353,8 +344,7 @@ resources.logCustomEvent = {
 	params: {
 		"name": validator(true, validationTypes.STRING),
 		"user_data": validator(true, validationTypes.STRING),
-		"custom_data": validator(false, validationTypes.STRING),
-		"developer_identity": validator(true, validationTypes.STRING)
+		"custom_data": validator(false, validationTypes.STRING)
 	}
 };
 
@@ -414,8 +404,7 @@ resources.crossPlatformIds = {
 	endpoint: "/v1/cpid",
 	method: utils.httpMethod.POST,
 	params: {
-		"user_data": validator(true, validationTypes.STRING),
-		"developer_identity": validator(true, validationTypes.STRING)
+		"user_data": validator(true, validationTypes.STRING)
 	}
 };
 
@@ -424,7 +413,6 @@ resources.lastAttributedTouchData = {
 	endpoint: "/v1/cpid/latd",
 	method: utils.httpMethod.POST,
 	params: {
-		"user_data": validator(true, validationTypes.STRING),
-		"developer_identity": validator(true, validationTypes.STRING)
+		"user_data": validator(true, validationTypes.STRING)
 	}
 };
