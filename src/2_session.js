@@ -58,8 +58,7 @@ session.update = function(storage, newData) {
 session.patch = function(storage, data, updateLocalStorage){
 
 	var merge = (source, patch) => {
-		var result = Object.assign({}, JSON.parse(source), patch);
-		return result;
+		return utils.encodeBFPs(utils.merge(goog.json.parse(source), patch));
 	};
 
 	var session = storage.get('branch_session', false) || {};

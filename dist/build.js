@@ -78,22 +78,6 @@ $jscomp.polyfill = function(a, b, c, d) {
     b != d && null != b && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
   }
 };
-$jscomp.owns = function(a, b) {
-  return Object.prototype.hasOwnProperty.call(a, b);
-};
-$jscomp.polyfill("Object.assign", function(a) {
-  return a ? a : function(a, c) {
-    for (var b = 1;b < arguments.length;b++) {
-      var e = arguments[b];
-      if (e) {
-        for (var f in e) {
-          $jscomp.owns(e, f) && (a[f] = e[f]);
-        }
-      }
-    }
-    return a;
-  };
-}, "es6-impl", "es3");
 $jscomp.checkStringArgs = function(a, b, c) {
   if (null == a) {
     throw new TypeError("The 'this' value for String.prototype." + c + " must not be null or undefined");
@@ -1506,34 +1490,33 @@ function defaults(a) {
 resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!1, validationTypes.STRING), alternative_browser_fingerprint_id:validator(!1, validationTypes.STRING), identity_id:validator(!1, validationTypes.STRING), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, 
 validationTypes.BOOLEAN), current_url:validator(!1, validationTypes.STRING), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, validationTypes.NUMBER)}};
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, validationTypes.STRING), branch_key:validator(!0, validationTypes.STRING)}};
-resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)}};
-resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)}};
-resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING), 
-identity:validator(!0, validationTypes.STRING)})};
-resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({identity:validator(!0, validationTypes.STRING)})};
-resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({identity:validator(!0, validationTypes.STRING)})};
+resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
+resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
+resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
+resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
+resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:defaults({session_id:validator(!0, validationTypes.STRING)})};
 resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
-resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, validationTypes.STRING)}, params:defaults({identity:validator(!0, validationTypes.STRING)})};
-resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:defaults({begin_after_id:validator(!1, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING), direction:validator(!1, validationTypes.NUMBER), length:validator(!1, validationTypes.NUMBER), link_click_id:validator(!1, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
+resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, validationTypes.STRING)}, params:defaults({})};
+resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:defaults({begin_after_id:validator(!1, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING), direction:validator(!1, validationTypes.NUMBER), length:validator(!1, validationTypes.NUMBER), link_click_id:validator(!1, validationTypes.STRING)})};
 resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, params:defaults({branch_key:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
-resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
+resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
-validationTypes.NUMBER), source:validator(!1, validationTypes.STRING), instrumentation:validator(!1, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
+validationTypes.NUMBER), source:validator(!1, validationTypes.STRING), instrumentation:validator(!1, validationTypes.STRING)})};
 resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), _t:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), append_deeplink_path:validator(!1, 
 validationTypes.BOOLEAN), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), deepview_type:validator(!0, validationTypes.STRING), source:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
 resources.hasApp = {destination:config.api_endpoint, endpoint:"/v1/has-app", method:utils.httpMethod.GET, params:{browser_fingerprint_id:validator(!0, validationTypes.STRING), instrumentation:validator(!1, validationTypes.STRING)}};
-resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), identity:validator(!0, validationTypes.STRING)})};
-resources.commerceEvent = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), commerce_data:validator(!0, validationTypes.OBJECT), identity:validator(!0, validationTypes.STRING)})};
-resources.logStandardEvent = {destination:config.api_endpoint, endpoint:"/v2/event/standard", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING), customer_event_alias:validator(!1, validationTypes.STRING), developer_identity:validator(!0, validationTypes.STRING)}};
-resources.logCustomEvent = {destination:config.api_endpoint, endpoint:"/v2/event/custom", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), developer_identity:validator(!0, validationTypes.STRING)}};
+resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN)})};
+resources.commerceEvent = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), commerce_data:validator(!0, validationTypes.OBJECT)})};
+resources.logStandardEvent = {destination:config.api_endpoint, endpoint:"/v2/event/standard", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING), customer_event_alias:validator(!1, validationTypes.STRING)}};
+resources.logCustomEvent = {destination:config.api_endpoint, endpoint:"/v2/event/custom", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING)}};
 resources.pageview = {destination:config.api_endpoint, endpoint:"/v1/pageview", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), branch_view_id:validator(!1, validationTypes.STRING), no_journeys:validator(!1, validationTypes.BOOLEAN), user_language:validator(!1, validationTypes.STRING), open_app:validator(!1, 
 validationTypes.BOOLEAN), has_app_websdk:validator(!1, validationTypes.BOOLEAN), source:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), is_iframe:validator(!1, validationTypes.BOOLEAN), data:validator(!1, validationTypes.OBJECT), callback_string:validator(!1, validationTypes.STRING), journey_displayed:validator(!1, validationTypes.BOOLEAN), audience_rule_id:validator(!1, validationTypes.STRING), journey_dismissals:validator(!1, validationTypes.OBJECT)})};
 resources.dismiss = {destination:config.api_endpoint, endpoint:"/v1/dismiss", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), branch_view_id:validator(!1, validationTypes.STRING), no_journeys:validator(!1, validationTypes.BOOLEAN), user_language:validator(!1, validationTypes.STRING), open_app:validator(!1, 
 validationTypes.BOOLEAN), has_app_websdk:validator(!1, validationTypes.BOOLEAN), source:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), is_iframe:validator(!1, validationTypes.BOOLEAN), data:validator(!1, validationTypes.OBJECT), callback_string:validator(!1, validationTypes.STRING), journey_displayed:validator(!1, validationTypes.BOOLEAN), audience_rule_id:validator(!1, validationTypes.STRING), journey_dismissals:validator(!1, validationTypes.OBJECT), dismissal_source:validator(!1, 
 validationTypes.STRING)})};
-resources.crossPlatformIds = {destination:config.api_endpoint, endpoint:"/v1/cpid", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING), developer_identity:validator(!0, validationTypes.STRING)}};
-resources.lastAttributedTouchData = {destination:config.api_endpoint, endpoint:"/v1/cpid/latd", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING), developer_identity:validator(!0, validationTypes.STRING)}};
+resources.crossPlatformIds = {destination:config.api_endpoint, endpoint:"/v1/cpid", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING)}};
+resources.lastAttributedTouchData = {destination:config.api_endpoint, endpoint:"/v1/cpid/latd", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING)}};
 // Input 7
 var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
   for (var b = 0;b < a.length;b++) {
@@ -1667,7 +1650,7 @@ var session = {get:function(a, b) {
   }
 }, patch:function(a, b, c) {
   var d = function(a, b) {
-    return Object.assign({}, JSON.parse(a), b);
+    return utils.encodeBFPs(utils.merge(goog.json.parse(a), b));
   }, e = a.get("branch_session", !1) || {};
   a.set("branch_session", goog.json.serialize(d(e, b)));
   c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(d(c, b)), !0));
