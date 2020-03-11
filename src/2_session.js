@@ -49,7 +49,7 @@ session.update = function(storage, newData) {
 	storage.set('branch_session', data);
 };
 
-/**
+/**new
  * Patches a field in localStorage or sessionStorage or both.
  * @param {storage} storage
  * @param {Object} data
