@@ -57,15 +57,15 @@ session.update = function(storage, newData) {
  */
 session.patch = function(storage, data, updateLocalStorage){
 
-	const merge = (source, patch) =>{
-		return utils.merge(source, patch);
+	var merge = (source, patch) => {
+		return utils.encodeBFPs(utils.merge(goog.json.parse(source), patch));
 	};
 
-	const session = storage.get('branch_session', false) || {}
+	var session = storage.get('branch_session', false) || {};
 	storage.set('branch_session', goog.json.serialize(merge(session, data)));
 
 	if (updateLocalStorage){
-		const sessionFirst = storage.get('branch_session_first', true) || {}
+		const sessionFirst = storage.get('branch_session_first', true) || {};
 		storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);
 	}
-}
+};

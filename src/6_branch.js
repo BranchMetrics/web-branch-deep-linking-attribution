@@ -781,7 +781,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 				safejson.parse(data['referring_data']) :
 				null;
 
-			session.patch(self._storage, {"identity": identity}, true)
+			session.patch(self._storage, {"identity": identity}, true);
 			done(null, data);
 		}
 	);
