@@ -609,6 +609,88 @@ journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId
 	return journeyDismissals;
 }
 
+journeys_utils.decodeSymbols = function (str) {
+	if (str === undefined || str === null) {
+		return null;
+	}
+	return str
+		.replace(/&lt;/g, "<")
+		.replace(/&gt;/g, ">")
+		.replace(/&amp;/g, "&")
+		.replace(/&quot;/g, "\"")
+		.replace(/&apos;/g, "'")
+		.replace(/&brvbar;/g, "¦")
+		.replace(/&laquo;/g, "«")
+		.replace(/&acute;/g, "´")
+		.replace(/&middot;/g, "·")
+		.replace(/&raquo;/g, "»")
+		.replace(/&amp;/g, "&")
+		.replace(/&iquest;/g, "¿")
+		.replace(/&times;/g, "×")
+		.replace(/&divide;/g, "÷")
+		.replace(/&Agrave;/g, "À")
+		.replace(/&Aacute;/g, "Á")
+		.replace(/&Acirc;/g, "Â")
+		.replace(/&Atilde;/g, "Ã")
+		.replace(/&Auml;/g, "Ä")
+		.replace(/&Aring;/g, "Å")
+		.replace(/&AElig;/g, "Æ")
+		.replace(/&Ccedil;/g, "Ç")
+		.replace(/&Egrave;/g, "È")
+		.replace(/&Eacute;/g, "É")
+		.replace(/&Ecirc;/g, "Ê")
+		.replace(/&Euml;/g, "Ë")
+		.replace(/&Igrave;/g, "Ì")
+		.replace(/&Iacute;/g, "Í")
+		.replace(/&Icirc;/g, "Î")
+		.replace(/&Iuml;/g, "Ï")
+		.replace(/&ETH;/g, "Ð")
+		.replace(/&Ntilde;/g, "Ñ")
+		.replace(/&Ograve;/g, "Ò")
+		.replace(/&Oacute;/g, "Ó")
+		.replace(/&Ocirc;/g, "Ô")
+		.replace(/&Otilde;/g, "Õ")
+		.replace(/&Ouml;/g, "Ö")
+		.replace(/&Oslash;/g, "Ø")
+		.replace(/&Ugrave;/g, "Ù")
+		.replace(/&Uacute;/g, "Ú")
+		.replace(/&Ucirc;/g, "Û")
+		.replace(/&Uuml;/g, "Ü")
+		.replace(/&Yacute;/g, "Ý")
+		.replace(/&THORN;/g, "Þ")
+		.replace(/&szlig;/g, "ß")
+		.replace(/&agrave;/g, "à")
+		.replace(/&aacute;/g, "á")
+		.replace(/&acirc;/g, "â")
+		.replace(/&atilde;/g, "ã")
+		.replace(/&auml;/g, "ä")
+		.replace(/&aring;/g, "å")
+		.replace(/&aelig;/g, "æ")
+		.replace(/&ccedil;/g, "ç")
+		.replace(/&egrave;/g, "è")
+		.replace(/&eacute;/g, "é")
+		.replace(/&ecirc;/g, "ê")
+		.replace(/&euml;/g, "ë")
+		.replace(/&igrave;/g, "ì")
+		.replace(/&iacute;/g, "í")
+		.replace(/&icirc;/g, "î")
+		.replace(/&iuml;/g, "ï")
+		.replace(/&eth;/g, "ð")
+		.replace(/&ntilde;/g, "ñ")
+		.replace(/&ograve;/g, "ò")
+		.replace(/&oacute;/g, "ó")
+		.replace(/&ocirc;/g, "ô")
+		.replace(/&otilde;/g, "õ")
+		.replace(/&ouml;/g, "ö")
+		.replace(/&oslash;/g, "ø")
+		.replace(/&ugrave;/g, "ù")
+		.replace(/&uacute;/g, "ú")
+		.replace(/&ucirc;/g, "û")
+		.replace(/&uuml;/g, "ü")
+		.replace(/&yacute;/g, "ý")
+		.replace(/&thorn;/g, "þ")
+		.replace(/&yuml;/g, "ÿ");
+}
 journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) {
 	var metadata = {};
 	var hostedDeeplinkData = utils.getHostedDeepLinkData();
@@ -635,7 +717,7 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"journey_name",
-			journeys_utils.journeyLinkData["journey_link_data"]["journey_name"]
+			journeys_utils.decodeSymbols(journeys_utils.journeyLinkData["journey_link_data"]["journey_name"])
 		);
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
@@ -645,17 +727,23 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"view_name",
-			journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
+			journeys_utils.decodeSymbols(
+				journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
+			)
 		);
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"channel",
-			journeys_utils.journeyLinkData["journey_link_data"]["channel"]
+			journeys_utils.decodeSymbols(
+				journeys_utils.journeyLinkData["journey_link_data"]["channel"]
+			)
 		);
 		utils.addPropertyIfNotNull(
 			dismissRequestData,
 			"campaign",
-			journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
+			journeys_utils.decodeSymbols(
+				journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
+			)
 		);
 		try {
 			utils.addPropertyIfNotNull(
