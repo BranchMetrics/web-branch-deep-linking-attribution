@@ -934,7 +934,7 @@ journeys_utils.hasJourneyCtaLink = function () {
 		return false;
 	}
 
-	return journeys_utils.branch._branchViewData.data.$journeys_cta.length > 0;
+	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta').length > 0;
 };
 
 journeys_utils.getBranchViewDataItemOrUndefined = function(name){
@@ -945,7 +945,7 @@ journeys_utils.getBranchViewDataItemOrUndefined = function(name){
 };
 
 journeys_utils.getJourneyCtaLink = function () {
-	return journeys_utils.branch._branchViewData.data.$journeys_cta;
+	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
 };
 
 journeys_utils.trySetBranchViewDataUrls = function (linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
