@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://nightlyregression.api.beta.branch.io", version:"2.52.6"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.6"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2396,7 +2396,7 @@ journeys_utils.setJourneyLinkData = function(a) {
   a && "object" === typeof a && 0 < Object.keys(a).length && (utils.removePropertiesFromObject(a, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b.journey_link_data = {}, utils.merge(b.journey_link_data, a));
   journeys_utils.journeyLinkData = b;
 };
-journeys_utils.existInBranchViewData = function(a) {
+journeys_utils.hasInBranchViewData = function(a) {
   return journeys_utils && journeys_utils.branch && journeys_utils.branch._branchViewData && journeys_utils.branch._branchViewData.data ? journeys_utils.branch._branchViewData.data[a] : !1;
 };
 journeys_utils.hasJourneyCtaLink = function() {
@@ -2504,7 +2504,6 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
   utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d);
 };
 branch_view._getPageviewRequestData = function(a, b, c, d) {
-  console.log("PAGEVIEW");
   journeys_utils.branch = c;
   b || (b = {});
   a || (a = {});
@@ -2844,9 +2843,7 @@ Branch.prototype.logEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c,
   });
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  console.log(b);
   var c = utils.cleanLinkData(b), c = journeys_utils.trySetBranchViewDataUrls(b), d = this.branch_key;
-  console.log(c);
   this._api(resources.link, c, function(b, f) {
     if (b) {
       return a(b, utils.generateDynamicBNCLink(d, c));
