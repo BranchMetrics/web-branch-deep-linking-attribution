@@ -2848,8 +2848,9 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
     if (b) {
       return a(b, utils.generateDynamicBNCLink(d, c));
     }
+    console.log(33);
     if (journeys_utils.hasJourneyCtaLink()) {
-      return a(null, journeys_utils.getJourneyCtaLink());
+      return console.log(123), a(null, journeys_utils.getJourneyCtaLink());
     }
     a(null, f && f.url);
   });
