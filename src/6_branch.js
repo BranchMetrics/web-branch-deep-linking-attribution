@@ -3,7 +3,7 @@
  */
 'use strict';
 goog.provide('Branch');
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 goog.require('utils');
 goog.require('resources');
@@ -17,8 +17,6 @@ goog.require('safejson');
 goog.require('branch_view');
 goog.require('appindexing');
 goog.require('journeys_utils');
-
-/*globals Ti, BranchStorage, require */
 
 var default_branch;
 
@@ -1253,11 +1251,17 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	var linkData = utils.cleanLinkData(data);
 	var keyCopy = this.branch_key;
+	//TODO: JW
 	this._api(resources.link, linkData, function(err, data) {
 		if (err) {
 			// if an error occurs or if tracking is disabled then return a dynamic link
 			return done(err, utils.generateDynamicBNCLink(keyCopy, linkData));
 		}
+
+		if(journeys_utils.hasJourneyCtaLink()){
+			return done (null, journeys_utils.getJourneyCtaLink());
+		}
+
 		done(null, data && data['url']);
 	});
 });

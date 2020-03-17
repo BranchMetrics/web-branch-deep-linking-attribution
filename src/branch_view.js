@@ -178,7 +178,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 };
 
 branch_view._getPageviewRequestData = function(metadata, options, branch, isDismissEvent) {
-
+	console.log("PAGEVIEW")
 	journeys_utils.branch = branch;
 
 	if (!options) {
@@ -194,6 +194,8 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 
 	// starts object off with data from setBranchViewData() call
 	var obj = utils.merge({}, branch._branchViewData);
+	// TODO: JW
+	console.log(obj);
 	var sessionStorage = session.get(branch._storage) || {};
 	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
 	var journeyDismissals = branch._storage.get('journeyDismissals', true);

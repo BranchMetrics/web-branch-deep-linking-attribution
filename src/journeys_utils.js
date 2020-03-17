@@ -908,3 +908,31 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 	}
 	journeys_utils.journeyLinkData = data;
 };
+
+journeys_utils.hasJourneyCtaLink = function () {
+	if(!journeys_utils){
+		return false;
+	}
+
+	if(!journeys_utils.branch){
+		return false;
+	}
+
+	if(!journeys_utils.branch._branchViewData){
+		return false;
+	}
+
+	if(!journeys_utils.branch._branchViewData.data.$journeys_cta){
+		return false;
+	}
+
+	if(!journeys_utils.branch._branchViewData.data.$journeys_cta){
+		return false;
+	}
+
+	return journeys_utils.branch._branchViewData.data.$journeys_cta.length > 0;
+};
+
+journeys_utils.getJourneyCtaLink = function () {
+	return journeys_utils.branch._branchViewData.data.$journeys_cta;
+};

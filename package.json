@@ -7,7 +7,9 @@
 	"scripts": {
 		"lint": "./lint.sh",
 		"test": "grunt test",
-		"builddocs": "jsdox src/3_branch_web.js --output docs/web"
+		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
+		"unit-test": "jest",
+		"unit-test-watch": "jest --watch"
 	},
 	"repository": {
 		"type": "git",
