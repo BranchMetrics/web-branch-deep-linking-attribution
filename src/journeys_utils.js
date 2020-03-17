@@ -954,7 +954,6 @@ journeys_utils.trySetBranchViewDataUrls = function (linkElements, urls = ['$andr
 		return linkElements;
 	}
 
-
 	var assignUrls = function (data) {
 		return urls.reduce((value, url)=>{
 			if(value[url]){
@@ -972,7 +971,6 @@ journeys_utils.trySetBranchViewDataUrls = function (linkElements, urls = ['$andr
 	try {
 		var data = (JSON.parse(linkElements.data));
 		linkElements.data = JSON.stringify(assignUrls(data));
-
 	}catch(e){
 		console.log(e);
 	}

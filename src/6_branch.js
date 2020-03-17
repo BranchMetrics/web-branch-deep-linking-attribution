@@ -3,7 +3,7 @@
  */
 'use strict';
 goog.provide('Branch');
-goog.require('goog.json');
+goog.require('goog.json'); // jshint unused:false
 
 goog.require('utils');
 goog.require('resources');
@@ -17,6 +17,8 @@ goog.require('safejson');
 goog.require('branch_view');
 goog.require('appindexing');
 goog.require('journeys_utils');
+
+/*globals Ti, BranchStorage, require */
 
 var default_branch;
 
@@ -1249,13 +1251,10 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 /*** +TOC_HEADING &Deep Linking& ^ALL ***/
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	console.log(data);
 	var linkData = utils.cleanLinkData(data);
 	linkData = journeys_utils.trySetBranchViewDataUrls(data);
 	var keyCopy = this.branch_key;
-	console.log(linkData);
 
-	//TODO: JW
 	this._api(resources.link, linkData, function(err, data) {
 		if (err) {
 			// if an error occurs or if tracking is disabled then return a dynamic link

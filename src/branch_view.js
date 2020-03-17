@@ -178,7 +178,6 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 };
 
 branch_view._getPageviewRequestData = function(metadata, options, branch, isDismissEvent) {
-	console.log("PAGEVIEW")
 	journeys_utils.branch = branch;
 
 	if (!options) {

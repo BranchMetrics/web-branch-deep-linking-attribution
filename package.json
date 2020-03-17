@@ -7,9 +7,7 @@
 	"scripts": {
 		"lint": "./lint.sh",
 		"test": "grunt test",
-		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
-		"unit-test": "jest",
-		"unit-test-watch": "jest --watch"
+		"builddocs": "jsdox src/3_branch_web.js --output docs/web"
 	},
 	"repository": {
 		"type": "git",
@@ -32,8 +30,7 @@
 		"jshint": "2.8.0",
 		"mocha": "^2.2.1",
 		"precommit-hook": "1.0.7",
-		"sinon": "1.17.3",
-		"jest": "23.6.0"
+		"sinon": "1.17.3"
 	},
 	"dependencies": {
 		"request": "^2.55.0"

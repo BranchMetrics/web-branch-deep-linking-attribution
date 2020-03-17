@@ -329,7 +329,7 @@ utils.cleanLinkData = function(linkData) {
 			data = {};
 			break;
 	}
-	//TODO: JW
+
 	if (!data['$canonical_url']) {
 		data['$canonical_url'] = utils.getWindowLocation();
 	}

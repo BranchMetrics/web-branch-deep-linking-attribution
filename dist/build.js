@@ -2396,7 +2396,7 @@ journeys_utils.setJourneyLinkData = function(a) {
   a && "object" === typeof a && 0 < Object.keys(a).length && (utils.removePropertiesFromObject(a, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b.journey_link_data = {}, utils.merge(b.journey_link_data, a));
   journeys_utils.journeyLinkData = b;
 };
-journeys_utils.hasInBranchViewData = function(a) {
+journeys_utils.existInBranchViewData = function(a) {
   return journeys_utils && journeys_utils.branch && journeys_utils.branch._branchViewData && journeys_utils.branch._branchViewData.data ? journeys_utils.branch._branchViewData.data[a] : !1;
 };
 journeys_utils.hasJourneyCtaLink = function() {
@@ -2417,7 +2417,6 @@ journeys_utils.trySetBranchViewDataUrls = function(a, b) {
   }
   var c = function(a) {
     return b.reduce(function(a, b) {
-      console.log({url:b, value:a[b]});
       if (a[b]) {
         return a;
       }
@@ -2428,9 +2427,7 @@ journeys_utils.trySetBranchViewDataUrls = function(a, b) {
   };
   try {
     var d = JSON.parse(a.data);
-    console.log(JSON.stringify({bedore:d}));
     a.data = JSON.stringify(c(d));
-    console.log(a.data);
   } catch (e) {
     console.log(e);
   }
