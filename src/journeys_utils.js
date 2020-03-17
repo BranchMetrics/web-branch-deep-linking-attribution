@@ -909,7 +909,7 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 	journeys_utils.journeyLinkData = data;
 };
 
-journeys_utils.hasJourneyCtaLink = function () {
+journeys_utils.hasInBranchViewData = function(fieldName) {
 	if(!journeys_utils){
 		return false;
 	}
@@ -922,17 +922,60 @@ journeys_utils.hasJourneyCtaLink = function () {
 		return false;
 	}
 
-	if(!journeys_utils.branch._branchViewData.data.$journeys_cta){
+	if(!journeys_utils.branch._branchViewData.data){
 		return false;
 	}
 
-	if(!journeys_utils.branch._branchViewData.data.$journeys_cta){
+	return journeys_utils.branch._branchViewData.data[fieldName];
+};
+
+journeys_utils.hasJourneyCtaLink = function () {
+	if(!journeys_utils.hasInBranchViewData('$journeys_cta')){
 		return false;
 	}
 
 	return journeys_utils.branch._branchViewData.data.$journeys_cta.length > 0;
 };
 
+journeys_utils.getBranchViewDataItemOrUndefined = function(name){
+	if(journeys_utils.hasInBranchViewData(name)){
+		return journeys_utils.branch._branchViewData.data[name];
+	}
+	 return undefined;
+};
+
 journeys_utils.getJourneyCtaLink = function () {
 	return journeys_utils.branch._branchViewData.data.$journeys_cta;
+};
+
+journeys_utils.trySetBranchViewDataUrls = function (linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
+	if(!linkElements){
+		console.log("setDefaultUrls - no data set");
+		return linkElements;
+	}
+
+
+	var assignUrls = function (data) {
+		return urls.reduce((value, url)=>{
+			if(value[url]){
+				return value;
+			}
+
+			var entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
+			if(entry){
+				value[url] = entry;
+			}
+			return value;
+		}, data);
+	};
+
+	try {
+		var data = (JSON.parse(linkElements.data));
+		linkElements.data = JSON.stringify(assignUrls(data));
+
+	}catch(e){
+		console.log(e);
+	}
+
+	return linkElements;
 };

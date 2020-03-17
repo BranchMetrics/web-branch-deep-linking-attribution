@@ -2396,11 +2396,45 @@ journeys_utils.setJourneyLinkData = function(a) {
   a && "object" === typeof a && 0 < Object.keys(a).length && (utils.removePropertiesFromObject(a, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b.journey_link_data = {}, utils.merge(b.journey_link_data, a));
   journeys_utils.journeyLinkData = b;
 };
+journeys_utils.hasInBranchViewData = function(a) {
+  return journeys_utils && journeys_utils.branch && journeys_utils.branch._branchViewData && journeys_utils.branch._branchViewData.data ? journeys_utils.branch._branchViewData.data[a] : !1;
+};
 journeys_utils.hasJourneyCtaLink = function() {
-  return journeys_utils && journeys_utils.branch && journeys_utils.branch._branchViewData && journeys_utils.branch._branchViewData.data.$journeys_cta && journeys_utils.branch._branchViewData.data.$journeys_cta ? 0 < journeys_utils.branch._branchViewData.data.$journeys_cta.length : !1;
+  return journeys_utils.hasInBranchViewData("$journeys_cta") ? 0 < journeys_utils.branch._branchViewData.data.$journeys_cta.length : !1;
+};
+journeys_utils.getBranchViewDataItemOrUndefined = function(a) {
+  if (journeys_utils.hasInBranchViewData(a)) {
+    return journeys_utils.branch._branchViewData.data[a];
+  }
 };
 journeys_utils.getJourneyCtaLink = function() {
   return journeys_utils.branch._branchViewData.data.$journeys_cta;
+};
+journeys_utils.trySetBranchViewDataUrls = function(a, b) {
+  b = void 0 === b ? ["$android_url", "$ios_url", "$fallback_url", "$desktop_url"] : b;
+  if (!a) {
+    return console.log("setDefaultUrls - no data set"), a;
+  }
+  var c = function(a) {
+    return b.reduce(function(a, b) {
+      console.log({url:b, value:a[b]});
+      if (a[b]) {
+        return a;
+      }
+      var c = journeys_utils.getBranchViewDataItemOrUndefined(b);
+      c && (a[b] = c);
+      return a;
+    }, a);
+  };
+  try {
+    var d = JSON.parse(a.data);
+    console.log(JSON.stringify({bedore:d}));
+    a.data = JSON.stringify(c(d));
+    console.log(a.data);
+  } catch (e) {
+    console.log(e);
+  }
+  return a;
 };
 // Input 15
 var branch_view = {};
@@ -2479,9 +2513,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   a || (a = {});
   journeys_utils.entryAnimationDisabled = b.disable_entry_animation || !1;
   journeys_utils.exitAnimationDisabled = b.disable_exit_animation || !1;
-  var e = utils.merge({}, c._branchViewData);
-  console.log(e);
-  var f = session.get(c._storage) || {}, g = f.hasOwnProperty("has_app") ? f.has_app : !1, k = c._storage.get("journeyDismissals", !0), h = (b.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase() || null, m = utils.getInitialReferrer(c._referringLink()), l = b.branch_view_id || utils.getParameterByName("_branch_view_id") || null;
+  var e = utils.merge({}, c._branchViewData), f = session.get(c._storage) || {}, g = f.hasOwnProperty("has_app") ? f.has_app : !1, k = c._storage.get("journeyDismissals", !0), h = (b.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase() || null, m = utils.getInitialReferrer(c._referringLink()), l = b.branch_view_id || utils.getParameterByName("_branch_view_id") || null;
   c = b.make_new_link ? null : utils.getClickIdAndSearchStringFromLink(c._referringLink());
   e.event = d ? "dismiss" : "pageview";
   e.metadata = a;
@@ -2815,7 +2847,9 @@ Branch.prototype.logEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c,
   });
 });
 Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  var c = utils.cleanLinkData(b), d = this.branch_key;
+  console.log(b);
+  var c = utils.cleanLinkData(b), c = journeys_utils.trySetBranchViewDataUrls(b), d = this.branch_key;
+  console.log(c);
   this._api(resources.link, c, function(b, f) {
     if (b) {
       return a(b, utils.generateDynamicBNCLink(d, c));
