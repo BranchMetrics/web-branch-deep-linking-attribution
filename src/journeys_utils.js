@@ -909,7 +909,7 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 	journeys_utils.journeyLinkData = data;
 };
 
-journeys_utils.hasInBranchViewData = function(fieldName) {
+journeys_utils.exitsValueInBranchViewData = function(name) {
 	if(!journeys_utils){
 		return false;
 	}
@@ -926,11 +926,11 @@ journeys_utils.hasInBranchViewData = function(fieldName) {
 		return false;
 	}
 
-	return journeys_utils.branch._branchViewData.data[fieldName];
+	return journeys_utils.branch._branchViewData.data[name];
 };
 
 journeys_utils.hasJourneyCtaLink = function () {
-	if(!journeys_utils.hasInBranchViewData('$journeys_cta')){
+	if(!journeys_utils.exitsValueInBranchViewData('$journeys_cta')){
 		return false;
 	}
 
@@ -938,7 +938,7 @@ journeys_utils.hasJourneyCtaLink = function () {
 };
 
 journeys_utils.getBranchViewDataItemOrUndefined = function(name){
-	if(journeys_utils.hasInBranchViewData(name)){
+	if(journeys_utils.exitsValueInBranchViewData(name)){
 		return journeys_utils.branch._branchViewData.data[name];
 	}
 	 return undefined;
