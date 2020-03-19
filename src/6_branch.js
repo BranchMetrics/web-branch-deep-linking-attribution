@@ -1252,7 +1252,7 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	var linkData = utils.cleanLinkData(data);
-	linkData = journeys_utils.trySetBranchViewDataUrls(data);
+	linkData = journeys_utils.trySetJourneyUrls(data);
 	var keyCopy = this.branch_key;
 
 	this._api(resources.link, linkData, function(err, data) {

@@ -909,7 +909,7 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 	journeys_utils.journeyLinkData = data;
 };
 
-journeys_utils.exitsValueInBranchViewData = function(name) {
+journeys_utils.getValueForKeyInBranchViewData = function(key) {
 	if(!journeys_utils){
 		return false;
 	}
@@ -926,11 +926,11 @@ journeys_utils.exitsValueInBranchViewData = function(name) {
 		return false;
 	}
 
-	return journeys_utils.branch._branchViewData.data[name];
+	return journeys_utils.branch._branchViewData.data[key];
 };
 
 journeys_utils.hasJourneyCtaLink = function () {
-	if(!journeys_utils.exitsValueInBranchViewData('$journeys_cta')){
+	if(!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')){
 		return false;
 	}
 
@@ -938,7 +938,7 @@ journeys_utils.hasJourneyCtaLink = function () {
 };
 
 journeys_utils.getBranchViewDataItemOrUndefined = function(name){
-	if(journeys_utils.exitsValueInBranchViewData(name)){
+	if(journeys_utils.getValueForKeyInBranchViewData(name)){
 		return journeys_utils.branch._branchViewData.data[name];
 	}
 	 return undefined;
@@ -948,9 +948,8 @@ journeys_utils.getJourneyCtaLink = function () {
 	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
 };
 
-journeys_utils.trySetBranchViewDataUrls = function (linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
+journeys_utils.trySetJourneyUrls = function (linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
 	if(!linkElements){
-		console.log("setDefaultUrls - no data set");
 		return linkElements;
 	}
 
@@ -971,9 +970,9 @@ journeys_utils.trySetBranchViewDataUrls = function (linkElements, urls = ['$andr
 	try {
 		var data = (JSON.parse(linkElements.data));
 		linkElements.data = JSON.stringify(assignUrls(data));
-	}catch(e){
-		console.log(e);
-	}
 
-	return linkElements;
+		return linkElements;
+	}catch(e){
+		return linkElements;
+	}
 };
