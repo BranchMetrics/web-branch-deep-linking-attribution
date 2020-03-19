@@ -479,17 +479,15 @@ Branch.prototype['init'] = wrap(
 					resources.pageview,
 					requestData,
 					function(err, pageviewResponse) {
-						console.log("PAGEVIEW")
-						if (!err && typeof pageviewResponse === "object") {
 
-							var journeyInTestMode = true //requestData['branch_view_id'] ? true : false;
+						if (!err && typeof pageviewResponse === "object") {
+							var journeyInTestMode = requestData['branch_view_id'] ? true : false;
 							if (branch_view.shouldDisplayJourney(
 									pageviewResponse,
 									options,
 									journeyInTestMode
 								)
 							) {
-								console.log("PAGEVIEW shouldDisplayJourney")
 								branch_view.displayJourney(
 									pageviewResponse['template'],
 									requestData,
@@ -500,7 +498,6 @@ Branch.prototype['init'] = wrap(
 								);
 							}
 							else {
-								console.log("PAGEVIEW else")
 								if (pageviewResponse['auto_branchify'] || (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink())) {
 									var linkOptions = {
 										'make_new_link': false,
@@ -1256,15 +1253,12 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 /*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
 	var linkData = utils.cleanLinkData(data);
-
 	var keyCopy = this.branch_key;
-
 	this._api(resources.link, linkData, function(err, data) {
 		if (err) {
 			// if an error occurs or if tracking is disabled then return a dynamic link
 			return done(err, utils.generateDynamicBNCLink(keyCopy, linkData));
 		}
-
 		done(null, data && data['url']);
 	});
 });

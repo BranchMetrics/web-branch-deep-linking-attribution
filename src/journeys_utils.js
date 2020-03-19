@@ -183,7 +183,6 @@ journeys_utils.getCss = function(html) {
  * take the js from template and add to document.body
  */
 journeys_utils.getJsAndAddToParent = function(html) {
-	console.log("LINK")
 	var match = html.match(journeys_utils.jsRe);
 	if(match) {
 		var src = match[1];
@@ -960,34 +959,4 @@ journeys_utils.tryReplaceJourneyCtaLink = function (html){
 	}
 
 	return html;
-};
-
-
-journeys_utils.trySetJourneyUrls = function (linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
-	if(!linkElements){
-		return linkElements;
-	}
-
-	var assignUrls = function (data) {
-		return urls.reduce((value, url)=>{
-			if(value[url]){
-				return value;
-			}
-
-			var entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
-			if(entry){
-				value[url] = entry;
-			}
-			return value;
-		}, data);
-	};
-
-	try {
-		var data = (JSON.parse(linkElements.data));
-		linkElements.data = JSON.stringify(assignUrls(data));
-
-		return linkElements;
-	}catch(e){
-		return linkElements;
-	}
 };
