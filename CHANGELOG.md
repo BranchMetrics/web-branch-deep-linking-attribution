@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.52.7] - 2020-03-12
+- Decode html symbols in /v1/dismiss api requests before sending
+
 ## [2.52.6] - 2020-03-04
 - Push dismissal metadata to /v1/dismiss
 - Remove branch fingerprint docs
