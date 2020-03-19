@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.6"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.52.7"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2314,17 +2314,24 @@ journeys_utils._setJourneyDismiss = function(a, b, c) {
   a.set("journeyDismissals", safejson.stringify(d), !0);
   return d;
 };
+journeys_utils.decodeSymbols = function(a) {
+  return void 0 === a || null === a ? null : a.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&brvbar;/g, "\u00a6").replace(/&laquo;/g, "\u00ab").replace(/&acute;/g, "\u00b4").replace(/&middot;/g, "\u00b7").replace(/&raquo;/g, "\u00bb").replace(/&amp;/g, "&").replace(/&iquest;/g, "\u00bf").replace(/&times;/g, "\u00d7").replace(/&divide;/g, "\u00f7").replace(/&Agrave;/g, "\u00c0").replace(/&Aacute;/g, "\u00c1").replace(/&Acirc;/g, 
+  "\u00c2").replace(/&Atilde;/g, "\u00c3").replace(/&Auml;/g, "\u00c4").replace(/&Aring;/g, "\u00c5").replace(/&AElig;/g, "\u00c6").replace(/&Ccedil;/g, "\u00c7").replace(/&Egrave;/g, "\u00c8").replace(/&Eacute;/g, "\u00c9").replace(/&Ecirc;/g, "\u00ca").replace(/&Euml;/g, "\u00cb").replace(/&Igrave;/g, "\u00cc").replace(/&Iacute;/g, "\u00cd").replace(/&Icirc;/g, "\u00ce").replace(/&Iuml;/g, "\u00cf").replace(/&ETH;/g, "\u00d0").replace(/&Ntilde;/g, "\u00d1").replace(/&Ograve;/g, "\u00d2").replace(/&Oacute;/g, 
+  "\u00d3").replace(/&Ocirc;/g, "\u00d4").replace(/&Otilde;/g, "\u00d5").replace(/&Ouml;/g, "\u00d6").replace(/&Oslash;/g, "\u00d8").replace(/&Ugrave;/g, "\u00d9").replace(/&Uacute;/g, "\u00da").replace(/&Ucirc;/g, "\u00db").replace(/&Uuml;/g, "\u00dc").replace(/&Yacute;/g, "\u00dd").replace(/&THORN;/g, "\u00de").replace(/&szlig;/g, "\u00df").replace(/&agrave;/g, "\u00e0").replace(/&aacute;/g, "\u00e1").replace(/&acirc;/g, "\u00e2").replace(/&atilde;/g, "\u00e3").replace(/&auml;/g, "\u00e4").replace(/&aring;/g, 
+  "\u00e5").replace(/&aelig;/g, "\u00e6").replace(/&ccedil;/g, "\u00e7").replace(/&egrave;/g, "\u00e8").replace(/&eacute;/g, "\u00e9").replace(/&ecirc;/g, "\u00ea").replace(/&euml;/g, "\u00eb").replace(/&igrave;/g, "\u00ec").replace(/&iacute;/g, "\u00ed").replace(/&icirc;/g, "\u00ee").replace(/&iuml;/g, "\u00ef").replace(/&eth;/g, "\u00f0").replace(/&ntilde;/g, "\u00f1").replace(/&ograve;/g, "\u00f2").replace(/&oacute;/g, "\u00f3").replace(/&ocirc;/g, "\u00f4").replace(/&otilde;/g, "\u00f5").replace(/&ouml;/g, 
+  "\u00f6").replace(/&oslash;/g, "\u00f8").replace(/&ugrave;/g, "\u00f9").replace(/&uacute;/g, "\u00fa").replace(/&ucirc;/g, "\u00fb").replace(/&uuml;/g, "\u00fc").replace(/&yacute;/g, "\u00fd").replace(/&thorn;/g, "\u00fe").replace(/&yuml;/g, "\u00ff");
+};
 journeys_utils._getDismissRequestData = function(a, b) {
   var c = {}, d = utils.getHostedDeepLinkData();
   d && 0 < Object.keys(d).length && (c.hosted_deeplink_data = d);
   c = a._getPageviewRequestData(journeys_utils._getPageviewMetadata(null, c), null, journeys_utils.branch, !0);
   if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data) {
     utils.addPropertyIfNotNull(c, "journey_id", journeys_utils.journeyLinkData.journey_link_data.journey_id);
-    utils.addPropertyIfNotNull(c, "journey_name", journeys_utils.journeyLinkData.journey_link_data.journey_name);
+    utils.addPropertyIfNotNull(c, "journey_name", journeys_utils.decodeSymbols(journeys_utils.journeyLinkData.journey_link_data.journey_name));
     utils.addPropertyIfNotNull(c, "view_id", journeys_utils.journeyLinkData.journey_link_data.view_id);
-    utils.addPropertyIfNotNull(c, "view_name", journeys_utils.journeyLinkData.journey_link_data.view_name);
-    utils.addPropertyIfNotNull(c, "channel", journeys_utils.journeyLinkData.journey_link_data.channel);
-    utils.addPropertyIfNotNull(c, "campaign", journeys_utils.journeyLinkData.journey_link_data.campaign);
+    utils.addPropertyIfNotNull(c, "view_name", journeys_utils.decodeSymbols(journeys_utils.journeyLinkData.journey_link_data.view_name));
+    utils.addPropertyIfNotNull(c, "channel", journeys_utils.decodeSymbols(journeys_utils.journeyLinkData.journey_link_data.channel));
+    utils.addPropertyIfNotNull(c, "campaign", journeys_utils.decodeSymbols(journeys_utils.journeyLinkData.journey_link_data.campaign));
     try {
       utils.addPropertyIfNotNull(c, "tags", JSON.stringify(journeys_utils.journeyLinkData.journey_link_data.tags));
     } catch (e) {
