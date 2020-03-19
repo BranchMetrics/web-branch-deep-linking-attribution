@@ -479,7 +479,6 @@ Branch.prototype['init'] = wrap(
 					resources.pageview,
 					requestData,
 					function(err, pageviewResponse) {
-
 						if (!err && typeof pageviewResponse === "object") {
 							var journeyInTestMode = requestData['branch_view_id'] ? true : false;
 							if (branch_view.shouldDisplayJourney(
