@@ -68,6 +68,7 @@ function _areJourneysDismissedGlobally(branch) {
 }
 
 branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
+	console.log("shouldDisplayJourney")
 	if (	checkPreviousBanner() ||
 		!utils.mobileUserAgent() ||
 		!eventResponse['event_data'] ||
@@ -131,11 +132,12 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	var cta = null;
 	var storage = journeys_utils.branch._storage;
 
-
 	if (html) {
 
 		var metadata = journeys_utils.getMetadata(html) || {};
 
+		html = journeys_utils.tryReplaceJourneyCtaLink(html);
+		console.log(html)
 		var timeoutTrigger = window.setTimeout(
 			function() {
 				window[callbackString] = function() { };
