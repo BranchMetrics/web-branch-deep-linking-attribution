@@ -233,7 +233,7 @@ utils.message = function(message, params, failCode, failDetails) {
  * @param {Object} data
  * @return {utils.sessionData}
  */
-utils.whiteListSessionData = function(data) {	
+utils.whiteListSessionData = function(data) {
 	return {
 		'data': data['data'] || "",
 		'data_parsed': data['data_parsed'] || {},
@@ -615,45 +615,50 @@ utils.base64Decode = function(str) {
 		return atob(str);
 	}
 	return str;
-}
+};
 
 /**
  * Check if a String is a BASE64 encoded value
- * @param {string} str 
+ * @param {string} str
  */
 utils.isBase64Encoded = function(str) {
-	if (typeof str != "string") { return false; }
-	if (str ==='' || str.trim() ==='') { return false; }
-    try {
-        return btoa(atob(str)) === str;
-    } catch (err) {
-        return false;
-    }
-} 
+	if (typeof str !== "string") {
+		return false;
+	}
+	if (str === '' || str.trim() === '') {
+		return false;
+	}
+	try {
+		return btoa(atob(str)) === str;
+	}
+	catch (err) {
+		return false;
+	}
+};
 
 /**
  * Encodes BFP in data object with Base64 encoding.
  * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
- * @param {Object} data 
+ * @param {Object} data
  */
 utils.encodeBFPs = function(data) {
-	if (data && data["browser_fingerprint_id"]
-		&& !utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+	if (data && data["browser_fingerprint_id"] &&
+		!utils.isBase64Encoded(data["browser_fingerprint_id"])) {
 		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
 	}
-	if (data && data["alternative_browser_fingerprint_id"]
-		&& !utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+	if (data && data["alternative_browser_fingerprint_id"] &&
+		!utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
 		data["alternative_browser_fingerprint_id"] = btoa(data["alternative_browser_fingerprint_id"]);
 	}
 	return data;
-}
+};
 
 /**
  * Decodes BFPs in data object from Base64 encoding.
  * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
  * @param {Object} data
  */
-utils.decodeBFPs = function (data) {
+utils.decodeBFPs = function(data) {
 	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
 		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
 	}
@@ -661,7 +666,7 @@ utils.decodeBFPs = function (data) {
 		data["alternative_browser_fingerprint_id"] = atob(data["alternative_browser_fingerprint_id"]);
 	}
 	return data;
-}
+};
 
 /**
  * Add event listeners to elements, taking older browsers into account
