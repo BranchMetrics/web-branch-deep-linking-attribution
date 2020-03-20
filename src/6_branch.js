@@ -152,7 +152,7 @@ Branch = function() {
  * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
-	
+
 	if (this.app_id) {
 		obj['app_id'] = this.app_id;
 	}
@@ -170,13 +170,14 @@ Branch.prototype._api = function(resource, obj, callback) {
 		obj['identity_id'] = this.identity_id;
 	}
 
-	if (resource.endpoint.indexOf("/v1/") < 0){
+	if (resource.endpoint.indexOf("/v1/") < 0) {
 		if (((resource.params && resource.params['developer_identity']) ||
 			(resource.queryPart && resource.queryPart['developer_identity'])) &&
 			this.identity) {
-	   		obj['developer_identity'] = this.identity;
+			obj['developer_identity'] = this.identity;
 		}
-	}else{
+	}
+	else {
 		if (((resource.params && resource.params['identity']) ||
 			(resource.queryPart && resource.queryPart['identity'])) &&
 			this.identity) {
@@ -369,7 +370,7 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
-	
+
 		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
@@ -377,7 +378,6 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !sessionData || !sessionData['identity_id'];
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(cb) {
-			
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 			var currentSessionData = session.get(self._storage) || {};
 			var permData = session.get(self._storage, true) || {};
@@ -421,18 +421,18 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var restoreIdentityOnInstall = function(data) {
-			if(freshInstall){
-				data["identity"] = self.identity;  
+			if (freshInstall) {
+				data["identity"] = self.identity;
 			}
 			return data;
-		}
+		};
 
 		var finishInit = function(err, data) {
 
 			if (data) {
-				data = setBranchValues(data);			
+				data = setBranchValues(data);
 
-				if (!utils.userPreferences.trackingDisabled) {					
+				if (!utils.userPreferences.trackingDisabled) {
 					data = restoreIdentityOnInstall(data);
 					session.set(self._storage, data, freshInstall);
 				}
@@ -589,14 +589,14 @@ Branch.prototype['init'] = wrap(
 							"initial_referrer": utils.getInitialReferrer(self._referringLink()),
 							"current_url": utils.getCurrentUrl(),
 							"screen_height": utils.getScreenHeight(),
-							"screen_width": utils.getScreenWidth()							
+							"screen_width": utils.getScreenWidth()
 						},
 						function(err, data) {
 							if (err) {
 								self.init_state_fail_code = init_state_fail_codes.OPEN_FAILED;
 								self.init_state_fail_details = err.message;
 							}
-							if (!err && typeof data === 'object') {						
+							if (!err && typeof data === 'object') {
 								if (data['branch_view_enabled']) {
 									self._branchViewEnabled = !!data['branch_view_enabled'];
 									self._storage.set('branch_view_enabled', self._branchViewEnabled);
@@ -772,16 +772,16 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 
 			data = data || { };
 			self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
-			self.sessionLink = data['link'];			
+			self.sessionLink = data['link'];
 
 			self.identity = identity;
-			data['developer_identity'] = identity;	
+			data['developer_identity'] = identity;
 
 			data['referring_data_parsed'] = data['referring_data'] ?
 				safejson.parse(data['referring_data']) :
 				null;
 
-			session.patch(self._storage, {"identity": identity}, true);
+			session.patch(self._storage, { "identity": identity }, true);
 			done(null, data);
 		}
 	);
@@ -824,7 +824,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
-			"identity": data['identity'],		
+			"identity": data['identity'],
 			"session_id": data['session_id'],
 			"identity_id": data['identity_id'],
 			"link": data['link'],
