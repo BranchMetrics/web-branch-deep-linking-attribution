@@ -15,7 +15,7 @@ goog.require('storage');
 session.get = function(storage, first) {
 	var sessionString = first ? 'branch_session_first' : 'branch_session';
 	try {
-		let data = safejson.parse(storage.get(sessionString, first)) || null;
+		var data = safejson.parse(storage.get(sessionString, first)) || null;
 		return utils.decodeBFPs(data);
 	}
 	catch (e) {
@@ -55,17 +55,16 @@ session.update = function(storage, newData) {
  * @param {Object} data
  * @param {boolean=} updateLocalStorage
  */
-session.patch = function(storage, data, updateLocalStorage){
-
-	var merge = (source, patch) => {
+session.patch = function(storage, data, updateLocalStorage) {
+	var merge = function(source, patch) {
 		return utils.encodeBFPs(utils.merge(goog.json.parse(source), patch));
 	};
 
 	var session = storage.get('branch_session', false) || {};
 	storage.set('branch_session', goog.json.serialize(merge(session, data)));
 
-	if (updateLocalStorage){
-		const sessionFirst = storage.get('branch_session_first', true) || {};
+	if (updateLocalStorage) {
+		var sessionFirst = storage.get('branch_session_first', true) || {};
 		storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);
 	}
 };
