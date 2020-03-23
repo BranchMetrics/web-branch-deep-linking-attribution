@@ -929,14 +929,6 @@ journeys_utils.getValueForKeyInBranchViewData = function(key) {
 	return journeys_utils.branch._branchViewData.data[key];
 };
 
-journeys_utils.hasJourneyCtaLink = function () {
-	if(!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')){
-		return false;
-	}
-
-	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta').length > 0;
-};
-
 journeys_utils.getBranchViewDataItemOrUndefined = function(name){
 	if(journeys_utils.getValueForKeyInBranchViewData(name)){
 		return journeys_utils.branch._branchViewData.data[name];
@@ -948,15 +940,15 @@ journeys_utils.getJourneyCtaLink = function () {
 	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
 };
 
-journeys_utils.tryReplaceJourneyCtaLink = function (html){
-	try{
-		if(journeys_utils.hasJourneyCtaLink()){
-			var journeyLinkReplacePattern = /validate[(].+[)];/g;
-			return html.replace(journeyLinkReplacePattern, 'validate("' + journeys_utils.getJourneyCtaLink() + '")');
-		}
-	}catch(e){
+journeys_utils.tryReplaceJourneyCtaLink = function (link, html){
+	if(!link){
 		return html;
 	}
 
-	return html;
+	try{
+		var journeyLinkReplacePattern = /validate[(].+[)];/g;
+		return html.replace(journeyLinkReplacePattern, 'validate("' + journeys_utils.getJourneyCtaLink() + '")');
+	}catch(e){
+		return html;
+	}
 };
