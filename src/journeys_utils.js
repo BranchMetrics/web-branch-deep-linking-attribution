@@ -940,7 +940,7 @@ journeys_utils.getJourneyCtaLink = function () {
 	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
 };
 
-journeys_utils.tryReplaceJourneyCtaLink = function (link, html){
+journeys_utils.tryToReplaceJourneyCtaLink = function (link, html){
 	if(!link){
 		return html;
 	}
