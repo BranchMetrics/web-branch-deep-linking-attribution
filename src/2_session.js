@@ -53,7 +53,7 @@ session.update = function(storage, newData) {
  * Patches a field in localStorage or sessionStorage or both.
  * @param {storage} storage
  * @param {Object} data
- * @param {boolean=} druable
+ * @param {boolean=} updateLocalStorage
  */
 session.patch = function(storage, data, updateLocalStorage) {
 	var merge = function(source, patch) {
