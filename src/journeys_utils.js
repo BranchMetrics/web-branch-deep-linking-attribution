@@ -910,45 +910,46 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 };
 
 journeys_utils.getValueForKeyInBranchViewData = function(key) {
-	if(!journeys_utils){
+	if (!journeys_utils) {
 		return false;
 	}
 
-	if(!journeys_utils.branch){
+	if (!journeys_utils.branch) {
 		return false;
 	}
 
-	if(!journeys_utils.branch._branchViewData){
+	if (!journeys_utils.branch._branchViewData) {
 		return false;
 	}
 
-	if(!journeys_utils.branch._branchViewData.data){
+	if (!journeys_utils.branch._branchViewData.data) {
 		return false;
 	}
 
 	return journeys_utils.branch._branchViewData.data[key];
 };
 
-journeys_utils.getBranchViewDataItemOrUndefined = function(name){
-	if(journeys_utils.getValueForKeyInBranchViewData(name)){
+journeys_utils.getBranchViewDataItemOrUndefined = function(name) {
+	if (journeys_utils.getValueForKeyInBranchViewData(name)) {
 		return journeys_utils.branch._branchViewData.data[name];
 	}
-	 return undefined;
+	return undefined;
 };
 
-journeys_utils.getJourneyCtaLink = function () {
+journeys_utils.getJourneyCtaLink = function() {
 	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
 };
 
-journeys_utils.tryToReplaceJourneyCtaLink = function (link, html){
-	if(!link){
+journeys_utils.tryToReplaceJourneyCtaLink = function(link, html) {
+	if (!link) {
 		return html;
 	}
 
-	try{
+	try {
 		var journeyLinkReplacePattern = /validate[(].+[)];/g;
 		return html.replace(journeyLinkReplacePattern, 'validate("' + journeys_utils.getJourneyCtaLink() + '")');
-	}catch(e){
+	}
+	catch(e) {
 		return html;
 	}
 };
