@@ -944,10 +944,9 @@ journeys_utils.tryToReplaceJourneyCtaLink = function(link, html) {
 	if (!link) {
 		return html;
 	}
-
 	try {
-		var journeyLinkReplacePattern = /validate[(].+[)];/g;
-		return html.replace(journeyLinkReplacePattern, 'validate("' + journeys_utils.getJourneyCtaLink() + '")');
+		var journeyLinkReplacePattern = /validate[(].*["]/g;
+		return html.replace(journeyLinkReplacePattern, 'validate("' + journeys_utils.getJourneyCtaLink() + '"');
 	}
 	catch(e) {
 		return html;
