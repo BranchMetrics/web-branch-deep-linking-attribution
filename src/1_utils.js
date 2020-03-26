@@ -238,7 +238,8 @@ utils.whiteListSessionData = function(data) {
 		'data': data['data'] || "",
 		'data_parsed': data['data_parsed'] || {},
 		'has_app': data['has_app'] || null,
-		'identity': data['identity'] || null,
+		'identity': data['developer_identity'] || null,
+		'developer_identity': data['developer_identity'] || null,
 		'referring_identity': data['referring_identity'] || null,
 		'referring_link': data['referring_link'] || null
 	};
@@ -605,6 +606,67 @@ utils.base64encode = function(input) {
 	return output;
 };
 
+/**
+ * Decode Base64 if the string is encoded
+ * @param {string} str
+ */
+utils.base64Decode = function(str) {
+	if (utils.isBase64Encoded(str)) {
+		return atob(str);
+	}
+	return str;
+};
+
+/**
+ * Check if a String is a BASE64 encoded value
+ * @param {string} str
+ */
+utils.isBase64Encoded = function(str) {
+	if (typeof str !== "string") {
+		return false;
+	}
+	if (str === '' || str.trim() === '') {
+		return false;
+	}
+	try {
+		return btoa(atob(str)) === str;
+	}
+	catch (err) {
+		return false;
+	}
+};
+
+/**
+ * Encodes BFP in data object with Base64 encoding.
+ * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
+ * @param {Object} data
+ */
+utils.encodeBFPs = function(data) {
+	if (data && data["browser_fingerprint_id"] &&
+		!utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
+	}
+	if (data && data["alternative_browser_fingerprint_id"] &&
+		!utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+		data["alternative_browser_fingerprint_id"] = btoa(data["alternative_browser_fingerprint_id"]);
+	}
+	return data;
+};
+
+/**
+ * Decodes BFPs in data object from Base64 encoding.
+ * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
+ * @param {Object} data
+ */
+utils.decodeBFPs = function(data) {
+	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
+		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
+	}
+	if (data && utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
+		data["alternative_browser_fingerprint_id"] = atob(data["alternative_browser_fingerprint_id"]);
+	}
+	return data;
+};
 
 /**
  * Add event listeners to elements, taking older browsers into account
@@ -1028,6 +1090,7 @@ utils.getUserData = function(branch) {
 	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
 	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
 	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
+	user_data = utils.addPropertyIfNotNull(user_data, "identity", branch.identity);
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk", "web");
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk_version", config.version);
 	return user_data;

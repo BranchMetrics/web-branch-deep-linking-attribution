@@ -152,6 +152,7 @@ Branch = function() {
  * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
+
 	if (this.app_id) {
 		obj['app_id'] = this.app_id;
 	}
@@ -168,6 +169,22 @@ Branch.prototype._api = function(resource, obj, callback) {
 			this.identity_id) {
 		obj['identity_id'] = this.identity_id;
 	}
+
+	if (resource.endpoint.indexOf("/v1/") < 0) {
+		if (((resource.params && resource.params['developer_identity']) ||
+			(resource.queryPart && resource.queryPart['developer_identity'])) &&
+			this.identity) {
+			obj['developer_identity'] = this.identity;
+		}
+	}
+	else {
+		if (((resource.params && resource.params['identity']) ||
+			(resource.queryPart && resource.queryPart['identity'])) &&
+			this.identity) {
+			obj['identity'] = this.identity;
+		}
+	}
+
 	if (((resource.params && resource.params['link_click_id']) ||
 			(resource.queryPart && resource.queryPart['link_click_id'])) &&
 			this.link_click_id) {
@@ -334,6 +351,9 @@ Branch.prototype['init'] = wrap(
 			if (data['identity_id']) {
 				self.identity_id = data['identity_id'].toString();
 			}
+			if (data['identity']) {
+				self.identity = data['identity'].toString();
+			}
 			if (data['link']) {
 				self.sessionLink = data['link'];
 			}
@@ -350,6 +370,7 @@ Branch.prototype['init'] = wrap(
 		};
 
 		var sessionData = session.get(self._storage);
+
 		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
@@ -363,6 +384,7 @@ Branch.prototype['init'] = wrap(
 			if (permData['browser_fingerprint_id']) {
 				params_r['_t'] = permData['browser_fingerprint_id'];
 			}
+
 			if (!utils.isSafari11OrGreater()) {
 				self._api(
 					resources._r,
@@ -398,12 +420,23 @@ Branch.prototype['init'] = wrap(
 			);
 		};
 
+		var restoreIdentityOnInstall = function(data) {
+			if (freshInstall) {
+				data["identity"] = self.identity;
+			}
+			return data;
+		};
+
 		var finishInit = function(err, data) {
+
 			if (data) {
 				data = setBranchValues(data);
+
 				if (!utils.userPreferences.trackingDisabled) {
+					data = restoreIdentityOnInstall(data);
 					session.set(self._storage, data, freshInstall);
 				}
+
 				self.init_state = init_states.INIT_SUCCEEDED;
 				data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 			}
@@ -516,7 +549,6 @@ Branch.prototype['init'] = wrap(
 				}
 			}
 		};
-
 		if (sessionData && sessionData['session_id'] && !link_identifier && !utils.getParamValue('branchify_url')) {
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
@@ -528,8 +560,13 @@ Branch.prototype['init'] = wrap(
 
 		var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 		var permData = session.get(self._storage, true) || {};
+
 		if (permData['browser_fingerprint_id']) {
 			params_r['_t'] = permData['browser_fingerprint_id'];
+		}
+
+		if (permData['identity']) {
+			self.identity = permData['identity'];
 		}
 
 		if (!utils.isSafari11OrGreater()) {
@@ -736,13 +773,15 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 			data = data || { };
 			self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
 			self.sessionLink = data['link'];
+
 			self.identity = identity;
+			data['developer_identity'] = identity;
 
 			data['referring_data_parsed'] = data['referring_data'] ?
 				safejson.parse(data['referring_data']) :
 				null;
-			session.update(self._storage, data);
 
+			session.patch(self._storage, { "identity": identity }, true);
 			done(null, data);
 		}
 	);
@@ -785,7 +824,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
-			"identity": null,
+			"identity": data['identity'],
 			"session_id": data['session_id'],
 			"identity_id": data['identity_id'],
 			"link": data['link'],
@@ -1858,7 +1897,7 @@ Branch.prototype['removeListener'] = function(listener) {
  * @param {Object} data - _required_ - object of all link data, same as Branch.link()
  *
  * This function lets you set the deep link data dynamically for a given mobile web Journey. For
- * example, if you desgin a full page interstitial, and want the deep link data to be custom for each
+ * example, if you design a full page interstitial, and want the deep link data to be custom for each
  * page, you'd need to use this function to dynamically set the deep link params on page load. Then,
  * any Journey loaded on that page will inherit these deep link params.
  *

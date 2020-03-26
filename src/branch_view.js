@@ -131,9 +131,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	var cta = null;
 	var storage = journeys_utils.branch._storage;
 
-
 	if (html) {
-
 		var metadata = journeys_utils.getMetadata(html) || {};
 
 		var timeoutTrigger = window.setTimeout(
