@@ -4,6 +4,11 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.53.0] - 2020-03-26
+- Adding local/session storage encoding
+- Persist developer identity in local/session storage
+- Journey dismissal change for ads postbacks
+
 ## [2.52.7] - 2020-03-12
 - Decode html symbols in /v1/dismiss api requests before sending
 

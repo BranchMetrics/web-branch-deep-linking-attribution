@@ -895,7 +895,7 @@ just an identical clone of the function.
 **data**: `Object`, _required_ - object of all link data, same as Branch.link()
 
 This function lets you set the deep link data dynamically for a given mobile web Journey. For
-example, if you desgin a full page interstitial, and want the deep link data to be custom for each
+example, if you design a full page interstitial, and want the deep link data to be custom for each
 page, you'd need to use this function to dynamically set the deep link params on page load. Then,
 any Journey loaded on that page will inherit these deep link params.
 
