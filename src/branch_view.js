@@ -134,8 +134,6 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	if (html) {
 		var metadata = journeys_utils.getMetadata(html) || {};
 
-		html = journeys_utils.tryToReplaceJourneyCtaLink(journeys_utils.getJourneyCtaLink(), html);
-
 		var timeoutTrigger = window.setTimeout(
 			function() {
 				window[callbackString] = function() { };
