@@ -237,7 +237,7 @@ utils.whiteListSessionData = function(data) {
 	return {
 		'data': data['data'] || "",
 		'data_parsed': data['data_parsed'] || {},
-		'has_app': data['has_app'] || null,
+		'has_app': utils.getBooleanOrNull(data['has_app']),
 		'identity': data['developer_identity'] || null,
 		'developer_identity': data['developer_identity'] || null,
 		'referring_identity': data['referring_identity'] || null,
@@ -1164,3 +1164,10 @@ utils.addNonceAttribute = function(element) {
 	}
 };
 
+utils.getBooleanOrNull = function (value) {
+	if (value === undefined) {
+		return null;
+	}
+
+	return value;
+};
