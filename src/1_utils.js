@@ -1164,7 +1164,7 @@ utils.addNonceAttribute = function(element) {
 	}
 };
 
-utils.getBooleanOrNull = function (value) {
+utils.getBooleanOrNull = function(value) {
 	if (value === undefined) {
 		return null;
 	}
