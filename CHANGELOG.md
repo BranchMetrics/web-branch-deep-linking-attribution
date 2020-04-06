@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.53.1] - 2020-04-06
+- Fixes bug in branch.init() where has_app value is not being returned if it is false
+
 ## [2.53.0] - 2020-03-26
 - Adding local/session storage encoding
 - Persist developer identity in local/session storage

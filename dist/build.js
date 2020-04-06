@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.53.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.53.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1045,7 +1045,7 @@ utils.message = function(a, b, c, d) {
   return a;
 };
 utils.whiteListSessionData = function(a) {
-  return {data:a.data || "", data_parsed:a.data_parsed || {}, has_app:a.has_app || null, identity:a.developer_identity || null, developer_identity:a.developer_identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
+  return {data:a.data || "", data_parsed:a.data_parsed || {}, has_app:utils.getBooleanOrNull(a.has_app), identity:a.developer_identity || null, developer_identity:a.developer_identity || null, referring_identity:a.referring_identity || null, referring_link:a.referring_link || null};
 };
 utils.whiteListJourneysLanguageData = function(a) {
   var b = /^\$journeys_\S+$/, c = a.data, d = {};
@@ -1436,6 +1436,9 @@ utils.mergeHostedDeeplinkData = function(a, b) {
 };
 utils.addNonceAttribute = function(a) {
   "" !== utils.nonce && a.setAttribute("nonce", utils.nonce);
+};
+utils.getBooleanOrNull = function(a) {
+  return void 0 === a ? null : a;
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
