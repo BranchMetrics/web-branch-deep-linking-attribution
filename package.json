@@ -16,14 +16,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/BranchMetrics/web-branch-deep-linking.git"
+		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution.git"
 	},
 	"author": "Dmitri Gaskin <dmitrig01@gmail.com>",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/BranchMetrics/web-branch-deep-linking/issues"
+		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues"
 	},
-	"homepage": "https://github.com/BranchMetrics/web-branch-deep-linking",
+	"homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
 	"devDependencies": {
 		"falafel": "1.0.1",
 		"grunt": "^0.4.5",
