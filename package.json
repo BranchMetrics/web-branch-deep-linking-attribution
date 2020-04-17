@@ -6,7 +6,9 @@
 	"files": [
 		"dist/build.min.js"
 	],
-	"precommit": ["lint"],
+	"precommit": [
+		"lint"
+	],
 	"scripts": {
 		"lint": "./lint.sh",
 		"test": "grunt test",
