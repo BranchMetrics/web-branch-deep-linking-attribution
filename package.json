@@ -3,6 +3,9 @@
 	"version": "2.53.1",
 	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
 	"main": "dist/build.min.js",
+	"files": [
+		"dist/build.min.js"
+	],
 	"precommit": ["lint"],
 	"scripts": {
 		"lint": "./lint.sh",
