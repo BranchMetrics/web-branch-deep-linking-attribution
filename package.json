@@ -19,7 +19,7 @@
 		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution.git"
 	},
 	"author": "Dmitri Gaskin <dmitrig01@gmail.com>",
-	"license": "ISC",
+	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues"
 	},
