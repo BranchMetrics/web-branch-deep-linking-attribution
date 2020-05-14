@@ -368,7 +368,9 @@ resources.pageview = {
 		"callback_string": validator(false, validationTypes.STRING),
 		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
-		"journey_dismissals": validator(false, validationTypes.OBJECT)
+		"journey_dismissals": validator(false, validationTypes.OBJECT),
+		"identity": validator(true, validationTypes.STRING),
+		"developer_identity": validator(true, validationTypes.STRING)
 	})
 };
 
