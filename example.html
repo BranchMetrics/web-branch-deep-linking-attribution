@@ -35,13 +35,13 @@
 		<section>
 			<div class="row col-lg-8 col-lg-offset-2">
 				<h4>Session Info</h4>
-				<pre class="info">Reading session from .init()...</pre>
+				<pre id="info">Reading session from .init()...</pre>
 				<br>
 				<h4>Request</h4>
-				<pre class="request">Click a button!</pre>
+				<pre id="request">Click a button!</pre>
 				<br>
 				<h4>Response</h4>
-				<pre class="response">Click a button!</pre>
+				<pre id="response">Click a button!</pre>
 			</div>
 		</section>
 		<section>
@@ -119,10 +119,12 @@
 		// Note that this example is using the key in two places, here and below
 		branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
 			// Escape any HTML in the output to avoid XSS.
-			$('.info').text(JSON.stringify(data));
+			$('#info').text(JSON.stringify(data));
 		});
 	</script>
 	<script type="text/javascript">
+	  var request = $('#request');
+		var response = $('#response');
 		var sampleParams = {
 			tags: [ 'tag1', 'tag2' ],
 			channel: 'sample app',
