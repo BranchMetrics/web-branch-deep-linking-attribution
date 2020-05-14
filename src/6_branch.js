@@ -1151,7 +1151,8 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		this._api(resources.logCustomEvent,
 			{ "name": name,
 			"user_data": safejson.stringify(utils.getUserData(this)),
-			"custom_data": safejson.stringify(utils.convertObjectValuesToString(eventData || {}))
+			"custom_data": safejson.stringify(utils.convertObjectValuesToString(eventData || {})),
+			"customer_event_alias": customer_event_alias
 		}, function(err, data) {
 			return done(err || null);
 		});
