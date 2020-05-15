@@ -1623,7 +1623,27 @@ describe('Branch', function() {
 
 	describe('logEvent', function() {
 		describe('standard events', function() {
+			it('should log standard events', function(done) {
+				// We might think about exposing standard event names as constants.
+				var branch = initBranch(false);
+				var assert = testUtils.plan(1, done);
 
+				var contentItem = {
+					"$og_title": "Title",
+					"$og_description": "Description"
+				};
+
+				// blech
+				branch.logEvent(
+					'VIEW_ITEM',
+					null, // event data
+					[ contentItem ],
+					null, // customer_event_alias
+					function(err) {
+						assert.equal(null, err);
+					}
+				);
+			});
 		});
 
 		describe('custom events', function() {
