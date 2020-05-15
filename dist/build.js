@@ -2804,7 +2804,7 @@ Branch.prototype.logEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c,
   e = utils.validateParameterType(e, "string") ? e : null;
   utils.isStandardEvent(b) ? (d = utils.validateParameterType(d, "array") ? d : null, c = utils.separateEventAndCustomData(c), this._api(resources.logStandardEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(c && c.custom_data || {}), event_data:safejson.stringify(c && c.event_data || {}), content_items:safejson.stringify(d || []), customer_event_alias:e}, function(b, c) {
     return a(b || null);
-  })) : this._api(resources.logCustomEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(utils.convertObjectValuesToString(c || {})), customer_event_alias:e}, function(b, c) {
+  })) : this._api(resources.logCustomEvent, {name:b, user_data:safejson.stringify(utils.getUserData(this)), custom_data:safejson.stringify(utils.convertObjectValuesToString(c || {})), content_items:safejson.stringify(d || []), customer_event_alias:e}, function(b, c) {
     return a(b || null);
   });
 });
