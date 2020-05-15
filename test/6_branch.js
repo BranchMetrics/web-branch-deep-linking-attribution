@@ -1621,6 +1621,20 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('logEvent', function() {
+		describe('standard events', function() {
+
+		});
+
+		describe('custom events', function() {
+
+		});
+
+		describe('common event handling', function() {
+
+		});
+	});
+
 	/*
 	describe.fail('Queueing used correctly', function() {
 		it('Should wait to call track after init', function(done) {
