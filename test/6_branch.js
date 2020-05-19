@@ -1599,12 +1599,12 @@ describe('Branch', function() {
 			);
 			requests[2].callback(null, {});
 
-			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 
 			branch.disableTracking(true);
-			assert.strictEqual("{}", sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual("{}", localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+			assert.strictEqual("{}", sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual("{}", localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 
 			branch.disableTracking(false);
 			requests[3].callback(null, browser_fingerprint_id);
@@ -1616,8 +1616,8 @@ describe('Branch', function() {
 				}
 			);
 			requests[5].callback(null, {});
-			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 		});
 	});
 
