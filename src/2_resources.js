@@ -105,7 +105,8 @@ resources.open = {
 		"tracking_disabled": validator(false, validationTypes.BOOLEAN),
 		"current_url": validator(false, validationTypes.STRING),
 		"screen_height": validator(false, validationTypes.NUMBER),
-		"screen_width": validator(false, validationTypes.NUMBER)
+		"screen_width": validator(false, validationTypes.NUMBER),
+		"identity": validator(false, validationTypes.STRING)
 	}
 };
 
@@ -370,7 +371,8 @@ resources.pageview = {
 		"callback_string": validator(false, validationTypes.STRING),
 		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
-		"journey_dismissals": validator(false, validationTypes.OBJECT)
+		"journey_dismissals": validator(false, validationTypes.OBJECT),
+		"identity": validator(false, validationTypes.STRING)
 	})
 };
 
