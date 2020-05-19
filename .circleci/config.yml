@@ -11,24 +11,24 @@ jobs:
     - run:
         name: Install Closure compiler
         command: |
-             mkdir -p compiler ;
-             stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-20170218.zip && unzip -o compiler-20170218.zip -d compiler) ;
+            mkdir -p compiler ;
+            stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-20170218.zip && unzip -o compiler-20170218.zip -d compiler) ;
     - run:
         name: Install Closure compiler library
         command: |
-             mkdir -p compiler/library ;
-             stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library) ;
+            mkdir -p compiler/library ;
+            stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library) ;
     - run:
         name: Install Node, Sauce, Phantom, etc.
         command: |
-             npm install ;
-             sudo npm install -g jsdox ;
-             mocha-phantomjs --help || sudo npm install -g mocha-phantomjs ;
-             wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate ;
-             tar -xzf sc-4.3.13-linux.tar.gz ;
-             jscs --help || sudo npm install -g jscs ;
-             jshint -v || sudo npm install -g jshint ;
-             which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
+            npm install ;
+            sudo npm install -g jsdox ;
+            mocha-phantomjs --help || sudo npm install -g mocha-phantomjs ;
+            wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate ;
+            tar -xzf sc-4.3.13-linux.tar.gz ;
+            jscs --help || sudo npm install -g jscs ;
+            jshint -v || sudo npm install -g jshint ;
+            which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
     - run:
         name: Add Jessie backports PPA
         command: |
@@ -46,20 +46,19 @@ jobs:
     - run:
         name: Install AWS CLI
         command: |
-             sudo apt-get install -qq -y python-pip libpython-dev ;
-             curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
-             pip install awscli --upgrade --user && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
-             sudo npm install -g slack-cli ;
+            sudo apt-get install -qq -y python-pip libpython-dev ;
+            curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
+            pip install awscli --upgrade --user && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
+            sudo npm install -g slack-cli ;
     - run:
-        name: Run deployment scripts I
+        name: Build minified JS
         command: |
-             deployment/test.sh
-    # Runs when merging into master or production
+            deployment/test.sh
     - run:
-        name: Run deployment scripts II
+        name: Run deployment script
         command: |
-             pip uninstall -y urllib3; pip install urllib3==1.22 --user
-             deployment/deploy.sh
+            pip uninstall -y urllib3; pip install urllib3==1.22 --user
+            deployment/deploy.sh
 
 workflows:
   version: 2
