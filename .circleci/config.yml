@@ -5,7 +5,10 @@ jobs:
     docker:
     - image: circleci/node:6.11.2
     steps:
-    - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+    - run:
+        name: Set up NPM auth token
+        command: |
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
     - setup_remote_docker
     - run:
