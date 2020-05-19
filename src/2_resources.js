@@ -345,7 +345,9 @@ resources.logCustomEvent = {
 	params: {
 		"name": validator(true, validationTypes.STRING),
 		"user_data": validator(true, validationTypes.STRING),
-		"custom_data": validator(false, validationTypes.STRING)
+		"custom_data": validator(false, validationTypes.STRING),
+		"content_items": validator(false, validationTypes.STRING),
+		"customer_event_alias": validator(false, validationTypes.STRING)
 	}
 };
 
