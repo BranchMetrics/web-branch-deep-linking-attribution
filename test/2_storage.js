@@ -103,7 +103,7 @@ describe('cookie storage', function() {
 	it('should get stored item with key', function() {
 		storage.set(ITEM_KEY, ITEM_VALUE);
 		var item = storage.get(ITEM_KEY);
-		assert.strictEqual(item, ITEM_VALUE, 'correct value for key');
+		assert.strictEqual(item, ITEM_VALUE, 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 	});
 
 	it('should return null for an un-stored item', function() {
@@ -159,7 +159,7 @@ describe('cookie storage', function() {
 			}
 		}
 		var actual = storage.getAll();
-		assert.strictEqual(Object.keys(expected).length, Object.keys(actual).length, ' length is equal');
+		assert.strictEqual(Object.keys(expected).length, Object.keys(actual).length, 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 		for (key in actual) {
 			if (actual.hasOwnProperty(key)) {
 				assert.strictEqual(actual[key], expected[key], ' correct value for key');
@@ -172,7 +172,7 @@ describe('cookie storage', function() {
 		};
 		for (key in nonBranchCookies) { // check whether original Branch cookies are returned
 			if (nonBranchCookies.hasOwnProperty(key)) {
-				assert.strictEqual(actual.hasOwnProperty(key), false, ' correct value for key');
+				assert.strictEqual(actual.hasOwnProperty(key), false, 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 			}
 		}
 	});
@@ -195,7 +195,7 @@ describe('cookie storage', function() {
 				cookiesFound +=1;
 			}
 		}
-		assert.strictEqual(3, cookiesFound, ' all three original cookies found');
+		assert.strictEqual(3, cookiesFound, 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 	});
 });
 

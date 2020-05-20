@@ -1599,12 +1599,12 @@ describe('Branch', function() {
 			);
 			requests[2].callback(null, {});
 
-			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+			assert.strictEqual('{"session_id":"1234","something":"else","identity":null}', sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual('{"session_id":"1234","something":"else","identity":null}', localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 
 			branch.disableTracking(true);
-			assert.strictEqual("{}", sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual("{}", localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
+			assert.strictEqual("{}", sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual("{}", localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 
 			branch.disableTracking(false);
 			requests[3].callback(null, browser_fingerprint_id);
@@ -1616,42 +1616,8 @@ describe('Branch', function() {
 				}
 			);
 			requests[5].callback(null, {});
-			assert.strictEqual('{"session_id":"1234","something":"else"}', sessionStorage.getItem('branch_session'), 'data stored in session storage is correct');
-			assert.strictEqual('{"session_id":"1234","something":"else"}', localStorage.getItem('branch_session_first'), 'data stored in local storage is correct');
-		});
-	});
-
-	describe('logEvent', function() {
-		describe('standard events', function() {
-			it('should log standard events', function(done) {
-				// We might think about exposing standard event names as constants.
-				var branch = initBranch(false);
-				var assert = testUtils.plan(1, done);
-
-				var contentItem = {
-					"$og_title": "Title",
-					"$og_description": "Description"
-				};
-
-				// blech
-				branch.logEvent(
-					'VIEW_ITEM',
-					null, // event data
-					[ contentItem ],
-					null, // customer_event_alias
-					function(err) {
-						assert.equal(null, err);
-					}
-				);
-			});
-		});
-
-		describe('custom events', function() {
-
-		});
-
-		describe('common event handling', function() {
-
+			assert.strictEqual('{"session_id":"1234","something":"else","identity":null}', sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual('{"session_id":"1234","something":"else","identity":null}', localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 		});
 	});
 
