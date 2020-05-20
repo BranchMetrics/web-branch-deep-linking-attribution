@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta content="http://branch.io/img/logo_icon_black.png" property="og:image" />
+	<meta content="Branch Metrics Web SDK Example App" property="og:title" />
+	<meta content="A basic example to demonstrate some of the ways that the Web SDK can be used" property="og:description" />
+	<meta name="branch_key" content="key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv" />
+	<title>Branch V2 Events - Branch Metrics</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<style type="text/css">
+		.btn {
+			margin-top: 5px;
+		}
+		.example-input {
+			width: 125px;
+			display: inline-block;
+			margin-top: 5px;
+			vertical-align: middle;
+		}
+		.radio-input {
+			margin-right: 10px !important;
+			margin-left: 20px !important;
+		}
+		.row {
+			margin-bottom: 30px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row col-lg-8 col-lg-offset-2">
+			<h2>Branch Metrics Branch V2 Events Example</h2>
+		</div>
+		<section>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Session Info</h4>
+				<pre id="info">Initializing...</pre>
+				<br>
+				<h4>Request</h4>
+				<pre id="request">Click a button!</pre>
+				<br>
+				<h4>Response</h4>
+				<pre id="response">Click a button!</pre>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Branch V2 Events</h4>
+				<div class="group">
+					<label><input id="custom-event-name" placeholder="enter a custom event" /> Custom Event </label>
+					<br/>
+					<label><input id="customer-event-alias" placeholder="enter an event alias" /> Customer Event Alias </label>
+					<br/>
+					<button id="standard-view-item" class="btn btn-info" disabled="yes">.logEvent('VIEW_ITEM')</button>
+					<button id="custom" class="btn btn-info" disabled="yes">.logEvent( { the event you entered above } )</button>
+				</div>
+			</div>
+		</section>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
+
+		// Take Branch key from meta tag.
+		var branch_key = $('meta[name="branch_key"]').attr('content');
+		branch.init(branch_key, function(err, data) {
+			// using jQuery .text() here avoids XSS in case this is ever hosted.
+			if (err) {
+				$('#info').text(JSON.stringify(err));
+				return;
+			}
+
+			$('#info').text(JSON.stringify(data));
+			$('.btn').removeAttr('disabled');
+		});
+	</script>
+	<script type="text/javascript">
+	  var contentItems = [{
+				"$og_title": "Content Item",
+				"$og_description": "Content description"
+		}];
+		var customData = {
+			foo: "bar"
+		};
+
+		$('#standard-view-item').click(function() {
+			var customerEventAlias = $('#customer-event-alias').val();
+			if (customerEventAlias.length == 0) customerEventAlias = null;
+
+			var requestText = "branch.logEvent('VIEW_ITEM', null, " + JSON.stringify(contentItems) + ", " + JSON.stringify(customerEventAlias) + ")";
+			$('#request').text(requestText);
+			$('#response').text('Waiting for response...');
+			branch.logEvent(
+				'VIEW_ITEM',
+				null,
+				contentItems,
+				customerEventAlias,
+				function(err) {
+					$('#response').text(JSON.stringify(err));
+				}
+			);
+		});
+		$('#custom').click(function() {
+			var eventName = $('#custom-event-name').val();
+			if (eventName.length == 0) {
+				alert('Please enter a custom event name.');
+				return;
+			}
+
+			var customerEventAlias = $('#customer-event-alias').val();
+			if (customerEventAlias.length == 0) customerEventAlias = null;
+
+			var requestText = "branch.logEvent('" + eventName + "', " + JSON.stringify(customData) + ", " + JSON.stringify(contentItems) + ", " + JSON.stringify(customerEventAlias) + ")";
+			$('#request').text(requestText);
+			$('#response').text('Waiting for response...');
+			branch.logEvent(
+				eventName,
+				customData,
+				contentItems,
+				customerEventAlias,
+				function(err) {
+				$('#response').text(JSON.stringify(err));
+			});
+		});
+	</script>
+</body>
+</html>
