@@ -70,7 +70,7 @@ You will need to create a [Branch Metrics app](http://branch.io) to obtain your 
 Initializing the SDK is an asynchronous method with a callback, so it may seem as though you would need to place any method calls that will execute immediately inside the `branch.init()` callback. We've made it even easier than that, by building in a queue to the SDK! The only thing that is required is that `branch.init()` is called prior to any other methods. All SDK methods called are guaranteed to : 1. be executed in the order that they were called, and 2. wait to execute until the previous SDK method finishes. Therefore, it is 100% allowable to do something like:
 ```js
 branch.init(...);
-branch.banner(...);
+branch.link(...);
 ```
 
 If `branch.init()` fails, all subsequent branch methods will fail.
