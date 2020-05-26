@@ -32,3 +32,6 @@ tmp
 local-testbench
 index.html
 dist
+
+# Probably shouldn't ignore this, but since it's not checked in, do this for now
+package-lock.json

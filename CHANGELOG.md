@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.53.2] - 2020-04-17
+- Fix missing build.min.js in NPM release.
+
 ## [2.53.1] - 2020-04-06
 - Fixes bug in branch.init() where has_app value is not being returned if it is false
 
@@ -118,7 +121,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Fixes bug where WebSDK deepviews do not show URI scheme popup on initial page load when open_app is true in Safari on iOS 11
 
 ## [2.31.0] - 2017-12-20
-- Pass metadata into branch.init() for Journeys targeting 
+- Pass metadata into branch.init() for Journeys targeting
 - Fixes bug related to listening for all events in Smart Banner and Journeys
 - Fixes bug related to showing different languages in Journeys
 
@@ -126,7 +129,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 - Adds ability to register commerce events, content events, user lifecycle events and custom events via logEvent()
 
 ## [2.29.0] - 2017-10-17
-- Adds retries, retry_delay and timeout options to .init() 
+- Adds retries, retry_delay and timeout options to .init()
 - Automatically generates $ios_deeplink_path, $android_deeplink_path, $deeplink_path from twitter:app:url:iphone and twitter:app:url:googleplay Meta tags
 - Fixes cookie storage bug for users in Safari private mode
 
@@ -200,7 +203,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v2.19.0] - 2017-03-07
 - add ability to track commerce events
-- fix for 'no_journeys' not being respected when passed in as an option to branch.init() 
+- fix for 'no_journeys' not being respected when passed in as an option to branch.init()
 - other minor bug fixes
 
 ## [v2.18.0] - 2017-02-10
@@ -289,7 +292,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ## [v2.2.0] - 2016-05-05
 - Fix for sendSMS issues with subdomains
 - Fix for custom banner styling issues
-- Added ability for custom Branch View display through events 
+- Added ability for custom Branch View display through events
 
 ## [v2.1.6] - 2016-04-27
 - Option for whether to respect 'Do Not Track'

@@ -105,7 +105,8 @@ resources.open = {
 		"tracking_disabled": validator(false, validationTypes.BOOLEAN),
 		"current_url": validator(false, validationTypes.STRING),
 		"screen_height": validator(false, validationTypes.NUMBER),
-		"screen_width": validator(false, validationTypes.NUMBER)
+		"screen_width": validator(false, validationTypes.NUMBER),
+		"identity": validator(false, validationTypes.STRING)
 	}
 };
 
@@ -343,7 +344,9 @@ resources.logCustomEvent = {
 	params: {
 		"name": validator(true, validationTypes.STRING),
 		"user_data": validator(true, validationTypes.STRING),
-		"custom_data": validator(false, validationTypes.STRING)
+		"custom_data": validator(false, validationTypes.STRING),
+		"content_items": validator(false, validationTypes.STRING),
+		"customer_event_alias": validator(false, validationTypes.STRING)
 	}
 };
 
@@ -368,7 +371,8 @@ resources.pageview = {
 		"callback_string": validator(false, validationTypes.STRING),
 		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
-		"journey_dismissals": validator(false, validationTypes.OBJECT)
+		"journey_dismissals": validator(false, validationTypes.OBJECT),
+		"identity": validator(false, validationTypes.STRING)
 	})
 };
 

@@ -57,21 +57,38 @@ describe('utils', function() {
 
 	describe('whiteListSessionData', function() {
 		it('should remove unwanted params', function() {
-			var data = {
+			/*
+			 * This actually describes how whitelistSessionData works. It looks for
+			 * developer_identity in the input and outputs both identity and
+			 * developer_identity. Perhaps this is used as a filter elsewhere.
+			 */
+			var input = {
+				"data": "string",
+				"data_parsed": {
+					"key": "value"
+				},
+				"has_app": true,
+				"developer_identity": "67890",
+				"referring_identity": "12345",
+				"referring_link": null,
+				"unwanted": "param"
+			};
+			var expected = {
 				"data": "string",
 				"data_parsed": {
 					"key": "value"
 				},
 				"has_app": true,
 				"identity": "67890",
+				"developer_identity": "67890",
 				"referring_identity": "12345",
-				"referring_link": null,
-				"unwanted": "param"
+				"referring_link": null
 			};
-			delete data.unwanted;
+			// determine whitelisted fields before deleting unwanted param
+			var actual = utils.whiteListSessionData(input);
 			assert.deepEqual(
-				utils.whiteListSessionData(data),
-				data,
+				actual,
+				expected,
 				'Unwanted param should be removed'
 			);
 		});
