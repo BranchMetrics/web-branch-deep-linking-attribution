@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.53.2"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.54.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);

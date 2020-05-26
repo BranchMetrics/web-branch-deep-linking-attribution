@@ -4,6 +4,11 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.54.0] - 2020-05-26
+- Support customer_event_alias and content_items in v2 events
+- Include identity in /v1/open and /v1/pageview requests
+- Prevent XSS in deployed example.html
+
 ## [2.53.2] - 2020-04-17
 - Fix missing build.min.js in NPM release.
 
