@@ -824,7 +824,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
-			"identity": data['identity'],
+			"identity": null,
 			"session_id": data['session_id'],
 			"identity_id": data['identity_id'],
 			"link": data['link'],
@@ -834,7 +834,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.sessionLink = data['link'];
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
-		self.identity = data['identity'];
+		self.identity = null;
 		session.update(self._storage, data);
 
 		done(null);
