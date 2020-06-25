@@ -395,8 +395,9 @@ utils.processReferringLink = function(link) {
 /**
  * @param {Object} to
  * @param {Object} from
+ * @param {boolean=} removeNull delete null or undefined entries instead of inserting
  */
-utils.merge = function(to, from) {
+utils.merge = function(to, from, removeNull) {
 	if (!to || typeof to !== 'object') {
 		to = {};
 	}
@@ -406,7 +407,14 @@ utils.merge = function(to, from) {
 
 	for (var attr in from) {
 		if (from.hasOwnProperty(attr)) {
-			to[attr] = from[attr];
+			var fromAttr = from[attr];
+			/* Only remove null and undefined, not all falsy values. */
+			if (removeNull && (fromAttr === undefined || fromAttr === null)) {
+				delete to[attr];
+			}
+			else {
+				to[attr] = fromAttr;
+			}
 		}
 	}
 	return to;
