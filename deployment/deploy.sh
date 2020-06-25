@@ -1,10 +1,10 @@
 #/bin/bash
 
-# To trigger a production deploy push a 
-# commit with these items: 
+# To trigger a production deploy push a
+# commit with these items:
 #
 # version: x.y.z
-# Changelog: 
+# Changelog:
 
 set -e
 
@@ -17,22 +17,22 @@ NC='\033[0m'
 #--------------------------------------------------------------------------------------------
 
 if [ "$CIRCLE_BRANCH" == 'production' ]; then
-  
+
   echo -en "${GREEN}Production Release...${NC}\n"
 
   GIT_COMMIT_MSG=$(git log --format=%B -n 1 $CIRCLE_SHA1)
-  
+
   VER=$(echo "$GIT_COMMIT_MSG" | grep version | cut -f 2 -d " ")
- 
+
   VERSION=$(echo $VER|tr -d '\r')
- 
+
   DATE=$(date "+%Y-%m-%d")
- 
+
   if [[ "$GIT_COMMIT_MSG" != *"version"* ]]; then
       echo "Version not found in commit message - Not deploying"
       exit 0
   fi
- 
+
   VER_REG='^([0-9]+\.){0,2}(\*|[0-9]+)$'
 
   if [[ $VERSION =~ $VER_REG ]]; then
@@ -53,6 +53,12 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
 
   echo -en "\n${GREEN}Extracted Changelog:\n$INSERT\n$CHANGELOG\n${NC}\n"
 
+  echo -en "\n${GREEN}Resetting local repo${NC}\n"
+  # Avoid scooping up any local changes left over from previous builds.
+  # These commands ensure a start from a pristine repo.
+  git reset HEAD .
+  git checkout -- .
+
 cat <<EOF >add.txt
 $CHANGELOG
 EOF
@@ -62,14 +68,14 @@ EOF
 
   sed -i -e "s/## \[VERSION\] - unreleased/## [$VERSION] - $DATE/" CHANGELOG.md
   perl -i -pe '$_ = "\n## [VERSION] - unreleased\n\n" if $. ==4' CHANGELOG.md
- 
+
   echo -en "${GREEN}Bumping versions ...${NC}\n"
   sed -i -e "s/version = '.*';$/version = '$VERSION';/" src/0_config.js
   sed -i -e "s/version = '.*';$/version = '$VERSION';/" test/web-config.js
-  
+
   sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" package.json
   sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" package.json
-  
+
   sed -i -e "s/\"version\":.*$/\"version\": \"$VERSION\",/" bower.json
   sed -i -e "s/\"build\":.*$/\"build\": \"$VERSION\"/" bower.json
 
@@ -96,7 +102,7 @@ EOF
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/websdk/branch-v2.0.0.min.js --acl public-read
   aws s3 cp --content-type="text/javascript" dist/build.js s3://branch-builds/websdk/branch.js --acl public-read
   aws s3 cp example.html s3://branch-builds/websdk/example.html --acl public-read
-  
+
   # Invalidate cache at CDN
   echo -en "${GREEN}Invalidating cloudfrond distribution for WebSDK ...${NC}\n"
   aws configure set preview.cloudfront true
@@ -123,7 +129,7 @@ EOF
   rm -rf /tmp/$CIRCLE_PROJECT_REPONAME
   git clone git@github.com:BranchMetrics/$CIRCLE_PROJECT_REPONAME.git /tmp/$CIRCLE_PROJECT_REPONAME
 
-  pushd /tmp/$CIRCLE_PROJECT_REPONAME 
+  pushd /tmp/$CIRCLE_PROJECT_REPONAME
 
   git merge origin/production -m "Merge Production [ci skip]"
   git push origin master
@@ -136,7 +142,7 @@ EOF
   #uncomment to send updates to int-eng
   #slackcli -t $SLACK_TOKEN -h int-eng -m $MESSAGE -u websdk-deploy -i $DEPLOY_IMG
   slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME deployed WebSDK v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
-  
+
   echo "Please update the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/_initialization.md"
 
   echo "Check the following links are valid:"
@@ -175,4 +181,3 @@ fi
 
 # Exit prompts
 echo -en "${GREEN}Done deploy script ...${NC}\n"
-
