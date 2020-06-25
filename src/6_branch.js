@@ -824,7 +824,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"referring_link": null,
 			"click_id": null,
 			"link_click_id": null,
-			"identity": null,
+			"identity": null, // data.identity is usually/always null anyway, but force it here
 			"session_id": data['session_id'],
 			"identity_id": data['identity_id'],
 			"link": data['link'],
@@ -835,7 +835,9 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
 		self.identity = null;
-		session.update(self._storage, data);
+		// make sure to update both session and local. removeNull = true deletes, in particular,
+		// identity instead of inserting null in storage.
+		session.patch(self._storage, data, /* updateLocalStorage */ true, /* removeNull */ true);
 
 		done(null);
 	});
