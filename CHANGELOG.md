@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.54.2] - 2020-07-01
+- [INTENG-9846] Clear developer identity on logout. This was not previously working because it was not deleted from storage.
+
 ## [2.54.1] - 2020-05-26
 - Fix example.html, not properly deployed in last release
 
