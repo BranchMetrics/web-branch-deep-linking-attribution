@@ -54,10 +54,11 @@ session.update = function(storage, newData) {
  * @param {storage} storage
  * @param {Object} data
  * @param {boolean=} updateLocalStorage
+ * @param {boolean=} removeNull delete null or undefined entries instead of inserting
  */
-session.patch = function(storage, data, updateLocalStorage) {
+session.patch = function(storage, data, updateLocalStorage, removeNull) {
 	var merge = function(source, patch) {
-		return utils.encodeBFPs(utils.merge(goog.json.parse(source), patch));
+		return utils.encodeBFPs(utils.merge(goog.json.parse(source), patch, removeNull));
 	};
 
 	var session = storage.get('branch_session', false) || {};

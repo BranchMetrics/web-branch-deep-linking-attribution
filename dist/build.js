@@ -1125,13 +1125,16 @@ utils.getClickIdAndSearchStringFromLink = function(a) {
 utils.processReferringLink = function(a) {
   return a ? "http" !== a.substring(0, 4) ? config.link_service_endpoint + a : a : null;
 };
-utils.merge = function(a, b) {
+utils.merge = function(a, b, c) {
   a && "object" === typeof a || (a = {});
   if (!b || "object" !== typeof b) {
     return a;
   }
-  for (var c in b) {
-    b.hasOwnProperty(c) && (a[c] = b[c]);
+  for (var d in b) {
+    if (b.hasOwnProperty(d)) {
+      var e = b[d];
+      !c || void 0 !== e && null !== e ? a[d] = e : delete a[d];
+    }
   }
   return a;
 };
@@ -1652,12 +1655,12 @@ var session = {get:function(a, b) {
     var c = session.get(a) || {}, c = goog.json.serialize(utils.encodeBFPs(utils.merge(c, b)));
     a.set("branch_session", c);
   }
-}, patch:function(a, b, c) {
-  var d = function(a, b) {
-    return utils.encodeBFPs(utils.merge(goog.json.parse(a), b));
-  }, e = a.get("branch_session", !1) || {};
-  a.set("branch_session", goog.json.serialize(d(e, b)));
-  c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(d(c, b)), !0));
+}, patch:function(a, b, c, d) {
+  var e = function(a, b) {
+    return utils.encodeBFPs(utils.merge(goog.json.parse(a), b, d));
+  }, f = a.get("branch_session", !1) || {};
+  a.set("branch_session", goog.json.serialize(e(f, b)));
+  c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(e(c, b)), !0));
 }};
 // Input 9
 var Server = function() {
@@ -2753,12 +2756,12 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._api(resources.logout, {}, function(c, d) {
     c && a(c);
     d = d || {};
-    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:d.identity, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
+    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
     b.sessionLink = d.link;
     b.session_id = d.session_id;
     b.identity_id = d.identity_id;
-    b.identity = d.identity;
-    session.update(b._storage, d);
+    b.identity = null;
+    session.patch(b._storage, d, !0, !0);
     a(null);
   });
 });
