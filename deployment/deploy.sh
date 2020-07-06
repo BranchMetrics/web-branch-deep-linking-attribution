@@ -54,10 +54,6 @@ if [ "$CIRCLE_BRANCH" == 'production' ]; then
   echo -en "\n${GREEN}Extracted Changelog:\n$INSERT\n$CHANGELOG\n${NC}\n"
 
   echo -en "\n${GREEN}Resetting local repo${NC}\n"
-  # Avoid scooping up any local changes left over from previous builds.
-  # These commands ensure a start from a pristine repo.
-  git reset HEAD .
-  git checkout -- .
 
 cat <<EOF >add.txt
 $CHANGELOG
