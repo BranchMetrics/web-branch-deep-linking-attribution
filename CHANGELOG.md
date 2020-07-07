@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.54.3] - 2020-07-07
+- [APPSEC-264] Fix template responsible for bad deploy of example.html.
+
 ## [2.54.2] - 2020-07-01
 - [INTENG-9846] Clear developer identity on logout. This was not previously working because it was not deleted from storage.
 
