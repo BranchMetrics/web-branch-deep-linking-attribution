@@ -2939,7 +2939,7 @@ function _setBranchViewData(a, b, c) {
 }
 Branch.prototype.setBranchViewData = wrap(callback_params.CALLBACK_ERR, function(a, b) {
   _setBranchViewData.call(null, this, a, b);
-});
+}, !0);
 Branch.prototype.closeJourney = wrap(callback_params.CALLBACK_ERR, function(a) {
   var b = this;
   b.renderQueue(function() {
@@ -3007,7 +3007,7 @@ Branch.prototype.disableTracking = wrap(callback_params.CALLBACK_ERR, function(a
     }
   }
   a();
-});
+}, !0);
 // Input 18
 var branch_instance = new Branch;
 if (window.branch && window.branch._q) {

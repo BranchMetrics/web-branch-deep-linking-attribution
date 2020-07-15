@@ -21,7 +21,8 @@
 	"author": "Dmitri Gaskin <dmitrig01@gmail.com>",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues"
+		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues",
+		"email": "support@branch.io"
 	},
 	"homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
 	"devDependencies": {

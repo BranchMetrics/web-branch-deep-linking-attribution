@@ -1942,7 +1942,7 @@ function _setBranchViewData(context, done, data) {
 
 Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, function(done, data) {
 	_setBranchViewData.call(null, this, done, data);
-});
+}, /* allowed before init */ true);
 
 /**
  * @function Branch.closeJourney
@@ -2287,4 +2287,4 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 		// Branch will not re-initialize
 	}
 	done();
-});
+}, /* allowed before init */ true);
