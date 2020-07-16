@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.54.4] - 2020-07-16
+- [INTENG-10184] Allow disableTracking() and setBranchViewData() before init()
+
 ## [2.54.3] - 2020-07-07
 - [APPSEC-264] Fix template responsible for bad deploy of example.html.
 

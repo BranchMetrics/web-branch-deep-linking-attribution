@@ -1,6 +1,6 @@
 {
 	"name": "branch-sdk",
-	"version": "2.54.3",
+	"version": "2.54.4",
 	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
 	"main": "dist/build.min.js",
 	"files": [
@@ -41,5 +41,5 @@
 	"dependencies": {
 		"request": "^2.55.0"
 	},
-	"build": "2.54.3"
+	"build": "2.54.4"
 }
