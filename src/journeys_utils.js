@@ -29,7 +29,7 @@ if (window.innerHeight < window.innerWidth) {
 journeys_utils.bodyMarginTop = 0;
 journeys_utils.bodyMarginBottom = 0;
 
-// Running state of the exit animation: INTENG-9671
+// Running state of the exit animation
 journeys_utils.exitAnimationIsRunning = false;
 
 // Regex to find pieces of the html blob
