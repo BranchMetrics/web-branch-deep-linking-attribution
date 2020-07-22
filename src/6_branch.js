@@ -569,6 +569,9 @@ Branch.prototype['init'] = wrap(
 			self.identity = permData['identity'];
 		}
 
+		// Execute the /v1/open right away or after _web_open_delay_ms.
+		var open_delay = parseInt(utils.getParamValue('_web_open_delay_ms'), 10);
+
 		if (!utils.isSafari11OrGreater()) {
 			self._api(
 				resources._r,
@@ -579,36 +582,38 @@ Branch.prototype['init'] = wrap(
 						self.init_state_fail_details = err.message;
 						return finishInit(err, null);
 					}
-					self._api(
-						resources.open,
-						{
-							"link_identifier": link_identifier,
-							"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
-							"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
-							"options": options,
-							"initial_referrer": utils.getInitialReferrer(self._referringLink()),
-							"current_url": utils.getCurrentUrl(),
-							"screen_height": utils.getScreenHeight(),
-							"screen_width": utils.getScreenWidth()
-						},
-						function(err, data) {
-							if (err) {
-								self.init_state_fail_code = init_state_fail_codes.OPEN_FAILED;
-								self.init_state_fail_details = err.message;
-							}
-							if (!err && typeof data === 'object') {
-								if (data['branch_view_enabled']) {
-									self._branchViewEnabled = !!data['branch_view_enabled'];
-									self._storage.set('branch_view_enabled', self._branchViewEnabled);
+					utils.delay(function() {
+						self._api(
+							resources.open,
+							{
+								"link_identifier": link_identifier,
+								"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
+								"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
+								"options": options,
+								"initial_referrer": utils.getInitialReferrer(self._referringLink()),
+								"current_url": utils.getCurrentUrl(),
+								"screen_height": utils.getScreenHeight(),
+								"screen_width": utils.getScreenWidth()
+							},
+							function(err, data) {
+								if (err) {
+									self.init_state_fail_code = init_state_fail_codes.OPEN_FAILED;
+									self.init_state_fail_details = err.message;
 								}
-								if (link_identifier) {
-									data['click_id'] = link_identifier;
+								if (!err && typeof data === 'object') {
+									if (data['branch_view_enabled']) {
+										self._branchViewEnabled = !!data['branch_view_enabled'];
+										self._storage.set('branch_view_enabled', self._branchViewEnabled);
+									}
+									if (link_identifier) {
+										data['click_id'] = link_identifier;
+									}
 								}
+								attachVisibilityEvent();
+								finishInit(err, data);
 							}
-							attachVisibilityEvent();
-							finishInit(err, data);
-						}
-					);
+						);
+					}, open_delay);
 				}
 			);
 		}
