@@ -29,6 +29,9 @@ if (window.innerHeight < window.innerWidth) {
 journeys_utils.bodyMarginTop = 0;
 journeys_utils.bodyMarginBottom = 0;
 
+// Running state of the exit animation: INTENG-9671
+journeys_utils.exitAnimationIsRunning = false;
+
 // Regex to find pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
@@ -829,6 +832,10 @@ journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
  * @param {boolean=} dismissedJourneyProgrammatically
  */
 journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatically) {
+	if(!journeys_utils.exitAnimationDisabled){
+		journeys_utils.exitAnimationIsRunning = true;
+	}
+
 	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
@@ -894,7 +901,9 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		if (!dismissedJourneyProgrammatically) {
 			journeys_utils.branch._publishEvent('branch_internal_event_didCloseJourney', journeys_utils.journeyLinkData);
 		}
+
 		journeys_utils.isJourneyDisplayed = false;
+		setTimeout(function(){ journeys_utils.exitAnimationIsRunning = false; }, journeys_utils.animationSpeed )
 	}, speedAndDelay);
 };
 
