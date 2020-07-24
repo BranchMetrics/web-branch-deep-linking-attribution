@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.54.5] - 2020-07-23
+- [INTENG-10563][INTENG-10570] Add support for all standard v2 events (thanks in part to @ssg-luke for the contribution)
+
 ## [2.54.4] - 2020-07-16
 - [INTENG-10184] Allow disableTracking() and setBranchViewData() before init()
 
