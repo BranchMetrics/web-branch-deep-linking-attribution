@@ -2091,6 +2091,7 @@ journeys_utils.windowWidth = window.innerWidth;
 window.innerHeight < window.innerWidth && (journeys_utils.windowHeight = window.innerWidth, journeys_utils.windowWidth = window.innerHeight);
 journeys_utils.bodyMarginTop = 0;
 journeys_utils.bodyMarginBottom = 0;
+journeys_utils.exitAnimationIsRunning = !1;
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
 journeys_utils.cssRe = /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
@@ -2372,6 +2373,7 @@ journeys_utils._getPageviewMetadata = function(a, b) {
   return utils.merge({url:a && a.url || utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1, window_device_pixel_ratio:window.devicePixelRatio || 1}, b || {});
 };
 journeys_utils.animateBannerExit = function(a, b) {
+  journeys_utils.exitAnimationDisabled || (journeys_utils.exitAnimationIsRunning = !0);
   if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
     document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease";
     document.getElementById("branch-banner-iframe").style.transition = "all 0" + journeys_utils.animationSpeed / 1000 + "s ease";
@@ -2396,6 +2398,9 @@ journeys_utils.animateBannerExit = function(a, b) {
     journeys_utils.branch._publishEvent("didCloseJourney", journeys_utils.journeyLinkData);
     b || journeys_utils.branch._publishEvent("branch_internal_event_didCloseJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !1;
+    setTimeout(function() {
+      journeys_utils.exitAnimationIsRunning = !1;
+    }, journeys_utils.animationSpeed);
   }, journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay);
 };
 journeys_utils.setJourneyLinkData = function(a) {
@@ -2443,35 +2448,37 @@ branch_view.incrementPageviewAnalytics = function(a) {
   });
 };
 branch_view.displayJourney = function(a, b, c, d, e, f) {
-  journeys_utils.branchViewId = c;
-  journeys_utils.setJourneyLinkData(f);
-  var g = d.audience_rule_id;
-  (f = document.getElementById("branch-iframe-css")) && f.parentElement.removeChild(f);
-  f = document.createElement("div");
-  f.id = "branch-banner";
-  document.body.insertBefore(f, null);
-  banner_utils.addClass(f, "branch-banner-is-active");
-  var k = !1, h = b.callback_string, m = null, l = null, n = journeys_utils.branch._storage;
-  if (a) {
-    var p = journeys_utils.getMetadata(a) || {}, q = window.setTimeout(function() {
-      window[h] = function() {
+  if (!journeys_utils.exitAnimationIsRunning) {
+    journeys_utils.branchViewId = c;
+    journeys_utils.setJourneyLinkData(f);
+    var g = d.audience_rule_id;
+    (f = document.getElementById("branch-iframe-css")) && f.parentElement.removeChild(f);
+    f = document.createElement("div");
+    f.id = "branch-banner";
+    document.body.insertBefore(f, null);
+    banner_utils.addClass(f, "branch-banner-is-active");
+    var k = !1, h = b.callback_string, m = null, l = null, n = journeys_utils.branch._storage;
+    if (a) {
+      var p = journeys_utils.getMetadata(a) || {}, q = window.setTimeout(function() {
+        window[h] = function() {
+        };
+      }, utils.timeout);
+      window[h] = function(a) {
+        window.clearTimeout(q);
+        k || (l = a, journeys_utils.finalHookups(c, g, n, l, m, p, e, branch_view));
       };
-    }, utils.timeout);
-    window[h] = function(a) {
-      window.clearTimeout(q);
-      k || (l = a, journeys_utils.finalHookups(c, g, n, l, m, p, e, branch_view));
-    };
-    m = renderHtmlBlob(document.body, a, b.has_app_websdk);
-    journeys_utils.banner = m;
-    if (null === m) {
-      k = !0;
-      return;
+      m = renderHtmlBlob(document.body, a, b.has_app_websdk);
+      journeys_utils.banner = m;
+      if (null === m) {
+        k = !0;
+        return;
+      }
+      journeys_utils.finalHookups(c, g, n, l, m, p, e, branch_view);
+      utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart());
     }
-    journeys_utils.finalHookups(c, g, n, l, m, p, e, branch_view);
-    utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart());
+    document.body.removeChild(f);
+    utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d);
   }
-  document.body.removeChild(f);
-  utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d);
 };
 branch_view._getPageviewRequestData = function(a, b, c, d) {
   journeys_utils.branch = c;
