@@ -971,4 +971,46 @@ describe('utils', function() {
 			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/xyz', { link_identifier: '111111111111' }));
 		});
 	});
+
+	describe('delay function', function() {
+		it('calls synchronously for a non-numeric delay argument', function() {
+			var executed = false;
+			utils.delay(function() {
+				executed = true;
+			}, NaN);
+			// executed is true immediately after the call
+			assert.equal(true, executed);
+		});
+
+		it('calls synchronously for a zero delay argument', function() {
+			var executed = false;
+			utils.delay(function() {
+				executed = true;
+			}, 0);
+			// executed is true immediately after the call
+			assert.equal(true, executed);
+		});
+
+		it('calls synchronously for a negative delay argument', function() {
+			var executed = false;
+			utils.delay(function() {
+				executed = true;
+			}, -25);
+			// executed is true immediately after the call
+			assert.equal(true, executed);
+		});
+
+		it('delays for any positive numeric argument', function(done) {
+			var executed = false;
+			var clock = sinon.useFakeTimers();
+			utils.delay(function() {
+				executed = true;
+				done();
+			}, 100);
+			// executed is still false immediately after the call
+			assert.equal(false, executed);
+			// ensure that done() gets called.
+			clock.tick(101);
+		});
+	});
 });
