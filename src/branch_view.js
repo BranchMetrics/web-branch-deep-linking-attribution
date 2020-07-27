@@ -108,6 +108,9 @@ branch_view.incrementPageviewAnalytics = function(branchViewData) {
 };
 
 branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled, journeyLinkData) {
+    if(journeys_utils.exitAnimationIsRunning){
+    	return;
+	}
 
 	journeys_utils.branchViewId = templateId;
 	journeys_utils.setJourneyLinkData(journeyLinkData);

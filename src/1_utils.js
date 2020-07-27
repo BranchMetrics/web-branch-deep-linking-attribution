@@ -1179,3 +1179,19 @@ utils.getBooleanOrNull = function(value) {
 
 	return value;
 };
+
+/**
+ * Execute operation immediately or after a timeout.
+ * setTimeout(operation, 0) will enqueue the operation and may not execute
+ * right away.
+ * @param {function} operation A function with no arguments to be executed after delay ms.
+ * @param {number} delay Operation will be executed after this number of ms. If 0, the operation is executed immediately, not using setTimeout.
+ */
+utils.delay = function(operation, delay) {
+	if (isNaN(delay) || delay <= 0) {
+		operation();
+		return;
+	}
+
+	setTimeout(operation, delay);
+};
