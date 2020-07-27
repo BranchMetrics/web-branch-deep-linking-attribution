@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.55.0] - 2020-07-27
+- [INTENG-9671] Detect animation state in Journeys
+- [INTENG-9975] Add support for _open_delay_ms
+
 ## [2.54.5] - 2020-07-23
 - [INTENG-10563][INTENG-10570] Add support for all standard v2 events (thanks in part to @ssg-luke for the contribution)
 

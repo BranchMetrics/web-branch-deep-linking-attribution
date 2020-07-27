@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.54.5"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.55.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1442,6 +1442,9 @@ utils.addNonceAttribute = function(a) {
 };
 utils.getBooleanOrNull = function(a) {
   return void 0 === a ? null : a;
+};
+utils.delay = function(a, b) {
+  isNaN(b) || 0 >= b ? a() : setTimeout(a, b);
 };
 // Input 6
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
@@ -2706,21 +2709,26 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     var p = session.get(d._storage, !0) || {};
     p.browser_fingerprint_id && (b._t = p.browser_fingerprint_id);
     p.identity && (d.identity = p.identity);
-    utils.isSafari11OrGreater() ? d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || p.browser_fingerprint_id, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
-      a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
-      a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
-      n();
-      l(a, b);
-    }) : d._api(resources._r, b, function(a, b) {
-      if (a) {
-        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, l(a, null);
-      }
-      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || b, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
+    var q = parseInt(utils.getParamValue("[?&]_open_delay_ms"), 10);
+    utils.isSafari11OrGreater() ? utils.delay(function() {
+      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || p.browser_fingerprint_id, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
         n();
         l(a, b);
       });
+    }, q) : d._api(resources._r, b, function(a, b) {
+      if (a) {
+        return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, l(a, null);
+      }
+      utils.delay(function() {
+        d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || b, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
+          a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
+          a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
+          n();
+          l(a, b);
+        });
+      }, q);
     });
   }
 }, !0);
