@@ -394,6 +394,14 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		postData = u.data;
 	}
 
+	var requestBody;
+	if (storage.get('use_jsonp') || resource.jsonp) {
+		requestBody = data;
+	}
+	else {
+		requestBody = postData;
+	}
+
 	// How many times to retry the request if the initial attempt fails
 	var retries = utils.retries;
 	// If request fails, retry after X miliseconds
@@ -401,6 +409,18 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	 * @type {function(?Error,*=): ?undefined}
 	 */
 	var done = function(err, data, status) {
+		if (typeof self.onAPIResponse === 'function') {
+			// Record every request and response, including retries
+			self.onAPIResponse(
+				url,
+				resource.method,
+				requestBody,
+				err,
+				status,
+				data
+			);
+		}
+
 		if (err && retries > 0 && (status || "").toString().substring(0, 1) === '5') {
 			retries--;
 			window.setTimeout(function() {
