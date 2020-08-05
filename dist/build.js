@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://nightlyregression.api.beta.branch.io", version:"2.55.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.55.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2509,9 +2509,7 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
     var k = !1, h = b.callback_string, m = null, l = null, n = journeys_utils.branch._storage;
     if (a) {
       var p = journeys_utils.getMetadata(a) || {};
-      console.log(a);
       a = journeys_utils.tryReplaceJourneyCtaLink(a);
-      console.log(a);
       var q = window.setTimeout(function() {
         window[h] = function() {
         };
