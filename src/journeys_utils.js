@@ -961,7 +961,7 @@ journeys_utils.tryReplaceJourneyCtaLink = function (html){
 	try{
 		if(journeys_utils.hasJourneyCtaLink()){
 			var journeyLinkReplacePattern = /validate[(].+[)];/g;
-			return html.replace(journeyLinkReplacePattern, 'validate("' + journeys_utils.getJourneyCtaLink() + '")');
+			return html.replace(journeyLinkReplacePattern, 'validate("' + journeys_utils.getJourneyCtaLink() + '");');
 		}
 	}catch(e){
 		return html;

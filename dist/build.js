@@ -2428,7 +2428,7 @@ journeys_utils.getJourneyCtaLink = function() {
 journeys_utils.tryReplaceJourneyCtaLink = function(a) {
   try {
     if (journeys_utils.hasJourneyCtaLink()) {
-      return a.replace(/validate[(].+[)];/g, 'validate("' + journeys_utils.getJourneyCtaLink() + '")');
+      return a.replace(/validate[(].+[)];/g, 'validate("' + journeys_utils.getJourneyCtaLink() + '");');
     }
   } catch (b) {
   }
