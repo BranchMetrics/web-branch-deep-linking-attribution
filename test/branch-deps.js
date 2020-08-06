@@ -31,3 +31,8 @@ goog.addDependency("../../../../../test/2_storage.js", [], ['storage']);
 goog.addDependency("../../../../../test/3_api.js", [], ['utils', 'Server', 'resources', 'storage', 'config', 'safejson']);
 goog.addDependency("../../../../../test/test-utils.js", [], []);
 goog.addDependency("../../../../../test/1_utils.js", [], ['utils', 'journeys_utils']);
+goog.addDependency("../../../../../test/React App_files/jquery-3.4.1.slim.min.js", [], []);
+goog.addDependency("../../../../../test/React App_files/bundle.js", [], []);
+goog.addDependency("../../../../../test/React App_files/bootstrap.min.js", [], []);
+goog.addDependency("../../../../../test/React App_files/1.chunk.js", [], []);
+goog.addDependency("../../../../../test/React App_files/popper.min.js", [], []);
