@@ -250,6 +250,8 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
 			(requestURL.indexOf('/c/') >= 0 ? '&click=1' : '') +
 			'&callback=' + callbackString,
 		function onError() {
+			// This occurs for all errors from these endpoints (/_r and /v1/deepview),
+			// including 5xx and no connectivity.
 			callback(new Error(utils.messages.blockedByClient), null);
 		},
 		function onLoad() {
@@ -411,6 +413,8 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	var done = function(err, data, status) {
 		if (typeof self.onAPIResponse === 'function') {
 			// Record every request and response, including retries
+			// Note status is always undefined for jsonp requests (/_r and
+			// /v1/deepview). These are loaded in async script tags.
 			self.onAPIResponse(
 				url,
 				resource.method,
