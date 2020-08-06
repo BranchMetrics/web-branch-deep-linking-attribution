@@ -1444,4 +1444,42 @@ describe('Server', function() {
 			});
 		});
 	});
+
+	describe('onAPIResponse', function() {
+		var assert = testUtils.unplanned();
+
+		beforeEach(function() {
+			requests = [];
+			storage.clear();
+			if (server.onAPIResponse) {
+				delete server.onAPIResponse;
+			}
+		});
+
+		it('receives all relevant fields from an XHR request if present', function(done) {
+			storage['set']('use_jsonp', false);
+
+			server.onAPIResponse = function(url, method, requestBody, error, status, responseBody) {
+				assert.strictEqual(url, resources.open.destination + resources.open.endpoint);
+				assert.strictEqual(method, resources.open.method);
+				assert.strictEqual(status, 200);
+				done();
+			};
+
+			server.request(
+				resources.open,
+				testUtils.params({
+					"link_identifier": "1111111111"
+				}),
+				storage,
+				function(err) {}
+			);
+
+			requests[0].respond(
+				200,
+				{ "Content-Type": "application/json" },
+				'{ "session_id": 123 }'
+			);
+		});
+	});
 });
