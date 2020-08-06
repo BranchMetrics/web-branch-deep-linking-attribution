@@ -519,6 +519,14 @@ utils.isSafari11OrGreater = function() {
 };
 
 /**
+ * Returns true if browser uses WebKit.
+ * @return {boolean}
+ */
+utils.isWebKitBrowser = function() {
+	return !!window.webkitURL;
+};
+
+/**
  * @param {string} key
  */
 utils.getParamValue = function(key) {

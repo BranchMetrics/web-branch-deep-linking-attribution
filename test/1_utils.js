@@ -1014,6 +1014,32 @@ describe('utils', function() {
 		});
 	});
 
+	describe('isWebKitBrowser function', function() {
+		var originalWebKitURL = window.webkitURL;
+
+		it('returns true when window.webkitURL is defined', function() {
+			// pretend to be webkit
+			if (!window.webkitURL) {
+				window.webkitURL = 'https://example.com';
+			}
+			assert.equal(utils.isWebKitBrowser(), true);
+		});
+
+		it('returns false when window.webkitURL is not defined', function() {
+			// pretend not to be webkit
+			if (window.webkitURL) {
+				delete window.webkitURL;
+			}
+			assert.equal(utils.isWebKitBrowser(), false);
+		});
+
+		if (originalWebKitURL !== undefined) {
+			window.webkitURL = originalWebKitURL;
+		}
+		else {
+			delete window.webkitURL;
+		}
+	});
 
 	describe('journey_cta', function(done) {
 		var html = 'html - validate("https://wdar9-alternate-qa.branchbeta.link/8ih4nDDQH8?__branch_flow_type=journeys_cta_override&__branch_flow_id=819580012495711960&__branch_mobile_deepview_type=4&_branch_match_id=814182034125937862&referrer=link_click_id%3D814182034125937862%26utm_source%3DBranch%26utm_campaign%3DChannel%20Test%26utm_medium%3Djourneys&_t=814182034125937862"); - html';
