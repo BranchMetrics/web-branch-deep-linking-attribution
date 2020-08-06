@@ -385,7 +385,7 @@ Branch.prototype['init'] = wrap(
 				params_r['_t'] = permData['browser_fingerprint_id'];
 			}
 
-			if (!utils.isSafari11OrGreater()) {
+			if (!utils.isWebKitBrowser()) {
 				self._api(
 					resources._r,
 					params_r,
@@ -572,7 +572,7 @@ Branch.prototype['init'] = wrap(
 		// Execute the /v1/open right away or after _open_delay_ms.
 		var open_delay = parseInt(utils.getParamValue('[?&]_open_delay_ms'), 10);
 
-		if (!utils.isSafari11OrGreater()) {
+		if (!utils.isWebKitBrowser()) {
 			self._api(
 				resources._r,
 				params_r,

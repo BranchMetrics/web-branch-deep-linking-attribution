@@ -469,16 +469,14 @@ describe('Branch', function() {
 			}
 		});
 
-		it('should not call _r if userAgent is safari 11 or greater',	function(done) {
-			var safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
-			setUserAgent(safari11Ua);
-			if (navigator.userAgent !== safari11Ua) {
-				return done();
+		it('should not call _r in a WebKit browser', function(done) {
+			var originalWebKitURL = window.webkitURL;
+			if (!window.webkitURL) {
+				window.webkitURL = 'https://example.com';
 			}
 
 			var branch = initBranch(false);
 			var assert = testUtils.plan(1, done);
-
 
 			branch.init(branch_sample_key);
 
@@ -490,7 +488,6 @@ describe('Branch', function() {
 				}
 			);
 			requests[1].callback(null, {});
-
 
 			assert.deepEqual(
 				requests[0].resource.endpoint,
@@ -514,14 +511,19 @@ describe('Branch', function() {
 				},
 				'Request to open params correct'
 			);
+
+			if (originalWebKitURL !== undefined) {
+				window.webkitURL = originalWebKitURL;
+			}
+			else {
+				delete window.webkitURL;
+			}
 		});
 
-		it('should not call _r if session present but no link_identifier and safari 11 or greater',
-			function(done) {
-			var safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
-			setUserAgent(safari11Ua);
-			if (navigator.userAgent !== safari11Ua) {
-				return done();
+		it('should not call _r if session present but no link_identifier and WebKit browser', function(done) {
+			var originalWebKitURL = window.webkitURL;
+			if (!window.webkitURL) {
+				window.webkitURL = 'https://example.com';
 			}
 
 			var branch = initBranch(false);
@@ -553,6 +555,13 @@ describe('Branch', function() {
 				'/v1/has-app',
 				'Second request should be sent to /v1/has-app'
 			);
+
+			if (originalWebKitURL !== undefined) {
+				window.webkitURL = originalWebKitURL;
+			}
+			else {
+				delete window.webkitURL;
+			}
 		});
 
 	});
