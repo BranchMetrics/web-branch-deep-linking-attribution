@@ -2295,3 +2295,8 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 	}
 	done();
 }, /* allowed before init */ true);
+
+Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, function(done, callback) {
+	this._server.onAPIResponse = callback;
+	done();
+}, /* allowed before init */ true);

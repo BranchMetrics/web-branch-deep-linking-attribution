@@ -62,7 +62,8 @@
 		'disableTracking',
 		'getBrowserFingerprintId',
 		'crossPlatformIds',
-		'lastAttributedTouchData'
+		'lastAttributedTouchData',
+		'setAPIResponseCallback'
 	],
 	0
 );
