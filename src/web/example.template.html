@@ -116,6 +116,16 @@
 	<script type="text/javascript">
 		// INSERT INIT CODE
 
+		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
+			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
+			if (error) {
+				console.log('Response: Error ' + error + '; status ' + JSON.stringify(status) + ' body=' + JSON.stringify(responseBody));
+			}
+			else {
+				console.log('Response: status ' + JSON.stringify(status) + ' body=' + JSON.stringify(responseBody));
+			}
+		});
+
 		// Note that this example is using the key in two places, here and below
 		branch.init('key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv', function(err, data) {
 			// Avoid XSS by HTML escaping the data for display
