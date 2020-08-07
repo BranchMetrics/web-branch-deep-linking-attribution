@@ -77,15 +77,16 @@
 		console.log('Initializing with branch_key=' + JSON.stringify(branch_key));
 		$('#request').text('branch.init(' + JSON.stringify(branch_key) + ', function(err, data) {...})');
 		branch.init(branch_key, function(err, data) {
-			$('#response').text(JSON.stringify(data));
 
 			// using jQuery .text() here avoids XSS in case this is ever hosted.
 			if (err) {
 				$('#info').text(JSON.stringify(err));
+				$('#response').text(JSON.stringify(err));
 				return;
 			}
 
 			$('#info').text(JSON.stringify(data));
+			$('#response').text(JSON.stringify(data));
 			$('.btn').removeAttr('disabled');
 		});
 	</script>
