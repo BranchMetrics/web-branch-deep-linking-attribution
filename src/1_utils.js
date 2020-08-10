@@ -467,6 +467,14 @@ function isSafari13OrGreateriPad(ua) {
 		screen.height > screen.width;
 }
 
+function isIOS(ua) {
+	return ua && /(iPad|iPod|iPhone)/.test(ua);
+}
+
+function isWKWebView() {
+	return !!(window.webkit && window.webkit.messageHandlers);
+}
+
 utils.mobileUserAgent = function() {
 	var ua = navigator.userAgent;
 	if (ua.match(/android/i)) {
@@ -524,6 +532,10 @@ utils.isSafari11OrGreater = function() {
  */
 utils.isWebKitBrowser = function() {
 	return !!window.webkitURL;
+};
+
+utils.isIOSWKWebView = function() {
+	return isIOS(navigator.userAgent) && isWKWebView();
 };
 
 /**
