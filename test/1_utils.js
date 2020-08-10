@@ -1041,6 +1041,70 @@ describe('utils', function() {
 		}
 	});
 
+	describe('isIOSWKWebView function', function() {
+		var originalUa = navigator.userAgent;
+		var originalWebKit = window.webkit;
+
+		function setUserAgent(ua) {
+			navigator.__defineGetter__("userAgent", function() {
+				return ua;
+			});
+		}
+
+		afterEach(function() {
+			setUserAgent(originalUa);
+			if (originalWebKit !== undefined) {
+				window.webkit = originalWebKit;
+			}
+			else {
+				delete window.webkit;
+			}
+		});
+
+		it('should return true when UA includes iPhone & window.webkit.messageHandlers is defined', function() {
+			setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
+			window.webkit = { messageHandlers: [] };
+
+			assert.equal(utils.isIOSWKWebView(), true);
+		});
+
+		it('should return true when UA includes iPad & window.webkit.messageHandlers is defined', function() {
+			setUserAgent('Mozilla/5.0 (iPad; U; CPU OS 5_1 like Mac OS X) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10 UCBrowser/3.4.3.532');
+			window.webkit = { messageHandlers: [] };
+
+			assert.equal(utils.isIOSWKWebView(), true);
+		});
+
+		it('should return true when UA includes iPod & window.webkit.messageHandlers is defined', function() {
+			// fake, based on iPhone from above
+			setUserAgent('Mozilla/5.0 (iPod; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
+			window.webkit = { messageHandlers: [] };
+
+			assert.equal(utils.isIOSWKWebView(), true);
+		});
+
+		it('should return false when UA is not iOS but window.webkit.messageHandlers is defined', function() {
+			setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:34.0) Gecko/20100101 Firefox/34.0');
+			window.webkit = { messageHandlers: [] };
+
+			assert.equal(utils.isIOSWKWebView(), false);
+		});
+
+		it('should return false when UA is iOS but window.webkit.messageHandlers is not defined', function() {
+			setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
+			window.webkit = {};
+
+			assert.equal(utils.isIOSWKWebView(), false);
+		});
+
+		it('should return false when UA is iOS but window.webkit is not defined', function() {
+			setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
+			delete window.webkit;
+
+			assert.equal(utils.isIOSWKWebView(), false);
+		});
+	});
+
 	describe('journey_cta', function(done) {
 		var html = 'html - validate("https://wdar9-alternate-qa.branchbeta.link/8ih4nDDQH8?__branch_flow_type=journeys_cta_override&__branch_flow_id=819580012495711960&__branch_mobile_deepview_type=4&_branch_match_id=814182034125937862&referrer=link_click_id%3D814182034125937862%26utm_source%3DBranch%26utm_campaign%3DChannel%20Test%26utm_medium%3Djourneys&_t=814182034125937862"); - html';
 
