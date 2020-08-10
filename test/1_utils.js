@@ -1085,7 +1085,7 @@ describe('utils', function() {
 				}
 
 			};
-			var htmlWithoutLink = 'html - validate(""); - html';
+			var htmlWithoutLink = 'html - validate("") - html';
 			assert.equal(journeys_utils.tryReplaceJourneyCtaLink(html).replace(link, ""), htmlWithoutLink);
 		});
 	});
