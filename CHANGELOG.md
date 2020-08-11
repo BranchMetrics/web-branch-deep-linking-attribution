@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.56.0] - 2020-08-11
+- [DASH-3022] Add support for $journeys_cta
+- [INTENG-10487] Add global callback for all API traffic
+
 ## [2.55.0] - 2020-07-27
 - [INTENG-9671] Detect animation state in Journeys
 - [INTENG-9975] Add support for _open_delay_ms
