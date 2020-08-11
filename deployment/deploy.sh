@@ -139,7 +139,7 @@ EOF
   # #uncomment to send updates to int-eng
   # #slackcli -t $SLACK_TOKEN -h int-eng -m $MESSAGE -u websdk-deploy -i $DEPLOY_IMG
   # slackcli -t $SLACK_TOKEN -h web-sdk -m "$CIRCLE_USERNAME deployed WebSDK v$VERSION" -u websdk-deploy -i $DEPLOY_IMG
-	#
+  #
   # echo "Please update the javascript version in https://github.com/BranchMetrics/documentation/edit/master/ingredients/web_sdk/_initialization.md"
 
   echo "Check the following links are valid:"
