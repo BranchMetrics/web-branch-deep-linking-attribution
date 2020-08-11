@@ -2411,6 +2411,52 @@ journeys_utils.setJourneyLinkData = function(a) {
   a && "object" === typeof a && 0 < Object.keys(a).length && (utils.removePropertiesFromObject(a, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b.journey_link_data = {}, utils.merge(b.journey_link_data, a));
   journeys_utils.journeyLinkData = b;
 };
+journeys_utils.getValueForKeyInBranchViewData = function(a) {
+  return journeys_utils && journeys_utils.branch && journeys_utils.branch._branchViewData && journeys_utils.branch._branchViewData.data ? journeys_utils.branch._branchViewData.data[a] : !1;
+};
+journeys_utils.hasJourneyCtaLink = function() {
+  return journeys_utils.getValueForKeyInBranchViewData("$journeys_cta") ? 0 < journeys_utils.getBranchViewDataItemOrUndefined("$journeys_cta").length : !1;
+};
+journeys_utils.getBranchViewDataItemOrUndefined = function(a) {
+  if (journeys_utils.getValueForKeyInBranchViewData(a)) {
+    return journeys_utils.branch._branchViewData.data[a];
+  }
+};
+journeys_utils.getJourneyCtaLink = function() {
+  return journeys_utils.getBranchViewDataItemOrUndefined("$journeys_cta");
+};
+journeys_utils.tryReplaceJourneyCtaLink = function(a) {
+  try {
+    if (journeys_utils.hasJourneyCtaLink()) {
+      return a.replace(/validate[(].+[)];/g, 'validate("' + journeys_utils.getJourneyCtaLink() + '");');
+    }
+  } catch (b) {
+  }
+  return a;
+};
+journeys_utils.trySetJourneyUrls = function(a, b) {
+  b = void 0 === b ? ["$android_url", "$ios_url", "$fallback_url", "$desktop_url"] : b;
+  if (!a) {
+    return a;
+  }
+  var c = function(a) {
+    return b.reduce(function(a, b) {
+      if (a[b]) {
+        return a;
+      }
+      var c = journeys_utils.getBranchViewDataItemOrUndefined(b);
+      c && (a[b] = c);
+      return a;
+    }, a);
+  };
+  try {
+    var d = JSON.parse(a.data);
+    a.data = JSON.stringify(c(d));
+    return a;
+  } catch (e) {
+    return a;
+  }
+};
 // Input 15
 var branch_view = {};
 function checkPreviousBanner() {
@@ -2462,7 +2508,9 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
     banner_utils.addClass(f, "branch-banner-is-active");
     var k = !1, h = b.callback_string, m = null, l = null, n = journeys_utils.branch._storage;
     if (a) {
-      var p = journeys_utils.getMetadata(a) || {}, q = window.setTimeout(function() {
+      var p = journeys_utils.getMetadata(a) || {};
+      a = journeys_utils.tryReplaceJourneyCtaLink(a);
+      var q = window.setTimeout(function() {
         window[h] = function() {
         };
       }, utils.timeout);

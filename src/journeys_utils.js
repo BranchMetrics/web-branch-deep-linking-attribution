@@ -917,3 +917,86 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 	}
 	journeys_utils.journeyLinkData = data;
 };
+
+journeys_utils.getValueForKeyInBranchViewData = function(key) {
+	if(!journeys_utils){
+		return false;
+	}
+
+	if(!journeys_utils.branch){
+		return false;
+	}
+
+	if(!journeys_utils.branch._branchViewData){
+		return false;
+	}
+
+	if(!journeys_utils.branch._branchViewData.data){
+		return false;
+	}
+
+	return journeys_utils.branch._branchViewData.data[key];
+};
+
+journeys_utils.hasJourneyCtaLink = function () {
+	if(!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')){
+		return false;
+	}
+
+	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta').length > 0;
+};
+
+journeys_utils.getBranchViewDataItemOrUndefined = function(name){
+	if(journeys_utils.getValueForKeyInBranchViewData(name)){
+		return journeys_utils.branch._branchViewData.data[name];
+	}
+	return undefined;
+};
+
+journeys_utils.getJourneyCtaLink = function () {
+	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
+};
+
+journeys_utils.tryReplaceJourneyCtaLink = function (html){
+	try{
+		if(journeys_utils.hasJourneyCtaLink()){
+			var journeyLinkReplacePattern = /validate[(].+[)];/g;
+			var pattern = 'validate("' + journeys_utils.getJourneyCtaLink() + '")'
+			var replacedHtml = html.replace(journeyLinkReplacePattern, pattern);
+			return replacedHtml.replace('window.top.location.replace(', 'window.top.location = ')
+		}
+	}catch(e){
+		return html;
+	}
+
+	return html;
+};
+
+journeys_utils.trySetJourneyUrls = function (linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
+	if(!linkElements){
+		return linkElements;
+	}
+
+	var assignUrls = function (data) {
+		return urls.reduce((value, url)=>{
+			if(value[url]){
+				return value;
+			}
+
+			var entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
+			if(entry){
+				value[url] = entry;
+			}
+			return value;
+		}, data);
+	};
+
+	try {
+		var data = (JSON.parse(linkElements.data));
+		linkElements.data = JSON.stringify(assignUrls(data));
+
+		return linkElements;
+	}catch(e){
+		return linkElements;
+	}
+};
