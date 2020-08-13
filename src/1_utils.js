@@ -536,7 +536,7 @@ utils.isWebKitBrowser = function() {
 
 utils.isIOSWKWebView = function() {
 	var ua = navigator.userAgent;
-	return this.isWebKitBrowser() && isIOS(ua) && !isChromeBrowser(ua);
+	return utils.isWebKitBrowser() && isIOS(ua) && !isChromeBrowser(ua);
 };
 
 /**
