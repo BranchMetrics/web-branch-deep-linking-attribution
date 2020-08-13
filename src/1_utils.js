@@ -439,7 +439,23 @@ function isSafariBrowser(ua) {
 }
 
 function isChromeBrowser(ua) {
-	return ua && /(chrome|crios)/i.test(ua);
+	return !!/(chrome|crios)/i.test(ua);
+}
+
+function isFirefoxBrowser(ua) {
+	return !!/(fxios|firefox)/i.test(ua);
+}
+
+function isEdgeBrowser(ua) {
+	return !!/edg/i.test(ua);
+}
+
+function isOperaBrowser(ua) {
+	return !!/(opt|opera)/i.test(ua);
+}
+
+function isYandexBrowser(ua) {
+	return !!/yabrowser/i.test(ua);
 }
 
 function isMacintoshDesktop(ua) {
@@ -536,7 +552,12 @@ utils.isWebKitBrowser = function() {
 
 utils.isIOSWKWebView = function() {
 	var ua = navigator.userAgent;
-	return utils.isWebKitBrowser() && isIOS(ua) && !isChromeBrowser(ua);
+	return utils.isWebKitBrowser() && isIOS(ua) && ua &&
+		!isChromeBrowser(ua) &&
+		!isFirefoxBrowser(ua) &&
+		!isEdgeBrowser(ua) &&
+		!isOperaBrowser(ua) &&
+		!isYandexBrowser(ua);
 };
 
 /**
