@@ -438,6 +438,10 @@ function isSafariBrowser(ua) {
 	return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
 }
 
+function isChromeBrowser(ua) {
+	return ua && /(chrome|crios)/i.test(ua);
+}
+
 function isMacintoshDesktop(ua) {
 	return ua && ua.indexOf('Macintosh') > -1;
 }
@@ -469,10 +473,6 @@ function isSafari13OrGreateriPad(ua) {
 
 function isIOS(ua) {
 	return ua && /(iPad|iPod|iPhone)/.test(ua);
-}
-
-function isWKWebView() {
-	return !!(window.webkit && window.webkit.messageHandlers);
 }
 
 utils.mobileUserAgent = function() {
@@ -535,7 +535,8 @@ utils.isWebKitBrowser = function() {
 };
 
 utils.isIOSWKWebView = function() {
-	return isIOS(navigator.userAgent) && isWKWebView();
+	var ua = navigator.userAgent;
+	return this.isWebKitBrowser() && isIOS(ua) && !isChromeBrowser(ua);
 };
 
 /**
