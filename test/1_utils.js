@@ -1044,6 +1044,16 @@ describe('utils', function() {
 	describe('isIOSWKWebView function', function() {
 		var originalUa = navigator.userAgent;
 		var originalWebKitURL = window.webkitURL;
+		var iOSBrowsers = {
+			safari: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Mobile/15E148 Safari/604.1',
+			chrome: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/84.0.4147.71 Mobile/15E148 Safari/604.1',
+			firefox: 'Mozilla/5.0 (iPhone; CPU OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/28.0 Mobile/15E148 Safari/605.1.15',
+			edge: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 EdgiOS/45.7.3 Mobile/15E148 Safari/605.1.15',
+			opera: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPT/2.4.4 Mobile/15E148',
+			yandex: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 YaBrowser/20.7.2.279.10 Mobile/15E148 Safari/604.1',
+			wkwebview: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)',
+			uiwebview: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+		};
 
 		function setUserAgent(ua) {
 			navigator.__defineGetter__("userAgent", function() {
@@ -1059,6 +1069,41 @@ describe('utils', function() {
 			else {
 				delete window.webkitURL;
 			}
+		});
+
+		it('should return false for Firefox', function() {
+			setUserAgent(iOSBrowsers.firefox);
+			window.webkitURL = function() {};
+
+			assert.equal(utils.isIOSWKWebView(), false);
+		});
+
+		it('should return false for Chrome', function() {
+			setUserAgent(iOSBrowsers.chrome);
+			window.webkitURL = function() {};
+
+			assert.equal(utils.isIOSWKWebView(), false);
+		});
+
+		it('should return false for Edge', function() {
+			setUserAgent(iOSBrowsers.edge);
+			window.webkitURL = function() {};
+
+			assert.equal(utils.isIOSWKWebView(), false);
+		});
+
+		it('should return false for Yandex', function() {
+			setUserAgent(iOSBrowsers.yandex);
+			window.webkitURL = function() {};
+
+			assert.equal(utils.isIOSWKWebView(), false);
+		});
+
+		it('should return false for Opera', function() {
+			setUserAgent(iOSBrowsers.firefox);
+			window.webkitURL = function() {};
+
+			assert.equal(utils.isIOSWKWebView(), false);
 		});
 
 		it('should return true when UA includes iPhone & window.webkitURL is defined', function() {
