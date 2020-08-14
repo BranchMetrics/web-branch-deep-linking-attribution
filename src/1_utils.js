@@ -435,7 +435,7 @@ utils.hashValue = function(key) {
 };
 
 function isSafariBrowser(ua) {
-	return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+	return !!/^((?!chrome|android|crios|firefox|fxios|edg|yabrowser).)*safari/i.test(ua);
 }
 
 function isChromeBrowser(ua) {
@@ -451,7 +451,7 @@ function isEdgeBrowser(ua) {
 }
 
 function isOperaBrowser(ua) {
-	return !!/(opt|opera)/i.test(ua);
+	return !!/(opt|opr)/i.test(ua);
 }
 
 function isYandexBrowser(ua) {
