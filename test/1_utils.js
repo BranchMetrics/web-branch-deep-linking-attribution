@@ -1043,7 +1043,7 @@ describe('utils', function() {
 
 	describe('isIOSWKWebView function', function() {
 		var originalUa = navigator.userAgent;
-		var originalWebKit = window.webkit;
+		var originalWebKitURL = window.webkitURL;
 
 		function setUserAgent(ua) {
 			navigator.__defineGetter__("userAgent", function() {
@@ -1053,53 +1053,46 @@ describe('utils', function() {
 
 		afterEach(function() {
 			setUserAgent(originalUa);
-			if (originalWebKit !== undefined) {
-				window.webkit = originalWebKit;
+			if (originalWebKitURL !== undefined) {
+				window.webkitURL = originalWebKitURL;
 			}
 			else {
-				delete window.webkit;
+				delete window.webkitURL;
 			}
 		});
 
-		it('should return true when UA includes iPhone & window.webkit.messageHandlers is defined', function() {
+		it('should return true when UA includes iPhone & window.webkitURL is defined', function() {
 			setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
-			window.webkit = { messageHandlers: [] };
+			window.webkitURL = function() {};
 
 			assert.equal(utils.isIOSWKWebView(), true);
 		});
 
-		it('should return true when UA includes iPad & window.webkit.messageHandlers is defined', function() {
+		it('should return true when UA includes iPad & window.webkitURL is defined', function() {
 			setUserAgent('Mozilla/5.0 (iPad; U; CPU OS 5_1 like Mac OS X) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10 UCBrowser/3.4.3.532');
-			window.webkit = { messageHandlers: [] };
+			window.webkitURL = function() {};
 
 			assert.equal(utils.isIOSWKWebView(), true);
 		});
 
-		it('should return true when UA includes iPod & window.webkit.messageHandlers is defined', function() {
+		it('should return true when UA includes iPod & window.webkitURL is defined', function() {
 			// fake, based on iPhone from above
 			setUserAgent('Mozilla/5.0 (iPod; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
-			window.webkit = { messageHandlers: [] };
+			window.webkitURL = function() {};
 
 			assert.equal(utils.isIOSWKWebView(), true);
 		});
 
-		it('should return false when UA is not iOS but window.webkit.messageHandlers is defined', function() {
+		it('should return false when UA is not iOS but window.webkitURL is defined', function() {
 			setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:34.0) Gecko/20100101 Firefox/34.0');
-			window.webkit = { messageHandlers: [] };
+			window.webkitURL = function() {};
 
 			assert.equal(utils.isIOSWKWebView(), false);
 		});
 
-		it('should return false when UA is iOS but window.webkit.messageHandlers is not defined', function() {
+		it('should return false when UA is iOS but window.webkitURL is not defined', function() {
 			setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
-			window.webkit = {};
-
-			assert.equal(utils.isIOSWKWebView(), false);
-		});
-
-		it('should return false when UA is iOS but window.webkit is not defined', function() {
-			setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; http://www.bing.com/bingbot.htm)');
-			delete window.webkit;
+			delete window.webkitURL;
 
 			assert.equal(utils.isIOSWKWebView(), false);
 		});
