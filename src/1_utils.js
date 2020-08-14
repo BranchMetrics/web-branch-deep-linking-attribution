@@ -435,7 +435,27 @@ utils.hashValue = function(key) {
 };
 
 function isSafariBrowser(ua) {
-	return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+	return !!/^((?!chrome|android|crios|firefox|fxios|edg|yabrowser).)*safari/i.test(ua);
+}
+
+function isChromeBrowser(ua) {
+	return !!/(chrome|crios)/i.test(ua);
+}
+
+function isFirefoxBrowser(ua) {
+	return !!/(fxios|firefox)/i.test(ua);
+}
+
+function isEdgeBrowser(ua) {
+	return !!/edg/i.test(ua);
+}
+
+function isOperaBrowser(ua) {
+	return !!/(opt|opr)/i.test(ua);
+}
+
+function isYandexBrowser(ua) {
+	return !!/yabrowser/i.test(ua);
 }
 
 function isMacintoshDesktop(ua) {
@@ -465,6 +485,10 @@ function isSafari13OrGreateriPad(ua) {
 		isMacintoshDesktop(ua) &&
 		isGTEVersion(ua, 13) &&
 		screen.height > screen.width;
+}
+
+function isIOS(ua) {
+	return ua && /(iPad|iPod|iPhone)/.test(ua);
 }
 
 utils.mobileUserAgent = function() {
@@ -516,6 +540,24 @@ utils.isSafari11OrGreater = function() {
 	}
 
 	return false;
+};
+
+/**
+ * Returns true if browser uses WebKit.
+ * @return {boolean}
+ */
+utils.isWebKitBrowser = function() {
+	return !!window.webkitURL;
+};
+
+utils.isIOSWKWebView = function() {
+	var ua = navigator.userAgent;
+	return utils.isWebKitBrowser() && ua && isIOS(ua) &&
+		!isChromeBrowser(ua) &&
+		!isFirefoxBrowser(ua) &&
+		!isEdgeBrowser(ua) &&
+		!isOperaBrowser(ua) &&
+		!isYandexBrowser(ua);
 };
 
 /**
