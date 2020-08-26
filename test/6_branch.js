@@ -479,7 +479,6 @@ describe('Branch', function() {
 			var branch = initBranch(false);
 			var assert = testUtils.plan(1, done);
 
-
 			branch.init(branch_sample_key);
 
 			requests[0].callback(
@@ -490,7 +489,6 @@ describe('Branch', function() {
 				}
 			);
 			requests[1].callback(null, {});
-
 
 			assert.deepEqual(
 				requests[0].resource.endpoint,
