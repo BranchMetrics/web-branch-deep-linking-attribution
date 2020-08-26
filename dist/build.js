@@ -934,7 +934,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.56.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.56.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1148,7 +1148,22 @@ utils.hashValue = function(a) {
   }
 };
 function isSafariBrowser(a) {
-  return !!/^((?!chrome|android|crios|fxios).)*safari/i.test(a);
+  return !!/^((?!chrome|android|crios|firefox|fxios|edg|yabrowser).)*safari/i.test(a);
+}
+function isChromeBrowser(a) {
+  return !!/(chrome|crios)/i.test(a);
+}
+function isFirefoxBrowser(a) {
+  return !!/(fxios|firefox)/i.test(a);
+}
+function isEdgeBrowser(a) {
+  return !!/edg/i.test(a);
+}
+function isOperaBrowser(a) {
+  return !!/(opt|opr)/i.test(a);
+}
+function isYandexBrowser(a) {
+  return !!/yabrowser/i.test(a);
 }
 function isMacintoshDesktop(a) {
   return a && -1 < a.indexOf("Macintosh");
@@ -1169,6 +1184,9 @@ function isGTEVersion(a, b) {
 function isSafari13OrGreateriPad(a) {
   return a && isSafariBrowser(a) && isMacintoshDesktop(a) && isGTEVersion(a, 13) && screen.height > screen.width;
 }
+function isIOS(a) {
+  return a && /(iPad|iPod|iPhone)/.test(a);
+}
 utils.mobileUserAgent = function() {
   var a = navigator.userAgent;
   return a.match(/android/i) ? "android" : a.match(/ipad/i) || isSafari13OrGreateriPad(a) ? "ipad" : a.match(/i(os|p(hone|od))/i) ? "ios" : a.match(/\(BB[1-9][0-9]*\;/i) ? "blackberry" : a.match(/Windows Phone/i) ? "windows_phone" : a.match(/Kindle/i) || a.match(/Silk/i) || a.match(/KFTT/i) || a.match(/KFOT/i) || a.match(/KFJWA/i) || a.match(/KFJWI/i) || a.match(/KFSOWI/i) || a.match(/KFTHWA/i) || a.match(/KFTHWI/i) || a.match(/KFAPWA/i) || a.match(/KFAPWI/i) ? "kindle" : !1;
@@ -1176,6 +1194,13 @@ utils.mobileUserAgent = function() {
 utils.isSafari11OrGreater = function() {
   var a = navigator.userAgent;
   return isSafariBrowser(a) ? isGTEVersion(a, 11) : !1;
+};
+utils.isWebKitBrowser = function() {
+  return !!window.webkitURL;
+};
+utils.isIOSWKWebView = function() {
+  var a = navigator.userAgent;
+  return utils.isWebKitBrowser() && a && isIOS(a) && !isChromeBrowser(a) && !isFirefoxBrowser(a) && !isEdgeBrowser(a) && !isOperaBrowser(a) && !isYandexBrowser(a);
 };
 utils.getParamValue = function(a) {
   try {
@@ -2714,7 +2739,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var h = function(a) {
     var b = {sdk:config.version, branch_key:d.branch_key}, c = session.get(d._storage) || {}, e = session.get(d._storage, !0) || {};
     e.browser_fingerprint_id && (b._t = e.browser_fingerprint_id);
-    utils.isSafari11OrGreater() || d._api(resources._r, b, function(a, b) {
+    utils.isSafari11OrGreater() || utils.isIOSWKWebView() || d._api(resources._r, b, function(a, b) {
       a && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message);
       b && (c.browser_fingerprint_id = b);
     });
@@ -2764,7 +2789,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     n.browser_fingerprint_id && (b._t = n.browser_fingerprint_id);
     n.identity && (d.identity = n.identity);
     var q = parseInt(utils.getParamValue("[?&]_open_delay_ms"), 10);
-    utils.isSafari11OrGreater() ? utils.delay(function() {
+    utils.isSafari11OrGreater() || utils.isIOSWKWebView() ? utils.delay(function() {
       d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || n.browser_fingerprint_id, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
