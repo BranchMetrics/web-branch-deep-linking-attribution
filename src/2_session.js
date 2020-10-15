@@ -58,7 +58,7 @@ session.update = function(storage, newData) {
  */
 session.patch = function(storage, data, updateLocalStorage, removeNull) {
 	var merge = function(source, patch) {
-		return utils.encodeBFPs(utils.merge(goog.json.parse(source), patch, removeNull));
+		return utils.encodeBFPs(utils.merge(safejson.parse(source), patch, removeNull));
 	};
 
 	var session = storage.get('branch_session', false) || {};
