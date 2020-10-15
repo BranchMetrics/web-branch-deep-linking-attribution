@@ -1685,7 +1685,7 @@ var session = {get:function(a, b) {
   }
 }, patch:function(a, b, c, d) {
   var e = function(a, b) {
-    return utils.encodeBFPs(utils.merge(goog.json.parse(a), b, d));
+    return utils.encodeBFPs(utils.merge(safejson.parse(a), b, d));
   }, f = a.get("branch_session", !1) || {};
   a.set("branch_session", goog.json.serialize(e(f, b)));
   c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(e(c, b)), !0));
