@@ -2481,7 +2481,7 @@ journeys_utils.trySetJourneyUrls = function(a, b) {
     }, a);
   };
   try {
-    var d = JSON.parse(a.data);
+    var d = safejson.parse(a.data);
     a.data = JSON.stringify(c(d));
     return a;
   } catch (e) {
@@ -2586,7 +2586,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   e.data = utils.merge(utils.getHostedDeepLinkData(), e.data);
   e.data = utils.merge(utils.whiteListJourneysLanguageData(f || {}), e.data);
   c && (e.data.link_click_id = c);
-  (a = f.data ? JSON.parse(f.data) : null) && a["+referrer"] && (e.data["+referrer"] = a["+referrer"]);
+  (a = f.data ? safejson.parse(f.data) : null) && a["+referrer"] && (e.data["+referrer"] = a["+referrer"]);
   return e = utils.cleanLinkData(e);
 };
 // Input 16
