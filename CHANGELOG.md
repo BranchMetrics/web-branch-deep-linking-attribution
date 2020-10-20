@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.56.2] - 2020-10-20
+- Remove more usage of unsafe JSON parse
+
 ## [2.56.1] - 2020-08-26
 - [CORE-1134 | Stop calling /_r in WKWebView]
 
