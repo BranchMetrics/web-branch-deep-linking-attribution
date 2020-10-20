@@ -173,7 +173,7 @@ fi
 # Rollbar updates
 if [ "$CIRCLE_BRANCH" == 'production' ] || [ "$CIRCLE_BRANCH" == 'master' ] ; then
     pip install requests
-    pip uninstall -y urllib3; pip install urllib3==1.25.4 --user
+    pip uninstall -y urllib3; pip install urllib3==1.22 --user
     deployment/rollbar.py
 fi
 
