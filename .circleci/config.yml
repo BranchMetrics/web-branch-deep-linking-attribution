@@ -60,7 +60,6 @@ jobs:
     - run:
         name: Run deployment script
         command: |
-            pip uninstall -y urllib3; pip install urllib3==1.22 --user
             deployment/deploy.sh
 
 workflows:

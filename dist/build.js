@@ -1685,7 +1685,7 @@ var session = {get:function(a, b) {
   }
 }, patch:function(a, b, c, d) {
   var e = function(a, b) {
-    return utils.encodeBFPs(utils.merge(goog.json.parse(a), b, d));
+    return utils.encodeBFPs(utils.merge(safejson.parse(a), b, d));
   }, f = a.get("branch_session", !1) || {};
   a.set("branch_session", goog.json.serialize(e(f, b)));
   c && (c = a.get("branch_session_first", !0) || {}, a.set("branch_session_first", goog.json.serialize(e(c, b)), !0));
@@ -2481,7 +2481,7 @@ journeys_utils.trySetJourneyUrls = function(a, b) {
     }, a);
   };
   try {
-    var d = JSON.parse(a.data);
+    var d = safejson.parse(a.data);
     a.data = JSON.stringify(c(d));
     return a;
   } catch (e) {
@@ -2586,7 +2586,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   e.data = utils.merge(utils.getHostedDeepLinkData(), e.data);
   e.data = utils.merge(utils.whiteListJourneysLanguageData(f || {}), e.data);
   c && (e.data.link_click_id = c);
-  (a = f.data ? JSON.parse(f.data) : null) && a["+referrer"] && (e.data["+referrer"] = a["+referrer"]);
+  (a = f.data ? safejson.parse(f.data) : null) && a["+referrer"] && (e.data["+referrer"] = a["+referrer"]);
   return e = utils.cleanLinkData(e);
 };
 // Input 16

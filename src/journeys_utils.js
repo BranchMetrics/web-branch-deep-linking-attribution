@@ -992,7 +992,7 @@ journeys_utils.trySetJourneyUrls = function (linkElements, urls = ['$android_url
 	};
 
 	try {
-		var data = (JSON.parse(linkElements.data));
+		var data = (safejson.parse(linkElements.data));
 		linkElements.data = JSON.stringify(assignUrls(data));
 
 		return linkElements;
