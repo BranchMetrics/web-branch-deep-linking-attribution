@@ -300,6 +300,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 		var data;
 		if (req.readyState === 4) {
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
+			// Got a response from the API. May be success or not. Should have a request ID.
+			var requestId = req.getResponseHeader('X-Branch-Request-Id');
 			if (req.status === 200) {
 				if (noparse) {
 					data = req.responseText;
@@ -312,10 +314,10 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 						data = {};
 					}
 				}
-				callback(null, data, req.status);
+				callback(null, data, req.status, requestId);
 			}
 			else if (req.status === 402) {
-				callback(new Error('Not enough credits to redeem.'), null, req.status);
+				callback(new Error('Not enough credits to redeem.'), null, req.status, requestId);
 			}
 			else if (req.status.toString().substring(0, 1) === '4' ||
 					req.status.toString().substring(0, 1) === '5') {
@@ -325,7 +327,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 					callback(req['responseText'], null, req['status']);
 				}
 				else {
-					callback(new Error('Error in API: ' + req.status), null, req.status);
+					callback(new Error('Error in API: ' + req.status), null, req.status, requestId);
 				}
 			}
 		}
@@ -410,7 +412,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	/***
 	 * @type {function(?Error,*=): ?undefined}
 	 */
-	var done = function(err, data, status) {
+	var done = function(err, data, status, requestId) {
 		if (typeof self.onAPIResponse === 'function') {
 			// Record every request and response, including retries
 			// Note status is always undefined for jsonp requests (/_r and
@@ -421,7 +423,8 @@ Server.prototype.request = function(resource, data, storage, callback) {
 				requestBody,
 				err,
 				status,
-				data
+				data,
+				requestId
 			);
 		}
 

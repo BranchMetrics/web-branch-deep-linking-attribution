@@ -116,8 +116,13 @@
 	<script type="text/javascript">
 		// INSERT INIT CODE
 
-		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
-			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
+		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody, requestId) {
+			if (requestId) {
+				console.log('Request [' + requestId + ']: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
+			}
+			else {
+				console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
+			}
 			if (error) {
 				console.log('Response: Error ' + error + '; status ' + JSON.stringify(status) + ' body=' + JSON.stringify(responseBody));
 			}
