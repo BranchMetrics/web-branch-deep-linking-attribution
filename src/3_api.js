@@ -324,7 +324,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 				// Server returns helpful information when a partner sends up incorrect fields in logEvent().
 				// This information appears in req.responseText.
 				if (req['responseURL'] && req['responseURL'].includes("v2/event")) {
-					callback(req['responseText'], null, req['status']);
+					callback(req['responseText'], null, req['status'], requestId);
 				}
 				else {
 					callback(new Error('Error in API: ' + req.status), null, req.status, requestId);
