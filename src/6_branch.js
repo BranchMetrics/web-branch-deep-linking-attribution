@@ -788,7 +788,8 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 				safejson.parse(data['referring_data']) :
 				null;
 
-			session.patch(self._storage, { "identity": identity }, true);
+			// /v1/profile will return a new identity_id, but the same session_id
+			session.patch(self._storage, { "identity": identity, "identity_id": self.identity_id }, true);
 			done(null, data);
 		}
 	);
@@ -838,6 +839,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"device_fingerprint_id": self.device_fingerprint_id || null
 		};
 
+		// /v1/logout will return a new identity_id and a new session_id
 		self.sessionLink = data['link'];
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];
