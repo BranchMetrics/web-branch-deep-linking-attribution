@@ -341,6 +341,11 @@ Branch.prototype['init'] = wrap(
 			utils.cleanApplicationAndSessionStorage(self);
 		}
 
+		// initialize identity_id from storage
+		// note the previous line scrubs this if tracking disabled.
+		var localData = session.get(self._storage, /* use local if possible */ true);
+		self.identity_id = localData && localData['identity_id'];
+
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {
 				self.link_click_id = data['link_click_id'].toString();
