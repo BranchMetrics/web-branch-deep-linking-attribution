@@ -415,10 +415,12 @@ describe('Server', function() {
 			it ('should not include developer identity', function(done) {
 				var assert = testUtils.plan(1, done);
 				storage.set('use_jsonp', false);
-				storage.set('identity', '12345678');
+				/*
+				 * Branch instance will pass identity, if set, but resources will filter it out.
+				 */
 				server.request(
 					resources.open,
-					testUtils.params({}),
+					testUtils.params({ identity: '12345678' }),
 					storage,
 					assert.done
 				);
