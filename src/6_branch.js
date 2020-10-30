@@ -380,7 +380,7 @@ Branch.prototype['init'] = wrap(
 			options['branch_match_id'] :
 			null;
 		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
-		var freshInstall = !sessionData || !sessionData['identity_id'];
+		var freshInstall = !self.identity_id; // initialized from local storage above
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(cb) {
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
