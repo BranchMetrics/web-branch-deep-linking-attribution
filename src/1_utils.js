@@ -238,7 +238,7 @@ utils.whiteListSessionData = function(data) {
 		'data': data['data'] || "",
 		'data_parsed': data['data_parsed'] || {},
 		'has_app': utils.getBooleanOrNull(data['has_app']),
-		'identity': data['developer_identity'] || null,
+		'identity': data['identity'] || null,
 		'developer_identity': data['developer_identity'] || null,
 		'referring_identity': data['referring_identity'] || null,
 		'referring_link': data['referring_link'] || null
