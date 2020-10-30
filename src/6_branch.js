@@ -343,7 +343,7 @@ Branch.prototype['init'] = wrap(
 
 		// initialize identity_id from storage
 		// note the previous line scrubs this if tracking disabled.
-		var localData = session.get(self._storage, /* use local if possible */ true);
+		var localData = session.get(self._storage, true);
 		self.identity_id = localData && localData['identity_id'];
 
 		var setBranchValues = function(data) {
