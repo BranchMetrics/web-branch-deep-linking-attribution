@@ -554,6 +554,7 @@
 		};
 
 		var assertions = [
+			'ok',
 			'fail',
 			'equal',
 			'notEqual',

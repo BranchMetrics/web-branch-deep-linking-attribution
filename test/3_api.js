@@ -412,6 +412,25 @@ describe('Server', function() {
 				assert.strictEqual(requests.length, 0, 'No request made');
 			});
 
+			it ('should not include developer identity', function(done) {
+				var assert = testUtils.plan(1, done);
+				storage.set('use_jsonp', false);
+				storage.set('identity', '12345678');
+				server.request(
+					resources.open,
+					testUtils.params({}),
+					storage,
+					assert.done
+				);
+				var request = requests[0];
+				assert.ok(!request.requestBody.includes('identity='), 'Does not include identity');
+				requests[0].respond(
+					200,
+					{ "Content-Type": "application/json" },
+					'{ "session_id": 123 }'
+				);
+			});
+
 		});
 
 		describe('/v1/profile', function() {
