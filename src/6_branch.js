@@ -341,6 +341,11 @@ Branch.prototype['init'] = wrap(
 			utils.cleanApplicationAndSessionStorage(self);
 		}
 
+		// initialize identity_id from storage
+		// note the previous line scrubs this if tracking disabled.
+		var localData = session.get(self._storage, true);
+		self.identity_id = localData && localData['identity_id'];
+
 		var setBranchValues = function(data) {
 			if (data['link_click_id']) {
 				self.link_click_id = data['link_click_id'].toString();
@@ -375,7 +380,7 @@ Branch.prototype['init'] = wrap(
 			options['branch_match_id'] :
 			null;
 		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
-		var freshInstall = !sessionData || !sessionData['identity_id'];
+		var freshInstall = !self.identity_id; // initialized from local storage above
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var checkHasApp = function(cb) {
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
@@ -788,7 +793,8 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 				safejson.parse(data['referring_data']) :
 				null;
 
-			session.patch(self._storage, { "identity": identity }, true);
+			// /v1/profile will return a new identity_id, but the same session_id
+			session.patch(self._storage, { "identity": identity, "identity_id": self.identity_id }, true);
 			done(null, data);
 		}
 	);
@@ -838,6 +844,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 			"device_fingerprint_id": self.device_fingerprint_id || null
 		};
 
+		// /v1/logout will return a new identity_id and a new session_id
 		self.sessionLink = data['link'];
 		self.session_id = data['session_id'];
 		self.identity_id = data['identity_id'];

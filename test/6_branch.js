@@ -584,17 +584,17 @@ describe('Branch', function() {
 	describe('setIdentity', function() {
 		basicTests('setIdentity', [ 1 ]);
 
-		var expectedRequest = testUtils.params(
-			{ "identity": "test_identity" },
-			[ "_t" ]
-		);
-		var expectedResponse = {
-			identity_id: '12345',
-			link: 'url',
-			referring_data: '{ }',
-			referring_identity: '12345'
-		};
 		it('should call api with identity', function(done) {
+			var expectedRequest = testUtils.params(
+				{ "identity": "test_identity" },
+				[ "_t" ]
+			);
+			var expectedResponse = {
+				identity_id: '12345',
+				link: 'url',
+				referring_data: '{ }',
+				referring_identity: '12345'
+			};
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
@@ -607,11 +607,20 @@ describe('Branch', function() {
 			requests[0].callback(null, expectedResponse);
 			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
+
+		it('should update identity and identity_id in local storage', function(done) {
+			var branch = initBranch(true);
+			var assert = testUtils.plan(2, done);
+			branch.setIdentity('12345678', function(err, data) {
+				var localData = safejson.parse(localStorage.getItem('branch_session_first'));
+				assert.strictEqual(localData['identity'], '12345678');
+				assert.strictEqual(localData['identity_id'], '7654321');
+			});
+			requests[0].callback(null, { identity: '12345678', identity_id: '7654321' });
+		});
 	});
 
 	describe('setIdentity accepts empty data', function() {
-		basicTests('setIdentity', [ 1 ]);
-
 		var expectedRequest = testUtils.params(
 			{ "identity": "test_identity" },
 			[ "_t" ]
