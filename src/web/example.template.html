@@ -52,6 +52,7 @@
 				<div class="group">
 					<button id="init" class="btn btn-success">.init()</button>
 					<button id="data" class="btn btn-info">.data()</button>
+					<button id="first" class="btn btn-info">.first()</button>
 					<input class="example-input" type="text" id="identityID" class="form-control" placeholder="test@test.com">
 					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
 					<button id="logout" class="btn btn-info">.logout()</button>
@@ -170,6 +171,12 @@
 		$('#data').click(function() {
 			request.html('branch.data();');
 			branch.data(function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		});
+		$('#first').click(function() {
+			request.html('branch.first();');
+			branch.first(function(err, data) {
 				response.html(err || JSON.stringify(data));
 			});
 		});

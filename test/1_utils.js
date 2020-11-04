@@ -58,9 +58,13 @@ describe('utils', function() {
 	describe('whiteListSessionData', function() {
 		it('should remove unwanted params', function() {
 			/*
-			 * This actually describes how whitelistSessionData works. It looks for
-			 * developer_identity in the input and outputs both identity and
-			 * developer_identity. Perhaps this is used as a filter elsewhere.
+			 * This is only used with responses to /v1/open, so there will never
+			 * be a developer_identity (or user_data.developer_identity), just
+			 * identity. As of 2.56.2, both params in every open response are null.
+			 * This has been changed so that each is mapped to itself in the
+			 * whitelisted response passed to the developer. Removing
+			 * developer_identity seems risky, but setting identity to the correct
+			 * value is an improvement over two nulls.
 			 */
 			var input = {
 				"data": "string",
@@ -68,6 +72,7 @@ describe('utils', function() {
 					"key": "value"
 				},
 				"has_app": true,
+				"identity": "90210",
 				"developer_identity": "67890",
 				"referring_identity": "12345",
 				"referring_link": null,
@@ -79,7 +84,7 @@ describe('utils', function() {
 					"key": "value"
 				},
 				"has_app": true,
-				"identity": "67890",
+				"identity": "90210",
 				"developer_identity": "67890",
 				"referring_identity": "12345",
 				"referring_link": null
