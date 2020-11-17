@@ -60,9 +60,11 @@ utils.userPreferences = {
 		// This precludes a filter on the path. Only apply the whitelist to
 		// service endpoints.
 		var whiteListDomains = [ config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint ];
-		// https://www.w3schools.com/jsref/prop_anchor_origin.asp
-		// "Return the protocol, hostname and port number of a link."
-		var urlOrigin = urlParser.origin;
+		var urlOrigin = urlParser.origin; // Property origin is defined on Anchor https://www.w3schools.com/jsref/prop_anchor_origin.asp
+		// Excess of caution: Make sure no trailing slash in urlOrigin.
+		if (urlOrigin.endsWith('/')) {
+			urlOrigin = urlOrigin.substring(0, urlOrigin.length - 1);
+		}
 		if (!whiteListDomains.includes(urlOrigin)) {
 			return false;
 		}
