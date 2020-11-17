@@ -46,7 +46,8 @@ utils.userPreferences = {
 	whiteListedEndpointsWithData: {
 		'/v1/open': { 'link_identifier':'\\d+' },
 		'/v1/pageview': { 'event': 'pageview' },
-		'/v1/dismiss': { 'event': 'dismiss' }
+		'/v1/dismiss': { 'event': 'dismiss' },
+		'/v1/url': { }
 	},
 	allowErrorsInCallback: false,
 	shouldBlockRequest: function(url, requestData) {

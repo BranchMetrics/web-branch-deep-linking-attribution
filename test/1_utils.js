@@ -85,7 +85,7 @@ describe('utils', function() {
 				},
 				"has_app": true,
 				"identity": "90210",
-				"developer_identity": "67890",
+				"developer_identity": "90210",
 				"referring_identity": "12345",
 				"referring_link": null
 			};
