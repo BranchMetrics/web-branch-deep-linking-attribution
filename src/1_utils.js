@@ -79,8 +79,7 @@ utils.userPreferences = {
 
 		// INTENG-11512
 		// To allow SMS when tracking disabled, we must allow POST https://bnc.lt/c/<whatever>
-		var urlPathComponents = urlPath.split('/');
-		if (urlPathComponents.length == 3 && urlPathComponents[1] === 'c') {
+		if (urlPath.startsWith('/c/')) {
 			return false;
 		}
 
