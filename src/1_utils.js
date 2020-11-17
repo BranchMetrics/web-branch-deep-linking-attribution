@@ -54,12 +54,32 @@ utils.userPreferences = {
 		// Used by 3_api.js to determine whether a request should be blocked
 		var urlParser = document.createElement('a');
 		urlParser.href = url;
+
+		// INTENG-11512
+		// To allow SMS when tracking disabled, we must allow GET <actual link>.
+		// This precludes a filter on the path. Only apply the whitelist to
+		// service endpoints.
+		var whiteListDomains = [ config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint ];
+		// https://www.w3schools.com/jsref/prop_anchor_origin.asp
+		// "Return the protocol, hostname and port number of a link."
+		var urlOrigin = urlParser.origin;
+		if (!whiteListDomains.includes(urlOrigin)) {
+			return false;
+		}
+
 		var urlPath = urlParser.pathname;
 
 		// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
 		// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
 		if (urlPath[0] != '/') {
 			urlPath = '/' + urlPath;
+		}
+
+		// INTENG-11512
+		// To allow SMS when tracking disabled, we must allow POST https://bnc.lt/c/<whatever>
+		var urlPathComponents = urlPath.split('/');
+		if (urlPathComponents.length == 3 && urlPathComponents[1] === 'c') {
+			return false;
 		}
 
 		var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
