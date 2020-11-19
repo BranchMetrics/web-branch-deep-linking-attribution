@@ -85,7 +85,7 @@ describe('utils', function() {
 				},
 				"has_app": true,
 				"identity": "90210",
-				"developer_identity": "67890",
+				"developer_identity": "90210",
 				"referring_identity": "12345",
 				"referring_link": null
 			};
@@ -974,6 +974,12 @@ describe('utils', function() {
 		});
 		it('should return true with v1/xyz as url endpoint and with bogus request data', function() {
 			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/xyz', { link_identifier: '111111111111' }));
+		});
+		it('should allow raw links', function() {
+			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://bnctestbed.app.link/abcdefg'));
+		});
+		it('should allow SMS posts', function() {
+			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://bnc.lt/c/hello'));
 		});
 	});
 
