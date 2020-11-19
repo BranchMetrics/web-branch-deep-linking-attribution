@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.57.1] - 2020-11-19
+- [INTENG-11512] Support SMS when tracking disabled
+- [INTENG-11551] Support link generation when tracking disabled
+
 ## [2.57.0] - 2020-11-04
 - [INTENG-11098] Corrected handling of developer identity in /v1/open and elsewhere.
 - [CORE-1417] Corrected behavior of `branch.first()` (also added to example.html).

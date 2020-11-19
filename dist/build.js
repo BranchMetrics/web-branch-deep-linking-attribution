@@ -1,5 +1,13 @@
 (function() {// Input 0
-var $jscomp = {scope:{}};
+var $jscomp = {scope:{}, checkStringArgs:function(a, b, c) {
+  if (null == a) {
+    throw new TypeError("The 'this' value for String.prototype." + c + " must not be null or undefined");
+  }
+  if (b instanceof RegExp) {
+    throw new TypeError("First argument to String.prototype." + c + " must not be a regular expression");
+  }
+  return a + "";
+}};
 $jscomp.defineProperty = "function" == typeof Object.defineProperties ? Object.defineProperty : function(a, b, c) {
   if (c.get || c.set) {
     throw new TypeError("ES3 does not support getters and setters.");
@@ -10,6 +18,51 @@ $jscomp.getGlobal = function(a) {
   return "undefined" != typeof window && window === a ? a : "undefined" != typeof global && null != global ? global : a;
 };
 $jscomp.global = $jscomp.getGlobal(this);
+$jscomp.polyfill = function(a, b, c, d) {
+  if (b) {
+    c = $jscomp.global;
+    a = a.split(".");
+    for (d = 0;d < a.length - 1;d++) {
+      var e = a[d];
+      e in c || (c[e] = {});
+      c = c[e];
+    }
+    a = a[a.length - 1];
+    d = c[a];
+    b = b(d);
+    b != d && null != b && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
+  }
+};
+$jscomp.polyfill("String.prototype.endsWith", function(a) {
+  return a ? a : function(a, c) {
+    var b = $jscomp.checkStringArgs(this, a, "endsWith");
+    a += "";
+    void 0 === c && (c = b.length);
+    for (var e = Math.max(0, Math.min(c | 0, b.length)), f = a.length;0 < f && 0 < e;) {
+      if (b[--e] != a[--f]) {
+        return !1;
+      }
+    }
+    return 0 >= f;
+  };
+}, "es6-impl", "es3");
+$jscomp.polyfill("String.prototype.includes", function(a) {
+  return a ? a : function(a, c) {
+    return -1 !== $jscomp.checkStringArgs(this, a, "includes").indexOf(a, c || 0);
+  };
+}, "es6-impl", "es3");
+$jscomp.polyfill("String.prototype.startsWith", function(a) {
+  return a ? a : function(a, c) {
+    var b = $jscomp.checkStringArgs(this, a, "startsWith");
+    a += "";
+    for (var e = b.length, f = a.length, g = Math.max(0, Math.min(c | 0, b.length)), k = 0;k < f && g < e;) {
+      if (b[g++] != a[k++]) {
+        return !1;
+      }
+    }
+    return k >= f;
+  };
+}, "es6-impl", "es3");
 $jscomp.SYMBOL_PREFIX = "jscomp_symbol_";
 $jscomp.initSymbol = function() {
   $jscomp.initSymbol = function() {
@@ -63,35 +116,6 @@ $jscomp.iteratorFromArray = function(a, b) {
   };
   return d;
 };
-$jscomp.polyfill = function(a, b, c, d) {
-  if (b) {
-    c = $jscomp.global;
-    a = a.split(".");
-    for (d = 0;d < a.length - 1;d++) {
-      var e = a[d];
-      e in c || (c[e] = {});
-      c = c[e];
-    }
-    a = a[a.length - 1];
-    d = c[a];
-    b = b(d);
-    b != d && null != b && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
-  }
-};
-$jscomp.checkStringArgs = function(a, b, c) {
-  if (null == a) {
-    throw new TypeError("The 'this' value for String.prototype." + c + " must not be null or undefined");
-  }
-  if (b instanceof RegExp) {
-    throw new TypeError("First argument to String.prototype." + c + " must not be a regular expression");
-  }
-  return a + "";
-};
-$jscomp.polyfill("String.prototype.includes", function(a) {
-  return a ? a : function(a, c) {
-    return -1 !== $jscomp.checkStringArgs(this, a, "includes").indexOf(a, c || 0);
-  };
-}, "es6-impl", "es3");
 $jscomp.polyfill("Number.isFinite", function(a) {
   return a ? a : function(a) {
     return "number" !== typeof a ? !1 : !isNaN(a) && Infinity !== a && -Infinity !== a;
@@ -934,7 +958,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.57.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.57.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -981,11 +1005,19 @@ utils.calculateBrtt = function(a) {
   return a && "number" === typeof a ? (Date.now() - a).toString() : null;
 };
 utils.dismissEventToSourceMapping = {didClickJourneyClose:"Button(X)", didClickJourneyContinue:"Dismiss Journey text"};
-utils.userPreferences = {trackingDisabled:!1, whiteListedEndpointsWithData:{"/v1/open":{link_identifier:"\\d+"}, "/v1/pageview":{event:"pageview"}, "/v1/dismiss":{event:"dismiss"}}, allowErrorsInCallback:!1, shouldBlockRequest:function(a, b) {
+utils.userPreferences = {trackingDisabled:!1, whiteListedEndpointsWithData:{"/v1/open":{link_identifier:"\\d+"}, "/v1/pageview":{event:"pageview"}, "/v1/dismiss":{event:"dismiss"}, "/v1/url":{}}, allowErrorsInCallback:!1, shouldBlockRequest:function(a, b) {
   var c = document.createElement("a");
   c.href = a;
+  var d = [config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint], e = c.origin;
+  e.endsWith("/") && (e = e.substring(0, e.length - 1));
+  if (!d.includes(e)) {
+    return !1;
+  }
   c = c.pathname;
   "/" != c[0] && (c = "/" + c);
+  if (c.startsWith("/c/")) {
+    return !1;
+  }
   c = utils.userPreferences.whiteListedEndpointsWithData[c];
   if (!c) {
     return !0;
@@ -994,9 +1026,8 @@ utils.userPreferences = {trackingDisabled:!1, whiteListedEndpointsWithData:{"/v1
     if (!b) {
       return !0;
     }
-    for (var d in c) {
-      var e = new RegExp(c[d]);
-      if (!b.hasOwnProperty(d) || !e.test(b[d])) {
+    for (var f in c) {
+      if (d = new RegExp(c[f]), !b.hasOwnProperty(f) || !d.test(b[f])) {
         return !0;
       }
     }
