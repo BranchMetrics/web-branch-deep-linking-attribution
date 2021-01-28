@@ -24,7 +24,7 @@ jobs:
     - run:
         name: Install Node, Sauce, Phantom, etc.
         command: |
-            npm install ;
+            sudo npm install ;
             sudo npm install -g jsdox ;
             mocha-phantomjs --help || sudo npm install -g mocha-phantomjs ;
             wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate ;
