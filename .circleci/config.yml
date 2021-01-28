@@ -48,7 +48,7 @@ jobs:
         command: |
             sudo apt-get install -qq -y python-pip libpython-dev ;
             curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
-            pip install awscli --upgrade --user && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
+            pip install awscli && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
             sudo npm install -g slack-cli ;
     - run:
         name: Build minified JS
