@@ -2,8 +2,8 @@ version: 2
 jobs:
   build:
     working_directory: ~/web-branch-deep-linking
-    docker:
-    - image: circleci/node:14.15.0
+    machine:
+       image: ubuntu-2004:202010-01
     steps:
     - run:
         name: Set up NPM auth token
