@@ -22,13 +22,10 @@ jobs:
             mkdir -p compiler/library ;
             stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library) ;
     - run:
-        name: Install Node, Sauce, Phantom, etc.
+        name: Install NPM dependencies
         command: |
-            sudo npm install ;
+            npm install ;
             sudo npm install -g jsdox ;
-            mocha-phantomjs --help || sudo npm install -g mocha-phantomjs ;
-            wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate ;
-            tar -xzf sc-4.3.13-linux.tar.gz ;
             jscs --help || sudo npm install -g jscs ;
             jshint -v || sudo npm install -g jshint ;
             which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
