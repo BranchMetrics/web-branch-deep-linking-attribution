@@ -154,27 +154,6 @@
 				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 			}
 		};
-		var qrCodeParams = {
-			tags: [ 'tag1', 'tag2' ],
-			channel: 'sample app',
-			feature: 'create link',
-			stage: 'created link',
-			type: 1,
-			data: {
-				mydata: 'bar',
-				'$desktop_url': 'https://cdn.branch.io/example.html',
-				'$og_title': 'Branch Metrics',
-				'$og_description': 'Branch Metrics',
-				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
-			},
-			qr_code_settings: {
-		        "code_color":"#000000",
-		        "background_color": "#FFFFFF",
-		        "margin": 5, 
-		        "width": 1000,
-		        "image_format": "png"
-		    }
-		};
 		var getInputVal = function(inputID) {
 			var inputElement = $(inputID);
 			if (!inputElement.val()) {
@@ -236,9 +215,6 @@
 			});
 		});
 		$('#qrCode').click(function() {
-			// var smsOptions = {};
-			// request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
-		// console.log('call qrCode');
 			var qr_code_settings = {
 			        "code_color":"#000000",
 			        "background_color": "#FFFFFF",
@@ -262,8 +238,7 @@
 
 			};
 			branch.qrCode(qrCodeParams, qr_code_settings, function(err, data) {
-				// console.log('data: ' + data);
-				// response.html(err || JSON.stringify(data) || 'undefined');
+				// TODO: Insert the link onto a page
 			});
 		});
 		$('#sendSMS').click(function() {
