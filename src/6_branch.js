@@ -61,6 +61,7 @@ var init_state_fail_codes = {
  * @param {boolean=} init
  */
 var wrap = function(parameters, func, init) {
+	console.log('wrap');
 	var r = function() {
 		var self = this;
 		var args;
@@ -152,7 +153,6 @@ Branch = function() {
  * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
-
 	if (this.app_id) {
 		obj['app_id'] = this.app_id;
 	}
@@ -1419,6 +1419,102 @@ Branch.prototype['sendSMS'] = wrap(
 	}
 );
 
+Branch.prototype['qrCode'] = wrap(
+	callback_params.CALLBACK_ERR,
+	function(done, linkData, qrCodeSettings, options) {
+		// var self = this;
+		// if (typeof options === 'function') {
+		// 	options = { };
+		// }
+		// else if (typeof options === 'undefined' || options === null) {
+		// 	options = { };
+		// }
+
+		// console('6_branch: qrCode');
+		// TODO: worry about make_new_link thing?
+		var data = utils.cleanLinkData(linkData);
+		data['qr_code_settings'] = safejson.stringify(utils.convertObjectValuesToString(qrCodeSettings || {}));
+		this._api(
+			resources.qrCode,
+			utils.cleanLinkData(linkData),
+			function(err, data) {
+				// console(err);
+				// console("data: " + data);
+				return done(err || null, data || null);
+				// if (err) {
+				// 	return done(err);
+				// }
+				// var url = data['url'];
+				// if (!/(bnc.lt\/|app\.link\/)/.test(url)) {
+				// 	url = config.link_service_endpoint + '/' + utils.extractDeeplinkPath(url);
+				// }
+				// self._api(
+				// 	resources.linkClick,
+				// 	{
+				// 		"link_url": url,
+				// 		"click": "click"
+				// 	},
+				// 	function(err, data) {
+				// 		if (err) {
+				// 			return done(err);
+				// 		}
+				// 		sendSMS(data['click_id']);
+				// 	}
+				// );
+			}
+		);
+
+		// options["make_new_link"] = options["make_new_link"] || false;
+
+		// if (!linkData['channel'] || linkData['channel'] === 'app banner') {
+		// 	linkData['channel'] = 'sms';
+		// }
+
+		// function sendSMS(click_id) {
+		// 	self._api(
+		// 		resources.SMSLinkSend, {
+		// 			"link_url": click_id,
+		// 			"phone": phone
+		// 		},
+		// 		function(err) {
+		// 			done(err || null);
+		// 		});
+		// }
+
+		// var referringLink = self._referringLink();
+		// if (referringLink && !options['make_new_link']) {
+		// 	sendSMS(utils.getClickIdAndSearchStringFromLink(referringLink));
+		// }
+		// else {
+		// 	self._api(
+		// 		resources.link,
+		// 		utils.cleanLinkData(linkData),
+		// 		function(err, data) {
+		// 			if (err) {
+		// 				return done(err);
+		// 			}
+		// 			var url = data['url'];
+		// 			if (!/(bnc.lt\/|app\.link\/)/.test(url)) {
+		// 				url = config.link_service_endpoint + '/' + utils.extractDeeplinkPath(url);
+		// 			}
+		// 			self._api(
+		// 				resources.linkClick,
+		// 				{
+		// 					"link_url": url,
+		// 					"click": "click"
+		// 				},
+		// 				function(err, data) {
+		// 					if (err) {
+		// 						return done(err);
+		// 					}
+		// 					sendSMS(data['click_id']);
+		// 				}
+		// 			);
+		// 		}
+		// 	);
+		// }
+	}
+);
 /**
  * @function Branch.deepview
  * @param {Object} data - _required_ - object of all link data, same as branch.link().

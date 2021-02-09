@@ -63,7 +63,8 @@
 		'getBrowserFingerprintId',
 		'crossPlatformIds',
 		'lastAttributedTouchData',
-		'setAPIResponseCallback'
+		'setAPIResponseCallback',
+		'qrCode'
 	],
 	0
 );

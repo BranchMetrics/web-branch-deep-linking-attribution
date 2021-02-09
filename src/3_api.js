@@ -352,6 +352,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
 
+	console.log('data: ' + JSON.stringify(data));
 	if (resource.endpoint === "/v1/pageview" && data && data['journey_displayed']) {
 		// special case for pageview endpoint
 		utils.currentRequestBrttTag = resource.endpoint + '-1-brtt';

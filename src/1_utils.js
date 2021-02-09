@@ -182,7 +182,7 @@ utils.httpMethod = {
  * queryPart: ?Object.<string, _validator>,
  * jsonp: ?boolean
  * }} */
-utils.resource;
+utils.x;
 
 /** @typedef {{listener: function(string, Object):null, event: string}} */
 utils.listener;
@@ -385,7 +385,6 @@ utils.cleanLinkData = function(linkData) {
 	catch (e) {
 		data = goog.json.serialize(data);
 	}
-
 	linkData['data'] = data;
 
 	return linkData;

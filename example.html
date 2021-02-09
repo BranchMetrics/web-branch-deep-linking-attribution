@@ -5,7 +5,7 @@
 	<meta content="http://branch.io/img/logo_icon_black.png" property="og:image" />
 	<meta content="Branch Metrics Web SDK Example App" property="og:title" />
 	<meta content="A basic example to demonstrate some of the ways that the Web SDK can be used" property="og:description" />
-	<meta content='key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv' name='branch_key'/>
+	<meta content='key_live_hkDytPACtipny3N9XmnbZlapBDdj4WIL' name='branch_key'/>
 	<title>Branch Metrics Web SDK Example App</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	<style type="text/css">
@@ -64,6 +64,7 @@
 				<div class="group">
 					<button id="track" class="btn btn-info">.track()</button>
 					<button id="link" class="btn btn-info">.link()</button>
+					<button id="qrCode" class="btn btn-info">.qrCode()</button>
 					<button id="banner" class="btn btn-info">.banner()</button>
 					<button id="disable-tracking" class="btn btn-info">.disableTracking(true)</button>
 					<button id="enable-tracking" class="btn btn-info">.disableTracking(false)</button>
@@ -118,7 +119,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback".split(" "), 0);
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link qrCode logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback".split(" "), 0);
 
 		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
 			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
@@ -152,6 +153,27 @@
 				'$og_description': 'Branch Metrics',
 				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 			}
+		};
+		var qrCodeParams = {
+			tags: [ 'tag1', 'tag2' ],
+			channel: 'sample app',
+			feature: 'create link',
+			stage: 'created link',
+			type: 1,
+			data: {
+				mydata: 'bar',
+				'$desktop_url': 'https://cdn.branch.io/example.html',
+				'$og_title': 'Branch Metrics',
+				'$og_description': 'Branch Metrics',
+				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+			},
+			qr_code_settings: {
+		        "code_color":"#000000",
+		        "background_color": "#FFFFFF",
+		        "margin": 5, 
+		        "width": 1000,
+		        "image_format": "png"
+		    }
 		};
 		var getInputVal = function(inputID) {
 			var inputElement = $(inputID);
@@ -211,6 +233,37 @@
 			request.html('branch.link(' + JSON.stringify(sampleParams) + ');');
 			branch.link(sampleParams, function(err, link) {
 				response.html('<a href="' + link + '">' + link + '</a>');
+			});
+		});
+		$('#qrCode').click(function() {
+			// var smsOptions = {};
+			// request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
+		// console.log('call qrCode');
+			var qr_code_settings = {
+			        "code_color":"#000000",
+			        "background_color": "#FFFFFF",
+			        "margin": 5, 
+			        "width": 1000,
+			        "image_format": "png"
+			    };
+		 	var qrCodeParams = {
+				tags: [ 'tag1', 'tag2' ],
+				channel: 'sample app',
+				feature: 'create link',
+				stage: 'created link',
+				type: 1,
+				data: {
+					mydata: 'bar',
+					'$desktop_url': 'https://cdn.branch.io/example.html',
+					'$og_title': 'Branch Metrics',
+					'$og_description': 'Branch Metrics',
+					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+				}
+
+			};
+			branch.qrCode(qrCodeParams, qr_code_settings, function(err, data) {
+				// console.log('data: ' + data);
+				// response.html(err || JSON.stringify(data) || 'undefined');
 			});
 		});
 		$('#sendSMS').click(function() {
