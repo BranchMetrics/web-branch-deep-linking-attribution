@@ -1432,8 +1432,7 @@ Branch.prototype['qrCode'] = wrap(
 				if (!error && rawBuffer) {
 					qrCodeResult.rawBuffer = rawBuffer;
 					try {
-						// qrCodeResult.base64 = btoa(unescape(encodeURIComponent(rawBuffer)));
-						qrCodeResult.base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawBuffer)));;
+						qrCodeResult.base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawBuffer)));
 					}
 					catch (encodingError) {
 						error = encodingError;

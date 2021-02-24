@@ -55,7 +55,7 @@ Server.prototype.serializeObject = function(obj, prefix) {
 };
 
 /**
- * @param {utils.resource} resource
+ * @param {Object.<string, *>} resource
  * @param {Object.<string, *>} data
  */
 Server.prototype.getUrl = function(resource, data) {
@@ -281,8 +281,8 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {utils._httpMethod} method
  * @param {storage} storage
  * @param {function(?Error,*=,?=)=} callback
- * @param {?boolean=} noparse
- * @param {?string} responseType
+ * @param {?boolean=} noParse - _optional_ -
+ * @param {?string} reponseType - _optional_ -
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback, noParse, responseType) {
 	var brtt = Date.now();
@@ -350,7 +350,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, noP
 };
 
 /**
- * @param {utils.resource} resource
+ * @param {Object.<string, *>} resource
  * @param {Object.<string, *>} data
  * @param {storage} storage
  * @param {function(?Error,*=)=} callback
