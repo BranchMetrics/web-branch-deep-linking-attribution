@@ -147,7 +147,7 @@ Branch = function() {
 };
 
 /***
- * @param {utils.resource} resource
+ * @param {Object.<string, *>} resource
  * @param {Object.<string, *>} obj
  * @param {function(?Error,?)=} callback
  */
@@ -1427,8 +1427,19 @@ Branch.prototype['qrCode'] = wrap(
 		this._api(
 			resources.qrCode,
 			utils.cleanLinkData(linkData),
-			function(err, data) {
-				return done(err || null, data || null);
+			function(error, rawBuffer) {
+				var qrCodeResult = {};
+				if (!error && rawBuffer) {
+					qrCodeResult.rawBuffer = rawBuffer;
+					try {
+						// qrCodeResult.base64 = btoa(unescape(encodeURIComponent(rawBuffer)));
+						qrCodeResult.base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawBuffer)));;
+					}
+					catch (encodingError) {
+						error = encodingError;
+					}
+				}
+				return done(error || null, qrCodeResult || null);
 			}
 		);
 	}

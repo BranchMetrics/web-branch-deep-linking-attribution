@@ -282,8 +282,9 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {storage} storage
  * @param {function(?Error,*=,?=)=} callback
  * @param {?boolean=} noparse
+ * @param {?string} responseType
  */
-Server.prototype.XHRRequest = function(url, data, method, storage, callback, noparse, responseType) {
+Server.prototype.XHRRequest = function(url, data, method, storage, callback, noParse, responseType) {
 	var brtt = Date.now();
 	var brttTag = utils.currentRequestBrttTag;
 	var req = (window.XMLHttpRequest ?
@@ -306,7 +307,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 		if (req.readyState === 4) {
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
-				if (noparse) {
+				if (noParse) {
 					data = req.response;
 				}
 				else {

@@ -240,12 +240,10 @@
 					'$og_description': 'Branch Metrics',
 					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 				}
-
 			};
 			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, image) {
 				// First Encode array buffer as UTF-8 String, then Base64 Encode
-				var base64image = btoa(String.fromCharCode.apply(null, new Uint8Array(image)));
-				response.html('<img src="data:image/png;charset=utf-8;base64,' + base64image + '" width="500" height="500">');		
+				response.html('<img src="data:image/png;charset=utf-8;base64,' + image.base64 + '" width="500" height="500">');
 			});
 		});
 		$('#sendSMS').click(function() {
