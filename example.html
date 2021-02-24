@@ -237,8 +237,69 @@
 				}
 
 			};
-			branch.qrCode(qrCodeParams, qr_code_settings, function(err, data) {
-				// TODO: Insert the link onto a page
+			branch.qrCode(qrCodeParams, qr_code_settings, function(err, image) {
+				// convert to Base64
+				// alert('branch.qrCode1');
+				// alert('clientdata: ' + err + ' ' + image);
+
+
+				//alert('image: ' + image);
+				// console.log('url.createObj: ' + URL.createObjectURL(image));
+				// console.log('encodeURIComponent: ' + encodeURIComponent(image));
+				// console.log('unescape: ' + unescape(image));
+				// console.log('btoa(unescape(: ' + btoa(image));
+
+				// var base64image = btoa(image);
+
+				console.log('image type: ' + typeof(image))
+				console.log('image: ' + image);
+				// console.log('raw: ' + image.replace(/\r/g, ''));
+				var base64image = btoa(unescape(encodeURIComponent(image)));
+
+				var arr = new Uint8Array(image);
+				console.log('uInt8Array: ' + arr);
+				var raw = String.fromCharCode.apply(null,arr);
+				console.log('raw: ' + raw);
+				// uInt8Array = Uint8Array.from(image);
+			 //    var i = uInt8Array.length;
+			 //    console.log('len: ' + i);
+			 //    var binaryString = new Array(i);
+			 //    while (i--)
+			 //    {
+			 //      binaryString[i] = String.fromCharCode(uInt8Array[i]);
+			 //    }
+
+			 	function b64EncodeUnicode(str) {
+				    // first we use encodeURIComponent to get percent-encoded UTF-8,
+				    // then we convert the percent encodings into raw bytes which
+				    // can be fed into btoa.
+				    return encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+				        function toSolidBytes(match, p1) {
+				            return String.fromCharCode('0x' + p1);
+				    });
+				}
+
+			    // var base64image = btoa(unescape(b64EncodeUnicode(image)));
+			    // var base64image = utils.base64encode()
+
+				// base64image = btoa(
+		  //         new Uint8Array(image
+		  //           .reduce((data, byte) => data + String.fromCharCode(byte), '')));
+		  		// var blob =  URL.createObjectURL(new Blob([image], {type: 'image/png'}));
+
+
+				base64image = btoa(String.fromCharCode.apply(null, new Uint8Array(image)));
+
+				console.log('base64image: ' + base64image);
+				// alert('image: ' + '<img src="data:image/png;base64,' + base64image + '"" width="500" height="500">');
+				// response.html('<img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Red dot" />');
+				response.html('<img src="data:image/png;charset=utf-8;base64,' + base64image + '" width="500" height="500">');
+
+
+				// response.html('<img src="' + blob + '" width="500" height="500">');
+
+
+				
 			});
 		});
 		$('#sendSMS').click(function() {

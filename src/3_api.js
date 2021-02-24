@@ -289,6 +289,8 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 	var req = (window.XMLHttpRequest ?
 			new XMLHttpRequest() :
 			new ActiveXObject('Microsoft.XMLHTTP'));
+	alert('request.responseType: ' + req.responseType);
+	req.responseType = "arraybuffer";
 	req.ontimeout = function() {
 		utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 		callback(new Error(utils.messages.timeout), null, 504);
@@ -302,7 +304,9 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
 				if (noparse) {
-					data = req.responseText;
+					alert('request.responseType2: ' + req.getResponseHeader('content-type'));
+					// alert('base64res: ' + utils.base64encode(req.response));
+					data = req.response;
 				}
 				else {
 					try {
@@ -441,12 +445,17 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		return utils.userPreferences.allowErrorsInCallback ? done(new Error(utils.messages.trackingDisabled), null, 300) : done(null, {}, 200);
 	}
 
+	var noParseJsonResp = false;
+	if (resource.endpoint === "/v1/qr-code") {
+		noParseJsonResp = true;
+	}
+
 	var makeRequest = function() {
 		if (storage.get('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);
 		}
 		else {
-			self.XHRRequest(url, postData, resource.method, storage, done);
+			self.XHRRequest(url, postData, resource.method, storage, done, noParseJsonResp);
 		}
 	};
 	makeRequest();

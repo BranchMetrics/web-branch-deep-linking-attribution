@@ -1420,7 +1420,7 @@ Branch.prototype['sendSMS'] = wrap(
 );
 
 Branch.prototype['qrCode'] = wrap(
-	callback_params.CALLBACK_ERR,
+	callback_params.CALLBACK_ERR_DATA,
 	function(done, linkData, qrCodeSettings, options) {
 		var data = utils.cleanLinkData(linkData);
 		data['qr_code_settings'] = safejson.stringify(utils.convertObjectValuesToString(qrCodeSettings || {}));

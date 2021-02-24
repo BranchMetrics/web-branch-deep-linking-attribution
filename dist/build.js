@@ -1838,6 +1838,8 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
   var g = Date.now(), k = utils.currentRequestBrttTag, h = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  alert("request.responseType: " + h.responseType);
+  h.responseType = "arraybuffer";
   h.ontimeout = function() {
     utils.addPropertyIfNotNull(utils.instrumentation, k, utils.calculateBrtt(g));
     e(Error(utils.messages.timeout), null, 504);
@@ -1850,7 +1852,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
     if (4 === h.readyState) {
       if (utils.addPropertyIfNotNull(utils.instrumentation, k, utils.calculateBrtt(g)), 200 === h.status) {
         if (f) {
-          a = h.responseText;
+          alert("request.responseType2: " + h.getResponseHeader("content-type")), a = h.response;
         } else {
           try {
             a = safejson.parse(h.responseText);
@@ -1878,7 +1880,6 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f) {
 };
 Server.prototype.request = function(a, b, c, d) {
   var e = this;
-  console.log("data: " + JSON.stringify(b));
   utils.currentRequestBrttTag = "/v1/pageview" === a.endpoint && b && b.journey_displayed ? a.endpoint + "-1-brtt" : a.endpoint + "-brtt";
   ("/v1/url" === a.endpoint || "/v1/has-app" === a.endpoint) && 1 < Object.keys(utils.instrumentation).length && (delete utils.instrumentation["-brtt"], b.instrumentation = safejson.stringify(utils.merge({}, utils.instrumentation)), utils.instrumentation = {});
   if (utils.userPreferences.trackingDisabled) {
@@ -1894,21 +1895,23 @@ Server.prototype.request = function(a, b, c, d) {
   "GET" === a.method ? k = f.url + "?" + f.data : (k = f.url, h = f.data);
   var l;
   l = c.get("use_jsonp") || a.jsonp ? b : h;
-  var m = utils.retries, p = function(b, c, f) {
+  var m = utils.retries, n = function(b, c, f) {
     if ("function" === typeof e.onAPIResponse) {
       e.onAPIResponse(k, a.method, l, b, f, c);
     }
     b && 0 < m && "5" === (f || "").toString().substring(0, 1) ? (m--, window.setTimeout(function() {
-      n();
+      q();
     }, utils.retry_delay)) : d(b, c);
   };
   if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(k, b)) {
-    return utils.userPreferences.allowErrorsInCallback ? p(Error(utils.messages.trackingDisabled), null, 300) : p(null, {}, 200);
+    return utils.userPreferences.allowErrorsInCallback ? n(Error(utils.messages.trackingDisabled), null, 300) : n(null, {}, 200);
   }
-  var n = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(k, b, a.method, p) : e.XHRRequest(k, h, a.method, c, p);
+  var p = !1;
+  "/v1/qr-code" === a.endpoint && (p = !0);
+  var q = function() {
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(k, b, a.method, n) : e.XHRRequest(k, h, a.method, c, n, p);
   };
-  n();
+  q();
 };
 // Input 10
 var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", error_timeout:2000, success_timeout:3000, removeElement:function(a) {
@@ -2071,7 +2074,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, p = function() {
+  }, n = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -2081,13 +2084,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var n = e.value;
-    /^\d{7,}$/.test(n.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(n, d, c, function(a) {
-      a ? (b._publishEvent("sendBannerSMSError"), p()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+    var p = e.value;
+    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
+      a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : p();
+    })) : n();
   }
 }, banner = function(a, b, c, d) {
   function e() {
@@ -2125,7 +2128,7 @@ var sendSMS = function(a, b, c, d) {
       });
     };
   }
-  var k = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, p = g.getElementById("branch-banner-close"), n = function(a, c) {
+  var k = banner_utils.getBodyStyle("margin-top"), h = document.body.style.marginTop, l = banner_utils.getBodyStyle("margin-bottom"), m = document.body.style.marginBottom, n = g.getElementById("branch-banner-close"), p = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
     "top" === b.position ? f.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (f.style.bottom = "-" + banner_utils.bannerHeight);
@@ -2139,17 +2142,17 @@ var sendSMS = function(a, b, c, d) {
       banner_utils.removeClass(document.body, "branch-banner-is-active");
     }, banner_utils.animationDelay));
   };
-  p && (p.onclick = function(b) {
+  n && (n.onclick = function(b) {
     b.preventDefault();
     a._publishEvent("willCloseBanner");
-    n({}, function() {
+    p({}, function() {
       a._publishEvent("didCloseBanner");
     });
   });
   banner_utils.addClass(document.body, "branch-banner-is-active");
   "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, k) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, l));
   b.immediate ? e() : setTimeout(e, banner_utils.animationDelay);
-  return n;
+  return p;
 };
 // Input 14
 var journeys_utils = {_callback_index:1, position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[], isSafeAreaEnabled:!1};
@@ -2571,9 +2574,9 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
     f.id = "branch-banner";
     document.body.insertBefore(f, null);
     banner_utils.addClass(f, "branch-banner-is-active");
-    var k = !1, h = b.callback_string, l = null, m = null, p = journeys_utils.branch._storage;
+    var k = !1, h = b.callback_string, l = null, m = null, n = journeys_utils.branch._storage;
     if (a) {
-      var n = journeys_utils.getMetadata(a) || {};
+      var p = journeys_utils.getMetadata(a) || {};
       a = journeys_utils.tryReplaceJourneyCtaLink(a);
       var q = window.setTimeout(function() {
         window[h] = function() {
@@ -2581,7 +2584,7 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
       }, utils.timeout);
       window[h] = function(a) {
         window.clearTimeout(q);
-        k || (m = a, journeys_utils.finalHookups(c, g, p, m, l, n, e, branch_view));
+        k || (m = a, journeys_utils.finalHookups(c, g, n, m, l, p, e, branch_view));
       };
       l = renderHtmlBlob(document.body, a, b.has_app_websdk);
       journeys_utils.banner = l;
@@ -2589,7 +2592,7 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
         k = !0;
         return;
       }
-      journeys_utils.finalHookups(c, g, p, m, l, n, e, branch_view);
+      journeys_utils.finalHookups(c, g, n, m, l, p, e, branch_view);
       utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart());
     }
     document.body.removeChild(f);
@@ -2676,7 +2679,6 @@ appindexing.populateConfigFromAppLinksTags = function(a) {
 };
 // Input 17
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, init_state_fail_codes = {NO_FAILURE:0, UNKNOWN_CAUSE:1, OPEN_FAILED:2, BFP_NOT_FOUND:3, HAS_APP_FAILED:4}, wrap = function(a, b, c) {
-  console.log("wrap");
   return function() {
     var d = this, e, f, g = arguments[arguments.length - 1];
     a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
@@ -2811,7 +2813,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         utils.userPreferences.trackingDisabled && (utils.userPreferences.allowErrorsInCallback = !0);
       });
     });
-  }, p = function() {
+  }, n = function() {
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && !d.changeEventListenerAdded && (d.changeEventListenerAdded = !0, document.addEventListener(b, function() {
@@ -2819,18 +2821,18 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }, !1));
   };
   if (b && b.session_id && !g && !utils.getParamValue("branchify_url")) {
-    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), p(), h(m);
+    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), n(), h(m);
   } else {
     b = {sdk:config.version, branch_key:d.branch_key};
-    var n = session.get(d._storage, !0) || {};
-    n.browser_fingerprint_id && (b._t = n.browser_fingerprint_id);
-    n.identity && (d.identity = n.identity);
+    var p = session.get(d._storage, !0) || {};
+    p.browser_fingerprint_id && (b._t = p.browser_fingerprint_id);
+    p.identity && (d.identity = p.identity);
     var q = parseInt(utils.getParamValue("[?&]_open_delay_ms"), 10);
     utils.isSafari11OrGreater() || utils.isIOSWKWebView() ? utils.delay(function() {
-      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || n.browser_fingerprint_id, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
+      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || p.browser_fingerprint_id, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
         a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
         a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
-        p();
+        n();
         m(a, b);
       });
     }, q) : d._api(resources._r, b, function(a, b) {
@@ -2838,10 +2840,10 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = a.message, m(a, null);
       }
       utils.delay(function() {
-        d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || b, alternative_browser_fingerprint_id:n.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
+        d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || b, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(a, b) {
           a && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = a.message);
           a || "object" !== typeof b || (b.branch_view_enabled && (d._branchViewEnabled = !!b.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (b.click_id = g));
-          p();
+          n();
           m(a, b);
         });
       }, q);
@@ -2983,7 +2985,7 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
     });
   });
 });
-Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
+Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c, d) {
   utils.cleanLinkData(b).qr_code_settings = safejson.stringify(utils.convertObjectValuesToString(c || {}));
   this._api(resources.qrCode, utils.cleanLinkData(b), function(b, c) {
     return a(b || null, c || null);
