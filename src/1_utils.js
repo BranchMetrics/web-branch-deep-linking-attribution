@@ -182,7 +182,7 @@ utils.httpMethod = {
  * queryPart: ?Object.<string, _validator>,
  * jsonp: ?boolean
  * }} */
-utils.x;
+utils.resource;
 
 /** @typedef {{listener: function(string, Object):null, event: string}} */
 utils.listener;

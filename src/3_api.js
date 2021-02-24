@@ -55,7 +55,7 @@ Server.prototype.serializeObject = function(obj, prefix) {
 };
 
 /**
- * @param {Object.<string, *>} resource
+ * @param {utils.resource} resource
  * @param {Object.<string, *>} data
  */
 Server.prototype.getUrl = function(resource, data) {
@@ -350,7 +350,7 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, noP
 };
 
 /**
- * @param {Object.<string, *>} resource
+ * @param {utils.resource} resource
  * @param {Object.<string, *>} data
  * @param {storage} storage
  * @param {function(?Error,*=)=} callback
