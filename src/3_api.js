@@ -283,14 +283,17 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {function(?Error,*=,?=)=} callback
  * @param {?boolean=} noparse
  */
-Server.prototype.XHRRequest = function(url, data, method, storage, callback, noparse) {
+Server.prototype.XHRRequest = function(url, data, method, storage, callback, noparse, responseType) {
 	var brtt = Date.now();
 	var brttTag = utils.currentRequestBrttTag;
 	var req = (window.XMLHttpRequest ?
 			new XMLHttpRequest() :
 			new ActiveXObject('Microsoft.XMLHTTP'));
-	alert('request.responseType: ' + req.responseType);
-	req.responseType = "arraybuffer";
+
+	if (responseType) {
+		req.responseType = responseType;
+	}
+
 	req.ontimeout = function() {
 		utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 		callback(new Error(utils.messages.timeout), null, 504);
@@ -304,8 +307,6 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
 				if (noparse) {
-					alert('request.responseType2: ' + req.getResponseHeader('content-type'));
-					// alert('base64res: ' + utils.base64encode(req.response));
 					data = req.response;
 				}
 				else {
@@ -446,8 +447,10 @@ Server.prototype.request = function(resource, data, storage, callback) {
 	}
 
 	var noParseJsonResp = false;
+	var responseType;
 	if (resource.endpoint === "/v1/qr-code") {
 		noParseJsonResp = true;
+		responseType = "arraybuffer";
 	}
 
 	var makeRequest = function() {
@@ -455,7 +458,7 @@ Server.prototype.request = function(resource, data, storage, callback) {
 			self.jsonpRequest(url, data, resource.method, done);
 		}
 		else {
-			self.XHRRequest(url, postData, resource.method, storage, done, noParseJsonResp);
+			self.XHRRequest(url, postData, resource.method, storage, done, noParseJsonResp, responseType);
 		}
 	};
 	makeRequest();
