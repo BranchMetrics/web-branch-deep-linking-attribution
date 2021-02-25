@@ -147,7 +147,7 @@ Branch = function() {
 };
 
 /***
- * @param {Object.<string, *>} resource
+ * @param {utils.resource} resource
  * @param {Object.<string, *>} obj
  * @param {function(?Error,?)=} callback
  */
