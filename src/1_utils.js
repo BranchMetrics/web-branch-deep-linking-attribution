@@ -385,7 +385,6 @@ utils.cleanLinkData = function(linkData) {
 	catch (e) {
 		data = goog.json.serialize(data);
 	}
-
 	linkData['data'] = data;
 
 	return linkData;

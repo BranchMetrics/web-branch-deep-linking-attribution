@@ -1420,6 +1420,88 @@ Branch.prototype['sendSMS'] = wrap(
 );
 
 /**
+ * @function Branch.qrCode
+ * @param {Object} linkData - _required_ - object of all link data, same as branch.link().
+ * @param {Object=} qrCodeSettings - _optional_ - options
+ *     image_format: Image format, "png" or "jpeg"
+ *     code_color: String Hex color value of the QR Code
+ *     background_color: String Hex color value of the background of the QR code
+ *     margin: Integer (Pixels) The number of pixels you want for the margin. Max 20.
+ *     width: Integer (Pixels) Output size of QR Code image.
+ * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
+ *
+ * Returns a qrCode with the specified linkData.
+ *
+ * #### Usage
+ * ```js
+ * branch.qrCode(
+ *     linkData,
+ *     qrCodeSettings,
+ *     callback (err, link)
+ * );
+ * ```
+ *
+ * #### Example
+ * ```js
+ *  var qrCodeSettings = {
+ *      "code_color":"#000000",
+ *      "background_color": "#FFFFFF",
+ *      "margin": 5,
+ *      "width": 1000,
+ *      "image_format": "png"
+ *  };
+ *  var qrCodeLinkData = {
+ *      tags: [ 'tag1', 'tag2' ],
+ *      channel: 'sample app',
+ *      feature: 'create link',
+ *      stage: 'created link',
+ *      type: 1,
+ *      data: {
+ *          mydata: 'bar',
+ *          '$desktop_url': 'https://cdn.branch.io/example.html',
+ *          '$og_title': 'Branch Metrics',
+ *          '$og_description': 'Branch Metrics',
+ *          '$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+ *      }
+ *  };
+ * branch.qrCode(qrCodeLinkData, qrCodeSettings, function(err, qrCode) {
+ *    response.html('<img src="data:image/png;charset=utf-8;base64,' + qrCode.base64() + '" width="500" height="500">');
+ * });
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback(
+ *     "Error message",
+ *     QrCode // Branch QrCode object
+ * );
+ * ```
+ /*** +TOC_ITEM #qrCode-options-callback &.qrCode()& ^ALL ***/
+Branch.prototype['qrCode'] = wrap(
+	callback_params.CALLBACK_ERR_DATA,
+	function(done, linkData, qrCodeSettings, options) {
+		var data = utils.cleanLinkData(linkData);
+		data['qr_code_settings'] = safejson.stringify(utils.convertObjectValuesToString(qrCodeSettings || {}));
+		this._api(
+			resources.qrCode,
+			utils.cleanLinkData(linkData),
+			function(error, rawBuffer) {
+				function QrCode() { };
+
+				QrCode.rawBuffer = rawBuffer;
+				QrCode.base64 = function() {
+					// First Encode array buffer as UTF-8 String, then Base64 Encode
+					if (this.rawBuffer) {
+						return btoa(String.fromCharCode.apply(null, new Uint8Array(this.rawBuffer)));
+					}
+					throw Error('QrCode.rawBuffer is empty.');
+				};
+				return done(error || null, QrCode || null);
+			}
+		);
+	}
+);
+/**
  * @function Branch.deepview
  * @param {Object} data - _required_ - object of all link data, same as branch.link().
  * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if
