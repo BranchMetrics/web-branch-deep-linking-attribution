@@ -1486,7 +1486,7 @@ Branch.prototype['qrCode'] = wrap(
 			resources.qrCode,
 			utils.cleanLinkData(linkData),
 			function(error, rawBuffer) {
-				function QrCode() { };
+				function QrCode() { }
 
 				QrCode.rawBuffer = rawBuffer;
 				QrCode.base64 = function() {

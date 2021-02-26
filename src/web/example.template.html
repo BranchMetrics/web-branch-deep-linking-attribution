@@ -70,6 +70,12 @@
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>QR Code</h4>
+				<div class="group">
+					<button id="qrCode" class="btn btn-info">.qrCode()</button>
+				</div>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
 				<h4>SMS</h4>
 				<div class="group">
 					<input class="example-input" type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
@@ -211,6 +217,32 @@
 			request.html('branch.link(' + JSON.stringify(sampleParams) + ');');
 			branch.link(sampleParams, function(err, link) {
 				response.html('<a href="' + link + '">' + link + '</a>');
+			});
+		});
+		$('#qrCode').click(function() {
+			var qrCodeSettings = {
+			        "code_color":"#000000",
+			        "background_color": "#FFFFFF",
+			        "margin": 5,
+			        "width": 1000,
+			        "image_format": "png"
+			    };
+			var qrCodeParams = {
+				tags: [ 'tag1', 'tag2' ],
+				channel: 'sample app',
+				feature: 'create link',
+				stage: 'created link',
+				type: 1,
+				data: {
+					mydata: 'bar',
+					'$desktop_url': 'https://cdn.branch.io/example.html',
+					'$og_title': 'Branch Metrics',
+					'$og_description': 'Branch Metrics',
+					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+				}
+			};
+			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, qrCode) {
+				response.html('<img src="data:image/png;charset=utf-8;base64,' + qrCode.base64() + '" width="500" height="500">');
 			});
 		});
 		$('#sendSMS').click(function() {
