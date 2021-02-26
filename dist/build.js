@@ -2991,15 +2991,15 @@ Branch.prototype.sendSMS = wrap(callback_params.CALLBACK_ERR, function(a, b, c, 
 Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c, d) {
   utils.cleanLinkData(b).qr_code_settings = safejson.stringify(utils.convertObjectValuesToString(c || {}));
   this._api(resources.qrCode, utils.cleanLinkData(b), function(b, c) {
-    var d = {};
-    if (!b && c) {
-      d.rawBuffer = c;
-      try {
-        d.base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(c)));
-      } catch (h) {
-        b = h;
-      }
+    function d() {
     }
+    d.rawBuffer = c;
+    d.base64 = function() {
+      if (this.rawBuffer) {
+        return btoa(String.fromCharCode.apply(null, new Uint8Array(this.rawBuffer)));
+      }
+      throw Error("QrCode.rawBuffer is empty.");
+    };
     return a(b || null, d || null);
   });
 });

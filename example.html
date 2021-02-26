@@ -241,8 +241,8 @@
 					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 				}
 			};
-			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, image) {
-				response.html('<img src="data:image/png;charset=utf-8;base64,' + image.base64 + '" width="500" height="500">');
+			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, qrCode) {
+				response.html('<img src="data:image/png;charset=utf-8;base64,' + qrCode.base64() + '" width="500" height="500">');
 			});
 		});
 		$('#sendSMS').click(function() {
