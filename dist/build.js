@@ -1850,13 +1850,17 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f, g) {
     var a;
     if (4 === l.readyState) {
       if (utils.addPropertyIfNotNull(utils.instrumentation, k, utils.calculateBrtt(h)), 200 === l.status) {
-        if (f) {
+        if ("arraybuffer" === l.responseType) {
           a = l.response;
         } else {
-          try {
-            a = safejson.parse(l.responseText);
-          } catch (n) {
-            a = {};
+          if (f) {
+            a = l.responseText;
+          } else {
+            try {
+              a = safejson.parse(l.responseText);
+            } catch (n) {
+              a = {};
+            }
           }
         }
         e(null, a, l.status);

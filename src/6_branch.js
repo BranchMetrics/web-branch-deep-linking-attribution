@@ -1430,9 +1430,10 @@ Branch.prototype['qrCode'] = wrap(
 			function(error, rawBuffer) {
 				var qrCodeResult = {};
 				if (!error && rawBuffer) {
-					qrCodeResult.rawBuffer = rawBuffer;
+					qrCodeResult['rawBuffer'] = rawBuffer;
 					try {
-						qrCodeResult.base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawBuffer)));
+						// First Encode array buffer as UTF-8 String, then Base64 Encode
+						qrCodeResult['base64'] = btoa(String.fromCharCode.apply(null, new Uint8Array(rawBuffer)));
 					}
 					catch (encodingError) {
 						error = encodingError;

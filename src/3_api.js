@@ -282,7 +282,7 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {storage} storage
  * @param {function(?Error,*=,?=)=} callback
  * @param {?boolean=} noParse - _optional_ -
- * @param {?string} reponseType - _optional_ -
+ * @param {?string} responseType - _optional_ -
  */
 Server.prototype.XHRRequest = function(url, data, method, storage, callback, noParse, responseType) {
 	var brtt = Date.now();
@@ -307,8 +307,14 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, noP
 		if (req.readyState === 4) {
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
-				if (noParse) {
+				// Response value will be in "req.responseText" by default, unless
+				// the "req.responseType" is "text" or null.
+				// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+				if (req.responseType === "arraybuffer") {
 					data = req.response;
+				}
+				else if (noParse) {
+					data = req.responseText;
 				}
 				else {
 					try {

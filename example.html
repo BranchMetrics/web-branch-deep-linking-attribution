@@ -242,7 +242,6 @@
 				}
 			};
 			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, image) {
-				// First Encode array buffer as UTF-8 String, then Base64 Encode
 				response.html('<img src="data:image/png;charset=utf-8;base64,' + image.base64 + '" width="500" height="500">');
 			});
 		});
