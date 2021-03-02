@@ -1488,14 +1488,16 @@ Branch.prototype['qrCode'] = wrap(
 			function(error, rawBuffer) {
 				function QrCode() { }
 
-				QrCode.rawBuffer = rawBuffer;
-				QrCode.base64 = function() {
-					// First Encode array buffer as UTF-8 String, then Base64 Encode
-					if (this.rawBuffer) {
-						return btoa(String.fromCharCode.apply(null, new Uint8Array(this.rawBuffer)));
-					}
-					throw Error('QrCode.rawBuffer is empty.');
-				};
+				if (!error) {
+					QrCode['rawBuffer'] = rawBuffer;
+					QrCode['base64'] = function() {
+						// First Encode array buffer as UTF-8 String, then Base64 Encode
+						if (this['rawBuffer']) {
+							return btoa(String.fromCharCode.apply(null, new Uint8Array(this['rawBuffer'])));
+						}
+						throw Error('QrCode.rawBuffer is empty.');
+					};
+				}
 				return done(error || null, QrCode || null);
 			}
 		);
