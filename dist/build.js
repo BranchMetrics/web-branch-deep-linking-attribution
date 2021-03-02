@@ -2993,13 +2993,12 @@ Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b,
   this._api(resources.qrCode, utils.cleanLinkData(b), function(b, c) {
     function d() {
     }
-    d.rawBuffer = c;
-    d.base64 = function() {
+    b || (d.rawBuffer = c, d.base64 = function() {
       if (this.rawBuffer) {
         return btoa(String.fromCharCode.apply(null, new Uint8Array(this.rawBuffer)));
       }
       throw Error("QrCode.rawBuffer is empty.");
-    };
+    });
     return a(b || null, d || null);
   });
 });
