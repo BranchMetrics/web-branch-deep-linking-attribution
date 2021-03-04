@@ -70,6 +70,12 @@
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>QR Code</h4>
+				<div class="group">
+					<button id="qrCode" class="btn btn-info">.qrCode()</button>
+				</div>
+			</div>
+			<div class="row col-lg-8 col-lg-offset-2">
 				<h4>SMS</h4>
 				<div class="group">
 					<input class="example-input" type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
@@ -118,7 +124,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback".split(" "), 0);
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode".split(" "), 0);
 
 		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
 			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
@@ -211,6 +217,32 @@
 			request.html('branch.link(' + JSON.stringify(sampleParams) + ');');
 			branch.link(sampleParams, function(err, link) {
 				response.html('<a href="' + link + '">' + link + '</a>');
+			});
+		});
+		$('#qrCode').click(function() {
+			var qrCodeSettings = {
+			        "code_color":"#000000",
+			        "background_color": "#FFFFFF",
+			        "margin": 5,
+			        "width": 1000,
+			        "image_format": "png"
+			    };
+			var qrCodeParams = {
+				tags: [ 'tag1', 'tag2' ],
+				channel: 'sample app',
+				feature: 'create link',
+				stage: 'created link',
+				type: 1,
+				data: {
+					mydata: 'bar',
+					'$desktop_url': 'https://cdn.branch.io/example.html',
+					'$og_title': 'Branch Metrics',
+					'$og_description': 'Branch Metrics',
+					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+				}
+			};
+			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, qrCode) {
+				response.html('<img src="data:image/png;charset=utf-8;base64,' + qrCode.base64() + '" width="500" height="500">');
 			});
 		});
 		$('#sendSMS').click(function() {

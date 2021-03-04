@@ -281,14 +281,20 @@ Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod,
  * @param {utils._httpMethod} method
  * @param {storage} storage
  * @param {function(?Error,*=,?=)=} callback
- * @param {?boolean=} noparse
+ * @param {?boolean=} noParse - _optional_ -
+ * @param {?string} responseType - _optional_ -
  */
-Server.prototype.XHRRequest = function(url, data, method, storage, callback, noparse) {
+Server.prototype.XHRRequest = function(url, data, method, storage, callback, noParse, responseType) {
 	var brtt = Date.now();
 	var brttTag = utils.currentRequestBrttTag;
 	var req = (window.XMLHttpRequest ?
 			new XMLHttpRequest() :
 			new ActiveXObject('Microsoft.XMLHTTP'));
+
+	if (responseType) {
+		req.responseType = responseType;
+	}
+
 	req.ontimeout = function() {
 		utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 		callback(new Error(utils.messages.timeout), null, 504);
@@ -301,7 +307,13 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, nop
 		if (req.readyState === 4) {
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
-				if (noparse) {
+				// Response value will be in "req.responseText" by default, unless
+				// the "req.responseType" is "text" or null.
+				// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+				if (req.responseType === "arraybuffer") {
+					data = req.response;
+				}
+				else if (noParse) {
 					data = req.responseText;
 				}
 				else {
@@ -441,12 +453,19 @@ Server.prototype.request = function(resource, data, storage, callback) {
 		return utils.userPreferences.allowErrorsInCallback ? done(new Error(utils.messages.trackingDisabled), null, 300) : done(null, {}, 200);
 	}
 
+	var noParseJsonResp = false;
+	var responseType;
+	if (resource.endpoint === "/v1/qr-code") {
+		noParseJsonResp = true;
+		responseType = "arraybuffer";
+	}
+
 	var makeRequest = function() {
 		if (storage.get('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);
 		}
 		else {
-			self.XHRRequest(url, postData, resource.method, storage, done);
+			self.XHRRequest(url, postData, resource.method, storage, done, noParseJsonResp, responseType);
 		}
 	};
 	makeRequest();

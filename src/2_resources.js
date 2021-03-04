@@ -265,6 +265,26 @@ resources.link = {
 	})
 };
 
+resources.qrCode = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/qr-code",
+	method: utils.httpMethod.POST,
+	ref: "obj",
+	params: defaults({
+		"alias": validator(false, validationTypes.STRING),
+		"campaign": validator(false, validationTypes.STRING),
+		"channel": validator(false, validationTypes.STRING),
+		"data": validator(false, validationTypes.STRING),
+		"qr_code_settings": validator(false, validationTypes.STRING),
+		"feature": validator(false, validationTypes.STRING),
+		"identity_id": validator(true, validationTypes.STRING),
+		"stage": validator(false, validationTypes.STRING),
+		"tags": validator(false, validationTypes.ARRAY),
+		"type": validator(false, validationTypes.NUMBER),
+		"source": validator(false, validationTypes.STRING)
+	})
+};
+
 resources.deepview = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/deepview",

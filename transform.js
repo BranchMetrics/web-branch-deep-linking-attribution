@@ -40,5 +40,5 @@ process.stdin.on('end', function() {
 			}
 		}
 	});
-	console.log(output);
+	console.log(output.toString());
 });

@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/web-branch-deep-linking
     docker:
-    - image: circleci/node:6.11.2
+    - image: circleci/node:14.15.0
     steps:
     - run:
         name: Set up NPM auth token
@@ -22,13 +22,10 @@ jobs:
             mkdir -p compiler/library ;
             stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library) ;
     - run:
-        name: Install Node, Sauce, Phantom, etc.
+        name: Install NPM dependencies
         command: |
             npm install ;
             sudo npm install -g jsdox ;
-            mocha-phantomjs --help || sudo npm install -g mocha-phantomjs ;
-            wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate ;
-            tar -xzf sc-4.3.13-linux.tar.gz ;
             jscs --help || sudo npm install -g jscs ;
             jshint -v || sudo npm install -g jshint ;
             which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
@@ -49,9 +46,8 @@ jobs:
     - run:
         name: Install AWS CLI
         command: |
-            sudo apt-get install -qq -y python-pip libpython-dev ;
-            curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py ;
-            pip install awscli --upgrade --user && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
+            sudo apt-get install -qq -y python3-pip ;
+            pip3 install awscli && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
             sudo npm install -g slack-cli ;
     - run:
         name: Build minified JS
