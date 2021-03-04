@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.58.0] - 2021-03-04
+– [CORE-1657] Support for INITIATE_STREAM & COMPLETE_STREAM
+– Adding support for private beta qrCode() API
+
 ## [2.57.1] - 2020-11-19
 - [INTENG-11512] Support SMS when tracking disabled
 - [INTENG-11551] Support link generation when tracking disabled
