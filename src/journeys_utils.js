@@ -44,8 +44,8 @@ journeys_utils.branch = null;
 journeys_utils.banner = null;
 journeys_utils.isJourneyDisplayed = false;
 
-journeys_utils.animationSpeed = 250;
-journeys_utils.animationDelay = 20;
+journeys_utils.animationSpeed = 550;
+journeys_utils.animationDelay = 140;
 
 // options to control a Journey's animations
 journeys_utils.exitAnimationDisabled = false;
