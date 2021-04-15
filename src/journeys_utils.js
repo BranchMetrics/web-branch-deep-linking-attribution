@@ -303,11 +303,12 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	if (cssIframeContainer) {}
 	else if (journeys_utils.position === 'top') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
-		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
+    document.body.style.transform = `translate(0, ${calculatedBodyMargin.toString()}px)`;
+		// document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
 	}
 	else if (journeys_utils.position === 'bottom') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
-		document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
+		// document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
 	}
 
 	// adds margin to the parent of div being inserted into
@@ -375,17 +376,29 @@ function generateIframeOuterCSS() {
 	}
 
 	var css = bodyWebkitTransitionStyle ? bodyWebkitTransitionStyle : ''; // add if we need to
-	css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
-	' left: 0; right: 0; border: 0; height: ' +
-	journeys_utils.bannerHeight + '; z-index: 99999; ' +
-	iFrameAnimationStyle  + ' }\n' +
-	'#branch-banner-iframe { position: ' +
-	(journeys_utils.sticky) + '; }\n' +
-	'@media only screen and (orientation: landscape) { ' +
-	'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
-	(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
-	'#branch-banner-iframe { height: ' +
-	(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
+	css +=
+    "#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;" +
+    " left: 0; right: 0; border: 0; height: " +
+    journeys_utils.bannerHeight +
+    "; z-index: 99999; margin-top: -" +
+    journeys_utils.bannerHeight + ';'+
+    iFrameAnimationStyle +
+    " }\n" +
+    "#branch-banner-iframe { position: " +
+    journeys_utils.sticky +
+    "; }\n" +
+    "@media only screen and (orientation: landscape) { " +
+    "body { " +
+    (journeys_utils.position === "top" ? "margin-top: " : "margin-bottom: ") +
+    (journeys_utils.isFullPage
+      ? journeys_utils.windowWidth + "px"
+      : journeys_utils.bannerHeight) +
+    "; }\n" +
+    "#branch-banner-iframe { height: " +
+    (journeys_utils.isFullPage
+      ? journeys_utils.windowWidth + "px"
+      : journeys_utils.bannerHeight) +
+    "; }";
 	return css;
 }
 
