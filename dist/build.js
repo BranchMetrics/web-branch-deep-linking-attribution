@@ -2279,8 +2279,9 @@ journeys_utils.addIframeOuterCSS = function(a) {
   journeys_utils.bodyMarginTop = banner_utils.getBodyStyle("margin-top");
   var c = +journeys_utils.bodyMarginTop.slice(0, -2);
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle("margin-bottom");
-  var d = +journeys_utils.bodyMarginBottom.slice(0, -2), e = +journeys_utils.bannerHeight.slice(0, -2);
-  a || ("top" === journeys_utils.position ? document.body.style.marginTop = (+e + c).toString() + "px" : "bottom" === journeys_utils.position && (document.body.style.marginBottom = (+e + d).toString() + "px"));
+  journeys_utils.bodyMarginBottom.slice(0, -2);
+  var d = +journeys_utils.bannerHeight.slice(0, -2);
+  a || "top" !== journeys_utils.position || (document.body.style.transform = "translate(0, " + (+d + c).toString() + "px)");
   0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
     var b, c = window.getComputedStyle(a);
     c && (b = journeys_utils.isFullPage && "fixed" === c.getPropertyValue("position"));
@@ -2331,7 +2332,7 @@ journeys_utils.animateBannerEntrance = function(a, b) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
   journeys_utils.isFullPage && "fixed" === journeys_utils.sticky && banner_utils.addClass(document.body, "branch-banner-no-scroll");
   setTimeout(function() {
-    b ? (a.style.top = null, a.style.bottom = null) : "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.bottom = "0" : journeys_utils._dynamicallyRepositionBanner());
+    b ? (a.style.top = null, a.style.bottom = null) : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.transform = "translate(0px, -" + journeys_utils.bannerHeight + ") " : journeys_utils._dynamicallyRepositionBanner());
     journeys_utils.branch._publishEvent("didShowJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !0;
   }, journeys_utils.animationDelay);
