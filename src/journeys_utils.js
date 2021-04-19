@@ -302,13 +302,9 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 
 	if (cssIframeContainer) {}
 	else if (journeys_utils.position === 'top') {
-		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
-		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
-	}
-	else if (journeys_utils.position === 'bottom') {
-		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
-		document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
-	}
+    var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
+     document.body.style.transform = `translate(0, ${calculatedBodyMargin.toString()}px)`;
+  }
 
 	// adds margin to the parent of div being inserted into
 	if (journeys_utils.divToInjectParents.length > 0) {
@@ -463,13 +459,10 @@ journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 			banner.style.top = null;
 			banner.style.bottom = null;
 		} else {
-			if (journeys_utils.position === 'top') {
-				banner.style.top = '0';
-			}
-			else if (journeys_utils.position === 'bottom') {
+			 if (journeys_utils.position === 'bottom') {
 				// check if safeAreaRequired is true or not
 				if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
-					banner.style.bottom = '0';
+					banner.style.transform = `translate(0px, -${journeys_utils.bannerHeight})`
 				} else {
 					journeys_utils._dynamicallyRepositionBanner();
 				}
