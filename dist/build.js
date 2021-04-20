@@ -2332,7 +2332,7 @@ journeys_utils.animateBannerEntrance = function(a, b) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
   journeys_utils.isFullPage && "fixed" === journeys_utils.sticky && banner_utils.addClass(document.body, "branch-banner-no-scroll");
   setTimeout(function() {
-    b ? (a.style.top = null, a.style.bottom = null) : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.transform = "translate(0px, -" + journeys_utils.bannerHeight + ") " : journeys_utils._dynamicallyRepositionBanner());
+    b ? (a.style.top = null, a.style.bottom = null) : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.transform = "translate(0px, -" + journeys_utils.bannerHeight + ")" : journeys_utils._dynamicallyRepositionBanner());
     journeys_utils.branch._publishEvent("didShowJourney", journeys_utils.journeyLinkData);
     journeys_utils.isJourneyDisplayed = !0;
   }, journeys_utils.animationDelay);
