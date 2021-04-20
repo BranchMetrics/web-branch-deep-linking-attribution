@@ -302,9 +302,9 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 
 	if (cssIframeContainer) {}
 	else if (journeys_utils.position === 'top') {
-		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
-		document.body.style.transform = `translate(0, ${calculatedBodyMargin.toString()}px)`;
-	}
+    var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
+     document.body.style.transform = `translate(0, ${calculatedBodyMargin.toString()}px)`;
+  }
 
 	// adds margin to the parent of div being inserted into
 	if (journeys_utils.divToInjectParents.length > 0) {
