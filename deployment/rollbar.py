@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import requests
@@ -24,8 +24,8 @@ def rollbar_record_deploy():
             }, timeout=3)
 
             if resp.status_code == 200:
-                print "Deploy recorded successfully."
+                print("Deploy recorded successfully.")
             else:
-                print "Error recording deploy:", resp.text
+                print("Error recording deploy:", resp.text)
 
 rollbar_record_deploy()
