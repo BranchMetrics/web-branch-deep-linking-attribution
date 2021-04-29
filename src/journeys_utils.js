@@ -262,7 +262,7 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 		bodyClass = 'branch-banner-desktop';
 	}
 
-	const iframedoc = iframe.contentDocument || iframe.contentWindow.document;
+	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');
 	iframedoc.body = iframedoc.createElement('body');
 	iframedoc.body.innerHTML = html;
