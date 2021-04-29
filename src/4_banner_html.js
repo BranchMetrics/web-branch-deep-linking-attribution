@@ -167,11 +167,12 @@ banner_html.iframe = function(options, action) {
  * @param {banner_utils.options} options
  */
 banner_html.div = function(options, action, doc) {
-	var banner = document.createElement('div');
+	doc = doc || document;
+
+	var banner = doc.createElement('div');
 	banner.id = 'branch-banner';
 	banner.className = 'branch-animation';
 	banner.innerHTML = banner_html.banner(options, action);
-	doc = doc || document;
 	doc.body.appendChild(banner);
 
 	return banner;
