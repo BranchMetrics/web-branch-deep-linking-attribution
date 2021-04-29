@@ -157,7 +157,11 @@ banner_html.iframe = function(options, action) {
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');
 	iframedoc.body = iframedoc.createElement('body');
-	iframedoc.body.innerHTML = html;
+	var containerDiv = iframedoc.createElement('div');
+	containerDiv.className = 'branch-animation';
+	containerDiv.id = 'branch-banner';
+	containerDiv.innerHTML = html;
+	iframedoc.body.append(containerDiv);
 	iframedoc.body.className = bodyClass;
 
 	return iframe;
