@@ -153,16 +153,12 @@ banner_html.iframe = function(options, action) {
 		bodyClass = 'branch-banner-desktop';
 	}
 
-	var html = banner_html.banner(options, action);
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');
 	iframedoc.body = iframedoc.createElement('body');
-	var containerDiv = iframedoc.createElement('div');
-	containerDiv.className = 'branch-animation';
-	containerDiv.id = 'branch-banner';
-	containerDiv.innerHTML = html;
-	iframedoc.body.append(containerDiv);
 	iframedoc.body.className = bodyClass;
+
+	banner_html.div(options, action, iframedoc);
 
 	return iframe;
 };
@@ -170,12 +166,13 @@ banner_html.iframe = function(options, action) {
 /**
  * @param {banner_utils.options} options
  */
-banner_html.div = function(options, action) {
+banner_html.div = function(options, action, doc) {
 	var banner = document.createElement('div');
 	banner.id = 'branch-banner';
 	banner.className = 'branch-animation';
 	banner.innerHTML = banner_html.banner(options, action);
-	document.body.appendChild(banner);
+	doc = doc || document;
+	doc.body.appendChild(banner);
 
 	return banner;
 };
