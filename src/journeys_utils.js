@@ -248,7 +248,8 @@ journeys_utils.createAndAppendIframe = function() {
 /***
  * @function journeys_utils.addHtmlToIframe
  * @param {Object} iframe - iframe node created in previous step
- * @param {string} iframeHTML
+ * @param {string} html - raw Journey HTML
+ * @param {string} userAgent - UA to determine body class
  */
 journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 	var bodyClass;
