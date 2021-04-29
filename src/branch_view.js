@@ -38,8 +38,7 @@ function renderHtmlBlob(parent, html, hasApp) {
 
 	// create iframe element, add html, add css, add ctaText
 	var iframe = journeys_utils.createAndAppendIframe();
-	var iframeHTML = journeys_utils.createIframeInnerHTML(html, utils.mobileUserAgent());
-	journeys_utils.addHtmlToIframe(iframe, iframeHTML);
+	journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
 	journeys_utils.addIframeOuterCSS(cssIframeContainer);
 	journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 	journeys_utils.addDynamicCtaText(iframe, ctaText);
