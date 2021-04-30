@@ -246,11 +246,12 @@ journeys_utils.createAndAppendIframe = function() {
 }
 
 /***
- * @function journeys_utils.createIframeInnerHTML
- * @param {string} html
- * @param {string} userAgent
+ * @function journeys_utils.addHtmlToIframe
+ * @param {Object} iframe - iframe node created in previous step
+ * @param {string} html - raw Journey HTML
+ * @param {string} userAgent - UA to determine body class
  */
-journeys_utils.createIframeInnerHTML = function(html, userAgent) {
+journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 	var bodyClass;
 	if (userAgent === 'ios' || userAgent === 'ipad') {
 		bodyClass = 'branch-banner-ios';
@@ -262,24 +263,11 @@ journeys_utils.createIframeInnerHTML = function(html, userAgent) {
 		bodyClass = 'branch-banner-desktop';
 	}
 
-	var iframeHTML = '<html><head></head><body class="' +
-		bodyClass +
-		'">' +
-		html +
-		'</body></html>';
-
-	return iframeHTML;
-}
-
-/***
- * @function journeys_utils.addHtmlToIframe
- * @param {Object} iframe - iframe node created in previous step
- * @param {string} iframeHTML
- */
-journeys_utils.addHtmlToIframe = function(iframe, iframeHTML) {
-	iframe.contentWindow.document.open();
-	iframe.contentWindow.document.write(iframeHTML);
-	iframe.contentWindow.document.close();
+	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
+	iframedoc.head = iframedoc.createElement('head');
+	iframedoc.body = iframedoc.createElement('body');
+	iframedoc.body.innerHTML = html;
+	iframedoc.body.className = bodyClass;
 }
 
 /***
