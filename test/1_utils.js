@@ -1202,4 +1202,44 @@ describe('utils', function() {
 			assert.equal(journeys_utils.tryReplaceJourneyCtaLink(html).replace(link, ""), htmlWithoutLink);
 		});
 	});
+
+	describe('addHtmlToIframe', function() {
+		var iframe = {
+			contentDocument: {
+				createElement: sinon.stub().returns({})
+			},
+			head: {},
+			body: {}
+		};
+
+		it('adds the specified HTML as the body.innerHTML of the supplied iframe', function(done) {
+			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ios');
+			assert.equal(iframe.contentDocument.body.innerHTML, '<p>A paragraph</p>');
+			done();
+		});
+
+		it('sets the body class to branch-banner-ios when UA is ios', function(done) {
+			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ios');
+			assert.equal(iframe.contentDocument.body.className, 'branch-banner-ios');
+			done();
+		});
+
+		it('sets the body class to branch-banner-ios when UA is ipad', function(done) {
+			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ipad');
+			assert.equal(iframe.contentDocument.body.className, 'branch-banner-ios');
+			done();
+		});
+
+		it('sets the body class to branch-banner-android when UA is android', function(done) {
+			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'android');
+			assert.equal(iframe.contentDocument.body.className, 'branch-banner-android');
+			done();
+		});
+
+		it('sets the body class to branch-banner-desktop when UA is any other value', function(done) {
+			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', '');
+			assert.equal(iframe.contentDocument.body.className, 'branch-banner-desktop');
+			done();
+		});
+	});
 });
