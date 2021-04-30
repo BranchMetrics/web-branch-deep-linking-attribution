@@ -1214,34 +1214,29 @@ describe('utils', function() {
 			body: {}
 		};
 
-		it('adds the specified HTML as the body.innerHTML of the supplied iframe', function(done) {
+		it('adds the specified HTML as the body.innerHTML of the supplied iframe', function() {
 			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ios');
 			assert.equal(iframe.contentDocument.body.innerHTML, '<p>A paragraph</p>');
-			done();
 		});
 
-		it('sets the body class to branch-banner-ios when UA is ios', function(done) {
+		it('sets the body class to branch-banner-ios when UA is ios', function() {
 			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ios');
 			assert.equal(iframe.contentDocument.body.className, 'branch-banner-ios');
-			done();
 		});
 
-		it('sets the body class to branch-banner-ios when UA is ipad', function(done) {
+		it('sets the body class to branch-banner-ios when UA is ipad', function() {
 			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ipad');
 			assert.equal(iframe.contentDocument.body.className, 'branch-banner-ios');
-			done();
 		});
 
-		it('sets the body class to branch-banner-android when UA is android', function(done) {
+		it('sets the body class to branch-banner-android when UA is android', function() {
 			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'android');
 			assert.equal(iframe.contentDocument.body.className, 'branch-banner-android');
-			done();
 		});
 
-		it('sets the body class to branch-banner-desktop when UA is any other value', function(done) {
+		it('sets the body class to branch-banner-desktop when UA is any other value', function() {
 			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', '');
 			assert.equal(iframe.contentDocument.body.className, 'branch-banner-desktop');
-			done();
 		});
 	});
 });
