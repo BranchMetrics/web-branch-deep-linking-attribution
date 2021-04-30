@@ -1206,7 +1206,9 @@ describe('utils', function() {
 	describe('addHtmlToIframe', function() {
 		var iframe = {
 			contentDocument: {
-				createElement: sinon.stub().returns({})
+				createElement: function() {
+					return {};
+				}
 			},
 			head: {},
 			body: {}
