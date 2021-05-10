@@ -958,7 +958,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.58.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.58.1"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2039,18 +2039,23 @@ var banner_html = {banner:function(a, b) {
   c.className = "branch-animation";
   utils.addNonceAttribute(c);
   document.body.appendChild(c);
-  var d = utils.mobileUserAgent(), d = '<html><head></head><body class="' + ("ios" === d || "ipad" === d ? "branch-banner-ios" : "android" === d ? "branch-banner-android" : "branch-banner-desktop") + '"><div id="branch-banner" class="branch-animation">' + banner_html.banner(a, b) + "</body></html>";
-  c.contentWindow.document.open();
-  c.contentWindow.document.write(d);
-  c.contentWindow.document.close();
+  var d;
+  d = utils.mobileUserAgent();
+  d = "ios" === d || "ipad" === d ? "branch-banner-ios" : "android" === d ? "branch-banner-android" : "branch-banner-desktop";
+  var e = c.contentDocument || c.contentWindow.document;
+  e.head = e.createElement("head");
+  e.body = e.createElement("body");
+  e.body.className = d;
+  banner_html.div(a, b, e);
   return c;
-}, div:function(a, b) {
-  var c = document.createElement("div");
-  c.id = "branch-banner";
-  c.className = "branch-animation";
-  c.innerHTML = banner_html.banner(a, b);
-  document.body.appendChild(c);
-  return c;
+}, div:function(a, b, c) {
+  c = c || document;
+  var d = c.createElement("div");
+  d.id = "branch-banner";
+  d.className = "branch-animation";
+  d.innerHTML = banner_html.banner(a, b);
+  c.body.appendChild(d);
+  return d;
 }, markup:function(a, b) {
   var c = '<div id="branch-sms-form-container">' + (utils.mobileUserAgent() ? banner_html.mobileAction(a, b) : banner_html.desktopAction(a)) + "</div>";
   return a.iframe ? banner_html.iframe(a, c) : banner_html.div(a, c);
@@ -2264,13 +2269,13 @@ journeys_utils.createAndAppendIframe = function() {
   document.body.appendChild(a);
   return a;
 };
-journeys_utils.createIframeInnerHTML = function(a, b) {
-  return '<html><head></head><body class="' + ("ios" === b || "ipad" === b ? "branch-banner-ios" : "android" === b ? "branch-banner-android" : "branch-banner-desktop") + '">' + a + "</body></html>";
-};
-journeys_utils.addHtmlToIframe = function(a, b) {
-  a.contentWindow.document.open();
-  a.contentWindow.document.write(b);
-  a.contentWindow.document.close();
+journeys_utils.addHtmlToIframe = function(a, b, c) {
+  c = "ios" === c || "ipad" === c ? "branch-banner-ios" : "android" === c ? "branch-banner-android" : "branch-banner-desktop";
+  a = a.contentDocument || a.contentWindow.document;
+  a.head = a.createElement("head");
+  a.body = a.createElement("body");
+  a.body.innerHTML = b;
+  a.body.className = c;
 };
 journeys_utils.addIframeOuterCSS = function(a) {
   var b = document.createElement("style");
@@ -2543,8 +2548,7 @@ function renderHtmlBlob(a, b, c) {
   c = journeys_utils.getIframeCss(b);
   b = journeys_utils.removeScriptAndCss(b);
   e = journeys_utils.createAndAppendIframe();
-  b = journeys_utils.createIframeInnerHTML(b, utils.mobileUserAgent());
-  journeys_utils.addHtmlToIframe(e, b);
+  journeys_utils.addHtmlToIframe(e, b, utils.mobileUserAgent());
   journeys_utils.addIframeOuterCSS(c);
   journeys_utils.addIframeInnerCSS(e, a);
   journeys_utils.addDynamicCtaText(e, d);

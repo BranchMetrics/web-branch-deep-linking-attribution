@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.58.1] - 2021-05-10
+- [INTENG-11986][JRNYS-2] Avoid using document.write() to modify the DOM for Journeys (flagged by Google PageSpeed)
+- Improvements to deployment automation
+
 ## [2.58.0] - 2021-03-04
 – [CORE-1657] Support for INITIATE_STREAM & COMPLETE_STREAM
 – Adding support for private beta qrCode() API
