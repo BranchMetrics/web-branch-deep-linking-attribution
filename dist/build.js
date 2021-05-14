@@ -2163,15 +2163,7 @@ var sendSMS = function(a, b, c, d) {
   return p;
 };
 // Input 14
-var journeys_utils = {}, MIN_HEIGHT_FULL_PAGE_INTERSTITIAL = 576;
-journeys_utils._callback_index = 1;
-journeys_utils.position = "top";
-journeys_utils.sticky = "absolute";
-journeys_utils.bannerHeight = "76px";
-journeys_utils.isFullPage = !1;
-journeys_utils.isHalfPage = !1;
-journeys_utils.divToInjectParents = [];
-journeys_utils.isSafeAreaEnabled = !1;
+var journeys_utils = {_callback_index:1, position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[], isSafeAreaEnabled:!1};
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
 window.innerHeight < window.innerWidth && (journeys_utils.windowHeight = window.innerWidth, journeys_utils.windowWidth = window.innerHeight);
@@ -2293,7 +2285,7 @@ journeys_utils.addIframeOuterCSS = function(a) {
   var c = +journeys_utils.bodyMarginTop.slice(0, -2);
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle("margin-bottom");
   var d = +journeys_utils.bodyMarginBottom.slice(0, -2), e = +journeys_utils.bannerHeight.slice(0, -2);
-  a || ("top" === journeys_utils.position ? (c = +e + c, d = Number(journeys_utils.bannerHeight.split("px")[0]), document.body.style.marginTop = c.toString() + "px", "fixed" === journeys_utils.sticky && d >= MIN_HEIGHT_FULL_PAGE_INTERSTITIAL && (document.body.style.overflow = "hidden")) : "bottom" === journeys_utils.position && (document.body.style.marginBottom = (+e + d).toString() + "px"));
+  a || ("top" === journeys_utils.position ? document.body.style.marginTop = (+e + c).toString() + "px" : "bottom" === journeys_utils.position && (document.body.style.marginBottom = (+e + d).toString() + "px"));
   0 < journeys_utils.divToInjectParents.length && journeys_utils.divToInjectParents.forEach(function(a) {
     var b, c = window.getComputedStyle(a);
     c && (b = journeys_utils.isFullPage && "fixed" === c.getPropertyValue("position"));
@@ -2342,7 +2334,13 @@ journeys_utils.addDynamicCtaText = function(a, b) {
 };
 journeys_utils.animateBannerEntrance = function(a, b) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  journeys_utils.isFullPage && "fixed" === journeys_utils.sticky && banner_utils.addClass(document.body, "branch-banner-no-scroll");
+  if (journeys_utils.isFullPage && "fixed" === journeys_utils.sticky) {
+    var c = document.createElement("style");
+    c.type = "text/css";
+    c.innerHTML = ".branch-banner-no-scroll {overflow: hidden;}";
+    document.head.appendChild(c);
+    banner_utils.addClass(document.body, "branch-banner-no-scroll");
+  }
   setTimeout(function() {
     b ? (a.style.top = null, a.style.bottom = null) : "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.bottom = "0" : journeys_utils._dynamicallyRepositionBanner());
     journeys_utils.branch._publishEvent("didShowJourney", journeys_utils.journeyLinkData);
@@ -2460,10 +2458,13 @@ journeys_utils._getPageviewMetadata = function(a, b) {
 };
 journeys_utils.animateBannerExit = function(a, b) {
   journeys_utils.exitAnimationDisabled || (journeys_utils.exitAnimationIsRunning = !0);
-  var c = Number(journeys_utils.bannerHeight.split("px")[0]);
-  "fixed" === journeys_utils.sticky && c >= MIN_HEIGHT_FULL_PAGE_INTERSTITIAL && (document.body.style.overflow = "unset");
-  journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled && (document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", document.getElementById("branch-banner-iframe").style.transition = "all 0" + journeys_utils.animationSpeed / 1000 + "s ease", c = document.getElementById("branch-iframe-css").innerHTML + "\n", c += "body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n", c += "#branch-banner-iframe { -webkit-transition: all " + 
-  journeys_utils.animationSpeed / 1000 + "s ease; }\n", document.getElementById("branch-iframe-css").innerHTML = "", document.getElementById("branch-iframe-css").innerHTML = c);
+  if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
+    document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease";
+    document.getElementById("branch-banner-iframe").style.transition = "all 0" + journeys_utils.animationSpeed / 1000 + "s ease";
+    var c = document.getElementById("branch-iframe-css").innerHTML + "\n", c = c + ("body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n"), c = c + ("#branch-banner-iframe { -webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; }\n");
+    document.getElementById("branch-iframe-css").innerHTML = "";
+    document.getElementById("branch-iframe-css").innerHTML = c;
+  }
   "top" === journeys_utils.position ? a.style.top = "-" + journeys_utils.bannerHeight : "bottom" === journeys_utils.position && (a.style.bottom = "-" + journeys_utils.bannerHeight);
   journeys_utils.branch._publishEvent("willCloseJourney", journeys_utils.journeyLinkData);
   setTimeout(function() {

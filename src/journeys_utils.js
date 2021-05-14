@@ -5,7 +5,6 @@ goog.require('banner_utils');
 goog.require('safejson');
 goog.require('utils');
 
-const MIN_HEIGHT_FULL_PAGE_INTERSTITIAL = 576;
 journeys_utils._callback_index = 1;
 
 // defaults. These will change based on banner info
@@ -292,11 +291,7 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	if (cssIframeContainer) {}
 	else if (journeys_utils.position === 'top') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
-		var bannerHeightValue = Number(journeys_utils.bannerHeight.split("px")[0]);
 		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
-		if (journeys_utils.sticky === "fixed" && bannerHeightValue >= MIN_HEIGHT_FULL_PAGE_INTERSTITIAL) {
-      		document.body.style.overflow = "hidden";
-    	}
 	} 
 	else if (journeys_utils.position === 'bottom') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
@@ -448,6 +443,10 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 	if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
+		var bodyCSS = document.createElement("style");
+      	bodyCSS.type = "text/css";
+		bodyCSS.innerHTML = ".branch-banner-no-scroll {overflow: hidden;}";
+      	document.head.appendChild(bodyCSS);
 		banner_utils.addClass(document.body, 'branch-banner-no-scroll');
 	}
 
@@ -828,11 +827,6 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	if(!journeys_utils.exitAnimationDisabled){
 		journeys_utils.exitAnimationIsRunning = true;
 	}
-
-	var bannerHeightValue = Number(journeys_utils.bannerHeight.split("px")[0]);
-    if (journeys_utils.sticky === "fixed" && bannerHeightValue >= MIN_HEIGHT_FULL_PAGE_INTERSTITIAL) {
-    	document.body.style.overflow = 'unset';
-    }
 
 	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
