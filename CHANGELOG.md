@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.58.2] - 2021-05-24
+– Added css to prevent scroll for sticky full page interstitial
+
 ## [2.58.1] - 2021-05-10
 - [INTENG-11986][JRNYS-2] Avoid using document.write() to modify the DOM for Journeys (flagged by Google PageSpeed)
 - Improvements to deployment automation
