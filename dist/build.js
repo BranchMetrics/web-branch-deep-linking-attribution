@@ -2334,7 +2334,13 @@ journeys_utils.addDynamicCtaText = function(a, b) {
 };
 journeys_utils.animateBannerEntrance = function(a, b) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
-  journeys_utils.isFullPage && "fixed" === journeys_utils.sticky && banner_utils.addClass(document.body, "branch-banner-no-scroll");
+  if (journeys_utils.isFullPage && "fixed" === journeys_utils.sticky) {
+    var c = document.createElement("style");
+    c.type = "text/css";
+    c.innerHTML = ".branch-banner-no-scroll {overflow: hidden;}";
+    document.head.appendChild(c);
+    banner_utils.addClass(document.body, "branch-banner-no-scroll");
+  }
   setTimeout(function() {
     b ? (a.style.top = null, a.style.bottom = null) : "top" === journeys_utils.position ? a.style.top = "0" : "bottom" === journeys_utils.position && (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData.journey_link_data && !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired ? a.style.bottom = "0" : journeys_utils._dynamicallyRepositionBanner());
     journeys_utils.branch._publishEvent("didShowJourney", journeys_utils.journeyLinkData);

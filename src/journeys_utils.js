@@ -292,7 +292,7 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	else if (journeys_utils.position === 'top') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
 		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
-	}
+	} 
 	else if (journeys_utils.position === 'bottom') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
 		document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
@@ -443,6 +443,10 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 	if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
+		var bodyCSS = document.createElement("style");
+      	bodyCSS.type = "text/css";
+		bodyCSS.innerHTML = ".branch-banner-no-scroll {overflow: hidden;}";
+      	document.head.appendChild(bodyCSS);
 		banner_utils.addClass(document.body, 'branch-banner-no-scroll');
 	}
 
