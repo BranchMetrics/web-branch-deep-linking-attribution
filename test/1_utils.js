@@ -1239,4 +1239,46 @@ describe('utils', function() {
 			assert.equal(iframe.contentDocument.body.className, 'branch-banner-desktop');
 		});
 	});
+
+	describe("animateBannerEntrance and animateBannerExit", function() {
+		var clock;
+		beforeEach(function() {
+			clock = sinon.useFakeTimers();
+		});
+		it("sets body class to branch-banner-is-active and branch-banner-no-scroll", function() {
+			var iframe = {
+				contentDocument: {
+					createElement: function() {
+						return {};
+					}
+				},
+				head: {},
+				body: {}
+			};
+			journeys_utils.isFullPage = true;
+			journeys_utils.sticky = "fixed";
+			journeys_utils.animateBannerEntrance(iframe);
+			assert.equal(document.body.className, " branch-banner-is-active branch-banner-no-scroll");
+		});
+
+		it("removes branch-banner-is-active and branch-banner-no-scroll class on animateBannerExit", function() {
+			var iframe = {
+				contentDocument: {
+					createElement: function() {
+						return {};
+					}
+				},
+				head: {},
+				body: {},
+				style: {},
+				parentNode: {
+					removeChild: function() {}
+				}
+			};
+			journeys_utils.branch._publishEvent = function() {};
+			journeys_utils.animateBannerExit(iframe);
+			clock.tick(270);
+			assert.equal(document.body.className, " ");
+		});
+	});
 });
