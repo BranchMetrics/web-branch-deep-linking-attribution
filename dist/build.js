@@ -958,7 +958,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.58.2"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.58.2-alpha"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1480,12 +1480,15 @@ utils.getInitialReferrer = function(a) {
 utils.getCurrentUrl = function() {
   return utils.isIframeAndFromSameOrigin() ? window.top.location.href : window.location.href;
 };
+utils.convertObjectValueToString = function(a) {
+  return utils.validateParameterType(a, "object") || utils.validateParameterType(a, "array") ? safejson.stringify(a) : null === a ? "null" : a.toString();
+};
 utils.convertObjectValuesToString = function(a) {
   if (!utils.validateParameterType(a, "object") || 0 === Object.keys(a).length) {
     return {};
   }
   for (var b in a) {
-    a.hasOwnProperty(b) && (a[b] = utils.validateParameterType(a[b], "object") || utils.validateParameterType(a[b], "array") ? safejson.stringify(a[b]) : a[b].toString());
+    a.hasOwnProperty(b) && (a[b] = utils.convertObjectValueToString(a[b]));
   }
   return a;
 };
