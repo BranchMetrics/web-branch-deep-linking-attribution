@@ -1206,17 +1206,17 @@ utils.getCurrentUrl = function() {
 	return utils.isIframeAndFromSameOrigin() ? window.top.location.href : window.location.href;
 };
 
-utils.convertObjectValueToString = function(valueToConvert) {
-	if (utils.validateParameterType(valueToConvert, 'object')) {
-		return safejson.stringify(valueToConvert);
+utils.convertValueToString = function(value) {
+	if (utils.validateParameterType(value, 'object')) {
+		return safejson.stringify(value);
 	}
-	if (utils.validateParameterType(valueToConvert, 'array')) {
-		return safejson.stringify(valueToConvert);
+	if (utils.validateParameterType(value, 'array')) {
+		return safejson.stringify(value);
 	}
-	if (valueToConvert === null) {
+	if (value === null) {
 		return 'null';
 	}
-	return valueToConvert.toString();
+	return value.toString();
 };
 
 // Required for logEvent()'s custom_data object - values must be converted to string
@@ -1226,7 +1226,7 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 	}
 	for (var key in objectToConvert) {
 		if (objectToConvert.hasOwnProperty(key)) {
-			objectToConvert[key] = utils.convertObjectValueToString(objectToConvert[key]);
+			objectToConvert[key] = utils.convertValueToString(objectToConvert[key]);
 		}
 	}
 	return objectToConvert;

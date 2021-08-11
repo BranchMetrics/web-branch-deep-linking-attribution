@@ -653,6 +653,61 @@ describe('utils', function() {
 		});
 	});
 
+	describe('convertValueToString', function() {
+		it('should stringify a number', function() {
+			var initial = 0;
+			var expected = "0";
+			assert.strictEqual(
+				expected,
+				utils.convertValueToString(initial),
+				"0 should be converted to \"0\""
+			);
+		});
+
+		it('should stringify a boolean', function() {
+			var initial = true;
+			var expected = "true";
+			assert.strictEqual(
+				expected,
+				utils.convertValueToString(initial),
+				"true should be converted to \"true\""
+			);
+		});
+
+		it('should stringify null', function() {
+			var initial = null;
+			var expected = "null";
+			assert.strictEqual(
+				expected,
+				utils.convertValueToString(initial),
+				"null should be converted to \"null\""
+			);
+		});
+
+		it('should stringify an object', function() {
+			var initial = { "sku": "foo-sku-7", "price": 8.50, "quantity": 4 };
+			var expected = "{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4}";
+			assert.strictEqual(
+				expected,
+				utils.convertValueToString(initial),
+				"object should be stringified"
+			);
+		});
+
+		it('should stringify an array', function() {
+			var initial = [
+				{ "sku": "foo-sku-7", "price": 8.50, "quantity": 4 },
+				'testing'
+			];
+			var expected = "[{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4},\"testing\"]";
+			assert.strictEqual(
+				expected,
+				utils.convertValueToString(initial),
+				"array should be stringified"
+			);
+		});
+	});
+
 
 	describe('setJourneyLinkData', function() {
 		it('should set journeys_utils.journeyLinkData with bannerid and journey link data', function() {
