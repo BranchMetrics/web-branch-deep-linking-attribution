@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.58.3] - 2021-08-19
+- Supports null values in logEvent custom data
+
 ## [2.58.2] - 2021-05-24
 – Added css to prevent scroll for sticky full page interstitial
 
