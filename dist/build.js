@@ -1480,12 +1480,15 @@ utils.getInitialReferrer = function(a) {
 utils.getCurrentUrl = function() {
   return utils.isIframeAndFromSameOrigin() ? window.top.location.href : window.location.href;
 };
+utils.convertValueToString = function(a) {
+  return utils.validateParameterType(a, "object") || utils.validateParameterType(a, "array") ? safejson.stringify(a) : null === a ? "null" : a.toString();
+};
 utils.convertObjectValuesToString = function(a) {
   if (!utils.validateParameterType(a, "object") || 0 === Object.keys(a).length) {
     return {};
   }
   for (var b in a) {
-    a.hasOwnProperty(b) && (a[b] = utils.validateParameterType(a[b], "object") || utils.validateParameterType(a[b], "array") ? safejson.stringify(a[b]) : a[b].toString());
+    a.hasOwnProperty(b) && (a[b] = utils.convertValueToString(a[b]));
   }
   return a;
 };
