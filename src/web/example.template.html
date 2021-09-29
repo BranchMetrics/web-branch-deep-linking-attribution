@@ -84,16 +84,6 @@
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
-				<h4>Referral</h4>
-				<div class="group">
-					<button id="credits" class="btn btn-info">.credits()</button>
-					<button id="creditHistory" class="btn btn-info">.creditHistory()</button><br><br>
-					<input class="example-input" type="text" id="redeem-amount" class="form-control" placeholder="Credits">
-					<input class="example-input" type="text" id="redeem-bucket" class="form-control" placeholder="from Bucket"><br>
-					<button id="redeem" class="btn btn-info">.redeem()</button>
-				</div>
-			</div>
-			<div class="row col-lg-8 col-lg-offset-2">
 				<h4>Codes</h4>
 				<div class="group">
 					<input class="example-input" type="text" id="code-amount" class="form-control" placeholder="Amount">
@@ -108,16 +98,8 @@
 					<input class="radio-input" type="radio" name="code-location" value="2">Referrer (2)
 					<input class="radio-input" type="radio" name="code-location" value="3">Both (3)<br><br>
 				</div>
-				<div class="group">
-					<button id="getCode" class="btn btn-info">.getCode()</button>
-				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
-				<div class="group">
-					<input class="example-input" type="text" id="code-input" class="form-control" placeholder="Code"><br>
-					<button id="validateCode" class="btn btn-info">.validateCode()</button>
-					<button id="applyCode" class="btn btn-info">.applyCode()</button>
-				</div>
 			</div>
 		</section>
 	</div>
@@ -260,71 +242,6 @@
 			branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
 				response.html(err || JSON.stringify(data) || 'undefined');
 			});
-		});
-		$('#referrals').click(function() {
-			request.html('branch.referrals();');
-			branch.referrals(function(err, data) {
-				response.html(err || JSON.stringify(data));
-			});
-		});
-		$('#credits').click(function() {
-			request.html('branch.credits();');
-			branch.credits(function(err, data) {
-				response.html(err || JSON.stringify(data));
-			});
-		});
-		$('#creditHistory').click(function() {
-			request.html('branch.creditHistory();');
-			branch.creditHistory(function(err, data) {
-				response.html(err || JSON.stringify(data));
-			});
-		});
-		$('#applyCode').click(function() {
-			request.html('branch.applyCode({code: ' + getInputVal('#code-input') + '});');
-			branch.applyCode(getInputVal('#code-input'), 'default', function(err, data) {
-				response.html(err || JSON.stringify(data));
-			});
-		});
-		$('#validateCode').click(function() {
-			request.html('branch.validateCode({code: ' + getInputVal('#code-input') + '});');
-			branch.validateCode(getInputVal('#code-input'), 'default', function(err, data) {
-				response.html(err || JSON.stringify(data));
-			});
-		});
-		$('#getCode').click(function() {
-			request.html(
-				'branch.getCode({ amount: ' + getInputVal("#code-amount") +
-					', calculation_type: ' + getInputVal("input:radio[name ='code-type']:checked") +
-					', location: ' + getInputVal("input:radio[name ='code-location']:checked") +
-					', bucket: ' + getInputVal("#code-bucket") +
-					', prefix: ' + getInputVal("#code-prefix") +
-					', expiration: ' + getInputVal("#code-expiration") +
-					' });'
-			);
-			branch.getCode({
-				amount: parseInt(getInputVal('#code-amount')),
-				calculation_type: parseInt(getInputVal("input:radio[name ='code-type']:checked")),
-				location: parseInt(getInputVal("input:radio[name ='code-location']:checked")),
-				bucket: getInputVal('#code-bucket'),
-				prefix: getInputVal('#code-prefix'),
-				expiration: getInputVal('#code-expiration')
-			}, function(err, data) {
-				response.html(err || JSON.stringify(data));
-			});
-		});
-		$('#redeem').click(function() {
-			request.html(
-				'branch.redeem({amount: ' + getInputVal('#redeem-amount') +
-					', bucket: \'' + getInputVal('#redeem-bucket') +
-					'\'});'
-			);
-			branch.redeem(
-				parseInt(getInputVal('#redeem-amount')),
-				getInputVal('#redeem-bucket'),
-				function(err, data) {
-					response.html(err || JSON.stringify(data));
-				}
-				);
 		});
 		$('#banner').click(function() {
 			request.html(

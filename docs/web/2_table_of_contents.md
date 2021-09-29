@@ -17,26 +17,21 @@
   + [.deepview()](#deepviewdata-options-callback)
   + [.deepviewCta()](#deepviewcta)
 
-4. Credit Functions
-  + [.credits()](#creditscallback)
-  + [.creditHistory()](#credithistoryoptions-callback)
-  + [.redeem()](#redeemamount-bucket-callback)
-
-5. Event Listener
+4. Event Listener
   + [.addListener()](#addlistenerevent-listener)
   + [.removeListener()](#removelistenerlistener)
 
-6. Journeys Web To App
+5. Journeys Web To App
   + [.setBranchViewData()](#setbranchviewdatadata)
   + [.closeJourney()](#closejourneycallback)
 
-7. Firebase App Indexing
+6. Firebase App Indexing
   + [.autoAppIndex()](#autoappindexdata-callback)
 
-8. Revenue Analytics
+7. Revenue Analytics
   + [.trackCommerceEvent()](#trackcommerceeventevent-commerce_data-metadata-callback)
 
-9. User Privacy
+8. User Privacy
   + [.disableTracking()](#disabletrackingdisabletracking)
 
 ___
