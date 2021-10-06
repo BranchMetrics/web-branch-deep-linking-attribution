@@ -1146,10 +1146,10 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	name = utils.validateParameterType(name, 'string') ? name : null;
 	eventData = utils.validateParameterType(eventData, 'object') ? eventData : null;
 	customer_event_alias = utils.validateParameterType(customer_event_alias, 'string') ? customer_event_alias : null;
+	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
 
 	if (utils.isStandardEvent(name)) {
 		contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
-		var extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
 		this._api(
 		resources.logStandardEvent,
 		{
@@ -1168,7 +1168,8 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
 		{
 			"name": name,
 			"user_data": safejson.stringify(utils.getUserData(this)),
-			"custom_data": safejson.stringify(utils.convertObjectValuesToString(eventData || {})),
+			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
+			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
 			"content_items": safejson.stringify(contentItems || []),
 			"customer_event_alias": customer_event_alias
 		}, function(err, data) {
