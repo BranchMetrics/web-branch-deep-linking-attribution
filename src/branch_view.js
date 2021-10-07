@@ -20,7 +20,7 @@ function checkPreviousBanner() {
  * @param {string} html
  * @param {boolean} hasApp
  */
-function renderHtmlBlob(parent, html, hasApp) {
+function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
@@ -37,16 +37,19 @@ function renderHtmlBlob(parent, html, hasApp) {
 	html = journeys_utils.removeScriptAndCss(html);
 
 	// create iframe element, add html, add css, add ctaText
-	var iframe = journeys_utils.createAndAppendIframe();
-	journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
-	journeys_utils.addIframeOuterCSS(cssIframeContainer);
-	journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
-	journeys_utils.addDynamicCtaText(iframe, ctaText);
-
-	journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
-
-	journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
-
+	var iframe = journeys_utils.createIframe();
+	iframe.onload = function() {
+		journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
+		journeys_utils.addIframeOuterCSS(cssIframeContainer);
+		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
+		journeys_utils.addDynamicCtaText(iframe, ctaText);
+	
+		journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
+	
+		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
+		iframeLoadedCallback(iframe);
+	}
+	document.body.appendChild(iframe);
 	return iframe;
 };
 
@@ -155,27 +158,33 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
 		};
 
-		banner = renderHtmlBlob(document.body, html, requestData['has_app_websdk']);
-		journeys_utils.banner = banner;
-
-
-		if (banner === null) {
-			failed = true;
-			return;
+		var finalHookupsOnIframeLoaded = function (banner) {
+			journeys_utils.banner = banner;
+	
+			if (banner === null) {
+				failed = true;
+				return;
+			}
+	
+			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
+	
+			if (utils.navigationTimingAPIEnabled) {
+				utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
+			}
+			
+			document.body.removeChild(placeholder);
+	
+			if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
+				branch_view.incrementPageviewAnalytics(branchViewData);
+			}
 		}
-
-		journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
-
-		if (utils.navigationTimingAPIEnabled) {
-			utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
+		renderHtmlBlob(document.body, html, requestData['has_app_websdk'], finalHookupsOnIframeLoaded);
+	} else {
+		document.body.removeChild(placeholder);
+	
+		if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
+			branch_view.incrementPageviewAnalytics(branchViewData);
 		}
-
-	}
-
-	document.body.removeChild(placeholder);
-
-	if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
-		branch_view.incrementPageviewAnalytics(branchViewData);
 	}
 };
 
