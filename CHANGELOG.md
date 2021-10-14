@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.59.0] - 2021-10-14
+- Separates custom and event data on logged custom events
+- Ensures banner insertion and manipulation order
+
 ## [2.58.3] - 2021-08-19
 - Supports null values in logEvent custom data
 

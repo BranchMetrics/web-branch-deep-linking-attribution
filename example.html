@@ -64,8 +64,6 @@
 				<div class="group">
 					<button id="track" class="btn btn-info">.track()</button>
 					<button id="link" class="btn btn-info">.link()</button>
-					<button id="logEventStandard" class="btn btn-info">.logEvent() - Standard</button>
-					<button id="logEventCustom" class="btn btn-info">.logEvent() - Custom</button>
 					<button id="banner" class="btn btn-info">.banner()</button>
 					<button id="disable-tracking" class="btn btn-info">.disableTracking(true)</button>
 					<button id="enable-tracking" class="btn btn-info">.disableTracking(false)</button>
@@ -126,7 +124,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode".split(" "), 0);
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode autoAppIndex banner closeBanner closeJourney creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode".split(" "), 0);
 
 		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
 			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
@@ -221,54 +219,6 @@
 				response.html('<a href="' + link + '">' + link + '</a>');
 			});
 		});
-		$('#logEventStandard').click(function() {
-			request.html('branch.logEvent - Standard (\'Tracked PURCHASE standard event\');');
-			var event_and_custom_data = {
-				"transaction_id": "tras_Id_1232343434",
-				"currency": "USD",
-				"revenue": 180.2,
-				"shipping": 10.5,
-				"tax": 13.5,
-				"coupon": "promo-1234",
-				"affiliation": "high_fi",
-				"description": "Preferred purchase",
-				"purchase_loc": "Palo Alto",
-				"store_pickup": "unavailable"
-			};
-			var content_items = [];
-			var customer_event_alias = "my custom alias";
-			branch.logEvent(
-				"PURCHASE",
-				event_and_custom_data,
-				content_items,
-				customer_event_alias,
-				function(err) { console.log(err); }
-			);
-		})
-		$('#logEventCustom').click(function() {
-			request.html('branch.logEvent - Custom (\'Tracked some custom event\');');
-			var event_and_custom_data = {
-				"transaction_id": "tras_Id_1232343434",
-				"currency": "USD",
-				"revenue": 180.2,
-				"shipping": 10.5,
-				"tax": 13.5,
-				"coupon": "promo-1234",
-				"affiliation": "high_fi",
-				"description": "Preferred purchase",
-				"purchase_loc": "Palo Alto",
-				"store_pickup": "unavailable"
-			};
-			var content_items = [];
-			var customer_event_alias = "some custom event";
-			branch.logEvent(
-				"Some Custom Event",
-				event_and_custom_data,
-				content_items,
-				customer_event_alias,
-				function(err) { console.log(err); }
-			);;
-		})
 		$('#qrCode').click(function() {
 			var qrCodeSettings = {
 			        "code_color":"#000000",
