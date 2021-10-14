@@ -227,9 +227,9 @@ journeys_utils.removeScriptAndCss = function(html) {
 }
 
 /***
- * @function journeys_utils.createAndAppendIframe
+ * @function journeys_utils.createIframe
  */
-journeys_utils.createAndAppendIframe = function() {
+journeys_utils.createIframe = function() {
 	var iframe = document.createElement('iframe');
 	iframe.src = 'about:blank'; // solves CORS issues, test in IE
 	iframe.style.overflow = 'hidden';
@@ -239,8 +239,6 @@ journeys_utils.createAndAppendIframe = function() {
 	iframe.title = 'Branch Banner'
 	iframe.setAttribute('aria-label', 'Branch Banner');
 	utils.addNonceAttribute(iframe);
-
-	document.body.appendChild(iframe);
 
 	return iframe;
 }

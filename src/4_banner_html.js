@@ -130,7 +130,7 @@ banner_html.checkmark = function() {
 /**
  * @param {banner_utils.options} options
  */
-banner_html.iframe = function(options, action) {
+banner_html.iframe = function(options, action, callback) {
 	var iframe = document.createElement('iframe');
 	iframe.src = 'about:blank'; // solves CORS issues, test in IE
 	iframe.style.overflow = 'hidden';
@@ -139,28 +139,30 @@ banner_html.iframe = function(options, action) {
 	iframe.className = 'branch-animation';
 	utils.addNonceAttribute(iframe);
 
+	iframe.onload = function() {
+		var bodyClass;
+		var userAgent = utils.mobileUserAgent();
+		if (userAgent === 'ios' || userAgent === 'ipad') {
+			bodyClass = 'branch-banner-ios';
+		}
+		else if (userAgent === 'android') {
+			bodyClass = 'branch-banner-android';
+		}
+		else {
+			bodyClass = 'branch-banner-desktop';
+		}
+
+		var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
+		iframedoc.head = iframedoc.createElement('head');
+		iframedoc.body = iframedoc.createElement('body');
+		iframedoc.body.className = bodyClass;
+
+		banner_html.div(options, action, iframedoc);
+
+		callback(iframe);
+	};
+
 	document.body.appendChild(iframe);
-
-	var bodyClass;
-	var userAgent = utils.mobileUserAgent();
-	if (userAgent === 'ios' || userAgent === 'ipad') {
-		bodyClass = 'branch-banner-ios';
-	}
-	else if (userAgent === 'android') {
-		bodyClass = 'branch-banner-android';
-	}
-	else {
-		bodyClass = 'branch-banner-desktop';
-	}
-
-	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
-	iframedoc.head = iframedoc.createElement('head');
-	iframedoc.body = iframedoc.createElement('body');
-	iframedoc.body.className = bodyClass;
-
-	banner_html.div(options, action, iframedoc);
-
-	return iframe;
 };
 
 /**
@@ -182,7 +184,7 @@ banner_html.div = function(options, action, doc) {
  * @param {banner_utils.options} options
  * @param {storage} storage
  */
-banner_html.markup = function(options, storage) {
+banner_html.markup = function(options, storage, callback) {
 	var action = '<div id="branch-sms-form-container">' +
 		(utils.mobileUserAgent() ?
 			banner_html.mobileAction(options, storage) :
@@ -190,9 +192,10 @@ banner_html.markup = function(options, storage) {
 		'</div>';
 
 	if (options.iframe) {
-		return banner_html.iframe(options, action);
+		banner_html.iframe(options, action, callback);
 	}
 	else {
-		return banner_html.div(options, action);
+		var markup_div = banner_html.div(options, action, document);
+		callback(markup_div);
 	}
 };

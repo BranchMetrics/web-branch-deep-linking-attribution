@@ -106,54 +106,9 @@ banner = function(branch, options, linkData, storage) {
 
 	branch._publishEvent('willShowBanner');
 
-	// Create markup
-	var element = banner_html.markup(options, storage);
-
-	// Add CSS
-	banner_css.css(options, element);
-
-	// Attach actions
-	linkData['channel'] = linkData['channel'] || 'app banner';
-
-	var doc = options.iframe ? element.contentWindow.document : document;
-	if (utils.mobileUserAgent()) {
-		options['open_app'] = options.open_app;
-		options['append_deeplink_path'] = options.append_deeplink_path;
-		options['make_new_link'] = options.make_new_link;
-		options['deepview_type'] = 'banner';
-		branch['deepview'](linkData, options);
-		var cta = doc.getElementById('branch-mobile-action');
-		if (cta) {
-			cta.onclick = function(ev) {
-				ev.preventDefault();
-				branch['deepviewCta']();
-			};
-		}
-	}
-	else if (doc.getElementById('sms-form')) {
-		doc.getElementById('sms-form').addEventListener('submit', function(ev) {
-			ev.preventDefault();
-			sendSMS(doc, branch, options, linkData);
-		});
-	}
-	else {
-		element.onload = function() {
-			doc = element.contentWindow.document;
-			if (doc.getElementById('sms-form')) {
-				doc.getElementById('sms-form').addEventListener('submit', function(ev) {
-					ev.preventDefault();
-					sendSMS(doc, branch, options, linkData);
-				});
-			}
-		};
-	}
-
-	var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
+	var element;
 	var bodyMarginTopInline = document.body.style.marginTop;
-	var bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom');
 	var bodyMarginBottomInline = document.body.style.marginBottom;
-
-	var closeButton = doc.getElementById('branch-banner-close');
 
 	var closeBanner = function(closeOptions, callback) {
 		if (typeof closeOptions === 'function') {
@@ -207,43 +162,93 @@ banner = function(branch, options, linkData, storage) {
 		}
 	};
 
-	if (closeButton) {
-		closeButton.onclick = function(ev) {
-			ev.preventDefault();
-			branch._publishEvent('willCloseBanner');
-			closeBanner({}, function() {
-				branch._publishEvent('didCloseBanner');
+	var finalHookupsCallback = function(markup) {
+		element = markup;
+		// Add CSS
+		banner_css.css(options, element);
+		// Attach actions
+		linkData['channel'] = linkData['channel'] || 'app banner';
+
+		var doc = options.iframe ? element.contentWindow.document : document;
+		if (utils.mobileUserAgent()) {
+			options['open_app'] = options.open_app;
+			options['append_deeplink_path'] = options.append_deeplink_path;
+			options['make_new_link'] = options.make_new_link;
+			options['deepview_type'] = 'banner';
+			branch['deepview'](linkData, options);
+			var cta = doc.getElementById('branch-mobile-action');
+			if (cta) {
+				cta.onclick = function(ev) {
+					ev.preventDefault();
+					branch['deepviewCta']();
+				};
+			}
+		}
+		else if (doc.getElementById('sms-form')) {
+			doc.getElementById('sms-form').addEventListener('submit', function(ev) {
+				ev.preventDefault();
+				sendSMS(doc, branch, options, linkData);
 			});
-		};
-	}
+		}
+		else {
+			element.onload = function() {
+				doc = element.contentWindow.document;
+				if (doc.getElementById('sms-form')) {
+					doc.getElementById('sms-form').addEventListener('submit', function(ev) {
+						ev.preventDefault();
+						sendSMS(doc, branch, options, linkData);
+					});
+				}
+			};
+		}
 
-	// Trigger animation
-	banner_utils.addClass(document.body, 'branch-banner-is-active');
-	if (options.position === 'top') {
-		document.body.style.marginTop =
-			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
-	}
-	else if (options.position === 'bottom') {
-		document.body.style.marginBottom =
-			banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
-	}
+		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
+		var bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom');
 
-	function onAnimationEnd() {
+		// Trigger animation
+		banner_utils.addClass(document.body, 'branch-banner-is-active');
 		if (options.position === 'top') {
-			element.style.top = '0';
+			document.body.style.marginTop =
+				banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginTopComputed);
 		}
 		else if (options.position === 'bottom') {
-			element.style.bottom = '0';
+			document.body.style.marginBottom =
+				banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
 		}
-		branch._publishEvent('didShowBanner');
-	}
 
-	if (options.immediate) {
-		onAnimationEnd();
-	}
-	else {
-		setTimeout(onAnimationEnd, banner_utils.animationDelay);
-	}
+		var closeButton = doc.getElementById('branch-banner-close');
+
+		if (closeButton) {
+			closeButton.onclick = function(ev) {
+				ev.preventDefault();
+				branch._publishEvent('willCloseBanner');
+				closeBanner({}, function() {
+					branch._publishEvent('didCloseBanner');
+				});
+			};
+		}
+
+		function onAnimationEnd() {
+			if (options.position === 'top') {
+				element.style.top = '0';
+			}
+			else if (options.position === 'bottom') {
+				element.style.bottom = '0';
+			}
+			branch._publishEvent('didShowBanner');
+		}
+
+		if (options.immediate) {
+			onAnimationEnd();
+		}
+		else {
+			setTimeout(onAnimationEnd, banner_utils.animationDelay);
+		}
+
+	};
+
+	// Create markup
+	banner_html.markup(options, storage, finalHookupsCallback);
 
 	return closeBanner;
 };
