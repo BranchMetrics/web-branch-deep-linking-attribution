@@ -62,6 +62,9 @@ journeys_utils.previousDivToInjectParents = [];
 // holds data from Journey that is currently being viewed & data from setBranchViewData()
 journeys_utils.journeyLinkData = null;
 
+// center_overlay template type
+journeys_utils.center_overlay = 'center_overlay';
+
 /***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
@@ -92,8 +95,8 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.position = 'bottom';
 			journeys_utils.sticky = 'fixed';
 		}
-		if (metadata["type"] === "center_overlay") {
-          journeys_utils.bannerHeight = metadata["bannerHeight"];
+		if (metadata["type"] === journeys_utils.center_overlay) {
+			journeys_utils.bannerHeight = metadata["bannerHeight"];
         }
 	}
 
@@ -363,7 +366,7 @@ function generateIframeOuterCSS(metadata) {
 						'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 	}
 
-	var isCenterOverlay = metadata.type === "center_overlay";
+	var isCenterOverlay = metadata.type === journeys_utils.center_overlay;
 
 	if (isCenterOverlay) {
 		document.body.style.background = "rgba(0,0,0,0.4)";
@@ -444,6 +447,17 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 }
 
 /***
+ * @function journeys_utils.centerOverlay
+ * @param {Object} banner
+ */
+journeys_utils.centerOverlay = function(banner) {
+	banner.style.bottom = "140px";
+	banner.style.width = "94%";
+	banner.style.borderRadius = "20px";
+	banner.style.margin = "auto";
+}
+
+/***
  * @function journeys_utils.animateBannerEntrance
  * @param {Object} banner
  */
@@ -470,11 +484,8 @@ journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer, meta
 				if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
 					banner.style.bottom = '0';
 
-					if (metadata.type === "center_overlay") {
-						banner.style.bottom = "140px";
-                        banner.style.width = "94%";
-                        banner.style.borderRadius = "20px";
-                        banner.style.margin = "auto";
+					if (metadata.type === journeys_utils.center_overlay) {
+						journeys_utils.centerOverlay(banner);
                     }
 				} else {
 					journeys_utils._dynamicallyRepositionBanner();
