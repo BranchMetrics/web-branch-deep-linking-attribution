@@ -92,6 +92,9 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.position = 'bottom';
 			journeys_utils.sticky = 'fixed';
 		}
+		if (metadata["type"] === "center_overlay") {
+          journeys_utils.bannerHeight = metadata["bannerHeight"];
+        }
 	}
 
 	// convert full page to fixed pixel height
@@ -274,7 +277,7 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
  * Creates a style element on document.body and adds CSS that will determine
  * banner position, height and sticky.
  */
-journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
+journeys_utils.addIframeOuterCSS = function(cssIframeContainer, metadata) {
 	var iFrameCSS = document.createElement('style');
 	iFrameCSS.type = 'text/css';
 	iFrameCSS.id = 'branch-iframe-css';
@@ -334,7 +337,7 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	if (cssIframeContainer) {
 		iFrameCSS.innerHTML = cssIframeContainer;
 	} else {
-		iFrameCSS.innerHTML = generateIframeOuterCSS();
+		iFrameCSS.innerHTML = generateIframeOuterCSS(metadata);
 	}
 
 	utils.addNonceAttribute(iFrameCSS);
@@ -342,7 +345,7 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	document.head.appendChild(iFrameCSS);
 }
 
-function generateIframeOuterCSS() {
+function generateIframeOuterCSS(metadata) {
 	var bodyWebkitTransitionStyle = '';
 	var iFrameAnimationStyle = '';
 
@@ -360,8 +363,14 @@ function generateIframeOuterCSS() {
 						'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 	}
 
+	var isCenterOverlay = metadata.type === "center_overlay";
+
+	if (isCenterOverlay) {
+		document.body.style.background = "rgba(0,0,0,0.4)";
+	}
+
 	var css = bodyWebkitTransitionStyle ? bodyWebkitTransitionStyle : ''; // add if we need to
-	css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
+	css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: ' + (isCenterOverlay ? 'null;': '100%;') +
 	' left: 0; right: 0; border: 0; height: ' +
 	journeys_utils.bannerHeight + '; z-index: 99999; ' +
 	iFrameAnimationStyle  + ' }\n' +
@@ -438,7 +447,7 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
  * @function journeys_utils.animateBannerEntrance
  * @param {Object} banner
  */
-journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
+journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer, metadata) {
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 	if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
 		var bodyCSS = document.createElement("style");
@@ -460,6 +469,13 @@ journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 				// check if safeAreaRequired is true or not
 				if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
 					banner.style.bottom = '0';
+
+					if (metadata.type === "center_overlay") {
+						banner.style.bottom = "140px";
+                        banner.style.width = "94%";
+                        banner.style.borderRadius = "20px";
+                        banner.style.margin = "auto";
+                    }
 				} else {
 					journeys_utils._dynamicallyRepositionBanner();
 				}
