@@ -266,13 +266,13 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent, templateId) {
 	else {
 		bodyClass = 'branch-banner-desktop';
 	}
-	var instacartAccessibilityTemplateId = '1042917133147779073';
+	var accessibleTemplateIds = ['1042917133147779073'];
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');
 	iframedoc.body = iframedoc.createElement('body');
 	iframedoc.body.innerHTML = html;
 	iframedoc.body.className = bodyClass;
-	if (templateId === instacartAccessibilityTemplateId) {
+	if (accessibleTemplateIds.includes(templateId)) {
 		var scriptTag = iframedoc.createElement('script');
 		scriptTag.type = 'text/javascript';
 		scriptTag.text = `
