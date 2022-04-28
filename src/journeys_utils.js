@@ -255,7 +255,7 @@ journeys_utils.createIframe = function() {
  * @param {string} html - raw Journey HTML
  * @param {string} userAgent - UA to determine body class
  */
-journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
+journeys_utils.addHtmlToIframe = function(iframe, html, userAgent, templateId) {
 	var bodyClass;
 	if (userAgent === 'ios' || userAgent === 'ipad') {
 		bodyClass = 'branch-banner-ios';
@@ -266,12 +266,44 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 	else {
 		bodyClass = 'branch-banner-desktop';
 	}
-
+	var instacartAccessibilityTemplateId = '1042917133147779073';
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');
 	iframedoc.body = iframedoc.createElement('body');
 	iframedoc.body.innerHTML = html;
 	iframedoc.body.className = bodyClass;
+	if (templateId === instacartAccessibilityTemplateId) {
+		var scriptTag = iframedoc.createElement('script');
+		scriptTag.type = 'text/javascript';
+		scriptTag.text = `
+			const  focusableElements =
+					'button, [href], input, select, textarea';
+			const modal = document.getElementById('branch-banner');
+			const focusableContent = modal.querySelectorAll(focusableElements);
+			const firstFocusableElement = focusableContent[0];
+			const lastFocusableElement = focusableContent[focusableContent.length - 1];
+
+			document.addEventListener('keydown', function(e) {
+				const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+			
+				if (!isTabPressed) {
+					return;
+				}
+
+				if (e.shiftKey) {
+					if (document.activeElement === firstFocusableElement) {
+						lastFocusableElement.focus();
+						e.preventDefault();
+					}
+				} else if (document.activeElement === lastFocusableElement) {
+					firstFocusableElement.focus();
+					e.preventDefault();
+				}
+			});
+			setTimeout(function() { firstFocusableElement.focus() }, 100);
+		`;
+		iframedoc.querySelector('body').append(scriptTag);
+	}
 }
 
 /***

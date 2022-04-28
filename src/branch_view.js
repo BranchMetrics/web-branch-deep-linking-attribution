@@ -20,7 +20,7 @@ function checkPreviousBanner() {
  * @param {string} html
  * @param {boolean} hasApp
  */
-function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
+function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback, templateId) {
 
 	var ctaText = hasApp ? 'OPEN' : 'GET';
 
@@ -39,7 +39,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 	// create iframe element, add html, add css, add ctaText
 	var iframe = journeys_utils.createIframe();
 	iframe.onload = function() {
-		journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
+		journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent(), templateId);
 		journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
 		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 		journeys_utils.addDynamicCtaText(iframe, ctaText);
@@ -178,7 +178,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 				branch_view.incrementPageviewAnalytics(branchViewData);
 			}
 		}
-		renderHtmlBlob(document.body, html, requestData['has_app_websdk'], finalHookupsOnIframeLoaded);
+		renderHtmlBlob(document.body, html, requestData['has_app_websdk'], finalHookupsOnIframeLoaded, templateId);
 	} else {
 		document.body.removeChild(placeholder);
 	
