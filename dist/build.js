@@ -958,7 +958,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.stage.branch.io", link_service_endpoint:"https://link.stage.branch.io", api_endpoint:"https://instacart.api.beta.branch.io", version:"2.59.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.60.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
