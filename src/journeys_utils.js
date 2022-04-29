@@ -266,12 +266,44 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 	else {
 		bodyClass = 'branch-banner-desktop';
 	}
-
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');
 	iframedoc.body = iframedoc.createElement('body');
 	iframedoc.body.innerHTML = html;
 	iframedoc.body.className = bodyClass;
+	var metaTag = iframedoc.querySelector('meta[name="accessibility"]');
+	if (metaTag && metaTag.content === 'wcag') {
+		var scriptTag = iframedoc.createElement('script');
+		scriptTag.type = 'text/javascript';
+		scriptTag.text = `
+			var  focusableElements =
+					'button, [href], input, select, textarea';
+			var modal = document.getElementById('branch-banner');
+			var focusableContent = modal.querySelectorAll(focusableElements);
+			var firstFocusableElement = focusableContent[0];
+			var lastFocusableElement = focusableContent[focusableContent.length - 1];
+
+			document.addEventListener('keydown', function(e) {
+				var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+			
+				if (!isTabPressed) {
+					return;
+				}
+
+				if (e.shiftKey) {
+					if (document.activeElement === firstFocusableElement) {
+						lastFocusableElement.focus();
+						e.preventDefault();
+					}
+				} else if (document.activeElement === lastFocusableElement) {
+					firstFocusableElement.focus();
+					e.preventDefault();
+				}
+			});
+			setTimeout(function() { firstFocusableElement.focus() }, 100);
+		`;
+		iframedoc.querySelector('body').append(scriptTag);
+	}
 }
 
 /***

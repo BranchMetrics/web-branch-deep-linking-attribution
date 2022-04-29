@@ -958,7 +958,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.59.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.60.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2284,6 +2284,8 @@ journeys_utils.addHtmlToIframe = function(a, b, c) {
   a.body = a.createElement("body");
   a.body.innerHTML = b;
   a.body.className = c;
+  (b = a.querySelector('meta[name="accessibility"]')) && "wcag" === b.content && (b = a.createElement("script"), b.type = "text/javascript", b.text = "\n\t\t\tvar  focusableElements =\n\t\t\t\t\t'button, [href], input, select, textarea';\n\t\t\tvar modal = document.getElementById('branch-banner');\n\t\t\tvar focusableContent = modal.querySelectorAll(focusableElements);\n\t\t\tvar firstFocusableElement = focusableContent[0];\n\t\t\tvar lastFocusableElement = focusableContent[focusableContent.length - 1];\n\n\t\t\tdocument.addEventListener('keydown', function(e) {\n\t\t\t\tvar isTabPressed = e.key === 'Tab' || e.keyCode === 9;\n\t\t\t\n\t\t\t\tif (!isTabPressed) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tif (e.shiftKey) {\n\t\t\t\t\tif (document.activeElement === firstFocusableElement) {\n\t\t\t\t\t\tlastFocusableElement.focus();\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t}\n\t\t\t\t} else if (document.activeElement === lastFocusableElement) {\n\t\t\t\t\tfirstFocusableElement.focus();\n\t\t\t\t\te.preventDefault();\n\t\t\t\t}\n\t\t\t});\n\t\t\tsetTimeout(function() { firstFocusableElement.focus() }, 100);\n\t\t", 
+  a.querySelector("body").append(b));
 };
 journeys_utils.addIframeOuterCSS = function(a, b) {
   var c = document.createElement("style");
