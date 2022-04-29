@@ -276,15 +276,15 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 		var scriptTag = iframedoc.createElement('script');
 		scriptTag.type = 'text/javascript';
 		scriptTag.text = `
-			const  focusableElements =
+			var  focusableElements =
 					'button, [href], input, select, textarea';
-			const modal = document.getElementById('branch-banner');
-			const focusableContent = modal.querySelectorAll(focusableElements);
-			const firstFocusableElement = focusableContent[0];
-			const lastFocusableElement = focusableContent[focusableContent.length - 1];
+			var modal = document.getElementById('branch-banner');
+			var focusableContent = modal.querySelectorAll(focusableElements);
+			var firstFocusableElement = focusableContent[0];
+			var lastFocusableElement = focusableContent[focusableContent.length - 1];
 
 			document.addEventListener('keydown', function(e) {
-				const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+				var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
 			
 				if (!isTabPressed) {
 					return;
