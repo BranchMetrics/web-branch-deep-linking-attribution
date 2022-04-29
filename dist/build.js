@@ -55,12 +55,12 @@ $jscomp.polyfill("String.prototype.startsWith", function(a) {
   return a ? a : function(a, c) {
     var b = $jscomp.checkStringArgs(this, a, "startsWith");
     a += "";
-    for (var e = b.length, f = a.length, g = Math.max(0, Math.min(c | 0, b.length)), h = 0;h < f && g < e;) {
-      if (b[g++] != a[h++]) {
+    for (var e = b.length, f = a.length, g = Math.max(0, Math.min(c | 0, b.length)), k = 0;k < f && g < e;) {
+      if (b[g++] != a[k++]) {
         return !1;
       }
     }
-    return h >= f;
+    return k >= f;
   };
 }, "es6-impl", "es3");
 $jscomp.SYMBOL_PREFIX = "jscomp_symbol_";
@@ -431,8 +431,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   goog.moduleLoaderState_ = null;
   for (a = 0;a < c.length;a++) {
     if (f = c[a]) {
-      var h = e.loadFlags[f] || {}, k = goog.needsTranspile_(h.lang || "es3");
-      "goog" == h.module || k ? goog.importProcessedScript_(goog.basePath + f, "goog" == h.module, k) : goog.importScript_(goog.basePath + f);
+      var k = e.loadFlags[f] || {}, h = goog.needsTranspile_(k.lang || "es3");
+      "goog" == k.module || h ? goog.importProcessedScript_(goog.basePath + f, "goog" == k.module, h) : goog.importScript_(goog.basePath + f);
     } else {
       throw goog.moduleLoaderState_ = g, Error("Undefined script input");
     }
@@ -1040,8 +1040,8 @@ utils.generateDynamicBNCLink = function(a, b) {
       var f = d[e], g = b[f];
       if (g) {
         if ("tags" === f && Array.isArray(g)) {
-          for (var h = 0;h < g.length;h++) {
-            c = ("?" === c[c.length - 1] ? c + f : c + "&" + f) + "=" + encodeURIComponent(g[h]);
+          for (var k = 0;k < g.length;k++) {
+            c = ("?" === c[c.length - 1] ? c + f : c + "&" + f) + "=" + encodeURIComponent(g[k]);
           }
         } else {
           if ("string" === typeof g && 0 < g.length || "number" === typeof g) {
@@ -1251,14 +1251,14 @@ utils.snakeToCamel = function(a) {
   });
 };
 utils.base64encode = function(a) {
-  var b = "", c, d, e, f, g, h, k = 0;
+  var b = "", c, d, e, f, g, k, h = 0;
   a = a.replace(/\r\n/g, "\n");
   d = "";
   for (e = 0;e < a.length;e++) {
     f = a.charCodeAt(e), 128 > f ? d += String.fromCharCode(f) : (127 < f && 2048 > f ? d += String.fromCharCode(f >> 6 | 192) : (d += String.fromCharCode(f >> 12 | 224), d += String.fromCharCode(f >> 6 & 63 | 128)), d += String.fromCharCode(f & 63 | 128));
   }
-  for (a = d;k < a.length;) {
-    c = a.charCodeAt(k++), d = a.charCodeAt(k++), e = a.charCodeAt(k++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, h = e & 63, isNaN(d) ? h = g = 64 : isNaN(e) && (h = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h);
+  for (a = d;h < a.length;) {
+    c = a.charCodeAt(h++), d = a.charCodeAt(h++), e = a.charCodeAt(h++), f = c >> 2, c = (c & 3) << 4 | d >> 4, g = (d & 15) << 2 | e >> 6, k = e & 63, isNaN(d) ? k = g = 64 : isNaN(e) && (k = 64), b = b + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(f) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(c) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(k);
   }
   return b;
 };
@@ -1747,7 +1747,7 @@ Server.prototype.serializeObject = function(a, b) {
   return c.join("&");
 };
 Server.prototype.getUrl = function(a, b) {
-  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, h = function(b, c) {
+  var c, d, e = a.destination + a.endpoint, f = /^[0-9]{15,20}$/, g = /key_(live|test)_[A-Za-z0-9]{32}/, k = function(b, c) {
     "undefined" === typeof c && (c = {});
     if (b.branch_key && g.test(b.branch_key)) {
       return c.branch_key = b.branch_key, c;
@@ -1763,7 +1763,7 @@ Server.prototype.getUrl = function(a, b) {
   };
   if ("/v1/has-app" === a.endpoint) {
     try {
-      a.queryPart = h(b, a.queryPart);
+      a.queryPart = k(b, a.queryPart);
     } catch (l) {
       return {error:l.message};
     }
@@ -1778,7 +1778,7 @@ Server.prototype.getUrl = function(a, b) {
       }
     }
   }
-  var k = {};
+  var h = {};
   if ("undefined" !== typeof a.params && "/v1/pageview" !== a.endpoint && "/v1/dismiss" !== a.endpoint) {
     for (c in a.params) {
       if (a.params.hasOwnProperty(c)) {
@@ -1786,23 +1786,23 @@ Server.prototype.getUrl = function(a, b) {
           return {error:d};
         }
         d = b[c];
-        "undefined" !== typeof d && "" !== d && null !== d && (k[c] = d);
+        "undefined" !== typeof d && "" !== d && null !== d && (h[c] = d);
       }
     }
   } else {
-    "/v1/pageview" !== a.endpoint && "/v1/dismiss" !== a.endpoint || utils.merge(k, b);
+    "/v1/pageview" !== a.endpoint && "/v1/dismiss" !== a.endpoint || utils.merge(h, b);
   }
   if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
     try {
-      b = h(b, k);
+      b = k(b, h);
     } catch (l) {
       return {error:l.message};
     }
   }
-  "/v1/event" === a.endpoint && (k.metadata = safejson.stringify(k.metadata || {}), k.hasOwnProperty("commerce_data") && (k.commerce_data = safejson.stringify(k.commerce_data || {})));
-  ("/v1/pageview" === a.endpoint || "/v1/dismiss" === a.endpoint) && k.metadata && (k.metadata = safejson.stringify(k.metadata || {}));
-  "/v1/open" === a.endpoint && (k.options = safejson.stringify(k.options || {}));
-  return {data:this.serializeObject(k, ""), url:e.replace(/^\//, "")};
+  "/v1/event" === a.endpoint && (h.metadata = safejson.stringify(h.metadata || {}), h.hasOwnProperty("commerce_data") && (h.commerce_data = safejson.stringify(h.commerce_data || {})));
+  ("/v1/pageview" === a.endpoint || "/v1/dismiss" === a.endpoint) && h.metadata && (h.metadata = safejson.stringify(h.metadata || {}));
+  "/v1/open" === a.endpoint && (h.options = safejson.stringify(h.options || {}));
+  return {data:this.serializeObject(h, ""), url:e.replace(/^\//, "")};
 };
 Server.prototype.createScript = function(a, b, c) {
   var d = document.createElement("script");
@@ -1816,19 +1816,19 @@ Server.prototype.createScript = function(a, b, c) {
 Server.prototype.jsonpRequest = function(a, b, c, d) {
   var e = Date.now(), f = utils.currentRequestBrttTag;
   0 === this._jsonp_callback_index && utils.isSafari11OrGreater() && this._jsonp_callback_index++;
-  var g = "branch_callback__" + this._jsonp_callback_index++, h = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
+  var g = "branch_callback__" + this._jsonp_callback_index++, k = 0 <= a.indexOf("branch.io") ? "&data=" : "&post_data=";
   b = "POST" === c ? encodeURIComponent(utils.base64encode(goog.json.serialize(b))) : "";
-  var k = window.setTimeout(function() {
+  var h = window.setTimeout(function() {
     window[g] = function() {
     };
     utils.addPropertyIfNotNull(utils.instrumentation, f, utils.calculateBrtt(e));
     d(Error(utils.messages.timeout), null, 504);
   }, utils.timeout);
   window[g] = function(a) {
-    window.clearTimeout(k);
+    window.clearTimeout(h);
     d(null, a);
   };
-  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? h + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + g, function() {
+  this.createScript(a + (0 > a.indexOf("?") ? "?" : "") + (b ? k + b : "") + (0 <= a.indexOf("/c/") ? "&click=1" : "") + "&callback=" + g, function() {
     d(Error(utils.messages.blockedByClient), null);
   }, function() {
     utils.addPropertyIfNotNull(utils.instrumentation, f, utils.calculateBrtt(e));
@@ -1840,10 +1840,10 @@ Server.prototype.jsonpRequest = function(a, b, c, d) {
   });
 };
 Server.prototype.XHRRequest = function(a, b, c, d, e, f, g) {
-  var h = Date.now(), k = utils.currentRequestBrttTag, l = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
+  var k = Date.now(), h = utils.currentRequestBrttTag, l = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
   g && (l.responseType = g);
   l.ontimeout = function() {
-    utils.addPropertyIfNotNull(utils.instrumentation, k, utils.calculateBrtt(h));
+    utils.addPropertyIfNotNull(utils.instrumentation, h, utils.calculateBrtt(k));
     e(Error(utils.messages.timeout), null, 504);
   };
   l.onerror = function(a) {
@@ -1852,7 +1852,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f, g) {
   l.onreadystatechange = function() {
     var a;
     if (4 === l.readyState) {
-      if (utils.addPropertyIfNotNull(utils.instrumentation, k, utils.calculateBrtt(h)), 200 === l.status) {
+      if (utils.addPropertyIfNotNull(utils.instrumentation, h, utils.calculateBrtt(k)), 200 === l.status) {
         if ("arraybuffer" === l.responseType) {
           a = l.response;
         } else {
@@ -1897,25 +1897,25 @@ Server.prototype.request = function(a, b, c, d) {
   if (f.error) {
     return d(Error(safejson.stringify({message:f.error, endpoint:a.endpoint, data:b})));
   }
-  var h, k = "";
-  "GET" === a.method ? h = f.url + "?" + f.data : (h = f.url, k = f.data);
+  var k, h = "";
+  "GET" === a.method ? k = f.url + "?" + f.data : (k = f.url, h = f.data);
   var l;
-  l = c.get("use_jsonp") || a.jsonp ? b : k;
+  l = c.get("use_jsonp") || a.jsonp ? b : h;
   var m = utils.retries, n = function(b, c, f) {
     if ("function" === typeof e.onAPIResponse) {
-      e.onAPIResponse(h, a.method, l, b, f, c);
+      e.onAPIResponse(k, a.method, l, b, f, c);
     }
     b && 0 < m && "5" === (f || "").toString().substring(0, 1) ? (m--, window.setTimeout(function() {
       r();
     }, utils.retry_delay)) : d(b, c);
   };
-  if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(h, b)) {
+  if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(k, b)) {
     return utils.userPreferences.allowErrorsInCallback ? n(Error(utils.messages.trackingDisabled), null, 300) : n(null, {}, 200);
   }
   var p = !1, q;
   "/v1/qr-code" === a.endpoint && (p = !0, q = "arraybuffer");
   var r = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(h, b, a.method, n) : e.XHRRequest(h, k, a.method, c, n, p, q);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(k, b, a.method, n) : e.XHRRequest(k, h, a.method, c, n, p, q);
   };
   r();
 };
@@ -1942,7 +1942,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     a = a.match(/\d+/g);
     var d = parseInt(0 < a.length ? a[0] : "0", 10), g = function() {
       return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
-    }, h = function() {
+    }, k = function() {
       return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
     };
     return parseInt({px:function(a) {
@@ -1954,11 +1954,11 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
     }, vw:function(a) {
       return a * g();
     }, vh:function(a) {
-      return a * h();
+      return a * k();
     }, vmin:function(a) {
-      return a * Math.min(h(), g());
+      return a * Math.min(k(), g());
     }, vmax:function(a) {
-      return a * Math.max(h(), g());
+      return a * Math.max(k(), g());
     }, "%":function() {
       return document.body.clientWidth / 100 * d;
     }}[b](d), 10);
@@ -2067,24 +2067,24 @@ var banner_html = {banner:function(a, b) {
 }};
 // Input 13
 var sendSMS = function(a, b, c, d) {
-  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), h = a.getElementById("branch-sms-form-container"), k, l = function() {
+  var e = a.getElementById("branch-sms-phone"), f = a.getElementById("branch-sms-send"), g = a.getElementById("branch-loader-wrapper"), k = a.getElementById("branch-sms-form-container"), h, l = function() {
     f.removeAttribute("disabled");
     e.removeAttribute("disabled");
     f.style.opacity = "1";
     e.style.opacity = "1";
     g.style.opacity = "0";
   }, m = function() {
-    k = a.createElement("div");
-    k.className = "branch-icon-wrapper";
-    k.id = "branch-checkmark";
-    k.style = "opacity: 0;";
-    k.innerHTML = banner_html.checkmark();
-    h.appendChild(k);
+    h = a.createElement("div");
+    h.className = "branch-icon-wrapper";
+    h.id = "branch-checkmark";
+    h.style = "opacity: 0;";
+    h.innerHTML = banner_html.checkmark();
+    k.appendChild(h);
     f.style.opacity = "0";
     e.style.opacity = "0";
     g.style.opacity = "0";
     setTimeout(function() {
-      k.style.opacity = "1";
+      h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
   }, n = function() {
@@ -2100,7 +2100,7 @@ var sendSMS = function(a, b, c, d) {
     var p = e.value;
     /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(a) {
       a ? (b._publishEvent("sendBannerSMSError"), n()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
-        h.removeChild(k);
+        k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
     })) : n();
@@ -2110,7 +2110,7 @@ var sendSMS = function(a, b, c, d) {
     return a._publishEvent("willNotShowBanner"), null;
   }
   a._publishEvent("willShowBanner");
-  var e, f = document.body.style.marginTop, g = document.body.style.marginBottom, h = function(a, c) {
+  var e, f = document.body.style.marginTop, g = document.body.style.marginBottom, k = function(a, c) {
     "function" === typeof a && (c = a, a = {});
     a = a || {};
     "top" === b.position ? e.style.top = "-" + banner_utils.bannerHeight : "bottom" === b.position && (e.style.bottom = "-" + banner_utils.bannerHeight);
@@ -2153,21 +2153,21 @@ var sendSMS = function(a, b, c, d) {
       };
     }
     d = banner_utils.getBodyStyle("margin-top");
-    var k = banner_utils.getBodyStyle("margin-bottom");
+    var h = banner_utils.getBodyStyle("margin-bottom");
     banner_utils.addClass(document.body, "branch-banner-is-active");
-    "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, d) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, k));
+    "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, d) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, h));
     if (d = g.getElementById("branch-banner-close")) {
       d.onclick = function(b) {
         b.preventDefault();
         a._publishEvent("willCloseBanner");
-        h({}, function() {
+        k({}, function() {
           a._publishEvent("didCloseBanner");
         });
       };
     }
     b.immediate ? f() : setTimeout(f, banner_utils.animationDelay);
   });
-  return h;
+  return k;
 };
 // Input 14
 var journeys_utils = {_callback_index:1, position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[], isSafeAreaEnabled:!1};
@@ -2277,7 +2277,7 @@ journeys_utils.createIframe = function() {
   utils.addNonceAttribute(a);
   return a;
 };
-journeys_utils.addHtmlToIframe = function(a, b, c, d) {
+journeys_utils.addHtmlToIframe = function(a, b, c) {
   c = "ios" === c || "ipad" === c ? "branch-banner-ios" : "android" === c ? "branch-banner-android" : "branch-banner-desktop";
   a = a.contentDocument || a.contentWindow.document;
   a.head = a.createElement("head");
@@ -2396,10 +2396,10 @@ journeys_utils._findGlobalDismissPeriod = function(a) {
     return -1 === a ? !0 : journeys_utils._addSecondsToDate(a);
   }
 };
-journeys_utils.finalHookups = function(a, b, c, d, e, f, g, h) {
+journeys_utils.finalHookups = function(a, b, c, d, e, f, g, k) {
   if (d && e) {
-    var k = e.contentWindow.document.querySelectorAll("#branch-mobile-action");
-    Array.prototype.forEach.call(k, function(a) {
+    var h = e.contentWindow.document.querySelectorAll("#branch-mobile-action");
+    Array.prototype.forEach.call(h, function(a) {
       a.addEventListener("click", function(a) {
         journeys_utils.branch._publishEvent("didClickJourneyCTA", journeys_utils.journeyLinkData);
         journeys_utils.journeyDismissed = !0;
@@ -2407,15 +2407,15 @@ journeys_utils.finalHookups = function(a, b, c, d, e, f, g, h) {
         journeys_utils.animateBannerExit(e);
       });
     });
-    journeys_utils._setupDismissBehavior(".branch-banner-continue", "didClickJourneyContinue", c, e, a, b, f, g, h);
-    journeys_utils._setupDismissBehavior(".branch-banner-close", "didClickJourneyClose", c, e, a, b, f, g, h);
+    journeys_utils._setupDismissBehavior(".branch-banner-continue", "didClickJourneyContinue", c, e, a, b, f, g, k);
+    journeys_utils._setupDismissBehavior(".branch-banner-close", "didClickJourneyClose", c, e, a, b, f, g, k);
   }
 };
-journeys_utils._setupDismissBehavior = function(a, b, c, d, e, f, g, h, k) {
+journeys_utils._setupDismissBehavior = function(a, b, c, d, e, f, g, k, h) {
   a = d.contentWindow.document.querySelectorAll(a);
   Array.prototype.forEach.call(a, function(a) {
     a.addEventListener("click", function(a) {
-      journeys_utils._handleJourneyDismiss(b, c, d, e, f, g, h, k);
+      journeys_utils._handleJourneyDismiss(b, c, d, e, f, g, k, h);
     });
   });
 };
@@ -2452,20 +2452,20 @@ journeys_utils._getDismissRequestData = function(a, b) {
   utils.addPropertyIfNotNull(c, "dismissal_source", b);
   return c;
 };
-journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, h) {
-  var k = g ? 0 : journeys_utils._findGlobalDismissPeriod(f);
+journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, k) {
+  var h = g ? 0 : journeys_utils._findGlobalDismissPeriod(f);
   journeys_utils.branch._publishEvent(a, journeys_utils.journeyLinkData);
   journeys_utils.journeyDismissed = !0;
   journeys_utils.animateBannerExit(c);
   if (!g) {
-    if (void 0 !== k && b.set("globalJourneysDismiss", k, !0), journeys_utils._setJourneyDismiss(b, d, e), f.dismissRedirect) {
+    if (void 0 !== h && b.set("globalJourneysDismiss", h, !0), journeys_utils._setJourneyDismiss(b, d, e), f.dismissRedirect) {
       window.location = f.dismissRedirect;
     } else {
       var l = function() {
         journeys_utils.branch.removeListener(l);
-        var b = journeys_utils._getDismissRequestData(h, utils.dismissEventToSourceMapping[a]);
+        var b = journeys_utils._getDismissRequestData(k, utils.dismissEventToSourceMapping[a]);
         journeys_utils.branch._api(resources.dismiss, b, function(a, c) {
-          !a && "object" === typeof c && c.template && h.shouldDisplayJourney(c, null, !1) && h.displayJourney(c.template, b, b.branch_view_id || c.event_data.branch_view_data.id, c.event_data.branch_view_data, !1, c.journey_link_data);
+          !a && "object" === typeof c && c.template && k.shouldDisplayJourney(c, null, !1) && k.displayJourney(c.template, b, b.branch_view_id || c.event_data.branch_view_data.id, c.event_data.branch_view_data, !1, c.journey_link_data);
         });
       };
       journeys_utils.branch.addListener("branch_internal_event_didCloseJourney", l);
@@ -2563,27 +2563,27 @@ var branch_view = {};
 function checkPreviousBanner() {
   return document.getElementById("branch-banner") || document.getElementById("branch-banner-iframe") || document.getElementById("branch-banner-container") ? !0 : !1;
 }
-function renderHtmlBlob(a, b, c, d, e) {
-  var f = c ? "OPEN" : "GET";
+function renderHtmlBlob(a, b, c, d) {
+  var e = c ? "OPEN" : "GET";
   journeys_utils.setPositionAndHeight(b);
-  var g = journeys_utils.getMetadata(b);
-  g && (f = journeys_utils.getCtaText(g, c), journeys_utils.findInsertionDiv(a, g));
-  var h = journeys_utils.getCss(b);
+  var f = journeys_utils.getMetadata(b);
+  f && (e = journeys_utils.getCtaText(f, c), journeys_utils.findInsertionDiv(a, f));
+  var g = journeys_utils.getCss(b);
   journeys_utils.getJsAndAddToParent(b);
   var k = journeys_utils.getIframeCss(b);
   b = journeys_utils.removeScriptAndCss(b);
-  var l = journeys_utils.createIframe();
-  l.onload = function() {
-    journeys_utils.addHtmlToIframe(l, b, utils.mobileUserAgent(), e);
-    journeys_utils.addIframeOuterCSS(k, g);
-    journeys_utils.addIframeInnerCSS(l, h);
-    journeys_utils.addDynamicCtaText(l, f);
+  var h = journeys_utils.createIframe();
+  h.onload = function() {
+    journeys_utils.addHtmlToIframe(h, b, utils.mobileUserAgent());
+    journeys_utils.addIframeOuterCSS(k, f);
+    journeys_utils.addIframeInnerCSS(h, g);
+    journeys_utils.addDynamicCtaText(h, e);
     journeys_utils.branch._publishEvent("willShowJourney", journeys_utils.journeyLinkData);
-    journeys_utils.animateBannerEntrance(l, k, g);
-    d(l);
+    journeys_utils.animateBannerEntrance(h, k, f);
+    d(h);
   };
-  document.body.appendChild(l);
-  return l;
+  document.body.appendChild(h);
+  return h;
 }
 function _areJourneysDismissedGlobally(a) {
   var b = a._storage.get("globalJourneysDismiss", !0);
@@ -2606,11 +2606,11 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
     journeys_utils.setJourneyLinkData(f);
     var g = d.audience_rule_id;
     (f = document.getElementById("branch-iframe-css")) && f.parentElement.removeChild(f);
-    var h = document.createElement("div");
-    h.id = "branch-banner";
-    document.body.insertBefore(h, null);
-    banner_utils.addClass(h, "branch-banner-is-active");
-    var k = !1, l = b.callback_string, m = null, n = journeys_utils.branch._storage;
+    var k = document.createElement("div");
+    k.id = "branch-banner";
+    document.body.insertBefore(k, null);
+    banner_utils.addClass(k, "branch-banner-is-active");
+    var h = !1, l = b.callback_string, m = null, n = journeys_utils.branch._storage;
     if (a) {
       var p = journeys_utils.getMetadata(a) || {};
       a = journeys_utils.tryReplaceJourneyCtaLink(a);
@@ -2620,14 +2620,14 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
       }, utils.timeout);
       window[l] = function(a) {
         window.clearTimeout(q);
-        k || (m = a, journeys_utils.finalHookups(c, g, n, m, null, p, e, branch_view));
+        h || (m = a, journeys_utils.finalHookups(c, g, n, m, null, p, e, branch_view));
       };
       renderHtmlBlob(document.body, a, b.has_app_websdk, function(a) {
         journeys_utils.banner = a;
-        null === a ? k = !0 : (journeys_utils.finalHookups(c, g, n, m, a, p, e, branch_view), utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart()), document.body.removeChild(h), utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d));
-      }, c);
+        null === a ? h = !0 : (journeys_utils.finalHookups(c, g, n, m, a, p, e, branch_view), utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart()), document.body.removeChild(k), utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d));
+      });
     } else {
-      document.body.removeChild(h), utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d);
+      document.body.removeChild(k), utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d);
     }
   }
 };
@@ -2637,7 +2637,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   a || (a = {});
   journeys_utils.entryAnimationDisabled = b.disable_entry_animation || !1;
   journeys_utils.exitAnimationDisabled = b.disable_exit_animation || !1;
-  var e = utils.merge({}, c._branchViewData), f = session.get(c._storage) || {}, g = f.hasOwnProperty("has_app") ? f.has_app : !1, h = c._storage.get("journeyDismissals", !0), k = (b.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase() || null, l = utils.getInitialReferrer(c._referringLink()), m = b.branch_view_id || utils.getParameterByName("_branch_view_id") || null;
+  var e = utils.merge({}, c._branchViewData), f = session.get(c._storage) || {}, g = f.hasOwnProperty("has_app") ? f.has_app : !1, k = c._storage.get("journeyDismissals", !0), h = (b.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase() || null, l = utils.getInitialReferrer(c._referringLink()), m = b.branch_view_id || utils.getParameterByName("_branch_view_id") || null;
   c = b.make_new_link ? null : utils.getClickIdAndSearchStringFromLink(c._referringLink());
   e.event = d ? "dismiss" : "pageview";
   e.metadata = a;
@@ -2645,8 +2645,8 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   e = utils.addPropertyIfNotNull(e, "branch_view_id", m);
   e = utils.addPropertyIfNotNull(e, "no_journeys", b.no_journeys);
   e = utils.addPropertyIfNotNull(e, "is_iframe", utils.isIframe());
-  e = utils.addPropertyIfNotNull(e, "journey_dismissals", h);
-  e.user_language = k;
+  e = utils.addPropertyIfNotNull(e, "journey_dismissals", k);
+  e.user_language = h;
   e.open_app = b.open_app || !1;
   e.has_app_websdk = g;
   e.feature = "journeys";
@@ -2716,7 +2716,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     a === callback_params.NO_CALLBACK || "function" !== typeof g ? (f = function(a) {
     }, e = Array.prototype.slice.call(arguments)) : (e = Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [], f = g);
     d._queue(function(g) {
-      var h = function(b, c) {
+      var k = function(b, c) {
         try {
           if (b && a === callback_params.NO_CALLBACK) {
             throw b;
@@ -2728,16 +2728,16 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
       };
       if (!c) {
         if (d.init_state === init_states.INIT_PENDING) {
-          return h(Error(utils.message(utils.messages.initPending)), null);
+          return k(Error(utils.message(utils.messages.initPending)), null);
         }
         if (d.init_state === init_states.INIT_FAILED) {
-          return h(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
+          return k(Error(utils.message(utils.messages.initFailed, d.init_state_fail_code, d.init_state_fail_details)), null);
         }
         if (d.init_state === init_states.NO_INIT || !d.init_state) {
-          return h(Error(utils.message(utils.messages.nonInit)), null);
+          return k(Error(utils.message(utils.messages.nonInit)), null);
         }
       }
-      e.unshift(h);
+      e.unshift(k);
       b.apply(d, e);
     });
   };
@@ -2805,9 +2805,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     return a;
   };
   b = session.get(d._storage);
-  var f = c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null, g = f || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), h = !d.identity_id;
+  var f = c && "undefined" !== typeof c.branch_match_id && null !== c.branch_match_id ? c.branch_match_id : null, g = f || utils.getParamValue("_branch_match_id") || utils.hashValue("r"), k = !d.identity_id;
   d._branchViewEnabled = !!d._storage.get("branch_view_enabled");
-  var k = function(a) {
+  var h = function(a) {
     var b = {sdk:config.version, branch_key:d.branch_key}, c = session.get(d._storage) || {}, e = session.get(d._storage, !0) || {};
     e.browser_fingerprint_id && (b._t = e.browser_fingerprint_id);
     utils.isSafari11OrGreater() || utils.isIOSWKWebView() || d._api(resources._r, b, function(a, b) {
@@ -2820,10 +2820,10 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
       a && a(null, c);
     });
   }, l = function(a) {
-    h && (a.identity = d.identity);
+    k && (a.identity = d.identity);
     return a;
   }, m = function(b, g) {
-    g && (g = e(g), utils.userPreferences.trackingDisabled || (g = l(g), session.set(d._storage, g, h)), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data && 0 !== g.data.length ? safejson.parse(g.data) : {});
+    g && (g = e(g), utils.userPreferences.trackingDisabled || (g = l(g), session.set(d._storage, g, k)), d.init_state = init_states.INIT_SUCCEEDED, g.data_parsed = g.data && 0 !== g.data.length ? safejson.parse(g.data) : {});
     if (b) {
       return d.init_state = init_states.INIT_FAILED, d.init_state_fail_code || (d.init_state_fail_code = init_state_fail_codes.UNKNOWN_CAUSE, d.init_state_fail_details = b.message), a(b, g && utils.whiteListSessionData(g));
     }
@@ -2833,9 +2833,9 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     } finally {
       d.renderFinalize();
     }
-    var k = utils.getAdditionalMetadata(), m = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
-    m && (m = utils.mergeHostedDeeplinkData(k.hosted_deeplink_data, m)) && 0 < Object.keys(m).length && (k.hosted_deeplink_data = m);
-    var n = branch_view._getPageviewRequestData(journeys_utils._getPageviewMetadata(c, k), c, d, !1);
+    var h = utils.getAdditionalMetadata(), m = utils.validateParameterType(c.metadata, "object") ? c.metadata : null;
+    m && (m = utils.mergeHostedDeeplinkData(h.hosted_deeplink_data, m)) && 0 < Object.keys(m).length && (h.hosted_deeplink_data = m);
+    var n = branch_view._getPageviewRequestData(journeys_utils._getPageviewMetadata(c, h), c, d, !1);
     d.renderQueue(function() {
       d._api(resources.pageview, n, function(a, b) {
         if (!a && "object" === typeof b) {
@@ -2849,11 +2849,11 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     var a, b;
     "undefined" !== typeof document.hidden ? (a = "hidden", b = "visibilitychange") : "undefined" !== typeof document.mozHidden ? (a = "mozHidden", b = "mozvisibilitychange") : "undefined" !== typeof document.msHidden ? (a = "msHidden", b = "msvisibilitychange") : "undefined" !== typeof document.webkitHidden && (a = "webkitHidden", b = "webkitvisibilitychange");
     b && !d.changeEventListenerAdded && (d.changeEventListenerAdded = !0, document.addEventListener(b, function() {
-      document[a] || (k(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
+      document[a] || (h(null), "function" === typeof d._deepviewRequestForReplay && d._deepviewRequestForReplay());
     }, !1));
   };
   if (b && b.session_id && !g && !utils.getParamValue("branchify_url")) {
-    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), n(), k(m);
+    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), n(), h(m);
   } else {
     b = {sdk:config.version, branch_key:d.branch_key};
     var p = session.get(d._storage, !0) || {};
