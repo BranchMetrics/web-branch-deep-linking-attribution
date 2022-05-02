@@ -17,6 +17,7 @@ var task_queue = function() {
 			});
 		}
 	};
+
 	return function(task) {
 		queue.push(task);
 		if (queue.length === 1) {
