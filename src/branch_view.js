@@ -40,13 +40,13 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 	var iframe = journeys_utils.createIframe();
 	iframe.onload = function() {
 		journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
-		journeys_utils.addIframeOuterCSS(cssIframeContainer);
+		journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
 		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 		journeys_utils.addDynamicCtaText(iframe, ctaText);
 	
 		journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
 	
-		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
+		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer, metadata);
 		iframeLoadedCallback(iframe);
 	}
 	document.body.appendChild(iframe);

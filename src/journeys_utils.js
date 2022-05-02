@@ -62,6 +62,9 @@ journeys_utils.previousDivToInjectParents = [];
 // holds data from Journey that is currently being viewed & data from setBranchViewData()
 journeys_utils.journeyLinkData = null;
 
+// center_overlay template type
+journeys_utils.center_overlay = 'center_overlay';
+
 /***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
@@ -92,6 +95,9 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.position = 'bottom';
 			journeys_utils.sticky = 'fixed';
 		}
+		if (metadata["type"] === journeys_utils.center_overlay) {
+			journeys_utils.bannerHeight = metadata["bannerHeight"];
+        }
 	}
 
 	// convert full page to fixed pixel height
@@ -260,12 +266,44 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 	else {
 		bodyClass = 'branch-banner-desktop';
 	}
-
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');
 	iframedoc.body = iframedoc.createElement('body');
 	iframedoc.body.innerHTML = html;
 	iframedoc.body.className = bodyClass;
+	var metaTag = iframedoc.querySelector('meta[name="accessibility"]');
+	if (metaTag && metaTag.content === 'wcag') {
+		var scriptTag = iframedoc.createElement('script');
+		scriptTag.type = 'text/javascript';
+		scriptTag.text = `
+			var  focusableElements =
+					'button, [href], input, select, textarea';
+			var modal = document.getElementById('branch-banner');
+			var focusableContent = modal.querySelectorAll(focusableElements);
+			var firstFocusableElement = focusableContent[0];
+			var lastFocusableElement = focusableContent[focusableContent.length - 1];
+
+			document.addEventListener('keydown', function(e) {
+				var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+			
+				if (!isTabPressed) {
+					return;
+				}
+
+				if (e.shiftKey) {
+					if (document.activeElement === firstFocusableElement) {
+						lastFocusableElement.focus();
+						e.preventDefault();
+					}
+				} else if (document.activeElement === lastFocusableElement) {
+					firstFocusableElement.focus();
+					e.preventDefault();
+				}
+			});
+			setTimeout(function() { firstFocusableElement.focus() }, 100);
+		`;
+		iframedoc.querySelector('body').append(scriptTag);
+	}
 }
 
 /***
@@ -274,7 +312,7 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
  * Creates a style element on document.body and adds CSS that will determine
  * banner position, height and sticky.
  */
-journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
+journeys_utils.addIframeOuterCSS = function(cssIframeContainer, metadata) {
 	var iFrameCSS = document.createElement('style');
 	iFrameCSS.type = 'text/css';
 	iFrameCSS.id = 'branch-iframe-css';
@@ -334,7 +372,7 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	if (cssIframeContainer) {
 		iFrameCSS.innerHTML = cssIframeContainer;
 	} else {
-		iFrameCSS.innerHTML = generateIframeOuterCSS();
+		iFrameCSS.innerHTML = generateIframeOuterCSS(metadata);
 	}
 
 	utils.addNonceAttribute(iFrameCSS);
@@ -342,7 +380,7 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer) {
 	document.head.appendChild(iFrameCSS);
 }
 
-function generateIframeOuterCSS() {
+function generateIframeOuterCSS(metadata) {
 	var bodyWebkitTransitionStyle = '';
 	var iFrameAnimationStyle = '';
 
@@ -360,8 +398,14 @@ function generateIframeOuterCSS() {
 						'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 	}
 
+	var isCenterOverlay = metadata.type === journeys_utils.center_overlay;
+
+	if (isCenterOverlay) {
+		document.body.style.background = "rgba(0,0,0,0.4)";
+	}
+
 	var css = bodyWebkitTransitionStyle ? bodyWebkitTransitionStyle : ''; // add if we need to
-	css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
+	css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: ' + (isCenterOverlay ? 'null;': '100%;') +
 	' left: 0; right: 0; border: 0; height: ' +
 	journeys_utils.bannerHeight + '; z-index: 99999; ' +
 	iFrameAnimationStyle  + ' }\n' +
@@ -435,10 +479,21 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 }
 
 /***
+ * @function journeys_utils.centerOverlay
+ * @param {Object} banner
+ */
+journeys_utils.centerOverlay = function(banner) {
+	banner.style.bottom = "140px";
+	banner.style.width = "94%";
+	banner.style.borderRadius = "20px";
+	banner.style.margin = "auto";
+}
+
+/***
  * @function journeys_utils.animateBannerEntrance
  * @param {Object} banner
  */
-journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
+journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer, metadata) {
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 	if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
 		var bodyCSS = document.createElement("style");
@@ -460,6 +515,10 @@ journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 				// check if safeAreaRequired is true or not
 				if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
 					banner.style.bottom = '0';
+
+					if (metadata.type === journeys_utils.center_overlay) {
+						journeys_utils.centerOverlay(banner);
+                    }
 				} else {
 					journeys_utils._dynamicallyRepositionBanner();
 				}
