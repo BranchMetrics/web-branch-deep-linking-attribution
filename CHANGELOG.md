@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.61.0] - 2022-05-04
+– Fix properties of undefined for center overlay
+
 ## [2.59.0] - 2021-10-14
 - Separates custom and event data on logged custom events
 - Ensures banner insertion and manipulation order
