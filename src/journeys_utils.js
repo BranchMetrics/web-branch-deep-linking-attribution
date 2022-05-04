@@ -74,8 +74,7 @@ journeys_utils.center_overlay = 'center_overlay';
  * For full page banners, gets view width/height to set fixed pixel values
  */
 journeys_utils.setPositionAndHeight = function(html) {
-	var metadata = journeys_utils.getMetadata(html);
-
+	var metadata = journeys_utils.getMetadata(html) || {};
 	if (metadata && metadata['bannerHeight'] && metadata['position'] && metadata['sticky']) {
 		journeys_utils.bannerHeight = metadata['bannerHeight'];
 		journeys_utils.position = metadata['position'];
@@ -398,7 +397,7 @@ function generateIframeOuterCSS(metadata) {
 						'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 	}
 
-	var isCenterOverlay = metadata.type === journeys_utils.center_overlay;
+	var isCenterOverlay = metadata && metadata.type === journeys_utils.center_overlay;
 
 	if (isCenterOverlay) {
 		document.body.style.background = "rgba(0,0,0,0.4)";
@@ -483,10 +482,12 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
  * @param {Object} banner
  */
 journeys_utils.centerOverlay = function(banner) {
-	banner.style.bottom = "140px";
-	banner.style.width = "94%";
-	banner.style.borderRadius = "20px";
-	banner.style.margin = "auto";
+	if (banner && banner.style) {
+		banner.style.bottom = "140px";
+		banner.style.width = "94%";
+		banner.style.borderRadius = "20px";
+		banner.style.margin = "auto";
+	}
 }
 
 /***

@@ -2197,7 +2197,7 @@ journeys_utils.previousDivToInjectParents = [];
 journeys_utils.journeyLinkData = null;
 journeys_utils.center_overlay = "center_overlay";
 journeys_utils.setPositionAndHeight = function(a) {
-  var b = journeys_utils.getMetadata(a);
+  var b = journeys_utils.getMetadata(a) || {};
   if (b && b.bannerHeight && b.position && b.sticky) {
     journeys_utils.bannerHeight = b.bannerHeight, journeys_utils.position = b.position, journeys_utils.sticky = b.sticky;
   } else {
@@ -2317,7 +2317,7 @@ function generateIframeOuterCSS(a) {
   document.body.style.transition = "";
   document.getElementById("branch-banner-iframe") && (document.getElementById("branch-banner-iframe").style.transition = "");
   journeys_utils.entryAnimationDisabled || (b = "body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n", document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", c = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;");
-  if (a = a.type === journeys_utils.center_overlay) {
+  if (a = a && a.type === journeys_utils.center_overlay) {
     document.body.style.background = "rgba(0,0,0,0.4)";
   }
   return (b ? b : "") + ("#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: " + (a ? "null;" : "100%;") + " left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + c + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + 
@@ -2346,10 +2346,7 @@ journeys_utils.addDynamicCtaText = function(a, b) {
   a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
 };
 journeys_utils.centerOverlay = function(a) {
-  a.style.bottom = "140px";
-  a.style.width = "94%";
-  a.style.borderRadius = "20px";
-  a.style.margin = "auto";
+  a && a.style && (a.style.bottom = "140px", a.style.width = "94%", a.style.borderRadius = "20px", a.style.margin = "auto");
 };
 journeys_utils.animateBannerEntrance = function(a, b, c) {
   banner_utils.addClass(document.body, "branch-banner-is-active");
