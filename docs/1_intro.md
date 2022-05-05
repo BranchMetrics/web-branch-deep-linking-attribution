@@ -20,7 +20,7 @@ The Branch Web SDK provides an easy way to interact with the Branch API on your 
 
 To use the Web SDK, you'll need to first initialize it with your Branch Key found in your [Branch dashboard](https://dashboard.branch.io/#/settings). You'll also need to register when your users login with `setIdentity`, and when they logout with `logout`.
 
-Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods. It also offers event tracking, access to referrals, and management of credits.
+Once initialized, the Branch Web SDK allows you to create and share links with a banner, over SMS, or your own methods.
 
 ## Using the Sample Web App
 

@@ -146,42 +146,6 @@ resources.SMSLinkSend = {
 	}
 };
 
-resources.getCode = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/referralcode",
-	method: utils.httpMethod.POST,
-	params: defaults({
-		"amount": validator(true, validationTypes.NUMBER),
-		"bucket": validator(false, validationTypes.STRING),
-		"calculation_type": validator(true, validationTypes.NUMBER),
-		"creation_source": validator(true, validationTypes.NUMBER),
-		"expiration": validator(false, validationTypes.STRING),
-		"location": validator(true, validationTypes.NUMBER),
-		"prefix": validator(false, validationTypes.STRING),
-		"type": validator(true, validationTypes.STRING)
-	})
-};
-
-resources.validateCode = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/referralcode",
-	method: utils.httpMethod.POST,
-	queryPart: {
-		"code": validator(true, validationTypes.STRING)
-	},
-	params: defaults({ })
-};
-
-resources.applyCode = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/applycode",
-	method: utils.httpMethod.POST,
-	queryPart: {
-		"code": validator(true, validationTypes.STRING)
-	},
-	params: defaults({ })
-};
-
 resources.logout = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/logout",
@@ -198,50 +162,6 @@ resources.profile = {
 	params: defaults({
 		"identity_id": validator(true, validationTypes.STRING),
 		"identity": validator(true, validationTypes.STRING)
-	})
-};
-
-resources.referrals = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/referrals",
-	method: utils.httpMethod.GET,
-	queryPart: {
-		"identity_id": validator(true, validationTypes.STRING)
-	},
-	params: defaults({ })
-};
-
-resources.creditHistory = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/credithistory",
-	method: utils.httpMethod.GET,
-	params: defaults({
-		"begin_after_id": validator(false, validationTypes.STRING),
-		"bucket": validator(false, validationTypes.STRING),
-		"direction": validator(false, validationTypes.NUMBER),
-		"length": validator(false, validationTypes.NUMBER),
-		"link_click_id": validator(false, validationTypes.STRING)
-	})
-};
-
-resources.credits = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/credits",
-	method: utils.httpMethod.GET,
-	params: defaults({
-		"branch_key": validator(true, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
-	})
-};
-
-resources.redeem = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/redeem",
-	method: utils.httpMethod.POST,
-	params: defaults({
-		"amount": validator(true, validationTypes.NUMBER),
-		"bucket": validator(true, validationTypes.STRING),
-		"identity_id": validator(true, validationTypes.STRING)
 	})
 };
 

@@ -143,17 +143,6 @@ Server.prototype.getUrl = function(resource, data) {
 		utils.merge(d, data);
 	}
 
-	if (resource.method === 'POST' || resource.endpoint === '/v1/credithistory') {
-		try {
-			data = appendKeyOrId(data, d);
-		}
-		catch (e) {
-			return {
-				error: e.message
-			};
-		}
-	}
-
 	if (resource.endpoint === '/v1/event') {
 		d['metadata'] = safejson.stringify(d['metadata'] || {});
 		if (d.hasOwnProperty('commerce_data')) {
@@ -325,9 +314,6 @@ Server.prototype.XHRRequest = function(url, data, method, storage, callback, noP
 					}
 				}
 				callback(null, data, req.status);
-			}
-			else if (req.status === 402) {
-				callback(new Error('Not enough credits to redeem.'), null, req.status);
 			}
 			else if (req.status.toString().substring(0, 1) === '4' ||
 					req.status.toString().substring(0, 1) === '5') {
