@@ -1717,28 +1717,28 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(do
 
 Branch.prototype['referrals'] = function() {
 	console.warn("Credits feature has been deprecated. This is no-op.");
-}
+};
 
 /**
  * Removing from documentation
  */
 Branch.prototype['getCode'] = function() {
 	console.warn("Credits feature has been deprecated. This is no-op.");
-}
+};
 
 /**
  * Removing from documentation
  */
 Branch.prototype['validateCode'] = function() {
 	console.warn("Credits feature has been deprecated. This is no-op.");
-}
+};
 
 /**
  * Removing from documentation
  */
 Branch.prototype['applyCode'] = function() {
 	console.warn("Credits feature has been deprecated. This is no-op.");
-}
+};
 
 /**
  * @function Branch.credits
@@ -1771,7 +1771,7 @@ Branch.prototype['applyCode'] = function() {
 /*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
 Branch.prototype['credits'] = function() {
 	console.warn("Credits feature has been deprecated. This is no-op.");
-}
+};
 /**
  * @function Branch.creditHistory
  * @param {Object} options - _optional_ - options controlling the returned history
@@ -1850,7 +1850,7 @@ Branch.prototype['credits'] = function() {
 /*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
 Branch.prototype['creditHistory'] = function() {
 	console.warn("Credits feature has been deprecated. This is no-op.");
-}
+};
 
 /**
  * @function Branch.redeem
@@ -1893,7 +1893,7 @@ Branch.prototype['creditHistory'] = function() {
 /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
 Branch.prototype['redeem'] = function() {
 	console.warn("Credits feature has been deprecated. This is no-op.");
-}
+};
 
 /** =WEB
  * @function Branch.addListener

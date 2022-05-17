@@ -1346,7 +1346,6 @@ describe('Branch', function() {
 		it('should print console warning about method deprecation for referrals', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
-			
 			branch.referrals();
 			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
@@ -1354,7 +1353,6 @@ describe('Branch', function() {
 		it('should print console warning about method deprecation getCode', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
-			
 			branch.getCode();
 			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
@@ -1362,7 +1360,6 @@ describe('Branch', function() {
 		it('should print console warning about method deprecation validateCode', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
-			
 			branch.validateCode();
 			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
@@ -1370,7 +1367,6 @@ describe('Branch', function() {
 		it('should print console warning about method deprecation applyCode', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
-			
 			branch.applyCode();
 			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
@@ -1378,7 +1374,6 @@ describe('Branch', function() {
 		it('should print console warning about method deprecation credits', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
-			
 			branch.credits();
 			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
@@ -1386,7 +1381,6 @@ describe('Branch', function() {
 		it('should print console warning about method deprecation creditHistory', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
-			
 			branch.creditHistory();
 			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
@@ -1394,7 +1388,6 @@ describe('Branch', function() {
 		it('should print console warning about method deprecation redeem', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
-			
 			branch.redeem();
 			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
