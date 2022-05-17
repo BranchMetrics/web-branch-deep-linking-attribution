@@ -1715,43 +1715,30 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(do
 	done();
 });
 
-Branch.prototype['referrals'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	this._api(resources.referrals, { }, done);
-});
+Branch.prototype['referrals'] = function() {
+	console.warn("Credits feature has been deprecated. This is no-op.");
+}
 
 /**
  * Removing from documentation
  */
-Branch.prototype['getCode'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	data['type'] = 'credit';
-	data['creation_source'] = data['creation_source'] || 2; // EventResponse.CREATION_SOURCE_SDK
-	this._api(resources.getCode, data, done);
-});
+Branch.prototype['getCode'] = function() {
+	console.warn("Credits feature has been deprecated. This is no-op.");
+}
 
 /**
  * Removing from documentation
  */
-Branch.prototype['validateCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-	this._api(
-		resources.validateCode,
-		{
-			"code": code
-		},
-		done
-	);
-});
+Branch.prototype['validateCode'] = function() {
+	console.warn("Credits feature has been deprecated. This is no-op.");
+}
 
 /**
  * Removing from documentation
  */
-Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done, code) {
-	this._api(
-		resources.applyCode,
-		{
-			"code": code
-		}, done
-	);
-});
+Branch.prototype['applyCode'] = function() {
+	console.warn("Credits feature has been deprecated. This is no-op.");
+}
 
 /**
  * @function Branch.credits
@@ -1782,13 +1769,9 @@ Branch.prototype['applyCode'] = wrap(callback_params.CALLBACK_ERR, function(done
  */
 /*** +TOC_HEADING &Credit Functions& ^ALL ***/
 /*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
-Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	this._api(resources.credits, {
-		"branch_key": this.branch_key,
-		"identity": this.identity
-	}, done);
-});
-
+Branch.prototype['credits'] = function() {
+	console.warn("Credits feature has been deprecated. This is no-op.");
+}
 /**
  * @function Branch.creditHistory
  * @param {Object} options - _optional_ - options controlling the returned history
@@ -1865,12 +1848,9 @@ Branch.prototype['credits'] = wrap(callback_params.CALLBACK_ERR_DATA, function(d
  *
  */
 /*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
-Branch.prototype['creditHistory'] = wrap(
-	callback_params.CALLBACK_ERR_DATA,
-	function(done, options) {
-		this._api(resources.creditHistory, options || { }, done);
-	}
-);
+Branch.prototype['creditHistory'] = function() {
+	console.warn("Credits feature has been deprecated. This is no-op.");
+}
 
 /**
  * @function Branch.redeem
@@ -1911,18 +1891,9 @@ Branch.prototype['creditHistory'] = wrap(
  * ___
  */
 /*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
-Branch.prototype['redeem'] = wrap(callback_params.CALLBACK_ERR, function(done, amount, bucket) {
-	this._api(
-		resources.redeem,
-		{
-			"amount": amount,
-			"bucket": bucket
-		},
-		function(err) {
-			done(err || null);
-		}
-	);
-});
+Branch.prototype['redeem'] = function() {
+	console.warn("Credits feature has been deprecated. This is no-op.");
+}
 
 /** =WEB
  * @function Branch.addListener

@@ -1340,221 +1340,64 @@ describe('Branch', function() {
 		});
 	});
 
-	describe('referrals', function() {
+	describe('Credits', function() {
 		basicTests('referrals', [ 0 ]);
-
-		it('should call api with identity_id', function(done) {
+		var spy = sinon.spy(console, 'warn');
+		it('should print console warning about method deprecation for referrals', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.unplanned();
+			
+			branch.referrals();
+			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
-			var expectedResponse = {
-				"install": {
-					"total": 5,
-					"unique": 2
-				},
-				"open": {
-					"total": 4,
-					"unique": 3
-				},
-				"buy": {
-					"total": 7,
-					"unique": 3
-				}
-			};
-
-			branch.referrals(function(err, res) {
-				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
-			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(
-				requests[0].obj,
-				testUtils.params({ }, [ "_t" ]),
-				'All params sent'
-			);
 		});
-	});
-
-	describe('getCode', function() {
-		basicTests('getCode', [ 0 ]);
-		it('should call api with required params and options', function(done) {
+		it('should print console warning about method deprecation getCode', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.unplanned();
+			
+			branch.getCode();
+			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
-			var options = {
-				"amount":10,
-				"bucket":"party",
-				"calculation_type":1,
-				"location":2
-			};
-
-			var expectedResponse = 'AB12CD';
-
-			branch.getCode(options, function(err, res) {
-				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
-			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(
-				requests[0].obj,
-				testUtils.params(options, [ "_t" ]),
-				'All params sent'
-			);
 		});
-	});
-
-	describe('validateCode', function() {
-		basicTests('validateCode', [ 0 ]);
-		it('should call api with required params and options', function(done) {
+		it('should print console warning about method deprecation validateCode', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.unplanned();
+			
+			branch.validateCode();
+			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
-			var expectedResponse = 'AB12CD';
-
-			branch.validateCode(expectedResponse, function(err, res) {
-				assert.deepEqual(res, null, 'null returned');
-				assert.strictEqual(err, null, 'No error');
-			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(
-				requests[0].obj,
-				testUtils.params({ "code": expectedResponse }, [ "_t" ]),
-				'All params sent'
-			);
 		});
-	});
-
-	describe('applyCode', function() {
-		basicTests('applyCode', [ 0 ]);
-		it('should call api with required params and options', function(done) {
+		it('should print console warning about method deprecation applyCode', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.unplanned();
+			
+			branch.applyCode();
+			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
-			var expectedResponse = 'AB12CD';
-
-			branch.applyCode(expectedResponse, function(err, res) {
-				assert.deepEqual(res, null, 'null returned');
-				assert.strictEqual(err, null, 'No error');
-			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(
-				requests[0].obj,
-				testUtils.params({ "code": expectedResponse }, [ "_t" ]),
-				'All params sent'
-			);
 		});
-	});
-
-	describe('credits', function() {
-		basicTests('credits', [ 0 ]);
-
-		it('should call api with identity', function(done) {
+		it('should print console warning about method deprecation credits', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.unplanned();
+			
+			branch.credits();
+			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
-			var expectedResponse = {
-				"default": 15,
-				"other bucket": 9
-			};
-
-			var expectedResponseSetIdentity = {
-				identity_id: '12345',
-				link: 'url',
-				referring_data: '{ }',
-				referring_identity: '12345'
-			};
-
-			branch.setIdentity('foo', function(err, res) {});
-			requests[0].callback(null, expectedResponseSetIdentity);
-
-			branch.credits(function(err, res) {
-				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
-			});
-
-			assert.strictEqual(requests.length, 2, 'Request made');
-			requests[1].callback(null, expectedResponse);
-
-			assert.deepEqual(
-				requests[1].obj,
-				testUtils.params({ identity: 'foo', identity_id: "12345" }, [ "_t" ]),
-				'All params sent'
-			);
 		});
-	});
-
-	describe('creditHistory', function() {
-		basicTests('creditHistory', [ 0 ]);
-
-		it('should call api with identity_id', function(done) {
+		it('should print console warning about method deprecation creditHistory', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			var assert = testUtils.unplanned();
+			
+			branch.creditHistory();
+			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
-			var options = {
-				"length":50,
-				"direction":0,
-				"begin_after_id":"123456789012345",
-				"bucket":"default"
-			};
-
-			var expectedResponse = [
-				{
-					"transaction": {
-						"id":"65301496270422583",
-						"bucket":"default",
-						"type":2,
-						"amount":-5,
-						"date":"2014-11-24T05:35:16.547Z"
-					},
-					"event": {
-						"name": null,
-						"metadata": null
-					},
-					"referrer": null,
-					"referree": null
-				}
-			];
-
-			branch.creditHistory(options, function(err, res) {
-				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
-			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(
-				requests[0].obj,
-				testUtils.params(options, [ "_t" ]),
-				'All params sent'
-			);
 		});
-	});
-
-	describe('redeem', function() {
-		basicTests('redeem', [ 2 ]);
-
-		it('should call api with identity_id', function(done) {
+		it('should print console warning about method deprecation redeem', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(3, done);
-			branch.redeem(1, 'testbucket', function(err) {
-				assert.strictEqual(err, null, 'No error');
-			});
+			var assert = testUtils.unplanned();
+			
+			branch.redeem();
+			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
 
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback();
-			assert.deepEqual(
-				requests[0].obj,
-				testUtils.params({ "amount": 1, "bucket": "testbucket" }, [ "_t" ]),
-				'All params sent'
-			);
 		});
 	});
 
