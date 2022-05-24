@@ -1560,15 +1560,8 @@ validationTypes.BOOLEAN), current_url:validator(!1, validationTypes.STRING), scr
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, validationTypes.STRING), branch_key:validator(!0, validationTypes.STRING)}};
 resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
 resources.SMSLinkSend = {destination:config.link_service_endpoint, endpoint:"/c", method:utils.httpMethod.POST, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{sdk:validator(!1, validationTypes.STRING), phone:validator(!0, validationTypes.STRING)}};
-resources.getCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!1, validationTypes.STRING), calculation_type:validator(!0, validationTypes.NUMBER), creation_source:validator(!0, validationTypes.NUMBER), expiration:validator(!1, validationTypes.STRING), location:validator(!0, validationTypes.NUMBER), prefix:validator(!1, validationTypes.STRING), type:validator(!0, validationTypes.STRING)})};
-resources.validateCode = {destination:config.api_endpoint, endpoint:"/v1/referralcode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
-resources.applyCode = {destination:config.api_endpoint, endpoint:"/v1/applycode", method:utils.httpMethod.POST, queryPart:{code:validator(!0, validationTypes.STRING)}, params:defaults({})};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:defaults({session_id:validator(!0, validationTypes.STRING)})};
 resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
-resources.referrals = {destination:config.api_endpoint, endpoint:"/v1/referrals", method:utils.httpMethod.GET, queryPart:{identity_id:validator(!0, validationTypes.STRING)}, params:defaults({})};
-resources.creditHistory = {destination:config.api_endpoint, endpoint:"/v1/credithistory", method:utils.httpMethod.GET, params:defaults({begin_after_id:validator(!1, validationTypes.STRING), bucket:validator(!1, validationTypes.STRING), direction:validator(!1, validationTypes.NUMBER), length:validator(!1, validationTypes.NUMBER), link_click_id:validator(!1, validationTypes.STRING)})};
-resources.credits = {destination:config.api_endpoint, endpoint:"/v1/credits", method:utils.httpMethod.GET, params:defaults({branch_key:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
-resources.redeem = {destination:config.api_endpoint, endpoint:"/v1/redeem", method:utils.httpMethod.POST, params:defaults({amount:validator(!0, validationTypes.NUMBER), bucket:validator(!0, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
 validationTypes.NUMBER), source:validator(!1, validationTypes.STRING), instrumentation:validator(!1, validationTypes.STRING)})};
 resources.qrCode = {destination:config.api_endpoint, endpoint:"/v1/qr-code", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), qr_code_settings:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), stage:validator(!1, validationTypes.STRING), 
@@ -1792,7 +1785,7 @@ Server.prototype.getUrl = function(a, b) {
   } else {
     "/v1/pageview" !== a.endpoint && "/v1/dismiss" !== a.endpoint || utils.merge(h, b);
   }
-  if ("POST" === a.method || "/v1/credithistory" === a.endpoint) {
+  if ("POST" === a.method) {
     try {
       b = k(b, h);
     } catch (l) {
@@ -1868,12 +1861,8 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f, g) {
         }
         e(null, a, l.status);
       } else {
-        if (402 === l.status) {
-          e(Error("Not enough credits to redeem."), null, l.status);
-        } else {
-          if ("4" === l.status.toString().substring(0, 1) || "5" === l.status.toString().substring(0, 1)) {
-            l.responseURL && l.responseURL.includes("v2/event") ? e(l.responseText, null, l.status) : e(Error("Error in API: " + l.status), null, l.status);
-          }
+        if ("4" === l.status.toString().substring(0, 1) || "5" === l.status.toString().substring(0, 1)) {
+          l.responseURL && l.responseURL.includes("v2/event") ? e(l.responseText, null, l.status) : e(Error("Error in API: " + l.status), null, l.status);
         }
       }
     }
@@ -3069,31 +3058,27 @@ Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._deepviewCta();
   a();
 });
-Branch.prototype.referrals = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  this._api(resources.referrals, {}, a);
-});
-Branch.prototype.getCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  b.type = "credit";
-  b.creation_source = b.creation_source || 2;
-  this._api(resources.getCode, b, a);
-});
-Branch.prototype.validateCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
-  this._api(resources.validateCode, {code:b}, a);
-});
-Branch.prototype.applyCode = wrap(callback_params.CALLBACK_ERR, function(a, b) {
-  this._api(resources.applyCode, {code:b}, a);
-});
-Branch.prototype.credits = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
-  this._api(resources.credits, {branch_key:this.branch_key, identity:this.identity}, a);
-});
-Branch.prototype.creditHistory = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  this._api(resources.creditHistory, b || {}, a);
-});
-Branch.prototype.redeem = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
-  this._api(resources.redeem, {amount:b, bucket:c}, function(b) {
-    a(b || null);
-  });
-});
+Branch.prototype.referrals = function() {
+  console.warn("Credits feature has been deprecated. This is no-op.");
+};
+Branch.prototype.getCode = function() {
+  console.warn("Credits feature has been deprecated. This is no-op.");
+};
+Branch.prototype.validateCode = function() {
+  console.warn("Credits feature has been deprecated. This is no-op.");
+};
+Branch.prototype.applyCode = function() {
+  console.warn("Credits feature has been deprecated. This is no-op.");
+};
+Branch.prototype.credits = function() {
+  console.warn("Credits feature has been deprecated. This is no-op.");
+};
+Branch.prototype.creditHistory = function() {
+  console.warn("Credits feature has been deprecated. This is no-op.");
+};
+Branch.prototype.redeem = function() {
+  console.warn("Credits feature has been deprecated. This is no-op.");
+};
 Branch.prototype.addListener = function(a, b) {
   "function" === typeof a && void 0 === b && (b = a, a = null);
   b && this._listeners.push({listener:b, event:a || null});
