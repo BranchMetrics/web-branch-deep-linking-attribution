@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.62.0] - 2022-05-24
+– [SDK-1190] Convert deprecated credit, referral related methods to no-ops
+
 ## [2.61.0] - 2022-05-04
 – Fix properties of undefined for center overlay
 
