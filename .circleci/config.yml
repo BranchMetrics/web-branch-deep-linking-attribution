@@ -12,16 +12,6 @@ jobs:
     - checkout
     - setup_remote_docker
     - run:
-        name: Install Closure compiler
-        command: |
-            mkdir -p compiler ;
-            stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-20170218.zip && unzip -o compiler-20170218.zip -d compiler) ;
-    - run:
-        name: Install Closure compiler library
-        command: |
-            mkdir -p compiler/library ;
-            stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library) ;
-    - run:
         name: Install NPM dependencies
         command: |
             npm install ;
