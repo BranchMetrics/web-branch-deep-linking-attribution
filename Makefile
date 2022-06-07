@@ -1,14 +1,13 @@
-COMPILER_VERSION=20170218
-CLOSURE_LIBRARY_VERSION=20170218
-COMPILER=java -jar compiler/compiler.jar
-COMPILER_LIBRARY=compiler/library/closure-library-$(CLOSURE_LIBRARY_VERSION)/closure
 
-COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --only_closure_dependencies --closure_entry_point branch_instance
+CLOSURE_COMPILER=java -jar ./node_modules/google-closure-compiler-java/compiler.jar
+CLOSURE_LIBRARY= ./node_modules/google-closure-library/closure
+
+COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --dependency_mode=PRUNE_LEGACY --entry_point branch_instance
 COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --define 'DEBUG=false'
 COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE --define 'DEBUG=true'
 
-SOURCES=$(COMPILER_LIBRARY)/goog/base.js\
-$(COMPILER_LIBRARY)/goog/json/json.js\
+SOURCES=$(CLOSURE_LIBRARY)/goog/base.js\
+$(CLOSURE_LIBRARY)/goog/json/json.js\
 src/0_config.js\
 src/0_jsonparse.js\
 src/0_queue.js\
@@ -28,8 +27,8 @@ EXTERN=src/extern.js
 VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/$$1/')
 
 ONPAGE_RELEASE=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="https://cdn.branch.io/branch-latest.min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
-ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="dist/build.min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
-ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(COMPILER) | node transform.js branch_sdk))
+ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="dist/build.min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(CLOSURE_COMPILER) | node transform.js branch_sdk))
+ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(CLOSURE_COMPILER) | node transform.js branch_sdk))
 
 .PHONY: clean
 
@@ -39,43 +38,23 @@ clean:
 release: clean all dist/build.min.js.gz
 	@echo "released"
 
-# Download closure compiler if none is found
-compiler/compiler.jar:
-	mkdir -p compiler && \
-		wget http://dl.google.com/closure-compiler/compiler-$(COMPILER_VERSION).zip && \
-		unzip -o compiler-$(COMPILER_VERSION).zip -d compiler && \
-		mv compiler/closure-compiler-v*.jar compiler/compiler.jar && \
-		rm -f compiler-$(COMPILER_VERSION).zip
-
-compiler/library/closure-library-$(CLOSURE_LIBRARY_VERSION)/closure/goog/base.js:
-	mkdir -p compiler/library && \
-		wget https://github.com/google/closure-library/archive/v$(CLOSURE_LIBRARY_VERSION).zip && \
-		unzip -o v$(CLOSURE_LIBRARY_VERSION).zip -d compiler/library && \
-		rm -f v$(CLOSURE_LIBRARY_VERSION).zip
-
-compiler/library/closure-library-$(CLOSURE_LIBRARY_VERSION)/closure/goog/json/json.js:
-	mkdir -p compiler/library && \
-		wget https://github.com/google/closure-library/archive/v$(CLOSURE_LIBRARY_VERSION).zip && \
-		unzip -o v$(CLOSURE_LIBRARY_VERSION).zip -d compiler/library && \
-		rm -f v$(CLOSURE_LIBRARY_VERSION).zip
-
-test/branch-deps.js: $(SOURCES) compiler/library
-	python $(COMPILER_LIBRARY)/bin/calcdeps.py \
-		--dep $(COMPILER_LIBRARY)/goog \
-		--path src \
-		--path test \
-		--output_mode deps \
+test/branch-deps.js: $(SOURCES)
+	npx closure-make-deps \
+        --closure-path $(CLOSURE_LIBRARY)/goog \
+		--f node_modules/google-closure-library/closure/goog/deps.js \
+		--root src \
+		--root test \
 		--exclude test/branch-deps.js > test/branch-deps.js.tmp
 	echo "// jscs:disable" | cat - test/branch-deps.js.tmp | sed -e 's#src/0_config.js#test/web-config.js#' > test/branch-deps.js && \
 		rm test/branch-deps.js.tmp
 
-dist/build.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+dist/build.js: $(SOURCES) $(EXTERN)
 	mkdir -p dist && \
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) > dist/build.js
+	$(CLOSURE_COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) > dist/build.js
 
-dist/build.min.js: $(SOURCES) $(EXTERN) compiler/compiler.jar
+dist/build.min.js: $(SOURCES) $(EXTERN)
 	mkdir -p dist && \
-	$(COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) > dist/build.min.js
+	$(CLOSURE_COMPILER) $(COMPILER_ARGS) $(COMPILER_MIN_ARGS) > dist/build.min.js
 
 dist/build.min.js.gz: dist/build.min.js
 	mkdir -p dist && \

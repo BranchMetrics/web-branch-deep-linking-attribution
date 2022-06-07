@@ -959,7 +959,7 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 
 journeys_utils.setJourneyLinkData = function(linkData) {
 	var data = { 'banner_id': journeys_utils.branchViewId };
-	if (linkData && typeof linkData === "object" && Object.keys(linkData).length > 0) {
+	if (linkData && typeof linkData === "object" && Object.keys(linkData || {}).length > 0) {
 		var journeyLinkDataPropertiesToFilterOut = ['browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id'];
 		utils.removePropertiesFromObject(linkData, journeyLinkDataPropertiesToFilterOut);
 		data['journey_link_data'] = {};

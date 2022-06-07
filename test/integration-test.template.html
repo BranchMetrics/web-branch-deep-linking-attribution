@@ -8,9 +8,10 @@
 	<div id="mocha"></div>
 	<link rel="stylesheet" type="text/css" href="../node_modules/mocha/mocha.css" />
 	<link rel="stylesheet" type="text/css" href="mocha.css" />
-	<script src="../compiler/library/closure-library-20170218/closure/goog/base.js"></script>
+	<script src="../node_modules/google-closure-library/closure/goog/base.js"></script>
+	<script src="branch-deps.js"></script>
 	<script>
-		goog.addDependency("../../../../../test/web-config.js", ['config'], []);
+		goog.require("utils");
 	</script>
 	<script src="../node_modules/mocha/mocha.js"></script>
 	<script src="../node_modules/sinon/pkg/sinon-1.17.3.js"></script>
