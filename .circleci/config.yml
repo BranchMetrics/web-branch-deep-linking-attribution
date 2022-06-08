@@ -6,9 +6,15 @@ jobs:
   build:
     docker:
      - image: cimg/base:2022.05
+     - image: circleci/node:14.15.0
     working_directory: ~/web-branch-deep-linking
     steps:
-      - run: echo "Say hello to YAML!"
+      - run:
+         name: Set up NPM auth token
+         command: |
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - checkout
+      - setup_remote_docker
       - run:
           name: Saying Hello
           command: |
@@ -20,8 +26,15 @@ jobs:
   say_hello:
     docker:
      - image: cimg/base:2022.05
+     - image: circleci/node:14.15.0
     steps:
       - run: echo "Say hello to YAML!"
+      - run:
+         name: Set up NPM auth token
+         command: |
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - checkout
+      - setup_remote_docker
       - run:
           name: Saying Hello
           command: |
