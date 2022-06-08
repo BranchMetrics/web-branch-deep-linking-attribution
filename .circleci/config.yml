@@ -6,6 +6,7 @@ jobs:
   build:
     docker:
      - image: cimg/base:2022.05
+     - image: circleci/node:14.15.0
     working_directory: ~/web-branch-deep-linking
     steps:
       - run:
@@ -15,12 +16,30 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+            name: Install NPM dependencies
+            command: |
+                npm install ;
+                sudo npm install -g jsdox ;
+                jscs --help || sudo npm install -g jscs ;
+                jshint -v || sudo npm install -g jshint ;
+                which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
+      - run:
           name: Install Java 11
           command: |
             sudo apt update
-            sudo apt install openjdk-11-jdk ca-certificates-java
+            sudo apt install openjdk-11-jre-headless ca-certificates-java
             sudo update-alternatives --config java
       - run: java -version
+      - run:
+            name: Install AWS CLI
+            command: |
+                sudo apt-get install -qq -y python3-pip ;
+                pip3 install awscli && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
+                sudo npm install -g slack-cli ;
+      - run:
+            name: Build minified JS
+            command: |
+                deployment/test.sh
 
   say_hello:
     docker:
