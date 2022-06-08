@@ -4,7 +4,6 @@ jobs:
     working_directory: ~/web-branch-deep-linking
     docker:
     - image: circleci/node:14.15.0
-    - image: cimg/openjdk:11.0
 
     steps:
     - run:
@@ -47,7 +46,7 @@ jobs:
         command: |
             sudo apt update
             sudo apt-get remove openjdk-*
-            sudo apt-get install openjdk-11-jdk
+            sudo apt-get install openjdk-11-jre-headless
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt-get -o Acquire::Check-Valid-Until=false update
             sudo apt install -t jessie-backports ca-certificates-java
