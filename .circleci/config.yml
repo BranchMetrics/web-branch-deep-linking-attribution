@@ -4,7 +4,6 @@ jobs:
     working_directory: ~/web-branch-deep-linking
     docker:
     - image: circleci/node:14.15.0
-    - image: cimg/openjdk:11.0
     steps:
     - run:
         name: Set up NPM auth token
@@ -47,7 +46,7 @@ jobs:
         command: |
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt-get -o Acquire::Check-Valid-Until=false update
-            sudo apt install -t jessie-backports ca-certificates-java
+            sudo apt install -t jessie-backports openjdk-11-jdk ca-certificates-java
     - run:
         name: Install AWS CLI
         command: |
@@ -64,7 +63,6 @@ jobs:
             deployment/deploy.sh
 
 workflows:
-  version: 2
   build-and-deploy:
     jobs:
       - build
