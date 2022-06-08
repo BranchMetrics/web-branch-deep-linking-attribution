@@ -24,6 +24,14 @@ jobs:
                 jshint -v || sudo npm install -g jshint ;
                 which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
       - run:
+            name: Add Jessie backports PPA
+            command: |
+                sudo su -c 'echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" >> /etc/apt/sources.list.d/jessie-backports.list'
+      - run:
+            name: Add main Jessie PPA
+            command: |
+                sudo sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
+      - run:
           name: Install Java 11
           command: |
             sudo apt update
