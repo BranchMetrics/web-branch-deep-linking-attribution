@@ -46,7 +46,6 @@ jobs:
         command: |
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt-get -o Acquire::Check-Valid-Until=false update
-            sudo apt-get update && sudo apt-get install -y openjdk-11-jre openjdk-11-jre-headless openjdk-11-jdk openjdk-11-jdk-headless && \
             sudo apt install -t jessie-backports ca-certificates-java
     - run:
         name: Install AWS CLI
