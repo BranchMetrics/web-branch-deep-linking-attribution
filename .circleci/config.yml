@@ -12,9 +12,7 @@ jobs:
           name: Saying Hello
           command: |
             sudo apt update
-            sudo rm -rf /var/lib/apt/lists/*
-            sudo apt-get -o Acquire::Check-Valid-Until=false update
-            sudo apt install -t jessie-backports openjdk-11-jdk ca-certificates-java
+            sudo apt install openjdk-11-jdk
             sudo update-alternatives --config java
       - run: java -version
   # Job two with a unique name
