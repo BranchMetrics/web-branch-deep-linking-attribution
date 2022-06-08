@@ -3,6 +3,20 @@ version: 2.1
 
 jobs:
   # Job one with a unique name
+  build:
+    docker:
+     - image: cimg/base:2022.05
+    working_directory: ~/web-branch-deep-linking
+    steps:
+      - run: echo "Say hello to YAML!"
+      - run:
+          name: Saying Hello
+          command: |
+            sudo apt update
+            sudo apt install openjdk-11-jdk
+            sudo update-alternatives --config java
+      - run: java -version
+
   say_hello:
     docker:
      - image: cimg/base:2022.05
@@ -24,8 +38,7 @@ jobs:
 
 workflows:
   # Name of workflow
-  hello_and_goodbye:
+  build-and-deploy:
     # List of jobs that will run
     jobs:
-      - say_hello
-      - say_goodbye
+      - build
