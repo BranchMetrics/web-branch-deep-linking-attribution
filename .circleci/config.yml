@@ -49,8 +49,8 @@ jobs:
             sudo apt-get purge --auto-remove openjdk*
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt-get -o Acquire::Check-Valid-Until=false update
-            sudo apt install -t jessie-backports openjdk-8-jre-headles ca-certificates-java
-            sudo apt-get install openjdk-11-jdk
+            sudo apt install -t jessie-backports openjdk-8-jre-headless ca-certificates-java
+            sudo apt install openjdk-11-jdk
             sudo update-alternatives --config java
     - run: java -version
     - run:
