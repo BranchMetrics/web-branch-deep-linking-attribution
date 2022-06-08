@@ -6,7 +6,6 @@ jobs:
     - image: circleci/node:14.15.0
     - image: circleci/openjdk:17-jdk-buster
     steps:
-    - run: java -version
     - run:
         name: Set up NPM auth token
         command: |
