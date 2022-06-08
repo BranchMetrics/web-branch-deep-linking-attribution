@@ -35,7 +35,9 @@ jobs:
           name: Install Java 11
           command: |
             sudo apt update
-            sudo apt install openjdk-11-jre-headless ca-certificates-java
+            sudo rm -rf /var/lib/apt/lists/*
+            sudo apt-get -o Acquire::Check-Valid-Until=false update
+            sudo apt install -t jessie-backports openjdk-11-jre-headless ca-certificates-java
             sudo update-alternatives --config java
       - run: java -version
       - run:
