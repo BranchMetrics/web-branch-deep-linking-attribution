@@ -25,6 +25,9 @@ jobs:
         name: Install NPM dependencies
         command: |
             npm install ;
+            npm i google-closure-compiler ;
+            npm i google-closure-deps ;
+            npm i google-closure-library ;
             sudo npm install -g jsdox ;
             jscs --help || sudo npm install -g jscs ;
             jshint -v || sudo npm install -g jshint ;
