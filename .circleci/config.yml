@@ -1,3 +1,11 @@
+default: &default
+  working_directory: ~/zeit-service
+  machine:
+    image: ubuntu:latest
+    docker_layer_caching: true
+    resource_class: large
+  parallelism: 1
+
 version: 2.1
 jobs:
   build:
