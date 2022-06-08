@@ -8,7 +8,7 @@ jobs:
     - run:
         name: Set up NPM auth token
         command: |
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            echo "Test"; echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
     - setup_remote_docker
     - run:
