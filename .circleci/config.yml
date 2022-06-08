@@ -6,7 +6,6 @@ jobs:
   build:
     docker:
      - image: cimg/base:2022.05
-     - image: circleci/node:14.15.0
     working_directory: ~/web-branch-deep-linking
     steps:
       - run:
@@ -20,8 +19,7 @@ jobs:
           command: |
             sudo apt update
             sudo rm -rf /var/lib/apt/lists/*
-            sudo apt-get -o Acquire::Check-Valid-Until=false update
-            sudo apt install -t openjdk-11-jdk ca-certificates-java
+            sudo apt install openjdk-11-jdk ca-certificates-java
             sudo update-alternatives --config java
       - run: java -version
 
