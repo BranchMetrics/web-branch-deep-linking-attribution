@@ -4,6 +4,8 @@ jobs:
     working_directory: ~/web-branch-deep-linking
     docker:
     - image: circleci/node:14.15.0
+    - image: cimg/openjdk:14.0
+
     steps:
     - run:
         name: Set up NPM auth token
