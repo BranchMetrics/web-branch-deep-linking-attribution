@@ -4,7 +4,6 @@ jobs:
     working_directory: ~/web-branch-deep-linking
     docker:
     - image: circleci/node:14.15.0
-    - image: circleci/openjdk:17-jdk-buster
     steps:
     - run:
         name: Set up NPM auth token
@@ -45,7 +44,7 @@ jobs:
         name: Install Java
         command: |
             sudo apt update
-            sudo apt install default-jdk
+            sudo apt-get install openjdk-11-jdk
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt-get -o Acquire::Check-Valid-Until=false update
             sudo apt install -t jessie-backports ca-certificates-java
