@@ -10,7 +10,6 @@ jobs:
         command: |
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
     - checkout
-    - run: java --version
     - setup_remote_docker
     - run:
         name: Install Closure compiler
@@ -47,6 +46,7 @@ jobs:
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt-get -o Acquire::Check-Valid-Until=false update
             sudo apt install -t jessie-backports openjdk-11-jdk ca-certificates-java
+    - run: java --version
     - run:
         name: Install AWS CLI
         command: |
