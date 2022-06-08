@@ -46,7 +46,7 @@ jobs:
         name: Install Java
         command: |
             sudo apt update
-            sudo apt-get remove openjdk
+            sudo apt-get remove openjdk-*
             sudo apt-get install openjdk-11-jdk
             sudo rm -rf /var/lib/apt/lists/*
             sudo apt-get -o Acquire::Check-Valid-Until=false update
