@@ -16,10 +16,13 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Saying Hello
+          name: Install Java 11
           command: |
             sudo apt update
+            sudo rm -rf /var/lib/apt/lists/*
             sudo apt install openjdk-11-jdk
+            sudo apt-get -o Acquire::Check-Valid-Until=false update
+            sudo apt install -t jessie-backports ca-certificates-java
             sudo update-alternatives --config java
       - run: java -version
 
