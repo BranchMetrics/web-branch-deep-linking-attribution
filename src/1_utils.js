@@ -833,7 +833,7 @@ utils.getOpenGraphContent = function(property, content) {
  * Returned params may include $ios_deeplink_path, $android_deeplink_path and $deeplink_path.
  */
 utils.prioritizeDeeplinkPaths = function(params, deeplinkPaths) {
-	if (!deeplinkPaths || typeof deeplinkPaths !== "object" || Object.keys(deeplinkPaths).length === 0) {
+	if (!deeplinkPaths || typeof deeplinkPaths !== "object" || Object.keys(deeplinkPaths || {}).length === 0) {
 		return params;
 	}
 
@@ -1025,7 +1025,7 @@ utils.validateCommerceEventParams = function(event, commerce_data) {
 		return commerceEventMessages['missingPurchaseEvent'];
 	}
 
-	if (!commerce_data || typeof commerce_data !== 'object' || Object.keys(commerce_data).length === 0) {
+	if (!commerce_data || typeof commerce_data !== 'object' || Object.keys(commerce_data || {}).length === 0) {
 		return commerceEventMessages['missingCommerceData'];
 	}
 
@@ -1062,7 +1062,7 @@ utils.getCanonicalURL = function() {
 
 utils.addPropertyIfNotNull = function(obj, key, value) {
 	if (value !== null && value !== undefined) {
-		if (typeof value === "object" && Object.keys(value).length === 0) {
+		if (typeof value === "object" && Object.keys(value || {}).length === 0) {
 			return obj;
 		}
 		obj[key] = value;
