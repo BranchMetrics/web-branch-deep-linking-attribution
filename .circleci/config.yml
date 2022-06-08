@@ -1,73 +1,25 @@
+# CircleCI configuration file
 version: 2.1
-jobs:
-  build:
-    working_directory: ~/web-branch-deep-linking
-    docker:
-    - image: circleci/node:14.15.0
 
+jobs:
+  # Job one with a unique name
+  say_hello:
+    docker:
+     - image: cimg/base:2022.05
     steps:
-    - run:
-        name: Set up NPM auth token
-        command: |
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-    - checkout
-    - setup_remote_docker
-    - run:
-        name: Install Closure compiler
-        command: |
-            mkdir -p compiler ;
-            stat compiler/compiler.jar || (wget http://dl.google.com/closure-compiler/compiler-20170218.zip && unzip -o compiler-20170218.zip -d compiler) ;
-    - run:
-        name: Install Closure compiler library
-        command: |
-            mkdir -p compiler/library ;
-            stat compiler/library/closure-library-20170218 || (wget https://github.com/google/closure-library/archive/v20170218.zip && unzip -o v20170218.zip -d compiler/library) ;
-    - run:
-        name: Install NPM dependencies
-        command: |
-            npm install ;
-            npm i google-closure-compiler ;
-            npm i google-closure-deps ;
-            npm i google-closure-library ;
-            sudo npm install -g jsdox ;
-            jscs --help || sudo npm install -g jscs ;
-            jshint -v || sudo npm install -g jshint ;
-            which grunt 2>&1 >/dev/null || sudo npm install -g grunt-cli ;
-    - run:
-        name: Add Jessie backports PPA
-        command: |
-            sudo su -c 'echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" >> /etc/apt/sources.list.d/jessie-backports.list'
-    - run:
-        name: Add main Jessie PPA
-        command: |
-            sudo sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
-    - run:
-        name: Install Java
-        command: |
-            sudo apt update
-            sudo rm -rf /var/lib/apt/lists/*
-            sudo apt-get -o Acquire::Check-Valid-Until=false update
-            sudo apt install -t jessie-backports openjdk-8-jre-headless ca-certificates-java
-            sudo apt install openjdk-11-jdk
-            sudo update-alternatives --config java
-    - run: java -version
-    - run:
-        name: Install AWS CLI
-        command: |
-            sudo apt-get install -qq -y python3-pip ;
-            pip3 install awscli && echo 'export PATH=/home/circleci/.local/bin:$PATH' >> $BASH_ENV;
-            sudo npm install -g slack-cli ;
-    - run:
-        name: Build minified JS
-        command: |
-            deployment/test.sh
-    - run:
-        name: Run deployment script
-        command: |
-            deployment/deploy.sh
+      - run: echo "Say hello to YAML!"
+      - run: java -version
+  # Job two with a unique name
+  say_goodbye:
+    docker:
+     - image: cimg/base:2022.05
+    steps:
+      - run: echo "Say goodbye to YAML!"
 
 workflows:
-  build-and-deploy:
+  # Name of workflow
+  hello_and_goodbye:
+    # List of jobs that will run
     jobs:
-      - build
-
+      - say_hello
+      - say_goodbye
