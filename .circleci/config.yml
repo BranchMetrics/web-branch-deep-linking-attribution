@@ -2,7 +2,6 @@
 version: 2.1
 
 jobs:
-  # Job one with a unique name
   build:
     docker:
      - image: cimg/node:14.15.0
@@ -39,6 +38,10 @@ jobs:
             name: Build minified JS
             command: |
                 deployment/test.sh
+      - run:
+            name: Run deployment script
+            command: |
+                deployment/deploy.sh
 
 workflows:
   # Name of workflow
