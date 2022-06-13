@@ -41,8 +41,7 @@
 	"dependencies": {
 		"google-closure-compiler": "^20220601.0.0",
 		"google-closure-deps": "^20220502.0.0",
-		"google-closure-library": "^20220502.0.0",
-		"request": "^2.55.0"
+		"google-closure-library": "^20220502.0.0"
 	},
 	"build": "2.62.0"
 }

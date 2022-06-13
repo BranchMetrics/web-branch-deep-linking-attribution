@@ -1,4 +1,3 @@
-var request = require('request');
 
 var safari_browsers = [
 	{
