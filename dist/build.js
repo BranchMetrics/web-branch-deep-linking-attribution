@@ -2783,60 +2783,6 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   return e = utils.cleanLinkData(e);
 };
 // Input 16
-var appindexing = {state:{}};
-appindexing.state.androidAppIndexingTagsPresent = !1;
-appindexing.state.iosAppIndexingTagsPresent = !1;
-appindexing.state.androidDetailsComplete = !1;
-appindexing.state.iosDetailsComplete = !1;
-appindexing.options = {};
-function addAppIndexingTag(a) {
-  if ("android" === a && appindexing.state.androidDetailsComplete) {
-    var b = "android-app://" + appindexing.options.androidPackageName + "/" + appindexing.options.androidURL;
-    b = addBranchTrackingParams(b);
-    writeToDOM(b);
-  }
-  "ios" === a && appindexing.state.iosDetailsComplete && (b = "ios-app://" + appindexing.options.iosAppId + "/" + appindexing.options.iosURL, b = addBranchTrackingParams(b), writeToDOM(b));
-}
-function addBranchTrackingParams(a) {
-  var b = {"~channel":"Firebase App Indexing", "~feature":"Auto App Indexing", $canonical_url:utils.getWindowLocation()};
-  if ("object" === typeof appindexing.options.data) {
-    for (var c in appindexing.options.data) {
-      appindexing.options.data.hasOwnProperty(c) && !b.hasOwnProperty(c) && (b[c] = appindexing.options.data[c]);
-    }
-  }
-  c = -1 < a.indexOf("?") ? "&" : "?";
-  return a + c + "link_click_id=a-" + btoa(safejson.stringify(b));
-}
-function writeToDOM(a) {
-  var b = document.createElement("link");
-  b.setAttribute("rel", "alternate");
-  b.setAttribute("href", a);
-  document.head.appendChild(b);
-}
-appindexing.updateAppIndexingTagsIfPresent = function() {
-  var a = document.getElementsByTagName("link"), b = a.length;
-  if (b) {
-    for (var c = 0; c < b; c++) {
-      var d = a[c], e = d.href;
-      e && (e.includes("ios-app") && (appindexing.state.iosAppIndexingTagsPresent = !0, d.setAttribute("href", addBranchTrackingParams(e))), e.includes("android-app") && (appindexing.state.androidAppIndexingTagsPresent = !0, d.setAttribute("href", addBranchTrackingParams(e))));
-    }
-  }
-};
-appindexing.insertAppIndexingTagsFromConfig = function(a) {
-  "android" === a && "string" === typeof appindexing.options.androidPackageName && "string" === typeof appindexing.options.androidURL && (appindexing.state.androidDetailsComplete = !0, addAppIndexingTag("android"));
-  "ios" === a && "string" === typeof appindexing.options.iosAppId && "string" === typeof appindexing.options.iosURL && (appindexing.state.iosDetailsComplete = !0, addAppIndexingTag("ios"));
-};
-appindexing.populateConfigFromAppLinksTags = function(a) {
-  for (var b = document.getElementsByTagName("meta"), c = 0; c < b.length; c++) {
-    var d = b[c];
-    "ios" === a && "al:ios:app_store_id" === d.getAttribute("property") && (appindexing.options.iosAppId = d.getAttribute("content"));
-    "ios" === a && "al:ios:url" === d.getAttribute("property") && (appindexing.options.iosURL = d.getAttribute("content").replace("://", "/"));
-    "android" === a && "al:android:package" === d.getAttribute("property") && (appindexing.options.androidPackageName = d.getAttribute("content"));
-    "android" === a && "al:android:url" === d.getAttribute("property") && (appindexing.options.androidURL = d.getAttribute("content").replace("://", "/"));
-  }
-  appindexing.insertAppIndexingTagsFromConfig(a);
-};
-// Input 17
 var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_ERR_DATA:2}, init_states = {NO_INIT:0, INIT_PENDING:1, INIT_FAILED:2, INIT_SUCCEEDED:3}, init_state_fail_codes = {NO_FAILURE:0, UNKNOWN_CAUSE:1, OPEN_FAILED:2, BFP_NOT_FOUND:3, HAS_APP_FAILED:4}, wrap = function(a, b, c) {
   return function() {
     var d = this, e = arguments[arguments.length - 1];
@@ -3284,14 +3230,9 @@ Branch.prototype.closeBanner = wrap(0, function(a) {
   });
   a();
 });
-Branch.prototype.autoAppIndex = wrap(callback_params.CALLBACK_ERR, function(a, b) {
-  b = b || {};
-  appindexing.updateAppIndexingTagsIfPresent();
-  appindexing.options = b;
-  appindexing.state.androidAppIndexingTagsPresent || (appindexing.insertAppIndexingTagsFromConfig("android"), appindexing.state.androidDetailsComplete || appindexing.populateConfigFromAppLinksTags("android"));
-  appindexing.state.iosAppIndexingTagsPresent || (appindexing.insertAppIndexingTagsFromConfig("ios"), appindexing.state.iosDetailsComplete || appindexing.populateConfigFromAppLinksTags("ios"));
-  appindexing.state.iosDetailsComplete || appindexing.state.androidDetailsComplete ? a(null) : a("Firebase App Indexing tags were not added to your webpage. Please check your configuration.");
-});
+Branch.prototype.autoAppIndex = function() {
+  console.warn("autoAppIndex feature has been deprecated. This is no-op.");
+};
 Branch.prototype.trackCommerceEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   var e = this;
   e.renderQueue(function() {
@@ -3317,7 +3258,7 @@ Branch.prototype.setAPIResponseCallback = wrap(callback_params.NO_CALLBACK, func
   this._server.onAPIResponse = b;
   a();
 }, !0);
-// Input 18
+// Input 17
 var branch_instance = new Branch();
 if (window.branch && window.branch._q) {
   for (var queue = window.branch._q, i = 0; i < queue.length; i++) {
