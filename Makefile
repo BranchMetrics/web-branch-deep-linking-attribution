@@ -19,8 +19,7 @@ src/5_banner.js\
 src/6_branch.js\
 src/7_initialization.js\
 src/branch_view.js\
-src/journeys_utils.js\
-src/appindexing.js
+src/journeys_utils.js
 
 EXTERN=src/extern.js
 
