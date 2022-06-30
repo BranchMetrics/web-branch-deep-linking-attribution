@@ -228,6 +228,18 @@ banner = function(branch, options, linkData, storage) {
 			};
 		}
 
+		var modalBackground = doc.getElementById('branch-banner-modal-background');
+
+		if (modalBackground) {
+			modalBackground.onclick = function(ev) {
+				ev.preventDefault();
+				branch._publishEvent('willCloseBanner');
+				closeBanner({}, function() {
+					branch._publishEvent('didCloseBanner');
+				});
+			};
+		}
+
 		function onAnimationEnd() {
 			if (options.position === 'top') {
 				element.style.top = '0';

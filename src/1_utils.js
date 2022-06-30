@@ -38,7 +38,9 @@ utils.calculateBrtt = function(startTime) {
 
 utils.dismissEventToSourceMapping = {
 	'didClickJourneyClose': 'Button(X)',
-	'didClickJourneyContinue': 'Dismiss Journey text'
+	'didClickJourneyContinue': 'Dismiss Journey text',
+	'didClickJourneyBackgroundDismiss': 'Background Dismiss',
+	'didScrollJourneyBackgroundDismiss': 'Background Dismiss'
 };
 
 utils.userPreferences = {
