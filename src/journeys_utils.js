@@ -614,8 +614,8 @@ journeys_utils.finalHookups = function(templateId, audienceRuleId, storage, cta,
 	})
 	journeys_utils._setupDismissBehavior('.branch-banner-continue', 'didClickJourneyContinue', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view, 'click');
 	journeys_utils._setupDismissBehavior('.branch-banner-close', 'didClickJourneyClose', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view, 'click');
-	journeys_utils._setupDismissBehavior('.branch-banner-dismiss-background', 'didClickJourneyBackgroundDismiss', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view, 'click'); // TODO add new dismissal_source
-	journeys_utils._setupDismissBehavior('.branch-banner-dismiss-background', 'didScrollJourneyBackgroundDismiss', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view, 'touchmove'); // TODO add new dismissal_source
+	journeys_utils._setupDismissBehavior('.branch-banner-dismiss-background', 'didClickJourneyBackgroundDismiss', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view, 'click');
+	journeys_utils._setupDismissBehavior('.branch-banner-dismiss-background', 'didScrollJourneyBackgroundDismiss', storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view, 'touchmove');
 }
 
 /**
