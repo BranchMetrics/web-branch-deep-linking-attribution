@@ -216,28 +216,23 @@ banner = function(branch, options, linkData, storage) {
 				banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
 		}
 
-		var closeButton = doc.getElementById('branch-banner-close');
+		function handleCloseBanner(ev) {
+			ev.preventDefault();
+			branch._publishEvent('willCloseBanner');
+			closeBanner({}, function() {
+				branch._publishEvent('didCloseBanner');
+			});
+		}
 
+
+		var closeButton = doc.getElementById('branch-banner-close');
 		if (closeButton) {
-			closeButton.onclick = function(ev) {
-				ev.preventDefault();
-				branch._publishEvent('willCloseBanner');
-				closeBanner({}, function() {
-					branch._publishEvent('didCloseBanner');
-				});
-			};
+			closeButton.addEventListener('click', handleCloseBanner);
 		}
 
 		var modalBackground = doc.getElementById('branch-banner-modal-background');
-
 		if (modalBackground) {
-			modalBackground.onclick = function(ev) {
-				ev.preventDefault();
-				branch._publishEvent('willCloseBanner');
-				closeBanner({}, function() {
-					branch._publishEvent('didCloseBanner');
-				});
-			};
+			modalBackground.addEventListener('click', handleCloseBanner);
 		}
 
 		function onAnimationEnd() {
