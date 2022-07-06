@@ -806,21 +806,21 @@ goog.createTrustedTypesPolicy = function(a) {
   goog.Dependency.call(this, a, b, c, d, e);
 }, goog.inherits(goog.Es6ModuleDependency, goog.Dependency), goog.Es6ModuleDependency.prototype.load = function(a) {
   function b(l, m) {
-    var r = "", p = goog.getScriptNonce_();
-    p && (r = ' nonce="' + p + '"');
-    l = m ? '<script type="module" crossorigin' + r + ">" + m + "\x3c/script>" : '<script type="module" crossorigin src="' + l + '"' + r + ">\x3c/script>";
+    var p = "", r = goog.getScriptNonce_();
+    r && (p = ' nonce="' + r + '"');
+    l = m ? '<script type="module" crossorigin' + p + ">" + m + "\x3c/script>" : '<script type="module" crossorigin src="' + l + '"' + p + ">\x3c/script>";
     d.write(goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createHTML(l) : l);
   }
   function c(l, m) {
-    var r = d.createElement("script");
-    r.defer = !0;
-    r.async = !1;
-    r.type = "module";
-    r.setAttribute("crossorigin", !0);
-    var p = goog.getScriptNonce_();
-    p && (r.nonce = p);
-    m ? r.text = goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createScript(m) : m : r.src = goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createScriptURL(l) : l;
-    d.head.appendChild(r);
+    var p = d.createElement("script");
+    p.defer = !0;
+    p.async = !1;
+    p.type = "module";
+    p.setAttribute("crossorigin", !0);
+    var r = goog.getScriptNonce_();
+    r && (p.nonce = r);
+    m ? p.text = goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createScript(m) : m : p.src = goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createScriptURL(l) : l;
+    d.head.appendChild(p);
   }
   if (goog.global.CLOSURE_IMPORT_SCRIPT) {
     goog.global.CLOSURE_IMPORT_SCRIPT(this.path) ? a.loaded() : a.pause();
@@ -887,9 +887,9 @@ goog.createTrustedTypesPolicy = function(a) {
     var l = goog.global.document, m = goog.Dependency.registerCallback_(function() {
       goog.Dependency.unregisterCallback_(m);
       c();
-    }), r = goog.getScriptNonce_();
-    r = "<script" + (r ? ' nonce="' + r + '"' : "") + ">" + goog.protectScriptTag_('goog.Dependency.callback_("' + m + '");') + "\x3c/script>";
-    l.write(goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createHTML(r) : r);
+    }), p = goog.getScriptNonce_();
+    p = "<script" + (p ? ' nonce="' + p + '"' : "") + ">" + goog.protectScriptTag_('goog.Dependency.callback_("' + m + '");') + "\x3c/script>";
+    l.write(goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createHTML(p) : p);
   }
   var e = this;
   if (goog.global.CLOSURE_IMPORT_SCRIPT) {
@@ -1949,7 +1949,7 @@ Server.prototype.XHRRequest = function(a, b, c, d, e, f, g) {
         } else {
           try {
             m = safejson.parse(l.responseText);
-          } catch (r) {
+          } catch (p) {
             m = {};
           }
         }
@@ -1985,7 +1985,7 @@ Server.prototype.request = function(a, b, c, d) {
     h = f.url, k = f.data;
   }
   var l = c.get("use_jsonp") || a.jsonp ? b : k;
-  var m = utils.retries, r = function(q, t, u) {
+  var m = utils.retries, p = function(q, t, u) {
     if ("function" === typeof e.onAPIResponse) {
       e.onAPIResponse(h, a.method, l, q, u, t);
     }
@@ -1994,15 +1994,15 @@ Server.prototype.request = function(a, b, c, d) {
     }, utils.retry_delay)) : d(q, t);
   };
   if (utils.userPreferences.trackingDisabled && utils.userPreferences.shouldBlockRequest(h, b)) {
-    return utils.userPreferences.allowErrorsInCallback ? r(Error(utils.messages.trackingDisabled), null, 300) : r(null, {}, 200);
+    return utils.userPreferences.allowErrorsInCallback ? p(Error(utils.messages.trackingDisabled), null, 300) : p(null, {}, 200);
   }
-  var p = !1;
+  var r = !1;
   if ("/v1/qr-code" === a.endpoint) {
-    p = !0;
-    var w = "arraybuffer";
+    r = !0;
+    var v = "arraybuffer";
   }
   var n = function() {
-    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(h, b, a.method, r) : e.XHRRequest(h, k, a.method, c, r, p, w);
+    c.get("use_jsonp") || a.jsonp ? e.jsonpRequest(h, b, a.method, p) : e.XHRRequest(h, k, a.method, c, p, r, v);
   };
   n();
 };
@@ -2199,7 +2199,7 @@ var sendSMS = function(a, b, c, d) {
       h.style.opacity = "1";
     }, banner_utils.animationDelay);
     e.value = "";
-  }, r = function() {
+  }, p = function() {
     l();
     f.style.background = "#FFD4D4";
     e.className = "error";
@@ -2209,13 +2209,13 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.error_timeout);
   };
   if (e) {
-    var p = e.value;
-    /^\d{7,}$/.test(p.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(p, d, c, function(w) {
-      w ? (b._publishEvent("sendBannerSMSError"), r()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
+    var r = e.value;
+    /^\d{7,}$/.test(r.replace(/[\s()+\-\.]|ext/gi, "")) ? (b._publishEvent("willSendBannerSMS"), f.setAttribute("disabled", ""), e.setAttribute("disabled", ""), f.style.opacity = ".4", e.style.opacity = ".4", g.style.opacity = "1", e.className = "", b.sendSMS(r, d, c, function(v) {
+      v ? (b._publishEvent("sendBannerSMSError"), p()) : (b._publishEvent("didSendBannerSMS"), m(), setTimeout(function() {
         k.removeChild(h);
         l();
       }, banner_utils.success_timeout));
-    })) : r();
+    })) : p();
   }
 }, banner = function(a, b, c, d) {
   if (!banner_utils.shouldAppend(d, b)) {
@@ -2237,30 +2237,37 @@ var sendSMS = function(a, b, c, d) {
     }, banner_utils.animationDelay));
   };
   banner_html.markup(b, d, function(h) {
-    function l() {
+    function l(v) {
+      v.preventDefault();
+      a._publishEvent("willCloseBanner");
+      k({}, function() {
+        a._publishEvent("didCloseBanner");
+      });
+    }
+    function m() {
       "top" === b.position ? e.style.top = "0" : "bottom" === b.position && (e.style.bottom = "0");
       a._publishEvent("didShowBanner");
     }
     e = h;
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
-    var m = b.iframe ? e.contentWindow.document : document;
+    var p = b.iframe ? e.contentWindow.document : document;
     if (utils.mobileUserAgent()) {
-      if (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, b.deepview_type = "banner", a.deepview(c, b), h = m.getElementById("branch-mobile-action")) {
-        h.onclick = function(p) {
-          p.preventDefault();
+      if (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, b.deepview_type = "banner", a.deepview(c, b), h = p.getElementById("branch-mobile-action")) {
+        h.onclick = function(v) {
+          v.preventDefault();
           a.deepviewCta();
         };
       }
     } else {
-      m.getElementById("sms-form") ? m.getElementById("sms-form").addEventListener("submit", function(p) {
-        p.preventDefault();
-        sendSMS(m, a, b, c);
+      p.getElementById("sms-form") ? p.getElementById("sms-form").addEventListener("submit", function(v) {
+        v.preventDefault();
+        sendSMS(p, a, b, c);
       }) : e.onload = function() {
-        m = e.contentWindow.document;
-        m.getElementById("sms-form") && m.getElementById("sms-form").addEventListener("submit", function(p) {
-          p.preventDefault();
-          sendSMS(m, a, b, c);
+        p = e.contentWindow.document;
+        p.getElementById("sms-form") && p.getElementById("sms-form").addEventListener("submit", function(v) {
+          v.preventDefault();
+          sendSMS(p, a, b, c);
         });
       };
     }
@@ -2268,25 +2275,9 @@ var sendSMS = function(a, b, c, d) {
     var r = banner_utils.getBodyStyle("margin-bottom");
     banner_utils.addClass(document.body, "branch-banner-is-active");
     "top" === b.position ? document.body.style.marginTop = banner_utils.addCSSLengths(banner_utils.bannerHeight, h) : "bottom" === b.position && (document.body.style.marginBottom = banner_utils.addCSSLengths(banner_utils.bannerHeight, r));
-    if (h = m.getElementById("branch-banner-close")) {
-      h.onclick = function(p) {
-        p.preventDefault();
-        a._publishEvent("willCloseBanner");
-        k({}, function() {
-          a._publishEvent("didCloseBanner");
-        });
-      };
-    }
-    if (h = m.getElementById("branch-banner-modal-background")) {
-      h.onclick = function(p) {
-        p.preventDefault();
-        a._publishEvent("willCloseBanner");
-        k({}, function() {
-          a._publishEvent("didCloseBanner");
-        });
-      };
-    }
-    b.immediate ? l() : setTimeout(l, banner_utils.animationDelay);
+    (h = p.getElementById("branch-banner-close")) && h.addEventListener("click", l);
+    (h = p.getElementById("branch-banner-modal-background")) && h.addEventListener("click", l);
+    b.immediate ? m() : setTimeout(m, banner_utils.animationDelay);
   });
   return k;
 };
@@ -2543,7 +2534,7 @@ journeys_utils.finalHookups = function(a, b, c, d, e, f, g, k) {
 journeys_utils._setupDismissBehavior = function(a, b, c, d, e, f, g, k, h, l) {
   a = d.contentWindow.document.querySelectorAll(a);
   Array.prototype.forEach.call(a, function(m) {
-    m.addEventListener(l, function(r) {
+    m.addEventListener(l, function(p) {
       journeys_utils._handleJourneyDismiss(b, c, d, e, f, g, k, h);
     });
   });
@@ -2594,8 +2585,8 @@ journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, k) {
       var l = function() {
         journeys_utils.branch.removeListener(l);
         var m = journeys_utils._getDismissRequestData(k, utils.dismissEventToSourceMapping[a]);
-        journeys_utils.branch._api(resources.dismiss, m, function(r, p) {
-          !r && "object" === typeof p && p.template && k.shouldDisplayJourney(p, null, !1) && k.displayJourney(p.template, m, m.branch_view_id || p.event_data.branch_view_data.id, p.event_data.branch_view_data, !1, p.journey_link_data);
+        journeys_utils.branch._api(resources.dismiss, m, function(p, r) {
+          !p && "object" === typeof r && r.template && k.shouldDisplayJourney(r, null, !1) && k.displayJourney(r.template, m, m.branch_view_id || r.event_data.branch_view_data.id, r.event_data.branch_view_data, !1, r.journey_link_data);
         });
       };
       journeys_utils.branch.addListener("branch_internal_event_didCloseJourney", l);
@@ -2741,21 +2732,21 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
     k.id = "branch-banner";
     document.body.insertBefore(k, null);
     banner_utils.addClass(k, "branch-banner-is-active");
-    var h = !1, l = b.callback_string, m = null, r = journeys_utils.branch._storage;
+    var h = !1, l = b.callback_string, m = null, p = journeys_utils.branch._storage;
     if (a) {
-      var p = journeys_utils.getMetadata(a) || {};
+      var r = journeys_utils.getMetadata(a) || {};
       a = journeys_utils.tryReplaceJourneyCtaLink(a);
-      var w = window.setTimeout(function() {
+      var v = window.setTimeout(function() {
         window[l] = function() {
         };
       }, utils.timeout);
       window[l] = function(n) {
-        window.clearTimeout(w);
-        h || (m = n, journeys_utils.finalHookups(c, g, r, m, null, p, e, branch_view));
+        window.clearTimeout(v);
+        h || (m = n, journeys_utils.finalHookups(c, g, p, m, null, r, e, branch_view));
       };
       renderHtmlBlob(document.body, a, b.has_app_websdk, function(n) {
         journeys_utils.banner = n;
-        null === n ? h = !0 : (journeys_utils.finalHookups(c, g, r, m, n, p, e, branch_view), utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart()), document.body.removeChild(k), utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d));
+        null === n ? h = !0 : (journeys_utils.finalHookups(c, g, p, m, n, r, e, branch_view), utils.navigationTimingAPIEnabled && (utils.instrumentation["journey-load-time"] = utils.timeSinceNavigationStart()), document.body.removeChild(k), utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d));
       });
     } else {
       document.body.removeChild(k), utils.userPreferences.trackingDisabled || e || branch_view.incrementPageviewAnalytics(d);
@@ -2895,13 +2886,13 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   var h = function(n) {
     var q = {sdk:config.version, branch_key:d.branch_key}, t = session.get(d._storage) || {}, u = session.get(d._storage, !0) || {};
     u.browser_fingerprint_id && (q._t = u.browser_fingerprint_id);
-    utils.isSafari11OrGreater() || utils.isIOSWKWebView() || d._api(resources._r, q, function(v, x) {
-      v && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = v.message);
+    utils.isSafari11OrGreater() || utils.isIOSWKWebView() || d._api(resources._r, q, function(w, x) {
+      w && (d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = w.message);
       x && (t.browser_fingerprint_id = x);
     });
-    d._api(resources.hasApp, {browser_fingerprint_id:t.browser_fingerprint_id}, function(v, x) {
-      v && (d.init_state_fail_code = init_state_fail_codes.HAS_APP_FAILED, d.init_state_fail_details = v.message);
-      v || !x || t.has_app || (t.has_app = !0, session.update(d._storage, t), d._publishEvent("didDownloadApp"));
+    d._api(resources.hasApp, {browser_fingerprint_id:t.browser_fingerprint_id}, function(w, x) {
+      w && (d.init_state_fail_code = init_state_fail_codes.HAS_APP_FAILED, d.init_state_fail_details = w.message);
+      w || !x || t.has_app || (t.has_app = !0, session.update(d._storage, t), d._publishEvent("didDownloadApp"));
       n && n(null, t);
     });
   }, l = function(n) {
@@ -2922,12 +2913,12 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     (q = utils.validateParameterType(c.metadata, "object") ? c.metadata : null) && (q = utils.mergeHostedDeeplinkData(n.hosted_deeplink_data, q)) && 0 < Object.keys(q).length && (n.hosted_deeplink_data = q);
     var t = branch_view._getPageviewRequestData(journeys_utils._getPageviewMetadata(c, n), c, d, !1);
     d.renderQueue(function() {
-      d._api(resources.pageview, t, function(u, v) {
-        u || "object" !== typeof v || (u = t.branch_view_id ? !0 : !1, branch_view.shouldDisplayJourney(v, c, u) ? branch_view.displayJourney(v.template, t, t.branch_view_id || v.event_data.branch_view_data.id, v.event_data.branch_view_data, u, v.journey_link_data) : ((v.auto_branchify || !f && utils.getParamValue("branchify_url") && d._referringLink()) && this.branch.deepview({}, {make_new_link:!1, open_app:!0, auto_branchify:!0}), journeys_utils.branch._publishEvent("willNotShowJourney")));
+      d._api(resources.pageview, t, function(u, w) {
+        u || "object" !== typeof w || (u = t.branch_view_id ? !0 : !1, branch_view.shouldDisplayJourney(w, c, u) ? branch_view.displayJourney(w.template, t, t.branch_view_id || w.event_data.branch_view_data.id, w.event_data.branch_view_data, u, w.journey_link_data) : ((w.auto_branchify || !f && utils.getParamValue("branchify_url") && d._referringLink()) && this.branch.deepview({}, {make_new_link:!1, open_app:!0, auto_branchify:!0}), journeys_utils.branch._publishEvent("willNotShowJourney")));
         utils.userPreferences.trackingDisabled && (utils.userPreferences.allowErrorsInCallback = !0);
       });
     });
-  }, r = function() {
+  }, p = function() {
     if ("undefined" !== typeof document.hidden) {
       var n = "hidden";
       var q = "visibilitychange";
@@ -2939,32 +2930,32 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     }, !1));
   };
   if (b && b.session_id && !g && !utils.getParamValue("branchify_url")) {
-    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), r(), h(m);
+    session.update(d._storage, {data:""}), session.update(d._storage, {referring_link:""}), p(), h(m);
   } else {
     b = {sdk:config.version, branch_key:d.branch_key};
-    var p = session.get(d._storage, !0) || {};
-    p.browser_fingerprint_id && (b._t = p.browser_fingerprint_id);
-    p.identity && (d.identity = p.identity);
-    var w = parseInt(utils.getParamValue("[?&]_open_delay_ms"), 10);
+    var r = session.get(d._storage, !0) || {};
+    r.browser_fingerprint_id && (b._t = r.browser_fingerprint_id);
+    r.identity && (d.identity = r.identity);
+    var v = parseInt(utils.getParamValue("[?&]_open_delay_ms"), 10);
     utils.isSafari11OrGreater() || utils.isIOSWKWebView() ? utils.delay(function() {
-      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || p.browser_fingerprint_id, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(n, q) {
+      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || r.browser_fingerprint_id, alternative_browser_fingerprint_id:r.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(n, q) {
         n && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = n.message);
         n || "object" !== typeof q || (q.branch_view_enabled && (d._branchViewEnabled = !!q.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (q.click_id = g));
-        r();
+        p();
         m(n, q);
       });
-    }, w) : d._api(resources._r, b, function(n, q) {
+    }, v) : d._api(resources._r, b, function(n, q) {
       if (n) {
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = n.message, m(n, null);
       }
       utils.delay(function() {
-        d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || q, alternative_browser_fingerprint_id:p.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(t, u) {
+        d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || q, alternative_browser_fingerprint_id:r.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(t, u) {
           t && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = t.message);
           t || "object" !== typeof u || (u.branch_view_enabled && (d._branchViewEnabled = !!u.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (u.click_id = g));
-          r();
+          p();
           m(t, u);
         });
-      }, w);
+      }, v);
     });
   }
 }, !0);
