@@ -1394,6 +1394,17 @@ describe('Branch', function() {
 		});
 	});
 
+	describe('AppIndexing', function() {
+		basicTests('autoAppIndex', [ 0 ]);
+		var spy = sinon.spy(console, 'warn');
+		it('should print console warning about method deprecation for autoAppIndex', function() {
+			var branch = initBranch(true);
+			var assert = testUtils.unplanned();
+			branch.autoAppIndex();
+			assert(spy.calledWith("autoAppIndex feature has been deprecated. This is no-op."));
+
+		});
+	});
 	describe('addListener', function() {
 		it('should add and remove an event listener to the branch object and fire', function(done) {
 			var branch = initBranch(true);

@@ -149,12 +149,12 @@ var webStorage = function(perm) {
 	};
 };
 
-/** @type storage */
+/** @type {storage} */
 BranchStorage.prototype['local'] = function() {
 	return webStorage(true);
 };
 
-/** @type storage */
+/** @type {storage} */
 BranchStorage.prototype['session'] = function() {
 	return webStorage(false);
 };
@@ -218,7 +218,7 @@ BranchStorage.prototype['cookie'] = function() {
 	return cookies();
 };
 
-/** @type storage */
+/** @type {storage} */
 BranchStorage.prototype['pojo'] = {
 	getAll: function() {
 		return this._store;

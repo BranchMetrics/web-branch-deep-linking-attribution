@@ -46,7 +46,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 	
 		journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
 	
-		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer, metadata);
+		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
 		iframeLoadedCallback(iframe);
 	}
 	document.body.appendChild(iframe);
