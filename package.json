@@ -1,6 +1,6 @@
 {
 	"name": "branch-sdk",
-	"version": "2.62.0",
+	"version": "2.63.0",
 	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
 	"main": "dist/build.min.js",
 	"files": [
@@ -43,5 +43,5 @@
 		"google-closure-deps": "^20220502.0.0",
 		"google-closure-library": "^20220502.0.0"
 	},
-	"build": "2.62.0"
+	"build": "2.63.0"
 }

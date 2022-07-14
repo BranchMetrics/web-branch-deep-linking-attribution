@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.63.0] - 2022-07-14
+- [BUX-931] Support for center overlay and partial interstitial creatives
+- [SDK-1486] Mark Firebase App Indexing SDK methods as deprecated
+
 ## [2.62.0] - 2022-05-24
 – [SDK-1190] Convert deprecated credit, referral related methods to no-ops
 
