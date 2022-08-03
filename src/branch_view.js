@@ -95,14 +95,20 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 };
 
 branch_view.incrementPageviewAnalytics = function(branchViewData) {
+	var requestData = 		{
+		"event": "pageview",
+		"journey_displayed": true,
+		"audience_rule_id": branchViewData['audience_rule_id'],
+		"branch_view_id": branchViewData['branch_view_id']
+	};
+
+	var sessionStorage = session.get(journeys_utils.branch._storage) || {};
+	var identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
+	requestData = utils.addPropertyIfNotNull(requestData, 'identity', identity);
+
 	journeys_utils.branch._api(
 		resources.pageview,
-		{
-			"event": "pageview",
-			"journey_displayed": true,
-			"audience_rule_id": branchViewData['audience_rule_id'],
-			"branch_view_id": branchViewData['branch_view_id']
-		},
+		requestData,
 		function (err, data) {
 			// do nothing with response
 		}

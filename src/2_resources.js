@@ -98,7 +98,6 @@ resources.open = {
 		"browser_fingerprint_id": validator(false, validationTypes.STRING),
 		"alternative_browser_fingerprint_id": validator(false, validationTypes.STRING),
 		"identity_id": validator(false, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING),
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),
 		"options": validator(false, validationTypes.OBJECT),
