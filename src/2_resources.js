@@ -312,7 +312,8 @@ resources.pageview = {
 		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
 		"journey_dismissals": validator(false, validationTypes.OBJECT),
-		"identity_id": validator(false, validationTypes.STRING)
+		"identity_id": validator(false, validationTypes.STRING),
+		"identity": validator(true, validationTypes.STRING)
 	})
 };
 
