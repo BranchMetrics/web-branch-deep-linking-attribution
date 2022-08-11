@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.64.0] - 2022-08-11
+– [SDK-1541] Include Raw Developer Identity in V1/PageView calls
+– [SDK-1587] Fix cdn example not loading
+
 ## [2.63.0] - 2022-07-14
 - [BUX-931] Support for center overlay and partial interstitial creatives
 - [SDK-1486] Mark Firebase App Indexing SDK methods as deprecated
