@@ -95,14 +95,20 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 };
 
 branch_view.incrementPageviewAnalytics = function(branchViewData) {
+	var requestData = 		{
+		"event": "pageview",
+		"journey_displayed": true,
+		"audience_rule_id": branchViewData['audience_rule_id'],
+		"branch_view_id": branchViewData['branch_view_id']
+	};
+
+	var sessionStorage = session.get(journeys_utils.branch._storage) || {};
+	var identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
+	requestData = utils.addPropertyIfNotNull(requestData, 'identity', identity);
+
 	journeys_utils.branch._api(
 		resources.pageview,
-		{
-			"event": "pageview",
-			"journey_displayed": true,
-			"audience_rule_id": branchViewData['audience_rule_id'],
-			"branch_view_id": branchViewData['branch_view_id']
-		},
+		requestData,
 		function (err, data) {
 			// do nothing with response
 		}
@@ -207,6 +213,7 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	var obj = utils.merge({}, branch._branchViewData);
 	var sessionStorage = session.get(branch._storage) || {};
 	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
+	var identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
 	var journeyDismissals = branch._storage.get('journeyDismissals', true);
 	var userLanguage = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase() || null;
 	var initialReferrer = utils.getInitialReferrer(branch._referringLink());
@@ -223,6 +230,7 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	obj = utils.addPropertyIfNotNull(obj, 'no_journeys', options['no_journeys']);
 	obj = utils.addPropertyIfNotNull(obj, 'is_iframe', utils.isIframe());
 	obj = utils.addPropertyIfNotNull(obj, 'journey_dismissals', journeyDismissals);
+	obj = utils.addPropertyIfNotNull(obj, 'identity', identity);
 	obj['user_language'] = userLanguage;
 	obj['open_app'] = options['open_app'] || false;
 	obj['has_app_websdk'] = has_app;
