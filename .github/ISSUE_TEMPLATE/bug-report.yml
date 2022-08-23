@@ -1,60 +1,64 @@
----
-name: "🐞 Bug report"
-description: Found a bug in the Branch Web SDK? File it here.
-title: "(short issue description)"
-labels: [bug, needs-triage]
+--- 
 assignees: []
-body:
-  - type: textarea
+body: 
+  - 
+    attributes: 
+      description: "What is the problem? A clear and concise description of what the bug is."
+      label: "Describe the bug"
+      placeholder: "Tell us what you see!"
     id: description
-    attributes:
-      label: Describe the bug
-      description: What is the problem? A clear and concise description of what the bug is.
-      placeholder: Tell us what you see!
-    validations:
+    type: textarea
+    validations: 
       required: true
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to reproduce
-      description: |
-      Please provide as much step-by-step detail as possible.Please copy and paste any relevant code to re-produce this issue.Please include full errors, uncaught exceptions, stack traces, and relevant logs.
+  - 
+    attributes: 
+      description: "Please provide as much step-by-step detail as possible.Please copy and paste any relevant code to re-produce this issue.Please include full errors, uncaught exceptions, stack traces, and relevant logs.\n"
+      label: "Steps to reproduce"
       value: |
-       1.
-       2.
-       3.
-    validations:
+          1.
+          2.
+          3.
+    id: steps
+    type: textarea
+    validations: 
       required: true
-  - type: textarea
+  - 
+    attributes: 
+      description: "What did you expect to happen?\n"
+      label: "Expected Behavior"
     id: expected
-    attributes:
-      label: Expected Behavior
-      description: |
-        What did you expect to happen?
-    validations:
+    type: textarea
+    validations: 
       required: true
-  - type: textarea
+  - 
+    attributes: 
+      description: "Anything else that might be relevant for troubleshooting this bug.Any screenshots or videos that show the issue are very helpful.\n"
+      label: "Additional Information/Context"
     id: context
-    attributes:
-      label: Additional Information/Context
-      description: |
-        Anything else that might be relevant for troubleshooting this bug.Any screenshots or videos that show the issue are very helpful.
-    validations:
+    type: textarea
+    validations: 
       required: false
-  - type: input
+  - 
+    attributes: 
+      description: "What version of sdk are you seeing this issue on?"
+      label: "SDK version used (`window.branch.sdk`)"
+      placeholder: "2.62.0\n"
     id: sdk-version
-    attributes:
-      label: SDK version used (`window.branch.sdk`)
-      description: What version of sdk are you seeing this issue on?
-      placeholder: |
-       2.62.0
-    validations:
+    type: input
+    validations: 
       required: true
-  - type: input
-    id: env
-    attributes:
+  - 
+    attributes: 
+      description: "What browser and operating system are you seeing this issue on? What versions?"
       label: Environment
-      description: What browser and operating system are you seeing this issue on? What versions?
-      placeholder: Chrome 104.0.5112.101 on macOS 12.5.1
-    validations:
+      placeholder: "Chrome 104.0.5112.101 on macOS 12.5.1"
+    id: env
+    type: input
+    validations: 
       required: true
+description: "Found a bug in the Branch Web SDK? File it here."
+labels: 
+  - bug
+  - needs-triage
+name: "🐞 Bug report"
+title: "(short issue description)"
