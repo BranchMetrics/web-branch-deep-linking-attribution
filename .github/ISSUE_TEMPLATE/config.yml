@@ -3,7 +3,7 @@ blank_issues_enabled: false
 contact_links:
   - name: "📕 Documentation Issue"
     url: https://help.branch.io/developers-hub/docs/web-sdk-overview
-    about: Report an issue in the Branch Web sdk Reference documentation by clicking "Suggest edits" button on the documenation page
+    about: Report an issue in the Branch Web SDK Reference documentation by clicking "Suggest edits" button on the documenation page
   - name: "Branch Support"
     url: https://help.branch.io/using-branch/page/submit-a-ticket
-    about: If you are having general trouble with Branch Web sdk or your Branch Web sdk integration, please reach out to Branch Support instead.
+    about: If you are having general trouble with Branch Web SDK or your Branch Web SDK integration, please reach out to Branch Support instead.
