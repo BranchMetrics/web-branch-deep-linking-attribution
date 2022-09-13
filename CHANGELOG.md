@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.65.0] - 2022-09-13
+– INTENG-16592 Fix 'v1/dismiss' to be called for 'Redirect to a web page' dismissal behavior
+
 ## [2.64.0] - 2022-08-11
 – [SDK-1541] Include Raw Developer Identity in V1/PageView calls
 – [SDK-1587] Fix cdn example not loading
