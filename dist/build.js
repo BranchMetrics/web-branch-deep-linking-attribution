@@ -2588,18 +2588,16 @@ journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, k) {
   journeys_utils.journeyDismissed = !0;
   journeys_utils.animateBannerExit(c);
   if (!g) {
-    if (void 0 !== h && b.set("globalJourneysDismiss", h, !0), journeys_utils._setJourneyDismiss(b, d, e), f.dismissRedirect) {
-      window.location = f.dismissRedirect;
-    } else {
-      var l = function() {
-        journeys_utils.branch.removeListener(l);
-        var m = journeys_utils._getDismissRequestData(k, utils.dismissEventToSourceMapping[a]);
-        journeys_utils.branch._api(resources.dismiss, m, function(p, q) {
-          !p && "object" === typeof q && q.template && k.shouldDisplayJourney(q, null, !1) && k.displayJourney(q.template, m, m.branch_view_id || q.event_data.branch_view_data.id, q.event_data.branch_view_data, !1, q.journey_link_data);
-        });
-      };
-      journeys_utils.branch.addListener("branch_internal_event_didCloseJourney", l);
-    }
+    void 0 !== h && b.set("globalJourneysDismiss", h, !0);
+    journeys_utils._setJourneyDismiss(b, d, e);
+    var l = function() {
+      journeys_utils.branch.removeListener(l);
+      var m = journeys_utils._getDismissRequestData(k, utils.dismissEventToSourceMapping[a]);
+      journeys_utils.branch._api(resources.dismiss, m, function(p, q) {
+        !p && f.dismissRedirect ? window.location = f.dismissRedirect : !p && "object" === typeof q && q.template && k.shouldDisplayJourney(q, null, !1) && k.displayJourney(q.template, m, m.branch_view_id || q.event_data.branch_view_data.id, q.event_data.branch_view_data, !1, q.journey_link_data);
+      });
+    };
+    journeys_utils.branch.addListener("branch_internal_event_didCloseJourney", l);
   }
 };
 journeys_utils._getPageviewMetadata = function(a, b) {
