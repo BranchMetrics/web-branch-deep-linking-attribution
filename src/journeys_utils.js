@@ -818,39 +818,38 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 			storage.set('globalJourneysDismiss', globalDismissPeriod, true);
 		}
 		journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
-		if (metadata['dismissRedirect']) {
-			window.location = metadata['dismissRedirect'];
-		} else {
-			var listener = function () {
-				journeys_utils.branch.removeListener(listener);
-				var requestData = journeys_utils._getDismissRequestData(branch_view, utils.dismissEventToSourceMapping[eventName]);
-				journeys_utils.branch._api(
-					resources.dismiss,
-					requestData,
-					function (err, data) {
-						if (!err && typeof data === "object" && data['template']) {
-							if (branch_view.shouldDisplayJourney
-								(
-									data,
-									null,
-									false
-								)
-							) {
-								branch_view.displayJourney(
-									data['template'],
-									requestData,
-									requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
-									data['event_data']['branch_view_data'],
-									false,
-									data['journey_link_data']
-								);
-							}
+		var listener = function () {
+			journeys_utils.branch.removeListener(listener);
+			var requestData = journeys_utils._getDismissRequestData(branch_view, utils.dismissEventToSourceMapping[eventName]);
+			journeys_utils.branch._api(
+				resources.dismiss,
+				requestData,
+				function (err, data) {
+					if (!err && metadata && metadata['dismissRedirect']) {
+						window.location = metadata['dismissRedirect'];
+					}
+					else if (!err && typeof data === "object" && data['template']) {
+						if (branch_view.shouldDisplayJourney
+							(
+								data,
+								null,
+								false
+							)
+						) {
+							branch_view.displayJourney(
+								data['template'],
+								requestData,
+								requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
+								data['event_data']['branch_view_data'],
+								false,
+								data['journey_link_data']
+							);
 						}
 					}
-				);
-			};
-			journeys_utils.branch.addListener('branch_internal_event_didCloseJourney', listener);
-		}
+				}
+			);
+		};
+		journeys_utils.branch.addListener('branch_internal_event_didCloseJourney', listener);
 	}
 }
 
