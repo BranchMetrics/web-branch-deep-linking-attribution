@@ -2594,7 +2594,7 @@ journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, k) {
       journeys_utils.branch.removeListener(l);
       var m = journeys_utils._getDismissRequestData(k, utils.dismissEventToSourceMapping[a]);
       journeys_utils.branch._api(resources.dismiss, m, function(p, q) {
-        !p && f.dismissRedirect ? window.location = f.dismissRedirect : !p && "object" === typeof q && q.template && k.shouldDisplayJourney(q, null, !1) && k.displayJourney(q.template, m, m.branch_view_id || q.event_data.branch_view_data.id, q.event_data.branch_view_data, !1, q.journey_link_data);
+        !p && f && f.dismissRedirect ? window.location = f.dismissRedirect : !p && "object" === typeof q && q.template && k.shouldDisplayJourney(q, null, !1) && k.displayJourney(q.template, m, m.branch_view_id || q.event_data.branch_view_data.id, q.event_data.branch_view_data, !1, q.journey_link_data);
       });
     };
     journeys_utils.branch.addListener("branch_internal_event_didCloseJourney", l);

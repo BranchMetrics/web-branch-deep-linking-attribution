@@ -825,7 +825,7 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 				resources.dismiss,
 				requestData,
 				function (err, data) {
-					if (!err && metadata['dismissRedirect']) {
+					if (!err && metadata && metadata['dismissRedirect']) {
 						window.location = metadata['dismissRedirect'];
 					}
 					else if (!err && typeof data === "object" && data['template']) {
