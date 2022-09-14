@@ -1078,7 +1078,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.64.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.65.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -2535,18 +2535,16 @@ journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, k) {
   journeys_utils.journeyDismissed = !0;
   journeys_utils.animateBannerExit(c);
   if (!g) {
-    if (void 0 !== h && b.set("globalJourneysDismiss", h, !0), journeys_utils._setJourneyDismiss(b, d, e), f.dismissRedirect) {
-      window.location = f.dismissRedirect;
-    } else {
-      var l = function() {
-        journeys_utils.branch.removeListener(l);
-        var m = journeys_utils._getDismissRequestData(k, utils.dismissEventToSourceMapping[a]);
-        journeys_utils.branch._api(resources.dismiss, m, function(q, r) {
-          !q && "object" === typeof r && r.template && k.shouldDisplayJourney(r, null, !1) && k.displayJourney(r.template, m, m.branch_view_id || r.event_data.branch_view_data.id, r.event_data.branch_view_data, !1, r.journey_link_data);
-        });
-      };
-      journeys_utils.branch.addListener("branch_internal_event_didCloseJourney", l);
-    }
+    void 0 !== h && b.set("globalJourneysDismiss", h, !0);
+    journeys_utils._setJourneyDismiss(b, d, e);
+    var l = function() {
+      journeys_utils.branch.removeListener(l);
+      var m = journeys_utils._getDismissRequestData(k, utils.dismissEventToSourceMapping[a]);
+      journeys_utils.branch._api(resources.dismiss, m, function(q, r) {
+        !q && f && f.dismissRedirect ? window.location = f.dismissRedirect : !q && "object" === typeof r && r.template && k.shouldDisplayJourney(r, null, !1) && k.displayJourney(r.template, m, m.branch_view_id || r.event_data.branch_view_data.id, r.event_data.branch_view_data, !1, r.journey_link_data);
+      });
+    };
+    journeys_utils.branch.addListener("branch_internal_event_didCloseJourney", l);
   }
 };
 journeys_utils._getPageviewMetadata = function(a, b) {
