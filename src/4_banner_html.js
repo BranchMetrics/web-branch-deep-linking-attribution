@@ -96,22 +96,6 @@ banner_html.mobileAction = function(options, storage) {
 		'</a>';
 };
 
-banner_html.desktopAction = function(options) {
-	return '<div class="branch-icon-wrapper" id="branch-loader-wrapper" style="opacity: 0;">' +
-		'<div id="branch-spinner"></div>' +
-	'</div>' +
-	'<div id="branch-sms-block">' +
-		'<form id="sms-form">' +
-			'<input type="phone" aria-label="Enter phone number" class="branch-animation" name="branch-sms-phone"' +
-			' id="branch-sms-phone" placeholder="' +
-			options.phonePreviewText +
-			'">' +
-			'<button type="submit" id="branch-sms-send" class="branch-animation button">' +
-			options.sendLinkText + '</button>' +
-		'</form>' +
-	'</div>';
-};
-
 banner_html.checkmark = function() {
 	if (window.ActiveXObject) {
 		return '<span class="checkmark">&#x2713;</span>';
@@ -149,7 +133,7 @@ banner_html.iframe = function(options, action, callback) {
 			bodyClass = 'branch-banner-android';
 		}
 		else {
-			bodyClass = 'branch-banner-desktop';
+			bodyClass = 'branch-banner-other';
 		}
 
 		var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -185,10 +169,8 @@ banner_html.div = function(options, action, doc) {
  * @param {storage} storage
  */
 banner_html.markup = function(options, storage, callback) {
-	var action = '<div id="branch-sms-form-container">' +
-		(utils.mobileUserAgent() ?
-			banner_html.mobileAction(options, storage) :
-			banner_html.desktopAction(options)) +
+	var action = '<div id="branch-banner-form-container">' +
+		banner_html.mobileAction(options, storage) +
 		'</div>';
 
 	if (options.iframe) {

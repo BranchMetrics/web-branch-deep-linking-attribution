@@ -74,10 +74,8 @@ banner_css.banner = function(options) {
 	'';
 };
 
-banner_css.desktop =
+banner_css.other =
 	'#branch-banner { position: fixed; min-width: 600px; }\n' +
-	'#branch-sms-block * { vertical-align: bottom; font-size: 15px; }\n' +
-	'#branch-sms-block { display: inline-block; }\n' +
 	'#branch-banner input{' +
 		' border: 1px solid #ccc; ' +
 		' font-weight: 400;  border-radius: 4px; height: 30px;' +
@@ -101,17 +99,6 @@ banner_css.desktop =
 		' border-radius:50%; -webkit-font-smoothing: antialiased !important; }\n' +
 	'#branch-banner .theme-dark input { border-color: transparent; }\n' +
 	'';
-
-banner_css.nonie =
-	'#branch-banner .checkmark { stroke: #428bca; stroke-dashoffset: 745.74853515625;' +
-		' stroke-dasharray: 745.74853515625; -webkit-animation: dash 2s ease-out forwards;' +
-		' animation: dash 2s ease-out forwards; }\n' +
-	'@-webkit-keyframes dash { 0% { stroke-dashoffset: 745.748535 15625; }' +
-		' 100% { stroke-dashoffset: 0; } }\n' +
-	'@keyframes dash { 0% { stroke-dashoffset: 745.74853515625; }' +
-		' 100% { stroke-dashoffset: 0; } }\n';
-
-banner_css.ie = '#branch-banner .checkmark { color: #428bca; font-size: 22px; }\n';
 
 banner_css.mobile =
 	'#branch-banner { position: absolute; }\n' +
@@ -192,15 +179,6 @@ banner_css.css = function(options, element) {
 	else if (userAgent === 'kindle' && options.showKindle) {
 		style += banner_css.mobile + banner_css.kindle;
 	}
-	else {
-		style += banner_css.desktop;
-		if (window.ActiveXObject) {
-			style += banner_css.ie;
-		}
-		else {
-			style += banner_css.nonie;
-		}
-	}
 	style += options.customCSS;
 
 	if (options.iframe) {
@@ -210,10 +188,7 @@ banner_css.css = function(options, element) {
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
 		utils.addNonceAttribute(iFrameCSS);
-		iFrameCSS.innerHTML = banner_css.iframe +
-			(utils.mobileUserAgent() ?
-				banner_css.iframe_position(options.mobileSticky, options.position) :
-				banner_css.iframe_position(options.desktopSticky, options.position));
+		iFrameCSS.innerHTML = banner_css.iframe + banner_css.iframe_position(options.mobileSticky, options.position);
 		(document.head || document.getElementsByTagName("head")[0]).appendChild(iFrameCSS);
 	}
 
