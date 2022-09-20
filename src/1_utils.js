@@ -79,12 +79,6 @@ utils.userPreferences = {
 			urlPath = '/' + urlPath;
 		}
 
-		// INTENG-11512
-		// To allow SMS when tracking disabled, we must allow POST https://bnc.lt/c/<whatever>
-		if (urlPath.startsWith('/c/')) {
-			return false;
-		}
-
 		var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
 
 		if (!whiteListedEndpointWithData) {
