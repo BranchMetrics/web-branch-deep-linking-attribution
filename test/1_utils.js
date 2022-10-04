@@ -1033,6 +1033,9 @@ describe('utils', function() {
 		it('should allow raw links', function() {
 			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://bnctestbed.app.link/abcdefg'));
 		});
+		it('should allow SMS posts', function() {
+			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://bnc.lt/c/hello'));
+		});
 	});
 
 	describe('delay function', function() {
@@ -1286,9 +1289,9 @@ describe('utils', function() {
 			assert.equal(iframe.contentDocument.body.className, 'branch-banner-android');
 		});
 
-		it('sets the body class to branch-banner-other when UA is any other value', function() {
+		it('sets the body class to branch-banner-desktop when UA is any other value', function() {
 			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', '');
-			assert.equal(iframe.contentDocument.body.className, 'branch-banner-other');
+			assert.equal(iframe.contentDocument.body.className, 'branch-banner-desktop');
 		});
 	});
 

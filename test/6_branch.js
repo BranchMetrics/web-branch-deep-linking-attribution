@@ -906,30 +906,125 @@ describe('Branch', function() {
 	});
 
 	describe('sendSMS', function() {
-		basicTests('sendSMS', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
-		it('should print console warning about method deprecation for sendMS', function() {
+		basicTests('sendSMS', [ 3, 4 ]);
+
+		var linkData = testUtils.params({
+			tags: [ 'tag1', 'tag2' ],
+			channel: 'sample app',
+			feature: 'create link',
+			stage: 'created link',
+			type: 1,
+			data: {
+				mydata: 'bar',
+				'$desktop_url': 'https://cdn.branch.io/example.html',
+				'$og_title': 'Branch Metrics',
+				'$og_description': 'Branch Metrics',
+				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
+			}
+		}, [ "_t" ]);
+
+		it('should call SMSLinkSend if a click_id already exists', function(done) {
 			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.sendSMS();
-			assert(spy.calledWith("SMS feature has been deprecated. This is no-op."));
+			var assert = testUtils.plan(3, done);
+			sandbox.stub(branch._storage, 'get', function(key, storage) {
+				return '12345';
+			});
 
-		});
-	});
-	describe('banner', function() {
-		basicTests('banner', [ 0 ]);
+			var expectedRequest = {
+				"link_url": "12345",
+				"phone": "9999999999",
+				"branch_key": branch_sample_key,
+				"sdk": "web" + config.version
+			};
 
-		// set to desktop
-		sandbox.stub(utils, 'mobileUserAgent', function(server, branchViewData, data) {
-			return false;
+			branch.sendSMS(
+				'9999999999',
+				linkData,
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+
+			assert.strictEqual(requests.length, 1, 'Request made');
+			requests[0].callback();
+			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
-		var spy = sinon.spy(console, 'info');
-		it('should print console warning about method deprecation for sendMS', function() {
+
+		it('should create new link if a click_id does not exist', function(done) {
 			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.banner();
-			assert(spy.calledWith("banner functionality is not supported on desktop"));
+			var assert = testUtils.plan(6, done);
+			sandbox.stub(branch._storage, 'get', function(key, storage) {
+				return null;
+			});
 
+			branch.sendSMS(
+				'9999999999',
+				linkData,
+				function(err) {
+					assert.strictEqual(err, null, 'No error');
+				}
+			);
+			assert.strictEqual(requests.length, 1, 'Requests made');
+			requests[0].callback(
+				null,
+				{
+					"url": "https://bnc.lt/l/4FPE0v-04H"
+				}
+			);
+			assert.strictEqual(requests.length, 2, 'Requests made');
+			assert.strictEqual(requests[1].obj.click, 'click', 'the second request is a click');
+			assert.strictEqual(
+				requests[1].obj.link_url,
+				'https://bnc.lt/l/4FPE0v-04H',
+				'the second request has the correct link url'
+			);
+			requests[1].callback(
+				null,
+				{
+					"click_id":"4FWepu-03S"
+				}
+			);
+			assert.strictEqual(requests.length, 3, 'Requests made');
+			requests[2].callback();
+		});
+
+		it('should handle app short url link from the api', function(done) {
+			var branch = initBranch(true);
+			var assert = testUtils.plan(6, done);
+			sandbox.stub(branch._storage, 'get', function(key, storage) {
+				return null;
+			});
+
+			branch.sendSMS(
+				'9999999999',
+				linkData,
+				function(err) {
+					assert(true);
+					// assert.strictEqual(err, null, 'No error');
+				}
+			);
+			assert.strictEqual(requests.length, 1, 'Requests made');
+			requests[0].callback(
+				null,
+				{
+					"url": "https://bnc.lt/ZPOc/p1Ej1fHI4n"
+				}
+			);
+			assert.strictEqual(requests.length, 2, 'Requests made');
+			assert.strictEqual(requests[1].obj.click, 'click', 'the second request is a click');
+			assert.strictEqual(
+				requests[1].obj.link_url,
+				'https://bnc.lt/ZPOc/p1Ej1fHI4n',
+				'the second request has the correct link url'
+			);
+			requests[1].callback(
+				null,
+				{
+					"click_id":"4FWepu-03S"
+				}
+			);
+			assert.strictEqual(requests.length, 3, 'Requests made');
+			requests[2].callback();
 		});
 	});
 
