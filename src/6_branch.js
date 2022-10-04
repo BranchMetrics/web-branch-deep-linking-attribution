@@ -332,6 +332,7 @@ Branch.prototype['init'] = wrap(
 		utils.retry_delay = options && options['retry_delay'] && Number.isInteger(options['retry_delay']) ? options['retry_delay'] : utils.retry_delay;
 		utils.timeout = options && options['timeout'] && Number.isInteger(options['timeout']) ? options['timeout'] : utils.timeout;
 		utils.nonce = options && options['nonce'] ? options['nonce'] : utils.nonce;
+		utils.debug = options && options['enableLogging'] ? options['enableLogging'] : utils.debug;
 
 		utils.userPreferences.trackingDisabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
 		utils.userPreferences.allowErrorsInCallback = false;
