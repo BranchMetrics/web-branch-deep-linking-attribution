@@ -257,7 +257,7 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 		bodyClass = 'branch-banner-android';
 	}
 	else {
-		bodyClass = 'branch-banner-other';
+		bodyClass = 'branch-banner-desktop';
 	}
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 	iframedoc.head = iframedoc.createElement('head');

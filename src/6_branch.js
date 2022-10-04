@@ -1283,10 +1283,141 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 
 /** =WEB
  * @function Branch.sendSMS
- * /** */
-Branch.prototype['sendSMS'] = function() {
-	console.warn("SMS feature has been deprecated. This is no-op.");
-};
+ * @param {string} phone - _required_ - phone number to send SMS to
+ * @param {Object} linkData - _required_ - object of link data
+ * @param {Object=} options - _optional_ - options: make_new_link, which forces the creation of a
+ * new link even if one already exists
+ * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
+ *
+ * **[Formerly `SMSLink()`](CHANGELOG.md)**
+ *
+ * A robust function to give your users the ability to share links via SMS. If
+ * the user navigated to this page via a Branch link, `sendSMS` will send that
+ * same link. Otherwise, it will create a new link with the data provided in
+ * the `params` argument. `sendSMS` also registers a click event with the
+ * `channel` pre-filled with `'sms'` before sending an sms to the provided
+ * `phone` parameter. This way the entire link click event is recorded starting
+ * with the user sending an sms.
+ *
+ * **Note**: `sendSMS` will *automatically* send a previously generated link click,
+ * along with the `data` object in the original link. Therefore, it is unneccessary for the
+ * `data()` method to be called to check for an already existing link. If a link already
+ * exists, `sendSMS` will simply ignore the `data` object passed to it, and send the existing link.
+ * If this behavior is not desired, set `make_new_link: true` in the `options` object argument
+ * of `sendSMS`, and `sendSMS` will always make a new link.
+ *
+ * **Supports international SMS**.
+ *
+ * Please note that the destination phone number needs to be from the same country the SMS is being sent from.
+ *
+ * #### Usage
+ * ```js
+ * branch.sendSMS(
+ *     phone,
+ *     linkData,
+ *     options,
+ *     callback (err, data)
+ * );
+ * ```
+ *
+ * ##### Example
+ * ```js
+ * branch.sendSMS(
+ *     '9999999999',
+ *     {
+ *         tags: ['tag1', 'tag2'],
+ *         channel: 'facebook',
+ *         feature: 'dashboard',
+ *         stage: 'new user',
+ *         data: {
+ *             mydata: 'something',
+ *             foo: 'bar',
+ *             '$desktop_url': 'http://myappwebsite.com',
+ *             '$ios_url': 'http://myappwebsite.com/ios',
+ *             '$ipad_url': 'http://myappwebsite.com/ipad',
+ *             '$android_url': 'http://myappwebsite.com/android',
+ *             '$og_app_id': '12345',
+ *             '$og_title': 'My App',
+ *             '$og_description': 'My app\'s description.',
+ *             '$og_image_url': 'http://myappwebsite.com/image.png'
+ *         }
+ *     },
+ *     { make_new_link: true }, // Default: false. If set to true, sendSMS will generate a new link even if one already exists.
+ *     function(err) { console.log(err); }
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback("Error message");
+ * ```
+ *
+ * ___
+ *
+ * ## Deepview
+ */
+/*** +TOC_ITEM #sendsmsphone-linkdata-options-callback &.sendSMS()& ^ALL ***/
+Branch.prototype['sendSMS'] = wrap(
+	callback_params.CALLBACK_ERR,
+	function(done, phone, linkData, options) {
+		var self = this;
+		if (typeof options === 'function') {
+			options = { };
+		}
+		else if (typeof options === 'undefined' || options === null) {
+			options = { };
+		}
+		options["make_new_link"] = options["make_new_link"] || false;
+
+		if (!linkData['channel'] || linkData['channel'] === 'app banner') {
+			linkData['channel'] = 'sms';
+		}
+
+		function sendSMS(click_id) {
+			self._api(
+				resources.SMSLinkSend, {
+					"link_url": click_id,
+					"phone": phone
+				},
+				function(err) {
+					done(err || null);
+				});
+		}
+
+		var referringLink = self._referringLink();
+		if (referringLink && !options['make_new_link']) {
+			sendSMS(utils.getClickIdAndSearchStringFromLink(referringLink));
+		}
+		else {
+			self._api(
+				resources.link,
+				utils.cleanLinkData(linkData),
+				function(err, data) {
+					if (err) {
+						return done(err);
+					}
+					var url = data['url'];
+					if (!/(bnc.lt\/|app\.link\/)/.test(url)) {
+						url = config.link_service_endpoint + '/' + utils.extractDeeplinkPath(url);
+					}
+					self._api(
+						resources.linkClick,
+						{
+							"link_url": url,
+							"click": "click"
+						},
+						function(err, data) {
+							if (err) {
+								return done(err);
+							}
+							sendSMS(data['click_id']);
+						}
+					);
+				}
+			);
+		}
+	}
+);
 
 /**
  * @function Branch.qrCode
@@ -1913,97 +2044,101 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 });
 
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
-	if (!utils.mobileUserAgent()) {
-		console.info("banner functionality is not supported on desktop");
-	}
-	else {
-		data = data || {};
-		_setBranchViewData.call(null, this, function() {}, data);
+	data = data || {};
+	_setBranchViewData.call(null, this, function() {}, data);
 
-		if (typeof options['showAgain'] === 'undefined' &&
+	if (typeof options['showAgain'] === 'undefined' &&
 			typeof options['forgetHide'] !== 'undefined') {
-			options['showAgain'] = options['forgetHide'];
-		}
-		/** @type {banner_utils.options} */
-		var bannerOptions = {
-			icon: /** @type {string} */ (utils.cleanBannerText(options['icon']) || ''),
-			title: /** @type {string} */ (utils.cleanBannerText(options['title']) || ''),
-			description: /** @type {string} */ (utils.cleanBannerText(options['description']) || ''),
-			reviewCount: /** @type {number} */ ((
-				typeof options['reviewCount'] === 'number' &&
-				options['reviewCount'] > 0 // force greater than 0
-			) ?
-				Math.floor(options['reviewCount']) : // force no decimal
-				null),
-			rating: /** @type {number} */ ((
-				typeof options['rating'] === 'number' &&
-				options['rating'] <= 5 &&
-				options['rating'] > 0
-			) ?
-				Math.round(options['rating'] * 2) / 2 : // force increments of .5
-				null),
-			openAppButtonText: /** @type {string} */ (utils.cleanBannerText(options['openAppButtonText']) || 'View in app'),
-			downloadAppButtonText: /** @type {string} */ (utils.cleanBannerText(options['downloadAppButtonText']) || 'Download App'),
-			iframe: /** @type {boolean} */ (typeof options['iframe'] === 'undefined' ?
-				true :
-				options['iframe']),
-			showiOS: /** @type {boolean} */ (typeof options['showiOS'] === 'undefined' ?
-				true :
-				options['showiOS']),
-			showiPad: /** @type {boolean} */ (typeof options['showiPad'] === 'undefined' ?
-				true :
-				options['showiPad']),
-			showAndroid: /** @type {boolean} */ (typeof options['showAndroid'] === 'undefined' ?
-				true :
-				options['showAndroid']),
-			showBlackberry: /** @type {boolean} */ (typeof options['showBlackberry'] === 'undefined' ?
-				true :
-				options['showBlackberry']),
-			showWindowsPhone: /** @type {boolean} */ (typeof options['showWindowsPhone'] === 'undefined' ?
-				true :
-				options['showWindowsPhone']),
-			showKindle: /** @type {boolean} */ (typeof options['showKindle'] === 'undefined' ?
-				true :
-				options['showKindle']),
-			disableHide: /** @type {boolean} */ (!!options['disableHide']),
-			forgetHide: /** @type {boolean} */ (typeof options['forgetHide'] === 'number' ?
-				options['forgetHide'] :
-				!!options['forgetHide']),
-			respectDNT: /** @type {boolean} */ (typeof options['respectDNT'] === 'undefined' ?
-				false :
-				options['respectDNT']),
-			position: /** @type {string} */ (options['position'] || 'top'),
-			customCSS: /** @type {string} */ (options['customCSS'] || ''),
-			mobileSticky: /** @type {boolean} */ (typeof options['mobileSticky'] === 'undefined' ?
-				false :
-				options['mobileSticky']),
-			buttonBorderColor: /** @type {string} */ (options['buttonBorderColor'] || ''),
-			buttonBackgroundColor: /** @type {string} */ (options['buttonBackgroundColor'] || ''),
-			buttonFontColor: /** @type {string} */ (options['buttonFontColor'] || ''),
-			buttonBorderColorHover: /** @type {string} */ (options['buttonBorderColorHover'] || ''),
-			buttonBackgroundColorHover: /** @type {string} */ (options['buttonBackgroundColorHover'] || ''),
-			buttonFontColorHover: /** @type {string} */ (options['buttonFontColorHover'] || ''),
-			make_new_link: /** @type {boolean} */ (!!options['make_new_link']),
-			open_app: /** @type {boolean} */ (!!options['open_app']),
-			immediate: /** @type {boolean} */ (!!options['immediate']),
-			append_deeplink_path: /** @type {boolean} */ (!!options['append_deeplink_path'])
-		};
-
-		if (typeof options['showMobile'] !== 'undefined') {
-			bannerOptions.showiOS = options['showMobile'];
-			bannerOptions.showAndroid = options['showMobile'];
-			bannerOptions.showBlackberry = options['showMobile'];
-			bannerOptions.showWindowsPhone = options['showMobile'];
-			bannerOptions.showKindle = options['showMobile'];
-		}
-
-		data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
-
-		var self = this;
-		self['renderQueue'](function() {
-			self.closeBannerPointer = banner(self, bannerOptions, data, self._storage);
-		});
+		options['showAgain'] = options['forgetHide'];
 	}
+	/** @type {banner_utils.options} */
+	var bannerOptions = {
+		icon: /** @type {string} */ (utils.cleanBannerText(options['icon']) || ''),
+		title: /** @type {string} */ (utils.cleanBannerText(options['title']) || ''),
+		description: /** @type {string} */ (utils.cleanBannerText(options['description']) || ''),
+		reviewCount: /** @type {number} */ ((
+			typeof options['reviewCount'] === 'number' &&
+			options['reviewCount'] > 0 // force greater than 0
+		) ?
+			Math.floor(options['reviewCount']) : // force no decimal
+			null),
+		rating: /** @type {number} */ ((
+			typeof options['rating'] === 'number' &&
+			options['rating'] <= 5 &&
+			options['rating'] > 0
+		) ?
+			Math.round(options['rating'] * 2) / 2 : // force increments of .5
+			null),
+		openAppButtonText: /** @type {string} */ (utils.cleanBannerText(options['openAppButtonText']) || 'View in app'),
+		downloadAppButtonText: /** @type {string} */ (utils.cleanBannerText(options['downloadAppButtonText']) || 'Download App'),
+		sendLinkText: /** @type {string} */ (utils.cleanBannerText(options['sendLinkText']) || 'Send Link'),
+		phonePreviewText: /** @type {string} */ (utils.cleanBannerText(options['phonePreviewText']) || '(999) 999-9999'),
+		iframe: /** @type {boolean} */ (typeof options['iframe'] === 'undefined' ?
+			true :
+			options['iframe']),
+		showiOS: /** @type {boolean} */ (typeof options['showiOS'] === 'undefined' ?
+			true :
+			options['showiOS']),
+		showiPad: /** @type {boolean} */ (typeof options['showiPad'] === 'undefined' ?
+			true :
+			options['showiPad']),
+		showAndroid: /** @type {boolean} */ (typeof options['showAndroid'] === 'undefined' ?
+			true :
+			options['showAndroid']),
+		showBlackberry: /** @type {boolean} */ (typeof options['showBlackberry'] === 'undefined' ?
+			true :
+			options['showBlackberry']),
+		showWindowsPhone: /** @type {boolean} */ (typeof options['showWindowsPhone'] === 'undefined' ?
+			true :
+			options['showWindowsPhone']),
+		showKindle: /** @type {boolean} */ (typeof options['showKindle'] === 'undefined' ?
+			true :
+			options['showKindle']),
+		showDesktop: /** @type {boolean} */ (typeof options['showDesktop'] === 'undefined' ?
+			true :
+			options['showDesktop']),
+		disableHide: /** @type {boolean} */ (!!options['disableHide']),
+		forgetHide: /** @type {boolean} */ (typeof options['forgetHide'] === 'number' ?
+			options['forgetHide'] :
+			!!options['forgetHide']),
+		respectDNT: /** @type {boolean} */ (typeof options['respectDNT'] === 'undefined' ?
+			false :
+			options['respectDNT']),
+		position: /** @type {string} */ (options['position'] || 'top'),
+		customCSS: /** @type {string} */ (options['customCSS'] || ''),
+		mobileSticky: /** @type {boolean} */ (typeof options['mobileSticky'] === 'undefined' ?
+			false :
+			options['mobileSticky']),
+		desktopSticky: /** @type {boolean} */ (typeof options['desktopSticky'] === 'undefined' ?
+			true :
+			options['desktopSticky']),
+		buttonBorderColor: /** @type {string} */ (options['buttonBorderColor'] || ''),
+		buttonBackgroundColor: /** @type {string} */ (options['buttonBackgroundColor'] || ''),
+		buttonFontColor: /** @type {string} */ (options['buttonFontColor'] || ''),
+		buttonBorderColorHover: /** @type {string} */ (options['buttonBorderColorHover'] || ''),
+		buttonBackgroundColorHover: /** @type {string} */ (options['buttonBackgroundColorHover'] || ''),
+		buttonFontColorHover: /** @type {string} */ (options['buttonFontColorHover'] || ''),
+		make_new_link: /** @type {boolean} */ (!!options['make_new_link']),
+		open_app: /** @type {boolean} */ (!!options['open_app']),
+		immediate: /** @type {boolean} */ (!!options['immediate']),
+		append_deeplink_path: /** @type {boolean} */ (!!options['append_deeplink_path'])
+	};
+
+	if (typeof options['showMobile'] !== 'undefined') {
+		bannerOptions.showiOS = options['showMobile'];
+		bannerOptions.showAndroid = options['showMobile'];
+		bannerOptions.showBlackberry = options['showMobile'];
+		bannerOptions.showWindowsPhone = options['showMobile'];
+		bannerOptions.showKindle = options['showMobile'];
+	}
+
+	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
+
+	var self = this;
+	self['renderQueue'](function() {
+		self.closeBannerPointer = banner(self, bannerOptions, data, self._storage);
+	});
+
 	done();
 });
 
