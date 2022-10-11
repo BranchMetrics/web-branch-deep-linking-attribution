@@ -9,13 +9,11 @@ goog.require('goog.json');
 goog.require('config');
 goog.require('safejson');
 
-/** @define {boolean} */
-var DEBUG = true;
 
 /* jshint ignore:start */
 /** @typedef {string} */
 var message;
-
+utils.debug = false;
 utils.retries = 2; // Value specifying the number of times that a Branch API call can be re-attempted.
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
 utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
@@ -247,7 +245,7 @@ utils.message = function(message, params, failCode, failDetails) {
 	if (failDetails) {
 		msg += '\n Failure Details:' + failDetails;
 	}
-	if (DEBUG && console) {
+	if (utils.debug && console) {
 		console.log(msg);
 	}
 	return msg;

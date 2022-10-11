@@ -4,6 +4,96 @@
  Copyright The Closure Library Authors.
  SPDX-License-Identifier: Apache-2.0
 */
+var $jscomp = $jscomp || {};
+$jscomp.scope = {};
+$jscomp.ASSUME_ES5 = !1;
+$jscomp.ASSUME_NO_NATIVE_MAP = !1;
+$jscomp.ASSUME_NO_NATIVE_SET = !1;
+$jscomp.SIMPLE_FROUND_POLYFILL = !1;
+$jscomp.ISOLATE_POLYFILLS = !1;
+$jscomp.FORCE_POLYFILL_PROMISE = !1;
+$jscomp.FORCE_POLYFILL_PROMISE_WHEN_NO_UNHANDLED_REJECTION = !1;
+$jscomp.defineProperty = $jscomp.ASSUME_ES5 || "function" == typeof Object.defineProperties ? Object.defineProperty : function(a, b, c) {
+  if (a == Array.prototype || a == Object.prototype) {
+    return a;
+  }
+  a[b] = c.value;
+  return a;
+};
+$jscomp.getGlobal = function(a) {
+  a = ["object" == typeof globalThis && globalThis, a, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof global && global,];
+  for (var b = 0; b < a.length; ++b) {
+    var c = a[b];
+    if (c && c.Math == Math) {
+      return c;
+    }
+  }
+  throw Error("Cannot find global object");
+};
+$jscomp.global = $jscomp.getGlobal(this);
+$jscomp.IS_SYMBOL_NATIVE = "function" === typeof Symbol && "symbol" === typeof Symbol("x");
+$jscomp.TRUST_ES6_POLYFILLS = !$jscomp.ISOLATE_POLYFILLS || $jscomp.IS_SYMBOL_NATIVE;
+$jscomp.polyfills = {};
+$jscomp.propertyToPolyfillSymbol = {};
+$jscomp.POLYFILL_PREFIX = "$jscp$";
+var $jscomp$lookupPolyfilledValue = function(a, b) {
+  var c = $jscomp.propertyToPolyfillSymbol[b];
+  if (null == c) {
+    return a[b];
+  }
+  c = a[c];
+  return void 0 !== c ? c : a[b];
+};
+$jscomp.polyfill = function(a, b, c, d) {
+  b && ($jscomp.ISOLATE_POLYFILLS ? $jscomp.polyfillIsolated(a, b, c, d) : $jscomp.polyfillUnisolated(a, b, c, d));
+};
+$jscomp.polyfillUnisolated = function(a, b, c, d) {
+  c = $jscomp.global;
+  a = a.split(".");
+  for (d = 0; d < a.length - 1; d++) {
+    var e = a[d];
+    if (!(e in c)) {
+      return;
+    }
+    c = c[e];
+  }
+  a = a[a.length - 1];
+  d = c[a];
+  b = b(d);
+  b != d && null != b && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
+};
+$jscomp.polyfillIsolated = function(a, b, c, d) {
+  var e = a.split(".");
+  a = 1 === e.length;
+  d = e[0];
+  d = !a && d in $jscomp.polyfills ? $jscomp.polyfills : $jscomp.global;
+  for (var f = 0; f < e.length - 1; f++) {
+    var g = e[f];
+    if (!(g in d)) {
+      return;
+    }
+    d = d[g];
+  }
+  e = e[e.length - 1];
+  c = $jscomp.IS_SYMBOL_NATIVE && "es6" === c ? d[e] : null;
+  b = b(c);
+  null != b && (a ? $jscomp.defineProperty($jscomp.polyfills, e, {configurable:!0, writable:!0, value:b}) : b !== c && (void 0 === $jscomp.propertyToPolyfillSymbol[e] && (c = 1E9 * Math.random() >>> 0, $jscomp.propertyToPolyfillSymbol[e] = $jscomp.IS_SYMBOL_NATIVE ? $jscomp.global.Symbol(e) : $jscomp.POLYFILL_PREFIX + c + "$" + e), $jscomp.defineProperty(d, $jscomp.propertyToPolyfillSymbol[e], {configurable:!0, writable:!0, value:b})));
+};
+$jscomp.polyfill("Array.prototype.includes", function(a) {
+  return a ? a : function(b, c) {
+    var d = this;
+    d instanceof String && (d = String(d));
+    var e = d.length;
+    c = c || 0;
+    for (0 > c && (c = Math.max(c + e, 0)); c < e; c++) {
+      var f = d[c];
+      if (f === b || Object.is(f, b)) {
+        return !0;
+      }
+    }
+    return !1;
+  };
+}, "es7", "es3");
 var COMPILED = !0, goog = goog || {};
 goog.global = this || self;
 goog.exportPath_ = function(a, b, c, d) {
@@ -1095,7 +1185,8 @@ var safejson = {parse:function(a) {
   throw Error("Could not stringify object");
 }};
 // Input 4
-var utils = {}, DEBUG = !0, message;
+var utils = {}, message;
+utils.debug = !1;
 utils.retries = 2;
 utils.retry_delay = 200;
 utils.timeout = 5000;
@@ -1177,7 +1268,7 @@ utils.message = function(a, b, c, d) {
   });
   c && (a += "\n Failure Code:" + c);
   d && (a += "\n Failure Details:" + d);
-  DEBUG && console && console.log(a);
+  utils.debug && console && console.log(a);
   return a;
 };
 utils.whiteListSessionData = function(a) {
@@ -2766,8 +2857,8 @@ branch_view.displayJourney = function(a, b, c, d, e, f) {
 };
 branch_view._getPageviewRequestData = function(a, b, c, d) {
   journeys_utils.branch = c;
-  b ||= {};
-  a ||= {};
+  b || (b = {});
+  a || (a = {});
   journeys_utils.entryAnimationDisabled = b.disable_entry_animation || !1;
   journeys_utils.exitAnimationDisabled = b.disable_exit_animation || !1;
   var e = utils.merge({}, c._branchViewData), f = session.get(c._storage) || {}, g = f.hasOwnProperty("has_app") ? f.has_app : !1, k = f.hasOwnProperty("identity") ? f.identity : null, h = c._storage.get("journeyDismissals", !0), l = (b.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase() || null, m = utils.getInitialReferrer(c._referringLink()), p = b.branch_view_id || utils.getParameterByName("_branch_view_id") || null;
@@ -2831,7 +2922,7 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
   };
 }, Branch = function() {
   if (!(this instanceof Branch)) {
-    return default_branch ||= new Branch(), default_branch;
+    return default_branch || (default_branch = new Branch()), default_branch;
   }
   this._queue = task_queue();
   this._storage = new BranchStorage(["session", "cookie", "pojo"]);
@@ -2876,6 +2967,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.retry_delay = c && c.retry_delay && Number.isInteger(c.retry_delay) ? c.retry_delay : utils.retry_delay;
   utils.timeout = c && c.timeout && Number.isInteger(c.timeout) ? c.timeout : utils.timeout;
   utils.nonce = c && c.nonce ? c.nonce : utils.nonce;
+  utils.debug = c && c.enableLogging ? c.enableLogging : utils.debug;
   utils.userPreferences.trackingDisabled = c && c.tracking_disabled && !0 === c.tracking_disabled ? !0 : !1;
   utils.userPreferences.allowErrorsInCallback = !1;
   utils.userPreferences.trackingDisabled && utils.cleanApplicationAndSessionStorage(d);
@@ -3121,7 +3213,7 @@ Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b,
 });
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   var d = this;
-  c ||= {};
+  c || (c = {});
   c.deepview_type = "undefined" === typeof c.deepview_type ? "deepview" : "banner";
   b.data = utils.merge(utils.getHostedDeepLinkData(), b.data);
   b = utils.isIframe() ? utils.merge({is_iframe:!0}, b) : b;
