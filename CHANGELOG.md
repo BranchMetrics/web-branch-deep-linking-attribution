@@ -4,6 +4,10 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.67.0] - 2022-10-11
+– SDK-1660 Change Google closure compiler config to ECMASCRIPT_2015
+– SDK-1445 enableLogging as part of init options
+
 ## [2.65.0] - 2022-09-13
 – INTENG-16592 Fix 'v1/dismiss' to be called for 'Redirect to a web page' dismissal behavior
 
