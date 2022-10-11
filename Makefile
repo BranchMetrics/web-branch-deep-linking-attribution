@@ -2,9 +2,9 @@
 CLOSURE_COMPILER=java -jar ./node_modules/google-closure-compiler-java/compiler.jar
 CLOSURE_LIBRARY= ./node_modules/google-closure-library/closure
 
-COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --dependency_mode=PRUNE_LEGACY --language_out ECMASCRIPT_2015 --entry_point branch_instance
-COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --language_out ECMASCRIPT_2015
-COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE
+COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --dependency_mode=PRUNE_LEGACY --entry_point branch_instance
+COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --define 'DEBUG=false'
+COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE --define 'DEBUG=true'
 
 SOURCES=$(CLOSURE_LIBRARY)/goog/base.js\
 $(CLOSURE_LIBRARY)/goog/json/json.js\
