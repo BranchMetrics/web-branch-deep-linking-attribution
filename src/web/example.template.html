@@ -76,14 +76,6 @@
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
-				<h4>SMS</h4>
-				<div class="group">
-					<input class="example-input" type="text" id="SMSNumber" class="form-control" placeholder="1234567890">
-					<button id="sendSMS" class="btn btn-info">.sendSMS(#, linkData, {})</button>
-					<button id="sendSMSNew" class="btn btn-info">.sendSMS(#, linkData, {make_new_link: true})</button>
-				</div>
-			</div>
-			<div class="row col-lg-8 col-lg-offset-2">
 			</div>
 		</section>
 	</div>
@@ -209,22 +201,6 @@
 			};
 			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, qrCode) {
 				response.html('<img src="data:image/png;charset=utf-8;base64,' + qrCode.base64() + '" width="500" height="500">');
-			});
-		});
-		$('#sendSMS').click(function() {
-			var smsOptions = {};
-			var phone = getInputVal('#SMSNumber');
-			request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
-			branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
-				response.html(err || JSON.stringify(data) || 'undefined');
-			});
-		});
-		$('#sendSMSNew').click(function() {
-			var smsOptions = { make_new_link: true };
-			var phone = getInputVal('#SMSNumber');
-			request.html('branch.sendSMS(' + phone + ', ' + JSON.stringify(sampleParams) + ', ' + smsOptions + ');');
-			branch.sendSMS(phone, sampleParams, smsOptions, function(err, data) {
-				response.html(err || JSON.stringify(data) || 'undefined');
 			});
 		});
 		$('#banner').click(function() {
