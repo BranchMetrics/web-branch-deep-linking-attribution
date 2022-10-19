@@ -17,7 +17,6 @@ goog.require('safejson');
  * description:string,
  * openAppButtonText:string,
  * downloadAppButtonText:string,
- * sendLinkText:string,
  * iframe:boolean,
  * showiOS:boolean,
  * showiPad:boolean,
@@ -25,13 +24,11 @@ goog.require('safejson');
  * showBlackberry:boolean,
  * showWindowsPhone:boolean,
  * showKindle:boolean,
- * showDesktop:boolean,
  * forgetHide:boolean,
  * disableHide:boolean,
  * make_new_link:boolean,
  * customCSS:string,
  * mobileSticky:boolean,
- * desktopSticky:boolean,
  * position:string,
  * rating:number,
  * reviewCount:number,
@@ -55,9 +52,6 @@ banner_utils.bannerHeight = '76px';
 /** @type {number} */
 banner_utils.error_timeout = 2000;
 
-// How long to show success state before reloading SMS form
-/** @type {number} */
-banner_utils.success_timeout = 3000;
 
 /**
  * @param {Object} element
@@ -200,7 +194,6 @@ banner_utils.shouldAppend = function(storage, options) {
 		!document.getElementById('branch-banner-iframe') &&
 		(hideBanner || forgetHide) &&
 		(
-			(options.showDesktop && !utils.mobileUserAgent()) ||
 			(options.showAndroid && utils.mobileUserAgent() === 'android') ||
 			(options.showiPad && utils.mobileUserAgent() === 'ipad') ||
 			(options.showiOS && utils.mobileUserAgent() === 'ios') ||

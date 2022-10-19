@@ -133,19 +133,6 @@ resources.linkClick = {
 	}
 };
 
-resources.SMSLinkSend = {
-	destination: config.link_service_endpoint,
-	endpoint: "/c",
-	method: utils.httpMethod.POST,
-	queryPart: {
-		"link_url": validator(true, validationTypes.STRING)
-	},
-	params: {
-		"sdk": validator(false, validationTypes.STRING),
-		"phone": validator(true, validationTypes.STRING)
-	}
-};
-
 resources.logout = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/logout",

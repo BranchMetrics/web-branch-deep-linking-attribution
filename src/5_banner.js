@@ -9,88 +9,6 @@ goog.require('banner_utils');
 goog.require('banner_css');
 goog.require('banner_html');
 
-var sendSMS = function(doc, branch, options, linkData) {
-	var phone = doc.getElementById('branch-sms-phone');
-	var sendButton = doc.getElementById('branch-sms-send');
-	var branchLoader = doc.getElementById('branch-loader-wrapper');
-	var smsFormContainer = doc.getElementById('branch-sms-form-container');
-	var checkmark;
-
-	var disableForm = function() {
-		sendButton.setAttribute('disabled', '');
-		phone.setAttribute('disabled', '');
-		sendButton.style.opacity = '.4';
-		phone.style.opacity = '.4';
-		branchLoader.style.opacity = '1';
-		phone.className = '';
-	};
-
-	var enableForm = function() {
-		sendButton.removeAttribute('disabled');
-		phone.removeAttribute('disabled');
-		sendButton.style.opacity = '1';
-		phone.style.opacity = '1';
-		branchLoader.style.opacity = '0';
-	};
-
-	var hideFormShowSuccess = function() {
-		checkmark = doc.createElement('div');
-		checkmark.className = 'branch-icon-wrapper';
-		checkmark.id = 'branch-checkmark';
-		checkmark.style = 'opacity: 0;';
-		checkmark.innerHTML = banner_html.checkmark();
-		smsFormContainer.appendChild(checkmark);
-
-		sendButton.style.opacity = '0';
-
-		phone.style.opacity = '0';
-
-		branchLoader.style.opacity = '0';
-
-		setTimeout(function() {
-			checkmark.style.opacity = '1';
-		}, banner_utils.animationDelay);
-
-		phone.value = '';
-	};
-
-	var errorForm = function() {
-		enableForm();
-		sendButton.style.background = '#FFD4D4';
-
-		phone.className = 'error';
-
-		setTimeout(function() {
-			sendButton.style.background = '#FFFFFF';
-			phone.className = '';
-		}, banner_utils.error_timeout);
-	};
-
-	if (phone) {
-		var phoneValue = phone.value;
-		if ((/^\d{7,}$/).test(phoneValue.replace(/[\s()+\-\.]|ext/gi, ''))) {
-			branch._publishEvent('willSendBannerSMS');
-			disableForm();
-			branch['sendSMS'](phoneValue, linkData, options, function(err) {
-				if (err) {
-					branch._publishEvent('sendBannerSMSError');
-					errorForm();
-				}
-				else {
-					branch._publishEvent('didSendBannerSMS');
-					hideFormShowSuccess();
-					setTimeout(function() {
-						smsFormContainer.removeChild(checkmark);
-						enableForm();
-					}, banner_utils.success_timeout);
-				}
-			});
-		}
-		else {
-			errorForm();
-		}
-	}
-};
 
 /**
  * @param {Object} branch
@@ -183,23 +101,6 @@ banner = function(branch, options, linkData, storage) {
 					branch['deepviewCta']();
 				};
 			}
-		}
-		else if (doc.getElementById('sms-form')) {
-			doc.getElementById('sms-form').addEventListener('submit', function(ev) {
-				ev.preventDefault();
-				sendSMS(doc, branch, options, linkData);
-			});
-		}
-		else {
-			element.onload = function() {
-				doc = element.contentWindow.document;
-				if (doc.getElementById('sms-form')) {
-					doc.getElementById('sms-form').addEventListener('submit', function(ev) {
-						ev.preventDefault();
-						sendSMS(doc, branch, options, linkData);
-					});
-				}
-			};
 		}
 
 		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
