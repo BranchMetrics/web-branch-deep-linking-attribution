@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.68.0] - 2022-10-19
+– SDK-1443 - remove desktop banner, make sendSMS no-op
+
 ## [2.67.0] - 2022-10-11
 – SDK-1660 Change Google closure compiler config to ECMASCRIPT_2015
 – SDK-1445 enableLogging as part of init options
