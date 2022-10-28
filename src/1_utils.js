@@ -383,6 +383,7 @@ utils.cleanLinkData = function(linkData) {
 	return linkData;
 };
 
+// INTENG-17048 Prevent to overwrite OG Keys by the Web SDK when $fallback_url, $desktop_url, $og_redirect exists
 utils.setOgTags = function(linkData, ogTagName) {
 	if (!linkData['$og_redirect'] || !linkData['$fallback_url'] || !linkData['$desktop_url']) {
 		return null;
