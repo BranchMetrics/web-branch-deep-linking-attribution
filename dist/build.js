@@ -1319,11 +1319,11 @@ utils.cleanLinkData = function(a) {
       b = {};
   }
   b.$canonical_url || (b.$canonical_url = utils.getWindowLocation());
-  b.$og_title || (b.$og_title = utils.getOpenGraphContent("title"));
-  b.$og_description || (b.$og_description = utils.getOpenGraphContent("description"));
-  b.$og_image_url || (b.$og_image_url = utils.getOpenGraphContent("image"));
-  b.$og_video || (b.$og_video = utils.getOpenGraphContent("video"));
-  b.$og_type || (b.$og_type = utils.getOpenGraphContent("type"));
+  b.$og_title || (b.$og_title = utils.setOgTags(b, "title"));
+  b.$og_description || (b.$og_description = utils.setOgTags(b, "description"));
+  b.$og_image_url || (b.$og_image_url = utils.setOgTags(b, "image"));
+  b.$og_video || (b.$og_video = utils.setOgTags(b, "video"));
+  b.$og_type || (b.$og_type = utils.setOgTags(b, "type"));
   "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?&]_branch_match_id=\d+)/, ""));
   try {
     safejson.parse(b);
@@ -1332,6 +1332,9 @@ utils.cleanLinkData = function(a) {
   }
   a.data = b;
   return a;
+};
+utils.setOgTags = function(a, b) {
+  return a.$og_redirect && a.$fallback_url && a.$desktop_url ? utils.getOpenGraphContent(b) : null;
 };
 utils.getClickIdAndSearchStringFromLink = function(a) {
   function b(d) {

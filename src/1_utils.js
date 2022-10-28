@@ -350,20 +350,19 @@ utils.cleanLinkData = function(linkData) {
 		data['$canonical_url'] = utils.getWindowLocation();
 	}
 	if (!data['$og_title']) {
-		data['$og_title'] = utils.getOpenGraphContent('title');
+		data['$og_title'] = utils.setOgTags(data, 'title');
 	}
 	if (!data['$og_description']) {
-		data['$og_description'] = utils.getOpenGraphContent('description');
+		data['$og_description'] = utils.setOgTags(data, 'description');
 	}
 	if (!data['$og_image_url']) {
-		data['$og_image_url'] = utils.getOpenGraphContent('image');
+		data['$og_image_url'] = utils.setOgTags(data, 'image');
 	}
 	if (!data['$og_video']) {
-		data['$og_video'] = utils.getOpenGraphContent('video');
+		data['$og_video'] = utils.setOgTags(data, 'video');
 	}
-
 	if (!data['$og_type']) {
-		data['$og_type'] = utils.getOpenGraphContent('type');
+		data['$og_type'] = utils.setOgTags(data, 'type');
 	}
 
 	if (typeof data['$desktop_url'] === 'string') {
@@ -382,6 +381,13 @@ utils.cleanLinkData = function(linkData) {
 	linkData['data'] = data;
 
 	return linkData;
+};
+
+utils.setOgTags = function(linkData, ogTagName) {
+	if (!linkData['$og_redirect'] || !linkData['$fallback_url'] || !linkData['$desktop_url']) {
+		return null;
+	}
+	return utils.getOpenGraphContent(ogTagName);
 };
 
 /**
