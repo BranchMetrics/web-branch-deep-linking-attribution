@@ -351,19 +351,19 @@ utils.cleanLinkData = function(linkData) {
 		data['$canonical_url'] = utils.getWindowLocation();
 	}
 	if (!data['$og_title']) {
-		data['$og_title'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('og_title') : null;
+		data['$og_title'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('title') : null;
 	}
 	if (!data['$og_description']) {
 		data['$og_description'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('description') : null;
 	}
 	if (!data['$og_image_url']) {
-		data['$og_image_url'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('og_image_url') : null;
+		data['$og_image_url'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('image') : null;
 	}
 	if (!data['$og_video']) {
-		data['$og_video'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('og_video') : null;
+		data['$og_video'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('video') : null;
 	}
 	if (!data['$og_type']) {
-		data['$og_type'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('og_type') : null;
+		data['$og_type'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('type') : null;
 	}
 
 	if (typeof data['$desktop_url'] === 'string') {

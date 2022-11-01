@@ -1319,11 +1319,11 @@ utils.cleanLinkData = function(a) {
       b = {};
   }
   b.$canonical_url || (b.$canonical_url = utils.getWindowLocation());
-  b.$og_title || (b.$og_title = c ? utils.getOpenGraphContent("og_title") : null);
+  b.$og_title || (b.$og_title = c ? utils.getOpenGraphContent("title") : null);
   b.$og_description || (b.$og_description = c ? utils.getOpenGraphContent("description") : null);
-  b.$og_image_url || (b.$og_image_url = c ? utils.getOpenGraphContent("og_image_url") : null);
-  b.$og_video || (b.$og_video = c ? utils.getOpenGraphContent("og_video") : null);
-  b.$og_type || (b.$og_type = c ? utils.getOpenGraphContent("og_type") : null);
+  b.$og_image_url || (b.$og_image_url = c ? utils.getOpenGraphContent("image") : null);
+  b.$og_video || (b.$og_video = c ? utils.getOpenGraphContent("video") : null);
+  b.$og_type || (b.$og_type = c ? utils.getOpenGraphContent("type") : null);
   "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?&]_branch_match_id=\d+)/, ""));
   try {
     safejson.parse(b);
