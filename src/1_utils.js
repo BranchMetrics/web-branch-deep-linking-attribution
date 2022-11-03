@@ -328,7 +328,7 @@ utils.getParameterByName = function(name) {
 utils.cleanLinkData = function(linkData) {
 	linkData['source'] = 'web-sdk';
 	var data = linkData['data'];
-	var hasOGRedirectwithFallback = linkData['$og_redirect'] && linkData['$fallback_url'] && linkData['$desktop_url'];
+	var hasOGRedirectOrFallback = linkData['$og_redirect'] || linkData['$fallback_url'] || linkData['$desktop_url'];
 
 	switch (typeof data) {
 		case 'string':
@@ -351,19 +351,19 @@ utils.cleanLinkData = function(linkData) {
 		data['$canonical_url'] = utils.getWindowLocation();
 	}
 	if (!data['$og_title']) {
-		data['$og_title'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('title') : null;
+		data['$og_title'] = hasOGRedirectOrFallback ? utils.getOpenGraphContent('title') : null;
 	}
 	if (!data['$og_description']) {
-		data['$og_description'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('description') : null;
+		data['$og_description'] = hasOGRedirectOrFallback ? null : utils.getOpenGraphContent('description');
 	}
 	if (!data['$og_image_url']) {
-		data['$og_image_url'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('image') : null;
+		data['$og_image_url'] = hasOGRedirectOrFallback ? null : utils.getOpenGraphContent('image');
 	}
 	if (!data['$og_video']) {
-		data['$og_video'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('video') : null;
+		data['$og_video'] = hasOGRedirectOrFallback ? null : utils.getOpenGraphContent('video');
 	}
 	if (!data['$og_type']) {
-		data['$og_type'] = hasOGRedirectwithFallback ? utils.getOpenGraphContent('type') : null;
+		data['$og_type'] = hasOGRedirectOrFallback ? null : utils.getOpenGraphContent('type');
 	}
 
 	if (typeof data['$desktop_url'] === 'string') {
