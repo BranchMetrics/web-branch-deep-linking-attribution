@@ -212,8 +212,8 @@ utils.bannerThemes = [
 ];
 
 /*
-* Getters for location.search and location.hash, so that we can stub this for testing
-*/
+ * Getters for location.search and location.hash, so that we can stub this for testing
+ */
 utils.getLocationSearch = function() {
 	return utils.isIframeAndFromSameOrigin() ? window.top.location.search : window.location.search;
 };
