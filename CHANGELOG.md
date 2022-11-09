@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.70.0] - 2022-11-09
+– Change test config
+
 ## [2.69.0] - 2022-11-09
 – INTENG-17048 - update OG tags for link data
 
