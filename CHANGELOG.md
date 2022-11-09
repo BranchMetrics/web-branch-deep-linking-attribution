@@ -4,6 +4,9 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.69.0] - 2022-11-09
+– INTENG-17048 - update OG tags for link data
+
 ## [2.68.0] - 2022-10-19
 – SDK-1443 - remove desktop banner, make sendSMS no-op
 
