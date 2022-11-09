@@ -1304,12 +1304,12 @@ utils.getParameterByName = function(a) {
 };
 utils.cleanLinkData = function(a) {
   a.source = "web-sdk";
-  var b = a.data;
+  var b = a.data, c = a.$og_redirect || a.$fallback_url || a.$desktop_url;
   switch(typeof b) {
     case "string":
       try {
         b = safejson.parse(b);
-      } catch (c) {
+      } catch (d) {
         b = {_bncNoEval:!0};
       }
       break;
@@ -1319,15 +1319,15 @@ utils.cleanLinkData = function(a) {
       b = {};
   }
   b.$canonical_url || (b.$canonical_url = utils.getWindowLocation());
-  b.$og_title || (b.$og_title = utils.getOpenGraphContent("title"));
-  b.$og_description || (b.$og_description = utils.getOpenGraphContent("description"));
-  b.$og_image_url || (b.$og_image_url = utils.getOpenGraphContent("image"));
-  b.$og_video || (b.$og_video = utils.getOpenGraphContent("video"));
-  b.$og_type || (b.$og_type = utils.getOpenGraphContent("type"));
+  b.$og_title || (b.$og_title = c ? utils.getOpenGraphContent("title") : null);
+  b.$og_description || (b.$og_description = c ? null : utils.getOpenGraphContent("description"));
+  b.$og_image_url || (b.$og_image_url = c ? null : utils.getOpenGraphContent("image"));
+  b.$og_video || (b.$og_video = c ? null : utils.getOpenGraphContent("video"));
+  b.$og_type || (b.$og_type = c ? null : utils.getOpenGraphContent("type"));
   "string" === typeof b.$desktop_url && (b.$desktop_url = b.$desktop_url.replace(/#r:[a-z0-9-_]+$/i, "").replace(/([\?&]_branch_match_id=\d+)/, ""));
   try {
     safejson.parse(b);
-  } catch (c) {
+  } catch (d) {
     b = goog.json.serialize(b);
   }
   a.data = b;
