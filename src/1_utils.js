@@ -51,51 +51,51 @@ utils.userPreferences = {
 	},
 	allowErrorsInCallback: false,
 	shouldBlockRequest: function(url, requestData) {
-	// Used by 3_api.js to determine whether a request should be blocked
-	var urlParser = document.createElement('a');
-	urlParser.href = url;
+		// Used by 3_api.js to determine whether a request should be blocked
+		var urlParser = document.createElement('a');
+		urlParser.href = url;
 
-	// INTENG-11512
-	// To allow SMS when tracking disabled, we must allow GET <actual link>.
-	// This precludes a filter on the path. Only apply the whitelist to
-	// service endpoints.
-	var whiteListDomains = [ config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint ];
-	var urlOrigin = urlParser.origin; // Property origin is defined on Anchor https://www.w3schools.com/jsref/prop_anchor_origin.asp
-	// Excess of caution: Make sure no trailing slash in urlOrigin.
-	if (urlOrigin.endsWith('/')) {
-		urlOrigin = urlOrigin.substring(0, urlOrigin.length - 1);
-	}
-	if (!whiteListDomains.includes(urlOrigin)) {
-		return false;
-	}
+		// INTENG-11512
+		// To allow SMS when tracking disabled, we must allow GET <actual link>.
+		// This precludes a filter on the path. Only apply the whitelist to
+		// service endpoints.
+		var whiteListDomains = [ config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint ];
+		var urlOrigin = urlParser.origin; // Property origin is defined on Anchor https://www.w3schools.com/jsref/prop_anchor_origin.asp
+		// Excess of caution: Make sure no trailing slash in urlOrigin.
+		if (urlOrigin.endsWith('/')) {
+			urlOrigin = urlOrigin.substring(0, urlOrigin.length - 1);
+		}
+		if (!whiteListDomains.includes(urlOrigin)) {
+			return false;
+		}
 
-	var urlPath = urlParser.pathname;
+		var urlPath = urlParser.pathname;
 
-	// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
-	// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
-	if (urlPath[0] != '/') {
-		urlPath = '/' + urlPath;
-	}
+		// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
+		// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
+		if (urlPath[0] != '/') {
+			urlPath = '/' + urlPath;
+		}
 
-	var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
+		var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
 
-	if (!whiteListedEndpointWithData) {
-		return true;
-	}
-	else if (Object.keys(whiteListedEndpointWithData).length > 0) {
-		if (!requestData) {
+		if (!whiteListedEndpointWithData) {
 			return true;
 		}
-		// Ensures that required request parameters are available in request data
-		for (var key in whiteListedEndpointWithData) {
-			var requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
-			if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
+		else if (Object.keys(whiteListedEndpointWithData).length > 0) {
+			if (!requestData) {
 				return true;
 			}
+			// Ensures that required request parameters are available in request data
+			for (var key in whiteListedEndpointWithData) {
+				var requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
+				if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
+					return true;
+				}
+			}
 		}
+		return false;
 	}
-	return false;
-}
 };
 
 utils.generateDynamicBNCLink = function(branchKey, data) {
