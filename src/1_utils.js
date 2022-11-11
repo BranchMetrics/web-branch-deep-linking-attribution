@@ -328,7 +328,6 @@ utils.getParameterByName = function(name) {
 utils.cleanLinkData = function(linkData) {
 	linkData['source'] = 'web-sdk';
 	var data = linkData['data'];
-	var hasOGRedirectOrFallback = linkData['$og_redirect'] || linkData['$fallback_url'] || linkData['$desktop_url'];
 
 	switch (typeof data) {
 		case 'string':
@@ -347,11 +346,13 @@ utils.cleanLinkData = function(linkData) {
 			break;
 	}
 
+	var hasOGRedirectOrFallback = data['$og_redirect'] || data['$fallback_url'] || data['$desktop_url'];
+
 	if (!data['$canonical_url']) {
 		data['$canonical_url'] = utils.getWindowLocation();
 	}
 	if (!data['$og_title']) {
-		data['$og_title'] = hasOGRedirectOrFallback ? utils.getOpenGraphContent('title') : null;
+		data['$og_title'] = hasOGRedirectOrFallback ? null : utils.getOpenGraphContent('title');
 	}
 	if (!data['$og_description']) {
 		data['$og_description'] = hasOGRedirectOrFallback ? null : utils.getOpenGraphContent('description');
