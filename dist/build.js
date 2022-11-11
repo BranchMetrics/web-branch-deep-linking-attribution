@@ -1304,7 +1304,7 @@ utils.getParameterByName = function(a) {
 };
 utils.cleanLinkData = function(a) {
   a.source = "web-sdk";
-  var b = a.data, c = a.$og_redirect || a.$fallback_url || a.$desktop_url;
+  var b = a.data;
   switch(typeof b) {
     case "string":
       try {
@@ -1318,8 +1318,9 @@ utils.cleanLinkData = function(a) {
     default:
       b = {};
   }
+  var c = b ? b.$og_redirect || b.$fallback_url || b.$desktop_url : !1;
   b.$canonical_url || (b.$canonical_url = utils.getWindowLocation());
-  b.$og_title || (b.$og_title = c ? utils.getOpenGraphContent("title") : null);
+  b.$og_title || (b.$og_title = c ? null : utils.getOpenGraphContent("title"));
   b.$og_description || (b.$og_description = c ? null : utils.getOpenGraphContent("description"));
   b.$og_image_url || (b.$og_image_url = c ? null : utils.getOpenGraphContent("image"));
   b.$og_video || (b.$og_video = c ? null : utils.getOpenGraphContent("video"));
