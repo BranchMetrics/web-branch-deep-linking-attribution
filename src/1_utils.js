@@ -346,7 +346,7 @@ utils.cleanLinkData = function(linkData) {
 			break;
 	}
 
-	var hasOGRedirectOrFallback = data ? data['$og_redirect'] || data['$fallback_url'] || data['$desktop_url'] : false;
+	var hasOGRedirectOrFallback = data['$og_redirect'] || data['$fallback_url'] || data['$desktop_url'];
 
 	if (!data['$canonical_url']) {
 		data['$canonical_url'] = utils.getWindowLocation();

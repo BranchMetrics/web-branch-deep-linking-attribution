@@ -1318,7 +1318,7 @@ utils.cleanLinkData = function(a) {
     default:
       b = {};
   }
-  var c = b ? b.$og_redirect || b.$fallback_url || b.$desktop_url : !1;
+  var c = b.$og_redirect || b.$fallback_url || b.$desktop_url;
   b.$canonical_url || (b.$canonical_url = utils.getWindowLocation());
   b.$og_title || (b.$og_title = c ? null : utils.getOpenGraphContent("title"));
   b.$og_description || (b.$og_description = c ? null : utils.getOpenGraphContent("description"));
