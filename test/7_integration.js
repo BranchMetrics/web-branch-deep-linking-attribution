@@ -343,47 +343,6 @@ describe('Integration tests', function() {
 		});
 	});
 
-	describe('track', function() {
-		it('should make two requests and return undefined, no metadata', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(2), done);
-			branchInit(assert);
-			branch.track('track', { }, function(err, data) {
-				assert.strictEqual(data, undefined, 'Expect data to be undefined');
-			});
-			assert.strictEqual(
-				requests.length,
-				indexOfLastInitRequest(3),
-				'Expect requests length'
-			);
-			requests[indexOfLastInitRequest(2)].respond(
-				200,
-				{ "Content-Type": "application/json" },
-				'{ }'
-			);
-		});
-
-		it('should make two requests and return undefined, with metadata', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(2), done);
-			var testMetadata = {
-				"test": "meta_data"
-			};
-			branchInit(assert);
-			branch.track('track', testMetadata, function(err, data) {
-				assert.strictEqual(data, undefined, 'Expect data to be undefined');
-			});
-			assert.strictEqual(
-				requests.length,
-				indexOfLastInitRequest(3),
-				'Expect requests length'
-			);
-			requests[indexOfLastInitRequest(2)].respond(
-				200,
-				{ "Content-Type": "application/json" },
-				JSON.stringify(testMetadata)
-			);
-		});
-	});
-
 	describe('link', function() {
 		it('should make three requests and return short link', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(2), done);

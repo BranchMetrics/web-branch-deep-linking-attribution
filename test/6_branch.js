@@ -642,63 +642,14 @@ describe('Branch', function() {
 	});
 
 	describe('track', function() {
-		basicTests('track', [ 1, 2 ]);
-
-		it('should call api with event with no metadata', function(done) {
+		basicTests('track', [ 0 ]);
+		var spy = sinon.spy(console, 'warn');
+		it('should print console warning about method deprecation for track', function() {
 			var branch = initBranch(true);
-			var assert = testUtils.plan(3, done);
-			branch.track('test_event', function(err) {
-				assert.strictEqual(err, null, 'No error');
-			});
-			var expectedRequest = {
-				"event": "test_event",
-				"metadata": {
-					"url": document.URL,
-					"user_agent": navigator.userAgent,
-					"language": navigator.language
-				},
-				"branch_key": branch_sample_key,
-				"session_id": session_id,
-				"browser_fingerprint_id": browser_fingerprint_id,
-				"sdk": "web" + config.version,
-				"initial_referrer": requests[0].obj.initial_referrer
-			};
-			expectedRequest.identity_id = identity_id;
+			var assert = testUtils.unplanned();
+			branch.track();
+			assert(spy.calledWith("track feature has been deprecated. This is no-op."));
 
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null);
-
-			assert.deepEqual(requests[0].obj, expectedRequest, 'Expected request sent');
-		});
-
-		it('should call api with event with metadata', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(3, done);
-			var metadata = {
-				"test": "meta_data"
-			};
-			branch.track('test_event', metadata, function(err) {
-				assert.strictEqual(err, null, 'No error');
-			});
-			var expectedRequest = {
-				"event": "test_event",
-				"metadata": {
-					"url": document.URL,
-					"user_agent": navigator.userAgent,
-					"language": navigator.language,
-					"test": "meta_data"
-				},
-				"branch_key": branch_sample_key,
-				"session_id": session_id,
-				"browser_fingerprint_id": browser_fingerprint_id,
-				"sdk": "web" + config.version,
-				"initial_referrer": requests[0].obj.initial_referrer
-			};
-			expectedRequest.identity_id = identity_id;
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null);
-			assert.deepEqual(requests[0].obj, expectedRequest, 'Expected request sent');
 		});
 	});
 
