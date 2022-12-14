@@ -180,12 +180,6 @@ describe('Branch', function() {
 				bannerDeeplinkData
 			);
 
-			branch.track(
-				'tester-event', {
-					'apple': 'seed'
-				}, function(err) {
-			});
-
 			// _r
 			requests[0].callback(null, browser_fingerprint_id);
 
@@ -216,7 +210,7 @@ describe('Branch', function() {
 					branch_view_enabled: true
 				});
 
-				assert.strictEqual(requests.length, 5, '5 requests made');
+				assert.strictEqual(requests.length, 4, '4 requests made');
 			}, 10);
 		});
 
@@ -256,12 +250,6 @@ describe('Branch', function() {
 				bannerDeeplinkData
 			);
 
-			branch.track(
-				'tester-event', {
-					'apple': 'seed'
-				}, function(err) {
-			});
-
 			// _r
 			requests[0].callback(null, browser_fingerprint_id);
 
@@ -292,7 +280,7 @@ describe('Branch', function() {
 					}
 				});
 
-				assert.strictEqual(requests.length, 5, '5 requests made');
+				assert.strictEqual(requests.length, 4, '4 requests made');
 			}, 10);
 		});
 
