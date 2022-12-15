@@ -170,12 +170,5 @@ else
     exit 0
 fi
 
-# Rollbar updates
-if [ "$CIRCLE_BRANCH" == 'production' ] || [ "$CIRCLE_BRANCH" == 'master' ] ; then
-    pip3 install requests
-    pip3 uninstall -y urllib3; pip3 install urllib3==1.22 --user
-    deployment/rollbar.py
-fi
-
 # Exit prompts
 echo -en "${GREEN}Done deploy script ...${NC}\n"
