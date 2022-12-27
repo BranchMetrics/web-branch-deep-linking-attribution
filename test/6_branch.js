@@ -648,7 +648,7 @@ describe('Branch', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
 			branch.track();
-			assert(spy.calledWith("track feature has been deprecated. This is no-op."));
+			assert(spy.calledWith("track method currently supports only pageview event."));
 
 		});
 	});
