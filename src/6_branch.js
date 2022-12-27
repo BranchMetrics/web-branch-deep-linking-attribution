@@ -925,10 +925,88 @@ Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_
 
 /**
  * @function Branch.track
-/*** ***/
-Branch.prototype['track'] = function() {
-	console.warn("track feature has been deprecated. This is no-op.");
-};
+ * @param {string} event - _required_ - name of the event to be tracked.
+ * @param {Object=} metadata - _optional_ - object of event metadata.
+ * @param {function(?Error)=} callback - _optional_
+ *
+ * This function allows you to track any event with supporting metadata.
+ * The `metadata` parameter is a formatted JSON object that can contain
+ * any data and has limitless hierarchy
+ *
+ * ##### Usage
+ * ```js
+ * branch.track(
+ *     event,
+ *     metadata,
+ *     callback (err)
+ * );
+ * ```
+ *
+ * ##### Callback Format
+ * ```js
+ * callback("Error message");
+ * ```
+ * ___
+ */
+/*** +TOC_HEADING &Event Tracking& ^ALL ***/
+/*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
+Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata, options) {
+	var self = this;
+
+	metadata = metadata || {};
+
+	options = options || {};
+
+	utils.nonce = options['nonce'] ? options['nonce'] : utils.nonce;
+
+	if (event === "pageview") {
+		var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
+		if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
+			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
+		}
+
+		var requestData = branch_view._getPageviewRequestData(
+			journeys_utils._getPageviewMetadata(options, metadata),
+			options,
+			self,
+			false
+		);
+		self._api(resources.pageview,
+			requestData,
+			function(err, pageviewResponse) {
+				if (!err && typeof pageviewResponse === "object") {
+					var journeyInTestMode = requestData['branch_view_id'] ? true : false;
+					if (branch_view.shouldDisplayJourney
+						(
+							pageviewResponse,
+							options,
+							journeyInTestMode
+						)
+					) {
+						branch_view.displayJourney(
+							pageviewResponse['template'],
+							requestData,
+							requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
+							pageviewResponse['event_data']['branch_view_data'],
+							journeyInTestMode,
+							pageviewResponse['journey_link_data']
+						);
+					}
+					else {
+						journeys_utils.branch._publishEvent('willNotShowJourney');
+					}
+				}
+				if (typeof done === 'function') {
+					done.apply(this, arguments);
+				}
+			}
+		);
+
+	}
+	else {
+		console.warn("track method currently supports only pageview event.");
+	}
+});
 
 /**
  * @function Branch.logEvent

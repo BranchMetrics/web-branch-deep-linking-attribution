@@ -1168,7 +1168,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.70.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.71.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -3076,9 +3076,24 @@ Branch.prototype.lastAttributedTouchData = wrap(callback_params.CALLBACK_ERR_DAT
     return a(d || null, e || null);
   });
 });
-Branch.prototype.track = function() {
-  console.warn("track feature has been deprecated. This is no-op.");
-};
+Branch.prototype.track = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
+  c = c || {};
+  d = d || {};
+  utils.nonce = d.nonce ? d.nonce : utils.nonce;
+  if ("pageview" === b) {
+    (b = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), c)) && 0 < Object.keys(b).length && (c.hosted_deeplink_data = b);
+    var e = branch_view._getPageviewRequestData(journeys_utils._getPageviewMetadata(d, c), d, this, !1);
+    this._api(resources.pageview, e, function(f, g) {
+      if (!f && "object" === typeof g) {
+        var k = e.branch_view_id ? !0 : !1;
+        branch_view.shouldDisplayJourney(g, d, k) ? branch_view.displayJourney(g.template, e, e.branch_view_id || g.event_data.branch_view_data.id, g.event_data.branch_view_data, k, g.journey_link_data) : journeys_utils.branch._publishEvent("willNotShowJourney");
+      }
+      "function" === typeof a && a.apply(this, arguments);
+    });
+  } else {
+    console.warn("track method currently supports only pageview event.");
+  }
+});
 Branch.prototype.logEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d, e) {
   b = utils.validateParameterType(b, "string") ? b : null;
   c = utils.validateParameterType(c, "object") ? c : null;
