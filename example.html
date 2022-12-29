@@ -149,9 +149,9 @@
 		});
 		$('#setIdentity').click(function() {
 			var identity = getInputVal('#identityID');
-			request.html("branch.setIdentity('" + identity + "');");
+			request.text("branch.setIdentity('" + identity + "');");
 			branch.setIdentity(identity, function(err, data) {
-				response.html(err || JSON.stringify(data));
+				response.text(err || JSON.stringify(data));
 			});
 		});
 		$('#logout').click(function() {
