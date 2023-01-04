@@ -33,7 +33,7 @@
 		"grunt-saucelabs": "~8.6.1",
 		"jscs": "2.0.0",
 		"jsdoc": "3.2.2",
-		"jshint": "2.8.0",
+		"jshint": "2.13.6",
 		"mocha": "^2.2.1",
 		"precommit-hook": "1.0.7",
 		"sinon": "1.17.3"
