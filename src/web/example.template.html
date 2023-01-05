@@ -126,7 +126,7 @@
 			else {
 				inputElement.parent().removeClass('has-error');
 			}
-			return inputElement.val();
+			return DOMPurify.sanitize(inputElement.val());
 		};
 		$('#init').click(function() {
 			request.html('branch.init();');
@@ -149,9 +149,9 @@
 		});
 		$('#setIdentity').click(function() {
 			var identity = getInputVal('#identityID');
-			request.html("branch.setIdentity('" + identity + "');");
+			request.text("branch.setIdentity('" + identity + "');");
 			branch.setIdentity(identity, function(err, data) {
-				response.html(err || JSON.stringify(data));
+				response.text(err || JSON.stringify(data));
 			});
 		});
 		$('#logout').click(function() {
@@ -317,5 +317,6 @@ branch.logEvent(
 			});
 		});
 	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.1/purify.min.js"></script>
 </body>
 </html>
