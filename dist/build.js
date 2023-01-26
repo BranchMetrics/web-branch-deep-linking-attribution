@@ -2514,6 +2514,9 @@ journeys_utils.addIframeInnerCSS = function(a, b) {
 journeys_utils.addDynamicCtaText = function(a, b) {
   a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
 };
+journeys_utils.addDynamicCtaAriaLabelValue = function(a, b) {
+  a.contentWindow.document.getElementById("branch-mobile-action").setAttribute("aria-label", b);
+};
 journeys_utils.centerOverlay = function(a) {
   a && a.style && (a.style.bottom = "140px", a.style.width = "94%", a.style.borderRadius = "20px", a.style.margin = "auto");
 };
@@ -2746,6 +2749,7 @@ function renderHtmlBlob(a, b, c, d) {
     journeys_utils.addIframeOuterCSS(k, f);
     journeys_utils.addIframeInnerCSS(h, g);
     journeys_utils.addDynamicCtaText(h, e);
+    journeys_utils.addDynamicCtaAriaLabelValue(h, e);
     journeys_utils.branch._publishEvent("willShowJourney", journeys_utils.journeyLinkData);
     journeys_utils.animateBannerEntrance(h, k);
     d(h);

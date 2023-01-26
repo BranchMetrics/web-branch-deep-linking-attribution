@@ -468,6 +468,16 @@ journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 }
 
 /***
+ * @function journeys_utils.addDynamicCtaAriaLabelValue
+ * @param {Object} iframe
+ * @param {string} ctaAriaLabelValue
+ */
+journeys_utils.addDynamicCtaAriaLabelValue = function(iframe, ctaAriaLabelValue) {
+	var doc = iframe.contentWindow.document;
+	doc.getElementById('branch-mobile-action').setAttribute('aria-label', ctaAriaLabelValue);
+}
+
+/***
  * @function journeys_utils.centerOverlay
  * @param {Object} banner
  */
