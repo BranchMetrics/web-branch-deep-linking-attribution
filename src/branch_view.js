@@ -43,7 +43,6 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 		journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
 		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 		journeys_utils.addDynamicCtaText(iframe, ctaText);
-		journeys_utils.addDynamicCtaAriaLabelValue(iframe, ctaText);
 	
 		journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
 	
