@@ -29,6 +29,12 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
+
+	if(first && data['referring_link'] && utils.userPreferences.enableReferringLinkExpiry)
+	{
+		var now = new Date();
+		data.referringLinkExpiry = now.getTime() + utils.defaultReferralLinkExpiry;
+	}
 	data = utils.encodeBFPs(data);
 	storage.set('branch_session', goog.json.serialize(data));
 	if (first) {

@@ -18,6 +18,7 @@ utils.retries = 2; // Value specifying the number of times that a Branch API cal
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
 utils.timeout = 5000; // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
 utils.nonce = ''; // Nonce value to allow for CSP whitelisting
+utils.defaultReferralLinkExpiry = 240000;
 
 // Properties and function related to calculating Branch request roundtrip time
 utils.instrumentation = {};
@@ -43,6 +44,7 @@ utils.dismissEventToSourceMapping = {
 
 utils.userPreferences = {
 	trackingDisabled: false,
+	enableReferringLinkExpiry: true,
 	whiteListedEndpointsWithData: {
 		'/v1/open': { 'link_identifier':'\\d+' },
 		'/v1/pageview': { 'event': 'pageview' },
