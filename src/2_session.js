@@ -30,8 +30,7 @@ session.get = function(storage, first) {
  */
 session.set = function(storage, data, first) {
 
-	if(first && data['referring_link'] && utils.userPreferences.enableReferringLinkExpiry)
-	{
+	if (first && data['referring_link'] && utils.userPreferences.enableReferringLinkExpiry) {
 		var now = new Date();
 		data.referringLinkExpiry = now.getTime() + utils.defaultReferralLinkExpiry;
 	}
