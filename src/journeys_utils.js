@@ -464,7 +464,11 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
  */
 journeys_utils.addDynamicCtaText = function(iframe, ctaText) {
 	var doc = iframe.contentWindow.document;
-	doc.getElementById('branch-mobile-action').innerHTML = ctaText;
+	if (doc && doc.getElementById('branch-mobile-action')) {
+		var mobileAction = doc.getElementById('branch-mobile-action');
+		mobileAction.innerHTML = ctaText;
+		mobileAction.setAttribute('aria-label', ctaText);
+	}
 }
 
 /***

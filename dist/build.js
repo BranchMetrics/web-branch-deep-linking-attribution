@@ -2512,7 +2512,7 @@ journeys_utils.addIframeInnerCSS = function(a, b) {
   }
 };
 journeys_utils.addDynamicCtaText = function(a, b) {
-  a.contentWindow.document.getElementById("branch-mobile-action").innerHTML = b;
+  (a = a.contentWindow.document) && a.getElementById("branch-mobile-action") && (a = a.getElementById("branch-mobile-action"), a.innerHTML = b, a.setAttribute("aria-label", b));
 };
 journeys_utils.centerOverlay = function(a) {
   a && a.style && (a.style.bottom = "140px", a.style.width = "94%", a.style.borderRadius = "20px", a.style.margin = "auto");
