@@ -219,7 +219,7 @@ Branch.prototype._referringLink = function(forJourneys) {
 		return referringLink;
 	}
 	else {
-		if (utils.userPreferences.enableReferringLinkExpiry && forJourneys) {
+		if (utils.userPreferences.enableExtendedJourneysAssist && forJourneys) {
 			var localStorageData = session.get(this._storage, true);
 			var referring_Link = localStorageData && localStorageData['referring_link'];
 			var referringLinkExpiry = localStorageData && localStorageData['referringLinkExpiry'];
@@ -352,7 +352,8 @@ Branch.prototype['init'] = wrap(
 		utils.debug = options && options['enableLogging'] ? options['enableLogging'] : utils.debug;
 
 		utils.userPreferences.trackingDisabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
-		utils.userPreferences.enableReferringLinkExpiry = options && options['enableReferringLinkExpiry'] ? options['enableReferringLinkExpiry'] : utils.userPreferences.enableReferringLinkExpiry;
+		utils.userPreferences.enableExtendedJourneysAssist = options && options['enableExtendedJourneysAssist'] ? options['enableExtendedJourneysAssist'] : utils.userPreferences.enableExtendedJourneysAssist;
+		utils.extendedJourneysAssistExpiryTime = options && options['extendedJourneysAssistExpiryTime'] && Number.isInteger(options['extendedJourneysAssistExpiryTime']) ? options['extendedJourneysAssistExpiryTime'] : utils.extendedJourneysAssistExpiryTime;
 		utils.userPreferences.allowErrorsInCallback = false;
 
 		if (utils.userPreferences.trackingDisabled) {
