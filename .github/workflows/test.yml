@@ -1,5 +1,29 @@
 name: demo
 on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+          description: 'Name of the branch'
+          required: true
+          default: 'main'
+            
+      perform_deploy_qa:
+          description: 'Want to deploy to QA'
+          required: true
+          type: boolean
+        
+      perform_deploy_prod:
+          description: 'Want to deploy to Prod'
+          required: true
+          type: boolean
+        
+      version:
+          type: choice
+          description: Version for Prod release
+          options: 
+           - major
+           - minor
+           - patch
   push:
     branches:
       - main
@@ -17,30 +41,6 @@ on:
     paths-ignore:
       - docs/**
       - README.md
-  workflow_dispatch:
-      inputs:
-        branch_name:
-          description: 'Name of the branch'
-          required: true
-          default: 'main'
-            
-        perform_deploy_qa:
-          description: 'Want to deploy to QA'
-          required: true
-          type: boolean
-        
-        perform_deploy_prod:
-          description: 'Want to deploy to Prod'
-          required: true
-          type: boolean
-        
-        version:
-          type: choice
-          description: Version for Prod release
-          options: 
-           - major
-           - minor
-           - patch
         
 env:
   BRANCH_NAME: '${{ github.event.inputs.branch_name || github.head_ref || github.ref_name  }}'
