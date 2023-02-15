@@ -40,8 +40,8 @@
 	},
 	"dependencies": {
 		"google-closure-compiler": "^20230206.0.0",
-		"google-closure-deps": "^20220502.0.0",
-		"google-closure-library": "^20220502.0.0"
+		"google-closure-deps": "^20230103.0.0",
+		"google-closure-library": "^20230103.0.0"
 	},
 	"build": "2.71.0"
 }
