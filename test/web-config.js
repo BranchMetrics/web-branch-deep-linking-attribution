@@ -1,6 +1,7 @@
 /**
  * Just a couple of variables that shouldn't change very often...
  */
+ goog.provide('config');
 
 config.app_service_endpoint = 'https://app.link';
 config.link_service_endpoint = 'https://bnc.lt';
