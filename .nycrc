@@ -1,0 +1,28 @@
+{
+    "reporter": [
+        "text-summary",
+        "html"
+    ],
+    "include": [
+        "src/**"
+    ],
+    "exclude": [
+        "coverage/**",
+        "docs/**",
+        "packages/*/test{,s}/**",
+        "**/*.d.ts",
+        "test{,s}/**",
+        "test{,-*}.{js,cjs,mjs,ts}",
+        "**/*{.,-}test.{js,cjs,mjs,ts}",
+        "**/__tests__/**",
+        "**/{karma,rollup,webpack}.config.js",
+        "**/{babel.config,.eslintrc,.mocharc}.{js,cjs}",
+        "lib/browser/**",
+        "package-scripts.js",
+        "scripts/**",
+        "dist/**",
+        "src/onpage.js",
+        "src/extern.js",
+        "src/7_initialization.js"
+    ]
+}
