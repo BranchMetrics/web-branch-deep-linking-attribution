@@ -18,7 +18,10 @@
 		"type": "git",
 		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution.git"
 	},
-	"author": "Jagadeesh Karicherla",
+	"author": "Dmitri Gaskin <dmitrig01@gmail.com>",
+	"contributors": [
+		"Jagadeesh Karicherla"
+	],
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues",
