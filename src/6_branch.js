@@ -212,11 +212,28 @@ Branch.prototype._api = function(resource, obj, callback) {
 /***
  * @function Branch._referringLink
  */
-Branch.prototype._referringLink = function() {
+Branch.prototype._referringLink = function(forJourneys) {
 	var sessionData = session.get(this._storage);
 	var referringLink = sessionData && sessionData['referring_link'];
 	if (referringLink) {
 		return referringLink;
+	}
+	else {
+		if (utils.userPreferences.enableExtendedJourneysAssist && forJourneys) {
+			var localStorageData = session.get(this._storage, true);
+			var referring_Link = localStorageData && localStorageData['referring_link'];
+			var referringLinkExpiry = localStorageData && localStorageData['referringLinkExpiry'];
+			if (referring_Link && referringLinkExpiry) {
+				var now = new Date();
+				// compare the expiry time of the item with the current time
+				if (now.getTime() > referringLinkExpiry) {
+					session.patch(this._storage, { "referringLinkExpiry": null }, true, true);
+				}
+				else {
+					return referring_Link;
+				}
+			}
+		}
 	}
 
 	var clickId = this._storage.get('click_id');
@@ -335,6 +352,8 @@ Branch.prototype['init'] = wrap(
 		utils.debug = options && options['enableLogging'] ? options['enableLogging'] : utils.debug;
 
 		utils.userPreferences.trackingDisabled = options && options['tracking_disabled'] && options['tracking_disabled'] === true ? true : false;
+		utils.userPreferences.enableExtendedJourneysAssist = options && options['enableExtendedJourneysAssist'] ? options['enableExtendedJourneysAssist'] : utils.userPreferences.enableExtendedJourneysAssist;
+		utils.extendedJourneysAssistExpiryTime = options && options['extendedJourneysAssistExpiryTime'] && Number.isInteger(options['extendedJourneysAssistExpiryTime']) ? options['extendedJourneysAssistExpiryTime'] : utils.extendedJourneysAssistExpiryTime;
 		utils.userPreferences.allowErrorsInCallback = false;
 
 		if (utils.userPreferences.trackingDisabled) {

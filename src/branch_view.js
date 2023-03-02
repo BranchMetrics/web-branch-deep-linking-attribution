@@ -218,7 +218,7 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	var userLanguage = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase() || null;
 	var initialReferrer = utils.getInitialReferrer(branch._referringLink());
 	var branchViewId = options['branch_view_id'] || utils.getParameterByName('_branch_view_id') || null;
-	var linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink()) : null;
+	var linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink(true)) : null;
 
 	// adds root level keys for v1/event
 	obj['event'] = !isDismissEvent ? 'pageview' : 'dismiss';
