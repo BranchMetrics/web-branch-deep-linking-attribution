@@ -43,6 +43,7 @@ test/branch-deps.js: $(SOURCES)
 		--f node_modules/google-closure-library/closure/goog/deps.js \
 		--root src \
 		--root test \
+		--exclude src/0_config.js \
 		--exclude test/branch-deps.js > test/branch-deps.js.tmp
 	echo "// jscs:disable" | cat - test/branch-deps.js.tmp | sed -e 's#src/0_config.js#test/web-config.js#' > test/branch-deps.js && \
 		rm test/branch-deps.js.tmp

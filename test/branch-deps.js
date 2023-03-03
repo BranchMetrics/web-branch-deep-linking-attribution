@@ -1,5 +1,4 @@
 // jscs:disable
-goog.addDependency('../../../../test/web-config.js', ['config'], []);
 goog.addDependency('../../../../src/0_jsonparse.js', ['safejson'], ['goog.json']);
 goog.addDependency('../../../../src/0_queue.js', ['task_queue'], []);
 goog.addDependency('../../../../src/1_utils.js', ['utils'], ['config', 'goog.json', 'safejson']);
@@ -18,7 +17,7 @@ goog.addDependency('../../../../src/extern.js', [], []);
 goog.addDependency('../../../../src/journeys_utils.js', ['journeys_utils'], ['banner_utils', 'safejson', 'utils'], {'lang': 'es6'});
 goog.addDependency('../../../../src/onpage.js', [], []);
 goog.addDependency('../../../../test/0_queue.js', [], ['task_queue']);
-goog.addDependency('../../../../test/1_utils.js', [], ['journeys_utils', 'utils']);
+goog.addDependency('../../../../test/1_utils.js', [], ['utils']);
 goog.addDependency('../../../../test/2_storage.js', [], ['storage']);
 goog.addDependency('../../../../test/3_api.js', [], ['Server', 'config', 'resources', 'safejson', 'storage', 'utils']);
 goog.addDependency('../../../../test/6_branch.js', [], ['Branch', 'banner_html', 'banner_utils', 'config', 'goog.json', 'resources', 'safejson', 'session', 'storage', 'utils']);
@@ -28,5 +27,5 @@ goog.addDependency('../../../../test/blob-interstitial.js', [], []);
 goog.addDependency('../../../../test/journeys.js', [], ['Branch', 'banner_utils', 'branch_view', 'config', 'goog.json', 'resources', 'session', 'storage', 'utils'], {'lang': 'es5'});
 goog.addDependency('../../../../test/saucelabs.js', [], []);
 goog.addDependency('../../../../test/test-utils.js', [], [], {'lang': 'es5'});
-goog.addDependency('../../../../test/web-config.js', [], []);
+goog.addDependency('../../../../test/web-config.js', ['config'], []);
 

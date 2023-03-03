@@ -32,3 +32,4 @@ tmp
 local-testbench
 index.html
 dist
+.nyc_output

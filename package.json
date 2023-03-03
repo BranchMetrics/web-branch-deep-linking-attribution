@@ -11,7 +11,7 @@
 	],
 	"scripts": {
 		"lint": "./lint.sh",
-		"test": "grunt test",
+		"test": "nyc --all mocha",
 		"builddocs": "jsdox src/3_branch_web.js --output docs/web"
 	},
 	"repository": {
@@ -19,6 +19,9 @@
 		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution.git"
 	},
 	"author": "Dmitri Gaskin <dmitrig01@gmail.com>",
+	"contributors": [
+		"Jagadeesh Karicherla"
+	],
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues",
@@ -27,14 +30,13 @@
 	"homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
 	"devDependencies": {
 		"falafel": "1.0.1",
-		"grunt": "^0.4.5",
-		"grunt-contrib-connect": "~0.9.0",
-		"grunt-contrib-watch": "~0.6.1",
-		"grunt-saucelabs": "~8.6.1",
+		"i": "^0.3.7",
 		"jscs": "2.0.0",
-		"jsdoc": "3.2.2",
+		"jsdom": "21.1.0",
+		"jsdom-global": "3.0.2",
 		"jshint": "2.8.0",
-		"mocha": "^2.2.1",
+		"mocha": "^10.2.0",
+		"nyc": "^15.1.0",
 		"precommit-hook": "1.0.7",
 		"sinon": "1.17.3"
 	},

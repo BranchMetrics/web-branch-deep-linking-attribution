@@ -303,8 +303,6 @@ goog.loadedModules_ = {};
 goog.DEPENDENCIES_ENABLED = !COMPILED && goog.ENABLE_DEBUG_LOADER;
 goog.TRANSPILE = "detect";
 goog.ASSUME_ES_MODULES_TRANSPILED = !1;
-goog.TRANSPILE_TO_LANGUAGE = "";
-goog.TRANSPILER = "transpile.js";
 goog.TRUSTED_TYPES_POLICY_NAME = "goog";
 goog.hasBadLetScoping = null;
 goog.loadModule = function(a) {
@@ -352,30 +350,6 @@ goog.loadFileSync_ = function(a) {
   } catch (c) {
     return null;
   }
-};
-goog.transpile_ = function(a, b, c) {
-  var d = goog.global.$jscomp;
-  d || (goog.global.$jscomp = d = {});
-  var e = d.transpile;
-  if (!e) {
-    var f = goog.basePath + goog.TRANSPILER, g = goog.loadFileSync_(f);
-    if (g) {
-      (function() {
-        (0,eval)(g + "\n//# sourceURL=" + f);
-      }).call(goog.global);
-      if (goog.global.$gwtExport && goog.global.$gwtExport.$jscomp && !goog.global.$gwtExport.$jscomp.transpile) {
-        throw Error('The transpiler did not properly export the "transpile" method. $gwtExport: ' + JSON.stringify(goog.global.$gwtExport));
-      }
-      goog.global.$jscomp.transpile = goog.global.$gwtExport.$jscomp.transpile;
-      d = goog.global.$jscomp;
-      e = d.transpile;
-    }
-  }
-  e || (e = d.transpile = function(k, h) {
-    goog.logToConsole_(h + " requires transpilation but no transpiler was found.");
-    return k;
-  });
-  return e(a, b, c);
 };
 goog.typeOf = function(a) {
   var b = typeof a;
@@ -596,65 +570,7 @@ goog.createTrustedTypesPolicy = function(a) {
       }
     }
   }
-}, goog.findBasePath_(), goog.Transpiler = function() {
-  this.requiresTranspilation_ = null;
-  this.transpilationTarget_ = goog.TRANSPILE_TO_LANGUAGE;
-}, goog.Transpiler.prototype.createRequiresTranspilation_ = function() {
-  function a(f, g) {
-    e ? d[f] = !0 : g() ? (c = f, d[f] = !1) : e = d[f] = !0;
-  }
-  function b(f) {
-    try {
-      return !!eval(goog.CLOSURE_EVAL_PREFILTER_.createScript(f));
-    } catch (g) {
-      return !1;
-    }
-  }
-  var c = "es3", d = {es3:!1}, e = !1;
-  a("es5", function() {
-    return b("[1,].length==1");
-  });
-  a("es6", function() {
-    return goog.isEdge_() ? !1 : b('(()=>{"use strict";class X{constructor(){if(new.target!=String)throw 1;this.x=42}}let q=Reflect.construct(X,[],String);if(q.x!=42||!(q instanceof String))throw 1;for(const a of[2,3]){if(a==2)continue;function f(z={a}){let a=0;return z.a}{function f(){return 0;}}return f()==3}})()');
-  });
-  a("es7", function() {
-    return b("2**3==8");
-  });
-  a("es8", function() {
-    return b("async()=>1,1");
-  });
-  a("es9", function() {
-    return b("({...rest}={}),1");
-  });
-  a("es_2019", function() {
-    return b('let r;try{r="\u2029"}catch{};r');
-  });
-  a("es_2020", function() {
-    return b("null?.x??1");
-  });
-  a("es_next", function() {
-    return !1;
-  });
-  return {target:c, map:d};
-}, goog.Transpiler.prototype.needsTranspile = function(a, b) {
-  if ("always" == goog.TRANSPILE) {
-    return !0;
-  }
-  if ("never" == goog.TRANSPILE) {
-    return !1;
-  }
-  if (!this.requiresTranspilation_) {
-    var c = this.createRequiresTranspilation_();
-    this.requiresTranspilation_ = c.map;
-    this.transpilationTarget_ = this.transpilationTarget_ || c.target;
-  }
-  if (a in this.requiresTranspilation_) {
-    return this.requiresTranspilation_[a] ? !0 : !goog.inHtmlDocument_() || "es6" != b || "noModule" in goog.global.document.createElement("script") ? !1 : !0;
-  }
-  throw Error("Unknown language mode: " + a);
-}, goog.Transpiler.prototype.transpile = function(a, b) {
-  return goog.transpile_(a, b, this.transpilationTarget_);
-}, goog.transpiler_ = new goog.Transpiler(), goog.protectScriptTag_ = function(a) {
+}, goog.findBasePath_(), goog.protectScriptTag_ = function(a) {
   return a.replace(/<\/(SCRIPT)/ig, "\\x3c/$1");
 }, goog.DebugLoader_ = function() {
   this.dependencies_ = {};
@@ -663,7 +579,7 @@ goog.createTrustedTypesPolicy = function(a) {
   this.loadingDeps_ = [];
   this.depsToLoad_ = [];
   this.paused_ = !1;
-  this.factory_ = new goog.DependencyFactory(goog.transpiler_);
+  this.factory_ = new goog.DependencyFactory();
   this.deferredCallbacks_ = {};
   this.deferredQueue_ = [];
 }, goog.DebugLoader_.prototype.bootstrap = function(a, b) {
@@ -691,7 +607,7 @@ goog.createTrustedTypesPolicy = function(a) {
     c();
   }
 }, goog.DebugLoader_.prototype.loadClosureDeps = function() {
-  this.depsToLoad_.push(this.factory_.createDependency(goog.normalizePath_(goog.basePath + "deps.js"), "deps.js", [], [], {}, !1));
+  this.depsToLoad_.push(this.factory_.createDependency(goog.normalizePath_(goog.basePath + "deps.js"), "deps.js", [], [], {}));
   this.loadDeps_();
 }, goog.DebugLoader_.prototype.requested = function(a, b) {
   (a = this.getPathFromDeps_(a)) && (b || this.areDepsLoaded_(this.dependencies_[a].requires)) && (b = this.deferredCallbacks_[a]) && (delete this.deferredCallbacks_[a], b());
@@ -1009,37 +925,28 @@ goog.createTrustedTypesPolicy = function(a) {
     }
   }
 }, goog.TransformedDependency.prototype.transform = function(a) {
-}, goog.TranspiledDependency = function(a, b, c, d, e, f) {
-  goog.TransformedDependency.call(this, a, b, c, d, e);
-  this.transpiler = f;
-}, goog.inherits(goog.TranspiledDependency, goog.TransformedDependency), goog.TranspiledDependency.prototype.transform = function(a) {
-  return this.transpiler.transpile(a, this.getPathName());
 }, goog.PreTranspiledEs6ModuleDependency = function(a, b, c, d, e) {
   goog.TransformedDependency.call(this, a, b, c, d, e);
 }, goog.inherits(goog.PreTranspiledEs6ModuleDependency, goog.TransformedDependency), goog.PreTranspiledEs6ModuleDependency.prototype.transform = function(a) {
   return a;
-}, goog.GoogModuleDependency = function(a, b, c, d, e, f, g) {
+}, goog.GoogModuleDependency = function(a, b, c, d, e) {
   goog.TransformedDependency.call(this, a, b, c, d, e);
-  this.needsTranspile_ = f;
-  this.transpiler_ = g;
 }, goog.inherits(goog.GoogModuleDependency, goog.TransformedDependency), goog.GoogModuleDependency.prototype.transform = function(a) {
-  this.needsTranspile_ && (a = this.transpiler_.transpile(a, this.getPathName()));
   return goog.LOAD_MODULE_USING_EVAL && void 0 !== goog.global.JSON ? "goog.loadModule(" + goog.global.JSON.stringify(a + "\n//# sourceURL=" + this.path + "\n") + ");" : 'goog.loadModule(function(exports) {"use strict";' + a + "\n;return exports});\n//# sourceURL=" + this.path + "\n";
 }, goog.DebugLoader_.prototype.addDependency = function(a, b, c, d) {
   b = b || [];
   a = a.replace(/\\/g, "/");
   var e = goog.normalizePath_(goog.basePath + a);
   d && "boolean" !== typeof d || (d = d ? {module:goog.ModuleType.GOOG} : {});
-  c = this.factory_.createDependency(e, a, b, c, d, goog.transpiler_.needsTranspile(d.lang || "es3", d.module));
+  c = this.factory_.createDependency(e, a, b, c, d);
   this.dependencies_[e] = c;
   for (c = 0; c < b.length; c++) {
     this.idToPath_[b[c]] = e;
   }
   this.idToPath_[a] = e;
-}, goog.DependencyFactory = function(a) {
-  this.transpiler = a;
-}, goog.DependencyFactory.prototype.createDependency = function(a, b, c, d, e, f) {
-  return e.module == goog.ModuleType.GOOG ? new goog.GoogModuleDependency(a, b, c, d, e, f, this.transpiler) : f ? new goog.TranspiledDependency(a, b, c, d, e, this.transpiler) : e.module == goog.ModuleType.ES6 ? "never" == goog.TRANSPILE && goog.ASSUME_ES_MODULES_TRANSPILED ? new goog.PreTranspiledEs6ModuleDependency(a, b, c, d, e) : new goog.Es6ModuleDependency(a, b, c, d, e) : new goog.Dependency(a, b, c, d, e);
+}, goog.DependencyFactory = function() {
+}, goog.DependencyFactory.prototype.createDependency = function(a, b, c, d, e) {
+  return e.module == goog.ModuleType.GOOG ? new goog.GoogModuleDependency(a, b, c, d, e) : e.module == goog.ModuleType.ES6 ? goog.ASSUME_ES_MODULES_TRANSPILED ? new goog.PreTranspiledEs6ModuleDependency(a, b, c, d, e) : new goog.Es6ModuleDependency(a, b, c, d, e) : new goog.Dependency(a, b, c, d, e);
 }, goog.debugLoader_ = new goog.DebugLoader_(), goog.loadClosureDeps = function() {
   goog.debugLoader_.loadClosureDeps();
 }, goog.setDependencyFactory = function(a) {
@@ -1061,7 +968,6 @@ goog.json = {};
 goog.json.Replacer = {};
 goog.json.Reviver = {};
 goog.json.USE_NATIVE_JSON = !1;
-goog.json.TRY_NATIVE_JSON = !0;
 goog.json.isValid = function(a) {
   return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/(?:"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)[\s\u2028\u2029]*(?=:|,|]|}|$)/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""));
 };
@@ -1072,12 +978,10 @@ goog.json.setErrorLogger = function(a) {
 };
 goog.json.parse = goog.json.USE_NATIVE_JSON ? goog.global.JSON.parse : function(a) {
   let b;
-  if (goog.json.TRY_NATIVE_JSON) {
-    try {
-      return goog.global.JSON.parse(a);
-    } catch (c) {
-      b = c;
-    }
+  try {
+    return goog.global.JSON.parse(a);
+  } catch (c) {
+    b = c;
   }
   a = String(a);
   if (goog.json.isValid(a)) {
@@ -1191,6 +1095,7 @@ utils.retries = 2;
 utils.retry_delay = 200;
 utils.timeout = 5000;
 utils.nonce = "";
+utils.extendedJourneysAssistExpiryTime = 604800000;
 utils.instrumentation = {};
 utils.navigationTimingAPIEnabled = "undefined" !== typeof window && !!(window.performance && window.performance.timing && window.performance.timing.navigationStart);
 utils.timeSinceNavigationStart = function() {
@@ -1201,7 +1106,7 @@ utils.calculateBrtt = function(a) {
   return a && "number" === typeof a ? (Date.now() - a).toString() : null;
 };
 utils.dismissEventToSourceMapping = {didClickJourneyClose:"Button(X)", didClickJourneyContinue:"Dismiss Journey text", didClickJourneyBackgroundDismiss:"Background Dismiss", didScrollJourneyBackgroundDismiss:"Background Dismiss"};
-utils.userPreferences = {trackingDisabled:!1, whiteListedEndpointsWithData:{"/v1/open":{link_identifier:"\\d+"}, "/v1/pageview":{event:"pageview"}, "/v1/dismiss":{event:"dismiss"}, "/v1/url":{}}, allowErrorsInCallback:!1, shouldBlockRequest:function(a, b) {
+utils.userPreferences = {trackingDisabled:!1, enableExtendedJourneysAssist:!1, whiteListedEndpointsWithData:{"/v1/open":{link_identifier:"\\d+"}, "/v1/pageview":{event:"pageview"}, "/v1/dismiss":{event:"dismiss"}, "/v1/url":{}}, allowErrorsInCallback:!1, shouldBlockRequest:function(a, b) {
   var c = document.createElement("a");
   c.href = a;
   a = [config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint];
@@ -2192,6 +2097,7 @@ var session = {get:function(a, b) {
     return null;
   }
 }, set:function(a, b, c) {
+  c && b.referring_link && utils.userPreferences.enableExtendedJourneysAssist && (b.referringLinkExpiry = (new Date()).getTime() + utils.extendedJourneysAssistExpiryTime);
   b = utils.encodeBFPs(b);
   a.set("branch_session", goog.json.serialize(b));
   c && a.set("branch_session_first", goog.json.serialize(b), !0);
@@ -2809,7 +2715,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   journeys_utils.entryAnimationDisabled = b.disable_entry_animation || !1;
   journeys_utils.exitAnimationDisabled = b.disable_exit_animation || !1;
   var e = utils.merge({}, c._branchViewData), f = session.get(c._storage) || {}, g = f.hasOwnProperty("has_app") ? f.has_app : !1, k = f.hasOwnProperty("identity") ? f.identity : null, h = c._storage.get("journeyDismissals", !0), l = (b.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase() || null, m = utils.getInitialReferrer(c._referringLink()), q = b.branch_view_id || utils.getParameterByName("_branch_view_id") || null;
-  c = b.make_new_link ? null : utils.getClickIdAndSearchStringFromLink(c._referringLink());
+  c = b.make_new_link ? null : utils.getClickIdAndSearchStringFromLink(c._referringLink(!0));
   e.event = d ? "dismiss" : "pageview";
   e.metadata = a;
   e = utils.addPropertyIfNotNull(e, "initial_referrer", m);
@@ -2894,9 +2800,19 @@ Branch.prototype._api = function(a, b, c) {
     c(d, e);
   });
 };
-Branch.prototype._referringLink = function() {
-  var a = session.get(this._storage);
-  return (a = a && a.referring_link) ? a : (a = this._storage.get("click_id")) ? config.link_service_endpoint + "/c/" + a : null;
+Branch.prototype._referringLink = function(a) {
+  var b = session.get(this._storage);
+  if (b = b && b.referring_link) {
+    return b;
+  }
+  if (utils.userPreferences.enableExtendedJourneysAssist && a && (a = (b = session.get(this._storage, !0)) && b.referring_link, b = b && b.referringLinkExpiry, a && b)) {
+    if ((new Date()).getTime() > b) {
+      session.patch(this._storage, {referringLinkExpiry:null}, !0, !0);
+    } else {
+      return a;
+    }
+  }
+  return (a = this._storage.get("click_id")) ? config.link_service_endpoint + "/c/" + a : null;
 };
 Branch.prototype._publishEvent = function(a, b) {
   for (var c = 0; c < this._listeners.length; c++) {
@@ -2916,6 +2832,8 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.nonce = c && c.nonce ? c.nonce : utils.nonce;
   utils.debug = c && c.enableLogging ? c.enableLogging : utils.debug;
   utils.userPreferences.trackingDisabled = c && c.tracking_disabled && !0 === c.tracking_disabled ? !0 : !1;
+  utils.userPreferences.enableExtendedJourneysAssist = c && c.enableExtendedJourneysAssist ? c.enableExtendedJourneysAssist : utils.userPreferences.enableExtendedJourneysAssist;
+  utils.extendedJourneysAssistExpiryTime = c && c.extendedJourneysAssistExpiryTime && Number.isInteger(c.extendedJourneysAssistExpiryTime) ? c.extendedJourneysAssistExpiryTime : utils.extendedJourneysAssistExpiryTime;
   utils.userPreferences.allowErrorsInCallback = !1;
   utils.userPreferences.trackingDisabled && utils.cleanApplicationAndSessionStorage(d);
   b = session.get(d._storage, !0);
