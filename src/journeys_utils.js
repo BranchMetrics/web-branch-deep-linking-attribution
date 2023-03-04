@@ -857,14 +857,18 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 }
 
 journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
-	return utils.merge({
+	var pageviewMetadata = utils.merge({
 		"url": options && options.url || utils.getWindowLocation(),
 		"user_agent": navigator.userAgent,
 		"language": navigator.language,
 		"screen_width": screen.width || -1,
 		"screen_height": screen.height || -1,
-		"window_device_pixel_ratio": window.devicePixelRatio || 1
+		"window_device_pixel_ratio": window.devicePixelRatio || 1,
+
 	}, additionalMetadata || {});
+	pageviewMetadata = utils.addPropertyIfNotNullorEmpty(pageviewMetadata, "model", utils.userAgentData ? utils.userAgentData.model : "");
+	pageviewMetadata = utils.addPropertyIfNotNullorEmpty(pageviewMetadata, "os_version", utils.userAgentData ? utils.userAgentData.platformVersion : "");
+	return pageviewMetadata;
 };
 
 /***

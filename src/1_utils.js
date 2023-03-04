@@ -22,6 +22,7 @@ utils.extendedJourneysAssistExpiryTime = 604800000;// TTL value in milliseconds 
 
 // Properties and function related to calculating Branch request roundtrip time
 utils.instrumentation = {};
+utils.userAgentData = null;
 utils.navigationTimingAPIEnabled = typeof window !== 'undefined' && !!(window.performance && window.performance.timing && window.performance.timing.navigationStart);
 utils.timeSinceNavigationStart = function() {
 	// in milliseconds
@@ -1161,6 +1162,8 @@ utils.getUserData = function(branch) {
 	user_data = utils.addPropertyIfNotNull(user_data, "identity", branch.identity);
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk", "web");
 	user_data = utils.addPropertyIfNotNull(user_data, "sdk_version", config.version);
+	user_data = utils.addPropertyIfNotNullorEmpty(user_data, "model", utils.userAgentData ? utils.userAgentData.model : "");
+	user_data = utils.addPropertyIfNotNullorEmpty(user_data, "os_version", utils.userAgentData ? utils.userAgentData.platformVersion : "");
 	return user_data;
 };
 
@@ -1267,4 +1270,36 @@ utils.delay = function(operation, delay) {
 	}
 
 	setTimeout(operation, delay);
+};
+
+/**
+ * gets client hints for supportd browser.
+ * This will be used for browsers that have reduced user agent
+ */
+utils.getClientHints = function() {
+	if (navigator.userAgentData) {
+		var hints = [
+			'model',
+			'platformVersion'
+		];
+		navigator.userAgentData.getHighEntropyValues(hints).then(function(data) {
+			utils.userAgentData = { 'model': data.model, 'platformVersion': data.platformVersion };
+		});
+	}
+	else {
+		utils.userAgentData = null;
+	}
+};
+
+/**
+ * @param {Object} obj
+ * @param {string} key
+ * @param {string} value
+ * A utility function to add a property to an object only if its value is not null, empty
+ */
+utils.addPropertyIfNotNullorEmpty = function(obj, key, value) {
+	if (typeof value === "string" && !!value) {
+		obj[key] = value;
+	}
+	return obj;
 };
