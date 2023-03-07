@@ -1273,7 +1273,7 @@ utils.delay = function(operation, delay) {
 };
 
 /**
- * gets client hints for supported browser.
+ * gets client hints for supported browsers.
  * This will be used for browsers that have reduced user agent
  */
 utils.getClientHints = function() {
