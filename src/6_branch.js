@@ -2167,7 +2167,7 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
 
 /***
  * @function Branch.referringLink
- * @param {Boolean} referringLink - withExtendedJourneysAssist - gets ReferringLink for extended Journeys Assist scenario.defaults to false.
+ * @param {Boolean} withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
  Branch.prototype.referringLink = function(withExtendedJourneysAssist) {
