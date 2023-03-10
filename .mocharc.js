@@ -6,6 +6,6 @@
 // Otherwise, JSON or YAML is recommended.
 
 module.exports = {
-  require: ['./node_modules/google-closure-library', './test/branch-deps.js', './node_modules/jsdom-global/register.js', './test/test-utils.js', './node_modules/sinon/lib/sinon.js', './src/0_queue.js'],
-  spec: ['./test/1_utils.js']
+  require: ['./node_modules/google-closure-library','./node_modules/jsdom-global/register.js', './test/branch-deps.js', './test/test-utils.js', './node_modules/sinon/lib/sinon.js'],
+  spec: ['./test/1_utils.js','./test/6_branch_new.js']
 };
