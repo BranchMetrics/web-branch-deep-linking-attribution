@@ -1,15 +1,5 @@
 name: Gate Keeping
 on:
-  workflow_dispatch:
-    inputs:
-      branch_name:
-          description: 'Name of the branch'
-          required: true
-          default: 'main'
-      perform_deploy_qa:
-          description: 'Want to deploy to QA'
-          required: true
-          type: boolean
   pull_request:
     types: [opened,reopened,edited,synchronize]
     branches:
@@ -99,7 +89,7 @@ jobs:
       
       - name: Invalidate cache at CDN
         run: |
-          echo -en "Invalidating cloudfrond distribution for webSDK scripts ...\n"
+          echo -en "Invalidating cloudfrond distribution for webSDK ...\n"
           aws configure set preview.cloudfront true
           aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js /example.html /branch-v2.0.0.min.js
 
