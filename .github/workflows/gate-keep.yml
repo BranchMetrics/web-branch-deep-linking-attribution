@@ -1,5 +1,15 @@
 name: Gate Keeping
 on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+          description: 'Name of the branch'
+          required: true
+          default: 'main'
+      perform_deploy_qa:
+          description: 'Want to deploy to QA'
+          required: true
+          type: boolean
   pull_request:
     types: [opened,reopened,edited,synchronize]
     branches:
