@@ -89,7 +89,7 @@ jobs:
       
       - name: Invalidate cache at CDN
         run: |
-          echo -en "Invalidating cloudfrond distribution for webSDK ...\n"
+          echo -en "Invalidating cloudfrond distribution for webSDK scripts ...\n"
           aws configure set preview.cloudfront true
           aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js /example.html /branch-v2.0.0.min.js
 
