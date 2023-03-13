@@ -1,0 +1,96 @@
+name: Gate Keeping
+on:
+  pull_request:
+    types: [opened,reopened,edited,synchronize]
+    branches:
+      - main
+    paths-ignore:
+      - docs/**
+      - README.md
+env:
+  BRANCH_NAME: '${{ github.event.inputs.branch_name || github.head_ref || github.ref_name  }}'
+  NODE_VERSION: 16
+  JAVA_VERSION: 11
+  JAVA_DISTRIBUTION: 'adopt'
+
+jobs:
+  test-unit:
+    name: Unit tests
+    runs-on: [ self-hosted, standard ]
+    steps:
+      - name: Checkout ${{ github.ref_name }}
+        uses: actions/checkout@v3
+
+      - name: Setup .npmrc
+        uses: bduff9/use-npmrc@v1.1
+        with:
+            dot-npmrc: ${{ secrets.DOT_NPMRC }}
+
+      - name: Install Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm run test
+
+  test-lint:
+    name: Lint
+    runs-on: [ self-hosted, standard ]
+    steps:
+      - name: Checkout ${{ github.ref_name }}
+        uses: actions/checkout@v3
+
+      - name: Setup .npmrc
+        uses: bduff9/use-npmrc@v1.1
+        with:
+            dot-npmrc: ${{ secrets.DOT_NPMRC }}
+
+      - name: Install Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint tests
+        run: npm run lint
+
+  test-build:
+    name: Test-build
+    needs: [test-unit,test-lint]
+    runs-on: [ self-hosted, standard ]
+    steps:
+      - name: Checkout ${{ github.ref_name }}
+        uses: actions/checkout@v3
+
+      - name: Install Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Call the Build bash script for QA
+        run:  bash ${GITHUB_WORKSPACE}/deployment/build-qa.sh
+      
+      - name: Invalidate cache at CDN
+        run: |
+          echo -en "Invalidating cloudfrond distribution for webSDK ...\n"
+          aws configure set preview.cloudfront true
+          aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js /example.html /branch-v2.0.0.min.js
+
+
