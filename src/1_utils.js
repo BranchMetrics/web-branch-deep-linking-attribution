@@ -1305,8 +1305,8 @@ utils.addPropertyIfNotNullorEmpty = function(obj, key, value) {
 };
 
 /**
- * @param {String} obj
- * A utility function to add a property to an object only if its value is not null, empty
+ * @param {String} versionNumber
+ * A utility function to remove trailing dot zeroes
  */
 utils.removeTrailingDotZeros = function(versionNumber) {
 	if (!!versionNumber) {
