@@ -1310,7 +1310,7 @@ utils.addPropertyIfNotNullorEmpty = function(obj, key, value) {
  */
 utils.removeTrailingDotZeros = function(versionNumber) {
 	if (!!versionNumber) {
-		var dotZeroRegex = /^[1-9]\d*(\.[0]\d*)*$/;
+		var dotZeroRegex = /^([1-9]\d*)\.(0\d*)(\.[0]\d*){1,}$/;
 
 		if (versionNumber.indexOf(".") !== -1) {
 			var dotString = versionNumber.substring(0, versionNumber.indexOf("."));

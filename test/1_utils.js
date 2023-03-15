@@ -1201,12 +1201,24 @@ describe('utils', function() {
 			var versionNumber = null;
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly matched null');
 		});
-		it('should return string with trailing dot zeros stripped', function() {
+		it('no dot- should not strip trailing dot zero', function() {
+			var versionNumber = "10";
+			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
+		});
+		it('with dot and no zeros- should not strip trailing dot zero', function() {
+			var versionNumber = "10.10";
+			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
+		});
+		it('single dot- should not strip trailing dot zero', function() {
+			var versionNumber = "10.0";
+			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
+		});
+		it('multi-dot : should return string with trailing dot zeros stripped', function() {
 			var versionNumber = "10.0.0";
 			var expected = "10";
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), expected, 'Correctly strip trailing zeros');
 		});
-		it('should not strip trailing dot zeroy', function() {
+		it('should not strip trailing dot zero', function() {
 			var versionNumber = "10.0.1";
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
 		});
