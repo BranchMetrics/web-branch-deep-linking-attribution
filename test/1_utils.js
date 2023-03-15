@@ -1191,6 +1191,27 @@ describe('utils', function() {
 			assert.deepEqual(utils.addPropertyIfNotNullorEmpty(obj, "prop2", "value2"), expectedObj, 'Correctly added property to object');
 		});
 	});
+
+	describe('removeTrailingDotZeros', function() {
+		it('should return empty if value is empty', function() {
+			var versionNumber = "";
+			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly matched empty');
+		});
+		it('should return null if value is null', function() {
+			var versionNumber = null;
+			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly matched null');
+		});
+		it('should return string with trailing dot zeros stripped', function() {
+			var versionNumber = "10.0.0";
+			var expected = "10";
+			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), expected, 'Correctly strip trailing zeros');
+		});
+		it('should not strip trailing dot zeroy', function() {
+			var versionNumber = "10.0.1";
+			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
+		});
+	});
+
 	/*
 	describe('journey_cta', function(done) {
 		var html = 'html - validate("https://wdar9-alternate-qa.branchbeta.link/8ih4nDDQH8?__branch_flow_type=journeys_cta_override&__branch_flow_id=819580012495711960&__branch_mobile_deepview_type=4&_branch_match_id=814182034125937862&referrer=link_click_id%3D814182034125937862%26utm_source%3DBranch%26utm_campaign%3DChannel%20Test%26utm_medium%3Djourneys&_t=814182034125937862"); - html';

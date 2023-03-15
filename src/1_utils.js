@@ -1316,6 +1316,6 @@ utils.removeTrailingDotZeros = function(versionNumber) {
 			var dotString = versionNumber.substring(0, versionNumber.indexOf("."));
 			versionNumber = versionNumber.replace(dotZeroRegex, dotString);
 		}
-		return versionNumber;
 	}
+	return versionNumber;
 };
