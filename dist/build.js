@@ -3217,6 +3217,9 @@ Branch.prototype.setAPIResponseCallback = wrap(callback_params.NO_CALLBACK, func
   this._server.onAPIResponse = b;
   a();
 }, !0);
+Branch.prototype.referringLink = function(a) {
+  return this._referringLink(a);
+};
 // Input 17
 var branch_instance = new Branch();
 if (window.branch && window.branch._q) {

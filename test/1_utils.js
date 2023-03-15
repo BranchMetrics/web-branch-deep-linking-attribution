@@ -5,15 +5,10 @@ goog.require('utils');
 
 describe('utils', function() {
 	var assert = testUtils.unplanned();
-	beforeEach(function() {
-		console.log("Initialising utils...");
-		console.log(utils);
-	});
 	describe('base64encode', function() {
 		it('should encode a string', function() {
 			var string = 'test string to encode';
 			var expectedEncoded = 'dGVzdCBzdHJpbmcgdG8gZW5jb2Rl';
-			console.log(utils);
 			assert.strictEqual(utils.base64encode(string), expectedEncoded, 'Correctly encoded');
 		});
 	});
