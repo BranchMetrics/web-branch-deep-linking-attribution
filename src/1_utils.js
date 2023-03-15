@@ -1283,7 +1283,7 @@ utils.getClientHints = function() {
 			'platformVersion'
 		];
 		navigator.userAgentData.getHighEntropyValues(hints).then(function(data) {
-			utils.userAgentData = { 'model': data.model, 'platformVersion': data.platformVersion };
+			utils.userAgentData = { 'model': data.model, 'platformVersion': utils.removeTrailingDotZeros(data.platformVersion) };
 		});
 	}
 	else {
@@ -1302,4 +1302,20 @@ utils.addPropertyIfNotNullorEmpty = function(obj, key, value) {
 		obj[key] = value;
 	}
 	return obj;
+};
+
+/**
+ * @param {String} obj
+ * A utility function to add a property to an object only if its value is not null, empty
+ */
+utils.removeTrailingDotZeros = function(versionNumber) {
+	if (!!versionNumber) {
+		var dotZeroRegex = /^[1-9]\d*(\.[0]\d*)*$/;
+
+		if (versionNumber.indexOf(".") !== -1) {
+			var dotString = versionNumber.substring(0, versionNumber.indexOf("."));
+			versionNumber = versionNumber.replace(dotZeroRegex, dotString);
+		}
+		return versionNumber;
+	}
 };
