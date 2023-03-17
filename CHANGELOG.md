@@ -4,6 +4,14 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
 
+## [2.72.0] - 2023-03-17
+– APPSEC-482 Sanitize cdn example
+- BUX-1856 Set Visual label of CTA is the same as the programmatic name.
+- SDK-1783 Enable referring link expiry
+- BUX-1912 Focus should directly move to banner
+- SDK-1853 Expose a new public method - branch.referringLink
+- SDK-1681 Make track method pageview event only
+
 ## [2.71.0] - 2022-11-17
 – Fix OG order precedence
 
