@@ -1097,6 +1097,7 @@ utils.timeout = 5000;
 utils.nonce = "";
 utils.extendedJourneysAssistExpiryTime = 604800000;
 utils.instrumentation = {};
+utils.userAgentData = null;
 utils.navigationTimingAPIEnabled = "undefined" !== typeof window && !!(window.performance && window.performance.timing && window.performance.timing.navigationStart);
 utils.timeSinceNavigationStart = function() {
   return (Date.now() - window.performance.timing.navigationStart).toString();
@@ -1578,7 +1579,9 @@ utils.getUserData = function(a) {
   b = utils.addPropertyIfNotNull(b, "developer_identity", a.identity);
   b = utils.addPropertyIfNotNull(b, "identity", a.identity);
   b = utils.addPropertyIfNotNull(b, "sdk", "web");
-  return b = utils.addPropertyIfNotNull(b, "sdk_version", config.version);
+  b = utils.addPropertyIfNotNull(b, "sdk_version", config.version);
+  b = utils.addPropertyIfNotNullorEmpty(b, "model", utils.userAgentData ? utils.userAgentData.model : "");
+  return b = utils.addPropertyIfNotNullorEmpty(b, "os_version", utils.userAgentData ? utils.userAgentData.platformVersion : "");
 };
 utils.isIframe = function() {
   return window.self !== window.top;
@@ -1626,6 +1629,15 @@ utils.getBooleanOrNull = function(a) {
 utils.delay = function(a, b) {
   isNaN(b) || 0 >= b ? a() : setTimeout(a, b);
 };
+utils.getClientHints = function() {
+  navigator.userAgentData ? navigator.userAgentData.getHighEntropyValues(["model", "platformVersion"]).then(function(a) {
+    utils.userAgentData = {model:a.model, platformVersion:a.platformVersion};
+  }) : utils.userAgentData = null;
+};
+utils.addPropertyIfNotNullorEmpty = function(a, b, c) {
+  "string" === typeof c && c && (a[b] = c);
+  return a;
+};
 // Input 5
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
@@ -1671,7 +1683,7 @@ function defaults(a) {
   return utils.merge(a, b);
 }
 resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:utils.httpMethod.POST, params:{browser_fingerprint_id:validator(!1, validationTypes.STRING), alternative_browser_fingerprint_id:validator(!1, validationTypes.STRING), identity_id:validator(!1, validationTypes.STRING), link_identifier:validator(!1, validationTypes.STRING), sdk:validator(!1, validationTypes.STRING), options:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, 
-validationTypes.BOOLEAN), current_url:validator(!1, validationTypes.STRING), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, validationTypes.NUMBER)}};
+validationTypes.BOOLEAN), current_url:validator(!1, validationTypes.STRING), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, validationTypes.NUMBER), model:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING)}};
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, validationTypes.STRING), branch_key:validator(!0, validationTypes.STRING)}};
 resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
 resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:defaults({session_id:validator(!0, validationTypes.STRING)})};
@@ -2545,7 +2557,9 @@ journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, k) {
   }
 };
 journeys_utils._getPageviewMetadata = function(a, b) {
-  return utils.merge({url:a && a.url || utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1, window_device_pixel_ratio:window.devicePixelRatio || 1}, b || {});
+  a = utils.merge({url:a && a.url || utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1, window_device_pixel_ratio:window.devicePixelRatio || 1,}, b || {});
+  a = utils.addPropertyIfNotNullorEmpty(a, "model", utils.userAgentData ? utils.userAgentData.model : "");
+  return a = utils.addPropertyIfNotNullorEmpty(a, "os_version", utils.userAgentData ? utils.userAgentData.platformVersion : "");
 };
 journeys_utils.animateBannerExit = function(a, b) {
   journeys_utils.exitAnimationDisabled || (journeys_utils.exitAnimationIsRunning = !0);
@@ -2835,6 +2849,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   utils.userPreferences.enableExtendedJourneysAssist = c && c.enableExtendedJourneysAssist ? c.enableExtendedJourneysAssist : utils.userPreferences.enableExtendedJourneysAssist;
   utils.extendedJourneysAssistExpiryTime = c && c.extendedJourneysAssistExpiryTime && Number.isInteger(c.extendedJourneysAssistExpiryTime) ? c.extendedJourneysAssistExpiryTime : utils.extendedJourneysAssistExpiryTime;
   utils.userPreferences.allowErrorsInCallback = !1;
+  utils.getClientHints();
   utils.userPreferences.trackingDisabled && utils.cleanApplicationAndSessionStorage(d);
   b = session.get(d._storage, !0);
   d.identity_id = b && b.identity_id;
@@ -2907,7 +2922,8 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
     r.identity && (d.identity = r.identity);
     var w = parseInt(utils.getParamValue("[?&]_open_delay_ms"), 10);
     utils.isSafari11OrGreater() || utils.isIOSWKWebView() ? utils.delay(function() {
-      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || r.browser_fingerprint_id, alternative_browser_fingerprint_id:r.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(n, p) {
+      d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || r.browser_fingerprint_id, alternative_browser_fingerprint_id:r.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth(), model:utils.userAgentData ? utils.userAgentData.model : null, os_version:utils.userAgentData ? utils.userAgentData.platformVersion : null}, function(n, 
+      p) {
         n && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = n.message);
         n || "object" !== typeof p || (p.branch_view_enabled && (d._branchViewEnabled = !!p.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (p.click_id = g));
         q();
@@ -2918,7 +2934,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
         return d.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND, d.init_state_fail_details = n.message, m(n, null);
       }
       utils.delay(function() {
-        d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || p, alternative_browser_fingerprint_id:r.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth()}, function(t, u) {
+        d._api(resources.open, {link_identifier:g, browser_fingerprint_id:g || p, alternative_browser_fingerprint_id:r.browser_fingerprint_id, options:c, initial_referrer:utils.getInitialReferrer(d._referringLink()), current_url:utils.getCurrentUrl(), screen_height:utils.getScreenHeight(), screen_width:utils.getScreenWidth(), model:utils.userAgentData ? utils.userAgentData.model : null, os_version:utils.userAgentData ? utils.userAgentData.platformVersion : null}, function(t, u) {
           t && (d.init_state_fail_code = init_state_fail_codes.OPEN_FAILED, d.init_state_fail_details = t.message);
           t || "object" !== typeof u || (u.branch_view_enabled && (d._branchViewEnabled = !!u.branch_view_enabled, d._storage.set("branch_view_enabled", d._branchViewEnabled)), g && (u.click_id = g));
           q();

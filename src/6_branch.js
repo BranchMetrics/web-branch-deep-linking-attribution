@@ -355,6 +355,7 @@ Branch.prototype['init'] = wrap(
 		utils.userPreferences.enableExtendedJourneysAssist = options && options['enableExtendedJourneysAssist'] ? options['enableExtendedJourneysAssist'] : utils.userPreferences.enableExtendedJourneysAssist;
 		utils.extendedJourneysAssistExpiryTime = options && options['extendedJourneysAssistExpiryTime'] && Number.isInteger(options['extendedJourneysAssistExpiryTime']) ? options['extendedJourneysAssistExpiryTime'] : utils.extendedJourneysAssistExpiryTime;
 		utils.userPreferences.allowErrorsInCallback = false;
+		utils.getClientHints();
 
 		if (utils.userPreferences.trackingDisabled) {
 			utils.cleanApplicationAndSessionStorage(self);
@@ -617,7 +618,9 @@ Branch.prototype['init'] = wrap(
 								"initial_referrer": utils.getInitialReferrer(self._referringLink()),
 								"current_url": utils.getCurrentUrl(),
 								"screen_height": utils.getScreenHeight(),
-								"screen_width": utils.getScreenWidth()
+								"screen_width": utils.getScreenWidth(),
+								"model": utils.userAgentData ? utils.userAgentData.model : null,
+								"os_version": utils.userAgentData ? utils.userAgentData.platformVersion : null
 							},
 							function(err, data) {
 								if (err) {
@@ -653,7 +656,9 @@ Branch.prototype['init'] = wrap(
 						"initial_referrer": utils.getInitialReferrer(self._referringLink()),
 						"current_url": utils.getCurrentUrl(),
 						"screen_height": utils.getScreenHeight(),
-						"screen_width": utils.getScreenWidth()
+						"screen_width": utils.getScreenWidth(),
+						"model": utils.userAgentData ? utils.userAgentData.model : null,
+						"os_version": utils.userAgentData ? utils.userAgentData.platformVersion : null
 					},
 					function(err, data) {
 						if (err) {
