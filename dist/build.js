@@ -1072,7 +1072,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.71.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.72.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1631,11 +1631,21 @@ utils.delay = function(a, b) {
 };
 utils.getClientHints = function() {
   navigator.userAgentData ? navigator.userAgentData.getHighEntropyValues(["model", "platformVersion"]).then(function(a) {
-    utils.userAgentData = {model:a.model, platformVersion:a.platformVersion};
+    utils.userAgentData = {model:a.model, platformVersion:utils.removeTrailingDotZeros(a.platformVersion)};
   }) : utils.userAgentData = null;
 };
 utils.addPropertyIfNotNullorEmpty = function(a, b, c) {
   "string" === typeof c && c && (a[b] = c);
+  return a;
+};
+utils.removeTrailingDotZeros = function(a) {
+  if (a) {
+    var b = /^([1-9]\d*)\.(0\d*)(\.[0]\d*){1,}$/;
+    if (-1 !== a.indexOf(".")) {
+      var c = a.substring(0, a.indexOf("."));
+      a = a.replace(b, c);
+    }
+  }
   return a;
 };
 // Input 5
