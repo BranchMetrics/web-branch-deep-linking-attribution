@@ -92,19 +92,25 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.sticky = 'fixed';
 		}
 	}
-
+	const bannerHeightIsVH = journeys_utils.bannerHeight.includes('vh');
+	const bannerHeightIsPercentage = journeys_utils.bannerHeight.includes('%');
 	// convert full page to fixed pixel height
-	if (journeys_utils.bannerHeight.indexOf('vh') !== -1 || journeys_utils.bannerHeight.indexOf('%') !== -1) {
-		var heightNumber = journeys_utils.bannerHeight.indexOf('vh')
-			? journeys_utils.bannerHeight.slice(0, -2)
-			: journeys_utils.bannerHeight.slice(0, -1);
-		journeys_utils.bannerHeight = (heightNumber/100) * journeys_utils.windowHeight + 'px';
-		if (heightNumber < 100) {
-			journeys_utils.isHalfPage = true;
-		}
-		else {
-			journeys_utils.isFullPage = true;
-		}
+	if (!bannerHeightIsVH && !bannerHeightIsPercentage) {
+		return;
+	}
+	let bannerHeight;
+	if (bannerHeightIsVH) {
+		bannerHeight = journeys_utils.bannerHeight.replace('vh', '');
+	}
+	if (bannerHeightIsPercentage) {
+		bannerHeight = journeys_utils.bannerHeight.replace('%', '');
+	}
+	journeys_utils.bannerHeight = (bannerHeight/100) * journeys_utils.windowHeight + 'px';
+	if (bannerHeight < 100) {
+		journeys_utils.isHalfPage = true;
+	}
+	else {
+		journeys_utils.isFullPage = true;
 	}
 }
 

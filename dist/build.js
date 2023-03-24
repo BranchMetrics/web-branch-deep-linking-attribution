@@ -2313,8 +2313,14 @@ journeys_utils.setPositionAndHeight = function(a) {
       journeys_utils.position = "bottom", journeys_utils.sticky = "fixed";
     }
   }
-  if (-1 !== journeys_utils.bannerHeight.indexOf("vh") || -1 !== journeys_utils.bannerHeight.indexOf("%")) {
-    a = journeys_utils.bannerHeight.indexOf("vh") ? journeys_utils.bannerHeight.slice(0, -2) : journeys_utils.bannerHeight.slice(0, -1), journeys_utils.bannerHeight = a / 100 * journeys_utils.windowHeight + "px", 100 > a ? journeys_utils.isHalfPage = !0 : journeys_utils.isFullPage = !0;
+  a = journeys_utils.bannerHeight.includes("vh");
+  b = journeys_utils.bannerHeight.includes("%");
+  if (a || b) {
+    var c;
+    a && (c = journeys_utils.bannerHeight.replace("vh", ""));
+    b && (c = journeys_utils.bannerHeight.replace("%", ""));
+    journeys_utils.bannerHeight = c / 100 * journeys_utils.windowHeight + "px";
+    100 > c ? journeys_utils.isHalfPage = !0 : journeys_utils.isFullPage = !0;
   }
 };
 journeys_utils.getMetadata = function(a) {
