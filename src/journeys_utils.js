@@ -63,6 +63,21 @@ journeys_utils.previousDivToInjectParents = [];
 journeys_utils.journeyLinkData = null;
 
 /***
+ * @function journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight
+ * @param {string} bannerHeight
+ */
+journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(bannerHeight) {
+	if (bannerHeight.includes('vh')) {
+		return bannerHeight.replace('vh', '');
+	}
+	if (bannerHeight.includes('%')) {
+		return bannerHeight.replace('%', '');
+	}
+	return false;
+}
+
+
+/***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
  *
@@ -92,21 +107,13 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.sticky = 'fixed';
 		}
 	}
-	const bannerHeightIsVH = journeys_utils.bannerHeight.includes('vh');
-	const bannerHeightIsPercentage = journeys_utils.bannerHeight.includes('%');
-	// convert full page to fixed pixel height
-	if (!bannerHeightIsVH && !bannerHeightIsPercentage) {
+	const relativeBannerHeightOrFalse = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight);
+	if (relativeBannerHeightOrFalse === false) {
 		return;
 	}
-	let bannerHeight;
-	if (bannerHeightIsVH) {
-		bannerHeight = journeys_utils.bannerHeight.replace('vh', '');
-	}
-	if (bannerHeightIsPercentage) {
-		bannerHeight = journeys_utils.bannerHeight.replace('%', '');
-	}
-	journeys_utils.bannerHeight = (bannerHeight/100) * journeys_utils.windowHeight + 'px';
-	if (bannerHeight < 100) {
+	const bannerHeightInPixels = (relativeBannerHeightOrFalse/100) * journeys_utils.windowHeight + 'px';
+	journeys_utils.bannerHeight = bannerHeightInPixels;
+	if (relativeBannerHeightOrFalse < 100) {
 		journeys_utils.isHalfPage = true;
 	}
 	else {

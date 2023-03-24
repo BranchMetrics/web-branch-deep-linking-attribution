@@ -2298,6 +2298,9 @@ journeys_utils.exitAnimationDisabledPreviously = !1;
 journeys_utils.previousPosition = "";
 journeys_utils.previousDivToInjectParents = [];
 journeys_utils.journeyLinkData = null;
+journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(a) {
+  return a.includes("vh") ? a.replace("vh", "") : a.includes("%") ? a.replace("%", "") : !1;
+};
 journeys_utils.setPositionAndHeight = function(a) {
   var b = journeys_utils.getMetadata(a) || {};
   if (b && b.bannerHeight && b.position && b.sticky) {
@@ -2313,15 +2316,8 @@ journeys_utils.setPositionAndHeight = function(a) {
       journeys_utils.position = "bottom", journeys_utils.sticky = "fixed";
     }
   }
-  a = journeys_utils.bannerHeight.includes("vh");
-  b = journeys_utils.bannerHeight.includes("%");
-  if (a || b) {
-    var c;
-    a && (c = journeys_utils.bannerHeight.replace("vh", ""));
-    b && (c = journeys_utils.bannerHeight.replace("%", ""));
-    journeys_utils.bannerHeight = c / 100 * journeys_utils.windowHeight + "px";
-    100 > c ? journeys_utils.isHalfPage = !0 : journeys_utils.isFullPage = !0;
-  }
+  a = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight);
+  !1 !== a && (journeys_utils.bannerHeight = a / 100 * journeys_utils.windowHeight + "px", 100 > a ? journeys_utils.isHalfPage = !0 : journeys_utils.isFullPage = !0);
 };
 journeys_utils.getMetadata = function(a) {
   if (a = a.match(journeys_utils.jsonRe)) {
