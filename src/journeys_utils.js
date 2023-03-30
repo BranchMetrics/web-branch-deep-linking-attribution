@@ -72,13 +72,8 @@ journeys_utils.journeyLinkData = null;
  * @param {string} bannerHeight
  */
 journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(bannerHeight) {
-	if (bannerHeight.includes('vh')) {
-		return bannerHeight.replace('vh', '');
-	}
-	if (bannerHeight.includes('%')) {
-		return bannerHeight.replace('%', '');
-	}
-	return false;
+	var unitsRegex = /vh|%/gi; // search and replace vh, %
+	return unitsRegex.test(bannerHeight) ? bannerHeight.replace(unitsRegex, '') : false;
 }
 
 
