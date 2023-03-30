@@ -7,12 +7,17 @@ goog.require('utils');
 
 journeys_utils._callback_index = 1;
 
-// defaults. These will change based on banner info
-journeys_utils.position = 'top';
-journeys_utils.sticky = 'absolute';
-journeys_utils.bannerHeight = '76px';
-journeys_utils.isFullPage = false;
-journeys_utils.isHalfPage = false;
+function setDefaultBannerProperties() {
+	// defaults. These will change based on banner info
+	journeys_utils.position = 'top';
+	journeys_utils.sticky = 'absolute';
+	journeys_utils.bannerHeight = '76px';
+	journeys_utils.isFullPage = false;
+	journeys_utils.isHalfPage = false;
+}
+
+setDefaultBannerProperties();
+
 journeys_utils.divToInjectParents = [];
 journeys_utils.isSafeAreaEnabled = false;
 
@@ -63,6 +68,16 @@ journeys_utils.previousDivToInjectParents = [];
 journeys_utils.journeyLinkData = null;
 
 /***
+ * @function journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight
+ * @param {string} bannerHeight
+ */
+journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(bannerHeight) {
+	var unitsRegex = /vh|%/gi; // search and replace vh, %
+	return unitsRegex.test(bannerHeight) ? bannerHeight.replace(unitsRegex, '') : false;
+}
+
+
+/***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
  *
@@ -71,6 +86,7 @@ journeys_utils.journeyLinkData = null;
  * For full page banners, gets view width/height to set fixed pixel values
  */
 journeys_utils.setPositionAndHeight = function(html) {
+	setDefaultBannerProperties();
 	var metadata = journeys_utils.getMetadata(html) || {};
 	if (metadata && metadata['bannerHeight'] && metadata['position'] && metadata['sticky']) {
 		journeys_utils.bannerHeight = metadata['bannerHeight'];
@@ -92,14 +108,11 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.sticky = 'fixed';
 		}
 	}
-
-	// convert full page to fixed pixel height
-	if (journeys_utils.bannerHeight.indexOf('vh') !== -1 || journeys_utils.bannerHeight.indexOf('%') !== -1) {
-		var heightNumber = journeys_utils.bannerHeight.indexOf('vh')
-			? journeys_utils.bannerHeight.slice(0, -2)
-			: journeys_utils.bannerHeight.slice(0, -1);
-		journeys_utils.bannerHeight = (heightNumber/100) * journeys_utils.windowHeight + 'px';
-		if (heightNumber < 100) {
+	var relativeBannerHeightOrFalse = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight);
+	if (relativeBannerHeightOrFalse) {
+		var bannerHeightInPixels = (relativeBannerHeightOrFalse/100) * journeys_utils.windowHeight + 'px';
+		journeys_utils.bannerHeight = bannerHeightInPixels;
+		if (relativeBannerHeightOrFalse < 100) {
 			journeys_utils.isHalfPage = true;
 		}
 		else {
