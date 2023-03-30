@@ -2309,7 +2309,8 @@ journeys_utils.previousPosition = "";
 journeys_utils.previousDivToInjectParents = [];
 journeys_utils.journeyLinkData = null;
 journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(a) {
-  return a.includes("vh") ? a.replace("vh", "") : a.includes("%") ? a.replace("%", "") : !1;
+  var b = /vh|%/gi;
+  return b.test(a) ? a.replace(b, "") : !1;
 };
 journeys_utils.setPositionAndHeight = function(a) {
   setDefaultBannerProperties();
@@ -2327,8 +2328,9 @@ journeys_utils.setPositionAndHeight = function(a) {
       journeys_utils.position = "bottom", journeys_utils.sticky = "fixed";
     }
   }
-  a = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight);
-  !1 !== a && (journeys_utils.bannerHeight = a / 100 * journeys_utils.windowHeight + "px", 100 > a ? journeys_utils.isHalfPage = !0 : journeys_utils.isFullPage = !0);
+  if (a = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight)) {
+    journeys_utils.bannerHeight = a / 100 * journeys_utils.windowHeight + "px", 100 > a ? journeys_utils.isHalfPage = !0 : journeys_utils.isFullPage = !0;
+  }
 };
 journeys_utils.getMetadata = function(a) {
   if (a = a.match(journeys_utils.jsonRe)) {

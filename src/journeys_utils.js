@@ -108,17 +108,16 @@ journeys_utils.setPositionAndHeight = function(html) {
 			journeys_utils.sticky = 'fixed';
 		}
 	}
-	const relativeBannerHeightOrFalse = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight);
-	if (relativeBannerHeightOrFalse === false) {
-		return;
-	}
-	const bannerHeightInPixels = (relativeBannerHeightOrFalse/100) * journeys_utils.windowHeight + 'px';
-	journeys_utils.bannerHeight = bannerHeightInPixels;
-	if (relativeBannerHeightOrFalse < 100) {
-		journeys_utils.isHalfPage = true;
-	}
-	else {
-		journeys_utils.isFullPage = true;
+	var relativeBannerHeightOrFalse = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight);
+	if (relativeBannerHeightOrFalse) {
+		var bannerHeightInPixels = (relativeBannerHeightOrFalse/100) * journeys_utils.windowHeight + 'px';
+		journeys_utils.bannerHeight = bannerHeightInPixels;
+		if (relativeBannerHeightOrFalse < 100) {
+			journeys_utils.isHalfPage = true;
+		}
+		else {
+			journeys_utils.isFullPage = true;
+		}
 	}
 }
 
