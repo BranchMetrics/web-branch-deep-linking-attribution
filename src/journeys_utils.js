@@ -7,12 +7,17 @@ goog.require('utils');
 
 journeys_utils._callback_index = 1;
 
-// defaults. These will change based on banner info
-journeys_utils.position = 'top';
-journeys_utils.sticky = 'absolute';
-journeys_utils.bannerHeight = '76px';
-journeys_utils.isFullPage = false;
-journeys_utils.isHalfPage = false;
+function setDefaultBannerProperties() {
+	// defaults. These will change based on banner info
+	journeys_utils.position = 'top';
+	journeys_utils.sticky = 'absolute';
+	journeys_utils.bannerHeight = '76px';
+	journeys_utils.isFullPage = false;
+	journeys_utils.isHalfPage = false;
+}
+
+setDefaultBannerProperties();
+
 journeys_utils.divToInjectParents = [];
 journeys_utils.isSafeAreaEnabled = false;
 
@@ -86,6 +91,7 @@ journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(bannerHe
  * For full page banners, gets view width/height to set fixed pixel values
  */
 journeys_utils.setPositionAndHeight = function(html) {
+	setDefaultBannerProperties();
 	var metadata = journeys_utils.getMetadata(html) || {};
 	if (metadata && metadata['bannerHeight'] && metadata['position'] && metadata['sticky']) {
 		journeys_utils.bannerHeight = metadata['bannerHeight'];

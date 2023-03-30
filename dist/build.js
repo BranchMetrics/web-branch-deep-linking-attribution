@@ -2273,7 +2273,17 @@ var task_queue = function() {
   };
 };
 // Input 14
-var journeys_utils = {_callback_index:1, position:"top", sticky:"absolute", bannerHeight:"76px", isFullPage:!1, isHalfPage:!1, divToInjectParents:[], isSafeAreaEnabled:!1};
+var journeys_utils = {_callback_index:1};
+function setDefaultBannerProperties() {
+  journeys_utils.position = "top";
+  journeys_utils.sticky = "absolute";
+  journeys_utils.bannerHeight = "76px";
+  journeys_utils.isFullPage = !1;
+  journeys_utils.isHalfPage = !1;
+}
+setDefaultBannerProperties();
+journeys_utils.divToInjectParents = [];
+journeys_utils.isSafeAreaEnabled = !1;
 journeys_utils.windowHeight = window.innerHeight;
 journeys_utils.windowWidth = window.innerWidth;
 window.innerHeight < window.innerWidth && (journeys_utils.windowHeight = window.innerWidth, journeys_utils.windowWidth = window.innerHeight);
@@ -2302,6 +2312,7 @@ journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(a) {
   return a.includes("vh") ? a.replace("vh", "") : a.includes("%") ? a.replace("%", "") : !1;
 };
 journeys_utils.setPositionAndHeight = function(a) {
+  setDefaultBannerProperties();
   var b = journeys_utils.getMetadata(a) || {};
   if (b && b.bannerHeight && b.position && b.sticky) {
     journeys_utils.bannerHeight = b.bannerHeight, journeys_utils.position = b.position, journeys_utils.sticky = b.sticky;
