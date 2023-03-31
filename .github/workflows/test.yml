@@ -43,4 +43,4 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-1
       - name: dry run aws
-        run: aws s3 cp --dryrun example.html s3://branch-cdn/example-test.html
+        run: aws s3 cp example.html s3://branch-cdn/example-test.html
