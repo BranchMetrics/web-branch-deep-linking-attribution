@@ -1,56 +1,44 @@
-name: demo
+# This is a deploy workflow for web-sdk
+
+name: Deploy
+
+# Controls when the action will run.
 on:
-  workflow_dispatch:
-    inputs:
-      branch_name:
-          description: 'Name of the branch'
-          required: true
-          default: 'main'
-            
-      perform_deploy_qa:
-          description: 'Want to deploy to QA'
-          required: true
-          type: boolean
-        
-      perform_deploy_prod:
-          description: 'Want to deploy to Prod'
-          required: true
-          type: boolean
-        
-      version:
-          type: choice
-          description: Version for Prod release
-          options: 
-           - major
-           - minor
-           - patch
-  push:
-    branches:
-      - main
-      - production
-      - releases/**
-    paths-ignore:
-      - docs/**
-      - README.md
+  # Triggers the workflow on push or pull request events but only for the master branch
+  # push:
+  #   branches: [main]
   pull_request:
-    types: [opened, reopened, edited, closed]
-    branches:
-      - main
-      - production
-      - releases/**
-    paths-ignore:
-      - docs/**
-      - README.md
-        
+    types: [opened,reopened,edited,synchronize]
+
 env:
-  BRANCH_NAME: '${{ github.event.inputs.branch_name || github.head_ref || github.ref_name  }}'
+  JAVA_VERSION: 11
+  JAVA_DISTRIBUTION: 'adopt'
+  NODE_VERSION: 14
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # This workflow contains a single job called "build"
   build:
-    runs-on: [small]
+    # The type of runner that the job will run on
+    runs-on: [ubuntu-latest]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Run tests
-        run: echo "Branch name is $BRANCH_NAME"
-      - name: Echo
-        run: |
-            echo "Version selected is, ${{ github.event.inputs.version }}!"
-            echo "- qa ${{ inputs.perform_deploy_qa }}!"
+      # Use the node version specified in the strategy
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Git checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
