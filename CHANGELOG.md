@@ -3,6 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.74.0] - 2023-04-04
+- INTENG-18040 Convert percentage banner height to pixels
+
 ## [2.73.0] - 2023-03-28
 - SDK-1840 Reduced User Agent - Send client hints for supported chromium browsers
 
