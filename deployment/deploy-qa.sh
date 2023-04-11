@@ -26,7 +26,7 @@ NC='\033[0m'
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-staging-latest.min.js --cache-control "max-age=300"
   aws s3 cp dist/example.html s3://branch-cdn/example-staging.html
   
-  echo -en "Invalidating cloudfrond distribution for staging ...\n"
+  echo -en "Invalidating cloudfront distribution for staging ...\n"
   aws configure set preview.cloudfront true
   aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-staging-latest.min.js /example-staging
 # Exit prompts
