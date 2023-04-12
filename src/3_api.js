@@ -92,6 +92,17 @@
 		}
 	};
 
+	if (resource.endpoint === '/v1/has-app') {
+		try {
+			resource.queryPart = appendKeyOrId(data, resource.queryPart);
+		}
+		catch (e) {
+			return {
+				error: e.message
+			};
+		}
+	}
+
 	if (typeof resource.queryPart !== 'undefined') {
 		for (k in resource.queryPart) {
 			if (!resource.queryPart.hasOwnProperty(k)) {
@@ -358,7 +369,7 @@
 		utils.currentRequestBrttTag = resource.endpoint + '-brtt';
 	}
 
-	if ((resource.endpoint === "/v1/url") && Object.keys(utils.instrumentation).length > 1) {
+	if ((resource.endpoint === "/v1/url" || resource.endpoint === "/v1/has-app") && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];
 		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));
 		utils.instrumentation = {};
