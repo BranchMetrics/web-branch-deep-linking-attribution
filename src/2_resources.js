@@ -215,6 +215,16 @@ resources.deepview = {
 	})
 };
 
+resources.hasApp = {
+	destination: config.api_endpoint,
+	endpoint: "/v1/has-app",
+	method: utils.httpMethod.GET,
+	params: {
+		"browser_fingerprint_id": validator(true, validationTypes.STRING),
+		"instrumentation": validator(false, validationTypes.STRING)
+	}
+};
+
 resources.event = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/event",
