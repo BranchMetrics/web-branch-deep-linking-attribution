@@ -402,7 +402,7 @@ Branch.prototype['init'] = wrap(
 		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
 		var freshInstall = !self.identity_id; // initialized from local storage above
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
-		var checkHasApp = function(cb) {
+		var fetchLatestBrowserFingerPrintID = function(cb) {
 			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 			var currentSessionData = session.get(self._storage) || {};
 			var permData = session.get(self._storage, true) || {};
@@ -425,24 +425,11 @@ Branch.prototype['init'] = wrap(
 					}
 				);
 			}
-			self._api(
-				resources.hasApp,
-				{ "browser_fingerprint_id": currentSessionData['browser_fingerprint_id'] },
-				function(err, has_app) {
-					if (err) {
-						self.init_state_fail_code = init_state_fail_codes.HAS_APP_FAILED;
-						self.init_state_fail_details = err.message;
-					}
-					if (!err && has_app && !currentSessionData['has_app']) {
-						currentSessionData['has_app'] = true;
-						session.update(self._storage, currentSessionData);
-						self._publishEvent('didDownloadApp');
-					}
-					if (cb) {
-						cb(null, currentSessionData);
-					}
-				}
-			);
+			if (cb) {
+				cb(null, currentSessionData);
+			}
+
+
 		};
 
 		var restoreIdentityOnInstall = function(data) {
@@ -565,7 +552,7 @@ Branch.prototype['init'] = wrap(
 					self.changeEventListenerAdded = true;
 					document.addEventListener(changeEvent, function() {
 						if (!document[hidden]) {
-							checkHasApp(null);
+							fetchLatestBrowserFingerPrintID(null);
 							if (typeof self._deepviewRequestForReplay === 'function') {
 								self._deepviewRequestForReplay();
 							}
@@ -579,7 +566,7 @@ Branch.prototype['init'] = wrap(
 			session.update(self._storage, { "data": "" });
 			session.update(self._storage, { "referring_link": "" });
 			attachVisibilityEvent();
-			checkHasApp(finishInit);
+			fetchLatestBrowserFingerPrintID(finishInit);
 			return;
 		}
 
