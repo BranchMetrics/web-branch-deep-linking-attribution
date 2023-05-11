@@ -6,13 +6,11 @@
 	"files": [
 		"dist/build.min.js"
 	],
-	"precommit": [
-		"lint"
-	],
 	"scripts": {
 		"lint": "./lint.sh",
 		"test": "nyc --all mocha",
-		"builddocs": "jsdox src/3_branch_web.js --output docs/web"
+		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
+		"prepare": "husky install"
 	},
 	"repository": {
 		"type": "git",
@@ -29,7 +27,10 @@
 	},
 	"homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
 	"devDependencies": {
+		"@commitlint/cli": "^17.5.1",
+		"@commitlint/config-conventional": "^17.4.4",
 		"falafel": "1.0.1",
+		"husky": "^8.0.3",
 		"i": "^0.3.7",
 		"jscs": "2.0.0",
 		"jsdom": "21.1.0",
