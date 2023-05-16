@@ -884,6 +884,15 @@ journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
 	return pageviewMetadata;
 };
 
+const removeIframeBodyTransformCss = function() {
+	const barnchIframeCSS = document.getElementById('branch-iframe-css').innerHTML.replace(/\n/g, "");
+
+	if (barnchIframeCSS.match(/body\s*\{\s*transform:\s*translate\(.*?\)/g)) {
+		const newCss = barnchIframeCSS.replace(/transform:\s*translate\(.*?\)/g, 'transform: none');
+		document.getElementById('branch-iframe-css').innerHTML = newCss;
+	}
+}
+
 /***
  * @function journeys_utils.animateBannerExit
  * @param {Object} banner
@@ -910,6 +919,7 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	}
 
 	if (journeys_utils.position === 'top') {
+		removeIframeBodyTransformCss();
 		banner.style.top = '-' + journeys_utils.bannerHeight;
 	}
 	else if (journeys_utils.position === 'bottom') {
