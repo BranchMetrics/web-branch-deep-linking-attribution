@@ -282,7 +282,7 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 		scriptTag.type = 'text/javascript';
 		scriptTag.text = `
 			var  focusableElements =
-					'button, [href], input, select, textarea, [role="button"], h1, [role="text"]';
+					'button, [href], input, select, textarea, [role="button"], h1, [role="text"], .branch-banner-content';
 			var modal = document.getElementById('branch-banner');
 			var focusableContent = modal.querySelectorAll(focusableElements);
 			var firstFocusableElement = focusableContent[0];
