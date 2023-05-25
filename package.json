@@ -7,7 +7,7 @@
 		"dist/build.min.js"
 	],
 	"scripts": {
-		"commit": "cz",
+		"commit": "./node_modules/cz-customizable/standalone.js",
 		"lint": "./lint.sh",
 		"test": "nyc --all mocha",
 		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
