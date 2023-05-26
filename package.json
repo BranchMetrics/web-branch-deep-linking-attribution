@@ -28,8 +28,6 @@
 	},
 	"homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
 	"devDependencies": {
-		"@commitlint/cli": "^17.6.3",
-		"@commitlint/config-conventional": "^17.6.3",
 		"commitizen": "^4.3.0",
 		"cz-customizable": "^7.0.0",
 		"falafel": "1.0.1",
