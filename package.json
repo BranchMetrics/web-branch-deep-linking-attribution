@@ -6,13 +6,12 @@
 	"files": [
 		"dist/build.min.js"
 	],
-	"precommit": [
-		"lint"
-	],
 	"scripts": {
+		"commit": "./node_modules/cz-customizable/standalone.js",
 		"lint": "./lint.sh",
 		"test": "nyc --all mocha",
-		"builddocs": "jsdox src/3_branch_web.js --output docs/web"
+		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
+		"prepare": "husky install"
 	},
 	"repository": {
 		"type": "git",
@@ -29,7 +28,10 @@
 	},
 	"homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
 	"devDependencies": {
+		"commitizen": "^4.3.0",
+		"cz-customizable": "^7.0.0",
 		"falafel": "1.0.1",
+		"husky": "^8.0.0",
 		"i": "^0.3.7",
 		"jscs": "2.0.0",
 		"jsdom": "21.1.0",
@@ -45,5 +47,13 @@
 		"google-closure-deps": "^20230103.0.0",
 		"google-closure-library": "^20230103.0.0"
 	},
-	"build": "2.71.0"
+	"build": "2.71.0",
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-customizable"
+		},
+		"cz-customizable": {
+			"config": ".cz-config.js"
+		}
+	}
 }
