@@ -38,8 +38,16 @@ jobs:
         if: success() || failure()
         with:
            name: Unit Tests
+           fail-on-error: true,
            path: test-results.json    # Path to test results
            reporter: mocha-json        # Format of test results
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        id: test-results
+        if: always()
+        with:
+          files: "test-results.json"
 
   test-lint:
     name: Lint
