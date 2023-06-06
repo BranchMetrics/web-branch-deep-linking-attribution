@@ -3,13 +3,12 @@ on:
   pull_request:
     types: [opened,reopened,edited,synchronize]
     branches:
-      - main
+      - master
       - production
     paths-ignore:
       - docs/**
       - README.md
 env:
-  BRANCH_NAME: '${{ github.event.inputs.branch_name || github.head_ref || github.ref_name  }}'
   NODE_VERSION: 16
   JAVA_VERSION: 11
   JAVA_DISTRIBUTION: 'adopt'
@@ -29,7 +28,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Run tests
         run: npm run test
@@ -48,7 +47,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Lint tests
         run: npm run lint
@@ -73,7 +72,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Call the Build bash script for QA
         run:  bash ${GITHUB_WORKSPACE}/deployment/build-test.sh
