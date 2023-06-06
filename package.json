@@ -12,6 +12,7 @@
 		"clean": "npm-run-all clean:*",
 		"clean:dist": "rimraf dist/*",
 		"clean:coverage": "rimraf .nyc_output coverage",
+		"clean:test-report": "rimraf test-results.json",
 		"clean-and-develop": "npm-run-all ci clean build cover",
 		"commit": "./node_modules/cz-customizable/standalone.js",
 		"cover": "npm-run-all cover:*",
@@ -19,6 +20,7 @@
 	    "cover:report": "nyc --all mocha",
 		"lint": "./lint.sh",
 		"test": "mocha",
+		"test-report": "mocha --reporter json > test-results.json",
 		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
 		"prepare": "husky install"
 	},
