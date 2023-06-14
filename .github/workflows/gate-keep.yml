@@ -49,6 +49,12 @@ jobs:
         with:
           files: "test-results.json"
 
+      - name: Run cover
+        run: npm run cover
+
+      - name : upload codecov
+        uses: codecov/codecov-action@v3
+
   test-lint:
     name: Lint
     runs-on: [ ubuntu-latest ]
