@@ -980,16 +980,16 @@ describe('utils', function() {
 	});
 	describe('Tests for utils.userPreferences.shouldBlockRequest()', function() {
 		it('should return true with v1/bogus as url endpoint', function() {
-			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/bogus'));
+			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/bogus'));
 		});
 		it('should return true with v1/open as url endpoint and no request data provided', function() {
-			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/open'));
+			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/open'));
 		});
 		it('should return false with v1/open as url endpoint and valid request data provided', function() {
-			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/open', { link_identifier: '111111111111' }));
+			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/open', { link_identifier: '111111111111' }));
 		});
 		it('should return true with v1/xyz as url endpoint and with bogus request data', function() {
-			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api.branch.io/v1/xyz', { link_identifier: '111111111111' }));
+			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/xyz', { link_identifier: '111111111111' }));
 		});
 		it('should allow raw links', function() {
 			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://bnctestbed.app.link/abcdefg'));
