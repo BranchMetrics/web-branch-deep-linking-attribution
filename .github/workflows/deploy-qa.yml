@@ -28,17 +28,20 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Run tests
         id: runTests
         run: npm run test
 
+      - name: Run coverage
+        id: runCover
+        if: steps.runTests.outcome == 'success'
+        run: npm run cover
+
       - name : upload codecov
         uses: codecov/codecov-action@v3
-        if: steps.runTests.outcome == 'success'
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        if: steps.runCover.outcome == 'success'
 
   test-lint:
     name: Lint
@@ -54,7 +57,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Lint tests
         run: npm run lint
@@ -80,7 +83,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Call the Build bash script for QA
         id: build

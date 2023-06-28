@@ -7,9 +7,20 @@
 		"dist/build.min.js"
 	],
 	"scripts": {
-		"commit": "./node_modules/cz-customizable/standalone.js",
+		"build": "make",
+		"ci": "npm ci",
+		"clean": "npm-run-all clean:*",
+		"clean:dist": "rimraf dist/*",
+		"clean:coverage": "rimraf .nyc_output coverage",
+		"clean:test-report": "rimraf test-results.json",
+		"clean-and-develop": "npm-run-all ci clean build cover",
+		"commit": "git-cz",
+		"cover": "npm-run-all cover:*",
+		"cover:clean": "npm run clean:coverage",
+	    "cover:report": "nyc mocha",
 		"lint": "./lint.sh",
-		"test": "nyc --all mocha",
+		"test": "mocha",
+		"test-report": "mocha --reporter json > test-results.json",
 		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
 		"prepare": "husky install"
 	},
@@ -31,6 +42,9 @@
 		"commitizen": "^4.3.0",
 		"cz-customizable": "^7.0.0",
 		"falafel": "1.0.1",
+		"google-closure-compiler": "^20230206.0.0",
+		"google-closure-deps": "^20230103.0.0",
+		"google-closure-library": "^20230103.0.0",
 		"husky": "^8.0.0",
 		"i": "^0.3.7",
 		"jscs": "2.0.0",
@@ -38,14 +52,11 @@
 		"jsdom-global": "3.0.2",
 		"jshint": "2.8.0",
 		"mocha": "^10.2.0",
+		"npm-run-all": "^4.1.5",
 		"nyc": "^15.1.0",
 		"precommit-hook": "1.0.7",
-		"sinon": "1.17.3"
-	},
-	"dependencies": {
-		"google-closure-compiler": "^20230206.0.0",
-		"google-closure-deps": "^20230103.0.0",
-		"google-closure-library": "^20230103.0.0"
+		"rimraf": "^5.0.1",
+		"sinon": "15.1.0"
 	},
 	"build": "2.71.0",
 	"config": {

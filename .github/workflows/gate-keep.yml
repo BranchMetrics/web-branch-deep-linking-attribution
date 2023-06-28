@@ -3,13 +3,12 @@ on:
   pull_request:
     types: [opened,reopened,edited,synchronize]
     branches:
-      - main
+      - master
       - production
     paths-ignore:
       - docs/**
       - README.md
 env:
-  BRANCH_NAME: '${{ github.event.inputs.branch_name || github.head_ref || github.ref_name  }}'
   NODE_VERSION: 16
   JAVA_VERSION: 11
   JAVA_DISTRIBUTION: 'adopt'
@@ -29,10 +28,32 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Run tests
-        run: npm run test
+        run: npm run test-report
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+           name: Unit Tests
+           fail-on-error: true,
+           path: test-results.json    # Path to test results
+           reporter: mocha-json        # Format of test results
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        id: test-results
+        if: always()
+        with:
+          files: "test-results.json"
+
+      - name: Run cover
+        run: npm run cover
+
+      - name : upload codecov
+        uses: codecov/codecov-action@v3
 
   test-lint:
     name: Lint
@@ -48,7 +69,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Lint tests
         run: npm run lint
@@ -73,7 +94,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Install dependencies
-        run: npm install
+        run: npm run ci
 
       - name: Call the Build bash script for QA
         run:  bash ${GITHUB_WORKSPACE}/deployment/build-test.sh
