@@ -32,7 +32,7 @@ session.set = function(storage, data, first) {
 
 	if (first && data['referring_link'] && utils.userPreferences.enableExtendedJourneysAssist) {
 		var now = new Date();
-		data.referringLinkExpiry = now.getTime() + utils.extendedJourneysAssistExpiryTime;
+		data['referringLinkExpiry'] = now.getTime() + utils.extendedJourneysAssistExpiryTime;
 	}
 	data = utils.encodeBFPs(data);
 	storage.set('branch_session', goog.json.serialize(data));
