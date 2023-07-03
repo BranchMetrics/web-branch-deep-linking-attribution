@@ -3,6 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.75.0] - 2023-07-03
+- SDK-1996 Fix issue with closure minification of referring link expiry
+
 ## [2.74.0] - 2023-04-04
 - INTENG-18040 Convert percentage banner height to pixels
 
