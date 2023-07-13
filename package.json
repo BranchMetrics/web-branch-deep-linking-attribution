@@ -1,6 +1,6 @@
 {
 	"name": "branch-sdk",
-	"version": "2.75.0",
+	"version": "2.76.0",
 	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
 	"main": "dist/build.min.js",
 	"files": [

@@ -3,6 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.76.0] - 2023-07-13
+- SDK-1897 remove v1/has-app API calls
+
 ## [2.75.0] - 2023-07-03
 - SDK-1996 Fix issue with closure minification of referring link expiry
 
