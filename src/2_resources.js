@@ -144,16 +144,6 @@ resources.logout = {
 	})
 };
 
-resources.profile = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/profile",
-	method: utils.httpMethod.POST,
-	params: defaults({
-		"identity_id": validator(true, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
-	})
-};
-
 resources.link = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/url",
