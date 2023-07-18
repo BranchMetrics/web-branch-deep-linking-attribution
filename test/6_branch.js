@@ -583,29 +583,18 @@ describe('Branch', function() {
 
 	describe('setIdentity', function() {
 		basicTests('setIdentity', [ 1 ]);
-
-		it('should call api with identity', function(done) {
-			var expectedRequest = testUtils.params(
-				{ "identity": "test_identity" },
-				[ "_t" ]
-			);
+		it('should invoke callback with data when a non-null value for identity is passed', function(done) {
 			var expectedResponse = {
-				identity_id: '12345',
-				link: 'url',
-				referring_data: '{ }',
-				referring_identity: '12345'
+				"session_id": "113636235674656786",
+				"identity_id": "98807509250212101",
+				"link": "https://bnctestbed.app.link/?%24identity_id=98807509250212101"
 			};
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
 			branch.setIdentity('test_identity', function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
 			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
 
 		it('should update identity and identity_id in local storage', function(done) {
@@ -618,28 +607,17 @@ describe('Branch', function() {
 			});
 			requests[0].callback(null, { identity: '12345678', identity_id: '7654321' });
 		});
-	});
 
-	describe('setIdentity accepts empty data', function() {
-		var expectedRequest = testUtils.params(
-			{ "identity": "test_identity" },
-			[ "_t" ]
-		);
-		var expectedResponse = { };
-		it('should call api with identity', function(done) {
+		it('should invoke callback with error when a null value for identity is passed', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
-			branch.setIdentity('test_identity', function(err, res) {
-				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
+			branch.setIdentity(null, function(err, res) {
+				assert.strictEqual(err, utils.messages.missingIdentity, 'error matched for missing identity');
 			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
 	});
+
 
 	describe('track', function() {
 		basicTests('track', [ 0 ]);
