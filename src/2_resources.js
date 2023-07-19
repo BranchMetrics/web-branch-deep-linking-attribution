@@ -135,15 +135,6 @@ resources.linkClick = {
 	}
 };
 
-resources.logout = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/logout",
-	method: utils.httpMethod.POST,
-	params: defaults({
-		"session_id": validator(true, validationTypes.STRING)
-	})
-};
-
 resources.profile = {
 	destination: config.api_endpoint,
 	endpoint: "/v1/profile",
