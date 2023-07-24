@@ -787,7 +787,8 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		var data = {
 			identity_id: self.identity_id,
 			session_id: self.session_id,
-			link: self.sessionLink
+			link: self.sessionLink,
+			developer_identity : identity
 		};
 		self.identity = identity;
 		// store the identity
