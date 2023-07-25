@@ -587,7 +587,8 @@ describe('Branch', function() {
 			var expectedResponse = {
 				"session_id": "113636235674656786",
 				"identity_id": "98807509250212101",
-				"link": "https://bnctestbed.app.link/?%24identity_id=98807509250212101"
+				"link": "https://bnctestbed.app.link/?%24identity_id=98807509250212101",
+				"developer_identity": "test_identity"
 			};
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
