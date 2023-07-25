@@ -600,6 +600,7 @@ Branch.prototype['init'] = wrap(
 							{
 								"link_identifier": link_identifier,
 								"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
+								"identity": permData['identity'] ? permData['identity'] : null,
 								"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 								"options": options,
 								"initial_referrer": utils.getInitialReferrer(self._referringLink()),
@@ -638,6 +639,7 @@ Branch.prototype['init'] = wrap(
 					{
 						"link_identifier": link_identifier,
 						"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
+						"identity": permData['identity'] ? permData['identity'] : null,
 						"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 						"options": options,
 						"initial_referrer": utils.getInitialReferrer(self._referringLink()),
