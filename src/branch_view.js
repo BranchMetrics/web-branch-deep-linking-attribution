@@ -251,6 +251,7 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	if (linkData && linkData['+referrer']) {
 		obj.data['+referrer'] = linkData['+referrer'];
 	}
+	obj['session_referring_link_data'] = sessionStorage['data'] || null;
 	obj = utils.cleanLinkData(obj);
 	return obj;
 };
