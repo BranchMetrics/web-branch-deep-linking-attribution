@@ -837,17 +837,7 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	var self = this;
 	var data = {
-		"data_parsed": null,
-		"data": null,
-		"referring_link": null,
-		"referringLinkExpiry": null,
-		"click_id": null,
-		"link_click_id": null,
-		"identity": null,
-		"session_id": self.session_id,
-		"identity_id": self.identity_id,
-		"link": self.sessionLink || null,
-		"device_fingerprint_id": self.device_fingerprint_id || null
+		"identity": null
 	};
 
 	self.identity = null;
