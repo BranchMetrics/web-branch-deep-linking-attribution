@@ -3,7 +3,7 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
-## [2.77.0] - 2023-08-08
+## [2.78.0] - 2023-08-08
 - feat(SDK-2049): send referring link data to pageview
 - fix(SDK-2016): Send raw identity to v1/open besides identity_id
 
