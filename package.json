@@ -44,7 +44,7 @@
 		"falafel": "1.0.1",
 		"google-closure-compiler": "^20230206.0.0",
 		"google-closure-deps": "^20230103.0.0",
-		"google-closure-library": "^20230103.0.0",
+		"google-closure-library": "^20230502.0.0",
 		"husky": "^8.0.0",
 		"i": "^0.3.7",
 		"jscs": "2.0.0",
