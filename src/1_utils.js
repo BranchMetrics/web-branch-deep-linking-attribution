@@ -201,7 +201,8 @@ utils.messages = {
 	blockedByClient: 'Request blocked by client, probably adblock',
 	missingUrl: 'Required argument: URL, is missing',
 	trackingDisabled: 'Requested operation cannot be completed since tracking is disabled',
-	deepviewNotCalled: 'Cannot call Deepview CTA, please call branch.deepview() first'
+	deepviewNotCalled: 'Cannot call Deepview CTA, please call branch.deepview() first',
+	missingIdentity: 'setIdentity - required argument identity should have a non-null value'
 };
 
 /**

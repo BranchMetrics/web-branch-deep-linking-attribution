@@ -98,6 +98,7 @@ resources.open = {
 		"browser_fingerprint_id": validator(false, validationTypes.STRING),
 		"alternative_browser_fingerprint_id": validator(false, validationTypes.STRING),
 		"identity_id": validator(false, validationTypes.STRING),
+		"identity": validator(false, validationTypes.STRING),
 		"link_identifier": validator(false, validationTypes.STRING),
 		"sdk": validator(false, validationTypes.STRING),
 		"options": validator(false, validationTypes.OBJECT),
@@ -135,15 +136,6 @@ resources.linkClick = {
 	}
 };
 
-resources.profile = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/profile",
-	method: utils.httpMethod.POST,
-	params: defaults({
-		"identity_id": validator(true, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
-	})
-};
 
 resources.link = {
 	destination: config.api_endpoint,
@@ -283,7 +275,8 @@ resources.pageview = {
 		"audience_rule_id": validator(false, validationTypes.STRING),
 		"journey_dismissals": validator(false, validationTypes.OBJECT),
 		"identity_id": validator(false, validationTypes.STRING),
-		"identity": validator(true, validationTypes.STRING)
+		"identity": validator(true, validationTypes.STRING),
+		"session_referring_link_data": validator(false, validationTypes.STRING)
 	})
 };
 

@@ -600,6 +600,7 @@ Branch.prototype['init'] = wrap(
 							{
 								"link_identifier": link_identifier,
 								"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
+								"identity": permData['identity'] ? permData['identity'] : null,
 								"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 								"options": options,
 								"initial_referrer": utils.getInitialReferrer(self._referringLink()),
@@ -638,6 +639,7 @@ Branch.prototype['init'] = wrap(
 					{
 						"link_identifier": link_identifier,
 						"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
+						"identity": permData['identity'] ? permData['identity'] : null,
 						"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
 						"options": options,
 						"initial_referrer": utils.getInitialReferrer(self._referringLink()),
@@ -783,32 +785,22 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
 /*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
 	var self = this;
-	this._api(
-		resources.profile,
-		{
-			"identity": identity
-		},
-		function(err, data) {
-			if (err) {
-				done(err);
-			}
+	if (identity) {
+		var data = {
+			identity_id: self.identity_id,
+			session_id: self.session_id,
+			link: self.sessionLink,
+			developer_identity: identity
+		};
+		self.identity = identity;
+		// store the identity
+		session.patch(self._storage, { "identity": identity }, true);
+		done(null, data);
 
-			data = data || { };
-			self.identity_id = data['identity_id'] ? data['identity_id'].toString() : null;
-			self.sessionLink = data['link'];
-
-			self.identity = identity;
-			data['developer_identity'] = identity;
-
-			data['referring_data_parsed'] = data['referring_data'] ?
-				safejson.parse(data['referring_data']) :
-				null;
-
-			// /v1/profile will return a new identity_id, but the same session_id
-			session.patch(self._storage, { "identity": identity, "identity_id": self.identity_id }, true);
-			done(null, data);
-		}
-	);
+	}
+	else {
+		done(new Error(utils.message(utils.messages.missingIdentity)));
+	}
 });
 
 /**

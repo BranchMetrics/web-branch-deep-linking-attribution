@@ -7,7 +7,7 @@ updates:
     schedule:
       interval: "weekly"
     # Raise pull requests against the "production" branch
-    target-branch: "production"
+    target-branch: "master"
     # Allow up to 10 open pull requests
     open-pull-requests-limit: 10
     # Use custom labels on pull requests for Docker version updates

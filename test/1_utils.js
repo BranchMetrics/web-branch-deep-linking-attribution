@@ -301,6 +301,14 @@ describe('utils', function() {
 				'Expected Missing url message produced'
 			);
 		});
+
+		it('should produce a missing identity error', function() {
+			assert.strictEqual(
+				utils.message(utils.messages.missingIdentity),
+				'setIdentity - required argument identity should have a non-null value',
+				'Expected Missing identity message produced'
+			);
+		});
 	});
 
 	describe('getParamValue', function() {
