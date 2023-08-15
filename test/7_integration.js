@@ -290,41 +290,6 @@ describe('Integration tests', function() {
 		});
 	});
 
-	describe('logout', function() {
-		it('should make two requests and logout session', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(5), done);
-			branchInit(assert);
-			branch.logout(function(err, data) {
-				assert.strictEqual(err, null, 'Expect no err');
-				assert.strictEqual(branch.session_id, newSessionId, 'branch session was replaced');
-				assert.strictEqual(
-					branch.identity_id,
-					newIdentityId,
-					'branch identity was replaced'
-				);
-				assert.strictEqual(branch.sessionLink, newLink, 'link was replaced');
-			});
-			var newSessionId = 'new_session';
-			var newIdentityId = 'new_id';
-			var newLink = 'new_link';
-
-			assert.strictEqual(
-				requests.length,
-				indexOfLastInitRequest(3),
-				'Expect requests length'
-			);
-			requests[indexOfLastInitRequest(2)].respond(
-				200,
-				{ "Content-Type": "application/json" },
-				JSON.stringify({
-					"session_id": newSessionId,
-					"identity_id": newIdentityId,
-					"link": newLink
-				})
-			);
-		});
-	});
-
 	describe('getBrowserFingerprintId', function() {
 		it('it should return browser-fingerprint-id with value 79336952217731267', function(done) {
 			var assert = testUtils.plan(numberOfAsserts(1), done);

@@ -828,36 +828,16 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 /*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	var self = this;
-	this._api(resources.logout, { }, function(err, data) {
-		if (err) {
-			done(err);
-		}
+	var data = {
+		"identity": null
+	};
 
-		data = data || { };
-		data = {
-			"data_parsed": null,
-			"data": null,
-			"referring_link": null,
-			"click_id": null,
-			"link_click_id": null,
-			"identity": null, // data.identity is usually/always null anyway, but force it here
-			"session_id": data['session_id'],
-			"identity_id": data['identity_id'],
-			"link": data['link'],
-			"device_fingerprint_id": self.device_fingerprint_id || null
-		};
+	self.identity = null;
+	// make sure to update both session and local. removeNull = true deletes, in particular,
+	// identity instead of inserting null in storage.
+	session.patch(self._storage, data, /* updateLocalStorage */ true, /* removeNull */ true);
 
-		// /v1/logout will return a new identity_id and a new session_id
-		self.sessionLink = data['link'];
-		self.session_id = data['session_id'];
-		self.identity_id = data['identity_id'];
-		self.identity = null;
-		// make sure to update both session and local. removeNull = true deletes, in particular,
-		// identity instead of inserting null in storage.
-		session.patch(self._storage, data, /* updateLocalStorage */ true, /* removeNull */ true);
-
-		done(null);
-	});
+	done(null);
 });
 
 Branch.prototype['getBrowserFingerprintId'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
