@@ -835,17 +835,6 @@ describe('Branch', function() {
 		});
 	});
 
-	describe('sendSMS', function() {
-		basicTests('sendSMS', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
-		it('should print console warning about method deprecation for sendMS', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.sendSMS();
-			assert(spy.calledWith("SMS feature has been deprecated. This is no-op."));
-
-		});
-	});
 	describe('banner', function() {
 		basicTests('banner', [ 0 ]);
 
@@ -1172,72 +1161,6 @@ describe('Branch', function() {
 			branch.deepviewCta(function(err) {
 				assert.strictEqual(err, undefined, 'no error should be present in callback');
 			});
-		});
-	});
-
-	describe('Credits', function() {
-		basicTests('referrals', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
-		it('should print console warning about method deprecation for referrals', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.referrals();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation getCode', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.getCode();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation validateCode', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.validateCode();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation applyCode', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.applyCode();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation credits', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.credits();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation creditHistory', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.creditHistory();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation redeem', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.redeem();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-	});
-
-	describe('AppIndexing', function() {
-		basicTests('autoAppIndex', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
-		it('should print console warning about method deprecation for autoAppIndex', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.autoAppIndex();
-			assert(spy.calledWith("autoAppIndex feature has been deprecated. This is no-op."));
-
 		});
 	});
 	describe('addListener', function() {

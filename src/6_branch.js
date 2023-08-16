@@ -1253,13 +1253,6 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 	});
 });
 
-/** =WEB
- * @function Branch.sendSMS
- * /** */
-Branch.prototype['sendSMS'] = function() {
-	console.warn("SMS feature has been deprecated. This is no-op.");
-};
-
 /**
  * @function Branch.qrCode
  * @param {Object} linkData - _required_ - object of all link data, same as branch.link().
@@ -1516,24 +1509,6 @@ Branch.prototype._windowRedirect = function(url) {
  * });
  * ```
  *
- * ___
- *
- * # Referral system rewarding functionality
- * In a standard referral system, you have 2 parties: the original user and the invitee. Our system
- * is flexible enough to handle rewards for all users for any actions. Here are a couple example
- * scenarios:
- * 1. Reward the original user for taking action (eg. inviting, purchasing, etc)
- * 2. Reward the invitee for installing the app from the original user's referral link
- * 3. Reward the original user when the invitee takes action (eg. give the original user credit when
- *     their the invitee buys something)
- *
- * These reward definitions are created on the dashboard, under the 'Reward Rules' section in the
- * 'Referrals' tab on the dashboard.
- *
- * Warning: For a referral program, you should not use unique awards for custom events and redeem
- * pre-identify call. This can allow users to cheat the system.
- *
- * ___
  *
  */
 /*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
@@ -1554,186 +1529,6 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(do
 	this._deepviewCta();
 	done();
 });
-
-Branch.prototype['referrals'] = function() {
-	console.warn("Credits feature has been deprecated. This is no-op.");
-};
-
-/**
- * Removing from documentation
- */
-Branch.prototype['getCode'] = function() {
-	console.warn("Credits feature has been deprecated. This is no-op.");
-};
-
-/**
- * Removing from documentation
- */
-Branch.prototype['validateCode'] = function() {
-	console.warn("Credits feature has been deprecated. This is no-op.");
-};
-
-/**
- * Removing from documentation
- */
-Branch.prototype['applyCode'] = function() {
-	console.warn("Credits feature has been deprecated. This is no-op.");
-};
-
-/**
- * @function Branch.credits
- * @param {function(?Error,Object=)=} callback - _required_ - returns an object with credit data.
- *
- * **[Formerly `showCredits()`](CHANGELOG.md)**
- *
- * This call will retrieve the entire history of credits and redemptions from the individual user.
- *
- * ##### Usage
- * ```js
- * branch.credits(
- *     callback (err, data)
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *     "Error message",
- *     {
- *         'default': 15,
- *         'other bucket': 9
- *     }
- * );
- * ```
- *
- */
-/*** +TOC_HEADING &Credit Functions& ^ALL ***/
-/*** +TOC_ITEM #creditscallback &.credits()& ^ALL ***/
-Branch.prototype['credits'] = function() {
-	console.warn("Credits feature has been deprecated. This is no-op.");
-};
-/**
- * @function Branch.creditHistory
- * @param {Object} options - _optional_ - options controlling the returned history
- * @param {function(?Error,Object=)=} callback - _required_ - returns an array with credit history
- * data
- *
- * This call will retrieve the entire history of credits and redemptions from the individual user.
- * Properties available in the `options` object:
- *
- * | Key | Value
- * | --- | ---
- * | bucket | *optional (max 63 characters)* - The bucket from which to retrieve credit transactions.
- * | begin_after_id | *optional* - The credit transaction id of the last item in the previous retrieval. Retrieval will start from the transaction next to it. If none is specified, retrieval starts from the very beginning in the transaction history, depending on the order.
- * | length | *optional* - The number of credit transactions to retrieve. If none is specified, up to 100 credit transactions will be retrieved.
- * | direction | **DEPRECATED** - The order of credit transactions to retrieve. If direction is `1`, retrieval is in least recent first order; If direction is `0`, or if none is specified, retrieval is in most recent first order. No longer supported.
- *
- * ##### Usage
- *
- * ```js
- * branch.creditHistory(
- *      options,
- *      callback(err, data)
- * );
- * ```
- *
- * ##### Example
- *
- * ```js
- * branch.creditHistory(
- *     {
- *       "length":50,
- *       "direction":0, // no longer supported.
- *       "begin_after_id":"123456789012345",
- *       "bucket":"default"
- *     }
- *     callback (err, data)
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback(
- *     "Error message",
- * [
- *     {
- *         "transaction": {
- *                            "date": "2014-10-14T01:54:40.425Z",
- *                            "id": "50388077461373184",
- *                            "bucket": "default",
- *                            "type": 0,
- *                            "amount": 5
- *                        },
- *         "referrer": "12345678",
- *         "referree": null
- *     },
- *     {
- *         "transaction": {
- *                            "date": "2014-10-14T01:55:09.474Z",
- *                            "id": "50388199301710081",
- *                            "bucket": "default",
- *                            "type": 2,
- *                            "amount": -3
- *                        },
- *         "referrer": null,
- *         "referree": "12345678"
- *     }
- * ]
- * );
- * ```
- *
- * ___
- *
- * ## Credit redemption
- *
- */
-/*** +TOC_ITEM #credithistoryoptions-callback &.creditHistory()& ^ALL ***/
-Branch.prototype['creditHistory'] = function() {
-	console.warn("Credits feature has been deprecated. This is no-op.");
-};
-
-/**
- * @function Branch.redeem
- * @param {number} amount - _required_ - an `amount` (int) of number of credits to redeem
- * @param {string} bucket - _required_ - the name of the `bucket` (string) of which bucket to redeem the credits from
- * @param {function(?Error)=} callback - _optional_ - returns an error if unsuccessful
- *
- * **[Formerly `redeemCredits()`](CHANGELOG.md)**
- *
- * Credits are stored in `buckets`, which you can define as points, currency, whatever makes sense
- * for your app. When you want to redeem credits, call this method with the number of points to be
- * redeemed, and the bucket to redeem them from.
- *
- * ```js
- * branch.redeem(
- *     amount, // Amount of credits to be redeemed
- *     bucket,  // String of bucket name to redeem credits from
- *     callback (err)
- * );
- * ```
- *
- * ##### Example
- *
- * ```js
- * branch.redeem(
- *     5,
- *     "Rubies",
- *     function(err) {
- *         console.log(err);
- *     }
- * );
- * ```
- *
- * ##### Callback Format
- * ```js
- * callback("Error message");
- * ```
- * ___
- */
-/*** +TOC_ITEM #redeemamount-bucket-callback &.redeem()& ^ALL ***/
-Branch.prototype['redeem'] = function() {
-	console.warn("Credits feature has been deprecated. This is no-op.");
-};
 
 /** =WEB
  * @function Branch.addListener
@@ -1991,15 +1786,6 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
 	});
 	done();
 });
-
-/**
- * @function Branch.autoAppIndex
- * This is a deprecated function.
- * ___
- */
-Branch.prototype['autoAppIndex'] = function() {
-	console.warn("autoAppIndex feature has been deprecated. This is no-op.");
-};
 
 /**
  * @function Branch.trackCommerceEvent
