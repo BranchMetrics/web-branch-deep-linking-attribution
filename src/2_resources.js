@@ -198,30 +198,6 @@ resources.deepview = {
 	})
 };
 
-resources.event = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/event",
-	method: utils.httpMethod.POST,
-	params: defaults({
-		"event": validator(true, validationTypes.STRING),
-		"metadata": validator(true, validationTypes.OBJECT),
-		"initial_referrer": validator(false, validationTypes.STRING),
-		"tracking_disabled": validator(false, validationTypes.BOOLEAN)
-	})
-};
-
-resources.commerceEvent = {
-	destination: config.api_endpoint,
-	endpoint: "/v1/event",
-	method: utils.httpMethod.POST,
-	params: defaults({
-		"event": validator(true, validationTypes.STRING),
-		"metadata": validator(false, validationTypes.OBJECT),
-		"initial_referrer": validator(false, validationTypes.STRING),
-		"commerce_data": validator(true, validationTypes.OBJECT)
-	})
-};
-
 // v2/event endpoints
 
 resources.logStandardEvent = {

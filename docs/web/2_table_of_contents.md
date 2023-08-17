@@ -13,7 +13,6 @@
 
 3. Deep Linking
   + [.link()](#linkdata-callback)
-  + [.sendSMS()](#sendsmsphone-linkdata-options-callback)
   + [.deepview()](#deepviewdata-options-callback)
   + [.deepviewCta()](#deepviewcta)
 
@@ -25,13 +24,10 @@
   + [.setBranchViewData()](#setbranchviewdatadata)
   + [.closeJourney()](#closejourneycallback)
 
-6. Firebase App Indexing
-  + [.autoAppIndex()](#autoappindexdata-callback)
-
-7. Revenue Analytics
+6. Revenue Analytics
   + [.trackCommerceEvent()](#trackcommerceeventevent-commerce_data-metadata-callback)
 
-8. User Privacy
+7. User Privacy
   + [.disableTracking()](#disabletrackingdisabletracking)
 
 ___
