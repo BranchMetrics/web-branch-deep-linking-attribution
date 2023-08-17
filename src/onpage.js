@@ -37,7 +37,6 @@
 		'banner',
 		'closeBanner',
 		'closeJourney',
-		'credits',
 		'data',
 		'deepview',
 		'deepviewCta',
