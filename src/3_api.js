@@ -438,7 +438,7 @@
 		noParseJsonResp = true;
 		responseType = "arraybuffer";
 	}
-
+	/* jshint -W003 */
 	var makeRequest = function() {
 		if (storage.get('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);
@@ -447,5 +447,6 @@
 			self.XHRRequest(url, postData, resource.method, storage, done, noParseJsonResp, responseType);
 		}
 	};
+	/* jshint +W003 */
 	makeRequest();
  };
