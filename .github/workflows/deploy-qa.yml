@@ -19,7 +19,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout ${{ github.ref_name }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
@@ -48,7 +48,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout ${{ github.ref_name }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
@@ -69,7 +69,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout ${{ github.ref_name }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
