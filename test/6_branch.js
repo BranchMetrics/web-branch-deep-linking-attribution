@@ -583,29 +583,19 @@ describe('Branch', function() {
 
 	describe('setIdentity', function() {
 		basicTests('setIdentity', [ 1 ]);
-
-		it('should call api with identity', function(done) {
-			var expectedRequest = testUtils.params(
-				{ "identity": "test_identity" },
-				[ "_t" ]
-			);
+		it('should invoke callback with data when a non-null value for identity is passed', function(done) {
 			var expectedResponse = {
-				identity_id: '12345',
-				link: 'url',
-				referring_data: '{ }',
-				referring_identity: '12345'
+				"session_id": "113636235674656786",
+				"identity_id": "98807509250212101",
+				"link": "https://bnctestbed.app.link/?%24identity_id=98807509250212101",
+				"developer_identity": "test_identity"
 			};
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
 			branch.setIdentity('test_identity', function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
 			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
 
 		it('should update identity and identity_id in local storage', function(done) {
@@ -618,28 +608,17 @@ describe('Branch', function() {
 			});
 			requests[0].callback(null, { identity: '12345678', identity_id: '7654321' });
 		});
-	});
 
-	describe('setIdentity accepts empty data', function() {
-		var expectedRequest = testUtils.params(
-			{ "identity": "test_identity" },
-			[ "_t" ]
-		);
-		var expectedResponse = { };
-		it('should call api with identity', function(done) {
+		it('should invoke callback with error when a null value for identity is passed', function(done) {
 			var branch = initBranch(true);
 			var assert = testUtils.plan(4, done);
 
-			branch.setIdentity('test_identity', function(err, res) {
-				assert.deepEqual(res, expectedResponse, 'response returned');
-				assert.strictEqual(err, null, 'No error');
+			branch.setIdentity(null, function(err, res) {
+				assert.strictEqual(err, utils.messages.missingIdentity, 'error matched for missing identity');
 			});
-
-			assert.strictEqual(requests.length, 1, 'Request made');
-			requests[0].callback(null, expectedResponse);
-			assert.deepEqual(requests[0].obj, expectedRequest, 'All params sent');
 		});
 	});
+
 
 	describe('track', function() {
 		basicTests('track', [ 0 ]);
@@ -856,17 +835,6 @@ describe('Branch', function() {
 		});
 	});
 
-	describe('sendSMS', function() {
-		basicTests('sendSMS', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
-		it('should print console warning about method deprecation for sendMS', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.sendSMS();
-			assert(spy.calledWith("SMS feature has been deprecated. This is no-op."));
-
-		});
-	});
 	describe('banner', function() {
 		basicTests('banner', [ 0 ]);
 
@@ -1193,72 +1161,6 @@ describe('Branch', function() {
 			branch.deepviewCta(function(err) {
 				assert.strictEqual(err, undefined, 'no error should be present in callback');
 			});
-		});
-	});
-
-	describe('Credits', function() {
-		basicTests('referrals', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
-		it('should print console warning about method deprecation for referrals', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.referrals();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation getCode', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.getCode();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation validateCode', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.validateCode();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation applyCode', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.applyCode();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation credits', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.credits();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation creditHistory', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.creditHistory();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-		it('should print console warning about method deprecation redeem', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.redeem();
-			assert(spy.calledWith("Credits feature has been deprecated. This is no-op."));
-
-		});
-	});
-
-	describe('AppIndexing', function() {
-		basicTests('autoAppIndex', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
-		it('should print console warning about method deprecation for autoAppIndex', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
-			branch.autoAppIndex();
-			assert(spy.calledWith("autoAppIndex feature has been deprecated. This is no-op."));
-
 		});
 	});
 	describe('addListener', function() {

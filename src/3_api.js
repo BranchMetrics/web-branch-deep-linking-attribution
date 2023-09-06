@@ -143,13 +143,6 @@
 		}
 	}
 
-	if (resource.endpoint === '/v1/event') {
-		d['metadata'] = safejson.stringify(d['metadata'] || {});
-		if (d.hasOwnProperty('commerce_data')) {
-			d['commerce_data'] = safejson.stringify(d['commerce_data'] || {});
-		}
-	}
-
 	if (resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss') {
 		if (d['metadata']) {
 			d['metadata'] = safejson.stringify(d['metadata'] || {});
@@ -445,7 +438,7 @@
 		noParseJsonResp = true;
 		responseType = "arraybuffer";
 	}
-
+	/* jshint -W003 */
 	var makeRequest = function() {
 		if (storage.get('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);
@@ -454,5 +447,6 @@
 			self.XHRRequest(url, postData, resource.method, storage, done, noParseJsonResp, responseType);
 		}
 	};
+	/* jshint +W003 */
 	makeRequest();
  };
