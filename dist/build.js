@@ -1072,7 +1072,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.78.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.79.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1157,7 +1157,7 @@ utils.cleanApplicationAndSessionStorage = function(a) {
 };
 utils.httpMethod = {POST:"POST", GET:"GET"};
 utils.messages = {missingParam:"API request $1 missing parameter $2", invalidType:"API request $1, parameter $2 is not $3", nonInit:"Branch SDK not initialized", initPending:"Branch SDK initialization pending and a Branch method was called outside of the queue order", initFailed:"Branch SDK initialization failed, so further methods cannot be called", existingInit:"Branch SDK already initialized", missingAppId:"Missing Branch app ID", callBranchInitFirst:"Branch.init must be called first", timeout:"Request timed out", 
-blockedByClient:"Request blocked by client, probably adblock", missingUrl:"Required argument: URL, is missing", trackingDisabled:"Requested operation cannot be completed since tracking is disabled", deepviewNotCalled:"Cannot call Deepview CTA, please call branch.deepview() first"};
+blockedByClient:"Request blocked by client, probably adblock", missingUrl:"Required argument: URL, is missing", trackingDisabled:"Requested operation cannot be completed since tracking is disabled", deepviewNotCalled:"Cannot call Deepview CTA, please call branch.deepview() first", missingIdentity:"setIdentity - required argument identity should have a non-null value"};
 utils.bannerThemes = ["light", "dark"];
 utils.getLocationSearch = function() {
   return utils.isIframeAndFromSameOrigin() ? window.top.location.search : window.location.search;
@@ -1696,16 +1696,12 @@ resources.open = {destination:config.api_endpoint, endpoint:"/v1/open", method:u
 validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), current_url:validator(!1, validationTypes.STRING), screen_height:validator(!1, validationTypes.NUMBER), screen_width:validator(!1, validationTypes.NUMBER), model:validator(!1, validationTypes.STRING), os_version:validator(!1, validationTypes.STRING)}};
 resources._r = {destination:config.app_service_endpoint, endpoint:"/_r", method:utils.httpMethod.GET, jsonp:!0, params:{sdk:validator(!0, validationTypes.STRING), _t:validator(!1, validationTypes.STRING), branch_key:validator(!0, validationTypes.STRING)}};
 resources.linkClick = {destination:"", endpoint:"", method:utils.httpMethod.GET, queryPart:{link_url:validator(!0, validationTypes.STRING)}, params:{click:validator(!0, validationTypes.STRING)}};
-resources.logout = {destination:config.api_endpoint, endpoint:"/v1/logout", method:utils.httpMethod.POST, params:defaults({session_id:validator(!0, validationTypes.STRING)})};
-resources.profile = {destination:config.api_endpoint, endpoint:"/v1/profile", method:utils.httpMethod.POST, params:defaults({identity_id:validator(!0, validationTypes.STRING), identity:validator(!0, validationTypes.STRING)})};
 resources.link = {destination:config.api_endpoint, endpoint:"/v1/url", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), type:validator(!1, 
 validationTypes.NUMBER), source:validator(!1, validationTypes.STRING), instrumentation:validator(!1, validationTypes.STRING)})};
 resources.qrCode = {destination:config.api_endpoint, endpoint:"/v1/qr-code", method:utils.httpMethod.POST, ref:"obj", params:defaults({alias:validator(!1, validationTypes.STRING), campaign:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!1, validationTypes.STRING), qr_code_settings:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), identity_id:validator(!0, validationTypes.STRING), stage:validator(!1, validationTypes.STRING), 
 tags:validator(!1, validationTypes.ARRAY), type:validator(!1, validationTypes.NUMBER), source:validator(!1, validationTypes.STRING)})};
 resources.deepview = {destination:config.api_endpoint, endpoint:"/v1/deepview", jsonp:!0, method:utils.httpMethod.POST, params:defaults({campaign:validator(!1, validationTypes.STRING), _t:validator(!1, validationTypes.STRING), channel:validator(!1, validationTypes.STRING), data:validator(!0, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), link_click_id:validator(!1, validationTypes.STRING), open_app:validator(!1, validationTypes.BOOLEAN), append_deeplink_path:validator(!1, 
 validationTypes.BOOLEAN), stage:validator(!1, validationTypes.STRING), tags:validator(!1, validationTypes.ARRAY), deepview_type:validator(!0, validationTypes.STRING), source:validator(!0, validationTypes.STRING)})};
-resources.event = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!0, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN)})};
-resources.commerceEvent = {destination:config.api_endpoint, endpoint:"/v1/event", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), commerce_data:validator(!0, validationTypes.OBJECT)})};
 resources.logStandardEvent = {destination:config.api_endpoint, endpoint:"/v2/event/standard", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING), customer_event_alias:validator(!1, validationTypes.STRING)}};
 resources.logCustomEvent = {destination:config.api_endpoint, endpoint:"/v2/event/custom", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING), customer_event_alias:validator(!1, validationTypes.STRING)}};
 resources.pageview = {destination:config.api_endpoint, endpoint:"/v1/pageview", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), branch_view_id:validator(!1, validationTypes.STRING), no_journeys:validator(!1, validationTypes.BOOLEAN), user_language:validator(!1, validationTypes.STRING), open_app:validator(!1, 
@@ -1893,7 +1889,6 @@ Server.prototype.getUrl = function(a, b) {
       return {error:k.message};
     }
   }
-  "/v1/event" === a.endpoint && (g.metadata = safejson.stringify(g.metadata || {}), g.hasOwnProperty("commerce_data") && (g.commerce_data = safejson.stringify(g.commerce_data || {})));
   ("/v1/pageview" === a.endpoint || "/v1/dismiss" === a.endpoint) && g.metadata && (g.metadata = safejson.stringify(g.metadata || {}));
   "/v1/open" === a.endpoint && (g.options = safejson.stringify(g.options || {}));
   return {data:this.serializeObject(g, ""), url:d.replace(/^\//, "")};
@@ -2977,32 +2972,19 @@ Branch.prototype.first = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   a(null, utils.whiteListSessionData(session.get(this._storage, !0)));
 });
 Branch.prototype.setIdentity = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
-  var c = this;
-  this._api(resources.profile, {identity:b}, function(d, e) {
-    d && a(d);
-    e = e || {};
-    c.identity_id = e.identity_id ? e.identity_id.toString() : null;
-    c.sessionLink = e.link;
-    c.identity = b;
-    e.developer_identity = b;
-    e.referring_data_parsed = e.referring_data ? safejson.parse(e.referring_data) : null;
-    session.patch(c._storage, {identity:b, identity_id:c.identity_id}, !0);
-    a(null, e);
-  });
+  if (b) {
+    var c = {identity_id:this.identity_id, session_id:this.session_id, link:this.sessionLink, developer_identity:b};
+    this.identity = b;
+    session.patch(this._storage, {identity:b}, !0);
+    a(null, c);
+  } else {
+    a(Error(utils.message(utils.messages.missingIdentity)));
+  }
 });
 Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function(a) {
-  var b = this;
-  this._api(resources.logout, {}, function(c, d) {
-    c && a(c);
-    d = d || {};
-    d = {data_parsed:null, data:null, referring_link:null, click_id:null, link_click_id:null, identity:null, session_id:d.session_id, identity_id:d.identity_id, link:d.link, device_fingerprint_id:b.device_fingerprint_id || null};
-    b.sessionLink = d.link;
-    b.session_id = d.session_id;
-    b.identity_id = d.identity_id;
-    b.identity = null;
-    session.patch(b._storage, d, !0, !0);
-    a(null);
-  });
+  this.identity = null;
+  session.patch(this._storage, {identity:null}, !0, !0);
+  a(null);
 });
 Branch.prototype.getBrowserFingerprintId = wrap(callback_params.CALLBACK_ERR_DATA, function(a) {
   var b = session.get(this._storage, !0) || {};
@@ -3059,9 +3041,6 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
     a(null, f && f.url);
   });
 });
-Branch.prototype.sendSMS = function() {
-  console.warn("SMS feature has been deprecated. This is no-op.");
-};
 Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c, d) {
   utils.cleanLinkData(b).qr_code_settings = safejson.stringify(utils.convertObjectValuesToString(c || {}));
   this._api(resources.qrCode, utils.cleanLinkData(b), function(e, f) {
@@ -3116,27 +3095,6 @@ Branch.prototype.deepviewCta = wrap(callback_params.CALLBACK_ERR, function(a) {
   this._deepviewCta();
   a();
 });
-Branch.prototype.referrals = function() {
-  console.warn("Credits feature has been deprecated. This is no-op.");
-};
-Branch.prototype.getCode = function() {
-  console.warn("Credits feature has been deprecated. This is no-op.");
-};
-Branch.prototype.validateCode = function() {
-  console.warn("Credits feature has been deprecated. This is no-op.");
-};
-Branch.prototype.applyCode = function() {
-  console.warn("Credits feature has been deprecated. This is no-op.");
-};
-Branch.prototype.credits = function() {
-  console.warn("Credits feature has been deprecated. This is no-op.");
-};
-Branch.prototype.creditHistory = function() {
-  console.warn("Credits feature has been deprecated. This is no-op.");
-};
-Branch.prototype.redeem = function() {
-  console.warn("Credits feature has been deprecated. This is no-op.");
-};
 Branch.prototype.addListener = function(a, b) {
   "function" === typeof a && void 0 === b && (b = a, a = null);
   b && this._listeners.push({listener:b, event:a || null});
@@ -3201,9 +3159,6 @@ Branch.prototype.closeBanner = wrap(0, function(a) {
   });
   a();
 });
-Branch.prototype.autoAppIndex = function() {
-  console.warn("autoAppIndex feature has been deprecated. This is no-op.");
-};
 Branch.prototype.trackCommerceEvent = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
   var e = this;
   e.renderQueue(function() {
