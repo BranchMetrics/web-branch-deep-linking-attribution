@@ -1706,7 +1706,7 @@ resources.logStandardEvent = {destination:config.api_endpoint, endpoint:"/v2/eve
 resources.logCustomEvent = {destination:config.api_endpoint, endpoint:"/v2/event/custom", method:utils.httpMethod.POST, params:{name:validator(!0, validationTypes.STRING), user_data:validator(!0, validationTypes.STRING), custom_data:validator(!1, validationTypes.STRING), event_data:validator(!1, validationTypes.STRING), content_items:validator(!1, validationTypes.STRING), customer_event_alias:validator(!1, validationTypes.STRING)}};
 resources.pageview = {destination:config.api_endpoint, endpoint:"/v1/pageview", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), branch_view_id:validator(!1, validationTypes.STRING), no_journeys:validator(!1, validationTypes.BOOLEAN), user_language:validator(!1, validationTypes.STRING), open_app:validator(!1, 
 validationTypes.BOOLEAN), has_app_websdk:validator(!1, validationTypes.BOOLEAN), source:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), is_iframe:validator(!1, validationTypes.BOOLEAN), data:validator(!1, validationTypes.OBJECT), callback_string:validator(!1, validationTypes.STRING), journey_displayed:validator(!1, validationTypes.BOOLEAN), audience_rule_id:validator(!1, validationTypes.STRING), journey_dismissals:validator(!1, validationTypes.OBJECT), identity_id:validator(!1, 
-validationTypes.STRING), identity:validator(!0, validationTypes.STRING), session_referring_link_data:validator(!1, validationTypes.STRING)})};
+validationTypes.STRING), identity:validator(!0, validationTypes.STRING), session_referring_link_data:validator(!1, validationTypes.STRING), session_link_click_id:validator(!1, validationTypes.STRING)})};
 resources.dismiss = {destination:config.api_endpoint, endpoint:"/v1/dismiss", method:utils.httpMethod.POST, params:defaults({event:validator(!0, validationTypes.STRING), metadata:validator(!1, validationTypes.OBJECT), initial_referrer:validator(!1, validationTypes.STRING), tracking_disabled:validator(!1, validationTypes.BOOLEAN), branch_view_id:validator(!1, validationTypes.STRING), no_journeys:validator(!1, validationTypes.BOOLEAN), user_language:validator(!1, validationTypes.STRING), open_app:validator(!1, 
 validationTypes.BOOLEAN), has_app_websdk:validator(!1, validationTypes.BOOLEAN), source:validator(!1, validationTypes.STRING), feature:validator(!1, validationTypes.STRING), is_iframe:validator(!1, validationTypes.BOOLEAN), data:validator(!1, validationTypes.OBJECT), callback_string:validator(!1, validationTypes.STRING), journey_displayed:validator(!1, validationTypes.BOOLEAN), audience_rule_id:validator(!1, validationTypes.STRING), journey_dismissals:validator(!1, validationTypes.OBJECT), dismissal_source:validator(!1, 
 validationTypes.STRING)})};
@@ -2739,6 +2739,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   journeys_utils.exitAnimationDisabled = b.disable_exit_animation || !1;
   var e = utils.merge({}, c._branchViewData), f = session.get(c._storage) || {}, g = f.hasOwnProperty("has_app") ? f.has_app : !1, h = f.hasOwnProperty("identity") ? f.identity : null, k = c._storage.get("journeyDismissals", !0), l = (b.user_language || utils.getBrowserLanguageCode() || "en").toLowerCase() || null, n = utils.getInitialReferrer(c._referringLink()), q = b.branch_view_id || utils.getParameterByName("_branch_view_id") || null;
   c = b.make_new_link ? null : utils.getClickIdAndSearchStringFromLink(c._referringLink(!0));
+  var r = f.hasOwnProperty("session_link_click_id") ? f.session_link_click_id : null;
   e.event = d ? "dismiss" : "pageview";
   e.metadata = a;
   e = utils.addPropertyIfNotNull(e, "initial_referrer", n);
@@ -2747,6 +2748,7 @@ branch_view._getPageviewRequestData = function(a, b, c, d) {
   e = utils.addPropertyIfNotNull(e, "is_iframe", utils.isIframe());
   e = utils.addPropertyIfNotNull(e, "journey_dismissals", k);
   e = utils.addPropertyIfNotNull(e, "identity", h);
+  e = utils.addPropertyIfNotNull(e, "session_link_click_id", r);
   e.user_language = l;
   e.open_app = b.open_app || !1;
   e.has_app_websdk = g;
@@ -2865,6 +2867,7 @@ Branch.prototype.init = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c
   d.identity_id = b && b.identity_id;
   var e = function(m) {
     m.link_click_id && (d.link_click_id = m.link_click_id.toString());
+    m.session_link_click_id && (d.session_link_click_id = m.session_link_click_id.toString());
     m.session_id && (d.session_id = m.session_id.toString());
     m.identity_id && (d.identity_id = m.identity_id.toString());
     m.identity && (d.identity = m.identity.toString());

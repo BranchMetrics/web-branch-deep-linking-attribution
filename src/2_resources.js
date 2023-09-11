@@ -252,7 +252,8 @@ resources.pageview = {
 		"journey_dismissals": validator(false, validationTypes.OBJECT),
 		"identity_id": validator(false, validationTypes.STRING),
 		"identity": validator(true, validationTypes.STRING),
-		"session_referring_link_data": validator(false, validationTypes.STRING)
+		"session_referring_link_data": validator(false, validationTypes.STRING),
+		"session_link_click_id": validator(false, validationTypes.STRING)
 	})
 };
 
