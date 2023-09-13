@@ -46,3 +46,4 @@ describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
 		assert.strictEqual(journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(bannerHeight), expected, '5 from bannerHeight of 5%');
 	});
 });
+
