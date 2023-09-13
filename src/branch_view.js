@@ -21,34 +21,33 @@ function checkPreviousBanner() {
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
-
-	var ctaText = hasApp ? 'OPEN' : 'GET';
+	let ctaText = hasApp ? 'OPEN' : 'GET';
 
 	journeys_utils.setPositionAndHeight(html);
 	// Get metadata, css and js from html blob then remove them
-	var metadata = journeys_utils.getMetadata(html);
+	const metadata = journeys_utils.getMetadata(html);
 	if (metadata) {
 		ctaText = journeys_utils.getCtaText(metadata, hasApp);
 		journeys_utils.findInsertionDiv(parent, metadata);
 	}
-	var cssInsideIframe = journeys_utils.getCss(html);
+	const cssInsideIframe = journeys_utils.getCss(html);
 	journeys_utils.getJsAndAddToParent(html);
-	var cssIframeContainer = journeys_utils.getIframeCss(html);
+	const cssIframeContainer = journeys_utils.getIframeCss(html);
 	html = journeys_utils.removeScriptAndCss(html);
 
 	// create iframe element, add html, add css, add ctaText
-	var iframe = journeys_utils.createIframe();
+	const iframe = journeys_utils.createIframe();
 	iframe.onload = function() {
 		journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
 		journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
 		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 		journeys_utils.addDynamicCtaText(iframe, ctaText);
-	
+
 		journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
-	
+
 		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
 		iframeLoadedCallback(iframe);
-	}
+	};
 	document.body.appendChild(iframe);
 	return iframe;
 };
@@ -59,7 +58,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
  * @return      {boolean}
  */
 function _areJourneysDismissedGlobally(branch) {
-	var globalDismissEndTimestamp = branch._storage.get('globalJourneysDismiss', true);
+	const globalDismissEndTimestamp = branch._storage.get('globalJourneysDismiss', true);
 
 	if (globalDismissEndTimestamp === true || globalDismissEndTimestamp > Date.now()) {
 		return true;
@@ -70,7 +69,7 @@ function _areJourneysDismissedGlobally(branch) {
 }
 
 branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
-	if (	checkPreviousBanner() ||
+	if (checkPreviousBanner() ||
 		!utils.mobileUserAgent() ||
 		!eventResponse['event_data'] ||
 		!eventResponse['template']
@@ -95,15 +94,15 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 };
 
 branch_view.incrementPageviewAnalytics = function(branchViewData) {
-	var requestData = 		{
-		"event": "pageview",
-		"journey_displayed": true,
-		"audience_rule_id": branchViewData['audience_rule_id'],
-		"branch_view_id": branchViewData['branch_view_id']
+	let requestData = 		{
+		'event': 'pageview',
+		'journey_displayed': true,
+		'audience_rule_id': branchViewData['audience_rule_id'],
+		'branch_view_id': branchViewData['branch_view_id']
 	};
 
-	var sessionStorage = session.get(journeys_utils.branch._storage) || {};
-	var identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
+	const sessionStorage = session.get(journeys_utils.branch._storage) || {};
+	const identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
 	requestData = utils.addPropertyIfNotNull(requestData, 'identity', identity);
 
 	journeys_utils.branch._api(
@@ -116,38 +115,38 @@ branch_view.incrementPageviewAnalytics = function(branchViewData) {
 };
 
 branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled, journeyLinkData) {
-    if(journeys_utils.exitAnimationIsRunning){
-    	return;
+	if (journeys_utils.exitAnimationIsRunning) {
+		return;
 	}
 
 	journeys_utils.branchViewId = templateId;
 	journeys_utils.setJourneyLinkData(journeyLinkData);
 
-	var audienceRuleId = branchViewData['audience_rule_id'];
+	const audienceRuleId = branchViewData['audience_rule_id'];
 
 	// this code removes any leftover css from previous banner
-	var branchCSS = document.getElementById('branch-iframe-css')
+	const branchCSS = document.getElementById('branch-iframe-css');
 	if (branchCSS) {
-		branchCSS.parentElement.removeChild(branchCSS)
+		branchCSS.parentElement.removeChild(branchCSS);
 	}
 
-	var placeholder = document.createElement('div');
+	const placeholder = document.createElement('div');
 	placeholder.id = 'branch-banner';
 	document.body.insertBefore(placeholder, null);
 	banner_utils.addClass(placeholder, 'branch-banner-is-active');
 
-	var failed = false;
-	var callbackString = requestData['callback_string'];
-	var banner = null;
-	var cta = null;
-	var storage = journeys_utils.branch._storage;
+	let failed = false;
+	const callbackString = requestData['callback_string'];
+	const banner = null;
+	let cta = null;
+	const storage = journeys_utils.branch._storage;
 
 	if (html) {
-		var metadata = journeys_utils.getMetadata(html) || {};
+		const metadata = journeys_utils.getMetadata(html) || {};
 
 		html = journeys_utils.tryReplaceJourneyCtaLink(html);
 
-		var timeoutTrigger = window.setTimeout(
+		const timeoutTrigger = window.setTimeout(
 			function() {
 				window[callbackString] = function() { };
 			},
@@ -164,30 +163,31 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
 		};
 
-		var finalHookupsOnIframeLoaded = function (banner) {
+		const finalHookupsOnIframeLoaded = function (banner) {
 			journeys_utils.banner = banner;
-	
+
 			if (banner === null) {
 				failed = true;
 				return;
 			}
-	
+
 			journeys_utils.finalHookups(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view);
-	
+
 			if (utils.navigationTimingAPIEnabled) {
 				utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
 			}
-			
+
 			document.body.removeChild(placeholder);
-	
+
 			if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
 				branch_view.incrementPageviewAnalytics(branchViewData);
 			}
-		}
+		};
 		renderHtmlBlob(document.body, html, requestData['has_app_websdk'], finalHookupsOnIframeLoaded);
-	} else {
+	}
+	else {
 		document.body.removeChild(placeholder);
-	
+
 		if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
 			branch_view.incrementPageviewAnalytics(branchViewData);
 		}
@@ -195,7 +195,6 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 };
 
 branch_view._getPageviewRequestData = function(metadata, options, branch, isDismissEvent) {
-
 	journeys_utils.branch = branch;
 
 	if (!options) {
@@ -210,15 +209,15 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	journeys_utils.exitAnimationDisabled = options['disable_exit_animation'] || false;
 
 	// starts object off with data from setBranchViewData() call
-	var obj = utils.merge({}, branch._branchViewData);
-	var sessionStorage = session.get(branch._storage) || {};
-	var has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
-	var identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
-	var journeyDismissals = branch._storage.get('journeyDismissals', true);
-	var userLanguage = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase() || null;
-	var initialReferrer = utils.getInitialReferrer(branch._referringLink());
-	var branchViewId = options['branch_view_id'] || utils.getParameterByName('_branch_view_id') || null;
-	var linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink(true)) : null;
+	let obj = utils.merge({}, branch._branchViewData);
+	const sessionStorage = session.get(branch._storage) || {};
+	const has_app = sessionStorage.hasOwnProperty('has_app') ? sessionStorage['has_app'] : false;
+	const identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
+	const journeyDismissals = branch._storage.get('journeyDismissals', true);
+	const userLanguage = (options['user_language'] || utils.getBrowserLanguageCode() || 'en').toLowerCase() || null;
+	const initialReferrer = utils.getInitialReferrer(branch._referringLink());
+	const branchViewId = options['branch_view_id'] || utils.getParameterByName('_branch_view_id') || null;
+	const linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink(true)) : null;
 
 	// adds root level keys for v1/event
 	obj['event'] = !isDismissEvent ? 'pageview' : 'dismiss';
@@ -247,7 +246,7 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	if (linkClickId) {
 		obj.data['link_click_id'] = linkClickId;
 	}
-	var linkData = sessionStorage['data'] ? safejson.parse(sessionStorage['data']) : null;
+	const linkData = sessionStorage['data'] ? safejson.parse(sessionStorage['data']) : null;
 	if (linkData && linkData['+referrer']) {
 		obj.data['+referrer'] = linkData['+referrer'];
 	}

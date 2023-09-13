@@ -24,11 +24,11 @@ banner = function(branch, options, linkData, storage) {
 
 	branch._publishEvent('willShowBanner');
 
-	var element;
-	var bodyMarginTopInline = document.body.style.marginTop;
-	var bodyMarginBottomInline = document.body.style.marginBottom;
+	let element;
+	const bodyMarginTopInline = document.body.style.marginTop;
+	const bodyMarginBottomInline = document.body.style.marginBottom;
 
-	var closeBanner = function(closeOptions, callback) {
+	const closeBanner = function(closeOptions, callback) {
 		if (typeof closeOptions === 'function') {
 			callback = closeOptions;
 			closeOptions = {};
@@ -80,21 +80,21 @@ banner = function(branch, options, linkData, storage) {
 		}
 	};
 
-	var finalHookupsCallback = function(markup) {
+	const finalHookupsCallback = function(markup) {
 		element = markup;
 		// Add CSS
 		banner_css.css(options, element);
 		// Attach actions
 		linkData['channel'] = linkData['channel'] || 'app banner';
 
-		var doc = options.iframe ? element.contentWindow.document : document;
+		const doc = options.iframe ? element.contentWindow.document : document;
 		if (utils.mobileUserAgent()) {
 			options['open_app'] = options.open_app;
 			options['append_deeplink_path'] = options.append_deeplink_path;
 			options['make_new_link'] = options.make_new_link;
 			options['deepview_type'] = 'banner';
 			branch['deepview'](linkData, options);
-			var cta = doc.getElementById('branch-mobile-action');
+			const cta = doc.getElementById('branch-mobile-action');
 			if (cta) {
 				cta.onclick = function(ev) {
 					ev.preventDefault();
@@ -103,8 +103,8 @@ banner = function(branch, options, linkData, storage) {
 			}
 		}
 
-		var bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
-		var bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom');
+		const bodyMarginTopComputed = banner_utils.getBodyStyle('margin-top');
+		const bodyMarginBottomComputed = banner_utils.getBodyStyle('margin-bottom');
 
 		// Trigger animation
 		banner_utils.addClass(document.body, 'branch-banner-is-active');
@@ -117,7 +117,7 @@ banner = function(branch, options, linkData, storage) {
 				banner_utils.addCSSLengths(banner_utils.bannerHeight, bodyMarginBottomComputed);
 		}
 
-		var closeButton = doc.getElementById('branch-banner-close');
+		const closeButton = doc.getElementById('branch-banner-close');
 
 		if (closeButton) {
 			closeButton.onclick = function(ev) {
@@ -129,7 +129,7 @@ banner = function(branch, options, linkData, storage) {
 			};
 		}
 
-		var modalBackground = doc.getElementById('branch-banner-modal-background');
+		const modalBackground = doc.getElementById('branch-banner-modal-background');
 
 		if (modalBackground) {
 			modalBackground.onclick = function(ev) {
@@ -157,7 +157,6 @@ banner = function(branch, options, linkData, storage) {
 		else {
 			setTimeout(onAnimationEnd, banner_utils.animationDelay);
 		}
-
 	};
 
 	// Create markup

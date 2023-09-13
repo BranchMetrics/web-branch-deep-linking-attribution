@@ -1,4 +1,4 @@
-/***
+/** *
  * This file provides the main Branch function.
  */
 'use strict';
@@ -17,15 +17,13 @@ goog.require('safejson');
 goog.require('branch_view');
 goog.require('journeys_utils');
 
-/*globals Ti, BranchStorage, require */
-
-var default_branch;
+let default_branch;
 
 /**
  * Enum for what parameters are in a wrapped Branch method
  * @enum {number}
  */
-var callback_params = {
+const callback_params = {
 	NO_CALLBACK: 0,
 	CALLBACK_ERR: 1,
 	CALLBACK_ERR_DATA: 2
@@ -35,7 +33,7 @@ var callback_params = {
  * Enum for the initialization state of the Branch Object
  * @enum {number}
  */
-var init_states = {
+const init_states = {
 	NO_INIT: 0,
 	INIT_PENDING: 1,
 	INIT_FAILED: 2,
@@ -46,7 +44,7 @@ var init_states = {
  * Enum for the initialization state of the Branch Object
  * @enum {number}
  */
-var init_state_fail_codes = {
+const init_state_fail_codes = {
 	NO_FAILURE: 0,
 	UNKNOWN_CAUSE: 1,
 	OPEN_FAILED: 2,
@@ -54,17 +52,17 @@ var init_state_fail_codes = {
 	HAS_APP_FAILED: 4
 };
 
-/***
+/** *
  * @param {number} parameters
  * @param {function(...?): undefined} func
  * @param {boolean=} init
  */
-var wrap = function(parameters, func, init) {
-	var r = function() {
-		var self = this;
-		var args;
-		var callback;
-		var lastArg = arguments[arguments.length - 1];
+const wrap = function(parameters, func, init) {
+	const r = function() {
+		const self = this;
+		let args;
+		let callback;
+		const lastArg = arguments[arguments.length - 1];
 		if (parameters === callback_params.NO_CALLBACK || typeof lastArg !== 'function') {
 			callback = function(err) {
 				return;
@@ -76,10 +74,10 @@ var wrap = function(parameters, func, init) {
 			callback = lastArg;
 		}
 		self._queue(function(next) {
-			/***
+			/** *
 			 * @type {function(?Error,?): undefined}
 			 */
-			var done = function(err, data) {
+			const done = function(err, data) {
 				try {
 					if (err && parameters === callback_params.NO_CALLBACK) {
 						throw err;
@@ -114,7 +112,7 @@ var wrap = function(parameters, func, init) {
 	return r;
 };
 
-/***
+/** *
  * @class Branch
  * @constructor
  */
@@ -127,13 +125,13 @@ Branch = function() {
 	}
 	this._queue = task_queue();
 
-	var storageMethods = [ 'session', 'cookie', 'pojo' ];
+	const storageMethods = [ 'session', 'cookie', 'pojo' ];
 
 	this._storage = /** @type {storage} */ (new BranchStorage(storageMethods));
 
 	this._server = new Server();
 
-	var sdk = 'web';
+	const sdk = 'web';
 
 	/** @type {Array<utils.listener>} */
 	this._listeners = [ ];
@@ -145,13 +143,12 @@ Branch = function() {
 	this.init_state_fail_details = null;
 };
 
-/***
+/** *
  * @param {utils.resource} resource
  * @param {Object.<string, *>} obj
  * @param {function(?Error,?)=} callback
  */
 Branch.prototype._api = function(resource, obj, callback) {
-
 	if (this.app_id) {
 		obj['app_id'] = this.app_id;
 	}
@@ -169,7 +166,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 		obj['identity_id'] = this.identity_id;
 	}
 
-	if (resource.endpoint.indexOf("/v1/") < 0) {
+	if (resource.endpoint.indexOf('/v1/') < 0) {
 		if (((resource.params && resource.params['developer_identity']) ||
 			(resource.queryPart && resource.queryPart['developer_identity'])) &&
 			this.identity) {
@@ -209,25 +206,25 @@ Branch.prototype._api = function(resource, obj, callback) {
 	});
 };
 
-/***
+/** *
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function(forJourneys) {
-	var sessionData = session.get(this._storage);
-	var referringLink = sessionData && sessionData['referring_link'];
+	const sessionData = session.get(this._storage);
+	const referringLink = sessionData && sessionData['referring_link'];
 	if (referringLink) {
 		return referringLink;
 	}
 	else {
 		if (utils.userPreferences.enableExtendedJourneysAssist && forJourneys) {
-			var localStorageData = session.get(this._storage, true);
-			var referring_Link = localStorageData && localStorageData['referring_link'];
-			var referringLinkExpiry = localStorageData && localStorageData['referringLinkExpiry'];
+			const localStorageData = session.get(this._storage, true);
+			const referring_Link = localStorageData && localStorageData['referring_link'];
+			const referringLinkExpiry = localStorageData && localStorageData['referringLinkExpiry'];
 			if (referring_Link && referringLinkExpiry) {
-				var now = new Date();
+				const now = new Date();
 				// compare the expiry time of the item with the current time
 				if (now.getTime() > referringLinkExpiry) {
-					session.patch(this._storage, { "referringLinkExpiry": null }, true, true);
+					session.patch(this._storage, {'referringLinkExpiry': null}, true, true);
 				}
 				else {
 					return referring_Link;
@@ -236,7 +233,7 @@ Branch.prototype._referringLink = function(forJourneys) {
 		}
 	}
 
-	var clickId = this._storage.get('click_id');
+	const clickId = this._storage.get('click_id');
 	if (clickId) {
 		return config.link_service_endpoint + '/c/' + clickId;
 	}
@@ -244,13 +241,13 @@ Branch.prototype._referringLink = function(forJourneys) {
 	return null;
 };
 
-/***
+/** *
  * @function Branch._publishEvent
  * @param {string} event
  * @param {Object} data - _optional_ - data to pass into listener callback.
  */
 Branch.prototype._publishEvent = function(event, data) {
-	for (var i = 0; i < this._listeners.length; i++) {
+	for (let i = 0; i < this._listeners.length; i++) {
 		if (!this._listeners[i].event || this._listeners[i].event === event) {
 			this._listeners[i].listener(event, data);
 		}
@@ -321,17 +318,16 @@ Branch.prototype._publishEvent = function(event, data) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-/*** +TOC_HEADING &Branch Session& ^ALL ***/
-/*** +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
+/** * +TOC_HEADING &Branch Session& ^ALL ***/
+/** * +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(
 	callback_params.CALLBACK_ERR_DATA,
 	function(done, branch_key, options) {
-
 		if (utils.navigationTimingAPIEnabled) {
 			utils.instrumentation['init-began-at'] = utils.timeSinceNavigationStart();
 		}
 
-		var self = this;
+		const self = this;
 
 		self.init_state = init_states.INIT_PENDING;
 
@@ -363,10 +359,10 @@ Branch.prototype['init'] = wrap(
 
 		// initialize identity_id from storage
 		// note the previous line scrubs this if tracking disabled.
-		var localData = session.get(self._storage, true);
+		const localData = session.get(self._storage, true);
 		self.identity_id = localData && localData['identity_id'];
 
-		var setBranchValues = function(data) {
+		const setBranchValues = function(data) {
 			if (data['link_click_id']) {
 				self.link_click_id = data['link_click_id'].toString();
 			}
@@ -394,18 +390,18 @@ Branch.prototype['init'] = wrap(
 			return data;
 		};
 
-		var sessionData = session.get(self._storage);
+		const sessionData = session.get(self._storage);
 
-		var branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
+		const branchMatchIdFromOptions = (options && typeof options['branch_match_id'] !== 'undefined' && options['branch_match_id'] !== null) ?
 			options['branch_match_id'] :
 			null;
-		var link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
-		var freshInstall = !self.identity_id; // initialized from local storage above
+		const link_identifier = (branchMatchIdFromOptions || utils.getParamValue('_branch_match_id') || utils.hashValue('r'));
+		const freshInstall = !self.identity_id; // initialized from local storage above
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
-		var fetchLatestBrowserFingerPrintID = function(cb) {
-			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
-			var currentSessionData = session.get(self._storage) || {};
-			var permData = session.get(self._storage, true) || {};
+		const fetchLatestBrowserFingerPrintID = function(cb) {
+			const params_r = {'sdk': config.version, 'branch_key': self.branch_key};
+			const currentSessionData = session.get(self._storage) || {};
+			const permData = session.get(self._storage, true) || {};
 			if (permData['browser_fingerprint_id']) {
 				params_r['_t'] = permData['browser_fingerprint_id'];
 			}
@@ -428,19 +424,16 @@ Branch.prototype['init'] = wrap(
 			if (cb) {
 				cb(null, currentSessionData);
 			}
-
-
 		};
 
-		var restoreIdentityOnInstall = function(data) {
+		const restoreIdentityOnInstall = function(data) {
 			if (freshInstall) {
-				data["identity"] = self.identity;
+				data['identity'] = self.identity;
 			}
 			return data;
 		};
 
-		var finishInit = function(err, data) {
-
+		const finishInit = function(err, data) {
 			if (data) {
 				data = setBranchValues(data);
 
@@ -472,15 +465,15 @@ Branch.prototype['init'] = wrap(
 				self['renderFinalize']();
 			}
 
-			var additionalMetadata = utils.getAdditionalMetadata();
-			var metadata = utils.validateParameterType(options['metadata'], "object") ? options['metadata'] : null;
+			const additionalMetadata = utils.getAdditionalMetadata();
+			const metadata = utils.validateParameterType(options['metadata'], 'object') ? options['metadata'] : null;
 			if (metadata) {
-				var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], metadata);
+				const hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], metadata);
 				if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
 					additionalMetadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 				}
 			}
-			var requestData = branch_view._getPageviewRequestData(
+			const requestData = branch_view._getPageviewRequestData(
 				journeys_utils._getPageviewMetadata(options, additionalMetadata),
 				options,
 				self,
@@ -491,13 +484,13 @@ Branch.prototype['init'] = wrap(
 					resources.pageview,
 					requestData,
 					function(err, pageviewResponse) {
-						if (!err && typeof pageviewResponse === "object") {
-							var journeyInTestMode = requestData['branch_view_id'] ? true : false;
+						if (!err && typeof pageviewResponse === 'object') {
+							const journeyInTestMode = requestData['branch_view_id'] ? true : false;
 							if (branch_view.shouldDisplayJourney(
-									pageviewResponse,
-									options,
-									journeyInTestMode
-								)
+								pageviewResponse,
+								options,
+								journeyInTestMode
+							)
 							) {
 								branch_view.displayJourney(
 									pageviewResponse['template'],
@@ -510,7 +503,7 @@ Branch.prototype['init'] = wrap(
 							}
 							else {
 								if (pageviewResponse['auto_branchify'] || (!branchMatchIdFromOptions && utils.getParamValue('branchify_url') && self._referringLink())) {
-									var linkOptions = {
+									const linkOptions = {
 										'make_new_link': false,
 										'open_app': true,
 										'auto_branchify': true
@@ -527,9 +520,9 @@ Branch.prototype['init'] = wrap(
 				);
 			});
 		};
-		var attachVisibilityEvent = function() {
-			var hidden;
-			var changeEvent;
+		const attachVisibilityEvent = function() {
+			let hidden;
+			let changeEvent;
 			if (typeof document.hidden !== 'undefined') {
 				hidden = 'hidden';
 				changeEvent = 'visibilitychange';
@@ -563,15 +556,15 @@ Branch.prototype['init'] = wrap(
 		};
 		if (sessionData && sessionData['session_id'] && !link_identifier && !utils.getParamValue('branchify_url')) {
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
-			session.update(self._storage, { "data": "" });
-			session.update(self._storage, { "referring_link": "" });
+			session.update(self._storage, {'data': ''});
+			session.update(self._storage, {'referring_link': ''});
 			attachVisibilityEvent();
 			fetchLatestBrowserFingerPrintID(finishInit);
 			return;
 		}
 
-		var params_r = { "sdk": config.version, "branch_key": self.branch_key };
-		var permData = session.get(self._storage, true) || {};
+		const params_r = {'sdk': config.version, 'branch_key': self.branch_key};
+		const permData = session.get(self._storage, true) || {};
 
 		if (permData['browser_fingerprint_id']) {
 			params_r['_t'] = permData['browser_fingerprint_id'];
@@ -582,7 +575,7 @@ Branch.prototype['init'] = wrap(
 		}
 
 		// Execute the /v1/open right away or after _open_delay_ms.
-		var open_delay = parseInt(utils.getParamValue('[?&]_open_delay_ms'), 10);
+		const open_delay = parseInt(utils.getParamValue('[?&]_open_delay_ms'), 10);
 
 		if (!utils.isSafari11OrGreater() && !utils.isIOSWKWebView()) {
 			self._api(
@@ -598,17 +591,17 @@ Branch.prototype['init'] = wrap(
 						self._api(
 							resources.open,
 							{
-								"link_identifier": link_identifier,
-								"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
-								"identity": permData['identity'] ? permData['identity'] : null,
-								"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
-								"options": options,
-								"initial_referrer": utils.getInitialReferrer(self._referringLink()),
-								"current_url": utils.getCurrentUrl(),
-								"screen_height": utils.getScreenHeight(),
-								"screen_width": utils.getScreenWidth(),
-								"model": utils.userAgentData ? utils.userAgentData.model : null,
-								"os_version": utils.userAgentData ? utils.userAgentData.platformVersion : null
+								'link_identifier': link_identifier,
+								'browser_fingerprint_id': link_identifier || browser_fingerprint_id,
+								'identity': permData['identity'] ? permData['identity'] : null,
+								'alternative_browser_fingerprint_id': permData['browser_fingerprint_id'],
+								'options': options,
+								'initial_referrer': utils.getInitialReferrer(self._referringLink()),
+								'current_url': utils.getCurrentUrl(),
+								'screen_height': utils.getScreenHeight(),
+								'screen_width': utils.getScreenWidth(),
+								'model': utils.userAgentData ? utils.userAgentData.model : null,
+								'os_version': utils.userAgentData ? utils.userAgentData.platformVersion : null
 							},
 							function(err, data) {
 								if (err) {
@@ -637,17 +630,17 @@ Branch.prototype['init'] = wrap(
 				self._api(
 					resources.open,
 					{
-						"link_identifier": link_identifier,
-						"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
-						"identity": permData['identity'] ? permData['identity'] : null,
-						"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
-						"options": options,
-						"initial_referrer": utils.getInitialReferrer(self._referringLink()),
-						"current_url": utils.getCurrentUrl(),
-						"screen_height": utils.getScreenHeight(),
-						"screen_width": utils.getScreenWidth(),
-						"model": utils.userAgentData ? utils.userAgentData.model : null,
-						"os_version": utils.userAgentData ? utils.userAgentData.platformVersion : null
+						'link_identifier': link_identifier,
+						'browser_fingerprint_id': link_identifier || permData['browser_fingerprint_id'],
+						'identity': permData['identity'] ? permData['identity'] : null,
+						'alternative_browser_fingerprint_id': permData['browser_fingerprint_id'],
+						'options': options,
+						'initial_referrer': utils.getInitialReferrer(self._referringLink()),
+						'current_url': utils.getCurrentUrl(),
+						'screen_height': utils.getScreenHeight(),
+						'screen_width': utils.getScreenWidth(),
+						'model': utils.userAgentData ? utils.userAgentData.model : null,
+						'os_version': utils.userAgentData ? utils.userAgentData.platformVersion : null
 					},
 					function(err, data) {
 						if (err) {
@@ -678,7 +671,7 @@ Branch.prototype['init'] = wrap(
  * currently private method, which may be opened to the public in the future
  */
 Branch.prototype['renderQueue'] = wrap(callback_params.NO_CALLBACK, function(done, render) {
-	var self = this;
+	const self = this;
 	if (self._renderFinalized) {
 		render();
 	}
@@ -694,7 +687,7 @@ Branch.prototype['renderQueue'] = wrap(callback_params.NO_CALLBACK, function(don
  * currently private method, which may be opened to the public in the future
  */
 Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var self = this;
+	const self = this;
 	if (self._renderQueue && self._renderQueue.length > 0) {
 		self._renderQueue.forEach(function(callback) {
 			callback.call(this);
@@ -719,9 +712,9 @@ Branch.prototype['renderFinalize'] = wrap(callback_params.CALLBACK_ERR_DATA, fun
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
-/*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
+/** * +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var data = utils.whiteListSessionData(session.get(this._storage));
+	const data = utils.whiteListSessionData(session.get(this._storage));
 	data['referring_link'] = this._referringLink();
 	data['data_parsed'] = data['data'] && data['data'].length !== 0 ? safejson.parse(data['data']) : {};
 	done(null, data);
@@ -742,7 +735,7 @@ Branch.prototype['data'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
  * ___
  *
  */
-/*** +TOC_ITEM #firstcallback &.first()& ^ALL ***/
+/** * +TOC_ITEM #firstcallback &.first()& ^ALL ***/
 Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	done(null, utils.whiteListSessionData(session.get(this._storage, true)));
 });
@@ -782,11 +775,11 @@ Branch.prototype['first'] = wrap(callback_params.CALLBACK_ERR_DATA, function(don
  * ```
  * ___
  */
-/*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
+/** * +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, identity) {
-	var self = this;
+	const self = this;
 	if (identity) {
-		var data = {
+		const data = {
 			identity_id: self.identity_id,
 			session_id: self.session_id,
 			link: self.sessionLink,
@@ -794,9 +787,8 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
 		};
 		self.identity = identity;
 		// store the identity
-		session.patch(self._storage, { "identity": identity }, true);
+		session.patch(self._storage, {'identity': identity}, true);
 		done(null, data);
-
 	}
 	else {
 		done(new Error(utils.message(utils.messages.missingIdentity)));
@@ -825,11 +817,11 @@ Branch.prototype['setIdentity'] = wrap(callback_params.CALLBACK_ERR_DATA, functi
  * ___
  *
  */
-/*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
+/** * +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
 Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
-	var self = this;
-	var data = {
-		"identity": null
+	const self = this;
+	const data = {
+		'identity': null
 	};
 
 	self.identity = null;
@@ -841,7 +833,7 @@ Branch.prototype['logout'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 });
 
 Branch.prototype['getBrowserFingerprintId'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
-	var permData = session.get(this._storage, true) || {};
+	const permData = session.get(this._storage, true) || {};
 	done(null, permData['browser_fingerprint_id'] || null);
 });
 
@@ -860,12 +852,12 @@ Branch.prototype['getBrowserFingerprintId'] = wrap(callback_params.CALLBACK_ERR_
  * ___
  *
  */
-/*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL ***/
+/** * +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL ***/
 Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done) {
 	this._api(
 		resources.crossPlatformIds,
 		{
-			"user_data": safejson.stringify(utils.getUserData(this))
+			'user_data': safejson.stringify(utils.getUserData(this))
 		},
 		function(err, data) {
 			return done(err || null, data && data['user_data'] || null);
@@ -890,15 +882,15 @@ Branch.prototype['crossPlatformIds'] = wrap(callback_params.CALLBACK_ERR_DATA, f
  * ___
  *
  */
-/*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL ***/
+/** * +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL ***/
 Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, attribution_window) {
 	attribution_window = utils.validateParameterType(attribution_window, 'number') ? attribution_window : null;
-	var userData = utils.getUserData(this);
+	const userData = utils.getUserData(this);
 	utils.addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
 	this._api(
 		resources.lastAttributedTouchData,
 		{
-			"user_data": safejson.stringify(userData)
+			'user_data': safejson.stringify(userData)
 		},
 		function(err, data) {
 			return done(err || null, data || null);
@@ -931,10 +923,10 @@ Branch.prototype['lastAttributedTouchData'] = wrap(callback_params.CALLBACK_ERR_
  * ```
  * ___
  */
-/*** +TOC_HEADING &Event Tracking& ^ALL ***/
-/*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
+/** * +TOC_HEADING &Event Tracking& ^ALL ***/
+/** * +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, event, metadata, options) {
-	var self = this;
+	const self = this;
 
 	metadata = metadata || {};
 
@@ -942,13 +934,13 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 
 	utils.nonce = options['nonce'] ? options['nonce'] : utils.nonce;
 
-	if (event === "pageview") {
-		var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
+	if (event === 'pageview') {
+		const hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
 		if (hostedDeeplinkDataWithMergedMetadata && Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0) {
 			metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
 		}
 
-		var requestData = branch_view._getPageviewRequestData(
+		const requestData = branch_view._getPageviewRequestData(
 			journeys_utils._getPageviewMetadata(options, metadata),
 			options,
 			self,
@@ -957,15 +949,9 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 		self._api(resources.pageview,
 			requestData,
 			function(err, pageviewResponse) {
-				if (!err && typeof pageviewResponse === "object") {
-					var journeyInTestMode = requestData['branch_view_id'] ? true : false;
-					if (branch_view.shouldDisplayJourney
-						(
-							pageviewResponse,
-							options,
-							journeyInTestMode
-						)
-					) {
+				if (!err && typeof pageviewResponse === 'object') {
+					const journeyInTestMode = requestData['branch_view_id'] ? true : false;
+					if (branch_view.shouldDisplayJourney(pageviewResponse, options, journeyInTestMode)) {
 						branch_view.displayJourney(
 							pageviewResponse['template'],
 							requestData,
@@ -984,10 +970,9 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 				}
 			}
 		);
-
 	}
 	else {
-		console.warn("track method currently supports only pageview event.");
+		console.warn('track method currently supports only pageview event.');
 	}
 });
 
@@ -1112,40 +1097,40 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
  * ```
  * ___
  */
-/*** +TOC_ITEM #logeventevent-event_data_and_custom_data-content_items-callback &.logEvent()& ^ALL ***/
+/** * +TOC_ITEM #logeventevent-event_data_and_custom_data-content_items-callback &.logEvent()& ^ALL ***/
 Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, name, eventData, contentItems, customer_event_alias) {
 	name = utils.validateParameterType(name, 'string') ? name : null;
 	eventData = utils.validateParameterType(eventData, 'object') ? eventData : null;
 	customer_event_alias = utils.validateParameterType(customer_event_alias, 'string') ? customer_event_alias : null;
-	var extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
+	const extractedEventAndCustomData = utils.separateEventAndCustomData(eventData);
 
 	if (utils.isStandardEvent(name)) {
 		contentItems = utils.validateParameterType(contentItems, 'array') ? contentItems : null;
 		this._api(
-		resources.logStandardEvent,
-		{
-			"name": name,
-			"user_data": safejson.stringify(utils.getUserData(this)),
-			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
-			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
-			"content_items": safejson.stringify(contentItems || []),
-			"customer_event_alias": customer_event_alias
-		}, function(err, data) {
-			return done(err || null);
-		});
+			resources.logStandardEvent,
+			{
+				'name': name,
+				'user_data': safejson.stringify(utils.getUserData(this)),
+				'custom_data': safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['custom_data'] || {}),
+				'event_data': safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['event_data'] || {}),
+				'content_items': safejson.stringify(contentItems || []),
+				'customer_event_alias': customer_event_alias
+			}, function(err, data) {
+				return done(err || null);
+			});
 	}
 	else {
 		this._api(resources.logCustomEvent,
-		{
-			"name": name,
-			"user_data": safejson.stringify(utils.getUserData(this)),
-			"custom_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["custom_data"] || {}),
-			"event_data": safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData["event_data"] || {}),
-			"content_items": safejson.stringify(contentItems || []),
-			"customer_event_alias": customer_event_alias
-		}, function(err, data) {
-			return done(err || null);
-		});
+			{
+				'name': name,
+				'user_data': safejson.stringify(utils.getUserData(this)),
+				'custom_data': safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['custom_data'] || {}),
+				'event_data': safejson.stringify(extractedEventAndCustomData && extractedEventAndCustomData['event_data'] || {}),
+				'content_items': safejson.stringify(contentItems || []),
+				'customer_event_alias': customer_event_alias
+			}, function(err, data) {
+				return done(err || null);
+			});
 	}
 });
 
@@ -1239,11 +1224,11 @@ Branch.prototype['logEvent'] = wrap(callback_params.CALLBACK_ERR, function(done,
  * ```
  *
  */
-/*** +TOC_HEADING &Deep Linking& ^ALL ***/
-/*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
+/** * +TOC_HEADING &Deep Linking& ^ALL ***/
+/** * +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done, data) {
-	var linkData = utils.cleanLinkData(data);
-	var keyCopy = this.branch_key;
+	const linkData = utils.cleanLinkData(data);
+	const keyCopy = this.branch_key;
 	this._api(resources.link, linkData, function(err, data) {
 		if (err) {
 			// if an error occurs or if tracking is disabled then return a dynamic link
@@ -1314,7 +1299,7 @@ Branch.prototype['link'] = wrap(callback_params.CALLBACK_ERR_DATA, function(done
 Branch.prototype['qrCode'] = wrap(
 	callback_params.CALLBACK_ERR_DATA,
 	function(done, linkData, qrCodeSettings, options) {
-		var data = utils.cleanLinkData(linkData);
+		const data = utils.cleanLinkData(linkData);
 		data['qr_code_settings'] = safejson.stringify(utils.convertObjectValuesToString(qrCodeSettings || {}));
 		this._api(
 			resources.qrCode,
@@ -1398,9 +1383,9 @@ Branch.prototype['qrCode'] = wrap(
  * ```
  *
  */
-/*** +TOC_ITEM #deepviewdata-options-callback &.deepview()& ^ALL ***/
+/** * +TOC_ITEM #deepviewdata-options-callback &.deepview()& ^ALL ***/
 Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done, data, options) {
-	var self = this;
+	const self = this;
 
 	if (!options) {
 		options = { };
@@ -1416,10 +1401,10 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	}
 
 	data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
-	data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
+	data = utils.isIframe() ? utils.merge({'is_iframe': true}, data) : data;
 
-	var cleanedData = utils.cleanLinkData(data);
-	var fallbackUrl = utils.generateDynamicBNCLink(this.branch_key, cleanedData);
+	const cleanedData = utils.cleanLinkData(data);
+	const fallbackUrl = utils.generateDynamicBNCLink(this.branch_key, cleanedData);
 
 	if (options['open_app'] || options['open_app'] === null || typeof options['open_app'] === 'undefined') {
 		cleanedData['open_app'] = true;
@@ -1427,7 +1412,7 @@ Branch.prototype['deepview'] = wrap(callback_params.CALLBACK_ERR, function(done,
 	cleanedData['append_deeplink_path'] = !!options['append_deeplink_path'];
 	cleanedData['deepview_type'] = options['deepview_type'];
 
-	var referringLink = self._referringLink();
+	const referringLink = self._referringLink();
 	if (referringLink && !options['make_new_link']) {
 		cleanedData['link_click_id'] = utils.getClickIdAndSearchStringFromLink(referringLink);
 	}
@@ -1511,11 +1496,11 @@ Branch.prototype._windowRedirect = function(url) {
  *
  *
  */
-/*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
+/** * +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(done) {
 	if (typeof this._deepviewCta === 'undefined') {
 		return utils.userPreferences.trackingDisabled ? done(new Error(utils.messages.trackingDisabled), null) :
-		done(new Error(utils.messages.deepviewNotCalled), null);
+			done(new Error(utils.messages.deepviewNotCalled), null);
 	}
 	if (window.event) {
 		if (window.event.preventDefault) {
@@ -1564,8 +1549,8 @@ Branch.prototype['deepviewCta'] = wrap(callback_params.CALLBACK_ERR, function(do
  * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
  * - *didCallJourneyClose*: Emitted when developer calls `branch.closeJourney()` to dismiss Journey.
  */
-/*** +TOC_HEADING &Event Listener& ^WEB ***/
-/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
+/** * +TOC_HEADING &Event Listener& ^WEB ***/
+/** * +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 Branch.prototype['addListener'] = function(event, listener) {
 	if (typeof event === 'function' && listener === undefined) {
 		listener = event;
@@ -1590,7 +1575,7 @@ Branch.prototype['addListener'] = function(event, listener) {
  * just an identical clone of the function.
  *
  */
-/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
+/** * +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
 Branch.prototype['removeListener'] = function(listener) {
 	if (listener) {
 		this._listeners = this._listeners.filter(function(subscription) {
@@ -1632,8 +1617,8 @@ Branch.prototype['removeListener'] = function(listener) {
  * });
  * ```
  */
-/*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
-/*** +TOC_ITEM #setbranchviewdatadata &.setBranchViewData()& ^WEB ***/
+/** * +TOC_HEADING &Journeys Web To App& ^WEB ***/
+/** * +TOC_ITEM #setbranchviewdatadata &.setBranchViewData()& ^WEB ***/
 function _setBranchViewData(context, done, data) {
 	data = data || {};
 	try {
@@ -1664,9 +1649,9 @@ Branch.prototype['setBranchViewData'] = wrap(callback_params.CALLBACK_ERR, funct
  * ___
  *
  */
-/*** +TOC_ITEM #closejourneycallback &.closeJourney()& ^WEB ***/
+/** * +TOC_ITEM #closejourneycallback &.closeJourney()& ^WEB ***/
 Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(done) {
-	var self = this;
+	const self = this;
 	self['renderQueue'](function() {
 		if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
 			self._publishEvent('didCallJourneyClose', journeys_utils.journeyLinkData);
@@ -1681,7 +1666,7 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
 	if (!utils.mobileUserAgent()) {
-		console.info("banner functionality is not supported on desktop");
+		console.info('banner functionality is not supported on desktop');
 	}
 	else {
 		data = data || {};
@@ -1692,7 +1677,7 @@ Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, o
 			options['showAgain'] = options['forgetHide'];
 		}
 		/** @type {banner_utils.options} */
-		var bannerOptions = {
+		const bannerOptions = {
 			icon: /** @type {string} */ (utils.cleanBannerText(options['icon']) || ''),
 			title: /** @type {string} */ (utils.cleanBannerText(options['title']) || ''),
 			description: /** @type {string} */ (utils.cleanBannerText(options['description']) || ''),
@@ -1766,7 +1751,7 @@ Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, o
 
 		data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
 
-		var self = this;
+		const self = this;
 		self['renderQueue'](function() {
 			self.closeBannerPointer = banner(self, bannerOptions, data, self._storage);
 		});
@@ -1775,12 +1760,12 @@ Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, o
 });
 
 Branch.prototype['closeBanner'] = wrap(0, function(done) {
-	var self = this;
+	const self = this;
 	self['renderQueue'](function() {
 		if (self.closeBannerPointer) {
-			self._publishEvent("willCloseBanner");
+			self._publishEvent('willCloseBanner');
 			self.closeBannerPointer(function() {
-				self._publishEvent("didCloseBanner");
+				self._publishEvent('didCloseBanner');
 			});
 		}
 	});
@@ -1839,26 +1824,25 @@ Branch.prototype['closeBanner'] = wrap(0, function(done) {
  * ```
  * ___
  */
-/*** +TOC_HEADING &Revenue Analytics& ^WEB ***/
-/*** +TOC_ITEM #trackcommerceeventevent-commerce_data-metadata-callback &.trackCommerceEvent()& ^WEB ***/
+/** * +TOC_HEADING &Revenue Analytics& ^WEB ***/
+/** * +TOC_ITEM #trackcommerceeventevent-commerce_data-metadata-callback &.trackCommerceEvent()& ^WEB ***/
 Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, function(done, event, commerce_data, metadata) {
-	var self = this;
+	const self = this;
 	self['renderQueue'](function() {
-
-		var validationError = utils.validateCommerceEventParams(event, commerce_data);
+		const validationError = utils.validateCommerceEventParams(event, commerce_data);
 		if (validationError) {
 			return done(new Error(validationError));
 		}
 
 		self._api(resources.commerceEvent, {
-			"event": event,
-			"metadata": utils.merge({
-				"url": document.URL,
-				"user_agent": navigator.userAgent,
-				"language": navigator.language
+			'event': event,
+			'metadata': utils.merge({
+				'url': document.URL,
+				'user_agent': navigator.userAgent,
+				'language': navigator.language
 			}, metadata || {}),
-			"initial_referrer": utils.getInitialReferrer(self._referringLink()),
-			"commerce_data": commerce_data
+			'initial_referrer': utils.getInitialReferrer(self._referringLink()),
+			'commerce_data': commerce_data
 		}, function(err, data) {
 			done(err || null);
 		});
@@ -1886,10 +1870,10 @@ Branch.prototype['trackCommerceEvent'] = wrap(callback_params.CALLBACK_ERR, func
  * The do-not-track mode state is persistent: it is saved for the user across browser sessions for the web site.
  * ___
  */
-/*** +TOC_HEADING &User Privacy& ^WEB ***/
-/*** +TOC_ITEM #disabletrackingdisabletracking &.disableTracking()& ^WEB ***/
+/** * +TOC_HEADING &User Privacy& ^WEB ***/
+/** * +TOC_ITEM #disabletrackingdisabletracking &.disableTracking()& ^WEB ***/
 Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, function(done, disableTracking) {
-	if (disableTracking === false || disableTracking === "false") {
+	if (disableTracking === false || disableTracking === 'false') {
 		utils.userPreferences.trackingDisabled = false;
 		utils.userPreferences.allowErrorsInCallback = false;
 		if (this.branch_key && this.init_options) {
@@ -1899,7 +1883,7 @@ Branch.prototype['disableTracking'] = wrap(callback_params.CALLBACK_ERR, functio
 			this['init'](this.branch_key, this.init_options);
 		}
 	}
-	else if (disableTracking === undefined || disableTracking === true || disableTracking === "true") {
+	else if (disableTracking === undefined || disableTracking === true || disableTracking === 'true') {
 		utils.cleanApplicationAndSessionStorage(this);
 		utils.userPreferences.trackingDisabled = true;
 		utils.userPreferences.allowErrorsInCallback = true;
@@ -1915,11 +1899,11 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
 	done();
 }, /* allowed before init */ true);
 
-/***
+/** *
  * @function Branch.referringLink
  * @param {Boolean} withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
- Branch.prototype.referringLink = function(withExtendedJourneysAssist) {
+Branch.prototype.referringLink = function(withExtendedJourneysAssist) {
 	return this._referringLink(withExtendedJourneysAssist);
 };

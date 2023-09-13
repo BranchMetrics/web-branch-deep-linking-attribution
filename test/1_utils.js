@@ -1,55 +1,55 @@
 'use strict';
-/*jshint -W079 */
-var sinon = require('sinon');
+/* jshint -W079 */
+const sinon = require('sinon');
 goog.require('utils');
 
 describe('utils', function() {
-	var assert = testUtils.unplanned();
+	const assert = testUtils.unplanned();
 	describe('base64encode', function() {
 		it('should encode a string', function() {
-			var string = 'test string to encode';
-			var expectedEncoded = 'dGVzdCBzdHJpbmcgdG8gZW5jb2Rl';
+			const string = 'test string to encode';
+			const expectedEncoded = 'dGVzdCBzdHJpbmcgdG8gZW5jb2Rl';
 			assert.strictEqual(utils.base64encode(string), expectedEncoded, 'Correctly encoded');
 		});
 	});
 
 	describe('merge', function() {
 		it('should merge two objects despite duplication', function() {
-			var obj1 = { "simple": "object" };
-			var obj2 = {
-				"simple": "object",
-				"nested": {
-					"object": "here"
+			const obj1 = {'simple': 'object'};
+			const obj2 = {
+				'simple': 'object',
+				'nested': {
+					'object': 'here'
 				}
 			};
-			var expectedMerged = {
-				"simple": "object",
-				"nested": {
-					"object": "here"
+			const expectedMerged = {
+				'simple': 'object',
+				'nested': {
+					'object': 'here'
 				}
 			};
 			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
 		});
 		it('should handle an non-object for first argument', function() {
-			var obj1 = null;
-			var obj2 = {
-				"simple": "object",
-				"nested": {
-					"object": "here"
+			const obj1 = null;
+			const obj2 = {
+				'simple': 'object',
+				'nested': {
+					'object': 'here'
 				}
 			};
-			var expectedMerged = {
-				"simple": "object",
-				"nested": {
-					"object": "here"
+			const expectedMerged = {
+				'simple': 'object',
+				'nested': {
+					'object': 'here'
 				}
 			};
 			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
 		});
 		it('should handle an non-object for second argument', function() {
-			var obj1 = { "simple": "object" };
-			var obj2 = null;
-			var expectedMerged = { "simple": "object" };
+			const obj1 = {'simple': 'object'};
+			const obj2 = null;
+			const expectedMerged = {'simple': 'object'};
 			assert.deepEqual(utils.merge(obj1, obj2), expectedMerged, 'Correctly merged');
 		});
 	});
@@ -65,31 +65,31 @@ describe('utils', function() {
 			 * developer_identity seems risky, but setting identity to the correct
 			 * value is an improvement over two nulls.
 			 */
-			var input = {
-				"data": "string",
-				"data_parsed": {
-					"key": "value"
+			const input = {
+				'data': 'string',
+				'data_parsed': {
+					'key': 'value'
 				},
-				"has_app": true,
-				"identity": "90210",
-				"developer_identity": "67890",
-				"referring_identity": "12345",
-				"referring_link": null,
-				"unwanted": "param"
+				'has_app': true,
+				'identity': '90210',
+				'developer_identity': '67890',
+				'referring_identity': '12345',
+				'referring_link': null,
+				'unwanted': 'param'
 			};
-			var expected = {
-				"data": "string",
-				"data_parsed": {
-					"key": "value"
+			const expected = {
+				'data': 'string',
+				'data_parsed': {
+					'key': 'value'
 				},
-				"has_app": true,
-				"identity": "90210",
-				"developer_identity": "90210",
-				"referring_identity": "12345",
-				"referring_link": null
+				'has_app': true,
+				'identity': '90210',
+				'developer_identity': '90210',
+				'referring_identity': '12345',
+				'referring_link': null
 			};
 			// determine whitelisted fields before deleting unwanted param
-			var actual = utils.whiteListSessionData(input);
+			const actual = utils.whiteListSessionData(input);
 			assert.deepEqual(
 				actual,
 				expected,
@@ -98,23 +98,23 @@ describe('utils', function() {
 		});
 
 		it('should make missing params null', function() {
-			var data = {
-				"data": "string",
-				"identity": "67890",
-				"referring_identity": "12345"
+			const data = {
+				'data': 'string',
+				'identity': '67890',
+				'referring_identity': '12345'
 			};
-			var whiteListedData = utils.whiteListSessionData(data);
+			const whiteListedData = utils.whiteListSessionData(data);
 			assert.strictEqual(whiteListedData['has_app'], null, 'has_app should be null');
 		});
 	});
 
 	describe('cleanLinkData', function() {
-		var windowLocation = 'http://someurl/pluspath';
-		var ogTitle = 'OGTitle';
-		var ogDescription = 'OGDescription';
-		var ogImage = 'OGImage';
-		var ogVideo = 'OGVideo';
-		var ogType = 'OGType';
+		const windowLocation = 'http://someurl/pluspath';
+		const ogTitle = 'OGTitle';
+		const ogDescription = 'OGDescription';
+		const ogImage = 'OGImage';
+		const ogVideo = 'OGVideo';
+		const ogType = 'OGType';
 
 		beforeEach(function() {
 			sinon.stub(utils, 'getWindowLocation')
@@ -134,8 +134,8 @@ describe('utils', function() {
 		});
 
 		it('should accept empty linkData', function() {
-			var linkData = { };
-			var dataString = [
+			const linkData = { };
+			const dataString = [
 				'{',
 				'"$canonical_url":"' + windowLocation + '",',
 				'"$og_title":"' + ogTitle + '",',
@@ -145,8 +145,8 @@ describe('utils', function() {
 				'"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
-			var expectedCleanedLinkData = {
-				source: "web-sdk",
+			const expectedCleanedLinkData = {
+				source: 'web-sdk',
 				data: dataString
 			};
 			assert.deepEqual(
@@ -157,17 +157,17 @@ describe('utils', function() {
 		});
 
 		it('should stringify field "data" and add "source"', function() {
-			var linkData = {
-				"data": {
-					subfield1:"bar",
-					"subfield2":false
+			const linkData = {
+				'data': {
+					'subfield1': 'bar',
+					'subfield2': false
 				},
-				field1: 12345,
-				field2: "67890",
-				"field 3": true,
-				field4: null
+				'field1': 12345,
+				'field2': '67890',
+				'field 3': true,
+				'field4': null
 			};
-			var dataString = [
+			const dataString = [
 				'{',
 				'"subfield1":"bar",',
 				'"subfield2":false,',
@@ -179,13 +179,13 @@ describe('utils', function() {
 				'"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
-			var expectedCleanedLinkData = {
-				"data": dataString,
-				field1: 12345,
-				field2: "67890",
-				"field 3": true,
-				field4: null,
-				source: "web-sdk"
+			const expectedCleanedLinkData = {
+				'data': dataString,
+				'field1': 12345,
+				'field2': '67890',
+				'field 3': true,
+				'field4': null,
+				'source': 'web-sdk'
 			};
 			assert.deepEqual(
 				utils.cleanLinkData(linkData),
@@ -195,18 +195,18 @@ describe('utils', function() {
 		});
 
 		it('should not stringify pre-stringified field "data"', function() {
-			var linkData = {
-				"data":
+			const linkData = {
+				'data':
 				{
-					subfield1:"bar",
-					"subfield2":false
+					'subfield1': 'bar',
+					'subfield2': false
 				},
-				field1: 12345,
-				field2: "67890",
-				"field 3": true,
-				field4: null
+				'field1': 12345,
+				'field2': '67890',
+				'field 3': true,
+				'field4': null
 			};
-			var dataString = [
+			const dataString = [
 				'{',
 				'"subfield1":"bar",',
 				'"subfield2":false,',
@@ -218,13 +218,13 @@ describe('utils', function() {
 				'"$og_type":"' + ogType + '"',
 				'}'
 			].join('');
-			var expectedCleanedLinkData = {
-				"data": dataString,
-				field1: 12345,
-				field2: "67890",
-				"field 3": true,
-				field4: null,
-				source: "web-sdk"
+			const expectedCleanedLinkData = {
+				'data': dataString,
+				'field1': 12345,
+				'field2': '67890',
+				'field 3': true,
+				'field4': null,
+				'source': 'web-sdk'
 			};
 			assert.deepEqual(
 				utils.cleanLinkData((utils.cleanLinkData(linkData))),
@@ -291,7 +291,7 @@ describe('utils', function() {
 				utils.message(utils.messages.timeout),
 				'Request timed out',
 				'Expected Request timed out message produced'
-				);
+			);
 		});
 
 		it('should produce a missing URL error', function() {
@@ -428,8 +428,8 @@ describe('utils', function() {
 			);
 		});
 		it.skip('should return OG tags', function() {
-			var expected = {
-				$og_type:'product'
+			const expected = {
+				$og_type: 'product'
 			};
 			assert.deepEqual(
 				expected,
@@ -438,7 +438,7 @@ describe('utils', function() {
 			);
 		});
 		it.skip('should find applink, twitter and branch hosted data on page', function() {
-			var expected = {
+			const expected = {
 				watch_brand: 'Hamilton',
 				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
 				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
@@ -451,13 +451,13 @@ describe('utils', function() {
 			);
 		});
 		it('$ios_deeplink_path and $android_deeplink_path should be formed from hosted metadata', function() {
-			var params = { "$key1":"val1", "$key2":"val2" };
-			var deeplinkPaths = { "hostedIOS":"hosteddld/ios", "hostedAndroid":"hosteddld/android", "applinksIOS":"appllinks/ios", "applinksAndroid":"applinks/android", "twitterIOS":"twitter/ios", "twitterAndroid":"twitter/android" };
-			var expected = {
-				"$key1":"val1",
-				"$key2":"val2",
-				"$ios_deeplink_path":"hosteddld/ios",
-				"$android_deeplink_path":"hosteddld/android"
+			const params = {'$key1': 'val1', '$key2': 'val2'};
+			const deeplinkPaths = {'hostedIOS': 'hosteddld/ios', 'hostedAndroid': 'hosteddld/android', 'applinksIOS': 'appllinks/ios', 'applinksAndroid': 'applinks/android', 'twitterIOS': 'twitter/ios', 'twitterAndroid': 'twitter/android'};
+			const expected = {
+				'$key1': 'val1',
+				'$key2': 'val2',
+				'$ios_deeplink_path': 'hosteddld/ios',
+				'$android_deeplink_path': 'hosteddld/android'
 			};
 			assert.deepEqual(
 				expected,
@@ -466,13 +466,13 @@ describe('utils', function() {
 			);
 		});
 		it('$ios_deeplink_path should be formed from applinks tag and $android_deeplink_path from hosted metadata tag', function() {
-			var params = { "$key1":"val1", "$key2":"val2" };
-			var deeplinkPaths = { "hostedIOS":null, "hostedAndroid":"hosteddld/android", "applinksIOS":"appllinks/ios", "applinksAndroid":"applinks/android", "twitterIOS":"twitter/ios", "twitterAndroid":"twitter/android" };
-			var expected = {
-				"$key1":"val1",
-				"$key2":"val2",
-				"$ios_deeplink_path":"appllinks/ios",
-				"$android_deeplink_path":"hosteddld/android"
+			const params = {'$key1': 'val1', '$key2': 'val2'};
+			const deeplinkPaths = {'hostedIOS': null, 'hostedAndroid': 'hosteddld/android', 'applinksIOS': 'appllinks/ios', 'applinksAndroid': 'applinks/android', 'twitterIOS': 'twitter/ios', 'twitterAndroid': 'twitter/android'};
+			const expected = {
+				'$key1': 'val1',
+				'$key2': 'val2',
+				'$ios_deeplink_path': 'appllinks/ios',
+				'$android_deeplink_path': 'hosteddld/android'
 			};
 			assert.deepEqual(
 				expected,
@@ -481,11 +481,11 @@ describe('utils', function() {
 			);
 		});
 		it('$ios_deeplink_path and $android_deeplink_path should be formed from twitter tags', function() {
-			var params = {};
-			var deeplinkPaths = { "twitterIOS":"twitter/ios", "twitterAndroid":"twitter/android" };
-			var expected = {
-				"$ios_deeplink_path":"twitter/ios",
-				"$android_deeplink_path":"twitter/android"
+			const params = {};
+			const deeplinkPaths = {'twitterIOS': 'twitter/ios', 'twitterAndroid': 'twitter/android'};
+			const expected = {
+				'$ios_deeplink_path': 'twitter/ios',
+				'$android_deeplink_path': 'twitter/android'
 			};
 			assert.deepEqual(
 				expected,
@@ -494,12 +494,12 @@ describe('utils', function() {
 			);
 		});
 		it('$ios_deeplink_path and $android_deeplink_path should be formed from twitter tags. $deeplink_path should also be present', function() {
-			var params = {};
-			var deeplinkPaths = { "twitterIOS":"twitter/some/path", "twitterAndroid":"twitter/some/path" };
-			var expected = {
-				"$ios_deeplink_path":"twitter/some/path",
-				"$android_deeplink_path":"twitter/some/path",
-				"$deeplink_path":"twitter/some/path"
+			const params = {};
+			const deeplinkPaths = {'twitterIOS': 'twitter/some/path', 'twitterAndroid': 'twitter/some/path'};
+			const expected = {
+				'$ios_deeplink_path': 'twitter/some/path',
+				'$android_deeplink_path': 'twitter/some/path',
+				'$deeplink_path': 'twitter/some/path'
 			};
 			assert.deepEqual(
 				expected,
@@ -508,11 +508,11 @@ describe('utils', function() {
 			);
 		});
 		it('Original key:value pairs in params should be present', function() {
-			var params = { "$key1":"val1", "$key2":"val2" };
-			var deeplinkPaths = {};
-			var expected = {
-				"$key1":"val1",
-				"$key2":"val2"
+			const params = {'$key1': 'val1', '$key2': 'val2'};
+			const deeplinkPaths = {};
+			const expected = {
+				'$key1': 'val1',
+				'$key2': 'val2'
 			};
 			assert.deepEqual(
 				expected,
@@ -524,47 +524,47 @@ describe('utils', function() {
 
 	describe('getClickIdAndSearchStringFromLink', function() {
 		it.skip('If /123abc is passed in, 123abc should be returned"', function() {
-			var expected = "123abc";
+			const expected = '123abc';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink("/123abc"),
+				utils.getClickIdAndSearchStringFromLink('/123abc'),
 				'should be equal'
 			);
 		});
 		it.skip('If /c/123abc is passed in, 123abc should be returned"', function() {
-			var expected = "123abc";
+			const expected = '123abc';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink("/c/123abc"),
+				utils.getClickIdAndSearchStringFromLink('/c/123abc'),
 				'should be equal'
 			);
 		});
 		it.skip('If /c/123abc?key1=val1 is passed in, 123abc?key1=val1 should be returned"', function() {
-			var expected = "123abc?key1=val1";
+			const expected = '123abc?key1=val1';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink("/c/123abc?key1=val1"),
+				utils.getClickIdAndSearchStringFromLink('/c/123abc?key1=val1'),
 				'should be equal'
 			);
 		});
 		it('If {} is passed in, "" should be returned"', function() {
-			var expected = "";
+			const expected = '';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink(""),
+				utils.getClickIdAndSearchStringFromLink(''),
 				'should be equal'
 			);
 		});
 		it('If "" is passed in, "" should be returned"', function() {
-			var expected = "";
+			const expected = '';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink(""),
+				utils.getClickIdAndSearchStringFromLink(''),
 				'should be equal'
 			);
 		});
 		it('If undefined is passed in, "" should be returned"', function() {
-			var expected = "";
+			const expected = '';
 			assert.strictEqual(
 				expected,
 				utils.getClickIdAndSearchStringFromLink(undefined),
@@ -572,7 +572,7 @@ describe('utils', function() {
 			);
 		});
 		it('If null is passed in, "" should be returned"', function() {
-			var expected = "";
+			const expected = '';
 			assert.strictEqual(
 				expected,
 				utils.getClickIdAndSearchStringFromLink(null),
@@ -580,148 +580,147 @@ describe('utils', function() {
 			);
 		});
 		it('If "http://example.com:3000?test=test" is passed in, ?test=test should be returned"', function() {
-			var expected = "?test=test";
+			const expected = '?test=test';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink("http://example.com:3000?test=test"),
+				utils.getClickIdAndSearchStringFromLink('http://example.com:3000?test=test'),
 				'should be equal'
 			);
 		});
 		it('If "http://example.com:3000/?test=test" is passed in, ?test=test should be returned"', function() {
-			var expected = "?test=test";
+			const expected = '?test=test';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink("http://example.com:3000/?test=test"),
+				utils.getClickIdAndSearchStringFromLink('http://example.com:3000/?test=test'),
 				'should be equal'
 			);
 		});
 		it('If "http://example.com:3000/c/clickid?search=test#hash" is passed in, clickid?search=test should be returned"', function() {
-			var expected = "clickid?search=test";
+			const expected = 'clickid?search=test';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink("http://example.com:3000/c/clickid?search=test#hash"),
+				utils.getClickIdAndSearchStringFromLink('http://example.com:3000/c/clickid?search=test#hash'),
 				'should be equal'
 			);
 		});
 		it('If "http://example.com:3000/c/clickid/?search=test#hash" is passed in, clickid?search=test should be returned"', function() {
-			var expected = "clickid?search=test";
+			const expected = 'clickid?search=test';
 			assert.strictEqual(
 				expected,
-				utils.getClickIdAndSearchStringFromLink("http://example.com:3000/c/clickid/?search=test#hash"),
+				utils.getClickIdAndSearchStringFromLink('http://example.com:3000/c/clickid/?search=test#hash'),
 				'should be equal'
 			);
 		});
 	});
 	describe('convertObjectValuesToString', function() {
 		it('a simple object\'s values should be stringified', function() {
-			var initial = {
+			const initial = {
 				key1: 1,
 				key2: 2
 			};
-			var expected = {
-				key1: "1",
-				key2: "2"
+			const expected = {
+				key1: '1',
+				key2: '2'
 			};
 			assert.deepEqual(
 				expected,
 				utils.convertObjectValuesToString(initial),
-				"objects values are not strings"
+				'objects values are not strings'
 			);
 		});
 		it('a complex object\'s values should be stringified', function() {
-			var initial = {
-				"revenue": 123,
-				"currency": "USD",
-				"custom_key_0": { "sku": "foo-sku-7", "price": 8.50, "quantity": 4 },
-				"custom_key_1": [
-					{ "sku": "foo-sku-7", "price": 8.50, "quantity": 4 },
+			const initial = {
+				'revenue': 123,
+				'currency': 'USD',
+				'custom_key_0': {'sku': 'foo-sku-7', 'price': 8.50, 'quantity': 4},
+				'custom_key_1': [
+					{'sku': 'foo-sku-7', 'price': 8.50, 'quantity': 4},
 					'testing'
 				]
 			};
-			var expected = {
-				"revenue":"123",
-				"currency":"USD",
-				"custom_key_0":"{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4}",
-				"custom_key_1": "[{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4},\"testing\"]"
+			const expected = {
+				'revenue': '123',
+				'currency': 'USD',
+				'custom_key_0': '{"sku":"foo-sku-7","price":8.5,"quantity":4}',
+				'custom_key_1': '[{"sku":"foo-sku-7","price":8.5,"quantity":4},"testing"]'
 			};
 			assert.deepEqual(
 				expected,
 				utils.convertObjectValuesToString(initial),
-				"objects values are not strings"
+				'objects values are not strings'
 			);
 		});
 		it('should return empty object', function() {
-			var initial = {};
+			const initial = {};
 			assert.deepEqual(
 				{},
 				utils.convertObjectValuesToString(initial),
-				"should return empty object"
+				'should return empty object'
 			);
 		});
 	});
 
 	describe('convertValueToString', function() {
 		it('should stringify a number', function() {
-			var initial = 0;
-			var expected = "0";
+			const initial = 0;
+			const expected = '0';
 			assert.strictEqual(
 				expected,
 				utils.convertValueToString(initial),
-				"0 should be converted to \"0\""
+				'0 should be converted to "0"'
 			);
 		});
 
 		it('should stringify a boolean', function() {
-			var initial = true;
-			var expected = "true";
+			const initial = true;
+			const expected = 'true';
 			assert.strictEqual(
 				expected,
 				utils.convertValueToString(initial),
-				"true should be converted to \"true\""
+				'true should be converted to "true"'
 			);
 		});
 
 		it('should stringify null', function() {
-			var initial = null;
-			var expected = "null";
+			const initial = null;
+			const expected = 'null';
 			assert.strictEqual(
 				expected,
 				utils.convertValueToString(initial),
-				"null should be converted to \"null\""
+				'null should be converted to "null"'
 			);
 		});
 
 		it('should stringify an object', function() {
-			var initial = { "sku": "foo-sku-7", "price": 8.50, "quantity": 4 };
-			var expected = "{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4}";
+			const initial = {'sku': 'foo-sku-7', 'price': 8.50, 'quantity': 4};
+			const expected = '{"sku":"foo-sku-7","price":8.5,"quantity":4}';
 			assert.strictEqual(
 				expected,
 				utils.convertValueToString(initial),
-				"object should be stringified"
+				'object should be stringified'
 			);
 		});
 
 		it('should stringify an array', function() {
-			var initial = [
-				{ "sku": "foo-sku-7", "price": 8.50, "quantity": 4 },
+			const initial = [
+				{'sku': 'foo-sku-7', 'price': 8.50, 'quantity': 4},
 				'testing'
 			];
-			var expected = "[{\"sku\":\"foo-sku-7\",\"price\":8.5,\"quantity\":4},\"testing\"]";
+			const expected = '[{"sku":"foo-sku-7","price":8.5,"quantity":4},"testing"]';
 			assert.strictEqual(
 				expected,
 				utils.convertValueToString(initial),
-				"array should be stringified"
+				'array should be stringified'
 			);
 		});
 	});
 
 
-
 	describe('isSafari11OrGreater', function() {
-		var originalUa = navigator.userAgent;
+		const originalUa = navigator.userAgent;
 
 		function setUserAgent(ua) {
-			navigator.__defineGetter__("userAgent", function() {
+			navigator.__defineGetter__('userAgent', function() {
 				return ua;
 			});
 		}
@@ -730,7 +729,7 @@ describe('utils', function() {
 			setUserAgent(originalUa);
 		});
 
-		var popularBrowsers = [
+		const popularBrowsers = [
 			'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36',
 			'Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)',
 			'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
@@ -774,7 +773,7 @@ describe('utils', function() {
 		];
 
 		it('should return false for non safari browsers', function() {
-			var isSafari11 = false;
+			let isSafari11 = false;
 			popularBrowsers.forEach(function(ua) {
 				setUserAgent(ua);
 				if (navigator.userAgent === ua && utils.isSafari11OrGreater()) {
@@ -785,7 +784,7 @@ describe('utils', function() {
 			assert.strictEqual(isSafari11, false, 'should return false for all browsers');
 		});
 
-		var safari11 = [
+		const safari11 = [
 			'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1',
 			'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.31 (KHTML, like Gecko) Version/11.0 Mobile/15A5327g Safari/604.1',
 			'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1',
@@ -799,7 +798,7 @@ describe('utils', function() {
 		];
 
 		it('should return true for safari 11 browsers', function() {
-			var isSafari11 = true;
+			let isSafari11 = true;
 			safari11.forEach(function(ua) {
 				setUserAgent(ua);
 				if (navigator.userAgent === ua && !utils.isSafari11OrGreater()) {
@@ -811,32 +810,31 @@ describe('utils', function() {
 		});
 	});
 	describe('separateEventAndCustomData ', function() {
-
 		it('extracted custom and event data should equal initial objects', function() {
-			var event_data = {
-				"transaction_id": "1AB23456C7890123D",
-				"revenue": 6.00,
-				"currency": "USD",
-				"shipping": 3.00,
-				"tax": 3.00,
-				"coupon": "8891701",
-				"affiliation": "xyz_affiliation",
-				"search_query": "boat shoes sperrys",
-				"description": "Sperry Authentic Original"
+			const event_data = {
+				'transaction_id': '1AB23456C7890123D',
+				'revenue': 6.00,
+				'currency': 'USD',
+				'shipping': 3.00,
+				'tax': 3.00,
+				'coupon': '8891701',
+				'affiliation': 'xyz_affiliation',
+				'search_query': 'boat shoes sperrys',
+				'description': 'Sperry Authentic Original'
 			};
 
-			var custom_data = {
-				"custom_key_1": "custom_val_1",
-				"custom_key_2": "custom_val_2",
-				"custom_key_3": "custom_val_3"
+			const custom_data = {
+				'custom_key_1': 'custom_val_1',
+				'custom_key_2': 'custom_val_2',
+				'custom_key_3': 'custom_val_3'
 			};
 
-			var event_and_custom_data = {};
+			const event_and_custom_data = {};
 
 			utils.merge(event_and_custom_data, event_data);
 			utils.merge(event_and_custom_data, custom_data);
 
-			var extractedEventAndCustomData = utils.separateEventAndCustomData(event_and_custom_data);
+			const extractedEventAndCustomData = utils.separateEventAndCustomData(event_and_custom_data);
 			assert.deepEqual(
 				event_data,
 				extractedEventAndCustomData['event_data'],
@@ -850,8 +848,8 @@ describe('utils', function() {
 		});
 
 		it('utils.isStandardEvent() should return true for standard events and false for custom events', function() {
-			var standardEvent = 'ADD_TO_WISHLIST';
-			var customEvent = 'ADD_TO_WISHLISTT';
+			const standardEvent = 'ADD_TO_WISHLIST';
+			const customEvent = 'ADD_TO_WISHLISTT';
 
 			assert.strictEqual(true,
 				utils.isStandardEvent(standardEvent),
@@ -862,12 +860,12 @@ describe('utils', function() {
 		});
 
 		it('should return true or false for a given parameter and type', function() {
-			var parameter1 = {};
-			var parameter2 = [];
-			var parameter3 = "test";
-			var type1 = "object";
-			var type2 = "array";
-			var type3 = "string";
+			const parameter1 = {};
+			const parameter2 = [];
+			const parameter3 = 'test';
+			const type1 = 'object';
+			const type2 = 'array';
+			const type3 = 'string';
 			assert.strictEqual(false,
 				utils.validateParameterType(null, type1),
 				'should return false');
@@ -904,19 +902,18 @@ describe('utils', function() {
 			assert.strictEqual(true,
 				utils.validateParameterType(parameter3, type3),
 				'should return true');
-
 		});
 	});
 
 	describe('mergeMetadataFromInitToHostedMetadata', function() {
 		it.skip('override previous hosted_deeplink_data keys via user-supplied metadata object', function() {
-			var additionalMetadata = {};
+			const additionalMetadata = {};
 			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
-			var userSuppliedMetadata = { watch_brand: 'Seiko',
+			const userSuppliedMetadata = {watch_brand: 'Seiko',
 				type: 'Presage'
 			};
-			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
-			var expected = {
+			const response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
+			const expected = {
 				watch_brand: 'Seiko',
 				type: 'Presage',
 				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
@@ -930,11 +927,11 @@ describe('utils', function() {
 		});
 
 		it.skip('merge hosted_deeplink_data and user-supplied metadata', function() {
-			var additionalMetadata = {};
+			const additionalMetadata = {};
 			additionalMetadata['hosted_deeplink_data'] = utils.getHostedDeepLinkData();
-			var userSuppliedMetadata = { productA: '12345' };
-			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
-			var expected = {
+			const userSuppliedMetadata = {productA: '12345'};
+			const response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
+			const expected = {
 				watch_brand: 'Hamilton',
 				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
 				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
@@ -949,10 +946,10 @@ describe('utils', function() {
 		});
 
 		it('tests with metadata and without hosted_deeplink_data', function() {
-			var additionalMetadata = {};
-			var userSuppliedMetadata = { productA: '12345' };
-			var response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
-			var expected = { productA: '12345' };
+			const additionalMetadata = {};
+			const userSuppliedMetadata = {productA: '12345'};
+			const response = utils.mergeHostedDeeplinkData(additionalMetadata['hosted_deeplink_data'], userSuppliedMetadata);
+			const expected = {productA: '12345'};
 			assert.deepEqual(
 				expected,
 				response,
@@ -961,11 +958,11 @@ describe('utils', function() {
 		});
 
 		it('ensure that additionalMetadata[\'hosted_deeplink_data\'] does not get mutated', function() {
-			var additionalData = { 'root_key': '1234' };
-			additionalData['hosted_deeplink_data'] = { productA: '12345' };
-			var userSuppliedMetadata = { productB: '12345' };
+			const additionalData = {'root_key': '1234'};
+			additionalData['hosted_deeplink_data'] = {productA: '12345'};
+			const userSuppliedMetadata = {productB: '12345'};
 			utils.mergeHostedDeeplinkData(additionalData['hosted_deeplink_data'], userSuppliedMetadata);
-			var expected = { 'root_key': '1234', 'hosted_deeplink_data': { productA: '12345' } };
+			const expected = {'root_key': '1234', 'hosted_deeplink_data': {productA: '12345'}};
 			assert.deepEqual(
 				expected,
 				additionalData,
@@ -974,11 +971,11 @@ describe('utils', function() {
 		});
 
 		it('ensure that userSuppliedMetadata does not get mutated', function() {
-			var additionalData = {};
-			additionalData['hosted_deeplink_data'] = { productA: '12345' };
-			var userSuppliedMetadata = { productB: '12345' };
+			const additionalData = {};
+			additionalData['hosted_deeplink_data'] = {productA: '12345'};
+			const userSuppliedMetadata = {productB: '12345'};
 			utils.mergeHostedDeeplinkData(additionalData['hosted_deeplink_data'], userSuppliedMetadata);
-			var expected = { productB: '12345' };
+			const expected = {productB: '12345'};
 			assert.deepEqual(
 				expected,
 				userSuppliedMetadata,
@@ -994,10 +991,10 @@ describe('utils', function() {
 			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/open'));
 		});
 		it('should return false with v1/open as url endpoint and valid request data provided', function() {
-			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/open', { link_identifier: '111111111111' }));
+			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/open', {link_identifier: '111111111111'}));
 		});
 		it('should return true with v1/xyz as url endpoint and with bogus request data', function() {
-			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/xyz', { link_identifier: '111111111111' }));
+			assert.strictEqual(true, utils.userPreferences.shouldBlockRequest('https://api2.branch.io/v1/xyz', {link_identifier: '111111111111'}));
 		});
 		it('should allow raw links', function() {
 			assert.strictEqual(false, utils.userPreferences.shouldBlockRequest('https://bnctestbed.app.link/abcdefg'));
@@ -1006,7 +1003,7 @@ describe('utils', function() {
 
 	describe('delay function', function() {
 		it('calls synchronously for a non-numeric delay argument', function() {
-			var executed = false;
+			let executed = false;
 			utils.delay(function() {
 				executed = true;
 			}, NaN);
@@ -1015,7 +1012,7 @@ describe('utils', function() {
 		});
 
 		it('calls synchronously for a zero delay argument', function() {
-			var executed = false;
+			let executed = false;
 			utils.delay(function() {
 				executed = true;
 			}, 0);
@@ -1024,7 +1021,7 @@ describe('utils', function() {
 		});
 
 		it('calls synchronously for a negative delay argument', function() {
-			var executed = false;
+			let executed = false;
 			utils.delay(function() {
 				executed = true;
 			}, -25);
@@ -1033,8 +1030,8 @@ describe('utils', function() {
 		});
 
 		it('delays for any positive numeric argument', function(done) {
-			var executed = false;
-			var clock = sinon.useFakeTimers();
+			let executed = false;
+			const clock = sinon.useFakeTimers();
 			utils.delay(function() {
 				executed = true;
 				done();
@@ -1047,7 +1044,7 @@ describe('utils', function() {
 	});
 
 	describe('isWebKitBrowser function', function() {
-		var originalWebKitURL = window.webkitURL;
+		const originalWebKitURL = window.webkitURL;
 
 		it('returns true when window.webkitURL is defined', function() {
 			// pretend to be webkit
@@ -1074,9 +1071,9 @@ describe('utils', function() {
 	});
 
 	describe('isIOSWKWebView function', function() {
-		var originalUa = navigator.userAgent;
-		var originalWebKitURL = window.webkitURL;
-		var iOSBrowsers = {
+		const originalUa = navigator.userAgent;
+		const originalWebKitURL = window.webkitURL;
+		const iOSBrowsers = {
 			safari: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Mobile/15E148 Safari/604.1',
 			chrome: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/84.0.4147.71 Mobile/15E148 Safari/604.1',
 			firefox: 'Mozilla/5.0 (iPhone; CPU OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/28.0 Mobile/15E148 Safari/605.1.15',
@@ -1088,7 +1085,7 @@ describe('utils', function() {
 		};
 
 		function setUserAgent(ua) {
-			navigator.__defineGetter__("userAgent", function() {
+			navigator.__defineGetter__('userAgent', function() {
 				return ua;
 			});
 		}
@@ -1177,57 +1174,57 @@ describe('utils', function() {
 
 	describe('addPropertyIfNotNullorEmpty', function() {
 		it('should not add property if value is empty', function() {
-			var obj = { "prop1": "value1" };
-			var expectedObj = {
-				"prop1": "value1"
+			const obj = {'prop1': 'value1'};
+			const expectedObj = {
+				'prop1': 'value1'
 			};
-			assert.deepEqual(utils.addPropertyIfNotNullorEmpty(obj, "prop2", ""), expectedObj, 'Correctly added property to object');
+			assert.deepEqual(utils.addPropertyIfNotNullorEmpty(obj, 'prop2', ''), expectedObj, 'Correctly added property to object');
 		});
 		it('should not add property if value is null', function() {
-			var obj = { "prop1": "value1" };
-			var expectedObj = {
-				"prop1": "value1"
+			const obj = {'prop1': 'value1'};
+			const expectedObj = {
+				'prop1': 'value1'
 			};
-			assert.deepEqual(utils.addPropertyIfNotNullorEmpty(obj, "prop2", null), expectedObj, 'Correctly added property to object');
+			assert.deepEqual(utils.addPropertyIfNotNullorEmpty(obj, 'prop2', null), expectedObj, 'Correctly added property to object');
 		});
 		it('should add property if value is not empty', function() {
-			var obj = { "prop1": "value1" };
-			var expectedObj = {
-				"prop1": "value1",
-				"prop2": "value2"
+			const obj = {'prop1': 'value1'};
+			const expectedObj = {
+				'prop1': 'value1',
+				'prop2': 'value2'
 			};
-			assert.deepEqual(utils.addPropertyIfNotNullorEmpty(obj, "prop2", "value2"), expectedObj, 'Correctly added property to object');
+			assert.deepEqual(utils.addPropertyIfNotNullorEmpty(obj, 'prop2', 'value2'), expectedObj, 'Correctly added property to object');
 		});
 	});
 
 	describe('removeTrailingDotZeros', function() {
 		it('should return empty if value is empty', function() {
-			var versionNumber = "";
+			const versionNumber = '';
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly matched empty');
 		});
 		it('should return null if value is null', function() {
-			var versionNumber = null;
+			const versionNumber = null;
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly matched null');
 		});
 		it('no dot- should not strip trailing dot zero', function() {
-			var versionNumber = "10";
+			const versionNumber = '10';
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
 		});
 		it('with dot and no zeros- should not strip trailing dot zero', function() {
-			var versionNumber = "10.10";
+			const versionNumber = '10.10';
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
 		});
 		it('single dot- should not strip trailing dot zero', function() {
-			var versionNumber = "10.0";
+			const versionNumber = '10.0';
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
 		});
 		it('multi-dot : should return string with trailing dot zeros stripped', function() {
-			var versionNumber = "10.0.0";
-			var expected = "10";
+			const versionNumber = '10.0.0';
+			const expected = '10';
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), expected, 'Correctly strip trailing zeros');
 		});
 		it('should not strip trailing dot zero', function() {
-			var versionNumber = "10.0.1";
+			const versionNumber = '10.0.1';
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
 		});
 	});

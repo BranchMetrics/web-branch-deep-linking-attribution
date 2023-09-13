@@ -2,40 +2,40 @@
  * This provides the principal function to make a call to the API. Basically
  * a fancy wrapper around XHR/JSONP/etc.
  */
- 'use strict';
+'use strict';
 
- goog.provide('Server');
- goog.require('utils');
- goog.require('goog.json');
- goog.require('storage'); // jshint unused:false
- goog.require('safejson');
+goog.provide('Server');
+goog.require('utils');
+goog.require('goog.json');
+goog.require('storage'); // jshint unused:false
+goog.require('safejson');
 
- /**
+/**
   * @class Server
   * @constructor
   */
- var Server = function() { };
+const Server = function() { };
 
- Server.prototype._jsonp_callback_index = 0;
+Server.prototype._jsonp_callback_index = 0;
 
- /**
+/**
   * @param {Object} obj
   * @param {string} prefix
   */
- Server.prototype.serializeObject = function(obj, prefix) {
+Server.prototype.serializeObject = function(obj, prefix) {
 	if (typeof obj === 'undefined') {
 		return '';
 	}
 
-	var pairs = [ ];
+	const pairs = [ ];
 	if (obj instanceof Array) {
-		for (var i = 0; i < obj.length; i++) {
+		for (let i = 0; i < obj.length; i++) {
 			pairs.push(encodeURIComponent(prefix) + '=' + encodeURIComponent(obj[i]));
 		}
 		return pairs.join('&');
 	}
 
-	for (var prop in obj) {
+	for (const prop in obj) {
 		if (!obj.hasOwnProperty(prop)) {
 			continue;
 		}
@@ -52,21 +52,21 @@
 		}
 	}
 	return pairs.join('&');
- };
+};
 
- /**
+/**
   * @param {utils.resource} resource
   * @param {Object.<string, *>} data
   */
- Server.prototype.getUrl = function(resource, data) {
-	var k;
-	var v;
-	var err;
-	var url = resource.destination + resource.endpoint;
-	var branch_id = /^[0-9]{15,20}$/;
-	var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
+Server.prototype.getUrl = function(resource, data) {
+	let k;
+	let v;
+	let err;
+	let url = resource.destination + resource.endpoint;
+	const branch_id = /^[0-9]{15,20}$/;
+	const branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
-	var appendKeyOrId = function(data, destinationObject) {
+	const appendKeyOrId = function(data, destinationObject) {
 		if (typeof destinationObject === 'undefined') {
 			destinationObject = { };
 		}
@@ -101,13 +101,13 @@
 				resource.queryPart[k](resource.endpoint, k, data[k]) :
 				err;
 			if (err) {
-				return { error: err };
+				return {error: err};
 			}
 			url += '/' + data[k];
 		}
 	}
 
-	var d = { };
+	const d = { };
 	// TODO: Add validation for v1/pageview and v1/dismiss, move setBranchViewData into a separate location so that it is isolated
 	if (typeof resource.params !== 'undefined' && resource.endpoint !== '/v1/pageview' && resource.endpoint !== '/v1/dismiss') {
 		for (k in resource.params) {
@@ -157,21 +157,21 @@
 		data: this.serializeObject(d, ''),
 		url: url.replace(/^\//, '')
 	};
- };
+};
 
- /**
+/**
   * This function is standalone for easy mocking.
   * @param {string} src
   */
- Server.prototype.createScript = function(src, onError, onLoad) {
-	var script = document.createElement('script');
+Server.prototype.createScript = function(src, onError, onLoad) {
+	const script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.async = true;
 	script.src = src;
 
 	utils.addNonceAttribute(script);
 
-	var heads = document.getElementsByTagName('head');
+	const heads = document.getElementsByTagName('head');
 	if (!heads || heads.length < 1) {
 		if (typeof onError === 'function') {
 			onError();
@@ -186,17 +186,17 @@
 	if (typeof onLoad === 'function') {
 		utils.addEvent(script, 'load', onLoad);
 	}
- };
+};
 
- /**
+/**
   * @param {string} requestURL
   * @param {Object} requestData
   * @param {utils._httpMethod} requestMethod
   * @param {function(?Error,*=,?=)=} callback
   */
- Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
-	var brtt = Date.now();
-	var brttTag = utils.currentRequestBrttTag;
+Server.prototype.jsonpRequest = function(requestURL, requestData, requestMethod, callback) {
+	const brtt = Date.now();
+	const brttTag = utils.currentRequestBrttTag;
 	/* On iOS 11-Safari when a partner calls .deepview() and uses $uri_redirect_mode: 2,
 		they will not get transported into the app (if installed) on pageload because
 		callbackString will evaluate to branch_callback_0. The backend expects branch_callback_1
@@ -205,14 +205,14 @@
 	if (this._jsonp_callback_index === 0 && utils.isSafari11OrGreater()) {
 		this._jsonp_callback_index++;
 	}
-	var callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
+	const callbackString = 'branch_callback__' + (this._jsonp_callback_index++);
 
-	var postPrefix = (requestURL.indexOf('branch.io') >= 0) ? '&data=' : '&post_data=';
-	var postData = (requestMethod === 'POST') ?
+	const postPrefix = (requestURL.indexOf('branch.io') >= 0) ? '&data=' : '&post_data=';
+	const postData = (requestMethod === 'POST') ?
 		encodeURIComponent(utils.base64encode(goog.json.serialize(requestData))) :
 		'';
 
-	var timeoutTrigger = window.setTimeout(
+	const timeoutTrigger = window.setTimeout(
 		function() {
 			window[callbackString] = function() { };
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
@@ -255,9 +255,9 @@
 			}
 			delete window[callbackString];
 		});
- };
+};
 
- /**
+/**
   * @param {string} url
   * @param {Object} data
   * @param {utils._httpMethod} method
@@ -266,12 +266,12 @@
   * @param {?boolean=} noParse - _optional_ -
   * @param {?string} responseType - _optional_ -
   */
- Server.prototype.XHRRequest = function(url, data, method, storage, callback, noParse, responseType) {
-	var brtt = Date.now();
-	var brttTag = utils.currentRequestBrttTag;
-	var req = (window.XMLHttpRequest ?
-			new XMLHttpRequest() :
-			new ActiveXObject('Microsoft.XMLHTTP'));
+Server.prototype.XHRRequest = function(url, data, method, storage, callback, noParse, responseType) {
+	const brtt = Date.now();
+	const brttTag = utils.currentRequestBrttTag;
+	const req = (window.XMLHttpRequest ?
+		new XMLHttpRequest() :
+		new ActiveXObject('Microsoft.XMLHTTP'));
 
 	if (responseType) {
 		req.responseType = responseType;
@@ -285,14 +285,14 @@
 		callback(new Error(e.error || ('Error in API: ' + req.status)), null, req.status);
 	};
 	req.onreadystatechange = function() {
-		var data;
+		let data;
 		if (req.readyState === 4) {
 			utils.addPropertyIfNotNull(utils.instrumentation, brttTag, utils.calculateBrtt(brtt));
 			if (req.status === 200) {
 				// Response value will be in "req.responseText" by default, unless
 				// the "req.responseType" is "text" or null.
 				// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-				if (req.responseType === "arraybuffer") {
+				if (req.responseType === 'arraybuffer') {
 					data = req.response;
 				}
 				else if (noParse) {
@@ -312,7 +312,7 @@
 					req.status.toString().substring(0, 1) === '5') {
 				// Server returns helpful information when a partner sends up incorrect fields in logEvent().
 				// This information appears in req.responseText.
-				if (req['responseURL'] && req['responseURL'].includes("v2/event")) {
+				if (req['responseURL'] && req['responseURL'].includes('v2/event')) {
 					callback(req['responseText'], null, req['status']);
 				}
 				else {
@@ -332,18 +332,18 @@
 		storage.set('use_jsonp', true);
 		this.jsonpRequest(url, data, method, callback);
 	}
- };
+};
 
- /**
+/**
   * @param {utils.resource} resource
   * @param {Object.<string, *>} data
   * @param {storage} storage
   * @param {function(?Error,*=)=} callback
   */
- Server.prototype.request = function(resource, data, storage, callback) {
-	var self = this;
+Server.prototype.request = function(resource, data, storage, callback) {
+	const self = this;
 
-	if (resource.endpoint === "/v1/pageview" && data && data['journey_displayed']) {
+	if (resource.endpoint === '/v1/pageview' && data && data['journey_displayed']) {
 		// special case for pageview endpoint
 		utils.currentRequestBrttTag = resource.endpoint + '-1-brtt';
 	}
@@ -351,7 +351,7 @@
 		utils.currentRequestBrttTag = resource.endpoint + '-brtt';
 	}
 
-	if ((resource.endpoint === "/v1/url") && Object.keys(utils.instrumentation).length > 1) {
+	if ((resource.endpoint === '/v1/url') && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];
 		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));
 		utils.instrumentation = {};
@@ -359,17 +359,17 @@
 
 	// Removes PII from request data in case fields flow in from cascading requests
 	if (utils.userPreferences.trackingDisabled) {
-		var PII = [ 'browser_fingerprint_id', 'alternative_browser_fingerprint_id', 'identity_id', 'session_id', 'identity' ];
-		for (var index = 0; index < PII.length; index++) {
+		const PII = [ 'browser_fingerprint_id', 'alternative_browser_fingerprint_id', 'identity_id', 'session_id', 'identity' ];
+		for (let index = 0; index < PII.length; index++) {
 			if (data.hasOwnProperty(PII[index])) {
 				delete data[PII[index]];
 			}
 		}
 	}
 
-	var u = this.getUrl(resource, data);
+	const u = this.getUrl(resource, data);
 	if (u.error) {
-		var errorObj = {
+		const errorObj = {
 			message: u.error,
 			endpoint: resource.endpoint,
 			data: data
@@ -377,8 +377,8 @@
 		return callback(new Error(safejson.stringify(errorObj)));
 	}
 
-	var url;
-	var postData = '';
+	let url;
+	let postData = '';
 	if (resource.method === 'GET') {
 		url = u.url + '?' + u.data;
 	}
@@ -387,7 +387,7 @@
 		postData = u.data;
 	}
 
-	var requestBody;
+	let requestBody;
 	if (storage.get('use_jsonp') || resource.jsonp) {
 		requestBody = data;
 	}
@@ -396,12 +396,12 @@
 	}
 
 	// How many times to retry the request if the initial attempt fails
-	var retries = utils.retries;
+	let retries = utils.retries;
 	// If request fails, retry after X miliseconds
-	/***
+	/** *
 	  * @type {function(?Error,*=): ?undefined}
 	*/
-	var done = function(err, data, status) {
+	const done = function(err, data, status) {
 		if (typeof self.onAPIResponse === 'function') {
 			// Record every request and response, including retries
 			// Note status is always undefined for jsonp requests (/_r and
@@ -416,7 +416,7 @@
 			);
 		}
 
-		if (err && retries > 0 && (status || "").toString().substring(0, 1) === '5') {
+		if (err && retries > 0 && (status || '').toString().substring(0, 1) === '5') {
 			retries--;
 			window.setTimeout(function() {
 				makeRequest();
@@ -432,14 +432,14 @@
 		return utils.userPreferences.allowErrorsInCallback ? done(new Error(utils.messages.trackingDisabled), null, 300) : done(null, {}, 200);
 	}
 
-	var noParseJsonResp = false;
-	var responseType;
-	if (resource.endpoint === "/v1/qr-code") {
+	let noParseJsonResp = false;
+	let responseType;
+	if (resource.endpoint === '/v1/qr-code') {
 		noParseJsonResp = true;
-		responseType = "arraybuffer";
+		responseType = 'arraybuffer';
 	}
 	/* jshint -W003 */
-	var makeRequest = function() {
+	const makeRequest = function() {
 		if (storage.get('use_jsonp') || resource.jsonp) {
 			self.jsonpRequest(url, data, resource.method, done);
 		}
@@ -449,4 +449,4 @@
 	};
 	/* jshint +W003 */
 	makeRequest();
- };
+};

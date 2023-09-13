@@ -81,13 +81,13 @@ banner_utils.removeClass = function(element, className) {
 		return;
 	}
 	if (banner_utils.hasClass(element, className)) {
-		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+		const reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
 		element.className = element.className.replace(reg, ' ');
 	}
 };
 
 banner_utils.getDate = function(days) {
-	var currentDate = new Date();
+	const currentDate = new Date();
 	return currentDate.setDate(currentDate.getDate() + days);
 };
 
@@ -101,25 +101,25 @@ banner_utils.getBodyStyle = function(style) {
 };
 
 banner_utils.addCSSLengths = function(length1, length2) {
-	var convertToUnitlessPixels = function(input) {
+	const convertToUnitlessPixels = function(input) {
 		if (!input) {
 			return 0;
 		}
-		var unit = input.replace(/[0-9,\.]/g, '');
-		var inputArray = input.match(/\d+/g);
-		var value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10);
-		var vw = function() {
+		const unit = input.replace(/[0-9,\.]/g, '');
+		const inputArray = input.match(/\d+/g);
+		const value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10);
+		const vw = function() {
 			return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
 		};
-		var vh = function() {
+		const vh = function() {
 			return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
 		};
 		return parseInt(
 			{
-				"px": function(value) {
+				'px': function(value) {
 					return value;
 				},
-				"em": function(value) {
+				'em': function(value) {
 					if (document.body.currentStyle) {
 						return value * convertToUnitlessPixels(document.body.currentStyle.fontSize);
 					}
@@ -127,7 +127,7 @@ banner_utils.addCSSLengths = function(length1, length2) {
 						return value * parseFloat(window.getComputedStyle(document.body).fontSize);
 					}
 				},
-				"rem": function(value) {
+				'rem': function(value) {
 					if (document.documentElement.currentStyle) {
 						return value *
 							convertToUnitlessPixels(document.documentElement.currentStyle.fontSize);
@@ -137,19 +137,19 @@ banner_utils.addCSSLengths = function(length1, length2) {
 							parseFloat(window.getComputedStyle(document.documentElement).fontSize);
 					}
 				},
-				"vw": function(value) {
+				'vw': function(value) {
 					return value * vw();
 				},
-				"vh": function(value) {
+				'vh': function(value) {
 					return value * vh();
 				},
-				"vmin": function(value) {
+				'vmin': function(value) {
 					return value * Math.min(vh(), vw());
 				},
-				"vmax": function(value) {
+				'vmax': function(value) {
 					return value * Math.max(vh(), vw());
 				},
-				"%": function() {
+				'%': function() {
 					return (document.body.clientWidth / 100) * value;
 				}
 			}[unit](value),
@@ -165,7 +165,7 @@ banner_utils.addCSSLengths = function(length1, length2) {
  * @return {boolean}
  */
 banner_utils.shouldAppend = function(storage, options) {
-	var hideBanner = storage.get('hideBanner', true);
+	let hideBanner = storage.get('hideBanner', true);
 
 	if (options.respectDNT && navigator && !!Number(navigator['doNotTrack'])) {
 		return false;
@@ -185,7 +185,7 @@ banner_utils.shouldAppend = function(storage, options) {
 		hideBanner = !hideBanner;
 	}
 
-	var forgetHide = options.forgetHide;
+	let forgetHide = options.forgetHide;
 	if (typeof forgetHide === 'number') {
 		forgetHide = false;
 	}

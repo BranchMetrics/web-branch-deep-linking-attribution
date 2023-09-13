@@ -5,11 +5,11 @@
 goog.provide('task_queue');
 
 /**
- * @returns {function(function(function()))}
+ * @return {function(function(function()))}
  */
-var task_queue = function() {
-	var queue = [];
-	var next = function() {
+task_queue = function() {
+	const queue = [];
+	const next = function() {
 		if (queue.length) {
 			queue[0](function() {
 				queue.shift();

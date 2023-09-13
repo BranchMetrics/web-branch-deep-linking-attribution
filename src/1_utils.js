@@ -4,7 +4,7 @@
 'use strict';
 
 goog.provide('utils');
-/*jshint unused:false*/
+/* jshint unused:false*/
 goog.require('goog.json');
 goog.require('config');
 goog.require('safejson');
@@ -12,7 +12,9 @@ goog.require('safejson');
 
 /* jshint ignore:start */
 /** @typedef {string} */
+// eslint-disable-next-line no-var, no-unused-vars
 var message;
+
 utils.debug = false;
 utils.retries = 2; // Value specifying the number of times that a Branch API call can be re-attempted.
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
@@ -28,9 +30,9 @@ utils.timeSinceNavigationStart = function() {
 	// in milliseconds
 	return (Date.now() - window.performance.timing.navigationStart).toString();
 };
-utils.currentRequestBrttTag = "";
+utils.currentRequestBrttTag = '';
 utils.calculateBrtt = function(startTime) {
-	if (!startTime || typeof startTime !== "number") {
+	if (!startTime || typeof startTime !== 'number') {
 		return null;
 	}
 	return (Date.now() - startTime).toString();
@@ -47,23 +49,23 @@ utils.userPreferences = {
 	trackingDisabled: false,
 	enableExtendedJourneysAssist: false,
 	whiteListedEndpointsWithData: {
-		'/v1/open': { 'link_identifier':'\\d+' },
-		'/v1/pageview': { 'event': 'pageview' },
-		'/v1/dismiss': { 'event': 'dismiss' },
+		'/v1/open': {'link_identifier': '\\d+'},
+		'/v1/pageview': {'event': 'pageview'},
+		'/v1/dismiss': {'event': 'dismiss'},
 		'/v1/url': { }
 	},
 	allowErrorsInCallback: false,
 	shouldBlockRequest: function(url, requestData) {
 		// Used by 3_api.js to determine whether a request should be blocked
-		var urlParser = document.createElement('a');
+		const urlParser = document.createElement('a');
 		urlParser.href = url;
 
 		// INTENG-11512
 		// To allow SMS when tracking disabled, we must allow GET <actual link>.
 		// This precludes a filter on the path. Only apply the whitelist to
 		// service endpoints.
-		var whiteListDomains = [ config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint ];
-		var urlOrigin = urlParser.origin; // Property origin is defined on Anchor https://www.w3schools.com/jsref/prop_anchor_origin.asp
+		const whiteListDomains = [ config.api_endpoint, config.app_service_endpoint, config.link_service_endpoint ];
+		let urlOrigin = urlParser.origin; // Property origin is defined on Anchor https://www.w3schools.com/jsref/prop_anchor_origin.asp
 		// Excess of caution: Make sure no trailing slash in urlOrigin.
 		if (urlOrigin.endsWith('/')) {
 			urlOrigin = urlOrigin.substring(0, urlOrigin.length - 1);
@@ -72,7 +74,7 @@ utils.userPreferences = {
 			return false;
 		}
 
-		var urlPath = urlParser.pathname;
+		let urlPath = urlParser.pathname;
 
 		// On Internet Explorer .pathname is returned without a leading '/' whereas on other browsers,
 		// a leading slash is available eg. v1/open on IE vs. /v1/open in Chrome
@@ -80,7 +82,7 @@ utils.userPreferences = {
 			urlPath = '/' + urlPath;
 		}
 
-		var whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
+		const whiteListedEndpointWithData = utils.userPreferences.whiteListedEndpointsWithData[urlPath];
 
 		if (!whiteListedEndpointWithData) {
 			return true;
@@ -90,10 +92,12 @@ utils.userPreferences = {
 				return true;
 			}
 			// Ensures that required request parameters are available in request data
-			for (var key in whiteListedEndpointWithData) {
-				var requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
-				if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
-					return true;
+			for (const key in whiteListedEndpointWithData) {
+				if (whiteListedEndpointWithData.hasOwnProperty(key)) {
+					const requiredParameterRegex = new RegExp(whiteListedEndpointWithData[key]);
+					if (!requestData.hasOwnProperty(key) || !requiredParameterRegex.test(requestData[key])) {
+						return true;
+					}
 				}
 			}
 		}
@@ -105,26 +109,26 @@ utils.generateDynamicBNCLink = function(branchKey, data) {
 	if (!branchKey && !data) {
 		return;
 	}
-	var addKeyAndValueToUrl = function(fallbackUrl, tagName, tagData) {
-		var first = fallbackUrl[fallbackUrl.length - 1] === "?";
-		var modifiedFallbackURL = first ? fallbackUrl + tagName : fallbackUrl + "&" + tagName;
-		modifiedFallbackURL += "=";
+	const addKeyAndValueToUrl = function(fallbackUrl, tagName, tagData) {
+		const first = fallbackUrl[fallbackUrl.length - 1] === '?';
+		let modifiedFallbackURL = first ? fallbackUrl + tagName : fallbackUrl + '&' + tagName;
+		modifiedFallbackURL += '=';
 		return modifiedFallbackURL + encodeURIComponent(tagData);
 	};
 
-	var fallbackUrl = config.link_service_endpoint + '/a/' + branchKey + '?';
-	var topLevelKeys = [ "tags", "alias", "channel", "feature", "stage", "campaign", "type", "duration", "sdk", "source", "data" ];
-	for (var i = 0; i < topLevelKeys.length; i++) {
-		var key = topLevelKeys[i];
-		var value = data[key];
+	let fallbackUrl = config.link_service_endpoint + '/a/' + branchKey + '?';
+	const topLevelKeys = [ 'tags', 'alias', 'channel', 'feature', 'stage', 'campaign', 'type', 'duration', 'sdk', 'source', 'data' ];
+	for (let i = 0; i < topLevelKeys.length; i++) {
+		const key = topLevelKeys[i];
+		let value = data[key];
 		if (value) {
-			if (key === "tags" && Array.isArray(value)) {
-				for (var index = 0; index < value.length; index++) {
+			if (key === 'tags' && Array.isArray(value)) {
+				for (let index = 0; index < value.length; index++) {
 					fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value[index]);
 				}
 			}
-			else if (typeof value === "string" && value.length > 0 || typeof value === "number") {
-				if (key === "data" && typeof value === "string") {
+			else if (typeof value === 'string' && value.length > 0 || typeof value === 'number') {
+				if (key === 'data' && typeof value === 'string') {
 					value = utils.base64encode(value);
 				}
 				fallbackUrl = addKeyAndValueToUrl(fallbackUrl, key, value);
@@ -152,7 +156,7 @@ utils.cleanApplicationAndSessionStorage = function(branch) {
 			delete branch._deepviewRequestForReplay;
 		}
 		branch._storage.remove('branch_view_enabled');
-		var data = {};
+		const data = {};
 		// Sets an empty object for branch_session and branch_session_first in local/sessionStorage
 		session.set(branch._storage, data, true);
 	}
@@ -211,8 +215,8 @@ utils.messages = {
  */
 /** @type {Array<string>} */
 utils.bannerThemes = [
-	"light",
-	"dark"
+	'light',
+	'dark'
 ];
 
 /*
@@ -234,7 +238,7 @@ utils.getLocationHash = function() {
  * @return {string}
  */
 utils.message = function(message, params, failCode, failDetails) {
-	var msg = message.replace(/\$(\d)/g, function(_, place) {
+	let msg = message.replace(/\$(\d)/g, function(_, place) {
 		return params[parseInt(place, 10) - 1];
 	});
 	if (failCode) {
@@ -255,7 +259,7 @@ utils.message = function(message, params, failCode, failDetails) {
  */
 utils.whiteListSessionData = function(data) {
 	return {
-		'data': data['data'] || "",
+		'data': data['data'] || '',
 		'data_parsed': data['data_parsed'] || {},
 		'has_app': utils.getBooleanOrNull(data['has_app']),
 		'identity': data['identity'] || null,
@@ -270,9 +274,9 @@ utils.whiteListSessionData = function(data) {
  * @return {Object} retData
  */
 utils.whiteListJourneysLanguageData = function(sessionData) {
-	var re = /^\$journeys_\S+$/;
-	var data = sessionData['data'];
-	var retData = {};
+	const re = /^\$journeys_\S+$/;
+	let data = sessionData['data'];
+	const retData = {};
 
 	if (!data) {
 		return {};
@@ -296,7 +300,7 @@ utils.whiteListJourneysLanguageData = function(sessionData) {
 	}
 
 	Object.keys(data).forEach(function(key) {
-		var found = re.test(key);
+		const found = re.test(key);
 		if (found) {
 			retData[key] = data[key];
 		}
@@ -316,13 +320,10 @@ utils.getWindowLocation = function() {
  * Find debugging parameters
  */
 utils.getParameterByName = function(name) {
-	var url;
-	var re;
-	var match;
 	name = name.replace(/[\[\]]/g, '\\$&');
-	url = utils.getWindowLocation();
-	re = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-	match = re.exec(url);
+	const url = utils.getWindowLocation();
+	const re = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+	const match = re.exec(url);
 	if (!match || !match[2]) {
 		return '';
 	}
@@ -331,7 +332,7 @@ utils.getParameterByName = function(name) {
 
 utils.cleanLinkData = function(linkData) {
 	linkData['source'] = 'web-sdk';
-	var data = linkData['data'];
+	let data = linkData['data'];
 
 	switch (typeof data) {
 		case 'string':
@@ -339,7 +340,7 @@ utils.cleanLinkData = function(linkData) {
 				data = safejson.parse(data);
 			}
 			catch (e) {
-				data = { '_bncNoEval': true };
+				data = {'_bncNoEval': true};
 			}
 			break;
 		case 'object':
@@ -350,7 +351,7 @@ utils.cleanLinkData = function(linkData) {
 			break;
 	}
 
-	var hasOGRedirectOrFallback = data['$og_redirect'] || data['$fallback_url'] || data['$desktop_url'];
+	const hasOGRedirectOrFallback = data['$og_redirect'] || data['$fallback_url'] || data['$desktop_url'];
 
 	if (!data['$canonical_url']) {
 		data['$canonical_url'] = utils.getWindowLocation();
@@ -393,16 +394,16 @@ utils.cleanLinkData = function(linkData) {
  * @param {String} link
  */
 utils.getClickIdAndSearchStringFromLink = function(link) {
-	if (!link || typeof link !== "string") {
-		return "";
+	if (!link || typeof link !== 'string') {
+		return '';
 	}
-	var elem = document.createElement("a");
+	const elem = document.createElement('a');
 	elem.href = link;
 	function notEmpty(data) {
-		return data !== "";
+		return data !== '';
 	}
-	var pathname = elem.pathname && elem.pathname.split('/').filter(notEmpty);
-	return Array.isArray(pathname) && pathname.length ? pathname[ pathname.length - 1 ] + elem.search : elem.search;
+	const pathname = elem.pathname && elem.pathname.split('/').filter(notEmpty);
+	return Array.isArray(pathname) && pathname.length ? pathname[pathname.length - 1] + elem.search : elem.search;
 };
 
 /**
@@ -425,9 +426,9 @@ utils.merge = function(to, from, removeNull) {
 		return to;
 	}
 
-	for (var attr in from) {
+	for (const attr in from) {
 		if (from.hasOwnProperty(attr)) {
-			var fromAttr = from[attr];
+			const fromAttr = from[attr];
 			/* Only remove null and undefined, not all falsy values. */
 			if (removeNull && (fromAttr === undefined || fromAttr === null)) {
 				delete to[attr];
@@ -445,7 +446,7 @@ utils.merge = function(to, from, removeNull) {
  */
 utils.hashValue = function(key) {
 	try {
-		var match = utils.getLocationHash().match(new RegExp(key + ':([^&]*)'));
+		const match = utils.getLocationHash().match(new RegExp(key + ':([^&]*)'));
 		if (match && match.length >= 1) {
 			return match[1];
 		}
@@ -485,14 +486,15 @@ function isMacintoshDesktop(ua) {
 function isGTEVersion(ua, v) {
 	v = v || 11;
 
-	var match = /version\/([^ ]*)/i.exec(ua);
+	const match = /version\/([^ ]*)/i.exec(ua);
 	if (match && match[1]) {
 		try {
-			var version = parseFloat(match[1]);
+			const version = parseFloat(match[1]);
 			if (version >= v) {
 				return true;
 			}
-		} catch (e) {
+		}
+		catch (e) {
 			return false;
 		}
 	}
@@ -512,7 +514,7 @@ function isIOS(ua) {
 }
 
 utils.mobileUserAgent = function() {
-	var ua = navigator.userAgent;
+	const ua = navigator.userAgent;
 	if (ua.match(/android/i)) {
 		return 'android';
 	}
@@ -542,7 +544,7 @@ utils.mobileUserAgent = function() {
 		ua.match(/KFAPWA/i) ||
 		ua.match(/KFAPWI/i)
 	) {
-		return "kindle";
+		return 'kindle';
 	}
 	return false;
 };
@@ -552,8 +554,8 @@ utils.mobileUserAgent = function() {
  * @return {boolean}
  */
 utils.isSafari11OrGreater = function() {
-	var ua = navigator.userAgent;
-	var isSafari = isSafariBrowser(ua);
+	const ua = navigator.userAgent;
+	const isSafari = isSafariBrowser(ua);
 
 	if (isSafari) {
 		return isGTEVersion(ua, 11);
@@ -571,7 +573,7 @@ utils.isWebKitBrowser = function() {
 };
 
 utils.isIOSWKWebView = function() {
-	var ua = navigator.userAgent;
+	const ua = navigator.userAgent;
 	return utils.isWebKitBrowser() && ua && isIOS(ua) &&
 		!isChromeBrowser(ua) &&
 		!isFirefoxBrowser(ua) &&
@@ -585,7 +587,7 @@ utils.isIOSWKWebView = function() {
  */
 utils.getParamValue = function(key) {
 	try {
-		var match = utils.getLocationSearch().substring(1).match(new RegExp(key + '=([^&]*)'));
+		const match = utils.getLocationSearch().substring(1).match(new RegExp(key + '=([^&]*)'));
 		if (match && match.length >= 1) {
 			return match[1];
 		}
@@ -605,8 +607,8 @@ utils.isKey = function(key_or_id) {
  * @param {string} string
  */
 utils.snakeToCamel = function(string) {
-	var find = /(\-\w)/g;
-	var convert = function(matches) {
+	const find = /(\-\w)/g;
+	const convert = function(matches) {
 		return matches[1].toUpperCase();
 	};
 	return string.replace(find, convert);
@@ -618,11 +620,11 @@ utils.snakeToCamel = function(string) {
  * @param {string} input
  */
 utils.base64encode = function(input) {
-	var utf8_encode = function(string) {
+	const utf8_encode = function(string) {
 		string = string.replace(/\r\n/g, '\n');
-		var utftext = '';
-		for (var n = 0; n < string.length; n++) {
-			var c = string.charCodeAt(n);
+		let utftext = '';
+		for (let n = 0; n < string.length; n++) {
+			const c = string.charCodeAt(n);
 			if (c < 128) {
 				utftext += String.fromCharCode(c);
 			}
@@ -639,17 +641,17 @@ utils.base64encode = function(input) {
 		return utftext;
 	};
 
-	var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+	const keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
-	var output = '';
-	var chr1;
-	var chr2;
-	var chr3;
-	var enc1;
-	var enc2;
-	var enc3;
-	var enc4;
-	var i = 0;
+	let output = '';
+	let chr1;
+	let chr2;
+	let chr3;
+	let enc1;
+	let enc2;
+	let enc3;
+	let enc4;
+	let i = 0;
 	input = utf8_encode(input);
 
 	while (i < input.length) {
@@ -692,7 +694,7 @@ utils.base64Decode = function(str) {
  * @param {string} str
  */
 utils.isBase64Encoded = function(str) {
-	if (typeof str !== "string") {
+	if (typeof str !== 'string') {
 		return false;
 	}
 	if (str === '' || str.trim() === '') {
@@ -712,13 +714,13 @@ utils.isBase64Encoded = function(str) {
  * @param {Object} data
  */
 utils.encodeBFPs = function(data) {
-	if (data && data["browser_fingerprint_id"] &&
-		!utils.isBase64Encoded(data["browser_fingerprint_id"])) {
-		data["browser_fingerprint_id"] = btoa(data["browser_fingerprint_id"]);
+	if (data && data['browser_fingerprint_id'] &&
+		!utils.isBase64Encoded(data['browser_fingerprint_id'])) {
+		data['browser_fingerprint_id'] = btoa(data['browser_fingerprint_id']);
 	}
-	if (data && data["alternative_browser_fingerprint_id"] &&
-		!utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
-		data["alternative_browser_fingerprint_id"] = btoa(data["alternative_browser_fingerprint_id"]);
+	if (data && data['alternative_browser_fingerprint_id'] &&
+		!utils.isBase64Encoded(data['alternative_browser_fingerprint_id'])) {
+		data['alternative_browser_fingerprint_id'] = btoa(data['alternative_browser_fingerprint_id']);
 	}
 	return data;
 };
@@ -729,11 +731,11 @@ utils.encodeBFPs = function(data) {
  * @param {Object} data
  */
 utils.decodeBFPs = function(data) {
-	if (data && utils.isBase64Encoded(data["browser_fingerprint_id"])) {
-		data["browser_fingerprint_id"] = atob(data["browser_fingerprint_id"]);
+	if (data && utils.isBase64Encoded(data['browser_fingerprint_id'])) {
+		data['browser_fingerprint_id'] = atob(data['browser_fingerprint_id']);
 	}
-	if (data && utils.isBase64Encoded(data["alternative_browser_fingerprint_id"])) {
-		data["alternative_browser_fingerprint_id"] = atob(data["alternative_browser_fingerprint_id"]);
+	if (data && utils.isBase64Encoded(data['alternative_browser_fingerprint_id'])) {
+		data['alternative_browser_fingerprint_id'] = atob(data['alternative_browser_fingerprint_id']);
 	}
 	return data;
 };
@@ -746,7 +748,7 @@ utils.decodeBFPs = function(data) {
  * @param {boolean=} useCapture
  */
 utils.addEvent = function(el, eventType, callback, useCapture) {
-	var ret = 0;
+	let ret = 0;
 
 	if (typeof el['addEventListener'] === 'function') {
 		ret = el['addEventListener'](eventType, callback, useCapture);
@@ -819,7 +821,7 @@ utils.getOpenGraphContent = function(property, content) {
 	property = String(property);
 	content = content || null;
 
-	var el = document.querySelector('meta[property="og:' + property + '"]');
+	const el = document.querySelector('meta[property="og:' + property + '"]');
 	if (el && el.content) {
 		content = el.content;
 	}
@@ -832,7 +834,7 @@ utils.getOpenGraphContent = function(property, content) {
  * Returned params may include $ios_deeplink_path, $android_deeplink_path and $deeplink_path.
  */
 utils.prioritizeDeeplinkPaths = function(params, deeplinkPaths) {
-	if (!deeplinkPaths || typeof deeplinkPaths !== "object" || Object.keys(deeplinkPaths || {}).length === 0) {
+	if (!deeplinkPaths || typeof deeplinkPaths !== 'object' || Object.keys(deeplinkPaths || {}).length === 0) {
 		return params;
 	}
 
@@ -868,11 +870,11 @@ utils.prioritizeDeeplinkPaths = function(params, deeplinkPaths) {
  * Used by utils.getHostedDeepLinkData() to process page metadata.
  */
 utils.processHostedDeepLinkData = function(metadata) {
-	var params = {};
+	const params = {};
 	if (!metadata || metadata.length === 0) {
 		return params;
 	}
-	var deeplinkPaths = { // keeps track of deeplink paths encountered when parsing page's meta tags
+	const deeplinkPaths = { // keeps track of deeplink paths encountered when parsing page's meta tags
 		'hostedIOS': null,
 		'hostedAndroid': null,
 		'applinksIOS': null,
@@ -881,17 +883,17 @@ utils.processHostedDeepLinkData = function(metadata) {
 		'twitterAndroid': null
 	};
 
-	for (var i = 0; i < metadata.length; i++) {
+	for (let i = 0; i < metadata.length; i++) {
 		if (!metadata[i].getAttribute('name') && !metadata[i].getAttribute('property') || !metadata[i].getAttribute('content')) {
 			continue;
 		}
 
-		var name = metadata[i].getAttribute('name');
-		var property = metadata[i].getAttribute('property');
+		const name = metadata[i].getAttribute('name');
+		const property = metadata[i].getAttribute('property');
 		// name takes precedence over property
-		var nameOrProperty = name || property;
+		const nameOrProperty = name || property;
 
-		var split = nameOrProperty.split(':');
+		const split = nameOrProperty.split(':');
 
 		if ((split.length === 3) && (split[0] === 'branch') && (split[1] === 'deeplink')) {
 			if (split[2] === '$ios_deeplink_path') { // Deeplink path detected from hosted deep link data
@@ -925,7 +927,7 @@ utils.processHostedDeepLinkData = function(metadata) {
  * Also searches for twitter and applinks tags, i.e. <meta property="al:ios:url" content="applinks://docs" />, <meta name="twitter:app:url:googleplay" content="twitter://docs">.
  */
 utils.getHostedDeepLinkData = function() {
-	var metadata = document.getElementsByTagName('meta');
+	const metadata = document.getElementsByTagName('meta');
 	return utils.processHostedDeepLinkData(metadata);
 };
 
@@ -934,9 +936,9 @@ utils.getHostedDeepLinkData = function() {
  * Returns the user's preferred language
  */
 utils.getBrowserLanguageCode = function() {
-	var code;
+	let code;
 	try {
-		if (navigator.languages && navigator.languages.length>0) {
+		if (navigator.languages && navigator.languages.length > 0) {
 			code = navigator.languages[0];
 		}
 		else if (navigator.language) {
@@ -955,7 +957,7 @@ utils.getBrowserLanguageCode = function() {
  * If there is no difference, an empty array will be returned.
  */
 utils.calculateDiffBetweenArrays = function(original, toCheck) {
-	var diff = [];
+	const diff = [];
 	toCheck.forEach(function(element) {
 		if (original.indexOf(element) === -1) {
 			diff.push(element);
@@ -964,9 +966,9 @@ utils.calculateDiffBetweenArrays = function(original, toCheck) {
 	return diff;
 };
 
-var validCommerceEvents = [ 'purchase' ];
+const validCommerceEvents = [ 'purchase' ];
 
-var commerceEventMessages = {
+const commerceEventMessages = {
 	'missingPurchaseEvent': 'event name is either missing, of the wrong type or not valid. Please specify \'purchase\' as the event name.',
 	'missingCommerceData': 'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
 	'invalidKeysForRoot': 'Please remove the following keys from the root of commerce_data: ',
@@ -980,17 +982,17 @@ var commerceEventMessages = {
  * If there are invalid keys present then it will report back what those keys are.
  * Note: The keys below are optional.
  */
-var validateCommerceDataKeys = function(commerceData) {
-	var allowedInRoot = [ 'common', 'type', 'transaction_id', 'currency', 'revenue', 'revenue_in_usd', 'exchange_rate', 'shipping', 'tax', 'coupon', 'affiliation', 'persona', 'products' ];
-	var allowedInProducts = [ 'sku', 'name', 'price', 'quantity', 'brand', 'category', 'variant' ];
+const validateCommerceDataKeys = function(commerceData) {
+	const allowedInRoot = [ 'common', 'type', 'transaction_id', 'currency', 'revenue', 'revenue_in_usd', 'exchange_rate', 'shipping', 'tax', 'coupon', 'affiliation', 'persona', 'products' ];
+	const allowedInProducts = [ 'sku', 'name', 'price', 'quantity', 'brand', 'category', 'variant' ];
 
-	var invalidKeysInRoot = utils.calculateDiffBetweenArrays(allowedInRoot, Object.keys(commerceData));
+	const invalidKeysInRoot = utils.calculateDiffBetweenArrays(allowedInRoot, Object.keys(commerceData));
 	if (invalidKeysInRoot.length) {
 		return commerceEventMessages['invalidKeysForRoot'] + invalidKeysInRoot.join(', ');
 	}
 
-	var invalidKeysForProducts = [];
-	var invalidProductType;
+	let invalidKeysForProducts = [];
+	let invalidProductType;
 	if (commerceData.hasOwnProperty('products')) {
 		// make sure products is an array
 		if (!Array.isArray(commerceData['products'])) {
@@ -1028,7 +1030,7 @@ utils.validateCommerceEventParams = function(event, commerce_data) {
 		return commerceEventMessages['missingCommerceData'];
 	}
 
-	var invalidKeysMessage = validateCommerceDataKeys(commerce_data);
+	const invalidKeysMessage = validateCommerceDataKeys(commerce_data);
 	if (invalidKeysMessage) {
 		return invalidKeysMessage;
 	}
@@ -1041,27 +1043,27 @@ utils.cleanBannerText = function(string) {
 		return null;
 	}
 
-	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	return string.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 
 utils.getTitle = function() {
-	var tags = document.getElementsByTagName('title');
+	const tags = document.getElementsByTagName('title');
 	return tags.length > 0 ? tags[0].innerText : null;
 };
 
 utils.getDescription = function() {
-	var el = document.querySelector('meta[name="description"]');
+	const el = document.querySelector('meta[name="description"]');
 	return el && el.content ? el.content : null;
 };
 
 utils.getCanonicalURL = function() {
-	var el = document.querySelector('link[rel="canonical"]');
+	const el = document.querySelector('link[rel="canonical"]');
 	return el && el.href ? el.href : null;
 };
 
 utils.addPropertyIfNotNull = function(obj, key, value) {
 	if (value !== null && value !== undefined) {
-		if (typeof value === "object" && Object.keys(value || {}).length === 0) {
+		if (typeof value === 'object' && Object.keys(value || {}).length === 0) {
 			return obj;
 		}
 		obj[key] = value;
@@ -1070,7 +1072,7 @@ utils.addPropertyIfNotNull = function(obj, key, value) {
 };
 
 utils.openGraphDataAsObject = function() {
-	var ogData = {};
+	let ogData = {};
 	ogData = utils.addPropertyIfNotNull(ogData, '$og_title', utils.getOpenGraphContent('title'));
 	ogData = utils.addPropertyIfNotNull(ogData, '$og_description', utils.getOpenGraphContent('description'));
 	ogData = utils.addPropertyIfNotNull(ogData, '$og_image_url', utils.getOpenGraphContent('image'));
@@ -1081,20 +1083,20 @@ utils.openGraphDataAsObject = function() {
 
 
 utils.getAdditionalMetadata = function() {
-	var metadata = {};
-	metadata = utils.addPropertyIfNotNull(metadata, "og_data", utils.openGraphDataAsObject());
-	metadata = utils.addPropertyIfNotNull(metadata, "hosted_deeplink_data", utils.getHostedDeepLinkData());
-	metadata = utils.addPropertyIfNotNull(metadata, "title", utils.getTitle());
-	metadata = utils.addPropertyIfNotNull(metadata, "description", utils.getDescription());
-	metadata = utils.addPropertyIfNotNull(metadata, "canonical_url", utils.getCanonicalURL());
+	let metadata = {};
+	metadata = utils.addPropertyIfNotNull(metadata, 'og_data', utils.openGraphDataAsObject());
+	metadata = utils.addPropertyIfNotNull(metadata, 'hosted_deeplink_data', utils.getHostedDeepLinkData());
+	metadata = utils.addPropertyIfNotNull(metadata, 'title', utils.getTitle());
+	metadata = utils.addPropertyIfNotNull(metadata, 'description', utils.getDescription());
+	metadata = utils.addPropertyIfNotNull(metadata, 'canonical_url', utils.getCanonicalURL());
 	return metadata && Object.keys(metadata).length > 0 ? metadata : {};
 };
 
 utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
-	if (objectToModify && typeof objectToModify === "object" && !Array.isArray(objectToModify) &&
+	if (objectToModify && typeof objectToModify === 'object' && !Array.isArray(objectToModify) &&
 		Object.keys(objectToModify).length > 0 && keysToRemove && Array.isArray(keysToRemove) &&
 		keysToRemove.length > 0) {
-		for (var key in objectToModify) {
+		for (const key in objectToModify) {
 			if (objectToModify.hasOwnProperty(key) && keysToRemove.indexOf(key) > -1) {
 				delete objectToModify[key];
 			}
@@ -1104,29 +1106,28 @@ utils.removePropertiesFromObject = function(objectToModify, keysToRemove) {
 
 // v2/event utility functions
 
-var BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_ITEM', 'VIEW_ITEMS', 'RATE', 'SHARE', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENT', 'LOGIN', 'SUBSCRIBE', 'START_TRIAL', 'INVITE', 'RESERVE', 'VIEW_AD', 'CLICK_AD', 'INITIATE_STREAM', 'COMPLETE_STREAM' ];
-var BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description' ];
+const BRANCH_STANDARD_EVENTS = [ 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'VIEW_CART', 'INITIATE_PURCHASE', 'ADD_PAYMENT_INFO', 'PURCHASE', 'SPEND_CREDITS', 'SEARCH', 'VIEW_ITEM', 'VIEW_ITEMS', 'RATE', 'SHARE', 'COMPLETE_REGISTRATION', 'COMPLETE_TUTORIAL', 'ACHIEVE_LEVEL', 'UNLOCK_ACHIEVEMENT', 'LOGIN', 'SUBSCRIBE', 'START_TRIAL', 'INVITE', 'RESERVE', 'VIEW_AD', 'CLICK_AD', 'INITIATE_STREAM', 'COMPLETE_STREAM' ];
+const BRANCH_STANDARD_EVENT_DATA = [ 'transaction_id', 'revenue', 'currency', 'shipping', 'tax', 'coupon', 'affiliation', 'search_query', 'description' ];
 
 utils.isStandardEvent = function(eventName) {
 	return eventName && BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
 };
 
 utils.separateEventAndCustomData = function(eventAndCustomData) {
-
 	if (!eventAndCustomData || Object.keys(eventAndCustomData).length === 0) {
 		return null;
 	}
-	var customDataKeys = utils.calculateDiffBetweenArrays(BRANCH_STANDARD_EVENT_DATA, Object.keys(eventAndCustomData));
-	var customData = {};
+	const customDataKeys = utils.calculateDiffBetweenArrays(BRANCH_STANDARD_EVENT_DATA, Object.keys(eventAndCustomData));
+	const customData = {};
 
-	for (var i = 0; i < customDataKeys.length; i++) {
-		var key = customDataKeys[i];
+	for (let i = 0; i < customDataKeys.length; i++) {
+		const key = customDataKeys[i];
 		customData[key] = eventAndCustomData[key];
 		delete eventAndCustomData[key];
 	}
 	return {
-		"custom_data": utils.convertObjectValuesToString(customData),
-		"event_data": eventAndCustomData
+		'custom_data': utils.convertObjectValuesToString(customData),
+		'event_data': eventAndCustomData
 	};
 };
 
@@ -1134,7 +1135,7 @@ utils.validateParameterType = function(parameter, type) {
 	if (!type || (parameter === null && type === 'object')) {
 		return false;
 	}
-	if (type === "array") {
+	if (type === 'array') {
 		return Array.isArray(parameter);
 	}
 	return typeof parameter === type && !Array.isArray(parameter);
@@ -1151,20 +1152,20 @@ utils.getScreenWidth = function() {
 // Used by logEvent() to send fields related to user's visit and device to v2/event standard and custom
 // Requires a reference to the branch object to access information such as browser_fingerprint_id
 utils.getUserData = function(branch) {
-	var user_data = {};
-	user_data = utils.addPropertyIfNotNull(user_data, "http_origin", document.URL);
-	user_data = utils.addPropertyIfNotNull(user_data, "user_agent", navigator.userAgent);
-	user_data = utils.addPropertyIfNotNull(user_data, "language", utils.getBrowserLanguageCode());
-	user_data = utils.addPropertyIfNotNull(user_data, "screen_width", utils.getScreenWidth());
-	user_data = utils.addPropertyIfNotNull(user_data, "screen_height", utils.getScreenHeight());
-	user_data = utils.addPropertyIfNotNull(user_data, "http_referrer", document.referrer);
-	user_data = utils.addPropertyIfNotNull(user_data, "browser_fingerprint_id", branch.browser_fingerprint_id);
-	user_data = utils.addPropertyIfNotNull(user_data, "developer_identity", branch.identity);
-	user_data = utils.addPropertyIfNotNull(user_data, "identity", branch.identity);
-	user_data = utils.addPropertyIfNotNull(user_data, "sdk", "web");
-	user_data = utils.addPropertyIfNotNull(user_data, "sdk_version", config.version);
-	user_data = utils.addPropertyIfNotNullorEmpty(user_data, "model", utils.userAgentData ? utils.userAgentData.model : "");
-	user_data = utils.addPropertyIfNotNullorEmpty(user_data, "os_version", utils.userAgentData ? utils.userAgentData.platformVersion : "");
+	let user_data = {};
+	user_data = utils.addPropertyIfNotNull(user_data, 'http_origin', document.URL);
+	user_data = utils.addPropertyIfNotNull(user_data, 'user_agent', navigator.userAgent);
+	user_data = utils.addPropertyIfNotNull(user_data, 'language', utils.getBrowserLanguageCode());
+	user_data = utils.addPropertyIfNotNull(user_data, 'screen_width', utils.getScreenWidth());
+	user_data = utils.addPropertyIfNotNull(user_data, 'screen_height', utils.getScreenHeight());
+	user_data = utils.addPropertyIfNotNull(user_data, 'http_referrer', document.referrer);
+	user_data = utils.addPropertyIfNotNull(user_data, 'browser_fingerprint_id', branch.browser_fingerprint_id);
+	user_data = utils.addPropertyIfNotNull(user_data, 'developer_identity', branch.identity);
+	user_data = utils.addPropertyIfNotNull(user_data, 'identity', branch.identity);
+	user_data = utils.addPropertyIfNotNull(user_data, 'sdk', 'web');
+	user_data = utils.addPropertyIfNotNull(user_data, 'sdk_version', config.version);
+	user_data = utils.addPropertyIfNotNullorEmpty(user_data, 'model', utils.userAgentData ? utils.userAgentData.model : '');
+	user_data = utils.addPropertyIfNotNullorEmpty(user_data, 'os_version', utils.userAgentData ? utils.userAgentData.platformVersion : '');
 	return user_data;
 };
 
@@ -1176,16 +1177,16 @@ utils.isIframe = function() {
 // Checks if page is on the same domain as its top most window
 // Will throw a cross-origin frame access error if it is not
 utils.isSameOriginFrame = function() {
-	var sameOriginTest = "true"; // without this minification of function doesn't work correctly
+	let sameOriginTest = 'true'; // without this minification of function doesn't work correctly
 	try {
 		if (window.top.location.search) {
-			sameOriginTest = "true"; // without this minification of function doesn't work correctly
+			sameOriginTest = 'true'; // without this minification of function doesn't work correctly
 		}
 	}
 	catch (err) {
 		return false;
 	}
-	return (sameOriginTest === "true"); // without this minification of function doesn't work correctly
+	return (sameOriginTest === 'true'); // without this minification of function doesn't work correctly
 };
 
 // Checks if page is in an iFrame and on the same domain as its top most window
@@ -1198,7 +1199,7 @@ utils.getInitialReferrer = function(referringLink) {
 		return referringLink;
 	}
 	if (utils.isIframe()) {
-		return utils.isSameOriginFrame() ? window.top.document.referrer : "";
+		return utils.isSameOriginFrame() ? window.top.document.referrer : '';
 	}
 	return document.referrer;
 };
@@ -1225,7 +1226,7 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 	if (!utils.validateParameterType(objectToConvert, 'object') || Object.keys(objectToConvert).length === 0) {
 		return {};
 	}
-	for (var key in objectToConvert) {
+	for (const key in objectToConvert) {
 		if (objectToConvert.hasOwnProperty(key)) {
 			objectToConvert[key] = utils.convertValueToString(objectToConvert[key]);
 		}
@@ -1235,7 +1236,7 @@ utils.convertObjectValuesToString = function(objectToConvert) {
 
 // Merges user supplied metadata to hosted deep link data for additional Journeys user targeting
 utils.mergeHostedDeeplinkData = function(hostedDeepLinkData, metadata) {
-	var hostedDeepLinkDataClone = hostedDeepLinkData ? utils.merge({}, hostedDeepLinkData) : {};
+	const hostedDeepLinkDataClone = hostedDeepLinkData ? utils.merge({}, hostedDeepLinkData) : {};
 	if (metadata && Object.keys(metadata).length > 0) {
 		return Object.keys(hostedDeepLinkDataClone).length > 0 ? utils.merge(hostedDeepLinkDataClone, metadata) : utils.merge({}, metadata);
 	}
@@ -1279,12 +1280,12 @@ utils.delay = function(operation, delay) {
  */
 utils.getClientHints = function() {
 	if (navigator.userAgentData) {
-		var hints = [
+		const hints = [
 			'model',
 			'platformVersion'
 		];
 		navigator.userAgentData.getHighEntropyValues(hints).then(function(data) {
-			utils.userAgentData = { 'model': data.model, 'platformVersion': utils.removeTrailingDotZeros(data.platformVersion) };
+			utils.userAgentData = {'model': data.model, 'platformVersion': utils.removeTrailingDotZeros(data.platformVersion)};
 		});
 	}
 	else {
@@ -1299,7 +1300,7 @@ utils.getClientHints = function() {
  * A utility function to add a property to an object only if its value is not null, empty
  */
 utils.addPropertyIfNotNullorEmpty = function(obj, key, value) {
-	if (typeof value === "string" && !!value) {
+	if (typeof value === 'string' && !!value) {
 		obj[key] = value;
 	}
 	return obj;
@@ -1311,10 +1312,10 @@ utils.addPropertyIfNotNullorEmpty = function(obj, key, value) {
  */
 utils.removeTrailingDotZeros = function(versionNumber) {
 	if (!!versionNumber) {
-		var dotZeroRegex = /^([1-9]\d*)\.(0\d*)(\.[0]\d*){1,}$/;
+		const dotZeroRegex = /^([1-9]\d*)\.(0\d*)(\.[0]\d*){1,}$/;
 
-		if (versionNumber.indexOf(".") !== -1) {
-			var dotString = versionNumber.substring(0, versionNumber.indexOf("."));
+		if (versionNumber.indexOf('.') !== -1) {
+			const dotString = versionNumber.substring(0, versionNumber.indexOf('.'));
 			versionNumber = versionNumber.replace(dotZeroRegex, dotString);
 		}
 	}

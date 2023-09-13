@@ -12,12 +12,12 @@ goog.require('safejson');
 
 goog.require('goog.json'); // jshint unused:false
 
-/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
+/* globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 
 describe('Branch', function() {
-	var storage = new BranchStorage([ 'pojo' ]);
-	var sandbox;
-	var requests;
+	const storage = new BranchStorage([ 'pojo' ]);
+	let sandbox;
+	let requests;
 
 	window.sdk_version = 'web' + config.version;
 
@@ -33,7 +33,7 @@ describe('Branch', function() {
 		if (!keepStorage) {
 			storage.clear();
 		}
-		var branch = new Branch();
+		const branch = new Branch();
 
 		sandbox.stub(branch._server, 'request', function(resource, obj, storage, callback) {
 			requests.push({
@@ -63,26 +63,26 @@ describe('Branch', function() {
 
 	function basicTests(call, params) {
 		it('should silently fail if branch not initialized', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(params.length * 2, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(params.length * 2, done);
 
 			function basicTest(param) {
-				var p = testUtils.nulls(param);
+				const p = testUtils.nulls(param);
 				branch[call].apply(branch, p.concat(function(err) {
 					assert.strictEqual(err.message, 'Branch SDK not initialized');
 				}));
 			}
 
-			for (var i = 0; i < params.length; i++) {
+			for (let i = 0; i < params.length; i++) {
 				basicTest(params[i]);
 			}
 			done();
 		});
 	}
 
-	var originalUa = navigator.userAgent;
+	const originalUa = navigator.userAgent;
 	function setUserAgent(ua) {
-		navigator.__defineGetter__("userAgent", function() {
+		navigator.__defineGetter__('userAgent', function() {
 			return ua;
 		});
 	}
@@ -95,17 +95,17 @@ describe('Branch', function() {
 
 	describe('init', function() {
 		it('should call api with params and version', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(7, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(7, done);
 			sandbox.stub(utils, 'whiteListSessionData', function(data) {
 				return data;
 			});
-			var expectedResponse = {
-				"session_id": "113636235674656786",
-				"identity_id": "98807509250212101",
-				"identity": "Branch",
-				"has_app": true,
-				"referring_link": null
+			const expectedResponse = {
+				'session_id': '113636235674656786',
+				'identity_id': '98807509250212101',
+				'identity': 'Branch',
+				'has_app': true,
+				'referring_link': null
 			};
 
 			branch.init(branch_sample_key, function(err, res) {
@@ -121,8 +121,8 @@ describe('Branch', function() {
 			assert.deepEqual(
 				requests[0].obj,
 				{
-					"sdk": "web" + config.version,
-					branch_key: branch_sample_key
+					'sdk': 'web' + config.version,
+					'branch_key': branch_sample_key
 				},
 				'Request params to _r correct'
 			);
@@ -131,16 +131,16 @@ describe('Branch', function() {
 			assert.deepEqual(
 				requests[1].obj,
 				{
-					"branch_key": branch_sample_key,
-					"link_identifier": undefined,
-					"initial_referrer": requests[1].obj.initial_referrer,
-					"browser_fingerprint_id": browser_fingerprint_id,
-					"alternative_browser_fingerprint_id": undefined,
-					"sdk": "web" + config.version,
-					"options": { },
-					"current_url": utils.getCurrentUrl(),
-					"screen_height": utils.getScreenHeight(),
-					"screen_width": utils.getScreenWidth()
+					'branch_key': branch_sample_key,
+					'link_identifier': undefined,
+					'initial_referrer': requests[1].obj.initial_referrer,
+					'browser_fingerprint_id': browser_fingerprint_id,
+					'alternative_browser_fingerprint_id': undefined,
+					'sdk': 'web' + config.version,
+					'options': { },
+					'current_url': utils.getCurrentUrl(),
+					'screen_height': utils.getScreenHeight(),
+					'screen_width': utils.getScreenWidth()
 				},
 				'Request to open params correct'
 			);
@@ -149,17 +149,17 @@ describe('Branch', function() {
 		});
 
 		it('should not whitelist referring_link', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(7, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(7, done);
 			sandbox.stub(utils, 'whiteListSessionData', function(data) {
 				return data;
 			});
-			var expectedResponse = {
-				"session_id": "113636235674656786",
-				"identity_id": "98807509250212101",
-				"identity": "Branch",
-				"has_app": true,
-				"referring_link": '/c/ngJf86-h'
+			const expectedResponse = {
+				'session_id': '113636235674656786',
+				'identity_id': '98807509250212101',
+				'identity': 'Branch',
+				'has_app': true,
+				'referring_link': '/c/ngJf86-h'
 			};
 
 			branch.init(branch_sample_key, function(err, res) {
@@ -175,8 +175,8 @@ describe('Branch', function() {
 			assert.deepEqual(
 				requests[0].obj,
 				{
-					"sdk": "web" + config.version,
-					branch_key: branch_sample_key
+					'sdk': 'web' + config.version,
+					'branch_key': branch_sample_key
 				},
 				'Request params to _r correct'
 			);
@@ -185,16 +185,16 @@ describe('Branch', function() {
 			assert.deepEqual(
 				requests[1].obj,
 				{
-					"branch_key": branch_sample_key,
-					"link_identifier": undefined,
-					"initial_referrer": requests[1].obj.initial_referrer,
-					"browser_fingerprint_id": browser_fingerprint_id,
-					"alternative_browser_fingerprint_id": undefined,
-					"sdk": "web" + config.version,
-					"options": { },
-					"current_url": utils.getCurrentUrl(),
-					"screen_height": utils.getScreenHeight(),
-					"screen_width": utils.getScreenWidth()
+					'branch_key': branch_sample_key,
+					'link_identifier': undefined,
+					'initial_referrer': requests[1].obj.initial_referrer,
+					'browser_fingerprint_id': browser_fingerprint_id,
+					'alternative_browser_fingerprint_id': undefined,
+					'sdk': 'web' + config.version,
+					'options': { },
+					'current_url': utils.getCurrentUrl(),
+					'screen_height': utils.getScreenHeight(),
+					'screen_width': utils.getScreenWidth()
 				},
 				'Request to open params correct'
 			);
@@ -203,8 +203,8 @@ describe('Branch', function() {
 		});
 
 		it('should support being called without a callback', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(1, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(1, done);
 
 			branch.init(branch_sample_key);
 
@@ -223,8 +223,8 @@ describe('Branch', function() {
 		});
 
 		it('should return invalid app id error', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(1, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(1, done);
 			branch.init(branch_sample_key, function(err) {
 				assert.strictEqual(err.message, 'Invalid app id');
 			});
@@ -234,8 +234,8 @@ describe('Branch', function() {
 		});
 
 		it('should fail early on browser fingerprint error', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(2, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err) {
 				assert.strictEqual(err.message, 'Browser fingerprint fetch failed');
 				assert.strictEqual(requests.length, 1, 'Only 1 request made');
@@ -245,8 +245,8 @@ describe('Branch', function() {
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
 			if (testUtils.go('#r:12345')) {
-				var branch = initBranch(false);
-				var assert = testUtils.plan(3, done);
+				const branch = initBranch(false);
+				const assert = testUtils.plan(3, done);
 
 				branch.init(branch_sample_key, function(err, data) {
 					assert.strictEqual(
@@ -267,8 +267,8 @@ describe('Branch', function() {
 				requests[1].callback(
 					null,
 					{
-						session_id: "1234",
-						something: "else"
+						session_id: '1234',
+						something: 'else'
 					}
 				);
 				requests[2].callback(null, {});
@@ -276,16 +276,16 @@ describe('Branch', function() {
 				assert.deepEqual(
 					requests[1].obj,
 					{
-						"branch_key": branch_sample_key,
-						"link_identifier": '12345',
-						"initial_referrer": requests[1].obj.initial_referrer,
-						"browser_fingerprint_id": '12345',
-						"alternative_browser_fingerprint_id": undefined,
-						"sdk": "web" + config.version,
-						"options": { },
-						"current_url": utils.getCurrentUrl(),
-						"screen_height": utils.getScreenHeight(),
-						"screen_width": utils.getScreenWidth()
+						'branch_key': branch_sample_key,
+						'link_identifier': '12345',
+						'initial_referrer': requests[1].obj.initial_referrer,
+						'browser_fingerprint_id': '12345',
+						'alternative_browser_fingerprint_id': undefined,
+						'sdk': 'web' + config.version,
+						'options': { },
+						'current_url': utils.getCurrentUrl(),
+						'screen_height': utils.getScreenHeight(),
+						'screen_width': utils.getScreenWidth()
 					},
 					'Request to open params correct'
 				);
@@ -299,8 +299,8 @@ describe('Branch', function() {
 			'should store in session and call open with link_identifier from get param',
 			function(done) {
 				if (testUtils.go('?_branch_match_id=67890')) {
-					var branch = initBranch(false);
-					var assert = testUtils.plan(3, done);
+					const branch = initBranch(false);
+					const assert = testUtils.plan(3, done);
 
 					branch.init(branch_sample_key, function(err, data) {
 						assert.strictEqual(
@@ -321,8 +321,8 @@ describe('Branch', function() {
 					requests[1].callback(
 						null,
 						{
-							session_id: "1234",
-							something: "else"
+							session_id: '1234',
+							something: 'else'
 						}
 					);
 					requests[2].callback(null, {});
@@ -330,16 +330,16 @@ describe('Branch', function() {
 					assert.deepEqual(
 						requests[1].obj,
 						{
-							"branch_key": branch_sample_key,
-							"link_identifier": '67890',
-							"initial_referrer": requests[1].obj.initial_referrer,
-							"browser_fingerprint_id": '67890',
-							"alternative_browser_fingerprint_id": undefined,
-							"sdk": "web" + config.version,
-							"options": { },
-							"current_url": utils.getCurrentUrl(),
-							"screen_height": utils.getScreenHeight(),
-							"screen_width": utils.getScreenWidth()
+							'branch_key': branch_sample_key,
+							'link_identifier': '67890',
+							'initial_referrer': requests[1].obj.initial_referrer,
+							'browser_fingerprint_id': '67890',
+							'alternative_browser_fingerprint_id': undefined,
+							'sdk': 'web' + config.version,
+							'options': { },
+							'current_url': utils.getCurrentUrl(),
+							'screen_height': utils.getScreenHeight(),
+							'screen_width': utils.getScreenWidth()
 						},
 						'Request to open params correct'
 					);
@@ -351,8 +351,8 @@ describe('Branch', function() {
 		);
 
 		it('should not call has_app if no session present', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(2, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(2, done);
 			branch.init(branch_sample_key, function(err, data) {
 				assert.strictEqual(requests.length, 2, 'two requests made');
 				assert.deepEqual(
@@ -375,47 +375,46 @@ describe('Branch', function() {
 
 		it('should call has_app if session present but no link_identifier from get param',
 			function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(3, done);
-			branch.init(branch_sample_key);
-			requests[0].callback(null, browser_fingerprint_id);
-			requests[1].callback(
-				null,
-				{
-					session_id: session_id,
-					browser_fingerprint_id: browser_fingerprint_id,
-					identity_id: identity_id,
-					data: JSON.stringify({
-						'$desktop_url': window.location.protocol + "//" +
+				let branch = initBranch(false);
+				const assert = testUtils.plan(3, done);
+				branch.init(branch_sample_key);
+				requests[0].callback(null, browser_fingerprint_id);
+				requests[1].callback(
+					null,
+					{
+						session_id: session_id,
+						browser_fingerprint_id: browser_fingerprint_id,
+						identity_id: identity_id,
+						data: JSON.stringify({
+							'$desktop_url': window.location.protocol + '//' +
 										window.location.host +
 										window.location.pathname
-					})
-				}
-			);
-			requests[2].callback(null, {});
+						})
+					}
+				);
+				requests[2].callback(null, {});
 
-			requests = [ ];
-			branch = initBranch(false, true);
-			branch.init(branch_sample_key);
+				requests = [ ];
+				branch = initBranch(false, true);
+				branch.init(branch_sample_key);
 
-			assert.strictEqual(requests.length, 2, 'Should make 2 requests');
-			assert.deepEqual(
-				requests[0].resource.endpoint,
-				'/_r',
-				'First request should be sent to /_r'
-			);
-			assert.deepEqual(
-				requests[1].resource.endpoint,
-				'/v1/has-app',
-				'Second request should be sent to /v1/has-app'
-			);
-		});
+				assert.strictEqual(requests.length, 2, 'Should make 2 requests');
+				assert.deepEqual(
+					requests[0].resource.endpoint,
+					'/_r',
+					'First request should be sent to /_r'
+				);
+				assert.deepEqual(
+					requests[1].resource.endpoint,
+					'/v1/has-app',
+					'Second request should be sent to /v1/has-app'
+				);
+			});
 
 		it('should not call has_app if session and link_identifier present', function(done) {
-			var assert = testUtils.plan(3, done);
+			const assert = testUtils.plan(3, done);
 			if (testUtils.go('?_branch_match_id=67890')) {
-
-				var branch = initBranch(false);
+				let branch = initBranch(false);
 				branch.init(branch_sample_key);
 
 				requests[0].callback(null, browser_fingerprint_id);
@@ -426,7 +425,7 @@ describe('Branch', function() {
 						browser_fingerprint_id: browser_fingerprint_id,
 						identity_id: identity_id,
 						data: JSON.stringify({
-							'$desktop_url': window.location.protocol + "//" +
+							'$desktop_url': window.location.protocol + '//' +
 											window.location.host +
 											window.location.pathname
 						})
@@ -444,7 +443,7 @@ describe('Branch', function() {
 						browser_fingerprint_id: browser_fingerprint_id,
 						identity_id: identity_id,
 						data: JSON.stringify({
-							'$desktop_url': window.location.protocol + "//" +
+							'$desktop_url': window.location.protocol + '//' +
 											window.location.host +
 											window.location.pathname
 						})
@@ -470,22 +469,22 @@ describe('Branch', function() {
 		});
 
 		it('should not call _r if userAgent is safari 11 or greater',	function(done) {
-			var safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
+			const safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
 			setUserAgent(safari11Ua);
 			if (navigator.userAgent !== safari11Ua) {
 				return done();
 			}
 
-			var branch = initBranch(false);
-			var assert = testUtils.plan(1, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(1, done);
 
 			branch.init(branch_sample_key);
 
 			requests[0].callback(
 				null,
 				{
-					session_id: "1234",
-					something: "else"
+					session_id: '1234',
+					something: 'else'
 				}
 			);
 			requests[1].callback(null, {});
@@ -499,16 +498,16 @@ describe('Branch', function() {
 			assert.deepEqual(
 				requests[0].obj,
 				{
-					"branch_key": branch_sample_key,
-					"link_identifier": undefined,
-					"initial_referrer": requests[0].obj.initial_referrer,
-					"browser_fingerprint_id": undefined,
-					"alternative_browser_fingerprint_id": undefined,
-					"sdk": "web" + config.version,
-					"options": { },
-					"current_url": utils.getCurrentUrl(),
-					"screen_height": utils.getScreenHeight(),
-					"screen_width": utils.getScreenWidth()
+					'branch_key': branch_sample_key,
+					'link_identifier': undefined,
+					'initial_referrer': requests[0].obj.initial_referrer,
+					'browser_fingerprint_id': undefined,
+					'alternative_browser_fingerprint_id': undefined,
+					'sdk': 'web' + config.version,
+					'options': { },
+					'current_url': utils.getCurrentUrl(),
+					'screen_height': utils.getScreenHeight(),
+					'screen_width': utils.getScreenWidth()
 				},
 				'Request to open params correct'
 			);
@@ -516,51 +515,50 @@ describe('Branch', function() {
 
 		it('should not call _r if session present but no link_identifier and safari 11 or greater',
 			function(done) {
-			var safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
-			setUserAgent(safari11Ua);
-			if (navigator.userAgent !== safari11Ua) {
-				return done();
-			}
+				const safari11Ua = 'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
+				setUserAgent(safari11Ua);
+				if (navigator.userAgent !== safari11Ua) {
+					return done();
+				}
 
-			var branch = initBranch(false);
-			var assert = testUtils.plan(2, done);
+				let branch = initBranch(false);
+				const assert = testUtils.plan(2, done);
 
-			branch.init(branch_sample_key);
-			requests[0].callback(
-				null,
-				{
-					session_id: session_id,
-					browser_fingerprint_id: undefined,
-					identity_id: identity_id,
-					data: JSON.stringify({
-						'$desktop_url': window.location.protocol + "//" +
+				branch.init(branch_sample_key);
+				requests[0].callback(
+					null,
+					{
+						session_id: session_id,
+						browser_fingerprint_id: undefined,
+						identity_id: identity_id,
+						data: JSON.stringify({
+							'$desktop_url': window.location.protocol + '//' +
 										window.location.host +
 										window.location.pathname
-					})
-				}
-			);
-			requests[1].callback(null, {});
+						})
+					}
+				);
+				requests[1].callback(null, {});
 
-			requests = [ ];
-			branch = initBranch(false, true);
-			branch.init(branch_sample_key);
+				requests = [ ];
+				branch = initBranch(false, true);
+				branch.init(branch_sample_key);
 
-			assert.strictEqual(requests.length, 1, 'Should make 2 requests');
-			assert.deepEqual(
-				requests[0].resource.endpoint,
-				'/v1/has-app',
-				'Second request should be sent to /v1/has-app'
-			);
-		});
-
+				assert.strictEqual(requests.length, 1, 'Should make 2 requests');
+				assert.deepEqual(
+					requests[0].resource.endpoint,
+					'/v1/has-app',
+					'Second request should be sent to /v1/has-app'
+				);
+			});
 	});
 
 	describe('data', function() {
 		it('should return whitelisted session storage data', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(2, done);
-			var data = safejson.stringify({ 'key_1': 'value_1' });
-			var whitelistedData = {
+			const branch = initBranch(true);
+			const assert = testUtils.plan(2, done);
+			const data = safejson.stringify({'key_1': 'value_1'});
+			const whitelistedData = {
 				'data': data,
 				'referring_identity': 'referring_user',
 				'identity': 'identity',
@@ -584,14 +582,14 @@ describe('Branch', function() {
 	describe('setIdentity', function() {
 		basicTests('setIdentity', [ 1 ]);
 		it('should invoke callback with data when a non-null value for identity is passed', function(done) {
-			var expectedResponse = {
-				"session_id": "113636235674656786",
-				"identity_id": "98807509250212101",
-				"link": "https://bnctestbed.app.link/?%24identity_id=98807509250212101",
-				"developer_identity": "test_identity"
+			const expectedResponse = {
+				'session_id': '113636235674656786',
+				'identity_id': '98807509250212101',
+				'link': 'https://bnctestbed.app.link/?%24identity_id=98807509250212101',
+				'developer_identity': 'test_identity'
 			};
-			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(4, done);
 
 			branch.setIdentity('test_identity', function(err, res) {
 				assert.deepEqual(res, expectedResponse, 'response returned');
@@ -599,19 +597,19 @@ describe('Branch', function() {
 		});
 
 		it('should update identity and identity_id in local storage', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(2, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(2, done);
 			branch.setIdentity('12345678', function(err, data) {
-				var localData = safejson.parse(localStorage.getItem('branch_session_first'));
+				const localData = safejson.parse(localStorage.getItem('branch_session_first'));
 				assert.strictEqual(localData['identity'], '12345678');
 				assert.strictEqual(localData['identity_id'], '7654321');
 			});
-			requests[0].callback(null, { identity: '12345678', identity_id: '7654321' });
+			requests[0].callback(null, {identity: '12345678', identity_id: '7654321'});
 		});
 
 		it('should invoke callback with error when a null value for identity is passed', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(4, done);
 
 			branch.setIdentity(null, function(err, res) {
 				assert.strictEqual(err, utils.messages.missingIdentity, 'error matched for missing identity');
@@ -622,13 +620,12 @@ describe('Branch', function() {
 
 	describe('track', function() {
 		basicTests('track', [ 0 ]);
-		var spy = sinon.spy(console, 'warn');
+		const spy = sinon.spy(console, 'warn');
 		it('should print console warning about method deprecation for track', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
+			const branch = initBranch(true);
+			const assert = testUtils.unplanned();
 			branch.track();
-			assert(spy.calledWith("track method currently supports only pageview event."));
-
+			assert(spy.calledWith('track method currently supports only pageview event.'));
 		});
 	});
 
@@ -636,8 +633,8 @@ describe('Branch', function() {
 		basicTests('logout', [ 0 ]);
 
 		it('should call api with branch_key and session_id', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(3, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(3, done);
 			branch.logout(function(err) {
 				assert.strictEqual(err, null, 'No error');
 			});
@@ -646,7 +643,7 @@ describe('Branch', function() {
 			requests[0].callback();
 			assert.deepEqual(
 				requests[0].obj,
-				testUtils.params({ }, [ "_t" ]),
+				testUtils.params({ }, [ '_t' ]),
 				'All params sent'
 			);
 		});
@@ -654,29 +651,29 @@ describe('Branch', function() {
 		it(
 			'should overwrite existing session_id, sessionLink, and identity_id\'s',
 			function(done) {
-				var branch = initBranch(true);
-				var assert = testUtils.plan(6, done);
+				const branch = initBranch(true);
+				const assert = testUtils.plan(6, done);
 				branch.logout(function(err) {
 					assert.strictEqual(err, null, 'No error');
 				});
 
 				assert.strictEqual(requests.length, 1, 'Request made');
 
-				var newSessionId = 'new_session';
-				var newIdentityId = 'new_id';
-				var newLink = 'new_link';
+				const newSessionId = 'new_session';
+				const newIdentityId = 'new_id';
+				const newLink = 'new_link';
 
 				requests[0].callback(
 					null,
 					{
-						"identity_id": newIdentityId,
-						"session_id": newSessionId,
-						"link": newLink
+						'identity_id': newIdentityId,
+						'session_id': newSessionId,
+						'link': newLink
 					}
 				);
 				assert.deepEqual(
 					requests[0].obj,
-					testUtils.params({ }, [ "_t" ]),
+					testUtils.params({ }, [ '_t' ]),
 					'All params sent'
 				);
 				assert.strictEqual(branch.session_id, newSessionId, 'branch session was replaced');
@@ -693,15 +690,15 @@ describe('Branch', function() {
 	describe('link', function() {
 		basicTests('link', [ 1 ]);
 
-		var expectedRequest = function(serialized, source, desktopUrlAppend) {
-			var val = testUtils.params({
-				tags: [ 'tag1', 'tag2' ],
-				channel: 'sample app',
-				feature: 'create link',
-				stage: 'created link',
-				type: 1,
-				data: {
-					mydata: 'bar',
+		const expectedRequest = function(serialized, source, desktopUrlAppend) {
+			const val = testUtils.params({
+				'tags': [ 'tag1', 'tag2' ],
+				'channel': 'sample app',
+				'feature': 'create link',
+				'stage': 'created link',
+				'type': 1,
+				'data': {
+					'mydata': 'bar',
 					'$desktop_url': 'https://cdn.branch.io/example.html',
 					'$og_title': 'Branch Metrics',
 					'$og_description': 'Branch Metrics',
@@ -710,8 +707,8 @@ describe('Branch', function() {
 					'$og_video': null,
 					'$og_type': 'product'
 				},
-				"sdk": "web" + config.version
-			}, [ "_t" ]);
+				'sdk': 'web' + config.version
+			}, [ '_t' ]);
 			if (desktopUrlAppend) {
 				val['data']['$desktop_url'] += desktopUrlAppend;
 			}
@@ -724,13 +721,13 @@ describe('Branch', function() {
 			return val;
 		};
 
-		var expectedResponse = {
-			"url": "https://bnc.lt/l/3HZMytU-BW"
+		const expectedResponse = {
+			'url': 'https://bnc.lt/l/3HZMytU-BW'
 		};
 
 		it('should call api with serialized data and return link with browser_fingerprint_id appended', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(4, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(4, done);
 			branch.link(expectedRequest(), function(err, link) {
 				assert.strictEqual(err, null, 'No error');
 				assert.strictEqual(link, expectedResponse['url'], 'link returned');
@@ -741,42 +738,42 @@ describe('Branch', function() {
 		});
 
 		it('an error should be returned causing .link() to return a bnc.lt long link', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(20, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(20, done);
 			branch.link(expectedRequest(), function(err, link) {
-				var urlParser = document.createElement("a");
+				const urlParser = document.createElement('a');
 				urlParser.href = link;
-				assert.strictEqual(urlParser.protocol, "https:", "Dynamic BNC link's protocol is correct");
-				var hostWithoutPort = urlParser.host;
+				assert.strictEqual(urlParser.protocol, 'https:', 'Dynamic BNC link\'s protocol is correct');
+				let hostWithoutPort = urlParser.host;
 				if (hostWithoutPort.indexOf(':') > -1) {
 					hostWithoutPort = hostWithoutPort.substring(0, hostWithoutPort.indexOf(':'));
 				}
-				assert.strictEqual(hostWithoutPort, "bnc.lt", "Dynamic BNC link's host correct");
+				assert.strictEqual(hostWithoutPort, 'bnc.lt', 'Dynamic BNC link\'s host correct');
 				// making sure that this test doesn't fail in IE10
-				var pathName = urlParser.pathname;
+				let pathName = urlParser.pathname;
 				if (pathName[0] === '/') {
 					pathName = pathName.substring(1, pathName.length);
 				}
-				assert.strictEqual(pathName, "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
+				assert.strictEqual(pathName, 'a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS', 'Dynamic BNC link\'s pathname correct');
 
-				var queryParams = urlParser.search.replace('?', '');
+				let queryParams = urlParser.search.replace('?', '');
 				queryParams = queryParams.split('&');
 
-				var expectedQueryParams = {
+				const expectedQueryParams = {
 					tags: [ 'tag1', 'tag2' ],
 					channel: 'sample app',
 					feature: 'create link',
 					stage: 'created link',
-					type: "1",
+					type: '1',
 					sdk: 'web' + config.version,
 					source: 'web-sdk',
-					data: { "mydata":"bar", "$desktop_url":"https://cdn.branch.io/example.html", "$og_title":"Branch Metrics", "$og_description":"Branch Metrics", "$og_image_url":"http://branch.io/img/logo_icon_white.png", "$canonical_url":"https://cdn.branch.io/example.html", "$og_video":null, "$og_type":"product" }
+					data: {'mydata': 'bar', '$desktop_url': 'https://cdn.branch.io/example.html', '$og_title': 'Branch Metrics', '$og_description': 'Branch Metrics', '$og_image_url': 'http://branch.io/img/logo_icon_white.png', '$canonical_url': 'https://cdn.branch.io/example.html', '$og_video': null, '$og_type': 'product'}
 				};
-				var actual = {};
-				for (var i = 0; i < queryParams.length; i++) {
-					var keyValuePair = queryParams[i].split('=');
-					var key = keyValuePair[0];
-					var value = decodeURIComponent(keyValuePair[1]);
+				const actual = {};
+				for (let i = 0; i < queryParams.length; i++) {
+					const keyValuePair = queryParams[i].split('=');
+					const key = keyValuePair[0];
+					const value = decodeURIComponent(keyValuePair[1]);
 					if (key === 'tags') {
 						if (!actual[key]) {
 							actual[key] = [];
@@ -788,10 +785,10 @@ describe('Branch', function() {
 					}
 				}
 				// jshint maxdepth:5
-				for (var property in expectedQueryParams) {
+				for (const property in expectedQueryParams) {
 					if (expectedQueryParams.hasOwnProperty(property)) {
-						assert.strictEqual(true, actual.hasOwnProperty(property), "property exists in dynamic bnc link");
-						var valActual = decodeURIComponent(actual[property]);
+						assert.strictEqual(true, actual.hasOwnProperty(property), 'property exists in dynamic bnc link');
+						let valActual = decodeURIComponent(actual[property]);
 						if (property === 'data') {
 							valActual = atob(valActual);
 							valActual = JSON.parse(valActual);
@@ -799,8 +796,8 @@ describe('Branch', function() {
 						}
 						else if (property === 'tags') {
 							valActual = valActual.split(',');
-							for (var t = 0; t < expectedQueryParams[property].length; t++) {
-								var valueExists = expectedQueryParams[property].indexOf(valActual[t]) > -1;
+							for (let t = 0; t < expectedQueryParams[property].length; t++) {
+								const valueExists = expectedQueryParams[property].indexOf(valActual[t]) > -1;
 								assert.strictEqual(true, valueExists, 'tag is correctly appended to dynamic bnc.lt link');
 							}
 						}
@@ -815,16 +812,16 @@ describe('Branch', function() {
 		});
 
 		it('should add source = "web-sdk" to link data', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(2, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(2, done);
 			branch.link(expectedRequest());
 			assert.strictEqual(requests.length, 1, 'Request made');
 			assert.strictEqual(requests[0].obj['source'], 'web-sdk', 'web-sdk source set');
 		});
 
 		it('should remove r hash from desktop_url', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(2, done);
+			const branch = initBranch(true);
+			const assert = testUtils.plan(2, done);
 			branch.link(expectedRequest(false, false, '#r:12345'));
 			assert.strictEqual(requests.length, 1, 'Request made');
 			assert.strictEqual(
@@ -842,38 +839,37 @@ describe('Branch', function() {
 		sandbox.stub(utils, 'mobileUserAgent', function(server, branchViewData, data) {
 			return false;
 		});
-		var spy = sinon.spy(console, 'info');
+		const spy = sinon.spy(console, 'info');
 		it('should print console warning about method deprecation for sendMS', function() {
-			var branch = initBranch(true);
-			var assert = testUtils.unplanned();
+			const branch = initBranch(true);
+			const assert = testUtils.unplanned();
 			branch.banner();
-			assert(spy.calledWith("banner functionality is not supported on desktop"));
-
+			assert(spy.calledWith('banner functionality is not supported on desktop'));
 		});
 	});
 
 	describe('deepview', function() {
 		basicTests('deepview', [ 1 ]);
 
-		var branch;
-		var linkData = testUtils.params({
+		let branch;
+		const linkData = testUtils.params({
 			channel: 'sample app',
-			data: { mydata: 'bar' },
+			data: {mydata: 'bar'},
 			feature: 'create link',
 			stage: 'created link',
 			tags: [ 'tag1', 'tag2' ]
-		}, [ "_t" ]);
-		var options = {
+		}, [ '_t' ]);
+		const options = {
 			make_new_link: true,
 			open_app: true,
 			append_deeplink_path: true
 		};
-		var windowLocation = 'http://someurl/pluspath';
-		var ogTitle = 'OGTitle';
-		var ogDescription = 'OGDescription';
-		var ogImage = 'OGImage';
-		var ogVideo = 'OGVideo';
-		var ogType = 'OGType';
+		const windowLocation = 'http://someurl/pluspath';
+		const ogTitle = 'OGTitle';
+		const ogDescription = 'OGDescription';
+		const ogImage = 'OGImage';
+		const ogVideo = 'OGVideo';
+		const ogType = 'OGType';
 
 		beforeEach(function() {
 			sinon.stub(utils, 'getWindowLocation')
@@ -905,8 +901,8 @@ describe('Branch', function() {
 		});
 
 		it('should call v1/deepview endpoint with the right params for branch.deepview() calls', function(done) {
-			var assert = testUtils.plan(7, done);
-			var dataString = [
+			const assert = testUtils.plan(7, done);
+			const dataString = [
 				'{',
 				'"mydata":"bar",',
 				'"$canonical_url":"' + windowLocation + '",',
@@ -928,10 +924,10 @@ describe('Branch', function() {
 
 			assert.strictEqual(requests.length, 1, 'exactly one request made');
 			requests[0].callback();
-			var obj = requests[0].obj;
+			const obj = requests[0].obj;
 
 			assert.strictEqual(obj.data, dataString, 'data is sent');
-			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
+			assert.deepEqual(obj.tags, [ 'tag1', 'tag2' ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');
 			// assert.strictEqual(obj.append_deeplink_path,
 			// 	utils.mobileUserAgent() ? true : undefined,
@@ -942,7 +938,7 @@ describe('Branch', function() {
 		});
 
 		it('should call v1/deepview endpoint with the right params for branch.banner() calls', function(done) {
-			var assert = testUtils.plan(2, done);
+			const assert = testUtils.plan(2, done);
 
 			// we're testing banner, which means we need to be mobile
 			sandbox.stub(utils, 'mobileUserAgent', function(server, branchViewData, data) {
@@ -955,7 +951,7 @@ describe('Branch', function() {
 			});
 
 			// create a fake banner div so we don't fill up the dom with real banners
-			var bannerDiv = document.createElement('iframe');
+			const bannerDiv = document.createElement('iframe');
 			bannerDiv.src = 'about:blank';
 			bannerDiv.id = 'branch-mobile-action';
 			document.body.appendChild(bannerDiv);
@@ -963,54 +959,35 @@ describe('Branch', function() {
 				return bannerDiv;
 			});
 
-
-			var bannerDeeplinkData = {
-				tags: [ 'custom' ],
-				data: {
-					mydata: 'From Banner',
-					foo: 'bar',
-					'$deeplink_path': 'open/item/5678'
-				}
-			};
-
-			var banner = branch.banner(
-				{
-					immediate: true,
-					disableHide: true,
-					forgetHide: true
-				},
-				bannerDeeplinkData
-			);
-
 			assert.strictEqual(requests.length, 1, 'exactly one request made');
 
-			var obj = requests[0].obj;
+			const obj = requests[0].obj;
 			assert.strictEqual(obj.deepview_type, 'banner', 'deepview_type is sent as \'banner\'');
 
 			document.body.removeChild(bannerDiv);
 		});
 
 		it('should ignore the referring link if make_new_link is true', function(done) {
-			var assert = testUtils.plan(2, done);
+			const assert = testUtils.plan(2, done);
 			sandbox.stub(branch, '_referringLink', function() {
 				return '123abc';
 			});
 
 			branch.deepview(
 				linkData,
-				{ make_new_link: true },
+				{make_new_link: true},
 				function(err) {
 					assert.strictEqual(err, null, 'No error');
 				}
 			);
 
 			requests[0].callback();
-			var obj = requests[0].obj;
+			const obj = requests[0].obj;
 			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
 		});
 
 		it('should reuse the referring link if make_new_link is not true', function(done) {
-			var assert = testUtils.plan(2, done);
+			const assert = testUtils.plan(2, done);
 			sandbox.stub(branch, '_referringLink', function() {
 				return '123abc';
 			});
@@ -1024,12 +1001,12 @@ describe('Branch', function() {
 			);
 
 			requests[0].callback();
-			var obj = requests[0].obj;
+			const obj = requests[0].obj;
 			assert.strictEqual(obj.link_click_id, '123abc', 'link_click_id is sent');
 		});
 
 		it('should assign the function in request callback to branch._deepviewCta', function(done) {
-			var assert = testUtils.plan(4, done);
+			const assert = testUtils.plan(4, done);
 
 			branch.deepview(
 				{},
@@ -1047,7 +1024,7 @@ describe('Branch', function() {
 		});
 
 		it('should return err and use the right fallback when the req has err', function(done) {
-			var assert = testUtils.plan(3, done);
+			const assert = testUtils.plan(3, done);
 
 			sandbox.stub(branch, '_windowRedirect', function(url) {
 				assert(false, 'redirect should not happen unless explicitly called');
@@ -1071,39 +1048,39 @@ describe('Branch', function() {
 				branch._windowRedirect.restore();
 			}
 			sandbox.stub(branch, '_windowRedirect', function(link) {
-				var urlParser = document.createElement("a");
+				const urlParser = document.createElement('a');
 				urlParser.href = link;
-				assert.strictEqual(urlParser.protocol, "https:", "Dynamic BNC link's protocol is correct");
-				var hostWithoutPort = urlParser.host;
+				assert.strictEqual(urlParser.protocol, 'https:', 'Dynamic BNC link\'s protocol is correct');
+				let hostWithoutPort = urlParser.host;
 				if (hostWithoutPort.indexOf(':') > -1) {
 					hostWithoutPort = hostWithoutPort.substring(0, hostWithoutPort.indexOf(':'));
 				}
-				assert.strictEqual(hostWithoutPort, "bnc.lt", "Dynamic BNC link's host correct");
+				assert.strictEqual(hostWithoutPort, 'bnc.lt', 'Dynamic BNC link\'s host correct');
 				// making sure that this test doesn't fail in IE10
-				var pathName = urlParser.pathname;
+				let pathName = urlParser.pathname;
 				if (pathName[0] === '/') {
 					pathName = pathName.substring(1, pathName.length);
 				}
-				assert.strictEqual(pathName, "a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS", "Dynamic BNC link's pathname correct");
+				assert.strictEqual(pathName, 'a/key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS', 'Dynamic BNC link\'s pathname correct');
 
-				var queryParams = urlParser.search.replace('?', '');
+				let queryParams = urlParser.search.replace('?', '');
 				queryParams = queryParams.split('&');
 
-				var expectedQueryParams = {
+				const expectedQueryParams = {
 					channel: 'testChannel',
 					source: 'web-sdk',
-					data: { "$canonical_url":"http://someurl/pluspath", "$og_title":"OGTitle", "$og_description":"OGDescription", "$og_image_url": "OGImage", "$og_video":"OGVideo", "$og_type":"OGType", "akey": "aval" }
+					data: {'$canonical_url': 'http://someurl/pluspath', '$og_title': 'OGTitle', '$og_description': 'OGDescription', '$og_image_url': 'OGImage', '$og_video': 'OGVideo', '$og_type': 'OGType', 'akey': 'aval'}
 				};
-				var actual = {};
-				for (var i = 0; i < queryParams.length; i++) {
-					var keyValuePair = queryParams[i].split('=');
-					var value = decodeURIComponent(keyValuePair[1]);
+				const actual = {};
+				for (let i = 0; i < queryParams.length; i++) {
+					const keyValuePair = queryParams[i].split('=');
+					const value = decodeURIComponent(keyValuePair[1]);
 					actual[keyValuePair[0]] = value;
 				}
-				for (var key in expectedQueryParams) {
+				for (const key in expectedQueryParams) {
 					if (expectedQueryParams.hasOwnProperty(key)) {
-						assert.strictEqual(true, actual.hasOwnProperty(key), "property exists in dynamic bnc link");
-						var actualVal = decodeURIComponent(actual[key]);
+						assert.strictEqual(true, actual.hasOwnProperty(key), 'property exists in dynamic bnc link');
+						let actualVal = decodeURIComponent(actual[key]);
 						if (key === 'data') {
 							actualVal = atob(actualVal);
 							actualVal = JSON.parse(actualVal);
@@ -1121,17 +1098,16 @@ describe('Branch', function() {
 				branch._windowRedirect.restore();
 			}
 		});
-
 	});
 
 	describe('deepviewCta', function() {
-		var branch;
+		let branch;
 		beforeEach(function() {
 			branch = initBranch(true);
 		});
 
 		it('should throw an error if branch._deepviewCta is undefined', function(done) {
-			var assert = testUtils.plan(2, done);
+			const assert = testUtils.plan(2, done);
 			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
 			branch.deepviewCta(function(err) {
 				assert.strictEqual(
@@ -1143,7 +1119,7 @@ describe('Branch', function() {
 		});
 
 		it('should throw an error if tracking is disabled and branch._deepviewCta is undefined', function(done) {
-			var assert = testUtils.plan(2, done);
+			const assert = testUtils.plan(2, done);
 			assert.strictEqual(branch._deepviewCta, undefined, 'default to undefined');
 			branch.disableTracking();
 			branch.deepviewCta(function(err) {
@@ -1156,7 +1132,7 @@ describe('Branch', function() {
 		});
 
 		it('should not throw an error if branch._deepviewCta is a function', function(done) {
-			var assert = testUtils.plan(1, done);
+			const assert = testUtils.plan(1, done);
 			branch._deepviewCta = function() {};
 			branch.deepviewCta(function(err) {
 				assert.strictEqual(err, undefined, 'no error should be present in callback');
@@ -1165,10 +1141,10 @@ describe('Branch', function() {
 	});
 	describe('addListener', function() {
 		it('should add and remove an event listener to the branch object and fire', function(done) {
-			var branch = initBranch(true);
-			var assert = testUtils.plan(7, done);
-			var listenerFired = 0;
-			var listener = function(event) {
+			const branch = initBranch(true);
+			const assert = testUtils.plan(7, done);
+			let listenerFired = 0;
+			const listener = function(event) {
 				assert.strictEqual('test_event', event, 'recieved event equals triggered event');
 				listenerFired++;
 			};
@@ -1196,8 +1172,8 @@ describe('Branch', function() {
 
 	describe('disableTracking() tests', function() {
 		it('Flow with branch.init(), branch.disableTracking(true), branch.disableTracking(false)', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(6, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(6, done);
 			branch.init(branch_sample_key, function(err, data) {
 				assert.strictEqual(err, null, 'No error');
 			});
@@ -1205,8 +1181,8 @@ describe('Branch', function() {
 			requests[1].callback(
 				null,
 				{
-					session_id: "1234",
-					something: "else"
+					session_id: '1234',
+					something: 'else'
 				}
 			);
 			requests[2].callback(null, {});
@@ -1215,16 +1191,16 @@ describe('Branch', function() {
 			assert.strictEqual('{"session_id":"1234","something":"else","identity":null}', localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 
 			branch.disableTracking(true);
-			assert.strictEqual("{}", sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
-			assert.strictEqual("{}", localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual('{}', sessionStorage.getItem('branch_session'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
+			assert.strictEqual('{}', localStorage.getItem('branch_session_first'), 'Cookie not stored. [This may not work in some browsers with a file: URL, e.g. Chrome.]');
 
 			branch.disableTracking(false);
 			requests[3].callback(null, browser_fingerprint_id);
 			requests[4].callback(
 				null,
 				{
-					session_id: "1234",
-					something: "else"
+					session_id: '1234',
+					something: 'else'
 				}
 			);
 			requests[5].callback(null, {});

@@ -1,11 +1,11 @@
 'use strict';
-/*jshint -W079 */
-var sinon = require('sinon');
+/* jshint -W079 */
+const sinon = require('sinon');
 
 goog.require('Branch');
 
 describe('Branch - new', function() {
-	var branch;
+	let branch;
 	beforeEach(function() {
 		branch = sinon.createStubInstance(Branch);
 	});
@@ -14,7 +14,7 @@ describe('Branch - new', function() {
 	});
 	describe('referringLink', function() {
 		it('test method exists', function() {
-			sinon.assert.match(typeof branch.referringLink, "function");
+			sinon.assert.match(typeof branch.referringLink, 'function');
 		});
 	});
 });
