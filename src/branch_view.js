@@ -218,7 +218,7 @@ branch_view._getPageviewRequestData = function(metadata, options, branch, isDism
 	const initialReferrer = utils.getInitialReferrer(branch._referringLink());
 	const branchViewId = options['branch_view_id'] || utils.getParameterByName('_branch_view_id') || null;
 	const linkClickId = !options['make_new_link'] ? utils.getClickIdAndSearchStringFromLink(branch._referringLink(true)) : null;
-  const SessionlinkClickId = sessionStorage.hasOwnProperty('session_link_click_id') ? sessionStorage['session_link_click_id'] : null;
+	const SessionlinkClickId = sessionStorage.hasOwnProperty('session_link_click_id') ? sessionStorage['session_link_click_id'] : null;
 
 	// adds root level keys for v1/event
 	obj['event'] = !isDismissEvent ? 'pageview' : 'dismiss';
