@@ -366,6 +366,9 @@ Branch.prototype['init'] = wrap(
 			if (data['link_click_id']) {
 				self.link_click_id = data['link_click_id'].toString();
 			}
+			if (data['session_link_click_id']) {
+				self.session_link_click_id = data['session_link_click_id'].toString();
+			}
 			if (data['session_id']) {
 				self.session_id = data['session_id'].toString();
 			}
