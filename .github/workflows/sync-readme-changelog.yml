@@ -15,9 +15,9 @@ jobs:
         # Get release name, body, and date from the release event
         release_name="${{ github.event.release.tag_name }}"
         release_body="${{ github.event.release.body }}"
-        release_date=$(date -d "${{ github.event.release.published_at }}" +"%Y-%B-%d")
+        release_date=$(date -d "${{ github.event.release.published_at }}" +"%Y-%m-%d")
         # Format release notes
-        formatted_notes="## $release_name\n\n**($release_date)**\n\n$release_body"
+        formatted_notes="## [$release_name] - $release_date\n\n$release_body"
         
         # Get existing version history page
         existing_content=$(curl --request GET \
