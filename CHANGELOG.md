@@ -3,6 +3,9 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.80.0] - 2023-09-14
+- fix(SDK-2113): send session_link_click_id
+
 ## [2.79.0] - 2023-08-22
 - fix(SDK-2006): remove v1/logout call inside logout
 - fix(SDK-2006): remove v1/profile call inside setIdentity
