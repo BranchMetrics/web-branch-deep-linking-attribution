@@ -342,14 +342,7 @@
   */
  Server.prototype.request = function(resource, data, storage, callback) {
 	var self = this;
-
-	if (resource.endpoint === "/v1/pageview" && data && data['journey_displayed']) {
-		// special case for pageview endpoint
-		utils.currentRequestBrttTag = resource.endpoint + '-1-brtt';
-	}
-	else {
-		utils.currentRequestBrttTag = resource.endpoint + '-brtt';
-	}
+	utils.currentRequestBrttTag = resource.endpoint + '-brtt';
 
 	if ((resource.endpoint === "/v1/url") && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];

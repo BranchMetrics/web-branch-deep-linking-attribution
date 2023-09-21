@@ -94,27 +94,6 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 	return true;
 };
 
-branch_view.incrementPageviewAnalytics = function(branchViewData) {
-	var requestData = 		{
-		"event": "pageview",
-		"journey_displayed": true,
-		"audience_rule_id": branchViewData['audience_rule_id'],
-		"branch_view_id": branchViewData['branch_view_id']
-	};
-
-	var sessionStorage = session.get(journeys_utils.branch._storage) || {};
-	var identity = sessionStorage.hasOwnProperty('identity') ? sessionStorage['identity'] : null;
-	requestData = utils.addPropertyIfNotNull(requestData, 'identity', identity);
-
-	journeys_utils.branch._api(
-		resources.pageview,
-		requestData,
-		function (err, data) {
-			// do nothing with response
-		}
-	);
-};
-
 branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled, journeyLinkData) {
     if(journeys_utils.exitAnimationIsRunning){
     	return;
@@ -179,18 +158,10 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 			}
 			
 			document.body.removeChild(placeholder);
-	
-			if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
-				branch_view.incrementPageviewAnalytics(branchViewData);
-			}
 		}
 		renderHtmlBlob(document.body, html, requestData['has_app_websdk'], finalHookupsOnIframeLoaded);
 	} else {
 		document.body.removeChild(placeholder);
-	
-		if (!utils.userPreferences.trackingDisabled && !testModeEnabled) {
-			branch_view.incrementPageviewAnalytics(branchViewData);
-		}
 	}
 };
 
