@@ -21,7 +21,7 @@ $jscomp.defineProperty = $jscomp.ASSUME_ES5 || "function" == typeof Object.defin
   return a;
 };
 $jscomp.getGlobal = function(a) {
-  a = ["object" == typeof globalThis && globalThis, a, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof global && global,];
+  a = ["object" == typeof globalThis && globalThis, a, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof global && global];
   for (var b = 0; b < a.length; ++b) {
     var c = a[b];
     if (c && c.Math == Math) {
@@ -36,13 +36,15 @@ $jscomp.TRUST_ES6_POLYFILLS = !$jscomp.ISOLATE_POLYFILLS || $jscomp.IS_SYMBOL_NA
 $jscomp.polyfills = {};
 $jscomp.propertyToPolyfillSymbol = {};
 $jscomp.POLYFILL_PREFIX = "$jscp$";
-var $jscomp$lookupPolyfilledValue = function(a, b) {
-  var c = $jscomp.propertyToPolyfillSymbol[b];
-  if (null == c) {
-    return a[b];
+var $jscomp$lookupPolyfilledValue = function(a, b, c) {
+  if (!c || null != a) {
+    c = $jscomp.propertyToPolyfillSymbol[b];
+    if (null == c) {
+      return a[b];
+    }
+    c = a[c];
+    return void 0 !== c ? c : a[b];
   }
-  c = a[c];
-  return void 0 !== c ? c : a[b];
 };
 $jscomp.polyfill = function(a, b, c, d) {
   b && ($jscomp.ISOLATE_POLYFILLS ? $jscomp.polyfillIsolated(a, b, c, d) : $jscomp.polyfillUnisolated(a, b, c, d));
@@ -124,9 +126,6 @@ goog.define = function(a, b) {
 goog.FEATURESET_YEAR = 2012;
 goog.DEBUG = !0;
 goog.LOCALE = "en";
-goog.getLocale = function() {
-  return goog.LOCALE;
-};
 goog.TRUSTED_SITE = !0;
 goog.DISALLOW_TEST_ONLY_CODE = COMPILED && !goog.DEBUG;
 goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING = !1;
@@ -256,7 +255,7 @@ goog.getObjectByName = function(a, b) {
 goog.addDependency = function(a, b, c, d) {
   !COMPILED && goog.DEPENDENCIES_ENABLED && goog.debugLoader_.addDependency(a, b, c, d);
 };
-goog.ENABLE_DEBUG_LOADER = !0;
+goog.ENABLE_DEBUG_LOADER = !1;
 goog.logToConsole_ = function(a) {
   goog.global.console && goog.global.console.error(a);
 };
@@ -2566,7 +2565,7 @@ journeys_utils._handleJourneyDismiss = function(a, b, c, d, e, f, g, h) {
   }
 };
 journeys_utils._getPageviewMetadata = function(a, b) {
-  a = utils.merge({url:a && a.url || utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1, window_device_pixel_ratio:window.devicePixelRatio || 1,}, b || {});
+  a = utils.merge({url:a && a.url || utils.getWindowLocation(), user_agent:navigator.userAgent, language:navigator.language, screen_width:screen.width || -1, screen_height:screen.height || -1, window_device_pixel_ratio:window.devicePixelRatio || 1}, b || {});
   a = utils.addPropertyIfNotNullorEmpty(a, "model", utils.userAgentData ? utils.userAgentData.model : "");
   return a = utils.addPropertyIfNotNullorEmpty(a, "os_version", utils.userAgentData ? utils.userAgentData.platformVersion : "");
 };
