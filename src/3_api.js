@@ -14,7 +14,7 @@
   * @class Server
   * @constructor
   */
- var Server = function() { };
+ Server = function() { };
 
  Server.prototype._jsonp_callback_index = 0;
 
@@ -130,6 +130,9 @@
 		// /v1/pageview and v1/dismiss require custom keys to be available in the post body due
 		// to .setBranchViewData() call so the logic above won't work
 		utils.merge(d, data);
+	}
+	if (data.hasOwnProperty("branch_requestMetadata") && data["branch_requestMetadata"] && !(resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss')) {
+		d['metadata'] = utils.deepcopy(data["branch_requestMetadata"]);
 	}
 
 	if (resource.method === 'POST') {

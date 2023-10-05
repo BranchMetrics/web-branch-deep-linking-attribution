@@ -7,7 +7,7 @@ goog.provide('task_queue');
 /**
  * @returns {function(function(function()))}
  */
-var task_queue = function() {
+task_queue = function() {
 	var queue = [];
 	var next = function() {
 		if (queue.length) {
