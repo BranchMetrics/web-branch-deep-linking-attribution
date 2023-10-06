@@ -1957,6 +1957,6 @@ Branch.prototype.setRequestMetaData = function(key, value) {
 		this.requestMetadata = utils.addPropertyIfNotNull(this.requestMetadata, key, value);
 	}
 	catch (e) {
-		console.log("An error occured while setting request metadata", e);
+		console.error("An error occured while setting request metadata", e);
 	}
 };
