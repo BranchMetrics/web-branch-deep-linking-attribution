@@ -564,7 +564,7 @@ Branch.prototype['init'] = wrap(
 				}
 			}
 		};
-		if (sessionData && sessionData['session_id'] && !link_identifier && !utils.getParamValue('branchify_url')) {
+		if (sessionData && !link_identifier && !utils.getParamValue('branchify_url')) {
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
 			session.update(self._storage, { "referring_link": "" });
