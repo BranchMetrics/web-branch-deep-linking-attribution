@@ -3,10 +3,10 @@
 goog.require('task_queue');
 
 describe('task_queue', function() {
-	var queue;
-	var orderCalled;
-	var clock;
-	var assert = testUtils.unplanned();
+	let queue;
+	let orderCalled;
+	let clock;
+	const assert = testUtils.unplanned();
 	beforeEach(function() {
 		queue = task_queue();
 		clock = sinon.useFakeTimers();

@@ -22,7 +22,7 @@
 
 		root[branchStr] = branchSdk;
 	}
-})(
+}(
 	window, document, 'script', 'branch', function(branch, name) {
 		branch[name] = function() {
 			branch._q.push([ name, arguments ]);
@@ -58,4 +58,4 @@
 		'qrCode'
 	],
 	0
-);
+));

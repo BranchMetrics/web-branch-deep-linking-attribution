@@ -160,10 +160,10 @@ banner_css.iframe_position = function(sticky, position) {
  */
 banner_css.css = function(options, element) {
 	// Construct Banner CSS
-	var style = banner_css.banner(options);
+	let style = banner_css.banner(options);
 
 	// User agent specific styles
-	var userAgent = utils.mobileUserAgent();
+	const userAgent = utils.mobileUserAgent();
 	if ((userAgent === 'ios' || userAgent === 'ipad') && options.showiOS) {
 		style += banner_css.mobile + banner_css.ios;
 	}
@@ -184,22 +184,22 @@ banner_css.css = function(options, element) {
 	if (options.iframe) {
 		style += banner_css.inneriframe;
 
-		var iFrameCSS = document.createElement('style');
+		const iFrameCSS = document.createElement('style');
 		iFrameCSS.type = 'text/css';
 		iFrameCSS.id = 'branch-iframe-css';
 		utils.addNonceAttribute(iFrameCSS);
 		iFrameCSS.innerHTML = banner_css.iframe + banner_css.iframe_position(options.mobileSticky, options.position);
-		(document.head || document.getElementsByTagName("head")[0]).appendChild(iFrameCSS);
+		(document.head || document.getElementsByTagName('head')[0]).appendChild(iFrameCSS);
 	}
 
-	var css = document.createElement('style');
+	const css = document.createElement('style');
 	css.type = 'text/css';
 	css.id = 'branch-css';
 	css.innerHTML = style;
 	utils.addNonceAttribute(css);
 
-	var doc = (options.iframe ? element.contentWindow.document : document);
-	var controlledHead = (doc.head || doc.getElementsByTagName("head")[0]);
+	const doc = (options.iframe ? element.contentWindow.document : document);
+	const controlledHead = (doc.head || doc.getElementsByTagName('head')[0]);
 	if (controlledHead && typeof controlledHead.appendChild === 'function') {
 		controlledHead.appendChild(css);
 	}

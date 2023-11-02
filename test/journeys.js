@@ -11,12 +11,12 @@ goog.require('banner_utils');
 
 goog.require('goog.json'); // jshint unused:false
 
-/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
+/* globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 
 describe('Branch', function() {
-	var storage = new BranchStorage([ 'pojo' ]);
-	var sandbox;
-	var requests;
+	const storage = new BranchStorage([ 'pojo' ]);
+	let sandbox;
+	let requests;
 
 	window.sdk_version = 'web' + config.version;
 
@@ -41,7 +41,7 @@ describe('Branch', function() {
 			return 'ios';
 		});
 
-		var branch = new Branch();
+		const branch = new Branch();
 
 		sandbox.stub(branch._server, 'request', function(resource, obj, storage, callback) {
 			requests.push({
@@ -69,45 +69,23 @@ describe('Branch', function() {
 		return branch;
 	}
 
-	function basicTests(call, params) {
-		it('should fail if branch not initialized', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(params.length * 2, done);
-
-			function basicTest(param) {
-				var p = testUtils.nulls(param);
-				branch[call].apply(branch, p.concat(function(err) {
-					assert.strictEqual(err.message, 'Branch SDK not initialized');
-				}));
-				assert.throws(function() {
-					branch[call].apply(branch, p);
-				}, 'Branch SDK not initialized');
-			}
-
-			for (var i = 0; i < params.length; i++) {
-				basicTest(params[i]);
-			}
-		});
-	}
-
 	afterEach(function() {
 		sandbox.restore();
 	});
 
 	describe('journeys', function() {
-
 		it('should attempt to pass deeplink data in a banner call', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(3, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(3, done);
 
-			var bannerDeeplinkData = {
+			const bannerDeeplinkData = {
 				tags: [ 'custom' ],
 				data: {
-					mydata: 'From Banner',
-					foo: 'bar',
+					'mydata': 'From Banner',
+					'foo': 'bar',
 					'$deeplink_path': 'open/item/5678'
 				}
-			}
+			};
 
 			branch.init(branch_sample_key);
 			branch.banner(
@@ -149,17 +127,17 @@ describe('Branch', function() {
 		});
 
 		it('should attempt to pass deeplink data to a journey in a page view event', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(4, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(4, done);
 
-			var bannerDeeplinkData = {
+			const bannerDeeplinkData = {
 				tags: [ 'custom' ],
 				data: {
-					mydata: 'From Banner',
-					foo: 'bar',
+					'mydata': 'From Banner',
+					'foo': 'bar',
 					'$deeplink_path': 'open/item/5678'
 				}
-			}
+			};
 
 			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
 				assert.isDefined(data, 'user data has been defined');
@@ -215,24 +193,20 @@ describe('Branch', function() {
 		});
 
 		it('should attempt to pass deeplink data to a journey in a custom event', function(done) {
-			var branch = initBranch(false);
-			var assert = testUtils.plan(4, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(4, done);
 
-			var bannerDeeplinkData = {
+			const bannerDeeplinkData = {
 				tags: [ 'custom' ],
 				data: {
-					mydata: 'From Banner',
-					foo: 'bar',
+					'mydata': 'From Banner',
+					'foo': 'bar',
 					'$deeplink_path': 'open/item/5678'
 				}
-			}
+			};
 
 			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
 				assert.isDefined(data, 'user data has been defined');
-				var test = banner_utils.shouldAppend(storage, {
-					forgetHide: true,
-					showiOS: true
-				});
 				assert.strictEqual(false, banner_utils.shouldAppend(storage, {
 					forgetHide: true,
 					showiOS: true
@@ -289,17 +263,17 @@ describe('Branch', function() {
 			// where a Journey view would be shown. In this case, the data most recently passed to
 			// branch.banner() and stored in the data cache would be sent through to the /v1/branchview
 			// call. It would be combined on the server with data set in the Dashboard.
-			var branch = initBranch(false);
-			var assert = testUtils.plan(4, done);
+			const branch = initBranch(false);
+			const assert = testUtils.plan(4, done);
 
-			var bannerDeeplinkData = {
+			const bannerDeeplinkData = {
 				tags: [ 'custom' ],
 				data: {
-					mydata: 'From Banner',
-					foo: 'bar',
+					'mydata': 'From Banner',
+					'foo': 'bar',
 					'$deeplink_path': 'open/item/5678'
 				}
-			}
+			};
 
 			sandbox.stub(branch_view, 'handleBranchViewData', function(server, branchViewData, data) {
 				assert.isDefined(data, 'user data has been defined');
@@ -349,7 +323,6 @@ describe('Branch', function() {
 				assert.strictEqual(requests.length, 4, '4 requests made');
 			}, 10);
 		});
-
 	});
 });
 

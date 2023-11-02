@@ -5,10 +5,10 @@
 
 goog.provide('safejson');
 
-/*jshint unused:false*/
+/* jshint unused:false*/
 goog.require('goog.json');
 
-safejson.parse = function(sJSON) {
+safejson.parse = function (sJSON) {
 	sJSON = String(sJSON);
 	try {
 		return JSON.parse(sJSON);
@@ -17,7 +17,7 @@ safejson.parse = function(sJSON) {
 
 	}
 
-	throw Error("Invalid JSON string: " + sJSON);
+	throw Error('Invalid JSON string: ' + sJSON);
 };
 
 safejson.stringify = function(objJSON) {
@@ -28,6 +28,6 @@ safejson.stringify = function(objJSON) {
 
 	}
 
-	throw Error("Could not stringify object");
+	throw Error('Could not stringify object');
 };
 

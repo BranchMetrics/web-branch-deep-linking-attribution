@@ -3,25 +3,24 @@
 goog.require('config');
 goog.require('goog.json'); // jshint unused:false
 
-/*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
-/*globals device_fingerprint_id */
+/* globals device_fingerprint_id */
 
 describe('Integration tests', function() {
-	var requests = [ ];
-	var xhr;
-	var clock;
-	var jsonpCallback = 0;
+	let requests = [ ];
+	let xhr;
+	let clock;
+	let jsonpCallback = 0;
 
-	var clearBranchStorage = function() {
+	const clearBranchStorage = function() {
 		sessionStorage.clear();
 		localStorage.clear();
-		var clearCookies = function(temp, perm) {
-			var deleteCookie = function(cookie) {
+		const clearCookies = function(temp, perm) {
+			const deleteCookie = function(cookie) {
 				document.cookie = cookie.substring(0, cookie.indexOf('=')) + '=;expires=-1;path=/';
 			};
-			var cookieArray = document.cookie.split(';');
-			for (var i = 0; i < cookieArray.length; i++) {
-				var cookie = cookieArray[i];
+			const cookieArray = document.cookie.split(';');
+			for (let i = 0; i < cookieArray.length; i++) {
+				let cookie = cookieArray[i];
 				while (cookie.charAt(0) === ' ') {
 					cookie = cookie.substring(1, cookie.length);
 				}
@@ -47,7 +46,7 @@ describe('Integration tests', function() {
 		};
 		branch._server.createScript = function() {};
 		sinon.stub(branch._server, 'createScript', function(src) {
-			requests.push({ src: src, callback: window[src.match(/callback=([^&]+)/)[1]] });
+			requests.push({src: src, callback: window[src.match(/callback=([^&]+)/)[1]]});
 		});
 	});
 
@@ -77,14 +76,14 @@ describe('Integration tests', function() {
 		}
 	});
 
-	var sampleParams = {
+	const sampleParams = {
 		tags: [ 'tag1', 'tag2' ],
 		channel: 'sample app',
 		feature: 'create link',
 		stage: 'created link',
 		type: 1,
 		data: {
-			mydata: 'bar',
+			'mydata': 'bar',
 			'$desktop_url': 'https://cdn.branch.io/example.html',
 			'$og_title': 'Branch Metrics',
 			'$og_description': 'Branch Metrics',
@@ -92,15 +91,15 @@ describe('Integration tests', function() {
 		}
 	};
 
-	var indexOfLastInitRequest = function(requestsAfterInit) {
+	const indexOfLastInitRequest = function(requestsAfterInit) {
 		return requestsAfterInit + 1;
 	};
 
-	var numberOfAsserts = function(assertsAfterInit) {
+	const numberOfAsserts = function(assertsAfterInit) {
 		return assertsAfterInit + 4;
 	};
 
-	var branchInit = function(assert, callback) {
+	const branchInit = function(assert, callback) {
 		branch.init.apply(
 			branch,
 			[
@@ -127,7 +126,7 @@ describe('Integration tests', function() {
 		// v1/open
 		requests[1].respond(
 			200,
-			{ "Content-Type": "application/json" },
+			{'Content-Type': 'application/json'},
 			'{ "identity_id":' + identity_id +
 				', "session_id":"123088518049178533", "device_fingerprint_id":null, ' +
 				'"browser_fingerprint_id":"79336952217731267", ' +
@@ -136,7 +135,7 @@ describe('Integration tests', function() {
 		// v1/event
 		requests[2].respond(
 			200,
-			{ "Content-Type": "application/json" },
+			{'Content-Type': 'application/json'},
 			JSON.stringify({
 				branch_view_enabled: false
 			}));
@@ -144,18 +143,18 @@ describe('Integration tests', function() {
 		if (assert) {
 			assert.strictEqual(requests.length, 3, 'Exactly three requests were made');
 
-			var params = requests[1].requestBody.split('&');
-			var requestObj = params.reduce(function(a, b) {
-				var pair = b.split('=');
+			const params = requests[1].requestBody.split('&');
+			const requestObj = params.reduce(function(a, b) {
+				const pair = b.split('=');
 				a[pair[0]] = pair[1];
 				return a;
 			}, {});
 
-			var expectedObj = {
+			const expectedObj = {
 				app_id: browser_fingerprint_id,
 				browser_fingerprint_id: browser_fingerprint_id,
 				identity_id: identity_id,
-				options: "%7B%7D",
+				options: '%7B%7D',
 				sdk: 'web' + config.version
 			};
 
@@ -173,14 +172,14 @@ describe('Integration tests', function() {
 
 	describe('init', function() {
 		it('should call api with params and version', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(1), done);
+			const assert = testUtils.plan(numberOfAsserts(1), done);
 			branchInit(assert, function(err, data) {
 				assert.deepEqual(data,
 					{
-						data: "",
+						data: '',
 						data_parsed: {},
 						has_app: true,
-						identity: "Branch",
+						identity: 'Branch',
 						referring_identity: null,
 						referring_link: null
 					},
@@ -189,12 +188,12 @@ describe('Integration tests', function() {
 		});
 
 		it('should support being called without a callback', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(0), done);
+			const assert = testUtils.plan(numberOfAsserts(0), done);
 			branchInit(assert);
 		});
 
 		it('should return error to callback', function(done) {
-			var assert = testUtils.plan(1, done);
+			const assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
 				assert.strictEqual(err.message, 'Error in API: 400', 'Expect 400 error message');
 			});
@@ -203,11 +202,11 @@ describe('Integration tests', function() {
 		});
 
 		it('should attempt 5xx error three times total', function(done) {
-			var assert = testUtils.plan(1, done);
+			const assert = testUtils.plan(1, done);
 			branch.init(browser_fingerprint_id, function(err) {
 				assert.strictEqual(err.message, 'Error in API: 500', 'Expect 500 error message');
 			});
-			var requestCount = 0;
+			let requestCount = 0;
 			requests[requestCount].callback(browser_fingerprint_id);
 			requestCount++;
 			requests[requestCount].respond(500);
@@ -220,7 +219,7 @@ describe('Integration tests', function() {
 		});
 
 		it('should store in session and call open with link_identifier from hash', function(done) {
-			var assert = testUtils.plan(1, done);
+			const assert = testUtils.plan(1, done);
 			if (testUtils.go('#r:12345')) {
 				branchInit();
 				assert(
@@ -234,21 +233,20 @@ describe('Integration tests', function() {
 				jsonpCallback--;
 				done();
 			}
-
 		});
 	});
 
 	describe('setIdentity', function() {
 		it('make two requests to init and set identity, and return expected data', function(done) {
-			var assert = testUtils.plan(2, done);
+			const assert = testUtils.plan(2, done);
 			branchInit();
 			branch.setIdentity('identity', function(err, data) {
 				assert.deepEqual(data,
 					{
-						"identity_id": identity_id,
-						"link_click_id": "114750153298026746",
-						"link": config.link_service_endpoint + "/i/4LYQTXE0_k",
-						"referring_data_parsed": null
+						'identity_id': identity_id,
+						'link_click_id': '114750153298026746',
+						'link': config.link_service_endpoint + '/i/4LYQTXE0_k',
+						'referring_data_parsed': null
 					},
 					'Expected response returned'
 				);
@@ -260,7 +258,7 @@ describe('Integration tests', function() {
 			);
 			requests[indexOfLastInitRequest(2)].respond(
 				200,
-				{ "Content-Type": "application/json" },
+				{'Content-Type': 'application/json'},
 				'{ "identity_id":' + identity_id +
 					', "link_click_id":"114750153298026746"' +
 					', "link":"https://bnc.lt/i/4LYQTXE0_k" }'
@@ -270,16 +268,16 @@ describe('Integration tests', function() {
 
 	describe('data', function() {
 		it('should make two requests and return session data', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(2), done);
+			const assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 			branch.data(function(err, data) {
 				assert.deepEqual(
 					data,
 					{
-						data: "",
+						data: '',
 						data_parsed: {},
 						has_app: true,
-						identity: "Branch",
+						identity: 'Branch',
 						referring_identity: null,
 						referring_link: null
 					},
@@ -292,14 +290,14 @@ describe('Integration tests', function() {
 
 	describe('getBrowserFingerprintId', function() {
 		it('it should return browser-fingerprint-id with value 79336952217731267', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(1), done);
+			const assert = testUtils.plan(numberOfAsserts(1), done);
 			branchInit(assert);
 			branch.getBrowserFingerprintId(function(err, data) {
-				assert.strictEqual("79336952217731267", data, 'expected browser-fingerprint-id returned correctly (79336952217731267)');
+				assert.strictEqual('79336952217731267', data, 'expected browser-fingerprint-id returned correctly (79336952217731267)');
 			});
 		});
 		it('with tracking disabled, it should return browser-fingerprint-id with value null', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(1), done);
+			const assert = testUtils.plan(numberOfAsserts(1), done);
 			branchInit(assert);
 			branch.disableTracking();
 			branch.getBrowserFingerprintId(function(err, data) {
@@ -310,7 +308,7 @@ describe('Integration tests', function() {
 
 	describe('link', function() {
 		it('should make three requests and return short link', function(done) {
-			var assert = testUtils.plan(numberOfAsserts(2), done);
+			const assert = testUtils.plan(numberOfAsserts(2), done);
 			branchInit(assert);
 
 			branch.link(sampleParams, function(err, data) {
@@ -327,7 +325,7 @@ describe('Integration tests', function() {
 			);
 			requests[indexOfLastInitRequest(2)].respond(
 				200,
-				{ "Content-Type": "application/json" },
+				{'Content-Type': 'application/json'},
 				'{ "url":"https://bnc.lt/l/4manXlk0AJ" }'
 			);
 		});

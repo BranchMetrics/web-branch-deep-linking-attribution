@@ -27,21 +27,22 @@
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		define([], factory); // AMD
-	} else if (typeof exports === 'object') {
+	}
+	else if (typeof exports === 'object') {
 		module.exports = factory(); // CommonJS
-	} else {
+	}
+	else {
 		root.assert = factory(); // Global
 	}
-})(
+}(
 	this,
 	function() {
-
 		// UTILITY
 
 		// Object.create compatible in IE
-		var create = Object.create || function(p) {
+		const create = Object.create || function(p) {
 			if (!p) {
-				throw Error('no type')
+				throw Error('no type');
 			};
 			function f() {};
 			f.prototype = p;
@@ -49,7 +50,7 @@
 		};
 
 		// UTILITY
-		var util = {
+		const util = {
 			inherits: function(ctor, superCtor) {
 				ctor.super_ = superCtor;
 				ctor.prototype = create(
@@ -117,15 +118,15 @@
 			}
 		};
 
-		var pSlice = Array.prototype.slice;
+		const pSlice = Array.prototype.slice;
 
 		// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
-		var objectKeys = typeof Object.keys === 'function' ?
+		const objectKeys = typeof Object.keys === 'function' ?
 			Object.keys :
 			(function() {
-				var hasOwnProperty = Object.prototype.hasOwnProperty;
-				var hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString');
-				var dontEnums = [
+				const hasOwnProperty = Object.prototype.hasOwnProperty;
+				const hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString');
+				const dontEnums = [
 					'toString',
 					'toLocaleString',
 					'valueOf',
@@ -134,20 +135,20 @@
 					'propertyIsEnumerable',
 					'constructor'
 				];
-				var dontEnumsLength = dontEnums.length;
+				const dontEnumsLength = dontEnums.length;
 
 				return function(obj) {
 					if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
 						throw new TypeError('Object.keys called on non-object');
 					}
 
-					var result = [];
-					var prop;
-					var i;
+					const result = [];
+					let prop;
+					let i;
 
 					for (prop in obj) {
 						if (hasOwnProperty.call(obj, prop)) {
-						result.push(prop);
+							result.push(prop);
 						}
 					}
 
@@ -160,13 +161,13 @@
 					}
 					return result;
 				};
-			})();
+			}());
 
 		// 1. The assert module provides functions that throw
 		// AssertionError's when particular conditions are not met. The
 		// assert module must conform to the following interface.
 
-		var assert = ok;
+		const assert = ok;
 
 		// 2. The AssertionError is defined in assert.
 		// new assert.AssertionError({ message: message,
@@ -178,18 +179,20 @@
 			this.actual = options.actual;
 			this.expected = options.expected;
 			this.operator = options.operator;
-			this.message = (options.message && (options.message + ": ")) + getMessage(this);
+			this.message = (options.message && (options.message + ': ')) + getMessage.call(this);
 			this.generatedMessage = true;
 
-			var stackStartFunction = options.stackStartFunction || fail;
+			const stackStartFunction = options.stackStartFunction || fail;
 			if (Error.captureStackTrace) {
 				Error.captureStackTrace(this, stackStartFunction);
-			} else {
+			}
+			else {
 				// try to throw an error now, and from the stack property
 				// work out the line that called in to assert.js.
 				try {
 					this.stack = (new Error).stack.toString();
-				} catch (e) {}
+				}
+				catch (e) {}
 			}
 		};
 
@@ -212,15 +215,16 @@
 		function truncate(s, n) {
 			if (util.isString(s)) {
 				return s.length < n ? s : s.slice(0, n);
-			} else {
+			}
+			else {
 				return s;
 			}
 		}
 
-		function getMessage(self) {
-			return truncate(JSON.stringify(self.actual, replacer), 128) + ' ' +
-				 self.operator + ' ' +
-				 truncate(JSON.stringify(self.expected, replacer), 128);
+		function getMessage() {
+			return truncate(JSON.stringify(this.actual, replacer), 128) + ' ' +
+				this.operator + ' ' +
+				truncate(JSON.stringify(this.expected, replacer), 128);
 		}
 
 		// At present only the three keys mentioned above are used and
@@ -258,7 +262,7 @@
 
 		function ok(value, message) {
 			if (!value) {
-				fail(value, true, message, '==', assert.ok)
+				fail(value, true, message, '==', assert.ok);
 			};
 		}
 		assert.ok = ok;
@@ -269,7 +273,7 @@
 
 		assert.equal = function equal(actual, expected, message) {
 			if (actual != expected) {
-				fail(actual, expected, message, '==', assert.equal)
+				fail(actual, expected, message, '==', assert.equal);
 			};
 		};
 
@@ -307,10 +311,10 @@
 			// properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
 			if (util.isRegExp(actual) && util.isRegExp(expected)) {
 				return actual.source === expected.source &&
-					 actual.global === expected.global &&
-					 actual.multiline === expected.multiline &&
-					 actual.lastIndex === expected.lastIndex &&
-					 actual.ignoreCase === expected.ignoreCase;
+					actual.global === expected.global &&
+					actual.multiline === expected.multiline &&
+					actual.lastIndex === expected.lastIndex &&
+					actual.ignoreCase === expected.ignoreCase;
 			}
 
 			// 7.4. Other pairs that do not both pass typeof value == 'object',
@@ -328,7 +332,7 @@
 			return objEquiv(actual, expected);
 		}
 
-		var isArguments = function(object) {
+		let isArguments = function(object) {
 			return Object.prototype.toString.call(object) == '[object Arguments]';
 		};
 
@@ -341,7 +345,7 @@
 						typeof object.length === 'number' || false;
 				};
 			}
-		})();
+		}());
 
 		function objEquiv(a, b) {
 			if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b)) {
@@ -351,10 +355,10 @@
 			if (a.prototype !== b.prototype) {
 				return false;
 			}
-			//~~~I've managed to break Object.keys through screwy arguments passing.
+			// ~~~I've managed to break Object.keys through screwy arguments passing.
 			//	 Converting to array solves the problem.
-			var aIsArgs = isArguments(a);
-			var bIsArgs = isArguments(b);
+			const aIsArgs = isArguments(a);
+			const bIsArgs = isArguments(b);
 			if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs)) {
 				return false;
 			}
@@ -365,35 +369,34 @@
 				return _deepEqual(a, b);
 			}
 			try {
-				var ka = objectKeys(a);
-				var kb = objectKeys(b);
-				var key;
-				var i;
-			} catch (e) {//happens when one is a string literal and the other isn't
-				return false;
-			}
-			// having the same number of owned properties (keys incorporates hasOwnProperty)
-			if (ka.length != kb.length) {
-				return false;
-			}
-			//the same set of keys (although not necessarily the same order),
-			ka.sort();
-			kb.sort();
-			//~~~cheap key test
-			for (i = ka.length - 1; i >= 0; i--) {
-				if (ka[i] != kb[i]) {
+				const ka = objectKeys(a);
+				const kb = objectKeys(b);
+				// having the same number of owned properties (keys incorporates hasOwnProperty)
+				if (ka.length != kb.length) {
 					return false;
 				}
-			}
-			//equivalent values for every corresponding key, and
-			//~~~possibly expensive deep test
-			for (i = ka.length - 1; i >= 0; i--) {
-				key = ka[i];
-				if (!_deepEqual(a[key], b[key])) {
-					return false;
+				// the same set of keys (although not necessarily the same order),
+				ka.sort();
+				kb.sort();
+				// ~~~cheap key test
+				for (let i = ka.length - 1; i >= 0; i--) {
+					if (ka[i] != kb[i]) {
+						return false;
+					}
 				}
+				// equivalent values for every corresponding key, and
+				// ~~~possibly expensive deep test
+				for (let i = ka.length - 1; i >= 0; i--) {
+					const key = ka[i];
+					if (!_deepEqual(a[key], b[key])) {
+						return false;
+					}
+				}
+				return true;
 			}
-			return true;
+			catch (e) {// happens when one is a string literal and the other isn't
+				return false;
+			}
 		}
 
 		// 8. The non-equivalence assertion tests for any deep inequality.
@@ -430,9 +433,11 @@
 
 			if (Object.prototype.toString.call(expected) == '[object RegExp]') {
 				return expected.test(actual);
-			} else if (actual instanceof expected) {
+			}
+			else if (actual instanceof expected) {
 				return true;
-			} else if (expected.call({}, actual) === true) {
+			}
+			else if (expected.call({}, actual) === true) {
 				return true;
 			}
 
@@ -440,7 +445,7 @@
 		}
 
 		function _throws(shouldThrow, block, expected, message) {
-			var actual;
+			let actual;
 
 			if (util.isString(expected)) {
 				message = expected;
@@ -449,7 +454,8 @@
 
 			try {
 				block();
-			} catch (e) {
+			}
+			catch (e) {
 				actual = e;
 			}
 
@@ -473,13 +479,13 @@
 		// 11. Expected to throw an error:
 		// assert.throws(block, Error_opt, message_opt);
 
-		assert.throws = function(block, /*optional*/error, /*optional*/message) {
-			_throws.apply(this, [true].concat(pSlice.call(arguments)));
+		assert.throws = function(block, /* optional*/error, /* optional*/message) {
+			_throws.apply(this, [ true ].concat(pSlice.call(arguments)));
 		};
 
 		// EXTENSION! This is annoying to write outside this module.
-		assert.doesNotThrow = function(block, /*optional*/message) {
-			_throws.apply(this, [false].concat(pSlice.call(arguments)));
+		assert.doesNotThrow = function(block, /* optional*/message) {
+			_throws.apply(this, [ false ].concat(pSlice.call(arguments)));
 		};
 
 		assert.ifError = function(err) {
@@ -515,7 +521,7 @@
 
 		testUtils.params = function(extra, without) {
 			// Returns new object every time.
-			var p = utils.merge(
+			const p = utils.merge(
 				{
 					branch_key: branch_sample_key,
 					browser_fingerprint_id: browser_fingerprint_id,
@@ -526,22 +532,22 @@
 				},
 				extra || {}
 			);
-			for (var k = 0; k < (without || []).length; k++) {
+			for (let k = 0; k < (without || []).length; k++) {
 				delete p[without[k]];
 			}
 			return p;
 		};
 
 		testUtils.nulls = function(n) {
-			var p = [];
-			for (var k = 0; k < n; k++) {
+			const p = [];
+			for (let k = 0; k < n; k++) {
 				p.push(null);
 			}
 			return p;
 		};
 
 		testUtils.after = function(n, done) {
-			var remaining = n;
+			let remaining = n;
 			return function() {
 				remaining--;
 				if (remaining == 0) {
@@ -553,7 +559,7 @@
 			};
 		};
 
-		var assertions = [
+		const assertions = [
 			'ok',
 			'fail',
 			'equal',
@@ -569,8 +575,8 @@
 		];
 
 		testUtils.plan = function(n, done) {
-			var d = testUtils.after(n, done);
-			var ret = function() {
+			const d = testUtils.after(n, done);
+			const ret = function() {
 				assert.apply(assert, Array.prototype.slice.call(arguments, 0));
 				d();
 			};
@@ -580,8 +586,8 @@
 					d();
 				};
 			}
-			for (var i = 0; i < assertions.length; i++) {
-				create(assertions[i])
+			for (let i = 0; i < assertions.length; i++) {
+				create(assertions[i]);
 			}
 
 			ret.done = function(err) {
@@ -599,7 +605,7 @@
 			if (!window.history.pushState) {
 				return false;
 			}
-			var newLocation = window.location.toString().split(/[\?#]/)[0] + suffix;
+			const newLocation = window.location.toString().split(/[\?#]/)[0] + suffix;
 			if (newLocation !== window.location.toString()) {
 				window.history.pushState({}, '', newLocation); // Simply not possible in IE 9
 				return true;
@@ -612,4 +618,4 @@
 		return assert;
 	}
 
-);
+));

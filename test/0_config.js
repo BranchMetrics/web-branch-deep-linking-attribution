@@ -4,7 +4,7 @@ goog.require('config');
 
 
 describe('config', function() {
-	var assert = testUtils.unplanned();
+	const assert = testUtils.unplanned();
 	describe('app_service_endpoint', function() {
 		it('app_service_endpoint should be defined', function() {
 			assert.isDefined(config.app_service_endpoint, 'app_service_endpoint is un-defined');

@@ -1,7 +1,7 @@
 'use strict';
 goog.provide('session');
 
-/*jshint unused:false*/
+/* jshint unused:false*/
 goog.require('goog.json');
 goog.require('utils');
 goog.require('safejson');
@@ -13,9 +13,9 @@ goog.require('storage');
  * @return {Object}
  */
 session.get = function(storage, first) {
-	var sessionString = first ? 'branch_session_first' : 'branch_session';
+	const sessionString = first ? 'branch_session_first' : 'branch_session';
 	try {
-		var data = safejson.parse(storage.get(sessionString, first)) || null;
+		const data = safejson.parse(storage.get(sessionString, first)) || null;
 		return utils.decodeBFPs(data);
 	}
 	catch (e) {
@@ -29,9 +29,8 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
-
 	if (first && data['referring_link'] && utils.userPreferences.enableExtendedJourneysAssist) {
-		var now = new Date();
+		const now = new Date();
 		data['referringLinkExpiry'] = now.getTime() + utils.extendedJourneysAssistExpiryTime;
 	}
 	data = utils.encodeBFPs(data);
@@ -49,8 +48,8 @@ session.update = function(storage, newData) {
 	if (!newData) {
 		return;
 	}
-	var currentData = session.get(storage) || {};
-	var data = goog.json.serialize(utils.encodeBFPs(utils.merge(currentData, newData)));
+	const currentData = session.get(storage) || {};
+	const data = goog.json.serialize(utils.encodeBFPs(utils.merge(currentData, newData)));
 	storage.set('branch_session', data);
 };
 
@@ -62,15 +61,15 @@ session.update = function(storage, newData) {
  * @param {boolean=} removeNull delete null or undefined entries instead of inserting
  */
 session.patch = function(storage, data, updateLocalStorage, removeNull) {
-	var merge = function(source, patch) {
+	const merge = function(source, patch) {
 		return utils.encodeBFPs(utils.merge(safejson.parse(source), patch, removeNull));
 	};
 
-	var session = storage.get('branch_session', false) || {};
+	const session = storage.get('branch_session', false) || {};
 	storage.set('branch_session', goog.json.serialize(merge(session, data)));
 
 	if (updateLocalStorage) {
-		var sessionFirst = storage.get('branch_session_first', true) || {};
+		const sessionFirst = storage.get('branch_session_first', true) || {};
 		storage.set('branch_session_first', goog.json.serialize(merge(sessionFirst, data)), true);
 	}
 };
