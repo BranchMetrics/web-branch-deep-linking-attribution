@@ -32,7 +32,7 @@
 		"grunt-contrib-watch": "~0.6.1",
 		"grunt-saucelabs": "~8.6.1",
 		"jscs": "2.0.0",
-		"jsdoc": "3.2.2",
+		"jsdoc": "4.0.2",
 		"jshint": "2.8.0",
 		"mocha": "^2.2.1",
 		"precommit-hook": "1.0.7",
