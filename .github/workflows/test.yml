@@ -27,7 +27,6 @@ on:
   push:
     branches:
       - main
-      - production
       - releases/**
     paths-ignore:
       - docs/**
@@ -36,7 +35,6 @@ on:
     types: [opened, reopened, edited, closed]
     branches:
       - main
-      - production
       - releases/**
     paths-ignore:
       - docs/**

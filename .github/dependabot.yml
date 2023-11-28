@@ -6,7 +6,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Raise pull requests against the "production" branch
+    # Raise pull requests against the "master" branch
     target-branch: "master"
     # Allow up to 10 open pull requests
     open-pull-requests-limit: 10

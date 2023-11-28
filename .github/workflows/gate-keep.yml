@@ -4,7 +4,6 @@ on:
     types: [opened,reopened,edited,synchronize]
     branches:
       - master
-      - production
     paths-ignore:
       - docs/**
       - README.md
