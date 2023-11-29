@@ -89,7 +89,7 @@ banner = function(branch, options, linkData, storage) {
 
 		var doc = options.iframe ? element.contentWindow.document : document;
 		var platform = utils.getPlatformByUserAgent();
-		if (!["other", "desktop"].includes(platform)) {
+		if (![ "other", "desktop" ].includes(platform)) {
 			options['open_app'] = options.open_app;
 			options['append_deeplink_path'] = options.append_deeplink_path;
 			options['make_new_link'] = options.make_new_link;
