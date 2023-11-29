@@ -1683,8 +1683,9 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 });
 
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
-	if (!utils.mobileUserAgent()) {
-		console.info("banner functionality is not supported on desktop");
+	var platform = utils.getPlatformByUserAgent();
+	if (["other", "desktop"].includes(platform)) {
+		console.info("banner functionality is not supported on this platform");
 	}
 	else {
 		data = data || {};

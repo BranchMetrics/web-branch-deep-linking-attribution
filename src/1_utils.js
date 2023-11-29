@@ -511,7 +511,7 @@ function isIOS(ua) {
 	return ua && /(iPad|iPod|iPhone)/.test(ua);
 }
 
-utils.mobileUserAgent = function() {
+utils.getPlatformByUserAgent = function() {
 	var ua = navigator.userAgent;
 	if (ua.match(/android/i)) {
 		return 'android';
@@ -544,7 +544,10 @@ utils.mobileUserAgent = function() {
 	) {
 		return "kindle";
 	}
-	return false;
+	if (ua.match(/(Windows|Macintosh|Linux)/i)) {
+		return 'desktop';
+	}
+	return "other";
 };
 
 /**
