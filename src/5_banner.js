@@ -17,12 +17,16 @@ goog.require('banner_html');
  * @param {storage} storage
  */
 banner = function(branch, options, linkData, storage) {
+
+
+
 	if (!banner_utils.shouldAppend(storage, options)) {
 		branch._publishEvent('willNotShowBanner');
 		return null;
 	}
 
 	branch._publishEvent('willShowBanner');
+
 
 	var element;
 	var bodyMarginTopInline = document.body.style.marginTop;
@@ -130,6 +134,7 @@ banner = function(branch, options, linkData, storage) {
 		}
 
 		var modalBackground = doc.getElementById('branch-banner-modal-background');
+
 
 		if (modalBackground) {
 			modalBackground.onclick = function(ev) {

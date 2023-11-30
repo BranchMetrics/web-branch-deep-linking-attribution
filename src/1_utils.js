@@ -512,6 +512,22 @@ function isIOS(ua) {
 }
 
 utils.mobileUserAgent = function() {
+
+
+	/**QRCode.toCanvas(canvas, 'sample text', function (error) {
+		if (error) console.error(error);
+		console.log('success!');
+		var base64Image = canvas.toDataURL("image/png");
+		console.log(base64Image);
+
+		var imageToReplace = document.querySelector('img[role="img"]');
+
+		// Replace the src of the image with the QR code
+		imageToReplace.src = base64Image;
+
+	});*/
+	console.log(3434);
+
 	var ua = navigator.userAgent;
 	if (ua.match(/android/i)) {
 		return 'android';

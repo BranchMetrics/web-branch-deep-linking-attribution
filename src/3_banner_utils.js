@@ -190,6 +190,9 @@ banner_utils.shouldAppend = function(storage, options) {
 		forgetHide = false;
 	}
 
+
+
+
 	return !document.getElementById('branch-banner') &&
 		!document.getElementById('branch-banner-iframe') &&
 		(hideBanner || forgetHide) &&

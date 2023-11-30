@@ -15,6 +15,20 @@ function checkPreviousBanner() {
 	return false;
 }
 
+function generateQRCodeBase64(text) {
+	return new Promise((resolve, reject) => {
+		QRCode.toDataURL(text, (err, url) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(url);
+			}
+		});
+	});
+}
+
+
+
 /**
  * @param {Object} parent
  * @param {string} html
@@ -34,22 +48,49 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 	var cssInsideIframe = journeys_utils.getCss(html);
 	journeys_utils.getJsAndAddToParent(html);
 	var cssIframeContainer = journeys_utils.getIframeCss(html);
+
+	let regex = /window\.top\.location\s*=\s*validate\("([^"]+)"\)/;
+	let match = html.match(regex);
+	console.log('link', match);
+
+
+	if (match && match[1]) {
+		console.log('Extracted content:', match[1]);
+		console.log('Size of the string match:', match[1].length);
+	} else {
+		console.log('No match found');
+	}
 	html = journeys_utils.removeScriptAndCss(html);
 
 	// create iframe element, add html, add css, add ctaText
 	var iframe = journeys_utils.createIframe();
 	iframe.onload = function() {
-		journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
-		journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
-		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
-		journeys_utils.addDynamicCtaText(iframe, ctaText);
-	
-		journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
-	
-		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
-		iframeLoadedCallback(iframe);
-	}
+
+
+		QRCode.toDataURL(match[1],function (err, url) {
+			if (err) throw err;
+
+			const regex = /src="http:\/\/branch\.io\/img\/logo_icon_black\.png"/g;
+			html = html.replace(regex, `src="${url}"`);
+
+			console.log(123123, ctaText, metadata);
+
+			journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
+			journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
+			journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
+			journeys_utils.addDynamicCtaText(iframe, ctaText);
+
+			journeys_utils.branch._publishEvent('willShowJourney', journeys_utils.journeyLinkData);
+
+			journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
+			iframeLoadedCallback(iframe);
+
+		});
+	};
+
 	document.body.appendChild(iframe);
+
+
 	return iframe;
 };
 
@@ -123,6 +164,8 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	journeys_utils.branchViewId = templateId;
 	journeys_utils.setJourneyLinkData(journeyLinkData);
 
+
+
 	var audienceRuleId = branchViewData['audience_rule_id'];
 
 	// this code removes any leftover css from previous banner
@@ -146,6 +189,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 		var metadata = journeys_utils.getMetadata(html) || {};
 
 		html = journeys_utils.tryReplaceJourneyCtaLink(html);
+
 
 		var timeoutTrigger = window.setTimeout(
 			function() {

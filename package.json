@@ -17,7 +17,7 @@
 		"commit": "git-cz",
 		"cover": "npm-run-all cover:*",
 		"cover:clean": "npm run clean:coverage",
-	    "cover:report": "npx nyc@latest mocha",
+		"cover:report": "npx nyc@latest mocha",
 		"lint": "./lint.sh",
 		"test": "mocha",
 		"test-report": "mocha --reporter json > test-results.json",
@@ -56,6 +56,9 @@
 		"precommit-hook": "1.0.7",
 		"rimraf": "^5.0.1",
 		"sinon": "16.0.0"
+	},
+	"dependencies": {
+		"qrcode": "^1.5.1"
 	},
 	"build": "2.71.0",
 	"config": {
