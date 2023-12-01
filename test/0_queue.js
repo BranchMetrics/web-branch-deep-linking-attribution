@@ -1,4 +1,6 @@
 'use strict';
+/*jshint -W079 */
+var sinon = require('sinon');
 
 goog.require('task_queue');
 
@@ -18,6 +20,9 @@ describe('task_queue', function() {
 			}, 10);
 		});
 		assert.strictEqual(orderCalled[0], undefined, 'Has not yet called function');
+	});
+	afterEach(function() {
+		clock.restore();
 	});
 
 	it('should queue a function and call it', function(done) {
