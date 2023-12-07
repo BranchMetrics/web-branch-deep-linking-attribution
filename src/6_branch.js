@@ -1683,6 +1683,7 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 });
 
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
+	console.warn('The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview');
 	if (!utils.mobileUserAgent()) {
 		console.info("banner functionality is not supported on desktop");
 	}
