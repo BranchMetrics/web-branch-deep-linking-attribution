@@ -1321,22 +1321,3 @@ utils.removeTrailingDotZeros = function(versionNumber) {
 	return versionNumber;
 };
 
-/**
- * @param {Object} obj
- * A utility function to deep copy objects
- */
-utils.deepCopy = function(obj) {
-	var ret = {};
-	for (var key in obj) {
-		if (obj.hasOwnProperty(key)) {
-			var val = obj[key];
-			if (typeof val === 'object' && val !== null) {
-				ret[key] = utils.deepCopy(val);
-			}
-			else {
-				ret[key] = val;
-			}
-		}
-	}
-	return ret;
-};

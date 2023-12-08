@@ -132,7 +132,7 @@
 		utils.merge(d, data);
 	}
 	if (data.hasOwnProperty("branch_requestMetadata") && data["branch_requestMetadata"] && !(resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss')) {
-		d['metadata'] = utils.deepcopy(data["branch_requestMetadata"]);
+		d['metadata'] = safejson.stringify(data["branch_requestMetadata"]);
 	}
 
 	if (resource.method === 'POST') {

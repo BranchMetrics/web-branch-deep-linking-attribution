@@ -1942,7 +1942,7 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  * @function Branch.setRequestMetaData
  * @param {String} key - Request metadata key
  * @param {String} value - Request metadata value
- * Sets request metadata
+ * Sets request metadata that gets passed along with all the API calls except v1/pageview
  */
 Branch.prototype.setRequestMetaData = function(key, value) {
 	try {
