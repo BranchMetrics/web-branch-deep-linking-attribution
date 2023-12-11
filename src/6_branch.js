@@ -129,7 +129,7 @@ Branch = function() {
 
 	var storageMethods = [ 'session', 'cookie', 'pojo' ];
 
-	this._storage = /** @type {storage} */ (new BranchStorage(storageMethods));
+	this._storage = /** @type {storage} */ (new storage.BranchStorage(storageMethods)); // jshint ignore:line
 
 	this._server = new Server();
 
@@ -139,6 +139,7 @@ Branch = function() {
 	this._listeners = [ ];
 
 	this.sdk = sdk + config.version;
+	this.requestMetadata = {};
 
 	this.init_state = init_states.NO_INIT;
 	this.init_state_fail_code = init_state_fail_codes.NO_FAILURE;
@@ -203,7 +204,17 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (utils.userPreferences.trackingDisabled) {
 		obj['tracking_disabled'] = utils.userPreferences.trackingDisabled;
 	}
+	if (this.requestMetadata) {
+		for (var metadata_key in this.requestMetadata) {
+			if (this.requestMetadata.hasOwnProperty(metadata_key)) {
+				if (!obj["branch_requestMetadata"]) {
+					obj["branch_requestMetadata"] = {};
+				}
+				obj["branch_requestMetadata"][metadata_key] = this.requestMetadata[metadata_key];
+			}
+		}
 
+	}
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
@@ -1926,4 +1937,27 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  */
  Branch.prototype.referringLink = function(withExtendedJourneysAssist) {
 	return this._referringLink(withExtendedJourneysAssist);
+};
+
+/***
+ * @function Branch.setRequestMetaData
+ * @param {String} key - Request metadata key
+ * @param {String} value - Request metadata value
+ * Sets request metadata that gets passed along with all the API calls except v1/pageview
+ */
+Branch.prototype.setRequestMetaData = function(key, value) {
+	try {
+		if ((typeof(key) === 'undefined' || key === null || key.length === 0) || (typeof value === "undefined")) {
+			return;
+		}
+
+		if (this.requestMetadata.hasOwnProperty(key) && value === null) {
+			delete this.requestMetadata[key];
+		}
+
+		this.requestMetadata = utils.addPropertyIfNotNull(this.requestMetadata, key, value);
+	}
+	catch (e) {
+		console.error("An error occured while setting request metadata", e);
+	}
 };

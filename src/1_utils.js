@@ -1320,3 +1320,4 @@ utils.removeTrailingDotZeros = function(versionNumber) {
 	}
 	return versionNumber;
 };
+

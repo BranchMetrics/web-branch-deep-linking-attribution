@@ -17,13 +17,12 @@ var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 /** @typedef {undefined|{get:function(string, boolean=), set:function(string, (string|boolean), boolean=),
  * remove:function(string), clear:function(), isEnabled:function()}} */
-var storage;
 
 /**
  * @class BranchStorage
  * @constructor
  */
-var BranchStorage = function(storageMethods) {
+storage.BranchStorage = function(storageMethods) {
 	for (var i = 0; i < storageMethods.length; i++) {
 		var storageMethod = this[storageMethods[i]];
 		storageMethod = (typeof storageMethod === 'function') ? storageMethod() : storageMethod;
@@ -150,12 +149,12 @@ var webStorage = function(perm) {
 };
 
 /** @type {storage} */
-BranchStorage.prototype['local'] = function() {
+storage.BranchStorage.prototype['local'] = function() {
 	return webStorage(true);
 };
 
 /** @type {storage} */
-BranchStorage.prototype['session'] = function() {
+storage.BranchStorage.prototype['session'] = function() {
 	return webStorage(false);
 };
 
@@ -214,12 +213,12 @@ var cookies = function() {
 	};
 };
 
-BranchStorage.prototype['cookie'] = function() {
+storage.BranchStorage.prototype['cookie'] = function() {
 	return cookies();
 };
 
 /** @type {storage} */
-BranchStorage.prototype['pojo'] = {
+storage.BranchStorage.prototype['pojo'] = {
 	getAll: function() {
 		return this._store;
 	},
