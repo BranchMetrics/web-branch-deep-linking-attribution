@@ -39,7 +39,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 	// create iframe element, add html, add css, add ctaText
 	var iframe = journeys_utils.createIframe();
 	iframe.onload = function() {
-		journeys_utils.addHtmlToIframe(iframe, html, utils.mobileUserAgent());
+		journeys_utils.addHtmlToIframe(iframe, html, utils.getPlatformByUserAgent());
 		journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
 		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 		journeys_utils.addDynamicCtaText(iframe, ctaText);
@@ -71,7 +71,7 @@ function _areJourneysDismissedGlobally(branch) {
 
 branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTestMode) {
 	if (	checkPreviousBanner() ||
-		!utils.mobileUserAgent() ||
+		utils.getPlatformByUserAgent() == "other" ||
 		!eventResponse['event_data'] ||
 		!eventResponse['template']
 	) {
