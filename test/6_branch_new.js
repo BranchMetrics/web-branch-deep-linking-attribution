@@ -54,15 +54,4 @@ describe('Branch - new', function() {
 			assert.deepEqual(requestMetadata, { "key": "value" });
 		});
 	});
-	/*
-	describe('setRequestMetaData - exceptions', function() {
-		it('should throw exception', function() {
-			var logSpy = sinon.spy(console, 'log');
-			sinon.stub(utils, 'addPropertyIfNotNull').throws(new Error("fake error"));
-			branch_instance.setRequestMetaData.call({ requestMetadata: {} }, "validKey", 'validValue');
-			assert(logSpy.calledWith("An error occured while setting request metadata"));
-		});
-
-	});
-	*/
 });
