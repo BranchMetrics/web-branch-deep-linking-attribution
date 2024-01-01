@@ -37,7 +37,7 @@ describe('Branch', function() {
 			storage.clear();
 		}
 
-		sandbox.stub(utils, 'mobileUserAgent', function() {
+		sandbox.stub(utils, 'getPlatformByUserAgent', function() {
 			return 'ios';
 		});
 
