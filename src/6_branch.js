@@ -1694,7 +1694,8 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 });
 
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
-  console.warn('The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview');
+	var banner_deprecation_msg = 'The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview';
+	console.warn(banner_deprecation_msg);
 	var platform = utils.getPlatformByUserAgent();
 	if ([ "other", "desktop" ].includes(platform)) {
 		console.info("banner functionality is not supported on this platform");
@@ -1936,7 +1937,7 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  * @param {Boolean} withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
- Branch.prototype.referringLink = function(withExtendedJourneysAssist) {
+ Branch.prototype['referringLink'] = function(withExtendedJourneysAssist) {
 	return this._referringLink(withExtendedJourneysAssist);
 };
 
@@ -1946,7 +1947,7 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  * @param {String} value - Request metadata value
  * Sets request metadata that gets passed along with all the API calls except v1/pageview
  */
-Branch.prototype.setRequestMetaData = function(key, value) {
+Branch.prototype['setRequestMetaData'] = function(key, value) {
 	try {
 		if ((typeof(key) === 'undefined' || key === null || key.length === 0) || (typeof value === "undefined")) {
 			return;
