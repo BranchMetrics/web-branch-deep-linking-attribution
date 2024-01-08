@@ -281,31 +281,43 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 		var scriptTag = iframedoc.createElement('script');
 		scriptTag.type = 'text/javascript';
 		scriptTag.text = `
-			var  focusableElements =
-					'button, [href], input, select, textarea, [role="button"], h1, [role="text"], .branch-banner-content';
+			var focusableElements = 'button, [href], input, select, textarea, [role="button"], h1, [role="text"], .branch-banner-content';
 			var modal = document.getElementById('branch-banner');
 			var focusableContent = modal.querySelectorAll(focusableElements);
-			var firstFocusableElement = focusableContent[0];
-			var lastFocusableElement = focusableContent[focusableContent.length - 1];
+			var focusElementIdx = 0;
 
-			document.addEventListener('keydown', function(e) {
+			function handleTabKey(e) {
 				var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
 			
 				if (!isTabPressed) {
 					return;
 				}
 
-				if (e.shiftKey) {
-					if (document.activeElement === firstFocusableElement) {
-						lastFocusableElement.focus();
-						e.preventDefault();
+				if (e.shifKey) {
+					if (focusElementIdx <= 0) {
+						focusElementIdx = focusableContent.length - 1;
+					} else {
+						focusElementIdx = focusElementIdx - 1;
 					}
-				} else if (document.activeElement === lastFocusableElement) {
-					firstFocusableElement.focus();
-					e.preventDefault();
+				} else {
+					if (focusElementIdx >= focusableContent.length - 1) {
+						focusElementIdx = 0;
+					} else {
+						focusElementIdx = focusElementIdx + 1;
+					}
 				}
-			});
-			setTimeout(function() { firstFocusableElement.focus() }, 100);
+
+				focusableContent[focusElementIdx].focus();
+				e.preventDefault();
+			}
+
+			function autoFocus(delay) {
+				setTimeout(function() { focusableContent[focusElementIdx].focus() }, delay);
+			}
+
+			document.addEventListener('keydown', handleTabKey);
+			autoFocus(100);
+			
 		`;
 		iframedoc.querySelector('body').append(scriptTag);
 	}
