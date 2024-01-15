@@ -255,7 +255,7 @@ describe('Branch', function() {
 						'hash session_id stored in local storage'
 					);
 					assert.strictEqual(
-						utils.mobileUserAgent() ?
+						utils.getPlatformByUserAgent() ?
 							'12345' :
 							JSON.parse(sessionStorage.getItem('branch_session')).click_id,
 						'12345',
@@ -309,7 +309,7 @@ describe('Branch', function() {
 							'get param match id stored in local storage'
 						);
 						assert.strictEqual(
-							utils.mobileUserAgent() ?
+							utils.getPlatformByUserAgent() ?
 								'67890' :
 								JSON.parse(sessionStorage.getItem('branch_session')).click_id,
 							'67890',
@@ -839,15 +839,15 @@ describe('Branch', function() {
 		basicTests('banner', [ 0 ]);
 
 		// set to desktop
-		sandbox.stub(utils, 'mobileUserAgent', function(server, branchViewData, data) {
-			return false;
+		sandbox.stub(utils, 'getPlatformByUserAgent', function(server, branchViewData, data) {
+			return 'desktop';
 		});
 		var spy = sinon.spy(console, 'info');
 		it('should print console warning about method deprecation for sendMS', function() {
 			var branch = initBranch(true);
 			var assert = testUtils.unplanned();
 			branch.banner();
-			assert(spy.calledWith("banner functionality is not supported on desktop"));
+			assert(spy.calledWith("banner functionality is not supported on this platform"));
 
 		});
 	});
@@ -934,7 +934,7 @@ describe('Branch', function() {
 			assert.deepEqual(obj.tags, [ "tag1", "tag2" ], 'tags is sent');
 			assert.strictEqual(obj.open_app, true, 'open_app is sent');
 			// assert.strictEqual(obj.append_deeplink_path,
-			// 	utils.mobileUserAgent() ? true : undefined,
+			// 	utils.getPlatformByUserAgent() ? true : undefined,
 			// 	'append_deeplink_path is sent');
 			assert.strictEqual(obj.make_new_link, undefined, 'make_new_link is not sent');
 			assert.strictEqual(obj.link_click_id, undefined, 'link_click_id is not sent');
@@ -945,8 +945,8 @@ describe('Branch', function() {
 			var assert = testUtils.plan(2, done);
 
 			// we're testing banner, which means we need to be mobile
-			sandbox.stub(utils, 'mobileUserAgent', function(server, branchViewData, data) {
-				return true;
+			sandbox.stub(utils, 'getPlatformByUserAgent', function(server, branchViewData, data) {
+				return "android";
 			});
 
 			// allow the banner to be shown
