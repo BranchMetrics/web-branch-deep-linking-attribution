@@ -88,7 +88,8 @@ banner = function(branch, options, linkData, storage) {
 		linkData['channel'] = linkData['channel'] || 'app banner';
 
 		var doc = options.iframe ? element.contentWindow.document : document;
-		if (utils.mobileUserAgent()) {
+		var platform = utils.getPlatformByUserAgent();
+		if (![ "other", "desktop" ].includes(platform)) {
 			options['open_app'] = options.open_app;
 			options['append_deeplink_path'] = options.append_deeplink_path;
 			options['make_new_link'] = options.make_new_link;
