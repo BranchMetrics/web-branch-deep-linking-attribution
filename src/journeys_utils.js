@@ -448,10 +448,13 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);
+	var isDesktopJourney = journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && journeys_utils.journeyLinkData['journey_link_data']['type'] && journeys_utils.journeyLinkData['journey_link_data']['type'] === "desktop";
+
+	var isDesktopOverlay = isDesktopJourney && journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && journeys_utils.journeyLinkData['journey_link_data']['variant'] && journeys_utils.journeyLinkData['journey_link_data']['variant'] === "overlay";
 
 	// if banner is partial height with relative units, we need to make sure
 	// it fills the entire height of the iframe
-	if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
+	if ((journeys_utils.isHalfPage || journeys_utils.isFullPage) && !(isDesktopOverlay)) {
 		var dismissBackground = doc.getElementsByClassName('branch-banner-dismiss-background')[0];
 		var content = doc.getElementsByClassName('branch-banner-content')[0];
 		if (!dismissBackground && content) {
