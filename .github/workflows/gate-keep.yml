@@ -1,12 +1,6 @@
 name: Gate Keeping
 on:
   pull_request:
-    types: [opened,reopened,edited,synchronize]
-    branches:
-      - master
-    paths-ignore:
-      - docs/**
-      - README.md
 env:
   NODE_VERSION: 16
   JAVA_VERSION: 11
