@@ -1,6 +1,6 @@
 name: Gate Keeping
 on:
-  pull_request:
+  push:
 env:
   NODE_VERSION: 16
   JAVA_VERSION: 11
