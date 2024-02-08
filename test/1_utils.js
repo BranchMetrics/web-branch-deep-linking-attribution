@@ -1324,6 +1324,59 @@ describe('utils', function() {
 		});
 	});
 
+	describe('isValidUrl', function() {
+		// Invalid schemes
+		it('should return false for invalid scheme htt', function() {
+			assert.equal(utils.isValidURL('htt://www.example.com'), false);
+		});
+		it('should return false for missing scheme', function() {
+			assert.equal(utils.isValidURL('://www.example.com'), false);
+		});
+
+		// Invalid domain names
+		it('should return false for missing domain', function() {
+			assert.equal(utils.isValidURL('https://example'), false);
+		});
+		it('should return false for missing domain after dot', function() {
+			assert.equal(utils.isValidURL('https://example.'), false);
+		});
+		it('should return false for missing domain before dot', function() {
+			assert.equal(utils.isValidURL('https://.example.com'), false);
+		});
+
+		// Invalid domain names
+		it('should return false for Invalid domain names', function() {
+			assert.equal(utils.isValidURL('www.example.com'), false);
+		});
+		it('should return false for Invalid domain names 2', function() {
+			assert.equal(utils.isValidURL('example.com'), false);
+		});
+		// Empty URL
+		it('should return false for empty url', function() {
+			assert.equal(utils.isValidURL(''), false);
+		});
+
+		it('should return false for Invalid domain names 2', function() {
+			assert.equal(utils.isValidURL(''), false);
+		});
+
+		it('should return false for null', function() {
+			assert.equal(utils.isValidURL(null), false);
+		});
+
+		it('should return false for undefined', function() {
+			assert.equal(utils.isValidURL(undefined), false);
+		});
+
+		it('should return false for invalid path', function() {
+			assert.equal(utils.isValidURL('https://www.example.com/path with spaces'), false);
+		});
+
+		it('should return true for valid url', function() {
+			assert.equal(utils.isValidURL('https://api2.branch.io'), true);
+		});
+	});
+
 
 	/*
 	describe('journey_cta', function(done) {

@@ -56,7 +56,9 @@
 		'lastAttributedTouchData',
 		'setAPIResponseCallback',
 		'qrCode',
-		'setRequestMetaData'
+		'setRequestMetaData',
+		'setAPIUrl',
+		'getAPIUrl'
 	],
 	0
 );
