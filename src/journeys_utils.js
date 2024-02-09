@@ -416,18 +416,40 @@ function generateIframeOuterCSS(metadata) {
 	}
 
 
-	var css = bodyWebkitTransitionStyle ? bodyWebkitTransitionStyle : ''; // add if we need to
-	css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' + 
-	' left: 0; right: 0; border: 0; height: ' +
-	journeys_utils.bannerHeight + '; z-index: 99999; ' +
-	iFrameAnimationStyle  + ' }\n' +
-	'#branch-banner-iframe { position: ' +
-	(journeys_utils.sticky) + '; }\n' +
-	'@media only screen and (orientation: landscape) { ' +
-	'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
-	(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
-	'#branch-banner-iframe { height: ' +
-	(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
+	var css = '';
+	css += bodyWebkitTransitionStyle || '';
+	if(journeys_utils.isDesktopJourney)
+	{
+		var bannerHeight = journeys_utils.bannerHeight;
+		var bannerWidth = journeys_utils.bannerWidth;
+		var sticky = journeys_utils.sticky;
+		if(journeys_utils.journeyVariant === "overlay")
+		{
+			bannerHeight = '100%!important';
+			bannerWidth = '100%!important';
+			sticky = 'fixed';
+		}
+		// add iframe container styles
+		css += '#branch-banner-iframe-embed { z-index: 99999!important; height: ' + bannerHeight + '; width: ' + bannerWidth + '; padding: 0px!important; margin: 0px!important; ' + '; position: ' + sticky + '; }\n';
+		css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: 100%; left: 0; right: 0; border: 0; height: 100%!important; width: 100%!important; '+ iFrameAnimationStyle + '; position: ' + sticky + '; }\n';
+
+	}
+	else
+	{
+		css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' + 
+		' left: 0; right: 0; border: 0; height: ' +
+		journeys_utils.bannerHeight + '; z-index: 99999; ' +
+		iFrameAnimationStyle  + ' }\n' +
+		'#branch-banner-iframe { position: ' +
+		(journeys_utils.sticky) + '; }\n' +
+		'@media only screen and (orientation: landscape) { ' +
+		'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
+		(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
+		'#branch-banner-iframe { height: ' +
+		(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
+
+	}
+
 	return css;
 }
 
@@ -449,9 +471,11 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	var doc = iframe.contentWindow.document;
 	doc.head.appendChild(css);
 
+	var isDesktopOverlay = journeys_utils.isDesktopJourney && journeys_utils.journeyVariant === "overlay";
+
 	// if banner is partial height with relative units, we need to make sure
 	// it fills the entire height of the iframe
-	if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
+	if ((journeys_utils.isHalfPage || journeys_utils.isFullPage) && !(isDesktopOverlay)) {
 		var dismissBackground = doc.getElementsByClassName('branch-banner-dismiss-background')[0];
 		var content = doc.getElementsByClassName('branch-banner-content')[0];
 		if (!dismissBackground && content) {
@@ -986,6 +1010,9 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 		utils.merge(data['journey_link_data'], linkData);
 	}
 	journeys_utils.journeyLinkData = data;
+	journeys_utils.journeyType = data['journey_link_data']['type'] || null;
+	journeys_utils.isDesktopJourney = data['journey_link_data']['type'] === "desktop";
+	journeys_utils.journeyVariant = data['journey_link_data']['variant'] || null;
 };
 
 journeys_utils.getValueForKeyInBranchViewData = function(key) {
