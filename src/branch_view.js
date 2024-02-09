@@ -37,6 +37,8 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 	html = journeys_utils.removeScriptAndCss(html);
 
 	// create iframe element, add html, add css, add ctaText
+	var iframeContainer = document.createElement("div");
+	iframeContainer.id = "branch-banner-iframe-embed";
 	var iframe = journeys_utils.createIframe();
 	iframe.onload = function() {
 		journeys_utils.addHtmlToIframe(iframe, html, utils.getPlatformByUserAgent());
@@ -49,7 +51,15 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
 		iframeLoadedCallback(iframe);
 	}
-	document.body.appendChild(iframe);
+	if(journeys_utils.isDesktopJourney)
+	{
+		iframeContainer.appendChild(iframe);
+		document.body.appendChild(iframeContainer);
+	}
+	else
+	{
+		document.body.appendChild(iframe);
+	}
 	return iframe;
 };
 
