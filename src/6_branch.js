@@ -215,6 +215,10 @@ Branch.prototype._api = function(resource, obj, callback) {
 		}
 
 	}
+	if (utils.shouldAddDMAParams(resource.endpoint)) {
+		var dmaData = this._storage.get('branch_dma_data', true);
+		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : {};
+	}
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
@@ -1939,6 +1943,26 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  */
  Branch.prototype['referringLink'] = function(withExtendedJourneysAssist) {
 	return this._referringLink(withExtendedJourneysAssist);
+};
+
+/***
+ * @function Branch.setDMAParamsForEEA
+ * @param {Boolean} eeaRegion - If European regulations, including the DMA, apply to this user and conversion.
+ * @param {Boolean} adPersonalizationConsent - If End user has granted/denied ads personalization consent.
+ * @param {Boolean} adUserDataUsageConsent - If User has granted/denied consent for 3P transmission of user level data for ads.
+ * Sets the value of parameters required by Google Conversion APIs for DMA Compliance in EEA region.
+ */
+Branch.prototype['setDMAParamsForEEA'] = function(eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
+	try {
+		var dmaObj = {};
+		dmaObj.eeaRegion = eeaRegion || false;
+		dmaObj.adPersonalizationConsent = adPersonalizationConsent || false;
+		dmaObj.adUserDataUsageConsent = adUserDataUsageConsent || false;
+		this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
+	}
+	catch (e) {
+		console.error("setDMAParamsForEEA::An error occured while setting DMA parameters for EEA", e);
+	}
 };
 
 /***

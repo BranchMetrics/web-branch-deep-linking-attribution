@@ -135,6 +135,12 @@
 	if (data.hasOwnProperty("branch_requestMetadata") && data["branch_requestMetadata"] && !(resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss')) {
 		d['metadata'] = safejson.stringify(data["branch_requestMetadata"]);
 	}
+	if (data['branch_dma_data']) {
+		utils.setDMAParams(d, data['branch_dma_data'], resource.endpoint);
+		if (d['branch_dma_data']) {
+			delete d['branch_dma_data'];
+		}
+	}
 
 	if (resource.method === 'POST') {
 		try {
