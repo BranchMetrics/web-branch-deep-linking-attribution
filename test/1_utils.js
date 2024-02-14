@@ -1372,8 +1372,12 @@ describe('utils', function() {
 			assert.equal(utils.isValidURL('https://www.example.com/path with spaces'), false);
 		});
 
-		it('should return true for valid url', function() {
+		it('should return true for valid url - https', function() {
 			assert.equal(utils.isValidURL('https://api2.branch.io'), true);
+		});
+
+		it('should return true for valid url - http', function() {
+			assert.equal(utils.isValidURL('http://api2.branch.io'), true);
 		});
 	});
 
