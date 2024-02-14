@@ -1,5 +1,6 @@
 'use strict';
 /*jshint -W079 */
+/*jshint esversion: 6 */
 var sinon = require('sinon');
 goog.require('utils');
 
@@ -1324,6 +1325,75 @@ describe('utils', function() {
 		});
 	});
 
+	describe('shouldAddDMAParams', function() {
+		it('should return true for valid endpoints', function() {
+			assert.equal(utils.shouldAddDMAParams('/v1/open'), true);
+			assert.equal(utils.shouldAddDMAParams('/v1/pageview'), true);
+			assert.equal(utils.shouldAddDMAParams('/v2/event'), true);
+		});
+
+		it('should return false for invalid endpoints', function() {
+			assert.equal(utils.shouldAddDMAParams('/v3/invalid'), false);
+			assert.equal(utils.shouldAddDMAParams('/v2/others'), false);
+		});
+	});
+
+	describe('setDMAParams', function() {
+		it('should add DMA parameters for valid endpoints: v1/open', () => {
+			const data = {};
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+			utils.setDMAParams(data, dmaObj, '/v1/open');
+			assert.deepEqual(data, { dma_eea: true, dma_ad_personalization: true, dma_ad_user_data: false });
+		});
+		it('should add DMA parameters for valid endpoints: v2/event', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {};
+			utils.setDMAParams(data2, dmaObj, '/v2/event');
+			assert.deepEqual(data2, { "user_data": { dma_eea: true, dma_ad_personalization: true, dma_ad_user_data: false } });
+		});
+		it('should add DMA parameters for valid endpoints: v1/pageview', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {};
+			utils.setDMAParams(data2, dmaObj, '/v1/pageview');
+			assert.deepEqual(data2, { dma_eea: true, dma_ad_personalization: true, dma_ad_user_data: false });
+		});
+		it('should not add DMA parameters for invalid endpoints: v1/invalid', () => {
+			const data = {};
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			utils.setDMAParams(data, dmaObj, '/v1/invalid');
+			assert.deepEqual(data, {});
+		});
+		it('should not add DMA parameters for invalid endpoints: v1/dismiss', () => {
+			const data = {};
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			utils.setDMAParams(data, dmaObj, '/v1/dismiss');
+			assert.deepEqual(data, {});
+		});
+	});
 
 	/*
 	describe('journey_cta', function(done) {

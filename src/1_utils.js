@@ -29,6 +29,11 @@ utils.timeSinceNavigationStart = function() {
 	return (Date.now() - window.performance.timing.navigationStart).toString();
 };
 utils.currentRequestBrttTag = "";
+utils.allowDMAParamURLMap = {
+	"/v1/open": "",
+	"/v1/pageview": "",
+	"/v2/event": "user_data"
+};
 utils.calculateBrtt = function(startTime) {
 	if (!startTime || typeof startTime !== "number") {
 		return null;
@@ -1322,5 +1327,33 @@ utils.removeTrailingDotZeros = function(versionNumber) {
 		}
 	}
 	return versionNumber;
+};
+
+utils.shouldAddDMAParams = function(endPointURL) {
+	return utils.allowDMAParamURLMap.hasOwnProperty(endPointURL);
+};
+
+utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
+	const DMA_EEA = "dma_eea";
+	const DMA_Ad_Personalization = "dma_ad_personalization";
+	const DMA_Ad_User_Data = "dma_ad_user_data";
+
+	const dmaParams = {
+		[DMA_EEA]: dmaObj.eeaRegion || false,
+		[DMA_Ad_Personalization]: dmaObj.adPersonalizationConsent || false,
+		[DMA_Ad_User_Data]: dmaObj.adUserDataUsageConsent || false
+	};
+
+	for (const [key, value] of Object.entries(utils.allowDMAParamURLMap)) {
+		if (endPoint.includes(key)) {
+			if (value === '') {
+				Object.assign(data, dmaParams);
+			}
+			else {
+				data[value] = Object.assign({}, data[value], dmaParams);
+			}
+			break;
+		}
+	}
 };
 
