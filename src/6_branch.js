@@ -219,6 +219,9 @@ Branch.prototype._api = function(resource, obj, callback) {
 		var dmaData = this._storage.get('branch_dma_data', true);
 		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : {};
 	}
+	if (resource.endpoint !== '/_r') {
+		resource.destination = config.api_endpoint;
+	}
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
@@ -1987,3 +1990,26 @@ Branch.prototype['setRequestMetaData'] = function(key, value) {
 		console.error("An error occured while setting request metadata", e);
 	}
 };
+
+/***
+ * @function Branch.setAPIUrl
+ * @param {String} url - url
+ * Sets a custom base URL for all calls to the Branch API
+ */
+Branch.prototype['setAPIUrl'] = function(url) {
+	if (!utils.isValidURL(url)) {
+		console.error("setAPIUrl: Invalid URL format. Default URL will be set.");
+		return;
+	}
+
+	config.api_endpoint = url;
+};
+
+/***
+ * @function Branch.getAPIUrl
+ * returns the base URL for all calls to the Branch API
+ */
+Branch.prototype['getAPIUrl'] = function() {
+	return config.api_endpoint;
+};
+

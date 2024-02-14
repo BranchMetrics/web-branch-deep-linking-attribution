@@ -117,4 +117,19 @@ describe('Branch - new', function() {
 			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::An error occured while setting DMA parameters for EEA', sinon.match.instanceOf(Error));
 		});
 	});
+	describe('setAPIUrl', function() {
+		it('test method exists', function() {
+			sinon.assert.match(typeof branch_instance.setAPIUrl, "function");
+		});
+	});
+	describe('getAPIUrl', function() {
+		it('test method exists', function() {
+			sinon.assert.match(typeof branch_instance.getAPIUrl, "function");
+		});
+		it('test url', function() {
+			var branch_url = 'https://api16.branch.io';
+			branch_instance.setAPIUrl(branch_url);
+			assert.equal(branch_instance.getAPIUrl(), branch_url);
+		});
+	});
 });

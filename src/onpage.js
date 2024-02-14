@@ -57,7 +57,9 @@
 		'setAPIResponseCallback',
 		'qrCode',
 		'setRequestMetaData',
-		'setDMAParamsForEEA'
+		'setDMAParamsForEEA',
+		'setAPIUrl',
+		'getAPIUrl'
 	],
 	0
 );
