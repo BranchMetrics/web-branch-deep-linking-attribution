@@ -56,7 +56,8 @@
 		'lastAttributedTouchData',
 		'setAPIResponseCallback',
 		'qrCode',
-		'setRequestMetaData'
+		'setRequestMetaData',
+		'setDMAParamsForEEA'
 	],
 	0
 );
