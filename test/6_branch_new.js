@@ -1,5 +1,6 @@
 'use strict';
 /*jshint -W079 */
+/*jshint esversion: 6 */
 var sinon = require('sinon');
 
 goog.require('Branch');
@@ -52,6 +53,68 @@ describe('Branch - new', function() {
 			assert.strictEqual(result2, undefined);
 			sinon.assert.notCalled(addPropertyIfNotNullSpy);
 			assert.deepEqual(requestMetadata, { "key": "value" });
+		});
+	});
+	describe('setDMAParamsForEEA', function() {
+		let sandbox;
+		beforeEach(() => {
+			sandbox = sinon.createSandbox();
+		});
+		afterEach(() => {
+			sandbox.restore();
+		});
+		it('test method exists', function() {
+			sinon.assert.match(typeof branch_instance.setDMAParamsForEEA, "function");
+		});
+		it('should store dma params inside branch_dma_data of storage', function() {
+			const thisObj = {
+				_storage: {
+					set: () => {}
+				}
+			};
+			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
+			const dmaObj = {};
+			dmaObj.eeaRegion = true;
+			dmaObj.adPersonalizationConsent = true;
+			dmaObj.adUserDataUsageConsent = true;
+			const stringifieddmaObj = JSON.stringify(dmaObj);
+			branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion, dmaObj.adPersonalizationConsent, dmaObj.adUserDataUsageConsent);
+			sinon.assert.calledWith(storageSetStub, 'branch_dma_data', stringifieddmaObj, true);
+		});
+		it('should store default dma params inside branch_dma_data of storage', function() {
+			const thisObj = {
+				_storage: {
+					set: () => {}
+				}
+			};
+			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
+			const dmaObj = {};
+			dmaObj.eeaRegion = false;
+			dmaObj.adPersonalizationConsent = false;
+			dmaObj.adUserDataUsageConsent = false;
+			const stringifieddmaObj = JSON.stringify(dmaObj);
+			branch_instance.setDMAParamsForEEA.call(thisObj);
+			sinon.assert.calledWith(storageSetStub, 'branch_dma_data', stringifieddmaObj, true);
+		});
+		it('should catch and log exception', function() {
+			const thisObj = {
+				_storage: {
+					set: () => {}
+				}
+			};
+			sandbox.stub(thisObj._storage, 'set').throws(new Error('Mock error'));
+			const consoleErrorStub = sandbox.stub(console, 'error');
+			try {
+				const dmaObj = {};
+				dmaObj.eeaRegion = false;
+				dmaObj.adPersonalizationConsent = false;
+				dmaObj.adUserDataUsageConsent = false;
+				branch_instance.setDMAParamsForEEA.call(thisObj);
+
+			} catch (e) {
+
+			}
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::An error occured while setting DMA parameters for EEA', sinon.match.instanceOf(Error));
 		});
 	});
 	describe('setAPIUrl', function() {
