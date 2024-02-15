@@ -1955,7 +1955,7 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  * @param {Boolean} adUserDataUsageConsent - If User has granted/denied consent for 3P transmission of user level data for ads.
  * Sets the value of parameters required by Google Conversion APIs for DMA Compliance in EEA region.
  */
-Branch.prototype['setDMAParamsForEEA'] = function(eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
+Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, function(done, eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
 	try {
 		var dmaObj = {};
 		dmaObj.eeaRegion = eeaRegion || false;
@@ -1966,7 +1966,8 @@ Branch.prototype['setDMAParamsForEEA'] = function(eeaRegion, adPersonalizationCo
 	catch (e) {
 		console.error("setDMAParamsForEEA::An error occured while setting DMA parameters for EEA", e);
 	}
-};
+	done();
+}, true);
 
 /***
  * @function Branch.setRequestMetaData

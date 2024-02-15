@@ -28,5 +28,6 @@
 	"undef": true,
 	"unused": true,
 	"esversion": 6,
-	"-W138": true
+	"-W138": true,
+	"-W073": true
 }
