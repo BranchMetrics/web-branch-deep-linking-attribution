@@ -96,6 +96,18 @@ $jscomp.polyfill("Array.prototype.includes", function(a) {
     return !1;
   };
 }, "es7", "es3");
+$jscomp.owns = function(a, b) {
+  return Object.prototype.hasOwnProperty.call(a, b);
+};
+$jscomp.polyfill("Object.entries", function(a) {
+  return a ? a : function(b) {
+    var c = [], d;
+    for (d in b) {
+      $jscomp.owns(b, d) && c.push([d, b[d]]);
+    }
+    return c;
+  };
+}, "es8", "es3");
 var COMPILED = !0, goog = goog || {};
 goog.global = this || self;
 goog.exportPath_ = function(a, b, c, d) {
@@ -1071,7 +1083,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.81.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.82.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1102,6 +1114,7 @@ utils.timeSinceNavigationStart = function() {
   return (Date.now() - window.performance.timing.navigationStart).toString();
 };
 utils.currentRequestBrttTag = "";
+utils.allowDMAParamURLMap = {"/v1/open":"", "/v1/pageview":"", "/v2/event/standard":"user_data", "/v2/event/custom":"user_data"};
 utils.calculateBrtt = function(a) {
   return a && "number" === typeof a ? (Date.now() - a).toString() : null;
 };
@@ -1648,6 +1661,37 @@ utils.removeTrailingDotZeros = function(a) {
   }
   return a;
 };
+utils.shouldAddDMAParams = function(a) {
+  return utils.allowDMAParamURLMap.hasOwnProperty(a);
+};
+utils.setDMAParams = function(a, b = {}, c) {
+  b = {dma_eea:b.eeaRegion || !1, dma_ad_personalization:b.adPersonalizationConsent || !1, dma_ad_user_data:b.adUserDataUsageConsent || !1};
+  const d = utils.allowDMAParamURLMap;
+  for (const [e, f] of Object.entries(d)) {
+    if (c.includes(e)) {
+      if ("" === f) {
+        Object.assign(a, b);
+      } else {
+        let g;
+        if (f in a && "" !== a[f]) {
+          try {
+            const h = JSON.parse(a[f]), k = Object.assign({}, h, b);
+            g = JSON.stringify(k);
+          } catch (h) {
+            console.error(`setDMAParams:: ${f} is not a valid JSON string`);
+          }
+        } else {
+          g = JSON.stringify(b);
+        }
+        g && (a[f] = g);
+      }
+      break;
+    }
+  }
+};
+utils.isValidURL = function(a) {
+  return a && "" !== a.trim() ? RegExp("^(https?)://((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$", "i").test(a) : !1;
+};
 // Input 5
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
@@ -1875,6 +1919,7 @@ Server.prototype.getUrl = function(a, b) {
     utils.merge(g, b), g.branch_requestMetadata && delete g.branch_requestMetadata;
   }
   b.hasOwnProperty("branch_requestMetadata") && b.branch_requestMetadata && "/v1/pageview" !== a.endpoint && "/v1/dismiss" !== a.endpoint && (g.metadata = safejson.stringify(b.branch_requestMetadata));
+  b.branch_dma_data && (utils.setDMAParams(g, b.branch_dma_data, a.endpoint), g.branch_dma_data && delete g.branch_dma_data);
   if ("POST" === a.method) {
     try {
       var h = g;
@@ -2405,12 +2450,21 @@ journeys_utils.addIframeOuterCSS = function(a, b) {
   document.head.appendChild(c);
 };
 function generateIframeOuterCSS(a) {
-  var b = a = "";
+  var b = "";
+  a = "";
   document.body.style.transition = "";
   document.getElementById("branch-banner-iframe") && (document.getElementById("branch-banner-iframe").style.transition = "");
-  journeys_utils.entryAnimationDisabled || (a = "body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n", document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", b = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;");
-  return (a ? a : "") + ("#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + b + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + 
-  "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }");
+  journeys_utils.entryAnimationDisabled || (b = "body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n", document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", a = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;");
+  b = "" + (b || "");
+  if (journeys_utils.isDesktopJourney) {
+    var c = journeys_utils.bannerHeight, d = journeys_utils.bannerWidth, e = journeys_utils.sticky;
+    "overlay" === journeys_utils.journeyVariant && (d = c = "100%!important", e = "fixed");
+    b = b + ("#branch-banner-iframe-embed { z-index: 99999!important; height: " + c + "; width: " + d + "; padding: 0px!important; margin: 0px!important; ; position: " + e + "; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: 100%; left: 0; right: 0; border: 0; height: 100%!important; width: 100%!important; ") + (a + "; position: " + e + "; }\n");
+  } else {
+    b += "#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + a + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + 
+    "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }";
+  }
+  return b;
 }
 journeys_utils.addIframeInnerCSS = function(a, b) {
   var c = document.createElement("style");
@@ -2420,7 +2474,8 @@ journeys_utils.addIframeInnerCSS = function(a, b) {
   utils.addNonceAttribute(c);
   b = a.contentWindow.document;
   b.head.appendChild(c);
-  if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
+  c = journeys_utils.isDesktopJourney && "overlay" === journeys_utils.journeyVariant;
+  if ((journeys_utils.isHalfPage || journeys_utils.isFullPage) && !c) {
     c = b.getElementsByClassName("branch-banner-dismiss-background")[0];
     var d = b.getElementsByClassName("branch-banner-content")[0];
     !c && d && (d.style.height = journeys_utils.bannerHeight);
@@ -2603,6 +2658,9 @@ journeys_utils.setJourneyLinkData = function(a) {
   var b = {banner_id:journeys_utils.branchViewId};
   a && "object" === typeof a && 0 < Object.keys(a || {}).length && (utils.removePropertiesFromObject(a, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b.journey_link_data = {}, utils.merge(b.journey_link_data, a));
   journeys_utils.journeyLinkData = b;
+  journeys_utils.journeyType = b.journey_link_data.type || null;
+  journeys_utils.isDesktopJourney = "desktop" === b.journey_link_data.type;
+  journeys_utils.journeyVariant = b.journey_link_data.variant || null;
 };
 journeys_utils.getValueForKeyInBranchViewData = function(a) {
   return journeys_utils && journeys_utils.branch && journeys_utils.branch._branchViewData && journeys_utils.branch._branchViewData.data ? journeys_utils.branch._branchViewData.data[a] : !1;
@@ -2664,6 +2722,8 @@ function renderHtmlBlob(a, b, c, d) {
   journeys_utils.getJsAndAddToParent(b);
   var h = journeys_utils.getIframeCss(b);
   b = journeys_utils.removeScriptAndCss(b);
+  a = document.createElement("div");
+  a.id = "branch-banner-iframe-embed";
   var k = journeys_utils.createIframe();
   k.onload = function() {
     journeys_utils.addHtmlToIframe(k, b, utils.getPlatformByUserAgent());
@@ -2674,7 +2734,7 @@ function renderHtmlBlob(a, b, c, d) {
     journeys_utils.animateBannerEntrance(k, h);
     d(k);
   };
-  document.body.appendChild(k);
+  journeys_utils.isDesktopJourney ? (a.appendChild(k), document.body.appendChild(a)) : document.body.appendChild(k);
   return k;
 }
 function _areJourneysDismissedGlobally(a) {
@@ -2824,6 +2884,8 @@ Branch.prototype._api = function(a, b, c) {
       this.requestMetadata.hasOwnProperty(d) && (b.branch_requestMetadata || (b.branch_requestMetadata = {}), b.branch_requestMetadata[d] = this.requestMetadata[d]);
     }
   }
+  utils.shouldAddDMAParams(a.endpoint) && (d = this._storage.get("branch_dma_data", !0), b.branch_dma_data = d ? safejson.parse(d) : {});
+  "/_r" !== a.endpoint && (a.destination = config.api_endpoint);
   return this._server.request(a, b, this._storage, function(e, f) {
     c(e, f);
   });
@@ -3194,12 +3256,30 @@ Branch.prototype.setAPIResponseCallback = wrap(callback_params.NO_CALLBACK, func
 Branch.prototype.referringLink = function(a) {
   return this._referringLink(a);
 };
+Branch.prototype.setDMAParamsForEEA = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
+  try {
+    var e = {};
+    e.eeaRegion = b || !1;
+    e.adPersonalizationConsent = c || !1;
+    e.adUserDataUsageConsent = d || !1;
+    this._storage.set("branch_dma_data", safejson.stringify(e), !0);
+  } catch (f) {
+    console.error("setDMAParamsForEEA::An error occured while setting DMA parameters for EEA", f);
+  }
+  a();
+}, !0);
 Branch.prototype.setRequestMetaData = function(a, b) {
   try {
     "undefined" !== typeof a && null !== a && 0 !== a.length && "undefined" !== typeof b && (this.requestMetadata.hasOwnProperty(a) && null === b && delete this.requestMetadata[a], this.requestMetadata = utils.addPropertyIfNotNull(this.requestMetadata, a, b));
   } catch (c) {
     console.error("An error occured while setting request metadata", c);
   }
+};
+Branch.prototype.setAPIUrl = function(a) {
+  utils.isValidURL(a) ? config.api_endpoint = a : console.error("setAPIUrl: Invalid URL format. Default URL will be set.");
+};
+Branch.prototype.getAPIUrl = function() {
+  return config.api_endpoint;
 };
 // Input 17
 var branch_instance = new Branch();
