@@ -1349,12 +1349,12 @@ utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
 
 	for (const [key, value] of Object.entries(allowDMAParamURLMap)) {
 		if (endPoint.includes(key)) {
-			let updatedValue;
 
 			if (value === '') {
 				Object.assign(data, dmaParams);
 			}
 			else {
+				let updatedValue;
 				const valueExists = value in data;
 				if (!valueExists || data[value] === '') {
 					updatedValue = JSON.stringify(dmaParams);
@@ -1370,7 +1370,6 @@ utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
 				}
 				if (updatedValue) {
 					data[value] = updatedValue;
-					console.log(data[value]);
 				}
 			}
 			break;
