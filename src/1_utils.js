@@ -32,7 +32,8 @@ utils.currentRequestBrttTag = "";
 utils.allowDMAParamURLMap = {
 	"/v1/open": "",
 	"/v1/pageview": "",
-	"/v2/event": "user_data"
+	"/v2/event/standard": "user_data",
+	"/v2/event/custom": "user_data"
 };
 utils.calculateBrtt = function(startTime) {
 	if (!startTime || typeof startTime !== "number") {
@@ -1344,18 +1345,39 @@ utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
 		[DMA_Ad_User_Data]: dmaObj.adUserDataUsageConsent || false
 	};
 
-	for (const [key, value] of Object.entries(utils.allowDMAParamURLMap)) {
+	const allowDMAParamURLMap = utils.allowDMAParamURLMap;
+
+	for (const [key, value] of Object.entries(allowDMAParamURLMap)) {
 		if (endPoint.includes(key)) {
+			let updatedValue;
+
 			if (value === '') {
 				Object.assign(data, dmaParams);
 			}
 			else {
-				data[value] = Object.assign({}, data[value], dmaParams);
+				const valueExists = value in data;
+				if (!valueExists || data[value] === '') {
+					updatedValue = JSON.stringify(dmaParams);
+				}
+				else {
+					try {
+						const innerJSONObject = JSON.parse(data[value]);
+						const mergedObject = Object.assign({}, innerJSONObject, dmaParams);
+						updatedValue = JSON.stringify(mergedObject);
+					} catch (error) {
+						console.error(`setDMAParams:: ${value} is not a valid JSON string`);
+					}
+				}
+				if (updatedValue) {
+					data[value] = updatedValue;
+					console.log(data[value]);
+				}
 			}
 			break;
 		}
 	}
 };
+
 
 /**
  * @param {String} url

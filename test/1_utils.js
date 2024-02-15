@@ -1329,7 +1329,8 @@ describe('utils', function() {
 		it('should return true for valid endpoints', function() {
 			assert.equal(utils.shouldAddDMAParams('/v1/open'), true);
 			assert.equal(utils.shouldAddDMAParams('/v1/pageview'), true);
-			assert.equal(utils.shouldAddDMAParams('/v2/event'), true);
+			assert.equal(utils.shouldAddDMAParams('/v2/event/standard'), true);
+			assert.equal(utils.shouldAddDMAParams('/v2/event/custom'), true);
 		});
 
 		it('should return false for invalid endpoints', function() {
@@ -1349,7 +1350,7 @@ describe('utils', function() {
 			utils.setDMAParams(data, dmaObj, '/v1/open');
 			assert.deepEqual(data, { dma_eea: true, dma_ad_personalization: true, dma_ad_user_data: false });
 		});
-		it('should add DMA parameters for valid endpoints: v2/event', () => {
+		it('should add DMA parameters for valid endpoints: v2/event/standard', () => {
 			const dmaObj = {
 				eeaRegion: true,
 				adPersonalizationConsent: true,
@@ -1357,8 +1358,19 @@ describe('utils', function() {
 			};
 
 			const data2 = {};
-			utils.setDMAParams(data2, dmaObj, '/v2/event');
-			assert.deepEqual(data2, { "user_data": { dma_eea: true, dma_ad_personalization: true, dma_ad_user_data: false } });
+			utils.setDMAParams(data2, dmaObj, '/v2/event/standard');
+			assert.deepEqual(data2, { "user_data":"{\"dma_eea\":true,\"dma_ad_personalization\":true,\"dma_ad_user_data\":false}" });
+		});
+		it('should add DMA parameters for valid endpoints: v2/event/custom', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {};
+			utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
+			assert.deepEqual(data2, { "user_data":"{\"dma_eea\":true,\"dma_ad_personalization\":true,\"dma_ad_user_data\":false}" });
 		});
 		it('should add DMA parameters for valid endpoints: v1/pageview', () => {
 			const dmaObj = {

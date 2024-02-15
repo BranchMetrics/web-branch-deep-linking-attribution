@@ -5,11 +5,14 @@ var sinon = require('sinon');
 
 goog.require('Branch');
 goog.require('utils');
+goog.require('task_queue');
 
 describe('Branch - new', function() {
-	var branch_instance = new Branch();
-	var assert = testUtils.unplanned();
+	const sandbox = sinon.createSandbox();
+	const branch_instance = new Branch();
+	const assert = testUtils.unplanned();
 	afterEach(function() {
+		sandbox.restore();
 		sinon.restore();
 	});
 	describe('referringLink', function() {
@@ -56,13 +59,6 @@ describe('Branch - new', function() {
 		});
 	});
 	describe('setDMAParamsForEEA', function() {
-		let sandbox;
-		beforeEach(() => {
-			sandbox = sinon.createSandbox();
-		});
-		afterEach(() => {
-			sandbox.restore();
-		});
 		it('test method exists', function() {
 			sinon.assert.match(typeof branch_instance.setDMAParamsForEEA, "function");
 		});
@@ -70,7 +66,8 @@ describe('Branch - new', function() {
 			const thisObj = {
 				_storage: {
 					set: () => {}
-				}
+				},
+				_queue: task_queue()
 			};
 			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
 			const dmaObj = {};
@@ -85,7 +82,8 @@ describe('Branch - new', function() {
 			const thisObj = {
 				_storage: {
 					set: () => {}
-				}
+				},
+				_queue: task_queue()
 			};
 			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
 			const dmaObj = {};
@@ -100,7 +98,8 @@ describe('Branch - new', function() {
 			const thisObj = {
 				_storage: {
 					set: () => {}
-				}
+				},
+				_queue: task_queue()
 			};
 			sandbox.stub(thisObj._storage, 'set').throws(new Error('Mock error'));
 			const consoleErrorStub = sandbox.stub(console, 'error');
