@@ -6,6 +6,7 @@ The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 ## [2.82.0] - 2024-02-15
 - feat(EMT-111): add setDMAParamsForEEA method
 - feat(SDK-2237): add setAPIUrl getAPIUrl methods
+- fix(MLP-13): prevent main inside body from taking total height of the overlay journeys
 
 ## [2.81.0] - 2024-01-18
 - feat(SDK-2101): add setRequestMetadata method
