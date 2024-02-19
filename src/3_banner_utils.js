@@ -194,11 +194,11 @@ banner_utils.shouldAppend = function(storage, options) {
 		!document.getElementById('branch-banner-iframe') &&
 		(hideBanner || forgetHide) &&
 		(
-			(options.showAndroid && utils.mobileUserAgent() === 'android') ||
-			(options.showiPad && utils.mobileUserAgent() === 'ipad') ||
-			(options.showiOS && utils.mobileUserAgent() === 'ios') ||
-			(options.showBlackberry && utils.mobileUserAgent() === 'blackberry') ||
-			(options.showWindowsPhone && utils.mobileUserAgent() === 'windows_phone') ||
-			(options.showKindle && utils.mobileUserAgent() === 'kindle')
+			(options.showAndroid && utils.getPlatformByUserAgent() === 'android') ||
+			(options.showiPad && utils.getPlatformByUserAgent() === 'ipad') ||
+			(options.showiOS && utils.getPlatformByUserAgent() === 'ios') ||
+			(options.showBlackberry && utils.getPlatformByUserAgent() === 'blackberry') ||
+			(options.showWindowsPhone && utils.getPlatformByUserAgent() === 'windows_phone') ||
+			(options.showKindle && utils.getPlatformByUserAgent() === 'kindle')
 		);
 };
