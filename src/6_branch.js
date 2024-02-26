@@ -217,7 +217,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 	}
 	if (utils.shouldAddDMAParams(resource.endpoint)) {
 		var dmaData = this._storage.get('branch_dma_data', true);
-		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : {};
+		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : null;
 	}
 	if (resource.endpoint !== '/_r') {
 		resource.destination = config.api_endpoint;
