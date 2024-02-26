@@ -1958,10 +1958,15 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
 Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, function(done, eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
 	try {
 		var dmaObj = {};
-		dmaObj.eeaRegion = eeaRegion || false;
-		dmaObj.adPersonalizationConsent = adPersonalizationConsent || false;
-		dmaObj.adUserDataUsageConsent = adUserDataUsageConsent || false;
-		this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
+		if (eeaRegion !== null && eeaRegion !== undefined) {
+			dmaObj.eeaRegion = !!eeaRegion;
+			dmaObj.adPersonalizationConsent = !!adPersonalizationConsent;
+			dmaObj.adUserDataUsageConsent = !!adUserDataUsageConsent;
+			this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
+		}
+		else {
+			console.error("setDMAParamsForEEA::DMA parameters for EEA cannot be null");
+		}
 	}
 	catch (e) {
 		console.error("setDMAParamsForEEA::An error occured while setting DMA parameters for EEA", e);
