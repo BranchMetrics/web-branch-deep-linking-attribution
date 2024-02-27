@@ -1959,14 +1959,16 @@ Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, func
 	try {
 		const validateParam = (param, paramName) => {
 			if (!utils.isBoolean(param)) {
-				console.warn(`setDMAParamsForEEA::DMA parameter ${paramName} must be boolean`);
+				console.warn(`setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`);
 				return false;
 			}
 			return true;
 		};
-		const isValid = (validateParam(eeaRegion, "eeaRegion") &&
-		validateParam(adPersonalizationConsent, "adPersonalizationConsent") &&
-		validateParam(adUserDataUsageConsent, "adUserDataUsageConsent"));
+		const isValid = (
+			validateParam(eeaRegion, "eeaRegion") &&
+			validateParam(adPersonalizationConsent, "adPersonalizationConsent") &&
+			validateParam(adUserDataUsageConsent, "adUserDataUsageConsent")
+		);
 		if (!isValid) {
 			return;
 		}

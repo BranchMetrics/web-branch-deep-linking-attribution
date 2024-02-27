@@ -122,7 +122,7 @@ describe('Branch - new', function() {
 			} catch (e) {
 
 			}
-			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::DMA parameter eeaRegion must be boolean');
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA: eeaRegion must be boolean, but got null');
 		});
 		it('should log warning if adPersonalizationConsent is not boolean', function() {
 			const thisObj = {
@@ -142,7 +142,7 @@ describe('Branch - new', function() {
 			} catch (e) {
 
 			}
-			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::DMA parameter adPersonalizationConsent must be boolean');
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA: adPersonalizationConsent must be boolean, but got null');
 		});
 		it('should log warning if eeaRegion is not boolean', function() {
 			const thisObj = {
@@ -162,7 +162,7 @@ describe('Branch - new', function() {
 			} catch (e) {
 
 			}
-			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::DMA parameter adUserDataUsageConsent must be boolean');
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA: adUserDataUsageConsent must be boolean, but got null');
 		});
 		it('should catch and log exception', function() {
 			const thisObj = {

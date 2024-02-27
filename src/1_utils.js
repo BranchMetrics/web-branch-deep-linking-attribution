@@ -1342,19 +1342,22 @@ utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
 		dma_ad_personalization: dmaObj['adPersonalizationConsent'],
 		dma_ad_user_data: dmaObj['adUserDataUsageConsent']
 	};
-	const isV1EndPoint = v1_DMAEndPoints.includes(endPoint);
-	const isV2EndPoint = v2_DMAEndPoints.includes(endPoint);
-	if (isV1EndPoint || isV2EndPoint) {
-		if (isV1EndPoint) {
-			Object.assign(data, dmaParams);
-		}
-		else {
-			try {
-				const user_data = JSON.parse(data['user_data'] || '{}');
-				data['user_data'] = JSON.stringify(Object.assign({}, user_data, dmaParams));
-			} catch (error) {
-				console.error(`setDMAParams:: ${data['user_data']} is not a valid JSON string`);
+	if (v1_DMAEndPoints.includes(endPoint)) {
+		Object.assign(data, dmaParams);
+	}
+	else if (v2_DMAEndPoints.includes(endPoint)) {
+		try {
+			let user_data;
+			if (!data['user_data']) {
+				user_data = {};
 			}
+			else {
+				user_data = JSON.parse(data['user_data']);
+			}
+			Object.assign(user_data, dmaParams);
+			data['user_data'] = JSON.stringify(user_data);
+		} catch (error) {
+			console.error(`setDMAParams:: ${data['user_data']} is not a valid JSON string`);
 		}
 	}
 };
