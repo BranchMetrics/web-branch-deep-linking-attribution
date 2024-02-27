@@ -136,7 +136,11 @@
 		d['metadata'] = safejson.stringify(data["branch_requestMetadata"]);
 	}
 	if (data['branch_dma_data']) {
-		utils.setDMAParams(d, data['branch_dma_data'], resource.endpoint);
+		const eeaRegion = data['branch_dma_data']['eeaRegion'];
+		const hasEEARegionValue = (eeaRegion === true || eeaRegion === false);
+		if (hasEEARegionValue) {
+			utils.setDMAParams(d, data['branch_dma_data'], resource.endpoint);
+		}
 		if (d['branch_dma_data']) {
 			delete d['branch_dma_data'];
 		}

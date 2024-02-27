@@ -1372,6 +1372,21 @@ describe('utils', function() {
 			utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
 			assert.deepEqual(data2, { "user_data":"{\"dma_eea\":true,\"dma_ad_personalization\":true,\"dma_ad_user_data\":false}" });
 		});
+		it('should add DMA parameters for valid endpoints: v2/event/custom', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {
+			};
+			data2.user_data = JSON.stringify({
+				"test": true
+			});
+			utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
+			assert.deepEqual(data2, { "user_data": "{\"test\":true,\"dma_eea\":true,\"dma_ad_personalization\":true,\"dma_ad_user_data\":false}" });
+		});
 		it('should add DMA parameters for valid endpoints: v1/pageview', () => {
 			const dmaObj = {
 				eeaRegion: true,

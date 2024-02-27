@@ -1957,19 +1957,29 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  */
 Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, function(done, eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
 	try {
-		var dmaObj = {};
-		if (eeaRegion !== null && eeaRegion !== undefined) {
-			dmaObj.eeaRegion = !!eeaRegion;
-			dmaObj.adPersonalizationConsent = !!adPersonalizationConsent;
-			dmaObj.adUserDataUsageConsent = !!adUserDataUsageConsent;
-			this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
+		const validateParam = (param, paramName) => {
+			if (!utils.isBoolean(param)) {
+				console.warn(`setDMAParamsForEEA::DMA parameter ${paramName} must be boolean`);
+				return false;
+			}
+			return true;
+		};
+		const isValid = (validateParam(eeaRegion, "eeaRegion") &&
+		validateParam(adPersonalizationConsent, "adPersonalizationConsent") &&
+		validateParam(adUserDataUsageConsent, "adUserDataUsageConsent"));
+		if (!isValid) {
+			return;
 		}
-		else {
-			console.error("setDMAParamsForEEA::DMA parameters for EEA cannot be null");
-		}
-	}
-	catch (e) {
-		console.error("setDMAParamsForEEA::An error occured while setting DMA parameters for EEA", e);
+
+		const dmaObj = {
+			eeaRegion,
+			adPersonalizationConsent,
+			adUserDataUsageConsent
+		};
+
+		this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
+	} catch (e) {
+		console.error("setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA", e);
 	}
 	done();
 }, true);

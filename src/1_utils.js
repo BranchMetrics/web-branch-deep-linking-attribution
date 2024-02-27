@@ -1335,48 +1335,38 @@ utils.shouldAddDMAParams = function(endPointURL) {
 };
 
 utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
-	const DMA_EEA = "dma_eea";
-	const DMA_Ad_Personalization = "dma_ad_personalization";
-	const DMA_Ad_User_Data = "dma_ad_user_data";
-
+	const v1_DMAEndPoints = [ "/v1/open", "/v1/pageview" ];
+	const v2_DMAEndPoints = [ "/v2/event/standard", "/v2/event/custom" ];
 	const dmaParams = {
-		[DMA_EEA]: dmaObj.eeaRegion || false,
-		[DMA_Ad_Personalization]: dmaObj.adPersonalizationConsent || false,
-		[DMA_Ad_User_Data]: dmaObj.adUserDataUsageConsent || false
+		dma_eea: dmaObj['eeaRegion'],
+		dma_ad_personalization: dmaObj['adPersonalizationConsent'],
+		dma_ad_user_data: dmaObj['adUserDataUsageConsent']
 	};
-
-	const allowDMAParamURLMap = utils.allowDMAParamURLMap;
-
-	for (const [key, value] of Object.entries(allowDMAParamURLMap)) {
-		if (endPoint.includes(key)) {
-
-			if (value === '') {
-				Object.assign(data, dmaParams);
+	const isV1EndPoint = v1_DMAEndPoints.includes(endPoint);
+	const isV2EndPoint = v2_DMAEndPoints.includes(endPoint);
+	if (isV1EndPoint || isV2EndPoint) {
+		if (isV1EndPoint) {
+			Object.assign(data, dmaParams);
+		}
+		else {
+			try {
+				const user_data = JSON.parse(data['user_data'] || '{}');
+				data['user_data'] = JSON.stringify(Object.assign({}, user_data, dmaParams));
+			} catch (error) {
+				console.error(`setDMAParams:: ${data['user_data']} is not a valid JSON string`);
 			}
-			else {
-				let updatedValue;
-				const valueExists = value in data;
-				if (!valueExists || data[value] === '') {
-					updatedValue = JSON.stringify(dmaParams);
-				}
-				else {
-					try {
-						const innerJSONObject = JSON.parse(data[value]);
-						const mergedObject = Object.assign({}, innerJSONObject, dmaParams);
-						updatedValue = JSON.stringify(mergedObject);
-					} catch (error) {
-						console.error(`setDMAParams:: ${value} is not a valid JSON string`);
-					}
-				}
-				if (updatedValue) {
-					data[value] = updatedValue;
-				}
-			}
-			break;
 		}
 	}
 };
 
+
+/**
+ * @param {?} value
+ * Check if given value is boolean or not
+ */
+ utils.isBoolean = function(value) {
+	return (value === true || value === false);
+};
 
 /**
  * @param {String} url

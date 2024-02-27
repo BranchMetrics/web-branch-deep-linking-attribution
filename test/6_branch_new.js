@@ -104,86 +104,65 @@ describe('Branch - new', function() {
 			branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion, dmaObj.adPersonalizationConsent, dmaObj.adUserDataUsageConsent);
 			sinon.assert.notCalled(storageSetStub);
 		});
-		it('should default adPersonalizationConsent if eeaRegion is true', function() {
+		it('should log warning if eeaRegion is not boolean', function() {
 			const thisObj = {
 				_storage: {
 					set: () => {}
 				},
 				_queue: task_queue()
 			};
-			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
-			const dmaObj = {};
-			dmaObj.eeaRegion = true;
-			dmaObj.adPersonalizationConsent = false;
-			dmaObj.adUserDataUsageConsent = false;
-			const stringifieddmaObj = JSON.stringify(dmaObj);
-			branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion);
-			sinon.assert.calledWith(storageSetStub, 'branch_dma_data', stringifieddmaObj, true);
-		});
-		it('should default adUserDataUsageConsent if eeaRegion is true', function() {
-			const thisObj = {
-				_storage: {
-					set: () => {}
-				},
-				_queue: task_queue()
-			};
-			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
-			const dmaObj = {};
-			dmaObj.eeaRegion = true;
-			dmaObj.adPersonalizationConsent = false;
-			dmaObj.adUserDataUsageConsent = false;
-			const stringifieddmaObj = JSON.stringify(dmaObj);
-			branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion);
-			sinon.assert.calledWith(storageSetStub, 'branch_dma_data', stringifieddmaObj, true);
-		});
-		it('should default adPersonalizationConsent if eeaRegion is false', function() {
-			const thisObj = {
-				_storage: {
-					set: () => {}
-				},
-				_queue: task_queue()
-			};
-			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
-			const dmaObj = {};
-			dmaObj.eeaRegion = false;
-			dmaObj.adPersonalizationConsent = false;
-			dmaObj.adUserDataUsageConsent = false;
-			const stringifieddmaObj = JSON.stringify(dmaObj);
-			branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion);
-			sinon.assert.calledWith(storageSetStub, 'branch_dma_data', stringifieddmaObj, true);
-		});
-		it('should default adUserDataUsageConsent if eeaRegion is false', function() {
-			const thisObj = {
-				_storage: {
-					set: () => {}
-				},
-				_queue: task_queue()
-			};
-			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
-			const dmaObj = {};
-			dmaObj.eeaRegion = false;
-			dmaObj.adPersonalizationConsent = false;
-			dmaObj.adUserDataUsageConsent = false;
-			const stringifieddmaObj = JSON.stringify(dmaObj);
-			branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion);
-			sinon.assert.calledWith(storageSetStub, 'branch_dma_data', stringifieddmaObj, true);
-		});
-		it('should log error if setDMAParamsForEEA is called without setting eeaRegion', function() {
-			const thisObj = {
-				_storage: {
-					set: () => {}
-				},
-				_queue: task_queue()
-			};
-			sandbox.stub(thisObj._storage, 'set').throws(new Error('Mock error'));
-			const consoleErrorStub = sandbox.stub(console, 'error');
+			const consoleErrorStub = sandbox.stub(console, 'warn');
 			try {
-				branch_instance.setDMAParamsForEEA.call(thisObj);
+				const dmaObj = {};
+				dmaObj.eeaRegion = null;
+				dmaObj.adPersonalizationConsent = true;
+				dmaObj.adUserDataUsageConsent = true;
+				branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion, dmaObj.adPersonalizationConsent, dmaObj.adUserDataUsageConsent);
 
 			} catch (e) {
 
 			}
-			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::DMA parameters for EEA cannot be null');
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::DMA parameter eeaRegion must be boolean');
+		});
+		it('should log warning if adPersonalizationConsent is not boolean', function() {
+			const thisObj = {
+				_storage: {
+					set: () => {}
+				},
+				_queue: task_queue()
+			};
+			const consoleErrorStub = sandbox.stub(console, 'warn');
+			try {
+				const dmaObj = {};
+				dmaObj.eeaRegion = true;
+				dmaObj.adPersonalizationConsent = null;
+				dmaObj.adUserDataUsageConsent = true;
+				branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion, dmaObj.adPersonalizationConsent, dmaObj.adUserDataUsageConsent);
+
+			} catch (e) {
+
+			}
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::DMA parameter adPersonalizationConsent must be boolean');
+		});
+		it('should log warning if eeaRegion is not boolean', function() {
+			const thisObj = {
+				_storage: {
+					set: () => {}
+				},
+				_queue: task_queue()
+			};
+			const consoleErrorStub = sandbox.stub(console, 'warn');
+			try {
+				const dmaObj = {};
+				dmaObj.eeaRegion = true;
+				dmaObj.adPersonalizationConsent = true;
+				dmaObj.adUserDataUsageConsent = null;
+				branch_instance.setDMAParamsForEEA.call(thisObj, dmaObj.eeaRegion, dmaObj.adPersonalizationConsent, dmaObj.adUserDataUsageConsent);
+
+			} catch (e) {
+
+			}
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::DMA parameter adUserDataUsageConsent must be boolean');
 		});
 		it('should catch and log exception', function() {
 			const thisObj = {
@@ -204,7 +183,7 @@ describe('Branch - new', function() {
 			} catch (e) {
 
 			}
-			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::An error occured while setting DMA parameters for EEA', sinon.match.instanceOf(Error));
+			sinon.assert.calledWith(consoleErrorStub, 'setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA', sinon.match.instanceOf(Error));
 		});
 	});
 	describe('setAPIUrl', function() {
