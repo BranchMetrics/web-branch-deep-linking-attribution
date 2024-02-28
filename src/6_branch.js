@@ -217,7 +217,7 @@ Branch.prototype._api = function(resource, obj, callback) {
 	}
 	if (utils.shouldAddDMAParams(resource.endpoint)) {
 		var dmaData = this._storage.get('branch_dma_data', true);
-		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : {};
+		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : null;
 	}
 	if (resource.endpoint !== '/_r') {
 		resource.destination = config.api_endpoint;
@@ -1957,14 +1957,31 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  */
 Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, function(done, eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
 	try {
-		var dmaObj = {};
-		dmaObj.eeaRegion = eeaRegion || false;
-		dmaObj.adPersonalizationConsent = adPersonalizationConsent || false;
-		dmaObj.adUserDataUsageConsent = adUserDataUsageConsent || false;
+		const validateParam = (param, paramName) => {
+			if (!utils.isBoolean(param)) {
+				console.warn(`setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`);
+				return false;
+			}
+			return true;
+		};
+		const isValid = (
+			validateParam(eeaRegion, "eeaRegion") &&
+			validateParam(adPersonalizationConsent, "adPersonalizationConsent") &&
+			validateParam(adUserDataUsageConsent, "adUserDataUsageConsent")
+		);
+		if (!isValid) {
+			return;
+		}
+
+		const dmaObj = {
+			eeaRegion,
+			adPersonalizationConsent,
+			adUserDataUsageConsent
+		};
+
 		this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
-	}
-	catch (e) {
-		console.error("setDMAParamsForEEA::An error occured while setting DMA parameters for EEA", e);
+	} catch (e) {
+		console.error("setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA", e);
 	}
 	done();
 }, true);
