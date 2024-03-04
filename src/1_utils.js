@@ -1337,11 +1337,10 @@ utils.shouldAddDMAParams = function(endPointURL) {
 utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
 	const v1_DMAEndPoints = [ "/v1/open", "/v1/pageview" ];
 	const v2_DMAEndPoints = [ "/v2/event/standard", "/v2/event/custom" ];
-	const dmaParams = {
-		dma_eea: dmaObj['eeaRegion'],
-		dma_ad_personalization: dmaObj['adPersonalizationConsent'],
-		dma_ad_user_data: dmaObj['adUserDataUsageConsent']
-	};
+	const dmaParams = {};
+	dmaParams['dma_eea'] = dmaObj['eeaRegion'];
+	dmaParams['dma_ad_personalization'] = dmaObj['adPersonalizationConsent'];
+	dmaParams['dma_ad_user_data'] = dmaObj['adUserDataUsageConsent'];
 	if (v1_DMAEndPoints.includes(endPoint)) {
 		Object.assign(data, dmaParams);
 	}

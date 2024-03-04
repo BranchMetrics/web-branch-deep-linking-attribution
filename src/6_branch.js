@@ -1973,11 +1973,10 @@ Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, func
 			return;
 		}
 
-		const dmaObj = {
-			eeaRegion,
-			adPersonalizationConsent,
-			adUserDataUsageConsent
-		};
+		const dmaObj = {};
+		dmaObj['eeaRegion'] = eeaRegion;
+		dmaObj['adPersonalizationConsent'] = adPersonalizationConsent;
+		dmaObj['adUserDataUsageConsent'] = adUserDataUsageConsent;
 
 		this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
 	} catch (e) {
