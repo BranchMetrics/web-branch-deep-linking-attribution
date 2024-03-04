@@ -3,6 +3,17 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.82.0] - 2024-02-15
+- feat(EMT-111): add setDMAParamsForEEA method
+- feat(SDK-2237): add setAPIUrl getAPIUrl methods
+- fix(MLP-13): prevent main inside body from taking total height of the overlay journeys
+
+## [2.81.0] - 2024-01-18
+- feat(SDK-2101): add setRequestMetadata method
+- fix(BUX-2863): fix focus getting trapped on banner
+- feat(SDK-2196): add banner method deprecation warning
+- fix(MLP-13): Update journey display criterion to include desktop, rename mobileUserAgent to getPlatformByUserAgent
+
 ## [2.80.0] - 2023-09-14
 - fix(SDK-2113): send session_link_click_id
 

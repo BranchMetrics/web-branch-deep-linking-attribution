@@ -14,7 +14,7 @@
   * @class Server
   * @constructor
   */
- var Server = function() { };
+ Server = function() { };
 
  Server.prototype._jsonp_callback_index = 0;
 
@@ -127,9 +127,19 @@
 		}
 	}
 	else if (resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss') {
-		// /v1/pageview and v1/dismiss require custom keys to be available in the post body due
-		// to .setBranchViewData() call so the logic above won't work
 		utils.merge(d, data);
+		if (d['branch_requestMetadata']) {
+			delete d['branch_requestMetadata'];
+		}
+	}
+	if (data.hasOwnProperty("branch_requestMetadata") && data["branch_requestMetadata"] && !(resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss')) {
+		d['metadata'] = safejson.stringify(data["branch_requestMetadata"]);
+	}
+	if (data['branch_dma_data']) {
+		utils.setDMAParams(d, data['branch_dma_data'], resource.endpoint);
+		if (d['branch_dma_data']) {
+			delete d['branch_dma_data'];
+		}
 	}
 
 	if (resource.method === 'POST') {

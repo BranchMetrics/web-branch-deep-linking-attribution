@@ -29,6 +29,12 @@ utils.timeSinceNavigationStart = function() {
 	return (Date.now() - window.performance.timing.navigationStart).toString();
 };
 utils.currentRequestBrttTag = "";
+utils.allowDMAParamURLMap = {
+	"/v1/open": "",
+	"/v1/pageview": "",
+	"/v2/event/standard": "user_data",
+	"/v2/event/custom": "user_data"
+};
 utils.calculateBrtt = function(startTime) {
 	if (!startTime || typeof startTime !== "number") {
 		return null;
@@ -511,7 +517,7 @@ function isIOS(ua) {
 	return ua && /(iPad|iPod|iPhone)/.test(ua);
 }
 
-utils.mobileUserAgent = function() {
+utils.getPlatformByUserAgent = function() {
 	var ua = navigator.userAgent;
 	if (ua.match(/android/i)) {
 		return 'android';
@@ -544,7 +550,10 @@ utils.mobileUserAgent = function() {
 	) {
 		return "kindle";
 	}
-	return false;
+	if (ua.match(/(Windows|Macintosh|Linux)/i)) {
+		return 'desktop';
+	}
+	return "other";
 };
 
 /**
@@ -1320,3 +1329,64 @@ utils.removeTrailingDotZeros = function(versionNumber) {
 	}
 	return versionNumber;
 };
+
+utils.shouldAddDMAParams = function(endPointURL) {
+	return utils.allowDMAParamURLMap.hasOwnProperty(endPointURL);
+};
+
+utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
+	const DMA_EEA = "dma_eea";
+	const DMA_Ad_Personalization = "dma_ad_personalization";
+	const DMA_Ad_User_Data = "dma_ad_user_data";
+
+	const dmaParams = {
+		[DMA_EEA]: dmaObj.eeaRegion || false,
+		[DMA_Ad_Personalization]: dmaObj.adPersonalizationConsent || false,
+		[DMA_Ad_User_Data]: dmaObj.adUserDataUsageConsent || false
+	};
+
+	const allowDMAParamURLMap = utils.allowDMAParamURLMap;
+
+	for (const [key, value] of Object.entries(allowDMAParamURLMap)) {
+		if (endPoint.includes(key)) {
+
+			if (value === '') {
+				Object.assign(data, dmaParams);
+			}
+			else {
+				let updatedValue;
+				const valueExists = value in data;
+				if (!valueExists || data[value] === '') {
+					updatedValue = JSON.stringify(dmaParams);
+				}
+				else {
+					try {
+						const innerJSONObject = JSON.parse(data[value]);
+						const mergedObject = Object.assign({}, innerJSONObject, dmaParams);
+						updatedValue = JSON.stringify(mergedObject);
+					} catch (error) {
+						console.error(`setDMAParams:: ${value} is not a valid JSON string`);
+					}
+				}
+				if (updatedValue) {
+					data[value] = updatedValue;
+				}
+			}
+			break;
+		}
+	}
+};
+
+
+/**
+ * @param {String} url
+ * A utility function to validate url
+ */
+utils.isValidURL = function(url) {
+	if (!url || url.trim() === "") {
+		return false;
+	}
+	var urlPattern = new RegExp('^(https?)://((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$', 'i');
+	return urlPattern.test(url);
+};
+
