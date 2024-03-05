@@ -43,7 +43,7 @@
     "commitizen": "^4.3.0",
     "cz-customizable": "^7.0.0",
     "falafel": "2.2.5",
-    "google-closure-compiler": "^20230802.0.0",
+    "google-closure-compiler": "^20231112.0.0",
     "google-closure-deps": "^20230802.0.0",
     "google-closure-library": "^20230802.0.0",
     "husky": "^8.0.0",
