@@ -292,7 +292,12 @@
 		callback(new Error(utils.messages.timeout), null, 504);
 	};
 	req.onerror = function(e) {
-		callback(new Error(e.error || ('Error in API: ' + req.status)), null, req.status);
+		var url = req.responseURL || 'Unknown';
+		var status = req.status || 'No status available';
+		var responseText = req.responseText || 'No response text available';
+		var errorMessage = 'Error in API: URL - ' + url + ', Status - ' + status + ', Response - ' + responseText;
+		console.log(errorMessage);
+		callback(new Error(e.error || errorMessage), null, req.status);
 	};
 	req.onreadystatechange = function() {
 		var data;
@@ -326,7 +331,12 @@
 					callback(req['responseText'], null, req['status']);
 				}
 				else {
-					callback(new Error('Error in API: ' + req.status), null, req.status);
+					var url = req.responseURL || 'Unknown';
+					var status = req.status || 'No status available';
+					var responseText = req.responseText || 'No response text available';
+					var errorMessage = 'Error in API: URL - ' + url + ', Status - ' + status + ', Response - ' + responseText;
+					console.log(errorMessage);
+					callback(new Error(errorMessage), null, req.status);
 				}
 			}
 		}
