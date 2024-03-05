@@ -3,6 +3,8 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.84.0] - 2024-02-28
+- fix(SDK-2255): removes defaults for parameter values of setDMAParamsForEEA method
 ## [2.82.0] - 2024-02-15
 - feat(EMT-111): add setDMAParamsForEEA method
 - feat(SDK-2237): add setAPIUrl getAPIUrl methods
