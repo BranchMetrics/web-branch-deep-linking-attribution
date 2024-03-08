@@ -16,6 +16,7 @@ goog.require('config');
 goog.require('safejson');
 goog.require('branch_view');
 goog.require('journeys_utils');
+goog.require('Logger');
 
 /*globals Ti, BranchStorage, require */
 
@@ -132,6 +133,8 @@ Branch = function() {
 	this._storage = /** @type {storage} */ (new storage.BranchStorage(storageMethods)); // jshint ignore:line
 
 	this._server = new Server();
+
+	this._logger = new Logger();
 
 	var sdk = 'web';
 
@@ -373,6 +376,7 @@ Branch.prototype['init'] = wrap(
 		utils.userPreferences.enableExtendedJourneysAssist = options && options['enableExtendedJourneysAssist'] ? options['enableExtendedJourneysAssist'] : utils.userPreferences.enableExtendedJourneysAssist;
 		utils.extendedJourneysAssistExpiryTime = options && options['extendedJourneysAssistExpiryTime'] && Number.isInteger(options['extendedJourneysAssistExpiryTime']) ? options['extendedJourneysAssistExpiryTime'] : utils.extendedJourneysAssistExpiryTime;
 		utils.userPreferences.allowErrorsInCallback = false;
+		this._logger.setLevel(options['logLevel'] || 'error');
 		utils.getClientHints();
 
 		if (utils.userPreferences.trackingDisabled) {
@@ -1008,7 +1012,7 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 
 	}
 	else {
-		console.warn("track method currently supports only pageview event.");
+		this._logger.log('warn', 'track method currently supports only pageview event.');
 	}
 });
 
@@ -1694,6 +1698,7 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 			journeys_utils.animateBannerExit(journeys_utils.banner, true);
 		}
 		else {
+			this._logger.log('info', 'Journey already dismissed.');
 			return done('Journey already dismissed.');
 		}
 	});
@@ -1702,10 +1707,10 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
 	var banner_deprecation_msg = 'The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview';
-	console.warn(banner_deprecation_msg);
+	this._logger.log('warn', banner_deprecation_msg);
 	var platform = utils.getPlatformByUserAgent();
 	if ([ "other", "desktop" ].includes(platform)) {
-		console.info("banner functionality is not supported on this platform");
+		this._logger.log('info', 'banner functionality is not supported on this platform');
 	}
 	else {
 		data = data || {};
@@ -1945,6 +1950,10 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
  Branch.prototype['referringLink'] = function(withExtendedJourneysAssist) {
+	if (!utils.isBoolean(withExtendedJourneysAssist)) {
+		this._logger.log('error', `referringLink: parameter withExtendedJourneysAssist must be boolean`);
+		return;
+	}
 	return this._referringLink(withExtendedJourneysAssist);
 };
 
@@ -1959,7 +1968,7 @@ Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, func
 	try {
 		const validateParam = (param, paramName) => {
 			if (!utils.isBoolean(param)) {
-				console.warn(`setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`);
+				this._logger.log('error', `setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`);
 				return false;
 			}
 			return true;
@@ -1980,7 +1989,7 @@ Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, func
 
 		this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
 	} catch (e) {
-		console.error("setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA", e);
+		this._logger.log('error', 'setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA', e);
 	}
 	done();
 }, true);
@@ -2004,7 +2013,7 @@ Branch.prototype['setRequestMetaData'] = function(key, value) {
 		this.requestMetadata = utils.addPropertyIfNotNull(this.requestMetadata, key, value);
 	}
 	catch (e) {
-		console.error("An error occured while setting request metadata", e);
+		this._logger.log('error', 'An error occured while setting request metadata', e);
 	}
 };
 
@@ -2015,7 +2024,7 @@ Branch.prototype['setRequestMetaData'] = function(key, value) {
  */
 Branch.prototype['setAPIUrl'] = function(url) {
 	if (!utils.isValidURL(url)) {
-		console.error("setAPIUrl: Invalid URL format. Default URL will be set.");
+		this._logger.log('error', 'setAPIUrl: Invalid URL format. Default URL will be set.');
 		return;
 	}
 
