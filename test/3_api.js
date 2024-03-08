@@ -411,41 +411,6 @@ describe('Server', function() {
 			});
 		});
 
-		describe('/_r', function() {
-			beforeEach(function() {
-				requests = [];
-				storage.clear();
-			});
-
-			it('should pass in sdk', function(done) {
-				var assert = testUtils.plan(3, done);
-				server.request(resources._r, testUtils.params(), storage, assert.done);
-				assert.strictEqual(requests.length, 1, 'Request made');
-				assert.strictEqual(
-					requests[0].src,
-					config.app_service_endpoint + '/_r?sdk=web' + config.version +
-					'&_t=79336952217731267' +
-					'&branch_key=' + branch_sample_key +
-					'&callback=branch_callback__' + (server._jsonp_callback_index - 1),
-					'Endpoint correct');
-				requests[0].callback();
-			});
-
-			it('should fail without sdk', function(done) {
-				var assert = testUtils.plan(2, done);
-				server.request(
-					resources._r,
-					testUtils.params({ }, [ 'sdk' ]),
-					storage,
-					function(err) {
-						err = safejson.parse(err.message);
-						assert.strictEqual(err.message, "API request /_r missing parameter sdk");
-					}
-				);
-				assert.strictEqual(requests.length, 0, 'No request made');
-			});
-		});
-
 		describe('/v1/link', function() {
 			beforeEach(function() {
 				requests = [];

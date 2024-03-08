@@ -5,7 +5,7 @@ goog.addDependency('../../../../src/1_utils.js', ['utils'], ['config', 'goog.jso
 goog.addDependency('../../../../src/2_resources.js', ['resources'], ['config', 'utils']);
 goog.addDependency('../../../../src/2_session.js', ['session'], ['goog.json', 'safejson', 'storage', 'utils']);
 goog.addDependency('../../../../src/2_storage.js', ['storage'], ['goog.json', 'utils']);
-goog.addDependency('../../../../src/3_api.js', ['Server'], ['goog.json', 'safejson', 'storage', 'utils'], {'lang': 'es6'});
+goog.addDependency('../../../../src/3_api.js', ['Server'], ['goog.json', 'safejson', 'storage', 'utils']);
 goog.addDependency('../../../../src/3_banner_utils.js', ['banner_utils'], ['safejson', 'storage', 'utils']);
 goog.addDependency('../../../../src/4_banner_css.js', ['banner_css'], ['banner_utils', 'utils']);
 goog.addDependency('../../../../src/4_banner_html.js', ['banner_html'], ['banner_utils', 'session', 'storage', 'utils']);
