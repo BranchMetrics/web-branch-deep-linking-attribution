@@ -5,6 +5,8 @@ CLOSURE_LIBRARY= ./node_modules/google-closure-library/closure
 COMPILER_ARGS=--js $(SOURCES) --externs $(EXTERN) --output_wrapper "(function() {%output%})();" --dependency_mode=PRUNE_LEGACY --language_out ECMASCRIPT_2015 --entry_point branch_instance
 COMPILER_MIN_ARGS=--compilation_level ADVANCED_OPTIMIZATIONS --language_out ECMASCRIPT_2015
 COMPILER_DEBUG_ARGS=--formatting=print_input_delimiter --formatting=pretty_print --warning_level=VERBOSE
+COMPILER_DEV_ARGS=
+KEY_VALUE=
 
 SOURCES=$(CLOSURE_LIBRARY)/goog/base.js\
 $(CLOSURE_LIBRARY)/goog/json/json.js\
@@ -26,8 +28,16 @@ EXTERN=src/extern.js
 VERSION=$(shell grep "version" package.json | perl -pe 's/\s+"version": "(.*)",/$$1/')
 
 ONPAGE_RELEASE=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="https://cdn.branch.io/branch-latest.min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(CLOSURE_COMPILER) | node transform.js branch_sdk))
-ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="dist/build.min.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(CLOSURE_COMPILER) | node transform.js branch_sdk))
+ONPAGE_DEV=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(CLOSURE_COMPILER) | node transform.js branch_sdk))
 ONPAGE_TEST=$(subst ",\",$(shell perl -pe 'BEGIN{$$sub="../dist/build.js"};s\#SCRIPT_URL_HERE\#$$sub\#' src/onpage.js | $(CLOSURE_COMPILER) | node transform.js branch_sdk))
+
+# Check if the target being executed is "dev" and set COMPILER_DEV_ARGS if API_ENDPOINT argument has value
+$(info Building dev...)
+ifeq ($(MAKECMDGOALS),dev)
+    ifneq ($(API_ENDPOINT),)
+        COMPILER_DEV_ARGS := --define='DEFAULT_API_ENDPOINT=$(API_ENDPOINT)'
+    endif
+endif
 
 .PHONY: clean
 
@@ -36,6 +46,9 @@ clean:
 	rm -f dist/** docs/web/3_branch_web.md example.html test/branch-deps.js dist/build.min.js.gz test/integration-test.html
 release: clean all dist/build.min.js.gz
 	@echo "released"
+dev-clean:
+	rm -rf dev/*
+dev: dev-clean dev-build example.html
 
 test/branch-deps.js: $(SOURCES)
 	npx closure-make-deps \
@@ -58,9 +71,15 @@ dist/build.min.js.gz: dist/build.min.js
 	mkdir -p dist && \
 	gzip -c dist/build.min.js > dist/build.min.js.gz
 
+dev-build: $(SOURCES) $(EXTERN)
+	mkdir -p dev && \
+	$(CLOSURE_COMPILER) $(COMPILER_ARGS) $(COMPILER_DEBUG_ARGS) $(COMPILER_DEV_ARGS) > dev/build.js
+
 example.html: src/web/example.template.html
 ifeq ($(MAKECMDGOALS), release)
 	perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > example.html
+else ifeq ($(MAKECMDGOALS),dev)
+	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"; $$b="$(KEY_VALUE)"}; s#// INSERT INIT CODE#$$a#; s#key_place_holder#$$b#' src/web/example.template.html > dev/example.html
 else
 	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > example.html
 endif
