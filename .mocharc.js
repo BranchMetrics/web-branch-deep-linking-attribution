@@ -7,5 +7,5 @@
 
 module.exports = {
   require: ['./node_modules/google-closure-library', './test/branch-deps.js', './node_modules/jsdom-global/register.js', './test/test-utils.js', './node_modules/sinon/lib/sinon.js'],
-  spec: ['./test/0_config.js','./test/0_queue.js','./test/1_utils.js','./test/6_branch_new.js', './test/journeys_utils.js']
+  spec: ['./test/0_config.js','./test/0_queue.js','./test/1_utils.js','./test/6_branch_new.js', './test/journeys_utils.js', './test/8_logger.js']
 };

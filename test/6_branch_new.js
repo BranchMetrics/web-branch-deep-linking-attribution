@@ -6,6 +6,7 @@ var sinon = require('sinon');
 goog.require('Branch');
 goog.require('utils');
 goog.require('task_queue');
+goog.require('Logger');
 
 describe('Branch - new', function() {
 	const sandbox = sinon.createSandbox();
@@ -67,7 +68,8 @@ describe('Branch - new', function() {
 				_storage: {
 					set: () => {}
 				},
-				_queue: task_queue()
+				_queue: task_queue(),
+				_logger: new Logger()
 			};
 			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
 			const dmaObj = {};
@@ -83,7 +85,8 @@ describe('Branch - new', function() {
 				_storage: {
 					set: () => {}
 				},
-				_queue: task_queue()
+				_queue: task_queue(),
+				_logger: new Logger()
 			};
 			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
 			branch_instance.setDMAParamsForEEA.call(thisObj);
@@ -94,7 +97,8 @@ describe('Branch - new', function() {
 				_storage: {
 					set: () => {}
 				},
-				_queue: task_queue()
+				_queue: task_queue(),
+				_logger: new Logger()
 			};
 			const storageSetStub = sandbox.stub(thisObj._storage, 'set');
 			const dmaObj = {};
@@ -109,9 +113,10 @@ describe('Branch - new', function() {
 				_storage: {
 					set: () => {}
 				},
-				_queue: task_queue()
+				_queue: task_queue(),
+				_logger: new Logger()
 			};
-			const consoleErrorStub = sandbox.stub(console, 'warn');
+			const consoleErrorStub = sandbox.stub(console, 'error');
 			try {
 				const dmaObj = {};
 				dmaObj.eeaRegion = null;
@@ -129,9 +134,10 @@ describe('Branch - new', function() {
 				_storage: {
 					set: () => {}
 				},
-				_queue: task_queue()
+				_queue: task_queue(),
+				_logger: new Logger()
 			};
-			const consoleErrorStub = sandbox.stub(console, 'warn');
+			const consoleErrorStub = sandbox.stub(console, 'error');
 			try {
 				const dmaObj = {};
 				dmaObj.eeaRegion = true;
@@ -149,9 +155,10 @@ describe('Branch - new', function() {
 				_storage: {
 					set: () => {}
 				},
-				_queue: task_queue()
+				_queue: task_queue(),
+				_logger: new Logger()
 			};
-			const consoleErrorStub = sandbox.stub(console, 'warn');
+			const consoleErrorStub = sandbox.stub(console, 'error');
 			try {
 				const dmaObj = {};
 				dmaObj.eeaRegion = true;
@@ -169,7 +176,8 @@ describe('Branch - new', function() {
 				_storage: {
 					set: () => {}
 				},
-				_queue: task_queue()
+				_queue: task_queue(),
+				_logger: new Logger()
 			};
 			sandbox.stub(thisObj._storage, 'set').throws(new Error('Mock error'));
 			const consoleErrorStub = sandbox.stub(console, 'error');
