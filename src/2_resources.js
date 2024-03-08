@@ -112,18 +112,6 @@ resources.open = {
 	}
 };
 
-resources._r = {
-	destination: config.app_service_endpoint,
-	endpoint: "/_r",
-	method: utils.httpMethod.GET,
-	jsonp: true,
-	params: {
-		"sdk": validator(true, validationTypes.STRING),
-		"_t": validator(false, validationTypes.STRING),
-		"branch_key": validator(true, validationTypes.STRING)
-	}
-};
-
 resources.linkClick = {
 	destination: "",
 	endpoint: "",
