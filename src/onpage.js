@@ -55,7 +55,11 @@
 		'crossPlatformIds',
 		'lastAttributedTouchData',
 		'setAPIResponseCallback',
-		'qrCode'
+		'qrCode',
+		'setRequestMetaData',
+		'setDMAParamsForEEA',
+		'setAPIUrl',
+		'getAPIUrl'
 	],
 	0
 );

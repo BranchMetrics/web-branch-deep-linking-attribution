@@ -1,69 +1,72 @@
 {
-	"name": "branch-sdk",
-	"version": "2.80.0",
-	"description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
-	"main": "dist/build.min.js",
-	"files": [
-		"dist/build.min.js"
-	],
-	"scripts": {
-		"build": "make",
-		"ci": "npm ci",
-		"clean": "npm-run-all clean:*",
-		"clean:dist": "rimraf dist/*",
-		"clean:coverage": "rimraf .nyc_output coverage",
-		"clean:test-report": "rimraf test-results.json",
-		"clean-and-develop": "npm-run-all ci clean build cover",
-		"commit": "git-cz",
-		"cover": "npm-run-all cover:*",
-		"cover:clean": "npm run clean:coverage",
-	    "cover:report": "npx nyc@latest mocha",
-		"lint": "./lint.sh",
-		"test": "mocha",
-		"test-report": "mocha --reporter json > test-results.json",
-		"builddocs": "jsdox src/3_branch_web.js --output docs/web",
-		"prepare": "husky install"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution.git"
-	},
-	"author": "Dmitri Gaskin <dmitrig01@gmail.com>",
-	"contributors": [
-		"Jagadeesh Karicherla"
-	],
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues",
-		"email": "support@branch.io"
-	},
-	"homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
-	"devDependencies": {
-		"commitizen": "^4.3.0",
-		"cz-customizable": "^7.0.0",
-		"falafel": "2.2.5",
-		"google-closure-compiler": "^20230802.0.0",
-		"google-closure-deps": "^20230802.0.0",
-		"google-closure-library": "^20230802.0.0",
-		"husky": "^8.0.0",
-		"i": "^0.3.7",
-		"jscs": "2.0.0",
-		"jsdom": "21.1.0",
-		"jsdom-global": "3.0.2",
-		"jshint": "^2.13.6",
-		"mocha": "^10.2.0",
-		"npm-run-all": "^4.1.5",
-		"precommit-hook": "3.0.0",
-		"rimraf": "^5.0.1",
-		"sinon": "16.0.0"
-	},
-	"build": "2.71.0",
-	"config": {
-		"commitizen": {
-			"path": "./node_modules/cz-customizable"
-		},
-		"cz-customizable": {
-			"config": ".cz-config.js"
-		}
-	}
+  "name": "branch-sdk",
+  "version": "2.84.0",
+  "description": "Branch Metrics Deep Linking/Smart Banner Web SDK",
+  "main": "dist/build.min.js",
+  "files": [
+    "dist/build.min.js"
+  ],
+  "scripts": {
+    "build": "make",
+    "ci": "npm ci",
+    "clean": "npm-run-all clean:*",
+    "clean:dist": "rimraf dist/*",
+    "clean:coverage": "rimraf .nyc_output coverage",
+    "clean:test-report": "rimraf test-results.json",
+    "clean-and-develop": "npm-run-all ci clean build cover",
+    "commit": "git-cz",
+    "cover": "npm-run-all cover:*",
+    "cover:clean": "npm run clean:coverage",
+    "cover:report": "npx nyc@latest mocha",
+    "lint": "./lint.sh",
+    "test": "mocha",
+    "test-report": "mocha --reporter json > test-results.json",
+    "builddocs": "jsdox src/3_branch_web.js --output docs/web",
+    "prepare": "husky install",
+    "validate": "npm ls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution.git"
+  },
+  "author": "Dmitri Gaskin <dmitrig01@gmail.com>",
+  "contributors": [
+    "Jagadeesh Karicherla"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues",
+    "email": "support@branch.io"
+  },
+  "homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
+  "devDependencies": {
+    "commitizen": "^4.3.0",
+    "cz-customizable": "^7.0.0",
+    "falafel": "2.2.5",
+    "google-closure-compiler": "^20231112.0.0",
+    "google-closure-deps": "^20230802.0.0",
+    "google-closure-library": "^20230802.0.0",
+    "husky": "^8.0.0",
+    "i": "^0.3.7",
+    "jscs": "2.0.0",
+    "jsdom": "21.1.0",
+    "jsdom-global": "3.0.2",
+    "jshint": "^2.13.6",
+    "mocha": "^10.2.0",
+    "npm-run-all": "^4.1.5",
+    "precommit-hook": "3.0.0",
+    "rimraf": "^5.0.1",
+    "sinon": "16.0.0"
+  },
+  "build": "2.71.0",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    }
+  },
+  "pre-commit": [
+    "lint",
+    "validate",
+    "test"
+  ]
 }
