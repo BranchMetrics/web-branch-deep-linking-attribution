@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm run ci
+        run: npm i
 
       - name: Run tests
         run: npm run test-report
@@ -62,7 +62,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm run ci
+        run: npm i
 
       - name: Lint tests
         run: npm run lint
@@ -87,7 +87,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Install dependencies
-        run: npm run ci
+        run: npm i
 
       - name: Call the Build bash script for QA
         run:  bash ${GITHUB_WORKSPACE}/deployment/build-test.sh
