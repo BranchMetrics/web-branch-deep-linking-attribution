@@ -29,6 +29,12 @@ utils.timeSinceNavigationStart = function() {
 	return (Date.now() - window.performance.timing.navigationStart).toString();
 };
 utils.currentRequestBrttTag = "";
+utils.allowDMAParamURLMap = {
+	"/v1/open": "",
+	"/v1/pageview": "",
+	"/v2/event/standard": "user_data",
+	"/v2/event/custom": "user_data"
+};
 utils.calculateBrtt = function(startTime) {
 	if (!startTime || typeof startTime !== "number") {
 		return null;
@@ -511,7 +517,7 @@ function isIOS(ua) {
 	return ua && /(iPad|iPod|iPhone)/.test(ua);
 }
 
-utils.mobileUserAgent = function() {
+utils.getPlatformByUserAgent = function() {
 	var ua = navigator.userAgent;
 	if (ua.match(/android/i)) {
 		return 'android';
@@ -544,7 +550,10 @@ utils.mobileUserAgent = function() {
 	) {
 		return "kindle";
 	}
-	return false;
+	if (ua.match(/(Windows|Macintosh|Linux)/i)) {
+		return 'desktop';
+	}
+	return "other";
 };
 
 /**
@@ -1320,3 +1329,57 @@ utils.removeTrailingDotZeros = function(versionNumber) {
 	}
 	return versionNumber;
 };
+
+utils.shouldAddDMAParams = function(endPointURL) {
+	return utils.allowDMAParamURLMap.hasOwnProperty(endPointURL);
+};
+
+utils.setDMAParams = function(data, dmaObj = {}, endPoint) {
+	const v1_DMAEndPoints = [ "/v1/open", "/v1/pageview" ];
+	const v2_DMAEndPoints = [ "/v2/event/standard", "/v2/event/custom" ];
+	const dmaParams = {
+		dma_eea: dmaObj['eeaRegion'],
+		dma_ad_personalization: dmaObj['adPersonalizationConsent'],
+		dma_ad_user_data: dmaObj['adUserDataUsageConsent']
+	};
+	if (v1_DMAEndPoints.includes(endPoint)) {
+		Object.assign(data, dmaParams);
+	}
+	else if (v2_DMAEndPoints.includes(endPoint)) {
+		try {
+			let user_data;
+			if (!data['user_data']) {
+				user_data = {};
+			}
+			else {
+				user_data = JSON.parse(data['user_data']);
+			}
+			Object.assign(user_data, dmaParams);
+			data['user_data'] = JSON.stringify(user_data);
+		} catch (error) {
+			console.error(`setDMAParams:: ${data['user_data']} is not a valid JSON string`);
+		}
+	}
+};
+
+
+/**
+ * @param {?} value
+ * Check if given value is boolean or not
+ */
+ utils.isBoolean = function(value) {
+	return (value === true || value === false);
+};
+
+/**
+ * @param {String} url
+ * A utility function to validate url
+ */
+utils.isValidURL = function(url) {
+	if (!url || url.trim() === "") {
+		return false;
+	}
+	var urlPattern = new RegExp('^(https?)://((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$', 'i');
+	return urlPattern.test(url);
+};
+
