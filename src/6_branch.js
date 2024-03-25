@@ -129,7 +129,7 @@ Branch = function() {
 
 	var storageMethods = [ 'session', 'cookie', 'pojo' ];
 
-	this._storage = /** @type {storage} */ (new BranchStorage(storageMethods));
+	this._storage = /** @type {storage} */ (new storage.BranchStorage(storageMethods)); // jshint ignore:line
 
 	this._server = new Server();
 
@@ -139,6 +139,7 @@ Branch = function() {
 	this._listeners = [ ];
 
 	this.sdk = sdk + config.version;
+	this.requestMetadata = {};
 
 	this.init_state = init_states.NO_INIT;
 	this.init_state_fail_code = init_state_fail_codes.NO_FAILURE;
@@ -203,7 +204,24 @@ Branch.prototype._api = function(resource, obj, callback) {
 	if (utils.userPreferences.trackingDisabled) {
 		obj['tracking_disabled'] = utils.userPreferences.trackingDisabled;
 	}
+	if (this.requestMetadata) {
+		for (var metadata_key in this.requestMetadata) {
+			if (this.requestMetadata.hasOwnProperty(metadata_key)) {
+				if (!obj["branch_requestMetadata"]) {
+					obj["branch_requestMetadata"] = {};
+				}
+				obj["branch_requestMetadata"][metadata_key] = this.requestMetadata[metadata_key];
+			}
+		}
 
+	}
+	if (utils.shouldAddDMAParams(resource.endpoint)) {
+		var dmaData = this._storage.get('branch_dma_data', true);
+		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : null;
+	}
+	if (resource.endpoint !== '/_r') {
+		resource.destination = config.api_endpoint;
+	}
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
@@ -564,7 +582,7 @@ Branch.prototype['init'] = wrap(
 				}
 			}
 		};
-		if (sessionData && !link_identifier && !utils.getParamValue('branchify_url')) {
+		if (sessionData && sessionData['session_id'] && !link_identifier && !utils.getParamValue('branchify_url')) {
 			// resets data in session storage to prevent previous link click data from being returned to Branch.init()
 			session.update(self._storage, { "data": "" });
 			session.update(self._storage, { "referring_link": "" });
@@ -1683,8 +1701,11 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 });
 
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
-	if (!utils.mobileUserAgent()) {
-		console.info("banner functionality is not supported on desktop");
+	var banner_deprecation_msg = 'The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview';
+	console.warn(banner_deprecation_msg);
+	var platform = utils.getPlatformByUserAgent();
+	if ([ "other", "desktop" ].includes(platform)) {
+		console.info("banner functionality is not supported on this platform");
 	}
 	else {
 		data = data || {};
@@ -1923,6 +1944,90 @@ Branch.prototype['setAPIResponseCallback'] = wrap(callback_params.NO_CALLBACK, f
  * @param {Boolean} withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
- Branch.prototype.referringLink = function(withExtendedJourneysAssist) {
+ Branch.prototype['referringLink'] = function(withExtendedJourneysAssist) {
 	return this._referringLink(withExtendedJourneysAssist);
 };
+
+/***
+ * @function Branch.setDMAParamsForEEA
+ * @param {Boolean} eeaRegion - If European regulations, including the DMA, apply to this user and conversion.
+ * @param {Boolean} adPersonalizationConsent - If End user has granted/denied ads personalization consent.
+ * @param {Boolean} adUserDataUsageConsent - If User has granted/denied consent for 3P transmission of user level data for ads.
+ * Sets the value of parameters required by Google Conversion APIs for DMA Compliance in EEA region.
+ */
+Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, function(done, eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
+	try {
+		const validateParam = (param, paramName) => {
+			if (!utils.isBoolean(param)) {
+				console.warn(`setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`);
+				return false;
+			}
+			return true;
+		};
+		const isValid = (
+			validateParam(eeaRegion, "eeaRegion") &&
+			validateParam(adPersonalizationConsent, "adPersonalizationConsent") &&
+			validateParam(adUserDataUsageConsent, "adUserDataUsageConsent")
+		);
+		if (!isValid) {
+			return;
+		}
+
+		const dmaObj = {
+			eeaRegion,
+			adPersonalizationConsent,
+			adUserDataUsageConsent
+		};
+
+		this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
+	} catch (e) {
+		console.error("setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA", e);
+	}
+	done();
+}, true);
+
+/***
+ * @function Branch.setRequestMetaData
+ * @param {String} key - Request metadata key
+ * @param {String} value - Request metadata value
+ * Sets request metadata that gets passed along with all the API calls except v1/pageview
+ */
+Branch.prototype['setRequestMetaData'] = function(key, value) {
+	try {
+		if ((typeof(key) === 'undefined' || key === null || key.length === 0) || (typeof value === "undefined")) {
+			return;
+		}
+
+		if (this.requestMetadata.hasOwnProperty(key) && value === null) {
+			delete this.requestMetadata[key];
+		}
+
+		this.requestMetadata = utils.addPropertyIfNotNull(this.requestMetadata, key, value);
+	}
+	catch (e) {
+		console.error("An error occured while setting request metadata", e);
+	}
+};
+
+/***
+ * @function Branch.setAPIUrl
+ * @param {String} url - url
+ * Sets a custom base URL for all calls to the Branch API
+ */
+Branch.prototype['setAPIUrl'] = function(url) {
+	if (!utils.isValidURL(url)) {
+		console.error("setAPIUrl: Invalid URL format. Default URL will be set.");
+		return;
+	}
+
+	config.api_endpoint = url;
+};
+
+/***
+ * @function Branch.getAPIUrl
+ * returns the base URL for all calls to the Branch API
+ */
+Branch.prototype['getAPIUrl'] = function() {
+	return config.api_endpoint;
+};
+

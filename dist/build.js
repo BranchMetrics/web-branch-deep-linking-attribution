@@ -96,6 +96,18 @@ $jscomp.polyfill("Array.prototype.includes", function(a) {
     return !1;
   };
 }, "es7", "es3");
+$jscomp.owns = function(a, b) {
+  return Object.prototype.hasOwnProperty.call(a, b);
+};
+$jscomp.polyfill("Object.entries", function(a) {
+  return a ? a : function(b) {
+    var c = [], d;
+    for (d in b) {
+      $jscomp.owns(b, d) && c.push([d, b[d]]);
+    }
+    return c;
+  };
+}, "es8", "es3");
 var COMPILED = !0, goog = goog || {};
 goog.global = this || self;
 goog.exportPath_ = function(a, b, c, d) {
@@ -1071,7 +1083,7 @@ goog.json.Serializer.prototype.serializeObject_ = function(a, b) {
   b.push("}");
 };
 // Input 2
-var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.80.0"};
+var config = {app_service_endpoint:"https://app.link", link_service_endpoint:"https://bnc.lt", api_endpoint:"https://api2.branch.io", version:"2.82.0"};
 // Input 3
 var safejson = {parse:function(a) {
   a = String(a);
@@ -1102,6 +1114,7 @@ utils.timeSinceNavigationStart = function() {
   return (Date.now() - window.performance.timing.navigationStart).toString();
 };
 utils.currentRequestBrttTag = "";
+utils.allowDMAParamURLMap = {"/v1/open":"", "/v1/pageview":"", "/v2/event/standard":"user_data", "/v2/event/custom":"user_data"};
 utils.calculateBrtt = function(a) {
   return a && "number" === typeof a ? (Date.now() - a).toString() : null;
 };
@@ -1315,9 +1328,10 @@ function isSafari13OrGreateriPad(a) {
 function isIOS(a) {
   return a && /(iPad|iPod|iPhone)/.test(a);
 }
-utils.mobileUserAgent = function() {
+utils.getPlatformByUserAgent = function() {
   var a = navigator.userAgent;
-  return a.match(/android/i) ? "android" : a.match(/ipad/i) || isSafari13OrGreateriPad(a) ? "ipad" : a.match(/i(os|p(hone|od))/i) ? "ios" : a.match(/\(BB[1-9][0-9]*;/i) ? "blackberry" : a.match(/Windows Phone/i) ? "windows_phone" : a.match(/Kindle/i) || a.match(/Silk/i) || a.match(/KFTT/i) || a.match(/KFOT/i) || a.match(/KFJWA/i) || a.match(/KFJWI/i) || a.match(/KFSOWI/i) || a.match(/KFTHWA/i) || a.match(/KFTHWI/i) || a.match(/KFAPWA/i) || a.match(/KFAPWI/i) ? "kindle" : !1;
+  return a.match(/android/i) ? "android" : a.match(/ipad/i) || isSafari13OrGreateriPad(a) ? "ipad" : a.match(/i(os|p(hone|od))/i) ? "ios" : a.match(/\(BB[1-9][0-9]*;/i) ? "blackberry" : a.match(/Windows Phone/i) ? "windows_phone" : a.match(/Kindle/i) || a.match(/Silk/i) || a.match(/KFTT/i) || a.match(/KFOT/i) || a.match(/KFJWA/i) || a.match(/KFJWI/i) || a.match(/KFSOWI/i) || a.match(/KFTHWA/i) || a.match(/KFTHWI/i) || a.match(/KFAPWA/i) || a.match(/KFAPWI/i) ? "kindle" : a.match(/(Windows|Macintosh|Linux)/i) ? 
+  "desktop" : "other";
 };
 utils.isSafari11OrGreater = function() {
   var a = navigator.userAgent;
@@ -1647,6 +1661,37 @@ utils.removeTrailingDotZeros = function(a) {
   }
   return a;
 };
+utils.shouldAddDMAParams = function(a) {
+  return utils.allowDMAParamURLMap.hasOwnProperty(a);
+};
+utils.setDMAParams = function(a, b = {}, c) {
+  b = {dma_eea:b.eeaRegion || !1, dma_ad_personalization:b.adPersonalizationConsent || !1, dma_ad_user_data:b.adUserDataUsageConsent || !1};
+  const d = utils.allowDMAParamURLMap;
+  for (const [e, f] of Object.entries(d)) {
+    if (c.includes(e)) {
+      if ("" === f) {
+        Object.assign(a, b);
+      } else {
+        let g;
+        if (f in a && "" !== a[f]) {
+          try {
+            const h = JSON.parse(a[f]), k = Object.assign({}, h, b);
+            g = JSON.stringify(k);
+          } catch (h) {
+            console.error(`setDMAParams:: ${f} is not a valid JSON string`);
+          }
+        } else {
+          g = JSON.stringify(b);
+        }
+        g && (a[f] = g);
+      }
+      break;
+    }
+  }
+};
+utils.isValidURL = function(a) {
+  return a && "" !== a.trim() ? RegExp("^(https?)://((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$", "i").test(a) : !1;
+};
 // Input 5
 var resources = {}, validationTypes = {OBJECT:0, STRING:1, NUMBER:2, ARRAY:3, BOOLEAN:4}, _validator;
 function validator(a, b) {
@@ -1712,7 +1757,8 @@ validationTypes.STRING)})};
 resources.crossPlatformIds = {destination:config.api_endpoint, endpoint:"/v1/cpid", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING)}};
 resources.lastAttributedTouchData = {destination:config.api_endpoint, endpoint:"/v1/cpid/latd", method:utils.httpMethod.POST, params:{user_data:validator(!0, validationTypes.STRING)}};
 // Input 6
-var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, BranchStorage = function(a) {
+var storage = {}, COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY";
+storage.BranchStorage = function(a) {
   for (var b = 0; b < a.length; b++) {
     var c = this[a[b]];
     c = "function" === typeof c ? c() : c;
@@ -1720,7 +1766,8 @@ var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, Branc
       return c._store = {}, c;
     }
   }
-}, prefix = function(a) {
+};
+var prefix = function(a) {
   return "branch_session" === a || "branch_session_first" === a ? a : BRANCH_KEY_PREFIX + a;
 }, trimPrefix = function(a) {
   return a.replace(BRANCH_KEY_PREFIX, "");
@@ -1769,10 +1816,10 @@ var COOKIE_MS = 31536E6, BRANCH_KEY_PREFIX = "BRANCH_WEBSDK_KEY", storage, Branc
     }
   }};
 };
-BranchStorage.prototype.local = function() {
+storage.BranchStorage.prototype.local = function() {
   return webStorage(!0);
 };
-BranchStorage.prototype.session = function() {
+storage.BranchStorage.prototype.session = function() {
   return webStorage(!1);
 };
 var cookies = function() {
@@ -1809,10 +1856,10 @@ var cookies = function() {
     return navigator.cookieEnabled;
   }};
 };
-BranchStorage.prototype.cookie = function() {
+storage.BranchStorage.prototype.cookie = function() {
   return cookies();
 };
-BranchStorage.prototype.pojo = {getAll:function() {
+storage.BranchStorage.prototype.pojo = {getAll:function() {
   return this._store;
 }, get:function(a) {
   return this._store[a] || null;
@@ -1868,9 +1915,11 @@ Server.prototype.getUrl = function(a, b) {
         "undefined" !== typeof c && "" !== c && null !== c && (g[h] = c);
       }
     }
-  } else {
-    "/v1/pageview" !== a.endpoint && "/v1/dismiss" !== a.endpoint || utils.merge(g, b);
+  } else if ("/v1/pageview" === a.endpoint || "/v1/dismiss" === a.endpoint) {
+    utils.merge(g, b), g.branch_requestMetadata && delete g.branch_requestMetadata;
   }
+  b.hasOwnProperty("branch_requestMetadata") && b.branch_requestMetadata && "/v1/pageview" !== a.endpoint && "/v1/dismiss" !== a.endpoint && (g.metadata = safejson.stringify(b.branch_requestMetadata));
+  b.branch_dma_data && (utils.setDMAParams(g, b.branch_dma_data, a.endpoint), g.branch_dma_data && delete g.branch_dma_data);
   if ("POST" === a.method) {
     try {
       var h = g;
@@ -2062,7 +2111,7 @@ var banner_utils = {animationSpeed:250, animationDelay:20, bannerHeight:"76px", 
   a = "number" === typeof a ? new Date() >= new Date(a) : !a;
   var c = b.forgetHide;
   "number" === typeof c && (c = !1);
-  return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (a || c) && (b.showAndroid && "android" === utils.mobileUserAgent() || b.showiPad && "ipad" === utils.mobileUserAgent() || b.showiOS && "ios" === utils.mobileUserAgent() || b.showBlackberry && "blackberry" === utils.mobileUserAgent() || b.showWindowsPhone && "windows_phone" === utils.mobileUserAgent() || b.showKindle && "kindle" === utils.mobileUserAgent());
+  return !document.getElementById("branch-banner") && !document.getElementById("branch-banner-iframe") && (a || c) && (b.showAndroid && "android" === utils.getPlatformByUserAgent() || b.showiPad && "ipad" === utils.getPlatformByUserAgent() || b.showiOS && "ios" === utils.getPlatformByUserAgent() || b.showBlackberry && "blackberry" === utils.getPlatformByUserAgent() || b.showWindowsPhone && "windows_phone" === utils.getPlatformByUserAgent() || b.showKindle && "kindle" === utils.getPlatformByUserAgent());
 }};
 // Input 9
 var banner_css = {banner:function(a) {
@@ -2080,7 +2129,7 @@ banner_css.iframe_position = function(a, b) {
   return "#branch-banner-iframe { position: " + ("top" !== b || a ? "fixed" : "absolute") + "; }\n";
 };
 banner_css.css = function(a, b) {
-  var c = banner_css.banner(a), d = utils.mobileUserAgent();
+  var c = banner_css.banner(a), d = utils.getPlatformByUserAgent();
   "ios" !== d && "ipad" !== d || !a.showiOS ? "android" === d && a.showAndroid ? c += banner_css.mobile + banner_css.android : "blackberry" === d && a.showBlackberry ? c += banner_css.mobile + banner_css.blackberry : "windows_phone" === d && a.showWindowsPhone ? c += banner_css.mobile + banner_css.windows_phone : "kindle" === d && a.showKindle && (c += banner_css.mobile + banner_css.kindle) : c += banner_css.mobile + banner_css.ios;
   c += a.customCSS;
   a.iframe && (c += banner_css.inneriframe, d = document.createElement("style"), d.type = "text/css", d.id = "branch-iframe-css", utils.addNonceAttribute(d), d.innerHTML = banner_css.iframe + banner_css.iframe_position(a.mobileSticky, a.position), (document.head || document.getElementsByTagName("head")[0]).appendChild(d));
@@ -2151,7 +2200,7 @@ var banner_html = {banner:function(a, b) {
   d.className = "branch-animation";
   utils.addNonceAttribute(d);
   d.onload = function() {
-    var e = utils.mobileUserAgent();
+    var e = utils.getPlatformByUserAgent();
     e = "ios" === e || "ipad" === e ? "branch-banner-ios" : "android" === e ? "branch-banner-android" : "branch-banner-other";
     var f = d.contentDocument || d.contentWindow.document;
     f.head = f.createElement("head");
@@ -2202,18 +2251,11 @@ var banner = function(a, b, c, d) {
     banner_css.css(b, e);
     c.channel = c.channel || "app banner";
     k = b.iframe ? e.contentWindow.document : document;
-    if (utils.mobileUserAgent()) {
-      b.open_app = b.open_app;
-      b.append_deeplink_path = b.append_deeplink_path;
-      b.make_new_link = b.make_new_link;
-      b.deepview_type = "banner";
-      a.deepview(c, b);
-      var n = k.getElementById("branch-mobile-action");
-      n && (n.onclick = function(r) {
-        r.preventDefault();
-        a.deepviewCta();
-      });
-    }
+    var n = utils.getPlatformByUserAgent();
+    !["other", "desktop"].includes(n) && (b.open_app = b.open_app, b.append_deeplink_path = b.append_deeplink_path, b.make_new_link = b.make_new_link, b.deepview_type = "banner", a.deepview(c, b), n = k.getElementById("branch-mobile-action")) && (n.onclick = function(r) {
+      r.preventDefault();
+      a.deepviewCta();
+    });
     n = banner_utils.getBodyStyle("margin-top");
     var q = banner_utils.getBodyStyle("margin-bottom");
     banner_utils.addClass(document.body, "branch-banner-is-active");
@@ -2379,7 +2421,7 @@ journeys_utils.addHtmlToIframe = function(a, b, c) {
   a.body = a.createElement("body");
   a.body.innerHTML = b;
   a.body.className = c;
-  (b = a.querySelector('meta[name="accessibility"]')) && "wcag" === b.content && (b = a.createElement("script"), b.type = "text/javascript", b.text = "\n\t\t\tvar  focusableElements =\n\t\t\t\t\t'button, [href], input, select, textarea, [role=\"button\"], h1, [role=\"text\"], .branch-banner-content';\n\t\t\tvar modal = document.getElementById('branch-banner');\n\t\t\tvar focusableContent = modal.querySelectorAll(focusableElements);\n\t\t\tvar firstFocusableElement = focusableContent[0];\n\t\t\tvar lastFocusableElement = focusableContent[focusableContent.length - 1];\n\n\t\t\tdocument.addEventListener('keydown', function(e) {\n\t\t\t\tvar isTabPressed = e.key === 'Tab' || e.keyCode === 9;\n\t\t\t\n\t\t\t\tif (!isTabPressed) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tif (e.shiftKey) {\n\t\t\t\t\tif (document.activeElement === firstFocusableElement) {\n\t\t\t\t\t\tlastFocusableElement.focus();\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t}\n\t\t\t\t} else if (document.activeElement === lastFocusableElement) {\n\t\t\t\t\tfirstFocusableElement.focus();\n\t\t\t\t\te.preventDefault();\n\t\t\t\t}\n\t\t\t});\n\t\t\tsetTimeout(function() { firstFocusableElement.focus() }, 100);\n\t\t", 
+  (b = a.querySelector('meta[name="accessibility"]')) && "wcag" === b.content && (b = a.createElement("script"), b.type = "text/javascript", b.text = "\n\t\t\tvar focusableElements = 'button, [href], input, select, textarea, [role=\"button\"], h1, [role=\"text\"], .branch-banner-content';\n\t\t\tvar modal = document.getElementById('branch-banner');\n\t\t\tvar focusableContent = modal.querySelectorAll(focusableElements);\n\t\t\tvar focusElementIdx = 0;\n\n\t\t\tfunction handleTabKey(e) {\n\t\t\t\tvar isTabPressed = e.key === 'Tab' || e.keyCode === 9;\n\t\t\t\n\t\t\t\tif (!isTabPressed) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tif (e.shifKey) {\n\t\t\t\t\tif (focusElementIdx <= 0) {\n\t\t\t\t\t\tfocusElementIdx = focusableContent.length - 1;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tfocusElementIdx = focusElementIdx - 1;\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tif (focusElementIdx >= focusableContent.length - 1) {\n\t\t\t\t\t\tfocusElementIdx = 0;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tfocusElementIdx = focusElementIdx + 1;\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tfocusableContent[focusElementIdx].focus();\n\t\t\t\te.preventDefault();\n\t\t\t}\n\n\t\t\tfunction autoFocus(delay) {\n\t\t\t\tsetTimeout(function() { focusableContent[focusElementIdx].focus() }, delay);\n\t\t\t}\n\n\t\t\tdocument.addEventListener('keydown', handleTabKey);\n\t\t\tautoFocus(100);\n\t\t\t\n\t\t", 
   a.querySelector("body").append(b));
 };
 journeys_utils.addIframeOuterCSS = function(a, b) {
@@ -2408,12 +2450,21 @@ journeys_utils.addIframeOuterCSS = function(a, b) {
   document.head.appendChild(c);
 };
 function generateIframeOuterCSS(a) {
-  var b = a = "";
+  var b = "";
+  a = "";
   document.body.style.transition = "";
   document.getElementById("branch-banner-iframe") && (document.getElementById("branch-banner-iframe").style.transition = "");
-  journeys_utils.entryAnimationDisabled || (a = "body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n", document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", b = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;");
-  return (a ? a : "") + ("#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + b + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + 
-  "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }");
+  journeys_utils.entryAnimationDisabled || (b = "body { -webkit-transition: all " + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease; }\n", document.body.style.transition = "all 0" + 1.5 * journeys_utils.animationSpeed / 1000 + "s ease", a = "-webkit-transition: all " + journeys_utils.animationSpeed / 1000 + "s ease; transition: all 0" + journeys_utils.animationSpeed / 1000 + "s ease;");
+  b = "" + (b || "");
+  if (journeys_utils.isDesktopJourney) {
+    var c = journeys_utils.bannerHeight, d = journeys_utils.bannerWidth, e = journeys_utils.sticky;
+    "overlay" === journeys_utils.journeyVariant && (d = c = "100%!important", e = "fixed");
+    b = b + ("#branch-banner-iframe-embed { z-index: 99999!important; height: " + c + "; width: " + d + "; padding: 0px!important; margin: 0px!important; ; position: " + e + "; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: 100%; left: 0; right: 0; border: 0; height: 100%!important; width: 100%!important; ") + (a + "; position: " + e + "; }\n");
+  } else {
+    b += "#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: " + journeys_utils.bannerHeight + "; z-index: 99999; " + a + " }\n#branch-banner-iframe { position: " + journeys_utils.sticky + "; }\n@media only screen and (orientation: landscape) { body { " + ("top" === journeys_utils.position ? "margin-top: " : "margin-bottom: ") + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + 
+    "; }\n#branch-banner-iframe { height: " + (journeys_utils.isFullPage ? journeys_utils.windowWidth + "px" : journeys_utils.bannerHeight) + "; }";
+  }
+  return b;
 }
 journeys_utils.addIframeInnerCSS = function(a, b) {
   var c = document.createElement("style");
@@ -2423,7 +2474,8 @@ journeys_utils.addIframeInnerCSS = function(a, b) {
   utils.addNonceAttribute(c);
   b = a.contentWindow.document;
   b.head.appendChild(c);
-  if (journeys_utils.isHalfPage || journeys_utils.isFullPage) {
+  c = journeys_utils.isDesktopJourney && "overlay" === journeys_utils.journeyVariant;
+  if ((journeys_utils.isHalfPage || journeys_utils.isFullPage) && !c) {
     c = b.getElementsByClassName("branch-banner-dismiss-background")[0];
     var d = b.getElementsByClassName("branch-banner-content")[0];
     !c && d && (d.style.height = journeys_utils.bannerHeight);
@@ -2606,6 +2658,9 @@ journeys_utils.setJourneyLinkData = function(a) {
   var b = {banner_id:journeys_utils.branchViewId};
   a && "object" === typeof a && 0 < Object.keys(a || {}).length && (utils.removePropertiesFromObject(a, ["browser_fingerprint_id", "app_id", "source", "open_app", "link_click_id"]), b.journey_link_data = {}, utils.merge(b.journey_link_data, a));
   journeys_utils.journeyLinkData = b;
+  journeys_utils.journeyType = b.journey_link_data.type || null;
+  journeys_utils.isDesktopJourney = "desktop" === b.journey_link_data.type;
+  journeys_utils.journeyVariant = b.journey_link_data.variant || null;
 };
 journeys_utils.getValueForKeyInBranchViewData = function(a) {
   return journeys_utils && journeys_utils.branch && journeys_utils.branch._branchViewData && journeys_utils.branch._branchViewData.data ? journeys_utils.branch._branchViewData.data[a] : !1;
@@ -2667,9 +2722,11 @@ function renderHtmlBlob(a, b, c, d) {
   journeys_utils.getJsAndAddToParent(b);
   var h = journeys_utils.getIframeCss(b);
   b = journeys_utils.removeScriptAndCss(b);
+  a = document.createElement("div");
+  a.id = "branch-banner-iframe-embed";
   var k = journeys_utils.createIframe();
   k.onload = function() {
-    journeys_utils.addHtmlToIframe(k, b, utils.mobileUserAgent());
+    journeys_utils.addHtmlToIframe(k, b, utils.getPlatformByUserAgent());
     journeys_utils.addIframeOuterCSS(h, f);
     journeys_utils.addIframeInnerCSS(k, g);
     journeys_utils.addDynamicCtaText(k, e);
@@ -2677,7 +2734,7 @@ function renderHtmlBlob(a, b, c, d) {
     journeys_utils.animateBannerEntrance(k, h);
     d(k);
   };
-  document.body.appendChild(k);
+  journeys_utils.isDesktopJourney ? (a.appendChild(k), document.body.appendChild(a)) : document.body.appendChild(k);
   return k;
 }
 function _areJourneysDismissedGlobally(a) {
@@ -2689,7 +2746,7 @@ function _areJourneysDismissedGlobally(a) {
   return !1;
 }
 branch_view.shouldDisplayJourney = function(a, b, c) {
-  return !checkPreviousBanner() && utils.mobileUserAgent() && a.event_data && a.template ? c ? !0 : !a.event_data.branch_view_data.id || b && b.no_journeys || _areJourneysDismissedGlobally(journeys_utils.branch) ? (branch_view.callback_index = 1, !1) : !0 : !1;
+  return !checkPreviousBanner() && "other" != utils.getPlatformByUserAgent() && a.event_data && a.template ? c ? !0 : !a.event_data.branch_view_data.id || b && b.no_journeys || _areJourneysDismissedGlobally(journeys_utils.branch) ? (branch_view.callback_index = 1, !1) : !0 : !1;
 };
 branch_view.incrementPageviewAnalytics = function(a) {
   a = {event:"pageview", journey_displayed:!0, audience_rule_id:a.audience_rule_id, branch_view_id:a.branch_view_id};
@@ -2803,10 +2860,11 @@ var default_branch, callback_params = {NO_CALLBACK:0, CALLBACK_ERR:1, CALLBACK_E
     return default_branch || (default_branch = new Branch()), default_branch;
   }
   this._queue = task_queue();
-  this._storage = new BranchStorage(["session", "cookie", "pojo"]);
+  this._storage = new storage.BranchStorage(["session", "cookie", "pojo"]);
   this._server = new Server();
   this._listeners = [];
   this.sdk = "web" + config.version;
+  this.requestMetadata = {};
   this.init_state = init_states.NO_INIT;
   this.init_state_fail_code = init_state_fail_codes.NO_FAILURE;
   this.init_state_fail_details = null;
@@ -2821,8 +2879,15 @@ Branch.prototype._api = function(a, b, c) {
   (a.params && a.params.sdk || a.queryPart && a.queryPart.sdk) && this.sdk && (b.sdk = this.sdk);
   (a.params && a.params.browser_fingerprint_id || a.queryPart && a.queryPart.browser_fingerprint_id) && this.browser_fingerprint_id && (b.browser_fingerprint_id = this.browser_fingerprint_id);
   utils.userPreferences.trackingDisabled && (b.tracking_disabled = utils.userPreferences.trackingDisabled);
-  return this._server.request(a, b, this._storage, function(d, e) {
-    c(d, e);
+  if (this.requestMetadata) {
+    for (var d in this.requestMetadata) {
+      this.requestMetadata.hasOwnProperty(d) && (b.branch_requestMetadata || (b.branch_requestMetadata = {}), b.branch_requestMetadata[d] = this.requestMetadata[d]);
+    }
+  }
+  utils.shouldAddDMAParams(a.endpoint) && (d = this._storage.get("branch_dma_data", !0), b.branch_dma_data = d ? safejson.parse(d) : {});
+  "/_r" !== a.endpoint && (a.destination = config.api_endpoint);
+  return this._server.request(a, b, this._storage, function(e, f) {
+    c(e, f);
   });
 };
 Branch.prototype._referringLink = function(a) {
@@ -3132,23 +3197,25 @@ Branch.prototype.closeJourney = wrap(callback_params.CALLBACK_ERR, function(a) {
   a();
 });
 Branch.prototype.banner = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
-  if (utils.mobileUserAgent()) {
+  console.warn('The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview');
+  var d = utils.getPlatformByUserAgent();
+  if (["other", "desktop"].includes(d)) {
+    console.info("banner functionality is not supported on this platform");
+  } else {
     c = c || {};
     _setBranchViewData.call(null, this, function() {
     }, c);
     "undefined" === typeof b.showAgain && "undefined" !== typeof b.forgetHide && (b.showAgain = b.forgetHide);
-    var d = {icon:utils.cleanBannerText(b.icon) || "", title:utils.cleanBannerText(b.title) || "", description:utils.cleanBannerText(b.description) || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:utils.cleanBannerText(b.openAppButtonText) || "View in app", downloadAppButtonText:utils.cleanBannerText(b.downloadAppButtonText) || 
+    var e = {icon:utils.cleanBannerText(b.icon) || "", title:utils.cleanBannerText(b.title) || "", description:utils.cleanBannerText(b.description) || "", reviewCount:"number" === typeof b.reviewCount && 0 < b.reviewCount ? Math.floor(b.reviewCount) : null, rating:"number" === typeof b.rating && 5 >= b.rating && 0 < b.rating ? Math.round(2 * b.rating) / 2 : null, openAppButtonText:utils.cleanBannerText(b.openAppButtonText) || "View in app", downloadAppButtonText:utils.cleanBannerText(b.downloadAppButtonText) || 
     "Download App", iframe:"undefined" === typeof b.iframe ? !0 : b.iframe, showiOS:"undefined" === typeof b.showiOS ? !0 : b.showiOS, showiPad:"undefined" === typeof b.showiPad ? !0 : b.showiPad, showAndroid:"undefined" === typeof b.showAndroid ? !0 : b.showAndroid, showBlackberry:"undefined" === typeof b.showBlackberry ? !0 : b.showBlackberry, showWindowsPhone:"undefined" === typeof b.showWindowsPhone ? !0 : b.showWindowsPhone, showKindle:"undefined" === typeof b.showKindle ? !0 : b.showKindle, 
     disableHide:!!b.disableHide, forgetHide:"number" === typeof b.forgetHide ? b.forgetHide : !!b.forgetHide, respectDNT:"undefined" === typeof b.respectDNT ? !1 : b.respectDNT, position:b.position || "top", customCSS:b.customCSS || "", mobileSticky:"undefined" === typeof b.mobileSticky ? !1 : b.mobileSticky, buttonBorderColor:b.buttonBorderColor || "", buttonBackgroundColor:b.buttonBackgroundColor || "", buttonFontColor:b.buttonFontColor || "", buttonBorderColorHover:b.buttonBorderColorHover || 
     "", buttonBackgroundColorHover:b.buttonBackgroundColorHover || "", buttonFontColorHover:b.buttonFontColorHover || "", make_new_link:!!b.make_new_link, open_app:!!b.open_app, immediate:!!b.immediate, append_deeplink_path:!!b.append_deeplink_path};
-    "undefined" !== typeof b.showMobile && (d.showiOS = b.showMobile, d.showAndroid = b.showMobile, d.showBlackberry = b.showMobile, d.showWindowsPhone = b.showMobile, d.showKindle = b.showMobile);
+    "undefined" !== typeof b.showMobile && (e.showiOS = b.showMobile, e.showAndroid = b.showMobile, e.showBlackberry = b.showMobile, e.showWindowsPhone = b.showMobile, e.showKindle = b.showMobile);
     c.data = utils.merge(utils.getHostedDeepLinkData(), c.data);
-    var e = this;
-    e.renderQueue(function() {
-      e.closeBannerPointer = banner(e, d, c, e._storage);
+    var f = this;
+    f.renderQueue(function() {
+      f.closeBannerPointer = banner(f, e, c, f._storage);
     });
-  } else {
-    console.info("banner functionality is not supported on desktop");
   }
   a();
 });
@@ -3188,6 +3255,31 @@ Branch.prototype.setAPIResponseCallback = wrap(callback_params.NO_CALLBACK, func
 }, !0);
 Branch.prototype.referringLink = function(a) {
   return this._referringLink(a);
+};
+Branch.prototype.setDMAParamsForEEA = wrap(callback_params.CALLBACK_ERR, function(a, b, c, d) {
+  try {
+    var e = {};
+    e.eeaRegion = b || !1;
+    e.adPersonalizationConsent = c || !1;
+    e.adUserDataUsageConsent = d || !1;
+    this._storage.set("branch_dma_data", safejson.stringify(e), !0);
+  } catch (f) {
+    console.error("setDMAParamsForEEA::An error occured while setting DMA parameters for EEA", f);
+  }
+  a();
+}, !0);
+Branch.prototype.setRequestMetaData = function(a, b) {
+  try {
+    "undefined" !== typeof a && null !== a && 0 !== a.length && "undefined" !== typeof b && (this.requestMetadata.hasOwnProperty(a) && null === b && delete this.requestMetadata[a], this.requestMetadata = utils.addPropertyIfNotNull(this.requestMetadata, a, b));
+  } catch (c) {
+    console.error("An error occured while setting request metadata", c);
+  }
+};
+Branch.prototype.setAPIUrl = function(a) {
+  utils.isValidURL(a) ? config.api_endpoint = a : console.error("setAPIUrl: Invalid URL format. Default URL will be set.");
+};
+Branch.prototype.getAPIUrl = function() {
+  return config.api_endpoint;
 };
 // Input 17
 var branch_instance = new Branch();
