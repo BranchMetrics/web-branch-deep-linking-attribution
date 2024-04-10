@@ -46,11 +46,11 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 		journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
 		journeys_utils.addDynamicCtaText(iframe, ctaText);
 		const eventData = Object.assign({}, journeys_utils.journeyLinkData);
-		eventData.bannerHeight = journeys_utils.bannerHeight;
-		eventData.isFullPageBanner = journeys_utils.isFullPage;
-		eventData.bannerPagePlacement = journeys_utils.position;
-		eventData.isBannerInline = journeys_utils.sticky === 'absolute';
-		eventData.isBannerSticky = journeys_utils.sticky === 'fixed';
+		eventData['bannerHeight'] = journeys_utils.bannerHeight;
+		eventData['isFullPageBanner'] = journeys_utils.isFullPage;
+		eventData['bannerPagePlacement'] = journeys_utils.position;
+		eventData['isBannerInline'] = journeys_utils.sticky === 'absolute';
+		eventData['isBannerSticky'] = journeys_utils.sticky === 'fixed';
 		journeys_utils.branch._publishEvent('willShowJourney', eventData);
 	
 		journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
