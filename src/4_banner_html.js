@@ -125,7 +125,7 @@ banner_html.iframe = function(options, action, callback) {
 
 	iframe.onload = function() {
 		var bodyClass;
-		var userAgent = utils.mobileUserAgent();
+		var userAgent = utils.getPlatformByUserAgent();
 		if (userAgent === 'ios' || userAgent === 'ipad') {
 			bodyClass = 'branch-banner-ios';
 		}
