@@ -201,4 +201,15 @@ describe('Branch - new', function() {
 			assert.equal(branch_instance.getAPIUrl(), branch_url);
 		});
 	});
+	describe('addListener', function() {
+		it('should fire listener added using addListener for an event', function() {
+			let listenerFired = 0;
+			const listener = function() {
+				listenerFired++;
+			};
+			branch_instance.addListener('willShowJourney', listener);
+			branch_instance._publishEvent('willShowJourney');
+			assert.equal(listenerFired, 1);
+		});
+	});
 });
