@@ -1700,6 +1700,21 @@ Branch.prototype['closeJourney'] = wrap(callback_params.CALLBACK_ERR, function(d
 	done();
 });
 
+Branch.prototype['dismissJourney'] = wrap(callback_params.CALLBACK_ERR, function(done) {
+  var self = this;
+  self['renderQueue'](function() {
+    if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
+      self._publishEvent('didCallJourneyDismiss', journeys_utils.journeyLinkData);
+      journeys_utils.animateBannerExit(journeys_utils.banner);
+      journeys_utils._setJourneyDismiss(journeys_utils.branch._storage, journeys_utils.journeyLinkData["journey_link_data"]["view_id"], journeys_utils.journeyLinkData["journey_link_data"]["journey_id"]);
+    }
+    else {
+      return done('Journey already dismissed.');
+    }
+  });
+  done();
+});
+
 Branch.prototype['banner'] = wrap(callback_params.CALLBACK_ERR, function(done, options, data) {
 	var banner_deprecation_msg = 'The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview';
 	console.warn(banner_deprecation_msg);

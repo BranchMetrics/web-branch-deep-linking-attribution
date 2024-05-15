@@ -34,3 +34,4 @@ index.html
 dist
 .nyc_output
 test-results.json
+.idea
