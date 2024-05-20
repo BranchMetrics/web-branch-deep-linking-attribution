@@ -46,7 +46,7 @@
     "google-closure-compiler": "^20240317.0.0",
     "google-closure-deps": "^20230802.0.0",
     "google-closure-library": "^20230802.0.0",
-    "husky": "^8.0.0",
+    "husky": "^9.0.11",
     "i": "^0.3.7",
     "jscs": "2.0.0",
     "jsdom": "21.1.0",
