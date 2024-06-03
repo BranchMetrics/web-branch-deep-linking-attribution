@@ -1,5 +1,6 @@
 'use strict';
 /*jshint -W079 */
+/*jshint esversion: 6 */
 var sinon = require('sinon');
 goog.require('utils');
 
@@ -1231,6 +1232,252 @@ describe('utils', function() {
 			assert.deepEqual(utils.removeTrailingDotZeros(versionNumber), versionNumber, 'Correctly strip trailing zeros');
 		});
 	});
+	describe('getPlatformByUserAgent', function() {
+		var originalUa = navigator.userAgent;
+		var originalScreenHeight = screen.height;
+		var originalScreenWidth = screen.width;
+		var userAgentsList = {
+			android_chrome: {
+				ua: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.163 Mobile Safari/537.36',
+				platform: 'android'
+			},
+			iOS_safari: {
+				ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1',
+				platform: 'ios'
+			},
+			iOS_chrome: {
+				ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/119.0.6045.169 Mobile/15E148 Safari/604.1',
+				platform: 'ios'
+			},
+			iOS_ipad_safari: {
+				ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Safari/605.1.15',
+				platform: 'ipad'
+			},
+			macOS_safari: {
+				ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+				platform: 'desktop'
+			},
+			macOS_chrome: {
+				ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+				platform: 'desktop'
+			},
+			windows_edge: {
+				ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.2151.93',
+				platform: 'desktop'
+			},
+			windows_chrome: {
+				ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+				platform: 'desktop'
+			},
+			linux_chrome: {
+				ua: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+				platform: 'desktop'
+			}
+
+		};
+
+		function setUserAgent(ua) {
+			Object.defineProperty(window.navigator, 'userAgent', { value: ua });
+		}
+
+		afterEach(function() {
+			setUserAgent(originalUa);
+			Object.defineProperty(window.screen, 'width', { writable: true, configurable: true, value: originalScreenWidth });
+			Object.defineProperty(window.screen, 'height', { writable: true, configurable: true, value: originalScreenHeight });
+		});
+		it('should return "android" for Android chrome user agent', function() {
+			setUserAgent(userAgentsList.android_chrome.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.android_chrome.platform);
+		});
+		it('should return "ios" for ios safari user agent', function() {
+			setUserAgent(userAgentsList.iOS_safari.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.iOS_safari.platform);
+		});
+		it('should return "ios" for ios chrome user agent', function() {
+			setUserAgent(userAgentsList.iOS_chrome.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.iOS_chrome.platform);
+		});
+		it('should return "ipad" for iOS ipad safari user agent', function() {
+			setUserAgent(userAgentsList.iOS_ipad_safari.ua);
+			Object.defineProperty(window.screen, 'width', { writable: true, configurable: true, value: 1024 });
+			Object.defineProperty(window.screen, 'height', { writable: true, configurable: true, value: 1366 });
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.iOS_ipad_safari.platform);
+		});
+		it('should return "desktop" for macOS safari user agent', function() {
+			setUserAgent(userAgentsList.macOS_safari.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.macOS_safari.platform);
+		});
+		it('should return "desktop" for macOS chrome user agent', function() {
+			setUserAgent(userAgentsList.macOS_chrome.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.macOS_chrome.platform);
+		});
+		it('should return "desktop" for windows edge user agent', function() {
+			setUserAgent(userAgentsList.windows_edge.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.windows_edge.platform);
+		});
+		it('should return "desktop" for windows chrome user agent', function() {
+			setUserAgent(userAgentsList.windows_chrome.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.windows_chrome.platform);
+		});
+		it('should return "desktop" for linux chrome user agent', function() {
+			setUserAgent(userAgentsList.linux_chrome.ua);
+			assert.equal(utils.getPlatformByUserAgent(), userAgentsList.linux_chrome.platform);
+		});
+	});
+
+	describe('shouldAddDMAParams', function() {
+		it('should return true for valid endpoints', function() {
+			assert.equal(utils.shouldAddDMAParams('/v1/open'), true);
+			assert.equal(utils.shouldAddDMAParams('/v1/pageview'), true);
+			assert.equal(utils.shouldAddDMAParams('/v2/event/standard'), true);
+			assert.equal(utils.shouldAddDMAParams('/v2/event/custom'), true);
+		});
+
+		it('should return false for invalid endpoints', function() {
+			assert.equal(utils.shouldAddDMAParams('/v3/invalid'), false);
+			assert.equal(utils.shouldAddDMAParams('/v2/others'), false);
+		});
+	});
+
+	describe('setDMAParams', function() {
+		it('should add DMA parameters for valid endpoints: v1/open', () => {
+			const data = {};
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+			utils.setDMAParams(data, dmaObj, '/v1/open');
+			assert.deepEqual(data, { dma_eea: true, dma_ad_personalization: true, dma_ad_user_data: false });
+		});
+		it('should add DMA parameters for valid endpoints: v2/event/standard', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {};
+			utils.setDMAParams(data2, dmaObj, '/v2/event/standard');
+			assert.deepEqual(data2, { "user_data":"{\"dma_eea\":true,\"dma_ad_personalization\":true,\"dma_ad_user_data\":false}" });
+		});
+		it('should add DMA parameters for valid endpoints: v2/event/custom', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {};
+			utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
+			assert.deepEqual(data2, { "user_data":"{\"dma_eea\":true,\"dma_ad_personalization\":true,\"dma_ad_user_data\":false}" });
+		});
+		it('should add DMA parameters for valid endpoints: v2/event/custom', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {
+			};
+			data2.user_data = JSON.stringify({
+				"test": true
+			});
+			utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
+			assert.deepEqual(data2, { "user_data": "{\"test\":true,\"dma_eea\":true,\"dma_ad_personalization\":true,\"dma_ad_user_data\":false}" });
+		});
+		it('should add DMA parameters for valid endpoints: v1/pageview', () => {
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			const data2 = {};
+			utils.setDMAParams(data2, dmaObj, '/v1/pageview');
+			assert.deepEqual(data2, { dma_eea: true, dma_ad_personalization: true, dma_ad_user_data: false });
+		});
+		it('should not add DMA parameters for invalid endpoints: v1/invalid', () => {
+			const data = {};
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			utils.setDMAParams(data, dmaObj, '/v1/invalid');
+			assert.deepEqual(data, {});
+		});
+		it('should not add DMA parameters for invalid endpoints: v1/dismiss', () => {
+			const data = {};
+			const dmaObj = {
+				eeaRegion: true,
+				adPersonalizationConsent: true,
+				adUserDataUsageConsent: false
+			};
+
+			utils.setDMAParams(data, dmaObj, '/v1/dismiss');
+			assert.deepEqual(data, {});
+		});
+	});
+	describe('isValidUrl', function() {
+		// Invalid schemes
+		it('should return false for invalid scheme htt', function() {
+			assert.equal(utils.isValidURL('htt://www.example.com'), false);
+		});
+		it('should return false for missing scheme', function() {
+			assert.equal(utils.isValidURL('://www.example.com'), false);
+		});
+
+		// Invalid domain names
+		it('should return false for missing domain', function() {
+			assert.equal(utils.isValidURL('https://example'), false);
+		});
+		it('should return false for missing domain after dot', function() {
+			assert.equal(utils.isValidURL('https://example.'), false);
+		});
+		it('should return false for missing domain before dot', function() {
+			assert.equal(utils.isValidURL('https://.example.com'), false);
+		});
+
+		// Invalid domain names
+		it('should return false for Invalid domain names', function() {
+			assert.equal(utils.isValidURL('www.example.com'), false);
+		});
+		it('should return false for Invalid domain names 2', function() {
+			assert.equal(utils.isValidURL('example.com'), false);
+		});
+		// Empty URL
+		it('should return false for empty url', function() {
+			assert.equal(utils.isValidURL(''), false);
+		});
+
+		it('should return false for Invalid domain names 2', function() {
+			assert.equal(utils.isValidURL(''), false);
+		});
+
+		it('should return false for null', function() {
+			assert.equal(utils.isValidURL(null), false);
+		});
+
+		it('should return false for undefined', function() {
+			assert.equal(utils.isValidURL(undefined), false);
+		});
+
+		it('should return false for invalid path', function() {
+			assert.equal(utils.isValidURL('https://www.example.com/path with spaces'), false);
+		});
+
+		it('should return true for valid url - https', function() {
+			assert.equal(utils.isValidURL('https://api2.branch.io'), true);
+		});
+
+		it('should return true for valid url - http', function() {
+			assert.equal(utils.isValidURL('http://api2.branch.io'), true);
+		});
+	});
+
 
 	/*
 	describe('journey_cta', function(done) {
