@@ -79,7 +79,9 @@ example.html: src/web/example.template.html
 ifeq ($(MAKECMDGOALS), release)
 	perl -pe 'BEGIN{$$a="$(ONPAGE_RELEASE)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > example.html
 else ifeq ($(MAKECMDGOALS),dev)
-	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"; $$b="$(KEY_VALUE)"}; s#// INSERT INIT CODE#$$a#; s#key_place_holder#$$b#' src/web/example.template.html > dev/example.html
+	perl -pe 'BEGIN{$$b="$(KEY_VALUE)"}; s#key_place_holder#$$b#' src/web/example.template.html > dev/example.template.html
+	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' dev/example.template.html > dev/example.html
+	rm -rf dev/example.template.html
 else
 	perl -pe 'BEGIN{$$a="$(ONPAGE_DEV)"}; s#// INSERT INIT CODE#$$a#' src/web/example.template.html > example.html
 endif
