@@ -247,7 +247,6 @@ resources.pageview = {
 		"is_iframe": validator(false, validationTypes.BOOLEAN),
 		"data": validator(false, validationTypes.OBJECT),
 		"callback_string": validator(false, validationTypes.STRING),
-		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
 		"journey_dismissals": validator(false, validationTypes.OBJECT),
 		"identity_id": validator(false, validationTypes.STRING),
@@ -276,7 +275,6 @@ resources.dismiss = {
 		"is_iframe": validator(false, validationTypes.BOOLEAN),
 		"data": validator(false, validationTypes.OBJECT),
 		"callback_string": validator(false, validationTypes.STRING),
-		"journey_displayed": validator(false, validationTypes.BOOLEAN),
 		"audience_rule_id": validator(false, validationTypes.STRING),
 		"journey_dismissals": validator(false, validationTypes.OBJECT),
 		"dismissal_source": validator(false, validationTypes.STRING)
