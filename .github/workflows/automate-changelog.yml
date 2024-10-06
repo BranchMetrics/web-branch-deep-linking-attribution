@@ -1,0 +1,45 @@
+name: Automate Changelog
+on:
+  workflow_dispatch:
+    inputs:
+      package_version:
+          description: 'Package Version to be added to changelog :'
+          required: true
+          type: 'string'
+            
+      from_tag:
+          description: 'Release tag to pull commits from :'
+          required: true
+          type: 'string'
+env:
+  BRANCH_NAME: '${{ github.event.inputs.branch_name || github.head_ref || github.ref_name  }}'
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout ${{ github.ref_name }}
+        uses: actions/checkout@v3
+      - name: Print inputs
+        run: |
+          echo "input package_version :  ${{ github.event.inputs.package_version }}"
+          echo "input from_tag :  ${{ github.event.inputs.from_tag }}"
+      - name: Call the read-logs bash script for preparing changelog.md
+        run:  bash ${GITHUB_WORKSPACE}/scripts/read-logs.sh ${{ github.event.inputs.from_tag }} ${{ github.event.inputs.package_version }}
+      # Create pull request
+      - name: Create Pull Request
+        run: |
+          VERSION="${{ github.event.inputs.package_version }}"
+          PR_BRANCH="changelog-update-$VERSION"
+
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+
+          git checkout -b $PR_BRANCH
+          git commit -am "docs(release): Changelog update - $VERSION"
+          git push --set-upstream origin $PR_BRANCH
+
+          gh pr create \
+            --title "Changelog update - \`$VERSION\`" \
+            --body "Updated \`CHANGELOG.md\` file for the \`$VERSION\` version." \
+            --base master \
+            --head $PR_BRANCH
