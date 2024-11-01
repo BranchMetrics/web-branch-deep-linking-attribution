@@ -219,9 +219,6 @@ Branch.prototype._api = function(resource, obj, callback) {
 		var dmaData = this._storage.get('branch_dma_data', true);
 		obj["branch_dma_data"] = dmaData ? safejson.parse(dmaData) : null;
 	}
-	if (resource.endpoint !== '/_r') {
-		resource.destination = config.api_endpoint;
-	}
 	return this._server.request(resource, obj, this._storage, function(err, data) {
 		callback(err, data);
 	});
@@ -424,28 +421,7 @@ Branch.prototype['init'] = wrap(
 		var freshInstall = !self.identity_id; // initialized from local storage above
 		self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
 		var fetchLatestBrowserFingerPrintID = function(cb) {
-			var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 			var currentSessionData = session.get(self._storage) || {};
-			var permData = session.get(self._storage, true) || {};
-			if (permData['browser_fingerprint_id']) {
-				params_r['_t'] = permData['browser_fingerprint_id'];
-			}
-
-			if (!utils.isSafari11OrGreater() && !utils.isIOSWKWebView()) {
-				self._api(
-					resources._r,
-					params_r,
-					function(err, browser_fingerprint_id) {
-						if (err) {
-							self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
-							self.init_state_fail_details = err.message;
-						}
-						if (browser_fingerprint_id) {
-							currentSessionData['browser_fingerprint_id'] = browser_fingerprint_id;
-						}
-					}
-				);
-			}
 			if (cb) {
 				cb(null, currentSessionData);
 			}
@@ -591,12 +567,7 @@ Branch.prototype['init'] = wrap(
 			return;
 		}
 
-		var params_r = { "sdk": config.version, "branch_key": self.branch_key };
 		var permData = session.get(self._storage, true) || {};
-
-		if (permData['browser_fingerprint_id']) {
-			params_r['_t'] = permData['browser_fingerprint_id'];
-		}
 
 		if (permData['identity']) {
 			self.identity = permData['identity'];
@@ -606,50 +577,39 @@ Branch.prototype['init'] = wrap(
 		var open_delay = parseInt(utils.getParamValue('[?&]_open_delay_ms'), 10);
 
 		if (!utils.isSafari11OrGreater() && !utils.isIOSWKWebView()) {
+			utils.delay(function() {
 			self._api(
-				resources._r,
-				params_r,
-				function(err, browser_fingerprint_id) {
+				resources.open,
+				{
+					"link_identifier": link_identifier,
+					"browser_fingerprint_id": link_identifier || permData['browser_fingerprint_id'],
+					"identity": permData['identity'] ? permData['identity'] : null,
+					"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
+					"options": options,
+					"initial_referrer": utils.getInitialReferrer(self._referringLink()),
+					"current_url": utils.getCurrentUrl(),
+					"screen_height": utils.getScreenHeight(),
+					"screen_width": utils.getScreenWidth(),
+					"model": utils.userAgentData ? utils.userAgentData.model : null,
+					"os_version": utils.userAgentData ? utils.userAgentData.platformVersion : null
+				},
+				function(err, data) {
 					if (err) {
-						self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
+						self.init_state_fail_code = init_state_fail_codes.OPEN_FAILED;
 						self.init_state_fail_details = err.message;
-						return finishInit(err, null);
 					}
-					utils.delay(function() {
-						self._api(
-							resources.open,
-							{
-								"link_identifier": link_identifier,
-								"browser_fingerprint_id": link_identifier || browser_fingerprint_id,
-								"identity": permData['identity'] ? permData['identity'] : null,
-								"alternative_browser_fingerprint_id": permData['browser_fingerprint_id'],
-								"options": options,
-								"initial_referrer": utils.getInitialReferrer(self._referringLink()),
-								"current_url": utils.getCurrentUrl(),
-								"screen_height": utils.getScreenHeight(),
-								"screen_width": utils.getScreenWidth(),
-								"model": utils.userAgentData ? utils.userAgentData.model : null,
-								"os_version": utils.userAgentData ? utils.userAgentData.platformVersion : null
-							},
-							function(err, data) {
-								if (err) {
-									self.init_state_fail_code = init_state_fail_codes.OPEN_FAILED;
-									self.init_state_fail_details = err.message;
-								}
-								if (!err && typeof data === 'object') {
-									if (data['branch_view_enabled']) {
-										self._branchViewEnabled = !!data['branch_view_enabled'];
-										self._storage.set('branch_view_enabled', self._branchViewEnabled);
-									}
-									if (link_identifier) {
-										data['click_id'] = link_identifier;
-									}
-								}
-								attachVisibilityEvent();
-								finishInit(err, data);
-							}
-						);
-					}, open_delay);
+					if (!err && typeof data === 'object') {
+						if (data['branch_view_enabled']) {
+							self._branchViewEnabled = !!data['branch_view_enabled'];
+							self._storage.set('branch_view_enabled', self._branchViewEnabled);
+						}
+						if (link_identifier) {
+							data['click_id'] = link_identifier;
+						}
+					}
+					attachVisibilityEvent();
+					finishInit(err, data);
+				}, open_delay);
 				}
 			);
 		}
