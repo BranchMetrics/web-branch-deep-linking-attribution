@@ -1,28 +1,22 @@
 {
-  description = "NodeJS 16_x project";
+  description = "web-branch-deep-linking-attribution flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self }:
-    let
-      nixpkgs = nixpkgs;
-      extra-pkgs = packages;
-      utils = utils;
-      system-utils = system-utils;
-    in
+  # each key in the inputs becomes the named argument of the the function below
+  outputs = { self, nixpkgs, utils }:
     utils.lib.eachDefaultSystem (system:
       let
-        stable-pkgs = nixpkgs.legacyPackages.${system};
-        pkgs = stable-pkgs // {
-          extra-pkgs = extra-pkgs.${system};
-        };
-        bazel-os = system-utils.getBazelOs system;
-        nodejs = pkgs.extra-pkgs.nodejs-16_x;
+        pkgs = nixpkgs.legacyPackages.${system};
+        # the oldest nodejs sdk version we can use with public nixpkgs is 18.x
+        # This should be find for our web-sdk
+        nodejs = pkgs.nodejs_18;
       in
       {
+        formatter = pkgs.nixpkgs-fmt;
         devShell = pkgs.mkShell {
           nativeBuildInputs = [
             nodejs
@@ -33,7 +27,6 @@
             fi
           '';
         };
-        formatter = pkgs.nixpkgs-fmt;
       }
     );
 }
