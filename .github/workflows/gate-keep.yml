@@ -2,7 +2,7 @@ name: Gate Keeping
 on:
   push:
 env:
-  NODE_VERSION: 16
+  NODE_VERSION: 18
   JAVA_VERSION: 11
   JAVA_DISTRIBUTION: 'adopt'
 
