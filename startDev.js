@@ -31,7 +31,7 @@ async function startDev() {
                 console.error(`Error executing makefile: ${error.message}`);
                 return;
             }
-            console.log('Dev build successfull.');
+            console.log('Dev build successful.');
             console.log('Starting server...');
             const app = new Koa();
             app.use(serve('dev'));

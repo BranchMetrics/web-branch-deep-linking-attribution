@@ -2,16 +2,16 @@
 
 **Last Updated**: Sep. 24th, 2015
 
-The entire process for releasing new versions of the Branch SDK, and geenrating accompanying doumentation, is enitrley automated.
+The entire process for releasing new versions of the Branch SDK, and generating accompanying documentation, is entirely automated.
 
 ### Features of Build and Release Automation
 + **Makefile**
 	+ Building and minification with Google Closure Compiler
 	+ gzip of minified JavaScript
-	+ Embeding of Branch snipet on the Web testbed
-	+ Embedding of Branch snipet on the integration Mocha.js test page
+	+ Embedding of Branch snippet on the Web testbed
+	+ Embedding of Branch snippet on the integration Mocha.js test page
 	+ Documentation generation from JSDoc style inline comments from `src/3_branch.js`
-	+ Concatenation of a summary README that includes an introduction, most recent Web snipet, and overview of Web Smart Banner
+	+ Concatenation of a summary README that includes an introduction, most recent Web snippet, and overview of Web Smart Banner
 	+ Concatenation of full documentation for Web of an introduction, an automatically generated table of contents, and JSDoc generated function descriptions and spec.
 
 + **Release.sh**
@@ -58,13 +58,6 @@ The markdown files concatenated together to make the Full Web SDK documentation,
 ## Releasing the Web SDK
 The entire release process has been encapsulated into a single shell script: `release.sh`. The release script has a few dependencies you'll need to make sure you have installed: [AWS CLI](http://aws.amazon.com/cli/), [make](http://www.gnu.org/software/make/), and you'll need environment variables to upload the SDK and Web testbed to S3. For convenience, I've placed mine in a simple shell script that I have added to `.gitignore`:
 `aws_access_keys.sh`
-```sh
-#!/bin/bash
 
-export AWS_ACCESS_KEY_ID='ID_GOES_HERE'
-export AWS_SECRET_ACCESS_KEY='ACCESS_KEY_GOES_HERE'
-```
 
-**VERY IMPORTANT**: Do not, in anyway, commit the S3 credentials to this repository. If you store them in a shell script, name it `aws_access_keys.sh`, or add it's name to `.gitignore` so that it is not committed.
-
-The release schell script is a simple wizard. Once your S3 environment variables are set, and you have been added to the Branch npmjs.org account, simple run :`./release.sh` and follow the steps.
+The release shell script is a simple wizard. Once your S3 environment variables are set, and you have been added to the Branch npmjs.org account, simple run :`./release.sh` and follow the steps.

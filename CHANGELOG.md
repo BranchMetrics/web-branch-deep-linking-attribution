@@ -3,6 +3,11 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.85.1] - 2024-11-04
+- Updates qr image download to avoid errors
+## [2.85.0] - 2024-04-10
+- SDK-2236: adds script to launch a local runner
+- updates jsdom, mocha
 ## [2.84.0] - 2024-02-28
 - fix(SDK-2255): removes defaults for parameter values of setDMAParamsForEEA method
 ## [2.82.0] - 2024-02-15
