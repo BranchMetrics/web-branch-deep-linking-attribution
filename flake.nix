@@ -2,25 +2,22 @@
   description = "NodeJS 16_x project";
 
   inputs = {
-    # Specify the source of Home Manager and Nixpkgs.
-    branch-nix.url = "git+ssh://git@github.com/BranchMetrics/nix";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, branch-nix }:
+  outputs = { self }:
     let
-      nixpkgs = branch-nix.nixpkgs;
-      nixpkgs-unstable = branch-nix.nixpkgs-unstable;
-      extra-pkgs = branch-nix.packages;
-      utils = branch-nix.utils;
-      system-utils = branch-nix.system-utils;
+      nixpkgs = nixpkgs;
+      extra-pkgs = packages;
+      utils = utils;
+      system-utils = system-utils;
     in
     utils.lib.eachDefaultSystem (system:
       let
         stable-pkgs = nixpkgs.legacyPackages.${system};
-        unstable-pkgs = nixpkgs.legacyPackages.${system};
         pkgs = stable-pkgs // {
           extra-pkgs = extra-pkgs.${system};
-          unstable = unstable-pkgs;
         };
         bazel-os = system-utils.getBazelOs system;
         nodejs = pkgs.extra-pkgs.nodejs-16_x;
