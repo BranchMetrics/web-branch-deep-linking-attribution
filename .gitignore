@@ -36,3 +36,4 @@ dev
 .nyc_output
 test-results.json
 .idea/
+.direnv/
