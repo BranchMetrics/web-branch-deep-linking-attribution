@@ -1340,22 +1340,22 @@ Branch.prototype['qrCode'] = wrap(
 		this._api(
 			resources.qrCode,
 			utils.cleanLinkData(linkData),
-			(error, rawBuffer) => {
-				if (error) return done(error, null);
+			function(error, rawBuffer) {
+				function QrCode() { }
 
-				const QrCode = {
-					rawBuffer,
-					base64() {
-						if (!this.rawBuffer) throw new Error('QrCode.rawBuffer is empty.');
-						// Encode the Uint8Array to a binary string, then convert to base64
-						const binaryString = Array.from(new Uint8Array(this.rawBuffer))
-							.map(byte => String.fromCharCode(byte))
-							.join('');
-						return btoa(binaryString);
-					}
-				};
-
-				return done(null, QrCode);
+				if (!error) {
+					QrCode['rawBuffer'] = rawBuffer;
+					QrCode['base64'] = function() {
+						// First Encode array buffer as UTF-8 String, then Base64 Encode
+						if (this['rawBuffer']) {
+							const binaryString = Array.from(new Uint8Array(this.rawBuffer))
+								.map(byte => String.fromCharCode(byte))
+								.join('');
+							return btoa(binaryString);						}
+						throw Error('QrCode.rawBuffer is empty.');
+					};
+				}
+				return done(error || null, QrCode || null);
 			}
 		);
 	}

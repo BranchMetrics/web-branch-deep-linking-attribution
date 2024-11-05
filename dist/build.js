@@ -3106,13 +3106,18 @@ Branch.prototype.link = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b) {
 });
 Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b, c, d) {
   utils.cleanLinkData(b).qr_code_settings = safejson.stringify(utils.convertObjectValuesToString(c || {}));
-  this._api(resources.qrCode, utils.cleanLinkData(b), (e, f) => e ? a(e, null) : a(null, {rawBuffer:f, base64() {
-    if (!this.rawBuffer) {
-      throw Error("QrCode.rawBuffer is empty.");
+  this._api(resources.qrCode, utils.cleanLinkData(b), function(e, f) {
+    function g() {
     }
-    const g = Array.from(new Uint8Array(this.rawBuffer)).map(h => String.fromCharCode(h)).join("");
-    return btoa(g);
-  }}));
+    e || (g.rawBuffer = f, g.base64 = function() {
+      if (this.rawBuffer) {
+        const h = Array.from(new Uint8Array(this.rawBuffer)).map(k => String.fromCharCode(k)).join("");
+        return btoa(h);
+      }
+      throw Error("QrCode.rawBuffer is empty.");
+    });
+    return a(e || null, g || null);
+  });
 });
 Branch.prototype.deepview = wrap(callback_params.CALLBACK_ERR, function(a, b, c) {
   var d = this;
