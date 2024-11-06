@@ -1342,16 +1342,16 @@ Branch.prototype['qrCode'] = wrap(
 			utils.cleanLinkData(linkData),
 			function(error, rawBuffer) {
 				function QrCode() { }
-
 				if (!error) {
 					QrCode['rawBuffer'] = rawBuffer;
 					QrCode['base64'] = function() {
 						// First Encode array buffer as UTF-8 String, then Base64 Encode
 						if (this['rawBuffer']) {
-							const binaryString = Array.from(new Uint8Array(this.rawBuffer))
+							const binaryString = Array.from(new Uint8Array(rawBuffer))
 								.map(byte => String.fromCharCode(byte))
 								.join('');
-							return btoa(binaryString);						}
+							return btoa(binaryString);
+						}
 						throw Error('QrCode.rawBuffer is empty.');
 					};
 				}
