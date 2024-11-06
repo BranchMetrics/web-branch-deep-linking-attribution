@@ -3111,7 +3111,7 @@ Branch.prototype.qrCode = wrap(callback_params.CALLBACK_ERR_DATA, function(a, b,
     }
     e || (g.rawBuffer = f, g.base64 = function() {
       if (this.rawBuffer) {
-        const h = Array.from(new Uint8Array(this.rawBuffer)).map(k => String.fromCharCode(k)).join("");
+        const h = Array.from(new Uint8Array(f)).map(k => String.fromCharCode(k)).join("");
         return btoa(h);
       }
       throw Error("QrCode.rawBuffer is empty.");
