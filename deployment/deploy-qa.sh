@@ -33,5 +33,6 @@ NC='\033[0m'
   echo -en "Invalidating cloudfront distribution for staging ...\n"
   aws configure set preview.cloudfront true
   aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-staging-latest.min.js /example-staging
+
 # Exit prompts
 echo -en "${GREEN}Done deploy QA script ...${NC}\n"

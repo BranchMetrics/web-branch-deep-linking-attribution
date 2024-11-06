@@ -8,4 +8,4 @@ var DEFAULT_API_ENDPOINT = 'https://api2.branch.io';
 config.app_service_endpoint = 'https://app.link';
 config.link_service_endpoint = 'https://bnc.lt';
 config.api_endpoint = DEFAULT_API_ENDPOINT;
-config.version = '2.84.0';
+config.version = '2.85.1';
