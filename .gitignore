@@ -37,3 +37,6 @@ dev
 test-results.json
 .idea/
 .direnv/
+dev.config
+dev.html
+example.html

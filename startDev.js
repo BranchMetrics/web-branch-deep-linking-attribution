@@ -1,46 +1,97 @@
 const { exec } = require('child_process');
-const fs = require('fs');
+const fs = require('fs').promises;
 const Koa = require('koa');
 const serve = require('koa-static');
+const path = require('path');
 
-function readDevConfig() {
+const defaultDev = {
+    "APIEndpoint": "https://api2.branch.io",
+    "sdkKey": null,
+    "port": "3000"
+};
+
+async function fileExists(filePath) {
+    try {
+        await fs.access(filePath);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+async function getDevConfig() {
     const devConfigPath = 'dev.config';
-    if (fs.existsSync(devConfigPath)) {
+    if (await fileExists(devConfigPath)) {
         try {
-            const config = JSON.parse(fs.readFileSync(devConfigPath, 'utf8'));
+            const data = await fs.readFile(devConfigPath, 'utf8');
+            const config = JSON.parse(data);
             return config;
         } catch (error) {
             console.error('Error reading dev.config:', error);
         }
+    } else {
+        await fs.writeFile(devConfigPath, JSON.stringify(
+            defaultDev
+        ));
+        return defaultDev;
     }
-    return {};
 }
 
-function writeDevConfig(config) {
+async function writeDevConfig(config) {
     const devConfigPath = 'dev.config';
-    fs.writeFileSync(devConfigPath, JSON.stringify(config, null, 4), 'utf8');
+    await fs.writeFile(devConfigPath, JSON.stringify(config, null, 4), 'utf8');
+}
+
+async function processTemplate(templateFile, outputFile, replacements) {
+    try {
+        let content = await fs.readFile(templateFile, 'utf8');
+
+        // Replace each placeholder with its replacement
+        for (const [placeholder, replacement] of Object.entries(replacements)) {
+            const regex = new RegExp(placeholder, 'g'); // Replace all occurrences
+            content = content.replace(regex, replacement);
+        }
+
+        // Write the updated content back to the output file
+        await fs.writeFile(outputFile, content, 'utf8');
+    } catch (error) {
+        console.error(`Error processing file: ${error}`);
+    }
+}
+
+async function writeExampleHtml(config) {
+    // Define your file paths and replacements
+    const templateFile = path.join(__dirname, 'examples/example.template.html');
+    const outputFile = path.join(__dirname, 'dev.html');
+    const replacements = {
+        'key_place_holder': config.sdkKey,
+        'api_place_holder': config.APIEndpoint,
+        'script_place_holder': './dist/build.js',
+    };
+
+    await processTemplate(templateFile, outputFile, replacements);
+}
+
+function executeBuild(config) {
+    console.log('Building build...');
+    exec(`make`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing makefile: ${error.message}`);
+            return;
+        }
+        console.log('Dev build successful.');
+        console.log('Starting server...');
+        const app = new Koa();
+        app.use(serve('.'));
+        app.listen(config.port, () => {
+            console.log('Server started successfully.');
+            console.log(`Example page running at http://localhost:${config.port}/dev.html`);
+        });
+    });
 }
 
 async function startDev() {
-    let config = readDevConfig();
-
-    function executeBuild() {
-        console.log('Building dev build...');
-        exec(`make dev API_ENDPOINT=${config.APIEndpoint} KEY_VALUE=${config.sdkKey}`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error executing makefile: ${error.message}`);
-                return;
-            }
-            console.log('Dev build successful.');
-            console.log('Starting server...');
-            const app = new Koa();
-            app.use(serve('dev'));
-            app.listen(config.port, () => {
-                console.log('Server started successfully.');
-                console.log(`Example page running at http://localhost:${config.port}/example.html`);
-            });
-        });
-    }
+    const config = await getDevConfig();
 
     if (!config.APIEndpoint || !config.sdkKey || !config.port) {
         const questions = [
@@ -69,18 +120,15 @@ async function startDev() {
             }
         ];
         const { default: inquirer } = await import('inquirer');
-        inquirer.prompt(questions).then(answers => {
-            const { apiEndpoint, sdkKey, port } = answers;
-            config.APIEndpoint = apiEndpoint;
-            config.sdkKey = sdkKey;
-            config.port = port;
-            writeDevConfig(config);
-            executeBuild();
-        });
+        const answers = await inquirer.prompt(questions);
+        const { apiEndpoint, sdkKey, port } = answers;
+        config.APIEndpoint = apiEndpoint;
+        config.sdkKey = sdkKey;
+        config.port = port;
+        await writeDevConfig(config);
     }
-    else{
-        executeBuild();
-    }
+    await writeExampleHtml(config);
+    executeBuild(config);
 }
 
 startDev();
