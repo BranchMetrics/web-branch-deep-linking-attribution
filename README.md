@@ -22,3 +22,8 @@ for full details.
 - [Testing]
 - [Troubleshooting]
 - [Web Full Reference]
+
+# Running locally
+```sh
+node startDev.js
+```
