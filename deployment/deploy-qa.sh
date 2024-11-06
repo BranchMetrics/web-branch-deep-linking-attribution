@@ -24,9 +24,6 @@ NC='\033[0m'
   ./deployment/build-example-html.sh "key_live_feebgAAhbH9Tv85H5wLQhpdaefiZv5Dv" "https://api.stage.branch.io" "https://cdn.branch.io/branch-staging-latest.min.js"
   aws s3 cp example.html s3://branch-cdn/example-staging.html
 
-  ./deployment/build-example-html.sh "key_live_hcnegAumkH7Kv18M8AOHhfgiohpXq5tB" "https://api2.branch.io" "https://cdn.branch.io/branch-latest.min.js"
-  aws s3 cp example.html s3://branch-builds/web-sdk/example.html
-
   echo -en "${GREEN}Pushing to CDN ...${NC}\n"
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-staging-latest.min.js --cache-control "max-age=300"
 

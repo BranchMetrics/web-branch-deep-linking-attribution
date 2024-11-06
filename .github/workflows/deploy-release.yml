@@ -57,7 +57,7 @@ jobs:
           INPUT_SHA: ${{ env.INPUT_SHA }}
 
       - name: Install Node ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -70,16 +70,9 @@ jobs:
       - name: Configure NPM
         run: npm ci
 
-      - name: Publish to NPM
-        run: npm publish
-
-      - name: Publish to s3
+      - name: Release to npm, s3
         run: |
-          make release
-          aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --cache-control "max-age=300"
-          aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest-${{ steps.next-version.outputs.result }}.min.js --cache-control "max-age=300"
-          aws configure set preview.cloudfront true
-          aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js
+          ./release.sh v${{ steps.next-version.outputs.result }}
 
       - name: Create Github Release
         uses: actions/github-script@v7

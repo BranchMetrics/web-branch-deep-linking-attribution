@@ -56,7 +56,7 @@ jobs:
       - name: upload codecov
         uses: codecov/codecov-action@v4
 
-      - name: check in whether updated build files are checked in
+      - name: check whether updated build files are checked in
         run: |
           make
           git diff --exit-code || (echo "Please run \"make\" and commit changes to dist/build.js and dist/build.min.js" && exit 1)
