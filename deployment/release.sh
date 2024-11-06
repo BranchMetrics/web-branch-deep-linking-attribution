@@ -1,34 +1,12 @@
 #!/bin/bash
 
-[ $# -eq 0 ] && { echo "Usage: $0 v1.0.0"; exit 1; }
+[ $# -eq 0 ] && { echo "Usage: $0 1.0.0"; exit 1; }
 
-VERSION_NO_V=$(echo $1 | tr -d "\nv")
+VERSION_NO_V=$1
 VERSION="v"$VERSION_NO_V
 DATE=$(date "+%Y-%m-%d")
 
 echo "Releasing Branch Web SDK"
-
-# check whether on master branch
-branch_name="$(git symbolic-ref HEAD 2>/dev/null)"
-branch_name=${branch_name##refs/heads/}
-if [ $branch_name != "master" ]; then
-  echo "ERROR: not on master branch: "$branch_name
-  exit 1
-fi
-
-# check whether the branch is clean
-check_git_branch() {
-  if [[ $(git status --porcelain 2> /dev/null | tail -n1) != "" ]]
-  then
-    echo 'ERROR: branch dirty'
-    exit 1
-  fi
-}
-
-check_git_branch
-
-sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" src/0_config.js
-sed -i -e "s/version = '.*';$/version = '$VERSION_NO_V';/" test/web-config.js
 
 make release
 

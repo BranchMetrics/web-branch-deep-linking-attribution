@@ -56,11 +56,6 @@ jobs:
       - name: upload codecov
         uses: codecov/codecov-action@v4
 
-      - name: check whether updated build files are checked in
-        run: |
-          make
-          git diff --exit-code || (echo "Please run \"make\" and commit changes to dist/build.js and dist/build.min.js" && exit 1)
-
       - name: Check whether we will be able to make the release
         run: make release
 
@@ -71,6 +66,19 @@ jobs:
           aws-region: us-west-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get the current release version
+        if: ${{ github.ref == 'refs/heads/master' }}
+        id: current-version
+        run: |
+          current_version=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          echo "Current version is $current_version"
+          echo "result=$current_version" >> $GITHUB_OUTPUT
+
+      - name: Write version to files
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          ./deployment/write-versions.sh ${{ steps.current-version.outputs.result }}
 
       - name: Deploy updated builds to staging
         if: ${{ github.ref == 'refs/heads/master' }}

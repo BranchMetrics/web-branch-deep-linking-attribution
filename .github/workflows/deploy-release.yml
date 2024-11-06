@@ -61,18 +61,21 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Bump package.json version
+      - name: Write version to files
         run: |
-          sed -i -e "s/\"version\":.*$/\"version\": \"$GE_NEXT_VERSION\",/" package.json
-        env:
-          GE_NEXT_VERSION: ${{ steps.next-version.outputs.result }}
+          ./deployment/write-versions.sh ${{ steps.next-version.outputs.result }}
 
       - name: Configure NPM
         run: npm ci
 
-      - name: Release to npm, s3
+      - name: Release to npm, s3, prod
         run: |
-          ./release.sh v${{ steps.next-version.outputs.result }}
+          ./deployment/release.sh ${{ steps.next-version.outputs.result }}
+
+      # We deploy to stage to send the updated release numbers. The code should not be any different
+      - name: Release to stage
+        run: |
+          ./deployment/deploy-qa.sh ${{ steps.next-version.outputs.result }}
 
       - name: Create Github Release
         uses: actions/github-script@v7
