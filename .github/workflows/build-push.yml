@@ -13,11 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Add INPUT_SHA env var
-        run: |
-          export INPUT_SHA=$(git rev-parse ${{ github.event.inputs.ref }})
-          echo "INPUT_SHA=`echo $INPUT_SHA`" >> $GITHUB_ENV
-
       - name: Install Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
@@ -79,7 +74,13 @@ jobs:
           repository: BranchMetrics/branch-github-actions
           ref: master
           path: .branch-github-actions
-          token: ${{ secrets.BRANCHLET_ACCESS_TOKEN }}
+          token: ${{ secrets.BRANCHLET_ACCESS_TOKEN_PUBLIC }}
+
+      - name: Add INPUT_SHA env var
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          export INPUT_SHA=$(git rev-parse ${{ github.ref }})
+          echo "INPUT_SHA=`echo $INPUT_SHA`" >> $GITHUB_ENV
 
       - name: Get next release version
         if: ${{ github.ref == 'refs/heads/master' }}
