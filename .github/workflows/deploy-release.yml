@@ -68,9 +68,16 @@ jobs:
       - name: Configure NPM
         run: npm ci
 
-      - name: Release to npm, s3, prod
+      - run: make release
+
+      - name: Publish to s3
         run: |
-          ./deployment/release.sh ${{ steps.next-version.outputs.result }}
+          ./deployment/release-s3.sh ${{ steps.next-version.outputs.result }}
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISHER_TOKEN }}
+        run: npm publish
 
       - name: Create Github Release
         uses: actions/github-script@v7
