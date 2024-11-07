@@ -72,6 +72,15 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Install branch-github-actions
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/checkout@v4
+        with:
+          repository: BranchMetrics/branch-github-actions
+          ref: master
+          path: .branch-github-actions
+          token: ${{ secrets.BRANCHLET_ACCESS_TOKEN }}
+
       - name: Get next release version
         if: ${{ github.ref == 'refs/heads/master' }}
         uses: actions/github-script@v7
