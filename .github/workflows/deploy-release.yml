@@ -1,0 +1,92 @@
+name: Publish Next Release (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Reference git commit to release (e.g. "master", "12341fa")
+        required: true
+        default: master
+
+env:
+  NODE_VERSION: 18
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: AWS, credentials setup
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-west-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Add INPUT_SHA env var
+        run: |
+          export INPUT_SHA=$(git rev-parse ${{ github.event.inputs.ref }})
+          echo "INPUT_SHA=`echo $INPUT_SHA`" >> $GITHUB_ENV
+
+      - name: Install branch-github-actions
+        uses: actions/checkout@v4
+        with:
+          repository: BranchMetrics/branch-github-actions
+          ref: master
+          path: .branch-github-actions
+          token: ${{ secrets.BRANCHLET_ACCESS_TOKEN }}
+
+      - name: Get next release version
+        uses: actions/github-script@v7
+        id: next-version
+        with:
+          result-encoding: string
+          script: |
+            const getNextVersion = require('./.branch-github-actions/custom-scripts/next-version');
+            const nextVersion = await getNextVersion({
+              core,
+              github,
+              context,
+              sha: process.env.INPUT_SHA,
+            });
+            return nextVersion;
+        env:
+          INPUT_SHA: ${{ env.INPUT_SHA }}
+
+      - name: Install Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Write version to files
+        run: |
+          ./deployment/write-versions.sh ${{ steps.next-version.outputs.result }}
+
+      - name: Configure NPM
+        run: npm ci
+
+      - name: Release to npm, s3, prod
+        run: |
+          ./deployment/release.sh ${{ steps.next-version.outputs.result }}
+
+      - name: Create Github Release
+        uses: actions/github-script@v7
+        env:
+          GE_NEXT_VERSION: ${{ steps.next-version.outputs.result }}
+          INPUT_SHA: ${{ env.INPUT_SHA }}
+        with:
+          result-encoding: string
+          script: |
+            const createRelease = require('./.branch-github-actions/custom-scripts/create-release');
+            const sha = process.env.INPUT_SHA;
+            const version = process.env.GE_NEXT_VERSION;
+            await createRelease({
+              core,
+              context,
+              github,
+              sha,
+              version,
+            });

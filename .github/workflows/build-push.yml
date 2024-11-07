@@ -13,6 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Add INPUT_SHA env var
+        run: |
+          export INPUT_SHA=$(git rev-parse ${{ github.event.inputs.ref }})
+          echo "INPUT_SHA=`echo $INPUT_SHA`" >> $GITHUB_ENV
+
       - name: Install Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
@@ -66,6 +71,29 @@ jobs:
           aws-region: us-west-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get next release version
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/github-script@v7
+        id: next-version
+        with:
+          result-encoding: string
+          script: |
+            const getNextVersion = require('./.branch-github-actions/custom-scripts/next-version');
+            const nextVersion = await getNextVersion({
+              core,
+              github,
+              context,
+              sha: process.env.INPUT_SHA,
+            });
+            return nextVersion;
+        env:
+          INPUT_SHA: ${{ env.INPUT_SHA }}
+
+      - name: Write version to files
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          ./deployment/write-versions.sh ${{ steps.next-version.outputs.result }}
 
       - name: Deploy updated builds to staging
         if: ${{ github.ref == 'refs/heads/master' }}

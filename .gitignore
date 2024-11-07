@@ -40,3 +40,4 @@ test-results.json
 dev.config
 dev.html
 example.html
+dist/
