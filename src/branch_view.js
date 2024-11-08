@@ -63,7 +63,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
 	}
 	else
 	{
-		document.body.appendChild(iframe);
+		document.body.prepend(iframe);
 	}
 	return iframe;
 };
