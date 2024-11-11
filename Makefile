@@ -37,7 +37,6 @@ all: dist/build.min.js dist/build.js test/branch-deps.js test/integration-test.h
 clean:
 	rm -f dist/** docs/web/3_branch_web.md test/branch-deps.js dist/build.min.js.gz test/integration-test.html
 release: clean all dist/build.min.js.gz
-	@echo "released"
 
 test/branch-deps.js: $(SOURCES)
 	npx closure-make-deps \

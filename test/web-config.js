@@ -6,4 +6,5 @@ goog.provide('config');
 config.app_service_endpoint = 'https://app.link';
 config.link_service_endpoint = 'https://bnc.lt';
 config.api_endpoint = 'https://api.branch.io';
-config.version = '2.85.1'; // will get overwritten by gha on actual deploy
+// will get overwritten by gha on actual deploy
+config.version = '2.85.2';
