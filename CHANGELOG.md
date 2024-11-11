@@ -3,6 +3,8 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
+## [2.85.2] - 2024-11-11
+- Updates release process
 ## [2.85.1] - 2024-11-04
 - Updates qr image download to avoid errors
 ## [2.85.0] - 2024-04-10

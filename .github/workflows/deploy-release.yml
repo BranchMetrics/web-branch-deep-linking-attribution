@@ -61,6 +61,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # Do this before npm configure because it writes the package.json version
       - name: Write version to files
         run: |
           ./deployment/write-versions.sh ${{ steps.next-version.outputs.result }}
