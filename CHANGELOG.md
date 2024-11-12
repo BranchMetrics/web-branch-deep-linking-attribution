@@ -3,7 +3,7 @@ All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
 ## [VERSION] - unreleased
-## [2.85.5] - 2024-11-12
+## [2.86.0] - 2024-11-12
 - Switched from appending to prepending journey content on mobile devices so screen readers read the journey first before the underlying page.
 ## [2.85.4] - 2024-11-11
 - updates release process
