@@ -10,7 +10,8 @@ echo "Releasing Branch Web SDK"
 
 make release
 
-./deployment/build-example-html.sh "key_live_hcnegAumkH7Kv18M8AOHhfgiohpXq5tB" "https://api2.branch.io" "https://cdn.branch.io/branch-latest.min.js"
+# Engagement Pro Production Testing App - ID: 1364963849844839205
+./deployment/build-example-html.sh "key_live_gAbR03mCEte9DLh6L9GFApebvyg4mMDw" "https://api2.branch.io" "https://cdn.branch.io/branch-latest.min.js"
 aws s3 cp example.html s3://branch-builds/example.html
 aws s3 cp example.html s3://branch-cdn/example.html
 
