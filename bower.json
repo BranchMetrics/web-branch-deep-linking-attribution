@@ -7,7 +7,7 @@
 	"description": "The Branch Web SDK provides an easy way to interact with the Branch API, to track and attribute mobile app downloads and referrals.",
 	"version": "2.71.0",
 	"main": "dist/build.min.js",
-	"license": "https://github.com/BranchMetrics/Web-SDK/blob/master/LICENSE",
+	"license": "https://github.com/BranchMetrics/Web-SDK/blob/main/LICENSE",
 	"homepage": "http://branch.io",
 	"repository": {
 		"type": "git",
