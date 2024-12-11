@@ -94,7 +94,7 @@ jobs:
         run: make release
 
       - name: AWS, credentials setup
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-west-1
@@ -102,7 +102,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Deploy updated builds to staging
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         id: build
         run: |
           ./deployment/deploy-qa.sh
