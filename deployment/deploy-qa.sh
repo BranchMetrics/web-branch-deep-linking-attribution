@@ -21,8 +21,8 @@ NC='\033[0m'
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds/web-sdk/branch-latest.min.js
   aws s3 cp --content-type="text/javascript" dist/build.js s3://branch-builds/web-sdk/branch.js
 
-  # Engagement Pro Staging Testing App - ID: 1359637087497768975
-  ./deployment/build-example-html.sh "key_live_bydNZt6LxLEPG6QHe9BY8gbgDFjikcY5" "https://api.stage.branch.io" "https://cdn.branch.io/branch-staging-latest.min.js"
+  # External services app - ID: 436637608899006753
+  ./deployment/build-example-html.sh "key_live_plqOidX7fW71Gzt0LdCThkemDEjCbTgx" "https://api.stage.branch.io" "https://cdn.branch.io/branch-staging-latest.min.js"
   aws s3 cp example.html s3://branch-cdn/example-staging.html
 
   echo -en "${GREEN}Pushing to CDN ...${NC}\n"
