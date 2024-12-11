@@ -5,27 +5,170 @@
 	<meta content="http://branch.io/img/logo_icon_black.png" property="og:image" />
 	<meta content="Branch Metrics Web SDK Example App" property="og:title" />
 	<meta content="A basic example to demonstrate some of the ways that the Web SDK can be used" property="og:description" />
-	<meta content='key_place_holder' name='branch_key'/>
 	<title>Branch Metrics Web SDK Example App</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	<style type="text/css">
 		.btn {
 			margin-top: 5px;
 		}
-		.example-input {
-			width: 125px;
-			display: inline-block;
-			margin-top: 5px;
-			vertical-align: middle;
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f4f4f9;
+			color: #333;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
 		}
-		.radio-input {
-			margin-right: 10px !important;
-			margin-left: 20px !important;
+
+		label {
+			display: block;
+			font-size: 14px;
+			margin-bottom: 6px;
+			font-weight: bold;
 		}
+
+		.apiInput {
+			width: 100%;
+			padding: 10px;
+			margin-bottom: 15px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			font-size: 14px;
+			outline: none;
+			box-sizing: border-box;
+			transition: border-color 0.3s ease, box-shadow 0.3s ease;
+		}
+
+		input:focus {
+			border-color: #007bff;
+			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+		}
+
 		.row {
 			margin-bottom: 30px;
 		}
+
+		#configButtons {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 3px;
+			margin-bottom: 10px;
+		}
+
 	</style>
+	<script>
+		function getFinalValue(inputValue, documentKey) {
+			if (inputValue) return inputValue;
+			return document.getElementById(documentKey).value.trim();
+		}
+
+		function updateQueryParams(branchKey, apiUrl, script) {
+			let finalBranchKey = getFinalValue(branchKey,'branchKeyInput');
+			let finalApiUrl = getFinalValue(apiUrl,'apiUrlInput');
+
+			if (!finalBranchKey && !finalApiUrl) {
+				alert('Please provide at least one value to update.');
+				return;
+			}
+
+			const url = new URL(window.location.href);
+			if (finalBranchKey) url.searchParams.set('branch_key', finalBranchKey);
+			if (finalApiUrl) url.searchParams.set('api_url', finalApiUrl);
+
+			window.location.href = url.toString();
+		}
+
+		function getBranchKey() {
+			const queryParams = getQueryParams();
+			return queryParams['branch_key'] || "key_place_holder"
+		}
+
+		function getApiUrlLocal() {
+			const queryParams = getQueryParams();
+			return queryParams['api_url'] || "api_place_holder"
+		}
+
+		function getBranchScript() {
+			return "script_place_holder"
+		}
+
+		function getQueryParams() {
+			const params = new URLSearchParams(window.location.search);
+			const queryParams = {};
+			for (const [key, value] of params.entries()) {
+				queryParams[key] = value;
+			}
+			return queryParams;
+		}
+
+		function setLabelText() {
+			const keyLabel = document.getElementById('branchKeyLabel');
+			keyLabel.textContent = `Branch Key: ${getBranchKey()}`;
+
+			const apiLabel = document.getElementById('apiUrlLabel');
+			apiLabel.textContent = `Api Url: ${getApiUrlLocal()}`;
+		}
+
+		function onLoad() {
+			generateConfigButtons()
+			setLabelText();
+		}
+
+		window.onload = onLoad;
+	</script>
+	<script>
+		const STAGING = "Staging"
+		const PRODUCTION = "Production"
+		const STAGING_AC = "Staging AC"
+		const PRODUCTION_AC = "Production AC"
+		const apiConfigurations = {
+			STAGING_AC: {
+				name: STAGING_AC,
+				branchKey: "key_live_juoZrlpzQZvBQbwR33GO5hicszlTGnVT",
+				apiUrl: "https://protected-api.stage.branch.io",
+				appId: "1387589751543976586",
+			},
+			STAGING: {
+				name: STAGING,
+				branchKey: "key_live_plqOidX7fW71Gzt0LdCThkemDEjCbTgx",
+				apiUrl: "https://api.stage.branch.io",
+				appId: "436637608899006753",
+			},
+			PRODUCTION_AC: {
+				name: PRODUCTION_AC,
+				branchKey: "key_live_hshD4wiPK2sSxfkZqkH30ggmyBfmGmD7",
+				apiUrl: "https://protected-api.branch.io",
+				appId: "1284289243903971463",
+			},
+			PRODUCTION: {
+				name: PRODUCTION,
+				branchKey: "key_live_iDiV7ZewvDm9GIYxUnwdFdmmvrc9m3Aw",
+				apiUrl: "https://api3.branch.io",
+				appId: "1364964166783226677",
+			},
+		};
+
+		function generateConfigButtons() {
+			const configButtonsContainer = document.getElementById('configButtons');
+
+			Object.keys(apiConfigurations).forEach(key => {
+				const config = apiConfigurations[key];
+				const button = document.createElement('button');
+				button.classList.add('btn', 'btn-info');
+				button.textContent = `${config.name}`;
+
+				button.onclick = () => {
+					updateQueryParams(config.branchKey, config.apiUrl);
+				};
+
+				configButtonsContainer.appendChild(button);
+			});
+		}
+
+	</script>
 </head>
 
 <body>
@@ -36,7 +179,7 @@
 		<section>
 			<div class="row col-lg-8 col-lg-offset-2">
 				<h4>Session Info</h4>
-				<pre id="info">Reading session from .init()...</pre>
+				<pre id="session-info">Reading session from .init()...</pre>
 				<br>
 				<h4>Request</h4>
 				<pre id="request">Click a button!</pre>
@@ -51,12 +194,13 @@
 				<hr>
 				<h4>Session and Identity</h4>
 				<div class="group">
-					<button id="init" class="btn btn-success">.init()</button>
 					<button id="data" class="btn btn-info">.data()</button>
-					<button id="first" class="btn btn-info">.first()</button>
-					<input class="example-input" type="text" id="identityID" class="form-control" placeholder="test@test.com">
-					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
 					<button id="logout" class="btn btn-info">.logout()</button>
+					<button id="first" class="btn btn-info">.first()</button>
+				</div>
+				<div class="group">
+					<input class="example-input" type="text" id="identityID" placeholder="test@test.com">
+					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
@@ -76,14 +220,26 @@
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
+				<h4>Api Settings</h4>
+				<div class="group" id="configButtons"></div>
+
+				<label id="branchKeyLabel" for="branchKeyInput">Branch Key:</label>
+				<input type="text" id="branchKeyInput" class="apiInput">
+				<br>
+				<label id="apiUrlLabel" for="apiUrlInput">Api Url:</label>
+				<input type="text" id="apiUrlInput" class="apiInput">
+				<br>
+				<button class="btn btn-info" onclick="updateQueryParams()">
+					Update Api Settings
+				</button>
 			</div>
 		</section>
 	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="script_place_holder";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener banner closeBanner closeJourney data deepview deepviewCta first init link logout removeListener setBranchViewData setIdentity track trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode setRequestMetaData setAPIUrl getAPIUrl setDMAParamsForEEA".split(" "), 0);
-		branch.setAPIUrl("api_place_holder")
+		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src=getBranchScript();k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener banner closeBanner closeJourney data deepview deepviewCta first init link logout removeListener setBranchViewData setIdentity track trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode setRequestMetaData setAPIUrl getAPIUrl setDMAParamsForEEA".split(" "), 0);
+		branch.setAPIUrl(getApiUrlLocal())
 
 		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
 			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
@@ -96,9 +252,16 @@
 		});
 
 		// Take the Branch key from a meta tag
-		branch.init($('meta[name="branch_key"]').attr('content'), function(err, data) {
+		branch.init(getBranchKey(), function(err, data) {
 			// Avoid XSS by HTML escaping the data for display
-			$('#info').text(JSON.stringify(data));
+			$('#session-info').text(JSON.stringify(data));
+			if (err) {
+				let alertMessage = err.message;
+				if (getApiUrlLocal().includes('stage')) {
+					alertMessage += ". Are you connected to VPN?";
+				}
+				alert(alertMessage);
+			}
 		});
 	</script>
 	<script type="text/javascript">
@@ -129,13 +292,6 @@
 			}
 			return DOMPurify.sanitize(inputElement.val());
 		};
-		$('#init').click(function() {
-			request.html('branch.init();');
-			// Take the Branch key from a meta tag
-			branch.init($('meta[name="branch_key"]').attr('content'), function(err, data) {
-				response.html(err || JSON.stringify(data));
-			});
-		});
 		$('#data').click(function() {
 			request.html('branch.data();');
 			branch.data(function(err, data) {
@@ -149,8 +305,8 @@
 			});
 		});
 		$('#setIdentity').click(function() {
-			var identity = getInputVal('#identityID');
-			request.text("branch.setIdentity('" + identity + "');");
+			const identity = getInputVal('#identityID');
+			request.text(`branch.setIdentity('${identity}');`);
 			branch.setIdentity(identity, function(err, data) {
 				response.text(err || JSON.stringify(data));
 			});

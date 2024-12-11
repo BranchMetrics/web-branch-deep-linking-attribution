@@ -5,8 +5,8 @@ const serve = require('koa-static');
 const path = require('path');
 
 const defaultDev = {
-    "APIEndpoint": "https://api2.branch.io",
-    "sdkKey": null,
+    "APIEndpoint": "https://api.stage.branch.io",
+    "sdkKey": 'key_live_plqOidX7fW71Gzt0LdCThkemDEjCbTgx',
     "port": "3000"
 };
 
