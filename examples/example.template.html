@@ -11,16 +11,11 @@
 		.btn {
 			margin-top: 5px;
 		}
+
 		body {
 			font-family: Arial, sans-serif;
 			background-color: #f4f4f9;
 			color: #333;
-			margin: 0;
-			padding: 0;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100vh;
 		}
 
 		label {
@@ -191,36 +186,39 @@
 		<section>
 			<div class="row col-lg-8 col-lg-offset-2">
 				<h3>Methods</h3>
+				<a>https://help.branch.io/developers-hub/docs/web-full-reference</a>
 				<hr>
-				<h4>Session and Identity</h4>
+				<h4>Session</h4>
 				<div class="group">
-					<button id="data" class="btn btn-info">.data()</button>
-					<button id="logout" class="btn btn-info">.logout()</button>
-					<button id="first" class="btn btn-info">.first()</button>
+					<button class="btn btn-info" onclick="callData()">.data()</button>
+					<button class="btn btn-info" onclick="callLogout()">Logout</button>
+					<button class="btn btn-info" onclick="callFirst()">.first()</button>
 				</div>
+				<h4>Identity</h4>
 				<div class="group">
 					<input class="example-input" type="text" id="identityID" placeholder="test@test.com">
-					<button id="setIdentity" class="btn btn-info">.setIdentity()</button>
+					<button id="setIdentity" class="btn btn-info" onclick="callSetIdentity()">Set Identity</button>
 				</div>
-			</div>
-			<div class="row col-lg-8 col-lg-offset-2">
-				<h4>Sharing and Tracking</h4>
+				<h4>Events</h4>
 				<div class="group">
-					<button id="track" class="btn btn-info">.logEvent()</button>
-					<button id="link" class="btn btn-info">.link()</button>
-					<button id="banner" class="btn btn-info">.banner()</button>
-					<button id="disable-tracking" class="btn btn-info">.disableTracking(true)</button>
-					<button id="enable-tracking" class="btn btn-info">.disableTracking(false)</button>
+					<button class="btn btn-info" onclick="callLogEvent('PURCHASE')">Create Standard Event</button>
+					<button class="btn btn-info" onclick="callLogEvent('testedCustomEvent')">Create Custom Event</button>
 				</div>
-			</div>
-			<div class="row col-lg-8 col-lg-offset-2">
-				<h4>QR Code</h4>
+				<h4>Sharing</h4>
 				<div class="group">
-					<button id="qrCode" class="btn btn-info">.qrCode()</button>
+					<button class="btn btn-info" onclick="callLink()">Create Link</button>
+					<button class="btn btn-info" onclick="callQrCode()">Create QrCode</button>
+					<button class="btn btn-info" onclick="callBanner()">.banner()</button>
+				</div>
+				<h4>Tracking</h4>
+				<div class="group">
+					<button class="btn btn-info" onclick="callDisableTracking()">Disable Tracking</button>
+					<button class="btn btn-info" onclick="callEnableTracking()">Enable Tracking</button>
 				</div>
 			</div>
 			<div class="row col-lg-8 col-lg-offset-2">
-				<h4>Api Settings</h4>
+				<h3>Api Settings</h3>
+				<hr>
 				<div class="group" id="configButtons"></div>
 
 				<label id="branchKeyLabel" for="branchKeyInput">Branch Key:</label>
@@ -265,9 +263,22 @@
 		});
 	</script>
 	<script type="text/javascript">
-		var request = $('#request');
-		var response = $('#response');
-		var sampleParams = {
+		function getInputVal(inputID) {
+			var inputElement = $(inputID);
+			if (!inputElement.val()) {
+				inputElement.parent().addClass('has-error');
+				return '';
+			}
+			else {
+				inputElement.parent().removeClass('has-error');
+			}
+			return DOMPurify.sanitize(inputElement.val());
+		}
+
+		const request = $('#request');
+		const response = $('#response');
+
+		const linkData = {
 			tags: [ 'tag1', 'tag2' ],
 			channel: 'sample app',
 			feature: 'create link',
@@ -281,155 +292,143 @@
 				'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
 			}
 		};
-		var getInputVal = function(inputID) {
-			var inputElement = $(inputID);
-			if (!inputElement.val()) {
-				inputElement.parent().addClass('has-error');
-				return '';
-			}
-			else {
-				inputElement.parent().removeClass('has-error');
-			}
-			return DOMPurify.sanitize(inputElement.val());
-		};
-		$('#data').click(function() {
+
+		function callData() {
 			request.html('branch.data();');
 			branch.data(function(err, data) {
 				response.html(err || JSON.stringify(data));
 			});
-		});
-		$('#first').click(function() {
+		}
+
+		function callFirst() {
 			request.html('branch.first();');
 			branch.first(function(err, data) {
 				response.html(err || JSON.stringify(data));
 			});
-		});
-		$('#setIdentity').click(function() {
+		}
+
+		function callSetIdentity() {
 			const identity = getInputVal('#identityID');
 			request.text(`branch.setIdentity('${identity}');`);
 			branch.setIdentity(identity, function(err, data) {
 				response.text(err || JSON.stringify(data));
 			});
-		});
-		$('#logout').click(function() {
+		}
+
+		function callLogout() {
 			request.html('branch.logout();');
 			branch.logout(function(err, data) {
 				response.html(err || 'undefined');
 			});
-		});
-		$('#track').click(function() {
-			request.html('branch.logEvent(\' this event\');');
-			var event_and_custom_data = {
-   "transaction_id": "tras_Id_1232343434",
-   "currency": "USD",
-   "revenue": 180.2,
-   "shipping": 10.5,
-   "tax": 13.5,
-   "coupon": "promo-1234",
-   "affiliation": "high_fi",
-   "description": "Preferred purchase",
-   "purchase_loc": "Palo Alto",
-   "store_pickup": "unavailable"
-};
+		}
 
-var content_items = [
-{
-   "$content_schema": "COMMERCE_PRODUCT",
-   "$og_title": "Nike Shoe",
-   "$og_description": "Start loving your steps",
-   "$og_image_url": "http://example.com/img1.jpg",
-   "$canonical_identifier": "nike/1234",
-   "$publicly_indexable": false,
-   "$price": 101.2,
-   "$locally_indexable": true,
-   "$quantity": 1,
-   "$sku": "1101123445",
-   "$product_name": "Runner",
-   "$product_brand": "Nike",
-   "$product_category": "Sporting Goods",
-   "$product_variant": "XL",
-   "$rating_average": 4.2,
-   "$rating_count": 5,
-   "$rating_max": 2.2,
-   "$creation_timestamp": 1499892854966,
-   "$exp_date": 1499892854966,
-   "$keywords": [ "sneakers", "shoes" ],
-   "$address_street": "230 South LaSalle Street",
-   "$address_city": "Chicago",
-   "$address_region": "IL",
-   "$address_country": "US",
-   "$address_postal_code": "60604",
-   "$latitude": 12.07,
-   "$longitude": -97.5,
-   "$image_captions": [ "my_img_caption1", "my_img_caption_2" ],
-   "$condition": "NEW",
-   "$custom_fields": {"foo1":"bar1","foo2":"bar2"}
-},
-{
-   "$og_title": "Nike Woolen Sox",
-   "$canonical_identifier": "nike/5324",
-   "$og_description": "Fine combed woolen sox for those who love your foot",
-   "$publicly_indexable": false,
-   "$price": 80.2,
-   "$locally_indexable": true,
-   "$quantity": 5,
-   "$sku": "110112467",
-   "$product_name": "Woolen Sox",
-   "$product_brand": "Nike",
-   "$product_category": "Apparel & Accessories",
-   "$product_variant": "Xl",
-   "$rating_average": 3.3,
-   "$rating_count": 5,
-   "$rating_max": 2.8,
-   "$creation_timestamp": 1499892854966
-}];
+		function callLogEvent(eventName) {
+			request.html(`See network tab`);
+			const eventAndCustomData = {
+				"transaction_id": "tras_Id_1232343434",
+				"currency": "USD",
+				"revenue": 180.2,
+				"shipping": 10.5,
+				"tax": 13.5,
+				"coupon": "promo-1234",
+				"affiliation": "high_fi",
+				"description": "Preferred purchase",
+				"purchase_loc": "Palo Alto",
+				"store_pickup": "unavailable"
+			};
 
-var customer_event_alias = "my custom alias";
+			const contentItems = [
+				{
+					"$content_schema": "COMMERCE_PRODUCT",
+					"$og_title": "Nike Shoe",
+					"$og_description": "Start loving your steps",
+					"$og_image_url": "http://example.com/img1.jpg",
+					"$canonical_identifier": "nike/1234",
+					"$publicly_indexable": false,
+					"$price": 101.2,
+					"$locally_indexable": true,
+					"$quantity": 1,
+					"$sku": "1101123445",
+					"$product_name": "Runner",
+					"$product_brand": "Nike",
+					"$product_category": "Sporting Goods",
+					"$product_variant": "XL",
+					"$rating_average": 4.2,
+					"$rating_count": 5,
+					"$rating_max": 2.2,
+					"$creation_timestamp": 1499892854966,
+					"$exp_date": 1499892854966,
+					"$keywords": [ "sneakers", "shoes" ],
+					"$address_street": "230 South LaSalle Street",
+					"$address_city": "Chicago",
+					"$address_region": "IL",
+					"$address_country": "US",
+					"$address_postal_code": "60604",
+					"$latitude": 12.07,
+					"$longitude": -97.5,
+					"$image_captions": [ "my_img_caption1", "my_img_caption_2" ],
+					"$condition": "NEW",
+					"$custom_fields": {"foo1":"bar1","foo2":"bar2"}
+				},
+				{
+					"$og_title": "Nike Woolen Sox",
+					"$canonical_identifier": "nike/5324",
+					"$og_description": "Fine combed woolen sox for those who love your foot",
+					"$publicly_indexable": false,
+					"$price": 80.2,
+					"$locally_indexable": true,
+					"$quantity": 5,
+					"$sku": "110112467",
+					"$product_name": "Woolen Sox",
+					"$product_brand": "Nike",
+					"$product_category": "Apparel & Accessories",
+					"$product_variant": "Xl",
+					"$rating_average": 3.3,
+					"$rating_count": 5,
+					"$rating_max": 2.8,
+					"$creation_timestamp": 1499892854966
+				}];
 
-branch.logEvent(
-   "PURCHASE",
-   event_and_custom_data,
-   content_items,
-   customer_event_alias,
-   function(err) { response.html(err || 'no error'); }
-);
-		});
-		$('#link').click(function() {
-			request.html('branch.link(' + JSON.stringify(sampleParams) + ');');
-			branch.link(sampleParams, function(err, link) {
+			const customerEventAlias = "my custom alias";
+
+			branch.logEvent(
+					eventName,
+					eventAndCustomData,
+					contentItems,
+					customerEventAlias,
+					function(err) { response.html(err || 'no error'); }
+			);
+		}
+
+		function callLink() {
+			request.html('branch.link(' + JSON.stringify(linkData) + ');');
+			branch.link(linkData, function(err, link) {
 				response.html('<a href="' + link + '">' + link + '</a>');
 			});
-		});
-		$('#qrCode').click(function() {
-			var qrCodeSettings = {
-			        "code_color":"#000000",
-			        "background_color": "#FFFFFF",
-			        "margin": 5,
-			        "width": 1000,
-			        "image_format": "png",
-					"center_logo_url": "https://branch-assets.s3.us-west-1.amazonaws.com/branch-badge-dark.svg",
-			    };
-			var qrCodeParams = {
-				tags: [ 'tag1', 'tag2' ],
-				channel: 'sample app',
-				feature: 'create link',
-				stage: 'created link',
-				type: 1,
-				data: {
-					mydata: 'bar',
-					'$desktop_url': 'https://cdn.branch.io/example.html',
-					'$og_title': 'Branch Metrics',
-					'$og_description': 'Branch Metrics',
-					'$og_image_url': 'http://branch.io/img/logo_icon_white.png'
-				}
+		}
+
+		function callQrCode() {
+			const qrCodeSettings = {
+				"code_color":"#000000",
+				"background_color": "#FFFFFF",
+				"margin": 5,
+				"width": 1000,
+				"image_format": "png",
+				"center_logo_url": "https://branch-assets.s3.us-west-1.amazonaws.com/branch-badge-dark.svg",
 			};
-			branch.qrCode(qrCodeParams, qrCodeSettings, function(err, qrCode) {
+			const req = {
+				...linkData,
+				'qr_code_settings': qrCodeSettings,
+			}
+			request.html(`branch.qrCode('${JSON.stringify(req)}');`);
+			branch.qrCode(linkData, qrCodeSettings, function(err, qrCode) {
 				response.html('<img src="data:image/png;charset=utf-8;base64,' + qrCode.base64() + '" width="500" height="500">');
 			});
-		});
-		$('#banner').click(function() {
+		}
+
+		function callBanner() {
 			request.html(
-				'branch.banner({icon: ' +
+					'branch.banner({icon: ' +
 					'"http://icons.iconarchive.com/icons/wineass/ios7-redesign/512/Appstore-icon.png",' +
 					'title: "Branch Demo App",' +
 					'description: "The Branch demo app!",' +
@@ -458,22 +457,24 @@ branch.logEvent(
 					disableHide: false, // false by default, just set here for an example
 					forgetHide: false // false by default, just set here for an example
 				}, // Banner Options
-				sampleParams // Link data or string of link
+				linkData // Link data or string of link
 			);
 			response.html('none');
-		});
-		$('#disable-tracking').click(function() {
+		}
+
+		function callDisableTracking() {
 			request.text('branch.disableTracking(true);');
 			branch.disableTracking(true, function() {
 				response.text('none');
 			});
-		});
-		$('#enable-tracking').click(function() {
+		}
+
+		function callEnableTracking() {
 			request.text('branch.disableTracking(false);');
 			branch.disableTracking(false, function() {
 				response.text('none');
 			});
-		});
+		}
 	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.3/purify.min.js" integrity="sha512-3dcbndbDLLWfKWevQu8C/1qVRcxx6h+eRDSnn3/pcBZHISRJgsj3u71U/Ad6nQVHrEi05hOSr6Hnb/p0pWc94w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
