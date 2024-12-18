@@ -24,6 +24,9 @@ for full details.
 - [Web Full Reference]
 
 # Running locally
+Download node 18 (if not using nix)
+
 ```sh
 node startDev.js
+# Navigate to http://localhost:3000/dev.html
 ```
