@@ -21,7 +21,7 @@ aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.
 
 echo -en "Invalidating cloudfront distribution...\n"
 aws configure set preview.cloudfront true
-aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js
+aws cloudfront create-invalidation --distribution-id E10P37NG0GMER --paths /branch-latest.min.js /example.html
 
 echo "Post-release sanity checks."
 read -p "Can you visit https://cdn.branch.io/branch-$VERSION.min.js ?" -n 1 -r
