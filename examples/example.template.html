@@ -8,10 +8,6 @@
 	<title>Branch Metrics Web SDK Example App</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	<style type="text/css">
-		.btn {
-			margin-top: 5px;
-		}
-
 		body {
 			font-family: Arial, sans-serif;
 			background-color: #f4f4f9;
@@ -163,6 +159,15 @@
 			});
 		}
 
+		function copySessionInfo() {
+			const pre = document.getElementById('session-info');
+			const text = pre.textContent;
+			navigator.clipboard.writeText(text).then(() => {
+				console.log('Copied');
+			}).catch(err => {
+				console.error('Failed to copy text: ', err);
+			});
+		}
 	</script>
 </head>
 
@@ -173,12 +178,14 @@
 		</div>
 		<section>
 			<div class="row col-lg-8 col-lg-offset-2">
-				<h4>Session Info</h4>
+				<h4>Session Info
+					<button class="btn btn-info" onclick="copySessionInfo()" style="margin-left: 10px; font-size: 12px; padding: 2px 8px; cursor: pointer;">
+						Copy
+					</button>
+				</h4>
 				<pre id="session-info">Reading session from .init()...</pre>
-				<br>
 				<h4>Request</h4>
 				<pre id="request">Click a button!</pre>
-				<br>
 				<h4>Response</h4>
 				<pre id="response">Click a button!</pre>
 			</div>
@@ -252,7 +259,7 @@
 		// Take the Branch key from a meta tag
 		branch.init(getBranchKey(), function(err, data) {
 			// Avoid XSS by HTML escaping the data for display
-			$('#session-info').text(JSON.stringify(data));
+			$('#session-info').text(JSON.stringify(data, null, 2));
 			if (err) {
 				let alertMessage = err.message;
 				if (getApiUrlLocal().includes('stage')) {
