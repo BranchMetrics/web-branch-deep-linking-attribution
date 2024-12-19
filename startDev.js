@@ -10,6 +10,9 @@ const defaultDev = {
     "port": "3000"
 };
 
+const TEMPLATE_FILE = 'examples/example.template.html';
+const DEV_HTML = 'dev.html';
+
 async function fileExists(filePath) {
     try {
         await fs.access(filePath);
@@ -61,8 +64,8 @@ async function processTemplate(templateFile, outputFile, replacements) {
 
 async function writeExampleHtml(config) {
     // Define your file paths and replacements
-    const templateFile = path.join(__dirname, 'examples/example.template.html');
-    const outputFile = path.join(__dirname, 'dev.html');
+    const templateFile = path.join(__dirname, TEMPLATE_FILE);
+    const outputFile = path.join(__dirname, DEV_HTML);
     const replacements = {
         'key_place_holder': config.sdkKey,
         'api_place_holder': config.APIEndpoint,
@@ -79,13 +82,12 @@ function executeBuild(config) {
             console.error(`Error executing makefile: ${error.message}`);
             return;
         }
-        console.log('Dev build successful.');
-        console.log('Starting server...');
+        console.log(`Dev websdk build successful, ${DEV_HTML} built from ${TEMPLATE_FILE}`);
         const app = new Koa();
         app.use(serve('.'));
         app.listen(config.port, () => {
             console.log('Server started successfully.');
-            console.log(`Example page running at http://localhost:${config.port}/dev.html`);
+            console.log(`Example page running at http://localhost:${config.port}/${DEV_HTML}. To edit, update ${TEMPLATE_FILE}`);
         });
     });
 }
