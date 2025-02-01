@@ -10,8 +10,9 @@ goog.addDependency('../../../../src/3_banner_utils.js', ['banner_utils'], ['safe
 goog.addDependency('../../../../src/4_banner_css.js', ['banner_css'], ['banner_utils', 'utils']);
 goog.addDependency('../../../../src/4_banner_html.js', ['banner_html'], ['banner_utils', 'session', 'storage', 'utils']);
 goog.addDependency('../../../../src/5_banner.js', ['banner'], ['banner_css', 'banner_html', 'banner_utils', 'utils']);
-goog.addDependency('../../../../src/6_branch.js', ['Branch'], ['Server', 'banner', 'branch_view', 'config', 'goog.json', 'journeys_utils', 'resources', 'safejson', 'session', 'storage', 'task_queue', 'utils'], {'lang': 'es6'});
+goog.addDependency('../../../../src/6_branch.js', ['Branch'], ['Logger', 'Server', 'banner', 'branch_view', 'config', 'goog.json', 'journeys_utils', 'resources', 'safejson', 'session', 'storage', 'task_queue', 'utils'], {'lang': 'es6'});
 goog.addDependency('../../../../src/7_initialization.js', ['branch_instance'], ['Branch', 'config']);
+goog.addDependency('../../../../src/8_logger.js', ['Logger'], [], {'lang': 'es6'});
 goog.addDependency('../../../../src/branch_view.js', ['branch_view'], ['banner_css', 'journeys_utils', 'safejson', 'utils'], {'lang': 'es6'});
 goog.addDependency('../../../../src/extern.js', [], []);
 goog.addDependency('../../../../src/journeys_utils.js', ['journeys_utils'], ['banner_utils', 'safejson', 'utils'], {'lang': 'es6'});
@@ -22,8 +23,9 @@ goog.addDependency('../../../../test/1_utils.js', [], ['utils'], {'lang': 'es6'}
 goog.addDependency('../../../../test/2_storage.js', [], ['storage']);
 goog.addDependency('../../../../test/3_api.js', [], ['Server', 'config', 'resources', 'safejson', 'storage', 'utils']);
 goog.addDependency('../../../../test/6_branch.js', [], ['Branch', 'banner_html', 'banner_utils', 'config', 'goog.json', 'resources', 'safejson', 'session', 'storage', 'utils']);
-goog.addDependency('../../../../test/6_branch_new.js', [], ['Branch', 'task_queue', 'utils'], {'lang': 'es6'});
+goog.addDependency('../../../../test/6_branch_new.js', [], ['Branch', 'Logger', 'task_queue', 'utils'], {'lang': 'es6'});
 goog.addDependency('../../../../test/7_integration.js', [], ['config', 'goog.json']);
+goog.addDependency('../../../../test/8_logger.js', [], ['Logger'], {'lang': 'es6'});
 goog.addDependency('../../../../test/blob-banner.js', [], []);
 goog.addDependency('../../../../test/blob-interstitial.js', [], []);
 goog.addDependency('../../../../test/journeys.js', [], ['Branch', 'banner_utils', 'branch_view', 'config', 'goog.json', 'resources', 'session', 'storage', 'utils'], {'lang': 'es5'});
