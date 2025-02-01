@@ -5,7 +5,7 @@ goog.provide('config');
 /** @define {string} */
 var DEFAULT_API_ENDPOINT = 'https://api2.branch.io';
 
-config.app_service_endpoint = 'https://app.link';
+config.app_service_endpoint = 'https://bnc.lt';
 config.link_service_endpoint = 'https://bnc.lt';
 config.api_endpoint = DEFAULT_API_ENDPOINT;
 // will get overwritten by gha on actual deploy
