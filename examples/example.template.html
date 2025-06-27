@@ -213,72 +213,72 @@
 	<div style="display: flex; flex-direction: column; align-items: center; width: 100%">
 		<h2>Branch Metrics Web SDK Example</h2>
 		<hr class="lineBreak horizontalLine">
-		<div class="split-container">
-			<div class="container api-methods">
-				<section>
-					<h3>Methods</h3>
-					<a href="https://help.branch.io/developers-hub/docs/web-full-reference" target="_blank">https://help.branch.io/developers-hub/docs/web-full-reference</a>
-					<hr class="lineBreak horizontalLine">
+<!--		<div class="split-container">-->
+<!--			<div class="container api-methods">-->
+<!--				<section>-->
+<!--					<h3>Methods</h3>-->
+<!--					<a href="https://help.branch.io/developers-hub/docs/web-full-reference" target="_blank">https://help.branch.io/developers-hub/docs/web-full-reference</a>-->
+<!--					<hr class="lineBreak horizontalLine">-->
 
-					<h4>Session</h4>
-					<div class="group">
-						<button class="btn btn-info" onclick="callData()">.data()</button>
-						<button class="btn btn-info" onclick="callLogout()">Logout</button>
-						<button class="btn btn-info" onclick="callFirst()">.first()</button>
-					</div>
-					<h4>Identity</h4>
-					<div class="group">
-						<input class="example-input" type="text" id="identityID" placeholder="test@test.com">
-						<button id="setIdentity" class="btn btn-info" onclick="callSetIdentity()">Set Identity</button>
-					</div>
-					<h4>Events</h4>
-					<div class="group">
-						<button class="btn btn-info" onclick="callLogEvent('PURCHASE')">Create Standard Event</button>
-						<button class="btn btn-info" onclick="callLogEvent('testedCustomEvent')">Create Custom Event</button>
-					</div>
-					<h4>Sharing</h4>
-					<div class="group">
-						<button class="btn btn-info" onclick="callLink()">Create Link</button>
-						<button class="btn btn-info" onclick="callQrCode()">Create QrCode</button>
-						<button class="btn btn-info" onclick="callBanner()">.banner()</button>
-					</div>
-					<h4>Tracking</h4>
-					<div class="group">
-						<button class="btn btn-info" onclick="callDisableTracking()">Disable Tracking</button>
-						<button class="btn btn-info" onclick="callEnableTracking()">Enable Tracking</button>
-					</div>
-					<h3>Api Settings</h3>
-					<hr class="lineBreak horizontalLine">
-					<div class="group" id="configButtons"></div>
-					<label id="branchKeyLabel" for="branchKeyInput">Branch Key:</label>
-					<input type="text" id="branchKeyInput" class="apiInput">
-					<br>
-					<label id="apiUrlLabel" for="apiUrlInput">Api Url:</label>
-					<input type="text" id="apiUrlInput" class="apiInput">
-					<br>
-					<button class="btn btn-info" onclick="updateQueryParams()">
-						Update Api Settings
-					</button>
-				</section>
-			</div>
-			<div class="lineBreak verticalLine"></div>
-			<div class="container api-info">
-				<section>
-					<h3>Api Requests</h3>
-					<hr class="lineBreak horizontalLine">
-					<h4>Session Info
-						<button class="btn btn-info" onclick="copySessionInfo()" style="margin-left: 10px; font-size: 12px; padding: 2px 8px; cursor: pointer;">
-							Copy
-						</button>
-					</h4>
-					<pre id="session-info">Reading session from .init()...</pre>
-					<h4>Request</h4>
-					<pre id="request">Click a button!</pre>
-					<h4>Response</h4>
-					<pre id="response">Click a button!</pre>
-				</section>
-			</div>
-		</div>
+<!--					<h4>Session</h4>-->
+<!--					<div class="group">-->
+<!--						<button class="btn btn-info" onclick="callData()">.data()</button>-->
+<!--						<button class="btn btn-info" onclick="callLogout()">Logout</button>-->
+<!--						<button class="btn btn-info" onclick="callFirst()">.first()</button>-->
+<!--					</div>-->
+<!--					<h4>Identity</h4>-->
+<!--					<div class="group">-->
+<!--						<input class="example-input" type="text" id="identityID" placeholder="test@test.com">-->
+<!--						<button id="setIdentity" class="btn btn-info" onclick="callSetIdentity()">Set Identity</button>-->
+<!--					</div>-->
+<!--					<h4>Events</h4>-->
+<!--					<div class="group">-->
+<!--						<button class="btn btn-info" onclick="callLogEvent('PURCHASE')">Create Standard Event</button>-->
+<!--						<button class="btn btn-info" onclick="callLogEvent('testedCustomEvent')">Create Custom Event</button>-->
+<!--					</div>-->
+<!--					<h4>Sharing</h4>-->
+<!--					<div class="group">-->
+<!--						<button class="btn btn-info" onclick="callLink()">Create Link</button>-->
+<!--						<button class="btn btn-info" onclick="callQrCode()">Create QrCode</button>-->
+<!--						<button class="btn btn-info" onclick="callBanner()">.banner()</button>-->
+<!--					</div>-->
+<!--					<h4>Tracking</h4>-->
+<!--					<div class="group">-->
+<!--						<button class="btn btn-info" onclick="callDisableTracking()">Disable Tracking</button>-->
+<!--						<button class="btn btn-info" onclick="callEnableTracking()">Enable Tracking</button>-->
+<!--					</div>-->
+<!--					<h3>Api Settings</h3>-->
+<!--					<hr class="lineBreak horizontalLine">-->
+<!--					<div class="group" id="configButtons"></div>-->
+<!--					<label id="branchKeyLabel" for="branchKeyInput">Branch Key:</label>-->
+<!--					<input type="text" id="branchKeyInput" class="apiInput">-->
+<!--					<br>-->
+<!--					<label id="apiUrlLabel" for="apiUrlInput">Api Url:</label>-->
+<!--					<input type="text" id="apiUrlInput" class="apiInput">-->
+<!--					<br>-->
+<!--					<button class="btn btn-info" onclick="updateQueryParams()">-->
+<!--						Update Api Settings-->
+<!--					</button>-->
+<!--				</section>-->
+<!--			</div>-->
+<!--			<div class="lineBreak verticalLine"></div>-->
+<!--			<div class="container api-info">-->
+<!--				<section>-->
+<!--					<h3>Api Requests</h3>-->
+<!--					<hr class="lineBreak horizontalLine">-->
+<!--					<h4>Session Info-->
+<!--						<button class="btn btn-info" onclick="copySessionInfo()" style="margin-left: 10px; font-size: 12px; padding: 2px 8px; cursor: pointer;">-->
+<!--							Copy-->
+<!--						</button>-->
+<!--					</h4>-->
+<!--					<pre id="session-info">Reading session from .init()...</pre>-->
+<!--					<h4>Request</h4>-->
+<!--					<pre id="request">Click a button!</pre>-->
+<!--					<h4>Response</h4>-->
+<!--					<pre id="response">Click a button!</pre>-->
+<!--				</section>-->
+<!--			</div>-->
+<!--		</div>-->
 	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>

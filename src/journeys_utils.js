@@ -248,7 +248,9 @@ journeys_utils.createIframe = function() {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
-	iframe.setAttribute('tabindex', '-1');
+	iframe.setAttribute('tabindex', '0');
+	iframe.setAttribute('aria-label', 'Branch Banner Frame');
+	iframe.title = 'Branch Banner Frame';
 	utils.addNonceAttribute(iframe);
 
 	return iframe;
@@ -292,8 +294,10 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 				if (!isTabPressed) {
 					return;
 				}
+				
+				console.log('tab pressed');
 
-				if (e.shifKey) {
+				if (e.shiftKey) {
 					if (focusElementIdx <= 0) {
 						focusElementIdx = focusableContent.length - 1;
 					} else {
