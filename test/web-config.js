@@ -7,4 +7,4 @@ config.app_service_endpoint = 'https://app.link';
 config.link_service_endpoint = 'https://bnc.lt';
 config.api_endpoint = 'https://api.branch.io';
 // will get overwritten by gha on actual deploy
-config.version = '2.85.2';
+config.version = '2.86.1';

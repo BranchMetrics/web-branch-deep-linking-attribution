@@ -248,7 +248,8 @@ journeys_utils.createIframe = function() {
 	iframe.scrolling = 'no';
 	iframe.id = 'branch-banner-iframe';
 	iframe.className = 'branch-animation';
-	iframe.setAttribute('tabindex', '-1');
+	iframe.title = 'Branch Banner Frame';
+	iframe.setAttribute('aria-label', 'Branch Banner Frame');
 	utils.addNonceAttribute(iframe);
 
 	return iframe;
@@ -286,36 +287,52 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 			var focusableContent = modal.querySelectorAll(focusableElements);
 			var focusElementIdx = 0;
 
-			function handleTabKey(e) {
+			function handleKeyboardNavigation(e) {
 				var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-			
-				if (!isTabPressed) {
+				var isEnterPressed = e.key === 'Enter' || e.keyCode === 13;
+				
+				// Handle Tab key for focus navigation
+				if (isTabPressed) {
+					if (e.shiftKey) {
+						if (focusElementIdx <= 0) {
+							focusElementIdx = focusableContent.length - 1;
+						} else {
+							focusElementIdx = focusElementIdx - 1;
+						}
+					} else {
+						if (focusElementIdx >= focusableContent.length - 1) {
+							focusElementIdx = 0;
+						} else {
+							focusElementIdx = focusElementIdx + 1;
+						}
+					}
+
+					focusableContent[focusElementIdx].focus();
+					e.preventDefault();
 					return;
 				}
-
-				if (e.shifKey) {
-					if (focusElementIdx <= 0) {
-						focusElementIdx = focusableContent.length - 1;
-					} else {
-						focusElementIdx = focusElementIdx - 1;
-					}
-				} else {
-					if (focusElementIdx >= focusableContent.length - 1) {
-						focusElementIdx = 0;
-					} else {
-						focusElementIdx = focusElementIdx + 1;
+				
+				// Handle Enter key for activation
+				if (isEnterPressed) {
+					// Get the currently focused element
+					var focusedElement = document.activeElement;
+					if (focusedElement && (
+						focusedElement.tagName === 'BUTTON' || 
+						focusedElement.getAttribute('role') === 'button' ||
+						focusedElement.tagName === 'A'
+					)) {
+						// Simulate a click on the element
+						focusedElement.click();
+						e.preventDefault();
 					}
 				}
-
-				focusableContent[focusElementIdx].focus();
-				e.preventDefault();
 			}
 
 			function autoFocus(delay) {
 				setTimeout(function() { focusableContent[focusElementIdx].focus() }, delay);
 			}
 
-			document.addEventListener('keydown', handleTabKey);
+			document.addEventListener('keydown', handleKeyboardNavigation);
 			autoFocus(100);
 			
 		`;
