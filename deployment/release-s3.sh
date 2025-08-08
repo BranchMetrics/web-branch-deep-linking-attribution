@@ -12,12 +12,12 @@ make release
 
 # Engagement Pro Production Testing App - ID: 1364963849844839205
 ./deployment/build-example-html.sh "key_live_gAbR03mCEte9DLh6L9GFApebvyg4mMDw" "https://api2.branch.io" "https://cdn.branch.io/branch-latest.min.js"
-aws s3 cp example.html s3://branch-builds/example.html
-aws s3 cp example.html s3://branch-cdn/example.html
+aws s3 cp example.html s3://branch-builds-usw2/example.html
+aws s3 cp example.html s3://branch-cdn-usw2/example.html
 
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.js s3://branch-cdn/branch-latest.js --cache-control "max-age=300"
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-$VERSION.min.js --cache-control "max-age=300"
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn/branch-latest.min.js --cache-control "max-age=300"
+aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.js s3://branch-cdn-usw2/branch-latest.js --cache-control "max-age=300"
+aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn-usw2/branch-$VERSION.min.js --cache-control "max-age=300"
+aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn-usw2/branch-latest.min.js --cache-control "max-age=300"
 
 echo -en "Invalidating cloudfront distribution...\n"
 aws configure set preview.cloudfront true
