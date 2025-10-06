@@ -8,16 +8,14 @@ env:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: arc-standard-small-set
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: AWS, credentials setup
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-west-1
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Add INPUT_SHA env var
         run: |
@@ -25,7 +23,7 @@ jobs:
           echo "INPUT_SHA=`echo $INPUT_SHA`" >> $GITHUB_ENV
 
       - name: Install branch-github-actions
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: BranchMetrics/branch-github-actions
           ref: master
