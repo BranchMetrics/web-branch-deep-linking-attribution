@@ -57,7 +57,7 @@ banner_utils.error_timeout = 2000;
  * @param {Object} element
  */
 banner_utils.removeElement = function(element) {
-	if (element) {
+	if (element && element.parentNode) {
 		element.parentNode.removeChild(element);
 	}
 };

@@ -141,9 +141,9 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	var audienceRuleId = branchViewData['audience_rule_id'];
 
 	// this code removes any leftover css from previous banner
-	var branchCSS = document.getElementById('branch-iframe-css')
-	if (branchCSS) {
-		branchCSS.parentElement.removeChild(branchCSS)
+	var branchCSS = document.getElementById('branch-iframe-css');
+	if (branchCSS && branchCSS.parentElement) {
+		branchCSS.parentElement.removeChild(branchCSS);
 	}
 
 	var placeholder = document.createElement('div');
