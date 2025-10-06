@@ -29,7 +29,6 @@ session.get = function(storage, first) {
  * @param {boolean=} first
  */
 session.set = function(storage, data, first) {
-
 	if (first && data['referring_link'] && utils.userPreferences.enableExtendedJourneysAssist) {
 		var now = new Date();
 		data['referringLinkExpiry'] = now.getTime() + utils.extendedJourneysAssistExpiryTime;
