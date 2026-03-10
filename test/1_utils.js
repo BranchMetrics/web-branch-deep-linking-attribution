@@ -1233,9 +1233,9 @@ describe('utils', function() {
 		});
 	});
 	describe('getPlatformByUserAgent', function() {
-		var originalUa = navigator.userAgent;
 		var originalScreenHeight = screen.height;
 		var originalScreenWidth = screen.width;
+		var originalNavigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
 		var userAgentsList = {
 			android_chrome: {
 				ua: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.163 Mobile Safari/537.36',
@@ -1277,11 +1277,18 @@ describe('utils', function() {
 		};
 
 		function setUserAgent(ua) {
-			Object.defineProperty(window.navigator, 'userAgent', { value: ua });
+			Object.defineProperty(globalThis, 'navigator', {
+				configurable: true,
+				get: function() {
+					return {
+						userAgent: ua
+					};
+				}
+			});
 		}
 
 		afterEach(function() {
-			setUserAgent(originalUa);
+			Object.defineProperty(globalThis, 'navigator', originalNavigatorDescriptor);
 			Object.defineProperty(window.screen, 'width', { writable: true, configurable: true, value: originalScreenWidth });
 			Object.defineProperty(window.screen, 'height', { writable: true, configurable: true, value: originalScreenHeight });
 		});
