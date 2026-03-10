@@ -2020,6 +2020,10 @@ Branch.prototype['setAPIUrl'] = function(url) {
 		console.error("setAPIUrl: Invalid URL format. Default URL will be set.");
 		return;
 	}
+	if (!utils.isBranchDomainURL(url)) {
+		console.error("setAPIUrl: Only *.branch.io domains are allowed. Default URL will be set.");
+		return;
+	}
 
 	config.api_endpoint = url;
 };

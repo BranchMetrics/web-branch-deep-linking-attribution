@@ -190,6 +190,20 @@ describe('Branch - new', function() {
 		it('test method exists', function() {
 			sinon.assert.match(typeof branch_instance.setAPIUrl, "function");
 		});
+		it('should allow setting api url for branch.io domains', function() {
+			var branch_url = 'https://api2.branch.io';
+			branch_instance.setAPIUrl(branch_url);
+			assert.equal(branch_instance.getAPIUrl(), branch_url);
+		});
+		it('should reject non-branch.io domains', function() {
+			var default_url = branch_instance.getAPIUrl();
+			var consoleErrorStub = sandbox.stub(console, 'error');
+
+			branch_instance.setAPIUrl('https://evil.example.com');
+
+			assert.equal(branch_instance.getAPIUrl(), default_url);
+			sinon.assert.calledWith(consoleErrorStub, 'setAPIUrl: Only *.branch.io domains are allowed. Default URL will be set.');
+		});
 	});
 	describe('getAPIUrl', function() {
 		it('test method exists', function() {

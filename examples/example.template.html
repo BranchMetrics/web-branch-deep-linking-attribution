@@ -94,12 +94,29 @@
 			return document.getElementById(documentKey).value.trim();
 		}
 
+		function isAllowedApiUrl(apiUrl) {
+			if (!apiUrl) {
+				return false;
+			}
+			try {
+				const parsedApiUrl = new URL(apiUrl);
+				const hostname = parsedApiUrl.hostname.toLowerCase();
+				return hostname === 'branch.io' || hostname.endsWith('.branch.io');
+			} catch (err) {
+				return false;
+			}
+		}
+
 		function updateQueryParams(branchKey, apiUrl, script) {
 			let finalBranchKey = getFinalValue(branchKey,'branchKeyInput');
 			let finalApiUrl = getFinalValue(apiUrl,'apiUrlInput');
 
 			if (!finalBranchKey && !finalApiUrl) {
 				alert('Please provide at least one value to update.');
+				return;
+			}
+			if (finalApiUrl && !isAllowedApiUrl(finalApiUrl)) {
+				alert('Invalid api_url. Please use a URL under *.branch.io.');
 				return;
 			}
 
@@ -117,7 +134,11 @@
 
 		function getApiUrlLocal() {
 			const queryParams = getQueryParams();
-			return queryParams['api_url'] || "api_place_holder"
+			const apiUrl = queryParams['api_url'] || "api_place_holder";
+			if (!isAllowedApiUrl(apiUrl)) {
+				return "api_place_holder";
+			}
+			return apiUrl;
 		}
 
 		function getBranchScript() {

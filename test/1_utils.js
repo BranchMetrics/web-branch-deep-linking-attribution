@@ -1478,6 +1478,24 @@ describe('utils', function() {
 		});
 	});
 
+	describe('isBranchDomainURL', function() {
+		it('should return true for branch.io root domain', function() {
+			assert.equal(utils.isBranchDomainURL('https://branch.io'), true);
+		});
+
+		it('should return true for branch.io subdomains', function() {
+			assert.equal(utils.isBranchDomainURL('https://api2.branch.io'), true);
+		});
+
+		it('should return false for lookalike domains', function() {
+			assert.equal(utils.isBranchDomainURL('https://branch.io.evil.com'), false);
+		});
+
+		it('should return false for non-branch domains', function() {
+			assert.equal(utils.isBranchDomainURL('https://example.com'), false);
+		});
+	});
+
 
 	/*
 	describe('journey_cta', function(done) {
