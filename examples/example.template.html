@@ -94,30 +94,12 @@
 			return document.getElementById(documentKey).value.trim();
 		}
 
-		function isAllowedApiUrl(apiUrl) {
-			if (!apiUrl) {
-				return false;
-			}
-			try {
-				const parsedApiUrl = new URL(apiUrl);
-				const hostname = parsedApiUrl.hostname.toLowerCase();
-				return (parsedApiUrl.protocol === 'http:' || parsedApiUrl.protocol === 'https:') &&
-					hostname.endsWith('.branch.io');
-			} catch (err) {
-				return false;
-			}
-		}
-
 		function updateQueryParams(branchKey, apiUrl, script) {
 			let finalBranchKey = getFinalValue(branchKey,'branchKeyInput');
 			let finalApiUrl = getFinalValue(apiUrl,'apiUrlInput');
 
 			if (!finalBranchKey && !finalApiUrl) {
 				alert('Please provide at least one value to update.');
-				return;
-			}
-			if (finalApiUrl && !isAllowedApiUrl(finalApiUrl)) {
-				alert('Invalid api_url. Please use a URL under *.branch.io.');
 				return;
 			}
 
@@ -135,11 +117,7 @@
 
 		function getApiUrlLocal() {
 			const queryParams = getQueryParams();
-			const apiUrl = queryParams['api_url'] || "api_place_holder";
-			if (!isAllowedApiUrl(apiUrl)) {
-				return "api_place_holder";
-			}
-			return apiUrl;
+			return queryParams['api_url'] || "api_place_holder";
 		}
 
 		function getBranchScript() {
@@ -306,7 +284,10 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src=getBranchScript();k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener banner closeBanner closeJourney data deepview deepviewCta first init link logout removeListener setBranchViewData setIdentity track trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode setRequestMetaData setAPIUrl getAPIUrl setDMAParamsForEEA".split(" "), 0);
-		branch.setAPIUrl(getApiUrlLocal())
+		var apiUrl = getApiUrlLocal();
+		if (apiUrl !== 'api_place_holder' && !branch.setAPIUrl(apiUrl)) {
+			alert('Invalid api_url. Only https://*.branch.io domains are allowed.');
+		}
 
 		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
 			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
