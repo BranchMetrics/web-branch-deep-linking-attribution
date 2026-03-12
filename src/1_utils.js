@@ -1382,4 +1382,3 @@ utils.isValidURL = function(url) {
 	return urlPattern.test(url);
 };
 
-

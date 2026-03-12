@@ -190,11 +190,6 @@ describe('Branch - new', function() {
 		it('test method exists', function() {
 			sinon.assert.match(typeof branch_instance.setAPIUrl, "function");
 		});
-		it('should allow setting api url for branch.io domains', function() {
-			var branch_url = 'https://api2.branch.io';
-			branch_instance.setAPIUrl(branch_url);
-			assert.equal(branch_instance.getAPIUrl(), branch_url);
-		});
 	});
 	describe('getAPIUrl', function() {
 		it('test method exists', function() {

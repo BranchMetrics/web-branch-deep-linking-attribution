@@ -1485,9 +1485,6 @@ describe('utils', function() {
 		});
 	});
 
-
-
-
 	/*
 	describe('journey_cta', function(done) {
 		var html = 'html - validate("https://wdar9-alternate-qa.branchbeta.link/8ih4nDDQH8?__branch_flow_type=journeys_cta_override&__branch_flow_id=819580012495711960&__branch_mobile_deepview_type=4&_branch_match_id=814182034125937862&referrer=link_click_id%3D814182034125937862%26utm_source%3DBranch%26utm_campaign%3DChannel%20Test%26utm_medium%3Djourneys&_t=814182034125937862"); - html';
