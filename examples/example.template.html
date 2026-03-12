@@ -101,7 +101,8 @@
 			try {
 				const parsedApiUrl = new URL(apiUrl);
 				const hostname = parsedApiUrl.hostname.toLowerCase();
-				return hostname === 'branch.io' || hostname.endsWith('.branch.io');
+				return (parsedApiUrl.protocol === 'http:' || parsedApiUrl.protocol === 'https:') &&
+					hostname.endsWith('.branch.io');
 			} catch (err) {
 				return false;
 			}

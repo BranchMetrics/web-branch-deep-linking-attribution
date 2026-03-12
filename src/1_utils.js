@@ -1384,15 +1384,17 @@ utils.isValidURL = function(url) {
 
 /**
  * @param {String} url
- * Validates if URL host is branch.io or a direct subdomain of branch.io
+ * Validates if URL uses http(s) and host is a subdomain of branch.io
  */
 utils.isBranchDomainURL = function(url) {
 	if (!utils.isValidURL(url)) {
 		return false;
 	}
 	try {
-		var hostname = (new URL(url)).hostname.toLowerCase();
-		return hostname === 'branch.io' || hostname.endsWith('.branch.io');
+		var parsedUrl = new URL(url);
+		var hostname = parsedUrl.hostname.toLowerCase();
+		return (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') &&
+			hostname.endsWith('.branch.io');
 	}
 	catch (err) {
 		return false;
