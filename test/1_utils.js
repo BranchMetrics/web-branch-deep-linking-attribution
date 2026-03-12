@@ -1485,33 +1485,7 @@ describe('utils', function() {
 		});
 	});
 
-	describe('isBranchDomainURL', function() {
-		it('should return true for branch.io subdomains', function() {
-			assert.equal(utils.isBranchDomainURL('https://api2.branch.io'), true);
-		});
 
-		it('should return true for http protocol', function() {
-			assert.equal(utils.isBranchDomainURL('http://api2.branch.io'), true);
-		});
-
-		it('should return false for branch.io root domain', function() {
-			assert.equal(utils.isBranchDomainURL('https://branch.io'), false);
-		});
-
-		it('should return false for lookalike domains', function() {
-			assert.equal(utils.isBranchDomainURL('https://branch.io.evil.com'), false);
-		});
-
-		it('should return false for non-branch domains', function() {
-			assert.equal(utils.isBranchDomainURL('https://example.com'), false);
-		});
-
-		it('should return false for non-http protocols', function() {
-			assert.equal(utils.isBranchDomainURL('file://api2.branch.io'), false);
-			assert.equal(utils.isBranchDomainURL('ws://api2.branch.io'), false);
-			assert.equal(utils.isBranchDomainURL('javascript://api2.branch.io'), false);
-		});
-	});
 
 
 	/*

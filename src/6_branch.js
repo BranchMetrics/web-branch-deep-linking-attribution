@@ -2018,15 +2018,10 @@ Branch.prototype['setRequestMetaData'] = function(key, value) {
 Branch.prototype['setAPIUrl'] = function(url) {
 	if (!utils.isValidURL(url)) {
 		console.error("setAPIUrl: Invalid URL format. Default URL will be set.");
-		return false;
-	}
-	if (!utils.isBranchDomainURL(url)) {
-		console.error("setAPIUrl: Only *.branch.io domains are allowed. Default URL will be set.");
-		return false;
+		return;
 	}
 
 	config.api_endpoint = url;
-	return true;
 };
 
 /***

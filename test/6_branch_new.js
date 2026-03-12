@@ -192,19 +192,8 @@ describe('Branch - new', function() {
 		});
 		it('should allow setting api url for branch.io domains', function() {
 			var branch_url = 'https://api2.branch.io';
-			var result = branch_instance.setAPIUrl(branch_url);
-			assert.equal(result, true);
+			branch_instance.setAPIUrl(branch_url);
 			assert.equal(branch_instance.getAPIUrl(), branch_url);
-		});
-		it('should reject non-branch.io domains', function() {
-			var default_url = branch_instance.getAPIUrl();
-			var consoleErrorStub = sandbox.stub(console, 'error');
-
-			var result = branch_instance.setAPIUrl('https://evil.example.com');
-
-			assert.equal(result, false);
-			assert.equal(branch_instance.getAPIUrl(), default_url);
-			sinon.assert.calledWith(consoleErrorStub, 'setAPIUrl: Only *.branch.io domains are allowed. Default URL will be set.');
 		});
 	});
 	describe('getAPIUrl', function() {
