@@ -115,9 +115,25 @@
 			return queryParams['branch_key'] || "key_place_holder"
 		}
 
+		function isAllowedApiUrl(apiUrl) {
+			if (!apiUrl) return false;
+			try {
+				const parsed = new URL(apiUrl);
+				return (parsed.protocol === 'http:' || parsed.protocol === 'https:') &&
+					parsed.hostname.toLowerCase().endsWith('.branch.io');
+			} catch (err) {
+				return false;
+			}
+		}
+
 		function getApiUrlLocal() {
 			const queryParams = getQueryParams();
-			return queryParams['api_url'] || "api_place_holder"
+			const apiUrl = queryParams['api_url'] || "api_place_holder";
+			if (apiUrl !== "api_place_holder" && !isAllowedApiUrl(apiUrl)) {
+				alert('Invalid api_url. Only https://*.branch.io domains are allowed.');
+				return "api_place_holder";
+			}
+			return apiUrl;
 		}
 
 		function getBranchScript() {
@@ -284,7 +300,8 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 		(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src=getBranchScript();k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener banner closeBanner closeJourney data deepview deepviewCta first init link logout removeListener setBranchViewData setIdentity track trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode setRequestMetaData setAPIUrl getAPIUrl setDMAParamsForEEA".split(" "), 0);
-		branch.setAPIUrl(getApiUrlLocal())
+		var apiUrl = getApiUrlLocal();
+		branch.setAPIUrl(apiUrl);
 
 		branch.setAPIResponseCallback(function(url, method, requestBody, error, status, responseBody) {
 			console.log('Request: ' + method + ' ' + url + ' body=' + JSON.stringify(requestBody));
