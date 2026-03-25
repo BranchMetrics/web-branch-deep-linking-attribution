@@ -2,7 +2,7 @@
   description = "web-branch-deep-linking-attribution flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     utils.url = "github:numtide/flake-utils";
   };
 
@@ -10,7 +10,7 @@
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        nodejs = pkgs.nodejs_22;
+        nodejs = pkgs.nodejs_24;
       in
       {
         devShell = pkgs.mkShell {
