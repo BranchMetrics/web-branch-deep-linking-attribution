@@ -10,7 +10,7 @@
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        nodejs = pkgs.nodejs-18_x;
+        nodejs = pkgs.nodejs_22;
       in
       {
         devShell = pkgs.mkShell {

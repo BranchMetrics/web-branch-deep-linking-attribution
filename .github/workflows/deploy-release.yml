@@ -8,13 +8,13 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: 18
+  NODE_VERSION: 22
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: AWS, credentials setup
         uses: aws-actions/configure-aws-credentials@v4
@@ -29,7 +29,7 @@ jobs:
           echo "INPUT_SHA=`echo $INPUT_SHA`" >> $GITHUB_ENV
 
       - name: Install branch-github-actions
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: BranchMetrics/branch-github-actions
           ref: master
