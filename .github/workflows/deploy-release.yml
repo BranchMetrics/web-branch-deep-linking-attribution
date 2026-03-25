@@ -73,7 +73,7 @@ jobs:
           ./deployment/release-s3.sh ${{ steps.next-version.outputs.result }}
 
       - name: Publish to npm
-        run: npm publish
+        run: npm publish --provenance
 
       - name: Create Github Release
         uses: actions/github-script@v7
