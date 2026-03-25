@@ -57,6 +57,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
 
       # Do this before npm configure because it writes the package.json version
       - name: Write version to files
@@ -73,7 +74,7 @@ jobs:
           ./deployment/release-s3.sh ${{ steps.next-version.outputs.result }}
 
       - name: Publish to npm
-        run: npm publish --provenance
+        run: npm publish
 
       - name: Create Github Release
         uses: actions/github-script@v7
