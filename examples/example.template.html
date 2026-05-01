@@ -89,6 +89,8 @@
 
 	</style>
 	<script>
+		const RESERVED_PARAMS = ['branch_key', 'api_url', '_branch_match_id', 'branchify_url'];
+
 		function getFinalValue(inputValue, documentKey) {
 			if (inputValue) return inputValue;
 			return document.getElementById(documentKey).value.trim();
@@ -97,8 +99,9 @@
 		function updateQueryParams(branchKey, apiUrl, script) {
 			let finalBranchKey = getFinalValue(branchKey,'branchKeyInput');
 			let finalApiUrl = getFinalValue(apiUrl,'apiUrlInput');
+			let finalMetadata = getFinalValue(null, 'metadataInput');
 
-			if (!finalBranchKey && !finalApiUrl) {
+			if (!finalBranchKey && !finalApiUrl && !finalMetadata) {
 				alert('Please provide at least one value to update.');
 				return;
 			}
@@ -106,6 +109,30 @@
 			const url = new URL(window.location.href);
 			if (finalBranchKey) url.searchParams.set('branch_key', finalBranchKey);
 			if (finalApiUrl) url.searchParams.set('api_url', finalApiUrl);
+
+			// Clear existing metadata params
+			Array.from(url.searchParams.keys()).forEach(key => {
+				if (!RESERVED_PARAMS.includes(key)) {
+					url.searchParams.delete(key);
+				}
+			});
+
+			// Add new metadata params from JSON input
+			if (finalMetadata) {
+				try {
+					const metadata = JSON.parse(finalMetadata);
+					if (typeof metadata !== 'object' || metadata === null || Array.isArray(metadata)) {
+						alert('Metadata must be a JSON object, e.g., {"key": "value"}');
+						return;
+					}
+					for (const [key, value] of Object.entries(metadata)) {
+						url.searchParams.set(key, value);
+					}
+				} catch (e) {
+					alert('Invalid JSON in metadata field: ' + e.message);
+					return;
+				}
+			}
 
 			window.location.href = url.toString();
 		}
@@ -149,12 +176,33 @@
 			return queryParams;
 		}
 
+		function getMetadataFromQp() {
+			const qp = getQueryParams();
+			const metadata = {};
+
+			for (const [key, value] of Object.entries(qp)) {
+				if (!RESERVED_PARAMS.includes(key)) {
+					metadata[key] = value;
+				}
+			}
+
+			return Object.keys(metadata).length > 0 ? metadata : null;
+		}
+
 		function setLabelText() {
 			const keyLabel = document.getElementById('branchKeyLabel');
 			keyLabel.textContent = `Branch Key: ${getBranchKey()}`;
 
 			const apiLabel = document.getElementById('apiUrlLabel');
 			apiLabel.textContent = `Api Url: ${getApiUrlLocal()}`;
+
+			const metadataLabel = document.getElementById('metadataLabel');
+			const metadata = getMetadataFromQp();
+			if (metadata && Object.keys(metadata).length > 0) {
+				metadataLabel.textContent = `Metadata: ${JSON.stringify(metadata)}`;
+			} else {
+				metadataLabel.textContent = 'Metadata (JSON):';
+			}
 		}
 
 		function onLoad() {
@@ -272,6 +320,9 @@
 					<label id="apiUrlLabel" for="apiUrlInput">Api Url:</label>
 					<input type="text" id="apiUrlInput" class="apiInput">
 					<br>
+					<label id="metadataLabel" for="metadataInput">Metadata (JSON):</label>
+					<input type="text" id="metadataInput" class="apiInput" placeholder='{"product_id": "123", "category": "shoes"}'>
+					<br>
 					<button class="btn btn-info" onclick="updateQueryParams()">
 						Update Api Settings
 					</button>
@@ -314,7 +365,13 @@
 		});
 
 		// Take the Branch key from a meta tag
-		branch.init(getBranchKey(), function(err, data) {
+		var initOptions = {};
+		var metadata = getMetadataFromQp();
+		if (metadata) {
+			initOptions.metadata = metadata;
+		}
+
+		branch.init(getBranchKey(), initOptions, function(err, data) {
 			// Avoid XSS by HTML escaping the data for display
 			$('#session-info').text(JSON.stringify(data, null, 2));
 			if (err) {
