@@ -462,6 +462,11 @@ Branch.prototype['init'] = wrap(
 
 		var finishInit = function(err, data) {
 
+			// Marks the moment the SDK is about to hand session data to the
+			// developer's init() callback (covers both the error and success paths
+			// below). First write wins.
+			utils.markPerformance('init_callback_fired');
+
 			if (data) {
 				data = setBranchValues(data);
 
@@ -2030,5 +2035,61 @@ Branch.prototype['setAPIUrl'] = function(url) {
  */
 Branch.prototype['getAPIUrl'] = function() {
 	return config.api_endpoint;
+};
+
+/***
+ * @function Branch.getPerformanceMetrics
+ *
+ * Returns sub-millisecond timings (performance.now()) and computed durations for
+ * each SDK initialization phase: script load/parse, /_r, /v1/open, /v1/pageview,
+ * banner render, and the init() callback. Phases that did not occur return null
+ * (e.g. /_r skipped on Safari 11+, no banner rendered, or no Resource Timing /
+ * NPM bundle for script load). The returned object contains only numeric
+ * timestamps -- no URLs, identifiers, or PII -- and nothing is sent to Branch.
+ * The top-level "performance_supported" flag is false when the browser lacks the
+ * Performance API, which disambiguates "every timing is null because we could not
+ * measure" from "a phase was skipped". See the README "Performance Monitoring" section.
+ */
+Branch.prototype['getPerformanceMetrics'] = function() {
+	var marks = utils.performanceTimings || {};
+	var script = utils.getScriptResourceTiming();
+
+	var val = function(name) {
+		return marks.hasOwnProperty(name) ? marks[name] : null;
+	};
+	var dur = function(a, b) {
+		return (a !== null && a !== undefined && b !== null && b !== undefined) ? (b - a) : null;
+	};
+
+	var timings = {
+		'sdk_script_load_start': script ? script.start : null,
+		'sdk_script_load_end': script ? script.end : null,
+		'sdk_parse_end': val('sdk_parse_end'),
+		'_r_request_start': val('_r_request_start'),
+		'_r_response_received': val('_r_response_received'),
+		'v1_open_request_start': val('v1_open_request_start'),
+		'v1_open_response_received': val('v1_open_response_received'),
+		'v1_pageview_request_start': val('v1_pageview_request_start'),
+		'v1_pageview_response_received': val('v1_pageview_response_received'),
+		'banner_render_start': val('banner_render_start'),
+		'banner_render_end': val('banner_render_end'),
+		'init_callback_fired': val('init_callback_fired')
+	};
+
+	var durations = {
+		'sdk_script_download_ms': dur(timings['sdk_script_load_start'], timings['sdk_script_load_end']),
+		'sdk_parse_ms': dur(timings['sdk_script_load_end'], timings['sdk_parse_end']),
+		'_r_roundtrip_ms': dur(timings['_r_request_start'], timings['_r_response_received']),
+		'v1_open_roundtrip_ms': dur(timings['v1_open_request_start'], timings['v1_open_response_received']),
+		'v1_pageview_roundtrip_ms': dur(timings['v1_pageview_request_start'], timings['v1_pageview_response_received']),
+		'banner_render_ms': dur(timings['banner_render_start'], timings['banner_render_end']),
+		'total_init_ms': dur(timings['sdk_script_load_start'], timings['init_callback_fired'])
+	};
+
+	return {
+		'performance_supported': utils.performanceEnabled,
+		'timings': timings,
+		'durations': durations
+	};
 };
 

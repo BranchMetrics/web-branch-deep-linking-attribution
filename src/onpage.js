@@ -59,7 +59,8 @@
 		'setRequestMetaData',
 		'setDMAParamsForEEA',
 		'setAPIUrl',
-		'getAPIUrl'
+		'getAPIUrl',
+		'getPerformanceMetrics'
 	],
 	0
 );
