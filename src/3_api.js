@@ -18,6 +18,15 @@
 
  Server.prototype._jsonp_callback_index = 0;
 
+ // Maps the init-critical endpoints to the metric prefix used by
+ // branch.getPerformanceMetrics(). Endpoints not in this map are ignored by the
+ // high-precision performance collector.
+ var PERF_ENDPOINT_MAP = {
+	'/_r': '_r',
+	'/v1/open': 'v1_open',
+	'/v1/pageview': 'v1_pageview'
+ };
+
  /**
   * @param {Object} obj
   * @param {string} prefix
@@ -365,6 +374,11 @@
 
 	utils.currentRequestBrttTag = resource.endpoint + '-brtt';
 
+	var perfName = PERF_ENDPOINT_MAP[resource.endpoint];
+	if (perfName) {
+		utils.markPerformance(perfName + '_request_start');
+	}
+
 	if ((resource.endpoint === "/v1/url") && Object.keys(utils.instrumentation).length > 1) {
 		delete utils.instrumentation['-brtt'];
 		data['instrumentation'] = safejson.stringify(utils.merge({}, utils.instrumentation));
@@ -416,6 +430,12 @@
 	  * @type {function(?Error,*=): ?undefined}
 	*/
 	var done = function(err, data, status) {
+		// Mark the response only on a successful response; first write wins, so a
+		// retry-then-success records the first success and an errored/timed-out
+		// phase leaves its *_response_received unset (null roundtrip).
+		if (!err && perfName) {
+			utils.markPerformance(perfName + '_response_received');
+		}
 		if (typeof self.onAPIResponse === 'function') {
 			// Record every request and response, including retries
 			// Note status is always undefined for jsonp requests (/_r and
