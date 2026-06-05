@@ -27,7 +27,6 @@ describe('getPerformanceMetrics', function() {
 		utils.performanceTimings = {};
 	});
 
-	// FR-001: contract shape
 	it('returns the { performance_supported, timings, durations } contract with every key present', function() {
 		var metrics = new Branch().getPerformanceMetrics();
 		assert.deepEqual(Object.keys(metrics).sort(), ['durations', 'performance_supported', 'timings'], 'top-level keys');
@@ -40,7 +39,6 @@ describe('getPerformanceMetrics', function() {
 		});
 	});
 
-	// FR-006: null-safety when nothing was marked
 	it('returns null for every timing and duration when no phase was marked', function() {
 		var metrics = new Branch().getPerformanceMetrics();
 		TIMING_KEYS.forEach(function(k) {
@@ -51,7 +49,6 @@ describe('getPerformanceMetrics', function() {
 		});
 	});
 
-	// FR-002 + contract math: durations computed as differences
 	it('computes durations from seeded timestamps', function() {
 		utils.performanceTimings = {
 			'sdk_parse_end': 250,
@@ -69,7 +66,6 @@ describe('getPerformanceMetrics', function() {
 		assert.strictEqual(d.v1_pageview_roundtrip_ms, 390, 'pageview roundtrip');
 	});
 
-	// FR-004: /_r skipped (Safari 11+) yields null _r timings, others populated
 	it('keeps _r timings null when /_r is skipped but reports the other phases', function() {
 		utils.performanceTimings = {
 			'v1_open_request_start': 100,
@@ -82,7 +78,6 @@ describe('getPerformanceMetrics', function() {
 		assert.strictEqual(m.durations.v1_open_roundtrip_ms, 600, 'open roundtrip computed');
 	});
 
-	// FR-005: absent banner yields null banner timings
 	it('returns null banner timings when no banner was rendered', function() {
 		utils.performanceTimings = { 'init_callback_fired': 500 };
 		var m = new Branch().getPerformanceMetrics();
@@ -91,7 +86,6 @@ describe('getPerformanceMetrics', function() {
 		assert.strictEqual(m.durations.banner_render_ms, null, 'banner duration null');
 	});
 
-	// EDGE-07: markPerformance is first-write-wins
 	it('markPerformance records only the first value for a given name', function() {
 		utils.markPerformance('v1_open_request_start');
 		var first = utils.performanceTimings.v1_open_request_start;
@@ -100,7 +94,6 @@ describe('getPerformanceMetrics', function() {
 		assert.strictEqual(typeof first, 'number', 'value is a numeric performance.now() timestamp');
 	});
 
-	// NFR-PERF-001: instrumentation overhead < 1ms for the full set of marks
 	it('marks all init phases in well under 1ms total', function() {
 		var names = TIMING_KEYS.slice();
 		var start = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
