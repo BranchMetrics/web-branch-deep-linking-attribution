@@ -42,6 +42,45 @@ utils.calculateBrtt = function(startTime) {
 	return (Date.now() - startTime).toString();
 };
 
+// High-precision performance timings exposed via branch.getPerformanceMetrics().
+// Kept separate from utils.instrumentation (brtt/Date.now, backend-bound) so that
+// the data sent to the backend stays untouched. Values are performance.now()
+// timestamps (fractional milliseconds).
+utils.performanceTimings = {};
+utils.performanceEnabled = typeof window !== 'undefined' &&
+	!!(window.performance && typeof window.performance.now === 'function');
+utils.markPerformance = function(name) {
+	// First write wins, so a re-init / disableTracking(false) re-init does not
+	// overwrite the original init measurement.
+	if (utils.performanceEnabled && !utils.performanceTimings.hasOwnProperty(name)) {
+		utils.performanceTimings[name] = window.performance.now();
+	}
+};
+utils.getScriptResourceTiming = function() {
+	// Returns { start, end } for the Branch SDK script from the Resource Timing
+	// API, or null when unavailable: no API, NPM bundle (no separate script
+	// resource), or cross-origin without a Timing-Allow-Origin header (responseEnd
+	// reads as 0 in that case, which we treat as null rather than a misleading 0).
+	if (!utils.performanceEnabled || typeof window.performance.getEntriesByType !== 'function') {
+		return null;
+	}
+	var entries = window.performance.getEntriesByType('resource') || [];
+	for (var i = 0; i < entries.length; i++) {
+		var entryName = entries[i].name || '';
+		if (entryName.indexOf('branch') >= 0 && entryName.indexOf('.js') >= 0) {
+			var startTime = entries[i].startTime;
+			var responseEnd = entries[i].responseEnd;
+			return {
+				// Explicit null checks (not `|| null`) so a legitimate startTime of 0
+				// is preserved, consistent with the duration null-safety below.
+				start: (startTime !== undefined && startTime !== null) ? startTime : null,
+				end: responseEnd ? responseEnd : null
+			};
+		}
+	}
+	return null;
+};
+
 utils.dismissEventToSourceMapping = {
 	'didClickJourneyClose': 'Button(X)',
 	'didClickJourneyContinue': 'Dismiss Journey text',
