@@ -8,6 +8,12 @@ goog.provide('branch_instance');
 
 goog.require('Branch');
 goog.require('config'); // jshint unused:false
+goog.require('utils'); // jshint unused:false
+
+// This file is the SDK entry point: it runs once the script has been downloaded
+// and parsed and the `branch` global is about to become available. Mark the parse
+// boundary here for branch.getPerformanceMetrics().
+utils.markPerformance('sdk_parse_end');
 
 branch_instance = new Branch();
 

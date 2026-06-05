@@ -115,6 +115,9 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
     	return;
 	}
 
+	// Banner/Journey render begins here (past the exit-animation early return).
+	utils.markPerformance('banner_render_start');
+
 	journeys_utils.branchViewId = templateId;
 	journeys_utils.setJourneyLinkData(journeyLinkData);
 
@@ -172,7 +175,8 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 			if (utils.navigationTimingAPIEnabled) {
 				utils.instrumentation['journey-load-time'] = utils.timeSinceNavigationStart();
 			}
-			
+			utils.markPerformance('banner_render_end');
+
 			document.body.removeChild(placeholder);
 		}
 		renderHtmlBlob(document.body, html, requestData['has_app_websdk'], finalHookupsOnIframeLoaded);
