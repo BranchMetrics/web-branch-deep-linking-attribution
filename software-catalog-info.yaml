@@ -1,5 +1,3 @@
-Based on the README, I can see this is a JavaScript SDK library for web integration. Let me generate the catalog file according to your template:
-
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
