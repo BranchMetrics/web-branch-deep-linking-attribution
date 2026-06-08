@@ -1,7 +1,10 @@
 'use strict';
 /*jshint esversion: 6 */
+var sinon = require('sinon');
 goog.require('utils');
 goog.require('Branch');
+goog.require('branch_view');
+goog.require('journeys_utils');
 
 // Covers EMT-3753 Deliverable 1 — branch.getPerformanceMetrics().
 // These tests exercise the pure assembly/null-safety logic by seeding
@@ -136,6 +139,40 @@ describe('getPerformanceMetrics', function() {
 				{ name: 'https://cdn.branch.io/branch-latest.min.js', initiatorType: 'script', startTime: 12, responseEnd: 0 }
 			]);
 			assert.deepEqual(utils.getScriptResourceTiming(), { start: 12, end: null }, 'end null when responseEnd is 0');
+		});
+	});
+
+	describe('banner render timings', function() {
+		var fs = require('fs');
+		var path = require('path');
+		var bannerHtml = fs.readFileSync(path.join(__dirname, 'blob-banner.html'), 'utf8');
+		var sb;
+
+		beforeEach(function() {
+			utils.performanceTimings = {};
+			sb = sinon.createSandbox();
+			// Minimal SDK state the render path reads.
+			journeys_utils.branch = { _publishEvent: function() {}, _storage: { get: function() { return null; }, set: function() {} } };
+			// Isolate from the journey-rendering internals; this test only asserts the perf marks.
+			['finalHookups', 'addHtmlToIframe', 'addIframeOuterCSS', 'addIframeInnerCSS', 'addDynamicCtaText', 'animateBannerEntrance', 'getJsAndAddToParent'].forEach(function(fn) {
+				if (typeof journeys_utils[fn] === 'function') { sb.stub(journeys_utils, fn); }
+			});
+		});
+		afterEach(function() { sb.restore(); });
+
+		it('marks banner_render_start when displayJourney runs and banner_render_end when the iframe loads', function() {
+			var requestData = { has_app_websdk: false, callback_string: 'branch_view_callback__test' };
+			branch_view.displayJourney(bannerHtml, requestData, '345', { id: '345' }, false, { type: 'desktop', variant: 'default' });
+			assert(utils.performanceTimings.hasOwnProperty('banner_render_start'), 'banner_render_start marked when displayJourney runs');
+
+			var iframe = document.getElementById('branch-banner-iframe');
+			assert(iframe, 'banner iframe was created');
+			// Fire the load handler deterministically; null it first so jsdom's own async
+			// load event does not re-run the cleanup (which would throw NotFoundError).
+			var onload = iframe.onload;
+			iframe.onload = null;
+			if (typeof onload === 'function') { onload.call(iframe); }
+			assert(utils.performanceTimings.hasOwnProperty('banner_render_end'), 'banner_render_end marked after the iframe loads');
 		});
 	});
 });
