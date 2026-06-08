@@ -101,4 +101,41 @@ describe('getPerformanceMetrics', function() {
 		var elapsed = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) - start;
 		assert(elapsed < 1, 'marking ' + names.length + ' phases took ' + elapsed.toFixed(4) + 'ms (< 1ms)');
 	});
+
+	describe('getScriptResourceTiming', function() {
+		var original;
+		function stubEntries(entries) {
+			original = window.performance.getEntriesByType;
+			window.performance.getEntriesByType = function() { return entries; };
+		}
+		afterEach(function() {
+			if (original) { window.performance.getEntriesByType = original; original = null; }
+		});
+
+		it('matches the Branch SDK script (script initiator + branch*.js filename) and returns its timing', function() {
+			stubEntries([
+				{ name: 'https://analytics.example.com/analytics.js', initiatorType: 'script', startTime: 1, responseEnd: 2 },
+				{ name: 'https://cdn.branch.io/branch/loader.css', initiatorType: 'link', startTime: 3, responseEnd: 4 },
+				{ name: 'https://api2.branch.io/v1/open', initiatorType: 'xmlhttprequest', startTime: 5, responseEnd: 6 },
+				{ name: 'https://cdn.branch.io/branch-latest.min.js', initiatorType: 'script', startTime: 10, responseEnd: 25 }
+			]);
+			assert.deepEqual(utils.getScriptResourceTiming(), { start: 10, end: 25 }, 'returns the branch script start/end');
+		});
+
+		it('ignores a /branch/ directory segment and non-script resources (no false positive)', function() {
+			stubEntries([
+				{ name: 'https://cdn.branch.io/branch/loader.js', initiatorType: 'script', startTime: 3, responseEnd: 4 },
+				{ name: 'https://x/app.js', initiatorType: 'script', startTime: 1, responseEnd: 2 },
+				{ name: 'https://cdn.branch.io/branch-latest.min.js', initiatorType: 'xmlhttprequest', startTime: 7, responseEnd: 9 }
+			]);
+			assert.strictEqual(utils.getScriptResourceTiming(), null, 'no match -> null');
+		});
+
+		it('treats a cross-origin responseEnd of 0 as null (no misleading zero)', function() {
+			stubEntries([
+				{ name: 'https://cdn.branch.io/branch-latest.min.js', initiatorType: 'script', startTime: 12, responseEnd: 0 }
+			]);
+			assert.deepEqual(utils.getScriptResourceTiming(), { start: 12, end: null }, 'end null when responseEnd is 0');
+		});
+	});
 });
