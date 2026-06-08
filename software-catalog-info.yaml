@@ -1,0 +1,18 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: web-branch-deep-linking-attribution
+  description: Branch Metrics Deep Linking/Smart Banner Web SDK
+  tags:
+    - javascript
+    - sdk
+    - web
+    - deep-linking
+  annotations:
+    github.com/project-slug: BranchMetrics/web-branch-deep-linking-attribution
+spec:
+  type: library
+  lifecycle: production
+  owner: Engagement
+---
