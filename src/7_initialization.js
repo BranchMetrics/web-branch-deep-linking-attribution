@@ -12,7 +12,8 @@ goog.require('utils'); // jshint unused:false
 
 // This file is the SDK entry point: it runs once the script has been downloaded
 // and parsed and the `branch` global is about to become available. Mark the parse
-// boundary here for branch.getPerformanceMetrics().
+// boundary here for branch.getPerformanceMetrics(). If performance.now() is not
+// available, the mark is silently skipped and performance_supported will be false.
 utils.markPerformance('sdk_parse_end');
 
 branch_instance = new Branch();

@@ -67,7 +67,11 @@ utils.getScriptResourceTiming = function() {
 	var entries = window.performance.getEntriesByType('resource') || [];
 	for (var i = 0; i < entries.length; i++) {
 		var entryName = entries[i].name || '';
-		if (entryName.indexOf('branch') >= 0 && entryName.indexOf('.js') >= 0) {
+		var entryInitiator = entries[i].initiatorType || '';
+		// Match the Branch SDK script specifically: a script-initiated resource whose
+		// filename starts with "branch" and ends in .js -- not any URL that merely
+		// contains "branch" and ".js" (which could be a /branch/ path or an unrelated bundle).
+		if (entryInitiator === 'script' && /branch[^/]*\.js(\?.*)?$/.test(entryName)) {
 			var startTime = entries[i].startTime;
 			var responseEnd = entries[i].responseEnd;
 			return {

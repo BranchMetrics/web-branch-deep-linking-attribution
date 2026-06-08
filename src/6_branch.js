@@ -2083,6 +2083,8 @@ Branch.prototype['getPerformanceMetrics'] = function() {
 		'v1_open_roundtrip_ms': dur(timings['v1_open_request_start'], timings['v1_open_response_received']),
 		'v1_pageview_roundtrip_ms': dur(timings['v1_pageview_request_start'], timings['v1_pageview_response_received']),
 		'banner_render_ms': dur(timings['banner_render_start'], timings['banner_render_end']),
+		// Intentionally ends at the init() callback (per spec): excludes /v1/pageview and
+		// banner render, which complete afterwards. Use the raw timestamps for those.
 		'total_init_ms': dur(timings['sdk_script_load_start'], timings['init_callback_fired'])
 	};
 
