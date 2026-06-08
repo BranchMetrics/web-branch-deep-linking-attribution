@@ -1,0 +1,20 @@
+Based on the README, I can see this is a JavaScript SDK library for web integration. Let me generate the catalog file according to your template:
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: web-branch-deep-linking-attribution
+  description: Branch Metrics Deep Linking/Smart Banner Web SDK
+  tags:
+    - javascript
+    - sdk
+    - web
+    - deep-linking
+  annotations:
+    github.com/project-slug: BranchMetrics/web-branch-deep-linking-attribution
+spec:
+  type: library
+  lifecycle: production
+  owner: Engagement
+---
