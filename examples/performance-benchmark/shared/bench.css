@@ -1,0 +1,189 @@
+body {
+	font: 14px -apple-system, "Segoe UI", Roboto, sans-serif;
+	color: #1a1a1a;
+	margin: 32px;
+	max-width: 820px;
+}
+h1 {
+	font-size: 19px;
+	margin: 0 0 6px;
+}
+h2 {
+	font-size: 16px;
+	margin: 22px 0 8px;
+}
+.sub {
+	color: #555;
+	font-size: 12px;
+	line-height: 1.55;
+	margin-bottom: 16px;
+}
+code {
+	font-family: ui-monospace, Menlo, monospace;
+	background: #f2f2f4;
+	padding: 1px 4px;
+	border-radius: 3px;
+	font-size: 12px;
+}
+.row {
+	margin: 12px 0;
+}
+button {
+	padding: 7px 14px;
+	font-size: 13px;
+	cursor: pointer;
+}
+.meta {
+	color: #666;
+	font-size: 12px;
+	margin-left: 8px;
+}
+.status {
+	font-size: 13px;
+	margin: 12px 0;
+	color: #0b6;
+}
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin-top: 8px;
+}
+th,
+td {
+	border: 1px solid #ddd;
+	padding: 5px 9px;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+th {
+	background: #f5f5f7;
+}
+td.k,
+th.k {
+	text-align: left;
+	font-family: ui-monospace, Menlo, monospace;
+	font-size: 12px;
+}
+.null {
+	color: #aaa;
+}
+.chr {
+	margin-top: 10px;
+	font-size: 13px;
+}
+pre {
+	background: #f7f7f8;
+	border: 1px solid #eee;
+	padding: 12px;
+	font-size: 11px;
+	overflow: auto;
+	max-height: 360px;
+}
+nav a {
+	display: inline-block;
+	margin-right: 16px;
+}
+
+/* Top navigation bar (all pages) */
+.topnav {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	margin: -16px -16px 22px;
+	padding: 12px 20px;
+	background: #1a1a1f;
+	color: #fff;
+	font-size: 13px;
+	border-radius: 0 0 8px 8px;
+}
+.topnav .brand {
+	font-weight: 600;
+	margin-right: auto;
+	color: #fff;
+}
+.topnav a {
+	color: #c9c9d4;
+	text-decoration: none;
+	padding: 4px 8px;
+	border-radius: 5px;
+}
+.topnav a:hover {
+	background: #2c2c36;
+	color: #fff;
+}
+.topnav a.active {
+	background: #3b82f6;
+	color: #fff;
+}
+
+/* Landing cards */
+.tip {
+	background: #fff8e6;
+	border: 1px solid #f3e2b3;
+	border-radius: 8px;
+	padding: 10px 14px;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: #6b5a1e;
+}
+.cards {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin: 20px 0;
+}
+.card {
+	border: 1px solid #e3e3e8;
+	border-radius: 10px;
+	padding: 18px 18px 20px;
+	background: #fcfcfd;
+}
+.card h2 {
+	margin: 0 0 8px;
+	font-size: 15px;
+}
+.card p {
+	color: #555;
+	font-size: 12.5px;
+	line-height: 1.5;
+	margin: 0 0 16px;
+	min-height: 52px;
+}
+.card .actions {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+.btn {
+	display: inline-block;
+	padding: 8px 14px;
+	border-radius: 7px;
+	border: 1px solid #d0d0d8;
+	background: #fff;
+	color: #1a1a1a;
+	text-decoration: none;
+	font-size: 13px;
+	cursor: pointer;
+}
+.btn:hover {
+	border-color: #3b82f6;
+}
+.btn.primary {
+	background: #3b82f6;
+	border-color: #3b82f6;
+	color: #fff;
+}
+.btn.primary:hover {
+	background: #2f6fe0;
+}
+.note {
+	color: #777;
+	font-size: 11.5px;
+	line-height: 1.6;
+	margin-top: 18px;
+}
+@media (max-width: 640px) {
+	.cards {
+		grid-template-columns: 1fr;
+	}
+}

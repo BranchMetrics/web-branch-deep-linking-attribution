@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>EMT-3769 · Web SDK delivery benchmark</title>
+  <link rel="stylesheet" href="/shared/bench.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">EMT-3769 · delivery benchmark</span>
+    <a href="/landing.html" class="active">Home</a>
+    <a href="/script-tag/test-script-tag.html?auto=1&iterations=20" target="_blank" rel="noopener">&lt;script&gt; tag ↗</a>
+    <a href="/npm-import/test-npm-import.html?auto=1&iterations=20" target="_blank" rel="noopener">npm import ↗</a>
+  </nav>
+
+  <h1>Web SDK delivery benchmark</h1>
+  <p class="sub">
+    Compares the two Branch Web SDK integration methods over repeated loads — the
+    <code>&lt;script&gt;</code> tag (CDN) path vs the npm import (bundled inline)
+    path. Each test runs <code>branch.init()</code> N times and aggregates
+    mean / median / p95 / max plus First Contentful Paint and cache hit rate.
+    Both exercise the SAME locally-built SDK, so the comparison isolates delivery.
+  </p>
+
+  <p class="tip">
+    💡 Tip: open <b>DevTools → Network → throttle to "Slow 4G"</b> before running, to
+    see realistic numbers and the sequential <code>_r → v1/open → v1/pageview</code>
+    waterfall. Each test opens in its own tab — run both and compare side by side.
+  </p>
+
+  <div class="cards">
+    <section class="card">
+      <h2>&lt;script&gt; tag (CDN)</h2>
+      <p>Classic <code>&lt;script src=…&gt;</code>. Loads the local build by default; add <code>?cdn=1</code> for the real CDN (load-only).</p>
+      <div class="actions">
+        <a class="btn primary" href="/script-tag/test-script-tag.html?auto=1&iterations=20" target="_blank" rel="noopener">Run · 20 iterations ↗</a>
+        <a class="btn" href="/script-tag/test-script-tag.html?auto=1&iterations=5" target="_blank" rel="noopener">Quick · 5 ↗</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>npm import (inline)</h2>
+      <p>Static <code>import branch from 'branch-sdk'</code>, bundled inline by Vite/Rollup — the recommended layout.</p>
+      <div class="actions">
+        <a class="btn primary" href="/npm-import/test-npm-import.html?auto=1&iterations=20" target="_blank" rel="noopener">Run · 20 iterations ↗</a>
+        <a class="btn" href="/npm-import/test-npm-import.html?auto=1&iterations=5" target="_blank" rel="noopener">Quick · 5 ↗</a>
+      </div>
+    </section>
+  </div>
+
+  <p class="note">
+    A run reloads its tab N times (status shows progress), then renders the results
+    table + raw JSON. For the automated, throttled, cold+warm matrix use
+    <code>npm run bench</code> — it writes <code>results/latest.json</code>. Full
+    analysis: <code>docs/npm-vs-script-tag-performance.md</code>.
+  </p>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Subproject deps & build artifacts (regenerated)
+node_modules
+dist
+public/branch-sdk-cdn.min.js
+public/sdk-build-info.json
+
+# The runner overwrites results/latest.json each run — that one is transient.
+# Dated snapshots (results/YYYY-MM-DD-*.json) are committed as the record of a run.
+results/latest.json

@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>EMT-3769 · npm import (bundled) delivery</title>
+  <link rel="stylesheet" href="/shared/bench.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">EMT-3769 · delivery benchmark</span>
+    <a href="/landing.html">Home</a>
+    <a href="/script-tag/test-script-tag.html?auto=1&iterations=20" target="_blank" rel="noopener">&lt;script&gt; tag ↗</a>
+    <a href="/npm-import/test-npm-import.html?auto=1&iterations=20" class="active">npm import</a>
+  </nav>
+  <h1>EMT-3769 — npm import (bundled) delivery</h1>
+  <p class="sub">
+    Imports the SDK via a <strong>static</strong> <code>import branch from 'branch-sdk'</code>,
+    so the bundler (Vite/Rollup) inlines it into the entry chunk — the recommended
+    npm delivery path. There is no separate SDK request, so <code>total_init_ms</code>
+    and <code>sdk_parse_ms</code> are null by design (the SDK is compiled into the
+    entry chunk and not separately attributable); the byte metrics describe the
+    bundled chunk the browser downloads, and <code>fcp_ms</code> captures render time.
+  </p>
+  <div class="row" id="controls"></div>
+  <div class="status" id="status">Bundling + loading SDK…</div>
+  <div id="result"></div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

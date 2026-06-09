@@ -1,0 +1,23 @@
+{
+  "name": "branch-sdk-perf-benchmark",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "EMT-3769 — benchmark Branch Web SDK delivery: <script> tag (CDN) vs npm import (bundled).",
+  "scripts": {
+    "presync-sdk": "npm run build --prefix ../..",
+    "sync-sdk": "node copy-sdk.mjs",
+    "dev": "npm run sync-sdk && vite",
+    "build": "npm run sync-sdk && vite build",
+    "preview": "vite preview --port 4317",
+    "bench": "npm run sync-sdk && node runner.mjs",
+    "bench:headed": "npm run sync-sdk && node runner.mjs --headed"
+  },
+  "dependencies": {
+    "branch-sdk": "file:../.."
+  },
+  "devDependencies": {
+    "playwright": "^1.45.0",
+    "vite": "^5.4.0"
+  }
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>EMT-3769 · &lt;script&gt; tag (CDN) delivery</title>
+  <link rel="stylesheet" href="/shared/bench.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">EMT-3769 · delivery benchmark</span>
+    <a href="/landing.html">Home</a>
+    <a href="/script-tag/test-script-tag.html?auto=1&iterations=20" class="active">&lt;script&gt; tag</a>
+    <a href="/npm-import/test-npm-import.html?auto=1&iterations=20" target="_blank" rel="noopener">npm import ↗</a>
+  </nav>
+  <h1>EMT-3769 — &lt;script&gt; tag delivery</h1>
+  <p class="sub">
+    Loads the SDK as a classic <code>&lt;script src&gt;</code>, then runs
+    <code>branch.init()</code> + <code>getPerformanceMetrics()</code> per load.
+    Default source is the locally-served build (identical to the CDN artifact, so
+    <code>getPerformanceMetrics()</code> is present). Append <code>?cdn=1</code> to
+    load the public <code>cdn.branch.io/branch-latest.min.js</code> instead
+    (load-only; the released CDN build predates the metrics API).
+  </p>
+
+  <!--
+    The SDK script src is injected by the inline script below so we can switch
+    between the local build and the real CDN via the ?cdn query param BEFORE the
+    module harness runs. Resource Timing then captures its transfer/cache stats.
+  -->
+  <div class="row" id="controls"></div>
+  <div class="status" id="status">Loading SDK…</div>
+  <div id="result"></div>
+
+  <script>
+    (function loadSdk() {
+      var qp = new URLSearchParams(location.search);
+      var useCdn = qp.get('cdn') === '1';
+      var src = useCdn
+        ? 'https://cdn.branch.io/branch-latest.min.js'
+        : '/branch-sdk-cdn.min.js';
+      window.__SDK_SRC__ = src;
+      window.__SDK_MATCH__ = useCdn ? 'branch-latest.min.js' : 'branch-sdk-cdn.min.js';
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function () { window.__SDK_READY__ = true; };
+      s.onerror = function () {
+        document.getElementById('status').textContent = 'Failed to load SDK from ' + src;
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
+
+  <script type="module" src="./run.js"></script>
+</body>
+</html>
