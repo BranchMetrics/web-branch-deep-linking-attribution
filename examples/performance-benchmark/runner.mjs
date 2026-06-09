@@ -20,7 +20,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const flag = (name, def) => {
 	const i = args.indexOf(name);
-	return i !== -1 && args[i + 1] ? args[i + 1] : def;
+	// Guard the bounds and reject a following flag, so `--iterations` as the last
+	// arg (or before another `--flag`) falls back to the default instead of NaN.
+	return i !== -1 && i + 1 < args.length && !args[i + 1].startsWith('--') ? args[i + 1] : def;
 };
 const HEADED = args.includes('--headed');
 const ITERATIONS = parseInt(flag('--iterations', '20'), 10);
@@ -174,7 +176,9 @@ async function main() {
 		// 3. Drive.
 		const { chromium } = await import('playwright');
 		playwright = await chromium.launch({ headless: !HEADED });
-		const results = { generated: new Date().toISOString(), iterations: ITERATIONS, key: 'demo key', methods: {} };
+		// Record a redacted key prefix for traceability (distinguish runs) without
+		// writing the full key into the committed results file.
+		const results = { generated: new Date().toISOString(), iterations: ITERATIONS, key: KEY.slice(0, 12) + '…', methods: {} };
 		for (const page of PAGES) {
 			results.methods[page.method] = {};
 			for (const [profileName, profile] of Object.entries(PROFILES)) {

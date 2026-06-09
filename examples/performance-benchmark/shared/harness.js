@@ -43,13 +43,15 @@ function initBranchAsync(branch, key) {
 			if (safety) clearTimeout(safety);
 			resolve({ err, data, tStart, tCallback: performance.now() });
 		};
+		// Arm the safety timeout BEFORE init() so a synchronous callback can clear
+		// it (otherwise a sync `done()` runs while `safety` is still null, leaving a
+		// dangling 15s timer). Never hangs the series if a callback is dropped.
+		safety = setTimeout(() => done(new Error('init timeout'), null), 15000);
 		try {
 			branch.init(key, done);
 		} catch (e) {
 			done(e, null);
 		}
-		// Safety: never hang the series if a callback is dropped.
-		safety = setTimeout(() => done(new Error('init timeout'), null), 15000);
 	});
 }
 

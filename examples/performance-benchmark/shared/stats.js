@@ -18,7 +18,9 @@ export function summarize(values) {
 	const sorted = [...nums].sort((a, b) => a - b);
 	const sum = sorted.reduce((a, b) => a + b, 0);
 	const mean = sum / n;
-	const variance = sorted.reduce((a, b) => a + (b - mean) * (b - mean), 0) / n;
+	// Sample variance (Bessel's correction, n-1) — these are samples from a
+	// distribution, not a full population. Falls back to 0 for n = 1.
+	const variance = n > 1 ? sorted.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (n - 1) : 0;
 	const round = (x) => (x === null ? null : Math.round(x * 10) / 10);
 	return {
 		n,

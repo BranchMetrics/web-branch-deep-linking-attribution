@@ -6,7 +6,7 @@
 
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
-import { join, extname, normalize } from 'node:path';
+import { join, extname, normalize, sep } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 // Compress text assets like a real CDN does, so Resource Timing's
@@ -40,7 +40,9 @@ export function startStaticServer(rootDir, port) {
 			if (pathname === '/') pathname = '/landing.html';
 			// Prevent path traversal.
 			const filePath = join(rootDir, normalize(pathname).replace(/^(\.\.[/\\])+/, ''));
-			if (!filePath.startsWith(rootDir)) {
+			// Confine to rootDir. The trailing-separator check stops a sibling whose
+			// name merely shares the prefix (e.g. `/dist2` vs root `/dist`).
+			if (filePath !== rootDir && !filePath.startsWith(rootDir + sep)) {
 				res.writeHead(403).end('Forbidden');
 				return;
 			}
@@ -72,7 +74,9 @@ export function startStaticServer(rootDir, port) {
 				res.end(raw);
 			}
 		} catch (e) {
-			res.writeHead(500).end(String(e));
+			// Log the detail server-side; don't echo internals (paths/stack) to the client.
+			console.error('[static-server]', e);
+			res.writeHead(500).end('Internal Server Error');
 		}
 	});
 	return new Promise((resolve) => {

@@ -15,6 +15,7 @@ const cdnCacheEmulation = {
 	name: 'cdn-cache-emulation',
 	configureServer(server) {
 		const file = resolve(__dirname, 'public/branch-sdk-cdn.min.js');
+		let warned = false;
 		server.middlewares.use((req, res, next) => {
 			if (req.url && req.url.split('?')[0] === '/branch-sdk-cdn.min.js') {
 				try {
@@ -24,7 +25,12 @@ const cdnCacheEmulation = {
 					res.end(buf);
 					return;
 				} catch (e) {
-					/* fall through to Vite's static handler */
+					// Fall through to Vite's static handler (404), but make the cause
+					// obvious once instead of leaving a silent missing-SDK 404.
+					if (!warned) {
+						console.warn('[cdn-cache-emulation] public/branch-sdk-cdn.min.js missing — run `npm run sync-sdk`');
+						warned = true;
+					}
 				}
 			}
 			next();
