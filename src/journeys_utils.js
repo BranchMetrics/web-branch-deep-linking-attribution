@@ -1027,6 +1027,7 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 		utils.merge(data['journey_link_data'], linkData);
 	}
 	journeys_utils.journeyLinkData = data;
+	data['journey_link_data'] = data['journey_link_data'] || {};
 	journeys_utils.journeyType = data['journey_link_data']['type'] || null;
 	journeys_utils.isDesktopJourney = data['journey_link_data']['type'] === "desktop";
 	journeys_utils.journeyVariant = data['journey_link_data']['variant'] || null;
