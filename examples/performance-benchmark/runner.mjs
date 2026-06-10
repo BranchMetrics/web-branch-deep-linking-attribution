@@ -25,7 +25,14 @@ const flag = (name, def) => {
 	return i !== -1 && i + 1 < args.length && !args[i + 1].startsWith('--') ? args[i + 1] : def;
 };
 const HEADED = args.includes('--headed');
-const ITERATIONS = parseInt(flag('--iterations', '20'), 10);
+const ITERATIONS = (() => {
+	const raw = flag('--iterations', '20');
+	const n = parseInt(raw, 10);
+	// Reject NaN / non-positive so `--iterations abc` fails loudly instead of
+	// silently becoming Array(NaN) downstream.
+	if (!Number.isFinite(n) || n < 1) throw new Error(`--iterations must be a positive integer, got: ${raw}`);
+	return n;
+})();
 const KEY = flag('--key', 'key_live_hshD4wiPK2sSxfkZqkH30ggmyBfmGmD7');
 const PORT = 4317;
 const BASE = `http://localhost:${PORT}`;
