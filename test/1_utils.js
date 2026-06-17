@@ -438,21 +438,40 @@ describe('utils', function() {
 				'should be equal'
 			);
 		});
-		// Still skipped — this exercises the DOM-coupled getHostedDeepLinkData() path against
-		// test.html's meta tags, but the node mocha runner has no DOM. The logic it would cover is
-		// now in describe('processHostedDeepLinkData') below via direct mocked metadata input.
-		it.skip('should find applink, twitter and branch hosted data on page', function() {
-			var expected = {
-				watch_brand: 'Hamilton',
-				type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
-				$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
-				$android_deeplink_path: 'twitter/hamilton/khaki/android'
-			};
-			assert.deepEqual(
-				expected,
-				utils.getHostedDeepLinkData(),
-				'should be equal'
-			);
+		it('should find applink, twitter and branch hosted data on page', function() {
+			// Inject the meta tags directly via the jsdom DOM so getHostedDeepLinkData picks them
+			// up; hosted iOS is absent, so $ios_deeplink_path falls back to al:ios:url, and Android
+			// has no hosted/applinks tag so it falls back to twitter:app:url:googleplay.
+			var injected = [
+				'<meta name="twitter:app:url:iphone" content="appuri://twitter/hamilton/khaki/ios">',
+				'<meta name="twitter:app:url:googleplay" content="appuri://twitter/hamilton/khaki/android">',
+				'<meta property="al:ios:url" content="appuri://applinks/hamilton/khaki/ios" />',
+				'<meta name="branch:deeplink:watch_brand" content="Hamilton" />',
+				'<meta name="branch:deeplink:type" content="Khaki Aviation Stainless Steel Automatic Leather-Strap Watch" />'
+			];
+			var added = injected.map(function(html) {
+				var tpl = document.createElement('template');
+				tpl.innerHTML = html;
+				var el = tpl.content.firstChild;
+				document.head.appendChild(el);
+				return el;
+			});
+			try {
+				var expected = {
+					watch_brand: 'Hamilton',
+					type: 'Khaki Aviation Stainless Steel Automatic Leather-Strap Watch',
+					$ios_deeplink_path: 'applinks/hamilton/khaki/ios',
+					$android_deeplink_path: 'twitter/hamilton/khaki/android'
+				};
+				assert.deepEqual(
+					expected,
+					utils.getHostedDeepLinkData(),
+					'should be equal'
+				);
+			}
+			finally {
+				added.forEach(function(el) { el.parentNode.removeChild(el); });
+			}
 		});
 		it('$ios_deeplink_path and $android_deeplink_path should be formed from hosted metadata', function() {
 			var params = { "$key1":"val1", "$key2":"val2" };
