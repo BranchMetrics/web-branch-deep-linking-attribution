@@ -438,6 +438,9 @@ describe('utils', function() {
 				'should be equal'
 			);
 		});
+		// Still skipped — this exercises the DOM-coupled getHostedDeepLinkData() path against
+		// test.html's meta tags, but the node mocha runner has no DOM. The logic it would cover is
+		// now in describe('processHostedDeepLinkData') below via direct mocked metadata input.
 		it.skip('should find applink, twitter and branch hosted data on page', function() {
 			var expected = {
 				watch_brand: 'Hamilton',
@@ -520,6 +523,121 @@ describe('utils', function() {
 				utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
 				'should be equal'
 			);
+		});
+	});
+
+	describe('processHostedDeepLinkData', function() {
+		// Helper: build a mock meta element matching the DOM interface processHostedDeepLinkData uses
+		// (only getAttribute('name') / getAttribute('property') / getAttribute('content')).
+		function meta(attrs) {
+			return {
+				getAttribute: function(key) {
+					return Object.prototype.hasOwnProperty.call(attrs, key) ? attrs[key] : null;
+				}
+			};
+		}
+
+		it('returns an empty object when there are no meta tags', function() {
+			assert.deepEqual({}, utils.processHostedDeepLinkData([]));
+			assert.deepEqual({}, utils.processHostedDeepLinkData(null));
+		});
+
+		it('ignores meta tags that have no name/property or no content', function() {
+			var metadata = [
+				meta({ name: 'twitter:app:url:iphone' }), // missing content
+				meta({ content: 'appuri://path/ios' }), // missing name/property
+				meta({ name: 'description', content: 'irrelevant' })
+			];
+			assert.deepEqual({}, utils.processHostedDeepLinkData(metadata));
+		});
+
+		it('scrapes twitter:app:url:iphone into $ios_deeplink_path (path only, no scheme)', function() {
+			var metadata = [
+				meta({ name: 'twitter:app:url:iphone', content: 'aetvplus://showid/SERIES5053' })
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('showid/SERIES5053', result['$ios_deeplink_path']);
+		});
+
+		it('scrapes twitter:app:url:googleplay into $android_deeplink_path', function() {
+			var metadata = [
+				meta({ name: 'twitter:app:url:googleplay', content: 'aetvplus://showid/SERIES5053' })
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('showid/SERIES5053', result['$android_deeplink_path']);
+		});
+
+		it('scrapes both Twitter iphone + googleplay tags in one pass', function() {
+			var metadata = [
+				meta({ name: 'twitter:app:url:iphone', content: 'aetvplus://ios/path' }),
+				meta({ name: 'twitter:app:url:googleplay', content: 'aetvplus://android/path' })
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('ios/path', result['$ios_deeplink_path']);
+			assert.strictEqual('android/path', result['$android_deeplink_path']);
+		});
+
+		it('scrapes al:ios:url / al:android:url App Links tags', function() {
+			var metadata = [
+				meta({ property: 'al:ios:url', content: 'appuri://applinks/ios' }),
+				meta({ property: 'al:android:url', content: 'appuri://applinks/android' })
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('applinks/ios', result['$ios_deeplink_path']);
+			assert.strictEqual('applinks/android', result['$android_deeplink_path']);
+		});
+
+		it('scrapes Branch-hosted branch:deeplink:$ios_deeplink_path / $android_deeplink_path', function() {
+			var metadata = [
+				meta({ name: 'branch:deeplink:$ios_deeplink_path', content: 'hosted://ios/path' }),
+				meta({ name: 'branch:deeplink:$android_deeplink_path', content: 'hosted://android/path' })
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('ios/path', result['$ios_deeplink_path']);
+			assert.strictEqual('android/path', result['$android_deeplink_path']);
+		});
+
+		it('forwards other branch:deeplink:* tags through as link data params', function() {
+			var metadata = [
+				meta({ name: 'branch:deeplink:custom_key', content: 'custom_value' }),
+				meta({ name: 'branch:deeplink:another_key', content: 'another_value' })
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('custom_value', result['custom_key']);
+			assert.strictEqual('another_value', result['another_key']);
+		});
+
+		it('prefers hosted > App Links > Twitter when multiple sources are present', function() {
+			var metadata = [
+				meta({ name: 'branch:deeplink:$ios_deeplink_path', content: 'hosted://ios' }),
+				meta({ property: 'al:ios:url', content: 'applinks://ios' }),
+				meta({ name: 'twitter:app:url:iphone', content: 'twitter://ios' })
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('ios', result['$ios_deeplink_path']);
+		});
+
+		it('falls back from missing hosted → App Links for one OS while another OS uses Twitter', function() {
+			var metadata = [
+				meta({ property: 'al:ios:url', content: 'applinks://ios' }), // no hosted iOS
+				meta({ name: 'twitter:app:url:googleplay', content: 'twitter://android' }) // no hosted/applinks android
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('ios', result['$ios_deeplink_path']);
+			assert.strictEqual('android', result['$android_deeplink_path']);
+		});
+
+		it('uses name over property when both are set on the same tag', function() {
+			// name takes precedence in processHostedDeepLinkData's `name || property` logic
+			var metadata = [
+				meta({
+					name: 'twitter:app:url:iphone',
+					property: 'al:ios:url', // would-be App Links if name weren't present
+					content: 'aetvplus://twitter/wins'
+				})
+			];
+			var result = utils.processHostedDeepLinkData(metadata);
+			assert.strictEqual('twitter/wins', result['$ios_deeplink_path']);
 		});
 	});
 
