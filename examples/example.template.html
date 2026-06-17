@@ -89,7 +89,7 @@
 
 	</style>
 	<script>
-		const RESERVED_PARAMS = ['branch_key', 'api_url', '_branch_match_id', 'branchify_url'];
+		const RESERVED_PARAMS = ['branch_key', 'api_url', '_branch_match_id', 'branchify_url', 'branchViewData'];
 
 		function getFinalValue(inputValue, documentKey) {
 			if (inputValue) return inputValue;
@@ -100,8 +100,9 @@
 			let finalBranchKey = getFinalValue(branchKey,'branchKeyInput');
 			let finalApiUrl = getFinalValue(apiUrl,'apiUrlInput');
 			let finalMetadata = getFinalValue(null, 'metadataInput');
+			let finalBranchViewData = getFinalValue(null, 'branchViewDataInput');
 
-			if (!finalBranchKey && !finalApiUrl && !finalMetadata) {
+			if (!finalBranchKey && !finalApiUrl && !finalMetadata && !finalBranchViewData) {
 				alert('Please provide at least one value to update.');
 				return;
 			}
@@ -130,6 +131,21 @@
 					}
 				} catch (e) {
 					alert('Invalid JSON in metadata field: ' + e.message);
+					return;
+				}
+			}
+
+			// Add branchViewData param from JSON input
+			if (finalBranchViewData) {
+				try {
+					const branchViewData = JSON.parse(finalBranchViewData);
+					if (typeof branchViewData !== 'object' || branchViewData === null || Array.isArray(branchViewData)) {
+						alert('Branch View Data must be a JSON object, e.g., {"data": {"$journeys_title": "value"}}');
+						return;
+					}
+					url.searchParams.set('branchViewData', JSON.stringify(branchViewData));
+				} catch (e) {
+					alert('Invalid JSON in Branch View Data field: ' + e.message);
 					return;
 				}
 			}
@@ -202,6 +218,20 @@
 				metadataLabel.textContent = `Metadata: ${JSON.stringify(metadata)}`;
 			} else {
 				metadataLabel.textContent = 'Metadata (JSON):';
+			}
+
+			const branchViewDataLabel = document.getElementById('branchViewDataLabel');
+			const qp = getQueryParams();
+			const branchViewData = qp['branchViewData'];
+			if (branchViewData) {
+				try {
+					const parsed = JSON.parse(branchViewData);
+					branchViewDataLabel.textContent = `Branch View Data: ${JSON.stringify(parsed)}`;
+				} catch (e) {
+					branchViewDataLabel.textContent = 'Branch View Data (JSON):';
+				}
+			} else {
+				branchViewDataLabel.textContent = 'Branch View Data (JSON):';
 			}
 		}
 
@@ -323,6 +353,9 @@
 					<label id="metadataLabel" for="metadataInput">Metadata (JSON):</label>
 					<input type="text" id="metadataInput" class="apiInput" placeholder='{"product_id": "123", "category": "shoes"}'>
 					<br>
+					<label id="branchViewDataLabel" for="branchViewDataInput">Branch View Data (JSON):</label>
+					<input type="text" id="branchViewDataInput" class="apiInput" placeholder='{"data": {"$journeys_title": "changed"}}'>
+					<br>
 					<button class="btn btn-info" onclick="updateQueryParams()">
 						Update Api Settings
 					</button>
@@ -369,6 +402,17 @@
 		var metadata = getMetadataFromQp();
 		if (metadata) {
 			initOptions.metadata = metadata;
+		}
+
+		// Get branchViewData from query params or use default
+		const qp = getQueryParams();
+		if (qp['branchViewData']) {
+			try {
+				branchViewData = JSON.parse(qp['branchViewData']);
+				branch.setBranchViewData(branchViewData);
+			} catch (e) {
+				console.error('Failed to parse branchViewData from query params:', e);
+			}
 		}
 
 		branch.init(getBranchKey(), initOptions, function(err, data) {
