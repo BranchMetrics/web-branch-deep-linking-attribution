@@ -3,7 +3,7 @@ on: push
 
 env:
   NODE_VERSION: 24
-  JAVA_VERSION: 11
+  JAVA_VERSION: 25
   JAVA_DISTRIBUTION: 'adopt'
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Set up JDK 11
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
