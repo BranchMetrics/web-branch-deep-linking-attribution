@@ -340,6 +340,55 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 	}
 }
 
+function getBodyRuleFromIframeCss(cssIframeContainer) {
+	const tempStyle = document.createElement('style');
+	tempStyle.textContent = cssIframeContainer;
+	document.head.appendChild(tempStyle);
+
+	const cssRules = (tempStyle.sheet && tempStyle.sheet.cssRules) || [];
+	document.head.removeChild(tempStyle);
+
+	for (let i = 0; i < cssRules.length; i++) {
+		if (cssRules[i].selectorText === 'body') {
+			return cssRules[i];
+		}
+	}
+
+	return null;
+}
+
+/***
+ * @function applyBodyCssFromIframeContainer
+ * @param {string} cssIframeContainer - CSS text supplied by the BE for the iframe container
+ * @param {number} bodyMarginTopNumber - margin-top (in px) the body already had before this Journey
+ * @param {number} bodyMarginBottomNumber - margin-bottom (in px) the body already had before this Journey
+ *
+ * Parse the BE's CSS via a throwaway stylesheet
+ * then copies the parsed `body` rule inline so it survives removal of the
+ * #branch-iframe-css stylesheet on exit and can still animate back on close. margin-top/
+ * margin-bottom are added onto whatever margin the body already had, since the BE authors
+ * those values assuming an empty page.
+ */
+function applyBodyCssFromIframeContainer(cssIframeContainer, bodyMarginTopNumber, bodyMarginBottomNumber) {
+	let bodyRule = getBodyRuleFromIframeCss(cssIframeContainer);
+
+	if (!bodyRule) {
+		return;
+	}
+	const existingBodyCssText = document.body.style.cssText;
+	document.body.style.cssText = (existingBodyCssText ? existingBodyCssText + '; ' : '') + bodyRule.style.cssText;
+
+	const beMarginTop = bodyRule.style.getPropertyValue('margin-top');
+	if (beMarginTop) {
+		document.body.style.marginTop = 'calc(' + beMarginTop + ' + ' + bodyMarginTopNumber + 'px)';
+	}
+
+	const beMarginBottom = bodyRule.style.getPropertyValue('margin-bottom');
+	if (beMarginBottom) {
+		document.body.style.marginBottom = 'calc(' + beMarginBottom + ' + ' + bodyMarginBottomNumber + 'px)';
+	}
+}
+
 /***
  * @function journeys_utils.addIframeOuterCSS
  *
@@ -358,11 +407,13 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer, metadata) {
 	var bodyMarginBottomNumber = +journeys_utils.bodyMarginBottom.slice(0, -2);
 	var bannerMarginNumber = +journeys_utils.bannerHeight.slice(0, -2);
 
-	if (cssIframeContainer) {}
+	if (cssIframeContainer) {
+		applyBodyCssFromIframeContainer(cssIframeContainer, bodyMarginTopNumber, bodyMarginBottomNumber);
+	}
 	else if (journeys_utils.position === 'top') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
 		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
-	} 
+	}
 	else if (journeys_utils.position === 'bottom') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
 		document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
