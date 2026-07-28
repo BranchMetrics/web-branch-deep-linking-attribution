@@ -61,11 +61,16 @@ describe('addIframeOuterCSS with a BE-supplied cssIframeContainer', function() {
     }
   });
 
-  it('should copy non-margin declarations from the BE body rule inline', function() {
+  it('should copy transition from the BE body rule inline', function() {
     const cssIframeContainer = 'body { transition: all 0.375s ease; background: black; } #branch-banner-iframe { height: 76px; }';
     journeys_utils.addIframeOuterCSS(cssIframeContainer, {});
-    assert.strictEqual(document.body.style.background, 'black', 'background copied from BE body rule');
     assert.ok(document.body.style.transition.indexOf('0.375s') !== -1, 'transition copied from BE body rule');
+  });
+
+  it('should not copy non-margin/transition declarations (e.g. background) from the BE body rule inline', function() {
+    const cssIframeContainer = 'body { background: black; }';
+    journeys_utils.addIframeOuterCSS(cssIframeContainer, {});
+    assert.strictEqual(document.body.style.background, '', 'background left in the stylesheet, not copied inline');
   });
 
   // jsdom's CSSOM implementation doesn't accept calc() as a valid margin value (real

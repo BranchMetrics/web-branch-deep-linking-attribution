@@ -363,11 +363,13 @@ function getBodyRuleFromIframeCss(cssIframeContainer) {
  * @param {number} bodyMarginTopNumber - margin-top (in px) the body already had before this Journey
  * @param {number} bodyMarginBottomNumber - margin-bottom (in px) the body already had before this Journey
  *
- * Parse the BE's CSS via a throwaway stylesheet
- * then copies the parsed `body` rule inline so it survives removal of the
- * #branch-iframe-css stylesheet on exit and can still animate back on close. margin-top/
- * margin-bottom are added onto whatever margin the body already had, since the BE authors
- * those values assuming an empty page.
+ * Parse the BE's CSS via a throwaway stylesheet, then move just the margin/transition
+ * declarations from the parsed `body` rule inline so they survive removal of the
+ * #branch-iframe-css stylesheet on exit and can still animate back on close. Other
+ * declarations (background, etc.) are left in the stylesheet only, same as before -
+ * they apply while the Journey is up and disappear cleanly when it's removed.
+ * margin-top/margin-bottom are added onto whatever margin the body already had, since
+ * the BE authors those values assuming an empty page.
  */
 function applyBodyCssFromIframeContainer(cssIframeContainer, bodyMarginTopNumber, bodyMarginBottomNumber) {
 	let bodyRule = getBodyRuleFromIframeCss(cssIframeContainer);
@@ -375,8 +377,15 @@ function applyBodyCssFromIframeContainer(cssIframeContainer, bodyMarginTopNumber
 	if (!bodyRule) {
 		return;
 	}
-	const existingBodyCssText = document.body.style.cssText;
-	document.body.style.cssText = (existingBodyCssText ? existingBodyCssText + '; ' : '') + bodyRule.style.cssText;
+
+	const beTransition = bodyRule.style.getPropertyValue('transition');
+	if (beTransition) {
+		document.body.style.transition = beTransition;
+	}
+	const beWebkitTransition = bodyRule.style.getPropertyValue('-webkit-transition');
+	if (beWebkitTransition) {
+		document.body.style.webkitTransition = beWebkitTransition;
+	}
 
 	const beMarginTop = bodyRule.style.getPropertyValue('margin-top');
 	if (beMarginTop) {
