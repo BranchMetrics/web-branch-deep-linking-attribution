@@ -426,12 +426,11 @@ function generateIframeOuterCSS(metadata) {
 
 	// If entry animation is not disabled, then animate Journey entry
 	if (!journeys_utils.entryAnimationDisabled) {
-		bodyWebkitTransitionStyle = 'body { -webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n';
-		document.body.style.transition = 'all 0' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease';
+		bodyWebkitTransitionStyle = 'body { -webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; }\n';
+		document.body.style.transition = 'all 0' + (journeys_utils.animationSpeed / 1000) + 's ease';
 		iFrameAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; ' +
 						'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 	}
-
 
 	var css = '';
 	css += bodyWebkitTransitionStyle || '';
@@ -949,12 +948,12 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 
 	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
-		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed * 1.5 / 1000) + "s ease";
+		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
 		document.getElementById('branch-banner-iframe').style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
 
 		// ensure that -webkit-transition styles get applied as well
 		var iFrameOutterCSSBackup = document.getElementById('branch-iframe-css').innerHTML + '\n';
-		iFrameOutterCSSBackup += 'body { -webkit-transition: all ' + (journeys_utils.animationSpeed * 1.5 / 1000) + 's ease; }\n';
+		iFrameOutterCSSBackup += 'body { -webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; }\n';
 		iFrameOutterCSSBackup += '#branch-banner-iframe { -webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; }\n';
 		// in order for updated styles to get applied, we have to remove all branch-iframe-css styles
 		document.getElementById('branch-iframe-css').innerHTML = "";
@@ -970,6 +969,12 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	}
 
 	journeys_utils.branch._publishEvent('willCloseJourney', journeys_utils.journeyLinkData);
+	if (journeys_utils.position === 'top') {
+		document.body.style.marginTop = journeys_utils.bodyMarginTop;
+	}
+	else if (journeys_utils.position === 'bottom') {
+		document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
+	}
 	// removes timeout if animation is disabled or uses default timeout
 	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
 	setTimeout(function() {
@@ -990,13 +995,6 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 			journeys_utils.exitAnimationDisabledPreviously = journeys_utils.exitAnimationDisabled;
 			journeys_utils.previousPosition = journeys_utils.position;
 			journeys_utils.previousDivToInjectParents = journeys_utils.divToInjectParents;
-		}
-
-		if (journeys_utils.position === 'top') {
-			document.body.style.marginTop = journeys_utils.bodyMarginTop;
-		}
-		else if (journeys_utils.position === 'bottom') {
-			document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 		}
 
 		banner_utils.removeClass(document.body, 'branch-banner-is-active');
