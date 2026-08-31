@@ -273,8 +273,17 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 		bodyClass = 'branch-banner-other';
 	}
 	var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
-	iframedoc.head = iframedoc.createElement('head');
-	iframedoc.body = iframedoc.createElement('body');
+
+	// Safely ensure <head> and <body> exist for style injection and innerHTML
+	if (!iframedoc.head) {
+        var head = iframedoc.createElement('head');
+        (iframedoc.documentElement || iframedoc).appendChild(head);
+    }
+    if (!iframedoc.body) {
+        var body = iframedoc.createElement('body');
+        (iframedoc.documentElement || iframedoc).appendChild(body);
+    }
+	
 	iframedoc.body.innerHTML = html;
 	iframedoc.body.className = bodyClass;
 	var metaTag = iframedoc.querySelector('meta[name="accessibility"]');
