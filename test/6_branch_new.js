@@ -62,10 +62,6 @@ describe('Branch - new', function() {
 		});
 	});
 	describe('pageview/dismiss request metadata', function() {
-		// Built inline (mirroring resources.pageview/resources.dismiss in src/2_resources.js)
-		// rather than via goog.require('resources'), since that module re-declares
-		// `var resources` after goog.provide('resources'), which shadows the populated
-		// object in this CJS-based test harness and leaves the global stub empty.
 		var pageviewResource = {
 			destination: config.api_endpoint,
 			endpoint: '/v1/pageview',
