@@ -6,6 +6,9 @@ var sinon = require('sinon');
 goog.require('Branch');
 goog.require('utils');
 goog.require('task_queue');
+goog.require('Server');
+goog.require('config');
+goog.require('safejson');
 
 describe('Branch - new', function() {
 	const sandbox = sinon.createSandbox();
@@ -56,6 +59,48 @@ describe('Branch - new', function() {
 			assert.strictEqual(result2, undefined);
 			sinon.assert.notCalled(addPropertyIfNotNullSpy);
 			assert.deepEqual(requestMetadata, { "key": "value" });
+		});
+	});
+	describe('pageview/dismiss request metadata', function() {
+		var pageviewResource = {
+			destination: config.api_endpoint,
+			endpoint: '/v1/pageview',
+			method: utils.httpMethod.POST
+		};
+		var dismissResource = {
+			destination: config.api_endpoint,
+			endpoint: '/v1/dismiss',
+			method: utils.httpMethod.POST
+		};
+
+		it('should nest branch_requestMetadata inside metadata for v1/pageview instead of dropping it', function() {
+			var server = new Server();
+			var result = server.getUrl(pageviewResource, {
+				branch_key: window.branch_sample_key,
+				event: 'pageview',
+				metadata: { url: 'http://example.com' },
+				branch_requestMetadata: { '$marketing_cloud_visitor_id': '12345' }
+			});
+			assert.strictEqual(typeof result.error, 'undefined');
+			var metadataMatch = decodeURIComponent(result.data).match(/metadata=(.+?)(&|$)/);
+			var metadata = safejson.parse(metadataMatch[1]);
+			assert.deepEqual(metadata.branch_requestMetadata, { '$marketing_cloud_visitor_id': '12345' });
+			assert.strictEqual(metadata.url, 'http://example.com');
+			assert.strictEqual(result.data.indexOf('branch_requestMetadata='), -1, 'not sent as a top-level field');
+		});
+
+		it('should nest branch_requestMetadata inside metadata for v1/dismiss instead of dropping it', function() {
+			var server = new Server();
+			var result = server.getUrl(dismissResource, {
+				branch_key: window.branch_sample_key,
+				event: 'dismiss',
+				metadata: {},
+				branch_requestMetadata: { '$marketing_cloud_visitor_id': '12345' }
+			});
+			assert.strictEqual(typeof result.error, 'undefined');
+			var metadataMatch = decodeURIComponent(result.data).match(/metadata=(.+?)(&|$)/);
+			var metadata = safejson.parse(metadataMatch[1]);
+			assert.deepEqual(metadata.branch_requestMetadata, { '$marketing_cloud_visitor_id': '12345' });
 		});
 	});
 	describe('setDMAParamsForEEA', function() {
