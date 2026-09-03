@@ -1992,7 +1992,8 @@ Branch.prototype['setDMAParamsForEEA'] = wrap(callback_params.CALLBACK_ERR, func
  * @param {String} key - Request metadata key
  * @param {String} value - Request metadata value
  * Sets request metadata that gets passed along with all the API calls, including
- * v1/pageview and v1/dismiss (nested under metadata.branch_requestMetadata for those two).
+ * v1/pageview and v1/dismiss (merged directly into that request's metadata field,
+ * same as every other endpoint).
  */
 Branch.prototype['setRequestMetaData'] = function(key, value) {
 	try {

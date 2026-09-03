@@ -129,11 +129,13 @@
 	else if (resource.endpoint === '/v1/pageview' || resource.endpoint === '/v1/dismiss') {
 		utils.merge(d, data);
 		if (d['branch_requestMetadata']) {
-			// v1/pageview and v1/dismiss already use 'metadata' for Journeys/view data
-			// (see branch_view._getPageviewRequestData), so nest setRequestMetaData()'s
-			// output under its own key instead of overwriting that object.
-			d['metadata'] = d['metadata'] || {};
-			d['metadata']['branch_requestMetadata'] = d['branch_requestMetadata'];
+			// Merge setRequestMetaData()'s output directly into metadata, same as every
+			// other endpoint (flat, not nested under its own key). Note: v1/pageview and
+			// v1/dismiss already populate 'metadata' with Journeys/view data (url,
+			// user_agent, screen_width, etc. - see branch_view._getPageviewRequestData),
+			// so a setRequestMetaData() key that happens to match one of those names
+			// will silently overwrite it (or vice versa, depending on merge order).
+			d['metadata'] = utils.merge(d['metadata'] || {}, d['branch_requestMetadata']);
 			delete d['branch_requestMetadata'];
 		}
 	}

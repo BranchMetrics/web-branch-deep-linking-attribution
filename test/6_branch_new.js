@@ -73,7 +73,7 @@ describe('Branch - new', function() {
 			method: utils.httpMethod.POST
 		};
 
-		it('should nest branch_requestMetadata inside metadata for v1/pageview instead of dropping it', function() {
+		it('should merge branch_requestMetadata directly into metadata for v1/pageview instead of dropping it', function() {
 			var server = new Server();
 			var result = server.getUrl(pageviewResource, {
 				branch_key: window.branch_sample_key,
@@ -84,12 +84,13 @@ describe('Branch - new', function() {
 			assert.strictEqual(typeof result.error, 'undefined');
 			var metadataMatch = decodeURIComponent(result.data).match(/metadata=(.+?)(&|$)/);
 			var metadata = safejson.parse(metadataMatch[1]);
-			assert.deepEqual(metadata.branch_requestMetadata, { '$marketing_cloud_visitor_id': '12345' });
+			assert.strictEqual(metadata['$marketing_cloud_visitor_id'], '12345');
 			assert.strictEqual(metadata.url, 'http://example.com');
 			assert.strictEqual(result.data.indexOf('branch_requestMetadata='), -1, 'not sent as a top-level field');
+			assert.strictEqual(typeof metadata.branch_requestMetadata, 'undefined', 'not nested under its own key');
 		});
 
-		it('should nest branch_requestMetadata inside metadata for v1/dismiss instead of dropping it', function() {
+		it('should merge branch_requestMetadata directly into metadata for v1/dismiss instead of dropping it', function() {
 			var server = new Server();
 			var result = server.getUrl(dismissResource, {
 				branch_key: window.branch_sample_key,
@@ -100,7 +101,7 @@ describe('Branch - new', function() {
 			assert.strictEqual(typeof result.error, 'undefined');
 			var metadataMatch = decodeURIComponent(result.data).match(/metadata=(.+?)(&|$)/);
 			var metadata = safejson.parse(metadataMatch[1]);
-			assert.deepEqual(metadata.branch_requestMetadata, { '$marketing_cloud_visitor_id': '12345' });
+			assert.strictEqual(metadata['$marketing_cloud_visitor_id'], '12345');
 		});
 	});
 	describe('setDMAParamsForEEA', function() {
