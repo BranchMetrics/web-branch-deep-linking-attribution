@@ -25,7 +25,7 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 
 ## JS Budget Check
 
-Please mention the size in kb before abd after this PR
+Please mention the size in kb before and after this PR
 
 | Files            | Before      | After       | 
 | -----------      | ----------- | ----------- |
