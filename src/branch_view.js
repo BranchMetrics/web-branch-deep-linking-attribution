@@ -119,6 +119,7 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	journeys_utils.setJourneyLinkData(journeyLinkData);
 
 	var audienceRuleId = branchViewData['audience_rule_id'];
+	journeys_utils.isNewAnimation = !!branchViewData['is_new_animation'];
 
 	// this code removes any leftover css from previous banner
 	var branchCSS = document.getElementById('branch-iframe-css');

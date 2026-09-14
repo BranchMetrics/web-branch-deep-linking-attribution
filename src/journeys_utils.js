@@ -37,12 +37,10 @@ journeys_utils.bodyMarginBottom = 0;
 // Running state of the exit animation
 journeys_utils.exitAnimationIsRunning = false;
 
-// CSS custom properties a creative sets on #branch-banner to say it handles its own
-// entrance/exit, so the SDK should not also move the iframe (see WebSdkContract in
-// audience-rule-service).
-journeys_utils.ENTRANCE_MARKER = '--branch-entrance';
-journeys_utils.EXIT_MARKER = '--branch-exit';
-journeys_utils.ANIMATION_MARKER_VALUE = '1';
+// Set from event_data.branch_view_data.is_new_animation (see branch_view.displayJourney): true
+// when the creative animates #branch-banner itself via CSS, so the SDK must not also move the
+// iframe for entrance/exit.
+journeys_utils.isNewAnimation = false;
 
 // Regex to find pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
@@ -517,8 +515,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 
 	// Skip if #branch-banner is animating its own entrance -- moving the iframe too would
 	// double or fight that animation.
-	var bannerRoot = doc.getElementById('branch-banner');
-	if (!bannerRoot || !journeys_utils._declaresOwnAnimation(bannerRoot, journeys_utils.ENTRANCE_MARKER)) {
+	if (!journeys_utils.isNewAnimation) {
 		if (journeys_utils.position === 'top') {
 			iframe.style.top = '-' + journeys_utils.bannerHeight;
 		}
@@ -971,14 +968,12 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	// duration so removal below waits for it instead of using the SDK default.
 	var contentHandlesExit = false;
 	var contentExitDurationMs = 0;
-	if (banner && banner.contentWindow) {
+	if (journeys_utils.isNewAnimation && banner && banner.contentWindow) {
 		var bannerRoot = banner.contentWindow.document.getElementById('branch-banner');
 		if (bannerRoot) {
 			banner_utils.addClass(bannerRoot, 'branch-banner-exit');
-			contentHandlesExit = journeys_utils._declaresOwnAnimation(bannerRoot, journeys_utils.EXIT_MARKER);
-			if (contentHandlesExit) {
-				contentExitDurationMs = journeys_utils._getAnimationDurationMs(bannerRoot);
-			}
+			contentHandlesExit = true;
+			contentExitDurationMs = journeys_utils._getAnimationDurationMs(bannerRoot);
 		}
 	}
 
@@ -1055,21 +1050,6 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		journeys_utils.isJourneyDisplayed = false;
 		setTimeout(function(){ journeys_utils.exitAnimationIsRunning = false; }, journeys_utils.animationSpeed )
 	}, speedAndDelay);
-};
-
-/***
- * @function journeys_utils._declaresOwnAnimation
- * @param {Object} element
- * @param {string} marker
- *
- * Whether element declares marker, the CSS custom property a creative sets to opt out of the
- * SDK moving the iframe for it.
- */
-journeys_utils._declaresOwnAnimation = function(element, marker) {
-	var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element);
-	// Exact match, not just truthy: custom properties inherit, so an ancestor's unrelated value
-	// shouldn't count as an opt-out.
-	return computedStyle.getPropertyValue(marker).trim() === journeys_utils.ANIMATION_MARKER_VALUE;
 };
 
 /***
