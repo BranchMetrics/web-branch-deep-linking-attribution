@@ -37,12 +37,9 @@ journeys_utils.bodyMarginBottom = 0;
 // Running state of the exit animation
 journeys_utils.exitAnimationIsRunning = false;
 
-// CSS custom properties the served creative sets on #branch-banner (see WebSdkContract in
-// audience-rule-service) to say it owns its own entrance/exit surface and the SDK must not also
-// move the iframe. They are set for every creative that positions/animates #branch-banner itself,
-// whether or not an animation actually resolved for its placement -- the signal is ownership, not
-// "something is animating", so unrelated creative-authored CSS can't trip it and a creative with
-// no animation still isn't shoved around by the SDK.
+// CSS custom properties a creative sets on #branch-banner to say it handles its own
+// entrance/exit, so the SDK should not also move the iframe (see WebSdkContract in
+// audience-rule-service).
 journeys_utils.ENTRANCE_MARKER = '--branch-entrance';
 journeys_utils.EXIT_MARKER = '--branch-exit';
 journeys_utils.ANIMATION_MARKER_VALUE = '1';
@@ -518,11 +515,8 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 		}
 	}
 
-	// Creatives that declare --branch-entrance (via the branch-css just injected above) own their
-	// entrance: their iframe is already placement-positioned with no transition, so moving it here
-	// would double any content animation, or just snap it around if there is none. Everything
-	// without the marker still needs this -- it's the only thing that positions/animates them
-	// at all.
+	// Skip if #branch-banner is animating its own entrance -- moving the iframe too would
+	// double or fight that animation.
 	var bannerRoot = doc.getElementById('branch-banner');
 	if (!bannerRoot || !journeys_utils._declaresOwnAnimation(bannerRoot, journeys_utils.ENTRANCE_MARKER)) {
 		if (journeys_utils.position === 'top') {
@@ -973,13 +967,8 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		journeys_utils.exitAnimationIsRunning = true;
 	}
 
-	// Trigger any CSS-driven exit animation the creative authored on #branch-banner itself, and
-	// read back how long it actually takes -- straight off the computed style, not a guess baked
-	// into this file -- so the removal below waits exactly as long as the CSS says to. Whether the
-	// creative owns its own exit at all is a separate question from how long it takes, and it's
-	// answered by the --branch-exit marker on its .branch-banner-exit rule: an entrance animation
-	// is still applied to #branch-banner at this point, so a non-zero duration on its own says
-	// nothing about the exit, and a creative can own the exit with no animation at all (duration 0).
+	// Trigger any exit animation the creative authored on #branch-banner, and read its real
+	// duration so removal below waits for it instead of using the SDK default.
 	var contentHandlesExit = false;
 	var contentExitDurationMs = 0;
 	if (banner && banner.contentWindow) {
@@ -1008,9 +997,7 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		document.getElementById('branch-iframe-css').innerHTML = iFrameOutterCSSBackup;
 	}
 
-	// Same guard as the entrance side (addIframeInnerCSS): if #branch-banner is animating its own
-	// exit, moving the iframe here too would snap it off-screen instantly (it has no transition of
-	// its own once the content handles entrance/exit), hiding whatever's playing inside it.
+	// Same guard as the entrance side: skip if #branch-banner is animating its own exit.
 	if (!contentHandlesExit) {
 		if (journeys_utils.position === 'top') {
 			banner.style.top = '-' + journeys_utils.bannerHeight;
@@ -1027,8 +1014,8 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	else if (journeys_utils.position === 'bottom') {
 		document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 	}
-	// removes timeout if animation is disabled or uses default timeout, whichever is longer than
-	// the content wrapper's own exit animation (if it has one)
+	// removes timeout if animation is disabled, else the default timeout or the content's own
+	// exit animation, whichever is longer
 	var speedAndDelay = journeys_utils.exitAnimationDisabled ? 0 :
 		Math.max(journeys_utils.animationSpeed + journeys_utils.animationDelay, contentExitDurationMs);
 	setTimeout(function() {
@@ -1075,16 +1062,13 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
  * @param {Object} element
  * @param {string} marker
  *
- * Whether element opts out of the SDK moving the iframe for it, by declaring marker (a CSS custom
- * property the served creative sets on #branch-banner alongside whatever entrance/exit it has). A
- * custom property rather than a class or attribute because the server only emits CSS, never edits
- * the creative's markup -- and unlike sniffing `animation-name`, an unrelated animation on
- * #branch-banner is not mistaken for the creative owning its entrance/exit itself.
+ * Whether element declares marker, the CSS custom property a creative sets to opt out of the
+ * SDK moving the iframe for it.
  */
 journeys_utils._declaresOwnAnimation = function(element, marker) {
 	var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element);
-	// Exact value, not merely non-empty: custom properties inherit, so an unrelated value that
-	// happened to land on an ancestor shouldn't read as an opt-out here.
+	// Exact match, not just truthy: custom properties inherit, so an ancestor's unrelated value
+	// shouldn't count as an opt-out.
 	return computedStyle.getPropertyValue(marker).trim() === journeys_utils.ANIMATION_MARKER_VALUE;
 };
 
@@ -1092,19 +1076,14 @@ journeys_utils._declaresOwnAnimation = function(element, marker) {
  * @function journeys_utils._getAnimationDurationMs
  * @param {Object} element
  *
- * Reads the full CSS animation timeline actually applied to element right now, in ms --
- * animation-delay plus animation-duration. This is whatever the creative's own CSS declared
- * (e.g. via the `animation: name 0.4s ease 0.3s both;` shorthand) -- there's nothing else to
- * keep in sync when that timeline changes or a new animation is introduced. A delayed animation
- * doesn't start playing until animation-delay has elapsed, so omitting it here would remove the
- * element mid-animation. Elements with no animation applied resolve to 0.
+ * Total CSS animation time on element (animation-delay + animation-duration), in ms.
+ * 0 if no animation is applied.
  */
 journeys_utils._getAnimationDurationMs = function(element) {
 	var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element);
-	// `animation-duration`/`animation-delay` are the standard sources; some environments (incl.
-	// jsdom, which our tests run under) only resolve the `animation` shorthand and leave the
-	// longhands blank, so each falls back to its position in the shorthand -- duration is always
-	// the first `<time>` value per spec, delay (when present) is always the second.
+	// Fall back to the `animation` shorthand for environments (incl. jsdom) that don't resolve
+	// it into the longhand properties: duration is the shorthand's 1st <time> value, delay the
+	// 2nd, per spec.
 	var duration = journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
 		journeys_utils._timeValueMsAt(computedStyle.animation, 0) || 0;
 	var delay = journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
