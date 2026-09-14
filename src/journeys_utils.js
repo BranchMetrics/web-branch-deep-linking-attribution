@@ -1092,32 +1092,41 @@ journeys_utils._declaresOwnAnimation = function(element, marker) {
  * @function journeys_utils._getAnimationDurationMs
  * @param {Object} element
  *
- * Reads the CSS animation duration actually applied to element right now, in ms. This is
- * whatever the creative's own CSS declared (e.g. via the `animation: name 0.25s ease both;`
- * shorthand) -- there's nothing else to keep in sync when that duration changes or a new
- * animation is introduced. Elements with no animation applied resolve to 0.
+ * Reads the full CSS animation timeline actually applied to element right now, in ms --
+ * animation-delay plus animation-duration. This is whatever the creative's own CSS declared
+ * (e.g. via the `animation: name 0.4s ease 0.3s both;` shorthand) -- there's nothing else to
+ * keep in sync when that timeline changes or a new animation is introduced. A delayed animation
+ * doesn't start playing until animation-delay has elapsed, so omitting it here would remove the
+ * element mid-animation. Elements with no animation applied resolve to 0.
  */
 journeys_utils._getAnimationDurationMs = function(element) {
 	var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element);
-	// `animation-duration` is the standard source; some environments only expose it through the
-	// `animation` shorthand, whose first <time> value is always the duration per spec, so that's
-	// tried next.
-	return journeys_utils._firstTimeValueMs(computedStyle.animationDuration) ||
-		journeys_utils._firstTimeValueMs(computedStyle.animation) || 0;
+	// `animation-duration`/`animation-delay` are the standard sources; some environments (incl.
+	// jsdom, which our tests run under) only resolve the `animation` shorthand and leave the
+	// longhands blank, so each falls back to its position in the shorthand -- duration is always
+	// the first `<time>` value per spec, delay (when present) is always the second.
+	var duration = journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
+		journeys_utils._timeValueMsAt(computedStyle.animation, 0) || 0;
+	var delay = journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
+		journeys_utils._timeValueMsAt(computedStyle.animation, 1) || 0;
+	return duration + delay;
 };
 
 /***
- * @function journeys_utils._firstTimeValueMs
+ * @function journeys_utils._timeValueMsAt
  * @param {string} cssValue
+ * @param {number} index
  *
- * The first `<time>` token (e.g. "0.25s" or "250ms") found in cssValue, in ms, or null if there
- * isn't one.
+ * The `<time>` token (e.g. "0.25s" or "250ms") at position index (0-based) found in cssValue, in
+ * ms, or null if there aren't that many.
  */
-journeys_utils._firstTimeValueMs = function(cssValue) {
-	var match = /(-?[\d.]+)(ms|s)\b/.exec(cssValue || '');
-	if (!match) {
+journeys_utils._timeValueMsAt = function(cssValue, index) {
+	var matches = (cssValue || '').match(/(-?[\d.]+)(ms|s)\b/g) || [];
+	var token = matches[index];
+	if (!token) {
 		return null;
 	}
+	var match = /(-?[\d.]+)(ms|s)/.exec(token);
 	var amount = parseFloat(match[1]);
 	return match[2] === 'ms' ? amount : amount * 1000;
 };

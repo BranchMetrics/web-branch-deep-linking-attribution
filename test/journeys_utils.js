@@ -272,6 +272,25 @@ describe('animateBannerExit branch-banner exit class', function() {
     assert.strictEqual(document.body.contains(banner), false);
   });
 
+  it('waits out a delayed exit animation instead of removing mid-animation', function() {
+    var doc = banner.contentWindow.document;
+    var style = doc.createElement('style');
+    // doesn't start playing until 0.3s in, then plays for 0.4s -- finishes at 0.7s total
+    style.textContent = '#branch-banner.branch-banner-exit { --branch-exit: 1; animation: branch-slide-out-top 0.4s ease 0.3s both; }';
+    doc.head.appendChild(style);
+    doc.body.innerHTML = '<div id="branch-banner"></div>';
+
+    journeys_utils.animateBannerExit(banner);
+
+    // duration alone (400ms) would remove it before the delayed animation even finishes playing
+    clock.tick(400);
+    assert.strictEqual(document.body.contains(banner), true);
+
+    // delay + duration (700ms) gets to elapse before removal happens
+    clock.tick(300);
+    assert.strictEqual(document.body.contains(banner), false);
+  });
+
   it('does not move the iframe itself when #branch-banner is handling its own exit animation', function() {
     var doc = banner.contentWindow.document;
     var style = doc.createElement('style');
