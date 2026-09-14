@@ -37,6 +37,16 @@ journeys_utils.bodyMarginBottom = 0;
 // Running state of the exit animation
 journeys_utils.exitAnimationIsRunning = false;
 
+// CSS custom properties the served creative sets on #branch-banner (see WebSdkContract in
+// audience-rule-service) to say it owns its own entrance/exit surface and the SDK must not also
+// move the iframe. They are set for every creative that positions/animates #branch-banner itself,
+// whether or not an animation actually resolved for its placement -- the signal is ownership, not
+// "something is animating", so unrelated creative-authored CSS can't trip it and a creative with
+// no animation still isn't shoved around by the SDK.
+journeys_utils.ENTRANCE_MARKER = '--branch-entrance';
+journeys_utils.EXIT_MARKER = '--branch-exit';
+journeys_utils.ANIMATION_MARKER_VALUE = '1';
+
 // Regex to find pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
@@ -508,11 +518,19 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 		}
 	}
 
-	if (journeys_utils.position === 'top') {
-		iframe.style.top = '-' + journeys_utils.bannerHeight;
-	}
-	else if (journeys_utils.position === 'bottom') {
-		iframe.style.bottom = '-' + journeys_utils.bannerHeight;
+	// Creatives that declare --branch-entrance (via the branch-css just injected above) own their
+	// entrance: their iframe is already placement-positioned with no transition, so moving it here
+	// would double any content animation, or just snap it around if there is none. Everything
+	// without the marker still needs this -- it's the only thing that positions/animates them
+	// at all.
+	var bannerRoot = doc.getElementById('branch-banner');
+	if (!bannerRoot || !journeys_utils._declaresOwnAnimation(bannerRoot, journeys_utils.ENTRANCE_MARKER)) {
+		if (journeys_utils.position === 'top') {
+			iframe.style.top = '-' + journeys_utils.bannerHeight;
+		}
+		else if (journeys_utils.position === 'bottom') {
+			iframe.style.bottom = '-' + journeys_utils.bannerHeight;
+		}
 	}
 
 	// remove box shadow if no content background color
@@ -955,6 +973,26 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		journeys_utils.exitAnimationIsRunning = true;
 	}
 
+	// Trigger any CSS-driven exit animation the creative authored on #branch-banner itself, and
+	// read back how long it actually takes -- straight off the computed style, not a guess baked
+	// into this file -- so the removal below waits exactly as long as the CSS says to. Whether the
+	// creative owns its own exit at all is a separate question from how long it takes, and it's
+	// answered by the --branch-exit marker on its .branch-banner-exit rule: an entrance animation
+	// is still applied to #branch-banner at this point, so a non-zero duration on its own says
+	// nothing about the exit, and a creative can own the exit with no animation at all (duration 0).
+	var contentHandlesExit = false;
+	var contentExitDurationMs = 0;
+	if (banner && banner.contentWindow) {
+		var bannerRoot = banner.contentWindow.document.getElementById('branch-banner');
+		if (bannerRoot) {
+			banner_utils.addClass(bannerRoot, 'branch-banner-exit');
+			contentHandlesExit = journeys_utils._declaresOwnAnimation(bannerRoot, journeys_utils.EXIT_MARKER);
+			if (contentHandlesExit) {
+				contentExitDurationMs = journeys_utils._getAnimationDurationMs(bannerRoot);
+			}
+		}
+	}
+
 	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
@@ -970,11 +1008,16 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		document.getElementById('branch-iframe-css').innerHTML = iFrameOutterCSSBackup;
 	}
 
-	if (journeys_utils.position === 'top') {
-		banner.style.top = '-' + journeys_utils.bannerHeight;
-	}
-	else if (journeys_utils.position === 'bottom') {
-		banner.style.bottom = '-' + journeys_utils.bannerHeight;
+	// Same guard as the entrance side (addIframeInnerCSS): if #branch-banner is animating its own
+	// exit, moving the iframe here too would snap it off-screen instantly (it has no transition of
+	// its own once the content handles entrance/exit), hiding whatever's playing inside it.
+	if (!contentHandlesExit) {
+		if (journeys_utils.position === 'top') {
+			banner.style.top = '-' + journeys_utils.bannerHeight;
+		}
+		else if (journeys_utils.position === 'bottom') {
+			banner.style.bottom = '-' + journeys_utils.bannerHeight;
+		}
 	}
 
 	journeys_utils.branch._publishEvent('willCloseJourney', journeys_utils.journeyLinkData);
@@ -984,8 +1027,10 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	else if (journeys_utils.position === 'bottom') {
 		document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 	}
-	// removes timeout if animation is disabled or uses default timeout
-	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
+	// removes timeout if animation is disabled or uses default timeout, whichever is longer than
+	// the content wrapper's own exit animation (if it has one)
+	var speedAndDelay = journeys_utils.exitAnimationDisabled ? 0 :
+		Math.max(journeys_utils.animationSpeed + journeys_utils.animationDelay, contentExitDurationMs);
 	setTimeout(function() {
 		// remove banner, branch-css, and branch-iframe-css
 		banner_utils.removeElement(banner);
@@ -1023,6 +1068,58 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		journeys_utils.isJourneyDisplayed = false;
 		setTimeout(function(){ journeys_utils.exitAnimationIsRunning = false; }, journeys_utils.animationSpeed )
 	}, speedAndDelay);
+};
+
+/***
+ * @function journeys_utils._declaresOwnAnimation
+ * @param {Object} element
+ * @param {string} marker
+ *
+ * Whether element opts out of the SDK moving the iframe for it, by declaring marker (a CSS custom
+ * property the served creative sets on #branch-banner alongside whatever entrance/exit it has). A
+ * custom property rather than a class or attribute because the server only emits CSS, never edits
+ * the creative's markup -- and unlike sniffing `animation-name`, an unrelated animation on
+ * #branch-banner is not mistaken for the creative owning its entrance/exit itself.
+ */
+journeys_utils._declaresOwnAnimation = function(element, marker) {
+	var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element);
+	// Exact value, not merely non-empty: custom properties inherit, so an unrelated value that
+	// happened to land on an ancestor shouldn't read as an opt-out here.
+	return computedStyle.getPropertyValue(marker).trim() === journeys_utils.ANIMATION_MARKER_VALUE;
+};
+
+/***
+ * @function journeys_utils._getAnimationDurationMs
+ * @param {Object} element
+ *
+ * Reads the CSS animation duration actually applied to element right now, in ms. This is
+ * whatever the creative's own CSS declared (e.g. via the `animation: name 0.25s ease both;`
+ * shorthand) -- there's nothing else to keep in sync when that duration changes or a new
+ * animation is introduced. Elements with no animation applied resolve to 0.
+ */
+journeys_utils._getAnimationDurationMs = function(element) {
+	var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element);
+	// `animation-duration` is the standard source; some environments only expose it through the
+	// `animation` shorthand, whose first <time> value is always the duration per spec, so that's
+	// tried next.
+	return journeys_utils._firstTimeValueMs(computedStyle.animationDuration) ||
+		journeys_utils._firstTimeValueMs(computedStyle.animation) || 0;
+};
+
+/***
+ * @function journeys_utils._firstTimeValueMs
+ * @param {string} cssValue
+ *
+ * The first `<time>` token (e.g. "0.25s" or "250ms") found in cssValue, in ms, or null if there
+ * isn't one.
+ */
+journeys_utils._firstTimeValueMs = function(cssValue) {
+	var match = /(-?[\d.]+)(ms|s)\b/.exec(cssValue || '');
+	if (!match) {
+		return null;
+	}
+	var amount = parseFloat(match[1]);
+	return match[2] === 'ms' ? amount : amount * 1000;
 };
 
 journeys_utils.setJourneyLinkData = function(linkData) {
