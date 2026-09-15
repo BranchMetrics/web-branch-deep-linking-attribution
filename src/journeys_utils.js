@@ -37,6 +37,11 @@ journeys_utils.bodyMarginBottom = 0;
 // Running state of the exit animation
 journeys_utils.exitAnimationIsRunning = false;
 
+// Set from event_data.branch_view_data.is_new_animation (see branch_view.displayJourney): true
+// when the creative animates #branch-banner itself via CSS, so the SDK must not also move the
+// iframe for entrance/exit.
+journeys_utils.isNewAnimation = false;
+
 // Regex to find pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
 journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
@@ -508,11 +513,15 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 		}
 	}
 
-	if (journeys_utils.position === 'top') {
-		iframe.style.top = '-' + journeys_utils.bannerHeight;
-	}
-	else if (journeys_utils.position === 'bottom') {
-		iframe.style.bottom = '-' + journeys_utils.bannerHeight;
+	// Skip if #branch-banner is animating its own entrance -- moving the iframe too would
+	// double or fight that animation.
+	if (!journeys_utils.isNewAnimation) {
+		if (journeys_utils.position === 'top') {
+			iframe.style.top = '-' + journeys_utils.bannerHeight;
+		}
+		else if (journeys_utils.position === 'bottom') {
+			iframe.style.bottom = '-' + journeys_utils.bannerHeight;
+		}
 	}
 
 	// remove box shadow if no content background color
@@ -955,6 +964,19 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		journeys_utils.exitAnimationIsRunning = true;
 	}
 
+	// Trigger any exit animation the creative authored on #branch-banner, and read its real
+	// duration so removal below waits for it instead of using the SDK default.
+	var contentHandlesExit = false;
+	var contentExitDurationMs = 0;
+	if (journeys_utils.isNewAnimation && banner && banner.contentWindow) {
+		var bannerRoot = banner.contentWindow.document.getElementById('branch-banner');
+		if (bannerRoot) {
+			banner_utils.addClass(bannerRoot, 'branch-banner-exit');
+			contentHandlesExit = true;
+			contentExitDurationMs = journeys_utils._getAnimationDurationMs(bannerRoot);
+		}
+	}
+
 	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
@@ -970,11 +992,14 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		document.getElementById('branch-iframe-css').innerHTML = iFrameOutterCSSBackup;
 	}
 
-	if (journeys_utils.position === 'top') {
-		banner.style.top = '-' + journeys_utils.bannerHeight;
-	}
-	else if (journeys_utils.position === 'bottom') {
-		banner.style.bottom = '-' + journeys_utils.bannerHeight;
+	// Same guard as the entrance side: skip if #branch-banner is animating its own exit.
+	if (!contentHandlesExit) {
+		if (journeys_utils.position === 'top') {
+			banner.style.top = '-' + journeys_utils.bannerHeight;
+		}
+		else if (journeys_utils.position === 'bottom') {
+			banner.style.bottom = '-' + journeys_utils.bannerHeight;
+		}
 	}
 
 	journeys_utils.branch._publishEvent('willCloseJourney', journeys_utils.journeyLinkData);
@@ -984,8 +1009,10 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	else if (journeys_utils.position === 'bottom') {
 		document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
 	}
-	// removes timeout if animation is disabled or uses default timeout
-	var speedAndDelay =  journeys_utils.exitAnimationDisabled ? 0 : journeys_utils.animationSpeed + journeys_utils.animationDelay;
+	// removes timeout if animation is disabled, else the default timeout or the content's own
+	// exit animation, whichever is longer
+	var speedAndDelay = journeys_utils.exitAnimationDisabled ? 0 :
+		Math.max(journeys_utils.animationSpeed + journeys_utils.animationDelay, contentExitDurationMs);
 	setTimeout(function() {
 		// remove banner, branch-css, and branch-iframe-css
 		banner_utils.removeElement(banner);
@@ -1023,6 +1050,44 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		journeys_utils.isJourneyDisplayed = false;
 		setTimeout(function(){ journeys_utils.exitAnimationIsRunning = false; }, journeys_utils.animationSpeed )
 	}, speedAndDelay);
+};
+
+/***
+ * @function journeys_utils._getAnimationDurationMs
+ * @param {Object} element
+ *
+ * Total CSS animation time on element (animation-delay + animation-duration), in ms.
+ * 0 if no animation is applied.
+ */
+journeys_utils._getAnimationDurationMs = function(element) {
+	var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element);
+	// Fall back to the `animation` shorthand for environments (incl. jsdom) that don't resolve
+	// it into the longhand properties: duration is the shorthand's 1st <time> value, delay the
+	// 2nd, per spec.
+	var duration = journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
+		journeys_utils._timeValueMsAt(computedStyle.animation, 0) || 0;
+	var delay = journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
+		journeys_utils._timeValueMsAt(computedStyle.animation, 1) || 0;
+	return duration + delay;
+};
+
+/***
+ * @function journeys_utils._timeValueMsAt
+ * @param {string} cssValue
+ * @param {number} index
+ *
+ * The `<time>` token (e.g. "0.25s" or "250ms") at position index (0-based) found in cssValue, in
+ * ms, or null if there aren't that many.
+ */
+journeys_utils._timeValueMsAt = function(cssValue, index) {
+	var matches = (cssValue || '').match(/(-?[\d.]+)(ms|s)\b/g) || [];
+	var token = matches[index];
+	if (!token) {
+		return null;
+	}
+	var match = /(-?[\d.]+)(ms|s)/.exec(token);
+	var amount = parseFloat(match[1]);
+	return match[2] === 'ms' ? amount : amount * 1000;
 };
 
 journeys_utils.setJourneyLinkData = function(linkData) {
