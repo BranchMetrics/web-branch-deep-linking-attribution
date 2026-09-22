@@ -526,7 +526,11 @@ Branch.prototype['init'] = wrap(
 									requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
 									pageviewResponse['event_data']['branch_view_data'],
 									journeyInTestMode,
-									pageviewResponse['journey_link_data']
+									pageviewResponse['journey_link_data'],
+									{
+										use_v2_renderer: pageviewResponse['template'],
+										animationConfig: pageviewResponse['animationConfig']
+									}
 								);
 							}
 							else {
@@ -993,7 +997,11 @@ Branch.prototype['track'] = wrap(callback_params.CALLBACK_ERR, function(done, ev
 							requestData['branch_view_id'] || pageviewResponse['event_data']['branch_view_data']['id'],
 							pageviewResponse['event_data']['branch_view_data'],
 							journeyInTestMode,
-							pageviewResponse['journey_link_data']
+							pageviewResponse['journey_link_data'],
+							{
+								use_v2_renderer: pageviewResponse['template'],
+								animationConfig: pageviewResponse['animationConfig']
+							}
 						);
 					}
 					else {

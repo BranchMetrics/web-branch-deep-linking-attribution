@@ -40,7 +40,7 @@ journeys_utils.exitAnimationIsRunning = false;
 // Set from event_data.branch_view_data.is_new_animation (see branch_view.displayJourney): true
 // when the creative animates #branch-banner itself via CSS, so the SDK must not also move the
 // iframe for entrance/exit.
-journeys_utils.isNewAnimation = false;
+journeys_utils.use_v2_renderer = false;
 
 // Regex to find pieces of the html blob
 journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
@@ -81,7 +81,6 @@ journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function(bannerHe
 	return unitsRegex.test(bannerHeight) ? bannerHeight.replace(unitsRegex, '') : false;
 }
 
-
 /***
  * @function journeys_utils.setPositionAndHeight
  * @param {string} html
@@ -115,7 +114,7 @@ journeys_utils.setPositionAndHeight = function(html) {
 	}
 	var relativeBannerHeightOrFalse = journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(journeys_utils.bannerHeight);
 	if (relativeBannerHeightOrFalse) {
-		var bannerHeightInPixels = (relativeBannerHeightOrFalse/100) * journeys_utils.windowHeight + 'px';
+		var bannerHeightInPixels = (relativeBannerHeightOrFalse / 100) * journeys_utils.windowHeight + 'px';
 		journeys_utils.bannerHeight = bannerHeightInPixels;
 		if (relativeBannerHeightOrFalse < 100) {
 			journeys_utils.isHalfPage = true;
@@ -132,7 +131,7 @@ journeys_utils.setPositionAndHeight = function(html) {
  */
 journeys_utils.getMetadata = function(html) {
 	var match = html.match(journeys_utils.jsonRe);
-	if(match) {
+	if (match) {
 		var src = match[1];
 		return safejson.parse(src);
 	}
@@ -157,10 +156,10 @@ journeys_utils.getIframeCss = function(html) {
 journeys_utils.getCtaText = function(metadata, hasApp) {
 	var ctaText;
 
-	if(hasApp && metadata && metadata['ctaText'] && metadata['ctaText']['has_app']) {
+	if (hasApp && metadata && metadata['ctaText'] && metadata['ctaText']['has_app']) {
 		ctaText = metadata['ctaText']['has_app'];
 	}
-	else if(metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
+	else if (metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
 		ctaText = metadata['ctaText']['no_app'];
 	}
 
@@ -178,7 +177,7 @@ journeys_utils.findInsertionDiv = function(parent, metadata) {
 	if (metadata && metadata['injectorSelector']) {
 		var injectors = document.querySelectorAll(metadata['injectorSelector']);
 		if (injectors) {
-			for(var i = 0; i < injectors.length; i++) {
+			for (var i = 0; i < injectors.length; i++) {
 				journeys_utils.divToInjectParents.push(injectors[i].parentElement);
 			}
 		}
@@ -204,7 +203,7 @@ journeys_utils.getCss = function(html) {
  */
 journeys_utils.getJsAndAddToParent = function(html) {
 	var match = html.match(journeys_utils.jsRe);
-	if(match) {
+	if (match) {
 		var src = match[1];
 		var script = document.createElement('script');
 		script.id = 'branch-journey-cta';
@@ -227,16 +226,16 @@ journeys_utils.removeScriptAndCss = function(html) {
 	var matchCss = html.match(journeys_utils.cssRe);
 	var matchIframeCss = html.match(journeys_utils.iframeCssRe);
 
-	if(matchJson) {
-		html = html.replace(journeys_utils.jsonRe,'');
+	if (matchJson) {
+		html = html.replace(journeys_utils.jsonRe, '');
 	}
-	if(matchJs) {
-		html = html.replace(journeys_utils.jsRe,'');
+	if (matchJs) {
+		html = html.replace(journeys_utils.jsRe, '');
 	}
-	if(matchCss) {
-		html = html.replace(journeys_utils.cssRe,'');
+	if (matchCss) {
+		html = html.replace(journeys_utils.cssRe, '');
 	}
-	if(matchIframeCss) {
+	if (matchIframeCss) {
 		html = html.replace(journeys_utils.iframeCssRe, '');
 	}
 
@@ -281,14 +280,14 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 
 	// Safely ensure <head> and <body> exist for style injection and innerHTML
 	if (!iframedoc.head) {
-        var head = iframedoc.createElement('head');
-        (iframedoc.documentElement || iframedoc).appendChild(head);
-    }
-    if (!iframedoc.body) {
-        var body = iframedoc.createElement('body');
-        (iframedoc.documentElement || iframedoc).appendChild(body);
-    }
-	
+		var head = iframedoc.createElement('head');
+		(iframedoc.documentElement || iframedoc).appendChild(head);
+	}
+	if (!iframedoc.body) {
+		var body = iframedoc.createElement('body');
+		(iframedoc.documentElement || iframedoc).appendChild(body);
+	}
+
 	iframedoc.body.innerHTML = html;
 	iframedoc.body.className = bodyClass;
 	var metaTag = iframedoc.querySelector('meta[name="accessibility"]');
@@ -296,60 +295,60 @@ journeys_utils.addHtmlToIframe = function(iframe, html, userAgent) {
 		var scriptTag = iframedoc.createElement('script');
 		scriptTag.type = 'text/javascript';
 		scriptTag.text = `
-			var focusableElements = 'button, [href], input, select, textarea, [role="button"], h1, [role="text"], .branch-banner-content';
-			var modal = document.getElementById('branch-banner');
-			var focusableContent = modal.querySelectorAll(focusableElements);
-			var focusElementIdx = 0;
+            var focusableElements = 'button, [href], input, select, textarea, [role="button"], h1, [role="text"], .branch-banner-content';
+            var modal = document.getElementById('branch-banner');
+            var focusableContent = modal.querySelectorAll(focusableElements);
+            var focusElementIdx = 0;
 
-			function handleKeyboardNavigation(e) {
-				var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-				var isEnterPressed = e.key === 'Enter' || e.keyCode === 13;
-				
-				// Handle Tab key for focus navigation
-				if (isTabPressed) {
-					if (e.shiftKey) {
-						if (focusElementIdx <= 0) {
-							focusElementIdx = focusableContent.length - 1;
-						} else {
-							focusElementIdx = focusElementIdx - 1;
-						}
-					} else {
-						if (focusElementIdx >= focusableContent.length - 1) {
-							focusElementIdx = 0;
-						} else {
-							focusElementIdx = focusElementIdx + 1;
-						}
-					}
+            function handleKeyboardNavigation(e) {
+                var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+                var isEnterPressed = e.key === 'Enter' || e.keyCode === 13;
+                
+                // Handle Tab key for focus navigation
+                if (isTabPressed) {
+                    if (e.shiftKey) {
+                        if (focusElementIdx <= 0) {
+                            focusElementIdx = focusableContent.length - 1;
+                        } else {
+                            focusElementIdx = focusElementIdx - 1;
+                        }
+                    } else {
+                        if (focusElementIdx >= focusableContent.length - 1) {
+                            focusElementIdx = 0;
+                        } else {
+                            focusElementIdx = focusElementIdx + 1;
+                        }
+                    }
 
-					focusableContent[focusElementIdx].focus();
-					e.preventDefault();
-					return;
-				}
-				
-				// Handle Enter key for activation
-				if (isEnterPressed) {
-					// Get the currently focused element
-					var focusedElement = document.activeElement;
-					if (focusedElement && (
-						focusedElement.tagName === 'BUTTON' || 
-						focusedElement.getAttribute('role') === 'button' ||
-						focusedElement.tagName === 'A'
-					)) {
-						// Simulate a click on the element
-						focusedElement.click();
-						e.preventDefault();
-					}
-				}
-			}
+                    focusableContent[focusElementIdx].focus();
+                    e.preventDefault();
+                    return;
+                }
+                
+                // Handle Enter key for activation
+                if (isEnterPressed) {
+                    // Get the currently focused element
+                    var focusedElement = document.activeElement;
+                    if (focusedElement && (
+                        focusedElement.tagName === 'BUTTON' || 
+                        focusedElement.getAttribute('role') === 'button' ||
+                        focusedElement.tagName === 'A'
+                    )) {
+                        // Simulate a click on the element
+                        focusedElement.click();
+                        e.preventDefault();
+                    }
+                }
+            }
 
-			function autoFocus(delay) {
-				setTimeout(function() { focusableContent[focusElementIdx].focus() }, delay);
-			}
+            function autoFocus(delay) {
+                setTimeout(function() { focusableContent[focusElementIdx].focus() }, delay);
+            }
 
-			document.addEventListener('keydown', handleKeyboardNavigation);
-			autoFocus(100);
-			
-		`;
+            document.addEventListener('keydown', handleKeyboardNavigation);
+            autoFocus(100);
+            
+        `        ;
 		iframedoc.querySelector('body').append(scriptTag);
 	}
 }
@@ -376,7 +375,7 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer, metadata) {
 	else if (journeys_utils.position === 'top') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
 		document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
-	} 
+	}
 	else if (journeys_utils.position === 'bottom') {
 		var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
 		document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
@@ -399,12 +398,12 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer, metadata) {
 
 	// determines the removal of additional whitespace above Journey if position changes from 'top' to 'bottom'
 	if (journeys_utils.previousPosition === "top" &&
-		journeys_utils.previousPosition !== journeys_utils.position &&
-		journeys_utils.exitAnimationDisabledPreviously &&
-		journeys_utils.previousDivToInjectParents &&
-		journeys_utils.previousDivToInjectParents.length > 0) {
+	journeys_utils.previousPosition !== journeys_utils.position &&
+	journeys_utils.exitAnimationDisabledPreviously &&
+	journeys_utils.previousDivToInjectParents &&
+	journeys_utils.previousDivToInjectParents.length > 0) {
 
-		journeys_utils.previousDivToInjectParents.forEach(function (parent) {
+		journeys_utils.previousDivToInjectParents.forEach(function(parent) {
 			parent.style.marginTop = 0;
 		});
 	}
@@ -417,11 +416,21 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer, metadata) {
 
 	journeys_utils.journeyDismissed = false;
 
+	var finalOuterCSS = '';
+
 	if (cssIframeContainer) {
-		iFrameCSS.innerHTML = cssIframeContainer;
-	} else {
-		iFrameCSS.innerHTML = generateIframeOuterCSS(metadata);
+		finalOuterCSS = cssIframeContainer;
 	}
+	else {
+		finalOuterCSS = generateIframeOuterCSS(metadata);
+	}
+
+	// Inject configured CSS if it targets the IFRAME surface (the host page)
+	if (journeys_utils.animationConfig && journeys_utils.animationConfig.surface === 'IFRAME') {
+		finalOuterCSS += '\n' + journeys_utils.animationConfig.generatedCss + '\n';
+	}
+
+	iFrameCSS.innerHTML = finalOuterCSS;
 
 	utils.addNonceAttribute(iFrameCSS);
 
@@ -443,37 +452,34 @@ function generateIframeOuterCSS(metadata) {
 		bodyWebkitTransitionStyle = 'body { -webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; }\n';
 		document.body.style.transition = 'all 0' + (journeys_utils.animationSpeed / 1000) + 's ease';
 		iFrameAnimationStyle = '-webkit-transition: all ' + (journeys_utils.animationSpeed / 1000) + 's ease; ' +
-						'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
+		'transition: all 0' + (journeys_utils.animationSpeed / 1000) + 's ease;';
 	}
 
 	var css = '';
 	css += bodyWebkitTransitionStyle || '';
-	if(journeys_utils.isDesktopJourney)
-	{
+	if (journeys_utils.isDesktopJourney)	{
 		var bannerHeight = journeys_utils.bannerHeight;
 		var bannerWidth = journeys_utils.bannerWidth;
 		var sticky = journeys_utils.sticky;
-		if(journeys_utils.journeyVariant === "overlay")
-		{
+		if (journeys_utils.journeyVariant === "overlay") {
 			bannerHeight = '100%!important';
 			bannerWidth = '100%!important';
 			sticky = 'fixed';
 		}
 		// add iframe container styles
 		css += '#branch-banner-iframe-embed { z-index: 99999!important; height: ' + bannerHeight + '; width: ' + bannerWidth + '; padding: 0px!important; margin: 0px!important; ' + '; position: ' + sticky + '; }\n';
-		css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: 100%; left: 0; right: 0; border: 0; height: 100%!important; width: 100%!important; '+ iFrameAnimationStyle + '; position: ' + sticky + '; }\n';
+		css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width: 100%; left: 0; right: 0; border: 0; height: 100%!important; width: 100%!important; ' + iFrameAnimationStyle + '; position: ' + sticky + '; }\n';
 
 	}
-	else
-	{
-		css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' + 
+	else {
+		css += '#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%;' +
 		' left: 0; right: 0; border: 0; height: ' +
 		journeys_utils.bannerHeight + '; z-index: 99999; ' +
-		iFrameAnimationStyle  + ' }\n' +
+		iFrameAnimationStyle + ' }\n' +
 		'#branch-banner-iframe { position: ' +
 		(journeys_utils.sticky) + '; }\n' +
 		'@media only screen and (orientation: landscape) { ' +
-		'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ' ) +
+		'body { ' + (journeys_utils.position === 'top' ? 'margin-top: ' : 'margin-bottom: ') +
 		(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }\n' +
 		'#branch-banner-iframe { height: ' +
 		(journeys_utils.isFullPage ? journeys_utils.windowWidth + 'px' : journeys_utils.bannerHeight) + '; }';
@@ -494,7 +500,13 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	var css = document.createElement('style');
 	css.type = 'text/css';
 	css.id = 'branch-css';
-	css.innerHTML = innerCSS;
+
+	var finalCSS = innerCSS;
+	if (journeys_utils.animationConfig && journeys_utils.animationConfig.surface === 'CONTENT') {
+		finalCSS += '\n' + journeys_utils.animationConfig.generatedCss + '\n';
+	}
+
+	css.innerHTML = finalCSS;
 
 	utils.addNonceAttribute(css);
 
@@ -515,7 +527,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 
 	// Skip if #branch-banner is animating its own entrance -- moving the iframe too would
 	// double or fight that animation.
-	if (!journeys_utils.isNewAnimation) {
+	if (!journeys_utils.use_v2_renderer) {
 		if (journeys_utils.position === 'top') {
 			iframe.style.top = '-' + journeys_utils.bannerHeight;
 		}
@@ -536,7 +548,7 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 		if (arr[3] && parseFloat(arr[3]) === 0) {
 			iframe.style.boxShadow = "none";
 		}
-	} catch(err) {};
+	} catch (err) {};
 }
 
 /***
@@ -566,17 +578,78 @@ journeys_utils.centerOverlay = function(banner) {
 	}
 }
 
+journeys_utils.getAnimationRoot = function(banner) {
+	if (!banner) return null;
+
+	var isIframeSurface = journeys_utils.animationConfig && journeys_utils.animationConfig.surface === 'IFRAME';
+
+	if (isIframeSurface) {
+		return banner;
+	}
+
+	if (banner.contentWindow) {
+		var doc = banner.contentWindow.document;
+		if (doc) {
+			return doc.getElementById('branch-banner') || doc.querySelector('.branch-banner-content') || null;
+		}
+	}
+	return null;
+};
+
+function getAnimationClass(isExit) {
+	if (journeys_utils.animationConfig && journeys_utils.animationConfig.classes) {
+		return isExit
+		? journeys_utils.animationConfig.classes.exit
+		: journeys_utils.animationConfig.classes.enter;
+	}
+	return isExit ? 'branch-banner-exit' : 'branch-banner-enter';
+}
+
+function isAnimationDisabled(isExit) {
+	return isExit
+	? journeys_utils.exitAnimationDisabled
+	: journeys_utils.entryAnimationDisabled;
+}
+
+journeys_utils.attachAnimation = function(element, isExit) {
+	if (!element || isAnimationDisabled(isExit)) {
+		return;
+	}
+
+	var className = getAnimationClass(isExit);
+	if (className) {
+		banner_utils.addClass(element, className);
+	}
+};
+
+journeys_utils.detachAnimation = function(element, isExit) {
+	if (!element || isAnimationDisabled(isExit)) {
+		return;
+	}
+
+	var className = getAnimationClass(isExit);
+	if (className) {
+		banner_utils.removeClass(element, className);
+	}
+};
+
 /***
  * @function journeys_utils.animateBannerEntrance
  * @param {Object} banner
  */
 journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
+	// Only attach the entrance class if this is the new animation path
+	if (journeys_utils.use_v2_renderer && banner && banner.contentWindow) {
+		var bannerRoot = journeys_utils.getAnimationRoot(banner);
+		journeys_utils.attachAnimation(bannerRoot, false);
+	}
+
 	banner_utils.addClass(document.body, 'branch-banner-is-active');
 	if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
 		var bodyCSS = document.createElement("style");
-      	bodyCSS.type = "text/css";
+		bodyCSS.type = "text/css";
 		bodyCSS.innerHTML = ".branch-banner-no-scroll {overflow: hidden;}";
-      	document.head.appendChild(bodyCSS);
+		document.head.appendChild(bodyCSS);
 		banner_utils.addClass(document.body, 'branch-banner-no-scroll');
 	}
 
@@ -584,7 +657,8 @@ journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 		if (cssIframeContainer) {
 			banner.style.top = null;
 			banner.style.bottom = null;
-		} else {
+		}
+		else {
 			if (journeys_utils.position === 'top') {
 				banner.style.top = '0';
 			}
@@ -593,7 +667,8 @@ journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 				if (journeys_utils.journeyLinkData && journeys_utils.journeyLinkData['journey_link_data'] && !journeys_utils.journeyLinkData['journey_link_data']['safeAreaRequired']) {
 					banner.style.bottom = '0';
 
-				} else {
+				}
+				else {
 					journeys_utils._dynamicallyRepositionBanner();
 				}
 			}
@@ -604,17 +679,18 @@ journeys_utils.animateBannerEntrance = function(banner, cssIframeContainer) {
 	setTimeout(onAnimationEnd, journeys_utils.animationDelay);
 }
 
-journeys_utils._resizeListener = function () {
+journeys_utils._resizeListener = function() {
 	if (journeys_utils.isSafeAreaEnabled) {
 		journeys_utils._resetJourneysBannerPosition(false, false);
 	}
 }
 
-journeys_utils._scrollListener = function () {
+journeys_utils._scrollListener = function() {
 	if (journeys_utils.isSafeAreaEnabled) {
 		if (window.pageYOffset > window.innerHeight) {
 			journeys_utils._resetJourneysBannerPosition(true, false);
-		} else {
+		}
+		else {
 			journeys_utils._resetJourneysBannerPosition(false, false);
 		}
 	}
@@ -639,8 +715,8 @@ journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling
 	var windowHeight = window.innerHeight;
 
 	// on first load check if the page is already scrolling
-	if(checkIfPageAlreadyScrollingOnFirstLoad) {
-		if(window.pageYOffset !== 0) {
+	if (checkIfPageAlreadyScrollingOnFirstLoad) {
+		if (window.pageYOffset !== 0) {
 			bannerIFrame.style.bottom = '0';
 			return false;
 		}
@@ -651,7 +727,8 @@ journeys_utils._resetJourneysBannerPosition = function(isPageBottomOverScrolling
 		if ((windowHeight - bannerTopDistance) != bannerHeight) {
 			bannerIFrame.style.top = "" + (windowHeight - bannerHeight) + "px";
 		}
-	} else {
+	}
+	else {
 		// bottom overscrolling is usually equivalent to half the banner size
 		bannerIFrame.style.top = (windowHeight - bannerHeight) + (bannerHeight / 2) + "px";
 	}
@@ -666,8 +743,8 @@ journeys_utils._findGlobalDismissPeriod = function(metadata) {
 	var globalDismissPeriod = metadata['globalDismissPeriod'];
 	if (typeof globalDismissPeriod === 'number') {
 		return globalDismissPeriod === -1
-			? true
-			: journeys_utils._addSecondsToDate(globalDismissPeriod);
+		? true
+		: journeys_utils._addSecondsToDate(globalDismissPeriod);
 	}
 }
 
@@ -683,7 +760,7 @@ journeys_utils._findGlobalDismissPeriod = function(metadata) {
  */
 journeys_utils.finalHookups = function(templateId, audienceRuleId, storage, cta, banner, metadata, testModeEnabled, branch_view) {
 
-	if(!cta || !banner) {
+	if (!cta || !banner) {
 		return;
 	}
 
@@ -737,87 +814,87 @@ journeys_utils._setJourneyDismiss = function(storage, templateId, audienceRuleId
 	return journeyDismissals;
 }
 
-journeys_utils.decodeSymbols = function (str) {
+journeys_utils.decodeSymbols = function(str) {
 	if (str === undefined || str === null) {
 		return null;
 	}
 	return str
-		.replace(/&lt;/g, "<")
-		.replace(/&gt;/g, ">")
-		.replace(/&amp;/g, "&")
-		.replace(/&quot;/g, "\"")
-		.replace(/&apos;/g, "'")
-		.replace(/&brvbar;/g, "¦")
-		.replace(/&laquo;/g, "«")
-		.replace(/&acute;/g, "´")
-		.replace(/&middot;/g, "·")
-		.replace(/&raquo;/g, "»")
-		.replace(/&amp;/g, "&")
-		.replace(/&iquest;/g, "¿")
-		.replace(/&times;/g, "×")
-		.replace(/&divide;/g, "÷")
-		.replace(/&Agrave;/g, "À")
-		.replace(/&Aacute;/g, "Á")
-		.replace(/&Acirc;/g, "Â")
-		.replace(/&Atilde;/g, "Ã")
-		.replace(/&Auml;/g, "Ä")
-		.replace(/&Aring;/g, "Å")
-		.replace(/&AElig;/g, "Æ")
-		.replace(/&Ccedil;/g, "Ç")
-		.replace(/&Egrave;/g, "È")
-		.replace(/&Eacute;/g, "É")
-		.replace(/&Ecirc;/g, "Ê")
-		.replace(/&Euml;/g, "Ë")
-		.replace(/&Igrave;/g, "Ì")
-		.replace(/&Iacute;/g, "Í")
-		.replace(/&Icirc;/g, "Î")
-		.replace(/&Iuml;/g, "Ï")
-		.replace(/&ETH;/g, "Ð")
-		.replace(/&Ntilde;/g, "Ñ")
-		.replace(/&Ograve;/g, "Ò")
-		.replace(/&Oacute;/g, "Ó")
-		.replace(/&Ocirc;/g, "Ô")
-		.replace(/&Otilde;/g, "Õ")
-		.replace(/&Ouml;/g, "Ö")
-		.replace(/&Oslash;/g, "Ø")
-		.replace(/&Ugrave;/g, "Ù")
-		.replace(/&Uacute;/g, "Ú")
-		.replace(/&Ucirc;/g, "Û")
-		.replace(/&Uuml;/g, "Ü")
-		.replace(/&Yacute;/g, "Ý")
-		.replace(/&THORN;/g, "Þ")
-		.replace(/&szlig;/g, "ß")
-		.replace(/&agrave;/g, "à")
-		.replace(/&aacute;/g, "á")
-		.replace(/&acirc;/g, "â")
-		.replace(/&atilde;/g, "ã")
-		.replace(/&auml;/g, "ä")
-		.replace(/&aring;/g, "å")
-		.replace(/&aelig;/g, "æ")
-		.replace(/&ccedil;/g, "ç")
-		.replace(/&egrave;/g, "è")
-		.replace(/&eacute;/g, "é")
-		.replace(/&ecirc;/g, "ê")
-		.replace(/&euml;/g, "ë")
-		.replace(/&igrave;/g, "ì")
-		.replace(/&iacute;/g, "í")
-		.replace(/&icirc;/g, "î")
-		.replace(/&iuml;/g, "ï")
-		.replace(/&eth;/g, "ð")
-		.replace(/&ntilde;/g, "ñ")
-		.replace(/&ograve;/g, "ò")
-		.replace(/&oacute;/g, "ó")
-		.replace(/&ocirc;/g, "ô")
-		.replace(/&otilde;/g, "õ")
-		.replace(/&ouml;/g, "ö")
-		.replace(/&oslash;/g, "ø")
-		.replace(/&ugrave;/g, "ù")
-		.replace(/&uacute;/g, "ú")
-		.replace(/&ucirc;/g, "û")
-		.replace(/&uuml;/g, "ü")
-		.replace(/&yacute;/g, "ý")
-		.replace(/&thorn;/g, "þ")
-		.replace(/&yuml;/g, "ÿ");
+	.replace(/&lt;/g, "<")
+	.replace(/&gt;/g, ">")
+	.replace(/&amp;/g, "&")
+	.replace(/&quot;/g, "\"")
+	.replace(/&apos;/g, "'")
+	.replace(/&brvbar;/g, "¦")
+	.replace(/&laquo;/g, "«")
+	.replace(/&acute;/g, "´")
+	.replace(/&middot;/g, "·")
+	.replace(/&raquo;/g, "»")
+	.replace(/&amp;/g, "&")
+	.replace(/&iquest;/g, "¿")
+	.replace(/&times;/g, "×")
+	.replace(/&divide;/g, "÷")
+	.replace(/&Agrave;/g, "À")
+	.replace(/&Aacute;/g, "Á")
+	.replace(/&Acirc;/g, "Â")
+	.replace(/&Atilde;/g, "Ã")
+	.replace(/&Auml;/g, "Ä")
+	.replace(/&Aring;/g, "Å")
+	.replace(/&AElig;/g, "Æ")
+	.replace(/&Ccedil;/g, "Ç")
+	.replace(/&Egrave;/g, "È")
+	.replace(/&Eacute;/g, "É")
+	.replace(/&Ecirc;/g, "Ê")
+	.replace(/&Euml;/g, "Ë")
+	.replace(/&Igrave;/g, "Ì")
+	.replace(/&Iacute;/g, "Í")
+	.replace(/&Icirc;/g, "Î")
+	.replace(/&Iuml;/g, "Ï")
+	.replace(/&ETH;/g, "Ð")
+	.replace(/&Ntilde;/g, "Ñ")
+	.replace(/&Ograve;/g, "Ò")
+	.replace(/&Oacute;/g, "Ó")
+	.replace(/&Ocirc;/g, "Ô")
+	.replace(/&Otilde;/g, "Õ")
+	.replace(/&Ouml;/g, "Ö")
+	.replace(/&Oslash;/g, "Ø")
+	.replace(/&Ugrave;/g, "Ù")
+	.replace(/&Uacute;/g, "Ú")
+	.replace(/&Ucirc;/g, "Û")
+	.replace(/&Uuml;/g, "Ü")
+	.replace(/&Yacute;/g, "Ý")
+	.replace(/&THORN;/g, "Þ")
+	.replace(/&szlig;/g, "ß")
+	.replace(/&agrave;/g, "à")
+	.replace(/&aacute;/g, "á")
+	.replace(/&acirc;/g, "â")
+	.replace(/&atilde;/g, "ã")
+	.replace(/&auml;/g, "ä")
+	.replace(/&aring;/g, "å")
+	.replace(/&aelig;/g, "æ")
+	.replace(/&ccedil;/g, "ç")
+	.replace(/&egrave;/g, "è")
+	.replace(/&eacute;/g, "é")
+	.replace(/&ecirc;/g, "ê")
+	.replace(/&euml;/g, "ë")
+	.replace(/&igrave;/g, "ì")
+	.replace(/&iacute;/g, "í")
+	.replace(/&icirc;/g, "î")
+	.replace(/&iuml;/g, "ï")
+	.replace(/&eth;/g, "ð")
+	.replace(/&ntilde;/g, "ñ")
+	.replace(/&ograve;/g, "ò")
+	.replace(/&oacute;/g, "ó")
+	.replace(/&ocirc;/g, "ô")
+	.replace(/&otilde;/g, "õ")
+	.replace(/&ouml;/g, "ö")
+	.replace(/&oslash;/g, "ø")
+	.replace(/&ugrave;/g, "ù")
+	.replace(/&uacute;/g, "ú")
+	.replace(/&ucirc;/g, "û")
+	.replace(/&uuml;/g, "ü")
+	.replace(/&yacute;/g, "ý")
+	.replace(/&thorn;/g, "þ")
+	.replace(/&yuml;/g, "ÿ");
 }
 journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) {
 	var metadata = {};
@@ -827,59 +904,59 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 	}
 
 	var dismissRequestData = branch_view._getPageviewRequestData(
-		journeys_utils._getPageviewMetadata(null, metadata),
-		null,
-		journeys_utils.branch,
-		true
+	journeys_utils._getPageviewMetadata(null, metadata),
+	null,
+	journeys_utils.branch,
+	true
 	);
 
 	if (
-		journeys_utils.journeyLinkData &&
-		journeys_utils.journeyLinkData["journey_link_data"]
+	journeys_utils.journeyLinkData &&
+	journeys_utils.journeyLinkData["journey_link_data"]
 	) {
 		utils.addPropertyIfNotNull(
-			dismissRequestData,
-			"journey_id",
-			journeys_utils.journeyLinkData["journey_link_data"]["journey_id"]
+		dismissRequestData,
+		"journey_id",
+		journeys_utils.journeyLinkData["journey_link_data"]["journey_id"]
 		);
 		utils.addPropertyIfNotNull(
-			dismissRequestData,
-			"journey_name",
-			journeys_utils.decodeSymbols(journeys_utils.journeyLinkData["journey_link_data"]["journey_name"])
+		dismissRequestData,
+		"journey_name",
+		journeys_utils.decodeSymbols(journeys_utils.journeyLinkData["journey_link_data"]["journey_name"])
 		);
 		utils.addPropertyIfNotNull(
-			dismissRequestData,
-			"view_id",
-			journeys_utils.journeyLinkData["journey_link_data"]["view_id"]
+		dismissRequestData,
+		"view_id",
+		journeys_utils.journeyLinkData["journey_link_data"]["view_id"]
 		);
 		utils.addPropertyIfNotNull(
-			dismissRequestData,
-			"view_name",
-			journeys_utils.decodeSymbols(
-				journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
-			)
+		dismissRequestData,
+		"view_name",
+		journeys_utils.decodeSymbols(
+		journeys_utils.journeyLinkData["journey_link_data"]["view_name"]
+		)
 		);
 		utils.addPropertyIfNotNull(
-			dismissRequestData,
-			"channel",
-			journeys_utils.decodeSymbols(
-				journeys_utils.journeyLinkData["journey_link_data"]["channel"]
-			)
+		dismissRequestData,
+		"channel",
+		journeys_utils.decodeSymbols(
+		journeys_utils.journeyLinkData["journey_link_data"]["channel"]
+		)
 		);
 		utils.addPropertyIfNotNull(
-			dismissRequestData,
-			"campaign",
-			journeys_utils.decodeSymbols(
-				journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
-			)
+		dismissRequestData,
+		"campaign",
+		journeys_utils.decodeSymbols(
+		journeys_utils.journeyLinkData["journey_link_data"]["campaign"]
+		)
 		);
 		try {
 			utils.addPropertyIfNotNull(
-				dismissRequestData,
-				"tags",
-				JSON.stringify(
-					journeys_utils.journeyLinkData["journey_link_data"]["tags"]
-				)
+			dismissRequestData,
+			"tags",
+			JSON.stringify(
+			journeys_utils.journeyLinkData["journey_link_data"]["tags"]
+			)
 			);
 		} catch (e) {
 			dismissRequestData["tags"] = JSON.stringify([]);
@@ -893,8 +970,8 @@ journeys_utils._getDismissRequestData = function(branch_view, dismissal_source) 
 
 journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, templateId, audienceRuleId, metadata, testModeEnabled, branch_view) {
 	var globalDismissPeriod = !testModeEnabled
-		? journeys_utils._findGlobalDismissPeriod(metadata)
-		: 0;
+	? journeys_utils._findGlobalDismissPeriod(metadata)
+	: 0;
 	journeys_utils.branch._publishEvent(eventName, journeys_utils.journeyLinkData);
 	journeys_utils.journeyDismissed = true;
 	journeys_utils.animateBannerExit(banner);
@@ -904,36 +981,40 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 			storage.set('globalJourneysDismiss', globalDismissPeriod, true);
 		}
 		journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
-		var listener = function () {
+		var listener = function() {
 			journeys_utils.branch.removeListener(listener);
 			var requestData = journeys_utils._getDismissRequestData(branch_view, utils.dismissEventToSourceMapping[eventName]);
 			journeys_utils.branch._api(
-				resources.dismiss,
-				requestData,
-				function (err, data) {
-					if (!err && metadata && metadata['dismissRedirect']) {
-						window.location = metadata['dismissRedirect'];
-					}
-					else if (!err && typeof data === "object" && data['template']) {
-						if (branch_view.shouldDisplayJourney
-							(
-								data,
-								null,
-								false
-							)
-						) {
-							branch_view.displayJourney(
-								data['template'],
-								requestData,
-								requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
-								data['event_data']['branch_view_data'],
-								false,
-								data['journey_link_data']
-							);
-						}
-					}
-				}
+			resources.dismiss,
+			requestData,
+                function(err, data) {
+	if (!err && metadata && metadata['dismissRedirect']) {
+		window.location = metadata['dismissRedirect'];
+	}
+	else if (!err && typeof data === "object" && data['template']) {
+		if (branch_view.shouldDisplayJourney
+		(
+		data,
+		null,
+		false
+		)
+		) {
+			branch_view.displayJourney(
+			data['template'],
+			requestData,
+			requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
+			data['event_data']['branch_view_data'],
+			false,
+			data['journey_link_data'],
+			{
+				use_v2_renderer: data['template'],
+				animationConfig: data['animationConfig']
+			}
 			);
+		}
+	}
+                }
+            );
 		};
 		journeys_utils.branch.addListener('branch_internal_event_didCloseJourney', listener);
 	}
@@ -946,7 +1027,7 @@ journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
 		"language": navigator.language,
 		"screen_width": screen.width || -1,
 		"screen_height": screen.height || -1,
-		"window_device_pixel_ratio": window.devicePixelRatio || 1,
+		"window_device_pixel_ratio": window.devicePixelRatio || 1
 
 	}, additionalMetadata || {});
 	pageviewMetadata = utils.addPropertyIfNotNullorEmpty(pageviewMetadata, "model", utils.userAgentData ? utils.userAgentData.model : "");
@@ -960,7 +1041,7 @@ journeys_utils._getPageviewMetadata = function(options, additionalMetadata) {
  * @param {boolean=} dismissedJourneyProgrammatically
  */
 journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatically) {
-	if(!journeys_utils.exitAnimationDisabled){
+	if (!journeys_utils.exitAnimationDisabled) {
 		journeys_utils.exitAnimationIsRunning = true;
 	}
 
@@ -968,15 +1049,17 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	// duration so removal below waits for it instead of using the SDK default.
 	var contentHandlesExit = false;
 	var contentExitDurationMs = 0;
-	if (journeys_utils.isNewAnimation && banner && banner.contentWindow) {
-		var bannerRoot = banner.contentWindow.document.getElementById('branch-banner');
+
+	if (journeys_utils.use_v2_renderer && banner && banner.contentWindow) {
+		var bannerRoot = journeys_utils.getAnimationRoot(banner);
 		if (bannerRoot) {
-			banner_utils.addClass(bannerRoot, 'branch-banner-exit');
+			journeys_utils.detachAnimation(bannerRoot, false);
+			journeys_utils.attachAnimation(bannerRoot, true);
+
 			contentHandlesExit = true;
 			contentExitDurationMs = journeys_utils._getAnimationDurationMs(bannerRoot);
 		}
 	}
-
 	// adds transitions for Journey exit if they don't exist
 	if (journeys_utils.entryAnimationDisabled && !journeys_utils.exitAnimationDisabled) {
 		document.body.style.transition = "all 0" + (journeys_utils.animationSpeed / 1000) + "s ease";
@@ -1012,7 +1095,7 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 	// removes timeout if animation is disabled, else the default timeout or the content's own
 	// exit animation, whichever is longer
 	var speedAndDelay = journeys_utils.exitAnimationDisabled ? 0 :
-		Math.max(journeys_utils.animationSpeed + journeys_utils.animationDelay, contentExitDurationMs);
+	Math.max(journeys_utils.animationSpeed + journeys_utils.animationDelay, contentExitDurationMs);
 	setTimeout(function() {
 		// remove banner, branch-css, and branch-iframe-css
 		banner_utils.removeElement(banner);
@@ -1022,12 +1105,13 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 
 		// remove margin from all elements with branch injection div
 		if ((!journeys_utils.exitAnimationDisabled || journeys_utils.journeyDismissed) &&
-			journeys_utils.divToInjectParents &&
-			journeys_utils.divToInjectParents.length > 0) {
+		journeys_utils.divToInjectParents &&
+		journeys_utils.divToInjectParents.length > 0) {
 			journeys_utils.divToInjectParents.forEach(function(parent) {
 				parent.style.marginTop = 0;
 			})
-		} else {
+		}
+		else {
 			journeys_utils.exitAnimationDisabledPreviously = journeys_utils.exitAnimationDisabled;
 			journeys_utils.previousPosition = journeys_utils.position;
 			journeys_utils.previousDivToInjectParents = journeys_utils.divToInjectParents;
@@ -1048,7 +1132,9 @@ journeys_utils.animateBannerExit = function(banner, dismissedJourneyProgrammatic
 		}
 
 		journeys_utils.isJourneyDisplayed = false;
-		setTimeout(function(){ journeys_utils.exitAnimationIsRunning = false; }, journeys_utils.animationSpeed )
+		setTimeout(function() {
+			journeys_utils.exitAnimationIsRunning = false;
+		}, journeys_utils.animationSpeed)
 	}, speedAndDelay);
 };
 
@@ -1065,9 +1151,9 @@ journeys_utils._getAnimationDurationMs = function(element) {
 	// it into the longhand properties: duration is the shorthand's 1st <time> value, delay the
 	// 2nd, per spec.
 	var duration = journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
-		journeys_utils._timeValueMsAt(computedStyle.animation, 0) || 0;
+	journeys_utils._timeValueMsAt(computedStyle.animation, 0) || 0;
 	var delay = journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
-		journeys_utils._timeValueMsAt(computedStyle.animation, 1) || 0;
+	journeys_utils._timeValueMsAt(computedStyle.animation, 1) || 0;
 	return duration + delay;
 };
 
@@ -1093,7 +1179,7 @@ journeys_utils._timeValueMsAt = function(cssValue, index) {
 journeys_utils.setJourneyLinkData = function(linkData) {
 	var data = { 'banner_id': journeys_utils.branchViewId };
 	if (linkData && typeof linkData === "object" && Object.keys(linkData || {}).length > 0) {
-		var journeyLinkDataPropertiesToFilterOut = ['browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id'];
+		var journeyLinkDataPropertiesToFilterOut = [ 'browser_fingerprint_id', 'app_id', 'source', 'open_app', 'link_click_id' ];
 		utils.removePropertiesFromObject(linkData, journeyLinkDataPropertiesToFilterOut);
 		data['journey_link_data'] = {};
 		utils.merge(data['journey_link_data'], linkData);
@@ -1105,72 +1191,72 @@ journeys_utils.setJourneyLinkData = function(linkData) {
 };
 
 journeys_utils.getValueForKeyInBranchViewData = function(key) {
-	if(!journeys_utils){
+	if (!journeys_utils) {
 		return false;
 	}
 
-	if(!journeys_utils.branch){
+	if (!journeys_utils.branch) {
 		return false;
 	}
 
-	if(!journeys_utils.branch._branchViewData){
+	if (!journeys_utils.branch._branchViewData) {
 		return false;
 	}
 
-	if(!journeys_utils.branch._branchViewData.data){
+	if (!journeys_utils.branch._branchViewData.data) {
 		return false;
 	}
 
 	return journeys_utils.branch._branchViewData.data[key];
 };
 
-journeys_utils.hasJourneyCtaLink = function () {
-	if(!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')){
+journeys_utils.hasJourneyCtaLink = function() {
+	if (!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')) {
 		return false;
 	}
 
 	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta').length > 0;
 };
 
-journeys_utils.getBranchViewDataItemOrUndefined = function(name){
-	if(journeys_utils.getValueForKeyInBranchViewData(name)){
+journeys_utils.getBranchViewDataItemOrUndefined = function(name) {
+	if (journeys_utils.getValueForKeyInBranchViewData(name)) {
 		return journeys_utils.branch._branchViewData.data[name];
 	}
 	return undefined;
 };
 
-journeys_utils.getJourneyCtaLink = function () {
+journeys_utils.getJourneyCtaLink = function() {
 	return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
 };
 
-journeys_utils.tryReplaceJourneyCtaLink = function (html){
-	try{
-		if(journeys_utils.hasJourneyCtaLink()){
+journeys_utils.tryReplaceJourneyCtaLink = function(html) {
+	try {
+		if (journeys_utils.hasJourneyCtaLink()) {
 			var journeyLinkReplacePattern = /validate[(].+[)];/g;
 			var pattern = 'validate("' + journeys_utils.getJourneyCtaLink() + '")'
 			var replacedHtml = html.replace(journeyLinkReplacePattern, pattern);
 			return replacedHtml.replace('window.top.location.replace(', 'window.top.location = ')
 		}
-	}catch(e){
+	}catch (e) {
 		return html;
 	}
 
 	return html;
 };
 
-journeys_utils.trySetJourneyUrls = function (linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
-	if(!linkElements){
+journeys_utils.trySetJourneyUrls = function(linkElements, urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url']) {
+	if (!linkElements) {
 		return linkElements;
 	}
 
-	var assignUrls = function (data) {
-		return urls.reduce((value, url)=>{
-			if(value[url]){
+	var assignUrls = function(data) {
+		return urls.reduce((value, url)=> {
+			if (value[url]) {
 				return value;
 			}
 
 			var entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
-			if(entry){
+			if (entry) {
 				value[url] = entry;
 			}
 			return value;
@@ -1182,7 +1268,7 @@ journeys_utils.trySetJourneyUrls = function (linkElements, urls = ['$android_url
 		linkElements.data = JSON.stringify(assignUrls(data));
 
 		return linkElements;
-	}catch(e){
+	}catch (e) {
 		return linkElements;
 	}
 };
