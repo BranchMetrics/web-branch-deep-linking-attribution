@@ -1,24 +1,24 @@
 /**
  * A simple blocking queue for the API requests
  */
-'use strict';
-goog.provide('task_queue');
+"use strict";
+goog.provide("task_queue");
 
 /**
  * @returns {function(function(function()))}
  */
-task_queue = function() {
+task_queue = function () {
 	var queue = [];
-	var next = function() {
+	var next = function () {
 		if (queue.length) {
-			queue[0](function() {
+			queue[0](function () {
 				queue.shift();
 				next();
 			});
 		}
 	};
 
-	return function(task) {
+	return function (task) {
 		queue.push(task);
 		if (queue.length === 1) {
 			next();

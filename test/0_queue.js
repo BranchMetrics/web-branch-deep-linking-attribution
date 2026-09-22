@@ -1,48 +1,56 @@
-'use strict';
+"use strict";
 /*jshint -W079 */
-var sinon = require('sinon');
+var sinon = require("sinon");
 
-goog.require('task_queue');
+goog.require("task_queue");
 
-describe('task_queue', function() {
+describe("task_queue", function () {
 	var queue;
 	var orderCalled;
 	var clock;
 	var assert = testUtils.unplanned();
-	beforeEach(function() {
+	beforeEach(function () {
 		queue = task_queue();
 		clock = sinon.useFakeTimers();
 		orderCalled = [];
-		queue(function(next) {
-			setTimeout(function() {
+		queue(function (next) {
+			setTimeout(function () {
 				orderCalled.push(0);
 				next();
 			}, 10);
 		});
-		assert.strictEqual(orderCalled[0], undefined, 'Has not yet called function');
+		assert.strictEqual(
+			orderCalled[0],
+			undefined,
+			"Has not yet called function",
+		);
 	});
-	afterEach(function() {
+	afterEach(function () {
 		clock.restore();
 	});
 
-	it('should queue a function and call it', function(done) {
+	it("should queue a function and call it", function (done) {
 		clock.tick(11);
-		assert.strictEqual(orderCalled[0], 0, 'Function called');
+		assert.strictEqual(orderCalled[0], 0, "Function called");
 		done();
 	});
 
-	it('should enqueue two functions, and call them in order', function(done) {
-		queue(function(next) {
-			setTimeout(function() {
+	it("should enqueue two functions, and call them in order", function (done) {
+		queue(function (next) {
+			setTimeout(function () {
 				orderCalled.push(1);
 				next();
 			}, 10);
 		});
 		clock.tick(11);
-		assert.strictEqual(orderCalled[0], 0, 'Called first function');
-		assert.strictEqual(orderCalled[1], undefined, 'Has not yet called second function');
+		assert.strictEqual(orderCalled[0], 0, "Called first function");
+		assert.strictEqual(
+			orderCalled[1],
+			undefined,
+			"Has not yet called second function",
+		);
 		clock.tick(11);
-		assert.strictEqual(orderCalled[1], 1, 'Called second function');
+		assert.strictEqual(orderCalled[1], 1, "Called second function");
 		done();
 	});
 });

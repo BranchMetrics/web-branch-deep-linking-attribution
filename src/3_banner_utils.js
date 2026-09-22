@@ -1,10 +1,10 @@
-'use strict';
+"use strict";
 
-goog.provide('banner_utils');
+goog.provide("banner_utils");
 
-goog.require('storage'); // jshint unused:false
-goog.require('utils');
-goog.require('safejson');
+goog.require("storage"); // jshint unused:false
+goog.require("utils");
+goog.require("safejson");
 
 /** @typedef {{icon:string,
  * title:string,
@@ -46,117 +46,140 @@ banner_utils.animationDelay = 20;
 
 // Height of banner.
 /** @type {string} */
-banner_utils.bannerHeight = '76px';
+banner_utils.bannerHeight = "76px";
 
 // How long to show red error state
 /** @type {number} */
 banner_utils.error_timeout = 2000;
 
-
 /**
  * @param {Object} element
  */
-banner_utils.removeElement = function(element) {
+banner_utils.removeElement = function (element) {
 	if (element && element.parentNode) {
 		element.parentNode.removeChild(element);
 	}
 };
 
-
-banner_utils.hasClass = function(element, className) {
-	return !!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+banner_utils.hasClass = function (element, className) {
+	return !!element.className.match(
+		new RegExp("(\\s|^)" + className + "(\\s|$)"),
+	);
 };
 
-banner_utils.addClass = function(element, className) {
+banner_utils.addClass = function (element, className) {
 	if (!element) {
 		return;
 	}
 	if (!banner_utils.hasClass(element, className)) {
-		element.className += ' ' + className;
+		element.className += " " + className;
 	}
 };
 
-banner_utils.removeClass = function(element, className) {
+banner_utils.removeClass = function (element, className) {
 	if (!element) {
 		return;
 	}
 	if (banner_utils.hasClass(element, className)) {
-		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-		element.className = element.className.replace(reg, ' ');
+		var reg = new RegExp("(\\s|^)" + className + "(\\s|$)");
+		element.className = element.className.replace(reg, " ");
 	}
 };
 
-banner_utils.getDate = function(days) {
+banner_utils.getDate = function (days) {
 	var currentDate = new Date();
 	return currentDate.setDate(currentDate.getDate() + days);
 };
 
-banner_utils.getBodyStyle = function(style) {
+banner_utils.getBodyStyle = function (style) {
 	if (document.body.currentStyle) {
 		return document.body.currentStyle[utils.snakeToCamel(style)];
-	}
-	else {
+	} else {
 		return window.getComputedStyle(document.body).getPropertyValue(style);
 	}
 };
 
-banner_utils.addCSSLengths = function(length1, length2) {
-	var convertToUnitlessPixels = function(input) {
+banner_utils.addCSSLengths = function (length1, length2) {
+	var convertToUnitlessPixels = function (input) {
 		if (!input) {
 			return 0;
 		}
-		var unit = input.replace(/[0-9,\.]/g, '');
+		var unit = input.replace(/[0-9,\.]/g, "");
 		var inputArray = input.match(/\d+/g);
-		var value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10);
-		var vw = function() {
-			return Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 100;
+		var value = parseInt(inputArray.length > 0 ? inputArray[0] : "0", 10);
+		var vw = function () {
+			return (
+				Math.max(document.documentElement.clientWidth, window.innerWidth || 0) /
+				100
+			);
 		};
-		var vh = function() {
-			return Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 100;
+		var vh = function () {
+			return (
+				Math.max(
+					document.documentElement.clientHeight,
+					window.innerHeight || 0,
+				) / 100
+			);
 		};
 		return parseInt(
 			{
-				"px": function(value) {
+				px: function (value) {
 					return value;
 				},
-				"em": function(value) {
+				em: function (value) {
 					if (document.body.currentStyle) {
-						return value * convertToUnitlessPixels(document.body.currentStyle.fontSize);
-					}
-					else {
-						return value * parseFloat(window.getComputedStyle(document.body).fontSize);
+						return (
+							value *
+							convertToUnitlessPixels(document.body.currentStyle.fontSize)
+						);
+					} else {
+						return (
+							value *
+							parseFloat(window.getComputedStyle(document.body).fontSize)
+						);
 					}
 				},
-				"rem": function(value) {
+				rem: function (value) {
 					if (document.documentElement.currentStyle) {
-						return value *
-							convertToUnitlessPixels(document.documentElement.currentStyle.fontSize);
-					}
-					else {
-						return value *
-							parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+						return (
+							value *
+							convertToUnitlessPixels(
+								document.documentElement.currentStyle.fontSize,
+							)
+						);
+					} else {
+						return (
+							value *
+							parseFloat(
+								window.getComputedStyle(document.documentElement).fontSize,
+							)
+						);
 					}
 				},
-				"vw": function(value) {
+				vw: function (value) {
 					return value * vw();
 				},
-				"vh": function(value) {
+				vh: function (value) {
 					return value * vh();
 				},
-				"vmin": function(value) {
+				vmin: function (value) {
 					return value * Math.min(vh(), vw());
 				},
-				"vmax": function(value) {
+				vmax: function (value) {
 					return value * Math.max(vh(), vw());
 				},
-				"%": function() {
+				"%": function () {
 					return (document.body.clientWidth / 100) * value;
-				}
+				},
 			}[unit](value),
-			10
+			10,
 		);
 	};
-	return (convertToUnitlessPixels(length1) + convertToUnitlessPixels(length2)).toString() + 'px';
+	return (
+		(
+			convertToUnitlessPixels(length1) + convertToUnitlessPixels(length2)
+		).toString() + "px"
+	);
 };
 
 /**
@@ -164,41 +187,41 @@ banner_utils.addCSSLengths = function(length1, length2) {
  * @param {banner_utils.options} options
  * @return {boolean}
  */
-banner_utils.shouldAppend = function(storage, options) {
-	var hideBanner = storage.get('hideBanner', true);
+banner_utils.shouldAppend = function (storage, options) {
+	var hideBanner = storage.get("hideBanner", true);
 
-	if (options.respectDNT && navigator && !!Number(navigator['doNotTrack'])) {
+	if (options.respectDNT && navigator && !!Number(navigator["doNotTrack"])) {
 		return false;
 	}
 	try {
-		if (typeof hideBanner === 'string') {
+		if (typeof hideBanner === "string") {
 			hideBanner = safejson.parse(hideBanner);
 		}
-	}
-	catch (e) {
+	} catch (e) {
 		hideBanner = false;
 	}
-	if (typeof hideBanner === 'number') {
+	if (typeof hideBanner === "number") {
 		hideBanner = new Date() >= new Date(hideBanner);
-	}
-	else {
+	} else {
 		hideBanner = !hideBanner;
 	}
 
 	var forgetHide = options.forgetHide;
-	if (typeof forgetHide === 'number') {
+	if (typeof forgetHide === "number") {
 		forgetHide = false;
 	}
 
-	return !document.getElementById('branch-banner') &&
-		!document.getElementById('branch-banner-iframe') &&
+	return (
+		!document.getElementById("branch-banner") &&
+		!document.getElementById("branch-banner-iframe") &&
 		(hideBanner || forgetHide) &&
-		(
-			(options.showAndroid && utils.getPlatformByUserAgent() === 'android') ||
-			(options.showiPad && utils.getPlatformByUserAgent() === 'ipad') ||
-			(options.showiOS && utils.getPlatformByUserAgent() === 'ios') ||
-			(options.showBlackberry && utils.getPlatformByUserAgent() === 'blackberry') ||
-			(options.showWindowsPhone && utils.getPlatformByUserAgent() === 'windows_phone') ||
-			(options.showKindle && utils.getPlatformByUserAgent() === 'kindle')
-		);
+		((options.showAndroid && utils.getPlatformByUserAgent() === "android") ||
+			(options.showiPad && utils.getPlatformByUserAgent() === "ipad") ||
+			(options.showiOS && utils.getPlatformByUserAgent() === "ios") ||
+			(options.showBlackberry &&
+				utils.getPlatformByUserAgent() === "blackberry") ||
+			(options.showWindowsPhone &&
+				utils.getPlatformByUserAgent() === "windows_phone") ||
+			(options.showKindle && utils.getPlatformByUserAgent() === "kindle"))
+	);
 };

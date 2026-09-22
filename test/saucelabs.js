@@ -3,14 +3,13 @@ function onload() {
 	var runner = mocha.run();
 
 	var failedTests = [];
-	runner.on('end', function() {
+	runner.on("end", function () {
 		window.mochaResults = runner.stats;
 		window.mochaResults.reports = failedTests;
 	});
 
-	var logFailure = function(test, err) {
-
-		var flattenTitles = function(test) {
+	var logFailure = function (test, err) {
+		var flattenTitles = function (test) {
 			var titles = [];
 			while (test.parent.title) {
 				titles.push(test.parent.title);
@@ -19,11 +18,13 @@ function onload() {
 			return titles.reverse();
 		};
 
-		failedTests.push({ name: test.title,
+		failedTests.push({
+			name: test.title,
 			result: false,
 			message: err.message,
 			stack: err.stack,
-			titles: flattenTitles(test) });
+			titles: flattenTitles(test),
+		});
 	};
-	runner.on('fail', logFailure);
-};
+	runner.on("fail", logFailure);
+}

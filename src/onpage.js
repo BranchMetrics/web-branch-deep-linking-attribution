@@ -6,9 +6,20 @@
  * This script creates a window.branch object with a number of calls. When you
  * call them, it saves your call for later.
  */
-'use strict';
+"use strict";
 
-(function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
+(function (
+	root,
+	doc,
+	scriptStr,
+	branchStr,
+	createCallback,
+	branchSdk,
+	funcs,
+	i,
+	scriptTag,
+	firstScript,
+) {
 	if (!root[branchStr] || !root[branchStr]._q) {
 		while (i < funcs.length) {
 			createCallback(branchSdk, funcs[i++]);
@@ -16,50 +27,54 @@
 
 		scriptTag = doc.createElement(scriptStr);
 		scriptTag.async = 1;
-		scriptTag.src = 'SCRIPT_URL_HERE';
+		scriptTag.src = "SCRIPT_URL_HERE";
 		firstScript = doc.getElementsByTagName(scriptStr)[0];
 		firstScript.parentNode.insertBefore(scriptTag, firstScript);
 
 		root[branchStr] = branchSdk;
 	}
 })(
-	window, document, 'script', 'branch', function(branch, name) {
-		branch[name] = function() {
-			branch._q.push([ name, arguments ]);
+	window,
+	document,
+	"script",
+	"branch",
+	function (branch, name) {
+		branch[name] = function () {
+			branch._q.push([name, arguments]);
 		};
 	},
 	{
 		_q: [], // _q: the "queue" of calls
-		_v: 1 // _v: the "version" of the embed script
+		_v: 1, // _v: the "version" of the embed script
 	},
 	[
-		'addListener',
-		'banner',
-		'closeBanner',
-		'closeJourney',
-		'data',
-		'deepview',
-		'deepviewCta',
-		'first',
-		'init',
-		'link',
-		'logout',
-		'removeListener',
-		'setBranchViewData',
-		'setIdentity',
-		'track',
-		'trackCommerceEvent',
-		'logEvent',
-		'disableTracking',
-		'getBrowserFingerprintId',
-		'crossPlatformIds',
-		'lastAttributedTouchData',
-		'setAPIResponseCallback',
-		'qrCode',
-		'setRequestMetaData',
-		'setDMAParamsForEEA',
-		'setAPIUrl',
-		'getAPIUrl'
+		"addListener",
+		"banner",
+		"closeBanner",
+		"closeJourney",
+		"data",
+		"deepview",
+		"deepviewCta",
+		"first",
+		"init",
+		"link",
+		"logout",
+		"removeListener",
+		"setBranchViewData",
+		"setIdentity",
+		"track",
+		"trackCommerceEvent",
+		"logEvent",
+		"disableTracking",
+		"getBrowserFingerprintId",
+		"crossPlatformIds",
+		"lastAttributedTouchData",
+		"setAPIResponseCallback",
+		"qrCode",
+		"setRequestMetaData",
+		"setDMAParamsForEEA",
+		"setAPIUrl",
+		"getAPIUrl",
 	],
-	0
+	0,
 );
