@@ -315,6 +315,7 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
 describe('animationConfig support', function() {
   const assert = testUtils.unplanned();
   var banner;
+  var clock;
 
   var mockAnimationConfig = {
     classes: {
@@ -327,6 +328,7 @@ describe('animationConfig support', function() {
   };
 
   beforeEach(function() {
+    clock = sinon.useFakeTimers();
     banner = document.createElement('iframe');
     document.body.appendChild(banner);
 
@@ -339,6 +341,10 @@ describe('animationConfig support', function() {
   });
 
   afterEach(function() {
+    clock.runAll();
+    clock.restore();
+    sinon.restore();
+    
     journeys_utils.animationConfig = null;
     journeys_utils.use_v2_renderer = false;
     if (banner.parentNode) {
