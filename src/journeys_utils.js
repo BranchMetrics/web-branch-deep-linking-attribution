@@ -426,8 +426,8 @@ journeys_utils.addIframeOuterCSS = function(cssIframeContainer, metadata) {
 	}
 
 	// Inject configured CSS if it targets the IFRAME surface (the host page)
-	if (journeys_utils.animationConfig && journeys_utils.animationConfig.surface === 'IFRAME') {
-		finalOuterCSS += '\n' + journeys_utils.animationConfig.generatedCss + '\n';
+	if (journeys_utils.animationConfig && journeys_utils.animationConfig['surface'] === 'IFRAME') {
+		finalOuterCSS += '\n' + journeys_utils.animationConfig['generatedCss'] + '\n';
 	}
 
 	iFrameCSS.innerHTML = finalOuterCSS;
@@ -457,7 +457,7 @@ function generateIframeOuterCSS(metadata) {
 
 	var css = '';
 	css += bodyWebkitTransitionStyle || '';
-	if (journeys_utils.isDesktopJourney)	{
+	if (journeys_utils.isDesktopJourney) {
 		var bannerHeight = journeys_utils.bannerHeight;
 		var bannerWidth = journeys_utils.bannerWidth;
 		var sticky = journeys_utils.sticky;
@@ -502,8 +502,8 @@ journeys_utils.addIframeInnerCSS = function(iframe, innerCSS) {
 	css.id = 'branch-css';
 
 	var finalCSS = innerCSS;
-	if (journeys_utils.animationConfig && journeys_utils.animationConfig.surface === 'CONTENT') {
-		finalCSS += '\n' + journeys_utils.animationConfig.generatedCss + '\n';
+	if (journeys_utils.animationConfig && journeys_utils.animationConfig['surface'] === 'CONTENT') {
+		finalCSS += '\n' + journeys_utils.animationConfig['generatedCss'] + '\n';
 	}
 
 	css.innerHTML = finalCSS;
@@ -581,7 +581,7 @@ journeys_utils.centerOverlay = function(banner) {
 journeys_utils.getAnimationRoot = function(banner) {
 	if (!banner) return null;
 
-	var isIframeSurface = journeys_utils.animationConfig && journeys_utils.animationConfig.surface === 'IFRAME';
+	var isIframeSurface = journeys_utils.animationConfig && journeys_utils.animationConfig['surface'] === 'IFRAME';
 
 	if (isIframeSurface) {
 		return banner;
@@ -597,10 +597,10 @@ journeys_utils.getAnimationRoot = function(banner) {
 };
 
 function getAnimationClass(isExit) {
-	if (journeys_utils.animationConfig && journeys_utils.animationConfig.classes) {
+	if (journeys_utils.animationConfig && journeys_utils.animationConfig['classes']) {
 		return isExit
-		? journeys_utils.animationConfig.classes.exit
-		: journeys_utils.animationConfig.classes.enter;
+		? journeys_utils.animationConfig['classes']['exit']
+		: journeys_utils.animationConfig['classes']['enter'];
 	}
 	return isExit ? 'branch-banner-exit' : 'branch-banner-enter';
 }
@@ -1006,11 +1006,11 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 			data['event_data']['branch_view_data'],
 			false,
 			data['journey_link_data'],
-			{
-				use_v2_renderer: data['template'],
-				animationConfig: data['animationConfig']
-			}
-			);
+            {
+	use_v2_renderer: data['template'],
+	animationConfig: data['animationConfig']
+            }
+            );
 		}
 	}
                 }
