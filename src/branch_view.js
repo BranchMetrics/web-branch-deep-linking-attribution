@@ -110,7 +110,7 @@ branch_view.shouldDisplayJourney = function(eventResponse, options, journeyInTes
 };
 
 
-branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled, journeyLinkData) {
+branch_view.displayJourney = function(html, requestData, templateId, branchViewData, testModeEnabled, journeyLinkData, newRenderOptions) {
     if(journeys_utils.exitAnimationIsRunning){
     	return;
 	}
@@ -119,8 +119,8 @@ branch_view.displayJourney = function(html, requestData, templateId, branchViewD
 	journeys_utils.setJourneyLinkData(journeyLinkData);
 
 	var audienceRuleId = branchViewData['audience_rule_id'];
-	journeys_utils.use_v2_renderer = !!branchViewData?.use_v2_renderer;
-	journeys_utils.animationConfig = branchViewData?.branch_view?.animationConfig
+	journeys_utils.use_v2_renderer = !!newRenderOptions?.use_v2_renderer;
+	journeys_utils.animationConfig = newRenderOptions?.animationConfig
 
 	// this code removes any leftover css from previous banner
 	var branchCSS = document.getElementById('branch-iframe-css');

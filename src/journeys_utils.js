@@ -1005,7 +1005,11 @@ journeys_utils._handleJourneyDismiss = function(eventName, storage, banner, temp
 			requestData['branch_view_id'] || data['event_data']['branch_view_data']['id'],
 			data['event_data']['branch_view_data'],
 			false,
-			data['journey_link_data']
+			data['journey_link_data'],
+			{
+				use_v2_renderer: data['template'],
+				animationConfig: data['animationConfig']
+			}
 			);
 		}
 	}

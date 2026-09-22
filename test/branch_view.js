@@ -3,7 +3,7 @@
 goog.require('branch_view');
 goog.require('journeys_utils');
 
-describe('displayJourney is_new_animation wiring', function() {
+describe('displayJourney new render options wiring', function() {
   const assert = testUtils.unplanned();
 
   beforeEach(function() {
@@ -20,8 +20,8 @@ describe('displayJourney is_new_animation wiring', function() {
     }
   });
 
-  function display(branchViewData) {
-    branch_view.displayJourney(null, {}, 'template-id', branchViewData, false, { type: 'mobile_web' });
+  function display(newOptionsData) {
+    branch_view.displayJourney(null, {}, 'template-id', {}, false, { type: 'mobile_web' }, newOptionsData);
   }
 
   it('sets use_v2_renderer to true when branchViewData.use_v2_renderer is true', function() {
