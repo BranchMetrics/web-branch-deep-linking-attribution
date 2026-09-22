@@ -136,7 +136,7 @@ describe('animateBannerExit margin/position restore timing', function() {
   });
 });
 
-describe('addIframeInnerCSS entrance and isNewAnimation', function() {
+describe('addIframeInnerCSS entrance and use_v2_renderer', function() {
   const assert = testUtils.unplanned();
   var iframe;
 
@@ -147,7 +147,7 @@ describe('addIframeInnerCSS entrance and isNewAnimation', function() {
     journeys_utils.isFullPage = false;
     journeys_utils.isDesktopJourney = false;
     journeys_utils.journeyVariant = null;
-    journeys_utils.isNewAnimation = false;
+    journeys_utils.use_v2_renderer = false;
 
     iframe = journeys_utils.createIframe();
     document.body.appendChild(iframe);
@@ -156,28 +156,28 @@ describe('addIframeInnerCSS entrance and isNewAnimation', function() {
   });
 
   afterEach(function() {
-    journeys_utils.isNewAnimation = false;
+    journeys_utils.use_v2_renderer = false;
     if (iframe.parentNode) {
       iframe.parentNode.removeChild(iframe);
     }
   });
 
-  it('does not move the iframe when isNewAnimation is true', function() {
-    journeys_utils.isNewAnimation = true;
+  it('does not move the iframe when use_v2_renderer is true', function() {
+    journeys_utils.use_v2_renderer = true;
 
     journeys_utils.addIframeInnerCSS(iframe, '');
 
     assert.strictEqual(iframe.style.top, '');
   });
 
-  it('still moves the iframe when isNewAnimation is false (legacy)', function() {
+  it('still moves the iframe when use_v2_renderer is false (legacy)', function() {
     journeys_utils.addIframeInnerCSS(iframe, '');
 
     assert.strictEqual(iframe.style.top, '-76px');
   });
 });
 
-describe('animateBannerExit branch-banner exit class and isNewAnimation', function() {
+describe('animateBannerExit branch-banner exit class and use_v2_renderer', function() {
   const assert = testUtils.unplanned();
   var clock;
   var banner;
@@ -198,13 +198,13 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
     journeys_utils.animationSpeed = 250;
     journeys_utils.animationDelay = 20;
     journeys_utils.isSafeAreaEnabled = false;
-    journeys_utils.isNewAnimation = false;
+    journeys_utils.use_v2_renderer = false;
   });
 
   afterEach(function() {
     clock.restore();
     sinon.restore();
-    journeys_utils.isNewAnimation = false;
+    journeys_utils.use_v2_renderer = false;
     journeys_utils.exitAnimationIsRunning = false;
     if (banner.parentNode) {
       banner.parentNode.removeChild(banner);
@@ -214,7 +214,7 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
   });
 
   it('adds branch-banner-exit to #branch-banner so any authored exit keyframes can play', function() {
-    journeys_utils.isNewAnimation = true;
+    journeys_utils.use_v2_renderer = true;
     banner.contentWindow.document.body.innerHTML = '<div id="branch-banner"></div>';
 
     journeys_utils.animateBannerExit(banner);
@@ -223,8 +223,8 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
     assert.strictEqual(bannerRoot.className.indexOf('branch-banner-exit') !== -1, true);
   });
 
-  it('still moves the iframe itself when isNewAnimation is true but the creative has no #branch-banner', function() {
-    journeys_utils.isNewAnimation = true;
+  it('still moves the iframe itself when use_v2_renderer is true but the creative has no #branch-banner', function() {
+    journeys_utils.use_v2_renderer = true;
 
     assert.doesNotThrow(function() {
       journeys_utils.animateBannerExit(banner);
@@ -233,7 +233,7 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
   });
 
   it('waits for a longer content exit animation instead of cutting it off at the default timeout', function() {
-    journeys_utils.isNewAnimation = true;
+    journeys_utils.use_v2_renderer = true;
     var doc = banner.contentWindow.document;
     var style = doc.createElement('style');
     style.textContent = '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.5s ease both; }';
@@ -252,7 +252,7 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
   });
 
   it('waits out a delayed exit animation instead of removing mid-animation', function() {
-    journeys_utils.isNewAnimation = true;
+    journeys_utils.use_v2_renderer = true;
     var doc = banner.contentWindow.document;
     var style = doc.createElement('style');
     // doesn't start playing until 0.3s in, then plays for 0.4s -- finishes at 0.7s total
@@ -271,8 +271,8 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
     assert.strictEqual(document.body.contains(banner), false);
   });
 
-  it('does not move the iframe itself when isNewAnimation is true', function() {
-    journeys_utils.isNewAnimation = true;
+  it('does not move the iframe itself when use_v2_renderer is true', function() {
+    journeys_utils.use_v2_renderer = true;
     var doc = banner.contentWindow.document;
     var style = doc.createElement('style');
     style.textContent = '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.25s ease both; }';
@@ -287,8 +287,8 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
     assert.strictEqual(banner.style.top, '');
   });
 
-  it('does not move the iframe and removes at the default timeout when isNewAnimation is true but there is no exit animation', function() {
-    journeys_utils.isNewAnimation = true;
+  it('does not move the iframe and removes at the default timeout when use_v2_renderer is true but there is no exit animation', function() {
+    journeys_utils.use_v2_renderer = true;
     banner.contentWindow.document.body.innerHTML = '<div id="branch-banner"></div>';
 
     journeys_utils.animateBannerExit(banner);
@@ -298,7 +298,7 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
     assert.strictEqual(document.body.contains(banner), false);
   });
 
-  it('still moves the iframe itself when isNewAnimation is false (legacy), even if #branch-banner has CSS animation', function() {
+  it('still moves the iframe itself when use_v2_renderer is false (legacy), even if #branch-banner has CSS animation', function() {
     var doc = banner.contentWindow.document;
     var style = doc.createElement('style');
     style.textContent = '#branch-banner { animation: branch-slide-in-top 0.25s ease both; }';
@@ -310,4 +310,106 @@ describe('animateBannerExit branch-banner exit class and isNewAnimation', functi
     assert.strictEqual(banner.style.top, '-76px');
   });
 
+});
+
+describe('animationConfig support', function() {
+  const assert = testUtils.unplanned();
+  var banner;
+
+  var mockAnimationConfig = {
+    classes: {
+      enter: 'branch-banner-enter',
+      exit: 'branch-banner-exit'
+    },
+    generatedCss: '.branch-banner-enter { animation: branch-slide-in-bottom 0.25s ease both; }\n.branch-banner-exit { animation: branch-slide-out-bottom 0.25s ease both; }',
+    surface: 'CONTENT',
+    type: 'SLIDE'
+  };
+
+  beforeEach(function() {
+    banner = document.createElement('iframe');
+    document.body.appendChild(banner);
+
+    journeys_utils.branch = { _publishEvent: sinon.stub() };
+    journeys_utils.journeyLinkData = {};
+    journeys_utils.use_v2_renderer = true;
+    journeys_utils.entryAnimationDisabled = false;
+    journeys_utils.exitAnimationDisabled = false;
+    journeys_utils.animationConfig = JSON.parse(JSON.stringify(mockAnimationConfig));
+  });
+
+  afterEach(function() {
+    journeys_utils.animationConfig = null;
+    journeys_utils.use_v2_renderer = false;
+    if (banner.parentNode) {
+      banner.parentNode.removeChild(banner);
+    }
+  });
+
+  it('injects generatedCss into iframe inner head when surface is CONTENT', function() {
+    var iframe = journeys_utils.createIframe();
+    document.body.appendChild(iframe);
+
+    journeys_utils.addIframeInnerCSS(iframe, '/* inner css */');
+
+    var doc = iframe.contentWindow.document;
+    var styleEl = doc.getElementById('branch-css');
+    assert.ok(styleEl, 'branch-css element should exist');
+    assert.ok(
+      styleEl.innerHTML.indexOf('.branch-banner-enter') !== -1,
+      'generatedCss should be injected into inner style'
+    );
+
+    if (iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe);
+    }
+  });
+
+  it('applies enter animation class from animationConfig during entrance animation', function() {
+    banner.contentWindow.document.body.innerHTML = '<div id="branch-banner"></div>';
+
+    journeys_utils.animateBannerEntrance(banner);
+
+    var bannerRoot = journeys_utils.getAnimationRoot(banner);
+    assert.ok(
+      bannerRoot.className.indexOf('branch-banner-enter') !== -1,
+      'enter animation class from config should be attached'
+    );
+  });
+
+  it('detaches enter class and attaches exit class from animationConfig during exit animation', function() {
+    banner.contentWindow.document.body.innerHTML = '<div id="branch-banner" class="branch-banner-enter"></div>';
+
+    journeys_utils.animateBannerExit(banner);
+
+    var bannerRoot = journeys_utils.getAnimationRoot(banner);
+    assert.strictEqual(
+      bannerRoot.className.indexOf('branch-banner-enter'),
+      -1,
+      'enter animation class should be detached'
+    );
+    assert.ok(
+      bannerRoot.className.indexOf('branch-banner-exit') !== -1,
+      'exit animation class from config should be attached'
+    );
+  });
+
+  it('applies outer CSS to host page when surface is IFRAME', function() {
+    journeys_utils.animationConfig.surface = 'IFRAME';
+    journeys_utils.position = 'top';
+    journeys_utils.bannerHeight = '76px';
+
+    journeys_utils.addIframeOuterCSS(undefined, {});
+
+    var outerStyleEl = document.getElementById('branch-iframe-css');
+    assert.ok(outerStyleEl, 'branch-iframe-css element should exist');
+    assert.ok(
+      outerStyleEl.innerHTML.indexOf('.branch-banner-enter') !== -1,
+      'generatedCss should be injected into outer style'
+    );
+
+    if (outerStyleEl && outerStyleEl.parentNode) {
+      outerStyleEl.parentNode.removeChild(outerStyleEl);
+    }
+  });
 });
