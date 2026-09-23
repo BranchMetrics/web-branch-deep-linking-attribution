@@ -8,58 +8,73 @@
  */
 'use strict';
 
-(function(root, doc, scriptStr, branchStr, createCallback, branchSdk, funcs, i, scriptTag, firstScript) {
-	if (!root[branchStr] || !root[branchStr]._q) {
-		while (i < funcs.length) {
-			createCallback(branchSdk, funcs[i++]);
-		}
+(function (
+  root,
+  doc,
+  scriptStr,
+  branchStr,
+  createCallback,
+  branchSdk,
+  funcs,
+  i,
+  scriptTag,
+  firstScript,
+) {
+  if (!root[branchStr] || !root[branchStr]._q) {
+    while (i < funcs.length) {
+      createCallback(branchSdk, funcs[i++]);
+    }
 
-		scriptTag = doc.createElement(scriptStr);
-		scriptTag.async = 1;
-		scriptTag.src = 'SCRIPT_URL_HERE';
-		firstScript = doc.getElementsByTagName(scriptStr)[0];
-		firstScript.parentNode.insertBefore(scriptTag, firstScript);
+    scriptTag = doc.createElement(scriptStr);
+    scriptTag.async = 1;
+    scriptTag.src = 'SCRIPT_URL_HERE';
+    firstScript = doc.getElementsByTagName(scriptStr)[0];
+    firstScript.parentNode.insertBefore(scriptTag, firstScript);
 
-		root[branchStr] = branchSdk;
-	}
+    root[branchStr] = branchSdk;
+  }
 })(
-	window, document, 'script', 'branch', function(branch, name) {
-		branch[name] = function() {
-			branch._q.push([ name, arguments ]);
-		};
-	},
-	{
-		_q: [], // _q: the "queue" of calls
-		_v: 1 // _v: the "version" of the embed script
-	},
-	[
-		'addListener',
-		'banner',
-		'closeBanner',
-		'closeJourney',
-		'data',
-		'deepview',
-		'deepviewCta',
-		'first',
-		'init',
-		'link',
-		'logout',
-		'removeListener',
-		'setBranchViewData',
-		'setIdentity',
-		'track',
-		'trackCommerceEvent',
-		'logEvent',
-		'disableTracking',
-		'getBrowserFingerprintId',
-		'crossPlatformIds',
-		'lastAttributedTouchData',
-		'setAPIResponseCallback',
-		'qrCode',
-		'setRequestMetaData',
-		'setDMAParamsForEEA',
-		'setAPIUrl',
-		'getAPIUrl'
-	],
-	0
+  window,
+  document,
+  'script',
+  'branch',
+  function (branch, name) {
+    branch[name] = function () {
+      branch._q.push([name, arguments]);
+    };
+  },
+  {
+    _q: [], // _q: the "queue" of calls
+    _v: 1, // _v: the "version" of the embed script
+  },
+  [
+    'addListener',
+    'banner',
+    'closeBanner',
+    'closeJourney',
+    'data',
+    'deepview',
+    'deepviewCta',
+    'first',
+    'init',
+    'link',
+    'logout',
+    'removeListener',
+    'setBranchViewData',
+    'setIdentity',
+    'track',
+    'trackCommerceEvent',
+    'logEvent',
+    'disableTracking',
+    'getBrowserFingerprintId',
+    'crossPlatformIds',
+    'lastAttributedTouchData',
+    'setAPIResponseCallback',
+    'qrCode',
+    'setRequestMetaData',
+    'setDMAParamsForEEA',
+    'setAPIUrl',
+    'getAPIUrl',
+  ],
+  0,
 );
