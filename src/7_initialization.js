@@ -12,11 +12,11 @@ goog.require('config'); // jshint unused:false
 branch_instance = new Branch();
 
 if (window['branch'] && window['branch']['_q']) {
-	var queue = window['branch']['_q'];
-	for (var i = 0; i < queue.length; i++) {
-		var task = queue[i];
-		branch_instance[task[0]].apply(branch_instance, task[1]);
-	}
+  var queue = window['branch']['_q'];
+  for (var i = 0; i < queue.length; i++) {
+    var task = queue[i];
+    branch_instance[task[0]].apply(branch_instance, task[1]);
+  }
 }
 
 // Provides a UMD-style module wrapper for the branch instance, meaning
@@ -24,20 +24,16 @@ if (window['branch'] && window['branch']['_q']) {
 
 // AMD
 if (typeof define === 'function' && define.amd) {
-	define(
-		'branch',
-		function() {
-			return branch_instance;
-		}
-	);
+  define('branch', function () {
+    return branch_instance;
+  });
 }
 // CommonJS-like environments that support module.exports
 else if (typeof exports === 'object') {
-	module.exports = branch_instance;
+  module.exports = branch_instance;
 }
 
 // Always make a global.
 if (window) {
-	window['branch'] = branch_instance;
+  window['branch'] = branch_instance;
 }
-
