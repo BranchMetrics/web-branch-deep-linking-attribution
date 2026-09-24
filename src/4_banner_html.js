@@ -4,7 +4,7 @@ goog.provide('banner_html');
 goog.require('banner_utils');
 goog.require('utils');
 goog.require('session');
-goog.require('storage'); // jshint unused:false
+goog.require('storage');
 
 /**
  * @param {banner_utils.options} options

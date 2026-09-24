@@ -1,7 +1,7 @@
 'use strict';
 
 goog.require('config');
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
 /*globals device_fingerprint_id */

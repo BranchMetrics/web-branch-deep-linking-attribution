@@ -1,7 +1,6 @@
 'use strict';
 goog.provide('session');
 
-/*jshint unused:false*/
 goog.require('goog.json');
 goog.require('utils');
 goog.require('safejson');

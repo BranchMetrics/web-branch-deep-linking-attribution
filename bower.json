@@ -15,9 +15,6 @@
 	},
 	"ignore": [
 		".gitignore",
-		".jscsrc",
-		".jshintignore",
-		".jshintrc",
 		"CHANGELOG.md",
 		"LICENSE",
 		"Makefile",

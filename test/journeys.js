@@ -9,7 +9,7 @@ goog.require('session');
 goog.require('branch_view');
 goog.require('banner_utils');
 
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 

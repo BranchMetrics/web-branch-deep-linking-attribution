@@ -7,7 +7,7 @@
 goog.provide('branch_instance');
 
 goog.require('Branch');
-goog.require('config'); // jshint unused:false
+goog.require('config');
 
 branch_instance = new Branch();
 

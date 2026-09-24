@@ -4,12 +4,11 @@
 'use strict';
 
 goog.provide('utils');
-/*jshint unused:false*/
+
 goog.require('goog.json');
 goog.require('config');
 goog.require('safejson');
 
-/* jshint ignore:start */
 /** @typedef {string} */
 var message;
 utils.debug = false;
@@ -219,8 +218,6 @@ utils.resource;
 
 /** @typedef {{listener: function(string, Object):null, event: string}} */
 utils.listener;
-
-/* jshint ignore:end */
 
 /** @type {Object<string,message>} */
 utils.messages = {

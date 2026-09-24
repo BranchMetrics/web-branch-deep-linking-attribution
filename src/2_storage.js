@@ -6,7 +6,7 @@
 'use strict';
 
 goog.provide('storage');
-/*jshint unused:false*/
+
 goog.require('goog.json');
 goog.require('utils');
 

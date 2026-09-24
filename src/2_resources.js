@@ -20,12 +20,8 @@ var validationTypes = {
   BOOLEAN: 4,
 };
 
-/* jshint ignore:start */
-
 /** @typedef {function(string, string, *)} */
 var _validator;
-
-/* jshint ignore:end */
 
 /**
  * @param {boolean} required

@@ -3,6 +3,13 @@
   "files": {
     "includes": ["src/**", "test/**", "package.json", "biome.json"]
   },
+  "linter": {
+    "rules": {
+      "complexity": {
+        "useArrowFunction": "off"
+      }
+    }
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",

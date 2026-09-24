@@ -10,7 +10,7 @@ goog.require('banner_utils');
 goog.require('banner_html');
 goog.require('safejson');
 
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 

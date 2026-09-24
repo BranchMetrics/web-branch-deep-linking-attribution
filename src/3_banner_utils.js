@@ -2,7 +2,7 @@
 
 goog.provide('banner_utils');
 
-goog.require('storage'); // jshint unused:false
+goog.require('storage');
 goog.require('utils');
 goog.require('safejson');
 
@@ -34,7 +34,7 @@ goog.require('safejson');
  * reviewCount:number,
  * open_app:boolean,
  * append_deeplink_path:boolean}} */
-banner_utils.options; // jshint ignore:line
+banner_utils.options;
 
 // UI Animation transition speed in ms.
 /** @type {number} */

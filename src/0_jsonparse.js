@@ -5,7 +5,6 @@
 
 goog.provide('safejson');
 
-/*jshint unused:false*/
 goog.require('goog.json');
 
 safejson.parse = function (sJSON) {

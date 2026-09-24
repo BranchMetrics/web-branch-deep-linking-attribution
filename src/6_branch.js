@@ -3,7 +3,7 @@
  */
 'use strict';
 goog.provide('Branch');
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 goog.require('utils');
 goog.require('resources');
@@ -144,7 +144,7 @@ Branch = function () {
 
   this._storage = /** @type {storage} */ (
     new storage.BranchStorage(storageMethods)
-  ); // jshint ignore:line
+  );
 
   this._server = new Server();
 

@@ -3,7 +3,7 @@
 goog.require('utils');
 goog.require('Server');
 goog.require('resources');
-goog.require('storage'); // jshint unused:false
+goog.require('storage');
 goog.require('config');
 goog.require('safejson');
 

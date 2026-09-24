@@ -1,6 +1,5 @@
 'use strict';
-/*jshint -W079 */
-/*jshint esversion: 6 */
+
 var sinon = require('sinon');
 goog.require('utils');
 
