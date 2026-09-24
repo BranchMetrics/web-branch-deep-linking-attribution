@@ -615,7 +615,7 @@ Branch.prototype['init'] = wrap(
                   journeyInTestMode,
                   pageviewResponse['journey_link_data'],
                   {
-                    use_v2_renderer: pageviewResponse['template'],
+                    use_v2_renderer: pageviewResponse['use_v2_renderer'],
                     animationConfig: pageviewResponse['animationConfig'],
                   },
                 );
@@ -1138,6 +1138,8 @@ Branch.prototype['track'] = wrap(
         requestData,
         function (err, pageviewResponse) {
           if (!err && typeof pageviewResponse === 'object') {
+            console.log(pageviewResponse['template']);
+
             var journeyInTestMode = requestData['branch_view_id']
               ? true
               : false;
@@ -1157,7 +1159,7 @@ Branch.prototype['track'] = wrap(
                 journeyInTestMode,
                 pageviewResponse['journey_link_data'],
                 {
-                  use_v2_renderer: pageviewResponse['template'],
+                  use_v2_renderer: pageviewResponse['use_v2_renderer'],
                   animationConfig: pageviewResponse['animationConfig'],
                 },
               );

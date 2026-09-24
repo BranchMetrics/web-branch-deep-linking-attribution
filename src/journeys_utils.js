@@ -1181,7 +1181,7 @@ journeys_utils._handleJourneyDismiss = function (
                 false,
                 data['journey_link_data'],
                 {
-                  use_v2_renderer: data['template'],
+                  use_v2_renderer: data['use_v2_renderer'],
                   animationConfig: data['animationConfig'],
                 },
               );

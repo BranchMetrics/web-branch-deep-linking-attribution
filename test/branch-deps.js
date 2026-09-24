@@ -168,4 +168,4 @@ goog.addDependency(
 );
 goog.addDependency('../../../../test/saucelabs.js', [], [], { 'lang': 'es5' });
 goog.addDependency('../../../../test/setup.js', [], []);
-goog.addDependency('../../../../test/test-utils.js', [], [], { lang: 'es5' });
+goog.addDependency('../../../../test/test-utils.js', [], [], { 'lang': 'es5' });
