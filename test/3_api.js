@@ -3,7 +3,7 @@
 goog.require('utils');
 goog.require('Server');
 goog.require('resources');
-goog.require('storage'); // jshint unused:false
+goog.require('storage');
 goog.require('config');
 goog.require('safejson');
 
@@ -213,7 +213,7 @@ describe('Server', function () {
         var assert = testUtils.plan(2, done);
         server.request(
           resources.open,
-          testUtils.params({ app_id: '5680621892404085' }, ['branch_key']),
+          testUtils.params({ 'app_id': '5680621892404085' }, ['branch_key']),
           storage,
           assert.done,
         );
@@ -238,7 +238,7 @@ describe('Server', function () {
         var assert = testUtils.plan(2, done);
         server.request(
           resources.open,
-          testUtils.params({ branch_key: 'ahd&7393j' }),
+          testUtils.params({ 'branch_key': 'ahd&7393j' }),
           storage,
           function (err) {
             err = safejson.parse(err.message);
@@ -255,7 +255,7 @@ describe('Server', function () {
         var assert = testUtils.plan(2, done);
         server.request(
           resources.open,
-          testUtils.params({ link_identifier: 45433 }),
+          testUtils.params({ 'link_identifier': 45433 }),
           storage,
           function (err) {
             err = safejson.parse(err.message);
@@ -304,7 +304,7 @@ describe('Server', function () {
         var assert = testUtils.plan(5, done);
         server.request(
           resources.profile,
-          testUtils.params({ identity: 'test_id' }),
+          testUtils.params({ 'identity': 'test_id' }),
           storage,
           assert.done,
         );
@@ -343,7 +343,7 @@ describe('Server', function () {
         var assert = testUtils.plan(3, done);
 
         storage['set']('use_jsonp', true);
-        var completeParams = testUtils.params({ identity: 'test_id' });
+        var completeParams = testUtils.params({ 'identity': 'test_id' });
         server.request(resources.profile, completeParams, storage, assert.done);
         assert.strictEqual(requests.length, 1, 'Request made');
 
@@ -385,7 +385,7 @@ describe('Server', function () {
         var assert = testUtils.plan(2, done);
         server.request(
           resources.profile,
-          testUtils.params({ identity: 'test_id' }, ['branch_key']),
+          testUtils.params({ 'identity': 'test_id' }, ['branch_key']),
           storage,
           function (err) {
             err = safejson.parse(err.message);
@@ -570,7 +570,7 @@ describe('Server', function () {
         var assert = testUtils.plan(2, done);
         server.request(
           resources.link,
-          testUtils.params({ tags: "Hello, I'm not an array." }),
+          testUtils.params({ 'tags': "Hello, I'm not an array." }),
           storage,
           function (err) {
             err = safejson.parse(err.message);
@@ -595,7 +595,7 @@ describe('Server', function () {
         var assert = testUtils.plan(4, done);
         server.request(
           resources.linkClick,
-          testUtils.params({ link_url: '3hpH54U-58', click: 'click' }),
+          testUtils.params({ 'link_url': '3hpH54U-58', 'click': 'click' }),
           storage,
           assert.done,
         );
@@ -620,7 +620,7 @@ describe('Server', function () {
         storage['set']('use_jsonp', true);
         server.request(
           resources.linkClick,
-          testUtils.params({ link_url: '3hpH54U-58', click: 'click' }),
+          testUtils.params({ 'link_url': '3hpH54U-58', 'click': 'click' }),
           storage,
           assert.done,
         );
@@ -638,7 +638,7 @@ describe('Server', function () {
         var assert = testUtils.plan(2, done);
         server.request(
           resources.linkClick,
-          testUtils.params({ click: 'click' }),
+          testUtils.params({ 'click': 'click' }),
           storage,
           function (err) {
             err = safejson.parse(err.message);
@@ -655,7 +655,7 @@ describe('Server', function () {
         var assert = testUtils.plan(2, done);
         server.request(
           resources.linkClick,
-          testUtils.params({ link_url: '3hpH54U-58' }),
+          testUtils.params({ 'link_url': '3hpH54U-58' }),
           storage,
           function (err) {
             err = safejson.parse(err.message);
@@ -679,7 +679,7 @@ describe('Server', function () {
         server.request(
           resources.open,
           testUtils.params({
-            link_identifier: '1111111111',
+            'link_identifier': '1111111111',
           }),
           storage,
           assert.done,
@@ -704,7 +704,7 @@ describe('Server', function () {
       storage['set']('use_jsonp', false);
 
       var params = testUtils.params({
-        link_identifier: '1111111111',
+        'link_identifier': '1111111111',
       });
       server.onAPIResponse = function (
         url,
@@ -726,7 +726,7 @@ describe('Server', function () {
           assert.strictEqual(status, 200);
           assert.deepEqual(
             responseBody,
-            { session_id: 123 },
+            { 'session_id': 123 },
             'correct response',
           );
           done();

@@ -10,7 +10,7 @@ goog.require('banner_utils');
 goog.require('banner_html');
 goog.require('safejson');
 
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 
@@ -104,11 +104,11 @@ describe('Branch', function () {
         return data;
       });
       var expectedResponse = {
-        session_id: '113636235674656786',
-        identity_id: '98807509250212101',
-        identity: 'Branch',
-        has_app: true,
-        referring_link: null,
+        'session_id': '113636235674656786',
+        'identity_id': '98807509250212101',
+        'identity': 'Branch',
+        'has_app': true,
+        'referring_link': null,
       };
 
       branch.init(branch_sample_key, function (err, res) {
@@ -128,7 +128,7 @@ describe('Branch', function () {
       assert.deepEqual(
         requests[0].obj,
         {
-          sdk: 'web' + config.version,
+          'sdk': 'web' + config.version,
           branch_key: branch_sample_key,
         },
         'Request params to _r correct',
@@ -142,16 +142,16 @@ describe('Branch', function () {
       assert.deepEqual(
         requests[1].obj,
         {
-          branch_key: branch_sample_key,
-          link_identifier: undefined,
-          initial_referrer: requests[1].obj.initial_referrer,
-          browser_fingerprint_id: browser_fingerprint_id,
-          alternative_browser_fingerprint_id: undefined,
-          sdk: 'web' + config.version,
-          options: {},
-          current_url: utils.getCurrentUrl(),
-          screen_height: utils.getScreenHeight(),
-          screen_width: utils.getScreenWidth(),
+          'branch_key': branch_sample_key,
+          'link_identifier': undefined,
+          'initial_referrer': requests[1].obj.initial_referrer,
+          'browser_fingerprint_id': browser_fingerprint_id,
+          'alternative_browser_fingerprint_id': undefined,
+          'sdk': 'web' + config.version,
+          'options': {},
+          'current_url': utils.getCurrentUrl(),
+          'screen_height': utils.getScreenHeight(),
+          'screen_width': utils.getScreenWidth(),
         },
         'Request to open params correct',
       );
@@ -166,11 +166,11 @@ describe('Branch', function () {
         return data;
       });
       var expectedResponse = {
-        session_id: '113636235674656786',
-        identity_id: '98807509250212101',
-        identity: 'Branch',
-        has_app: true,
-        referring_link: '/c/ngJf86-h',
+        'session_id': '113636235674656786',
+        'identity_id': '98807509250212101',
+        'identity': 'Branch',
+        'has_app': true,
+        'referring_link': '/c/ngJf86-h',
       };
 
       branch.init(branch_sample_key, function (err, res) {
@@ -190,7 +190,7 @@ describe('Branch', function () {
       assert.deepEqual(
         requests[0].obj,
         {
-          sdk: 'web' + config.version,
+          'sdk': 'web' + config.version,
           branch_key: branch_sample_key,
         },
         'Request params to _r correct',
@@ -204,16 +204,16 @@ describe('Branch', function () {
       assert.deepEqual(
         requests[1].obj,
         {
-          branch_key: branch_sample_key,
-          link_identifier: undefined,
-          initial_referrer: requests[1].obj.initial_referrer,
-          browser_fingerprint_id: browser_fingerprint_id,
-          alternative_browser_fingerprint_id: undefined,
-          sdk: 'web' + config.version,
-          options: {},
-          current_url: utils.getCurrentUrl(),
-          screen_height: utils.getScreenHeight(),
-          screen_width: utils.getScreenWidth(),
+          'branch_key': branch_sample_key,
+          'link_identifier': undefined,
+          'initial_referrer': requests[1].obj.initial_referrer,
+          'browser_fingerprint_id': browser_fingerprint_id,
+          'alternative_browser_fingerprint_id': undefined,
+          'sdk': 'web' + config.version,
+          'options': {},
+          'current_url': utils.getCurrentUrl(),
+          'screen_height': utils.getScreenHeight(),
+          'screen_width': utils.getScreenWidth(),
         },
         'Request to open params correct',
       );
@@ -289,16 +289,16 @@ describe('Branch', function () {
         assert.deepEqual(
           requests[1].obj,
           {
-            branch_key: branch_sample_key,
-            link_identifier: '12345',
-            initial_referrer: requests[1].obj.initial_referrer,
-            browser_fingerprint_id: '12345',
-            alternative_browser_fingerprint_id: undefined,
-            sdk: 'web' + config.version,
-            options: {},
-            current_url: utils.getCurrentUrl(),
-            screen_height: utils.getScreenHeight(),
-            screen_width: utils.getScreenWidth(),
+            'branch_key': branch_sample_key,
+            'link_identifier': '12345',
+            'initial_referrer': requests[1].obj.initial_referrer,
+            'browser_fingerprint_id': '12345',
+            'alternative_browser_fingerprint_id': undefined,
+            'sdk': 'web' + config.version,
+            'options': {},
+            'current_url': utils.getCurrentUrl(),
+            'screen_height': utils.getScreenHeight(),
+            'screen_width': utils.getScreenWidth(),
           },
           'Request to open params correct',
         );
@@ -337,16 +337,16 @@ describe('Branch', function () {
         assert.deepEqual(
           requests[1].obj,
           {
-            branch_key: branch_sample_key,
-            link_identifier: '67890',
-            initial_referrer: requests[1].obj.initial_referrer,
-            browser_fingerprint_id: '67890',
-            alternative_browser_fingerprint_id: undefined,
-            sdk: 'web' + config.version,
-            options: {},
-            current_url: utils.getCurrentUrl(),
-            screen_height: utils.getScreenHeight(),
-            screen_width: utils.getScreenWidth(),
+            'branch_key': branch_sample_key,
+            'link_identifier': '67890',
+            'initial_referrer': requests[1].obj.initial_referrer,
+            'browser_fingerprint_id': '67890',
+            'alternative_browser_fingerprint_id': undefined,
+            'sdk': 'web' + config.version,
+            'options': {},
+            'current_url': utils.getCurrentUrl(),
+            'screen_height': utils.getScreenHeight(),
+            'screen_width': utils.getScreenWidth(),
           },
           'Request to open params correct',
         );
@@ -385,7 +385,7 @@ describe('Branch', function () {
         browser_fingerprint_id: browser_fingerprint_id,
         identity_id: identity_id,
         data: JSON.stringify({
-          $desktop_url:
+          '$desktop_url':
             window.location.protocol +
             '//' +
             window.location.host +
@@ -423,7 +423,7 @@ describe('Branch', function () {
           browser_fingerprint_id: browser_fingerprint_id,
           identity_id: identity_id,
           data: JSON.stringify({
-            $desktop_url:
+            '$desktop_url':
               window.location.protocol +
               '//' +
               window.location.host +
@@ -440,7 +440,7 @@ describe('Branch', function () {
           browser_fingerprint_id: browser_fingerprint_id,
           identity_id: identity_id,
           data: JSON.stringify({
-            $desktop_url:
+            '$desktop_url':
               window.location.protocol +
               '//' +
               window.location.host +
@@ -493,16 +493,16 @@ describe('Branch', function () {
       assert.deepEqual(
         requests[0].obj,
         {
-          branch_key: branch_sample_key,
-          link_identifier: undefined,
-          initial_referrer: requests[0].obj.initial_referrer,
-          browser_fingerprint_id: undefined,
-          alternative_browser_fingerprint_id: undefined,
-          sdk: 'web' + config.version,
-          options: {},
-          current_url: utils.getCurrentUrl(),
-          screen_height: utils.getScreenHeight(),
-          screen_width: utils.getScreenWidth(),
+          'branch_key': branch_sample_key,
+          'link_identifier': undefined,
+          'initial_referrer': requests[0].obj.initial_referrer,
+          'browser_fingerprint_id': undefined,
+          'alternative_browser_fingerprint_id': undefined,
+          'sdk': 'web' + config.version,
+          'options': {},
+          'current_url': utils.getCurrentUrl(),
+          'screen_height': utils.getScreenHeight(),
+          'screen_width': utils.getScreenWidth(),
         },
         'Request to open params correct',
       );
@@ -525,7 +525,7 @@ describe('Branch', function () {
         browser_fingerprint_id: undefined,
         identity_id: identity_id,
         data: JSON.stringify({
-          $desktop_url:
+          '$desktop_url':
             window.location.protocol +
             '//' +
             window.location.host +
@@ -551,13 +551,13 @@ describe('Branch', function () {
     it('should return whitelisted session storage data', function (done) {
       var branch = initBranch(true);
       var assert = testUtils.plan(2, done);
-      var data = safejson.stringify({ key_1: 'value_1' });
+      var data = safejson.stringify({ 'key_1': 'value_1' });
       var whitelistedData = {
-        data: data,
-        referring_identity: 'referring_user',
-        identity: 'identity',
-        has_app: false,
-        referring_link: '/c/ngJf86-h',
+        'data': data,
+        'referring_identity': 'referring_user',
+        'identity': 'identity',
+        'has_app': false,
+        'referring_link': '/c/ngJf86-h',
       };
       sandbox.stub(utils, 'whiteListSessionData', function (data) {
         return data;
@@ -577,10 +577,10 @@ describe('Branch', function () {
     basicTests('setIdentity', [1]);
     it('should invoke callback with data when a non-null value for identity is passed', function (done) {
       var expectedResponse = {
-        session_id: '113636235674656786',
-        identity_id: '98807509250212101',
-        link: 'https://bnctestbed.app.link/?%24identity_id=98807509250212101',
-        developer_identity: 'test_identity',
+        'session_id': '113636235674656786',
+        'identity_id': '98807509250212101',
+        'link': 'https://bnctestbed.app.link/?%24identity_id=98807509250212101',
+        'developer_identity': 'test_identity',
       };
       var branch = initBranch(true);
       var assert = testUtils.plan(4, done);
@@ -666,9 +666,9 @@ describe('Branch', function () {
       var newLink = 'new_link';
 
       requests[0].callback(null, {
-        identity_id: newIdentityId,
-        session_id: newSessionId,
-        link: newLink,
+        'identity_id': newIdentityId,
+        'session_id': newSessionId,
+        'link': newLink,
       });
       assert.deepEqual(
         requests[0].obj,
@@ -702,15 +702,15 @@ describe('Branch', function () {
           type: 1,
           data: {
             mydata: 'bar',
-            $desktop_url: 'https://cdn.branch.io/example.html',
-            $og_title: 'Branch Metrics',
-            $og_description: 'Branch Metrics',
-            $og_image_url: 'http://branch.io/img/logo_icon_white.png',
-            $canonical_url: 'https://cdn.branch.io/example.html',
-            $og_video: null,
-            $og_type: 'product',
+            '$desktop_url': 'https://cdn.branch.io/example.html',
+            '$og_title': 'Branch Metrics',
+            '$og_description': 'Branch Metrics',
+            '$og_image_url': 'http://branch.io/img/logo_icon_white.png',
+            '$canonical_url': 'https://cdn.branch.io/example.html',
+            '$og_video': null,
+            '$og_type': 'product',
           },
-          sdk: 'web' + config.version,
+          'sdk': 'web' + config.version,
         },
         ['_t'],
       );
@@ -727,7 +727,7 @@ describe('Branch', function () {
     };
 
     var expectedResponse = {
-      url: 'https://bnc.lt/l/3HZMytU-BW',
+      'url': 'https://bnc.lt/l/3HZMytU-BW',
     };
 
     it('should call api with serialized data and return link with browser_fingerprint_id appended', function (done) {
@@ -792,14 +792,14 @@ describe('Branch', function () {
           sdk: 'web' + config.version,
           source: 'web-sdk',
           data: {
-            mydata: 'bar',
-            $desktop_url: 'https://cdn.branch.io/example.html',
-            $og_title: 'Branch Metrics',
-            $og_description: 'Branch Metrics',
-            $og_image_url: 'http://branch.io/img/logo_icon_white.png',
-            $canonical_url: 'https://cdn.branch.io/example.html',
-            $og_video: null,
-            $og_type: 'product',
+            'mydata': 'bar',
+            '$desktop_url': 'https://cdn.branch.io/example.html',
+            '$og_title': 'Branch Metrics',
+            '$og_description': 'Branch Metrics',
+            '$og_image_url': 'http://branch.io/img/logo_icon_white.png',
+            '$canonical_url': 'https://cdn.branch.io/example.html',
+            '$og_video': null,
+            '$og_type': 'product',
           },
         };
         var actual = {};
@@ -1050,7 +1050,7 @@ describe('Branch', function () {
         data: {
           mydata: 'From Banner',
           foo: 'bar',
-          $deeplink_path: 'open/item/5678',
+          '$deeplink_path': 'open/item/5678',
         },
       };
 
@@ -1197,13 +1197,13 @@ describe('Branch', function () {
           channel: 'testChannel',
           source: 'web-sdk',
           data: {
-            $canonical_url: 'http://someurl/pluspath',
-            $og_title: 'OGTitle',
-            $og_description: 'OGDescription',
-            $og_image_url: 'OGImage',
-            $og_video: 'OGVideo',
-            $og_type: 'OGType',
-            akey: 'aval',
+            '$canonical_url': 'http://someurl/pluspath',
+            '$og_title': 'OGTitle',
+            '$og_description': 'OGDescription',
+            '$og_image_url': 'OGImage',
+            '$og_video': 'OGVideo',
+            '$og_type': 'OGType',
+            'akey': 'aval',
           },
         };
         var actual = {};

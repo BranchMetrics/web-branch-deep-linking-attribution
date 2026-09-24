@@ -1,6 +1,5 @@
 'use strict';
-/*jshint -W079 */
-/*jshint esversion: 6 */
+
 var sinon = require('sinon');
 goog.require('utils');
 
@@ -20,17 +19,17 @@ describe('utils', function () {
 
   describe('merge', function () {
     it('should merge two objects despite duplication', function () {
-      var obj1 = { simple: 'object' };
+      var obj1 = { 'simple': 'object' };
       var obj2 = {
-        simple: 'object',
-        nested: {
-          object: 'here',
+        'simple': 'object',
+        'nested': {
+          'object': 'here',
         },
       };
       var expectedMerged = {
-        simple: 'object',
-        nested: {
-          object: 'here',
+        'simple': 'object',
+        'nested': {
+          'object': 'here',
         },
       };
       assert.deepEqual(
@@ -42,15 +41,15 @@ describe('utils', function () {
     it('should handle an non-object for first argument', function () {
       var obj1 = null;
       var obj2 = {
-        simple: 'object',
-        nested: {
-          object: 'here',
+        'simple': 'object',
+        'nested': {
+          'object': 'here',
         },
       };
       var expectedMerged = {
-        simple: 'object',
-        nested: {
-          object: 'here',
+        'simple': 'object',
+        'nested': {
+          'object': 'here',
         },
       };
       assert.deepEqual(
@@ -60,9 +59,9 @@ describe('utils', function () {
       );
     });
     it('should handle an non-object for second argument', function () {
-      var obj1 = { simple: 'object' };
+      var obj1 = { 'simple': 'object' };
       var obj2 = null;
-      var expectedMerged = { simple: 'object' };
+      var expectedMerged = { 'simple': 'object' };
       assert.deepEqual(
         utils.merge(obj1, obj2),
         expectedMerged,
@@ -83,27 +82,27 @@ describe('utils', function () {
        * value is an improvement over two nulls.
        */
       var input = {
-        data: 'string',
-        data_parsed: {
-          key: 'value',
+        'data': 'string',
+        'data_parsed': {
+          'key': 'value',
         },
-        has_app: true,
-        identity: '90210',
-        developer_identity: '67890',
-        referring_identity: '12345',
-        referring_link: null,
-        unwanted: 'param',
+        'has_app': true,
+        'identity': '90210',
+        'developer_identity': '67890',
+        'referring_identity': '12345',
+        'referring_link': null,
+        'unwanted': 'param',
       };
       var expected = {
-        data: 'string',
-        data_parsed: {
-          key: 'value',
+        'data': 'string',
+        'data_parsed': {
+          'key': 'value',
         },
-        has_app: true,
-        identity: '90210',
-        developer_identity: '90210',
-        referring_identity: '12345',
-        referring_link: null,
+        'has_app': true,
+        'identity': '90210',
+        'developer_identity': '90210',
+        'referring_identity': '12345',
+        'referring_link': null,
       };
       // determine whitelisted fields before deleting unwanted param
       var actual = utils.whiteListSessionData(input);
@@ -112,9 +111,9 @@ describe('utils', function () {
 
     it('should make missing params null', function () {
       var data = {
-        data: 'string',
-        identity: '67890',
-        referring_identity: '12345',
+        'data': 'string',
+        'identity': '67890',
+        'referring_identity': '12345',
       };
       var whiteListedData = utils.whiteListSessionData(data);
       assert.strictEqual(
@@ -180,9 +179,9 @@ describe('utils', function () {
 
     it('should stringify field "data" and add "source"', function () {
       var linkData = {
-        data: {
+        'data': {
           subfield1: 'bar',
-          subfield2: false,
+          'subfield2': false,
         },
         field1: 12345,
         field2: '67890',
@@ -202,7 +201,7 @@ describe('utils', function () {
         '}',
       ].join('');
       var expectedCleanedLinkData = {
-        data: dataString,
+        'data': dataString,
         field1: 12345,
         field2: '67890',
         'field 3': true,
@@ -218,9 +217,9 @@ describe('utils', function () {
 
     it('should not stringify pre-stringified field "data"', function () {
       var linkData = {
-        data: {
+        'data': {
           subfield1: 'bar',
-          subfield2: false,
+          'subfield2': false,
         },
         field1: 12345,
         field2: '67890',
@@ -240,7 +239,7 @@ describe('utils', function () {
         '}',
       ].join('');
       var expectedCleanedLinkData = {
-        data: dataString,
+        'data': dataString,
         field1: 12345,
         field2: '67890',
         'field 3': true,
@@ -504,20 +503,20 @@ describe('utils', function () {
       }
     });
     it('$ios_deeplink_path and $android_deeplink_path should be formed from hosted metadata', function () {
-      var params = { $key1: 'val1', $key2: 'val2' };
+      var params = { '$key1': 'val1', '$key2': 'val2' };
       var deeplinkPaths = {
-        hostedIOS: 'hosteddld/ios',
-        hostedAndroid: 'hosteddld/android',
-        applinksIOS: 'appllinks/ios',
-        applinksAndroid: 'applinks/android',
-        twitterIOS: 'twitter/ios',
-        twitterAndroid: 'twitter/android',
+        'hostedIOS': 'hosteddld/ios',
+        'hostedAndroid': 'hosteddld/android',
+        'applinksIOS': 'appllinks/ios',
+        'applinksAndroid': 'applinks/android',
+        'twitterIOS': 'twitter/ios',
+        'twitterAndroid': 'twitter/android',
       };
       var expected = {
-        $key1: 'val1',
-        $key2: 'val2',
-        $ios_deeplink_path: 'hosteddld/ios',
-        $android_deeplink_path: 'hosteddld/android',
+        '$key1': 'val1',
+        '$key2': 'val2',
+        '$ios_deeplink_path': 'hosteddld/ios',
+        '$android_deeplink_path': 'hosteddld/android',
       };
       assert.deepEqual(
         expected,
@@ -526,20 +525,20 @@ describe('utils', function () {
       );
     });
     it('$ios_deeplink_path should be formed from applinks tag and $android_deeplink_path from hosted metadata tag', function () {
-      var params = { $key1: 'val1', $key2: 'val2' };
+      var params = { '$key1': 'val1', '$key2': 'val2' };
       var deeplinkPaths = {
-        hostedIOS: null,
-        hostedAndroid: 'hosteddld/android',
-        applinksIOS: 'appllinks/ios',
-        applinksAndroid: 'applinks/android',
-        twitterIOS: 'twitter/ios',
-        twitterAndroid: 'twitter/android',
+        'hostedIOS': null,
+        'hostedAndroid': 'hosteddld/android',
+        'applinksIOS': 'appllinks/ios',
+        'applinksAndroid': 'applinks/android',
+        'twitterIOS': 'twitter/ios',
+        'twitterAndroid': 'twitter/android',
       };
       var expected = {
-        $key1: 'val1',
-        $key2: 'val2',
-        $ios_deeplink_path: 'appllinks/ios',
-        $android_deeplink_path: 'hosteddld/android',
+        '$key1': 'val1',
+        '$key2': 'val2',
+        '$ios_deeplink_path': 'appllinks/ios',
+        '$android_deeplink_path': 'hosteddld/android',
       };
       assert.deepEqual(
         expected,
@@ -550,12 +549,12 @@ describe('utils', function () {
     it('$ios_deeplink_path and $android_deeplink_path should be formed from twitter tags', function () {
       var params = {};
       var deeplinkPaths = {
-        twitterIOS: 'twitter/ios',
-        twitterAndroid: 'twitter/android',
+        'twitterIOS': 'twitter/ios',
+        'twitterAndroid': 'twitter/android',
       };
       var expected = {
-        $ios_deeplink_path: 'twitter/ios',
-        $android_deeplink_path: 'twitter/android',
+        '$ios_deeplink_path': 'twitter/ios',
+        '$android_deeplink_path': 'twitter/android',
       };
       assert.deepEqual(
         expected,
@@ -566,13 +565,13 @@ describe('utils', function () {
     it('$ios_deeplink_path and $android_deeplink_path should be formed from twitter tags. $deeplink_path should also be present', function () {
       var params = {};
       var deeplinkPaths = {
-        twitterIOS: 'twitter/some/path',
-        twitterAndroid: 'twitter/some/path',
+        'twitterIOS': 'twitter/some/path',
+        'twitterAndroid': 'twitter/some/path',
       };
       var expected = {
-        $ios_deeplink_path: 'twitter/some/path',
-        $android_deeplink_path: 'twitter/some/path',
-        $deeplink_path: 'twitter/some/path',
+        '$ios_deeplink_path': 'twitter/some/path',
+        '$android_deeplink_path': 'twitter/some/path',
+        '$deeplink_path': 'twitter/some/path',
       };
       assert.deepEqual(
         expected,
@@ -581,11 +580,11 @@ describe('utils', function () {
       );
     });
     it('Original key:value pairs in params should be present', function () {
-      var params = { $key1: 'val1', $key2: 'val2' };
+      var params = { '$key1': 'val1', '$key2': 'val2' };
       var deeplinkPaths = {};
       var expected = {
-        $key1: 'val1',
-        $key2: 'val2',
+        '$key1': 'val1',
+        '$key2': 'val2',
       };
       assert.deepEqual(
         expected,
@@ -855,19 +854,19 @@ describe('utils', function () {
     });
     it("a complex object's values should be stringified", function () {
       var initial = {
-        revenue: 123,
-        currency: 'USD',
-        custom_key_0: { sku: 'foo-sku-7', price: 8.5, quantity: 4 },
-        custom_key_1: [
-          { sku: 'foo-sku-7', price: 8.5, quantity: 4 },
+        'revenue': 123,
+        'currency': 'USD',
+        'custom_key_0': { 'sku': 'foo-sku-7', 'price': 8.5, 'quantity': 4 },
+        'custom_key_1': [
+          { 'sku': 'foo-sku-7', 'price': 8.5, 'quantity': 4 },
           'testing',
         ],
       };
       var expected = {
-        revenue: '123',
-        currency: 'USD',
-        custom_key_0: '{"sku":"foo-sku-7","price":8.5,"quantity":4}',
-        custom_key_1:
+        'revenue': '123',
+        'currency': 'USD',
+        'custom_key_0': '{"sku":"foo-sku-7","price":8.5,"quantity":4}',
+        'custom_key_1':
           '[{"sku":"foo-sku-7","price":8.5,"quantity":4},"testing"]',
       };
       assert.deepEqual(
@@ -918,7 +917,7 @@ describe('utils', function () {
     });
 
     it('should stringify an object', function () {
-      var initial = { sku: 'foo-sku-7', price: 8.5, quantity: 4 };
+      var initial = { 'sku': 'foo-sku-7', 'price': 8.5, 'quantity': 4 };
       var expected = '{"sku":"foo-sku-7","price":8.5,"quantity":4}';
       assert.strictEqual(
         expected,
@@ -928,7 +927,10 @@ describe('utils', function () {
     });
 
     it('should stringify an array', function () {
-      var initial = [{ sku: 'foo-sku-7', price: 8.5, quantity: 4 }, 'testing'];
+      var initial = [
+        { 'sku': 'foo-sku-7', 'price': 8.5, 'quantity': 4 },
+        'testing',
+      ];
       var expected = '[{"sku":"foo-sku-7","price":8.5,"quantity":4},"testing"]';
       assert.strictEqual(
         expected,
@@ -1042,21 +1044,21 @@ describe('utils', function () {
   describe('separateEventAndCustomData ', function () {
     it('extracted custom and event data should equal initial objects', function () {
       var event_data = {
-        transaction_id: '1AB23456C7890123D',
-        revenue: 6.0,
-        currency: 'USD',
-        shipping: 3.0,
-        tax: 3.0,
-        coupon: '8891701',
-        affiliation: 'xyz_affiliation',
-        search_query: 'boat shoes sperrys',
-        description: 'Sperry Authentic Original',
+        'transaction_id': '1AB23456C7890123D',
+        'revenue': 6.0,
+        'currency': 'USD',
+        'shipping': 3.0,
+        'tax': 3.0,
+        'coupon': '8891701',
+        'affiliation': 'xyz_affiliation',
+        'search_query': 'boat shoes sperrys',
+        'description': 'Sperry Authentic Original',
       };
 
       var custom_data = {
-        custom_key_1: 'custom_val_1',
-        custom_key_2: 'custom_val_2',
-        custom_key_3: 'custom_val_3',
+        'custom_key_1': 'custom_val_1',
+        'custom_key_2': 'custom_val_2',
+        'custom_key_3': 'custom_val_3',
       };
 
       var event_and_custom_data = {};
@@ -1213,7 +1215,7 @@ describe('utils', function () {
     });
 
     it("ensure that additionalMetadata['hosted_deeplink_data'] does not get mutated", function () {
-      var additionalData = { root_key: '1234' };
+      var additionalData = { 'root_key': '1234' };
       additionalData['hosted_deeplink_data'] = { productA: '12345' };
       var userSuppliedMetadata = { productB: '12345' };
       utils.mergeHostedDeeplinkData(
@@ -1221,8 +1223,8 @@ describe('utils', function () {
         userSuppliedMetadata,
       );
       var expected = {
-        root_key: '1234',
-        hosted_deeplink_data: { productA: '12345' },
+        'root_key': '1234',
+        'hosted_deeplink_data': { productA: '12345' },
       };
       assert.deepEqual(expected, additionalData, 'should be equal');
     });
@@ -1472,9 +1474,9 @@ describe('utils', function () {
 
   describe('addPropertyIfNotNullorEmpty', function () {
     it('should not add property if value is empty', function () {
-      var obj = { prop1: 'value1' };
+      var obj = { 'prop1': 'value1' };
       var expectedObj = {
-        prop1: 'value1',
+        'prop1': 'value1',
       };
       assert.deepEqual(
         utils.addPropertyIfNotNullorEmpty(obj, 'prop2', ''),
@@ -1483,9 +1485,9 @@ describe('utils', function () {
       );
     });
     it('should not add property if value is null', function () {
-      var obj = { prop1: 'value1' };
+      var obj = { 'prop1': 'value1' };
       var expectedObj = {
-        prop1: 'value1',
+        'prop1': 'value1',
       };
       assert.deepEqual(
         utils.addPropertyIfNotNullorEmpty(obj, 'prop2', null),
@@ -1494,10 +1496,10 @@ describe('utils', function () {
       );
     });
     it('should add property if value is not empty', function () {
-      var obj = { prop1: 'value1' };
+      var obj = { 'prop1': 'value1' };
       var expectedObj = {
-        prop1: 'value1',
-        prop2: 'value2',
+        'prop1': 'value1',
+        'prop2': 'value2',
       };
       assert.deepEqual(
         utils.addPropertyIfNotNullorEmpty(obj, 'prop2', 'value2'),
@@ -1754,7 +1756,7 @@ describe('utils', function () {
       const data2 = {};
       utils.setDMAParams(data2, dmaObj, '/v2/event/standard');
       assert.deepEqual(data2, {
-        user_data:
+        'user_data':
           '{"dma_eea":true,"dma_ad_personalization":true,"dma_ad_user_data":false}',
       });
     });
@@ -1768,7 +1770,7 @@ describe('utils', function () {
       const data2 = {};
       utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
       assert.deepEqual(data2, {
-        user_data:
+        'user_data':
           '{"dma_eea":true,"dma_ad_personalization":true,"dma_ad_user_data":false}',
       });
     });
@@ -1781,11 +1783,11 @@ describe('utils', function () {
 
       const data2 = {};
       data2.user_data = JSON.stringify({
-        test: true,
+        'test': true,
       });
       utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
       assert.deepEqual(data2, {
-        user_data:
+        'user_data':
           '{"test":true,"dma_eea":true,"dma_ad_personalization":true,"dma_ad_user_data":false}',
       });
     });

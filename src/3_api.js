@@ -7,7 +7,7 @@
 goog.provide('Server');
 goog.require('utils');
 goog.require('goog.json');
-goog.require('storage'); // jshint unused:false
+goog.require('storage');
 goog.require('safejson');
 
 /**
@@ -515,7 +515,7 @@ Server.prototype.request = function (resource, data, storage, callback) {
     noParseJsonResp = true;
     responseType = 'arraybuffer';
   }
-  /* jshint -W003 */
+
   var makeRequest = function () {
     if (storage.get('use_jsonp') || resource.jsonp) {
       self.jsonpRequest(url, data, resource.method, done);
@@ -531,6 +531,6 @@ Server.prototype.request = function (resource, data, storage, callback) {
       );
     }
   };
-  /* jshint +W003 */
+
   makeRequest();
 };

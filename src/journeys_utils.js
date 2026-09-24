@@ -963,8 +963,8 @@ journeys_utils._setJourneyDismiss = function (
     ? safejson.parse(journeyDismissals)
     : {};
   journeyDismissals[audienceRuleId] = {
-    view_id: templateId,
-    dismiss_time: Date.now(),
+    'view_id': templateId,
+    'dismiss_time': Date.now(),
   };
   storage.set('journeyDismissals', safejson.stringify(journeyDismissals), true);
   return journeyDismissals;
@@ -1181,7 +1181,7 @@ journeys_utils._handleJourneyDismiss = function (
                 false,
                 data['journey_link_data'],
                 {
-                  use_v2_renderer: data['template'],
+                  use_v2_renderer: data['use_v2_renderer'],
                   animationConfig: data['animationConfig'],
                 },
               );
@@ -1200,12 +1200,12 @@ journeys_utils._handleJourneyDismiss = function (
 journeys_utils._getPageviewMetadata = function (options, additionalMetadata) {
   var pageviewMetadata = utils.merge(
     {
-      url: (options && options.url) || utils.getWindowLocation(),
-      user_agent: navigator.userAgent,
-      language: navigator.language,
-      screen_width: screen.width || -1,
-      screen_height: screen.height || -1,
-      window_device_pixel_ratio: window.devicePixelRatio || 1,
+      'url': (options && options.url) || utils.getWindowLocation(),
+      'user_agent': navigator.userAgent,
+      'language': navigator.language,
+      'screen_width': screen.width || -1,
+      'screen_height': screen.height || -1,
+      'window_device_pixel_ratio': window.devicePixelRatio || 1,
     },
     additionalMetadata || {},
   );
@@ -1401,7 +1401,7 @@ journeys_utils._timeValueMsAt = function (cssValue, index) {
 };
 
 journeys_utils.setJourneyLinkData = function (linkData) {
-  var data = { banner_id: journeys_utils.branchViewId };
+  var data = { 'banner_id': journeys_utils.branchViewId };
   if (
     linkData &&
     typeof linkData === 'object' &&

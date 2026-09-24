@@ -1,6 +1,6 @@
 'use strict';
 
-goog.require('storage'); // jshint ignore:line
+goog.require('storage');
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 var ITEM_KEY = 'key';
@@ -8,7 +8,7 @@ var ITEM_KEY_UNSTORED = 'key unstored';
 var ITEM_VALUE = 'value';
 
 describe('session storage', function () {
-  var storage = new BranchStorage(['session']); // jshint ignore:line
+  var storage = new BranchStorage(['session']);
   var assert = testUtils.unplanned();
   beforeEach(function () {
     storage.clear();
@@ -49,7 +49,7 @@ describe('session storage', function () {
 });
 
 describe('local storage', function () {
-  var storage = new BranchStorage(['local']); // jshint ignore:line
+  var storage = new BranchStorage(['local']);
   var assert = testUtils.unplanned();
   beforeEach(function () {
     storage.clear();
@@ -90,7 +90,7 @@ describe('local storage', function () {
 });
 
 describe('cookie storage', function () {
-  var storage = new BranchStorage(['cookie']); // jshint ignore:line
+  var storage = new BranchStorage(['cookie']);
   var ITEM_KEY = 'branch_session';
   var ITEM_VALUE = 'test_val';
   var assert = testUtils.unplanned();
@@ -132,9 +132,9 @@ describe('cookie storage', function () {
 
   it('should clear all Branch cookies', function () {
     var testCookies = {
-      key_1: 'val_1',
-      branch_session: 'val_2',
-      branch_session_first: 'val_3',
+      'key_1': 'val_1',
+      'branch_session': 'val_2',
+      'branch_session_first': 'val_3',
     };
     for (var key in testCookies) {
       if (testCookies.hasOwnProperty(key)) {
@@ -153,9 +153,9 @@ describe('cookie storage', function () {
 
   it('should return all Branch cookies', function () {
     var expected = {
-      key_1: 'val_1',
-      branch_session: 'val_2',
-      branch_session_first: 'val_3',
+      'key_1': 'val_1',
+      'branch_session': 'val_2',
+      'branch_session_first': 'val_3',
     };
     for (var key in expected) {
       if (expected.hasOwnProperty(key)) {
@@ -178,9 +178,9 @@ describe('cookie storage', function () {
       }
     }
     var nonBranchCookies = {
-      non_branch_cookie_1: 'abc',
-      non_branch_cookie_2: 'def',
-      non_branch_cookie_3: 'ghi',
+      'non_branch_cookie_1': 'abc',
+      'non_branch_cookie_2': 'def',
+      'non_branch_cookie_3': 'ghi',
     };
     for (key in nonBranchCookies) {
       // check whether original Branch cookies are returned
@@ -197,9 +197,9 @@ describe('cookie storage', function () {
   it('non-Branch cookies should remain after clearing storage', function () {
     storage.clear();
     var expected = {
-      non_branch_cookie_1: 'abc',
-      non_branch_cookie_2: 'def',
-      non_branch_cookie_3: 'ghi',
+      'non_branch_cookie_1': 'abc',
+      'non_branch_cookie_2': 'def',
+      'non_branch_cookie_3': 'ghi',
     };
     var cookiesArray = document.cookie.split(';');
     var cookiesFound = 0;
@@ -224,7 +224,7 @@ describe('cookie storage', function () {
 });
 
 describe('pojo storage', function () {
-  var storage = new BranchStorage(['pojo']); // jshint ignore:line
+  var storage = new BranchStorage(['pojo']);
   var assert = testUtils.unplanned();
   beforeEach(function () {
     storage.clear();

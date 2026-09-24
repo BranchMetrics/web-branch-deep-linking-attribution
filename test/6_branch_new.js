@@ -1,6 +1,5 @@
 'use strict';
-/*jshint -W079 */
-/*jshint esversion: 6 */
+
 var sinon = require('sinon');
 
 goog.require('Branch');
@@ -42,11 +41,11 @@ describe('Branch - new', function () {
       );
       assert.strictEqual(result, undefined);
       sinon.assert.calledOnce(addPropertyIfNotNullSpy);
-      assert.deepEqual(requestMetadata, { validKey: 'validValue' });
+      assert.deepEqual(requestMetadata, { 'validKey': 'validValue' });
     });
 
     it('should delete metadata for a key when value is null', function () {
-      var requestMetadata = { keyToDelete: 'value' };
+      var requestMetadata = { 'keyToDelete': 'value' };
       branch_instance.setRequestMetaData.call(
         { requestMetadata: requestMetadata },
         'keyToDelete',
@@ -58,7 +57,7 @@ describe('Branch - new', function () {
     it('should not modify metadata for an invalid key or undefined value', function () {
       var invalidKey = null;
       var undefinedValue;
-      var requestMetadata = { key: 'value' };
+      var requestMetadata = { 'key': 'value' };
 
       var result1 = branch_instance.setRequestMetaData.call(
         { requestMetadata: requestMetadata },
@@ -73,7 +72,7 @@ describe('Branch - new', function () {
       assert.strictEqual(result1, undefined);
       assert.strictEqual(result2, undefined);
       sinon.assert.notCalled(addPropertyIfNotNullSpy);
-      assert.deepEqual(requestMetadata, { key: 'value' });
+      assert.deepEqual(requestMetadata, { 'key': 'value' });
     });
   });
   describe('pageview/dismiss request metadata', function () {
@@ -94,7 +93,7 @@ describe('Branch - new', function () {
         branch_key: window.branch_sample_key,
         event: 'pageview',
         metadata: { url: 'http://example.com' },
-        branch_requestMetadata: { $marketing_cloud_visitor_id: '12345' },
+        branch_requestMetadata: { '$marketing_cloud_visitor_id': '12345' },
       });
       assert.strictEqual(typeof result.error, 'undefined');
       var metadataMatch = decodeURIComponent(result.data).match(
@@ -121,7 +120,7 @@ describe('Branch - new', function () {
         branch_key: window.branch_sample_key,
         event: 'dismiss',
         metadata: {},
-        branch_requestMetadata: { $marketing_cloud_visitor_id: '12345' },
+        branch_requestMetadata: { '$marketing_cloud_visitor_id': '12345' },
       });
       assert.strictEqual(typeof result.error, 'undefined');
       var metadataMatch = decodeURIComponent(result.data).match(

@@ -3,7 +3,7 @@
  */
 'use strict';
 goog.provide('Branch');
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 goog.require('utils');
 goog.require('resources');
@@ -144,7 +144,7 @@ Branch = function () {
 
   this._storage = /** @type {storage} */ (
     new storage.BranchStorage(storageMethods)
-  ); // jshint ignore:line
+  );
 
   this._server = new Server();
 
@@ -281,7 +281,7 @@ Branch.prototype._referringLink = function (forJourneys) {
         if (now.getTime() > referringLinkExpiry) {
           session.patch(
             this._storage,
-            { referringLinkExpiry: null },
+            { 'referringLinkExpiry': null },
             true,
             true,
           );
@@ -498,7 +498,7 @@ Branch.prototype['init'] = wrap(
     var freshInstall = !self.identity_id; // initialized from local storage above
     self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
     var fetchLatestBrowserFingerPrintID = function (cb) {
-      var params_r = { sdk: config.version, branch_key: self.branch_key };
+      var params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
       var currentSessionData = session.get(self._storage) || {};
       var permData = session.get(self._storage, true) || {};
       if (permData['browser_fingerprint_id']) {
@@ -615,7 +615,7 @@ Branch.prototype['init'] = wrap(
                   journeyInTestMode,
                   pageviewResponse['journey_link_data'],
                   {
-                    use_v2_renderer: pageviewResponse['template'],
+                    use_v2_renderer: pageviewResponse['use_v2_renderer'],
                     animationConfig: pageviewResponse['animationConfig'],
                   },
                 );
@@ -627,9 +627,9 @@ Branch.prototype['init'] = wrap(
                     self._referringLink())
                 ) {
                   var linkOptions = {
-                    make_new_link: false,
-                    open_app: true,
-                    auto_branchify: true,
+                    'make_new_link': false,
+                    'open_app': true,
+                    'auto_branchify': true,
                   };
                   this['branch']['deepview']({}, linkOptions);
                 }
@@ -685,14 +685,14 @@ Branch.prototype['init'] = wrap(
       !utils.getParamValue('branchify_url')
     ) {
       // resets data in session storage to prevent previous link click data from being returned to Branch.init()
-      session.update(self._storage, { data: '' });
-      session.update(self._storage, { referring_link: '' });
+      session.update(self._storage, { 'data': '' });
+      session.update(self._storage, { 'referring_link': '' });
       attachVisibilityEvent();
       fetchLatestBrowserFingerPrintID(finishInit);
       return;
     }
 
-    var params_r = { sdk: config.version, branch_key: self.branch_key };
+    var params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
     var permData = session.get(self._storage, true) || {};
 
     if (permData['browser_fingerprint_id']) {
@@ -717,18 +717,21 @@ Branch.prototype['init'] = wrap(
           self._api(
             resources.open,
             {
-              link_identifier: link_identifier,
-              browser_fingerprint_id: link_identifier || browser_fingerprint_id,
-              identity: permData['identity'] ? permData['identity'] : null,
-              alternative_browser_fingerprint_id:
+              'link_identifier': link_identifier,
+              'browser_fingerprint_id':
+                link_identifier || browser_fingerprint_id,
+              'identity': permData['identity'] ? permData['identity'] : null,
+              'alternative_browser_fingerprint_id':
                 permData['browser_fingerprint_id'],
-              options: options,
-              initial_referrer: utils.getInitialReferrer(self._referringLink()),
-              current_url: utils.getCurrentUrl(),
-              screen_height: utils.getScreenHeight(),
-              screen_width: utils.getScreenWidth(),
-              model: utils.userAgentData ? utils.userAgentData.model : null,
-              os_version: utils.userAgentData
+              'options': options,
+              'initial_referrer': utils.getInitialReferrer(
+                self._referringLink(),
+              ),
+              'current_url': utils.getCurrentUrl(),
+              'screen_height': utils.getScreenHeight(),
+              'screen_width': utils.getScreenWidth(),
+              'model': utils.userAgentData ? utils.userAgentData.model : null,
+              'os_version': utils.userAgentData
                 ? utils.userAgentData.platformVersion
                 : null,
             },
@@ -760,19 +763,19 @@ Branch.prototype['init'] = wrap(
         self._api(
           resources.open,
           {
-            link_identifier: link_identifier,
-            browser_fingerprint_id:
+            'link_identifier': link_identifier,
+            'browser_fingerprint_id':
               link_identifier || permData['browser_fingerprint_id'],
-            identity: permData['identity'] ? permData['identity'] : null,
-            alternative_browser_fingerprint_id:
+            'identity': permData['identity'] ? permData['identity'] : null,
+            'alternative_browser_fingerprint_id':
               permData['browser_fingerprint_id'],
-            options: options,
-            initial_referrer: utils.getInitialReferrer(self._referringLink()),
-            current_url: utils.getCurrentUrl(),
-            screen_height: utils.getScreenHeight(),
-            screen_width: utils.getScreenWidth(),
-            model: utils.userAgentData ? utils.userAgentData.model : null,
-            os_version: utils.userAgentData
+            'options': options,
+            'initial_referrer': utils.getInitialReferrer(self._referringLink()),
+            'current_url': utils.getCurrentUrl(),
+            'screen_height': utils.getScreenHeight(),
+            'screen_width': utils.getScreenWidth(),
+            'model': utils.userAgentData ? utils.userAgentData.model : null,
+            'os_version': utils.userAgentData
               ? utils.userAgentData.platformVersion
               : null,
           },
@@ -937,7 +940,7 @@ Branch.prototype['setIdentity'] = wrap(
       };
       self.identity = identity;
       // store the identity
-      session.patch(self._storage, { identity: identity }, true);
+      session.patch(self._storage, { 'identity': identity }, true);
       done(null, data);
     } else {
       done(new Error(utils.message(utils.messages.missingIdentity)));
@@ -973,7 +976,7 @@ Branch.prototype['logout'] = wrap(
   function (done) {
     var self = this;
     var data = {
-      identity: null,
+      'identity': null,
     };
 
     self.identity = null;
@@ -1020,7 +1023,7 @@ Branch.prototype['crossPlatformIds'] = wrap(
     this._api(
       resources.crossPlatformIds,
       {
-        user_data: safejson.stringify(utils.getUserData(this)),
+        'user_data': safejson.stringify(utils.getUserData(this)),
       },
       function (err, data) {
         return done(err || null, (data && data['user_data']) || null);
@@ -1065,7 +1068,7 @@ Branch.prototype['lastAttributedTouchData'] = wrap(
     this._api(
       resources.lastAttributedTouchData,
       {
-        user_data: safejson.stringify(userData),
+        'user_data': safejson.stringify(userData),
       },
       function (err, data) {
         return done(err || null, data || null);
@@ -1154,7 +1157,7 @@ Branch.prototype['track'] = wrap(
                 journeyInTestMode,
                 pageviewResponse['journey_link_data'],
                 {
-                  use_v2_renderer: pageviewResponse['template'],
+                  use_v2_renderer: pageviewResponse['use_v2_renderer'],
                   animationConfig: pageviewResponse['animationConfig'],
                 },
               );
@@ -1318,20 +1321,20 @@ Branch.prototype['logEvent'] = wrap(
       this._api(
         resources.logStandardEvent,
         {
-          name: name,
-          user_data: safejson.stringify(utils.getUserData(this)),
-          custom_data: safejson.stringify(
+          'name': name,
+          'user_data': safejson.stringify(utils.getUserData(this)),
+          'custom_data': safejson.stringify(
             (extractedEventAndCustomData &&
               extractedEventAndCustomData['custom_data']) ||
               {},
           ),
-          event_data: safejson.stringify(
+          'event_data': safejson.stringify(
             (extractedEventAndCustomData &&
               extractedEventAndCustomData['event_data']) ||
               {},
           ),
-          content_items: safejson.stringify(contentItems || []),
-          customer_event_alias: customer_event_alias,
+          'content_items': safejson.stringify(contentItems || []),
+          'customer_event_alias': customer_event_alias,
         },
         function (err, data) {
           return done(err || null);
@@ -1341,20 +1344,20 @@ Branch.prototype['logEvent'] = wrap(
       this._api(
         resources.logCustomEvent,
         {
-          name: name,
-          user_data: safejson.stringify(utils.getUserData(this)),
-          custom_data: safejson.stringify(
+          'name': name,
+          'user_data': safejson.stringify(utils.getUserData(this)),
+          'custom_data': safejson.stringify(
             (extractedEventAndCustomData &&
               extractedEventAndCustomData['custom_data']) ||
               {},
           ),
-          event_data: safejson.stringify(
+          'event_data': safejson.stringify(
             (extractedEventAndCustomData &&
               extractedEventAndCustomData['event_data']) ||
               {},
           ),
-          content_items: safejson.stringify(contentItems || []),
-          customer_event_alias: customer_event_alias,
+          'content_items': safejson.stringify(contentItems || []),
+          'customer_event_alias': customer_event_alias,
         },
         function (err, data) {
           return done(err || null);
@@ -1639,7 +1642,7 @@ Branch.prototype['deepview'] = wrap(
     }
 
     data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
-    data = utils.isIframe() ? utils.merge({ is_iframe: true }, data) : data;
+    data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
 
     var cleanedData = utils.cleanLinkData(data);
     var fallbackUrl = utils.generateDynamicBNCLink(
@@ -2159,17 +2162,17 @@ Branch.prototype['trackCommerceEvent'] = wrap(
       self._api(
         resources.commerceEvent,
         {
-          event: event,
-          metadata: utils.merge(
+          'event': event,
+          'metadata': utils.merge(
             {
-              url: document.URL,
-              user_agent: navigator.userAgent,
-              language: navigator.language,
+              'url': document.URL,
+              'user_agent': navigator.userAgent,
+              'language': navigator.language,
             },
             metadata || {},
           ),
-          initial_referrer: utils.getInitialReferrer(self._referringLink()),
-          commerce_data: commerce_data,
+          'initial_referrer': utils.getInitialReferrer(self._referringLink()),
+          'commerce_data': commerce_data,
         },
         function (err, data) {
           done(err || null);

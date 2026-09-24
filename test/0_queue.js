@@ -1,5 +1,5 @@
 'use strict';
-/*jshint -W079 */
+
 var sinon = require('sinon');
 
 goog.require('task_queue');

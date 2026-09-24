@@ -2,7 +2,7 @@
 
 goog.provide('banner_utils');
 
-goog.require('storage'); // jshint unused:false
+goog.require('storage');
 goog.require('utils');
 goog.require('safejson');
 
@@ -34,7 +34,7 @@ goog.require('safejson');
  * reviewCount:number,
  * open_app:boolean,
  * append_deeplink_path:boolean}} */
-banner_utils.options; // jshint ignore:line
+banner_utils.options;
 
 // UI Animation transition speed in ms.
 /** @type {number} */
@@ -123,10 +123,10 @@ banner_utils.addCSSLengths = function (length1, length2) {
     };
     return parseInt(
       {
-        px: function (value) {
+        'px': function (value) {
           return value;
         },
-        em: function (value) {
+        'em': function (value) {
           if (document.body.currentStyle) {
             return (
               value *
@@ -139,7 +139,7 @@ banner_utils.addCSSLengths = function (length1, length2) {
             );
           }
         },
-        rem: function (value) {
+        'rem': function (value) {
           if (document.documentElement.currentStyle) {
             return (
               value *
@@ -156,16 +156,16 @@ banner_utils.addCSSLengths = function (length1, length2) {
             );
           }
         },
-        vw: function (value) {
+        'vw': function (value) {
           return value * vw();
         },
-        vh: function (value) {
+        'vh': function (value) {
           return value * vh();
         },
-        vmin: function (value) {
+        'vmin': function (value) {
           return value * Math.min(vh(), vw());
         },
-        vmax: function (value) {
+        'vmax': function (value) {
           return value * Math.max(vh(), vw());
         },
         '%': function () {

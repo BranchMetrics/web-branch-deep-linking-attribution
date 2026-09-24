@@ -1,7 +1,7 @@
 'use strict';
 
 goog.require('config');
-goog.require('goog.json'); // jshint unused:false
+goog.require('goog.json');
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
 /*globals device_fingerprint_id */
@@ -88,10 +88,10 @@ describe('Integration tests', function () {
     type: 1,
     data: {
       mydata: 'bar',
-      $desktop_url: 'https://cdn.branch.io/example.html',
-      $og_title: 'Branch Metrics',
-      $og_description: 'Branch Metrics',
-      $og_image_url: 'http://branch.io/img/logo_icon_white.png',
+      '$desktop_url': 'https://cdn.branch.io/example.html',
+      '$og_title': 'Branch Metrics',
+      '$og_description': 'Branch Metrics',
+      '$og_image_url': 'http://branch.io/img/logo_icon_white.png',
     },
   };
 
@@ -258,10 +258,10 @@ describe('Integration tests', function () {
         assert.deepEqual(
           data,
           {
-            identity_id: identity_id,
-            link_click_id: '114750153298026746',
-            link: config.link_service_endpoint + '/i/4LYQTXE0_k',
-            referring_data_parsed: null,
+            'identity_id': identity_id,
+            'link_click_id': '114750153298026746',
+            'link': config.link_service_endpoint + '/i/4LYQTXE0_k',
+            'referring_data_parsed': null,
           },
           'Expected response returned',
         );

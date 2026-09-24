@@ -9,12 +9,13 @@ goog.addDependency(
   '../../../../src/1_utils.js',
   ['utils'],
   ['config', 'goog.json', 'safejson'],
-  { lang: 'es6' },
+  { 'lang': 'es6' },
 );
 goog.addDependency(
   '../../../../src/2_resources.js',
   ['resources'],
   ['config', 'utils'],
+  { 'lang': 'es5' },
 );
 goog.addDependency(
   '../../../../src/2_session.js',
@@ -25,16 +26,19 @@ goog.addDependency(
   '../../../../src/2_storage.js',
   ['storage'],
   ['goog.json', 'utils'],
+  { 'lang': 'es5' },
 );
 goog.addDependency(
   '../../../../src/3_api.js',
   ['Server'],
   ['goog.json', 'safejson', 'storage', 'utils'],
+  { 'lang': 'es5' },
 );
 goog.addDependency(
   '../../../../src/3_banner_utils.js',
   ['banner_utils'],
   ['safejson', 'storage', 'utils'],
+  { 'lang': 'es5' },
 );
 goog.addDependency(
   '../../../../src/4_banner_css.js',
@@ -68,7 +72,7 @@ goog.addDependency(
     'task_queue',
     'utils',
   ],
-  { lang: 'es6' },
+  { 'lang': 'es6' },
 );
 goog.addDependency(
   '../../../../src/7_initialization.js',
@@ -79,26 +83,29 @@ goog.addDependency(
   '../../../../src/branch_view.js',
   ['branch_view'],
   ['banner_css', 'journeys_utils', 'safejson', 'utils'],
-  { lang: 'es6' },
+  { 'lang': 'es_2020' },
 );
-goog.addDependency('../../../../src/extern.js', [], []);
+goog.addDependency('../../../../src/extern.js', [], [], { 'lang': 'es5' });
 goog.addDependency(
   '../../../../src/journeys_utils.js',
   ['journeys_utils'],
   ['banner_utils', 'safejson', 'utils'],
-  { lang: 'es6' },
+  { 'lang': 'es6' },
 );
-goog.addDependency('../../../../src/onpage.js', [], []);
+goog.addDependency('../../../../src/onpage.js', [], [], { 'lang': 'es5' });
 goog.addDependency('../../../../test/0_config.js', [], ['config']);
 goog.addDependency('../../../../test/0_queue.js', [], ['task_queue']);
 goog.addDependency('../../../../test/1_utils.js', [], ['utils'], {
-  lang: 'es6',
+  'lang': 'es6',
 });
-goog.addDependency('../../../../test/2_storage.js', [], ['storage']);
+goog.addDependency('../../../../test/2_storage.js', [], ['storage'], {
+  'lang': 'es5',
+});
 goog.addDependency(
   '../../../../test/3_api.js',
   [],
   ['Server', 'config', 'resources', 'safejson', 'storage', 'utils'],
+  { 'lang': 'es5' },
 );
 goog.addDependency(
   '../../../../test/6_branch.js',
@@ -115,17 +122,19 @@ goog.addDependency(
     'storage',
     'utils',
   ],
+  { 'lang': 'es5' },
 );
 goog.addDependency(
   '../../../../test/6_branch_new.js',
   [],
   ['Branch', 'Server', 'config', 'safejson', 'task_queue', 'utils'],
-  { lang: 'es6' },
+  { 'lang': 'es6' },
 );
 goog.addDependency(
   '../../../../test/7_integration.js',
   [],
   ['config', 'goog.json'],
+  { 'lang': 'es5' },
 );
 goog.addDependency('../../../../test/blob-banner.js', [], []);
 goog.addDependency('../../../../test/blob-interstitial.js', [], []);
@@ -133,7 +142,7 @@ goog.addDependency(
   '../../../../test/branch_view.js',
   [],
   ['branch_view', 'journeys_utils'],
-  { lang: 'es6' },
+  { 'lang': 'es6' },
 );
 goog.addDependency(
   '../../../../test/journeys.js',
@@ -149,14 +158,14 @@ goog.addDependency(
     'storage',
     'utils',
   ],
-  { lang: 'es5' },
+  { 'lang': 'es5' },
 );
 goog.addDependency(
   '../../../../test/journeys_utils.js',
   [],
   ['journeys_utils'],
-  { lang: 'es6' },
+  { 'lang': 'es6' },
 );
-goog.addDependency('../../../../test/saucelabs.js', [], []);
+goog.addDependency('../../../../test/saucelabs.js', [], [], { 'lang': 'es5' });
 goog.addDependency('../../../../test/setup.js', [], []);
-goog.addDependency('../../../../test/test-utils.js', [], [], { lang: 'es5' });
+goog.addDependency('../../../../test/test-utils.js', [], [], { 'lang': 'es5' });

@@ -4,12 +4,11 @@
 'use strict';
 
 goog.provide('utils');
-/*jshint unused:false*/
+
 goog.require('goog.json');
 goog.require('config');
 goog.require('safejson');
 
-/* jshint ignore:start */
 /** @typedef {string} */
 var message;
 utils.debug = false;
@@ -48,19 +47,19 @@ utils.calculateBrtt = function (startTime) {
 };
 
 utils.dismissEventToSourceMapping = {
-  didClickJourneyClose: 'Button(X)',
-  didClickJourneyContinue: 'Dismiss Journey text',
-  didClickJourneyBackgroundDismiss: 'Background Dismiss',
-  didScrollJourneyBackgroundDismiss: 'Background Dismiss',
+  'didClickJourneyClose': 'Button(X)',
+  'didClickJourneyContinue': 'Dismiss Journey text',
+  'didClickJourneyBackgroundDismiss': 'Background Dismiss',
+  'didScrollJourneyBackgroundDismiss': 'Background Dismiss',
 };
 
 utils.userPreferences = {
   trackingDisabled: false,
   enableExtendedJourneysAssist: false,
   whiteListedEndpointsWithData: {
-    '/v1/open': { link_identifier: '\\d+' },
-    '/v1/pageview': { event: 'pageview' },
-    '/v1/dismiss': { event: 'dismiss' },
+    '/v1/open': { 'link_identifier': '\\d+' },
+    '/v1/pageview': { 'event': 'pageview' },
+    '/v1/dismiss': { 'event': 'dismiss' },
     '/v1/url': {},
   },
   allowErrorsInCallback: false,
@@ -220,8 +219,6 @@ utils.resource;
 /** @typedef {{listener: function(string, Object):null, event: string}} */
 utils.listener;
 
-/* jshint ignore:end */
-
 /** @type {Object<string,message>} */
 utils.messages = {
   missingParam: 'API request $1 missing parameter $2',
@@ -297,13 +294,13 @@ utils.message = function (message, params, failCode, failDetails) {
  */
 utils.whiteListSessionData = function (data) {
   return {
-    data: data['data'] || '',
-    data_parsed: data['data_parsed'] || {},
-    has_app: utils.getBooleanOrNull(data['has_app']),
-    identity: data['identity'] || null,
-    developer_identity: data['identity'] || null,
-    referring_identity: data['referring_identity'] || null,
-    referring_link: data['referring_link'] || null,
+    'data': data['data'] || '',
+    'data_parsed': data['data_parsed'] || {},
+    'has_app': utils.getBooleanOrNull(data['has_app']),
+    'identity': data['identity'] || null,
+    'developer_identity': data['identity'] || null,
+    'referring_identity': data['referring_identity'] || null,
+    'referring_link': data['referring_link'] || null,
   };
 };
 
@@ -379,7 +376,7 @@ utils.cleanLinkData = function (linkData) {
       try {
         data = safejson.parse(data);
       } catch (e) {
-        data = { _bncNoEval: true };
+        data = { '_bncNoEval': true };
       }
       break;
     case 'object':
@@ -946,12 +943,12 @@ utils.processHostedDeepLinkData = function (metadata) {
   }
   var deeplinkPaths = {
     // keeps track of deeplink paths encountered when parsing page's meta tags
-    hostedIOS: null,
-    hostedAndroid: null,
-    applinksIOS: null,
-    applinksAndroid: null,
-    twitterIOS: null,
-    twitterAndroid: null,
+    'hostedIOS': null,
+    'hostedAndroid': null,
+    'applinksIOS': null,
+    'applinksAndroid': null,
+    'twitterIOS': null,
+    'twitterAndroid': null,
   };
 
   for (var i = 0; i < metadata.length; i++) {
@@ -1059,16 +1056,17 @@ utils.calculateDiffBetweenArrays = function (original, toCheck) {
 var validCommerceEvents = ['purchase'];
 
 var commerceEventMessages = {
-  missingPurchaseEvent:
+  'missingPurchaseEvent':
     "event name is either missing, of the wrong type or not valid. Please specify 'purchase' as the event name.",
-  missingCommerceData:
+  'missingCommerceData':
     'commerce_data is either missing, of the wrong type or empty. Please ensure that commerce_data is constructed correctly.',
-  invalidKeysForRoot:
+  'invalidKeysForRoot':
     'Please remove the following keys from the root of commerce_data: ',
-  invalidKeysForProducts:
+  'invalidKeysForProducts':
     'Please remove the following keys from commerce_data.products: ',
-  invalidProductListType: 'commerce_data.products must be an array of objects',
-  invalidProductType: 'Each product in the products list must be an object',
+  'invalidProductListType':
+    'commerce_data.products must be an array of objects',
+  'invalidProductType': 'Each product in the products list must be an object',
 };
 
 /**
@@ -1346,8 +1344,8 @@ utils.separateEventAndCustomData = function (eventAndCustomData) {
     delete eventAndCustomData[key];
   }
   return {
-    custom_data: utils.convertObjectValuesToString(customData),
-    event_data: eventAndCustomData,
+    'custom_data': utils.convertObjectValuesToString(customData),
+    'event_data': eventAndCustomData,
   };
 };
 
@@ -1559,8 +1557,8 @@ utils.getClientHints = function () {
     var hints = ['model', 'platformVersion'];
     navigator.userAgentData.getHighEntropyValues(hints).then(function (data) {
       utils.userAgentData = {
-        model: data.model,
-        platformVersion: utils.removeTrailingDotZeros(data.platformVersion),
+        'model': data.model,
+        'platformVersion': utils.removeTrailingDotZeros(data.platformVersion),
       };
     });
   } else {
