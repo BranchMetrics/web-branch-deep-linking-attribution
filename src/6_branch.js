@@ -1138,8 +1138,6 @@ Branch.prototype['track'] = wrap(
         requestData,
         function (err, pageviewResponse) {
           if (!err && typeof pageviewResponse === 'object') {
-            console.log(pageviewResponse['template']);
-
             var journeyInTestMode = requestData['branch_view_id']
               ? true
               : false;
