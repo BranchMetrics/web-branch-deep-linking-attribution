@@ -2,6 +2,7 @@
 
 var sinon = require('sinon');
 
+goog.require('journeys_a11y');
 goog.require('journeys_utils');
 
 describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
@@ -194,18 +195,19 @@ describe('animateBannerExit margin/position restore timing', function () {
   });
 });
 
-describe('addIframeInnerCSS entrance and use_v2_renderer', function () {
+describe('addIframeInnerCSS entrance', function () {
   const assert = testUtils.unplanned();
   var iframe;
+  var clock;
 
   beforeEach(function () {
+    clock = sinon.useFakeTimers();
     journeys_utils.position = 'top';
     journeys_utils.bannerHeight = '76px';
     journeys_utils.isHalfPage = false;
     journeys_utils.isFullPage = false;
     journeys_utils.isDesktopJourney = false;
     journeys_utils.journeyVariant = null;
-    journeys_utils.use_v2_renderer = false;
 
     iframe = journeys_utils.createIframe();
     document.body.appendChild(iframe);
@@ -214,282 +216,63 @@ describe('addIframeInnerCSS entrance and use_v2_renderer', function () {
   });
 
   afterEach(function () {
-    journeys_utils.use_v2_renderer = false;
+    clock.restore();
     if (iframe.parentNode) {
       iframe.parentNode.removeChild(iframe);
     }
   });
 
-  it('does not move the iframe when use_v2_renderer is true', function () {
-    journeys_utils.use_v2_renderer = true;
-
-    journeys_utils.addIframeInnerCSS(iframe, '');
-
-    assert.strictEqual(iframe.style.top, '');
-  });
-
-  it('still moves the iframe when use_v2_renderer is false (legacy)', function () {
+  it('moves the iframe off-screen to hide its entrance', function () {
     journeys_utils.addIframeInnerCSS(iframe, '');
 
     assert.strictEqual(iframe.style.top, '-76px');
   });
-});
 
-describe('animateBannerExit branch-banner exit class and use_v2_renderer', function () {
-  const assert = testUtils.unplanned();
-  var clock;
-  var banner;
-
-  beforeEach(function () {
-    clock = sinon.useFakeTimers();
-    banner = document.createElement('iframe');
-    document.body.appendChild(banner);
-
-    journeys_utils.branch = { _publishEvent: sinon.stub() };
-    journeys_utils.journeyLinkData = {};
-    journeys_utils.divToInjectParents = [];
-    journeys_utils.position = 'top';
-    journeys_utils.bannerHeight = '76px';
-    journeys_utils.bodyMarginTop = '10px';
-    journeys_utils.exitAnimationDisabled = false;
-    journeys_utils.entryAnimationDisabled = false;
-    journeys_utils.animationSpeed = 250;
-    journeys_utils.animationDelay = 20;
-    journeys_utils.isSafeAreaEnabled = false;
-    journeys_utils.use_v2_renderer = false;
-  });
-
-  afterEach(function () {
-    clock.restore();
-    sinon.restore();
-    journeys_utils.use_v2_renderer = false;
-    journeys_utils.exitAnimationIsRunning = false;
-    if (banner.parentNode) {
-      banner.parentNode.removeChild(banner);
-    }
-    document.body.removeAttribute('style');
-    document.body.className = '';
-  });
-
-  it('adds branch-banner-exit to #branch-banner so any authored exit keyframes can play', function () {
-    journeys_utils.use_v2_renderer = true;
-    banner.contentWindow.document.body.innerHTML =
+  it('removes the banner at the default timeout', function () {
+    iframe.contentWindow.document.body.innerHTML =
       '<div id="branch-banner"></div>';
 
-    journeys_utils.animateBannerExit(banner);
+    journeys_utils.animateBannerExit(iframe);
 
-    var bannerRoot =
-      banner.contentWindow.document.getElementById('branch-banner');
-    assert.strictEqual(
-      bannerRoot.className.indexOf('branch-banner-exit') !== -1,
-      true,
-    );
-  });
-
-  it('still moves the iframe itself when use_v2_renderer is true but the creative has no #branch-banner', function () {
-    journeys_utils.use_v2_renderer = true;
-
-    assert.doesNotThrow(function () {
-      journeys_utils.animateBannerExit(banner);
-    });
-    assert.strictEqual(banner.style.top, '-76px');
-  });
-
-  it('waits for a longer content exit animation instead of cutting it off at the default timeout', function () {
-    journeys_utils.use_v2_renderer = true;
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
-    style.textContent =
-      '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.5s ease both; }';
-    doc.head.appendChild(style);
-    doc.body.innerHTML = '<div id="branch-banner"></div>';
-
-    journeys_utils.animateBannerExit(banner);
-
-    // the default timeout (animationSpeed + animationDelay = 270ms) would remove it too early
+    assert.strictEqual(document.body.contains(iframe), true);
     clock.tick(journeys_utils.animationSpeed + journeys_utils.animationDelay);
-    assert.strictEqual(document.body.contains(banner), true);
-
-    // the content's real 500ms exit animation gets to finish before removal happens
-    clock.tick(
-      500 - (journeys_utils.animationSpeed + journeys_utils.animationDelay),
-    );
-    assert.strictEqual(document.body.contains(banner), false);
-  });
-
-  it('waits out a delayed exit animation instead of removing mid-animation', function () {
-    journeys_utils.use_v2_renderer = true;
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
-    // doesn't start playing until 0.3s in, then plays for 0.4s -- finishes at 0.7s total
-    style.textContent =
-      '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.4s ease 0.3s both; }';
-    doc.head.appendChild(style);
-    doc.body.innerHTML = '<div id="branch-banner"></div>';
-
-    journeys_utils.animateBannerExit(banner);
-
-    // duration alone (400ms) would remove it before the delayed animation even finishes playing
-    clock.tick(400);
-    assert.strictEqual(document.body.contains(banner), true);
-
-    // delay + duration (700ms) gets to elapse before removal happens
-    clock.tick(300);
-    assert.strictEqual(document.body.contains(banner), false);
-  });
-
-  it('does not move the iframe itself when use_v2_renderer is true', function () {
-    journeys_utils.use_v2_renderer = true;
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
-    style.textContent =
-      '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.25s ease both; }';
-    doc.head.appendChild(style);
-    doc.body.innerHTML = '<div id="branch-banner"></div>';
-
-    journeys_utils.animateBannerExit(banner);
-
-    // #branch-banner-iframe has no transition of its own once the content handles this, so
-    // moving it here would snap it off-screen instantly instead of letting the content's
-    // animation actually play out.
-    assert.strictEqual(banner.style.top, '');
-  });
-
-  it('does not move the iframe and removes at the default timeout when use_v2_renderer is true but there is no exit animation', function () {
-    journeys_utils.use_v2_renderer = true;
-    banner.contentWindow.document.body.innerHTML =
-      '<div id="branch-banner"></div>';
-
-    journeys_utils.animateBannerExit(banner);
-
-    assert.strictEqual(banner.style.top, '');
-    clock.tick(journeys_utils.animationSpeed + journeys_utils.animationDelay);
-    assert.strictEqual(document.body.contains(banner), false);
-  });
-
-  it('still moves the iframe itself when use_v2_renderer is false (legacy), even if #branch-banner has CSS animation', function () {
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
-    style.textContent =
-      '#branch-banner { animation: branch-slide-in-top 0.25s ease both; }';
-    doc.head.appendChild(style);
-    doc.body.innerHTML = '<div id="branch-banner"></div>';
-
-    journeys_utils.animateBannerExit(banner);
-
-    assert.strictEqual(banner.style.top, '-76px');
+    assert.strictEqual(document.body.contains(iframe), false);
   });
 });
 
-describe('animationConfig support', function () {
+describe('addHtmlToIframe WCAG keyboard navigation (legacy path)', function () {
   const assert = testUtils.unplanned();
-  var banner;
-  var clock;
-
-  var mockAnimationConfig = {
-    classes: {
-      enter: 'branch-banner-enter',
-      exit: 'branch-banner-exit',
-    },
-    generatedCss:
-      '.branch-banner-enter { animation: branch-slide-in-bottom 0.25s ease both; }\n.branch-banner-exit { animation: branch-slide-out-bottom 0.25s ease both; }',
-    surface: 'CONTENT',
-    type: 'SLIDE',
-  };
+  var iframe;
 
   beforeEach(function () {
-    clock = sinon.useFakeTimers();
-    banner = document.createElement('iframe');
-    document.body.appendChild(banner);
-
-    journeys_utils.branch = { _publishEvent: sinon.stub() };
-    journeys_utils.journeyLinkData = {};
-    journeys_utils.use_v2_renderer = true;
-    journeys_utils.entryAnimationDisabled = false;
-    journeys_utils.exitAnimationDisabled = false;
-    journeys_utils.animationConfig = JSON.parse(
-      JSON.stringify(mockAnimationConfig),
-    );
-  });
-
-  afterEach(function () {
-    clock.runAll();
-    clock.restore();
-    sinon.restore();
-
-    journeys_utils.animationConfig = null;
-    journeys_utils.use_v2_renderer = false;
-    if (banner.parentNode) {
-      banner.parentNode.removeChild(banner);
-    }
-  });
-
-  it('injects generatedCss into iframe inner head when surface is CONTENT', function () {
-    var iframe = journeys_utils.createIframe();
+    iframe = journeys_utils.createIframe();
     document.body.appendChild(iframe);
+  });
 
-    journeys_utils.addIframeInnerCSS(iframe, '/* inner css */');
-
-    var doc = iframe.contentWindow.document;
-    var styleEl = doc.getElementById('branch-css');
-    assert.ok(styleEl, 'branch-css element should exist');
-    assert.ok(
-      styleEl.innerHTML.indexOf('.branch-banner-enter') !== -1,
-      'generatedCss should be injected into inner style',
-    );
-
+  afterEach(function () {
     if (iframe.parentNode) {
       iframe.parentNode.removeChild(iframe);
     }
   });
 
-  it('applies enter animation class from animationConfig during entrance animation', function () {
-    banner.contentWindow.document.body.innerHTML =
-      '<div id="branch-banner"></div>';
+  it('installs the keyboard-navigation script when the creative requests WCAG support', function () {
+    var html =
+      '<meta name="accessibility" content="wcag" /><div id="branch-banner"></div>';
 
-    journeys_utils.animateBannerEntrance(banner);
+    var doc = journeys_utils.addHtmlToIframe(iframe, html, 'ios');
 
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
-    assert.ok(
-      bannerRoot.className.indexOf('branch-banner-enter') !== -1,
-      'enter animation class from config should be attached',
-    );
+    var scripts = doc.body.querySelectorAll('script');
+    assert.strictEqual(scripts.length, 1);
+    assert.strictEqual(scripts[0].text, journeys_a11y.SCRIPT);
   });
 
-  it('detaches enter class and attaches exit class from animationConfig during exit animation', function () {
-    banner.contentWindow.document.body.innerHTML =
-      '<div id="branch-banner" class="branch-banner-enter"></div>';
-
-    journeys_utils.animateBannerExit(banner);
-
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
-    assert.strictEqual(
-      bannerRoot.className.indexOf('branch-banner-enter'),
-      -1,
-      'enter animation class should be detached',
-    );
-    assert.ok(
-      bannerRoot.className.indexOf('branch-banner-exit') !== -1,
-      'exit animation class from config should be attached',
-    );
-  });
-
-  it('applies outer CSS to host page when surface is IFRAME', function () {
-    journeys_utils.animationConfig.surface = 'IFRAME';
-    journeys_utils.position = 'top';
-    journeys_utils.bannerHeight = '76px';
-
-    journeys_utils.addIframeOuterCSS(undefined, {});
-
-    var outerStyleEl = document.getElementById('branch-iframe-css');
-    assert.ok(outerStyleEl, 'branch-iframe-css element should exist');
-    assert.ok(
-      outerStyleEl.innerHTML.indexOf('.branch-banner-enter') !== -1,
-      'generatedCss should be injected into outer style',
+  it('does not install the script when the creative has no accessibility meta', function () {
+    var doc = journeys_utils.addHtmlToIframe(
+      iframe,
+      '<div id="branch-banner"></div>',
+      'ios',
     );
 
-    if (outerStyleEl && outerStyleEl.parentNode) {
-      outerStyleEl.parentNode.removeChild(outerStyleEl);
-    }
+    assert.strictEqual(doc.body.querySelectorAll('script').length, 0);
   });
 });

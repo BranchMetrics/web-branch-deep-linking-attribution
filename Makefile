@@ -21,7 +21,9 @@ src/5_banner.js\
 src/6_branch.js\
 src/7_initialization.js\
 src/branch_view.js\
-src/journeys_utils.js
+src/journeys_utils.js\
+src/journeys/analytics.js src/journeys/css_animation.js src/journeys/dismissals.js src/journeys/events.js src/journeys/frame.js src/journeys/link_overrides.js src/journeys/template.js\
+src/journeys/a11y.js src/journeys/v2/animation.js src/journeys/v2/context.js src/journeys/v2/frame.js src/journeys/v2/interactions.js src/journeys/v2/index.js
 
 EXTERN=src/extern.js
 
