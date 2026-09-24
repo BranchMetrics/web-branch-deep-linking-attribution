@@ -68,8 +68,5 @@
     "commitizen": {
       "path": "./node_modules/cz-customizable"
     }
-  },
-  "dependencies": {
-    "jshint": "^2.13.6"
   }
 }
