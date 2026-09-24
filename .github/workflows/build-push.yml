@@ -62,6 +62,9 @@ jobs:
       - name: Install dependencies
         run: npm run ci
 
+      - name: Check Formatting
+        run: npm run format:check
+
       - name: Lint tests
         run: npm run lint
 
