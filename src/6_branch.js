@@ -614,9 +614,13 @@ Branch.prototype['init'] = wrap(
                   pageviewResponse['event_data']['branch_view_data'],
                   journeyInTestMode,
                   pageviewResponse['journey_link_data'],
+                  self,
                   {
-                    use_v2_renderer: pageviewResponse['use_v2_renderer'],
-                    animationConfig: pageviewResponse['animationConfig'],
+                    'use_v2_renderer': pageviewResponse['use_v2_renderer'],
+                    'animationConfig': pageviewResponse['animationConfig'],
+                    'entryAnimationDisabled':
+                      options['disable_entry_animation'],
+                    'exitAnimationDisabled': options['disable_exit_animation'],
                   },
                 );
               } else {
@@ -633,7 +637,10 @@ Branch.prototype['init'] = wrap(
                   };
                   this['branch']['deepview']({}, linkOptions);
                 }
-                journeys_utils.branch._publishEvent('willNotShowJourney');
+                journeys_events.publish(
+                  journeys_utils.branch,
+                  'willNotShowJourney',
+                );
               }
             }
             if (utils.userPreferences.trackingDisabled) {
@@ -1156,13 +1163,19 @@ Branch.prototype['track'] = wrap(
                 pageviewResponse['event_data']['branch_view_data'],
                 journeyInTestMode,
                 pageviewResponse['journey_link_data'],
+                self,
                 {
-                  use_v2_renderer: pageviewResponse['use_v2_renderer'],
-                  animationConfig: pageviewResponse['animationConfig'],
+                  'use_v2_renderer': pageviewResponse['use_v2_renderer'],
+                  'animationConfig': pageviewResponse['animationConfig'],
+                  'entryAnimationDisabled': options['disable_entry_animation'],
+                  'exitAnimationDisabled': options['disable_exit_animation'],
                 },
               );
             } else {
-              journeys_utils.branch._publishEvent('willNotShowJourney');
+              journeys_events.publish(
+                journeys_utils.branch,
+                'willNotShowJourney',
+              );
             }
           }
           if (typeof done === 'function') {
@@ -1913,18 +1926,16 @@ Branch.prototype['closeJourney'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
     var self = this;
-    self['renderQueue'](function () {
-      if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
-        self._publishEvent(
-          'didCallJourneyClose',
-          journeys_utils.journeyLinkData,
-        );
-        journeys_utils.animateBannerExit(journeys_utils.banner, true);
-      } else {
-        return done('Journey already dismissed.');
-      }
-    });
-    done();
+    // Before renderFinalize no journey can exist yet (init's pageview is itself queued behind it), and
+    // waiting on the queue here would deadlock, so answer immediately.
+    if (!self._renderFinalized) {
+      return done('Journey already dismissed.');
+    }
+    return done(
+      branch_view.closeActiveJourney(self)
+        ? null
+        : 'Journey already dismissed.',
+    );
   },
 );
 

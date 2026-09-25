@@ -4,6 +4,7 @@ goog.require('utils');
 goog.require('banner_css');
 goog.require('safejson');
 goog.require('journeys_utils');
+goog.require('journeys_v2');
 
 function checkPreviousBanner() {
   // if banner already exists, don't add another
@@ -56,7 +57,11 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
     eventData['bannerPagePlacement'] = journeys_utils.position;
     eventData['isBannerInline'] = journeys_utils.sticky === 'absolute';
     eventData['isBannerSticky'] = journeys_utils.sticky === 'fixed';
-    journeys_utils.branch._publishEvent('willShowJourney', eventData);
+    journeys_events.publish(
+      journeys_utils.branch,
+      'willShowJourney',
+      eventData,
+    );
 
     journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
     iframeLoadedCallback(iframe);
@@ -68,28 +73,6 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
     document.body.prepend(iframe);
   }
   return iframe;
-}
-
-/**
- * Checks if a journey should show based on dismiss time
- * @param       {Object} branch
- * @return      {boolean}
- */
-function _areJourneysDismissedGlobally(branch) {
-  var globalDismissEndTimestamp = branch._storage.get(
-    'globalJourneysDismiss',
-    true,
-  );
-
-  if (
-    globalDismissEndTimestamp === true ||
-    globalDismissEndTimestamp > Date.now()
-  ) {
-    return true;
-  }
-
-  branch._storage.remove('globalJourneysDismiss', true);
-  return false;
 }
 
 branch_view.shouldDisplayJourney = function (
@@ -113,7 +96,7 @@ branch_view.shouldDisplayJourney = function (
   if (
     !eventResponse['event_data']['branch_view_data']['id'] ||
     (options && options['no_journeys']) ||
-    _areJourneysDismissedGlobally(journeys_utils.branch)
+    journeys_dismissals.isDismissedGlobally(journeys_utils.branch._storage)
   ) {
     // resets the callback index so that auto-open works the next time a Journey is rendered
     branch_view.callback_index = 1;
@@ -122,46 +105,30 @@ branch_view.shouldDisplayJourney = function (
   return true;
 };
 
-branch_view.displayJourney = function (
+// Legacy render pipeline, extracted into a named function so displayJourney can dispatch to it.
+function renderLegacyJourneyBody(
   html,
   requestData,
   templateId,
-  branchViewData,
+  audienceRuleId,
   testModeEnabled,
-  journeyLinkData,
-  newRenderOptions,
+  placeholder,
 ) {
-  if (journeys_utils.exitAnimationIsRunning) {
-    return;
-  }
-
-  journeys_utils.branchViewId = templateId;
-  journeys_utils.setJourneyLinkData(journeyLinkData);
-
-  var audienceRuleId = branchViewData['audience_rule_id'];
-  journeys_utils.use_v2_renderer = !!newRenderOptions?.use_v2_renderer;
-  journeys_utils.animationConfig = newRenderOptions?.animationConfig;
-
-  // this code removes any leftover css from previous banner
-  var branchCSS = document.getElementById('branch-iframe-css');
-  if (branchCSS && branchCSS.parentElement) {
-    branchCSS.parentElement.removeChild(branchCSS);
-  }
-
-  var placeholder = document.createElement('div');
-  placeholder.id = 'branch-banner';
-  document.body.insertBefore(placeholder, null);
-  banner_utils.addClass(placeholder, 'branch-banner-is-active');
-
   var failed = false;
   var callbackString = requestData['callback_string'];
   var banner = null;
   var cta = null;
   var storage = journeys_utils.branch._storage;
 
-  if (html) {
-    var metadata = journeys_utils.getMetadata(html) || {};
+  var metadata;
+  // Malformed JSON metadata throws - treat like no html rather than leaving the placeholder stuck.
+  try {
+    metadata = html && (journeys_utils.getMetadata(html) || {});
+  } catch (e) {
+    html = null;
+  }
 
+  if (html) {
     html = journeys_utils.tryReplaceJourneyCtaLink(html);
 
     var timeoutTrigger = window.setTimeout(function () {
@@ -222,6 +189,103 @@ branch_view.displayJourney = function (
   } else {
     document.body.removeChild(placeholder);
   }
+}
+
+// branch/animationOptions are explicit params, not read off journeys_utils, so journeys_v2 stays
+// fully decoupled from legacy's module state - only the legacy branch below touches those globals.
+branch_view.displayJourney = function (
+  html,
+  requestData,
+  templateId,
+  branchViewData,
+  testModeEnabled,
+  journeyLinkData,
+  branch,
+  options,
+) {
+  var use_v2_renderer = options['use_v2_renderer'];
+
+  // exitAnimationIsRunning is a legacy-only cooldown; journeys_v2 has its own overlap protection.
+  if (!use_v2_renderer && journeys_utils.exitAnimationIsRunning) {
+    return;
+  }
+  if (!use_v2_renderer) {
+    journeys_utils.branchViewId = templateId;
+    journeys_utils.setJourneyLinkData(journeyLinkData);
+  }
+
+  // this code removes any leftover css from previous banner
+  var branchCSS = document.getElementById('branch-iframe-css');
+  if (branchCSS && branchCSS.parentElement) {
+    branchCSS.parentElement.removeChild(branchCSS);
+  }
+
+  var placeholder = document.createElement('div');
+  placeholder.id = 'branch-banner';
+  document.body.insertBefore(placeholder, null);
+  banner_utils.addClass(placeholder, 'branch-banner-is-active');
+
+  // Server-laid-out creatives render through journeys_v2 instead of the legacy pipeline below.
+  if (use_v2_renderer) {
+    // A flag the caller set (even to false) wins; otherwise fall back to the init-time default.
+    const initOptions = (branch && branch.init_options) || {};
+    const callOptions = options || {};
+    const resolve = function (callValue, initKey) {
+      return callValue !== undefined ? !!callValue : !!initOptions[initKey];
+    };
+
+    journeys_v2.displayJourney({
+      'branch': branch,
+      'branchView': branch_view,
+      'html': html,
+      'requestData': requestData,
+      'templateId': templateId,
+      'branchViewData': branchViewData,
+      'testMode': testModeEnabled,
+      'linkData': journeyLinkData,
+      'placeholder': placeholder,
+      'options': {
+        'animationConfig': options['animationConfig'],
+        'entryAnimationDisabled': resolve(
+          callOptions['entryAnimationDisabled'],
+          'disable_entry_animation',
+        ),
+        'exitAnimationDisabled': resolve(
+          callOptions['exitAnimationDisabled'],
+          'disable_exit_animation',
+        ),
+      },
+    });
+    return;
+  }
+
+  var audienceRuleId = branchViewData['audience_rule_id'];
+  renderLegacyJourneyBody(
+    html,
+    requestData,
+    templateId,
+    audienceRuleId,
+    testModeEnabled,
+    placeholder,
+  );
+};
+
+// Closes whichever journey is on screen, v2 or legacy. Returns false when there is nothing to
+// close so `branch.closeJourney()` can report it.
+branch_view.closeActiveJourney = function (callerBranch) {
+  if (journeys_v2.closeActiveJourney(callerBranch)) {
+    return true;
+  }
+  if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
+    journeys_events.publish(
+      callerBranch,
+      'didCallJourneyClose',
+      journeys_utils.journeyLinkData,
+    );
+    journeys_utils.animateBannerExit(journeys_utils.banner, true);
+    return true;
+  }
+  return false;
 };
 
 branch_view._getPageviewRequestData = function (
@@ -240,10 +304,14 @@ branch_view._getPageviewRequestData = function (
     metadata = {};
   }
 
-  journeys_utils.entryAnimationDisabled =
-    options['disable_entry_animation'] || false;
-  journeys_utils.exitAnimationDisabled =
-    options['disable_exit_animation'] || false;
+  // Skip the reset for a dismiss-request build (isDismissEvent) - it has no customer options of
+  // its own, and a journey chained off that dismiss should keep the actual pageview's preference.
+  if (!isDismissEvent) {
+    journeys_utils.entryAnimationDisabled =
+      options['disable_entry_animation'] || false;
+    journeys_utils.exitAnimationDisabled =
+      options['disable_exit_animation'] || false;
+  }
 
   // starts object off with data from setBranchViewData() call
   var obj = utils.merge({}, branch._branchViewData);
@@ -254,7 +322,10 @@ branch_view._getPageviewRequestData = function (
   var identity = sessionStorage.hasOwnProperty('identity')
     ? sessionStorage['identity']
     : null;
-  var journeyDismissals = branch._storage.get('journeyDismissals', true);
+  var journeyDismissals = branch._storage.get(
+    journeys_dismissals.VIEWS_KEY,
+    true,
+  );
   var userLanguage =
     (
       options['user_language'] ||

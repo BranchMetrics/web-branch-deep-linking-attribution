@@ -82,15 +82,112 @@ goog.addDependency(
 goog.addDependency(
   '../../../../src/branch_view.js',
   ['branch_view'],
-  ['banner_css', 'journeys_utils', 'safejson', 'utils'],
-  { 'lang': 'es_2020' },
+  ['banner_css', 'journeys_utils', 'journeys_v2', 'safejson', 'utils'],
+  { 'lang': 'es6' },
 );
 goog.addDependency('../../../../src/extern.js', [], [], { 'lang': 'es5' });
+goog.addDependency('../../../../src/journeys/a11y.js', ['journeys_a11y'], [], {
+  'lang': 'es5',
+});
+goog.addDependency(
+  '../../../../src/journeys/analytics.js',
+  ['journeys_analytics'],
+  ['utils'],
+  { 'lang': 'es5' },
+);
+goog.addDependency(
+  '../../../../src/journeys/css_animation.js',
+  ['journeys_css_animation'],
+  [],
+);
+goog.addDependency(
+  '../../../../src/journeys/dismissals.js',
+  ['journeys_dismissals'],
+  ['safejson'],
+  { 'lang': 'es5' },
+);
+goog.addDependency(
+  '../../../../src/journeys/events.js',
+  ['journeys_events'],
+  [],
+);
+goog.addDependency(
+  '../../../../src/journeys/frame.js',
+  ['journeys_frame'],
+  ['utils'],
+);
+goog.addDependency(
+  '../../../../src/journeys/link_overrides.js',
+  ['journeys_link_overrides'],
+  [],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../src/journeys/template.js',
+  ['journeys_template'],
+  ['safejson'],
+  { 'lang': 'es5' },
+);
+goog.addDependency(
+  '../../../../src/journeys/v2/animation.js',
+  ['journeys_v2.animation', 'journeys_v2.animation.Animator'],
+  ['journeys_css_animation', 'journeys_v2.frame'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../src/journeys/v2/context.js',
+  ['journeys_v2.context'],
+  ['journeys_analytics', 'journeys_template', 'utils'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../src/journeys/v2/frame.js',
+  ['journeys_v2.frame'],
+  ['banner_utils', 'journeys_frame', 'utils'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../src/journeys/v2/index.js',
+  ['journeys_v2'],
+  [
+    'banner_utils',
+    'journeys_a11y',
+    'journeys_analytics',
+    'journeys_dismissals',
+    'journeys_events',
+    'journeys_link_overrides',
+    'journeys_template',
+    'journeys_v2.animation.Animator',
+    'journeys_v2.context',
+    'journeys_v2.frame',
+    'journeys_v2.interactions',
+    'resources',
+    'utils',
+  ],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../src/journeys/v2/interactions.js',
+  ['journeys_v2.interactions'],
+  ['utils'],
+  { 'lang': 'es6' },
+);
 goog.addDependency(
   '../../../../src/journeys_utils.js',
   ['journeys_utils'],
-  ['banner_utils', 'safejson', 'utils'],
-  { 'lang': 'es6' },
+  [
+    'banner_utils',
+    'journeys_a11y',
+    'journeys_analytics',
+    'journeys_dismissals',
+    'journeys_events',
+    'journeys_frame',
+    'journeys_link_overrides',
+    'journeys_template',
+    'safejson',
+    'utils',
+  ],
+  { 'lang': 'es5' },
 );
 goog.addDependency('../../../../src/onpage.js', [], [], { 'lang': 'es5' });
 goog.addDependency('../../../../test/0_config.js', [], ['config']);
@@ -127,7 +224,17 @@ goog.addDependency(
 goog.addDependency(
   '../../../../test/6_branch_new.js',
   [],
-  ['Branch', 'Server', 'config', 'safejson', 'task_queue', 'utils'],
+  [
+    'Branch',
+    'Server',
+    'branch_view',
+    'config',
+    'journeys_utils',
+    'journeys_v2',
+    'safejson',
+    'task_queue',
+    'utils',
+  ],
   { 'lang': 'es6' },
 );
 goog.addDependency(
@@ -160,10 +267,90 @@ goog.addDependency(
   ],
   { 'lang': 'es5' },
 );
+goog.addDependency('../../../../test/journeys/a11y.js', [], ['journeys_a11y'], {
+  'lang': 'es6',
+});
+goog.addDependency(
+  '../../../../test/journeys/analytics.js',
+  [],
+  ['journeys_analytics'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/dismissals.js',
+  [],
+  [
+    'branch_view',
+    'journeys_dismissals',
+    'journeys_utils',
+    'resources',
+    'utils',
+  ],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/events.js',
+  [],
+  ['journeys_events'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/link_overrides.js',
+  [],
+  ['journeys_link_overrides', 'journeys_utils'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/template.js',
+  [],
+  ['journeys_template', 'journeys_utils'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/v2/animation.js',
+  [],
+  [
+    'journeys_css_animation',
+    'journeys_v2.animation',
+    'journeys_v2.animation.Animator',
+  ],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/v2/context.js',
+  [],
+  ['journeys_v2.context', 'utils'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/v2/frame.js',
+  [],
+  ['journeys_v2.frame', 'utils'],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/v2/index.js',
+  [],
+  [
+    'branch_view',
+    'journeys_utils',
+    'journeys_v2',
+    'journeys_v2.animation.Animator',
+    'resources',
+    'utils',
+  ],
+  { 'lang': 'es6' },
+);
+goog.addDependency(
+  '../../../../test/journeys/v2/interactions.js',
+  [],
+  ['journeys_v2.interactions', 'utils'],
+  { 'lang': 'es6' },
+);
 goog.addDependency(
   '../../../../test/journeys_utils.js',
   [],
-  ['journeys_utils'],
+  ['journeys_a11y', 'journeys_utils'],
   { 'lang': 'es6' },
 );
 goog.addDependency('../../../../test/saucelabs.js', [], [], { 'lang': 'es5' });

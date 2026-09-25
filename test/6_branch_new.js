@@ -3,6 +3,9 @@
 var sinon = require('sinon');
 
 goog.require('Branch');
+goog.require('branch_view');
+goog.require('journeys_utils');
+goog.require('journeys_v2');
 goog.require('utils');
 goog.require('task_queue');
 goog.require('Server');
@@ -307,6 +310,65 @@ describe('Branch - new', function () {
       var branch_url = 'https://api16.branch.io';
       branch_instance.setAPIUrl(branch_url);
       assert.equal(branch_instance.getAPIUrl(), branch_url);
+    });
+  });
+  describe('closeJourney', function () {
+    function readyBranch() {
+      var b = new Branch();
+      b.init_state = 3; // init_states.INIT_SUCCEEDED (module-private in 6_branch.js)
+      b._renderFinalized = true;
+      return b;
+    }
+
+    beforeEach(function () {
+      journeys_v2.active = null;
+      journeys_utils.banner = null;
+      journeys_utils.isJourneyDisplayed = false;
+    });
+
+    it('calls back exactly once with the "already dismissed" error when nothing is on screen, and the queue keeps moving', function () {
+      var b = readyBranch();
+      var cb = sinon.spy();
+      b.closeJourney(cb);
+      assert.strictEqual(cb.callCount, 1);
+      assert.strictEqual(cb.getCall(0).args[0], 'Journey already dismissed.');
+
+      var after = sinon.spy();
+      b.setBranchViewData({}, after);
+      assert.strictEqual(after.calledOnce, true, 'the next queued call runs');
+    });
+
+    it('calls back exactly once with no error when a shown journey was closed', function () {
+      var b = readyBranch();
+      var closeStub = sandbox
+        .stub(branch_view, 'closeActiveJourney')
+        .returns(true);
+      var cb = sinon.spy();
+      b.closeJourney(cb);
+      assert.strictEqual(closeStub.calledOnceWith(b), true);
+      assert.strictEqual(cb.callCount, 1);
+      assert.strictEqual(cb.getCall(0).args[0], null);
+    });
+
+    it('answers "already dismissed" immediately before renderFinalize, without touching the queue', function () {
+      // No journey can exist before renderFinalize (init's pageview is queued behind it), and
+      // waiting on the queue here would deadlock, so this is both truthful and safe.
+      var b = readyBranch();
+      b._renderFinalized = false;
+      var closeStub = sandbox
+        .stub(branch_view, 'closeActiveJourney')
+        .returns(false);
+      var cb = sinon.spy();
+      b.closeJourney(cb);
+      assert.strictEqual(cb.callCount, 1);
+      assert.strictEqual(cb.getCall(0).args[0], 'Journey already dismissed.');
+      b.renderFinalize();
+      assert.strictEqual(
+        closeStub.called,
+        false,
+        'nothing deferred to the queue',
+      );
+      assert.strictEqual(cb.callCount, 1);
     });
   });
   describe('addListener', function () {

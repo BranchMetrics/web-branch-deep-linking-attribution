@@ -6,7 +6,9 @@
   "linter": {
     "rules": {
       "complexity": {
-        "useArrowFunction": "off"
+        "useArrowFunction": "off",
+        "useLiteralKeys": "off",
+        "useOptionalChain": "off"
       }
     }
   },

@@ -2,6 +2,13 @@
 goog.provide('journeys_utils');
 
 goog.require('banner_utils');
+goog.require('journeys_analytics');
+goog.require('journeys_dismissals');
+goog.require('journeys_events');
+goog.require('journeys_frame');
+goog.require('journeys_link_overrides');
+goog.require('journeys_template');
+goog.require('journeys_a11y');
 goog.require('safejson');
 goog.require('utils');
 
@@ -37,18 +44,12 @@ journeys_utils.bodyMarginBottom = 0;
 // Running state of the exit animation
 journeys_utils.exitAnimationIsRunning = false;
 
-// Set from event_data.branch_view_data.is_new_animation (see branch_view.displayJourney): true
-// when the creative animates #branch-banner itself via CSS, so the SDK must not also move the
-// iframe for entrance/exit.
-journeys_utils.use_v2_renderer = false;
-
-// Regex to find pieces of the html blob
-journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
-journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-journeys_utils.cssRe =
-  /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
-journeys_utils.iframeCssRe =
-  /<style type="text\/css" id="branch-iframe-css">((.|\s)*?)<\/style>/;
+// Regex to find pieces of the html blob (contract regexes live in journeys_template; the spacer
+// ones below are legacy-only, for templates that predate the metadata block)
+journeys_utils.jsonRe = journeys_template.jsonRe;
+journeys_utils.jsRe = journeys_template.jsRe;
+journeys_utils.cssRe = journeys_template.cssRe;
+journeys_utils.iframeCssRe = journeys_template.iframeCssRe;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
@@ -138,50 +139,12 @@ journeys_utils.setPositionAndHeight = function (html) {
   }
 };
 
-/***
- * @function journeys_utils.getMetadata
- * @param {string} html
- */
-journeys_utils.getMetadata = function (html) {
-  var match = html.match(journeys_utils.jsonRe);
-  if (match) {
-    var src = match[1];
-    return safejson.parse(src);
-  }
-};
-
-/***
- * @function journeys_utils.getIframeCss
- * @param {string} html
- */
-journeys_utils.getIframeCss = function (html) {
-  var match = html.match(journeys_utils.iframeCssRe);
-  if (match) {
-    return match[1];
-  }
-};
-
-/***
- * @function journeys_utils.getCtaText
- * @param {Object} metadata
- * @param {boolean} hasApp
- */
-journeys_utils.getCtaText = function (metadata, hasApp) {
-  var ctaText;
-
-  if (
-    hasApp &&
-    metadata &&
-    metadata['ctaText'] &&
-    metadata['ctaText']['has_app']
-  ) {
-    ctaText = metadata['ctaText']['has_app'];
-  } else if (metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
-    ctaText = metadata['ctaText']['no_app'];
-  }
-
-  return ctaText;
-};
+// html-blob extraction delegates to journeys_template (shared with journeys_v2)
+journeys_utils.getMetadata = journeys_template.getMetadata;
+journeys_utils.getIframeCss = journeys_template.getIframeCss;
+journeys_utils.getCtaText = journeys_template.getCtaText;
+journeys_utils.getCss = journeys_template.getCss;
+journeys_utils.removeScriptAndCss = journeys_template.removeScriptAndCss;
 
 /***
  * @function journeys_utils.findInsertionDiv
@@ -202,26 +165,14 @@ journeys_utils.findInsertionDiv = function (parent, metadata) {
 };
 
 /***
- * @function journeys_utils.getCss
- * @param {string} html
- */
-journeys_utils.getCss = function (html) {
-  var match = html.match(journeys_utils.cssRe);
-  if (match) {
-    return match[1];
-  }
-};
-
-/***
  * @function journeys_utils.getJsAndAddToParent
  * @param {string} html
  *
  * take the js from template and add to document.body
  */
 journeys_utils.getJsAndAddToParent = function (html) {
-  var match = html.match(journeys_utils.jsRe);
-  if (match) {
-    var src = match[1];
+  var src = journeys_template.getJs(html);
+  if (src !== undefined) {
     var script = document.createElement('script');
     script.id = 'branch-journey-cta';
     utils.addNonceAttribute(script);
@@ -230,142 +181,14 @@ journeys_utils.getJsAndAddToParent = function (html) {
   }
 };
 
-/***
- * @function journeys_utils.removeScriptAndCss
- * @param {string} html
- *
- * After extracting js and css from html blob, we should remove it.
- * We will use the remaining html to add to iframe
- */
-journeys_utils.removeScriptAndCss = function (html) {
-  var matchJson = html.match(journeys_utils.jsonRe);
-  var matchJs = html.match(journeys_utils.jsRe);
-  var matchCss = html.match(journeys_utils.cssRe);
-  var matchIframeCss = html.match(journeys_utils.iframeCssRe);
+// iframe shell construction delegates to journeys_frame (shared with journeys_v2)
+journeys_utils.createIframe = journeys_frame.createIframe;
 
-  if (matchJson) {
-    html = html.replace(journeys_utils.jsonRe, '');
-  }
-  if (matchJs) {
-    html = html.replace(journeys_utils.jsRe, '');
-  }
-  if (matchCss) {
-    html = html.replace(journeys_utils.cssRe, '');
-  }
-  if (matchIframeCss) {
-    html = html.replace(journeys_utils.iframeCssRe, '');
-  }
-
-  return html;
-};
-
-/***
- * @function journeys_utils.createIframe
- */
-journeys_utils.createIframe = function () {
-  var iframe = document.createElement('iframe');
-  iframe.src = 'about:blank'; // solves CORS issues, test in IE
-  iframe.style.overflow = 'hidden';
-  iframe.scrolling = 'no';
-  iframe.id = 'branch-banner-iframe';
-  iframe.className = 'branch-animation';
-  iframe.title = 'Branch Banner Frame';
-  iframe.setAttribute('aria-label', 'Branch Banner Frame');
-  utils.addNonceAttribute(iframe);
-
-  return iframe;
-};
-
-/***
- * @function journeys_utils.addHtmlToIframe
- * @param {Object} iframe - iframe node created in previous step
- * @param {string} html - raw Journey HTML
- * @param {string} userAgent - UA to determine body class
- */
-journeys_utils.addHtmlToIframe = function (iframe, html, userAgent) {
-  var bodyClass;
-  if (userAgent === 'ios' || userAgent === 'ipad') {
-    bodyClass = 'branch-banner-ios';
-  } else if (userAgent === 'android') {
-    bodyClass = 'branch-banner-android';
-  } else {
-    bodyClass = 'branch-banner-other';
-  }
-  var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
-
-  // Safely ensure <head> and <body> exist for style injection and innerHTML
-  if (!iframedoc.head) {
-    var head = iframedoc.createElement('head');
-    (iframedoc.documentElement || iframedoc).appendChild(head);
-  }
-  if (!iframedoc.body) {
-    var body = iframedoc.createElement('body');
-    (iframedoc.documentElement || iframedoc).appendChild(body);
-  }
-
-  iframedoc.body.innerHTML = html;
-  iframedoc.body.className = bodyClass;
-  var metaTag = iframedoc.querySelector('meta[name="accessibility"]');
-  if (metaTag && metaTag.content === 'wcag') {
-    var scriptTag = iframedoc.createElement('script');
-    scriptTag.type = 'text/javascript';
-    scriptTag.text = `
-            var focusableElements = 'button, [href], input, select, textarea, [role="button"], h1, [role="text"], .branch-banner-content';
-            var modal = document.getElementById('branch-banner');
-            var focusableContent = modal.querySelectorAll(focusableElements);
-            var focusElementIdx = 0;
-
-            function handleKeyboardNavigation(e) {
-                var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-                var isEnterPressed = e.key === 'Enter' || e.keyCode === 13;
-                
-                // Handle Tab key for focus navigation
-                if (isTabPressed) {
-                    if (e.shiftKey) {
-                        if (focusElementIdx <= 0) {
-                            focusElementIdx = focusableContent.length - 1;
-                        } else {
-                            focusElementIdx = focusElementIdx - 1;
-                        }
-                    } else {
-                        if (focusElementIdx >= focusableContent.length - 1) {
-                            focusElementIdx = 0;
-                        } else {
-                            focusElementIdx = focusElementIdx + 1;
-                        }
-                    }
-
-                    focusableContent[focusElementIdx].focus();
-                    e.preventDefault();
-                    return;
-                }
-                
-                // Handle Enter key for activation
-                if (isEnterPressed) {
-                    // Get the currently focused element
-                    var focusedElement = document.activeElement;
-                    if (focusedElement && (
-                        focusedElement.tagName === 'BUTTON' || 
-                        focusedElement.getAttribute('role') === 'button' ||
-                        focusedElement.tagName === 'A'
-                    )) {
-                        // Simulate a click on the element
-                        focusedElement.click();
-                        e.preventDefault();
-                    }
-                }
-            }
-
-            function autoFocus(delay) {
-                setTimeout(function() { focusableContent[focusElementIdx].focus() }, delay);
-            }
-
-            document.addEventListener('keydown', handleKeyboardNavigation);
-            autoFocus(100);
-            
-        `;
-    iframedoc.querySelector('body').append(scriptTag);
-  }
+// Mounts the creative and installs the WCAG keyboard-nav script if the creative requests it.
+journeys_utils.addHtmlToIframe = function (iframe, html, platform) {
+  var doc = journeys_frame.mount(iframe, html, platform);
+  journeys_a11y.install(doc);
+  return doc;
 };
 
 /***
@@ -375,10 +198,6 @@ journeys_utils.addHtmlToIframe = function (iframe, html, userAgent) {
  * banner position, height and sticky.
  */
 journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
-  var iFrameCSS = document.createElement('style');
-  iFrameCSS.type = 'text/css';
-  iFrameCSS.id = 'branch-iframe-css';
-
   var bodyMargin = '';
   journeys_utils.bodyMarginTop = banner_utils.getBodyStyle('margin-top');
   var bodyMarginTopNumber = +journeys_utils.bodyMarginTop.slice(0, -2);
@@ -433,28 +252,12 @@ journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
 
   journeys_utils.journeyDismissed = false;
 
-  var finalOuterCSS = '';
-
-  if (cssIframeContainer) {
-    finalOuterCSS = cssIframeContainer;
-  } else {
-    finalOuterCSS = generateIframeOuterCSS(metadata);
-  }
-
-  // Inject configured CSS if it targets the IFRAME surface (the host page)
-  if (
-    journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['surface'] === 'IFRAME'
-  ) {
-    finalOuterCSS +=
-      '\n' + journeys_utils.animationConfig['generatedCss'] + '\n';
-  }
-
-  iFrameCSS.innerHTML = finalOuterCSS;
-
-  utils.addNonceAttribute(iFrameCSS);
-
-  document.head.appendChild(iFrameCSS);
+  var css = cssIframeContainer
+    ? cssIframeContainer
+    : generateIframeOuterCSS(metadata);
+  document.head.appendChild(
+    journeys_frame.styleElement(document, 'branch-iframe-css', css),
+  );
 };
 
 function generateIframeOuterCSS(metadata) {
@@ -550,16 +353,7 @@ journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
   var css = document.createElement('style');
   css.type = 'text/css';
   css.id = 'branch-css';
-
-  var finalCSS = innerCSS;
-  if (
-    journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['surface'] === 'CONTENT'
-  ) {
-    finalCSS += '\n' + journeys_utils.animationConfig['generatedCss'] + '\n';
-  }
-
-  css.innerHTML = finalCSS;
+  css.innerHTML = innerCSS;
 
   utils.addNonceAttribute(css);
 
@@ -585,14 +379,10 @@ journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
     }
   }
 
-  // Skip if #branch-banner is animating its own entrance -- moving the iframe too would
-  // double or fight that animation.
-  if (!journeys_utils.use_v2_renderer) {
-    if (journeys_utils.position === 'top') {
-      iframe.style.top = '-' + journeys_utils.bannerHeight;
-    } else if (journeys_utils.position === 'bottom') {
-      iframe.style.bottom = '-' + journeys_utils.bannerHeight;
-    }
+  if (journeys_utils.position === 'top') {
+    iframe.style.top = '-' + journeys_utils.bannerHeight;
+  } else if (journeys_utils.position === 'bottom') {
+    iframe.style.bottom = '-' + journeys_utils.bannerHeight;
   }
 
   // remove box shadow if no content background color
@@ -637,87 +427,20 @@ journeys_utils.centerOverlay = function (banner) {
   }
 };
 
-journeys_utils.getAnimationRoot = function (banner) {
-  if (!banner) return null;
-
-  var isIframeSurface =
-    journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['surface'] === 'IFRAME';
-
-  if (isIframeSurface) {
-    return banner;
-  }
-
-  if (banner.contentWindow) {
-    var doc = banner.contentWindow.document;
-    if (doc) {
-      return (
-        doc.getElementById('branch-banner') ||
-        doc.querySelector('.branch-banner-content') ||
-        null
-      );
-    }
-  }
-  return null;
-};
-
-function getAnimationClass(isExit) {
-  if (
-    journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['classes']
-  ) {
-    return isExit
-      ? journeys_utils.animationConfig['classes']['exit']
-      : journeys_utils.animationConfig['classes']['enter'];
-  }
-  return isExit ? 'branch-banner-exit' : 'branch-banner-enter';
-}
-
-function isAnimationDisabled(isExit) {
-  return isExit
-    ? journeys_utils.exitAnimationDisabled
-    : journeys_utils.entryAnimationDisabled;
-}
-
-journeys_utils.attachAnimation = function (element, isExit) {
-  if (!element || isAnimationDisabled(isExit)) {
-    return;
-  }
-
-  var className = getAnimationClass(isExit);
-  if (className) {
-    banner_utils.addClass(element, className);
-  }
-};
-
-journeys_utils.detachAnimation = function (element, isExit) {
-  if (!element || isAnimationDisabled(isExit)) {
-    return;
-  }
-
-  var className = getAnimationClass(isExit);
-  if (className) {
-    banner_utils.removeClass(element, className);
-  }
-};
-
 /***
  * @function journeys_utils.animateBannerEntrance
  * @param {Object} banner
  */
 journeys_utils.animateBannerEntrance = function (banner, cssIframeContainer) {
-  // Only attach the entrance class if this is the new animation path
-  if (journeys_utils.use_v2_renderer && banner && banner.contentWindow) {
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
-    journeys_utils.attachAnimation(bannerRoot, false);
-  }
-
   banner_utils.addClass(document.body, 'branch-banner-is-active');
   if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
-    var bodyCSS = document.createElement('style');
-    bodyCSS.type = 'text/css';
-    bodyCSS.innerHTML = '.branch-banner-no-scroll {overflow: hidden;}';
-    document.head.appendChild(bodyCSS);
+    document.head.appendChild(
+      journeys_frame.styleElement(
+        document,
+        undefined,
+        '.branch-banner-no-scroll {overflow: hidden;}',
+      ),
+    );
     banner_utils.addClass(document.body, 'branch-banner-no-scroll');
   }
 
@@ -743,7 +466,8 @@ journeys_utils.animateBannerEntrance = function (banner, cssIframeContainer) {
         }
       }
     }
-    journeys_utils.branch._publishEvent(
+    journeys_events.publish(
+      journeys_utils.branch,
       'didShowJourney',
       journeys_utils.journeyLinkData,
     );
@@ -809,19 +533,10 @@ journeys_utils._resetJourneysBannerPosition = function (
   }
 };
 
-journeys_utils._addSecondsToDate = function (seconds) {
-  var currentDate = new Date();
-  return currentDate.setSeconds(currentDate.getSeconds() + seconds);
-};
-
-journeys_utils._findGlobalDismissPeriod = function (metadata) {
-  var globalDismissPeriod = metadata['globalDismissPeriod'];
-  if (typeof globalDismissPeriod === 'number') {
-    return globalDismissPeriod === -1
-      ? true
-      : journeys_utils._addSecondsToDate(globalDismissPeriod);
-  }
-};
+// Dismissal storage delegates to journeys_dismissals (shared with journeys_v2)
+journeys_utils._findGlobalDismissPeriod =
+  journeys_dismissals.globalDismissDeadline;
+journeys_utils._setJourneyDismiss = journeys_dismissals.recordViewDismiss;
 
 /***
  * @function journeys_utils.finalHookups
@@ -852,7 +567,8 @@ journeys_utils.finalHookups = function (
   var actionEls = doc.querySelectorAll('#branch-mobile-action');
   Array.prototype.forEach.call(actionEls, function (el) {
     el.addEventListener('click', function (e) {
-      journeys_utils.branch._publishEvent(
+      journeys_events.publish(
+        journeys_utils.branch,
         'didClickJourneyCTA',
         journeys_utils.journeyLinkData,
       );
@@ -953,184 +669,16 @@ journeys_utils._setupDismissBehavior = function (
   });
 };
 
-journeys_utils._setJourneyDismiss = function (
-  storage,
-  templateId,
-  audienceRuleId,
-) {
-  var journeyDismissals = storage.get('journeyDismissals', true);
-  journeyDismissals = journeyDismissals
-    ? safejson.parse(journeyDismissals)
-    : {};
-  journeyDismissals[audienceRuleId] = {
-    'view_id': templateId,
-    'dismiss_time': Date.now(),
-  };
-  storage.set('journeyDismissals', safejson.stringify(journeyDismissals), true);
-  return journeyDismissals;
-};
-
-journeys_utils.decodeSymbols = function (str) {
-  if (str === undefined || str === null) {
-    return null;
-  }
-  return str
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&brvbar;/g, '¦')
-    .replace(/&laquo;/g, '«')
-    .replace(/&acute;/g, '´')
-    .replace(/&middot;/g, '·')
-    .replace(/&raquo;/g, '»')
-    .replace(/&amp;/g, '&')
-    .replace(/&iquest;/g, '¿')
-    .replace(/&times;/g, '×')
-    .replace(/&divide;/g, '÷')
-    .replace(/&Agrave;/g, 'À')
-    .replace(/&Aacute;/g, 'Á')
-    .replace(/&Acirc;/g, 'Â')
-    .replace(/&Atilde;/g, 'Ã')
-    .replace(/&Auml;/g, 'Ä')
-    .replace(/&Aring;/g, 'Å')
-    .replace(/&AElig;/g, 'Æ')
-    .replace(/&Ccedil;/g, 'Ç')
-    .replace(/&Egrave;/g, 'È')
-    .replace(/&Eacute;/g, 'É')
-    .replace(/&Ecirc;/g, 'Ê')
-    .replace(/&Euml;/g, 'Ë')
-    .replace(/&Igrave;/g, 'Ì')
-    .replace(/&Iacute;/g, 'Í')
-    .replace(/&Icirc;/g, 'Î')
-    .replace(/&Iuml;/g, 'Ï')
-    .replace(/&ETH;/g, 'Ð')
-    .replace(/&Ntilde;/g, 'Ñ')
-    .replace(/&Ograve;/g, 'Ò')
-    .replace(/&Oacute;/g, 'Ó')
-    .replace(/&Ocirc;/g, 'Ô')
-    .replace(/&Otilde;/g, 'Õ')
-    .replace(/&Ouml;/g, 'Ö')
-    .replace(/&Oslash;/g, 'Ø')
-    .replace(/&Ugrave;/g, 'Ù')
-    .replace(/&Uacute;/g, 'Ú')
-    .replace(/&Ucirc;/g, 'Û')
-    .replace(/&Uuml;/g, 'Ü')
-    .replace(/&Yacute;/g, 'Ý')
-    .replace(/&THORN;/g, 'Þ')
-    .replace(/&szlig;/g, 'ß')
-    .replace(/&agrave;/g, 'à')
-    .replace(/&aacute;/g, 'á')
-    .replace(/&acirc;/g, 'â')
-    .replace(/&atilde;/g, 'ã')
-    .replace(/&auml;/g, 'ä')
-    .replace(/&aring;/g, 'å')
-    .replace(/&aelig;/g, 'æ')
-    .replace(/&ccedil;/g, 'ç')
-    .replace(/&egrave;/g, 'è')
-    .replace(/&eacute;/g, 'é')
-    .replace(/&ecirc;/g, 'ê')
-    .replace(/&euml;/g, 'ë')
-    .replace(/&igrave;/g, 'ì')
-    .replace(/&iacute;/g, 'í')
-    .replace(/&icirc;/g, 'î')
-    .replace(/&iuml;/g, 'ï')
-    .replace(/&eth;/g, 'ð')
-    .replace(/&ntilde;/g, 'ñ')
-    .replace(/&ograve;/g, 'ò')
-    .replace(/&oacute;/g, 'ó')
-    .replace(/&ocirc;/g, 'ô')
-    .replace(/&otilde;/g, 'õ')
-    .replace(/&ouml;/g, 'ö')
-    .replace(/&oslash;/g, 'ø')
-    .replace(/&ugrave;/g, 'ù')
-    .replace(/&uacute;/g, 'ú')
-    .replace(/&ucirc;/g, 'û')
-    .replace(/&uuml;/g, 'ü')
-    .replace(/&yacute;/g, 'ý')
-    .replace(/&thorn;/g, 'þ')
-    .replace(/&yuml;/g, 'ÿ');
-};
 journeys_utils._getDismissRequestData = function (
   branch_view,
   dismissal_source,
 ) {
-  var metadata = {};
-  var hostedDeeplinkData = utils.getHostedDeepLinkData();
-  if (hostedDeeplinkData && Object.keys(hostedDeeplinkData).length > 0) {
-    metadata['hosted_deeplink_data'] = hostedDeeplinkData;
-  }
-
-  var dismissRequestData = branch_view._getPageviewRequestData(
-    journeys_utils._getPageviewMetadata(null, metadata),
-    null,
-    journeys_utils.branch,
-    true,
-  );
-
-  if (
-    journeys_utils.journeyLinkData &&
-    journeys_utils.journeyLinkData['journey_link_data']
-  ) {
-    utils.addPropertyIfNotNull(
-      dismissRequestData,
-      'journey_id',
-      journeys_utils.journeyLinkData['journey_link_data']['journey_id'],
-    );
-    utils.addPropertyIfNotNull(
-      dismissRequestData,
-      'journey_name',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['journey_name'],
-      ),
-    );
-    utils.addPropertyIfNotNull(
-      dismissRequestData,
-      'view_id',
-      journeys_utils.journeyLinkData['journey_link_data']['view_id'],
-    );
-    utils.addPropertyIfNotNull(
-      dismissRequestData,
-      'view_name',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['view_name'],
-      ),
-    );
-    utils.addPropertyIfNotNull(
-      dismissRequestData,
-      'channel',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['channel'],
-      ),
-    );
-    utils.addPropertyIfNotNull(
-      dismissRequestData,
-      'campaign',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['campaign'],
-      ),
-    );
-    try {
-      utils.addPropertyIfNotNull(
-        dismissRequestData,
-        'tags',
-        JSON.stringify(
-          journeys_utils.journeyLinkData['journey_link_data']['tags'],
-        ),
-      );
-    } catch (e) {
-      dismissRequestData['tags'] = JSON.stringify([]);
-    }
-  }
-
-  utils.addPropertyIfNotNull(
-    dismissRequestData,
-    'dismissal_source',
+  return journeys_analytics.getDismissRequestData(
+    branch_view,
     dismissal_source,
+    journeys_utils.journeyLinkData,
+    journeys_utils.branch,
   );
-
-  return dismissRequestData;
 };
 
 journeys_utils._handleJourneyDismiss = function (
@@ -1146,7 +694,8 @@ journeys_utils._handleJourneyDismiss = function (
   var globalDismissPeriod = !testModeEnabled
     ? journeys_utils._findGlobalDismissPeriod(metadata)
     : 0;
-  journeys_utils.branch._publishEvent(
+  journeys_events.publish(
+    journeys_utils.branch,
     eventName,
     journeys_utils.journeyLinkData,
   );
@@ -1154,10 +703,8 @@ journeys_utils._handleJourneyDismiss = function (
   journeys_utils.animateBannerExit(banner);
 
   if (!testModeEnabled) {
-    if (globalDismissPeriod !== undefined) {
-      storage.set('globalJourneysDismiss', globalDismissPeriod, true);
-    }
-    journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
+    journeys_dismissals.recordGlobalDismiss(storage, globalDismissPeriod);
+    journeys_dismissals.recordViewDismiss(storage, templateId, audienceRuleId);
     var listener = function () {
       journeys_utils.branch.removeListener(listener);
       var requestData = journeys_utils._getDismissRequestData(
@@ -1180,9 +727,13 @@ journeys_utils._handleJourneyDismiss = function (
                 data['event_data']['branch_view_data'],
                 false,
                 data['journey_link_data'],
+                journeys_utils.branch,
                 {
-                  use_v2_renderer: data['use_v2_renderer'],
-                  animationConfig: data['animationConfig'],
+                  'use_v2_renderer': data['use_v2_renderer'],
+                  'animationConfig': data['animationConfig'],
+                  'entryAnimationDisabled':
+                    journeys_utils.entryAnimationDisabled,
+                  'exitAnimationDisabled': journeys_utils.exitAnimationDisabled,
                 },
               );
             }
@@ -1197,30 +748,7 @@ journeys_utils._handleJourneyDismiss = function (
   }
 };
 
-journeys_utils._getPageviewMetadata = function (options, additionalMetadata) {
-  var pageviewMetadata = utils.merge(
-    {
-      'url': (options && options.url) || utils.getWindowLocation(),
-      'user_agent': navigator.userAgent,
-      'language': navigator.language,
-      'screen_width': screen.width || -1,
-      'screen_height': screen.height || -1,
-      'window_device_pixel_ratio': window.devicePixelRatio || 1,
-    },
-    additionalMetadata || {},
-  );
-  pageviewMetadata = utils.addPropertyIfNotNullorEmpty(
-    pageviewMetadata,
-    'model',
-    utils.userAgentData ? utils.userAgentData.model : '',
-  );
-  pageviewMetadata = utils.addPropertyIfNotNullorEmpty(
-    pageviewMetadata,
-    'os_version',
-    utils.userAgentData ? utils.userAgentData.platformVersion : '',
-  );
-  return pageviewMetadata;
-};
+journeys_utils._getPageviewMetadata = journeys_analytics.getPageviewMetadata;
 
 /***
  * @function journeys_utils.animateBannerExit
@@ -1235,22 +763,6 @@ journeys_utils.animateBannerExit = function (
     journeys_utils.exitAnimationIsRunning = true;
   }
 
-  // Trigger any exit animation the creative authored on #branch-banner, and read its real
-  // duration so removal below waits for it instead of using the SDK default.
-  var contentHandlesExit = false;
-  var contentExitDurationMs = 0;
-
-  if (journeys_utils.use_v2_renderer && banner && banner.contentWindow) {
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
-    if (bannerRoot) {
-      journeys_utils.detachAnimation(bannerRoot, false);
-      journeys_utils.attachAnimation(bannerRoot, true);
-
-      contentHandlesExit = true;
-      contentExitDurationMs =
-        journeys_utils._getAnimationDurationMs(bannerRoot);
-    }
-  }
   // adds transitions for Journey exit if they don't exist
   if (
     journeys_utils.entryAnimationDisabled &&
@@ -1279,16 +791,14 @@ journeys_utils.animateBannerExit = function (
       iFrameOutterCSSBackup;
   }
 
-  // Same guard as the entrance side: skip if #branch-banner is animating its own exit.
-  if (!contentHandlesExit) {
-    if (journeys_utils.position === 'top') {
-      banner.style.top = '-' + journeys_utils.bannerHeight;
-    } else if (journeys_utils.position === 'bottom') {
-      banner.style.bottom = '-' + journeys_utils.bannerHeight;
-    }
+  if (journeys_utils.position === 'top') {
+    banner.style.top = '-' + journeys_utils.bannerHeight;
+  } else if (journeys_utils.position === 'bottom') {
+    banner.style.bottom = '-' + journeys_utils.bannerHeight;
   }
 
-  journeys_utils.branch._publishEvent(
+  journeys_events.publish(
+    journeys_utils.branch,
     'willCloseJourney',
     journeys_utils.journeyLinkData,
   );
@@ -1297,14 +807,10 @@ journeys_utils.animateBannerExit = function (
   } else if (journeys_utils.position === 'bottom') {
     document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
   }
-  // removes timeout if animation is disabled, else the default timeout or the content's own
-  // exit animation, whichever is longer
+  // removes timeout if animation is disabled, else waits out the default animation speed + delay
   var speedAndDelay = journeys_utils.exitAnimationDisabled
     ? 0
-    : Math.max(
-        journeys_utils.animationSpeed + journeys_utils.animationDelay,
-        contentExitDurationMs,
-      );
+    : journeys_utils.animationSpeed + journeys_utils.animationDelay;
   setTimeout(function () {
     // remove banner, branch-css, and branch-iframe-css
     banner_utils.removeElement(banner);
@@ -1339,12 +845,14 @@ journeys_utils.animateBannerExit = function (
       window.removeEventListener('resize', journeys_utils._resizeListener);
       window.removeEventListener('scroll', journeys_utils._scrollListener);
     }
-    journeys_utils.branch._publishEvent(
+    journeys_events.publish(
+      journeys_utils.branch,
       'didCloseJourney',
       journeys_utils.journeyLinkData,
     );
     if (!dismissedJourneyProgrammatically) {
-      journeys_utils.branch._publishEvent(
+      journeys_events.publish(
+        journeys_utils.branch,
         'branch_internal_event_didCloseJourney',
         journeys_utils.journeyLinkData,
       );
@@ -1357,49 +865,6 @@ journeys_utils.animateBannerExit = function (
   }, speedAndDelay);
 };
 
-/***
- * @function journeys_utils._getAnimationDurationMs
- * @param {Object} element
- *
- * Total CSS animation time on element (animation-delay + animation-duration), in ms.
- * 0 if no animation is applied.
- */
-journeys_utils._getAnimationDurationMs = function (element) {
-  var computedStyle =
-    element.ownerDocument.defaultView.getComputedStyle(element);
-  // Fall back to the `animation` shorthand for environments (incl. jsdom) that don't resolve
-  // it into the longhand properties: duration is the shorthand's 1st <time> value, delay the
-  // 2nd, per spec.
-  var duration =
-    journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
-    journeys_utils._timeValueMsAt(computedStyle.animation, 0) ||
-    0;
-  var delay =
-    journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
-    journeys_utils._timeValueMsAt(computedStyle.animation, 1) ||
-    0;
-  return duration + delay;
-};
-
-/***
- * @function journeys_utils._timeValueMsAt
- * @param {string} cssValue
- * @param {number} index
- *
- * The `<time>` token (e.g. "0.25s" or "250ms") at position index (0-based) found in cssValue, in
- * ms, or null if there aren't that many.
- */
-journeys_utils._timeValueMsAt = function (cssValue, index) {
-  var matches = (cssValue || '').match(/(-?[\d.]+)(ms|s)\b/g) || [];
-  var token = matches[index];
-  if (!token) {
-    return null;
-  }
-  var match = /(-?[\d.]+)(ms|s)/.exec(token);
-  var amount = parseFloat(match[1]);
-  return match[2] === 'ms' ? amount : amount * 1000;
-};
-
 journeys_utils.setJourneyLinkData = function (linkData) {
   var data = { 'banner_id': journeys_utils.branchViewId };
   if (
@@ -1407,16 +872,9 @@ journeys_utils.setJourneyLinkData = function (linkData) {
     typeof linkData === 'object' &&
     Object.keys(linkData || {}).length > 0
   ) {
-    var journeyLinkDataPropertiesToFilterOut = [
-      'browser_fingerprint_id',
-      'app_id',
-      'source',
-      'open_app',
-      'link_click_id',
-    ];
     utils.removePropertiesFromObject(
       linkData,
-      journeyLinkDataPropertiesToFilterOut,
+      journeys_analytics.FILTERED_LINK_KEYS,
     );
     data['journey_link_data'] = {};
     utils.merge(data['journey_link_data'], linkData);
@@ -1428,93 +886,17 @@ journeys_utils.setJourneyLinkData = function (linkData) {
   journeys_utils.journeyVariant = data['journey_link_data']['variant'] || null;
 };
 
-journeys_utils.getValueForKeyInBranchViewData = function (key) {
-  if (!journeys_utils) {
-    return false;
-  }
-
-  if (!journeys_utils.branch) {
-    return false;
-  }
-
-  if (!journeys_utils.branch._branchViewData) {
-    return false;
-  }
-
-  if (!journeys_utils.branch._branchViewData.data) {
-    return false;
-  }
-
-  return journeys_utils.branch._branchViewData.data[key];
-};
-
+// $journeys_cta override delegates to journeys_link_overrides (shared with journeys_v2)
 journeys_utils.hasJourneyCtaLink = function () {
-  if (!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')) {
-    return false;
-  }
-
   return (
-    journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta').length > 0
+    journeys_link_overrides.getCtaLink(journeys_utils.branch) !== undefined
   );
 };
 
-journeys_utils.getBranchViewDataItemOrUndefined = function (name) {
-  if (journeys_utils.getValueForKeyInBranchViewData(name)) {
-    return journeys_utils.branch._branchViewData.data[name];
-  }
-  return undefined;
-};
-
 journeys_utils.getJourneyCtaLink = function () {
-  return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
+  return journeys_link_overrides.getCtaLink(journeys_utils.branch);
 };
 
 journeys_utils.tryReplaceJourneyCtaLink = function (html) {
-  try {
-    if (journeys_utils.hasJourneyCtaLink()) {
-      var journeyLinkReplacePattern = /validate[(].+[)];/g;
-      var pattern = 'validate("' + journeys_utils.getJourneyCtaLink() + '")';
-      var replacedHtml = html.replace(journeyLinkReplacePattern, pattern);
-      return replacedHtml.replace(
-        'window.top.location.replace(',
-        'window.top.location = ',
-      );
-    }
-  } catch (e) {
-    return html;
-  }
-
-  return html;
-};
-
-journeys_utils.trySetJourneyUrls = function (
-  linkElements,
-  urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url'],
-) {
-  if (!linkElements) {
-    return linkElements;
-  }
-
-  var assignUrls = function (data) {
-    return urls.reduce((value, url) => {
-      if (value[url]) {
-        return value;
-      }
-
-      var entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
-      if (entry) {
-        value[url] = entry;
-      }
-      return value;
-    }, data);
-  };
-
-  try {
-    var data = safejson.parse(linkElements.data);
-    linkElements.data = JSON.stringify(assignUrls(data));
-
-    return linkElements;
-  } catch (e) {
-    return linkElements;
-  }
+  return journeys_link_overrides.applyCtaOverride(journeys_utils.branch, html);
 };
