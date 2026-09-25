@@ -162,7 +162,7 @@ describe('journeys_v2.context.build', function () {
         has_app_websdk: true,
       },
       templateId: 't1',
-      branchViewData: { audience_rule_id: 'r1', is_new_animation: true },
+      branchViewData: { audience_rule_id: 'r1' },
       linkData: { journey_id: 'j', app_id: 'drop-me' },
       testMode: false,
       options: { entryAnimationDisabled: true, animationConfig: {} },

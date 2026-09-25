@@ -3,7 +3,7 @@
 goog.require('branch_view');
 goog.require('journeys_utils');
 
-// Coverage for which pipeline is_new_animation routes to lives in
+// Coverage for which pipeline use_v2_renderer routes to lives in
 // test/journeys/v2/index.js ("branch_view.displayJourney fork"), via a sinon stub on
 // journeys_v2.displayJourney rather than an internal journeys_utils flag.
 describe('displayJourney', function () {
