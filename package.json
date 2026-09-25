@@ -46,7 +46,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
     "commitizen": "^4.3.0",
-    "cz-customizable": "^7.0.0",
+    "cz-customizable": "^7.5.4",
     "falafel": "2.2.5",
     "global-jsdom": "24.0.0",
     "google-closure-compiler": "^20240317.0.0",
