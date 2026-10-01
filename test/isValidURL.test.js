@@ -2,19 +2,93 @@ import { config } from '../src/0_config.js';
 import { utils } from '../src/1_utils.js';
 import { Branch } from '../src/6_branch.js';
 
-// The pattern utils.isValidURL used before the backtracking fix. Kept only to prove the new
-// pattern accepts exactly the same URLs. Never call it on long input: it is exponential.
-// biome-ignore lint/complexity/useRegexLiterals: as a literal, CodeQL would flag this known-vulnerable pattern
-const LEGACY_PATTERN = new RegExp(
-  '^(https?)://((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$',
-  'i',
-);
+// Same URL rules as isValidURL, written without a regex, to check the pattern against.
+const ALNUM = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const charIn = function (set) {
+  return function (c) {
+    return c !== undefined && set.includes(c);
+  };
+};
+const isAlnum = charIn(ALNUM);
+const isDigit = charIn('0123456789');
+const isHostChar = charIn(`${ALNUM}.-`);
+const isPathChar = charIn(`${ALNUM}-%_.~+`);
+const isQueryChar = charIn(`${ALNUM};&%_.~+=-`);
+const isFragmentChar = charIn(`${ALNUM}-_`);
+const isLabel = function (s) {
+  return (
+    s.length > 0 &&
+    isAlnum(s[0]) &&
+    isAlnum(s[s.length - 1]) &&
+    [...s].every((c) => isAlnum(c) || c === '-')
+  );
+};
+const isTld = function (s) {
+  return s.length >= 2 && [...s].every((c) => c >= 'a' && c <= 'z');
+};
+const isOctet = function (s) {
+  return s.length >= 1 && s.length <= 3 && [...s].every(isDigit);
+};
+const asciiLowerCase = function (s) {
+  return [...s]
+    .map((c) => (c >= 'A' && c <= 'Z' ? c.toLowerCase() : c))
+    .join('');
+};
 
-const legacyIsValidURL = function (url) {
+const referenceIsValidURL = function (url) {
   if (!url || url.trim() === '') {
     return false;
   }
-  return LEGACY_PATTERN.test(url);
+  const s = asciiLowerCase(url);
+  let i;
+  if (s.startsWith('https://')) {
+    i = 8;
+  } else if (s.startsWith('http://')) {
+    i = 7;
+  } else {
+    return false;
+  }
+  const hostStart = i;
+  while (isHostChar(s[i])) {
+    i++;
+  }
+  const parts = s.slice(hostStart, i).split('.');
+  const isDomain =
+    parts.length >= 2 &&
+    isTld(parts[parts.length - 1]) &&
+    parts.slice(0, -1).every(isLabel);
+  const isIPv4 = parts.length === 4 && parts.every(isOctet);
+  if (!isDomain && !isIPv4) {
+    return false;
+  }
+  if (s[i] === ':') {
+    const portStart = ++i;
+    while (isDigit(s[i])) {
+      i++;
+    }
+    if (i === portStart) {
+      return false;
+    }
+  }
+  while (s[i] === '/') {
+    i++;
+    while (isPathChar(s[i])) {
+      i++;
+    }
+  }
+  if (s[i] === '?') {
+    i++;
+    while (isQueryChar(s[i])) {
+      i++;
+    }
+  }
+  if (s[i] === '#') {
+    i++;
+    while (isFragmentChar(s[i])) {
+      i++;
+    }
+  }
+  return i === s.length;
 };
 
 // Small deterministic PRNG (mulberry32) so fuzz failures are reproducible.
@@ -123,7 +197,7 @@ describe('utils.isValidURL', function () {
     });
   });
 
-  describe('matches the legacy pattern exactly', function () {
+  describe('matches the regex-free reference', function () {
     it('agrees on every host built from [a 1 - . !] up to 7 characters', function () {
       const alphabet = ['a', '1', '-', '.', '!'];
       const suffixes = ['', '.io', '-.io', '.1.2', ':80', '/p?q#f'];
@@ -133,7 +207,7 @@ describe('utils.isValidURL', function () {
         for (const suffix of suffixes) {
           const url = `http://${host}${suffix}`;
           compared++;
-          if (utils.isValidURL(url) !== legacyIsValidURL(url)) {
+          if (utils.isValidURL(url) !== referenceIsValidURL(url)) {
             mismatches.push(url);
           }
         }
@@ -147,6 +221,45 @@ describe('utils.isValidURL', function () {
       visit('', 7);
       expect(mismatches).toEqual([]);
       expect(compared).toBeGreaterThan(500000);
+    });
+
+    it('agrees on every port/path/query/fragment tail up to 4 characters', function () {
+      const alphabet = [
+        ':',
+        '1',
+        '/',
+        '?',
+        '#',
+        'a',
+        '.',
+        '%',
+        ' ',
+        '=',
+        '&',
+        ';',
+        '-',
+        '_',
+      ];
+      let compared = 0;
+      const mismatches = [];
+      const visit = function (tail, depth) {
+        for (const host of ['https://ex.com', 'http://1.2.3.4']) {
+          const url = host + tail;
+          compared++;
+          if (utils.isValidURL(url) !== referenceIsValidURL(url)) {
+            mismatches.push(url);
+          }
+        }
+        if (depth === 0) {
+          return;
+        }
+        for (const ch of alphabet) {
+          visit(tail + ch, depth - 1);
+        }
+      };
+      visit('', 4);
+      expect(mismatches).toEqual([]);
+      expect(compared).toBeGreaterThan(80000);
     });
 
     it('agrees on 20,000 random URL-shaped strings', function () {
@@ -174,13 +287,13 @@ describe('utils.isValidURL', function () {
       };
       const mismatches = [];
       for (let i = 0; i < 20000; i++) {
-        // Hosts stay short so the exponential legacy pattern finishes quickly.
+        // Hosts stay short so a regression to the exponential pattern fails fast instead of hanging.
         const url =
           pick(schemes) +
           randomString(hostChars, 14) +
           pick(['', '.com', '.co.uk', '.1']) +
           randomString(tailChars, 10);
-        if (utils.isValidURL(url) !== legacyIsValidURL(url)) {
+        if (utils.isValidURL(url) !== referenceIsValidURL(url)) {
           mismatches.push(url);
         }
       }
@@ -191,7 +304,7 @@ describe('utils.isValidURL', function () {
   describe('does not backtrack exponentially', function () {
     const BUDGET_MS = 250;
 
-    // Sized one step past where the legacy pattern takes ~1 s on a fast laptop (its time
+    // Sized one step past where the old pattern takes ~1 s on a fast laptop (its time
     // roughly doubles per extra character). The fixed pattern finishes in well under 1 ms.
     // Kept short on purpose: a regression fails in a few seconds instead of hanging the run,
     // because a backtracking regex cannot be interrupted by the test timeout.
@@ -214,7 +327,7 @@ describe('utils.isValidURL', function () {
       expect(utils.isValidURL(url)).toBe(false);
     });
 
-    // Long inputs. Only shapes the legacy pattern also handled quickly, so these guard
+    // Long inputs. Only shapes the old pattern also handled quickly, so these guard
     // against new slowdowns without being able to hang the run.
     it.each([
       ['IPv4-like run', `http://${'1.'.repeat(3000)}!`, false],
