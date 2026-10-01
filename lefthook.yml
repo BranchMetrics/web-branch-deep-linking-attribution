@@ -1,11 +1,7 @@
-# Git hooks. Docs: https://lefthook.dev/configuration/
 min_version: 2.1.0
 
-# `sh` script sourced before each job: puts node_modules/.bin on PATH and loads the direnv/nix
-# environment when a GUI git client (e.g. VS Code) runs the hook without node on PATH.
 rc: .lefthookrc
 
-# Stay quiet when everything passes. A failing job still prints its output and its name.
 output:
   - failure
 
