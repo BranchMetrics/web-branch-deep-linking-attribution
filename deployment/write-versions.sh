@@ -4,4 +4,3 @@
 
 sed -i -e "s/\"version\":.*$/\"version\": \"$1\",/" package.json
 sed -i -e "s/version = '.*';$/version = '$1';/" src/0_config.js
-sed -i -e "s/version = '.*';$/version = '$1';/" test/web-config.js
