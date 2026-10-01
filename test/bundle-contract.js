@@ -10,6 +10,11 @@ const BUNDLE = readFileSync(
   'utf8',
 );
 
+// The script-tag loader from the README's Installation section.
+const README_SNIPPET = readFileSync('README.md', 'utf8')
+  .split('```html\n<script>\n')[1]
+  .split('\n\n  branch.init')[0];
+
 // Public methods of window.branch that customers rely on.
 const PUBLIC_METHODS = [
   'addListener',
@@ -70,6 +75,38 @@ describe('dist/build.min.js contract', function () {
     });
     expect(window.branch._q).toBeUndefined();
     expect(window.branch.getAPIUrl()).toBe('https://api.example.com');
+  });
+
+  it('runs the documented loader snippet before the SDK loads', function () {
+    const window = load(function (w) {
+      // The snippet inserts the SDK before the first script on the page (its own).
+      w.document.head.appendChild(w.document.createElement('script'));
+      w.eval(README_SNIPPET);
+      // Stubs exist for every method, so early calls queue instead of throwing.
+      w.branch.referringLink();
+      w.branch.setAPIUrl('https://api.example.com');
+    });
+    expect(window.branch._q).toBeUndefined();
+    expect(window.branch.getAPIUrl()).toBe('https://api.example.com');
+  });
+
+  it('stubs every public method in each copy of the loader snippet', function () {
+    // The SDK calls these on itself; pages never need to queue them.
+    const internal = ['renderFinalize', 'renderQueue'];
+    const expected = PUBLIC_METHODS.filter((m) => !internal.includes(m)).sort();
+    const onpage = readFileSync('src/onpage.js', 'utf8')
+      .match(/\[\s*('[\w]+',\s*)+\]/)[0]
+      .match(/[\w]+/g);
+    const snippetMethods = (html) =>
+      html.match(/"([\w ]+)"\.split\(" "\)/)[1].split(' ');
+
+    expect(onpage.sort()).toEqual(expected);
+    expect(snippetMethods(README_SNIPPET).sort()).toEqual(expected);
+    expect(
+      snippetMethods(
+        readFileSync('examples/example.template.html', 'utf8'),
+      ).sort(),
+    ).toEqual(expected);
   });
 
   it('registers as the named AMD module "branch"', function () {

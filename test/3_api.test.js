@@ -486,6 +486,93 @@ describe('Server', function () {
     });
   });
 
+  describe('XHR failures', function () {
+    beforeEach(function () {
+      storage.set('use_jsonp', false);
+      vi.spyOn(console, 'log').mockImplementation(function () {});
+    });
+
+    it('retries a timeout utils.retries times, then returns a timeout error', function () {
+      var callback = vi.fn();
+      var attempt;
+      server.request(resources.open, testUtils.params({}), storage, callback);
+
+      for (attempt = 0; attempt < utils.retries; attempt++) {
+        requests[attempt].triggerTimeout();
+        expect(callback).not.toHaveBeenCalled();
+        vi.advanceTimersByTime(utils.retry_delay);
+      }
+      expect(requests.length).toBe(utils.retries + 1);
+
+      requests[utils.retries].triggerTimeout();
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback.mock.calls[0][0].message).toBe(utils.messages.timeout);
+    });
+
+    it('returns a network error without retrying', function () {
+      var callback = vi.fn();
+      server.request(resources.open, testUtils.params({}), storage, callback);
+
+      requests[0].error();
+      vi.advanceTimersByTime(utils.retry_delay * 10);
+
+      expect(requests.length).toBe(1);
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback.mock.calls[0][0].message).toBe(
+        'Error in API: URL - Unknown, Status - No status available, Response - No response text available',
+      );
+    });
+  });
+
+  describe('/v1/qr-code', function () {
+    beforeEach(function () {
+      storage.set('use_jsonp', false);
+    });
+
+    it('requests an arraybuffer and returns it unparsed', function () {
+      var callback = vi.fn();
+      var png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]).buffer;
+      server.request(resources.qrCode, testUtils.params({}), storage, callback);
+
+      expect(requests[0].url).toBe(config.api_endpoint + '/v1/qr-code');
+      expect(requests[0].responseType).toBe('arraybuffer');
+      requests[0].respond(200, {}, png);
+
+      expect(callback).toHaveBeenCalledWith(null, png);
+    });
+
+    it('returns an error for a 4xx response without reading responseText', function () {
+      vi.spyOn(console, 'log').mockImplementation(function () {});
+      var callback = vi.fn();
+      server.request(resources.qrCode, testUtils.params({}), storage, callback);
+
+      requests[0].respond(400, {}, new ArrayBuffer(0));
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback.mock.calls[0][0].message).toBe(
+        'Error in API: URL - ' +
+          config.api_endpoint +
+          '/v1/qr-code, Status - 400, Response - No response text available',
+      );
+    });
+
+    it('retries a 5xx response, then returns an error', function () {
+      var i;
+      vi.spyOn(console, 'log').mockImplementation(function () {});
+      var callback = vi.fn();
+      server.request(resources.qrCode, testUtils.params({}), storage, callback);
+
+      for (i = 0; i <= utils.retries; i++) {
+        requests[i].respond(503, {}, new ArrayBuffer(0));
+        vi.advanceTimersByTime(utils.retry_delay);
+      }
+
+      expect(requests.length).toBe(utils.retries + 1);
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback.mock.calls[0][0].message).toContain('Status - 503');
+    });
+  });
+
   describe('onAPIResponse', function () {
     afterEach(function () {
       delete server.onAPIResponse;

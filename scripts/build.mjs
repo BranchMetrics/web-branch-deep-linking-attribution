@@ -36,8 +36,10 @@ export function bundle(fileName, { minify = false, watch = false } = {}) {
         output: {
           format: 'iife',
           entryFileNames: fileName,
-          // No 'use strict': the SDK has always run sloppy, and a top-level
-          // directive would leak into any code a customer concatenates after it.
+          // Don't emit "use strict". The SDK has always shipped in non-strict
+          // mode, and Rolldown places the directive at the top of the file,
+          // outside the IIFE, so it would also switch any script a customer
+          // bundles after ours into strict mode.
           strict: false,
         },
         onwarn(warning, warn) {

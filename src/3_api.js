@@ -317,6 +317,13 @@ Server.prototype.XHRRequest = function (
     req.responseType = responseType;
   }
 
+  var errorResponseText = function () {
+    return (
+      (req.responseType === 'arraybuffer' ? '' : req.responseText) ||
+      'No response text available'
+    );
+  };
+
   req.ontimeout = function () {
     utils.addPropertyIfNotNull(
       utils.instrumentation,
@@ -328,7 +335,7 @@ Server.prototype.XHRRequest = function (
   req.onerror = function (e) {
     var url = req.responseURL || 'Unknown';
     var status = req.status || 'No status available';
-    var responseText = req.responseText || 'No response text available';
+    var responseText = errorResponseText();
     var errorMessage =
       'Error in API: URL - ' +
       url +
@@ -374,7 +381,7 @@ Server.prototype.XHRRequest = function (
         } else {
           var url = req.responseURL || 'Unknown';
           var status = req.status || 'No status available';
-          var responseText = req.responseText || 'No response text available';
+          var responseText = errorResponseText();
           var errorMessage =
             'Error in API: URL - ' +
             url +

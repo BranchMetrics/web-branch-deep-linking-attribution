@@ -743,6 +743,45 @@ describe('Branch', function () {
     );
   });
 
+  describe('qrCode', function () {
+    it('sends the QR code settings and returns the image as a QrCode', function () {
+      var branch = initBranch(true);
+      var callback = vi.fn();
+      var png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]).buffer;
+
+      branch.qrCode(
+        { data: { mydata: 'bar' } },
+        { code_color: '#000000', width: 500 },
+        callback,
+      );
+
+      expect(requests[0].resource.endpoint).toBe('/v1/qr-code');
+      expect(JSON.parse(requests[0].obj.qr_code_settings)).toEqual({
+        code_color: '#000000',
+        width: '500',
+      });
+      requests[0].callback(null, png);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      var qrCode = callback.mock.calls[0][1];
+      expect(callback.mock.calls[0][0]).toBeNull();
+      expect(qrCode.rawBuffer).toBe(png);
+      expect(qrCode.base64()).toBe(btoa('\x89PNG'));
+    });
+
+    it('passes request errors to the callback', function () {
+      var branch = initBranch(true);
+      var callback = vi.fn();
+      var error = new Error('Error in API');
+
+      branch.qrCode({ data: {} }, {}, callback);
+      requests[0].callback(error);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback.mock.calls[0][0]).toBe(error);
+    });
+  });
+
   describe('link', function () {
     basicTests('link', [1]);
 
