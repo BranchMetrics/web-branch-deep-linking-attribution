@@ -1,4 +1,3 @@
-import sinon from 'sinon';
 import { config } from '../src/0_config.js';
 import { safejson } from '../src/0_jsonparse.js';
 import { task_queue } from '../src/0_queue.js';
@@ -7,25 +6,23 @@ import { Server } from '../src/3_api.js';
 import { Branch } from '../src/6_branch.js';
 
 describe('Branch - new', function () {
-  const sandbox = sinon.createSandbox();
   const branch_instance = new Branch();
   const assert = testUtils.unplanned();
   afterEach(function () {
-    sandbox.restore();
-    sinon.restore();
+    vi.restoreAllMocks();
   });
   describe('referringLink', function () {
     it('test method exists', function () {
-      sinon.assert.match(typeof branch_instance.referringLink, 'function');
+      expect(typeof branch_instance.referringLink).toBe('function');
     });
   });
   describe('setRequestMetaData', function () {
     var addPropertyIfNotNullSpy;
     beforeEach(function () {
-      addPropertyIfNotNullSpy = sinon.spy(utils, 'addPropertyIfNotNull');
+      addPropertyIfNotNullSpy = vi.spyOn(utils, 'addPropertyIfNotNull');
     });
     it('test method exists', function () {
-      sinon.assert.match(typeof branch_instance.setRequestMetaData, 'function');
+      expect(typeof branch_instance.setRequestMetaData).toBe('function');
     });
     it('should set metadata for a valid key and value', function () {
       var key = 'validKey';
@@ -37,7 +34,7 @@ describe('Branch - new', function () {
         value,
       );
       assert.strictEqual(result, undefined);
-      sinon.assert.calledOnce(addPropertyIfNotNullSpy);
+      expect(addPropertyIfNotNullSpy).toHaveBeenCalledOnce();
       assert.deepEqual(requestMetadata, { 'validKey': 'validValue' });
     });
 
@@ -68,7 +65,7 @@ describe('Branch - new', function () {
       );
       assert.strictEqual(result1, undefined);
       assert.strictEqual(result2, undefined);
-      sinon.assert.notCalled(addPropertyIfNotNullSpy);
+      expect(addPropertyIfNotNullSpy).not.toHaveBeenCalled();
       assert.deepEqual(requestMetadata, { 'key': 'value' });
     });
   });
@@ -129,7 +126,7 @@ describe('Branch - new', function () {
   });
   describe('setDMAParamsForEEA', function () {
     it('test method exists', function () {
-      sinon.assert.match(typeof branch_instance.setDMAParamsForEEA, 'function');
+      expect(typeof branch_instance.setDMAParamsForEEA).toBe('function');
     });
     it('should store dma params inside branch_dma_data of storage', function () {
       const thisObj = {
@@ -138,7 +135,9 @@ describe('Branch - new', function () {
         },
         _queue: task_queue(),
       };
-      const storageSetStub = sandbox.stub(thisObj._storage, 'set');
+      const storageSetStub = vi
+        .spyOn(thisObj._storage, 'set')
+        .mockImplementation(function () {});
       const dmaObj = {};
       dmaObj.eeaRegion = true;
       dmaObj.adPersonalizationConsent = true;
@@ -150,8 +149,7 @@ describe('Branch - new', function () {
         dmaObj.adPersonalizationConsent,
         dmaObj.adUserDataUsageConsent,
       );
-      sinon.assert.calledWith(
-        storageSetStub,
+      expect(storageSetStub).toHaveBeenCalledWith(
         'branch_dma_data',
         stringifieddmaObj,
         true,
@@ -164,9 +162,11 @@ describe('Branch - new', function () {
         },
         _queue: task_queue(),
       };
-      const storageSetStub = sandbox.stub(thisObj._storage, 'set');
+      const storageSetStub = vi
+        .spyOn(thisObj._storage, 'set')
+        .mockImplementation(function () {});
       branch_instance.setDMAParamsForEEA.call(thisObj);
-      sinon.assert.notCalled(storageSetStub);
+      expect(storageSetStub).not.toHaveBeenCalled();
     });
     it('should not store dma params inside branch_dma_data of storage if eeaRegion is null', function () {
       const thisObj = {
@@ -175,7 +175,9 @@ describe('Branch - new', function () {
         },
         _queue: task_queue(),
       };
-      const storageSetStub = sandbox.stub(thisObj._storage, 'set');
+      const storageSetStub = vi
+        .spyOn(thisObj._storage, 'set')
+        .mockImplementation(function () {});
       const dmaObj = {};
       dmaObj.eeaRegion = null;
       dmaObj.adPersonalizationConsent = true;
@@ -186,7 +188,7 @@ describe('Branch - new', function () {
         dmaObj.adPersonalizationConsent,
         dmaObj.adUserDataUsageConsent,
       );
-      sinon.assert.notCalled(storageSetStub);
+      expect(storageSetStub).not.toHaveBeenCalled();
     });
     it('should log warning if eeaRegion is not boolean', function () {
       const thisObj = {
@@ -195,7 +197,9 @@ describe('Branch - new', function () {
         },
         _queue: task_queue(),
       };
-      const consoleErrorStub = sandbox.stub(console, 'warn');
+      const consoleErrorStub = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(function () {});
       try {
         const dmaObj = {};
         dmaObj.eeaRegion = null;
@@ -208,8 +212,7 @@ describe('Branch - new', function () {
           dmaObj.adUserDataUsageConsent,
         );
       } catch (e) {}
-      sinon.assert.calledWith(
-        consoleErrorStub,
+      expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA: eeaRegion must be boolean, but got null',
       );
     });
@@ -220,7 +223,9 @@ describe('Branch - new', function () {
         },
         _queue: task_queue(),
       };
-      const consoleErrorStub = sandbox.stub(console, 'warn');
+      const consoleErrorStub = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(function () {});
       try {
         const dmaObj = {};
         dmaObj.eeaRegion = true;
@@ -233,8 +238,7 @@ describe('Branch - new', function () {
           dmaObj.adUserDataUsageConsent,
         );
       } catch (e) {}
-      sinon.assert.calledWith(
-        consoleErrorStub,
+      expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA: adPersonalizationConsent must be boolean, but got null',
       );
     });
@@ -245,7 +249,9 @@ describe('Branch - new', function () {
         },
         _queue: task_queue(),
       };
-      const consoleErrorStub = sandbox.stub(console, 'warn');
+      const consoleErrorStub = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(function () {});
       try {
         const dmaObj = {};
         dmaObj.eeaRegion = true;
@@ -258,8 +264,7 @@ describe('Branch - new', function () {
           dmaObj.adUserDataUsageConsent,
         );
       } catch (e) {}
-      sinon.assert.calledWith(
-        consoleErrorStub,
+      expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA: adUserDataUsageConsent must be boolean, but got null',
       );
     });
@@ -270,8 +275,12 @@ describe('Branch - new', function () {
         },
         _queue: task_queue(),
       };
-      sandbox.stub(thisObj._storage, 'set').throws(new Error('Mock error'));
-      const consoleErrorStub = sandbox.stub(console, 'error');
+      vi.spyOn(thisObj._storage, 'set').mockImplementation(function () {
+        throw new Error('Mock error');
+      });
+      const consoleErrorStub = vi
+        .spyOn(console, 'error')
+        .mockImplementation(function () {});
       try {
         const dmaObj = {};
         dmaObj.eeaRegion = false;
@@ -284,21 +293,20 @@ describe('Branch - new', function () {
           dmaObj.adUserDataUsageConsent,
         );
       } catch (e) {}
-      sinon.assert.calledWith(
-        consoleErrorStub,
+      expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA',
-        sinon.match.instanceOf(Error),
+        expect.any(Error),
       );
     });
   });
   describe('setAPIUrl', function () {
     it('test method exists', function () {
-      sinon.assert.match(typeof branch_instance.setAPIUrl, 'function');
+      expect(typeof branch_instance.setAPIUrl).toBe('function');
     });
   });
   describe('getAPIUrl', function () {
     it('test method exists', function () {
-      sinon.assert.match(typeof branch_instance.getAPIUrl, 'function');
+      expect(typeof branch_instance.getAPIUrl).toBe('function');
     });
     it('test url', function () {
       var branch_url = 'https://api16.branch.io';

@@ -1,4 +1,3 @@
-import sinon from 'sinon';
 import { utils } from '../src/1_utils.js';
 
 describe('utils', function () {
@@ -131,25 +130,20 @@ describe('utils', function () {
     var ogType = 'OGType';
 
     beforeEach(function () {
-      sinon.stub(utils, 'getWindowLocation').returns(windowLocation);
+      vi.spyOn(utils, 'getWindowLocation').mockReturnValue(windowLocation);
 
-      sinon
-        .stub(utils, 'getOpenGraphContent')
-        .onCall(0)
-        .returns(ogTitle)
-        .onCall(1)
-        .returns(ogDescription)
-        .onCall(2)
-        .returns(ogImage)
-        .onCall(3)
-        .returns(ogVideo)
-        .onCall(4)
-        .returns(ogType);
+      vi.spyOn(utils, 'getOpenGraphContent')
+        .mockImplementation(function () {})
+        .mockReturnValueOnce(ogTitle)
+        .mockReturnValueOnce(ogDescription)
+        .mockReturnValueOnce(ogImage)
+        .mockReturnValueOnce(ogVideo)
+        .mockReturnValueOnce(ogType);
     });
 
     afterEach(function () {
-      utils.getOpenGraphContent.restore();
-      utils.getWindowLocation.restore();
+      utils.getOpenGraphContent.mockRestore();
+      utils.getWindowLocation.mockRestore();
     });
 
     it('should accept empty linkData', function () {
@@ -1314,15 +1308,15 @@ describe('utils', function () {
 
     it('delays for any positive numeric argument', function () {
       var executed = false;
-      var clock = sinon.useFakeTimers();
+      vi.useFakeTimers();
       utils.delay(function () {
         executed = true;
       }, 100);
       // executed is still false immediately after the call
       assert.equal(false, executed);
-      clock.tick(101);
+      vi.advanceTimersByTime(101);
       assert.equal(true, executed);
-      clock.restore();
+      vi.useRealTimers();
     });
   });
 
@@ -1886,134 +1880,4 @@ describe('utils', function () {
       assert.equal(utils.isValidURL('http://api2.branch.io'), true);
     });
   });
-
-  /*
-	describe('journey_cta', function(done) {
-		var html = 'html - validate("https://wdar9-alternate-qa.branchbeta.link/8ih4nDDQH8?__branch_flow_type=journeys_cta_override&__branch_flow_id=819580012495711960&__branch_mobile_deepview_type=4&_branch_match_id=814182034125937862&referrer=link_click_id%3D814182034125937862%26utm_source%3DBranch%26utm_campaign%3DChannel%20Test%26utm_medium%3Djourneys&_t=814182034125937862"); - html';
-
-		var assert = testUtils.plan(4, done);
-
-		it('journey link should replace by $journeys_cta value', function() {
-			var link = "http://test.com";
-
-			journeys_utils.branch = {
-				_branchViewData: {
-					data: {
-						$journeys_cta: link
-					}
-				}
-
-			};
-
-			assert.equal(journeys_utils.tryReplaceJourneyCtaLink(html).indexOf(link) > -1, true);
-		});
-
-
-		it('exists no $journeys_cta the html should be untouched', function() {
-			journeys_utils.branch = {
-				_branchViewData: {
-					data: {
-						$journeys_cta: undefined
-					}
-				}
-
-			};
-
-			assert.equal(journeys_utils.tryReplaceJourneyCtaLink(html), html);
-		});
-
-		it('only the link should be replaced', function() {
-			var link = "http://test.com";
-			journeys_utils.branch = {
-				_branchViewData: {
-					data: {
-						$journeys_cta: link
-					}
-				}
-
-			};
-			var htmlWithoutLink = 'html - validate("") - html';
-			assert.equal(journeys_utils.tryReplaceJourneyCtaLink(html).replace(link, ""), htmlWithoutLink);
-		});
-	});
-
-	describe('addHtmlToIframe', function() {
-		var iframe = {
-			contentDocument: {
-				createElement: function() {
-					return {};
-				}
-			},
-			head: {},
-			body: {}
-		};
-
-		it('adds the specified HTML as the body.innerHTML of the supplied iframe', function() {
-			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ios');
-			assert.equal(iframe.contentDocument.body.innerHTML, '<p>A paragraph</p>');
-		});
-
-		it('sets the body class to branch-banner-ios when UA is ios', function() {
-			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ios');
-			assert.equal(iframe.contentDocument.body.className, 'branch-banner-ios');
-		});
-
-		it('sets the body class to branch-banner-ios when UA is ipad', function() {
-			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'ipad');
-			assert.equal(iframe.contentDocument.body.className, 'branch-banner-ios');
-		});
-
-		it('sets the body class to branch-banner-android when UA is android', function() {
-			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', 'android');
-			assert.equal(iframe.contentDocument.body.className, 'branch-banner-android');
-		});
-
-		it('sets the body class to branch-banner-other when UA is any other value', function() {
-			journeys_utils.addHtmlToIframe(iframe, '<p>A paragraph</p>', '');
-			assert.equal(iframe.contentDocument.body.className, 'branch-banner-other');
-		});
-	});
-
-	describe("animateBannerEntrance and animateBannerExit", function() {
-		var clock;
-		beforeEach(function() {
-			clock = sinon.useFakeTimers();
-		});
-		it("sets body class to branch-banner-is-active and branch-banner-no-scroll", function() {
-			var iframe = {
-				contentDocument: {
-					createElement: function() {
-						return {};
-					}
-				},
-				head: {},
-				body: {}
-			};
-			journeys_utils.isFullPage = true;
-			journeys_utils.sticky = "fixed";
-			journeys_utils.animateBannerEntrance(iframe);
-			assert.equal(document.body.className, " branch-banner-is-active branch-banner-no-scroll");
-		});
-
-		it("removes branch-banner-is-active and branch-banner-no-scroll class on animateBannerExit", function() {
-			var iframe = {
-				contentDocument: {
-					createElement: function() {
-						return {};
-					}
-				},
-				head: {},
-				body: {},
-				style: {},
-				parentNode: {
-					removeChild: function() {}
-				}
-			};
-			journeys_utils.branch._publishEvent = function() {};
-			journeys_utils.animateBannerExit(iframe);
-			clock.tick(270);
-			assert.equal(document.body.className, " ");
-		});
-	});
-	*/
 });

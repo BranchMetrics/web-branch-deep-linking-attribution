@@ -1,4 +1,3 @@
-import sinon from 'sinon';
 import { journeys_utils } from '../src/journeys_utils.js';
 
 describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
@@ -139,15 +138,14 @@ describe('addIframeOuterCSS generated CSS (no BE-supplied cssIframeContainer)', 
 
 describe('animateBannerExit margin/position restore timing', function () {
   const assert = testUtils.unplanned();
-  var clock;
   var banner;
 
   beforeEach(function () {
-    clock = sinon.useFakeTimers();
+    vi.useFakeTimers();
     banner = document.createElement('div');
     document.body.appendChild(banner);
 
-    journeys_utils.branch = { _publishEvent: sinon.stub() };
+    journeys_utils.branch = { _publishEvent: vi.fn() };
     journeys_utils.journeyLinkData = {};
     journeys_utils.divToInjectParents = [];
     journeys_utils.position = 'top';
@@ -162,8 +160,8 @@ describe('animateBannerExit margin/position restore timing', function () {
   });
 
   afterEach(function () {
-    clock.restore();
-    sinon.restore();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
     journeys_utils.exitAnimationIsRunning = false;
     if (banner.parentNode) {
       banner.parentNode.removeChild(banner);
@@ -185,7 +183,9 @@ describe('animateBannerExit margin/position restore timing', function () {
     // teardown (removal) is still deferred at this point
     assert.strictEqual(document.body.contains(banner), true);
 
-    clock.tick(journeys_utils.animationSpeed + journeys_utils.animationDelay);
+    vi.advanceTimersByTime(
+      journeys_utils.animationSpeed + journeys_utils.animationDelay,
+    );
 
     assert.strictEqual(document.body.contains(banner), false);
   });
@@ -234,15 +234,14 @@ describe('addIframeInnerCSS entrance and use_v2_renderer', function () {
 
 describe('animateBannerExit branch-banner exit class and use_v2_renderer', function () {
   const assert = testUtils.unplanned();
-  var clock;
   var banner;
 
   beforeEach(function () {
-    clock = sinon.useFakeTimers();
+    vi.useFakeTimers();
     banner = document.createElement('iframe');
     document.body.appendChild(banner);
 
-    journeys_utils.branch = { _publishEvent: sinon.stub() };
+    journeys_utils.branch = { _publishEvent: vi.fn() };
     journeys_utils.journeyLinkData = {};
     journeys_utils.divToInjectParents = [];
     journeys_utils.position = 'top';
@@ -257,8 +256,8 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
   });
 
   afterEach(function () {
-    clock.restore();
-    sinon.restore();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
     journeys_utils.use_v2_renderer = false;
     journeys_utils.exitAnimationIsRunning = false;
     if (banner.parentNode) {
@@ -304,11 +303,13 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
     journeys_utils.animateBannerExit(banner);
 
     // the default timeout (animationSpeed + animationDelay = 270ms) would remove it too early
-    clock.tick(journeys_utils.animationSpeed + journeys_utils.animationDelay);
+    vi.advanceTimersByTime(
+      journeys_utils.animationSpeed + journeys_utils.animationDelay,
+    );
     assert.strictEqual(document.body.contains(banner), true);
 
     // the content's real 500ms exit animation gets to finish before removal happens
-    clock.tick(
+    vi.advanceTimersByTime(
       500 - (journeys_utils.animationSpeed + journeys_utils.animationDelay),
     );
     assert.strictEqual(document.body.contains(banner), false);
@@ -327,11 +328,11 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
     journeys_utils.animateBannerExit(banner);
 
     // duration alone (400ms) would remove it before the delayed animation even finishes playing
-    clock.tick(400);
+    vi.advanceTimersByTime(400);
     assert.strictEqual(document.body.contains(banner), true);
 
     // delay + duration (700ms) gets to elapse before removal happens
-    clock.tick(300);
+    vi.advanceTimersByTime(300);
     assert.strictEqual(document.body.contains(banner), false);
   });
 
@@ -360,7 +361,9 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
     journeys_utils.animateBannerExit(banner);
 
     assert.strictEqual(banner.style.top, '');
-    clock.tick(journeys_utils.animationSpeed + journeys_utils.animationDelay);
+    vi.advanceTimersByTime(
+      journeys_utils.animationSpeed + journeys_utils.animationDelay,
+    );
     assert.strictEqual(document.body.contains(banner), false);
   });
 
@@ -381,7 +384,6 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
 describe('animationConfig support', function () {
   const assert = testUtils.unplanned();
   var banner;
-  var clock;
 
   var mockAnimationConfig = {
     classes: {
@@ -395,11 +397,11 @@ describe('animationConfig support', function () {
   };
 
   beforeEach(function () {
-    clock = sinon.useFakeTimers();
+    vi.useFakeTimers();
     banner = document.createElement('iframe');
     document.body.appendChild(banner);
 
-    journeys_utils.branch = { _publishEvent: sinon.stub() };
+    journeys_utils.branch = { _publishEvent: vi.fn() };
     journeys_utils.journeyLinkData = {};
     journeys_utils.use_v2_renderer = true;
     journeys_utils.entryAnimationDisabled = false;
@@ -410,9 +412,9 @@ describe('animationConfig support', function () {
   });
 
   afterEach(function () {
-    clock.runAll();
-    clock.restore();
-    sinon.restore();
+    vi.runAllTimers();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
 
     journeys_utils.animationConfig = null;
     journeys_utils.use_v2_renderer = false;

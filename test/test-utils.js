@@ -610,6 +610,55 @@
     return ret;
   };
 
+  // Runs a `function (done)` test body (as used with testUtils.plan) as a
+  // promise, since Vitest has no `done` callback. It settles only after the
+  // body returns, so an assertion that throws after the plan completes still
+  // fails the test.
+  testUtils.withDone = function (body) {
+    return function () {
+      return new Promise(function (resolve, reject) {
+        var planDone = false;
+        var bodyReturned = false;
+        try {
+          body(function (err) {
+            if (err) {
+              return reject(err);
+            }
+            planDone = true;
+            if (bodyReturned) {
+              resolve();
+            }
+          });
+        } catch (e) {
+          return reject(e);
+        }
+        bodyReturned = true;
+        if (planDone) {
+          resolve();
+        }
+      });
+    };
+  };
+
+  // Records server.request calls into `requests` instead of sending them.
+  testUtils.captureRequests = function (server, requests) {
+    return vi
+      .spyOn(server, 'request')
+      .mockImplementation(function (resource, obj, storage, callback) {
+        requests.push({ resource: resource, obj: obj, callback: callback });
+      });
+  };
+
+  // Records JSONP script loads into `requests` with the callback they'd invoke.
+  testUtils.captureJsonp = function (server, requests) {
+    return vi.spyOn(server, 'createScript').mockImplementation(function (src) {
+      requests.push({
+        src: src,
+        callback: window[src.match(/callback=([^&]+)/)[1]],
+      });
+    });
+  };
+
   testUtils.unplanned = function () {
     return assert;
   };

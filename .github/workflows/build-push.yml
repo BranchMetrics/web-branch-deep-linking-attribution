@@ -63,14 +63,17 @@ jobs:
       - name: Run tests
         run: npm run test-report
 
+      - name: Run tests against minified modules
+        run: npm run test:min
+
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Unit Tests
-          fail-on-error: true,
-          path: test-results.xml     # Path to test results
-          reporter: java-junit       # Format of test results
+          fail-on-error: true
+          path: test-results.xml
+          reporter: jest-junit
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -78,9 +81,6 @@ jobs:
         if: always()
         with:
           files: "test-results.xml"
-
-      - name: Run coverage
-        run: npm run cover
 
       - name: upload codecov
         uses: codecov/codecov-action@v4

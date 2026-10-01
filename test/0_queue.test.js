@@ -1,14 +1,12 @@
-import sinon from 'sinon';
 import { task_queue } from '../src/0_queue.js';
 
 describe('task_queue', function () {
   var queue;
   var orderCalled;
-  var clock;
   var assert = testUtils.unplanned();
   beforeEach(function () {
     queue = task_queue();
-    clock = sinon.useFakeTimers();
+    vi.useFakeTimers();
     orderCalled = [];
     queue(function (next) {
       setTimeout(function () {
@@ -23,11 +21,11 @@ describe('task_queue', function () {
     );
   });
   afterEach(function () {
-    clock.restore();
+    vi.useRealTimers();
   });
 
   it('should queue a function and call it', function () {
-    clock.tick(11);
+    vi.advanceTimersByTime(11);
     assert.strictEqual(orderCalled[0], 0, 'Function called');
   });
 
@@ -38,14 +36,14 @@ describe('task_queue', function () {
         next();
       }, 10);
     });
-    clock.tick(11);
+    vi.advanceTimersByTime(11);
     assert.strictEqual(orderCalled[0], 0, 'Called first function');
     assert.strictEqual(
       orderCalled[1],
       undefined,
       'Has not yet called second function',
     );
-    clock.tick(11);
+    vi.advanceTimersByTime(11);
     assert.strictEqual(orderCalled[1], 1, 'Called second function');
   });
 });
