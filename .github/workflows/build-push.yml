@@ -83,7 +83,7 @@ jobs:
           files: "test-results.xml"
 
       - name: upload codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
 
       - name: Check whether we will be able to make the release
         run: npm run release
