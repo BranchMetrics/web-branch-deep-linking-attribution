@@ -52,10 +52,10 @@ branch.init('key_live_YOUR_KEY', function (err, data) {});
 See [Basic Integration] for the full setup.
 
 ## Running locally
-Requires Node 24 (provided by the nix dev shell).
+Requires Node 24 and pnpm (both provided by the nix dev shell).
 
 ```sh
-npm run start:dev   # first run prompts for your Branch key, API endpoint and port (default 3000)
+pnpm run start:dev   # first run prompts for your Branch key, API endpoint and port (default 3000)
 # Navigate to http://localhost:3000/dev.html
 ```
 

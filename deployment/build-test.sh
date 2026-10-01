@@ -13,7 +13,7 @@ NC='\033[0m'
 
   echo -en "${GREEN}init build test ...${NC}\n"
 
-  npm run release
+  pnpm run release
   
 # Exit prompts
 echo -en "${GREEN}Done build test ...${NC}\n"
