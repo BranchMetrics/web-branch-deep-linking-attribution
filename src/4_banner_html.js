@@ -148,7 +148,6 @@ banner_html.iframe = function (options, action, callback) {
     }
 
     var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
-    iframedoc.head = iframedoc.createElement('head');
     iframedoc.body = iframedoc.createElement('body');
     iframedoc.body.className = bodyClass;
 
