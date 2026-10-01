@@ -67,7 +67,6 @@ jobs:
       - name: Configure NPM
         run: npm ci
 
-      # release-s3.sh builds dist/ and runs test:bundle on it before uploading.
       - name: Publish to s3
         run: |
           ./deployment/release-s3.sh ${{ steps.next-version.outputs.result }}
