@@ -1,7 +1,5 @@
-'use strict';
-
-goog.require('branch_view');
-goog.require('journeys_utils');
+import { branch_view } from '../src/branch_view.js';
+import { journeys_utils } from '../src/journeys_utils.js';
 
 describe('displayJourney new render options wiring', function () {
   const assert = testUtils.unplanned();

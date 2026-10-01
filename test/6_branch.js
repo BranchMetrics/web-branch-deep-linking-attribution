@@ -1,16 +1,11 @@
-'use strict';
-
-goog.require('utils');
-goog.require('Branch');
-goog.require('resources');
-goog.require('config');
-goog.require('storage');
-goog.require('session');
-goog.require('banner_utils');
-goog.require('banner_html');
-goog.require('safejson');
-
-goog.require('goog.json');
+import sinon from 'sinon';
+import { config } from '../src/0_config.js';
+import { safejson } from '../src/0_jsonparse.js';
+import { utils } from '../src/1_utils.js';
+import { session } from '../src/2_session.js';
+import { banner_utils } from '../src/3_banner_utils.js';
+import { banner_html } from '../src/4_banner_html.js';
+import { Branch } from '../src/6_branch.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 

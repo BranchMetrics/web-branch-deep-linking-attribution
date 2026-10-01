@@ -1,16 +1,13 @@
 /**
  * Just provides a couple of utilities.
  */
-'use strict';
 
-goog.provide('utils');
+import { config } from './0_config.js';
+import { safejson } from './0_jsonparse.js';
+import { session } from './2_session.js';
 
-goog.require('goog.json');
-goog.require('config');
-goog.require('safejson');
+export const utils = {};
 
-/** @typedef {string} */
-var message;
 utils.debug = false;
 utils.retries = 2; // Value specifying the number of times that a Branch API call can be re-attempted.
 utils.retry_delay = 200; // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
@@ -219,7 +216,7 @@ utils.resource;
 /** @typedef {{listener: function(string, Object):null, event: string}} */
 utils.listener;
 
-/** @type {Object<string,message>} */
+/** @type {Object<string,string>} */
 utils.messages = {
   missingParam: 'API request $1 missing parameter $2',
   invalidType: 'API request $1, parameter $2 is not $3',
@@ -266,7 +263,7 @@ utils.getLocationHash = function () {
 };
 
 /**
- * @param {message} message
+ * @param {string} message
  * @param {Array.<*>=} params
  * @param {number=} failCode
  * @param {string=} failDetails
@@ -321,7 +318,7 @@ utils.whiteListJourneysLanguageData = function (sessionData) {
     case 'string':
       try {
         data = safejson.parse(data);
-      } catch (e) {
+      } catch (_e) {
         data = {};
       }
       break;
@@ -375,7 +372,7 @@ utils.cleanLinkData = function (linkData) {
     case 'string':
       try {
         data = safejson.parse(data);
-      } catch (e) {
+      } catch (_e) {
         data = { '_bncNoEval': true };
       }
       break;
@@ -427,8 +424,8 @@ utils.cleanLinkData = function (linkData) {
 
   try {
     safejson.parse(data);
-  } catch (e) {
-    data = goog.json.serialize(data);
+  } catch (_e) {
+    data = safejson.serialize(data);
   }
   linkData['data'] = data;
 
@@ -500,7 +497,7 @@ utils.hashValue = function (key) {
     if (match && match.length >= 1) {
       return match[1];
     }
-  } catch (e) {}
+  } catch (_e) {}
 };
 
 function isSafariBrowser(ua) {
@@ -543,7 +540,7 @@ function isGTEVersion(ua, v) {
       if (version >= v) {
         return true;
       }
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   }
@@ -651,7 +648,7 @@ utils.getParamValue = function (key) {
     if (match && match.length >= 1) {
       return match[1];
     }
-  } catch (e) {}
+  } catch (_e) {}
 };
 
 /**
@@ -759,7 +756,7 @@ utils.isBase64Encoded = function (str) {
   }
   try {
     return btoa(atob(str)) === str;
-  } catch (err) {
+  } catch (_err) {
     return false;
   }
 };
@@ -1033,7 +1030,7 @@ utils.getBrowserLanguageCode = function () {
       code = navigator.language;
     }
     code = code.substring(0, 2).toUpperCase();
-  } catch (e) {
+  } catch (_e) {
     code = null;
   }
   return code;
@@ -1448,7 +1445,7 @@ utils.isSameOriginFrame = function () {
     if (window.top.location.search) {
       sameOriginTest = 'true'; // without this minification of function doesn't work correctly
     }
-  } catch (err) {
+  } catch (_err) {
     return false;
   }
   return sameOriginTest === 'true'; // without this minification of function doesn't work correctly
@@ -1618,7 +1615,7 @@ utils.setDMAParams = function (data, dmaObj = {}, endPoint) {
       }
       Object.assign(user_data, dmaParams);
       data['user_data'] = JSON.stringify(user_data);
-    } catch (error) {
+    } catch (_error) {
       console.error(
         `setDMAParams:: ${data['user_data']} is not a valid JSON string`,
       );

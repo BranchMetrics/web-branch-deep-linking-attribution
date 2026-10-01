@@ -1,8 +1,5 @@
-'use strict';
-
-var sinon = require('sinon');
-
-goog.require('task_queue');
+import sinon from 'sinon';
+import { task_queue } from '../src/0_queue.js';
 
 describe('task_queue', function () {
   var queue;
@@ -29,13 +26,12 @@ describe('task_queue', function () {
     clock.restore();
   });
 
-  it('should queue a function and call it', function (done) {
+  it('should queue a function and call it', function () {
     clock.tick(11);
     assert.strictEqual(orderCalled[0], 0, 'Function called');
-    done();
   });
 
-  it('should enqueue two functions, and call them in order', function (done) {
+  it('should enqueue two functions, and call them in order', function () {
     queue(function (next) {
       setTimeout(function () {
         orderCalled.push(1);
@@ -51,6 +47,5 @@ describe('task_queue', function () {
     );
     clock.tick(11);
     assert.strictEqual(orderCalled[1], 1, 'Called second function');
-    done();
   });
 });

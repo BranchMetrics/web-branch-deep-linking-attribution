@@ -1,7 +1,7 @@
 /**
  * Just a couple of variables that shouldn't change very often...
  */
-goog.provide('config');
+export const config = {};
 /** @define {string} */
 var DEFAULT_API_ENDPOINT = 'https://api2.branch.io';
 

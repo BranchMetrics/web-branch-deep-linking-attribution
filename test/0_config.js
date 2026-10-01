@@ -1,6 +1,4 @@
-'use strict';
-
-goog.require('config');
+import { config } from '../src/0_config.js';
 
 describe('config', function () {
   var assert = testUtils.unplanned();

@@ -1,15 +1,9 @@
-'use strict';
-
-goog.require('utils');
-goog.require('Branch');
-goog.require('resources');
-goog.require('config');
-goog.require('storage');
-goog.require('session');
-goog.require('branch_view');
-goog.require('banner_utils');
-
-goog.require('goog.json');
+import sinon from 'sinon';
+import { config } from '../src/0_config.js';
+import { utils } from '../src/1_utils.js';
+import { banner_utils } from '../src/3_banner_utils.js';
+import { Branch } from '../src/6_branch.js';
+import { branch_view } from '../src/branch_view.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 

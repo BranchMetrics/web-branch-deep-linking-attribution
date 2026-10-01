@@ -1,8 +1,5 @@
-'use strict';
-
-var sinon = require('sinon');
-
-goog.require('journeys_utils');
+import sinon from 'sinon';
+import { journeys_utils } from '../src/journeys_utils.js';
 
 describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
   const assert = testUtils.unplanned();

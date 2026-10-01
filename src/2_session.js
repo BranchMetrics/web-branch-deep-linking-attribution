@@ -1,10 +1,8 @@
-'use strict';
-goog.provide('session');
+import { safejson } from './0_jsonparse.js';
+import { utils } from './1_utils.js';
+import { storage } from './2_storage.js';
 
-goog.require('goog.json');
-goog.require('utils');
-goog.require('safejson');
-goog.require('storage');
+export const session = {};
 
 /**
  * @param {storage} storage
@@ -16,7 +14,7 @@ session.get = function (storage, first) {
   try {
     var data = safejson.parse(storage.get(sessionString, first)) || null;
     return utils.decodeBFPs(data);
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 };
@@ -37,9 +35,9 @@ session.set = function (storage, data, first) {
       now.getTime() + utils.extendedJourneysAssistExpiryTime;
   }
   data = utils.encodeBFPs(data);
-  storage.set('branch_session', goog.json.serialize(data));
+  storage.set('branch_session', safejson.serialize(data));
   if (first) {
-    storage.set('branch_session_first', goog.json.serialize(data), true);
+    storage.set('branch_session_first', safejson.serialize(data), true);
   }
 };
 
@@ -52,7 +50,7 @@ session.update = function (storage, newData) {
     return;
   }
   var currentData = session.get(storage) || {};
-  var data = goog.json.serialize(
+  var data = safejson.serialize(
     utils.encodeBFPs(utils.merge(currentData, newData)),
   );
   storage.set('branch_session', data);
@@ -73,13 +71,13 @@ session.patch = function (storage, data, updateLocalStorage, removeNull) {
   };
 
   var session = storage.get('branch_session', false) || {};
-  storage.set('branch_session', goog.json.serialize(merge(session, data)));
+  storage.set('branch_session', safejson.serialize(merge(session, data)));
 
   if (updateLocalStorage) {
     var sessionFirst = storage.get('branch_session_first', true) || {};
     storage.set(
       'branch_session_first',
-      goog.json.serialize(merge(sessionFirst, data)),
+      safejson.serialize(merge(sessionFirst, data)),
       true,
     );
   }

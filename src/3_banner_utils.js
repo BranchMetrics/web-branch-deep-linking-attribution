@@ -1,10 +1,8 @@
-'use strict';
+import { safejson } from './0_jsonparse.js';
+import { utils } from './1_utils.js';
+import { storage } from './2_storage.js';
 
-goog.provide('banner_utils');
-
-goog.require('storage');
-goog.require('utils');
-goog.require('safejson');
+export const banner_utils = {};
 
 /** @typedef {{icon:string,
  * title:string,
@@ -197,7 +195,7 @@ banner_utils.shouldAppend = function (storage, options) {
     if (typeof hideBanner === 'string') {
       hideBanner = safejson.parse(hideBanner);
     }
-  } catch (e) {
+  } catch (_e) {
     hideBanner = false;
   }
   if (typeof hideBanner === 'number') {

@@ -1,10 +1,9 @@
-'use strict';
-goog.provide('banner_html');
+import { utils } from './1_utils.js';
+import { session } from './2_session.js';
+import { storage } from './2_storage.js';
+import { banner_utils } from './3_banner_utils.js';
 
-goog.require('banner_utils');
-goog.require('utils');
-goog.require('session');
-goog.require('storage');
+export const banner_html = {};
 
 /**
  * @param {banner_utils.options} options

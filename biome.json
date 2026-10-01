@@ -7,6 +7,9 @@
     "rules": {
       "complexity": {
         "useArrowFunction": "off"
+      },
+      "correctness": {
+        "noUnusedImports": { "level": "error", "fix": "safe" }
       }
     }
   },
@@ -19,6 +22,20 @@
     "formatter": {
       "quoteStyle": "single",
       "quoteProperties": "preserve"
+    },
+    "globals": ["define", "ActiveXObject"]
+  },
+  "overrides": [
+    {
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUndeclaredVariables": "error",
+            "noUnusedVariables": { "level": "error", "fix": "none" }
+          }
+        }
+      }
     }
-  }
+  ]
 }

@@ -1,8 +1,7 @@
-'use strict';
-goog.provide('banner_css');
+import { utils } from './1_utils.js';
+import { banner_utils } from './3_banner_utils.js';
 
-goog.require('banner_utils');
-goog.require('utils');
+export const banner_css = {};
 
 banner_css.banner = function (options) {
   return (

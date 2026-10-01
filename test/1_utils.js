@@ -1,7 +1,5 @@
-'use strict';
-
-var sinon = require('sinon');
-goog.require('utils');
+import sinon from 'sinon';
+import { utils } from '../src/1_utils.js';
 
 describe('utils', function () {
   var assert = testUtils.unplanned();
@@ -1314,17 +1312,17 @@ describe('utils', function () {
       assert.equal(true, executed);
     });
 
-    it('delays for any positive numeric argument', function (done) {
+    it('delays for any positive numeric argument', function () {
       var executed = false;
       var clock = sinon.useFakeTimers();
       utils.delay(function () {
         executed = true;
-        done();
       }, 100);
       // executed is still false immediately after the call
       assert.equal(false, executed);
-      // ensure that done() gets called.
       clock.tick(101);
+      assert.equal(true, executed);
+      clock.restore();
     });
   });
 

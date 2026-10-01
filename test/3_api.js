@@ -1,11 +1,9 @@
-'use strict';
-
-goog.require('utils');
-goog.require('Server');
-goog.require('resources');
-goog.require('storage');
-goog.require('config');
-goog.require('safejson');
+import sinon from 'sinon';
+import { config } from '../src/0_config.js';
+import { safejson } from '../src/0_jsonparse.js';
+import { utils } from '../src/1_utils.js';
+import { resources } from '../src/2_resources.js';
+import { Server } from '../src/3_api.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, BranchStorage */
 
@@ -176,7 +174,7 @@ describe('Server', function () {
         assert.strictEqual(requests.length, 1, 'Request made');
 
         var encodedData = encodeURIComponent(
-          utils.base64encode(goog.json.serialize(completeParams)),
+          utils.base64encode(JSON.stringify(completeParams)),
         );
         assert.strictEqual(
           requests[0].src,
@@ -348,7 +346,7 @@ describe('Server', function () {
         assert.strictEqual(requests.length, 1, 'Request made');
 
         var encodedData = encodeURIComponent(
-          utils.base64encode(goog.json.serialize(completeParams)),
+          utils.base64encode(JSON.stringify(completeParams)),
         );
         assert.strictEqual(
           requests[0].src,
@@ -517,7 +515,7 @@ describe('Server', function () {
         );
         assert.strictEqual(requests.length, 1, 'Request made');
         var encodedData = encodeURIComponent(
-          utils.base64encode(goog.json.serialize(testUtils.params())),
+          utils.base64encode(JSON.stringify(testUtils.params())),
         );
         assert.strictEqual(
           requests[0].src,

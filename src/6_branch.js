@@ -1,21 +1,18 @@
 /***
  * This file provides the main Branch function.
  */
-'use strict';
-goog.provide('Branch');
-goog.require('goog.json');
 
-goog.require('utils');
-goog.require('resources');
-goog.require('Server');
-goog.require('banner');
-goog.require('task_queue');
-goog.require('storage');
-goog.require('session');
-goog.require('config');
-goog.require('safejson');
-goog.require('branch_view');
-goog.require('journeys_utils');
+import { config } from './0_config.js';
+import { safejson } from './0_jsonparse.js';
+import { task_queue } from './0_queue.js';
+import { utils } from './1_utils.js';
+import { resources } from './2_resources.js';
+import { session } from './2_session.js';
+import { storage } from './2_storage.js';
+import { Server } from './3_api.js';
+import { banner } from './5_banner.js';
+import { branch_view } from './branch_view.js';
+import { journeys_utils } from './journeys_utils.js';
 
 /*globals Ti, BranchStorage, require */
 
@@ -131,7 +128,7 @@ var wrap = function (parameters, func, init) {
  * @class Branch
  * @constructor
  */
-Branch = function () {
+export const Branch = function () {
   if (!(this instanceof Branch)) {
     if (!default_branch) {
       default_branch = new Branch();
@@ -560,7 +557,7 @@ Branch.prototype['init'] = wrap(
 
       try {
         done(err, data && utils.whiteListSessionData(data));
-      } catch (e) {
+      } catch (_e) {
         // pass
       } finally {
         self['renderFinalize']();
@@ -1672,8 +1669,7 @@ Branch.prototype['deepview'] = wrap(
       cleanedData['auto_branchify'] = true;
     }
 
-    self._deepviewRequestForReplay = goog.bind(
-      this._api,
+    self._deepviewRequestForReplay = this._api.bind(
       self,
       resources.deepview,
       cleanedData,

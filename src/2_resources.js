@@ -2,14 +2,11 @@
  * This provides a list of endpoints and client-side validation for any calls
  * to those endpoints.
  */
-'use strict';
 
-goog.provide('resources');
+import { config } from './0_config.js';
+import { utils } from './1_utils.js';
 
-goog.require('utils');
-goog.require('config');
-
-var resources = {};
+export const resources = {};
 
 /** @enum {number} */
 var validationTypes = {

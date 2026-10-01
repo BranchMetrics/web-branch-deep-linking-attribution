@@ -1,7 +1,3 @@
-'use strict';
-
-goog.require('storage');
-
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 var ITEM_KEY = 'key';
 var ITEM_KEY_UNSTORED = 'key unstored';

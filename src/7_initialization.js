@@ -3,13 +3,11 @@
  * were any tasks that were executed on the dummy branch object before real
  * branch was loaded.
  */
-'use strict';
-goog.provide('branch_instance');
 
-goog.require('Branch');
-goog.require('config');
+import './0_polyfills.js';
+import { Branch } from './6_branch.js';
 
-branch_instance = new Branch();
+export const branch_instance = new Branch();
 
 if (window['branch'] && window['branch']['_q']) {
   var queue = window['branch']['_q'];

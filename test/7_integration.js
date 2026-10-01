@@ -1,7 +1,5 @@
-'use strict';
-
-goog.require('config');
-goog.require('goog.json');
+import sinon from 'sinon';
+import { config } from '../src/0_config.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id, branch */
 /*globals device_fingerprint_id */
