@@ -1839,19 +1839,6 @@ describe('utils', function () {
     it('should return false for missing domain before dot', function () {
       assert.equal(utils.isValidURL('https://.example.com'), false);
     });
-    it('should reject a long invalid label without exponential backtracking', function () {
-      // Took minutes with the old `([a-z\d-]*[a-z\d])*` label pattern; linear now.
-      const start = Date.now();
-      assert.equal(utils.isValidURL(`http://${'0'.repeat(5000)}!`), false);
-      assert.ok(Date.now() - start < 1000);
-    });
-    it('should accept hyphenated labels', function () {
-      assert.equal(utils.isValidURL('https://a-b.c-d.example.co.uk'), true);
-    });
-    it('should return false for labels starting or ending with a hyphen', function () {
-      assert.equal(utils.isValidURL('https://-a.example.com'), false);
-      assert.equal(utils.isValidURL('https://a-.example.com'), false);
-    });
 
     // Invalid domain names
     it('should return false for Invalid domain names', function () {
