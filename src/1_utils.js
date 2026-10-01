@@ -191,32 +191,11 @@ utils.cleanApplicationAndSessionStorage = function (branch) {
   // a user will need to explicitly opt out from _s cookie
 };
 
-/** @typedef {{data:?string, referring_identity:?string, identity:?string, has_app:?boolean}} */
-utils.sessionData;
-
-/** @typedef {string} */
-utils._httpMethod;
-
-/** @enum {utils._httpMethod} */
 utils.httpMethod = {
   POST: 'POST',
   GET: 'GET',
 };
 
-/** @typedef {{
- * destination: string,
- * endpoint: string,
- * method: utils._httpMethod,
- * params: ?Object.<string, _validator>,
- * queryPart: ?Object.<string, _validator>,
- * jsonp: ?boolean
- * }} */
-utils.resource;
-
-/** @typedef {{listener: function(string, Object):null, event: string}} */
-utils.listener;
-
-/** @type {Object<string,string>} */
 utils.messages = {
   missingParam: 'API request $1 missing parameter $2',
   invalidType: 'API request $1, parameter $2 is not $3',
@@ -244,7 +223,6 @@ utils.messages = {
  * List of valid banner themes
  * The first theme in the list becomes the default theme if one is not specified
  */
-/** @type {Array<string>} */
 utils.bannerThemes = ['light', 'dark'];
 
 /*

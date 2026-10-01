@@ -8,7 +8,6 @@ import { utils } from './1_utils.js';
 
 export const resources = {};
 
-/** @enum {number} */
 var validationTypes = {
   OBJECT: 0,
   STRING: 1,
@@ -16,9 +15,6 @@ var validationTypes = {
   ARRAY: 3,
   BOOLEAN: 4,
 };
-
-/** @typedef {function(string, string, *)} */
-var _validator;
 
 /**
  * @param {boolean} required

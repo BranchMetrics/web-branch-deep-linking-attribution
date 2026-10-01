@@ -39,8 +39,7 @@ function serializeString(s) {
 }
 
 /**
- * Port of Closure Library's goog.json.serialize, which this SDK used before
- * dropping Closure. Unlike JSON.stringify, its output is always ASCII (every
+ * JSON serializer. Unlike JSON.stringify, its output is always ASCII (every
  * non-ASCII character is \u-escaped, which utils.base64encode relies on for
  * surrogate pairs), undefined object values serialize as null instead of
  * being dropped, and toJSON() is ignored.

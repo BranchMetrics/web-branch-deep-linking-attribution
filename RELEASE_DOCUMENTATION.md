@@ -1,63 +1,55 @@
 # Branch Web SDK Build and Release Documentation
 
-**Last Updated**: Sep. 24th, 2015
+Building, testing, staging and releasing the Web SDK all run in GitHub Actions.
 
-The entire process for releasing new versions of the Branch SDK, and generating accompanying documentation, is entirely automated.
+## Building locally
 
-### Features of Build and Release Automation
-+ **Makefile**
-	+ Building and minification with Google Closure Compiler
-	+ gzip of minified JavaScript
-	+ Embedding of Branch snippet on the Web testbed
-	+ Embedding of Branch snippet on the integration Mocha.js test page
-	+ Documentation generation from JSDoc style inline comments from `src/3_branch.js`
-	+ Concatenation of a summary README that includes an introduction, most recent Web snippet, and overview of Web Smart Banner
-	+ Concatenation of full documentation for Web of an introduction, an automatically generated table of contents, and JSDoc generated function descriptions and spec.
+Requires Node 24 (the `flake.nix` dev shell provides it).
 
-+ **Release.sh**
-	+ Version number management in `0_config.js`, `package.json`, `CHANGELOG.md`, `bower.json`, Git commit and tag
-	+ Build a release build with the Makefile
-	+ Upload both the minified and gzipped Web SDK, and the example web testbed to S3
-	+ Publish to npm
-	+ Reset everything: Changelog unreleased version at top, clean and remake, then commit
-	+ Reminder to update the Branch integration guide - soon to be automated
+| Command | What it does |
+|:--|:--|
+| `npm run release` | Cleans `dist/` and builds it with Vite/Rolldown (`scripts/build.mjs`): `build.js` (readable), `build.min.js` (minified with Oxc) and `build.min.js.gz`. Fails if the gzipped bundle exceeds `size-budget.json`. |
+| `npm test` | Unit tests (Vitest + jsdom) against `src/`. |
+| `npm run test:min` | The same unit tests against `src/` modules minified with the production minifier. |
+| `npm run test:bundle` | Checks the public contract of the built `dist/build.min.js`. Run `npm run release` first. |
+| `npm run cover` | Unit tests with coverage. |
+| `npm run format:check` / `npm run lint:src` | Biome formatting check, and undeclared/unused variable check across `src/`. |
+
+## Versioning
+
+The version is not bumped by hand. Both workflows compute the next version with `next-version` from [BranchMetrics/branch-github-actions](https://github.com/BranchMetrics/branch-github-actions): it starts from the latest GitHub release and looks at the first line of every commit since then.
+
+- Any commit containing `[major]` → major bump.
+- Otherwise, any commit containing `[minor]` → minor bump.
+- Otherwise → patch bump (so `[patch]`, `[other]` and untagged commits all release as a patch).
+
+`deployment/write-versions.sh` then writes that version into `package.json` and `src/0_config.js` before building, so the version in the repo is only a placeholder.
+
+## On every push: Build and Push
+
+`.github/workflows/build-push.yml` runs on every branch: format check, lint, unit tests (plain and minified), coverage, a release build and the bundle contract test.
+
+On `main` it also deploys to staging (`deployment/deploy-qa.sh`):
+
+- `s3://branch-builds-usw2/web-sdk/branch-latest.min.js` and `branch.js`
+- `https://cdn.branch.io/branch-staging-latest.min.js` and `example-staging.html` (CloudFront is invalidated)
+
+## Releasing: Publish Next Release (Manual)
+
+Run the **Publish Next Release (Manual)** workflow (`.github/workflows/deploy-release.yml`) from the Actions tab against `main`. It:
+
+1. Computes and writes the next version (see above).
+2. Runs `deployment/release-s3.sh`, which rebuilds `dist/`, runs `test:bundle`, and uploads to the CDN:
+   - `branch-v<version>.min.js`, `branch-latest.min.js` and `branch-latest.js`
+   - `example.html`
+   - then invalidates CloudFront for `branch-latest.min.js` and `example.html`
+3. Publishes `branch-sdk` to npm.
+4. Creates the GitHub release for the version.
+
+Publishing the GitHub release triggers `.github/workflows/sync-readme-changelog.yml`, which prepends the release notes to the Web version history page on readme.com.
+
+After a release, check that `https://cdn.branch.io/branch-v<version>.min.js` loads and that [npm](https://www.npmjs.com/package/branch-sdk) shows the new version.
 
 ## Documentation
 
-**Important Note**: The majority of the documentation markdown files for the Web SDK are **generated** - meaning that any changes made directly to them will not survive running `make`, and will be overwritten. All generated filed are concated from components of the documentation in the `docs` folder, or generated from comments in `src/3_branch.js`.
-
-### Files that are generated
-+ `README.md`
-+ `WEB_GUIDE.md`
-
-### Files that can be edited directly
-+ `CHANGELOG.md` - **Note**: The changelog should only be edited directly under the unreleased version: `## [VERSION] - unreleased`
-+ `RELEASE_DOCUMENTATION.md` (this file)
-+ `SMART_BANNER_GUIDE.md` - An in-depth guide explaining every feature of the smart app sharing banner
-
-#### Editing the main README (`README.md`)
-The markdown files concatenated together to make the main README, can be seen in the `README.md` target of the Makefile. In summary, the files consist of:
-
-| File | Edit Directly? | Content |
-|:--------:|:-------:|:-------:|
-| `docs/0_notice.md` | &#10007; | A notice placed at the top of every generated document, that any edits made to the following file will be overwritten. |
-| `docs/readme/1_main.md` | &#10004; | The content of the `README` file, along with a placeholder for the Branch init code to be put. This is done with a perl string substitution regex. **Any edits to the content of the `README` file should be made here.** |
-| `docs/4_footer.md` | &#10007; | A generic footer placed at the end of all documentationt that includes an email where bugs and feature requests can be dropped. |
-
-#### Editing The Full Web SDK Documentation (`WEB_GUIDE.md`)
-The markdown files concatenated together to make the Full Web SDK documentation, can be seen in the `WEB_GUIDE.md` target of the Makefile. The introduction (`docs/web/1_intro.md`), is the only markdown file that should be edited directly. The Tabe of Contents (`docs/web/2_table_of_contents.md`), and the bulk of the readme (`docs/web/3_branch_web.md`), are both generated from the source code for the main Branch class `src/3_branch.js`.
-
-| File | Edit Directly? | Content |
-|:--------:|:-------:|:-------:|
-| `docs/0_notice.md` | &#10007; | A notice placed at the top of every generated document, that any edits made to this file will be overwritten. |
-| `docs/web/1_intro.md` | &#10004; | An introduction to the Web SDK, showing current Browser compatibility, basic installation of the Branch Web SDK, and other high level items that are important for basic implementations of the Web SDK. An up-to-date embed code is automatically placed here by the Makefile. |
-| `docs/web/2_table_of_contents.md` | &#10007; | The Table of Contents of every function of the Branch Web SDK. This file is generated by passing `src/3_branch.js` into a simple perl program: `build_utils/toc_generator.pl`. Instructions for use of the Table of Contents generator can be found in the comments at the top of it, and examples can be seen of the exitisting Table of Content items in `src/3_branch.js` |
-| `docs/web/3_branch_web.md` | &#10007; | The full specification of every function of the Web SDK. This entire file is generated using [JSDoc](http://usejsdoc.org/)/[JSDox](http://jsdox.org/) from the comments found in `src/3_branch.js`. Whenever a new function is added to the Branch class, or a function is edited, be sure to make the appropriate documentation changes to the comments above the function. |
-| `docs/4_footer.md` | &#10007; | A generic footer placed at the end of all documentationt that includes an email where bugs and feature requests can be dropped. |
-
-## Releasing the Web SDK
-The entire release process has been encapsulated into a single shell script: `release.sh`. The release script has a few dependencies you'll need to make sure you have installed: [AWS CLI](http://aws.amazon.com/cli/), [make](http://www.gnu.org/software/make/), and you'll need environment variables to upload the SDK and Web testbed to S3. For convenience, I've placed mine in a simple shell script that I have added to `.gitignore`:
-`aws_access_keys.sh`
-
-
-The release shell script is a simple wizard. Once your S3 environment variables are set, and you have been added to the Branch npmjs.org account, simple run :`./release.sh` and follow the steps.
+Public integration docs live at [help.branch.io](https://help.branch.io/developers-hub/docs/web-sdk-overview). The JSDoc comments on the `branch.*` methods in `src/6_branch.js` are the in-code reference.

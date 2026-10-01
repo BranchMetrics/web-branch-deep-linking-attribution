@@ -36,9 +36,8 @@ export function bundle(fileName, { minify = false, watch = false } = {}) {
         output: {
           format: 'iife',
           entryFileNames: fileName,
-          // Closure stripped 'use strict', so the shipped SDK has always run
-          // sloppy; a top-level directive would also leak into any code a
-          // customer concatenates after this file.
+          // No 'use strict': the SDK has always run sloppy, and a top-level
+          // directive would leak into any code a customer concatenates after it.
           strict: false,
         },
         onwarn(warning, warn) {

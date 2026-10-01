@@ -20,7 +20,6 @@ var default_branch;
 
 /**
  * Enum for what parameters are in a wrapped Branch method
- * @enum {number}
  */
 var callback_params = {
   NO_CALLBACK: 0,
@@ -30,7 +29,6 @@ var callback_params = {
 
 /**
  * Enum for the initialization state of the Branch Object
- * @enum {number}
  */
 var init_states = {
   NO_INIT: 0,
@@ -40,8 +38,7 @@ var init_states = {
 };
 
 /**
- * Enum for the initialization state of the Branch Object
- * @enum {number}
+ * Failure codes for Branch initialization
  */
 var init_state_fail_codes = {
   NO_FAILURE: 0,
@@ -76,9 +73,6 @@ var wrap = function (parameters, func, init) {
       callback = lastArg;
     }
     self._queue(function (next) {
-      /***
-       * @type {function(?Error,?): undefined}
-       */
       var done = function (err, data) {
         try {
           if (err && parameters === callback_params.NO_CALLBACK) {
@@ -124,10 +118,6 @@ var wrap = function (parameters, func, init) {
   return r;
 };
 
-/***
- * @class Branch
- * @constructor
- */
 export const Branch = function () {
   if (!(this instanceof Branch)) {
     if (!default_branch) {
@@ -139,15 +129,12 @@ export const Branch = function () {
 
   var storageMethods = ['session', 'cookie', 'pojo'];
 
-  this._storage = /** @type {storage} */ (
-    new storage.BranchStorage(storageMethods)
-  );
+  this._storage = new storage.BranchStorage(storageMethods);
 
   this._server = new Server();
 
   var sdk = 'web';
 
-  /** @type {Array<utils.listener>} */
   this._listeners = [];
 
   this.sdk = sdk + config.version;
@@ -374,8 +361,6 @@ Branch.prototype._publishEvent = function (event, data) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-/*** +TOC_HEADING &Branch Session& ^ALL ***/
-/*** +TOC_ITEM #initbranch_key-options-callback &.init()& ^ALL ***/
 Branch.prototype['init'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, branch_key, options) {
@@ -851,7 +836,6 @@ Branch.prototype['renderFinalize'] = wrap(
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
-/*** +TOC_ITEM #datacallback &.data()& ^ALL ***/
 Branch.prototype['data'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
@@ -880,7 +864,6 @@ Branch.prototype['data'] = wrap(
  * ___
  *
  */
-/*** +TOC_ITEM #firstcallback &.first()& ^ALL ***/
 Branch.prototype['first'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
@@ -895,7 +878,7 @@ Branch.prototype['first'] = wrap(
  * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's
  * Branch identity id and unique link.
  *
- * **[Formerly `identify()`](CHANGELOG.md)**
+ * **Formerly `identify()`**
  *
  * Sets the identity of a user and returns the data. To use this function, pass
  * a unique string that identifies the user - this could be an email address,
@@ -923,7 +906,6 @@ Branch.prototype['first'] = wrap(
  * ```
  * ___
  */
-/*** +TOC_ITEM #setidentityidentity-callback &.setIdentity()& ^ALL ***/
 Branch.prototype['setIdentity'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, identity) {
@@ -967,7 +949,6 @@ Branch.prototype['setIdentity'] = wrap(
  * ___
  *
  */
-/*** +TOC_ITEM #logoutcallback &.logout()& ^ALL ***/
 Branch.prototype['logout'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
@@ -1013,7 +994,6 @@ Branch.prototype['getBrowserFingerprintId'] = wrap(
  * ___
  *
  */
-/*** +TOC_ITEM #crossPlatformIdscallback &.crossPlatformIds()& ^ALL ***/
 Branch.prototype['crossPlatformIds'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
@@ -1046,7 +1026,6 @@ Branch.prototype['crossPlatformIds'] = wrap(
  * ___
  *
  */
-/*** +TOC_ITEM #lastAttributedTouchDataattribution_window-callback &.lastAttributedTouchData()& ^ALL ***/
 Branch.prototype['lastAttributedTouchData'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, attribution_window) {
@@ -1099,8 +1078,6 @@ Branch.prototype['lastAttributedTouchData'] = wrap(
  * ```
  * ___
  */
-/*** +TOC_HEADING &Event Tracking& ^ALL ***/
-/*** +TOC_ITEM #trackevent-metadata-callback &.track()& ^ALL ***/
 Branch.prototype['track'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done, event, metadata, options) {
@@ -1294,7 +1271,6 @@ Branch.prototype['track'] = wrap(
  * ```
  * ___
  */
-/*** +TOC_ITEM #logeventevent-event_data_and_custom_data-content_items-callback &.logEvent()& ^ALL ***/
 Branch.prototype['logEvent'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done, name, eventData, contentItems, customer_event_alias) {
@@ -1370,7 +1346,7 @@ Branch.prototype['logEvent'] = wrap(
  * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep
  * linking URL.
  *
- * **[Formerly `createLink()`](CHANGELOG.md)**
+ * **Formerly `createLink()`**
  *
  * Creates and returns a deep linking URL.  The `data` parameter can include an
  * object with optional data you would like to store, including Facebook
@@ -1454,8 +1430,6 @@ Branch.prototype['logEvent'] = wrap(
  * ```
  *
  */
-/*** +TOC_HEADING &Deep Linking& ^ALL ***/
-/*** +TOC_ITEM #linkdata-callback &.link()& ^ALL ***/
 Branch.prototype['link'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, data) {
@@ -1528,7 +1502,7 @@ Branch.prototype['link'] = wrap(
  *     QrCode // Branch QrCode object
  * );
  * ```
- /*** +TOC_ITEM #qrCode-options-callback &.qrCode()& ^ALL ***/
+ */
 Branch.prototype['qrCode'] = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, linkData, qrCodeSettings, options) {
@@ -1620,7 +1594,6 @@ Branch.prototype['qrCode'] = wrap(
  * ```
  *
  */
-/*** +TOC_ITEM #deepviewdata-options-callback &.deepview()& ^ALL ***/
 Branch.prototype['deepview'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done, data, options) {
@@ -1746,7 +1719,6 @@ Branch.prototype._windowRedirect = function (url) {
  *
  *
  */
-/*** +TOC_ITEM #deepviewcta &.deepviewCta()& ^ALL ***/
 Branch.prototype['deepviewCta'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
@@ -1802,8 +1774,6 @@ Branch.prototype['deepviewCta'] = wrap(
  * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
  * - *didCallJourneyClose*: Emitted when developer calls `branch.closeJourney()` to dismiss Journey.
  */
-/*** +TOC_HEADING &Event Listener& ^WEB ***/
-/*** +TOC_ITEM #addlistenerevent-listener &.addListener()& ^WEB ***/
 Branch.prototype['addListener'] = function (event, listener) {
   if (typeof event === 'function' && listener === undefined) {
     listener = event;
@@ -1828,7 +1798,6 @@ Branch.prototype['addListener'] = function (event, listener) {
  * just an identical clone of the function.
  *
  */
-/*** +TOC_ITEM #removelistenerlistener &.removeListener()& ^WEB ***/
 Branch.prototype['removeListener'] = function (listener) {
   if (listener) {
     this._listeners = this._listeners.filter(function (subscription) {
@@ -1869,8 +1838,6 @@ Branch.prototype['removeListener'] = function (listener) {
  * });
  * ```
  */
-/*** +TOC_HEADING &Journeys Web To App& ^WEB ***/
-/*** +TOC_ITEM #setbranchviewdatadata &.setBranchViewData()& ^WEB ***/
 function _setBranchViewData(context, done, data) {
   data = data || {};
   try {
@@ -1904,7 +1871,6 @@ Branch.prototype['setBranchViewData'] = wrap(
  * ___
  *
  */
-/*** +TOC_ITEM #closejourneycallback &.closeJourney()& ^WEB ***/
 Branch.prototype['closeJourney'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
@@ -1943,112 +1909,77 @@ Branch.prototype['banner'] = wrap(
       ) {
         options['showAgain'] = options['forgetHide'];
       }
-      /** @type {banner_utils.options} */
       var bannerOptions = {
-        icon: /** @type {string} */ (
-          utils.cleanBannerText(options['icon']) || ''
-        ),
-        title: /** @type {string} */ (
-          utils.cleanBannerText(options['title']) || ''
-        ),
-        description: /** @type {string} */ (
-          utils.cleanBannerText(options['description']) || ''
-        ),
-        reviewCount: /** @type {number} */ (
+        icon: utils.cleanBannerText(options['icon']) || '',
+        title: utils.cleanBannerText(options['title']) || '',
+        description: utils.cleanBannerText(options['description']) || '',
+        reviewCount:
           typeof options['reviewCount'] === 'number' &&
           options['reviewCount'] > 0 // force greater than 0
             ? Math.floor(options['reviewCount'])
             : // force no decimal
-              null
-        ),
-        rating: /** @type {number} */ (
+              null,
+        rating:
           typeof options['rating'] === 'number' &&
           options['rating'] <= 5 &&
           options['rating'] > 0
             ? Math.round(options['rating'] * 2) / 2
             : // force increments of .5
-              null
-        ),
-        openAppButtonText: /** @type {string} */ (
-          utils.cleanBannerText(options['openAppButtonText']) || 'View in app'
-        ),
-        downloadAppButtonText: /** @type {string} */ (
+              null,
+        openAppButtonText:
+          utils.cleanBannerText(options['openAppButtonText']) || 'View in app',
+        downloadAppButtonText:
           utils.cleanBannerText(options['downloadAppButtonText']) ||
-            'Download App'
-        ),
-        iframe: /** @type {boolean} */ (
-          typeof options['iframe'] === 'undefined' ? true : options['iframe']
-        ),
-        showiOS: /** @type {boolean} */ (
-          typeof options['showiOS'] === 'undefined' ? true : options['showiOS']
-        ),
-        showiPad: /** @type {boolean} */ (
+          'Download App',
+        iframe:
+          typeof options['iframe'] === 'undefined' ? true : options['iframe'],
+        showiOS:
+          typeof options['showiOS'] === 'undefined' ? true : options['showiOS'],
+        showiPad:
           typeof options['showiPad'] === 'undefined'
             ? true
-            : options['showiPad']
-        ),
-        showAndroid: /** @type {boolean} */ (
+            : options['showiPad'],
+        showAndroid:
           typeof options['showAndroid'] === 'undefined'
             ? true
-            : options['showAndroid']
-        ),
-        showBlackberry: /** @type {boolean} */ (
+            : options['showAndroid'],
+        showBlackberry:
           typeof options['showBlackberry'] === 'undefined'
             ? true
-            : options['showBlackberry']
-        ),
-        showWindowsPhone: /** @type {boolean} */ (
+            : options['showBlackberry'],
+        showWindowsPhone:
           typeof options['showWindowsPhone'] === 'undefined'
             ? true
-            : options['showWindowsPhone']
-        ),
-        showKindle: /** @type {boolean} */ (
+            : options['showWindowsPhone'],
+        showKindle:
           typeof options['showKindle'] === 'undefined'
             ? true
-            : options['showKindle']
-        ),
-        disableHide: /** @type {boolean} */ (!!options['disableHide']),
-        forgetHide: /** @type {boolean} */ (
+            : options['showKindle'],
+        disableHide: !!options['disableHide'],
+        forgetHide:
           typeof options['forgetHide'] === 'number'
             ? options['forgetHide']
-            : !!options['forgetHide']
-        ),
-        respectDNT: /** @type {boolean} */ (
+            : !!options['forgetHide'],
+        respectDNT:
           typeof options['respectDNT'] === 'undefined'
             ? false
-            : options['respectDNT']
-        ),
-        position: /** @type {string} */ (options['position'] || 'top'),
-        customCSS: /** @type {string} */ (options['customCSS'] || ''),
-        mobileSticky: /** @type {boolean} */ (
+            : options['respectDNT'],
+        position: options['position'] || 'top',
+        customCSS: options['customCSS'] || '',
+        mobileSticky:
           typeof options['mobileSticky'] === 'undefined'
             ? false
-            : options['mobileSticky']
-        ),
-        buttonBorderColor: /** @type {string} */ (
-          options['buttonBorderColor'] || ''
-        ),
-        buttonBackgroundColor: /** @type {string} */ (
-          options['buttonBackgroundColor'] || ''
-        ),
-        buttonFontColor: /** @type {string} */ (
-          options['buttonFontColor'] || ''
-        ),
-        buttonBorderColorHover: /** @type {string} */ (
-          options['buttonBorderColorHover'] || ''
-        ),
-        buttonBackgroundColorHover: /** @type {string} */ (
-          options['buttonBackgroundColorHover'] || ''
-        ),
-        buttonFontColorHover: /** @type {string} */ (
-          options['buttonFontColorHover'] || ''
-        ),
-        make_new_link: /** @type {boolean} */ (!!options['make_new_link']),
-        open_app: /** @type {boolean} */ (!!options['open_app']),
-        immediate: /** @type {boolean} */ (!!options['immediate']),
-        append_deeplink_path: /** @type {boolean} */ (
-          !!options['append_deeplink_path']
-        ),
+            : options['mobileSticky'],
+        buttonBorderColor: options['buttonBorderColor'] || '',
+        buttonBackgroundColor: options['buttonBackgroundColor'] || '',
+        buttonFontColor: options['buttonFontColor'] || '',
+        buttonBorderColorHover: options['buttonBorderColorHover'] || '',
+        buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
+        buttonFontColorHover: options['buttonFontColorHover'] || '',
+        make_new_link: !!options['make_new_link'],
+        open_app: !!options['open_app'],
+        immediate: !!options['immediate'],
+        append_deeplink_path: !!options['append_deeplink_path'],
       };
 
       if (typeof options['showMobile'] !== 'undefined') {
@@ -2140,8 +2071,6 @@ Branch.prototype['closeBanner'] = wrap(0, function (done) {
  * ```
  * ___
  */
-/*** +TOC_HEADING &Revenue Analytics& ^WEB ***/
-/*** +TOC_ITEM #trackcommerceeventevent-commerce_data-metadata-callback &.trackCommerceEvent()& ^WEB ***/
 Branch.prototype['trackCommerceEvent'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done, event, commerce_data, metadata) {
@@ -2199,8 +2128,6 @@ Branch.prototype['trackCommerceEvent'] = wrap(
  * The do-not-track mode state is persistent: it is saved for the user across browser sessions for the web site.
  * ___
  */
-/*** +TOC_HEADING &User Privacy& ^WEB ***/
-/*** +TOC_ITEM #disabletrackingdisabletracking &.disableTracking()& ^WEB ***/
 Branch.prototype['disableTracking'] = wrap(
   callback_params.CALLBACK_ERR,
   function (done, disableTracking) {

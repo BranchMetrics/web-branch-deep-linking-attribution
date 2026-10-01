@@ -1,8 +1,6 @@
 /**
- * Port of the Array.prototype.includes polyfill that Closure Compiler injected
- * into the SDK before we dropped it. Like Closure's, it is only installed when
- * the browser lacks a native implementation, and it is added to the host
- * page's Array.prototype as a non-enumerable property.
+ * Array.prototype.includes polyfill, installed on the host page as a
+ * non-enumerable property only when the browser lacks a native one.
  */
 
 if (!Array.prototype.includes) {

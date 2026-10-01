@@ -12,13 +12,6 @@ export const storage = {};
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
-/** @typedef {undefined|{get:function(string, boolean=), set:function(string, (string|boolean), boolean=),
- * remove:function(string), clear:function(), isEnabled:function()}} */
-
-/**
- * @class BranchStorage
- * @constructor
- */
 storage.BranchStorage = function (storageMethods) {
   for (var i = 0; i < storageMethods.length; i++) {
     var storageMethod = this[storageMethods[i]];
@@ -151,12 +144,10 @@ var webStorage = function (perm) {
   };
 };
 
-/** @type {storage} */
 storage.BranchStorage.prototype['local'] = function () {
   return webStorage(true);
 };
 
-/** @type {storage} */
 storage.BranchStorage.prototype['session'] = function () {
   return webStorage(false);
 };
@@ -234,7 +225,6 @@ storage.BranchStorage.prototype['cookie'] = function () {
   return cookies();
 };
 
-/** @type {storage} */
 storage.BranchStorage.prototype['pojo'] = {
   getAll: function () {
     return this._store;

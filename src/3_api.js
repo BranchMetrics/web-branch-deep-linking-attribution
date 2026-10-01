@@ -7,10 +7,6 @@ import { safejson } from './0_jsonparse.js';
 import { utils } from './1_utils.js';
 import { storage } from './2_storage.js';
 
-/**
- * @class Server
- * @constructor
- */
 export const Server = function () {};
 
 Server.prototype._jsonp_callback_index = 0;
@@ -471,9 +467,6 @@ Server.prototype.request = function (resource, data, storage, callback) {
   // How many times to retry the request if the initial attempt fails
   var retries = utils.retries;
   // If request fails, retry after X miliseconds
-  /***
-   * @type {function(?Error,*=): ?undefined}
-   */
   var done = function (err, data, status) {
     if (typeof self.onAPIResponse === 'function') {
       // Record every request and response, including retries

@@ -1,8 +1,9 @@
 # Change Log
-All notable changes to the Branch Web SDK will be documented here.
+
+Releases after 2.86.1 are documented in [GitHub Releases](https://github.com/BranchMetrics/web-branch-deep-linking-attribution/releases).
+
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
 ## [2.86.1] - 2024-11-15
 - Updated keys/apps that the example page uses for staging and prod.
 ## [2.86.0] - 2024-11-12

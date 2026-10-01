@@ -10,7 +10,7 @@ const BUNDLE = readFileSync(
   'utf8',
 );
 
-// Public methods of window.branch in the last Closure-compiled release.
+// Public methods of window.branch that customers rely on.
 const PUBLIC_METHODS = [
   'addListener',
   'banner',
