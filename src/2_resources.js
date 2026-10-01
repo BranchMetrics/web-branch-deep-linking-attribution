@@ -8,7 +8,7 @@ import { utils } from './1_utils.js';
 
 export const resources = {};
 
-var validationTypes = {
+const validationTypes = {
   OBJECT: 0,
   STRING: 1,
   NUMBER: 2,
@@ -42,7 +42,7 @@ function validator(required, type) {
         ]);
       }
     } else if (type === validationTypes.ARRAY) {
-      if (!(data instanceof Array)) {
+      if (!Array.isArray(data)) {
         return utils.message(utils.messages.invalidType, [
           endpoint,
           param,
@@ -86,7 +86,7 @@ function validator(required, type) {
 }
 
 function defaults(obj) {
-  var def = {
+  const def = {
     'browser_fingerprint_id': validator(true, validationTypes.STRING),
     'identity_id': validator(true, validationTypes.STRING),
     'sdk': validator(true, validationTypes.STRING),

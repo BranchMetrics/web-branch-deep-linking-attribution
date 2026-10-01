@@ -66,7 +66,7 @@ async function writeExampleHtml(config) {
     const replacements = {
         'key_place_holder': config.sdkKey,
         'api_place_holder': config.APIEndpoint,
-        'script_place_holder': './dist/build.js',
+        'script_place_holder': './dist/build.min.js',
     };
 
     await processTemplate(templateFile, outputFile, replacements);

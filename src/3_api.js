@@ -20,19 +20,19 @@ Server.prototype.serializeObject = function (obj, prefix) {
     return '';
   }
 
-  var pairs = [];
-  if (obj instanceof Array) {
-    for (var i = 0; i < obj.length; i++) {
+  const pairs = [];
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) {
       pairs.push(encodeURIComponent(prefix) + '=' + encodeURIComponent(obj[i]));
     }
     return pairs.join('&');
   }
 
-  for (var prop in obj) {
-    if (!obj.hasOwnProperty(prop)) {
+  for (const prop in obj) {
+    if (!Object.prototype.hasOwnProperty.call(obj, prop)) {
       continue;
     }
-    if (obj[prop] instanceof Array || typeof obj[prop] === 'object') {
+    if (Array.isArray(obj[prop]) || typeof obj[prop] === 'object') {
       pairs.push(
         this.serializeObject(obj[prop], prefix ? prefix + '.' + prop : prop),
       );
@@ -52,25 +52,25 @@ Server.prototype.serializeObject = function (obj, prefix) {
  * @param {Object.<string, *>} data
  */
 Server.prototype.getUrl = function (resource, data) {
-  var k;
-  var v;
-  var err;
-  var url = resource.destination + resource.endpoint;
-  var branch_id = /^[0-9]{15,20}$/;
-  var branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
+  let k;
+  let v;
+  let err;
+  let url = resource.destination + resource.endpoint;
+  const branch_id = /^[0-9]{15,20}$/;
+  const branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
-  var appendKeyOrId = function (data, destinationObject) {
+  const appendKeyOrId = function (data, destinationObject) {
     if (typeof destinationObject === 'undefined') {
       destinationObject = {};
     }
-    if (data['branch_key'] && branch_key.test(data['branch_key'])) {
-      destinationObject['branch_key'] = data['branch_key'];
+    if (data.branch_key && branch_key.test(data.branch_key)) {
+      destinationObject.branch_key = data.branch_key;
       return destinationObject;
-    } else if (data['app_id'] && branch_id.test(data['app_id'])) {
-      destinationObject['app_id'] = data['app_id'];
+    } else if (data.app_id && branch_id.test(data.app_id)) {
+      destinationObject.app_id = data.app_id;
       return destinationObject;
-    } else if (data['instrumentation']) {
-      destinationObject['instrumentation'] = data['instrumentation'];
+    } else if (data.instrumentation) {
+      destinationObject.instrumentation = data.instrumentation;
     } else {
       throw Error(
         utils.message(utils.messages.missingParam, [
@@ -83,7 +83,7 @@ Server.prototype.getUrl = function (resource, data) {
 
   if (typeof resource.queryPart !== 'undefined') {
     for (k in resource.queryPart) {
-      if (!resource.queryPart.hasOwnProperty(k)) {
+      if (!Object.prototype.hasOwnProperty.call(resource.queryPart, k)) {
         continue;
       }
       err =
@@ -97,7 +97,7 @@ Server.prototype.getUrl = function (resource, data) {
     }
   }
 
-  var d = {};
+  const d = {};
   // TODO: Add validation for v1/pageview and v1/dismiss, move setBranchViewData into a separate location so that it is isolated
   if (
     typeof resource.params !== 'undefined' &&
@@ -105,7 +105,7 @@ Server.prototype.getUrl = function (resource, data) {
     resource.endpoint !== '/v1/dismiss'
   ) {
     for (k in resource.params) {
-      if (resource.params.hasOwnProperty(k)) {
+      if (Object.prototype.hasOwnProperty.call(resource.params, k)) {
         err = resource.params[k](resource.endpoint, k, data[k]);
         if (err) {
           return {
@@ -124,28 +124,25 @@ Server.prototype.getUrl = function (resource, data) {
     resource.endpoint === '/v1/dismiss'
   ) {
     utils.merge(d, data);
-    if (d['branch_requestMetadata']) {
-      d['metadata'] = utils.merge(
-        d['metadata'] || {},
-        d['branch_requestMetadata'],
-      );
-      delete d['branch_requestMetadata'];
+    if (d.branch_requestMetadata) {
+      d.metadata = utils.merge(d.metadata || {}, d.branch_requestMetadata);
+      delete d.branch_requestMetadata;
     }
   }
   if (
-    data.hasOwnProperty('branch_requestMetadata') &&
-    data['branch_requestMetadata'] &&
+    Object.prototype.hasOwnProperty.call(data, 'branch_requestMetadata') &&
+    data.branch_requestMetadata &&
     !(
       resource.endpoint === '/v1/pageview' ||
       resource.endpoint === '/v1/dismiss'
     )
   ) {
-    d['metadata'] = safejson.stringify(data['branch_requestMetadata']);
+    d.metadata = safejson.stringify(data.branch_requestMetadata);
   }
-  if (data['branch_dma_data']) {
-    utils.setDMAParams(d, data['branch_dma_data'], resource.endpoint);
-    if (d['branch_dma_data']) {
-      delete d['branch_dma_data'];
+  if (data.branch_dma_data) {
+    utils.setDMAParams(d, data.branch_dma_data, resource.endpoint);
+    if (d.branch_dma_data) {
+      delete d.branch_dma_data;
     }
   }
 
@@ -163,13 +160,13 @@ Server.prototype.getUrl = function (resource, data) {
     resource.endpoint === '/v1/pageview' ||
     resource.endpoint === '/v1/dismiss'
   ) {
-    if (d['metadata']) {
-      d['metadata'] = safejson.stringify(d['metadata'] || {});
+    if (d.metadata) {
+      d.metadata = safejson.stringify(d.metadata || {});
     }
   }
 
   if (resource.endpoint === '/v1/open') {
-    d['options'] = safejson.stringify(d['options'] || {});
+    d.options = safejson.stringify(d.options || {});
   }
 
   return {
@@ -183,14 +180,14 @@ Server.prototype.getUrl = function (resource, data) {
  * @param {string} src
  */
 Server.prototype.createScript = function (src, onError, onLoad) {
-  var script = document.createElement('script');
+  const script = document.createElement('script');
   script.type = 'text/javascript';
   script.async = true;
   script.src = src;
 
   utils.addNonceAttribute(script);
 
-  var heads = document.getElementsByTagName('head');
+  const heads = document.getElementsByTagName('head');
   if (!heads || heads.length < 1) {
     if (typeof onError === 'function') {
       onError();
@@ -219,8 +216,8 @@ Server.prototype.jsonpRequest = function (
   requestMethod,
   callback,
 ) {
-  var brtt = Date.now();
-  var brttTag = utils.currentRequestBrttTag;
+  const brtt = Date.now();
+  const brttTag = utils.currentRequestBrttTag;
   /* On iOS 11-Safari when a partner calls .deepview() and uses $uri_redirect_mode: 2,
 		they will not get transported into the app (if installed) on pageload because
 		callbackString will evaluate to branch_callback_0. The backend expects branch_callback_1
@@ -229,16 +226,16 @@ Server.prototype.jsonpRequest = function (
   if (this._jsonp_callback_index === 0 && utils.isSafari11OrGreater()) {
     this._jsonp_callback_index++;
   }
-  var callbackString = 'branch_callback__' + this._jsonp_callback_index++;
+  const callbackString = 'branch_callback__' + this._jsonp_callback_index++;
 
-  var postPrefix =
+  const postPrefix =
     requestURL.indexOf('branch.io') >= 0 ? '&data=' : '&post_data=';
-  var postData =
+  const postData =
     requestMethod === 'POST'
       ? encodeURIComponent(utils.base64encode(safejson.serialize(requestData)))
       : '';
 
-  var timeoutTrigger = window.setTimeout(function () {
+  const timeoutTrigger = window.setTimeout(function () {
     window[callbackString] = function () {};
     utils.addPropertyIfNotNull(
       utils.instrumentation,
@@ -307,9 +304,9 @@ Server.prototype.XHRRequest = function (
   noParse,
   responseType,
 ) {
-  var brtt = Date.now();
-  var brttTag = utils.currentRequestBrttTag;
-  var req = window.XMLHttpRequest
+  const brtt = Date.now();
+  const brttTag = utils.currentRequestBrttTag;
+  const req = window.XMLHttpRequest
     ? new XMLHttpRequest()
     : new ActiveXObject('Microsoft.XMLHTTP');
 
@@ -317,7 +314,7 @@ Server.prototype.XHRRequest = function (
     req.responseType = responseType;
   }
 
-  var errorResponseText = function () {
+  const errorResponseText = function () {
     return (
       (req.responseType === 'arraybuffer' ? '' : req.responseText) ||
       'No response text available'
@@ -333,10 +330,10 @@ Server.prototype.XHRRequest = function (
     callback(new Error(utils.messages.timeout), null, 504);
   };
   req.onerror = function (e) {
-    var url = req.responseURL || 'Unknown';
-    var status = req.status || 'No status available';
-    var responseText = errorResponseText();
-    var errorMessage =
+    const url = req.responseURL || 'Unknown';
+    const status = req.status || 'No status available';
+    const responseText = errorResponseText();
+    const errorMessage =
       'Error in API: URL - ' +
       url +
       ', Status - ' +
@@ -347,7 +344,7 @@ Server.prototype.XHRRequest = function (
     callback(new Error(e.error || errorMessage), null, req.status);
   };
   req.onreadystatechange = function () {
-    var data;
+    let data;
     if (req.readyState === 4) {
       utils.addPropertyIfNotNull(
         utils.instrumentation,
@@ -376,13 +373,13 @@ Server.prototype.XHRRequest = function (
       ) {
         // Server returns helpful information when a partner sends up incorrect fields in logEvent().
         // This information appears in req.responseText.
-        if (req['responseURL'] && req['responseURL'].includes('v2/event')) {
-          callback(req['responseText'], null, req['status']);
+        if (req.responseURL?.includes('v2/event')) {
+          callback(req.responseText, null, req.status);
         } else {
-          var url = req.responseURL || 'Unknown';
-          var status = req.status || 'No status available';
-          var responseText = errorResponseText();
-          var errorMessage =
+          const url = req.responseURL || 'Unknown';
+          const status = req.status || 'No status available';
+          const responseText = errorResponseText();
+          const errorMessage =
             'Error in API: URL - ' +
             url +
             ', Status - ' +
@@ -414,7 +411,7 @@ Server.prototype.XHRRequest = function (
  * @param {function(?Error,*=)=} callback
  */
 Server.prototype.request = function (resource, data, storage, callback) {
-  var self = this;
+  const self = this;
 
   utils.currentRequestBrttTag = resource.endpoint + '-brtt';
 
@@ -423,7 +420,7 @@ Server.prototype.request = function (resource, data, storage, callback) {
     Object.keys(utils.instrumentation).length > 1
   ) {
     delete utils.instrumentation['-brtt'];
-    data['instrumentation'] = safejson.stringify(
+    data.instrumentation = safejson.stringify(
       utils.merge({}, utils.instrumentation),
     );
     utils.instrumentation = {};
@@ -431,23 +428,23 @@ Server.prototype.request = function (resource, data, storage, callback) {
 
   // Removes PII from request data in case fields flow in from cascading requests
   if (utils.userPreferences.trackingDisabled) {
-    var PII = [
+    const PII = [
       'browser_fingerprint_id',
       'alternative_browser_fingerprint_id',
       'identity_id',
       'session_id',
       'identity',
     ];
-    for (var index = 0; index < PII.length; index++) {
-      if (data.hasOwnProperty(PII[index])) {
+    for (let index = 0; index < PII.length; index++) {
+      if (Object.prototype.hasOwnProperty.call(data, PII[index])) {
         delete data[PII[index]];
       }
     }
   }
 
-  var u = this.getUrl(resource, data);
+  const u = this.getUrl(resource, data);
   if (u.error) {
-    var errorObj = {
+    const errorObj = {
       message: u.error,
       endpoint: resource.endpoint,
       data: data,
@@ -455,8 +452,8 @@ Server.prototype.request = function (resource, data, storage, callback) {
     return callback(new Error(safejson.stringify(errorObj)));
   }
 
-  var url;
-  var postData = '';
+  let url;
+  let postData = '';
   if (resource.method === 'GET') {
     url = u.url + '?' + u.data;
   } else {
@@ -464,7 +461,7 @@ Server.prototype.request = function (resource, data, storage, callback) {
     postData = u.data;
   }
 
-  var requestBody;
+  let requestBody;
   if (storage.get('use_jsonp') || resource.jsonp) {
     requestBody = data;
   } else {
@@ -472,9 +469,9 @@ Server.prototype.request = function (resource, data, storage, callback) {
   }
 
   // How many times to retry the request if the initial attempt fails
-  var retries = utils.retries;
+  let retries = utils.retries;
   // If request fails, retry after X miliseconds
-  var done = function (err, data, status) {
+  const done = function (err, data, status) {
     if (typeof self.onAPIResponse === 'function') {
       // Record every request and response, including retries
       // Note status is always undefined for jsonp requests (/_r and
@@ -506,14 +503,14 @@ Server.prototype.request = function (resource, data, storage, callback) {
       : done(null, {}, 200);
   }
 
-  var noParseJsonResp = false;
-  var responseType;
+  let noParseJsonResp = false;
+  let responseType;
   if (resource.endpoint === '/v1/qr-code') {
     noParseJsonResp = true;
     responseType = 'arraybuffer';
   }
 
-  var makeRequest = function () {
+  const makeRequest = function () {
     if (storage.get('use_jsonp') || resource.jsonp) {
       self.jsonpRequest(url, data, resource.method, done);
     } else {

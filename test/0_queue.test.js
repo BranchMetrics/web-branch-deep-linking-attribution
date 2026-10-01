@@ -1,9 +1,9 @@
 import { task_queue } from '../src/0_queue.js';
 
 describe('task_queue', function () {
-  var queue;
-  var orderCalled;
-  var assert = testUtils.unplanned();
+  let queue;
+  let orderCalled;
+  const assert = testUtils.unplanned();
   beforeEach(function () {
     queue = task_queue();
     vi.useFakeTimers();

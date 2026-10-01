@@ -6,8 +6,8 @@
  * @returns {function(function(function()))}
  */
 export const task_queue = function () {
-  var queue = [];
-  var next = function () {
+  const queue = [];
+  const next = function () {
     if (queue.length) {
       queue[0](function () {
         queue.shift();

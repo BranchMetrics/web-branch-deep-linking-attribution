@@ -9,7 +9,7 @@
  * fake.restore();
  */
 
-var FakeXMLHttpRequest = function () {
+const FakeXMLHttpRequest = function () {
   this.readyState = 0;
   this.status = 0;
   this.response = '';

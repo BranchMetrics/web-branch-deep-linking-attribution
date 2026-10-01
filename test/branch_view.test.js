@@ -12,8 +12,8 @@ describe('displayJourney new render options wiring', function () {
 
   afterEach(function () {
     journeys_utils.use_v2_renderer = false;
-    var placeholder = document.getElementById('branch-banner');
-    if (placeholder && placeholder.parentNode) {
+    const placeholder = document.getElementById('branch-banner');
+    if (placeholder?.parentNode) {
       placeholder.parentNode.removeChild(placeholder);
     }
   });

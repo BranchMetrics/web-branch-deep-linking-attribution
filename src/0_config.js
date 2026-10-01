@@ -2,7 +2,7 @@
  * Just a couple of variables that shouldn't change very often...
  */
 export const config = {};
-var DEFAULT_API_ENDPOINT = 'https://api2.branch.io';
+const DEFAULT_API_ENDPOINT = 'https://api2.branch.io';
 
 config.app_service_endpoint = 'https://app.link';
 config.link_service_endpoint = 'https://bnc.lt';

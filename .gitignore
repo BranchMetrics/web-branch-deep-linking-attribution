@@ -39,3 +39,6 @@ example.html
 dist/
 .ai/
 test-results.xml
+
+# Lefthook
+lefthook-local.yml

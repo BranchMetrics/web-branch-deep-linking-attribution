@@ -10,11 +10,11 @@ export const storage = {};
 
 /*globals Ti */
 
-var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
+const BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 
 storage.BranchStorage = function (storageMethods) {
-  for (var i = 0; i < storageMethods.length; i++) {
-    var storageMethod = this[storageMethods[i]];
+  for (let i = 0; i < storageMethods.length; i++) {
+    let storageMethod = this[storageMethods[i]];
     storageMethod =
       typeof storageMethod === 'function' ? storageMethod() : storageMethod;
     if (storageMethod.isEnabled()) {
@@ -24,17 +24,17 @@ storage.BranchStorage = function (storageMethods) {
   }
 };
 
-var prefix = function (key) {
+const prefix = function (key) {
   return key === 'branch_session' || key === 'branch_session_first'
     ? key
     : BRANCH_KEY_PREFIX + key;
 };
 
-var trimPrefix = function (key) {
+const trimPrefix = function (key) {
   return key.replace(BRANCH_KEY_PREFIX, '');
 };
 
-var retrieveValue = function (value) {
+const retrieveValue = function (value) {
   if (value === 'true') {
     return true;
   }
@@ -44,11 +44,11 @@ var retrieveValue = function (value) {
   return value;
 };
 
-var hasBranchPrefix = function (key) {
+const hasBranchPrefix = function (key) {
   return key.indexOf(BRANCH_KEY_PREFIX) === 0;
 };
 
-var isBranchCookie = function (key) {
+const isBranchCookie = function (key) {
   return (
     key === 'branch_session' ||
     key === 'branch_session_first' ||
@@ -56,17 +56,17 @@ var isBranchCookie = function (key) {
   );
 };
 
-var processCookie = function (row) {
-  var cookie = row.trim();
-  var firstEqualSign = cookie.indexOf('=');
+const processCookie = function (row) {
+  const cookie = row.trim();
+  const firstEqualSign = cookie.indexOf('=');
   return {
     name: cookie.substring(0, firstEqualSign),
     value: retrieveValue(cookie.substring(firstEqualSign + 1, cookie.length)),
   };
 };
 
-var webStorage = function (perm) {
-  var storageMethod;
+const webStorage = function (perm) {
+  let storageMethod;
   try {
     storageMethod = perm && localStorage ? localStorage : sessionStorage;
   } catch (_err) {
@@ -82,8 +82,8 @@ var webStorage = function (perm) {
         return null;
       }
 
-      var allKeyValues = null;
-      for (var key in storageMethod) {
+      let allKeyValues = null;
+      for (const key in storageMethod) {
         if (key.indexOf(BRANCH_KEY_PREFIX) === 0) {
           if (allKeyValues === null) {
             allKeyValues = {};
@@ -144,20 +144,20 @@ var webStorage = function (perm) {
   };
 };
 
-storage.BranchStorage.prototype['local'] = function () {
+storage.BranchStorage.prototype.local = function () {
   return webStorage(true);
 };
 
-storage.BranchStorage.prototype['session'] = function () {
+storage.BranchStorage.prototype.session = function () {
   return webStorage(false);
 };
 
-var cookies = function () {
-  var setCookie = function (key, value) {
+const cookies = function () {
+  const setCookie = function (key, value) {
     document.cookie = key + '=' + value + '; path=/';
   };
-  var removeCookie = function (key, addPrefix) {
-    var expires = 'Thu, 01 Jan 1970 00:00:01 GMT';
+  const removeCookie = function (key, addPrefix) {
+    const expires = 'Thu, 01 Jan 1970 00:00:01 GMT';
     if (addPrefix) {
       key = prefix(key);
     }
@@ -165,33 +165,33 @@ var cookies = function () {
   };
   return {
     getAll: function () {
-      var returnCookieObject = {};
-      var cookieArray = document.cookie.split(';');
-      for (var i = 0; i < cookieArray.length; i++) {
-        var cookie = processCookie(cookieArray[i]);
+      const returnCookieObject = {};
+      const cookieArray = document.cookie.split(';');
+      for (let i = 0; i < cookieArray.length; i++) {
+        const cookie = processCookie(cookieArray[i]);
         if (
           cookie &&
-          cookie.hasOwnProperty('name') &&
-          cookie.hasOwnProperty('value') &&
-          isBranchCookie(cookie['name'])
+          Object.prototype.hasOwnProperty.call(cookie, 'name') &&
+          Object.prototype.hasOwnProperty.call(cookie, 'value') &&
+          isBranchCookie(cookie.name)
         ) {
-          returnCookieObject[trimPrefix(cookie['name'])] = cookie['value'];
+          returnCookieObject[trimPrefix(cookie.name)] = cookie.value;
         }
       }
       return returnCookieObject;
     },
     get: function (key) {
       key = prefix(key);
-      var cookieArray = document.cookie.split(';');
-      for (var i = 0; i < cookieArray.length; i++) {
-        var cookie = processCookie(cookieArray[i]);
+      const cookieArray = document.cookie.split(';');
+      for (let i = 0; i < cookieArray.length; i++) {
+        const cookie = processCookie(cookieArray[i]);
         if (
           cookie &&
-          cookie.hasOwnProperty('name') &&
-          cookie.hasOwnProperty('value') &&
-          cookie['name'] === key
+          Object.prototype.hasOwnProperty.call(cookie, 'name') &&
+          Object.prototype.hasOwnProperty.call(cookie, 'value') &&
+          cookie.name === key
         ) {
-          return cookie['value'];
+          return cookie.value;
         }
       }
       return null;
@@ -203,15 +203,15 @@ var cookies = function () {
       removeCookie(key, true);
     },
     clear: function () {
-      var cookieArray = document.cookie.split(';');
-      for (var i = 0; i < cookieArray.length; i++) {
-        var cookie = processCookie(cookieArray[i]);
+      const cookieArray = document.cookie.split(';');
+      for (let i = 0; i < cookieArray.length; i++) {
+        const cookie = processCookie(cookieArray[i]);
         if (
           cookie &&
-          cookie.hasOwnProperty('name') &&
-          isBranchCookie(cookie['name'])
+          Object.prototype.hasOwnProperty.call(cookie, 'name') &&
+          isBranchCookie(cookie.name)
         ) {
-          removeCookie(cookie['name'], false);
+          removeCookie(cookie.name, false);
         }
       }
     },
@@ -221,11 +221,11 @@ var cookies = function () {
   };
 };
 
-storage.BranchStorage.prototype['cookie'] = function () {
+storage.BranchStorage.prototype.cookie = function () {
   return cookies();
 };
 
-storage.BranchStorage.prototype['pojo'] = {
+storage.BranchStorage.prototype.pojo = {
   getAll: function () {
     return this._store;
   },

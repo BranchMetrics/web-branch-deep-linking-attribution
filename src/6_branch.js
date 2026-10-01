@@ -16,12 +16,12 @@ import { journeys_utils } from './journeys_utils.js';
 
 /*globals Ti, BranchStorage, require */
 
-var default_branch;
+let default_branch;
 
 /**
  * Enum for what parameters are in a wrapped Branch method
  */
-var callback_params = {
+const callback_params = {
   NO_CALLBACK: 0,
   CALLBACK_ERR: 1,
   CALLBACK_ERR_DATA: 2,
@@ -30,7 +30,7 @@ var callback_params = {
 /**
  * Enum for the initialization state of the Branch Object
  */
-var init_states = {
+const init_states = {
   NO_INIT: 0,
   INIT_PENDING: 1,
   INIT_FAILED: 2,
@@ -40,7 +40,7 @@ var init_states = {
 /**
  * Failure codes for Branch initialization
  */
-var init_state_fail_codes = {
+const init_state_fail_codes = {
   NO_FAILURE: 0,
   UNKNOWN_CAUSE: 1,
   OPEN_FAILED: 2,
@@ -53,27 +53,26 @@ var init_state_fail_codes = {
  * @param {function(...?): undefined} func
  * @param {boolean=} init
  */
-var wrap = function (parameters, func, init) {
-  var r = function () {
-    var self = this;
-    var args;
-    var callback;
-    var lastArg = arguments[arguments.length - 1];
+const wrap = function (parameters, func, init) {
+  const r = function (...callArgs) {
+    const self = this;
+    let args;
+    let callback;
+    const lastArg = callArgs[callArgs.length - 1];
     if (
       parameters === callback_params.NO_CALLBACK ||
       typeof lastArg !== 'function'
     ) {
-      callback = function (err) {
+      callback = function (_err) {
         return;
       };
-      args = Array.prototype.slice.call(arguments);
+      args = callArgs.slice();
     } else {
-      args =
-        Array.prototype.slice.call(arguments, 0, arguments.length - 1) || [];
+      args = callArgs.slice(0, callArgs.length - 1) || [];
       callback = lastArg;
     }
     self._queue(function (next) {
-      var done = function (err, data) {
+      const done = function (err, data) {
         try {
           if (err && parameters === callback_params.NO_CALLBACK) {
             throw err;
@@ -127,13 +126,13 @@ export const Branch = function () {
   }
   this._queue = task_queue();
 
-  var storageMethods = ['session', 'cookie', 'pojo'];
+  const storageMethods = ['session', 'cookie', 'pojo'];
 
   this._storage = new storage.BranchStorage(storageMethods);
 
   this._server = new Server();
 
-  var sdk = 'web';
+  const sdk = 'web';
 
   this._listeners = [];
 
@@ -152,84 +151,78 @@ export const Branch = function () {
  */
 Branch.prototype._api = function (resource, obj, callback) {
   if (this.app_id) {
-    obj['app_id'] = this.app_id;
+    obj.app_id = this.app_id;
   }
   if (this.branch_key) {
-    obj['branch_key'] = this.branch_key;
+    obj.branch_key = this.branch_key;
   }
   if (
-    ((resource.params && resource.params['session_id']) ||
-      (resource.queryPart && resource.queryPart['session_id'])) &&
+    (resource.params?.session_id || resource.queryPart?.session_id) &&
     this.session_id
   ) {
-    obj['session_id'] = this.session_id;
+    obj.session_id = this.session_id;
   }
   if (
-    ((resource.params && resource.params['identity_id']) ||
-      (resource.queryPart && resource.queryPart['identity_id'])) &&
+    (resource.params?.identity_id || resource.queryPart?.identity_id) &&
     this.identity_id
   ) {
-    obj['identity_id'] = this.identity_id;
+    obj.identity_id = this.identity_id;
   }
 
   if (resource.endpoint.indexOf('/v1/') < 0) {
     if (
-      ((resource.params && resource.params['developer_identity']) ||
-        (resource.queryPart && resource.queryPart['developer_identity'])) &&
+      (resource.params?.developer_identity ||
+        resource.queryPart?.developer_identity) &&
       this.identity
     ) {
-      obj['developer_identity'] = this.identity;
+      obj.developer_identity = this.identity;
     }
   } else {
     if (
-      ((resource.params && resource.params['identity']) ||
-        (resource.queryPart && resource.queryPart['identity'])) &&
+      (resource.params?.identity || resource.queryPart?.identity) &&
       this.identity
     ) {
-      obj['identity'] = this.identity;
+      obj.identity = this.identity;
     }
   }
 
   if (
-    ((resource.params && resource.params['link_click_id']) ||
-      (resource.queryPart && resource.queryPart['link_click_id'])) &&
+    (resource.params?.link_click_id || resource.queryPart?.link_click_id) &&
     this.link_click_id
   ) {
-    obj['link_click_id'] = this.link_click_id;
+    obj.link_click_id = this.link_click_id;
   }
-  if (
-    ((resource.params && resource.params['sdk']) ||
-      (resource.queryPart && resource.queryPart['sdk'])) &&
-    this.sdk
-  ) {
-    obj['sdk'] = this.sdk;
+  if ((resource.params?.sdk || resource.queryPart?.sdk) && this.sdk) {
+    obj.sdk = this.sdk;
   }
 
   if (
-    ((resource.params && resource.params['browser_fingerprint_id']) ||
-      (resource.queryPart && resource.queryPart['browser_fingerprint_id'])) &&
+    (resource.params?.browser_fingerprint_id ||
+      resource.queryPart?.browser_fingerprint_id) &&
     this.browser_fingerprint_id
   ) {
-    obj['browser_fingerprint_id'] = this.browser_fingerprint_id;
+    obj.browser_fingerprint_id = this.browser_fingerprint_id;
   }
   // Adds tracking_disabled to every post request when enabled
   if (utils.userPreferences.trackingDisabled) {
-    obj['tracking_disabled'] = utils.userPreferences.trackingDisabled;
+    obj.tracking_disabled = utils.userPreferences.trackingDisabled;
   }
   if (this.requestMetadata) {
-    for (var metadata_key in this.requestMetadata) {
-      if (this.requestMetadata.hasOwnProperty(metadata_key)) {
-        if (!obj['branch_requestMetadata']) {
-          obj['branch_requestMetadata'] = {};
+    for (const metadata_key in this.requestMetadata) {
+      if (
+        Object.prototype.hasOwnProperty.call(this.requestMetadata, metadata_key)
+      ) {
+        if (!obj.branch_requestMetadata) {
+          obj.branch_requestMetadata = {};
         }
-        obj['branch_requestMetadata'][metadata_key] =
+        obj.branch_requestMetadata[metadata_key] =
           this.requestMetadata[metadata_key];
       }
     }
   }
   if (utils.shouldAddDMAParams(resource.endpoint)) {
-    var dmaData = this._storage.get('branch_dma_data', true);
-    obj['branch_dma_data'] = dmaData ? safejson.parse(dmaData) : null;
+    const dmaData = this._storage.get('branch_dma_data', true);
+    obj.branch_dma_data = dmaData ? safejson.parse(dmaData) : null;
   }
   if (resource.endpoint !== '/_r') {
     resource.destination = config.api_endpoint;
@@ -248,19 +241,17 @@ Branch.prototype._api = function (resource, obj, callback) {
  * @function Branch._referringLink
  */
 Branch.prototype._referringLink = function (forJourneys) {
-  var sessionData = session.get(this._storage);
-  var referringLink = sessionData && sessionData['referring_link'];
+  const sessionData = session.get(this._storage);
+  const referringLink = sessionData?.referring_link;
   if (referringLink) {
     return referringLink;
   } else {
     if (utils.userPreferences.enableExtendedJourneysAssist && forJourneys) {
-      var localStorageData = session.get(this._storage, true);
-      var referring_Link =
-        localStorageData && localStorageData['referring_link'];
-      var referringLinkExpiry =
-        localStorageData && localStorageData['referringLinkExpiry'];
+      const localStorageData = session.get(this._storage, true);
+      const referring_Link = localStorageData?.referring_link;
+      const referringLinkExpiry = localStorageData?.referringLinkExpiry;
       if (referring_Link && referringLinkExpiry) {
-        var now = new Date();
+        const now = new Date();
         // compare the expiry time of the item with the current time
         if (now.getTime() > referringLinkExpiry) {
           session.patch(
@@ -276,7 +267,7 @@ Branch.prototype._referringLink = function (forJourneys) {
     }
   }
 
-  var clickId = this._storage.get('click_id');
+  const clickId = this._storage.get('click_id');
   if (clickId) {
     return config.link_service_endpoint + '/c/' + clickId;
   }
@@ -290,7 +281,7 @@ Branch.prototype._referringLink = function (forJourneys) {
  * @param {Object} data - _optional_ - data to pass into listener callback.
  */
 Branch.prototype._publishEvent = function (event, data) {
-  for (var i = 0; i < this._listeners.length; i++) {
+  for (let i = 0; i < this._listeners.length; i++) {
     if (!this._listeners[i].event || this._listeners[i].event === event) {
       this._listeners[i].listener(event, data);
     }
@@ -361,14 +352,14 @@ Branch.prototype._publishEvent = function (event, data) {
  * **Note:** `Branch.init` must be called prior to calling any other Branch functions.
  * ___
  */
-Branch.prototype['init'] = wrap(
+Branch.prototype.init = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, branch_key, options) {
     if (utils.navigationTimingAPIEnabled) {
       utils.instrumentation['init-began-at'] = utils.timeSinceNavigationStart();
     }
 
-    var self = this;
+    const self = this;
 
     self.init_state = init_states.INIT_PENDING;
 
@@ -383,40 +374,32 @@ Branch.prototype['init'] = wrap(
     self.init_options = options;
 
     utils.retries =
-      options && options['retries'] && Number.isInteger(options['retries'])
-        ? options['retries']
+      options?.retries && Number.isInteger(options.retries)
+        ? options.retries
         : utils.retries;
     utils.retry_delay =
-      options &&
-      options['retry_delay'] &&
-      Number.isInteger(options['retry_delay'])
-        ? options['retry_delay']
+      options?.retry_delay && Number.isInteger(options.retry_delay)
+        ? options.retry_delay
         : utils.retry_delay;
     utils.timeout =
-      options && options['timeout'] && Number.isInteger(options['timeout'])
-        ? options['timeout']
+      options?.timeout && Number.isInteger(options.timeout)
+        ? options.timeout
         : utils.timeout;
-    utils.nonce = options && options['nonce'] ? options['nonce'] : utils.nonce;
-    utils.debug =
-      options && options['enableLogging']
-        ? options['enableLogging']
-        : utils.debug;
+    utils.nonce = options?.nonce ? options.nonce : utils.nonce;
+    utils.debug = options?.enableLogging ? options.enableLogging : utils.debug;
 
     utils.userPreferences.trackingDisabled =
-      options &&
-      options['tracking_disabled'] &&
-      options['tracking_disabled'] === true
+      options?.tracking_disabled && options.tracking_disabled === true
         ? true
         : false;
     utils.userPreferences.enableExtendedJourneysAssist =
-      options && options['enableExtendedJourneysAssist']
-        ? options['enableExtendedJourneysAssist']
+      options?.enableExtendedJourneysAssist
+        ? options.enableExtendedJourneysAssist
         : utils.userPreferences.enableExtendedJourneysAssist;
     utils.extendedJourneysAssistExpiryTime =
-      options &&
-      options['extendedJourneysAssistExpiryTime'] &&
-      Number.isInteger(options['extendedJourneysAssistExpiryTime'])
-        ? options['extendedJourneysAssistExpiryTime']
+      options?.extendedJourneysAssistExpiryTime &&
+      Number.isInteger(options.extendedJourneysAssistExpiryTime)
+        ? options.extendedJourneysAssistExpiryTime
         : utils.extendedJourneysAssistExpiryTime;
     utils.userPreferences.allowErrorsInCallback = false;
     utils.getClientHints();
@@ -427,64 +410,63 @@ Branch.prototype['init'] = wrap(
 
     // initialize identity_id from storage
     // note the previous line scrubs this if tracking disabled.
-    var localData = session.get(self._storage, true);
-    self.identity_id = localData && localData['identity_id'];
+    const localData = session.get(self._storage, true);
+    // biome-ignore lint/complexity/useOptionalChain: keeps identity_id null (not undefined) when storage is empty
+    self.identity_id = localData && localData.identity_id;
 
-    var setBranchValues = function (data) {
-      if (data['link_click_id']) {
-        self.link_click_id = data['link_click_id'].toString();
+    const setBranchValues = function (data) {
+      if (data.link_click_id) {
+        self.link_click_id = data.link_click_id.toString();
       }
-      if (data['session_link_click_id']) {
-        self.session_link_click_id = data['session_link_click_id'].toString();
+      if (data.session_link_click_id) {
+        self.session_link_click_id = data.session_link_click_id.toString();
       }
-      if (data['session_id']) {
-        self.session_id = data['session_id'].toString();
+      if (data.session_id) {
+        self.session_id = data.session_id.toString();
       }
-      if (data['identity_id']) {
-        self.identity_id = data['identity_id'].toString();
+      if (data.identity_id) {
+        self.identity_id = data.identity_id.toString();
       }
-      if (data['identity']) {
-        self.identity = data['identity'].toString();
+      if (data.identity) {
+        self.identity = data.identity.toString();
       }
-      if (data['link']) {
-        self.sessionLink = data['link'];
+      if (data.link) {
+        self.sessionLink = data.link;
       }
-      if (data['referring_link']) {
-        data['referring_link'] = utils.processReferringLink(
-          data['referring_link'],
+      if (data.referring_link) {
+        data.referring_link = utils.processReferringLink(data.referring_link);
+      }
+      if (!data.click_id && data.referring_link) {
+        data.click_id = utils.getClickIdAndSearchStringFromLink(
+          data.referring_link,
         );
       }
-      if (!data['click_id'] && data['referring_link']) {
-        data['click_id'] = utils.getClickIdAndSearchStringFromLink(
-          data['referring_link'],
-        );
-      }
 
-      self.browser_fingerprint_id = data['browser_fingerprint_id'];
+      self.browser_fingerprint_id = data.browser_fingerprint_id;
 
       return data;
     };
 
-    var sessionData = session.get(self._storage);
+    const sessionData = session.get(self._storage);
 
-    var branchMatchIdFromOptions =
+    const branchMatchIdFromOptions =
       options &&
-      typeof options['branch_match_id'] !== 'undefined' &&
-      options['branch_match_id'] !== null
-        ? options['branch_match_id']
+      typeof options.branch_match_id !== 'undefined' &&
+      options.branch_match_id !== null
+        ? options.branch_match_id
         : null;
-    var link_identifier =
+    const link_identifier =
       branchMatchIdFromOptions ||
       utils.getParamValue('_branch_match_id') ||
       utils.hashValue('r');
-    var freshInstall = !self.identity_id; // initialized from local storage above
+    const freshInstall = !self.identity_id; // initialized from local storage above
     self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
-    var fetchLatestBrowserFingerPrintID = function (cb) {
-      var params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
-      var currentSessionData = session.get(self._storage) || {};
-      var permData = session.get(self._storage, true) || {};
-      if (permData['browser_fingerprint_id']) {
-        params_r['_t'] = permData['browser_fingerprint_id'];
+    const fetchLatestBrowserFingerPrintID = function (cb) {
+      const params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
+      const currentSessionData = session.get(self._storage) || {};
+      const permData = session.get(self._storage, true) || {};
+      if (permData.browser_fingerprint_id) {
+        params_r._t = permData.browser_fingerprint_id;
       }
 
       if (!utils.isSafari11OrGreater() && !utils.isIOSWKWebView()) {
@@ -497,7 +479,7 @@ Branch.prototype['init'] = wrap(
               self.init_state_fail_details = err.message;
             }
             if (browser_fingerprint_id) {
-              currentSessionData['browser_fingerprint_id'] =
+              currentSessionData.browser_fingerprint_id =
                 browser_fingerprint_id;
             }
           },
@@ -508,14 +490,14 @@ Branch.prototype['init'] = wrap(
       }
     };
 
-    var restoreIdentityOnInstall = function (data) {
+    const restoreIdentityOnInstall = function (data) {
       if (freshInstall) {
-        data['identity'] = self.identity;
+        data.identity = self.identity;
       }
       return data;
     };
 
-    var finishInit = function (err, data) {
+    const finishInit = function (err, data) {
       if (data) {
         data = setBranchValues(data);
 
@@ -525,10 +507,8 @@ Branch.prototype['init'] = wrap(
         }
 
         self.init_state = init_states.INIT_SUCCEEDED;
-        data['data_parsed'] =
-          data['data'] && data['data'].length !== 0
-            ? safejson.parse(data['data'])
-            : {};
+        data.data_parsed =
+          data.data && data.data.length !== 0 ? safejson.parse(data.data) : {};
       }
       if (err) {
         self.init_state = init_states.INIT_FAILED;
@@ -545,40 +525,40 @@ Branch.prototype['init'] = wrap(
       } catch (_e) {
         // pass
       } finally {
-        self['renderFinalize']();
+        self.renderFinalize();
       }
 
-      var additionalMetadata = utils.getAdditionalMetadata();
-      var metadata = utils.validateParameterType(options['metadata'], 'object')
-        ? options['metadata']
+      const additionalMetadata = utils.getAdditionalMetadata();
+      const metadata = utils.validateParameterType(options.metadata, 'object')
+        ? options.metadata
         : null;
       if (metadata) {
-        var hostedDeeplinkDataWithMergedMetadata =
+        const hostedDeeplinkDataWithMergedMetadata =
           utils.mergeHostedDeeplinkData(
-            additionalMetadata['hosted_deeplink_data'],
+            additionalMetadata.hosted_deeplink_data,
             metadata,
           );
         if (
           hostedDeeplinkDataWithMergedMetadata &&
           Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0
         ) {
-          additionalMetadata['hosted_deeplink_data'] =
+          additionalMetadata.hosted_deeplink_data =
             hostedDeeplinkDataWithMergedMetadata;
         }
       }
-      var requestData = branch_view._getPageviewRequestData(
+      const requestData = branch_view._getPageviewRequestData(
         journeys_utils._getPageviewMetadata(options, additionalMetadata),
         options,
         self,
         false,
       );
-      self['renderQueue'](function () {
+      self.renderQueue(function () {
         self._api(
           resources.pageview,
           requestData,
           function (err, pageviewResponse) {
             if (!err && typeof pageviewResponse === 'object') {
-              var journeyInTestMode = requestData['branch_view_id']
+              const journeyInTestMode = requestData.branch_view_id
                 ? true
                 : false;
               if (
@@ -589,31 +569,31 @@ Branch.prototype['init'] = wrap(
                 )
               ) {
                 branch_view.displayJourney(
-                  pageviewResponse['template'],
+                  pageviewResponse.template,
                   requestData,
-                  requestData['branch_view_id'] ||
-                    pageviewResponse['event_data']['branch_view_data']['id'],
-                  pageviewResponse['event_data']['branch_view_data'],
+                  requestData.branch_view_id ||
+                    pageviewResponse.event_data.branch_view_data.id,
+                  pageviewResponse.event_data.branch_view_data,
                   journeyInTestMode,
-                  pageviewResponse['journey_link_data'],
+                  pageviewResponse.journey_link_data,
                   {
-                    use_v2_renderer: pageviewResponse['use_v2_renderer'],
-                    animationConfig: pageviewResponse['animationConfig'],
+                    use_v2_renderer: pageviewResponse.use_v2_renderer,
+                    animationConfig: pageviewResponse.animationConfig,
                   },
                 );
               } else {
                 if (
-                  pageviewResponse['auto_branchify'] ||
+                  pageviewResponse.auto_branchify ||
                   (!branchMatchIdFromOptions &&
                     utils.getParamValue('branchify_url') &&
                     self._referringLink())
                 ) {
-                  var linkOptions = {
+                  const linkOptions = {
                     'make_new_link': false,
                     'open_app': true,
                     'auto_branchify': true,
                   };
-                  this['branch']['deepview']({}, linkOptions);
+                  this.branch.deepview({}, linkOptions);
                 }
                 journeys_utils.branch._publishEvent('willNotShowJourney');
               }
@@ -625,9 +605,9 @@ Branch.prototype['init'] = wrap(
         );
       });
     };
-    var attachVisibilityEvent = function () {
-      var hidden;
-      var changeEvent;
+    const attachVisibilityEvent = function () {
+      let hidden;
+      let changeEvent;
       if (typeof document.hidden !== 'undefined') {
         hidden = 'hidden';
         changeEvent = 'visibilitychange';
@@ -661,8 +641,7 @@ Branch.prototype['init'] = wrap(
       }
     };
     if (
-      sessionData &&
-      sessionData['session_id'] &&
+      sessionData?.session_id &&
       !link_identifier &&
       !utils.getParamValue('branchify_url')
     ) {
@@ -674,19 +653,19 @@ Branch.prototype['init'] = wrap(
       return;
     }
 
-    var params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
-    var permData = session.get(self._storage, true) || {};
+    const params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
+    const permData = session.get(self._storage, true) || {};
 
-    if (permData['browser_fingerprint_id']) {
-      params_r['_t'] = permData['browser_fingerprint_id'];
+    if (permData.browser_fingerprint_id) {
+      params_r._t = permData.browser_fingerprint_id;
     }
 
-    if (permData['identity']) {
-      self.identity = permData['identity'];
+    if (permData.identity) {
+      self.identity = permData.identity;
     }
 
     // Execute the /v1/open right away or after _open_delay_ms.
-    var open_delay = parseInt(utils.getParamValue('[?&]_open_delay_ms'), 10);
+    const open_delay = parseInt(utils.getParamValue('[?&]_open_delay_ms'), 10);
 
     if (!utils.isSafari11OrGreater() && !utils.isIOSWKWebView()) {
       self._api(resources._r, params_r, function (err, browser_fingerprint_id) {
@@ -702,9 +681,9 @@ Branch.prototype['init'] = wrap(
               'link_identifier': link_identifier,
               'browser_fingerprint_id':
                 link_identifier || browser_fingerprint_id,
-              'identity': permData['identity'] ? permData['identity'] : null,
+              'identity': permData.identity ? permData.identity : null,
               'alternative_browser_fingerprint_id':
-                permData['browser_fingerprint_id'],
+                permData.browser_fingerprint_id,
               'options': options,
               'initial_referrer': utils.getInitialReferrer(
                 self._referringLink(),
@@ -723,15 +702,15 @@ Branch.prototype['init'] = wrap(
                 self.init_state_fail_details = err.message;
               }
               if (!err && typeof data === 'object') {
-                if (data['branch_view_enabled']) {
-                  self._branchViewEnabled = !!data['branch_view_enabled'];
+                if (data.branch_view_enabled) {
+                  self._branchViewEnabled = !!data.branch_view_enabled;
                   self._storage.set(
                     'branch_view_enabled',
                     self._branchViewEnabled,
                   );
                 }
                 if (link_identifier) {
-                  data['click_id'] = link_identifier;
+                  data.click_id = link_identifier;
                 }
               }
               attachVisibilityEvent();
@@ -747,10 +726,10 @@ Branch.prototype['init'] = wrap(
           {
             'link_identifier': link_identifier,
             'browser_fingerprint_id':
-              link_identifier || permData['browser_fingerprint_id'],
-            'identity': permData['identity'] ? permData['identity'] : null,
+              link_identifier || permData.browser_fingerprint_id,
+            'identity': permData.identity ? permData.identity : null,
             'alternative_browser_fingerprint_id':
-              permData['browser_fingerprint_id'],
+              permData.browser_fingerprint_id,
             'options': options,
             'initial_referrer': utils.getInitialReferrer(self._referringLink()),
             'current_url': utils.getCurrentUrl(),
@@ -767,15 +746,15 @@ Branch.prototype['init'] = wrap(
               self.init_state_fail_details = err.message;
             }
             if (!err && typeof data === 'object') {
-              if (data['branch_view_enabled']) {
-                self._branchViewEnabled = !!data['branch_view_enabled'];
+              if (data.branch_view_enabled) {
+                self._branchViewEnabled = !!data.branch_view_enabled;
                 self._storage.set(
                   'branch_view_enabled',
                   self._branchViewEnabled,
                 );
               }
               if (link_identifier) {
-                data['click_id'] = link_identifier;
+                data.click_id = link_identifier;
               }
             }
             attachVisibilityEvent();
@@ -791,10 +770,10 @@ Branch.prototype['init'] = wrap(
 /**
  * currently private method, which may be opened to the public in the future
  */
-Branch.prototype['renderQueue'] = wrap(
+Branch.prototype.renderQueue = wrap(
   callback_params.NO_CALLBACK,
   function (done, render) {
-    var self = this;
+    const self = this;
     if (self._renderFinalized) {
       render();
     } else {
@@ -808,10 +787,10 @@ Branch.prototype['renderQueue'] = wrap(
 /**
  * currently private method, which may be opened to the public in the future
  */
-Branch.prototype['renderFinalize'] = wrap(
+Branch.prototype.renderFinalize = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
-    var self = this;
+    const self = this;
     if (self._renderQueue && self._renderQueue.length > 0) {
       self._renderQueue.forEach(function (callback) {
         callback.call(this);
@@ -836,15 +815,13 @@ Branch.prototype['renderFinalize'] = wrap(
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
-Branch.prototype['data'] = wrap(
+Branch.prototype.data = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
-    var data = utils.whiteListSessionData(session.get(this._storage));
-    data['referring_link'] = this._referringLink();
-    data['data_parsed'] =
-      data['data'] && data['data'].length !== 0
-        ? safejson.parse(data['data'])
-        : {};
+    const data = utils.whiteListSessionData(session.get(this._storage));
+    data.referring_link = this._referringLink();
+    data.data_parsed =
+      data.data && data.data.length !== 0 ? safejson.parse(data.data) : {};
     done(null, data);
   },
 );
@@ -864,7 +841,7 @@ Branch.prototype['data'] = wrap(
  * ___
  *
  */
-Branch.prototype['first'] = wrap(
+Branch.prototype.first = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
     done(null, utils.whiteListSessionData(session.get(this._storage, true)));
@@ -906,12 +883,12 @@ Branch.prototype['first'] = wrap(
  * ```
  * ___
  */
-Branch.prototype['setIdentity'] = wrap(
+Branch.prototype.setIdentity = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, identity) {
-    var self = this;
+    const self = this;
     if (identity) {
-      var data = {
+      const data = {
         identity_id: self.identity_id,
         session_id: self.session_id,
         link: self.sessionLink,
@@ -949,33 +926,30 @@ Branch.prototype['setIdentity'] = wrap(
  * ___
  *
  */
-Branch.prototype['logout'] = wrap(
-  callback_params.CALLBACK_ERR,
-  function (done) {
-    var self = this;
-    var data = {
-      'identity': null,
-    };
+Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function (done) {
+  const self = this;
+  const data = {
+    'identity': null,
+  };
 
-    self.identity = null;
-    // make sure to update both session and local. removeNull = true deletes, in particular,
-    // identity instead of inserting null in storage.
-    session.patch(
-      self._storage,
-      data,
-      /* updateLocalStorage */ true,
-      /* removeNull */ true,
-    );
+  self.identity = null;
+  // make sure to update both session and local. removeNull = true deletes, in particular,
+  // identity instead of inserting null in storage.
+  session.patch(
+    self._storage,
+    data,
+    /* updateLocalStorage */ true,
+    /* removeNull */ true,
+  );
 
-    done(null);
-  },
-);
+  done(null);
+});
 
-Branch.prototype['getBrowserFingerprintId'] = wrap(
+Branch.prototype.getBrowserFingerprintId = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
-    var permData = session.get(this._storage, true) || {};
-    done(null, permData['browser_fingerprint_id'] || null);
+    const permData = session.get(this._storage, true) || {};
+    done(null, permData.browser_fingerprint_id || null);
   },
 );
 
@@ -994,7 +968,7 @@ Branch.prototype['getBrowserFingerprintId'] = wrap(
  * ___
  *
  */
-Branch.prototype['crossPlatformIds'] = wrap(
+Branch.prototype.crossPlatformIds = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
     this._api(
@@ -1003,7 +977,7 @@ Branch.prototype['crossPlatformIds'] = wrap(
         'user_data': safejson.stringify(utils.getUserData(this)),
       },
       function (err, data) {
-        return done(err || null, (data && data['user_data']) || null);
+        return done(err || null, data?.user_data || null);
       },
     );
   },
@@ -1026,7 +1000,7 @@ Branch.prototype['crossPlatformIds'] = wrap(
  * ___
  *
  */
-Branch.prototype['lastAttributedTouchData'] = wrap(
+Branch.prototype.lastAttributedTouchData = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, attribution_window) {
     attribution_window = utils.validateParameterType(
@@ -1035,7 +1009,7 @@ Branch.prototype['lastAttributedTouchData'] = wrap(
     )
       ? attribution_window
       : null;
-    var userData = utils.getUserData(this);
+    const userData = utils.getUserData(this);
     utils.addPropertyIfNotNull(
       userData,
       'attribution_window',
@@ -1078,72 +1052,65 @@ Branch.prototype['lastAttributedTouchData'] = wrap(
  * ```
  * ___
  */
-Branch.prototype['track'] = wrap(
+Branch.prototype.track = wrap(
   callback_params.CALLBACK_ERR,
   function (done, event, metadata, options) {
-    var self = this;
+    const self = this;
 
     metadata = metadata || {};
 
     options = options || {};
 
-    utils.nonce = options['nonce'] ? options['nonce'] : utils.nonce;
+    utils.nonce = options.nonce ? options.nonce : utils.nonce;
 
     if (event === 'pageview') {
-      var hostedDeeplinkDataWithMergedMetadata = utils.mergeHostedDeeplinkData(
-        utils.getHostedDeepLinkData(),
-        metadata,
-      );
+      const hostedDeeplinkDataWithMergedMetadata =
+        utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
       if (
         hostedDeeplinkDataWithMergedMetadata &&
         Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0
       ) {
-        metadata['hosted_deeplink_data'] = hostedDeeplinkDataWithMergedMetadata;
+        metadata.hosted_deeplink_data = hostedDeeplinkDataWithMergedMetadata;
       }
 
-      var requestData = branch_view._getPageviewRequestData(
+      const requestData = branch_view._getPageviewRequestData(
         journeys_utils._getPageviewMetadata(options, metadata),
         options,
         self,
         false,
       );
-      self._api(
-        resources.pageview,
-        requestData,
-        function (err, pageviewResponse) {
-          if (!err && typeof pageviewResponse === 'object') {
-            var journeyInTestMode = requestData['branch_view_id']
-              ? true
-              : false;
-            if (
-              branch_view.shouldDisplayJourney(
-                pageviewResponse,
-                options,
-                journeyInTestMode,
-              )
-            ) {
-              branch_view.displayJourney(
-                pageviewResponse['template'],
-                requestData,
-                requestData['branch_view_id'] ||
-                  pageviewResponse['event_data']['branch_view_data']['id'],
-                pageviewResponse['event_data']['branch_view_data'],
-                journeyInTestMode,
-                pageviewResponse['journey_link_data'],
-                {
-                  use_v2_renderer: pageviewResponse['use_v2_renderer'],
-                  animationConfig: pageviewResponse['animationConfig'],
-                },
-              );
-            } else {
-              journeys_utils.branch._publishEvent('willNotShowJourney');
-            }
+      self._api(resources.pageview, requestData, function (...responseArgs) {
+        const [err, pageviewResponse] = responseArgs;
+        if (!err && typeof pageviewResponse === 'object') {
+          const journeyInTestMode = requestData.branch_view_id ? true : false;
+          if (
+            branch_view.shouldDisplayJourney(
+              pageviewResponse,
+              options,
+              journeyInTestMode,
+            )
+          ) {
+            branch_view.displayJourney(
+              pageviewResponse.template,
+              requestData,
+              requestData.branch_view_id ||
+                pageviewResponse.event_data.branch_view_data.id,
+              pageviewResponse.event_data.branch_view_data,
+              journeyInTestMode,
+              pageviewResponse.journey_link_data,
+              {
+                use_v2_renderer: pageviewResponse.use_v2_renderer,
+                animationConfig: pageviewResponse.animationConfig,
+              },
+            );
+          } else {
+            journeys_utils.branch._publishEvent('willNotShowJourney');
           }
-          if (typeof done === 'function') {
-            done.apply(this, arguments);
-          }
-        },
-      );
+        }
+        if (typeof done === 'function') {
+          done.apply(this, responseArgs);
+        }
+      });
     } else {
       console.warn('track method currently supports only pageview event.');
     }
@@ -1271,7 +1238,7 @@ Branch.prototype['track'] = wrap(
  * ```
  * ___
  */
-Branch.prototype['logEvent'] = wrap(
+Branch.prototype.logEvent = wrap(
   callback_params.CALLBACK_ERR,
   function (done, name, eventData, contentItems, customer_event_alias) {
     name = utils.validateParameterType(name, 'string') ? name : null;
@@ -1284,7 +1251,7 @@ Branch.prototype['logEvent'] = wrap(
     )
       ? customer_event_alias
       : null;
-    var extractedEventAndCustomData =
+    const extractedEventAndCustomData =
       utils.separateEventAndCustomData(eventData);
 
     if (utils.isStandardEvent(name)) {
@@ -1297,19 +1264,15 @@ Branch.prototype['logEvent'] = wrap(
           'name': name,
           'user_data': safejson.stringify(utils.getUserData(this)),
           'custom_data': safejson.stringify(
-            (extractedEventAndCustomData &&
-              extractedEventAndCustomData['custom_data']) ||
-              {},
+            extractedEventAndCustomData?.custom_data || {},
           ),
           'event_data': safejson.stringify(
-            (extractedEventAndCustomData &&
-              extractedEventAndCustomData['event_data']) ||
-              {},
+            extractedEventAndCustomData?.event_data || {},
           ),
           'content_items': safejson.stringify(contentItems || []),
           'customer_event_alias': customer_event_alias,
         },
-        function (err, data) {
+        function (err, _data) {
           return done(err || null);
         },
       );
@@ -1320,19 +1283,15 @@ Branch.prototype['logEvent'] = wrap(
           'name': name,
           'user_data': safejson.stringify(utils.getUserData(this)),
           'custom_data': safejson.stringify(
-            (extractedEventAndCustomData &&
-              extractedEventAndCustomData['custom_data']) ||
-              {},
+            extractedEventAndCustomData?.custom_data || {},
           ),
           'event_data': safejson.stringify(
-            (extractedEventAndCustomData &&
-              extractedEventAndCustomData['event_data']) ||
-              {},
+            extractedEventAndCustomData?.event_data || {},
           ),
           'content_items': safejson.stringify(contentItems || []),
           'customer_event_alias': customer_event_alias,
         },
-        function (err, data) {
+        function (err, _data) {
           return done(err || null);
         },
       );
@@ -1430,17 +1389,18 @@ Branch.prototype['logEvent'] = wrap(
  * ```
  *
  */
-Branch.prototype['link'] = wrap(
+Branch.prototype.link = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, data) {
-    var linkData = utils.cleanLinkData(data);
-    var keyCopy = this.branch_key;
+    const linkData = utils.cleanLinkData(data);
+    const keyCopy = this.branch_key;
     this._api(resources.link, linkData, function (err, data) {
       if (err) {
         // if an error occurs or if tracking is disabled then return a dynamic link
         return done(err, utils.generateDynamicBNCLink(keyCopy, linkData));
       }
-      done(null, data && data['url']);
+      // biome-ignore lint/complexity/useOptionalChain: callers get null (not undefined) when data is null
+      done(null, data && data.url);
     });
   },
 );
@@ -1503,11 +1463,11 @@ Branch.prototype['link'] = wrap(
  * );
  * ```
  */
-Branch.prototype['qrCode'] = wrap(
+Branch.prototype.qrCode = wrap(
   callback_params.CALLBACK_ERR_DATA,
-  function (done, linkData, qrCodeSettings, options) {
-    var data = utils.cleanLinkData(linkData);
-    data['qr_code_settings'] = safejson.stringify(
+  function (done, linkData, qrCodeSettings, _options) {
+    const data = utils.cleanLinkData(linkData);
+    data.qr_code_settings = safejson.stringify(
       utils.convertObjectValuesToString(qrCodeSettings || {}),
     );
     this._api(
@@ -1516,10 +1476,10 @@ Branch.prototype['qrCode'] = wrap(
       function (error, rawBuffer) {
         function QrCode() {}
         if (!error) {
-          QrCode['rawBuffer'] = rawBuffer;
-          QrCode['base64'] = function () {
+          QrCode.rawBuffer = rawBuffer;
+          QrCode.base64 = function () {
             // First Encode array buffer as UTF-8 String, then Base64 Encode
-            if (this['rawBuffer']) {
+            if (this.rawBuffer) {
               const binaryString = Array.from(new Uint8Array(rawBuffer))
                 .map((byte) => String.fromCharCode(byte))
                 .join('');
@@ -1594,52 +1554,54 @@ Branch.prototype['qrCode'] = wrap(
  * ```
  *
  */
-Branch.prototype['deepview'] = wrap(
+Branch.prototype.deepview = wrap(
   callback_params.CALLBACK_ERR,
   function (done, data, options) {
-    var self = this;
+    const self = this;
 
     if (!options) {
       options = {};
     }
 
-    if (typeof options['deepview_type'] === 'undefined') {
-      options['deepview_type'] = 'deepview';
+    if (typeof options.deepview_type === 'undefined') {
+      options.deepview_type = 'deepview';
     } else {
       // we are currently limited to just 'deepview' or 'banner', but if that changes,
       // then this line should be removed
-      options['deepview_type'] = 'banner';
+      options.deepview_type = 'banner';
     }
 
-    data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
+    data.data = utils.merge(utils.getHostedDeepLinkData(), data.data);
     data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
 
-    var cleanedData = utils.cleanLinkData(data);
-    var fallbackUrl = utils.generateDynamicBNCLink(
+    const cleanedData = utils.cleanLinkData(data);
+    const fallbackUrl = utils.generateDynamicBNCLink(
       this.branch_key,
       cleanedData,
     );
 
     if (
-      options['open_app'] ||
-      options['open_app'] === null ||
-      typeof options['open_app'] === 'undefined'
+      options.open_app ||
+      options.open_app === null ||
+      typeof options.open_app === 'undefined'
     ) {
-      cleanedData['open_app'] = true;
+      cleanedData.open_app = true;
     }
-    cleanedData['append_deeplink_path'] = !!options['append_deeplink_path'];
-    cleanedData['deepview_type'] = options['deepview_type'];
+    cleanedData.append_deeplink_path = !!options.append_deeplink_path;
+    cleanedData.deepview_type = options.deepview_type;
 
-    var referringLink = self._referringLink();
-    if (referringLink && !options['make_new_link']) {
-      cleanedData['link_click_id'] =
+    const referringLink = self._referringLink();
+    if (referringLink && !options.make_new_link) {
+      cleanedData.link_click_id =
         utils.getClickIdAndSearchStringFromLink(referringLink);
     }
 
-    cleanedData['banner_options'] = options;
+    // Not sent to the server: _api only sends keys listed in resources.deepview.params, and
+    // banner_options isn't one of them.
+    cleanedData.banner_options = options;
 
-    if (options['auto_branchify']) {
-      cleanedData['auto_branchify'] = true;
+    if (options.auto_branchify) {
+      cleanedData.auto_branchify = true;
     }
 
     self._deepviewRequestForReplay = this._api.bind(
@@ -1719,7 +1681,7 @@ Branch.prototype._windowRedirect = function (url) {
  *
  *
  */
-Branch.prototype['deepviewCta'] = wrap(
+Branch.prototype.deepviewCta = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
     if (typeof this._deepviewCta === 'undefined') {
@@ -1774,7 +1736,7 @@ Branch.prototype['deepviewCta'] = wrap(
  * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
  * - *didCallJourneyClose*: Emitted when developer calls `branch.closeJourney()` to dismiss Journey.
  */
-Branch.prototype['addListener'] = function (event, listener) {
+Branch.prototype.addListener = function (event, listener) {
   if (typeof event === 'function' && listener === undefined) {
     listener = event;
     event = null;
@@ -1798,12 +1760,10 @@ Branch.prototype['addListener'] = function (event, listener) {
  * just an identical clone of the function.
  *
  */
-Branch.prototype['removeListener'] = function (listener) {
+Branch.prototype.removeListener = function (listener) {
   if (listener) {
     this._listeners = this._listeners.filter(function (subscription) {
-      if (subscription.listener !== listener) {
-        return subscription;
-      }
+      return subscription.listener !== listener;
     });
   }
 };
@@ -1848,7 +1808,7 @@ function _setBranchViewData(context, done, data) {
   done();
 }
 
-Branch.prototype['setBranchViewData'] = wrap(
+Branch.prototype.setBranchViewData = wrap(
   callback_params.CALLBACK_ERR,
   function (done, data) {
     _setBranchViewData.call(null, this, done, data);
@@ -1871,11 +1831,11 @@ Branch.prototype['setBranchViewData'] = wrap(
  * ___
  *
  */
-Branch.prototype['closeJourney'] = wrap(
+Branch.prototype.closeJourney = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
-    var self = this;
-    self['renderQueue'](function () {
+    const self = this;
+    self.renderQueue(function () {
       if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
         self._publishEvent(
           'didCallJourneyClose',
@@ -1890,13 +1850,13 @@ Branch.prototype['closeJourney'] = wrap(
   },
 );
 
-Branch.prototype['banner'] = wrap(
+Branch.prototype.banner = wrap(
   callback_params.CALLBACK_ERR,
   function (done, options, data) {
-    var banner_deprecation_msg =
+    const banner_deprecation_msg =
       'The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview';
     console.warn(banner_deprecation_msg);
-    var platform = utils.getPlatformByUserAgent();
+    const platform = utils.getPlatformByUserAgent();
     if (['other', 'desktop'].includes(platform)) {
       console.info('banner functionality is not supported on this platform');
     } else {
@@ -1904,96 +1864,90 @@ Branch.prototype['banner'] = wrap(
       _setBranchViewData.call(null, this, function () {}, data);
 
       if (
-        typeof options['showAgain'] === 'undefined' &&
-        typeof options['forgetHide'] !== 'undefined'
+        typeof options.showAgain === 'undefined' &&
+        typeof options.forgetHide !== 'undefined'
       ) {
-        options['showAgain'] = options['forgetHide'];
+        options.showAgain = options.forgetHide;
       }
-      var bannerOptions = {
-        icon: utils.cleanBannerText(options['icon']) || '',
-        title: utils.cleanBannerText(options['title']) || '',
-        description: utils.cleanBannerText(options['description']) || '',
+      const bannerOptions = {
+        icon: utils.cleanBannerText(options.icon) || '',
+        title: utils.cleanBannerText(options.title) || '',
+        description: utils.cleanBannerText(options.description) || '',
         reviewCount:
-          typeof options['reviewCount'] === 'number' &&
-          options['reviewCount'] > 0 // force greater than 0
-            ? Math.floor(options['reviewCount'])
+          typeof options.reviewCount === 'number' && options.reviewCount > 0 // force greater than 0
+            ? Math.floor(options.reviewCount)
             : // force no decimal
               null,
         rating:
-          typeof options['rating'] === 'number' &&
-          options['rating'] <= 5 &&
-          options['rating'] > 0
-            ? Math.round(options['rating'] * 2) / 2
+          typeof options.rating === 'number' &&
+          options.rating <= 5 &&
+          options.rating > 0
+            ? Math.round(options.rating * 2) / 2
             : // force increments of .5
               null,
         openAppButtonText:
-          utils.cleanBannerText(options['openAppButtonText']) || 'View in app',
+          utils.cleanBannerText(options.openAppButtonText) || 'View in app',
         downloadAppButtonText:
-          utils.cleanBannerText(options['downloadAppButtonText']) ||
+          utils.cleanBannerText(options.downloadAppButtonText) ||
           'Download App',
-        iframe:
-          typeof options['iframe'] === 'undefined' ? true : options['iframe'],
+        iframe: typeof options.iframe === 'undefined' ? true : options.iframe,
         showiOS:
-          typeof options['showiOS'] === 'undefined' ? true : options['showiOS'],
+          typeof options.showiOS === 'undefined' ? true : options.showiOS,
         showiPad:
-          typeof options['showiPad'] === 'undefined'
-            ? true
-            : options['showiPad'],
+          typeof options.showiPad === 'undefined' ? true : options.showiPad,
         showAndroid:
-          typeof options['showAndroid'] === 'undefined'
+          typeof options.showAndroid === 'undefined'
             ? true
-            : options['showAndroid'],
+            : options.showAndroid,
         showBlackberry:
-          typeof options['showBlackberry'] === 'undefined'
+          typeof options.showBlackberry === 'undefined'
             ? true
-            : options['showBlackberry'],
+            : options.showBlackberry,
         showWindowsPhone:
-          typeof options['showWindowsPhone'] === 'undefined'
+          typeof options.showWindowsPhone === 'undefined'
             ? true
-            : options['showWindowsPhone'],
+            : options.showWindowsPhone,
         showKindle:
-          typeof options['showKindle'] === 'undefined'
-            ? true
-            : options['showKindle'],
-        disableHide: !!options['disableHide'],
+          typeof options.showKindle === 'undefined' ? true : options.showKindle,
+        disableHide: !!options.disableHide,
         forgetHide:
-          typeof options['forgetHide'] === 'number'
-            ? options['forgetHide']
-            : !!options['forgetHide'],
+          typeof options.forgetHide === 'number'
+            ? options.forgetHide
+            : !!options.forgetHide,
         respectDNT:
-          typeof options['respectDNT'] === 'undefined'
+          typeof options.respectDNT === 'undefined'
             ? false
-            : options['respectDNT'],
-        position: options['position'] || 'top',
-        customCSS: options['customCSS'] || '',
+            : options.respectDNT,
+        position: options.position || 'top',
+        customCSS: options.customCSS || '',
         mobileSticky:
-          typeof options['mobileSticky'] === 'undefined'
+          typeof options.mobileSticky === 'undefined'
             ? false
-            : options['mobileSticky'],
-        buttonBorderColor: options['buttonBorderColor'] || '',
-        buttonBackgroundColor: options['buttonBackgroundColor'] || '',
-        buttonFontColor: options['buttonFontColor'] || '',
-        buttonBorderColorHover: options['buttonBorderColorHover'] || '',
-        buttonBackgroundColorHover: options['buttonBackgroundColorHover'] || '',
-        buttonFontColorHover: options['buttonFontColorHover'] || '',
-        make_new_link: !!options['make_new_link'],
-        open_app: !!options['open_app'],
-        immediate: !!options['immediate'],
-        append_deeplink_path: !!options['append_deeplink_path'],
+            : options.mobileSticky,
+        buttonBorderColor: options.buttonBorderColor || '',
+        buttonBackgroundColor: options.buttonBackgroundColor || '',
+        buttonFontColor: options.buttonFontColor || '',
+        buttonBorderColorHover: options.buttonBorderColorHover || '',
+        buttonBackgroundColorHover: options.buttonBackgroundColorHover || '',
+        buttonFontColorHover: options.buttonFontColorHover || '',
+        make_new_link: !!options.make_new_link,
+        open_app: !!options.open_app,
+        immediate: !!options.immediate,
+        append_deeplink_path: !!options.append_deeplink_path,
       };
 
-      if (typeof options['showMobile'] !== 'undefined') {
-        bannerOptions.showiOS = options['showMobile'];
-        bannerOptions.showAndroid = options['showMobile'];
-        bannerOptions.showBlackberry = options['showMobile'];
-        bannerOptions.showWindowsPhone = options['showMobile'];
-        bannerOptions.showKindle = options['showMobile'];
+      if (typeof options.showMobile !== 'undefined') {
+        bannerOptions.showiOS = options.showMobile;
+        bannerOptions.showAndroid = options.showMobile;
+        bannerOptions.showBlackberry = options.showMobile;
+        bannerOptions.showWindowsPhone = options.showMobile;
+        bannerOptions.showKindle = options.showMobile;
       }
 
-      data['data'] = utils.merge(utils.getHostedDeepLinkData(), data['data']);
+      data.data = utils.merge(utils.getHostedDeepLinkData(), data.data);
 
-      var self = this;
-      self['renderQueue'](function () {
+      const self = this;
+      self.renderQueue(function () {
         self.closeBannerPointer = banner(
           self,
           bannerOptions,
@@ -2006,9 +1960,9 @@ Branch.prototype['banner'] = wrap(
   },
 );
 
-Branch.prototype['closeBanner'] = wrap(0, function (done) {
-  var self = this;
-  self['renderQueue'](function () {
+Branch.prototype.closeBanner = wrap(0, function (done) {
+  const self = this;
+  self.renderQueue(function () {
     if (self.closeBannerPointer) {
       self._publishEvent('willCloseBanner');
       self.closeBannerPointer(function () {
@@ -2071,12 +2025,12 @@ Branch.prototype['closeBanner'] = wrap(0, function (done) {
  * ```
  * ___
  */
-Branch.prototype['trackCommerceEvent'] = wrap(
+Branch.prototype.trackCommerceEvent = wrap(
   callback_params.CALLBACK_ERR,
   function (done, event, commerce_data, metadata) {
-    var self = this;
-    self['renderQueue'](function () {
-      var validationError = utils.validateCommerceEventParams(
+    const self = this;
+    self.renderQueue(function () {
+      const validationError = utils.validateCommerceEventParams(
         event,
         commerce_data,
       );
@@ -2099,7 +2053,7 @@ Branch.prototype['trackCommerceEvent'] = wrap(
           'initial_referrer': utils.getInitialReferrer(self._referringLink()),
           'commerce_data': commerce_data,
         },
-        function (err, data) {
+        function (err, _data) {
           done(err || null);
         },
       );
@@ -2128,17 +2082,17 @@ Branch.prototype['trackCommerceEvent'] = wrap(
  * The do-not-track mode state is persistent: it is saved for the user across browser sessions for the web site.
  * ___
  */
-Branch.prototype['disableTracking'] = wrap(
+Branch.prototype.disableTracking = wrap(
   callback_params.CALLBACK_ERR,
   function (done, disableTracking) {
     if (disableTracking === false || disableTracking === 'false') {
       utils.userPreferences.trackingDisabled = false;
       utils.userPreferences.allowErrorsInCallback = false;
       if (this.branch_key && this.init_options) {
-        if (this.init_options['tracking_disabled'] === true) {
-          delete this.init_options['tracking_disabled'];
+        if (this.init_options.tracking_disabled === true) {
+          delete this.init_options.tracking_disabled;
         }
-        this['init'](this.branch_key, this.init_options);
+        this.init(this.branch_key, this.init_options);
       }
     } else if (
       disableTracking === undefined ||
@@ -2148,8 +2102,8 @@ Branch.prototype['disableTracking'] = wrap(
       utils.cleanApplicationAndSessionStorage(this);
       utils.userPreferences.trackingDisabled = true;
       utils.userPreferences.allowErrorsInCallback = true;
-      this['closeBanner']();
-      this['closeJourney']();
+      this.closeBanner();
+      this.closeJourney();
       // Branch will not re-initialize
     }
     done();
@@ -2157,7 +2111,7 @@ Branch.prototype['disableTracking'] = wrap(
   /* allowed before init */ true,
 );
 
-Branch.prototype['setAPIResponseCallback'] = wrap(
+Branch.prototype.setAPIResponseCallback = wrap(
   callback_params.NO_CALLBACK,
   function (done, callback) {
     this._server.onAPIResponse = callback;
@@ -2171,7 +2125,7 @@ Branch.prototype['setAPIResponseCallback'] = wrap(
  * @param {Boolean} withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
-Branch.prototype['referringLink'] = function (withExtendedJourneysAssist) {
+Branch.prototype.referringLink = function (withExtendedJourneysAssist) {
   return this._referringLink(withExtendedJourneysAssist);
 };
 
@@ -2182,7 +2136,7 @@ Branch.prototype['referringLink'] = function (withExtendedJourneysAssist) {
  * @param {Boolean} adUserDataUsageConsent - If User has granted/denied consent for 3P transmission of user level data for ads.
  * Sets the value of parameters required by Google Conversion APIs for DMA Compliance in EEA region.
  */
-Branch.prototype['setDMAParamsForEEA'] = wrap(
+Branch.prototype.setDMAParamsForEEA = wrap(
   callback_params.CALLBACK_ERR,
   function (done, eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
     try {
@@ -2204,9 +2158,9 @@ Branch.prototype['setDMAParamsForEEA'] = wrap(
       }
 
       const dmaObj = {};
-      dmaObj['eeaRegion'] = eeaRegion;
-      dmaObj['adPersonalizationConsent'] = adPersonalizationConsent;
-      dmaObj['adUserDataUsageConsent'] = adUserDataUsageConsent;
+      dmaObj.eeaRegion = eeaRegion;
+      dmaObj.adPersonalizationConsent = adPersonalizationConsent;
+      dmaObj.adUserDataUsageConsent = adUserDataUsageConsent;
 
       this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
     } catch (e) {
@@ -2228,7 +2182,7 @@ Branch.prototype['setDMAParamsForEEA'] = wrap(
  * v1/pageview and v1/dismiss (merged directly into that request's metadata field,
  * same as every other endpoint).
  */
-Branch.prototype['setRequestMetaData'] = function (key, value) {
+Branch.prototype.setRequestMetaData = function (key, value) {
   try {
     if (
       typeof key === 'undefined' ||
@@ -2239,7 +2193,10 @@ Branch.prototype['setRequestMetaData'] = function (key, value) {
       return;
     }
 
-    if (this.requestMetadata.hasOwnProperty(key) && value === null) {
+    if (
+      Object.prototype.hasOwnProperty.call(this.requestMetadata, key) &&
+      value === null
+    ) {
       delete this.requestMetadata[key];
     }
 
@@ -2258,7 +2215,7 @@ Branch.prototype['setRequestMetaData'] = function (key, value) {
  * @param {String} url - url
  * Sets a custom base URL for all calls to the Branch API
  */
-Branch.prototype['setAPIUrl'] = function (url) {
+Branch.prototype.setAPIUrl = function (url) {
   if (!utils.isValidURL(url)) {
     console.error('setAPIUrl: Invalid URL format. Default URL will be set.');
     return;
@@ -2271,6 +2228,6 @@ Branch.prototype['setAPIUrl'] = function (url) {
  * @function Branch.getAPIUrl
  * returns the base URL for all calls to the Branch API
  */
-Branch.prototype['getAPIUrl'] = function () {
+Branch.prototype.getAPIUrl = function () {
   return config.api_endpoint;
 };

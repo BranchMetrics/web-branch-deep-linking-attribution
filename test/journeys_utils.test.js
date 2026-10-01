@@ -91,8 +91,8 @@ describe('addIframeOuterCSS generated CSS (no BE-supplied cssIframeContainer)', 
   const assert = testUtils.unplanned();
 
   afterEach(function () {
-    var existing = document.getElementById('branch-iframe-css');
-    if (existing && existing.parentNode) {
+    const existing = document.getElementById('branch-iframe-css');
+    if (existing?.parentNode) {
       existing.parentNode.removeChild(existing);
     }
     document.body.removeAttribute('style');
@@ -108,13 +108,13 @@ describe('addIframeOuterCSS generated CSS (no BE-supplied cssIframeContainer)', 
 
     journeys_utils.addIframeOuterCSS(undefined, {});
 
-    var expectedDurationSeconds = journeys_utils.animationSpeed / 1000;
+    const expectedDurationSeconds = journeys_utils.animationSpeed / 1000;
     assert.strictEqual(
       document.body.style.transition,
       'all 0' + expectedDurationSeconds + 's ease',
     );
 
-    var css = document.getElementById('branch-iframe-css').innerHTML;
+    const css = document.getElementById('branch-iframe-css').innerHTML;
     assert.ok(
       css.indexOf(
         'body { -webkit-transition: all ' +
@@ -138,7 +138,7 @@ describe('addIframeOuterCSS generated CSS (no BE-supplied cssIframeContainer)', 
 
 describe('animateBannerExit margin/position restore timing', function () {
   const assert = testUtils.unplanned();
-  var banner;
+  let banner;
 
   beforeEach(function () {
     vi.useFakeTimers();
@@ -193,7 +193,7 @@ describe('animateBannerExit margin/position restore timing', function () {
 
 describe('addIframeInnerCSS entrance and use_v2_renderer', function () {
   const assert = testUtils.unplanned();
-  var iframe;
+  let iframe;
 
   beforeEach(function () {
     journeys_utils.position = 'top';
@@ -234,7 +234,7 @@ describe('addIframeInnerCSS entrance and use_v2_renderer', function () {
 
 describe('animateBannerExit branch-banner exit class and use_v2_renderer', function () {
   const assert = testUtils.unplanned();
-  var banner;
+  let banner;
 
   beforeEach(function () {
     vi.useFakeTimers();
@@ -274,7 +274,7 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
 
     journeys_utils.animateBannerExit(banner);
 
-    var bannerRoot =
+    const bannerRoot =
       banner.contentWindow.document.getElementById('branch-banner');
     assert.strictEqual(
       bannerRoot.className.indexOf('branch-banner-exit') !== -1,
@@ -293,8 +293,8 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
 
   it('waits for a longer content exit animation instead of cutting it off at the default timeout', function () {
     journeys_utils.use_v2_renderer = true;
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
+    const doc = banner.contentWindow.document;
+    const style = doc.createElement('style');
     style.textContent =
       '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.5s ease both; }';
     doc.head.appendChild(style);
@@ -317,8 +317,8 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
 
   it('waits out a delayed exit animation instead of removing mid-animation', function () {
     journeys_utils.use_v2_renderer = true;
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
+    const doc = banner.contentWindow.document;
+    const style = doc.createElement('style');
     // doesn't start playing until 0.3s in, then plays for 0.4s -- finishes at 0.7s total
     style.textContent =
       '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.4s ease 0.3s both; }';
@@ -338,8 +338,8 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
 
   it('does not move the iframe itself when use_v2_renderer is true', function () {
     journeys_utils.use_v2_renderer = true;
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
+    const doc = banner.contentWindow.document;
+    const style = doc.createElement('style');
     style.textContent =
       '#branch-banner.branch-banner-exit { animation: branch-slide-out-top 0.25s ease both; }';
     doc.head.appendChild(style);
@@ -368,8 +368,8 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
   });
 
   it('still moves the iframe itself when use_v2_renderer is false (legacy), even if #branch-banner has CSS animation', function () {
-    var doc = banner.contentWindow.document;
-    var style = doc.createElement('style');
+    const doc = banner.contentWindow.document;
+    const style = doc.createElement('style');
     style.textContent =
       '#branch-banner { animation: branch-slide-in-top 0.25s ease both; }';
     doc.head.appendChild(style);
@@ -383,9 +383,9 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
 
 describe('animationConfig support', function () {
   const assert = testUtils.unplanned();
-  var banner;
+  let banner;
 
-  var mockAnimationConfig = {
+  const mockAnimationConfig = {
     classes: {
       enter: 'branch-banner-enter',
       exit: 'branch-banner-exit',
@@ -424,13 +424,13 @@ describe('animationConfig support', function () {
   });
 
   it('injects generatedCss into iframe inner head when surface is CONTENT', function () {
-    var iframe = journeys_utils.createIframe();
+    const iframe = journeys_utils.createIframe();
     document.body.appendChild(iframe);
 
     journeys_utils.addIframeInnerCSS(iframe, '/* inner css */');
 
-    var doc = iframe.contentWindow.document;
-    var styleEl = doc.getElementById('branch-css');
+    const doc = iframe.contentWindow.document;
+    const styleEl = doc.getElementById('branch-css');
     assert.ok(styleEl, 'branch-css element should exist');
     assert.ok(
       styleEl.innerHTML.indexOf('.branch-banner-enter') !== -1,
@@ -448,7 +448,7 @@ describe('animationConfig support', function () {
 
     journeys_utils.animateBannerEntrance(banner);
 
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
+    const bannerRoot = journeys_utils.getAnimationRoot(banner);
     assert.ok(
       bannerRoot.className.indexOf('branch-banner-enter') !== -1,
       'enter animation class from config should be attached',
@@ -461,7 +461,7 @@ describe('animationConfig support', function () {
 
     journeys_utils.animateBannerExit(banner);
 
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
+    const bannerRoot = journeys_utils.getAnimationRoot(banner);
     assert.strictEqual(
       bannerRoot.className.indexOf('branch-banner-enter'),
       -1,
@@ -480,14 +480,14 @@ describe('animationConfig support', function () {
 
     journeys_utils.addIframeOuterCSS(undefined, {});
 
-    var outerStyleEl = document.getElementById('branch-iframe-css');
+    const outerStyleEl = document.getElementById('branch-iframe-css');
     assert.ok(outerStyleEl, 'branch-iframe-css element should exist');
     assert.ok(
       outerStyleEl.innerHTML.indexOf('.branch-banner-enter') !== -1,
       'generatedCss should be injected into outer style',
     );
 
-    if (outerStyleEl && outerStyleEl.parentNode) {
+    if (outerStyleEl?.parentNode) {
       outerStyleEl.parentNode.removeChild(outerStyleEl);
     }
   });

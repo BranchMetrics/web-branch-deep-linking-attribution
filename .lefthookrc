@@ -1,0 +1,12 @@
+# Sourced by lefthook (sh) before each hook job. See `rc` in lefthook.yml.
+# GUI git clients may run hooks without the shell PATH, and sometimes without node or nix.
+# Loading the flake through direnv is slow, so skip it when the shell already has node.
+if ! command -v node >/dev/null 2>&1; then
+  export PATH="$PATH:$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin"
+  if command -v direnv >/dev/null 2>&1; then
+    direnv allow 2>/dev/null
+    eval "$(direnv export bash 2>/dev/null)"
+  fi
+fi
+
+export PATH="$PWD/node_modules/.bin:$PATH"

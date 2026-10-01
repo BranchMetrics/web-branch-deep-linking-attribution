@@ -81,7 +81,7 @@ journeys_utils.journeyLinkData = null;
 journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function (
   bannerHeight,
 ) {
-  var unitsRegex = /vh|%/gi; // search and replace vh, %
+  const unitsRegex = /vh|%/gi; // search and replace vh, %
   return unitsRegex.test(bannerHeight)
     ? bannerHeight.replace(unitsRegex, '')
     : false;
@@ -97,22 +97,17 @@ journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight = function (
  */
 journeys_utils.setPositionAndHeight = function (html) {
   setDefaultBannerProperties();
-  var metadata = journeys_utils.getMetadata(html) || {};
-  if (
-    metadata &&
-    metadata['bannerHeight'] &&
-    metadata['position'] &&
-    metadata['sticky']
-  ) {
-    journeys_utils.bannerHeight = metadata['bannerHeight'];
-    journeys_utils.position = metadata['position'];
-    journeys_utils.sticky = metadata['sticky'];
+  const metadata = journeys_utils.getMetadata(html) || {};
+  if (metadata?.bannerHeight && metadata.position && metadata.sticky) {
+    journeys_utils.bannerHeight = metadata.bannerHeight;
+    journeys_utils.position = metadata.position;
+    journeys_utils.sticky = metadata.sticky;
   } else {
     // to support older banners without proper metadata. Spacer div === top
-    var spacerMatch = html.match(journeys_utils.spacerRe);
+    const spacerMatch = html.match(journeys_utils.spacerRe);
     if (spacerMatch) {
       journeys_utils.position = 'top';
-      var heightMatch = spacerMatch[1].match(journeys_utils.findMarginRe);
+      const heightMatch = spacerMatch[1].match(journeys_utils.findMarginRe);
       if (heightMatch) {
         journeys_utils.bannerHeight = heightMatch[1];
       }
@@ -122,12 +117,12 @@ journeys_utils.setPositionAndHeight = function (html) {
       journeys_utils.sticky = 'fixed';
     }
   }
-  var relativeBannerHeightOrFalse =
+  const relativeBannerHeightOrFalse =
     journeys_utils.getRelativeHeightValueOrFalseFromBannerHeight(
       journeys_utils.bannerHeight,
     );
   if (relativeBannerHeightOrFalse) {
-    var bannerHeightInPixels =
+    const bannerHeightInPixels =
       (relativeBannerHeightOrFalse / 100) * journeys_utils.windowHeight + 'px';
     journeys_utils.bannerHeight = bannerHeightInPixels;
     if (relativeBannerHeightOrFalse < 100) {
@@ -143,9 +138,9 @@ journeys_utils.setPositionAndHeight = function (html) {
  * @param {string} html
  */
 journeys_utils.getMetadata = function (html) {
-  var match = html.match(journeys_utils.jsonRe);
+  const match = html.match(journeys_utils.jsonRe);
   if (match) {
-    var src = match[1];
+    const src = match[1];
     return safejson.parse(src);
   }
 };
@@ -155,7 +150,7 @@ journeys_utils.getMetadata = function (html) {
  * @param {string} html
  */
 journeys_utils.getIframeCss = function (html) {
-  var match = html.match(journeys_utils.iframeCssRe);
+  const match = html.match(journeys_utils.iframeCssRe);
   if (match) {
     return match[1];
   }
@@ -167,17 +162,12 @@ journeys_utils.getIframeCss = function (html) {
  * @param {boolean} hasApp
  */
 journeys_utils.getCtaText = function (metadata, hasApp) {
-  var ctaText;
+  let ctaText;
 
-  if (
-    hasApp &&
-    metadata &&
-    metadata['ctaText'] &&
-    metadata['ctaText']['has_app']
-  ) {
-    ctaText = metadata['ctaText']['has_app'];
-  } else if (metadata && metadata['ctaText'] && metadata['ctaText']['no_app']) {
-    ctaText = metadata['ctaText']['no_app'];
+  if (hasApp && metadata?.ctaText?.has_app) {
+    ctaText = metadata.ctaText.has_app;
+  } else if (metadata?.ctaText?.no_app) {
+    ctaText = metadata.ctaText.no_app;
   }
 
   return ctaText;
@@ -188,13 +178,13 @@ journeys_utils.getCtaText = function (metadata, hasApp) {
  * @param {Object} parent - A dom element or document.body
  * @param {Object} metadata
  */
-journeys_utils.findInsertionDiv = function (parent, metadata) {
+journeys_utils.findInsertionDiv = function (_parent, metadata) {
   journeys_utils.divToInjectParents = [];
 
-  if (metadata && metadata['injectorSelector']) {
-    var injectors = document.querySelectorAll(metadata['injectorSelector']);
+  if (metadata?.injectorSelector) {
+    const injectors = document.querySelectorAll(metadata.injectorSelector);
     if (injectors) {
-      for (var i = 0; i < injectors.length; i++) {
+      for (let i = 0; i < injectors.length; i++) {
         journeys_utils.divToInjectParents.push(injectors[i].parentElement);
       }
     }
@@ -206,7 +196,7 @@ journeys_utils.findInsertionDiv = function (parent, metadata) {
  * @param {string} html
  */
 journeys_utils.getCss = function (html) {
-  var match = html.match(journeys_utils.cssRe);
+  const match = html.match(journeys_utils.cssRe);
   if (match) {
     return match[1];
   }
@@ -219,10 +209,10 @@ journeys_utils.getCss = function (html) {
  * take the js from template and add to document.body
  */
 journeys_utils.getJsAndAddToParent = function (html) {
-  var match = html.match(journeys_utils.jsRe);
+  const match = html.match(journeys_utils.jsRe);
   if (match) {
-    var src = match[1];
-    var script = document.createElement('script');
+    const src = match[1];
+    const script = document.createElement('script');
     script.id = 'branch-journey-cta';
     utils.addNonceAttribute(script);
     script.innerHTML = src;
@@ -238,10 +228,10 @@ journeys_utils.getJsAndAddToParent = function (html) {
  * We will use the remaining html to add to iframe
  */
 journeys_utils.removeScriptAndCss = function (html) {
-  var matchJson = html.match(journeys_utils.jsonRe);
-  var matchJs = html.match(journeys_utils.jsRe);
-  var matchCss = html.match(journeys_utils.cssRe);
-  var matchIframeCss = html.match(journeys_utils.iframeCssRe);
+  const matchJson = html.match(journeys_utils.jsonRe);
+  const matchJs = html.match(journeys_utils.jsRe);
+  const matchCss = html.match(journeys_utils.cssRe);
+  const matchIframeCss = html.match(journeys_utils.iframeCssRe);
 
   if (matchJson) {
     html = html.replace(journeys_utils.jsonRe, '');
@@ -263,7 +253,7 @@ journeys_utils.removeScriptAndCss = function (html) {
  * @function journeys_utils.createIframe
  */
 journeys_utils.createIframe = function () {
-  var iframe = document.createElement('iframe');
+  const iframe = document.createElement('iframe');
   iframe.src = 'about:blank'; // solves CORS issues, test in IE
   iframe.style.overflow = 'hidden';
   iframe.scrolling = 'no';
@@ -283,7 +273,7 @@ journeys_utils.createIframe = function () {
  * @param {string} userAgent - UA to determine body class
  */
 journeys_utils.addHtmlToIframe = function (iframe, html, userAgent) {
-  var bodyClass;
+  let bodyClass;
   if (userAgent === 'ios' || userAgent === 'ipad') {
     bodyClass = 'branch-banner-ios';
   } else if (userAgent === 'android') {
@@ -291,23 +281,23 @@ journeys_utils.addHtmlToIframe = function (iframe, html, userAgent) {
   } else {
     bodyClass = 'branch-banner-other';
   }
-  var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
+  const iframedoc = iframe.contentDocument || iframe.contentWindow.document;
 
   // Safely ensure <head> and <body> exist for style injection and innerHTML
   if (!iframedoc.head) {
-    var head = iframedoc.createElement('head');
+    const head = iframedoc.createElement('head');
     (iframedoc.documentElement || iframedoc).appendChild(head);
   }
   if (!iframedoc.body) {
-    var body = iframedoc.createElement('body');
+    const body = iframedoc.createElement('body');
     (iframedoc.documentElement || iframedoc).appendChild(body);
   }
 
   iframedoc.body.innerHTML = html;
   iframedoc.body.className = bodyClass;
-  var metaTag = iframedoc.querySelector('meta[name="accessibility"]');
+  const metaTag = iframedoc.querySelector('meta[name="accessibility"]');
   if (metaTag && metaTag.content === 'wcag') {
-    var scriptTag = iframedoc.createElement('script');
+    const scriptTag = iframedoc.createElement('script');
     scriptTag.type = 'text/javascript';
     scriptTag.text = `
             var focusableElements = 'button, [href], input, select, textarea, [role="button"], h1, [role="text"], .branch-banner-content';
@@ -375,22 +365,22 @@ journeys_utils.addHtmlToIframe = function (iframe, html, userAgent) {
  * banner position, height and sticky.
  */
 journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
-  var iFrameCSS = document.createElement('style');
+  const iFrameCSS = document.createElement('style');
   iFrameCSS.type = 'text/css';
   iFrameCSS.id = 'branch-iframe-css';
 
   journeys_utils.bodyMarginTop = banner_utils.getBodyStyle('margin-top');
-  var bodyMarginTopNumber = +journeys_utils.bodyMarginTop.slice(0, -2);
+  const bodyMarginTopNumber = +journeys_utils.bodyMarginTop.slice(0, -2);
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle('margin-bottom');
-  var bodyMarginBottomNumber = +journeys_utils.bodyMarginBottom.slice(0, -2);
-  var bannerMarginNumber = +journeys_utils.bannerHeight.slice(0, -2);
+  const bodyMarginBottomNumber = +journeys_utils.bodyMarginBottom.slice(0, -2);
+  const bannerMarginNumber = +journeys_utils.bannerHeight.slice(0, -2);
 
   if (cssIframeContainer) {
   } else if (journeys_utils.position === 'top') {
-    var calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
+    const calculatedBodyMargin = +bannerMarginNumber + bodyMarginTopNumber;
     document.body.style.marginTop = calculatedBodyMargin.toString() + 'px';
   } else if (journeys_utils.position === 'bottom') {
-    var calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
+    const calculatedBodyMargin = +bannerMarginNumber + bodyMarginBottomNumber;
     document.body.style.marginBottom = calculatedBodyMargin.toString() + 'px';
   }
 
@@ -398,8 +388,8 @@ journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
   if (journeys_utils.divToInjectParents.length > 0) {
     // dont want to add margin for full page fixed
     journeys_utils.divToInjectParents.forEach(function (parent) {
-      var isFixedNavFullPage;
-      var computedParentStyle = window.getComputedStyle(parent);
+      let isFixedNavFullPage;
+      const computedParentStyle = window.getComputedStyle(parent);
       if (computedParentStyle) {
         isFixedNavFullPage =
           journeys_utils.isFullPage &&
@@ -432,7 +422,7 @@ journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
 
   journeys_utils.journeyDismissed = false;
 
-  var finalOuterCSS = '';
+  let finalOuterCSS = '';
 
   if (cssIframeContainer) {
     finalOuterCSS = cssIframeContainer;
@@ -443,10 +433,9 @@ journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
   // Inject configured CSS if it targets the IFRAME surface (the host page)
   if (
     journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['surface'] === 'IFRAME'
+    journeys_utils.animationConfig.surface === 'IFRAME'
   ) {
-    finalOuterCSS +=
-      '\n' + journeys_utils.animationConfig['generatedCss'] + '\n';
+    finalOuterCSS += '\n' + journeys_utils.animationConfig.generatedCss + '\n';
   }
 
   iFrameCSS.innerHTML = finalOuterCSS;
@@ -456,9 +445,9 @@ journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
   document.head.appendChild(iFrameCSS);
 };
 
-function generateIframeOuterCSS(metadata) {
-  var bodyWebkitTransitionStyle = '';
-  var iFrameAnimationStyle = '';
+function generateIframeOuterCSS(_metadata) {
+  let bodyWebkitTransitionStyle = '';
+  let iFrameAnimationStyle = '';
 
   // Resets previous transition styles
   document.body.style.transition = '';
@@ -483,12 +472,12 @@ function generateIframeOuterCSS(metadata) {
       's ease;';
   }
 
-  var css = '';
+  let css = '';
   css += bodyWebkitTransitionStyle || '';
   if (journeys_utils.isDesktopJourney) {
-    var bannerHeight = journeys_utils.bannerHeight;
-    var bannerWidth = journeys_utils.bannerWidth;
-    var sticky = journeys_utils.sticky;
+    let bannerHeight = journeys_utils.bannerHeight;
+    let bannerWidth = journeys_utils.bannerWidth;
+    let sticky = journeys_utils.sticky;
     if (journeys_utils.journeyVariant === 'overlay') {
       bannerHeight = '100%!important';
       bannerWidth = '100%!important';
@@ -546,26 +535,26 @@ function generateIframeOuterCSS(metadata) {
  * Adds css that was stripped from html blob to the iframe element
  */
 journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
-  var css = document.createElement('style');
+  const css = document.createElement('style');
   css.type = 'text/css';
   css.id = 'branch-css';
 
-  var finalCSS = innerCSS;
+  let finalCSS = innerCSS;
   if (
     journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['surface'] === 'CONTENT'
+    journeys_utils.animationConfig.surface === 'CONTENT'
   ) {
-    finalCSS += '\n' + journeys_utils.animationConfig['generatedCss'] + '\n';
+    finalCSS += '\n' + journeys_utils.animationConfig.generatedCss + '\n';
   }
 
   css.innerHTML = finalCSS;
 
   utils.addNonceAttribute(css);
 
-  var doc = iframe.contentWindow.document;
+  const doc = iframe.contentWindow.document;
   doc.head.appendChild(css);
 
-  var isDesktopOverlay =
+  const isDesktopOverlay =
     journeys_utils.isDesktopJourney &&
     journeys_utils.journeyVariant === 'overlay';
 
@@ -575,10 +564,10 @@ journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
     (journeys_utils.isHalfPage || journeys_utils.isFullPage) &&
     !isDesktopOverlay
   ) {
-    var dismissBackground = doc.getElementsByClassName(
+    const dismissBackground = doc.getElementsByClassName(
       'branch-banner-dismiss-background',
     )[0];
-    var content = doc.getElementsByClassName('branch-banner-content')[0];
+    const content = doc.getElementsByClassName('branch-banner-content')[0];
     if (!dismissBackground && content) {
       content.style.height = journeys_utils.bannerHeight;
     }
@@ -598,10 +587,10 @@ journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
   // this is to allow floating button to work
   try {
     // get computed background-color of .branch-banner-content
-    var content = doc.getElementsByClassName('branch-banner-content')[0];
-    var contentComputedStyle = window.getComputedStyle(content);
-    var bg = contentComputedStyle.getPropertyValue('background-color');
-    var arr = bg.split(', ');
+    const content = doc.getElementsByClassName('branch-banner-content')[0];
+    const contentComputedStyle = window.getComputedStyle(content);
+    const bg = contentComputedStyle.getPropertyValue('background-color');
+    const arr = bg.split(', ');
     // if the alpha === 0, remove the box shadow
     if (arr[3] && parseFloat(arr[3]) === 0) {
       iframe.style.boxShadow = 'none';
@@ -615,9 +604,9 @@ journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
  * @param {string} ctaText
  */
 journeys_utils.addDynamicCtaText = function (iframe, ctaText) {
-  var doc = iframe.contentWindow.document;
-  if (doc && doc.getElementById('branch-mobile-action')) {
-    var mobileAction = doc.getElementById('branch-mobile-action');
+  const doc = iframe.contentWindow.document;
+  if (doc?.getElementById('branch-mobile-action')) {
+    const mobileAction = doc.getElementById('branch-mobile-action');
     mobileAction.innerHTML = ctaText;
     mobileAction.setAttribute('aria-label', ctaText);
   }
@@ -628,7 +617,7 @@ journeys_utils.addDynamicCtaText = function (iframe, ctaText) {
  * @param {Object} banner
  */
 journeys_utils.centerOverlay = function (banner) {
-  if (banner && banner.style) {
+  if (banner?.style) {
     banner.style.bottom = '140px';
     banner.style.width = '94%';
     banner.style.borderRadius = '20px';
@@ -639,16 +628,16 @@ journeys_utils.centerOverlay = function (banner) {
 journeys_utils.getAnimationRoot = function (banner) {
   if (!banner) return null;
 
-  var isIframeSurface =
+  const isIframeSurface =
     journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['surface'] === 'IFRAME';
+    journeys_utils.animationConfig.surface === 'IFRAME';
 
   if (isIframeSurface) {
     return banner;
   }
 
   if (banner.contentWindow) {
-    var doc = banner.contentWindow.document;
+    const doc = banner.contentWindow.document;
     if (doc) {
       return (
         doc.getElementById('branch-banner') ||
@@ -661,13 +650,10 @@ journeys_utils.getAnimationRoot = function (banner) {
 };
 
 function getAnimationClass(isExit) {
-  if (
-    journeys_utils.animationConfig &&
-    journeys_utils.animationConfig['classes']
-  ) {
+  if (journeys_utils.animationConfig?.classes) {
     return isExit
-      ? journeys_utils.animationConfig['classes']['exit']
-      : journeys_utils.animationConfig['classes']['enter'];
+      ? journeys_utils.animationConfig.classes.exit
+      : journeys_utils.animationConfig.classes.enter;
   }
   return isExit ? 'branch-banner-exit' : 'branch-banner-enter';
 }
@@ -683,7 +669,7 @@ journeys_utils.attachAnimation = function (element, isExit) {
     return;
   }
 
-  var className = getAnimationClass(isExit);
+  const className = getAnimationClass(isExit);
   if (className) {
     banner_utils.addClass(element, className);
   }
@@ -694,7 +680,7 @@ journeys_utils.detachAnimation = function (element, isExit) {
     return;
   }
 
-  var className = getAnimationClass(isExit);
+  const className = getAnimationClass(isExit);
   if (className) {
     banner_utils.removeClass(element, className);
   }
@@ -706,14 +692,14 @@ journeys_utils.detachAnimation = function (element, isExit) {
  */
 journeys_utils.animateBannerEntrance = function (banner, cssIframeContainer) {
   // Only attach the entrance class if this is the new animation path
-  if (journeys_utils.use_v2_renderer && banner && banner.contentWindow) {
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
+  if (journeys_utils.use_v2_renderer && banner?.contentWindow) {
+    const bannerRoot = journeys_utils.getAnimationRoot(banner);
     journeys_utils.attachAnimation(bannerRoot, false);
   }
 
   banner_utils.addClass(document.body, 'branch-banner-is-active');
   if (journeys_utils.isFullPage && journeys_utils.sticky === 'fixed') {
-    var bodyCSS = document.createElement('style');
+    const bodyCSS = document.createElement('style');
     bodyCSS.type = 'text/css';
     bodyCSS.innerHTML = '.branch-banner-no-scroll {overflow: hidden;}';
     document.head.appendChild(bodyCSS);
@@ -730,11 +716,8 @@ journeys_utils.animateBannerEntrance = function (banner, cssIframeContainer) {
       } else if (journeys_utils.position === 'bottom') {
         // check if safeAreaRequired is true or not
         if (
-          journeys_utils.journeyLinkData &&
-          journeys_utils.journeyLinkData['journey_link_data'] &&
-          !journeys_utils.journeyLinkData['journey_link_data'][
-            'safeAreaRequired'
-          ]
+          journeys_utils.journeyLinkData?.journey_link_data &&
+          !journeys_utils.journeyLinkData.journey_link_data.safeAreaRequired
         ) {
           banner.style.bottom = '0';
         } else {
@@ -783,10 +766,10 @@ journeys_utils._resetJourneysBannerPosition = function (
   isPageBottomOverScrolling,
   checkIfPageAlreadyScrollingOnFirstLoad,
 ) {
-  var bannerIFrame = document.getElementById('branch-banner-iframe');
-  var bannerHeight = bannerIFrame.offsetHeight;
-  var bannerTopDistance = bannerIFrame.offsetTop;
-  var windowHeight = window.innerHeight;
+  const bannerIFrame = document.getElementById('branch-banner-iframe');
+  const bannerHeight = bannerIFrame.offsetHeight;
+  const bannerTopDistance = bannerIFrame.offsetTop;
+  const windowHeight = window.innerHeight;
 
   // on first load check if the page is already scrolling
   if (checkIfPageAlreadyScrollingOnFirstLoad) {
@@ -798,7 +781,7 @@ journeys_utils._resetJourneysBannerPosition = function (
 
   if (!isPageBottomOverScrolling) {
     // always keep banner top location equal to the height specified
-    if (windowHeight - bannerTopDistance != bannerHeight) {
+    if (windowHeight - bannerTopDistance !== bannerHeight) {
       bannerIFrame.style.top = '' + (windowHeight - bannerHeight) + 'px';
     }
   } else {
@@ -809,12 +792,12 @@ journeys_utils._resetJourneysBannerPosition = function (
 };
 
 journeys_utils._addSecondsToDate = function (seconds) {
-  var currentDate = new Date();
+  const currentDate = new Date();
   return currentDate.setSeconds(currentDate.getSeconds() + seconds);
 };
 
 journeys_utils._findGlobalDismissPeriod = function (metadata) {
-  var globalDismissPeriod = metadata['globalDismissPeriod'];
+  const globalDismissPeriod = metadata.globalDismissPeriod;
   if (typeof globalDismissPeriod === 'number') {
     return globalDismissPeriod === -1
       ? true
@@ -846,11 +829,11 @@ journeys_utils.finalHookups = function (
     return;
   }
 
-  var doc = banner.contentWindow.document;
+  const doc = banner.contentWindow.document;
 
-  var actionEls = doc.querySelectorAll('#branch-mobile-action');
+  const actionEls = doc.querySelectorAll('#branch-mobile-action');
   Array.prototype.forEach.call(actionEls, function (el) {
-    el.addEventListener('click', function (e) {
+    el.addEventListener('click', function (_e) {
       journeys_utils.branch._publishEvent(
         'didClickJourneyCTA',
         journeys_utils.journeyLinkData,
@@ -934,10 +917,10 @@ journeys_utils._setupDismissBehavior = function (
   branch_view,
   eventType,
 ) {
-  var doc = banner.contentWindow.document;
-  var cancelEls = doc.querySelectorAll(cssSelector);
+  const doc = banner.contentWindow.document;
+  const cancelEls = doc.querySelectorAll(cssSelector);
   Array.prototype.forEach.call(cancelEls, function (el) {
-    el.addEventListener(eventType, function (e) {
+    el.addEventListener(eventType, function (_e) {
       journeys_utils._handleJourneyDismiss(
         eventName,
         storage,
@@ -957,7 +940,7 @@ journeys_utils._setJourneyDismiss = function (
   templateId,
   audienceRuleId,
 ) {
-  var journeyDismissals = storage.get('journeyDismissals', true);
+  let journeyDismissals = storage.get('journeyDismissals', true);
   journeyDismissals = journeyDismissals
     ? safejson.parse(journeyDismissals)
     : {};
@@ -1055,71 +1038,66 @@ journeys_utils._getDismissRequestData = function (
   branch_view,
   dismissal_source,
 ) {
-  var metadata = {};
-  var hostedDeeplinkData = utils.getHostedDeepLinkData();
+  const metadata = {};
+  const hostedDeeplinkData = utils.getHostedDeepLinkData();
   if (hostedDeeplinkData && Object.keys(hostedDeeplinkData).length > 0) {
-    metadata['hosted_deeplink_data'] = hostedDeeplinkData;
+    metadata.hosted_deeplink_data = hostedDeeplinkData;
   }
 
-  var dismissRequestData = branch_view._getPageviewRequestData(
+  const dismissRequestData = branch_view._getPageviewRequestData(
     journeys_utils._getPageviewMetadata(null, metadata),
     null,
     journeys_utils.branch,
     true,
   );
 
-  if (
-    journeys_utils.journeyLinkData &&
-    journeys_utils.journeyLinkData['journey_link_data']
-  ) {
+  if (journeys_utils.journeyLinkData?.journey_link_data) {
     utils.addPropertyIfNotNull(
       dismissRequestData,
       'journey_id',
-      journeys_utils.journeyLinkData['journey_link_data']['journey_id'],
+      journeys_utils.journeyLinkData.journey_link_data.journey_id,
     );
     utils.addPropertyIfNotNull(
       dismissRequestData,
       'journey_name',
       journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['journey_name'],
+        journeys_utils.journeyLinkData.journey_link_data.journey_name,
       ),
     );
     utils.addPropertyIfNotNull(
       dismissRequestData,
       'view_id',
-      journeys_utils.journeyLinkData['journey_link_data']['view_id'],
+      journeys_utils.journeyLinkData.journey_link_data.view_id,
     );
     utils.addPropertyIfNotNull(
       dismissRequestData,
       'view_name',
       journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['view_name'],
+        journeys_utils.journeyLinkData.journey_link_data.view_name,
       ),
     );
     utils.addPropertyIfNotNull(
       dismissRequestData,
       'channel',
       journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['channel'],
+        journeys_utils.journeyLinkData.journey_link_data.channel,
       ),
     );
     utils.addPropertyIfNotNull(
       dismissRequestData,
       'campaign',
       journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData['journey_link_data']['campaign'],
+        journeys_utils.journeyLinkData.journey_link_data.campaign,
       ),
     );
     try {
       utils.addPropertyIfNotNull(
         dismissRequestData,
         'tags',
-        JSON.stringify(
-          journeys_utils.journeyLinkData['journey_link_data']['tags'],
-        ),
+        JSON.stringify(journeys_utils.journeyLinkData.journey_link_data.tags),
       );
     } catch (_e) {
-      dismissRequestData['tags'] = JSON.stringify([]);
+      dismissRequestData.tags = JSON.stringify([]);
     }
   }
 
@@ -1142,7 +1120,7 @@ journeys_utils._handleJourneyDismiss = function (
   testModeEnabled,
   branch_view,
 ) {
-  var globalDismissPeriod = !testModeEnabled
+  const globalDismissPeriod = !testModeEnabled
     ? journeys_utils._findGlobalDismissPeriod(metadata)
     : 0;
   journeys_utils.branch._publishEvent(
@@ -1157,9 +1135,9 @@ journeys_utils._handleJourneyDismiss = function (
       storage.set('globalJourneysDismiss', globalDismissPeriod, true);
     }
     journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
-    var listener = function () {
+    const listener = function () {
       journeys_utils.branch.removeListener(listener);
-      var requestData = journeys_utils._getDismissRequestData(
+      const requestData = journeys_utils._getDismissRequestData(
         branch_view,
         utils.dismissEventToSourceMapping[eventName],
       );
@@ -1167,21 +1145,21 @@ journeys_utils._handleJourneyDismiss = function (
         resources.dismiss,
         requestData,
         function (err, data) {
-          if (!err && metadata && metadata['dismissRedirect']) {
-            window.location = metadata['dismissRedirect'];
-          } else if (!err && typeof data === 'object' && data['template']) {
+          if (!err && metadata && metadata.dismissRedirect) {
+            window.location = metadata.dismissRedirect;
+          } else if (!err && typeof data === 'object' && data.template) {
             if (branch_view.shouldDisplayJourney(data, null, false)) {
               branch_view.displayJourney(
-                data['template'],
+                data.template,
                 requestData,
-                requestData['branch_view_id'] ||
-                  data['event_data']['branch_view_data']['id'],
-                data['event_data']['branch_view_data'],
+                requestData.branch_view_id ||
+                  data.event_data.branch_view_data.id,
+                data.event_data.branch_view_data,
                 false,
-                data['journey_link_data'],
+                data.journey_link_data,
                 {
-                  use_v2_renderer: data['use_v2_renderer'],
-                  animationConfig: data['animationConfig'],
+                  use_v2_renderer: data.use_v2_renderer,
+                  animationConfig: data.animationConfig,
                 },
               );
             }
@@ -1197,9 +1175,9 @@ journeys_utils._handleJourneyDismiss = function (
 };
 
 journeys_utils._getPageviewMetadata = function (options, additionalMetadata) {
-  var pageviewMetadata = utils.merge(
+  let pageviewMetadata = utils.merge(
     {
-      'url': (options && options.url) || utils.getWindowLocation(),
+      'url': options?.url || utils.getWindowLocation(),
       'user_agent': navigator.userAgent,
       'language': navigator.language,
       'screen_width': screen.width || -1,
@@ -1236,11 +1214,11 @@ journeys_utils.animateBannerExit = function (
 
   // Trigger any exit animation the creative authored on #branch-banner, and read its real
   // duration so removal below waits for it instead of using the SDK default.
-  var contentHandlesExit = false;
-  var contentExitDurationMs = 0;
+  let contentHandlesExit = false;
+  let contentExitDurationMs = 0;
 
-  if (journeys_utils.use_v2_renderer && banner && banner.contentWindow) {
-    var bannerRoot = journeys_utils.getAnimationRoot(banner);
+  if (journeys_utils.use_v2_renderer && banner?.contentWindow) {
+    const bannerRoot = journeys_utils.getAnimationRoot(banner);
     if (bannerRoot) {
       journeys_utils.detachAnimation(bannerRoot, false);
       journeys_utils.attachAnimation(bannerRoot, true);
@@ -1261,7 +1239,7 @@ journeys_utils.animateBannerExit = function (
       'all 0' + journeys_utils.animationSpeed / 1000 + 's ease';
 
     // ensure that -webkit-transition styles get applied as well
-    var iFrameOutterCSSBackup =
+    let iFrameOutterCSSBackup =
       document.getElementById('branch-iframe-css').innerHTML + '\n';
     iFrameOutterCSSBackup +=
       'body { -webkit-transition: all ' +
@@ -1298,7 +1276,7 @@ journeys_utils.animateBannerExit = function (
   }
   // removes timeout if animation is disabled, else the default timeout or the content's own
   // exit animation, whichever is longer
-  var speedAndDelay = journeys_utils.exitAnimationDisabled
+  const speedAndDelay = journeys_utils.exitAnimationDisabled
     ? 0
     : Math.max(
         journeys_utils.animationSpeed + journeys_utils.animationDelay,
@@ -1364,16 +1342,16 @@ journeys_utils.animateBannerExit = function (
  * 0 if no animation is applied.
  */
 journeys_utils._getAnimationDurationMs = function (element) {
-  var computedStyle =
+  const computedStyle =
     element.ownerDocument.defaultView.getComputedStyle(element);
   // Fall back to the `animation` shorthand for environments (incl. jsdom) that don't resolve
   // it into the longhand properties: duration is the shorthand's 1st <time> value, delay the
   // 2nd, per spec.
-  var duration =
+  const duration =
     journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
     journeys_utils._timeValueMsAt(computedStyle.animation, 0) ||
     0;
-  var delay =
+  const delay =
     journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
     journeys_utils._timeValueMsAt(computedStyle.animation, 1) ||
     0;
@@ -1389,24 +1367,24 @@ journeys_utils._getAnimationDurationMs = function (element) {
  * ms, or null if there aren't that many.
  */
 journeys_utils._timeValueMsAt = function (cssValue, index) {
-  var matches = (cssValue || '').match(/(-?[\d.]+)(ms|s)\b/g) || [];
-  var token = matches[index];
+  const matches = (cssValue || '').match(/(-?[\d.]+)(ms|s)\b/g) || [];
+  const token = matches[index];
   if (!token) {
     return null;
   }
-  var match = /(-?[\d.]+)(ms|s)/.exec(token);
-  var amount = parseFloat(match[1]);
+  const match = /(-?[\d.]+)(ms|s)/.exec(token);
+  const amount = parseFloat(match[1]);
   return match[2] === 'ms' ? amount : amount * 1000;
 };
 
 journeys_utils.setJourneyLinkData = function (linkData) {
-  var data = { 'banner_id': journeys_utils.branchViewId };
+  const data = { 'banner_id': journeys_utils.branchViewId };
   if (
     linkData &&
     typeof linkData === 'object' &&
     Object.keys(linkData || {}).length > 0
   ) {
-    var journeyLinkDataPropertiesToFilterOut = [
+    const journeyLinkDataPropertiesToFilterOut = [
       'browser_fingerprint_id',
       'app_id',
       'source',
@@ -1417,14 +1395,13 @@ journeys_utils.setJourneyLinkData = function (linkData) {
       linkData,
       journeyLinkDataPropertiesToFilterOut,
     );
-    data['journey_link_data'] = {};
-    utils.merge(data['journey_link_data'], linkData);
+    data.journey_link_data = {};
+    utils.merge(data.journey_link_data, linkData);
   }
   journeys_utils.journeyLinkData = data;
-  journeys_utils.journeyType = data['journey_link_data']['type'] || null;
-  journeys_utils.isDesktopJourney =
-    data['journey_link_data']['type'] === 'desktop';
-  journeys_utils.journeyVariant = data['journey_link_data']['variant'] || null;
+  journeys_utils.journeyType = data.journey_link_data.type || null;
+  journeys_utils.isDesktopJourney = data.journey_link_data.type === 'desktop';
+  journeys_utils.journeyVariant = data.journey_link_data.variant || null;
 };
 
 journeys_utils.getValueForKeyInBranchViewData = function (key) {
@@ -1471,9 +1448,9 @@ journeys_utils.getJourneyCtaLink = function () {
 journeys_utils.tryReplaceJourneyCtaLink = function (html) {
   try {
     if (journeys_utils.hasJourneyCtaLink()) {
-      var journeyLinkReplacePattern = /validate[(].+[)];/g;
-      var pattern = 'validate("' + journeys_utils.getJourneyCtaLink() + '")';
-      var replacedHtml = html.replace(journeyLinkReplacePattern, pattern);
+      const journeyLinkReplacePattern = /validate[(].+[)];/g;
+      const pattern = 'validate("' + journeys_utils.getJourneyCtaLink() + '")';
+      const replacedHtml = html.replace(journeyLinkReplacePattern, pattern);
       return replacedHtml.replace(
         'window.top.location.replace(',
         'window.top.location = ',
@@ -1494,13 +1471,13 @@ journeys_utils.trySetJourneyUrls = function (
     return linkElements;
   }
 
-  var assignUrls = function (data) {
+  const assignUrls = function (data) {
     return urls.reduce((value, url) => {
       if (value[url]) {
         return value;
       }
 
-      var entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
+      const entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
       if (entry) {
         value[url] = entry;
       }
@@ -1509,7 +1486,7 @@ journeys_utils.trySetJourneyUrls = function (
   };
 
   try {
-    var data = safejson.parse(linkElements.data);
+    const data = safejson.parse(linkElements.data);
     linkElements.data = JSON.stringify(assignUrls(data));
 
     return linkElements;

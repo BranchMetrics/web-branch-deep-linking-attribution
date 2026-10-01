@@ -10,8 +10,8 @@ import { Branch } from '../src/6_branch.js';
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
 describe('Branch', function () {
-  var storage = new branchStorage.BranchStorage(['pojo']);
-  var requests = [];
+  const storage = new branchStorage.BranchStorage(['pojo']);
+  const requests = [];
 
   beforeEach(function () {
     testUtils.go('');
@@ -24,7 +24,7 @@ describe('Branch', function () {
     if (!keepStorage) {
       storage.clear();
     }
-    var branch = new Branch();
+    const branch = new Branch();
 
     testUtils.captureRequests(branch._server, requests);
 
@@ -47,11 +47,11 @@ describe('Branch', function () {
     it(
       'should silently fail if branch not initialized',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(params.length, done);
+        const branch = initBranch(false);
+        const assert = testUtils.plan(params.length, done);
 
         function basicTest(param) {
-          var p = testUtils.nulls(param);
+          const p = testUtils.nulls(param);
           branch[call].apply(
             branch,
             p.concat(function (err) {
@@ -60,14 +60,14 @@ describe('Branch', function () {
           );
         }
 
-        for (var i = 0; i < params.length; i++) {
+        for (let i = 0; i < params.length; i++) {
           basicTest(params[i]);
         }
       }),
     );
   }
 
-  var originalUa = navigator.userAgent;
+  const originalUa = navigator.userAgent;
   function setUserAgent(ua) {
     navigator.__defineGetter__('userAgent', function () {
       return ua;
@@ -83,14 +83,14 @@ describe('Branch', function () {
     it(
       'should call api with params and version',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(7, done);
+        const branch = initBranch(false);
+        const assert = testUtils.plan(7, done);
         vi.spyOn(utils, 'whiteListSessionData').mockImplementation(
           function (data) {
             return data;
           },
         );
-        var expectedResponse = {
+        const expectedResponse = {
           'session_id': '113636235674656786',
           'identity_id': '98807509250212101',
           'identity': 'Branch',
@@ -98,7 +98,7 @@ describe('Branch', function () {
           'referring_link': null,
         };
         // init() adds data_parsed to the response it hands to the callback.
-        var expectedCallbackResponse = utils.merge(
+        const expectedCallbackResponse = utils.merge(
           { 'data_parsed': {} },
           expectedResponse,
         );
@@ -163,14 +163,14 @@ describe('Branch', function () {
     it(
       'should not whitelist referring_link',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(7, done);
+        const branch = initBranch(false);
+        const assert = testUtils.plan(7, done);
         vi.spyOn(utils, 'whiteListSessionData').mockImplementation(
           function (data) {
             return data;
           },
         );
-        var expectedResponse = {
+        const expectedResponse = {
           'session_id': '113636235674656786',
           'identity_id': '98807509250212101',
           'identity': 'Branch',
@@ -179,7 +179,7 @@ describe('Branch', function () {
         };
         // init() expands the relative referring_link against the link service
         // endpoint and adds click_id and data_parsed before invoking the callback.
-        var expectedCallbackResponse = {
+        const expectedCallbackResponse = {
           'session_id': '113636235674656786',
           'identity_id': '98807509250212101',
           'identity': 'Branch',
@@ -249,8 +249,8 @@ describe('Branch', function () {
     it(
       'should support being called without a callback',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(1, done);
+        const branch = initBranch(false);
+        const assert = testUtils.plan(1, done);
 
         branch.init(branch_sample_key);
 
@@ -269,8 +269,8 @@ describe('Branch', function () {
     it(
       'should return invalid app id error',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(1, done);
+        const branch = initBranch(false);
+        const assert = testUtils.plan(1, done);
         branch.init(branch_sample_key, function (err) {
           assert.strictEqual(err.message, 'Invalid app id');
         });
@@ -283,8 +283,8 @@ describe('Branch', function () {
     it(
       'should fail early on browser fingerprint error',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(2, done);
+        const branch = initBranch(false);
+        const assert = testUtils.plan(2, done);
         branch.init(branch_sample_key, function (err) {
           assert.strictEqual(err.message, 'Browser fingerprint fetch failed');
           assert.strictEqual(requests.length, 1, 'Only 1 request made');
@@ -297,10 +297,10 @@ describe('Branch', function () {
       'should store in session and call open with link_identifier from hash',
       testUtils.withDone(function (done) {
         if (testUtils.go('#r:12345')) {
-          var branch = initBranch(false);
-          var assert = testUtils.plan(3, done);
+          const branch = initBranch(false);
+          const assert = testUtils.plan(3, done);
 
-          branch.init(branch_sample_key, function (err, data) {
+          branch.init(branch_sample_key, function (_err, _data) {
             assert.strictEqual(
               JSON.parse(localStorage.getItem('branch_session_first')).click_id,
               '12345',
@@ -352,10 +352,10 @@ describe('Branch', function () {
       'should store in session and call open with link_identifier from get param',
       testUtils.withDone(function (done) {
         if (testUtils.go('?_branch_match_id=67890')) {
-          var branch = initBranch(false);
-          var assert = testUtils.plan(3, done);
+          const branch = initBranch(false);
+          const assert = testUtils.plan(3, done);
 
-          branch.init(branch_sample_key, function (err, data) {
+          branch.init(branch_sample_key, function (_err, _data) {
             assert.strictEqual(
               JSON.parse(localStorage.getItem('branch_session_first')).click_id,
               '67890',
@@ -406,9 +406,9 @@ describe('Branch', function () {
     it(
       'should not call has_app if no session present',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(2, done);
-        branch.init(branch_sample_key, function (err, data) {
+        const branch = initBranch(false);
+        const assert = testUtils.plan(2, done);
+        branch.init(branch_sample_key, function (_err, _data) {
           assert.strictEqual(requests.length, 2, 'two requests made');
           assert.deepEqual(
             requests[0].resource.endpoint,
@@ -431,8 +431,8 @@ describe('Branch', function () {
       // fingerprint via /_r and reuses the stored session.
       'should not call open if session present but no link_identifier from get param',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(3, done);
+        let branch = initBranch(false);
+        const assert = testUtils.plan(3, done);
         branch.init(branch_sample_key);
         requests[0].callback(null, browser_fingerprint_id);
         requests[1].callback(null, {
@@ -470,9 +470,9 @@ describe('Branch', function () {
     it(
       'should not call has_app if session and link_identifier present',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(3, done);
+        const assert = testUtils.plan(3, done);
         if (testUtils.go('?_branch_match_id=67890')) {
-          var branch = initBranch(false);
+          let branch = initBranch(false);
           branch.init(branch_sample_key);
 
           requests[0].callback(null, browser_fingerprint_id);
@@ -527,13 +527,13 @@ describe('Branch', function () {
     it(
       'should not call _r if userAgent is safari 11 or greater',
       testUtils.withDone(function (done) {
-        var safari11Ua =
+        const safari11Ua =
           'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
         setUserAgent(safari11Ua);
         expect(navigator.userAgent).toBe(safari11Ua);
 
-        var branch = initBranch(false);
-        var assert = testUtils.plan(2, done);
+        const branch = initBranch(false);
+        const assert = testUtils.plan(2, done);
 
         branch.init(branch_sample_key);
 
@@ -575,13 +575,13 @@ describe('Branch', function () {
     it(
       'should not call _r or open if session present but no link_identifier and safari 11 or greater',
       testUtils.withDone(function (done) {
-        var safari11Ua =
+        const safari11Ua =
           'Mozilla/5.0 (iPod touch; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.28 (KHTML, like Gecko) Version/11.0 Mobile/15A5318g Safari/604.1';
         setUserAgent(safari11Ua);
         expect(navigator.userAgent).toBe(safari11Ua);
 
-        var branch = initBranch(false);
-        var assert = testUtils.plan(2, done);
+        let branch = initBranch(false);
+        const assert = testUtils.plan(2, done);
 
         branch.init(branch_sample_key);
         requests[0].callback(null, {
@@ -616,10 +616,10 @@ describe('Branch', function () {
     it(
       'should return whitelisted session storage data',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(2, done);
-        var data = safejson.stringify({ 'key_1': 'value_1' });
-        var whitelistedData = {
+        const branch = initBranch(true);
+        const assert = testUtils.plan(2, done);
+        const data = safejson.stringify({ 'key_1': 'value_1' });
+        const whitelistedData = {
           'data': data,
           'referring_identity': 'referring_user',
           'identity': 'identity',
@@ -631,7 +631,7 @@ describe('Branch', function () {
             return data;
           },
         );
-        vi.spyOn(session, 'get').mockImplementation(function (storage) {
+        vi.spyOn(session, 'get').mockImplementation(function (_storage) {
           return whitelistedData;
         });
 
@@ -650,16 +650,16 @@ describe('Branch', function () {
     it(
       'should invoke callback with data when a non-null value for identity is passed',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var expectedResponse = {
+        const branch = initBranch(true);
+        const expectedResponse = {
           'session_id': session_id,
           'identity_id': identity_id,
           'link': undefined,
           'developer_identity': 'test_identity',
         };
-        var assert = testUtils.plan(2, done);
+        const assert = testUtils.plan(2, done);
 
-        branch.setIdentity('test_identity', function (err, res) {
+        branch.setIdentity('test_identity', function (_err, res) {
           assert.deepEqual(res, expectedResponse, 'response returned');
         });
         assert.strictEqual(requests.length, 0, 'No request made');
@@ -669,14 +669,14 @@ describe('Branch', function () {
     it(
       'should update identity in local storage and keep identity_id',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(3, done);
-        branch.setIdentity('12345678', function (err, data) {
-          var localData = safejson.parse(
+        const branch = initBranch(true);
+        const assert = testUtils.plan(3, done);
+        branch.setIdentity('12345678', function (_err, _data) {
+          const localData = safejson.parse(
             localStorage.getItem('branch_session_first'),
           );
-          assert.strictEqual(localData['identity'], '12345678');
-          assert.strictEqual(localData['identity_id'], identity_id);
+          assert.strictEqual(localData.identity, '12345678');
+          assert.strictEqual(localData.identity_id, identity_id);
         });
         assert.strictEqual(requests.length, 0, 'No request made');
       }),
@@ -685,10 +685,10 @@ describe('Branch', function () {
     it(
       'should invoke callback with error when a null value for identity is passed',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(1, done);
+        const branch = initBranch(true);
+        const assert = testUtils.plan(1, done);
 
-        branch.setIdentity(null, function (err, res) {
+        branch.setIdentity(null, function (err, _res) {
           assert.strictEqual(
             err.message,
             utils.message(utils.messages.missingIdentity),
@@ -702,8 +702,8 @@ describe('Branch', function () {
   describe('track', function () {
     basicTests('track', [0]);
     it('should print console warning about method deprecation for track', function () {
-      var spy = vi.spyOn(console, 'warn').mockImplementation(function () {});
-      var branch = initBranch(true);
+      const spy = vi.spyOn(console, 'warn').mockImplementation(function () {});
+      const branch = initBranch(true);
       branch.track();
       expect(spy).toHaveBeenCalledWith(
         'track method currently supports only pageview event.',
@@ -718,8 +718,8 @@ describe('Branch', function () {
     it(
       'should clear identity without calling the api',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(5, done);
+        const branch = initBranch(true);
+        const assert = testUtils.plan(5, done);
         branch.setIdentity('test_identity');
         branch.logout(function (err) {
           assert.strictEqual(err, null, 'No error');
@@ -728,9 +728,7 @@ describe('Branch', function () {
         assert.strictEqual(requests.length, 0, 'No request made');
         assert.strictEqual(branch.identity, null, 'identity cleared');
         assert.strictEqual(
-          safejson.parse(localStorage.getItem('branch_session_first'))[
-            'identity'
-          ],
+          safejson.parse(localStorage.getItem('branch_session_first')).identity,
           undefined,
           'identity removed from local storage',
         );
@@ -745,9 +743,9 @@ describe('Branch', function () {
 
   describe('qrCode', function () {
     it('sends the QR code settings and returns the image as a QrCode', function () {
-      var branch = initBranch(true);
-      var callback = vi.fn();
-      var png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]).buffer;
+      const branch = initBranch(true);
+      const callback = vi.fn();
+      const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]).buffer;
 
       branch.qrCode(
         { data: { mydata: 'bar' } },
@@ -763,16 +761,16 @@ describe('Branch', function () {
       requests[0].callback(null, png);
 
       expect(callback).toHaveBeenCalledTimes(1);
-      var qrCode = callback.mock.calls[0][1];
+      const qrCode = callback.mock.calls[0][1];
       expect(callback.mock.calls[0][0]).toBeNull();
       expect(qrCode.rawBuffer).toBe(png);
       expect(qrCode.base64()).toBe(btoa('\x89PNG'));
     });
 
     it('passes request errors to the callback', function () {
-      var branch = initBranch(true);
-      var callback = vi.fn();
-      var error = new Error('Error in API');
+      const branch = initBranch(true);
+      const callback = vi.fn();
+      const error = new Error('Error in API');
 
       branch.qrCode({ data: {} }, {}, callback);
       requests[0].callback(error);
@@ -785,8 +783,8 @@ describe('Branch', function () {
   describe('link', function () {
     basicTests('link', [1]);
 
-    var expectedRequest = function (serialized, source, desktopUrlAppend) {
-      var val = testUtils.params(
+    const expectedRequest = function (serialized, source, desktopUrlAppend) {
+      const val = testUtils.params(
         {
           tags: ['tag1', 'tag2'],
           channel: 'sample app',
@@ -808,29 +806,29 @@ describe('Branch', function () {
         ['_t'],
       );
       if (desktopUrlAppend) {
-        val['data']['$desktop_url'] += desktopUrlAppend;
+        val.data.$desktop_url += desktopUrlAppend;
       }
       if (serialized) {
-        val['data'] = JSON.stringify(val['data']);
+        val.data = JSON.stringify(val.data);
       }
       if (source) {
-        val['source'] = 'web-sdk';
+        val.source = 'web-sdk';
       }
       return val;
     };
 
-    var expectedResponse = {
+    const expectedResponse = {
       'url': 'https://bnc.lt/l/3HZMytU-BW',
     };
 
     it(
       'should call api with serialized data and return link with browser_fingerprint_id appended',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(4, done);
+        const branch = initBranch(true);
+        const assert = testUtils.plan(4, done);
         branch.link(expectedRequest(), function (err, link) {
           assert.strictEqual(err, null, 'No error');
-          assert.strictEqual(link, expectedResponse['url'], 'link returned');
+          assert.strictEqual(link, expectedResponse.url, 'link returned');
         });
         assert.strictEqual(requests.length, 1, 'Request made');
         requests[0].callback(null, expectedResponse);
@@ -845,17 +843,17 @@ describe('Branch', function () {
     it(
       'an error should be returned causing .link() to return a bnc.lt long link',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(21, done);
-        branch.link(expectedRequest(), function (err, link) {
-          var urlParser = document.createElement('a');
+        const branch = initBranch(true);
+        const assert = testUtils.plan(21, done);
+        branch.link(expectedRequest(), function (_err, link) {
+          const urlParser = document.createElement('a');
           urlParser.href = link;
           assert.strictEqual(
             urlParser.protocol,
             'https:',
             "Dynamic BNC link's protocol is correct",
           );
-          var hostWithoutPort = urlParser.host;
+          let hostWithoutPort = urlParser.host;
           if (hostWithoutPort.indexOf(':') > -1) {
             hostWithoutPort = hostWithoutPort.substring(
               0,
@@ -867,7 +865,7 @@ describe('Branch', function () {
             'bnc.lt',
             "Dynamic BNC link's host correct",
           );
-          var pathName = urlParser.pathname;
+          let pathName = urlParser.pathname;
           if (pathName[0] === '/') {
             pathName = pathName.substring(1, pathName.length);
           }
@@ -877,10 +875,10 @@ describe('Branch', function () {
             "Dynamic BNC link's pathname correct",
           );
 
-          var queryParams = urlParser.search.replace('?', '');
+          let queryParams = urlParser.search.replace('?', '');
           queryParams = queryParams.split('&');
 
-          var expectedQueryParams = {
+          const expectedQueryParams = {
             tags: ['tag1', 'tag2'],
             channel: 'sample app',
             feature: 'create link',
@@ -899,11 +897,11 @@ describe('Branch', function () {
               '$og_type': 'product',
             },
           };
-          var actual = {};
-          for (var i = 0; i < queryParams.length; i++) {
-            var keyValuePair = queryParams[i].split('=');
-            var key = keyValuePair[0];
-            var value = decodeURIComponent(keyValuePair[1]);
+          const actual = {};
+          for (let i = 0; i < queryParams.length; i++) {
+            const keyValuePair = queryParams[i].split('=');
+            const key = keyValuePair[0];
+            const value = decodeURIComponent(keyValuePair[1]);
             if (key === 'tags') {
               if (!actual[key]) {
                 actual[key] = [];
@@ -913,26 +911,31 @@ describe('Branch', function () {
               actual[key] = value;
             }
           }
-          for (var property in expectedQueryParams) {
-            if (expectedQueryParams.hasOwnProperty(property)) {
+          for (const property in expectedQueryParams) {
+            if (
+              Object.prototype.hasOwnProperty.call(
+                expectedQueryParams,
+                property,
+              )
+            ) {
               assert.strictEqual(
                 true,
-                actual.hasOwnProperty(property),
+                Object.prototype.hasOwnProperty.call(actual, property),
                 'property exists in dynamic bnc link',
               );
-              var valActual = decodeURIComponent(actual[property]);
+              let valActual = decodeURIComponent(actual[property]);
               if (property === 'data') {
                 valActual = atob(valActual);
                 valActual = JSON.parse(valActual);
                 assert.deepEqual(
-                  expectedQueryParams['data'],
+                  expectedQueryParams.data,
                   valActual,
                   'data object appended correctly to dynamic BNC link',
                 );
               } else if (property === 'tags') {
                 valActual = valActual.split(',');
-                for (var t = 0; t < expectedQueryParams[property].length; t++) {
-                  var valueExists =
+                for (let t = 0; t < expectedQueryParams[property].length; t++) {
+                  const valueExists =
                     expectedQueryParams[property].indexOf(valActual[t]) > -1;
                   assert.strictEqual(
                     true,
@@ -958,12 +961,12 @@ describe('Branch', function () {
     it(
       'should add source = "web-sdk" to link data',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(2, done);
+        const branch = initBranch(true);
+        const assert = testUtils.plan(2, done);
         branch.link(expectedRequest());
         assert.strictEqual(requests.length, 1, 'Request made');
         assert.strictEqual(
-          requests[0].obj['source'],
+          requests[0].obj.source,
           'web-sdk',
           'web-sdk source set',
         );
@@ -973,14 +976,12 @@ describe('Branch', function () {
     it(
       'should remove r hash from desktop_url',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(2, done);
+        const branch = initBranch(true);
+        const assert = testUtils.plan(2, done);
         branch.link(expectedRequest(false, false, '#r:12345'));
         assert.strictEqual(requests.length, 1, 'Request made');
         assert.strictEqual(
-          JSON.parse(requests[0].obj['data'])['$desktop_url'].indexOf(
-            '#r:12345',
-          ),
+          JSON.parse(requests[0].obj.data).$desktop_url.indexOf('#r:12345'),
           -1,
           'web-sdk source set',
         );
@@ -995,8 +996,8 @@ describe('Branch', function () {
       // set to desktop
       vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('desktop');
       vi.spyOn(console, 'warn').mockImplementation(function () {});
-      var spy = vi.spyOn(console, 'info').mockImplementation(function () {});
-      var branch = initBranch(true);
+      const spy = vi.spyOn(console, 'info').mockImplementation(function () {});
+      const branch = initBranch(true);
       branch.banner();
       expect(spy).toHaveBeenCalledWith(
         'banner functionality is not supported on this platform',
@@ -1007,21 +1008,21 @@ describe('Branch', function () {
   describe('deepview', function () {
     basicTests('deepview', [1]);
 
-    var branch;
+    let branch;
     // deepview() mutates the link data it is given (cleanLinkData), so each
     // test gets a fresh copy.
-    var linkData;
-    var options = {
+    let linkData;
+    const options = {
       make_new_link: true,
       open_app: true,
       append_deeplink_path: true,
     };
-    var windowLocation = 'http://someurl/pluspath';
-    var ogTitle = 'OGTitle';
-    var ogDescription = 'OGDescription';
-    var ogImage = 'OGImage';
-    var ogVideo = 'OGVideo';
-    var ogType = 'OGType';
+    const windowLocation = 'http://someurl/pluspath';
+    const ogTitle = 'OGTitle';
+    const ogDescription = 'OGDescription';
+    const ogImage = 'OGImage';
+    const ogVideo = 'OGVideo';
+    const ogType = 'OGType';
 
     beforeEach(function () {
       linkData = testUtils.params(
@@ -1040,14 +1041,14 @@ describe('Branch', function () {
       vi.spyOn(utils, 'getHostedDeepLinkData').mockReturnValue({});
 
       // check starting with 10th call since first 9 are called by openGraphDataAsObject
-      var ogContentByCall = {
+      const ogContentByCall = {
         10: ogTitle,
         11: ogDescription,
         12: ogImage,
         13: ogVideo,
         14: ogType,
       };
-      var ogContentCalls = 0;
+      let ogContentCalls = 0;
       vi.spyOn(utils, 'getOpenGraphContent').mockImplementation(function () {
         return ogContentByCall[ogContentCalls++];
       });
@@ -1059,8 +1060,8 @@ describe('Branch', function () {
     it(
       'should call v1/deepview endpoint with the right params for branch.deepview() calls',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(8, done);
-        var dataString = [
+        const assert = testUtils.plan(8, done);
+        const dataString = [
           '{',
           '"mydata":"bar",',
           '"$canonical_url":"' + windowLocation + '",',
@@ -1078,7 +1079,7 @@ describe('Branch', function () {
 
         assert.strictEqual(requests.length, 1, 'exactly one request made');
         requests[0].callback();
-        var obj = requests[0].obj;
+        const obj = requests[0].obj;
 
         assert.strictEqual(obj.data, dataString, 'data is sent');
         assert.deepEqual(obj.tags, ['tag1', 'tag2'], 'tags is sent');
@@ -1104,7 +1105,7 @@ describe('Branch', function () {
     it(
       'should call v1/deepview endpoint with the right params for branch.banner() calls',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(2, done);
+        const assert = testUtils.plan(2, done);
 
         // we're testing banner, which means we need to be mobile
         vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('android');
@@ -1113,20 +1114,20 @@ describe('Branch', function () {
         vi.spyOn(banner_utils, 'shouldAppend').mockReturnValue(true);
 
         // create a fake banner div so we don't fill up the dom with real banners
-        var bannerDiv = document.createElement('iframe');
+        const bannerDiv = document.createElement('iframe');
         bannerDiv.src = 'about:blank';
         bannerDiv.id = 'branch-mobile-action';
         document.body.appendChild(bannerDiv);
         // markup() hands the element to its callback.
         vi.spyOn(banner_html, 'markup').mockImplementation(
-          function (options, storage, callback) {
+          function (_options, _storage, callback) {
             callback(bannerDiv);
           },
         );
         // banner() logs a deprecation warning.
         vi.spyOn(console, 'warn').mockImplementation(function () {});
 
-        var bannerDeeplinkData = {
+        const bannerDeeplinkData = {
           tags: ['custom'],
           data: {
             mydata: 'From Banner',
@@ -1135,7 +1136,7 @@ describe('Branch', function () {
           },
         };
 
-        var banner = branch.banner(
+        const _banner = branch.banner(
           {
             immediate: true,
             disableHide: true,
@@ -1146,7 +1147,7 @@ describe('Branch', function () {
 
         assert.strictEqual(requests.length, 1, 'exactly one request made');
 
-        var obj = requests[0].obj;
+        const obj = requests[0].obj;
         assert.strictEqual(
           obj.deepview_type,
           'banner',
@@ -1160,7 +1161,7 @@ describe('Branch', function () {
     it(
       'should ignore the referring link if make_new_link is true',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(2, done);
+        const assert = testUtils.plan(2, done);
         vi.spyOn(branch, '_referringLink').mockReturnValue('123abc');
 
         branch.deepview(linkData, { make_new_link: true }, function (err) {
@@ -1168,7 +1169,7 @@ describe('Branch', function () {
         });
 
         requests[0].callback();
-        var obj = requests[0].obj;
+        const obj = requests[0].obj;
         assert.strictEqual(
           obj.link_click_id,
           undefined,
@@ -1180,7 +1181,7 @@ describe('Branch', function () {
     it(
       'should reuse the referring link if make_new_link is not true',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(2, done);
+        const assert = testUtils.plan(2, done);
         vi.spyOn(branch, '_referringLink').mockReturnValue('123abc');
 
         branch.deepview(linkData, {}, function (err) {
@@ -1188,7 +1189,7 @@ describe('Branch', function () {
         });
 
         requests[0].callback();
-        var obj = requests[0].obj;
+        const obj = requests[0].obj;
         assert.strictEqual(
           obj.link_click_id,
           '123abc',
@@ -1200,7 +1201,7 @@ describe('Branch', function () {
     it(
       'should assign the function in request callback to branch._deepviewCta',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(4, done);
+        const assert = testUtils.plan(4, done);
 
         branch.deepview({}, {}, function (err) {
           assert.strictEqual(err, null, 'No error');
@@ -1225,9 +1226,9 @@ describe('Branch', function () {
     it(
       'should return err and use the right fallback when the req has err',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(10, done);
+        const assert = testUtils.plan(10, done);
 
-        vi.spyOn(branch, '_windowRedirect').mockImplementation(function (url) {
+        vi.spyOn(branch, '_windowRedirect').mockImplementation(function (_url) {
           assert(false, 'redirect should not happen unless explicitly called');
         });
 
@@ -1250,14 +1251,14 @@ describe('Branch', function () {
         requests[0].callback(new Error('error message abc'));
 
         vi.spyOn(branch, '_windowRedirect').mockImplementation(function (link) {
-          var urlParser = document.createElement('a');
+          const urlParser = document.createElement('a');
           urlParser.href = link;
           assert.strictEqual(
             urlParser.protocol,
             'https:',
             "Dynamic BNC link's protocol is correct",
           );
-          var hostWithoutPort = urlParser.host;
+          let hostWithoutPort = urlParser.host;
           if (hostWithoutPort.indexOf(':') > -1) {
             hostWithoutPort = hostWithoutPort.substring(
               0,
@@ -1269,7 +1270,7 @@ describe('Branch', function () {
             'bnc.lt',
             "Dynamic BNC link's host correct",
           );
-          var pathName = urlParser.pathname;
+          let pathName = urlParser.pathname;
           if (pathName[0] === '/') {
             pathName = pathName.substring(1, pathName.length);
           }
@@ -1279,10 +1280,10 @@ describe('Branch', function () {
             "Dynamic BNC link's pathname correct",
           );
 
-          var queryParams = urlParser.search.replace('?', '');
+          let queryParams = urlParser.search.replace('?', '');
           queryParams = queryParams.split('&');
 
-          var expectedQueryParams = {
+          const expectedQueryParams = {
             channel: 'testChannel',
             source: 'web-sdk',
             data: {
@@ -1295,25 +1296,27 @@ describe('Branch', function () {
               'akey': 'aval',
             },
           };
-          var actual = {};
-          for (var i = 0; i < queryParams.length; i++) {
-            var keyValuePair = queryParams[i].split('=');
-            var value = decodeURIComponent(keyValuePair[1]);
+          const actual = {};
+          for (let i = 0; i < queryParams.length; i++) {
+            const keyValuePair = queryParams[i].split('=');
+            const value = decodeURIComponent(keyValuePair[1]);
             actual[keyValuePair[0]] = value;
           }
-          for (var key in expectedQueryParams) {
-            if (expectedQueryParams.hasOwnProperty(key)) {
+          for (const key in expectedQueryParams) {
+            if (
+              Object.prototype.hasOwnProperty.call(expectedQueryParams, key)
+            ) {
               assert.strictEqual(
                 true,
-                actual.hasOwnProperty(key),
+                Object.prototype.hasOwnProperty.call(actual, key),
                 'property exists in dynamic bnc link',
               );
-              var actualVal = decodeURIComponent(actual[key]);
+              let actualVal = decodeURIComponent(actual[key]);
               if (key === 'data') {
                 actualVal = atob(actualVal);
                 actualVal = JSON.parse(actualVal);
                 assert.deepEqual(
-                  expectedQueryParams['data'],
+                  expectedQueryParams.data,
                   actualVal,
                   'data object appended correctly to dynamic BNC link',
                 );
@@ -1333,7 +1336,7 @@ describe('Branch', function () {
   });
 
   describe('deepviewCta', function () {
-    var branch;
+    let branch;
     beforeEach(function () {
       branch = initBranch(true);
     });
@@ -1341,7 +1344,7 @@ describe('Branch', function () {
     it(
       'should throw an error if branch._deepviewCta is undefined',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(2, done);
+        const assert = testUtils.plan(2, done);
         assert.strictEqual(
           branch._deepviewCta,
           undefined,
@@ -1360,7 +1363,7 @@ describe('Branch', function () {
     it(
       'should throw an error if tracking is disabled and branch._deepviewCta is undefined',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(2, done);
+        const assert = testUtils.plan(2, done);
         assert.strictEqual(
           branch._deepviewCta,
           undefined,
@@ -1380,7 +1383,7 @@ describe('Branch', function () {
     it(
       'should not throw an error if branch._deepviewCta is a function',
       testUtils.withDone(function (done) {
-        var assert = testUtils.plan(1, done);
+        const assert = testUtils.plan(1, done);
         branch._deepviewCta = function () {};
         branch.deepviewCta(function (err) {
           assert.strictEqual(
@@ -1396,10 +1399,10 @@ describe('Branch', function () {
     it(
       'should add and remove an event listener to the branch object and fire',
       testUtils.withDone(function (done) {
-        var branch = initBranch(true);
-        var assert = testUtils.plan(8, done);
-        var listenerFired = 0;
-        var listener = function (event) {
+        const branch = initBranch(true);
+        const assert = testUtils.plan(8, done);
+        let listenerFired = 0;
+        const listener = function (event) {
           assert.strictEqual(
             'test_event',
             event,
@@ -1446,9 +1449,9 @@ describe('Branch', function () {
     it(
       'Flow with branch.init(), branch.disableTracking(true), branch.disableTracking(false)',
       testUtils.withDone(function (done) {
-        var branch = initBranch(false);
-        var assert = testUtils.plan(7, done);
-        branch.init(branch_sample_key, function (err, data) {
+        const branch = initBranch(false);
+        const assert = testUtils.plan(7, done);
+        branch.init(branch_sample_key, function (err, _data) {
           assert.strictEqual(err, null, 'No error');
         });
         requests[0].callback(null, browser_fingerprint_id);

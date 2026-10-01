@@ -24,24 +24,24 @@ function checkPreviousBanner() {
  * @param {boolean} hasApp
  */
 function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
-  var ctaText = hasApp ? 'OPEN' : 'GET';
+  let ctaText = hasApp ? 'OPEN' : 'GET';
 
   journeys_utils.setPositionAndHeight(html);
   // Get metadata, css and js from html blob then remove them
-  var metadata = journeys_utils.getMetadata(html);
+  const metadata = journeys_utils.getMetadata(html);
   if (metadata) {
     ctaText = journeys_utils.getCtaText(metadata, hasApp);
     journeys_utils.findInsertionDiv(parent, metadata);
   }
-  var cssInsideIframe = journeys_utils.getCss(html);
+  const cssInsideIframe = journeys_utils.getCss(html);
   journeys_utils.getJsAndAddToParent(html);
-  var cssIframeContainer = journeys_utils.getIframeCss(html);
+  const cssIframeContainer = journeys_utils.getIframeCss(html);
   html = journeys_utils.removeScriptAndCss(html);
 
   // create iframe element, add html, add css, add ctaText
-  var iframeContainer = document.createElement('div');
+  const iframeContainer = document.createElement('div');
   iframeContainer.id = 'branch-banner-iframe-embed';
-  var iframe = journeys_utils.createIframe();
+  const iframe = journeys_utils.createIframe();
   iframe.onload = function () {
     journeys_utils.addHtmlToIframe(
       iframe,
@@ -52,11 +52,11 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
     journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
     journeys_utils.addDynamicCtaText(iframe, ctaText);
     const eventData = Object.assign({}, journeys_utils.journeyLinkData);
-    eventData['bannerHeight'] = journeys_utils.bannerHeight;
-    eventData['isFullPageBanner'] = journeys_utils.isFullPage;
-    eventData['bannerPagePlacement'] = journeys_utils.position;
-    eventData['isBannerInline'] = journeys_utils.sticky === 'absolute';
-    eventData['isBannerSticky'] = journeys_utils.sticky === 'fixed';
+    eventData.bannerHeight = journeys_utils.bannerHeight;
+    eventData.isFullPageBanner = journeys_utils.isFullPage;
+    eventData.bannerPagePlacement = journeys_utils.position;
+    eventData.isBannerInline = journeys_utils.sticky === 'absolute';
+    eventData.isBannerSticky = journeys_utils.sticky === 'fixed';
     journeys_utils.branch._publishEvent('willShowJourney', eventData);
 
     journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
@@ -77,7 +77,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
  * @return      {boolean}
  */
 function _areJourneysDismissedGlobally(branch) {
-  var globalDismissEndTimestamp = branch._storage.get(
+  const globalDismissEndTimestamp = branch._storage.get(
     'globalJourneysDismiss',
     true,
   );
@@ -100,9 +100,9 @@ branch_view.shouldDisplayJourney = function (
 ) {
   if (
     checkPreviousBanner() ||
-    utils.getPlatformByUserAgent() == 'other' ||
-    !eventResponse['event_data'] ||
-    !eventResponse['template']
+    utils.getPlatformByUserAgent() === 'other' ||
+    !eventResponse.event_data ||
+    !eventResponse.template
   ) {
     return false;
   }
@@ -112,8 +112,8 @@ branch_view.shouldDisplayJourney = function (
   }
 
   if (
-    !eventResponse['event_data']['branch_view_data']['id'] ||
-    (options && options['no_journeys']) ||
+    !eventResponse.event_data.branch_view_data.id ||
+    options?.no_journeys ||
     _areJourneysDismissedGlobally(journeys_utils.branch)
   ) {
     // resets the callback index so that auto-open works the next time a Journey is rendered
@@ -139,33 +139,33 @@ branch_view.displayJourney = function (
   journeys_utils.branchViewId = templateId;
   journeys_utils.setJourneyLinkData(journeyLinkData);
 
-  var audienceRuleId = branchViewData['audience_rule_id'];
+  const audienceRuleId = branchViewData.audience_rule_id;
   journeys_utils.use_v2_renderer = !!newRenderOptions?.use_v2_renderer;
   journeys_utils.animationConfig = newRenderOptions?.animationConfig;
 
   // this code removes any leftover css from previous banner
-  var branchCSS = document.getElementById('branch-iframe-css');
-  if (branchCSS && branchCSS.parentElement) {
+  const branchCSS = document.getElementById('branch-iframe-css');
+  if (branchCSS?.parentElement) {
     branchCSS.parentElement.removeChild(branchCSS);
   }
 
-  var placeholder = document.createElement('div');
+  const placeholder = document.createElement('div');
   placeholder.id = 'branch-banner';
   document.body.insertBefore(placeholder, null);
   banner_utils.addClass(placeholder, 'branch-banner-is-active');
 
-  var failed = false;
-  var callbackString = requestData['callback_string'];
-  var banner = null;
-  var cta = null;
-  var storage = journeys_utils.branch._storage;
+  let failed = false;
+  const callbackString = requestData.callback_string;
+  const banner = null;
+  let cta = null;
+  const storage = journeys_utils.branch._storage;
 
   if (html) {
-    var metadata = journeys_utils.getMetadata(html) || {};
+    const metadata = journeys_utils.getMetadata(html) || {};
 
     html = journeys_utils.tryReplaceJourneyCtaLink(html);
 
-    var timeoutTrigger = window.setTimeout(function () {
+    const timeoutTrigger = window.setTimeout(function () {
       window[callbackString] = function () {};
     }, utils.timeout);
 
@@ -188,7 +188,7 @@ branch_view.displayJourney = function (
       );
     };
 
-    var finalHookupsOnIframeLoaded = function (banner) {
+    const finalHookupsOnIframeLoaded = function (banner) {
       journeys_utils.banner = banner;
 
       if (banner === null) {
@@ -217,7 +217,7 @@ branch_view.displayJourney = function (
     renderHtmlBlob(
       document.body,
       html,
-      requestData['has_app_websdk'],
+      requestData.has_app_websdk,
       finalHookupsOnIframeLoaded,
     );
   } else {
@@ -242,48 +242,55 @@ branch_view._getPageviewRequestData = function (
   }
 
   journeys_utils.entryAnimationDisabled =
-    options['disable_entry_animation'] || false;
+    options.disable_entry_animation || false;
   journeys_utils.exitAnimationDisabled =
-    options['disable_exit_animation'] || false;
+    options.disable_exit_animation || false;
 
   // starts object off with data from setBranchViewData() call
-  var obj = utils.merge({}, branch._branchViewData);
-  var sessionStorage = session.get(branch._storage) || {};
-  var has_app = sessionStorage.hasOwnProperty('has_app')
-    ? sessionStorage['has_app']
+  let obj = utils.merge({}, branch._branchViewData);
+  const sessionStorage = session.get(branch._storage) || {};
+  const has_app = Object.prototype.hasOwnProperty.call(
+    sessionStorage,
+    'has_app',
+  )
+    ? sessionStorage.has_app
     : false;
-  var identity = sessionStorage.hasOwnProperty('identity')
-    ? sessionStorage['identity']
+  const identity = Object.prototype.hasOwnProperty.call(
+    sessionStorage,
+    'identity',
+  )
+    ? sessionStorage.identity
     : null;
-  var journeyDismissals = branch._storage.get('journeyDismissals', true);
-  var userLanguage =
+  const journeyDismissals = branch._storage.get('journeyDismissals', true);
+  const userLanguage =
     (
-      options['user_language'] ||
+      options.user_language ||
       utils.getBrowserLanguageCode() ||
       'en'
     ).toLowerCase() || null;
-  var initialReferrer = utils.getInitialReferrer(branch._referringLink());
-  var branchViewId =
-    options['branch_view_id'] ||
+  const initialReferrer = utils.getInitialReferrer(branch._referringLink());
+  const branchViewId =
+    options.branch_view_id ||
     utils.getParameterByName('_branch_view_id') ||
     null;
-  var linkClickId = !options['make_new_link']
+  const linkClickId = !options.make_new_link
     ? utils.getClickIdAndSearchStringFromLink(branch._referringLink(true))
     : null;
-  var SessionlinkClickId = sessionStorage.hasOwnProperty(
+  const SessionlinkClickId = Object.prototype.hasOwnProperty.call(
+    sessionStorage,
     'session_link_click_id',
   )
-    ? sessionStorage['session_link_click_id']
+    ? sessionStorage.session_link_click_id
     : null;
 
   // adds root level keys for v1/event
-  obj['event'] = !isDismissEvent ? 'pageview' : 'dismiss';
-  obj['metadata'] = metadata;
+  obj.event = !isDismissEvent ? 'pageview' : 'dismiss';
+  obj.metadata = metadata;
   obj = utils.addPropertyIfNotNull(obj, 'initial_referrer', initialReferrer);
 
   // adds root level keys for v1/branchview
   obj = utils.addPropertyIfNotNull(obj, 'branch_view_id', branchViewId);
-  obj = utils.addPropertyIfNotNull(obj, 'no_journeys', options['no_journeys']);
+  obj = utils.addPropertyIfNotNull(obj, 'no_journeys', options.no_journeys);
   obj = utils.addPropertyIfNotNull(obj, 'is_iframe', utils.isIframe());
   obj = utils.addPropertyIfNotNull(
     obj,
@@ -296,11 +303,11 @@ branch_view._getPageviewRequestData = function (
     'session_link_click_id',
     SessionlinkClickId,
   );
-  obj['user_language'] = userLanguage;
-  obj['open_app'] = options['open_app'] || false;
-  obj['has_app_websdk'] = has_app;
-  obj['feature'] = 'journeys';
-  obj['callback_string'] =
+  obj.user_language = userLanguage;
+  obj.open_app = options.open_app || false;
+  obj.has_app_websdk = has_app;
+  obj.feature = 'journeys';
+  obj.callback_string =
     'branch_view_callback__' + journeys_utils._callback_index++;
 
   if (!obj.data) {
@@ -314,15 +321,15 @@ branch_view._getPageviewRequestData = function (
     obj.data,
   );
   if (linkClickId) {
-    obj.data['link_click_id'] = linkClickId;
+    obj.data.link_click_id = linkClickId;
   }
-  var linkData = sessionStorage['data']
-    ? safejson.parse(sessionStorage['data'])
+  const linkData = sessionStorage.data
+    ? safejson.parse(sessionStorage.data)
     : null;
-  if (linkData && linkData['+referrer']) {
+  if (linkData?.['+referrer']) {
     obj.data['+referrer'] = linkData['+referrer'];
   }
-  obj['session_referring_link_data'] = sessionStorage['data'] || null;
+  obj.session_referring_link_data = sessionStorage.data || null;
   obj = utils.cleanLinkData(obj);
   return obj;
 };

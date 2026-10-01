@@ -9,7 +9,13 @@
         "useArrowFunction": "off"
       },
       "correctness": {
-        "noUnusedImports": { "level": "error", "fix": "safe" }
+        "noUnusedImports": {
+          "level": "error",
+          "fix": "safe"
+        }
+      },
+      "suspicious": {
+        "noPrototypeBuiltins": "off"
       }
     }
   },
@@ -32,7 +38,75 @@
         "rules": {
           "correctness": {
             "noUndeclaredVariables": "error",
-            "noUnusedVariables": { "level": "error", "fix": "none" }
+            "noUnusedVariables": {
+              "level": "error",
+              "fix": "none"
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["test/**/*.html", "src/stars/**/*.svg"],
+      "linter": {
+        "rules": {
+          "a11y": "off"
+        }
+      }
+    },
+    {
+      "includes": ["src/**/*.js", "test/**/*.js", "!test/blob-*.js"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noVar": "error"
+          },
+          "style": {
+            "useConst": "error"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/**/*.js"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useTemplate": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/onpage.js"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noArguments": "off",
+            "useOptionalChain": "off"
+          },
+          "suspicious": {
+            "noRedundantUseStrict": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["test/blob-*.js"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/2_storage.js", "test/2_storage.test.js"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noDocumentCookie": "off"
           }
         }
       }
