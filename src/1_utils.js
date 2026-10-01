@@ -1608,9 +1608,11 @@ utils.isValidURL = function (url) {
   if (!url || url.trim() === '') {
     return false;
   }
-  // biome-ignore lint/complexity/useRegexLiterals: pattern is unchanged from main; fixed separately
+  // The label's inner group is `?`, not `*`: with `*` a run like "0000" can be split many ways,
+  // causing exponential backtracking (ReDoS) on invalid input. Both accept the same URLs.
+  // biome-ignore lint/complexity/useRegexLiterals: kept as a string, same form as before the fix
   const urlPattern = new RegExp(
-    '^(https?)://((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$',
+    '^(https?)://((([a-z\\d]([a-z\\d-]*[a-z\\d])?)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$',
     'i',
   );
   return urlPattern.test(url);
