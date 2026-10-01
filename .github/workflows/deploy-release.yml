@@ -53,26 +53,30 @@ jobs:
         env:
           INPUT_SHA: ${{ env.INPUT_SHA }}
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.0
+
       - name: Install Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
 
-      # Do this before npm configure because it writes the package.json version
+      # Do this before installing dependencies because it writes the package.json version
       - name: Write version to files
         run: |
           ./deployment/write-versions.sh ${{ steps.next-version.outputs.result }}
 
-      - name: Configure NPM
-        run: npm ci
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Publish to s3
         run: |
           ./deployment/release-s3.sh ${{ steps.next-version.outputs.result }}
 
+      # Skip git checks: write-versions.sh has just modified tracked files.
       - name: Publish to npm
-        run: npm publish
+        run: pnpm publish --no-git-checks
 
       - name: Create Github Release
         uses: actions/github-script@v7

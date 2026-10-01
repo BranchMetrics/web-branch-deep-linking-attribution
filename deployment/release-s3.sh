@@ -9,8 +9,8 @@ DATE=$(date "+%Y-%m-%d")
 echo "Releasing Branch Web SDK"
 
 # Contract-check the exact dist/ that gets uploaded below; stop before any upload if either fails.
-npm run release || exit 1
-npm run test:bundle || exit 1
+pnpm run release || exit 1
+pnpm run test:bundle || exit 1
 
 # Engagement Pro Production Testing App - ID: 1364963849844839205
 ./deployment/build-example-html.sh "key_live_gAbR03mCEte9DLh6L9GFApebvyg4mMDw" "https://api2.branch.io" "https://cdn.branch.io/branch-latest.min.js"

@@ -8,9 +8,9 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "ci": "npm ci",
+    "ci": "pnpm install --frozen-lockfile",
     "clean": "rimraf dist coverage test-results.xml",
-    "clean-and-develop": "npm ci && npm run clean && npm run build && npm run cover",
+    "clean-and-develop": "pnpm install --frozen-lockfile && pnpm run clean && pnpm run build && pnpm run cover",
     "cover": "vitest run --coverage",
     "format": "biome lint --only=correctness/noUnusedImports --write . && biome format --write .",
     "format:check": "biome ci --linter-enabled=false .",
@@ -19,7 +19,7 @@
     "test-report": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-results.xml",
     "test:min": "vitest run --config vitest.min.config.mjs",
     "prepare": "sh scripts/install-git-hooks.sh",
-    "validate": "npm ls",
+    "validate": "pnpm ls",
     "start:dev": "node startDev.js",
     "release": "rimraf dist && node scripts/build.mjs",
     "lint": "biome lint .",
@@ -38,15 +38,16 @@
     "url": "https://github.com/BranchMetrics/web-branch-deep-linking-attribution/issues",
     "email": "support@branch.io"
   },
+  "packageManager": "pnpm@12.3.4",
   "homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15",
-    "@vitest/coverage-v8": "^5.0.3",
+    "@biomejs/biome": "^2.5.14",
+    "@vitest/coverage-v8": "^5.0.1",
     "inquirer": "^14.2.2",
     "jsdom": "^26.1.0",
-    "lefthook": "2.1.16",
+    "lefthook": "2.1.14",
     "rimraf": "^6.1.3",
-    "vite": "^8.3.2",
-    "vitest": "^5.0.3"
+    "vite": "^8.3.1",
+    "vitest": "^5.0.1"
   }
 }

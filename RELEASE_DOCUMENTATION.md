@@ -4,16 +4,16 @@ Building, testing, staging and releasing the Web SDK all run in GitHub Actions.
 
 ## Building locally
 
-Requires Node 24 (the `flake.nix` dev shell provides it).
+Requires Node 24 and pnpm (the `flake.nix` dev shell provides both).
 
 | Command | What it does |
 |:--|:--|
-| `npm run release` | Cleans `dist/` and builds it with Vite/Rolldown (`scripts/build.mjs`): `build.js` (readable), `build.min.js` (minified with Oxc) and `build.min.js.gz`. Fails if the gzipped bundle exceeds `size-budget.json`. |
-| `npm test` | Unit tests (Vitest + jsdom) against `src/`. |
-| `npm run test:min` | The same unit tests against `src/` modules minified with the production minifier. |
-| `npm run test:bundle` | Checks the public contract of the built `dist/build.min.js`. Run `npm run release` first. |
-| `npm run cover` | Unit tests with coverage. |
-| `npm run format:check` / `npm run lint` | Biome formatting check, and Biome lint (errors fail; includes undeclared/unused variable checks in `src/`). |
+| `pnpm run release` | Cleans `dist/` and builds it with Vite/Rolldown (`scripts/build.mjs`): `build.js` (readable), `build.min.js` (minified with Oxc) and `build.min.js.gz`. Fails if the gzipped bundle exceeds `size-budget.json`. |
+| `pnpm test` | Unit tests (Vitest + jsdom) against `src/`. |
+| `pnpm run test:min` | The same unit tests against `src/` modules minified with the production minifier. |
+| `pnpm run test:bundle` | Checks the public contract of the built `dist/build.min.js`. Run `pnpm run release` first. |
+| `pnpm run cover` | Unit tests with coverage. |
+| `pnpm run format:check` / `pnpm run lint` | Biome formatting check, and Biome lint (errors fail; includes undeclared/unused variable checks in `src/`). |
 
 ## Versioning
 

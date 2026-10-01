@@ -1,0 +1,4 @@
+allowBuilds:
+  lefthook: false
+
+minimumReleaseAge: 10080

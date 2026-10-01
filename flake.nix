@@ -11,11 +11,13 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         nodejs = pkgs.nodejs_24;
+        pnpm = pkgs.pnpm_12;
       in
       {
         devShell = pkgs.mkShell {
           nativeBuildInputs = [
             nodejs
+            pnpm
           ];
           shellHook = ''
             if [ -f $HOME/.config/bin/setup-webstorm-sdk ] && [ -f ./.idea/workspace.xml ]; then

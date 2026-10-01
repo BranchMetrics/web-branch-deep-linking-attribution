@@ -1,6 +1,6 @@
 /**
  * Checks the public contract of the built dist/build.min.js that customers
- * load from the CDN (or require from npm). Run after `npm run build`.
+ * load from the CDN (or require from npm). Run after `pnpm run build`.
  */
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';

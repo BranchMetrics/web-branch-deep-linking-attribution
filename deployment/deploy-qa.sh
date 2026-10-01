@@ -14,12 +14,12 @@ NC='\033[0m'
 
   echo -en "${GREEN}QA Release...${NC}\n"
 
-  echo -en "${GREEN}npm run release ...${NC}\n"
-  npm run release
+  echo -en "${GREEN}pnpm run release ...${NC}\n"
+  pnpm run release
 
   # Contract-check the exact dist/ that gets uploaded below.
-  echo -en "${GREEN}npm run test:bundle ...${NC}\n"
-  npm run test:bundle
+  echo -en "${GREEN}pnpm run test:bundle ...${NC}\n"
+  pnpm run test:bundle
 
   echo -en "${GREEN}Pushing to builds ...${NC}\n"
   aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-builds-usw2/web-sdk/branch-latest.min.js

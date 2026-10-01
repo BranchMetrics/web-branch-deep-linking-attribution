@@ -11,11 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.0
+
       - name: Install Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install branch-github-actions
         uses: actions/checkout@v5
@@ -52,19 +55,19 @@ jobs:
           ./deployment/write-versions.sh ${{ steps.next-version.outputs.result }}
 
       - name: Install dependencies
-        run: npm run ci
+        run: pnpm run ci
 
       - name: Check Formatting
-        run: npm run format:check
+        run: pnpm run format:check
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Run tests
-        run: npm run test-report
+        run: pnpm run test-report
 
       - name: Run tests against minified modules
-        run: npm run test:min
+        run: pnpm run test:min
 
       - name: Test Report
         uses: dorny/test-reporter@v1
@@ -86,10 +89,10 @@ jobs:
         uses: codecov/codecov-action@v4
 
       - name: Check whether we will be able to make the release
-        run: npm run release
+        run: pnpm run release
 
       - name: Check the built bundle's public contract
-        run: npm run test:bundle
+        run: pnpm run test:bundle
 
       - name: AWS, credentials setup
         if: ${{ github.ref == 'refs/heads/main' }}
