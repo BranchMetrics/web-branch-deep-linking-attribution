@@ -16,12 +16,8 @@ aws_access_keys.sh
 build
 build.log
 build/Release
-compiler
-compiler-latest.zip
 coverage
 dist/web/build.min.js.gz
-docs/1_onpage.md
-docs/3_branch.md
 lib-cov
 logs
 node_modules
@@ -42,3 +38,4 @@ dev.html
 example.html
 dist/
 .ai/
+test-results.xml

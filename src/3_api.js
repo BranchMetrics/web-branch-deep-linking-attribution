@@ -2,19 +2,12 @@
  * This provides the principal function to make a call to the API. Basically
  * a fancy wrapper around XHR/JSONP/etc.
  */
-'use strict';
 
-goog.provide('Server');
-goog.require('utils');
-goog.require('goog.json');
-goog.require('storage');
-goog.require('safejson');
+import { safejson } from './0_jsonparse.js';
+import { utils } from './1_utils.js';
+import { storage } from './2_storage.js';
 
-/**
- * @class Server
- * @constructor
- */
-Server = function () {};
+export const Server = function () {};
 
 Server.prototype._jsonp_callback_index = 0;
 
@@ -242,7 +235,7 @@ Server.prototype.jsonpRequest = function (
     requestURL.indexOf('branch.io') >= 0 ? '&data=' : '&post_data=';
   var postData =
     requestMethod === 'POST'
-      ? encodeURIComponent(utils.base64encode(goog.json.serialize(requestData)))
+      ? encodeURIComponent(utils.base64encode(safejson.serialize(requestData)))
       : '';
 
   var timeoutTrigger = window.setTimeout(function () {
@@ -286,7 +279,7 @@ Server.prototype.jsonpRequest = function (
           // for Element, so fall back
           this.parentNode.removeChild(this);
         }
-      } catch (e) {
+      } catch (_e) {
         // we're trying to remove the script tag during a
         // jsonp request, but if that fails, we shouldn't
         // break anything else...just continue
@@ -324,6 +317,13 @@ Server.prototype.XHRRequest = function (
     req.responseType = responseType;
   }
 
+  var errorResponseText = function () {
+    return (
+      (req.responseType === 'arraybuffer' ? '' : req.responseText) ||
+      'No response text available'
+    );
+  };
+
   req.ontimeout = function () {
     utils.addPropertyIfNotNull(
       utils.instrumentation,
@@ -335,7 +335,7 @@ Server.prototype.XHRRequest = function (
   req.onerror = function (e) {
     var url = req.responseURL || 'Unknown';
     var status = req.status || 'No status available';
-    var responseText = req.responseText || 'No response text available';
+    var responseText = errorResponseText();
     var errorMessage =
       'Error in API: URL - ' +
       url +
@@ -365,7 +365,7 @@ Server.prototype.XHRRequest = function (
         } else {
           try {
             data = safejson.parse(req.responseText);
-          } catch (e) {
+          } catch (_e) {
             data = {};
           }
         }
@@ -381,7 +381,7 @@ Server.prototype.XHRRequest = function (
         } else {
           var url = req.responseURL || 'Unknown';
           var status = req.status || 'No status available';
-          var responseText = req.responseText || 'No response text available';
+          var responseText = errorResponseText();
           var errorMessage =
             'Error in API: URL - ' +
             url +
@@ -401,7 +401,7 @@ Server.prototype.XHRRequest = function (
     req.timeout = utils.timeout;
     req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     req.send(data);
-  } catch (e) {
+  } catch (_e) {
     storage.set('use_jsonp', true);
     this.jsonpRequest(url, data, method, callback);
   }
@@ -474,9 +474,6 @@ Server.prototype.request = function (resource, data, storage, callback) {
   // How many times to retry the request if the initial attempt fails
   var retries = utils.retries;
   // If request fails, retry after X miliseconds
-  /***
-   * @type {function(?Error,*=): ?undefined}
-   */
   var done = function (err, data, status) {
     if (typeof self.onAPIResponse === 'function') {
       // Record every request and response, including retries

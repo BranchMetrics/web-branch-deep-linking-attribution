@@ -8,14 +8,16 @@ DATE=$(date "+%Y-%m-%d")
 
 echo "Releasing Branch Web SDK"
 
-make release
+# Contract-check the exact dist/ that gets uploaded below; stop before any upload if either fails.
+npm run release || exit 1
+npm run test:bundle || exit 1
 
 # Engagement Pro Production Testing App - ID: 1364963849844839205
 ./deployment/build-example-html.sh "key_live_gAbR03mCEte9DLh6L9GFApebvyg4mMDw" "https://api2.branch.io" "https://cdn.branch.io/branch-latest.min.js"
 aws s3 cp example.html s3://branch-builds-usw2/example.html
 aws s3 cp example.html s3://branch-cdn-usw2/example.html
 
-aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.js s3://branch-cdn-usw2/branch-latest.js --cache-control "max-age=300"
+aws s3 cp --content-type="text/javascript" dist/build.js s3://branch-cdn-usw2/branch-latest.js --cache-control "max-age=300"
 aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn-usw2/branch-$VERSION.min.js --cache-control "max-age=300"
 aws s3 cp --content-type="text/javascript" --content-encoding="gzip" dist/build.min.js.gz s3://branch-cdn-usw2/branch-latest.min.js --cache-control "max-age=300"
 

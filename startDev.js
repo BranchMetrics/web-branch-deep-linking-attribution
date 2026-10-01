@@ -1,7 +1,4 @@
-const { exec } = require('child_process');
 const fs = require('fs').promises;
-const Koa = require('koa');
-const serve = require('koa-static');
 const path = require('path');
 
 const defaultDev = {
@@ -75,21 +72,45 @@ async function writeExampleHtml(config) {
     await processTemplate(templateFile, outputFile, replacements);
 }
 
-function executeBuild(config) {
+// Reloads open pages whenever the watched dist/build.js is rewritten.
+function reloadOnBundleChange() {
+    return {
+        name: 'reload-on-bundle-change',
+        configureServer(server) {
+            const bundlePath = path.join(__dirname, 'dist/build.js');
+            server.watcher.add(bundlePath);
+            server.watcher.on('change', (file) => {
+                if (file === bundlePath) {
+                    server.ws.send({ type: 'full-reload' });
+                }
+            });
+        },
+    };
+}
+
+async function executeBuild(config) {
     console.log('Building build...');
-    exec(`make`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error executing makefile: ${error.message}`);
-            return;
-        }
-        console.log(`Dev websdk build successful, ${DEV_HTML} built from ${TEMPLATE_FILE}`);
-        const app = new Koa();
-        app.use(serve('.'));
-        app.listen(config.port, () => {
-            console.log('Server started successfully.');
-            console.log(`Example page running at http://localhost:${config.port}/${DEV_HTML}. To edit, update ${TEMPLATE_FILE}`);
+    const { createServer } = await import('vite');
+    const { bundle } = await import('./scripts/build.mjs');
+
+    const watcher = await bundle('build.js', { watch: true });
+    await new Promise((resolve, reject) => {
+        watcher.on('event', (event) => {
+            if (event.code === 'END') resolve();
+            if (event.code === 'ERROR') reject(event.error);
         });
     });
+    console.log(`Dev websdk build successful, ${DEV_HTML} built from ${TEMPLATE_FILE}`);
+
+    const server = await createServer({
+        configFile: false,
+        root: __dirname,
+        server: { port: Number(config.port), strictPort: true },
+        plugins: [reloadOnBundleChange()],
+    });
+    await server.listen();
+    console.log('Server started successfully.');
+    console.log(`Example page running at http://localhost:${config.port}/${DEV_HTML}. To edit, update ${TEMPLATE_FILE}`);
 }
 
 async function startDev() {
@@ -130,7 +151,7 @@ async function startDev() {
         await writeDevConfig(config);
     }
     await writeExampleHtml(config);
-    executeBuild(config);
+    await executeBuild(config);
 }
 
 startDev();

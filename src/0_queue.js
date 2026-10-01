@@ -1,13 +1,11 @@
 /**
  * A simple blocking queue for the API requests
  */
-'use strict';
-goog.provide('task_queue');
 
 /**
  * @returns {function(function(function()))}
  */
-task_queue = function () {
+export const task_queue = function () {
   var queue = [];
   var next = function () {
     if (queue.length) {

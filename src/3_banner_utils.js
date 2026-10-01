@@ -1,55 +1,19 @@
-'use strict';
+import { safejson } from './0_jsonparse.js';
+import { utils } from './1_utils.js';
+import { storage } from './2_storage.js';
 
-goog.provide('banner_utils');
-
-goog.require('storage');
-goog.require('utils');
-goog.require('safejson');
-
-/** @typedef {{icon:string,
- * title:string,
- * buttonBackgroundColor:string,
- * buttonBackgroundColorHover:string,
- * buttonBorderColor:string,
- * buttonBorderColorHover:string,
- * buttonFontColor:string,
- * buttonFontColorHover:string,
- * description:string,
- * openAppButtonText:string,
- * downloadAppButtonText:string,
- * iframe:boolean,
- * showiOS:boolean,
- * showiPad:boolean,
- * showAndroid:boolean,
- * showBlackberry:boolean,
- * showWindowsPhone:boolean,
- * showKindle:boolean,
- * forgetHide:boolean,
- * disableHide:boolean,
- * make_new_link:boolean,
- * customCSS:string,
- * mobileSticky:boolean,
- * position:string,
- * rating:number,
- * reviewCount:number,
- * open_app:boolean,
- * append_deeplink_path:boolean}} */
-banner_utils.options;
+export const banner_utils = {};
 
 // UI Animation transition speed in ms.
-/** @type {number} */
 banner_utils.animationSpeed = 250;
 
 // UIAnimation delay between juxtaposed elements.
-/** @type {number} */
 banner_utils.animationDelay = 20;
 
 // Height of banner.
-/** @type {string} */
 banner_utils.bannerHeight = '76px';
 
 // How long to show red error state
-/** @type {number} */
 banner_utils.error_timeout = 2000;
 
 /**
@@ -197,7 +161,7 @@ banner_utils.shouldAppend = function (storage, options) {
     if (typeof hideBanner === 'string') {
       hideBanner = safejson.parse(hideBanner);
     }
-  } catch (e) {
+  } catch (_e) {
     hideBanner = false;
   }
   if (typeof hideBanner === 'number') {

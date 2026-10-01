@@ -3,8 +3,6 @@ on: push
 
 env:
   NODE_VERSION: 24
-  JAVA_VERSION: 25
-  JAVA_DISTRIBUTION: 'adopt'
 
 jobs:
   build-push:
@@ -18,12 +16,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Install branch-github-actions
         uses: actions/checkout@v5
@@ -65,36 +57,39 @@ jobs:
       - name: Check Formatting
         run: npm run format:check
 
-      - name: Lint tests
-        run: npm run lint
+      - name: Check modules for undeclared globals
+        run: npm run lint:src
 
       - name: Run tests
         run: npm run test-report
+
+      - name: Run tests against minified modules
+        run: npm run test:min
 
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Unit Tests
-          fail-on-error: true,
-          path: test-results.json    # Path to test results
-          reporter: mocha-json        # Format of test results
+          fail-on-error: true
+          path: test-results.xml
+          reporter: jest-junit
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         id: test-results
         if: always()
         with:
-          files: "test-results.json"
-
-      - name: Run coverage
-        run: npm run cover
+          files: "test-results.xml"
 
       - name: upload codecov
         uses: codecov/codecov-action@v4
 
       - name: Check whether we will be able to make the release
-        run: make release
+        run: npm run release
+
+      - name: Check the built bundle's public contract
+        run: npm run test:bundle
 
       - name: AWS, credentials setup
         if: ${{ github.ref == 'refs/heads/main' }}

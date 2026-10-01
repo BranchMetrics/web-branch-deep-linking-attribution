@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "files": {
     "includes": ["src/**", "test/**", "package.json", "biome.json"]
   },
@@ -7,6 +7,9 @@
     "rules": {
       "complexity": {
         "useArrowFunction": "off"
+      },
+      "correctness": {
+        "noUnusedImports": { "level": "error", "fix": "safe" }
       }
     }
   },
@@ -19,6 +22,20 @@
     "formatter": {
       "quoteStyle": "single",
       "quoteProperties": "preserve"
+    },
+    "globals": ["define", "ActiveXObject"]
+  },
+  "overrides": [
+    {
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUndeclaredVariables": "error",
+            "noUnusedVariables": { "level": "error", "fix": "none" }
+          }
+        }
+      }
     }
-  }
+  ]
 }

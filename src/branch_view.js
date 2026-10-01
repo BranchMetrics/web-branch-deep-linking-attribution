@@ -1,9 +1,10 @@
-'use strict';
-goog.provide('branch_view');
-goog.require('utils');
-goog.require('banner_css');
-goog.require('safejson');
-goog.require('journeys_utils');
+import { safejson } from './0_jsonparse.js';
+import { utils } from './1_utils.js';
+import { session } from './2_session.js';
+import { banner_utils } from './3_banner_utils.js';
+import { journeys_utils } from './journeys_utils.js';
+
+export const branch_view = {};
 
 function checkPreviousBanner() {
   // if banner already exists, don't add another

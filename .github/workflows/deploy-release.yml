@@ -67,8 +67,6 @@ jobs:
       - name: Configure NPM
         run: npm ci
 
-      - run: make release
-
       - name: Publish to s3
         run: |
           ./deployment/release-s3.sh ${{ steps.next-version.outputs.result }}

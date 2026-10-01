@@ -75,6 +75,7 @@
     'setDMAParamsForEEA',
     'setAPIUrl',
     'getAPIUrl',
+    'referringLink',
   ],
   0,
 );

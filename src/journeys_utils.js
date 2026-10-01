@@ -1,9 +1,9 @@
-'use strict';
-goog.provide('journeys_utils');
+import { safejson } from './0_jsonparse.js';
+import { utils } from './1_utils.js';
+import { resources } from './2_resources.js';
+import { banner_utils } from './3_banner_utils.js';
 
-goog.require('banner_utils');
-goog.require('safejson');
-goog.require('utils');
+export const journeys_utils = {};
 
 journeys_utils._callback_index = 1;
 
@@ -379,7 +379,6 @@ journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
   iFrameCSS.type = 'text/css';
   iFrameCSS.id = 'branch-iframe-css';
 
-  var bodyMargin = '';
   journeys_utils.bodyMarginTop = banner_utils.getBodyStyle('margin-top');
   var bodyMarginTopNumber = +journeys_utils.bodyMarginTop.slice(0, -2);
   journeys_utils.bodyMarginBottom = banner_utils.getBodyStyle('margin-bottom');
@@ -607,7 +606,7 @@ journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
     if (arr[3] && parseFloat(arr[3]) === 0) {
       iframe.style.boxShadow = 'none';
     }
-  } catch (err) {}
+  } catch (_err) {}
 };
 
 /***
@@ -1119,7 +1118,7 @@ journeys_utils._getDismissRequestData = function (
           journeys_utils.journeyLinkData['journey_link_data']['tags'],
         ),
       );
-    } catch (e) {
+    } catch (_e) {
       dismissRequestData['tags'] = JSON.stringify([]);
     }
   }
@@ -1480,7 +1479,7 @@ journeys_utils.tryReplaceJourneyCtaLink = function (html) {
         'window.top.location = ',
       );
     }
-  } catch (e) {
+  } catch (_e) {
     return html;
   }
 
@@ -1514,7 +1513,7 @@ journeys_utils.trySetJourneyUrls = function (
     linkElements.data = JSON.stringify(assignUrls(data));
 
     return linkElements;
-  } catch (e) {
+  } catch (_e) {
     return linkElements;
   }
 };

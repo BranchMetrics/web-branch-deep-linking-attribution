@@ -2,16 +2,12 @@
  * This provides a list of endpoints and client-side validation for any calls
  * to those endpoints.
  */
-'use strict';
 
-goog.provide('resources');
+import { config } from './0_config.js';
+import { utils } from './1_utils.js';
 
-goog.require('utils');
-goog.require('config');
+export const resources = {};
 
-var resources = {};
-
-/** @enum {number} */
 var validationTypes = {
   OBJECT: 0,
   STRING: 1,
@@ -19,9 +15,6 @@ var validationTypes = {
   ARRAY: 3,
   BOOLEAN: 4,
 };
-
-/** @typedef {function(string, string, *)} */
-var _validator;
 
 /**
  * @param {boolean} required

@@ -1,13 +1,11 @@
 /**
  * This provides the markup, styles, and helper functions for all Banner UI Elements
  */
-'use strict';
-goog.provide('banner');
 
-goog.require('utils');
-goog.require('banner_utils');
-goog.require('banner_css');
-goog.require('banner_html');
+import { utils } from './1_utils.js';
+import { banner_utils } from './3_banner_utils.js';
+import { banner_css } from './4_banner_css.js';
+import { banner_html } from './4_banner_html.js';
 
 /**
  * @param {Object} branch
@@ -15,7 +13,7 @@ goog.require('banner_html');
  * @param {Object} linkData
  * @param {storage} storage
  */
-banner = function (branch, options, linkData, storage) {
+export const banner = function (branch, options, linkData, storage) {
   if (!banner_utils.shouldAppend(storage, options)) {
     branch._publishEvent('willNotShowBanner');
     return null;

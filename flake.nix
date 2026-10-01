@@ -11,15 +11,12 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         nodejs = pkgs.nodejs_24;
-        jdk = pkgs.temurin-bin-25;
       in
       {
         devShell = pkgs.mkShell {
           nativeBuildInputs = [
             nodejs
-            jdk
           ];
-          JAVA_HOME = "${jdk}";
           shellHook = ''
             if [ -f $HOME/.config/bin/setup-webstorm-sdk ] && [ -f ./.idea/workspace.xml ]; then
               $HOME/.config/bin/setup-webstorm-sdk || echo "setup-webstorm-sdk failed"

@@ -1,6 +1,4 @@
-'use strict';
-
-goog.require('storage');
+import { storage as branchStorage } from '../src/2_storage.js';
 
 var BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 var ITEM_KEY = 'key';
@@ -8,7 +6,7 @@ var ITEM_KEY_UNSTORED = 'key unstored';
 var ITEM_VALUE = 'value';
 
 describe('session storage', function () {
-  var storage = new BranchStorage(['session']);
+  var storage = new branchStorage.BranchStorage(['session']);
   var assert = testUtils.unplanned();
   beforeEach(function () {
     storage.clear();
@@ -49,7 +47,7 @@ describe('session storage', function () {
 });
 
 describe('local storage', function () {
-  var storage = new BranchStorage(['local']);
+  var storage = new branchStorage.BranchStorage(['local']);
   var assert = testUtils.unplanned();
   beforeEach(function () {
     storage.clear();
@@ -90,7 +88,7 @@ describe('local storage', function () {
 });
 
 describe('cookie storage', function () {
-  var storage = new BranchStorage(['cookie']);
+  var storage = new branchStorage.BranchStorage(['cookie']);
   var ITEM_KEY = 'branch_session';
   var ITEM_VALUE = 'test_val';
   var assert = testUtils.unplanned();
@@ -224,7 +222,7 @@ describe('cookie storage', function () {
 });
 
 describe('pojo storage', function () {
-  var storage = new BranchStorage(['pojo']);
+  var storage = new branchStorage.BranchStorage(['pojo']);
   var assert = testUtils.unplanned();
   beforeEach(function () {
     storage.clear();
