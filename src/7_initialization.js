@@ -9,10 +9,10 @@ import { Branch } from './6_branch.js';
 
 export const branch_instance = new Branch();
 
-if (window['branch'] && window['branch']['_q']) {
-  var queue = window['branch']['_q'];
-  for (var i = 0; i < queue.length; i++) {
-    var task = queue[i];
+if (window.branch?._q) {
+  const queue = window.branch._q;
+  for (let i = 0; i < queue.length; i++) {
+    const task = queue[i];
     branch_instance[task[0]].apply(branch_instance, task[1]);
   }
 }
@@ -33,5 +33,5 @@ else if (typeof exports === 'object') {
 
 // Always make a global.
 if (window) {
-  window['branch'] = branch_instance;
+  window.branch = branch_instance;
 }

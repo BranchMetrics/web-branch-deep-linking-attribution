@@ -5,11 +5,11 @@ import { installFakeXHR } from './fake-xhr.js';
 /*globals identity_id, browser_fingerprint_id, device_fingerprint_id */
 
 describe('Integration tests', function () {
-  var requests = [];
-  var fakeXHR;
-  var jsonpCallback = 0;
+  const requests = [];
+  let fakeXHR;
+  let jsonpCallback = 0;
 
-  var clearBranchStorage = function () {
+  const clearBranchStorage = function () {
     sessionStorage.clear();
     localStorage.clear();
     branch._storage.clear();
@@ -43,7 +43,7 @@ describe('Integration tests', function () {
     vi.useRealTimers();
   });
 
-  var sampleParams = {
+  const sampleParams = {
     tags: ['tag1', 'tag2'],
     channel: 'sample app',
     feature: 'create link',
@@ -58,11 +58,11 @@ describe('Integration tests', function () {
     },
   };
 
-  var indexOfLastInitRequest = function (requestsAfterInit) {
+  const indexOfLastInitRequest = function (requestsAfterInit) {
     return requestsAfterInit + 1;
   };
 
-  var branchInit = function (checkRequests, callback) {
+  const branchInit = function (checkRequests, callback) {
     branch.init.apply(branch, [device_fingerprint_id, callback]);
     if (checkRequests) {
       expect(requests.length, 'Exactly one request was made').toBe(1);
@@ -103,16 +103,16 @@ describe('Integration tests', function () {
     if (checkRequests) {
       expect(requests.length, 'Exactly three requests were made').toBe(3);
 
-      var params = requests[1].requestBody.split('&');
-      var requestObj = params.reduce(function (a, b) {
-        var pair = b.split('=');
+      const params = requests[1].requestBody.split('&');
+      const requestObj = params.reduce(function (a, b) {
+        const pair = b.split('=');
         a[pair[0]] = pair[1];
         return a;
       }, {});
 
       // identity_id is omitted: init reloads it from storage, which is empty on
       // a fresh install.
-      var expectedObj = {
+      const expectedObj = {
         app_id: browser_fingerprint_id,
         browser_fingerprint_id: browser_fingerprint_id,
         identity: 'foo',
@@ -136,7 +136,7 @@ describe('Integration tests', function () {
 
   describe('init', function () {
     it('should call api with params and version', function () {
-      var callback = vi.fn();
+      const callback = vi.fn();
       branchInit(true, callback);
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback.mock.calls[0][1], 'Expected response returned').toEqual({
@@ -155,7 +155,7 @@ describe('Integration tests', function () {
     });
 
     it('should return error to callback', function () {
-      var callback = vi.fn();
+      const callback = vi.fn();
       branch.init(browser_fingerprint_id, callback);
       requests[0].callback(browser_fingerprint_id);
       requests[1].respond(400);
@@ -171,9 +171,9 @@ describe('Integration tests', function () {
     });
 
     it('should attempt 5xx error three times total', function () {
-      var callback = vi.fn();
+      const callback = vi.fn();
       branch.init(browser_fingerprint_id, callback);
-      var requestCount = 0;
+      let requestCount = 0;
       requests[requestCount].callback(browser_fingerprint_id);
       requestCount++;
       requests[requestCount].respond(500);
@@ -208,7 +208,7 @@ describe('Integration tests', function () {
   describe('setIdentity', function () {
     it('set identity after init without a request, and return expected data', function () {
       branchInit();
-      var callback = vi.fn();
+      const callback = vi.fn();
       branch.setIdentity('identity', callback);
       expect(requests.length, 'Expect requests length').toBe(
         indexOfLastInitRequest(2),
@@ -226,7 +226,7 @@ describe('Integration tests', function () {
   describe('data', function () {
     it('should make two requests and return session data', function () {
       branchInit(true);
-      var callback = vi.fn();
+      const callback = vi.fn();
       branch.data(callback);
       expect(callback).toHaveBeenCalledTimes(1);
       expect(
@@ -248,7 +248,7 @@ describe('Integration tests', function () {
   describe('getBrowserFingerprintId', function () {
     it('it should return browser-fingerprint-id with value 79336952217731267', function () {
       branchInit(true);
-      var callback = vi.fn();
+      const callback = vi.fn();
       branch.getBrowserFingerprintId(callback);
       expect(callback).toHaveBeenCalledTimes(1);
       expect(
@@ -260,7 +260,7 @@ describe('Integration tests', function () {
     it('with tracking disabled, it should return browser-fingerprint-id with value null', function () {
       branchInit(true);
       branch.disableTracking();
-      var callback = vi.fn();
+      const callback = vi.fn();
       branch.getBrowserFingerprintId(callback);
       expect(callback).toHaveBeenCalledTimes(1);
       expect(
@@ -273,7 +273,7 @@ describe('Integration tests', function () {
   describe('link', function () {
     it('should make three requests and return short link', function () {
       branchInit(true);
-      var callback = vi.fn();
+      const callback = vi.fn();
       branch.link(sampleParams, callback);
       expect(requests.length, 'Expect requests length').toBe(
         indexOfLastInitRequest(3),

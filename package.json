@@ -18,11 +18,11 @@
     "test-debug": "vitest --inspect-brk --no-file-parallelism",
     "test-report": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-results.xml",
     "test:min": "vitest run --config vitest.min.config.mjs",
-    "prepare": "husky",
+    "prepare": "sh scripts/install-git-hooks.sh",
     "validate": "npm ls",
     "start:dev": "node startDev.js",
     "release": "rimraf dist && node scripts/build.mjs",
-    "lint:src": "biome lint --only=correctness/noUndeclaredVariables --only=correctness/noUnusedVariables --only=correctness/noUnusedImports src",
+    "lint": "biome lint .",
     "test:bundle": "vitest run --config vitest.bundle.config.mjs"
   },
   "repository": {
@@ -42,9 +42,9 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@vitest/coverage-v8": "^5.0.3",
-    "husky": "^9.1.7",
     "inquirer": "^14.2.2",
     "jsdom": "^26.1.0",
+    "lefthook": "2.1.16",
     "rimraf": "^6.1.3",
     "vite": "^8.3.2",
     "vitest": "^5.0.3"

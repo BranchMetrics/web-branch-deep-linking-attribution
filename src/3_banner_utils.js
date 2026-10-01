@@ -20,7 +20,7 @@ banner_utils.error_timeout = 2000;
  * @param {Object} element
  */
 banner_utils.removeElement = function (element) {
-  if (element && element.parentNode) {
+  if (element?.parentNode) {
     element.parentNode.removeChild(element);
   }
 };
@@ -45,13 +45,13 @@ banner_utils.removeClass = function (element, className) {
     return;
   }
   if (banner_utils.hasClass(element, className)) {
-    var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+    const reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
     element.className = element.className.replace(reg, ' ');
   }
 };
 
 banner_utils.getDate = function (days) {
-  var currentDate = new Date();
+  const currentDate = new Date();
   return currentDate.setDate(currentDate.getDate() + days);
 };
 
@@ -64,20 +64,20 @@ banner_utils.getBodyStyle = function (style) {
 };
 
 banner_utils.addCSSLengths = function (length1, length2) {
-  var convertToUnitlessPixels = function (input) {
+  const convertToUnitlessPixels = function (input) {
     if (!input) {
       return 0;
     }
-    var unit = input.replace(/[0-9,\.]/g, '');
-    var inputArray = input.match(/\d+/g);
-    var value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10);
-    var vw = function () {
+    const unit = input.replace(/[0-9,\.]/g, '');
+    const inputArray = input.match(/\d+/g);
+    const value = parseInt(inputArray.length > 0 ? inputArray[0] : '0', 10);
+    const vw = function () {
       return (
         Math.max(document.documentElement.clientWidth, window.innerWidth || 0) /
         100
       );
     };
-    var vh = function () {
+    const vh = function () {
       return (
         Math.max(
           document.documentElement.clientHeight,
@@ -152,9 +152,9 @@ banner_utils.addCSSLengths = function (length1, length2) {
  * @return {boolean}
  */
 banner_utils.shouldAppend = function (storage, options) {
-  var hideBanner = storage.get('hideBanner', true);
+  let hideBanner = storage.get('hideBanner', true);
 
-  if (options.respectDNT && navigator && !!Number(navigator['doNotTrack'])) {
+  if (options.respectDNT && navigator && !!Number(navigator.doNotTrack)) {
     return false;
   }
   try {
@@ -170,7 +170,7 @@ banner_utils.shouldAppend = function (storage, options) {
     hideBanner = !hideBanner;
   }
 
-  var forgetHide = options.forgetHide;
+  let forgetHide = options.forgetHide;
   if (typeof forgetHide === 'number') {
     forgetHide = false;
   }

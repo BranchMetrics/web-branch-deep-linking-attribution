@@ -4,7 +4,7 @@ import { Branch } from '../src/6_branch.js';
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
 describe('Branch', function () {
-  var requests = [];
+  const requests = [];
 
   beforeEach(function () {
     testUtils.go('');
@@ -18,12 +18,12 @@ describe('Branch', function () {
       document.getElementById('branch-banner-iframe'),
       document.getElementById('branch-banner'),
     ].forEach(function (el) {
-      el && el.parentNode && el.parentNode.removeChild(el);
+      el?.parentNode?.removeChild(el);
     });
 
     vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('ios');
 
-    var branch = new Branch();
+    const branch = new Branch();
 
     testUtils.captureRequests(branch._server, requests);
 
@@ -35,8 +35,8 @@ describe('Branch', function () {
   });
 
   describe('journeys', function () {
-    var bannerDeeplinkData;
-    var bannerOptions;
+    let bannerDeeplinkData;
+    let bannerOptions;
 
     beforeEach(function () {
       bannerDeeplinkData = {
@@ -73,8 +73,8 @@ describe('Branch', function () {
     it(
       'should attempt to pass deeplink data in a banner call',
       testUtils.withDone(function (done) {
-        var branch = initBranch();
-        var assert = testUtils.plan(3, done);
+        const branch = initBranch();
+        const assert = testUtils.plan(3, done);
 
         branch.init(branch_sample_key);
         branch.banner(bannerOptions, bannerDeeplinkData);
@@ -97,7 +97,7 @@ describe('Branch', function () {
           'calling deepview',
         );
         assert.strictEqual(
-          JSON.parse(requests[2].obj.data)['mydata'],
+          JSON.parse(requests[2].obj.data).mydata,
           'From Banner',
           'deep link data was passed by banner',
         );
@@ -111,8 +111,8 @@ describe('Branch', function () {
     it(
       'should attempt to pass deeplink data to a journey in a page view event',
       testUtils.withDone(function (done) {
-        var branch = initBranch();
-        var assert = testUtils.plan(3, done);
+        const branch = initBranch();
+        const assert = testUtils.plan(3, done);
 
         branch.init(branch_sample_key);
         branch.banner(bannerOptions, bannerDeeplinkData);
@@ -129,7 +129,7 @@ describe('Branch', function () {
           'calling pageview',
         );
         assert.strictEqual(
-          JSON.parse(requests[3].obj.data)['mydata'],
+          JSON.parse(requests[3].obj.data).mydata,
           'From Banner',
           'deep link data was passed by banner',
         );
@@ -143,13 +143,13 @@ describe('Branch', function () {
         // where a Journey view would be shown. In this case, the data most recently passed to
         // branch.banner() is sent through to the /v1/pageview call. It would be combined on the
         // server with data set in the Dashboard.
-        var branch = initBranch();
-        var assert = testUtils.plan(3, done);
+        const branch = initBranch();
+        const assert = testUtils.plan(3, done);
 
         branch.init(
           branch_sample_key,
           {},
-          function onInit(errorMessage, branchData) {
+          function onInit(_errorMessage, _branchData) {
             branch.banner(bannerOptions, bannerDeeplinkData);
           },
         );
@@ -166,7 +166,7 @@ describe('Branch', function () {
           'calling pageview',
         );
         assert.strictEqual(
-          JSON.parse(requests[3].obj.data)['mydata'],
+          JSON.parse(requests[3].obj.data).mydata,
           'From Banner',
           'deep link data was passed by banner',
         );

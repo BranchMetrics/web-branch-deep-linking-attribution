@@ -36,7 +36,7 @@
   // UTILITY
 
   // Object.create compatible in IE
-  var create =
+  const create =
     Object.create ||
     function (p) {
       if (!p) {
@@ -48,7 +48,7 @@
     };
 
   // UTILITY
-  var util = {
+  const util = {
     inherits: function (ctor, superCtor) {
       ctor.super_ = superCtor;
       ctor.prototype = create(superCtor.prototype, {
@@ -117,18 +117,19 @@
     },
   };
 
-  var pSlice = Array.prototype.slice;
+  const pSlice = Array.prototype.slice;
 
   // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
-  var objectKeys =
+  const objectKeys =
     typeof Object.keys === 'function'
       ? Object.keys
       : (function () {
-          var hasOwnProperty = Object.prototype.hasOwnProperty;
-          var hasDontEnumBug = !{ toString: null }.propertyIsEnumerable(
+          const hasOwn = Object.prototype.hasOwnProperty;
+          const hasDontEnumBug = !Object.prototype.propertyIsEnumerable.call(
+            { toString: null },
             'toString',
           );
-          var dontEnums = [
+          const dontEnums = [
             'toString',
             'toLocaleString',
             'valueOf',
@@ -137,7 +138,7 @@
             'propertyIsEnumerable',
             'constructor',
           ];
-          var dontEnumsLength = dontEnums.length;
+          const dontEnumsLength = dontEnums.length;
 
           return function (obj) {
             if (
@@ -147,19 +148,19 @@
               throw new TypeError('Object.keys called on non-object');
             }
 
-            var result = [];
-            var prop;
-            var i;
+            const result = [];
+            let prop;
+            let i;
 
             for (prop in obj) {
-              if (hasOwnProperty.call(obj, prop)) {
+              if (hasOwn.call(obj, prop)) {
                 result.push(prop);
               }
             }
 
             if (hasDontEnumBug) {
               for (i = 0; i < dontEnumsLength; i++) {
-                if (hasOwnProperty.call(obj, dontEnums[i])) {
+                if (hasOwn.call(obj, dontEnums[i])) {
                   result.push(dontEnums[i]);
                 }
               }
@@ -172,7 +173,7 @@
   // AssertionError's when particular conditions are not met. The
   // assert module must conform to the following interface.
 
-  var assert = ok;
+  const assert = ok;
 
   // 2. The AssertionError is defined in assert.
   // new assert.AssertionError({ message: message,
@@ -188,7 +189,7 @@
       (options.message && options.message + ': ') + getMessage(this);
     this.generatedMessage = true;
 
-    var stackStartFunction = options.stackStartFunction || fail;
+    const stackStartFunction = options.stackStartFunction || fail;
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, stackStartFunction);
     } else {
@@ -196,18 +197,21 @@
       // work out the line that called in to assert.js.
       try {
         this.stack = new Error().stack.toString();
-      } catch (e) {}
+      } catch (_e) {}
     }
   };
 
   // assert.AssertionError instanceof Error
   util.inherits(assert.AssertionError, Error);
 
-  function replacer(key, value) {
+  function replacer(_key, value) {
     if (util.isUndefined(value)) {
       return '' + value;
     }
-    if (util.isNumber(value) && (isNaN(value) || !isFinite(value))) {
+    if (
+      util.isNumber(value) &&
+      (Number.isNaN(value) || !Number.isFinite(value))
+    ) {
       return value.toString();
     }
     if (util.isFunction(value) || util.isRegExp(value)) {
@@ -277,6 +281,7 @@
   // assert.equal(actual, expected, message_opt);
 
   assert.equal = function equal(actual, expected, message) {
+    // biome-ignore lint/suspicious/noDoubleEquals: assert.equal is coercive by definition
     if (actual != expected) {
       fail(actual, expected, message, '==', assert.equal);
     }
@@ -286,6 +291,7 @@
   // with != assert.notEqual(actual, expected, message_opt);
 
   assert.notEqual = function notEqual(actual, expected, message) {
+    // biome-ignore lint/suspicious/noDoubleEquals: assert.notEqual is coercive by definition
     if (actual == expected) {
       fail(actual, expected, message, '!=', assert.notEqual);
     }
@@ -327,6 +333,7 @@
     // 7.4. Other pairs that do not both pass typeof value == 'object',
     // equivalence is determined by ==.
     if (!util.isObject(actual) && !util.isObject(expected)) {
+      // biome-ignore lint/suspicious/noDoubleEquals: deepEqual compares primitives with == by spec
       return actual == expected;
     }
 
@@ -339,11 +346,12 @@
     return objEquiv(actual, expected);
   }
 
-  var isArguments = function (object) {
-    return Object.prototype.toString.call(object) == '[object Arguments]';
+  let isArguments = function (object) {
+    return Object.prototype.toString.call(object) === '[object Arguments]';
   };
 
   (function () {
+    // biome-ignore lint/complexity/noArguments: feature-detects the arguments object itself
     if (!isArguments(arguments)) {
       isArguments = function (object) {
         return (
@@ -367,8 +375,8 @@
     }
     //~~~I've managed to break Object.keys through screwy arguments passing.
     //	 Converting to array solves the problem.
-    var aIsArgs = isArguments(a);
-    var bIsArgs = isArguments(b);
+    const aIsArgs = isArguments(a);
+    const bIsArgs = isArguments(b);
     if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs)) {
       return false;
     }
@@ -378,17 +386,16 @@
       b = pSlice.call(b);
       return _deepEqual(a, b);
     }
+    let ka, kb, key, i;
     try {
-      var ka = objectKeys(a);
-      var kb = objectKeys(b);
-      var key;
-      var i;
-    } catch (e) {
+      ka = objectKeys(a);
+      kb = objectKeys(b);
+    } catch (_e) {
       //happens when one is a string literal and the other isn't
       return false;
     }
     // having the same number of owned properties (keys incorporates hasOwnProperty)
-    if (ka.length != kb.length) {
+    if (ka.length !== kb.length) {
       return false;
     }
     //the same set of keys (although not necessarily the same order),
@@ -396,7 +403,7 @@
     kb.sort();
     //~~~cheap key test
     for (i = ka.length - 1; i >= 0; i--) {
-      if (ka[i] != kb[i]) {
+      if (ka[i] !== kb[i]) {
         return false;
       }
     }
@@ -443,7 +450,7 @@
       return false;
     }
 
-    if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+    if (Object.prototype.toString.call(expected) === '[object RegExp]') {
       return expected.test(actual);
     } else if (actual instanceof expected) {
       return true;
@@ -455,7 +462,7 @@
   }
 
   function _throws(shouldThrow, block, expected, message) {
-    var actual;
+    let actual;
 
     if (util.isString(expected)) {
       message = expected;
@@ -469,7 +476,7 @@
     }
 
     message =
-      (expected && expected.name ? ' (' + expected.name + ').' : '.') +
+      (expected?.name ? ' (' + expected.name + ').' : '.') +
       (message ? ' ' + message : '.');
 
     if (shouldThrow && !actual) {
@@ -494,13 +501,13 @@
   // 11. Expected to throw an error:
   // assert.throws(block, Error_opt, message_opt);
 
-  assert.throws = function (block, /*optional*/ error, /*optional*/ message) {
-    _throws.apply(this, [true].concat(pSlice.call(arguments)));
+  assert.throws = function (...args) {
+    _throws.apply(this, [true].concat(args));
   };
 
   // EXTENSION! This is annoying to write outside this module.
-  assert.doesNotThrow = function (block, /*optional*/ message) {
-    _throws.apply(this, [false].concat(pSlice.call(arguments)));
+  assert.doesNotThrow = function (...args) {
+    _throws.apply(this, [false].concat(args));
   };
 
   assert.ifError = function (err) {
@@ -517,16 +524,16 @@
 
   // =========================================================================
 
-  (window.branch_sample_key = 'key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS'),
-    (window.session_id = '98807509250212101'),
-    (window.identity_id = '98807509250212101'),
-    (window.browser_fingerprint_id = '79336952217731267');
+  window.branch_sample_key = 'key_live_ljmAgMXod0f4V0wNEf4ZubhpphenI4wS';
+  window.session_id = '98807509250212101';
+  window.identity_id = '98807509250212101';
+  window.browser_fingerprint_id = '79336952217731267';
   window.device_fingerprint_id = '79336952217731267';
 
   // Fix for IE 9
   window.console = window.console || {
-    log: function () {
-      return arguments;
+    log: function (...args) {
+      return args;
     },
   };
 
@@ -534,7 +541,7 @@
 
   testUtils.params = function (extra, without) {
     // Returns new object every time.
-    var p = utils.merge(
+    const p = utils.merge(
       {
         branch_key: branch_sample_key,
         browser_fingerprint_id: browser_fingerprint_id,
@@ -545,25 +552,25 @@
       },
       extra || {},
     );
-    for (var k = 0; k < (without || []).length; k++) {
+    for (let k = 0; k < (without || []).length; k++) {
       delete p[without[k]];
     }
     return p;
   };
 
   testUtils.nulls = function (n) {
-    var p = [];
-    for (var k = 0; k < n; k++) {
+    const p = [];
+    for (let k = 0; k < n; k++) {
       p.push(null);
     }
     return p;
   };
 
   testUtils.after = function (n, done) {
-    var remaining = n;
+    let remaining = n;
     return function () {
       remaining--;
-      if (remaining == 0) {
+      if (remaining === 0) {
         done();
       }
       if (remaining < 0) {
@@ -572,7 +579,7 @@
     };
   };
 
-  var assertions = [
+  const assertions = [
     'ok',
     'fail',
     'equal',
@@ -588,18 +595,18 @@
   ];
 
   testUtils.plan = function (n, done) {
-    var d = testUtils.after(n, done);
-    var ret = function () {
-      assert.apply(assert, Array.prototype.slice.call(arguments, 0));
+    const d = testUtils.after(n, done);
+    const ret = function (...args) {
+      assert.apply(assert, args);
       d();
     };
     function create(name) {
-      ret[name] = function () {
-        assert[name].apply(assert, Array.prototype.slice.call(arguments, 0));
+      ret[name] = function (...args) {
+        assert[name].apply(assert, args);
         d();
       };
     }
-    for (var i = 0; i < assertions.length; i++) {
+    for (let i = 0; i < assertions.length; i++) {
       create(assertions[i]);
     }
 
@@ -617,8 +624,8 @@
   testUtils.withDone = function (body) {
     return function () {
       return new Promise(function (resolve, reject) {
-        var planDone = false;
-        var bodyReturned = false;
+        let planDone = false;
+        let bodyReturned = false;
         try {
           body(function (err) {
             if (err) {
@@ -644,7 +651,7 @@
   testUtils.captureRequests = function (server, requests) {
     return vi
       .spyOn(server, 'request')
-      .mockImplementation(function (resource, obj, storage, callback) {
+      .mockImplementation(function (resource, obj, _storage, callback) {
         requests.push({ resource: resource, obj: obj, callback: callback });
       });
   };
@@ -667,7 +674,7 @@
     if (!window.history.pushState) {
       return false;
     }
-    var newLocation = window.location.toString().split(/[\?#]/)[0] + suffix;
+    const newLocation = window.location.toString().split(/[\?#]/)[0] + suffix;
     if (newLocation !== window.location.toString()) {
       window.history.pushState({}, '', newLocation); // Simply not possible in IE 9
       return true;

@@ -9,8 +9,8 @@ import { installFakeXHR } from './fake-xhr.js';
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
 describe('Server helpers', function () {
-  var server = new Server();
-  var assert = testUtils.unplanned();
+  const server = new Server();
+  const assert = testUtils.unplanned();
 
   it('serializeObject should work', function () {
     // Test simple objects
@@ -85,18 +85,18 @@ describe('Server helpers', function () {
 });
 
 describe('Server', function () {
-  var server = new Server();
-  var storage = new branchStorage.BranchStorage(['session', 'pojo']);
-  var fakeXHR;
-  var requests = [];
+  const server = new Server();
+  const storage = new branchStorage.BranchStorage(['session', 'pojo']);
+  let fakeXHR;
+  const requests = [];
 
   // Parses the JSON-encoded validation error that Server#request hands back.
-  var errorMessage = function (callback) {
+  const errorMessage = function (callback) {
     expect(callback).toHaveBeenCalledTimes(1);
     return safejson.parse(callback.mock.calls[0][0].message).message;
   };
 
-  var respondOk = function (request) {
+  const respondOk = function (request) {
     request.respond(
       200,
       { 'Content-Type': 'application/json' },
@@ -126,8 +126,8 @@ describe('Server', function () {
   describe('Resources', function () {
     describe('/v1/open', function () {
       it('should pass in branch_key and browser_fingerprint_id', function () {
-        storage['set']('use_jsonp', false);
-        var callback = vi.fn();
+        storage.set('use_jsonp', false);
+        const callback = vi.fn();
         server.request(resources.open, testUtils.params({}), storage, callback);
         expect(requests.length, 'Request made').toBe(1);
         expect(requests[0].url, 'Endpoint correct').toBe(
@@ -151,13 +151,13 @@ describe('Server', function () {
       });
 
       it('should pass as a jsonp request', function () {
-        storage['set']('use_jsonp', true);
-        var callback = vi.fn();
-        var completeParams = testUtils.params({});
+        storage.set('use_jsonp', true);
+        const callback = vi.fn();
+        const completeParams = testUtils.params({});
         server.request(resources.open, completeParams, storage, callback);
         expect(requests.length, 'Request made').toBe(1);
 
-        var encodedData = encodeURIComponent(
+        const encodedData = encodeURIComponent(
           utils.base64encode(JSON.stringify(completeParams)),
         );
         expect(requests[0].src, 'Endpoint correct').toBe(
@@ -174,7 +174,7 @@ describe('Server', function () {
       });
 
       it('should fail without branch_key', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.open,
           testUtils.params({}, ['branch_key']),
@@ -188,7 +188,7 @@ describe('Server', function () {
       });
 
       it('should pass without branch_key but with app_id', function () {
-        storage['set']('use_jsonp', false);
+        storage.set('use_jsonp', false);
         server.request(
           resources.open,
           testUtils.params({ 'app_id': '5680621892404085' }, ['branch_key']),
@@ -211,7 +211,7 @@ describe('Server', function () {
 
       // param format and type tests
       it('should fail with incorrect branch_key format', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.open,
           testUtils.params({ 'branch_key': 'ahd&7393j' }),
@@ -225,7 +225,7 @@ describe('Server', function () {
       });
 
       it('should fail with link_identifier as number, not string', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.open,
           testUtils.params({ 'link_identifier': 45433 }),
@@ -240,7 +240,7 @@ describe('Server', function () {
 
       it('should include developer identity', function () {
         storage.set('use_jsonp', false);
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.open,
           testUtils.params({ identity: '12345678' }),
@@ -257,7 +257,7 @@ describe('Server', function () {
 
     describe('/_r', function () {
       it('should pass in sdk', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(resources._r, testUtils.params(), storage, callback);
         expect(requests.length, 'Request made').toBe(1);
         expect(requests[0].src, 'Endpoint correct').toBe(
@@ -276,7 +276,7 @@ describe('Server', function () {
       });
 
       it('should fail without sdk', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources._r,
           testUtils.params({}, ['sdk']),
@@ -292,8 +292,8 @@ describe('Server', function () {
 
     describe('/v1/link', function () {
       it('should pass in branch_key and identity_id', function () {
-        storage['set']('use_jsonp', false);
-        var callback = vi.fn();
+        storage.set('use_jsonp', false);
+        const callback = vi.fn();
         server.request(resources.link, testUtils.params(), storage, callback);
 
         expect(requests.length, 'Request made').toBe(1);
@@ -320,11 +320,11 @@ describe('Server', function () {
       });
 
       it('should pass as a jsonp request', function () {
-        storage['set']('use_jsonp', true);
-        var callback = vi.fn();
+        storage.set('use_jsonp', true);
+        const callback = vi.fn();
         server.request(resources.link, testUtils.params(), storage, callback);
         expect(requests.length, 'Request made').toBe(1);
-        var encodedData = encodeURIComponent(
+        const encodedData = encodeURIComponent(
           utils.base64encode(JSON.stringify(testUtils.params())),
         );
         expect(requests[0].src, 'Endpoint correct').toBe(
@@ -340,7 +340,7 @@ describe('Server', function () {
       });
 
       it('should fail without branch_key', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.link,
           testUtils.params({}, ['branch_key']),
@@ -354,7 +354,7 @@ describe('Server', function () {
       });
 
       it('should fail without identity_id', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.link,
           testUtils.params({}, ['identity_id']),
@@ -369,7 +369,7 @@ describe('Server', function () {
 
       // param format and type tests
       it('should fail with tags as string, not array', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.link,
           testUtils.params({ 'tags': "Hello, I'm not an array." }),
@@ -385,8 +385,8 @@ describe('Server', function () {
 
     describe('/l', function () {
       it('should pass in link_url and click', function () {
-        storage['set']('use_jsonp', false);
-        var callback = vi.fn();
+        storage.set('use_jsonp', false);
+        const callback = vi.fn();
         server.request(
           resources.linkClick,
           testUtils.params({ 'link_url': '3hpH54U-58', 'click': 'click' }),
@@ -406,8 +406,8 @@ describe('Server', function () {
       });
 
       it('should pass as a jsonp request', function () {
-        storage['set']('use_jsonp', true);
-        var callback = vi.fn();
+        storage.set('use_jsonp', true);
+        const callback = vi.fn();
         server.request(
           resources.linkClick,
           testUtils.params({ 'link_url': '3hpH54U-58', 'click': 'click' }),
@@ -425,7 +425,7 @@ describe('Server', function () {
       });
 
       it('should fail without link_url', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.linkClick,
           testUtils.params({ 'click': 'click' }),
@@ -439,7 +439,7 @@ describe('Server', function () {
       });
 
       it('should fail without click', function () {
-        var callback = vi.fn();
+        const callback = vi.fn();
         server.request(
           resources.linkClick,
           testUtils.params({ 'link_url': '3hpH54U-58' }),
@@ -454,8 +454,8 @@ describe('Server', function () {
     });
 
     describe('API tests for trackingDisabled mode', function () {
-      var trackingDisabled;
-      var allowErrorsInCallback;
+      let trackingDisabled;
+      let allowErrorsInCallback;
 
       beforeEach(function () {
         trackingDisabled = utils.userPreferences.trackingDisabled;
@@ -493,8 +493,8 @@ describe('Server', function () {
     });
 
     it('retries a timeout utils.retries times, then returns a timeout error', function () {
-      var callback = vi.fn();
-      var attempt;
+      const callback = vi.fn();
+      let attempt;
       server.request(resources.open, testUtils.params({}), storage, callback);
 
       for (attempt = 0; attempt < utils.retries; attempt++) {
@@ -510,7 +510,7 @@ describe('Server', function () {
     });
 
     it('returns a network error without retrying', function () {
-      var callback = vi.fn();
+      const callback = vi.fn();
       server.request(resources.open, testUtils.params({}), storage, callback);
 
       requests[0].error();
@@ -530,8 +530,8 @@ describe('Server', function () {
     });
 
     it('requests an arraybuffer and returns it unparsed', function () {
-      var callback = vi.fn();
-      var png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]).buffer;
+      const callback = vi.fn();
+      const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]).buffer;
       server.request(resources.qrCode, testUtils.params({}), storage, callback);
 
       expect(requests[0].url).toBe(config.api_endpoint + '/v1/qr-code');
@@ -543,7 +543,7 @@ describe('Server', function () {
 
     it('returns an error for a 4xx response without reading responseText', function () {
       vi.spyOn(console, 'log').mockImplementation(function () {});
-      var callback = vi.fn();
+      const callback = vi.fn();
       server.request(resources.qrCode, testUtils.params({}), storage, callback);
 
       requests[0].respond(400, {}, new ArrayBuffer(0));
@@ -557,9 +557,9 @@ describe('Server', function () {
     });
 
     it('retries a 5xx response, then returns an error', function () {
-      var i;
+      let i;
       vi.spyOn(console, 'log').mockImplementation(function () {});
-      var callback = vi.fn();
+      const callback = vi.fn();
       server.request(resources.qrCode, testUtils.params({}), storage, callback);
 
       for (i = 0; i <= utils.retries; i++) {
@@ -579,9 +579,9 @@ describe('Server', function () {
     });
 
     it('receives all relevant fields from an XHR request if present', function () {
-      storage['set']('use_jsonp', false);
+      storage.set('use_jsonp', false);
 
-      var params = testUtils.params({
+      const params = testUtils.params({
         'link_identifier': '1111111111',
       });
       server.onAPIResponse = vi.fn();
@@ -591,10 +591,10 @@ describe('Server', function () {
       respondOk(requests[0]);
 
       expect(server.onAPIResponse).toHaveBeenCalledTimes(1);
-      var args = server.onAPIResponse.mock.calls[0];
-      var url = args[0];
-      var method = args[1];
-      var requestBody = args[2];
+      const args = server.onAPIResponse.mock.calls[0];
+      const url = args[0];
+      const method = args[1];
+      const requestBody = args[2];
       expect(url).toBe(resources.open.destination + resources.open.endpoint);
       expect(method).toBe(resources.open.method);
       // Use regexp to avoid details of different browsers.

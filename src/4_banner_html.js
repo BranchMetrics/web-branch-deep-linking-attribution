@@ -12,7 +12,7 @@ export const banner_html = {};
 banner_html.banner = function (options, action) {
   return (
     '<div class="content' +
-    (options['theme'] ? ' theme-' + options['theme'] : '') +
+    (options.theme ? ' theme-' + options.theme : '') +
     '">' +
     '<div class="right">' +
     action +
@@ -35,8 +35,8 @@ banner_html.banner = function (options, action) {
         (options.rating
           ? '<span class="stars">' +
             (function () {
-              var stars = '';
-              for (var i = 0; i < 5; i++) {
+              let stars = '';
+              for (let i = 0; i < 5; i++) {
                 stars +=
                   '<span class="star">' +
                   '<svg class="star" fill="#555555" height="12" viewBox="3 2 20 19" width="12">' +
@@ -101,7 +101,7 @@ banner_html.banner = function (options, action) {
 banner_html.mobileAction = function (options, storage) {
   return (
     '<a id="branch-mobile-action" class="button" href="#" target="_parent">' +
-    ((session.get(storage) || {})['has_app']
+    (session.get(storage)?.has_app
       ? options.openAppButtonText
       : options.downloadAppButtonText) +
     '</a>'
@@ -128,7 +128,7 @@ banner_html.checkmark = function () {
  * @param {banner_utils.options} options
  */
 banner_html.iframe = function (options, action, callback) {
-  var iframe = document.createElement('iframe');
+  const iframe = document.createElement('iframe');
   iframe.src = 'about:blank'; // solves CORS issues, test in IE
   iframe.style.overflow = 'hidden';
   iframe.scrolling = 'no';
@@ -137,8 +137,8 @@ banner_html.iframe = function (options, action, callback) {
   utils.addNonceAttribute(iframe);
 
   iframe.onload = function () {
-    var bodyClass;
-    var userAgent = utils.getPlatformByUserAgent();
+    let bodyClass;
+    const userAgent = utils.getPlatformByUserAgent();
     if (userAgent === 'ios' || userAgent === 'ipad') {
       bodyClass = 'branch-banner-ios';
     } else if (userAgent === 'android') {
@@ -147,7 +147,7 @@ banner_html.iframe = function (options, action, callback) {
       bodyClass = 'branch-banner-other';
     }
 
-    var iframedoc = iframe.contentDocument || iframe.contentWindow.document;
+    const iframedoc = iframe.contentDocument || iframe.contentWindow.document;
     iframedoc.body = iframedoc.createElement('body');
     iframedoc.body.className = bodyClass;
 
@@ -165,7 +165,7 @@ banner_html.iframe = function (options, action, callback) {
 banner_html.div = function (options, action, doc) {
   doc = doc || document;
 
-  var banner = doc.createElement('div');
+  const banner = doc.createElement('div');
   banner.id = 'branch-banner';
   banner.className = 'branch-animation';
   banner.innerHTML = banner_html.banner(options, action);
@@ -179,7 +179,7 @@ banner_html.div = function (options, action, doc) {
  * @param {storage} storage
  */
 banner_html.markup = function (options, storage, callback) {
-  var action =
+  const action =
     '<div id="branch-banner-form-container">' +
     banner_html.mobileAction(options, storage) +
     '</div>';
@@ -187,7 +187,7 @@ banner_html.markup = function (options, storage, callback) {
   if (options.iframe) {
     banner_html.iframe(options, action, callback);
   } else {
-    var markup_div = banner_html.div(options, action, document);
+    const markup_div = banner_html.div(options, action, document);
     callback(markup_div);
   }
 };

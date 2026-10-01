@@ -13,7 +13,7 @@ safejson.parse = function (sJSON) {
   throw Error('Invalid JSON string: ' + sJSON);
 };
 
-var JSON_ESCAPES = {
+const JSON_ESCAPES = {
   '"': '\\"',
   '\\': '\\\\',
   '/': '\\/',
@@ -28,6 +28,7 @@ var JSON_ESCAPES = {
 function serializeString(s) {
   return (
     '"' +
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: escaping control chars is the purpose of this regex
     s.replace(/[\\"\x00-\x1f\x7f-\uffff]/g, function (c) {
       return (
         JSON_ESCAPES[c] ||
@@ -45,10 +46,10 @@ function serializeString(s) {
  * being dropped, and toJSON() is ignored.
  */
 safejson.serialize = function (value) {
-  var items;
-  var members;
-  var i;
-  var key;
+  let items;
+  let members;
+  let i;
+  let key;
   if (value == null) {
     return 'null';
   }
@@ -85,7 +86,9 @@ safejson.serialize = function (value) {
     case 'string':
       return serializeString(value);
     case 'number':
-      return isFinite(value) && !isNaN(value) ? String(value) : 'null';
+      return Number.isFinite(value) && !Number.isNaN(value)
+        ? String(value)
+        : 'null';
     case 'boolean':
       return String(value);
     case 'function':

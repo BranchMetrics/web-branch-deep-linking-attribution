@@ -19,14 +19,14 @@ banner_css.banner = function (options) {
     's ease; }\n' +
     '#branch-banner .button{' +
     ' border: 1px solid ' +
-    (options['buttonBorderColor'] ||
-      (options['theme'] === 'dark' ? 'transparent' : '#ccc')) +
+    (options.buttonBorderColor ||
+      (options.theme === 'dark' ? 'transparent' : '#ccc')) +
     ';' +
     ' background: ' +
-    (options['buttonBackgroundColor'] || '#fff') +
+    (options.buttonBackgroundColor || '#fff') +
     ';' +
     ' color: ' +
-    (options['buttonFontColor'] || '#000') +
+    (options.buttonFontColor || '#000') +
     ';' +
     ' cursor: pointer; margin-top: 0px; font-size: 14px;' +
     ' display: inline-block; margin-left: 5px; font-weight: 400; text-decoration: none; ' +
@@ -34,14 +34,14 @@ banner_css.banner = function (options) {
     '}\n' +
     '#branch-banner .button:hover { ' +
     ' border: 1px solid ' +
-    (options['buttonBorderColorHover'] ||
-      (options['theme'] === 'dark' ? 'transparent' : '#BABABA')) +
+    (options.buttonBorderColorHover ||
+      (options.theme === 'dark' ? 'transparent' : '#BABABA')) +
     ';' +
     ' background: ' +
-    (options['buttonBackgroundColorHover'] || '#E0E0E0') +
+    (options.buttonBackgroundColorHover || '#E0E0E0') +
     ';' +
     ' color: ' +
-    (options['buttonFontColorHover'] || '#000') +
+    (options.buttonFontColorHover || '#000') +
     ';' +
     '}\n' +
     '#branch-banner .button:focus { outline: none; }\n' +
@@ -177,10 +177,10 @@ banner_css.iframe_position = function (sticky, position) {
  */
 banner_css.css = function (options, element) {
   // Construct Banner CSS
-  var style = banner_css.banner(options);
+  let style = banner_css.banner(options);
 
   // User agent specific styles
-  var userAgent = utils.getPlatformByUserAgent();
+  const userAgent = utils.getPlatformByUserAgent();
   if ((userAgent === 'ios' || userAgent === 'ipad') && options.showiOS) {
     style += banner_css.mobile + banner_css.ios;
   } else if (userAgent === 'android' && options.showAndroid) {
@@ -197,7 +197,7 @@ banner_css.css = function (options, element) {
   if (options.iframe) {
     style += banner_css.inneriframe;
 
-    var iFrameCSS = document.createElement('style');
+    const iFrameCSS = document.createElement('style');
     iFrameCSS.type = 'text/css';
     iFrameCSS.id = 'branch-iframe-css';
     utils.addNonceAttribute(iFrameCSS);
@@ -209,14 +209,14 @@ banner_css.css = function (options, element) {
     );
   }
 
-  var css = document.createElement('style');
+  const css = document.createElement('style');
   css.type = 'text/css';
   css.id = 'branch-css';
   css.innerHTML = style;
   utils.addNonceAttribute(css);
 
-  var doc = options.iframe ? element.contentWindow.document : document;
-  var controlledHead = doc.head || doc.getElementsByTagName('head')[0];
+  const doc = options.iframe ? element.contentWindow.document : document;
+  const controlledHead = doc.head || doc.getElementsByTagName('head')[0];
   if (controlledHead && typeof controlledHead.appendChild === 'function') {
     controlledHead.appendChild(css);
   }

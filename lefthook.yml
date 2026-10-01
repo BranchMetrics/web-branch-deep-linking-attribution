@@ -1,0 +1,24 @@
+min_version: 2.1.0
+
+rc: .lefthookrc
+
+output:
+  - failure
+
+pre-commit:
+  piped: true # stop at the first failing job
+  jobs:
+    # Formatting only. `biome check --write` would also apply lint "safe" fixes such as
+    # `Object.hasOwn`, which is ES2022 and breaks the SDK's ES2015 browser target.
+    - name: format
+      run: biome format --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+
+    - name: lint
+      run: biome lint --no-errors-on-unmatched --files-ignore-unknown=true --diagnostic-level=error {staged_files}
+
+pre-push:
+  jobs:
+    # Whole repo (the pre-commit job only sees staged files), same checks as CI's format and lint steps.
+    - name: biome
+      run: biome check --diagnostic-level=error

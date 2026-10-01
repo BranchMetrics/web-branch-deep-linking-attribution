@@ -17,7 +17,7 @@ describe('Branch - new', function () {
     });
   });
   describe('setRequestMetaData', function () {
-    var addPropertyIfNotNullSpy;
+    let addPropertyIfNotNullSpy;
     beforeEach(function () {
       addPropertyIfNotNullSpy = vi.spyOn(utils, 'addPropertyIfNotNull');
     });
@@ -25,10 +25,10 @@ describe('Branch - new', function () {
       expect(typeof branch_instance.setRequestMetaData).toBe('function');
     });
     it('should set metadata for a valid key and value', function () {
-      var key = 'validKey';
-      var value = 'validValue';
-      var requestMetadata = {};
-      var result = branch_instance.setRequestMetaData.call(
+      const key = 'validKey';
+      const value = 'validValue';
+      const requestMetadata = {};
+      const result = branch_instance.setRequestMetaData.call(
         { requestMetadata: requestMetadata },
         key,
         value,
@@ -39,7 +39,7 @@ describe('Branch - new', function () {
     });
 
     it('should delete metadata for a key when value is null', function () {
-      var requestMetadata = { 'keyToDelete': 'value' };
+      const requestMetadata = { 'keyToDelete': 'value' };
       branch_instance.setRequestMetaData.call(
         { requestMetadata: requestMetadata },
         'keyToDelete',
@@ -49,16 +49,16 @@ describe('Branch - new', function () {
     });
 
     it('should not modify metadata for an invalid key or undefined value', function () {
-      var invalidKey = null;
-      var undefinedValue;
-      var requestMetadata = { 'key': 'value' };
+      const invalidKey = null;
+      let undefinedValue;
+      const requestMetadata = { 'key': 'value' };
 
-      var result1 = branch_instance.setRequestMetaData.call(
+      const result1 = branch_instance.setRequestMetaData.call(
         { requestMetadata: requestMetadata },
         invalidKey,
         'validValue',
       );
-      var result2 = branch_instance.setRequestMetaData.call(
+      const result2 = branch_instance.setRequestMetaData.call(
         { requestMetadata: requestMetadata },
         'validKey',
         undefinedValue,
@@ -70,31 +70,31 @@ describe('Branch - new', function () {
     });
   });
   describe('pageview/dismiss request metadata', function () {
-    var pageviewResource = {
+    const pageviewResource = {
       destination: config.api_endpoint,
       endpoint: '/v1/pageview',
       method: utils.httpMethod.POST,
     };
-    var dismissResource = {
+    const dismissResource = {
       destination: config.api_endpoint,
       endpoint: '/v1/dismiss',
       method: utils.httpMethod.POST,
     };
 
     it('should merge branch_requestMetadata directly into metadata for v1/pageview instead of dropping it', function () {
-      var server = new Server();
-      var result = server.getUrl(pageviewResource, {
+      const server = new Server();
+      const result = server.getUrl(pageviewResource, {
         branch_key: window.branch_sample_key,
         event: 'pageview',
         metadata: { url: 'http://example.com' },
         branch_requestMetadata: { '$marketing_cloud_visitor_id': '12345' },
       });
       assert.strictEqual(typeof result.error, 'undefined');
-      var metadataMatch = decodeURIComponent(result.data).match(
+      const metadataMatch = decodeURIComponent(result.data).match(
         /metadata=(.+?)(&|$)/,
       );
-      var metadata = safejson.parse(metadataMatch[1]);
-      assert.strictEqual(metadata['$marketing_cloud_visitor_id'], '12345');
+      const metadata = safejson.parse(metadataMatch[1]);
+      assert.strictEqual(metadata.$marketing_cloud_visitor_id, '12345');
       assert.strictEqual(metadata.url, 'http://example.com');
       assert.strictEqual(
         result.data.indexOf('branch_requestMetadata='),
@@ -109,19 +109,19 @@ describe('Branch - new', function () {
     });
 
     it('should merge branch_requestMetadata directly into metadata for v1/dismiss instead of dropping it', function () {
-      var server = new Server();
-      var result = server.getUrl(dismissResource, {
+      const server = new Server();
+      const result = server.getUrl(dismissResource, {
         branch_key: window.branch_sample_key,
         event: 'dismiss',
         metadata: {},
         branch_requestMetadata: { '$marketing_cloud_visitor_id': '12345' },
       });
       assert.strictEqual(typeof result.error, 'undefined');
-      var metadataMatch = decodeURIComponent(result.data).match(
+      const metadataMatch = decodeURIComponent(result.data).match(
         /metadata=(.+?)(&|$)/,
       );
-      var metadata = safejson.parse(metadataMatch[1]);
-      assert.strictEqual(metadata['$marketing_cloud_visitor_id'], '12345');
+      const metadata = safejson.parse(metadataMatch[1]);
+      assert.strictEqual(metadata.$marketing_cloud_visitor_id, '12345');
     });
   });
   describe('setDMAParamsForEEA', function () {
@@ -211,7 +211,7 @@ describe('Branch - new', function () {
           dmaObj.adPersonalizationConsent,
           dmaObj.adUserDataUsageConsent,
         );
-      } catch (e) {}
+      } catch (_e) {}
       expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA: eeaRegion must be boolean, but got null',
       );
@@ -237,7 +237,7 @@ describe('Branch - new', function () {
           dmaObj.adPersonalizationConsent,
           dmaObj.adUserDataUsageConsent,
         );
-      } catch (e) {}
+      } catch (_e) {}
       expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA: adPersonalizationConsent must be boolean, but got null',
       );
@@ -263,7 +263,7 @@ describe('Branch - new', function () {
           dmaObj.adPersonalizationConsent,
           dmaObj.adUserDataUsageConsent,
         );
-      } catch (e) {}
+      } catch (_e) {}
       expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA: adUserDataUsageConsent must be boolean, but got null',
       );
@@ -292,7 +292,7 @@ describe('Branch - new', function () {
           dmaObj.adPersonalizationConsent,
           dmaObj.adUserDataUsageConsent,
         );
-      } catch (e) {}
+      } catch (_e) {}
       expect(consoleErrorStub).toHaveBeenCalledWith(
         'setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA',
         expect.any(Error),
@@ -309,7 +309,7 @@ describe('Branch - new', function () {
       expect(typeof branch_instance.getAPIUrl).toBe('function');
     });
     it('test url', function () {
-      var branch_url = 'https://api16.branch.io';
+      const branch_url = 'https://api16.branch.io';
       branch_instance.setAPIUrl(branch_url);
       assert.equal(branch_instance.getAPIUrl(), branch_url);
     });
