@@ -7,9 +7,10 @@ env:
 jobs:
   build-push:
     name: run tests, build and push
+    needs: perf
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6.1.0
@@ -21,7 +22,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install branch-github-actions
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: BranchMetrics/branch-github-actions
           ref: master
@@ -107,3 +108,46 @@ jobs:
         id: build
         run: |
           ./deployment/deploy-qa.sh
+
+  perf:
+    name: CLS suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Tag must match @playwright/test in package.json.
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - name: Install dependencies
+        run: pnpm run ci
+
+      - name: Build
+        run: pnpm build
+
+      - name: Measure CLS
+        run: pnpm exec playwright test
+        env:
+          PERF_PHASE: parallel
+
+      # Non-blocking until CI has shown it stays inside its range.
+      - name: Measure CLS, legacy phone banners
+        if: ${{ !cancelled() }}
+        run: pnpm exec playwright test
+        continue-on-error: true
+        env:
+          PERF_PHASE: serial
+
+      - name: Upload Playwright results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-results
+          path: test-results/
+          if-no-files-found: ignore

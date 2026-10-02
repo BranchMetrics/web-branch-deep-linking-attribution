@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perf host: article</title>
+  <style>
+    body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #222; }
+    .hero { display: block; width: 100%; max-width: 960px; height: auto; margin: 0 auto; }
+    main { max-width: 720px; margin: 0 auto; padding: 16px; }
+    h1 { font-size: 28px; line-height: 1.2; margin: 0 0 12px; }
+  </style>
+  <!-- Before the SDK, so every shift is recorded. -->
+  <script>
+    window.__perf = { shifts: [] };
+    const describe = (node) => {
+      const el = node?.nodeType === 1 ? node : node?.parentElement;
+      if (!el) return null;
+      return el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '') +
+        [...el.classList].map((c) => `.${c}`).join('');
+    };
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) {
+        __perf.shifts.push({ t: e.startTime, value: e.value, input: e.hadRecentInput, target: describe(e.sources[0]?.node) });
+      }
+    }).observe({ type: 'layout-shift', buffered: true });
+  </script>
+  <!-- The standard customer snippet, pointed at the local build. -->
+  <script>
+    (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="/dist/build.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener banner closeBanner closeJourney data deepview deepviewCta first init link logout removeListener setBranchViewData setIdentity track trackCommerceEvent logEvent disableTracking getBrowserFingerprintId crossPlatformIds lastAttributedTouchData setAPIResponseCallback qrCode setRequestMetaData setAPIUrl getAPIUrl setDMAParamsForEEA".split(" "), 0);
+    window.__perfSdk = {};
+    var perfQuery = new URLSearchParams(location.search);
+    branch.setAPIUrl(perfQuery.get('branch_api'));
+    branch.addListener('didShowJourney', function () { window.__perfSdk.shownAt = performance.now(); });
+    branch.addListener('didCloseJourney', function () { window.__perfSdk.closedAt = performance.now(); });
+    branch.init(perfQuery.get('branch_key'), {}, function (err) {
+      window.__perfSdk.initAt = performance.now();
+      if (err) window.__perfSdk.initError = String(err.message || err);
+    });
+  </script>
+</head>
+<body>
+  <img class="hero" src="/hosts/hero.jpg" width="1200" height="675" alt="">
+  <main>
+    <h1>Trail running shoes, reviewed</h1>
+    <p>Lightweight, grippy and built for long days on rough ground. We ran three hundred miles in them across wet rock, loose gravel and soft forest trails to see how they hold up.</p>
+    <p>The upper is a single layer of engineered mesh that drains quickly and dries in minutes. The midsole foam is soft without being mushy, and the rock plate takes the sting out of sharp stones.</p>
+    <p>Grip is the standout. The lugs bite into mud and stay sure-footed on wet slabs where most shoes skate. Durability was good: after three hundred miles the outsole shows wear but no lug damage.</p>
+    <p>Sizing runs true. The toe box is roomy enough for swelling feet late in a long run, and the heel lock is secure without a runner's knot.</p>
+    <p>If you want one shoe for everything from short technical loops to all-day mountain efforts, these are easy to recommend.</p>
+    <p>Lightweight, grippy and built for long days on rough ground. We ran three hundred miles in them across wet rock, loose gravel and soft forest trails to see how they hold up.</p>
+    <p>The upper is a single layer of engineered mesh that drains quickly and dries in minutes. The midsole foam is soft without being mushy, and the rock plate takes the sting out of sharp stones.</p>
+    <p>Grip is the standout. The lugs bite into mud and stay sure-footed on wet slabs where most shoes skate. Durability was good: after three hundred miles the outsole shows wear but no lug damage.</p>
+    <p>Lightweight, grippy and built for long days on rough ground. We ran three hundred miles in them across wet rock, loose gravel and soft forest trails to see how they hold up.</p>
+    <p>The upper is a single layer of engineered mesh that drains quickly and dries in minutes. The midsole foam is soft without being mushy, and the rock plate takes the sting out of sharp stones.</p>
+    <p>Grip is the standout. The lugs bite into mud and stay sure-footed on wet slabs where most shoes skate. Durability was good: after three hundred miles the outsole shows wear but no lug damage.</p>
+    <p>Sizing runs true. The toe box is roomy enough for swelling feet late in a long run, and the heel lock is secure without a runner's knot.</p>
+    <p>If you want one shoe for everything from short technical loops to all-day mountain efforts, these are easy to recommend.</p>
+    <p>Lightweight, grippy and built for long days on rough ground. We ran three hundred miles in them across wet rock, loose gravel and soft forest trails to see how they hold up.</p>
+    <p>The upper is a single layer of engineered mesh that drains quickly and dries in minutes. The midsole foam is soft without being mushy, and the rock plate takes the sting out of sharp stones.</p>
+    <p>Grip is the standout. The lugs bite into mud and stay sure-footed on wet slabs where most shoes skate. Durability was good: after three hundred miles the outsole shows wear but no lug damage.</p>
+  </main>
+  <script>
+    if (perfQuery.get('scroll')) window.scrollTo(0, Number(perfQuery.get('scroll')));
+  </script>
+</body>
+</html>

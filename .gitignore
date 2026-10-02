@@ -41,3 +41,5 @@ dist/
 test-results.xml
 
 lefthook-local.yml
+test/perf/banners.local.json
+test-results/

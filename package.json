@@ -23,7 +23,11 @@
     "start:dev": "node startDev.js",
     "release": "rimraf dist && node scripts/build.mjs",
     "lint": "biome lint .",
-    "test:bundle": "vitest run --config vitest.bundle.config.mjs"
+    "test:bundle": "vitest run --config vitest.bundle.config.mjs",
+    "perf": "pnpm build && node test/perf/run.mjs",
+    "perf:record": "pnpm build && PERF_RECORD=1 playwright test",
+    "perf:baseline": "pnpm build && node test/perf/run.mjs --workers 1 --repeat-each 10 --reporter dot,./test/perf/baseline-reporter.mjs",
+    "perf:docker": "sh test/perf/docker.sh"
   },
   "repository": {
     "type": "git",
@@ -42,6 +46,7 @@
   "homepage": "https://help.branch.io/developers-hub/docs/web-sdk-overview",
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
+    "@playwright/test": "1.63.0",
     "@vitest/coverage-v8": "^5.0.1",
     "inquirer": "^14.2.2",
     "jsdom": "^26.1.0",

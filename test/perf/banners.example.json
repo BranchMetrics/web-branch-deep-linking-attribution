@@ -1,0 +1,37 @@
+{
+  "apiUrl": "https://api.stage.branch.io",
+  "banners": {
+    "legacy standard top": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    },
+    "v2 standard top": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    },
+    "legacy full page": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    },
+    "v2 full page": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    },
+    "legacy desktop center": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    },
+    "v2 desktop center": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    },
+    "legacy desktop corner": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    },
+    "v2 desktop corner": {
+      "branchKey": "key_live_...",
+      "branchViewId": "..."
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "banner": "no banner",
+  "mode": "mobile",
+  "recordedAt": "2026-10-02T09:36:05.826Z",
+  "sdkVersion": "2.86.1",
+  "v2": false,
+  "api": {
+    "/v1/open": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "body": "{\"browser_fingerprint_id\":\"100000000000000001\",\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":false}\",\"has_app\":false,\"identity_id\":\"100000000000000002\",\"link\":\"https://perf.app.link?%24identity_id=100000000000000002\",\"session_id\":\"100000000000000003\"}"
+    },
+    "/v1/pageview": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "body": "{\"animationConfig\":{\"classes\":{\"enter\":\"branch-banner-enter\",\"exit\":\"branch-banner-exit\"},\"generatedCss\":\".branch-banner-enter {\\n    animation: branch-slide-in-top 0.25s ease both;\\n}\\n@keyframes branch-slide-in-top { from { transform: translateY(-100%); } to { transform: translate(0); } }\\n.branch-banner-exit {\\n    animation: branch-slide-out-top 0.25s ease both;\\n}\\n@keyframes branch-slide-out-top { from { transform: translate(0); } to { transform: translateY(-100%); } }\",\"surface\":\"IFRAME\",\"type\":\"SLIDE\"},\"event_data\":{\"branch_view_data\":{\"branch_view_id\":\"perf_fixture_view\",\"id\":\"perf_fixture_view\"},\"branch_view_enabled\":true},\"journey_link_data\":{\"app_id\":\"100000000000000001\",\"branch_key\":\"key_live_perfFixtureKey000000000000000000\",\"branch_view_id\":\"perf_fixture_view\",\"browser_fingerprint_id\":\"100000000000000002\",\"callback_string\":\"branch_view_callback__1\",\"data\":{\"$canonical_url\":\"http://127.0.0.1/hosts/article.html?branch_api=https%253A%252F%252Fapi.perf.invalid&branch_key=key_live_perfFixtureKey000000000000000000&_branch_view_id=perf_fixture_view\",\"$og_description\":null,\"$og_image_url\":null,\"$og_title\":null,\"$og_type\":null,\"$og_video\":null},\"event\":\"pageview\",\"feature\":\"journeys\",\"identity_id\":\"100000000000000003\",\"initial_referrer\":\"\",\"is_iframe\":false,\"journey_type\":\"mobile\",\"metadata\":\"{\\\"url\\\":\\\"http://127.0.0.1/hosts/article.html?branch_api=https%253A%252F%252Fapi.perf.invalid&branch_key=key_live_perfFixtureKey000000000000000000&_branch_view_id=perf_fixture_view\\\",\\\"user_agent\\\":\\\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\\\",\\\"language\\\":\\\"en-US\\\",\\\"screen_width\\\":412,\\\"screen_height\\\":839,\\\"window_device_pixel_ratio\\\":2.625,\\\"title\\\":\\\"Perf host: article\\\",\\\"os_version\\\":\\\"14\\\",\\\"ip\\\":\\\"192.0.2.1\\\"}\",\"openApp\":false,\"open_app\":false,\"os\":null,\"safeAreaRequired\":false,\"sdk\":\"web2.86.1\",\"session_id\":\"100000000000000004\",\"session_referring_link_data\":null,\"source\":\"web-sdk\",\"type\":\"mobile\",\"user_language\":\"en\",\"view_id\":\"perf_fixture_view\",\"view_name\":\"Standard — Default\"},\"use_v2_renderer\":true}"
+    }
+  },
+  "services": {
+    "https://app.link/_r": {
+      "status": 200,
+      "contentType": "text/javascript; charset=utf-8",
+      "body": "/**/ typeof branch_callback__0 === 'function' && branch_callback__0(\"100000000000000001\");"
+    }
+  },
+  "assets": {}
+}

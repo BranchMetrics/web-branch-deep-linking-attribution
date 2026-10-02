@@ -1,0 +1,27 @@
+{
+  "banner": "no banner",
+  "mode": "desktop",
+  "recordedAt": "2026-10-02T09:36:05.810Z",
+  "sdkVersion": "2.86.1",
+  "v2": false,
+  "api": {
+    "/v1/open": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "body": "{\"browser_fingerprint_id\":\"100000000000000001\",\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":false}\",\"has_app\":false,\"identity_id\":\"100000000000000002\",\"link\":\"https://perf.app.link?%24identity_id=100000000000000002\",\"session_id\":\"100000000000000003\"}"
+    },
+    "/v1/pageview": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "body": "{\"animationConfig\":{\"classes\":{\"enter\":\"branch-banner-enter\",\"exit\":\"branch-banner-exit\"},\"generatedCss\":\".branch-banner-enter {\\n    animation: branch-journey-fade-in 0.25s ease both;\\n}\\n@keyframes branch-journey-fade-in { from { opacity: 0; } to { opacity: 1; } }\\n.branch-banner-exit {\\n    animation: branch-journey-fade-out 0.25s ease both;\\n}\\n@keyframes branch-journey-fade-out { from { opacity: 1; } to { opacity: 0; } }\",\"surface\":\"CONTENT\",\"type\":\"FADE_IN\"},\"event_data\":{\"branch_view_data\":{\"branch_view_id\":\"perf_fixture_view\",\"id\":\"perf_fixture_view\"},\"branch_view_enabled\":true},\"journey_link_data\":{\"app_id\":\"100000000000000001\",\"branch_key\":\"key_live_perfFixtureKey000000000000000000\",\"branch_view_id\":\"perf_fixture_view\",\"browser_fingerprint_id\":\"100000000000000002\",\"callback_string\":\"branch_view_callback__1\",\"data\":{\"$canonical_url\":\"http://127.0.0.1/hosts/article.html?branch_api=https%253A%252F%252Fapi.perf.invalid&branch_key=key_live_perfFixtureKey000000000000000000&_branch_view_id=perf_fixture_view\",\"$og_description\":null,\"$og_image_url\":null,\"$og_title\":null,\"$og_type\":null,\"$og_video\":null},\"event\":\"pageview\",\"feature\":\"journeys\",\"identity_id\":\"100000000000000003\",\"initial_referrer\":\"\",\"is_iframe\":false,\"journey_type\":\"desktop\",\"metadata\":\"{\\\"url\\\":\\\"http://127.0.0.1/hosts/article.html?branch_api=https%253A%252F%252Fapi.perf.invalid&branch_key=key_live_perfFixtureKey000000000000000000&_branch_view_id=perf_fixture_view\\\",\\\"user_agent\\\":\\\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\\\",\\\"language\\\":\\\"en-US\\\",\\\"screen_width\\\":1280,\\\"screen_height\\\":800,\\\"window_device_pixel_ratio\\\":1,\\\"title\\\":\\\"Perf host: article\\\",\\\"os_version\\\":\\\"10.0\\\",\\\"ip\\\":\\\"192.0.2.1\\\"}\",\"openApp\":false,\"open_app\":false,\"os\":null,\"qrCodeSettings\":{\"background_color\":\"#FFFFFF\",\"background_image_url\":\"\",\"center_logo_url\":\"\",\"code_color\":\"#000000\",\"code_pattern\":1,\"code_shape\":1,\"finder_pattern\":1,\"finder_pattern_color\":\"#000000\",\"frame_style\":1,\"image_format\":\"png\",\"margin\":0,\"transparent_background\":false,\"width\":396},\"qr_code_settings\":{\"background_color\":\"#FFFFFF\",\"background_image_url\":\"\",\"center_logo_url\":\"\",\"code_color\":\"#000000\",\"code_pattern\":1,\"code_shape\":1,\"error_correction\":\"L\",\"finder_pattern\":1,\"finder_pattern_color\":\"#000000\",\"frame_style\":1,\"image_format\":\"png\",\"margin\":0,\"transparent_background\":false,\"width\":396},\"safeAreaRequired\":false,\"sdk\":\"web2.86.1\",\"session_id\":\"100000000000000004\",\"session_referring_link_data\":null,\"source\":\"web-sdk\",\"type\":\"desktop\",\"user_language\":\"en\",\"variant\":\"overlay\",\"view_id\":\"perf_fixture_view\",\"view_name\":\"Desktop Overlay Modal\"},\"use_v2_renderer\":true}"
+    }
+  },
+  "services": {
+    "https://app.link/_r": {
+      "status": 200,
+      "contentType": "text/javascript; charset=utf-8",
+      "body": "/**/ typeof branch_callback__0 === 'function' && branch_callback__0(\"100000000000000001\");"
+    }
+  },
+  "assets": {}
+}
