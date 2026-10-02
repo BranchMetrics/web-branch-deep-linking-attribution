@@ -1,6 +1,6 @@
-import { config } from '../src/0_config.js';
-import { utils } from '../src/1_utils.js';
-import { Branch } from '../src/6_branch.js';
+import { Branch } from '../../src/branch.js';
+import { config } from '../../src/core/config.js';
+import { utils } from '../../src/core/utils.js';
 
 // Same URL rules as isValidURL, written without a regex, to check the pattern against.
 const ALNUM = 'abcdefghijklmnopqrstuvwxyz0123456789';

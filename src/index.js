@@ -4,8 +4,8 @@
  * branch was loaded.
  */
 
-import './0_polyfills.js';
-import { Branch } from './6_branch.js';
+import './core/polyfills.js';
+import { Branch } from './branch.js';
 
 export const branch_instance = new Branch();
 

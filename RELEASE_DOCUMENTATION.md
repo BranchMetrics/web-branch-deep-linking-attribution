@@ -23,7 +23,7 @@ The version is not bumped by hand. Both workflows compute the next version with 
 - Otherwise, any commit containing `[minor]` → minor bump.
 - Otherwise → patch bump (so `[patch]`, `[other]` and untagged commits all release as a patch).
 
-`deployment/write-versions.sh` then writes that version into `package.json` and `src/0_config.js` before building, so the version in the repo is only a placeholder.
+`deployment/write-versions.sh` then writes that version into `package.json` and `src/core/config.js` before building, so the version in the repo is only a placeholder.
 
 ## On every push: Build and Push
 
@@ -52,4 +52,4 @@ After a release, check that `https://cdn.branch.io/branch-v<version>.min.js` loa
 
 ## Documentation
 
-Public integration docs live at [help.branch.io](https://help.branch.io/developers-hub/docs/web-sdk-overview). The JSDoc comments on the `branch.*` methods in `src/6_branch.js` are the in-code reference.
+Public integration docs live at [help.branch.io](https://help.branch.io/developers-hub/docs/web-sdk-overview). The JSDoc comments on the `branch.*` methods in `src/branch.js` are the in-code reference.

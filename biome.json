@@ -34,6 +34,16 @@
   "overrides": [
     {
       "includes": ["src/**"],
+      "assist": {
+        "actions": {
+          "source": {
+            "organizeImports": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/**"],
       "linter": {
         "rules": {
           "correctness": {
@@ -47,7 +57,7 @@
       }
     },
     {
-      "includes": ["test/**/*.html", "src/stars/**/*.svg"],
+      "includes": ["test/**/*.html", "src/banner/stars/**/*.svg"],
       "linter": {
         "rules": {
           "a11y": "off"
@@ -78,7 +88,7 @@
       }
     },
     {
-      "includes": ["src/onpage.js"],
+      "includes": ["src/snippet/onpage.js"],
       "linter": {
         "rules": {
           "complexity": {
@@ -102,7 +112,7 @@
       }
     },
     {
-      "includes": ["src/2_storage.js", "test/2_storage.test.js"],
+      "includes": ["src/core/storage.js", "test/core/storage.test.js"],
       "linter": {
         "rules": {
           "suspicious": {

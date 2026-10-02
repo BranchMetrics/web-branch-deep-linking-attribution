@@ -1,4 +1,4 @@
-import { task_queue } from '../src/0_queue.js';
+import { task_queue } from '../../src/core/queue.js';
 
 describe('task_queue', function () {
   let queue;

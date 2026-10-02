@@ -94,7 +94,7 @@ describe('dist/build.min.js contract', function () {
     // The SDK calls these on itself; pages never need to queue them.
     const internal = ['renderFinalize', 'renderQueue'];
     const expected = PUBLIC_METHODS.filter((m) => !internal.includes(m)).sort();
-    const onpage = readFileSync('src/onpage.js', 'utf8')
+    const onpage = readFileSync('src/snippet/onpage.js', 'utf8')
       .match(/\[\s*('[\w]+',\s*)+\]/)[0]
       .match(/[\w]+/g);
     const snippetMethods = (html) =>

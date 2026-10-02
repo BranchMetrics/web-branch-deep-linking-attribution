@@ -2,17 +2,17 @@
  * This file provides the main Branch function.
  */
 
-import { config } from './0_config.js';
-import { safejson } from './0_jsonparse.js';
-import { task_queue } from './0_queue.js';
-import { utils } from './1_utils.js';
-import { resources } from './2_resources.js';
-import { session } from './2_session.js';
-import { storage } from './2_storage.js';
-import { Server } from './3_api.js';
-import { banner } from './5_banner.js';
-import { branch_view } from './branch_view.js';
-import { journeys_utils } from './journeys_utils.js';
+import { config } from './core/config.js';
+import { safejson } from './core/safejson.js';
+import { task_queue } from './core/queue.js';
+import { utils } from './core/utils.js';
+import { resources } from './network/resources.js';
+import { session } from './core/session.js';
+import { storage } from './core/storage.js';
+import { Server } from './network/api.js';
+import { banner } from './banner/banner.js';
+import { branch_view } from './journeys/branch_view.js';
+import { journeys_utils } from './journeys/journeys_utils.js';
 
 /*globals Ti, BranchStorage, require */
 

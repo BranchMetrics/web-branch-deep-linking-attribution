@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { build } from 'vite';
 
-const ENTRY = 'src/7_initialization.js';
+const ENTRY = 'src/index.js';
 const TARGET = 'es2015';
 const ENTRY_PATH = resolve(ENTRY);
 

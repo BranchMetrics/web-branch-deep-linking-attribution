@@ -1,4 +1,4 @@
-import { banner_html } from '../src/4_banner_html.js';
+import { banner_html } from '../../src/banner/banner_html.js';
 
 describe('banner_html.iframe', function () {
   afterEach(function () {

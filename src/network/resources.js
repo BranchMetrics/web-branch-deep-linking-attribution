@@ -3,8 +3,8 @@
  * to those endpoints.
  */
 
-import { config } from './0_config.js';
-import { utils } from './1_utils.js';
+import { config } from '../core/config.js';
+import { utils } from '../core/utils.js';
 
 export const resources = {};
 

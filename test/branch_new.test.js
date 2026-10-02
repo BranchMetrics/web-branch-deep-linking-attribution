@@ -1,9 +1,9 @@
-import { config } from '../src/0_config.js';
-import { safejson } from '../src/0_jsonparse.js';
-import { task_queue } from '../src/0_queue.js';
-import { utils } from '../src/1_utils.js';
-import { Server } from '../src/3_api.js';
-import { Branch } from '../src/6_branch.js';
+import { Branch } from '../src/branch.js';
+import { config } from '../src/core/config.js';
+import { task_queue } from '../src/core/queue.js';
+import { safejson } from '../src/core/safejson.js';
+import { utils } from '../src/core/utils.js';
+import { Server } from '../src/network/api.js';
 
 describe('Branch - new', function () {
   const branch_instance = new Branch();

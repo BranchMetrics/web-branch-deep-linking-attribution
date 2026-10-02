@@ -1,5 +1,5 @@
-import { config } from '../src/0_config.js';
-import { branch_instance as branch } from '../src/7_initialization.js';
+import { config } from '../src/core/config.js';
+import { branch_instance as branch } from '../src/index.js';
 import { installFakeXHR } from './fake-xhr.js';
 
 /*globals identity_id, browser_fingerprint_id, device_fingerprint_id */

@@ -1,4 +1,4 @@
-import { journeys_utils } from '../src/journeys_utils.js';
+import { journeys_utils } from '../../src/journeys/journeys_utils.js';
 
 describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
   const assert = testUtils.unplanned();
