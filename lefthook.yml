@@ -22,3 +22,6 @@ pre-push:
     # Whole repo (the pre-commit job only sees staged files), same checks as CI's format and lint steps.
     - name: biome
       run: biome check --diagnostic-level=error
+
+    - name: typecheck
+      run: tsc -p .
