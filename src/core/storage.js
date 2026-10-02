@@ -4,7 +4,7 @@
  * old javascript object as a fallback
  */
 
-import { utils } from './1_utils.js';
+import { utils } from './utils.js';
 
 export const storage = {};
 

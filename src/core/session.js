@@ -1,6 +1,6 @@
-import { safejson } from './0_jsonparse.js';
-import { utils } from './1_utils.js';
-import { storage } from './2_storage.js';
+import { safejson } from './safejson.js';
+import { utils } from './utils.js';
+import { storage } from './storage.js';
 
 export const session = {};
 

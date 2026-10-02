@@ -2,10 +2,10 @@
  * This provides the markup, styles, and helper functions for all Banner UI Elements
  */
 
-import { utils } from './1_utils.js';
-import { banner_utils } from './3_banner_utils.js';
-import { banner_css } from './4_banner_css.js';
-import { banner_html } from './4_banner_html.js';
+import { utils } from '../core/utils.js';
+import { banner_utils } from './banner_utils.js';
+import { banner_css } from './banner_css.js';
+import { banner_html } from './banner_html.js';
 
 /**
  * @param {Object} branch

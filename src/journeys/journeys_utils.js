@@ -1,7 +1,7 @@
-import { safejson } from './0_jsonparse.js';
-import { utils } from './1_utils.js';
-import { resources } from './2_resources.js';
-import { banner_utils } from './3_banner_utils.js';
+import { safejson } from '../core/safejson.js';
+import { utils } from '../core/utils.js';
+import { resources } from '../network/resources.js';
+import { banner_utils } from '../banner/banner_utils.js';
 
 export const journeys_utils = {};
 

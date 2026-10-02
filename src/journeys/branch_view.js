@@ -1,7 +1,7 @@
-import { safejson } from './0_jsonparse.js';
-import { utils } from './1_utils.js';
-import { session } from './2_session.js';
-import { banner_utils } from './3_banner_utils.js';
+import { safejson } from '../core/safejson.js';
+import { utils } from '../core/utils.js';
+import { session } from '../core/session.js';
+import { banner_utils } from '../banner/banner_utils.js';
 import { journeys_utils } from './journeys_utils.js';
 
 export const branch_view = {};

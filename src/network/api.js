@@ -3,9 +3,9 @@
  * a fancy wrapper around XHR/JSONP/etc.
  */
 
-import { safejson } from './0_jsonparse.js';
-import { utils } from './1_utils.js';
-import { storage } from './2_storage.js';
+import { safejson } from '../core/safejson.js';
+import { utils } from '../core/utils.js';
+import { storage } from '../core/storage.js';
 
 export const Server = function () {};
 

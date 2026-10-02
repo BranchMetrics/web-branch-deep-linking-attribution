@@ -1,5 +1,5 @@
-import { branch_view } from '../src/branch_view.js';
-import { journeys_utils } from '../src/journeys_utils.js';
+import { branch_view } from '../../src/journeys/branch_view.js';
+import { journeys_utils } from '../../src/journeys/journeys_utils.js';
 
 describe('displayJourney new render options wiring', function () {
   const assert = testUtils.unplanned();

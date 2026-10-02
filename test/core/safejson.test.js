@@ -1,4 +1,4 @@
-import { safejson } from '../src/0_jsonparse.js';
+import { safejson } from '../../src/core/safejson.js';
 
 // Expected values pin safejson.serialize's established output, which differs
 // from JSON.stringify.

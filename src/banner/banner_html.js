@@ -1,7 +1,7 @@
-import { utils } from './1_utils.js';
-import { session } from './2_session.js';
-import { storage } from './2_storage.js';
-import { banner_utils } from './3_banner_utils.js';
+import { utils } from '../core/utils.js';
+import { session } from '../core/session.js';
+import { storage } from '../core/storage.js';
+import { banner_utils } from './banner_utils.js';
 
 export const banner_html = {};
 

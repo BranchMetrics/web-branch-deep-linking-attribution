@@ -1,4 +1,4 @@
-import { utils } from '../src/1_utils.js';
+import { utils } from '../../src/core/utils.js';
 
 describe('utils', function () {
   const assert = testUtils.unplanned();

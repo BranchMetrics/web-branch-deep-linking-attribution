@@ -1,4 +1,4 @@
-import { storage as branchStorage } from '../src/2_storage.js';
+import { storage as branchStorage } from '../../src/core/storage.js';
 
 const BRANCH_KEY_PREFIX = 'BRANCH_WEBSDK_KEY';
 const ITEM_KEY = 'key';

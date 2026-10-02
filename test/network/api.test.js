@@ -1,10 +1,10 @@
-import { config } from '../src/0_config.js';
-import { safejson } from '../src/0_jsonparse.js';
-import { utils } from '../src/1_utils.js';
-import { resources } from '../src/2_resources.js';
-import { storage as branchStorage } from '../src/2_storage.js';
-import { Server } from '../src/3_api.js';
-import { installFakeXHR } from './fake-xhr.js';
+import { config } from '../../src/core/config.js';
+import { safejson } from '../../src/core/safejson.js';
+import { storage as branchStorage } from '../../src/core/storage.js';
+import { utils } from '../../src/core/utils.js';
+import { Server } from '../../src/network/api.js';
+import { resources } from '../../src/network/resources.js';
+import { installFakeXHR } from '../fake-xhr.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 

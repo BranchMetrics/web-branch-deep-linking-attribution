@@ -1,5 +1,5 @@
-import { utils } from './1_utils.js';
-import { banner_utils } from './3_banner_utils.js';
+import { utils } from '../core/utils.js';
+import { banner_utils } from './banner_utils.js';
 
 export const banner_css = {};
 

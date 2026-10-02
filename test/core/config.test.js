@@ -1,4 +1,4 @@
-import { config } from '../src/0_config.js';
+import { config } from '../../src/core/config.js';
 
 describe('config', function () {
   const assert = testUtils.unplanned();

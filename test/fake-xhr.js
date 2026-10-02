@@ -1,6 +1,6 @@
 /**
  * Minimal fake XMLHttpRequest covering what Server.prototype.XHRRequest
- * (src/3_api.js) uses.
+ * (src/network/api.js) uses.
  *
  * var fake = installFakeXHR(function (req) { requests.push(req); });
  * // ...code under test calls new XMLHttpRequest()...

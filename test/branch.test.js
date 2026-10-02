@@ -1,11 +1,11 @@
-import { config } from '../src/0_config.js';
-import { safejson } from '../src/0_jsonparse.js';
-import { utils } from '../src/1_utils.js';
-import { session } from '../src/2_session.js';
-import { storage as branchStorage } from '../src/2_storage.js';
-import { banner_utils } from '../src/3_banner_utils.js';
-import { banner_html } from '../src/4_banner_html.js';
-import { Branch } from '../src/6_branch.js';
+import { banner_html } from '../src/banner/banner_html.js';
+import { banner_utils } from '../src/banner/banner_utils.js';
+import { Branch } from '../src/branch.js';
+import { config } from '../src/core/config.js';
+import { safejson } from '../src/core/safejson.js';
+import { session } from '../src/core/session.js';
+import { storage as branchStorage } from '../src/core/storage.js';
+import { utils } from '../src/core/utils.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 

@@ -10,7 +10,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text-summary', 'html', 'lcov'],
       include: ['src/**'],
-      exclude: ['src/onpage.js', 'src/7_initialization.js'],
+      exclude: ['src/snippet/onpage.js', 'src/index.js'],
     },
   },
 });

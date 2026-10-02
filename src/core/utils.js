@@ -2,9 +2,9 @@
  * Just provides a couple of utilities.
  */
 
-import { config } from './0_config.js';
-import { safejson } from './0_jsonparse.js';
-import { session } from './2_session.js';
+import { config } from './config.js';
+import { safejson } from './safejson.js';
+import { session } from './session.js';
 
 export const utils = {};
 
@@ -57,7 +57,7 @@ utils.userPreferences = {
   },
   allowErrorsInCallback: false,
   shouldBlockRequest: function (url, requestData) {
-    // Used by 3_api.js to determine whether a request should be blocked
+    // Used by network/api.js to determine whether a request should be blocked
     const urlParser = document.createElement('a');
     urlParser.href = url;
 

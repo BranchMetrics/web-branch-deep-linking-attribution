@@ -1,5 +1,5 @@
-import { utils } from '../src/1_utils.js';
-import { Branch } from '../src/6_branch.js';
+import { Branch } from '../../src/branch.js';
+import { utils } from '../../src/core/utils.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
@@ -51,7 +51,7 @@ describe('Branch', function () {
         immediate: true,
         disableHide: true,
         forgetHide: true,
-        iframe: false, // renders synchronously; the iframe path is covered in 4_banner_html.test.js
+        iframe: false, // renders synchronously; the iframe path is covered in banner/banner_html.test.js
       };
       vi.spyOn(console, 'warn').mockImplementation(function () {}); // banner() deprecation warning
     });
