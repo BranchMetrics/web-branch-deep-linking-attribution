@@ -1,6 +1,4 @@
 {
-  // Type-checks the SDK's JavaScript (`pnpm run typecheck`). Nothing is emitted;
-  // Vite builds the bundle.
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
@@ -11,8 +9,6 @@
     "lib": ["es2020", "dom"],
     "types": [],
     "strict": false,
-    // Only allow TypeScript syntax that compiles away, so .ts files can't add
-    // runtime code (enums, namespaces) to the bundle.
     "erasableSyntaxOnly": true,
     "skipLibCheck": true
   },
