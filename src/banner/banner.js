@@ -9,9 +9,9 @@ import { banner_html } from './banner_html.js';
 
 /**
  * @param {Object} branch
- * @param {banner_utils.options} options
+ * @param {Object} options
  * @param {Object} linkData
- * @param {storage} storage
+ * @param {Object} storage
  */
 export const banner = function (branch, options, linkData, storage) {
   if (!banner_utils.shouldAppend(storage, options)) {

@@ -50,7 +50,7 @@ const init_state_fail_codes = {
 
 /***
  * @param {number} parameters
- * @param {function(...?): undefined} func
+ * @param {(...args: any[]) => void} func
  * @param {boolean=} init
  */
 const wrap = function (parameters, func, init) {
@@ -120,6 +120,7 @@ const wrap = function (parameters, func, init) {
 export const Branch = function () {
   if (!(this instanceof Branch)) {
     if (!default_branch) {
+      // @ts-expect-error -- TS 7 doesn't treat JS constructor functions as classes
       default_branch = new Branch();
     }
     return default_branch;
@@ -128,6 +129,7 @@ export const Branch = function () {
 
   const storageMethods = ['session', 'cookie', 'pojo'];
 
+  // @ts-expect-error -- TS 7 doesn't treat JS constructor functions as classes
   this._storage = new storage.BranchStorage(storageMethods);
 
   this._server = new Server();
@@ -145,9 +147,9 @@ export const Branch = function () {
 };
 
 /***
- * @param {utils.resource} resource
+ * @param {Object} resource
  * @param {Object.<string, *>} obj
- * @param {function(?Error,?)=} callback
+ * @param {((err: Error | null, data?: any) => void)=} callback
  */
 Branch.prototype._api = function (resource, obj, callback) {
   if (this.app_id) {
@@ -292,7 +294,7 @@ Branch.prototype._publishEvent = function (event, data) {
  * @function Branch.init
  * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
  * @param {Object=} options - _optional_ - { }.
- * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
+ * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read the
  * session data.
  *
  * Adding the Branch script to your page automatically creates a window.branch
@@ -804,7 +806,7 @@ Branch.prototype.renderFinalize = wrap(
 
 /**
  * @function Branch.data
- * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
+ * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read the
  * session data.
  *
  * Returns the same session information and any referring data, as
@@ -828,7 +830,7 @@ Branch.prototype.data = wrap(
 
 /**
  * @function Branch.first
- * @param {function(?Error, utils.sessionData=)=} callback - _optional_ - callback to read the
+ * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read the
  * session data.
  *
  * Returns the same session information and any referring data, as
@@ -852,7 +854,7 @@ Branch.prototype.first = wrap(
  * @function Branch.setIdentity
  * @param {string} identity - _required_ - a string uniquely identifying the user - often a user ID
  * or email address.
- * @param {function(?Error, Object=)=} callback - _optional_ - callback that returns the user's
+ * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback that returns the user's
  * Branch identity id and unique link.
  *
  * **Formerly `identify()`**
@@ -906,7 +908,7 @@ Branch.prototype.setIdentity = wrap(
 
 /**
  * @function Branch.logout
- * @param {function(?Error)=} callback - _optional_
+ * @param {((err: Error | null) => void)=} callback - _optional_
  *
  * Logs out the current session, replaces session IDs and identity IDs.
  *
@@ -955,7 +957,7 @@ Branch.prototype.getBrowserFingerprintId = wrap(
 
 /**
  * @function Branch.crossPlatformIds
- * @param {function(?Error, Object=)=} callback - _optional_ - callback to read CPIDs
+ * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read CPIDs
  *
  * Returns CPIDs for current user.
  *
@@ -986,7 +988,7 @@ Branch.prototype.crossPlatformIds = wrap(
 /**
  * @function Branch.lastAttributedTouchData
  * @param {number} attribution_window - the number of days to look up attribution data for
- * @param {function(?Error, Object=)=} callback - _optional_ - callback to read last attributed touch data
+ * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read last attributed touch data
  *
  * Returns last attributed touch data for current user. Last attributed touch data has the information associated with that user's last viewed impression or clicked link.
  *
@@ -1031,7 +1033,7 @@ Branch.prototype.lastAttributedTouchData = wrap(
  * @function Branch.track
  * @param {string} event - _required_ - name of the event to be tracked.
  * @param {Object=} metadata - _optional_ - object of event metadata.
- * @param {function(?Error)=} callback - _optional_
+ * @param {((err: Error | null) => void)=} callback - _optional_
  *
  * This function allows you to track any event with supporting metadata.
  * The `metadata` parameter is a formatted JSON object that can contain
@@ -1123,7 +1125,7 @@ Branch.prototype.track = wrap(
  * @param {Object} event_data_and_custom_data - _optional_
  * @param {Array} content_items - _optional_
  * @param {String} customer_event_alias - _optional_
- * @param {function(?Error)=} callback - _optional_
+ * @param {((err: Error | null) => void)=} callback - _optional_
  *
  * Register commerce events, content events, user lifecycle events and custom events via logEvent()
  *
@@ -1302,7 +1304,7 @@ Branch.prototype.logEvent = wrap(
 /**
  * @function Branch.link
  * @param {Object} data - _required_ - link data and metadata.
- * @param {function(?Error,String=)} callback - _required_ - returns a string of the Branch deep
+ * @param {(err: Error | null, url?: string) => void} callback - _required_ - returns a string of the Branch deep
  * linking URL.
  *
  * **Formerly `createLink()`**
@@ -1414,7 +1416,7 @@ Branch.prototype.link = wrap(
  *     background_color: String Hex color value of the background of the QR code
  *     margin: Integer (Pixels) The number of pixels you want for the margin. Max 20.
  *     width: Integer (Pixels) Output size of QR Code image.
- * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
+ * @param {((err: Error | null) => void)=} callback - _optional_ - returns an error if the API call is unsuccessful
  *
  * Returns a qrCode with the specified linkData.
  *
@@ -1500,7 +1502,7 @@ Branch.prototype.qrCode = wrap(
  * one already exists_. *open_app*, _whether to try to open the app passively (as opposed to
  * opening it upon user clicking); defaults to true_
  * }.
- * @param {function(?Error)=} callback - _optional_ - returns an error if the API call is unsuccessful
+ * @param {((err: Error | null) => void)=} callback - _optional_ - returns an error if the API call is unsuccessful
  *
  * Turns the current page into a "deepview" – a preview of app content. This gives the page two
  * special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
@@ -1706,7 +1708,7 @@ Branch.prototype.deepviewCta = wrap(
  * @function Branch.addListener
  * @param {String} event - _optional_ - Specify which events you would like to listen for. If
  * not defined, the observer will recieve all events.
- * @param {function(String, Object)} listener - _required_ - Listening function that will recieves an
+ * @param {(event: string, data: Object) => void} listener - _required_ - Listening function that will recieves an
  * event as a string and optional data as an object.
  *
  * The Branch Web SDK includes a simple event listener, that currently only publishes events for
@@ -1751,7 +1753,7 @@ Branch.prototype.addListener = function (event, listener) {
 
 /** =WEB
  * @function Branch.removeListener
- * @param {function(String)} listener - _required_ - Reference to the listening function you
+ * @param {(event: string) => void} listener - _required_ - Reference to the listening function you
  * would like to remove. *note*: this must be the same reference that was passed to
  * `branch.addListener()`, not an identical clone of the function.
  *
@@ -1818,7 +1820,7 @@ Branch.prototype.setBranchViewData = wrap(
 
 /**
  * @function Branch.closeJourney
- * @param {function(?Error)=} callback - _optional_
+ * @param {((err: Error | null) => void)=} callback - _optional_
  *
  * Journeys include a close button the user can click, but you may want to close the
  * Journey with a timeout, or via some other user interaction with your web app. In this case,
@@ -1978,7 +1980,7 @@ Branch.prototype.closeBanner = wrap(0, function (done) {
  * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events
  * @param {Object} commerce_data - _required_ - Data that describes the commerce event
  * @param {Object} metadata - _optional_ - metadata you may want add to the event
- * @param {function(?Error)=} callback - _optional_ - Returns an error if unsuccessful
+ * @param {((err: Error | null) => void)=} callback - _optional_ - Returns an error if unsuccessful
  *
  * Sends a user commerce event to the server
  *

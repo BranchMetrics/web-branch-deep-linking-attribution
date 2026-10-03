@@ -3,7 +3,7 @@
  */
 
 /**
- * @returns {function(function(function()))}
+ * @returns {(task: (next: () => void) => void) => void}
  */
 export const task_queue = function () {
   const queue = [];

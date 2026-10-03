@@ -18,9 +18,9 @@ const validationTypes = {
 
 /**
  * @param {boolean} required
- * @param {validationTypes|RegExp} type
+ * @param {number|RegExp} type
  * @throws {Error}
- * @return {_validator}
+ * @return {(endpoint: string, param: string, data: any) => (string|false)}
  */
 function validator(required, type) {
   return function (endpoint, param, data) {
@@ -73,6 +73,7 @@ function validator(required, type) {
         param,
         'a string',
       ]);
+      // @ts-expect-error -- `type` is a RegExp once it isn't a validationTypes value
     } else if (type !== validationTypes.STRING && !type.test(data)) {
       return utils.message(utils.messages.invalidType, [
         endpoint,

@@ -5,7 +5,6 @@
 
 import { safejson } from '../core/safejson.js';
 import { utils } from '../core/utils.js';
-import { storage } from '../core/storage.js';
 
 export const Server = function () {};
 
@@ -48,7 +47,7 @@ Server.prototype.serializeObject = function (obj, prefix) {
 };
 
 /**
- * @param {utils.resource} resource
+ * @param {Object} resource
  * @param {Object.<string, *>} data
  */
 Server.prototype.getUrl = function (resource, data) {
@@ -207,8 +206,8 @@ Server.prototype.createScript = function (src, onError, onLoad) {
 /**
  * @param {string} requestURL
  * @param {Object} requestData
- * @param {utils._httpMethod} requestMethod
- * @param {function(?Error,*=,?=)=} callback
+ * @param {string} requestMethod
+ * @param {((err: Error | string | null, data?: any, status?: any) => void)=} callback
  */
 Server.prototype.jsonpRequest = function (
   requestURL,
@@ -289,11 +288,11 @@ Server.prototype.jsonpRequest = function (
 /**
  * @param {string} url
  * @param {Object} data
- * @param {utils._httpMethod} method
- * @param {storage} storage
- * @param {function(?Error,*=,?=)=} callback
+ * @param {string} method
+ * @param {Object} storage
+ * @param {((err: Error | string | null, data?: any, status?: any) => void)=} callback
  * @param {?boolean=} noParse - _optional_ -
- * @param {?string} responseType - _optional_ -
+ * @param {?XMLHttpRequestResponseType=} responseType - _optional_ -
  */
 Server.prototype.XHRRequest = function (
   url,
@@ -341,6 +340,7 @@ Server.prototype.XHRRequest = function (
       ', Response - ' +
       responseText;
     console.log(errorMessage);
+    // @ts-expect-error -- some old browsers put an `error` on the XHR error event
     callback(new Error(e.error || errorMessage), null, req.status);
   };
   req.onreadystatechange = function () {
@@ -405,10 +405,10 @@ Server.prototype.XHRRequest = function (
 };
 
 /**
- * @param {utils.resource} resource
+ * @param {Object} resource
  * @param {Object.<string, *>} data
- * @param {storage} storage
- * @param {function(?Error,*=)=} callback
+ * @param {Object} storage
+ * @param {((err: Error | null, data?: any) => void)=} callback
  */
 Server.prototype.request = function (resource, data, storage, callback) {
   const self = this;
