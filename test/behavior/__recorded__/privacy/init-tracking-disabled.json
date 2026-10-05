@@ -1,0 +1,157 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "link_identifier": "123456789",
+        "sdk": "web<VERSION>",
+        "options": "{\"tracking_disabled\":true}",
+        "tracking_disabled": "true",
+        "current_url": "https://shop.example.com/p?_branch_match_id=123456789",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 1,
+      "callback": "init",
+      "args": [
+        null,
+        {
+          "data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
+          "data_parsed": {
+            "+clicked_branch_link": false,
+            "+is_first_session": true
+          },
+          "developer_identity": null,
+          "has_app": false,
+          "identity": null,
+          "referring_identity": null,
+          "referring_link": null
+        }
+      ]
+    },
+    {
+      "at": 1,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/pageview",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "event": "pageview",
+        "metadata": "{\"url\":\"https://shop.example.com/p?_branch_match_id=123456789\",\"user_agent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36\",\"language\":\"en-US\",\"screen_width\":-1,\"screen_height\":-1,\"window_device_pixel_ratio\":1}",
+        "initial_referrer": "",
+        "is_iframe": "false",
+        "user_language": "en",
+        "open_app": "false",
+        "has_app_websdk": "false",
+        "feature": "journeys",
+        "callback_string": "branch_view_callback__1",
+        "data": "{\"$canonical_url\":\"https://shop.example.com/p?_branch_match_id=123456789\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+        "source": "web-sdk",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "sdk": "web<VERSION>",
+        "tracking_disabled": "true"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 2,
+      "callback": "track",
+      "args": [
+        null
+      ]
+    },
+    {
+      "at": 2,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/url",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "data": "{\"k\":\"v\",\"$canonical_url\":\"https://shop.example.com/p?_branch_match_id=123456789\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+        "source": "web-sdk",
+        "instrumentation": "{\"init-began-at\":\"500\",\"/v1/open-brtt\":\"1\",\"/v1/pageview-brtt\":\"1\"}",
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 3,
+      "callback": "link",
+      "args": [
+        null,
+        "https://bnc.lt/l/3HZMytU-BW"
+      ]
+    },
+    {
+      "at": 3,
+      "callback": "logEvent",
+      "args": [
+        null
+      ]
+    },
+    {
+      "at": 3,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/pageview",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "event": "pageview",
+        "metadata": "{\"url\":\"https://shop.example.com/p?_branch_match_id=123456789\",\"user_agent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36\",\"language\":\"en-US\",\"screen_width\":-1,\"screen_height\":-1,\"window_device_pixel_ratio\":1}",
+        "initial_referrer": "",
+        "is_iframe": "false",
+        "user_language": "en",
+        "open_app": "false",
+        "has_app_websdk": "false",
+        "feature": "journeys",
+        "callback_string": "branch_view_callback__2",
+        "data": "{\"$canonical_url\":\"https://shop.example.com/p?_branch_match_id=123456789\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+        "source": "web-sdk",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "sdk": "web<VERSION>",
+        "tracking_disabled": "true"
+      },
+      "responseType": "",
+      "timeout": 5000
+    }
+  ],
+  "storage": {
+    "local": {
+      "branch_session_first": "{}"
+    },
+    "session": {
+      "branch_session": "{}"
+    },
+    "cookie": []
+  },
+  "location": "https://shop.example.com/p?_branch_match_id=123456789",
+  "dom": {
+    "head": "<head></head>",
+    "body": "<body></body>",
+    "iframes": []
+  }
+}

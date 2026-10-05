@@ -1,0 +1,78 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "jsonp": "/_r",
+      "origin": "https://app.link",
+      "query": {
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "callback": "branch_callback__0"
+      },
+      "nonce": null
+    },
+    {
+      "at": 1,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "browser_fingerprint_id": "79336952217731267",
+        "sdk": "web<VERSION>",
+        "options": "{\"retries\":1,\"retry_delay\":10,\"timeout\":100}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 100
+    },
+    {
+      "at": 12,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "browser_fingerprint_id": "79336952217731267",
+        "sdk": "web<VERSION>",
+        "options": "{\"retries\":1,\"retry_delay\":10,\"timeout\":100}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 100
+    },
+    {
+      "at": 13,
+      "callback": "init",
+      "args": [
+        {
+          "error": "Request timed out"
+        },
+        null
+      ]
+    }
+  ],
+  "storage": {
+    "local": {},
+    "session": {},
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head></head>",
+    "body": "<body></body>",
+    "iframes": []
+  }
+}

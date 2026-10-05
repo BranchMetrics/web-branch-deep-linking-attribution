@@ -1,0 +1,169 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "sdk": "web<VERSION>",
+        "options": "{}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 1,
+      "console": "warn",
+      "args": [
+        "The \"banner\" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview"
+      ]
+    },
+    {
+      "at": 1,
+      "callback": "banner",
+      "args": [
+        "<undefined>"
+      ]
+    },
+    {
+      "at": 1,
+      "event": "listener",
+      "name": "willShowBanner",
+      "data": "<undefined>"
+    },
+    {
+      "at": 1,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/pageview",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "data": "{\"k\":\"v\",\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+        "event": "pageview",
+        "metadata": "{\"url\":\"https://shop.example.com/product/42\",\"user_agent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1\",\"language\":\"en-US\",\"screen_width\":-1,\"screen_height\":-1,\"window_device_pixel_ratio\":1}",
+        "initial_referrer": "",
+        "is_iframe": "false",
+        "user_language": "en",
+        "open_app": "false",
+        "has_app_websdk": "false",
+        "feature": "journeys",
+        "callback_string": "branch_view_callback__1",
+        "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
+        "source": "web-sdk",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "session_id": "98807509250212102",
+        "identity_id": "98807509250212101",
+        "sdk": "web<VERSION>",
+        "browser_fingerprint_id": "79336952217731267"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 1,
+      "jsonp": "/v1/deepview",
+      "origin": "https://api2.branch.io",
+      "query": {
+        "data": {
+          "append_deeplink_path": false,
+          "banner_options": {
+            "append_deeplink_path": false,
+            "buttonBackgroundColor": "",
+            "buttonBackgroundColorHover": "",
+            "buttonBorderColor": "",
+            "buttonBorderColorHover": "",
+            "buttonFontColor": "",
+            "buttonFontColorHover": "",
+            "customCSS": "",
+            "deepview_type": "banner",
+            "description": "d",
+            "disableHide": false,
+            "downloadAppButtonText": "Get",
+            "forgetHide": false,
+            "icon": "https://x/i.png",
+            "iframe": true,
+            "immediate": false,
+            "make_new_link": false,
+            "mobileSticky": false,
+            "openAppButtonText": "Open",
+            "open_app": false,
+            "position": "top",
+            "rating": null,
+            "respectDNT": false,
+            "reviewCount": null,
+            "showAndroid": true,
+            "showBlackberry": true,
+            "showKindle": true,
+            "showWindowsPhone": true,
+            "showiOS": true,
+            "showiPad": true,
+            "title": "App"
+          },
+          "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+          "browser_fingerprint_id": "79336952217731267",
+          "channel": "app banner",
+          "data": "{\"k\":\"v\",\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+          "deepview_type": "banner",
+          "identity_id": "98807509250212101",
+          "sdk": "web<VERSION>",
+          "session_id": "98807509250212102",
+          "source": "web-sdk"
+        },
+        "callback": "branch_callback__1"
+      },
+      "nonce": null
+    },
+    {
+      "at": 2,
+      "event": "listener",
+      "name": "willNotShowJourney",
+      "data": "<undefined>"
+    },
+    {
+      "at": 21,
+      "event": "listener",
+      "name": "didShowBanner",
+      "data": "<undefined>"
+    },
+    {
+      "at": 2000,
+      "event": "listener",
+      "name": "willCloseBanner",
+      "data": "<undefined>"
+    },
+    {
+      "at": 2270,
+      "event": "listener",
+      "name": "didCloseBanner",
+      "data": "<undefined>"
+    }
+  ],
+  "storage": {
+    "local": {
+      "branch_session_first": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}",
+      "BRANCH_WEBSDK_KEYhideBanner": "true"
+    },
+    "session": {
+      "branch_session": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}"
+    },
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head><style type=\"text/css\" id=\"branch-iframe-css\">body { -webkit-transition: all 0.375s ease; transition: all 00.375s ease; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: 76px; z-index: 99999; -webkit-transition: all 0.25s ease; transition: all 00.25s ease; }\n#branch-banner-iframe { position: absolute; }\n</style></head>",
+    "body": "<body class=\" \" style=\"\"></body>",
+    "iframes": []
+  }
+}

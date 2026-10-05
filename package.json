@@ -24,7 +24,9 @@
     "release": "rimraf dist && node scripts/build.mjs",
     "lint": "biome lint .",
     "typecheck": "tsc -p .",
-    "test:bundle": "vitest run --config vitest.bundle.config.mjs"
+    "test:bundle": "vitest run --config vitest.bundle.config.mjs",
+    "test:behavior": "vitest run -c vitest.behavior.config.mjs",
+    "behavior:baseline": "sh scripts/behavior-baseline.sh"
   },
   "repository": {
     "type": "git",
