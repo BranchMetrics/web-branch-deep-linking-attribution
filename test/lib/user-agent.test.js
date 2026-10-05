@@ -2,13 +2,13 @@ import {
   getPlatformByUserAgent,
   isIOSWKWebView,
   isSafari11OrGreater,
-} from '../../src/lib/ua.js';
+} from '../../src/lib/user-agent.js';
 import { UA } from '../behavior/fixtures.js';
 
 // Characterization tests: these pin what the ua helpers do today, quirks
 // included. Do not "fix" expectations here without a behavior change.
 
-describe('lib/ua', () => {
+describe('lib/user-agent', () => {
   describe('getPlatformByUserAgent', () => {
     const cases = [
       ['desktop Chrome', UA.desktopChrome, false, 'desktop'],

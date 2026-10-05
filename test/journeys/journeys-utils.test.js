@@ -1,6 +1,6 @@
 import { createContext } from '../../src/core/context.js';
 import { getEnv, setEnv } from '../../src/env/env.js';
-import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { journeys_utils } from '../../src/journeys/journeys-utils.js';
 import { makeFakeEnv, useFakeEnv } from '../helpers/fake-env.js';
 
 describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {

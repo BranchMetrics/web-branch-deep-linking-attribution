@@ -1,4 +1,4 @@
-import type { Branch } from './Branch.js';
+import type { Branch } from './branch.js';
 import { log } from '../core/context.js';
 import { formatMessage, messages } from '../lib/messages.js';
 

@@ -1,4 +1,4 @@
-import { Branch } from '../../src/branch.js';
+import { Branch } from '../../src/branch/branch.js';
 import { config } from '../../src/core/config.js';
 import { isValidURL } from '../../src/lib/url.js';
 

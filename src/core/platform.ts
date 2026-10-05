@@ -8,12 +8,12 @@ import {
   getPlatformByUserAgent as platformFromUserAgent,
   isIOSWKWebView as isIOSWKWebViewUserAgent,
   isSafari11OrGreater as isSafari11OrGreaterUserAgent,
-} from '../lib/ua.js';
+} from '../lib/user-agent.js';
 import { getEnv } from '../env/env.js';
 import type { Context } from './context.js';
 
-// UA checks against the current environment (the lib/ua.ts versions take the
-// user agent as an argument).
+// UA checks against the current environment (the lib/user-agent.ts versions
+// take the user agent as an argument).
 export const getPlatformByUserAgent = () =>
   platformFromUserAgent(
     getEnv().userAgent(),

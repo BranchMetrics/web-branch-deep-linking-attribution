@@ -1,7 +1,7 @@
 import {
   whiteListJourneysLanguageData,
   whiteListSessionData,
-} from '../../src/lib/session_data.js';
+} from '../../src/lib/session-data.js';
 
 describe('lib/session_data', () => {
   describe('whiteListSessionData', () => {

@@ -6,7 +6,7 @@
  * journey elements, styling and measuring them, iframes, event listeners,
  * navigation) and the storage writes still use the DOM directly.
  */
-import { processHostedDeepLinkData } from '../lib/hosted_data.js';
+import { processHostedDeepLinkData } from '../lib/hosted-data.js';
 
 export interface Env {
   /** String(window.location), or document.referrer inside an iframe (legacy getWindowLocation). */

@@ -1,6 +1,6 @@
-import type { Branch } from './Branch.js';
+import type { Branch } from './branch.js';
 import { safejson } from '../core/safejson.js';
-import { whiteListSessionData } from '../lib/session_data.js';
+import { whiteListSessionData } from '../lib/session-data.js';
 import { getUserData } from '../core/platform.js';
 import { addPropertyIfNotNull, validateParameterType } from '../lib/objects.js';
 import { resources } from '../network/resources.js';
