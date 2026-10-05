@@ -1,4 +1,4 @@
-import { Branch, wrap, callback_params } from './core.js';
+import type { Branch } from './Branch.js';
 import { safejson } from '../core/safejson.js';
 import { whiteListSessionData } from '../lib/session_data.js';
 import { getUserData } from '../core/platform.js';
@@ -21,16 +21,13 @@ import { formatMessage, messages } from '../lib/messages.js';
  * immediately, otherwise, it will return once Branch has been initialized.
  * ___
  */
-Branch.prototype.data = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (done) {
-    const data = whiteListSessionData(session.get(this._storage));
-    data.referring_link = this._referringLink();
-    data.data_parsed =
-      data.data && data.data.length !== 0 ? safejson.parse(data.data) : {};
-    done(null, data);
-  },
-);
+export function data(this: Branch, done) {
+  const data = whiteListSessionData(session.get(this._storage));
+  data.referring_link = this._referringLink();
+  data.data_parsed =
+    data.data && data.data.length !== 0 ? safejson.parse(data.data) : {};
+  done(null, data);
+}
 
 /**
  * @function Branch.first
@@ -47,12 +44,9 @@ Branch.prototype.data = wrap(
  * ___
  *
  */
-Branch.prototype.first = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (done) {
-    done(null, whiteListSessionData(session.get(this._storage, true)));
-  },
-);
+export function first(this: Branch, done) {
+  done(null, whiteListSessionData(session.get(this._storage, true)));
+}
 
 /**
  * @function Branch.setIdentity
@@ -89,28 +83,25 @@ Branch.prototype.first = wrap(
  * ```
  * ___
  */
-Branch.prototype.setIdentity = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (done, identity: string) {
-    const self = this;
-    if (identity) {
-      const data = {
-        identity_id: self.identity_id,
-        session_id: self.session_id,
-        link: self.sessionLink,
-        developer_identity: identity,
-      };
-      self.identity = identity;
-      // store the identity
-      session.patch(self._storage, { 'identity': identity }, true);
-      done(null, data);
-    } else {
-      const msg = formatMessage(messages.missingIdentity);
-      log(self._ctx, msg);
-      done(new Error(msg));
-    }
-  },
-);
+export function setIdentity(this: Branch, done, identity: string) {
+  const self = this;
+  if (identity) {
+    const data = {
+      identity_id: self.identity_id,
+      session_id: self.session_id,
+      link: self.sessionLink,
+      developer_identity: identity,
+    };
+    self.identity = identity;
+    // store the identity
+    session.patch(self._storage, { 'identity': identity }, true);
+    done(null, data);
+  } else {
+    const msg = formatMessage(messages.missingIdentity);
+    log(self._ctx, msg);
+    done(new Error(msg));
+  }
+}
 
 /**
  * @function Branch.logout
@@ -134,7 +125,7 @@ Branch.prototype.setIdentity = wrap(
  * ___
  *
  */
-Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function (done) {
+export function logout(this: Branch, done) {
   const self = this;
   const data = {
     'identity': null,
@@ -151,15 +142,12 @@ Branch.prototype.logout = wrap(callback_params.CALLBACK_ERR, function (done) {
   );
 
   done(null);
-});
+}
 
-Branch.prototype.getBrowserFingerprintId = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (done) {
-    const permData = session.get(this._storage, true) || {};
-    done(null, permData.browser_fingerprint_id || null);
-  },
-);
+export function getBrowserFingerprintId(this: Branch, done) {
+  const permData = session.get(this._storage, true) || {};
+  done(null, permData.browser_fingerprint_id || null);
+}
 
 /**
  * @function Branch.crossPlatformIds
@@ -176,20 +164,17 @@ Branch.prototype.getBrowserFingerprintId = wrap(
  * ___
  *
  */
-Branch.prototype.crossPlatformIds = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (done) {
-    this._api(
-      resources.crossPlatformIds,
-      {
-        'user_data': safejson.stringify(getUserData(this)),
-      },
-      function (err, data) {
-        return done(err || null, data?.user_data || null);
-      },
-    );
-  },
-);
+export function crossPlatformIds(this: Branch, done) {
+  this._api(
+    resources.crossPlatformIds,
+    {
+      'user_data': safejson.stringify(getUserData(this)),
+    },
+    function (err, data) {
+      return done(err || null, data?.user_data || null);
+    },
+  );
+}
 
 /**
  * @function Branch.lastAttributedTouchData
@@ -208,33 +193,35 @@ Branch.prototype.crossPlatformIds = wrap(
  * ___
  *
  */
-Branch.prototype.lastAttributedTouchData = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (done, attribution_window: number) {
-    attribution_window = validateParameterType(attribution_window, 'number')
-      ? attribution_window
-      : null;
-    const userData = getUserData(this);
-    addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
-    this._api(
-      resources.lastAttributedTouchData,
-      {
-        'user_data': safejson.stringify(userData),
-      },
-      function (err, data) {
-        return done(err || null, data || null);
-      },
-    );
-  },
-);
+export function lastAttributedTouchData(
+  this: Branch,
+  done,
+  attribution_window: number,
+) {
+  attribution_window = validateParameterType(attribution_window, 'number')
+    ? attribution_window
+    : null;
+  const userData = getUserData(this);
+  addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
+  this._api(
+    resources.lastAttributedTouchData,
+    {
+      'user_data': safejson.stringify(userData),
+    },
+    function (err, data) {
+      return done(err || null, data || null);
+    },
+  );
+}
 
 /***
  * @function Branch.referringLink
  * @param withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
-Branch.prototype.referringLink = function (
+export function referringLink(
+  this: Branch,
   withExtendedJourneysAssist: boolean,
 ) {
   return this._referringLink(withExtendedJourneysAssist);
-};
+}

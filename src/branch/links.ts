@@ -1,4 +1,4 @@
-import { Branch, wrap, callback_params } from './core.js';
+import type { Branch } from './Branch.js';
 import { safejson } from '../core/safejson.js';
 import { cleanLinkData } from '../core/url.js';
 import { generateDynamicBNCLink } from '../lib/url.js';
@@ -97,21 +97,18 @@ import { resources } from '../network/resources.js';
  * ```
  *
  */
-Branch.prototype.link = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (done, data: Record<string, any>) {
-    const linkData = cleanLinkData(data);
-    const keyCopy = this.branch_key;
-    this._api(resources.link, linkData, function (err, data) {
-      if (err) {
-        // if an error occurs or if tracking is disabled then return a dynamic link
-        return done(err, generateDynamicBNCLink(keyCopy, linkData));
-      }
-      // biome-ignore lint/complexity/useOptionalChain: callers get null (not undefined) when data is null
-      done(null, data && data.url);
-    });
-  },
-);
+export function link(this: Branch, done, data: Record<string, any>) {
+  const linkData = cleanLinkData(data);
+  const keyCopy = this.branch_key;
+  this._api(resources.link, linkData, function (err, data) {
+    if (err) {
+      // if an error occurs or if tracking is disabled then return a dynamic link
+      return done(err, generateDynamicBNCLink(keyCopy, linkData));
+    }
+    // biome-ignore lint/complexity/useOptionalChain: callers get null (not undefined) when data is null
+    done(null, data && data.url);
+  });
+}
 
 /**
  * @function Branch.qrCode
@@ -171,41 +168,39 @@ Branch.prototype.link = wrap(
  * );
  * ```
  */
-Branch.prototype.qrCode = wrap(
-  callback_params.CALLBACK_ERR_DATA,
-  function (
-    done,
-    linkData: Record<string, any>,
-    qrCodeSettings?: Record<string, any>,
-    _options?: Record<string, any>,
-  ) {
-    const data = cleanLinkData(linkData);
-    data.qr_code_settings = safejson.stringify(
-      convertObjectValuesToString(qrCodeSettings || {}),
-    );
-    this._api(
-      resources.qrCode,
-      cleanLinkData(linkData),
-      function (error, rawBuffer) {
-        function QrCode() {}
-        if (!error) {
-          QrCode.rawBuffer = rawBuffer;
-          QrCode.base64 = function () {
-            // First Encode array buffer as UTF-8 String, then Base64 Encode
-            if (this.rawBuffer) {
-              const binaryString = Array.from(new Uint8Array(rawBuffer))
-                .map((byte) => String.fromCharCode(byte))
-                .join('');
-              return btoa(binaryString);
-            }
-            throw Error('QrCode.rawBuffer is empty.');
-          };
-        }
-        return done(error || null, QrCode || null);
-      },
-    );
-  },
-);
+export function qrCode(
+  this: Branch,
+  done,
+  linkData: Record<string, any>,
+  qrCodeSettings?: Record<string, any>,
+  _options?: Record<string, any>,
+) {
+  const data = cleanLinkData(linkData);
+  data.qr_code_settings = safejson.stringify(
+    convertObjectValuesToString(qrCodeSettings || {}),
+  );
+  this._api(
+    resources.qrCode,
+    cleanLinkData(linkData),
+    function (error, rawBuffer) {
+      function QrCode() {}
+      if (!error) {
+        QrCode.rawBuffer = rawBuffer;
+        QrCode.base64 = function () {
+          // First Encode array buffer as UTF-8 String, then Base64 Encode
+          if (this.rawBuffer) {
+            const binaryString = Array.from(new Uint8Array(rawBuffer))
+              .map((byte) => String.fromCharCode(byte))
+              .join('');
+            return btoa(binaryString);
+          }
+          throw Error('QrCode.rawBuffer is empty.');
+        };
+      }
+      return done(error || null, QrCode || null);
+    },
+  );
+}
 
 /**
  * @function Branch.deepview
@@ -268,83 +263,85 @@ Branch.prototype.qrCode = wrap(
  * ```
  *
  */
-Branch.prototype.deepview = wrap(
-  callback_params.CALLBACK_ERR,
-  function (done, data: Record<string, any>, options?: Record<string, any>) {
-    const self = this;
+export function deepview(
+  this: Branch,
+  done,
+  data: Record<string, any>,
+  options?: Record<string, any>,
+) {
+  const self = this;
 
-    if (!options) {
-      options = {};
-    }
+  if (!options) {
+    options = {};
+  }
 
-    if (typeof options.deepview_type === 'undefined') {
-      options.deepview_type = 'deepview';
-    } else {
-      // we are currently limited to just 'deepview' or 'banner', but if that changes,
-      // then this line should be removed
-      options.deepview_type = 'banner';
-    }
+  if (typeof options.deepview_type === 'undefined') {
+    options.deepview_type = 'deepview';
+  } else {
+    // we are currently limited to just 'deepview' or 'banner', but if that changes,
+    // then this line should be removed
+    options.deepview_type = 'banner';
+  }
 
-    data.data = merge(getEnv().hostedDeepLinkData(), data.data);
-    data = getEnv().isIframe() ? merge({ 'is_iframe': true }, data) : data;
+  data.data = merge(getEnv().hostedDeepLinkData(), data.data);
+  data = getEnv().isIframe() ? merge({ 'is_iframe': true }, data) : data;
 
-    const cleanedData = cleanLinkData(data);
-    const fallbackUrl = generateDynamicBNCLink(this.branch_key, cleanedData);
+  const cleanedData = cleanLinkData(data);
+  const fallbackUrl = generateDynamicBNCLink(this.branch_key, cleanedData);
 
-    if (
-      options.open_app ||
-      options.open_app === null ||
-      typeof options.open_app === 'undefined'
-    ) {
-      cleanedData.open_app = true;
-    }
-    cleanedData.append_deeplink_path = !!options.append_deeplink_path;
-    cleanedData.deepview_type = options.deepview_type;
+  if (
+    options.open_app ||
+    options.open_app === null ||
+    typeof options.open_app === 'undefined'
+  ) {
+    cleanedData.open_app = true;
+  }
+  cleanedData.append_deeplink_path = !!options.append_deeplink_path;
+  cleanedData.deepview_type = options.deepview_type;
 
-    const referringLink = self._referringLink();
-    if (referringLink && !options.make_new_link) {
-      cleanedData.link_click_id =
-        getEnv().clickIdAndSearchStringFromLink(referringLink);
-    }
+  const referringLink = self._referringLink();
+  if (referringLink && !options.make_new_link) {
+    cleanedData.link_click_id =
+      getEnv().clickIdAndSearchStringFromLink(referringLink);
+  }
 
-    // Not sent to the server: _api only sends keys listed in resources.deepview.params, and
-    // banner_options isn't one of them.
-    cleanedData.banner_options = options;
+  // Not sent to the server: _api only sends keys listed in resources.deepview.params, and
+  // banner_options isn't one of them.
+  cleanedData.banner_options = options;
 
-    if (options.auto_branchify) {
-      cleanedData.auto_branchify = true;
-    }
+  if (options.auto_branchify) {
+    cleanedData.auto_branchify = true;
+  }
 
-    self._deepviewRequestForReplay = this._api.bind(
-      self,
-      resources.deepview,
-      cleanedData,
-      function (err, data) {
-        if (err) {
-          // ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
-          if (!self._ctx.userPreferences.trackingDisabled) {
-            self._deepviewCta = function () {
-              self._windowRedirect(fallbackUrl);
-            };
-          }
-          return done(err);
+  self._deepviewRequestForReplay = this._api.bind(
+    self,
+    resources.deepview,
+    cleanedData,
+    function (err, data) {
+      if (err) {
+        // ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
+        if (!self._ctx.userPreferences.trackingDisabled) {
+          self._deepviewCta = function () {
+            self._windowRedirect(fallbackUrl);
+          };
         }
+        return done(err);
+      }
 
-        if (typeof data === 'function') {
-          self._deepviewCta = data;
-        }
+      if (typeof data === 'function') {
+        self._deepviewCta = data;
+      }
 
-        done(null);
-      },
-    );
+      done(null);
+    },
+  );
 
-    self._deepviewRequestForReplay();
-  },
-);
+  self._deepviewRequestForReplay();
+}
 
-Branch.prototype._windowRedirect = function (url) {
+export function _windowRedirect(this: Branch, url) {
   window.top.location = url;
-};
+}
 
 /**
  * @function Branch.deepviewCta
@@ -392,23 +389,20 @@ Branch.prototype._windowRedirect = function (url) {
  *
  *
  */
-Branch.prototype.deepviewCta = wrap(
-  callback_params.CALLBACK_ERR,
-  function (done) {
-    if (typeof this._deepviewCta === 'undefined') {
-      return this._ctx.userPreferences.trackingDisabled
-        ? done(new Error(messages.trackingDisabled), null)
-        : done(new Error(messages.deepviewNotCalled), null);
+export function deepviewCta(this: Branch, done) {
+  if (typeof this._deepviewCta === 'undefined') {
+    return this._ctx.userPreferences.trackingDisabled
+      ? done(new Error(messages.trackingDisabled), null)
+      : done(new Error(messages.deepviewNotCalled), null);
+  }
+  if (window.event) {
+    if (window.event.preventDefault) {
+      window.event.preventDefault();
+    } else {
+      window.event.returnValue = false;
     }
-    if (window.event) {
-      if (window.event.preventDefault) {
-        window.event.preventDefault();
-      } else {
-        window.event.returnValue = false;
-      }
-    }
-    this._publishEvent('didDeepviewCTA');
-    this._deepviewCta();
-    done();
-  },
-);
+  }
+  this._publishEvent('didDeepviewCTA');
+  this._deepviewCta();
+  done();
+}

@@ -7,7 +7,6 @@
 import './core/polyfills.js';
 import { Branch } from './branch.js';
 
-// @ts-expect-error -- TS 7 doesn't treat JS constructor functions as classes
 export const branch_instance = new Branch();
 
 if (window.branch?._q) {
