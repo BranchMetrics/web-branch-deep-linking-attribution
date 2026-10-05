@@ -36,7 +36,7 @@ import {
 } from '../../src/lib/validation.js';
 import { makeFakeEnv } from '../helpers/fake-env.js';
 
-describe('utils', function () {
+describe('legacy helpers (lib, core/url, core/platform, env)', function () {
   const assert = testUtils.unplanned();
   describe('base64encode', function () {
     it('should encode a string', function () {

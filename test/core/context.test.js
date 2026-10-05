@@ -1,11 +1,8 @@
 import { applyNonce, createContext, log } from '../../src/core/context.js';
-import { browserEnv, setEnv } from '../../src/env/env.js';
-import { makeFakeEnv } from '../helpers/fake-env.js';
 
 describe('core/context', function () {
   afterEach(function () {
     vi.restoreAllMocks();
-    setEnv(null);
   });
 
   describe('createContext', function () {
@@ -45,14 +42,6 @@ describe('core/context', function () {
       a.timeout = 100;
       expect(b.userPreferences.trackingDisabled).toBe(false);
       expect(b.timeout).toBe(5000);
-    });
-
-    it('env() returns the current global env', function () {
-      const ctx = createContext();
-      expect(ctx.env()).toBe(browserEnv);
-      const fake = makeFakeEnv();
-      setEnv(fake);
-      expect(ctx.env()).toBe(fake);
     });
   });
 

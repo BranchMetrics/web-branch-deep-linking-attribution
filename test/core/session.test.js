@@ -1,6 +1,7 @@
-// Only src/core/session.js and src/core/context.js are imported here (no
-// src/core/storage.js), to confirm session.set reaches userPreferences and
-// extendedJourneysAssistExpiryTime through the context on the storage owner.
+// Uses a hand-rolled storage object rather than a BranchStorage (session.js
+// imports ./storage.js only for its side effects), to confirm session.set
+// reaches userPreferences and extendedJourneysAssistExpiryTime through the
+// context on the storage owner.
 
 import { createContext } from '../../src/core/context.js';
 import { session } from '../../src/core/session.js';
@@ -89,7 +90,15 @@ describe('session (storage.ctx)', function () {
     });
 
     it('does nothing without a branch', function () {
-      session.cleanApplicationAndSessionStorage(null);
+      const set = vi.spyOn(session, 'set');
+      try {
+        expect(() =>
+          session.cleanApplicationAndSessionStorage(null),
+        ).not.toThrow();
+        expect(set).not.toHaveBeenCalled();
+      } finally {
+        set.mockRestore();
+      }
     });
   });
 });
