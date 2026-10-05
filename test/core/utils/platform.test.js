@@ -1,5 +1,7 @@
 import { config } from '../../../src/core/config.js';
 import { utils } from '../../../src/core/utils.js';
+import { browserEnv, setEnv } from '../../../src/env/env.js';
+import { makeFakeEnv } from '../../helpers/fake-env.js';
 
 // Characterization tests: these pin what the platform helpers do today,
 // quirks included. Do not "fix" expectations here without a behavior change.
@@ -119,6 +121,7 @@ afterEach(function () {
     restorers.pop()();
   }
   vi.restoreAllMocks();
+  setEnv(null);
 });
 
 // --- tests -------------------------------------------------------------------
@@ -302,12 +305,12 @@ describe('platform utils (characterization)', function () {
   describe('isWebKitBrowser', function () {
     it('returns true when window.webkitURL is truthy', function () {
       stubProperty(window, 'webkitURL', function () {});
-      expect(utils.isWebKitBrowser()).toBe(true);
+      expect(browserEnv.isWebKit()).toBe(true);
     });
 
     it('returns false when window.webkitURL is undefined', function () {
       stubProperty(window, 'webkitURL', undefined);
-      expect(utils.isWebKitBrowser()).toBe(false);
+      expect(browserEnv.isWebKit()).toBe(false);
     });
   });
 
@@ -426,12 +429,12 @@ describe('platform utils (characterization)', function () {
 
     it('isSameOriginFrame is true when top.location.search is empty', function () {
       stubProperty(window, 'top', { location: { search: '' } });
-      expect(utils.isSameOriginFrame()).toBe(true);
+      expect(browserEnv.isSameOriginFrame()).toBe(true);
     });
 
     it('isSameOriginFrame is true when top.location.search is non-empty', function () {
       stubProperty(window, 'top', { location: { search: '?a=1' } });
-      expect(utils.isSameOriginFrame()).toBe(true);
+      expect(browserEnv.isSameOriginFrame()).toBe(true);
     });
 
     it('isSameOriginFrame is false when reading top.location throws', function () {
@@ -442,7 +445,7 @@ describe('platform utils (characterization)', function () {
         },
       });
       stubProperty(window, 'top', crossOriginTop);
-      expect(utils.isSameOriginFrame()).toBe(false);
+      expect(browserEnv.isSameOriginFrame()).toBe(false);
     });
 
     it('isIframeAndFromSameOrigin is false when not in an iframe', function () {
@@ -465,11 +468,11 @@ describe('platform utils (characterization)', function () {
       expect(utils.isIframeAndFromSameOrigin()).toBe(false);
     });
 
-    it('isIframeAndFromSameOrigin goes through utils.isIframe / utils.isSameOriginFrame', function () {
-      vi.spyOn(utils, 'isIframe').mockReturnValue(true);
-      const sameOrigin = vi
-        .spyOn(utils, 'isSameOriginFrame')
-        .mockReturnValue(true);
+    it('isIframeAndFromSameOrigin goes through env.isIframe / env.isSameOriginFrame', function () {
+      const sameOrigin = vi.fn().mockReturnValue(true);
+      setEnv(
+        makeFakeEnv({ isIframe: () => true, isSameOriginFrame: sameOrigin }),
+      );
       expect(utils.isIframeAndFromSameOrigin()).toBe(true);
       expect(sameOrigin).toHaveBeenCalledTimes(1);
     });

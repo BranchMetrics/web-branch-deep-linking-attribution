@@ -1,8 +1,10 @@
 import { session } from '../../src/core/session.js';
 import { storage as storageModule } from '../../src/core/storage.js';
 import { utils } from '../../src/core/utils.js';
+import { getEnv, setEnv } from '../../src/env/env.js';
 import { branch_view } from '../../src/journeys/branch_view.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { makeFakeEnv, UA_FOR_PLATFORM } from '../helpers/fake-env.js';
 
 describe('displayJourney new render options wiring', function () {
   const assert = testUtils.unplanned();
@@ -129,12 +131,13 @@ describe('branch_view.shouldDisplayJourney', function () {
     sessionStorage.clear();
     store = new storageModule.BranchStorage(['local']);
     journeys_utils.branch = makeJourneyBranch(store);
-    vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('ios');
+    setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.ios }));
   });
 
   afterEach(function () {
     vi.useRealTimers();
     vi.restoreAllMocks();
+    setEnv(null);
     removeJourneyElements();
     localStorage.clear();
     sessionStorage.clear();
@@ -162,14 +165,14 @@ describe('branch_view.shouldDisplayJourney', function () {
   );
 
   it('returns false on platform "other", even in test mode', function () {
-    utils.getPlatformByUserAgent.mockReturnValue('other');
+    setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.other }));
     expect(branch_view.shouldDisplayJourney(journeyResponse(), {}, true)).toBe(
       false,
     );
   });
 
   it('returns true on desktop', function () {
-    utils.getPlatformByUserAgent.mockReturnValue('desktop');
+    setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.desktop }));
     expect(branch_view.shouldDisplayJourney(journeyResponse(), {}, false)).toBe(
       true,
     );
@@ -354,7 +357,7 @@ describe('branch_view.displayJourney', function () {
     store = new storageModule.BranchStorage(['local']);
     branch = makeJourneyBranch(store);
     journeys_utils.branch = branch;
-    vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('ios');
+    setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.ios }));
     utils.navigationTimingAPIEnabled = false;
     // The iframe rendering helpers are covered in journeys_utils tests; stub
     // them so these tests see only what branch_view passes along.
@@ -376,6 +379,7 @@ describe('branch_view.displayJourney', function () {
   afterEach(function () {
     vi.useRealTimers();
     vi.restoreAllMocks();
+    setEnv(null);
     removeJourneyElements();
     delete window.branch_view_callback__test;
     localStorage.clear();
@@ -589,7 +593,9 @@ describe('branch_view.displayJourney', function () {
 
   it('records journey-load-time when the navigation timing API is enabled', async function () {
     utils.navigationTimingAPIEnabled = true;
-    vi.spyOn(utils, 'timeSinceNavigationStart').mockReturnValue('1234');
+    setEnv(
+      makeFakeEnv({ ...getEnv(), timeSinceNavigationStart: () => '1234' }),
+    );
     display(journeyHtml(METADATA));
     await waitForIframeLoad();
     expect(utils.instrumentation['journey-load-time']).toBe('1234');
@@ -668,6 +674,7 @@ describe('branch_view._getPageviewRequestData', function () {
 
   afterEach(function () {
     vi.restoreAllMocks();
+    setEnv(null);
     testUtils.go('');
     localStorage.clear();
     sessionStorage.clear();
@@ -768,7 +775,7 @@ describe('branch_view._getPageviewRequestData', function () {
   });
 
   it('falls back to "en" when the browser language is unknown', function () {
-    vi.spyOn(utils, 'getBrowserLanguageCode').mockReturnValue(null);
+    setEnv(makeFakeEnv({ browserLanguageCode: () => null }));
     const obj = branch_view._getPageviewRequestData(
       {},
       {},

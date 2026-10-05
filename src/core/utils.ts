@@ -33,11 +33,6 @@ import {
   removeTrailingDotZeros,
 } from '../lib/url.js';
 import {
-  getPlatformByUserAgent,
-  isIOSWKWebView,
-  isSafari11OrGreater,
-} from '../lib/ua.js';
-import {
   calculateDiffBetweenArrays,
   isStandardEvent,
   separateEventAndCustomData,
@@ -126,9 +121,6 @@ const lib = {
   processReferringLink,
   generateDynamicBNCLink,
   removeTrailingDotZeros,
-  getPlatformByUserAgent,
-  isSafari11OrGreater,
-  isIOSWKWebView,
   calculateDiffBetweenArrays,
   validateCommerceEventParams,
   isStandardEvent,

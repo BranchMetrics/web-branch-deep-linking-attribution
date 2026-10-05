@@ -1,5 +1,7 @@
 import { utils } from '../../src/core/utils.js';
+import { setEnv } from '../../src/env/env.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { makeFakeEnv } from '../helpers/fake-env.js';
 
 describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
   const assert = testUtils.unplanned();
@@ -1874,6 +1876,9 @@ describe('journeys_utils characterization: finalHookups', function () {
 
 describe('journeys_utils characterization: _handleJourneyDismiss', function () {
   isolateJourneysState();
+  afterEach(function () {
+    setEnv(null);
+  });
   let banner;
   let exitSpy;
   let branchView;
@@ -1885,7 +1890,7 @@ describe('journeys_utils characterization: _handleJourneyDismiss', function () {
     exitSpy = vi
       .spyOn(journeys_utils, 'animateBannerExit')
       .mockImplementation(function () {});
-    vi.spyOn(utils, 'getHostedDeepLinkData').mockReturnValue({});
+    setEnv(makeFakeEnv({ hostedDeepLinkData: () => ({}) }));
     journeys_utils.journeyLinkData = { banner_id: 'b1' };
     journeys_utils.journeyDismissed = false;
     branchView = {
@@ -2048,6 +2053,9 @@ describe('journeys_utils characterization: _handleJourneyDismiss', function () {
 
 describe('journeys_utils characterization: dismiss request data', function () {
   isolateJourneysState();
+  afterEach(function () {
+    setEnv(null);
+  });
   let branchView;
 
   beforeEach(function () {
@@ -2084,7 +2092,7 @@ describe('journeys_utils characterization: dismiss request data', function () {
   });
 
   it('_getDismissRequestData without journey_link_data only adds the dismissal source', function () {
-    vi.spyOn(utils, 'getHostedDeepLinkData').mockReturnValue({});
+    setEnv(makeFakeEnv({ hostedDeepLinkData: () => ({}) }));
     journeys_utils.journeyLinkData = { banner_id: 'b1' };
     const result = journeys_utils._getDismissRequestData(
       branchView,
@@ -2105,7 +2113,7 @@ describe('journeys_utils characterization: dismiss request data', function () {
   });
 
   it('_getDismissRequestData adds hosted deep link data and decoded journey fields', function () {
-    vi.spyOn(utils, 'getHostedDeepLinkData').mockReturnValue({ foo: 'bar' });
+    setEnv(makeFakeEnv({ hostedDeepLinkData: () => ({ foo: 'bar' }) }));
     journeys_utils.journeyLinkData = {
       journey_link_data: {
         journey_id: 'j1',
@@ -2130,7 +2138,7 @@ describe('journeys_utils characterization: dismiss request data', function () {
   });
 
   it('_getDismissRequestData omits missing fields and falls back to [] for unserializable tags', function () {
-    vi.spyOn(utils, 'getHostedDeepLinkData').mockReturnValue({});
+    setEnv(makeFakeEnv({ hostedDeepLinkData: () => ({}) }));
     const circular = {};
     circular.self = circular;
     journeys_utils.journeyLinkData = { journey_link_data: { tags: circular } };
