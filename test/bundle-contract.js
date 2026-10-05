@@ -86,6 +86,8 @@ describe('dist/build.min.js contract', function () {
       .map((key) => `${key}: ${typeof window.branch[key]}`);
     expect(surface).toEqual([
       '_api: function',
+      // Per-instance SDK runtime state (src/core/context.ts).
+      '_ctx: object',
       '_listeners: object',
       '_publishEvent: function',
       '_queue: function',

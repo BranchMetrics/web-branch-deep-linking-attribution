@@ -17,25 +17,12 @@ const IDENTITY_ID = '98807509250212102';
 
 describe('Branch identity', function () {
   const requests = [];
-  let savedUtils;
   let savedJourneysBranch;
 
   beforeEach(function () {
     localStorage.clear();
     sessionStorage.clear();
     requests.length = 0;
-    savedUtils = {
-      nonce: utils.nonce,
-      debug: utils.debug,
-      retries: utils.retries,
-      retry_delay: utils.retry_delay,
-      timeout: utils.timeout,
-      extendedJourneysAssistExpiryTime: utils.extendedJourneysAssistExpiryTime,
-      trackingDisabled: utils.userPreferences.trackingDisabled,
-      enableExtendedJourneysAssist:
-        utils.userPreferences.enableExtendedJourneysAssist,
-      allowErrorsInCallback: utils.userPreferences.allowErrorsInCallback,
-    };
     savedJourneysBranch = journeys_utils.branch;
   });
 
@@ -44,18 +31,6 @@ describe('Branch identity', function () {
     vi.useRealTimers();
     localStorage.clear();
     sessionStorage.clear();
-    utils.nonce = savedUtils.nonce;
-    utils.debug = savedUtils.debug;
-    utils.retries = savedUtils.retries;
-    utils.retry_delay = savedUtils.retry_delay;
-    utils.timeout = savedUtils.timeout;
-    utils.extendedJourneysAssistExpiryTime =
-      savedUtils.extendedJourneysAssistExpiryTime;
-    utils.userPreferences.trackingDisabled = savedUtils.trackingDisabled;
-    utils.userPreferences.enableExtendedJourneysAssist =
-      savedUtils.enableExtendedJourneysAssist;
-    utils.userPreferences.allowErrorsInCallback =
-      savedUtils.allowErrorsInCallback;
     journeys_utils.branch = savedJourneysBranch;
   });
 
@@ -137,7 +112,7 @@ describe('Branch identity', function () {
         branch[method](...calls[method], cb);
         expect(cb).toHaveBeenCalledTimes(1);
         // NOTE: possible bug: wrap() passes init_state_fail_code as the
-        // `params` argument of utils.message and the fail details as the
+        // `params` argument of formatMessage and the fail details as the
         // failCode, so the code is lost and details are labelled "Failure Code".
         expect(cb.mock.calls[0][0].message).toBe(
           'Branch SDK initialization failed, so further methods cannot be called' +
@@ -384,7 +359,7 @@ describe('Branch identity', function () {
     it('includes identity and tracking_disabled when set', function () {
       const branch = makeBranch('ok');
       branch.setIdentity('user_4');
-      utils.userPreferences.trackingDisabled = true;
+      branch._ctx.userPreferences.trackingDisabled = true;
       branch.crossPlatformIds();
       const req = requests[0];
       expect(safejson.parse(req.obj.user_data)).toEqual(
@@ -479,7 +454,7 @@ describe('Branch identity', function () {
 
       it('returns the unexpired local referring link when asked for journeys', function () {
         const branch = makeBranch('ok');
-        utils.userPreferences.enableExtendedJourneysAssist = true;
+        branch._ctx.userPreferences.enableExtendedJourneysAssist = true;
         seed(branch, Date.now() + 60000);
         expect(branch.referringLink(true)).toBe(
           'https://example.app.link/local',
@@ -489,14 +464,14 @@ describe('Branch identity', function () {
 
       it('ignores the local link when the preference is off', function () {
         const branch = makeBranch('ok');
-        utils.userPreferences.enableExtendedJourneysAssist = false;
+        branch._ctx.userPreferences.enableExtendedJourneysAssist = false;
         seed(branch, Date.now() + 60000);
         expect(branch.referringLink(true)).toBeNull();
       });
 
       it('clears the expiry and returns null when the local link expired', function () {
         const branch = makeBranch('ok');
-        utils.userPreferences.enableExtendedJourneysAssist = true;
+        branch._ctx.userPreferences.enableExtendedJourneysAssist = true;
         seed(branch, Date.now() - 1000);
         expect(branch.referringLink(true)).toBeNull();
         const local = session.get(branch._storage, true);
@@ -507,7 +482,7 @@ describe('Branch identity', function () {
 
       it('ignores a local link without an expiry', function () {
         const branch = makeBranch('ok');
-        utils.userPreferences.enableExtendedJourneysAssist = true;
+        branch._ctx.userPreferences.enableExtendedJourneysAssist = true;
         seed(branch, null);
         expect(branch.referringLink(true)).toBeNull();
       });

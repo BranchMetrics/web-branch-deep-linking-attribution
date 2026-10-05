@@ -56,12 +56,9 @@ import { formatMessage, messages as libMessages } from '../lib/messages.js';
 import { calculateBrtt } from '../lib/brtt.js';
 
 import { utils } from './state.js';
-import { messages } from './utils/messages.js';
-import { preferences } from './utils/preferences.js';
 import { url } from './utils/url.js';
 import { platform } from './utils/platform.js';
 import { page_data } from './utils/page_data.js';
-import { session_data } from './utils/session_data.js';
 
 /**
  * Shapes the state fields moved to src/core/state.ts. Declared here (not
@@ -69,16 +66,7 @@ import { session_data } from './utils/session_data.js';
  * real values with their comments live in state.ts.
  */
 declare const stateFields: {
-  debug: boolean;
-  retries: number;
-  retry_delay: number;
-  timeout: number;
-  nonce: string;
-  extendedJourneysAssistExpiryTime: number;
-  instrumentation: Record<string, unknown>;
-  userAgentData: { model: string; platformVersion: string } | null;
   navigationTimingAPIEnabled: boolean;
-  currentRequestBrttTag: string;
   dismissEventToSourceMapping: {
     'didClickJourneyClose': string;
     'didClickJourneyContinue': string;
@@ -144,22 +132,10 @@ const lib = {
  */
 export type Utils = typeof stateFields &
   typeof lib &
-  typeof messages &
-  typeof preferences &
   typeof url &
   typeof platform &
-  typeof page_data &
-  typeof session_data;
+  typeof page_data;
 
-Object.assign(
-  utils,
-  lib,
-  messages,
-  preferences,
-  url,
-  platform,
-  page_data,
-  session_data,
-);
+Object.assign(utils, lib, url, platform, page_data);
 
 export { utils };

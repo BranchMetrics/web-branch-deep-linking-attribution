@@ -1,5 +1,6 @@
 import { safejson } from '../core/safejson.js';
 import { utils } from '../core/utils.js';
+import { applyNonce } from '../core/context.js';
 import { resources } from '../network/resources.js';
 import { banner_utils } from '../banner/banner_utils.js';
 
@@ -218,7 +219,7 @@ journeys_utils.getJsAndAddToParent = function (html) {
     const src = match[1];
     const script = document.createElement('script');
     script.id = 'branch-journey-cta';
-    utils.addNonceAttribute(script);
+    applyNonce(journeys_utils.branch._ctx, script);
     script.innerHTML = src;
     document.body.appendChild(script);
   }
@@ -265,7 +266,7 @@ journeys_utils.createIframe = function () {
   iframe.className = 'branch-animation';
   iframe.title = 'Branch Banner Frame';
   iframe.setAttribute('aria-label', 'Branch Banner Frame');
-  utils.addNonceAttribute(iframe);
+  applyNonce(journeys_utils.branch._ctx, iframe);
 
   return iframe;
 };
@@ -444,7 +445,7 @@ journeys_utils.addIframeOuterCSS = function (cssIframeContainer, metadata) {
 
   iFrameCSS.innerHTML = finalOuterCSS;
 
-  utils.addNonceAttribute(iFrameCSS);
+  applyNonce(journeys_utils.branch._ctx, iFrameCSS);
 
   document.head.appendChild(iFrameCSS);
 };
@@ -553,7 +554,7 @@ journeys_utils.addIframeInnerCSS = function (iframe, innerCSS) {
 
   css.innerHTML = finalCSS;
 
-  utils.addNonceAttribute(css);
+  applyNonce(journeys_utils.branch._ctx, css);
 
   const doc = iframe.contentWindow.document;
   doc.head.appendChild(css);
@@ -1049,7 +1050,11 @@ journeys_utils._getDismissRequestData = function (
   }
 
   const dismissRequestData = branch_view._getPageviewRequestData(
-    journeys_utils._getPageviewMetadata(null, metadata),
+    journeys_utils._getPageviewMetadata(
+      null,
+      metadata,
+      journeys_utils.branch._ctx,
+    ),
     null,
     journeys_utils.branch,
     true,
@@ -1178,7 +1183,11 @@ journeys_utils._handleJourneyDismiss = function (
   }
 };
 
-journeys_utils._getPageviewMetadata = function (options, additionalMetadata) {
+journeys_utils._getPageviewMetadata = function (
+  options,
+  additionalMetadata,
+  ctx,
+) {
   let pageviewMetadata = utils.merge(
     {
       'url': options?.url || utils.getWindowLocation(),
@@ -1193,12 +1202,12 @@ journeys_utils._getPageviewMetadata = function (options, additionalMetadata) {
   pageviewMetadata = utils.addPropertyIfNotNullorEmpty(
     pageviewMetadata,
     'model',
-    utils.userAgentData ? utils.userAgentData.model : '',
+    ctx.userAgentData ? ctx.userAgentData.model : '',
   );
   pageviewMetadata = utils.addPropertyIfNotNullorEmpty(
     pageviewMetadata,
     'os_version',
-    utils.userAgentData ? utils.userAgentData.platformVersion : '',
+    ctx.userAgentData ? ctx.userAgentData.platformVersion : '',
   );
   return pageviewMetadata;
 };

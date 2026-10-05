@@ -5,6 +5,7 @@
 
 import { config } from '../core/config.js';
 import { utils } from '../core/utils.js';
+import { formatMessage } from '../lib/messages.js';
 
 export const resources = {};
 
@@ -20,22 +21,22 @@ const validationTypes = {
  * @param {boolean} required
  * @param {number|RegExp} type
  * @throws {Error}
- * @return {(endpoint: string, param: string, data: any) => (string|false)}
+ * @return {(endpoint: string, param: string, data: any, ctx: import('../core/context.js').Context) => (string|false)} the message, which getUrl logs
  */
 function validator(required, type) {
-  return function (endpoint, param, data) {
+  return function (endpoint, param, data, ctx) {
     // Ignores request validation when tracking is disabled because information will be intentionally missing from requests
-    if (utils.userPreferences.trackingDisabled) {
+    if (ctx.userPreferences.trackingDisabled) {
       return false;
     }
     // Ensure data is not a number before doing a !data otherwise the number can't be 0.
     if (typeof data !== 'number' && !data) {
       if (required) {
-        return utils.message(utils.messages.missingParam, [endpoint, param]);
+        return formatMessage(utils.messages.missingParam, [endpoint, param]);
       }
     } else if (type === validationTypes.OBJECT) {
       if (typeof data !== 'object') {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(utils.messages.invalidType, [
           endpoint,
           param,
           'an object',
@@ -43,7 +44,7 @@ function validator(required, type) {
       }
     } else if (type === validationTypes.ARRAY) {
       if (!Array.isArray(data)) {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(utils.messages.invalidType, [
           endpoint,
           param,
           'an array',
@@ -51,7 +52,7 @@ function validator(required, type) {
       }
     } else if (type === validationTypes.NUMBER) {
       if (typeof data !== 'number') {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(utils.messages.invalidType, [
           endpoint,
           param,
           'a number',
@@ -59,7 +60,7 @@ function validator(required, type) {
       }
     } else if (type === validationTypes.BOOLEAN) {
       if (typeof data !== 'boolean') {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(utils.messages.invalidType, [
           endpoint,
           param,
           'a boolean',
@@ -68,14 +69,14 @@ function validator(required, type) {
     }
     // String or regex validator
     else if (typeof data !== 'string') {
-      return utils.message(utils.messages.invalidType, [
+      return formatMessage(utils.messages.invalidType, [
         endpoint,
         param,
         'a string',
       ]);
       // @ts-expect-error -- `type` is a RegExp once it isn't a validationTypes value
     } else if (type !== validationTypes.STRING && !type.test(data)) {
-      return utils.message(utils.messages.invalidType, [
+      return formatMessage(utils.messages.invalidType, [
         endpoint,
         param,
         'in the proper format',
