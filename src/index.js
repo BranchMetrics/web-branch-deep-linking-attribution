@@ -5,9 +5,34 @@
  */
 
 import './core/polyfills.js';
-import { Branch } from './branch.js';
+import { Branch, initBranch } from './branch.js';
 
-// @ts-expect-error -- TS 7 doesn't treat JS constructor functions as classes
+// Backward compatibility for window.branch.constructor. Branch is now a class,
+// so calling it without `new` would throw. The old constructor function
+// instead returned a shared default instance when called without `new`, and
+// otherwise re-initialized `this` in place (`new`, method calls such as
+// window.branch.constructor(), and ES5 subclasses calling it on their own
+// `this`). Customers can reach the constructor through
+// window.branch.constructor, so keep that behavior here at the public boundary
+// instead of giving up the class internally.
+let default_branch;
+function LegacyBranch() {
+  if (!(this instanceof LegacyBranch)) {
+    if (!default_branch) {
+      default_branch = new Branch();
+    }
+    return default_branch;
+  }
+  initBranch(this);
+}
+LegacyBranch.prototype = Branch.prototype;
+// Non-enumerable, like the built-in prototype.constructor it replaces.
+Object.defineProperty(Branch.prototype, 'constructor', {
+  value: LegacyBranch,
+  writable: true,
+  configurable: true,
+});
+
 export const branch_instance = new Branch();
 
 if (window.branch?._q) {
