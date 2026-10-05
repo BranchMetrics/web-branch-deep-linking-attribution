@@ -5,6 +5,7 @@
  */
 
 import { base64Decode, decodeBFPs } from '../lib/encoding.js';
+import { getEnv } from '../env/env.js';
 
 export const storage = {};
 
@@ -166,7 +167,7 @@ const cookies = function () {
   return {
     getAll: function () {
       const returnCookieObject = {};
-      const cookieArray = document.cookie.split(';');
+      const cookieArray = getEnv().documentCookie().split(';');
       for (let i = 0; i < cookieArray.length; i++) {
         const cookie = processCookie(cookieArray[i]);
         if (
@@ -182,7 +183,7 @@ const cookies = function () {
     },
     get: function (key) {
       key = prefix(key);
-      const cookieArray = document.cookie.split(';');
+      const cookieArray = getEnv().documentCookie().split(';');
       for (let i = 0; i < cookieArray.length; i++) {
         const cookie = processCookie(cookieArray[i]);
         if (
@@ -203,7 +204,7 @@ const cookies = function () {
       removeCookie(key, true);
     },
     clear: function () {
-      const cookieArray = document.cookie.split(';');
+      const cookieArray = getEnv().documentCookie().split(';');
       for (let i = 0; i < cookieArray.length; i++) {
         const cookie = processCookie(cookieArray[i]);
         if (
@@ -216,7 +217,7 @@ const cookies = function () {
       }
     },
     isEnabled: function () {
-      return navigator.cookieEnabled;
+      return getEnv().cookieEnabled();
     },
   };
 };

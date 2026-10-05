@@ -12,9 +12,16 @@ const ENV_KEYS = [
   'isWebKit',
   'userAgent',
   'userAgentData',
+  'language',
   'browserLanguageCode',
   'screenHeight',
   'screenWidth',
+  'devicePixelRatio',
+  'documentURL',
+  'documentReferrer',
+  'documentCookie',
+  'cookieEnabled',
+  'doNotTrack',
   'timeSinceNavigationStart',
   'navigationTimingAPIEnabled',
   'openGraphContent',
@@ -76,6 +83,43 @@ describe('env', function () {
       expect(browserEnv.screenHeight()).toBe(screen.height || 0);
       expect(browserEnv.screenWidth()).toBe(screen.width || 0);
       expect(browserEnv.isWebKit()).toBe(!!window.webkitURL);
+    });
+
+    it('reads the language, pixel ratio and cookie/DNT flags from navigator and window raw', function () {
+      expect(browserEnv.language()).toBe(navigator.language);
+      expect(browserEnv.devicePixelRatio()).toBe(window.devicePixelRatio);
+      expect(browserEnv.cookieEnabled()).toBe(navigator.cookieEnabled);
+      expect(browserEnv.doNotTrack()).toBe(navigator.doNotTrack);
+    });
+
+    it('returns navigator.doNotTrack as set by the browser', function () {
+      const original = Object.getOwnPropertyDescriptor(navigator, 'doNotTrack');
+      Object.defineProperty(navigator, 'doNotTrack', {
+        configurable: true,
+        get: function () {
+          return '1';
+        },
+      });
+      try {
+        expect(browserEnv.doNotTrack()).toBe('1');
+      } finally {
+        if (original) {
+          Object.defineProperty(navigator, 'doNotTrack', original);
+        } else {
+          delete navigator.doNotTrack;
+        }
+      }
+    });
+
+    it('reads document.URL, document.referrer and document.cookie', function () {
+      testUtils.go('?u=1');
+      expect(browserEnv.documentURL()).toBe(document.URL);
+      expect(browserEnv.documentReferrer()).toBe(document.referrer);
+      document.cookie = 'env_test=1; path=/';
+      expect(browserEnv.documentCookie()).toBe(document.cookie);
+      expect(browserEnv.documentCookie()).toContain('env_test=1');
+      document.cookie =
+        'env_test=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
     });
 
     it('returns null for og tags that are absent, or the given default', function () {
@@ -196,6 +240,12 @@ describe('env', function () {
       it('initialReferrer is window.top.document.referrer', function () {
         expect(browserEnv.initialReferrer()).toBe(
           'https://top-referrer.example.com/',
+        );
+      });
+
+      it('documentReferrer is still the frame document.referrer', function () {
+        expect(browserEnv.documentReferrer()).toBe(
+          'https://frame-referrer.example.com/',
         );
       });
     });

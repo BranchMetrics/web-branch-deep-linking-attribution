@@ -1198,11 +1198,11 @@ journeys_utils._getPageviewMetadata = function (
   let pageviewMetadata = merge(
     {
       'url': options?.url || getEnv().windowLocation(),
-      'user_agent': navigator.userAgent,
-      'language': navigator.language,
-      'screen_width': screen.width || -1,
-      'screen_height': screen.height || -1,
-      'window_device_pixel_ratio': window.devicePixelRatio || 1,
+      'user_agent': getEnv().userAgent(),
+      'language': getEnv().language(),
+      'screen_width': getEnv().screenWidth() || -1,
+      'screen_height': getEnv().screenHeight() || -1,
+      'window_device_pixel_ratio': getEnv().devicePixelRatio() || 1,
     },
     additionalMetadata || {},
   );
