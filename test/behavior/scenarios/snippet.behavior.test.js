@@ -8,7 +8,7 @@ const README_SNIPPET = readFileSync('README.md', 'utf8')
   .split('```html\n<script>\n')[1]
   .split('\n\n  branch.init')[0];
 
-describe('golden: snippet', () => {
+describe('behavior: snippet', () => {
   it('replays calls queued by the loader snippet', async () => {
     const p = createPage({
       before(w, { cb, push }) {

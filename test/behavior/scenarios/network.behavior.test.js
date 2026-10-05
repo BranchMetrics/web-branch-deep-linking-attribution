@@ -7,7 +7,7 @@ const xhrBlocked = () =>
     routes: { '/v1/open': { throwOnSend: true, body: API.openBody() } },
   });
 
-describe('golden: network', () => {
+describe('behavior: network', () => {
   it('XHR that throws on send falls back to JSONP', async () => {
     const p = xhrBlocked();
     p.branch.init(KEY, p.cb('init'));

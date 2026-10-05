@@ -1,7 +1,7 @@
 import { KEY } from '../fixtures.js';
 import { createPage, snap } from '../harness.js';
 
-describe('golden: privacy', () => {
+describe('behavior: privacy', () => {
   it('init with tracking disabled', async () => {
     const p = createPage({
       url: 'https://shop.example.com/p?_branch_match_id=123456789',

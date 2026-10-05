@@ -3,7 +3,7 @@ import { createPage, snap } from '../harness.js';
 
 // enableLogging turns on the SDK's debug console messages; these pin which
 // messages each failure path logs.
-describe('golden: debug logging', () => {
+describe('behavior: debug logging', () => {
   it('init fails, then a queued call logs initFailed', async () => {
     const p = createPage({
       routes: { '/v1/open': { status: 500, body: { error: 'x' } } },

@@ -1,7 +1,7 @@
 import { API, KEY } from '../fixtures.js';
 import { createPage, nextPage, snap } from '../harness.js';
 
-describe('golden: session', () => {
+describe('behavior: session', () => {
   it('data() before init', async () => {
     const p = createPage();
     p.branch.data(p.cb('data'));

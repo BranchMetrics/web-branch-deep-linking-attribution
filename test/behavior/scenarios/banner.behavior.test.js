@@ -10,7 +10,7 @@ const options = () => ({
   downloadAppButtonText: 'Get',
 });
 
-describe('golden: banner', () => {
+describe('behavior: banner', () => {
   it('show and close with a callback', async () => {
     const p = createPage({ ua: UA.iphoneSafari });
     p.listen();

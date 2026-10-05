@@ -3,7 +3,7 @@ import {
   isIOSWKWebView,
   isSafari11OrGreater,
 } from '../../src/lib/ua.js';
-import { UA } from '../golden/fixtures.js';
+import { UA } from '../behavior/fixtures.js';
 
 // Characterization tests: these pin what the ua helpers do today, quirks
 // included. Do not "fix" expectations here without a behavior change.

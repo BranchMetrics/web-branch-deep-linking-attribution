@@ -4,7 +4,7 @@
     "includes": [
       "src/**",
       "test/**",
-      "!test/golden/__golden__",
+      "!test/behavior/__recorded__",
       "package.json",
       "biome.json"
     ]

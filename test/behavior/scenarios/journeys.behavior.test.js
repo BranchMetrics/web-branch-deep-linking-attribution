@@ -18,7 +18,7 @@ const clickInJourney = (p, selector) =>
     return !!el;
   });
 
-describe('golden: journeys', () => {
+describe('behavior: journeys', () => {
   it('renders a top banner Journey', async () => {
     const p = journeyPage();
     p.listen();

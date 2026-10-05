@@ -6,8 +6,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./test/setup.js'],
     include: ['test/**/*.test.js'],
-    // Golden traces run against the built bundle: see vitest.golden.config.mjs.
-    exclude: [...configDefaults.exclude, 'test/golden/**'],
+    // Behavior traces run against the built bundle: see vitest.behavior.config.mjs.
+    exclude: [...configDefaults.exclude, 'test/behavior/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text-summary', 'html', 'lcov'],

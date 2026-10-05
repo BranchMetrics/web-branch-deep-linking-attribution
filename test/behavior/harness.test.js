@@ -1,6 +1,6 @@
 import { createPage } from './harness.js';
 
-describe('golden harness', () => {
+describe('behavior harness', () => {
   it('records the target of every way to navigate', async () => {
     const p = createPage();
     const w = p.win;

@@ -1,7 +1,7 @@
 import { KEY } from '../fixtures.js';
 import { createPage, snap } from '../harness.js';
 
-describe('golden: events', () => {
+describe('behavior: events', () => {
   it('track pageview', async () => {
     const p = createPage();
     p.branch.init(KEY);

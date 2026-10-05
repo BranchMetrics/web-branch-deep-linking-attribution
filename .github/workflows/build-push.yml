@@ -100,8 +100,8 @@ jobs:
       - name: Check the built bundle's public contract
         run: pnpm run test:bundle
 
-      - name: Check the built bundle against the golden traces
-        run: pnpm run test:golden
+      - name: Check the built bundle against the behavior traces
+        run: pnpm run test:behavior
 
       - name: AWS, credentials setup
         if: ${{ github.ref == 'refs/heads/main' }}

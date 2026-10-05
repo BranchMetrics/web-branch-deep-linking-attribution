@@ -11,7 +11,7 @@ const linkData = () => ({
   data: { $desktop_url: 'https://shop.example.com/d', k: 'v' },
 });
 
-describe('golden: links', () => {
+describe('behavior: links', () => {
   it('link with full data', async () => {
     const p = createPage();
     p.branch.init(KEY);

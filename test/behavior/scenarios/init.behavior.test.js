@@ -1,7 +1,7 @@
 import { API, KEY, UA } from '../fixtures.js';
 import { createPage, nextPage, snap } from '../harness.js';
 
-describe('golden: init', () => {
+describe('behavior: init', () => {
   it('fresh visitor, plain URL', async () => {
     const p = createPage();
     p.listen();

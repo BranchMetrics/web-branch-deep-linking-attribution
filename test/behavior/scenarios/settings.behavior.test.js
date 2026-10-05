@@ -1,7 +1,7 @@
 import { KEY } from '../fixtures.js';
 import { createPage, snap } from '../harness.js';
 
-describe('golden: settings', () => {
+describe('behavior: settings', () => {
   it('addListener and removeListener', async () => {
     const p = createPage();
     p.listen('kept');

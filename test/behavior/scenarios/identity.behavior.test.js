@@ -1,7 +1,7 @@
 import { KEY } from '../fixtures.js';
 import { createPage, snap } from '../harness.js';
 
-describe('golden: identity', () => {
+describe('behavior: identity', () => {
   it('setIdentity', async () => {
     const p = createPage();
     p.listen();

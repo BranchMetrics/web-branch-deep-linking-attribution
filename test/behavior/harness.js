@@ -1,5 +1,5 @@
 /**
- * Black-box golden harness. Each scenario gets a fresh JSDOM window, evaluates
+ * Black-box behavior harness. Each scenario gets a fresh JSDOM window, evaluates
  * the built SDK bundle in it, fakes only the outer boundaries (XHR, JSONP
  * script tags, clock, storage, cookies, UA, URL), and records a trace of
  * everything observable. Imports nothing from src/.
@@ -9,7 +9,7 @@ import { createRequire } from 'node:module';
 import { JSDOM, ResourceLoader, VirtualConsole } from 'jsdom';
 import { API, UA } from './fixtures.js';
 
-const BUNDLE_PATH = process.env.GOLDEN_BUNDLE || 'dist/build.min.js';
+const BUNDLE_PATH = process.env.BEHAVIOR_BUNDLE || 'dist/build.min.js';
 const BUNDLE = readFileSync(BUNDLE_PATH, 'utf8');
 export const EPOCH = Date.UTC(2026, 0, 15, 12, 0, 0);
 
@@ -473,17 +473,17 @@ export function createPage(opts = {}) {
 }
 
 /** Serialises a finished page for toMatchFileSnapshot. */
-export function golden(result) {
+export function serialize(result) {
   return `${JSON.stringify(result, null, 2)}\n`;
 }
 
 /**
- * Finishes `page` and compares it with test/golden/__golden__/<name>.json.
+ * Finishes `page` and compares it with test/behavior/__recorded__/<name>.json.
  * The path is resolved from the scenario file, which lives in scenarios/.
  */
 export async function snap(name, page) {
-  await expect(golden(await page.finish())).toMatchFileSnapshot(
-    `../__golden__/${name}.json`,
+  await expect(serialize(await page.finish())).toMatchFileSnapshot(
+    `../__recorded__/${name}.json`,
   );
 }
 

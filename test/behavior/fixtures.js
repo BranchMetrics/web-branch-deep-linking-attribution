@@ -1,5 +1,5 @@
 /**
- * Fixed inputs for the golden scenarios. IDs match the globals in
+ * Fixed inputs for the behavior scenarios. IDs match the globals in
  * test/test-utils.js so traces look familiar.
  */
 // Well-formed but fake: real keys never go into the repo.
