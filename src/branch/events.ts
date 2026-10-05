@@ -1,4 +1,4 @@
-import { Branch, wrap, callback_params } from './core.js';
+import type { Branch } from './Branch.js';
 import { safejson } from '../core/safejson.js';
 import { mergeHostedDeeplinkData } from '../lib/hosted_data.js';
 import { getEnv } from '../env/env.js';
@@ -39,77 +39,75 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
  * ```
  * ___
  */
-Branch.prototype.track = wrap(
-  callback_params.CALLBACK_ERR,
-  function (
-    done,
-    event: string,
-    metadata?: Record<string, any>,
-    options?: Record<string, any>,
-  ) {
-    const self = this;
+export function track(
+  this: Branch,
+  done,
+  event: string,
+  metadata?: Record<string, any>,
+  options?: Record<string, any>,
+) {
+  const self = this;
 
-    metadata = metadata || {};
+  metadata = metadata || {};
 
-    options = options || {};
+  options = options || {};
 
-    self._ctx.nonce = options.nonce ? options.nonce : self._ctx.nonce;
+  self._ctx.nonce = options.nonce ? options.nonce : self._ctx.nonce;
 
-    if (event === 'pageview') {
-      const hostedDeeplinkDataWithMergedMetadata = mergeHostedDeeplinkData(
-        getEnv().hostedDeepLinkData(),
-        metadata,
-      );
-      if (
-        hostedDeeplinkDataWithMergedMetadata &&
-        Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0
-      ) {
-        metadata.hosted_deeplink_data = hostedDeeplinkDataWithMergedMetadata;
-      }
-
-      const requestData = branch_view._getPageviewRequestData(
-        journeys_utils._getPageviewMetadata(options, metadata, self._ctx),
-        options,
-        self,
-        false,
-      );
-      self._api(resources.pageview, requestData, function (...responseArgs) {
-        const [err, pageviewResponse] = responseArgs;
-        if (!err && typeof pageviewResponse === 'object') {
-          const journeyInTestMode = requestData.branch_view_id ? true : false;
-          if (
-            branch_view.shouldDisplayJourney(
-              pageviewResponse,
-              options,
-              journeyInTestMode,
-            )
-          ) {
-            branch_view.displayJourney(
-              pageviewResponse.template,
-              requestData,
-              requestData.branch_view_id ||
-                pageviewResponse.event_data.branch_view_data.id,
-              pageviewResponse.event_data.branch_view_data,
-              journeyInTestMode,
-              pageviewResponse.journey_link_data,
-              {
-                use_v2_renderer: pageviewResponse.use_v2_renderer,
-                animationConfig: pageviewResponse.animationConfig,
-              },
-            );
-          } else {
-            journeys_utils.branch._publishEvent('willNotShowJourney');
-          }
-        }
-        if (typeof done === 'function') {
-          done.apply(this, responseArgs);
-        }
-      });
-    } else {
-      console.warn('track method currently supports only pageview event.');
+  if (event === 'pageview') {
+    const hostedDeeplinkDataWithMergedMetadata = mergeHostedDeeplinkData(
+      getEnv().hostedDeepLinkData(),
+      metadata,
+    );
+    if (
+      hostedDeeplinkDataWithMergedMetadata &&
+      Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0
+    ) {
+      metadata.hosted_deeplink_data = hostedDeeplinkDataWithMergedMetadata;
     }
-  },
-);
+
+    const requestData = branch_view._getPageviewRequestData(
+      journeys_utils._getPageviewMetadata(options, metadata, self._ctx),
+      options,
+      self,
+      false,
+    );
+    self._api(resources.pageview, requestData, function (...responseArgs) {
+      const [err, pageviewResponse] = responseArgs;
+      if (!err && typeof pageviewResponse === 'object') {
+        const journeyInTestMode = requestData.branch_view_id ? true : false;
+        if (
+          branch_view.shouldDisplayJourney(
+            pageviewResponse,
+            options,
+            journeyInTestMode,
+          )
+        ) {
+          branch_view.displayJourney(
+            pageviewResponse.template,
+            requestData,
+            requestData.branch_view_id ||
+              pageviewResponse.event_data.branch_view_data.id,
+            pageviewResponse.event_data.branch_view_data,
+            journeyInTestMode,
+            pageviewResponse.journey_link_data,
+            {
+              use_v2_renderer: pageviewResponse.use_v2_renderer,
+              animationConfig: pageviewResponse.animationConfig,
+            },
+          );
+        } else {
+          journeys_utils.branch._publishEvent('willNotShowJourney');
+        }
+      }
+      if (typeof done === 'function') {
+        done.apply(this, responseArgs);
+      }
+    });
+  } else {
+    console.warn('track method currently supports only pageview event.');
+  }
+}
 
 /**
  * @function Branch.logEvent
@@ -232,60 +230,64 @@ Branch.prototype.track = wrap(
  * ```
  * ___
  */
-Branch.prototype.logEvent = wrap(
-  callback_params.CALLBACK_ERR,
-  function (done, name, eventData, contentItems, customer_event_alias: string) {
-    name = validateParameterType(name, 'string') ? name : null;
-    eventData = validateParameterType(eventData, 'object') ? eventData : null;
-    customer_event_alias = validateParameterType(customer_event_alias, 'string')
-      ? customer_event_alias
-      : null;
-    const extractedEventAndCustomData = separateEventAndCustomData(eventData);
+export function logEvent(
+  this: Branch,
+  done,
+  name,
+  eventData,
+  contentItems,
+  customer_event_alias: string,
+) {
+  name = validateParameterType(name, 'string') ? name : null;
+  eventData = validateParameterType(eventData, 'object') ? eventData : null;
+  customer_event_alias = validateParameterType(customer_event_alias, 'string')
+    ? customer_event_alias
+    : null;
+  const extractedEventAndCustomData = separateEventAndCustomData(eventData);
 
-    if (isStandardEvent(name)) {
-      contentItems = validateParameterType(contentItems, 'array')
-        ? contentItems
-        : null;
-      this._api(
-        resources.logStandardEvent,
-        {
-          'name': name,
-          'user_data': safejson.stringify(getUserData(this)),
-          'custom_data': safejson.stringify(
-            extractedEventAndCustomData?.custom_data || {},
-          ),
-          'event_data': safejson.stringify(
-            extractedEventAndCustomData?.event_data || {},
-          ),
-          'content_items': safejson.stringify(contentItems || []),
-          'customer_event_alias': customer_event_alias,
-        },
-        function (err, _data) {
-          return done(err || null);
-        },
-      );
-    } else {
-      this._api(
-        resources.logCustomEvent,
-        {
-          'name': name,
-          'user_data': safejson.stringify(getUserData(this)),
-          'custom_data': safejson.stringify(
-            extractedEventAndCustomData?.custom_data || {},
-          ),
-          'event_data': safejson.stringify(
-            extractedEventAndCustomData?.event_data || {},
-          ),
-          'content_items': safejson.stringify(contentItems || []),
-          'customer_event_alias': customer_event_alias,
-        },
-        function (err, _data) {
-          return done(err || null);
-        },
-      );
-    }
-  },
-);
+  if (isStandardEvent(name)) {
+    contentItems = validateParameterType(contentItems, 'array')
+      ? contentItems
+      : null;
+    this._api(
+      resources.logStandardEvent,
+      {
+        'name': name,
+        'user_data': safejson.stringify(getUserData(this)),
+        'custom_data': safejson.stringify(
+          extractedEventAndCustomData?.custom_data || {},
+        ),
+        'event_data': safejson.stringify(
+          extractedEventAndCustomData?.event_data || {},
+        ),
+        'content_items': safejson.stringify(contentItems || []),
+        'customer_event_alias': customer_event_alias,
+      },
+      function (err, _data) {
+        return done(err || null);
+      },
+    );
+  } else {
+    this._api(
+      resources.logCustomEvent,
+      {
+        'name': name,
+        'user_data': safejson.stringify(getUserData(this)),
+        'custom_data': safejson.stringify(
+          extractedEventAndCustomData?.custom_data || {},
+        ),
+        'event_data': safejson.stringify(
+          extractedEventAndCustomData?.event_data || {},
+        ),
+        'content_items': safejson.stringify(contentItems || []),
+        'customer_event_alias': customer_event_alias,
+      },
+      function (err, _data) {
+        return done(err || null);
+      },
+    );
+  }
+}
 
 /**
  * @function Branch.trackCommerceEvent
@@ -339,41 +341,39 @@ Branch.prototype.logEvent = wrap(
  * ```
  * ___
  */
-Branch.prototype.trackCommerceEvent = wrap(
-  callback_params.CALLBACK_ERR,
-  function (
-    done,
-    event: string,
-    commerce_data: Record<string, any>,
-    metadata: Record<string, any>,
-  ) {
-    const self = this;
-    self.renderQueue(function () {
-      const validationError = validateCommerceEventParams(event, commerce_data);
-      if (validationError) {
-        return done(new Error(validationError));
-      }
+export function trackCommerceEvent(
+  this: Branch,
+  done,
+  event: string,
+  commerce_data: Record<string, any>,
+  metadata: Record<string, any>,
+) {
+  const self = this;
+  self.renderQueue(function () {
+    const validationError = validateCommerceEventParams(event, commerce_data);
+    if (validationError) {
+      return done(new Error(validationError));
+    }
 
-      self._api(
-        resources.commerceEvent,
-        {
-          'event': event,
-          'metadata': merge(
-            {
-              'url': document.URL,
-              'user_agent': navigator.userAgent,
-              'language': navigator.language,
-            },
-            metadata || {},
-          ),
-          'initial_referrer': getInitialReferrer(self._referringLink()),
-          'commerce_data': commerce_data,
-        },
-        function (err, _data) {
-          done(err || null);
-        },
-      );
-    });
-    done();
-  },
-);
+    self._api(
+      resources.commerceEvent,
+      {
+        'event': event,
+        'metadata': merge(
+          {
+            'url': document.URL,
+            'user_agent': navigator.userAgent,
+            'language': navigator.language,
+          },
+          metadata || {},
+        ),
+        'initial_referrer': getInitialReferrer(self._referringLink()),
+        'commerce_data': commerce_data,
+      },
+      function (err, _data) {
+        done(err || null);
+      },
+    );
+  });
+  done();
+}

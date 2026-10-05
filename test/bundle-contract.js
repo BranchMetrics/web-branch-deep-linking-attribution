@@ -134,6 +134,28 @@ describe('dist/build.min.js contract', function () {
     ]);
   });
 
+  it('keeps window.branch.constructor callable with and without new', function () {
+    const window = load();
+    const Ctor = window.branch.constructor;
+
+    // Without `new`: returns one shared default instance, separate from
+    // window.branch (the pre-class constructor function did this).
+    const shared = Ctor();
+    expect(shared).not.toBe(window.branch);
+    expect(Ctor()).toBe(shared);
+    expect(typeof shared.init).toBe('function');
+
+    // With `new`: a fresh instance every time.
+    const fresh = new Ctor();
+    expect(fresh).not.toBe(window.branch);
+    expect(fresh).not.toBe(shared);
+    expect(fresh instanceof Ctor).toBe(true);
+    expect(window.branch instanceof Ctor).toBe(true);
+    expect(Object.keys(Object.getPrototypeOf(window.branch))).not.toContain(
+      'constructor',
+    );
+  });
+
   it('replays calls queued by the on-page snippet', function () {
     const window = load(function (w) {
       w.branch = { _q: [['setAPIUrl', ['https://api.example.com']]], _v: 1 };

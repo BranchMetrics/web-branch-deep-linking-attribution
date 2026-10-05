@@ -1,4 +1,4 @@
-import { Branch } from './core.js';
+import type { Branch } from './Branch.js';
 
 /** =WEB
  * @function Branch.addListener
@@ -34,7 +34,8 @@ import { Branch } from './core.js';
  * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
  * - *didCallJourneyClose*: Emitted when developer calls `branch.closeJourney()` to dismiss Journey.
  */
-Branch.prototype.addListener = function (
+export function addListener(
+  this: Branch,
   event: string,
   listener: (event: string, data: Object) => void,
 ) {
@@ -48,7 +49,7 @@ Branch.prototype.addListener = function (
       event: event || null,
     });
   }
-};
+}
 
 /** =WEB
  * @function Branch.removeListener
@@ -61,10 +62,13 @@ Branch.prototype.addListener = function (
  * just an identical clone of the function.
  *
  */
-Branch.prototype.removeListener = function (listener: (event: string) => void) {
+export function removeListener(
+  this: Branch,
+  listener: (event: string) => void,
+) {
   if (listener) {
     this._listeners = this._listeners.filter(function (subscription) {
       return subscription.listener !== listener;
     });
   }
-};
+}
