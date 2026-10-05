@@ -1,6 +1,6 @@
 import { safejson } from '../core/safejson.js';
 import { getPlatformByUserAgent } from '../core/platform.js';
-import { getEnv } from '../env/env.js';
+import { getEnv, navigationTimingAPIEnabled } from '../env/env.js';
 import { addPropertyIfNotNull, merge } from '../lib/objects.js';
 import {
   cleanLinkData,
@@ -213,7 +213,7 @@ branch_view.displayJourney = function (
         branch_view,
       );
 
-      if (getEnv().navigationTimingAPIEnabled()) {
+      if (navigationTimingAPIEnabled) {
         journeys_utils.branch._ctx.instrumentation['journey-load-time'] =
           getEnv().timeSinceNavigationStart();
       }
