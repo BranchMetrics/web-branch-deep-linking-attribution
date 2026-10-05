@@ -1,6 +1,6 @@
 import { utils } from '../utils.js';
 
-export const messages = /** @satisfies {Record<string, unknown>} */ ({
+export const messages = {
   messages: {
     missingParam: 'API request $1 missing parameter $2',
     invalidType: 'API request $1, parameter $2 is not $3',
@@ -25,13 +25,17 @@ export const messages = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {string} message
-   * @param {Array.<*>=} params
-   * @param {number=} failCode
-   * @param {string=} failDetails
-   * @return {string}
+   * @param message
+   * @param params
+   * @param failCode
+   * @param failDetails
    */
-  message: function (message, params, failCode, failDetails) {
+  message: function (
+    message: string,
+    params?: any[],
+    failCode?: number,
+    failDetails?: string,
+  ) {
     let msg = message.replace(/\$(\d)/g, function (_, place) {
       return params[parseInt(place, 10) - 1];
     });
@@ -46,4 +50,4 @@ export const messages = /** @satisfies {Record<string, unknown>} */ ({
     }
     return msg;
   },
-});
+};

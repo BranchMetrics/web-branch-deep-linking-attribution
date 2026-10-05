@@ -17,7 +17,7 @@ function minifySrc() {
     name: 'minify-src',
     enforce: 'post',
     transform(code, id) {
-      if (!id.startsWith(SRC_DIR) || !id.endsWith('.js')) {
+      if (!id.startsWith(SRC_DIR) || !/\.[jt]s$/.test(id)) {
         return null;
       }
       const result = minifySync(id, code, {

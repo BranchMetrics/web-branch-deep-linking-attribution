@@ -2,7 +2,7 @@ import { utils } from '../utils.js';
 import { safejson } from '../safejson.js';
 import { session } from '../session.js';
 
-export const session_data = /** @satisfies {Record<string, unknown>} */ ({
+export const session_data = {
   // Removes PII when a user disables tracking
   cleanApplicationAndSessionStorage: function (branch) {
     if (branch) {
@@ -21,7 +21,7 @@ export const session_data = /** @satisfies {Record<string, unknown>} */ ({
         delete branch._deepviewRequestForReplay;
       }
       branch._storage.remove('branch_view_enabled');
-      const data = {};
+      const data: Record<string, any> = {};
       // Sets an empty object for branch_session and branch_session_first in local/sessionStorage
       session.set(branch._storage, data, true);
     }
@@ -29,10 +29,9 @@ export const session_data = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {Object} data
-   * @return {Object}
+   * @param data
    */
-  whiteListSessionData: function (data) {
+  whiteListSessionData: function (data: Record<string, any>) {
     return {
       'data': data.data || '',
       'data_parsed': data.data_parsed || {},
@@ -45,13 +44,13 @@ export const session_data = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {Object} sessionData
-   * @return {Object} retData
+   * @param sessionData
+   * @return retData
    */
-  whiteListJourneysLanguageData: function (sessionData) {
+  whiteListJourneysLanguageData: function (sessionData: Record<string, any>) {
     const re = /^\$journeys_\S+$/;
     let data = sessionData.data;
-    const retData = {};
+    const retData: Record<string, any> = {};
 
     if (!data) {
       return {};
@@ -82,4 +81,4 @@ export const session_data = /** @satisfies {Record<string, unknown>} */ ({
 
     return retData;
   },
-});
+};

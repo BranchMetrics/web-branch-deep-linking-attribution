@@ -5,8 +5,8 @@ import { resources } from '../network/resources.js';
 
 /**
  * @function Branch.link
- * @param {Object} data - _required_ - link data and metadata.
- * @param {(err: Error | null, url?: string) => void} callback - _required_ - returns a string of the Branch deep
+ * @param data - _required_ - link data and metadata.
+ * @param callback - _required_ - returns a string of the Branch deep
  * linking URL.
  *
  * **Formerly `createLink()`**
@@ -95,7 +95,7 @@ import { resources } from '../network/resources.js';
  */
 Branch.prototype.link = wrap(
   callback_params.CALLBACK_ERR_DATA,
-  function (done, data) {
+  function (done, data: Record<string, any>) {
     const linkData = utils.cleanLinkData(data);
     const keyCopy = this.branch_key;
     this._api(resources.link, linkData, function (err, data) {
@@ -111,14 +111,14 @@ Branch.prototype.link = wrap(
 
 /**
  * @function Branch.qrCode
- * @param {Object} linkData - _required_ - object of all link data, same as branch.link().
- * @param {Object=} qrCodeSettings - _optional_ - options
+ * @param linkData - _required_ - object of all link data, same as branch.link().
+ * @param qrCodeSettings - _optional_ - options
  *     image_format: Image format, "png" or "jpeg"
  *     code_color: String Hex color value of the QR Code
  *     background_color: String Hex color value of the background of the QR code
  *     margin: Integer (Pixels) The number of pixels you want for the margin. Max 20.
  *     width: Integer (Pixels) Output size of QR Code image.
- * @param {((err: Error | null) => void)=} callback - _optional_ - returns an error if the API call is unsuccessful
+ * @param callback - _optional_ - returns an error if the API call is unsuccessful
  *
  * Returns a qrCode with the specified linkData.
  *
@@ -169,7 +169,12 @@ Branch.prototype.link = wrap(
  */
 Branch.prototype.qrCode = wrap(
   callback_params.CALLBACK_ERR_DATA,
-  function (done, linkData, qrCodeSettings, _options) {
+  function (
+    done,
+    linkData: Record<string, any>,
+    qrCodeSettings?: Record<string, any>,
+    _options?: Record<string, any>,
+  ) {
     const data = utils.cleanLinkData(linkData);
     data.qr_code_settings = safejson.stringify(
       utils.convertObjectValuesToString(qrCodeSettings || {}),
@@ -200,12 +205,12 @@ Branch.prototype.qrCode = wrap(
 
 /**
  * @function Branch.deepview
- * @param {Object} data - _required_ - object of all link data, same as branch.link().
- * @param {Object=} options - _optional_ - { *make_new_link*: _whether to create a new link even if
+ * @param data - _required_ - object of all link data, same as branch.link().
+ * @param options - _optional_ - { *make_new_link*: _whether to create a new link even if
  * one already exists_. *open_app*, _whether to try to open the app passively (as opposed to
  * opening it upon user clicking); defaults to true_
  * }.
- * @param {((err: Error | null) => void)=} callback - _optional_ - returns an error if the API call is unsuccessful
+ * @param callback - _optional_ - returns an error if the API call is unsuccessful
  *
  * Turns the current page into a "deepview" – a preview of app content. This gives the page two
  * special behaviors: (1) when the page is viewed on a mobile browser, if the user has the app
@@ -261,7 +266,7 @@ Branch.prototype.qrCode = wrap(
  */
 Branch.prototype.deepview = wrap(
   callback_params.CALLBACK_ERR,
-  function (done, data, options) {
+  function (done, data: Record<string, any>, options?: Record<string, any>) {
     const self = this;
 
     if (!options) {

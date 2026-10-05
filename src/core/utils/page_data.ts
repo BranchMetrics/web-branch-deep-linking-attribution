@@ -1,20 +1,20 @@
 import { utils } from '../utils.js';
 
-export const page_data = /** @satisfies {Record<string, unknown>} */ ({
+export const page_data = {
   /**
    * Search for a particular og tag by name, and return the content, if it exists. The optional
    * parameter 'content' will be the default value used if the og tag is not found or cannot
    * be parsed.
-   * @param {string} property
-   * @param {null|string=} content
+   * @param property
+   * @param content
    */
-  getOpenGraphContent: function (property, content) {
+  getOpenGraphContent: function (property: string, content?: null | string) {
     property = String(property);
     content = content || null;
 
-    const el = /** @type {HTMLMetaElement | null} */ (
-      document.querySelector('meta[property="og:' + property + '"]')
-    );
+    const el = document.querySelector(
+      'meta[property="og:' + property + '"]',
+    ) as HTMLMetaElement | null;
     if (el?.content) {
       content = el.content;
     }
@@ -66,7 +66,7 @@ export const page_data = /** @satisfies {Record<string, unknown>} */ ({
    * Used by utils.getHostedDeepLinkData() to process page metadata.
    */
   processHostedDeepLinkData: function (metadata) {
-    const params = {};
+    const params: Record<string, any> = {};
     if (!metadata || metadata.length === 0) {
       return params;
     }
@@ -156,21 +156,21 @@ export const page_data = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   getDescription: function () {
-    const el = /** @type {HTMLMetaElement | null} */ (
-      document.querySelector('meta[name="description"]')
-    );
+    const el = document.querySelector(
+      'meta[name="description"]',
+    ) as HTMLMetaElement | null;
     return el?.content ? el.content : null;
   },
 
   getCanonicalURL: function () {
-    const el = /** @type {HTMLLinkElement | null} */ (
-      document.querySelector('link[rel="canonical"]')
-    );
+    const el = document.querySelector(
+      'link[rel="canonical"]',
+    ) as HTMLLinkElement | null;
     return el?.href ? el.href : null;
   },
 
   openGraphDataAsObject: function () {
-    let ogData = {};
+    let ogData: Record<string, any> = {};
     ogData = utils.addPropertyIfNotNull(
       ogData,
       '$og_title',
@@ -200,7 +200,7 @@ export const page_data = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   getAdditionalMetadata: function () {
-    let metadata = {};
+    let metadata: Record<string, any> = {};
     metadata = utils.addPropertyIfNotNull(
       metadata,
       'og_data',
@@ -237,4 +237,4 @@ export const page_data = /** @satisfies {Record<string, unknown>} */ ({
     }
     return hostedDeepLinkDataClone;
   },
-});
+};

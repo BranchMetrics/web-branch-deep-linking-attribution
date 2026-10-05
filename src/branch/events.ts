@@ -7,9 +7,9 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
 
 /**
  * @function Branch.track
- * @param {string} event - _required_ - name of the event to be tracked.
- * @param {Object=} metadata - _optional_ - object of event metadata.
- * @param {((err: Error | null) => void)=} callback - _optional_
+ * @param event - _required_ - name of the event to be tracked.
+ * @param metadata - _optional_ - object of event metadata.
+ * @param callback - _optional_
  *
  * This function allows you to track any event with supporting metadata.
  * The `metadata` parameter is a formatted JSON object that can contain
@@ -32,7 +32,12 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
  */
 Branch.prototype.track = wrap(
   callback_params.CALLBACK_ERR,
-  function (done, event, metadata, options) {
+  function (
+    done,
+    event: string,
+    metadata?: Record<string, any>,
+    options?: Record<string, any>,
+  ) {
     const self = this;
 
     metadata = metadata || {};
@@ -97,11 +102,11 @@ Branch.prototype.track = wrap(
 
 /**
  * @function Branch.logEvent
- * @param {String} event - _required_
- * @param {Object} event_data_and_custom_data - _optional_
- * @param {Array} content_items - _optional_
- * @param {String} customer_event_alias - _optional_
- * @param {((err: Error | null) => void)=} callback - _optional_
+ * @param event - _required_
+ * @param event_data_and_custom_data - _optional_
+ * @param content_items - _optional_
+ * @param customer_event_alias - _optional_
+ * @param callback - _optional_
  *
  * Register commerce events, content events, user lifecycle events and custom events via logEvent()
  *
@@ -218,7 +223,7 @@ Branch.prototype.track = wrap(
  */
 Branch.prototype.logEvent = wrap(
   callback_params.CALLBACK_ERR,
-  function (done, name, eventData, contentItems, customer_event_alias) {
+  function (done, name, eventData, contentItems, customer_event_alias: string) {
     name = utils.validateParameterType(name, 'string') ? name : null;
     eventData = utils.validateParameterType(eventData, 'object')
       ? eventData
@@ -279,10 +284,10 @@ Branch.prototype.logEvent = wrap(
 
 /**
  * @function Branch.trackCommerceEvent
- * @param {String} event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events
- * @param {Object} commerce_data - _required_ - Data that describes the commerce event
- * @param {Object} metadata - _optional_ - metadata you may want add to the event
- * @param {((err: Error | null) => void)=} callback - _optional_ - Returns an error if unsuccessful
+ * @param event - _required_ - Name of the commerce event to be tracked. We currently support 'purchase' events
+ * @param commerce_data - _required_ - Data that describes the commerce event
+ * @param metadata - _optional_ - metadata you may want add to the event
+ * @param callback - _optional_ - Returns an error if unsuccessful
  *
  * Sends a user commerce event to the server
  *
@@ -331,7 +336,12 @@ Branch.prototype.logEvent = wrap(
  */
 Branch.prototype.trackCommerceEvent = wrap(
   callback_params.CALLBACK_ERR,
-  function (done, event, commerce_data, metadata) {
+  function (
+    done,
+    event: string,
+    commerce_data: Record<string, any>,
+    metadata: Record<string, any>,
+  ) {
     const self = this;
     self.renderQueue(function () {
       const validationError = utils.validateCommerceEventParams(
