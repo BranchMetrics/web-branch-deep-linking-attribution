@@ -42,4 +42,31 @@ function visit(v) {
 }
 for (const f of files) if (idx[f] === undefined) visit(f);
 for (const c of sccs) console.error('import cycle:\n  ' + c.sort().join('\n  '));
-process.exit(sccs.length ? 1 : 0);
+
+// Layer boundaries:
+//   src/lib/**  may import only src/lib/**, src/core/config.js, src/core/safejson.js
+//   src/env/**  may import only src/lib/**, src/env/**, src/core/config.js, src/core/safejson.js
+const ALLOWED_EXTRA = new Set([
+  join('src', 'core', 'config.js'),
+  join('src', 'core', 'safejson.js'),
+]);
+const inDir = (p, dir) => p === dir || p.startsWith(dir + '/');
+const layerViolations = [];
+for (const f of files) {
+  const isLib = inDir(f, join('src', 'lib'));
+  const isEnv = inDir(f, join('src', 'env'));
+  if (!isLib && !isEnv) continue;
+  for (const dep of graph[f]) {
+    if (ALLOWED_EXTRA.has(dep)) continue;
+    if (isLib && inDir(dep, join('src', 'lib'))) continue;
+    if (isEnv && (inDir(dep, join('src', 'lib')) || inDir(dep, join('src', 'env')))) continue;
+    layerViolations.push(`${f} -> ${dep}`);
+  }
+}
+for (const v of layerViolations) {
+  console.error(
+    `layer violation: ${v}\n  src/lib/** may import only src/lib/**, src/core/config.js and src/core/safejson.js\n  src/env/** may import only src/lib/**, src/env/**, src/core/config.js and src/core/safejson.js`,
+  );
+}
+
+process.exit(sccs.length || layerViolations.length ? 1 : 0);
