@@ -38,10 +38,20 @@ export function makeFakeEnv(overrides = {}) {
     isWebKit: () => false,
     userAgent: () => UA.desktopChrome,
     userAgentData: () => null,
+    language: () => 'en-US',
     browserLanguageCode: () => 'EN',
     screenHeight: () => 900,
     screenWidth: () => 1440,
+    devicePixelRatio: () => 2,
+    documentURL: () => 'https://shop.example.com/p',
+    documentReferrer: () => '',
+    // Storage writes still go to document.cookie, so reads use the same jar.
+    documentCookie: () => document.cookie,
+    cookieEnabled: () => true,
+    doNotTrack: () => null,
     timeSinceNavigationStart: () => '0',
+    // Ignored by the SDK: it reads browserEnv.navigationTimingAPIEnabled()
+    // once at load (by design), so swapping the env can't change it.
     navigationTimingAPIEnabled: () => false,
     openGraphContent: (_property, content) => content || null,
     title: () => null,

@@ -361,9 +361,9 @@ export function trackCommerceEvent(
         'event': event,
         'metadata': merge(
           {
-            'url': document.URL,
-            'user_agent': navigator.userAgent,
-            'language': navigator.language,
+            'url': getEnv().documentURL(),
+            'user_agent': getEnv().userAgent(),
+            'language': getEnv().language(),
           },
           metadata || {},
         ),

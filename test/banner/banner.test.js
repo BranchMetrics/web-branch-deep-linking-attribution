@@ -200,24 +200,17 @@ describe('banner', function () {
     });
 
     it('respects Do Not Track when respectDNT is set', function () {
-      mockPlatform('ios');
-      Object.defineProperty(navigator, 'doNotTrack', {
-        configurable: true,
-        get: function () {
-          return '1';
-        },
-      });
-      try {
-        expect(
-          banner(branch, makeOptions({ respectDNT: true }), {}, store),
-        ).toBeNull();
-        // Without respectDNT the same browser gets a banner.
-        expect(typeof banner(branch, makeOptions(), {}, store)).toBe(
-          'function',
-        );
-      } finally {
-        delete navigator.doNotTrack;
-      }
+      setEnv(
+        makeFakeEnv({
+          userAgent: () => UA_FOR_PLATFORM.ios,
+          doNotTrack: () => '1',
+        }),
+      );
+      expect(
+        banner(branch, makeOptions({ respectDNT: true }), {}, store),
+      ).toBeNull();
+      // Without respectDNT the same browser gets a banner.
+      expect(typeof banner(branch, makeOptions(), {}, store)).toBe('function');
     });
   });
 
