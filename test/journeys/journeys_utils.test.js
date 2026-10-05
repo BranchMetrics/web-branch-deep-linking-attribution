@@ -1,6 +1,5 @@
 import { createContext } from '../../src/core/context.js';
-import { utils } from '../../src/core/utils.js';
-import { setEnv } from '../../src/env/env.js';
+import { getEnv, setEnv } from '../../src/env/env.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
 import { makeFakeEnv } from '../helpers/fake-env.js';
 
@@ -2088,7 +2087,7 @@ describe('journeys_utils characterization: dismiss request data', function () {
     const ctx = createContext();
     ctx.userAgentData = { model: 'Pixel 9', platformVersion: '15' };
     const result = journeys_utils._getPageviewMetadata(null, null, ctx);
-    expect(result.url).toBe(utils.getWindowLocation());
+    expect(result.url).toBe(getEnv().windowLocation());
     expect(result.model).toBe('Pixel 9');
     expect(result.os_version).toBe('15');
   });

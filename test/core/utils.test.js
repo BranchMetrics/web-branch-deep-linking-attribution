@@ -1,6 +1,39 @@
 import { createContext } from '../../src/core/context.js';
-import { utils } from '../../src/core/utils.js';
-import { browserEnv, setEnv } from '../../src/env/env.js';
+import { openGraphDataAsObject } from '../../src/core/page_data.js';
+import {
+  getPlatformByUserAgent,
+  isIOSWKWebView,
+  isSafari11OrGreater,
+} from '../../src/core/platform.js';
+import { cleanLinkData, getParamValue, hashValue } from '../../src/core/url.js';
+import { browserEnv, getEnv, setEnv } from '../../src/env/env.js';
+import { setDMAParams, shouldAddDMAParams } from '../../src/lib/dma.js';
+import { base64encode } from '../../src/lib/encoding.js';
+import {
+  mergeHostedDeeplinkData,
+  prioritizeDeeplinkPaths,
+  processHostedDeepLinkData,
+} from '../../src/lib/hosted_data.js';
+import { formatMessage, messages } from '../../src/lib/messages.js';
+import {
+  addPropertyIfNotNullorEmpty,
+  convertObjectValuesToString,
+  convertValueToString,
+  delay,
+  merge,
+  validateParameterType,
+} from '../../src/lib/objects.js';
+import { whiteListSessionData } from '../../src/lib/session_data.js';
+import {
+  extractDeeplinkPath,
+  extractMobileDeeplinkPath,
+  isValidURL,
+  removeTrailingDotZeros,
+} from '../../src/lib/url.js';
+import {
+  isStandardEvent,
+  separateEventAndCustomData,
+} from '../../src/lib/validation.js';
 import { makeFakeEnv } from '../helpers/fake-env.js';
 
 describe('utils', function () {
@@ -10,7 +43,7 @@ describe('utils', function () {
       const string = 'test string to encode';
       const expectedEncoded = 'dGVzdCBzdHJpbmcgdG8gZW5jb2Rl';
       assert.strictEqual(
-        utils.base64encode(string),
+        base64encode(string),
         expectedEncoded,
         'Correctly encoded',
       );
@@ -32,11 +65,7 @@ describe('utils', function () {
           'object': 'here',
         },
       };
-      assert.deepEqual(
-        utils.merge(obj1, obj2),
-        expectedMerged,
-        'Correctly merged',
-      );
+      assert.deepEqual(merge(obj1, obj2), expectedMerged, 'Correctly merged');
     });
     it('should handle an non-object for first argument', function () {
       const obj1 = null;
@@ -52,21 +81,13 @@ describe('utils', function () {
           'object': 'here',
         },
       };
-      assert.deepEqual(
-        utils.merge(obj1, obj2),
-        expectedMerged,
-        'Correctly merged',
-      );
+      assert.deepEqual(merge(obj1, obj2), expectedMerged, 'Correctly merged');
     });
     it('should handle an non-object for second argument', function () {
       const obj1 = { 'simple': 'object' };
       const obj2 = null;
       const expectedMerged = { 'simple': 'object' };
-      assert.deepEqual(
-        utils.merge(obj1, obj2),
-        expectedMerged,
-        'Correctly merged',
-      );
+      assert.deepEqual(merge(obj1, obj2), expectedMerged, 'Correctly merged');
     });
   });
 
@@ -105,7 +126,7 @@ describe('utils', function () {
         'referring_link': null,
       };
       // determine whitelisted fields before deleting unwanted param
-      const actual = utils.whiteListSessionData(input);
+      const actual = whiteListSessionData(input);
       assert.deepEqual(actual, expected, 'Unwanted param should be removed');
     });
 
@@ -115,7 +136,7 @@ describe('utils', function () {
         'identity': '67890',
         'referring_identity': '12345',
       };
-      const whiteListedData = utils.whiteListSessionData(data);
+      const whiteListedData = whiteListSessionData(data);
       assert.strictEqual(
         whiteListedData.has_app,
         null,
@@ -169,7 +190,7 @@ describe('utils', function () {
         data: dataString,
       };
       assert.deepEqual(
-        utils.cleanLinkData(linkData),
+        cleanLinkData(linkData),
         expectedCleanedLinkData,
         'Accept empty linkData',
       );
@@ -207,7 +228,7 @@ describe('utils', function () {
         source: 'web-sdk',
       };
       assert.deepEqual(
-        utils.cleanLinkData(linkData),
+        cleanLinkData(linkData),
         expectedCleanedLinkData,
         'Stringified field "data" and added "source"',
       );
@@ -245,7 +266,7 @@ describe('utils', function () {
         source: 'web-sdk',
       };
       assert.deepEqual(
-        utils.cleanLinkData(utils.cleanLinkData(linkData)),
+        cleanLinkData(cleanLinkData(linkData)),
         expectedCleanedLinkData,
         'Refrain from over-stringifying field "data"',
       );
@@ -255,7 +276,7 @@ describe('utils', function () {
   describe('formatMessage', function () {
     it('should produce a missing param message', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.missingParam, ['endpoint', 'param']),
+        formatMessage(messages.missingParam, ['endpoint', 'param']),
         'API request endpoint missing parameter param',
         'Expected missing param message produced',
       );
@@ -263,11 +284,7 @@ describe('utils', function () {
 
     it('should produce an invalid param type message', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.invalidType, [
-          'endpoint',
-          'param',
-          'type',
-        ]),
+        formatMessage(messages.invalidType, ['endpoint', 'param', 'type']),
         'API request endpoint, parameter param is not type',
         'Expected invalid param type message produced',
       );
@@ -275,7 +292,7 @@ describe('utils', function () {
 
     it('should produce a Branch SDK not init message', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.nonInit),
+        formatMessage(messages.nonInit),
         'Branch SDK not initialized',
         'Expected Branch SDK not init message produced',
       );
@@ -283,7 +300,7 @@ describe('utils', function () {
 
     it('should produce a Branch SDK already init message', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.existingInit),
+        formatMessage(messages.existingInit),
         'Branch SDK already initialized',
         'Expected Branch SDK already initialized message produced',
       );
@@ -291,7 +308,7 @@ describe('utils', function () {
 
     it('should produce a missing app id', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.missingAppId),
+        formatMessage(messages.missingAppId),
         'Missing Branch app ID',
         'Expected Branch app id missing message produced',
       );
@@ -299,7 +316,7 @@ describe('utils', function () {
 
     it('should produce a call branch init first', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.callBranchInitFirst),
+        formatMessage(messages.callBranchInitFirst),
         'Branch.init must be called first',
         'Expected Branch must be called first message produced',
       );
@@ -307,7 +324,7 @@ describe('utils', function () {
 
     it('should produce a timeout message', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.timeout),
+        formatMessage(messages.timeout),
         'Request timed out',
         'Expected Request timed out message produced',
       );
@@ -315,7 +332,7 @@ describe('utils', function () {
 
     it('should produce a missing URL error', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.missingUrl),
+        formatMessage(messages.missingUrl),
         'Required argument: URL, is missing',
         'Expected Missing url message produced',
       );
@@ -323,7 +340,7 @@ describe('utils', function () {
 
     it('should produce a missing identity error', function () {
       assert.strictEqual(
-        utils.formatMessage(utils.messages.missingIdentity),
+        formatMessage(messages.missingIdentity),
         'setIdentity - required argument identity should have a non-null value',
         'Expected Missing identity message produced',
       );
@@ -334,7 +351,7 @@ describe('utils', function () {
     it('should return search param value', function () {
       testUtils.go('?test=testsearch');
       assert.strictEqual(
-        utils.getParamValue('test'),
+        getParamValue('test'),
         'testsearch',
         'Returns search param',
       );
@@ -342,32 +359,20 @@ describe('utils', function () {
 
     it('should return undefined if not set', function () {
       testUtils.go('');
-      assert.strictEqual(
-        undefined,
-        utils.getParamValue('test'),
-        'returns undefined',
-      );
+      assert.strictEqual(undefined, getParamValue('test'), 'returns undefined');
     });
   });
 
   describe('hashValue', function () {
     it('should return hash param value', function () {
       if (testUtils.go('#test:testhash')) {
-        assert.strictEqual(
-          utils.hashValue('test'),
-          'testhash',
-          'Returns hash param',
-        );
+        assert.strictEqual(hashValue('test'), 'testhash', 'Returns hash param');
       }
     });
 
     it('should return undefined if not set', function () {
       if (testUtils.go('')) {
-        assert.strictEqual(
-          undefined,
-          utils.hashValue('test'),
-          'returns undefined',
-        );
+        assert.strictEqual(undefined, hashValue('test'), 'returns undefined');
       }
     });
   });
@@ -377,7 +382,7 @@ describe('utils', function () {
       if (testUtils.go('#test:extractDeeplinkPath')) {
         assert.strictEqual(
           'abc/def/',
-          utils.extractDeeplinkPath('https://domain.name/abc/def/'),
+          extractDeeplinkPath('https://domain.name/abc/def/'),
           'should extract deeplink path',
         );
       }
@@ -387,7 +392,7 @@ describe('utils', function () {
       if (testUtils.go('#test:extractDeeplinkPath')) {
         assert.strictEqual(
           'abc/def/',
-          utils.extractDeeplinkPath('domain.name/abc/def/'),
+          extractDeeplinkPath('domain.name/abc/def/'),
           'should extract deeplink path',
         );
       }
@@ -397,7 +402,7 @@ describe('utils', function () {
       if (testUtils.go('#test:extractDeeplinkPath')) {
         assert.strictEqual(
           '',
-          utils.extractDeeplinkPath('https://domain.name'),
+          extractDeeplinkPath('https://domain.name'),
           'should extract deeplink path as empty string',
         );
       }
@@ -408,7 +413,7 @@ describe('utils', function () {
       if (testUtils.go('#test:extractMobileDeeplinkPath')) {
         assert.strictEqual(
           'abc/def/',
-          utils.extractMobileDeeplinkPath('AppName://abc/def/'),
+          extractMobileDeeplinkPath('AppName://abc/def/'),
           'should extract deeplink path',
         );
       }
@@ -418,7 +423,7 @@ describe('utils', function () {
       if (testUtils.go('#test:extractMobileDeeplinkPath')) {
         assert.strictEqual(
           'abc/def/',
-          utils.extractMobileDeeplinkPath('abc/def/'),
+          extractMobileDeeplinkPath('abc/def/'),
           'should extract deeplink path',
         );
       }
@@ -428,7 +433,7 @@ describe('utils', function () {
       if (testUtils.go('#test:extractMobileDeeplinkPath')) {
         assert.strictEqual(
           'abc/def/',
-          utils.extractMobileDeeplinkPath('/abc/def/'),
+          extractMobileDeeplinkPath('/abc/def/'),
           'should extract deeplink path',
         );
       }
@@ -438,7 +443,7 @@ describe('utils', function () {
       if (testUtils.go('#test:extractMobileDeeplinkPath')) {
         assert.strictEqual(
           '',
-          utils.extractMobileDeeplinkPath('AppName://'),
+          extractMobileDeeplinkPath('AppName://'),
           'should extract deeplink path as empty string',
         );
       }
@@ -448,7 +453,7 @@ describe('utils', function () {
     it('should return an object', function () {
       assert.strictEqual(
         'object',
-        typeof utils.getHostedDeepLinkData(),
+        typeof getEnv().hostedDeepLinkData(),
         'should return an object type',
       );
     });
@@ -456,11 +461,7 @@ describe('utils', function () {
       const expected = {
         $og_type: 'product',
       };
-      assert.deepEqual(
-        expected,
-        utils.openGraphDataAsObject(),
-        'should be equal',
-      );
+      assert.deepEqual(expected, openGraphDataAsObject(), 'should be equal');
     });
     it('should find applink, twitter and branch hosted data on page', function () {
       // Inject the meta tags directly via the jsdom DOM so getHostedDeepLinkData picks them
@@ -489,7 +490,7 @@ describe('utils', function () {
         };
         assert.deepEqual(
           expected,
-          utils.getHostedDeepLinkData(),
+          getEnv().hostedDeepLinkData(),
           'should be equal',
         );
       } finally {
@@ -516,7 +517,7 @@ describe('utils', function () {
       };
       assert.deepEqual(
         expected,
-        utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
+        prioritizeDeeplinkPaths(params, deeplinkPaths),
         'should be equal',
       );
     });
@@ -538,7 +539,7 @@ describe('utils', function () {
       };
       assert.deepEqual(
         expected,
-        utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
+        prioritizeDeeplinkPaths(params, deeplinkPaths),
         'should be equal',
       );
     });
@@ -554,7 +555,7 @@ describe('utils', function () {
       };
       assert.deepEqual(
         expected,
-        utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
+        prioritizeDeeplinkPaths(params, deeplinkPaths),
         'should be equal',
       );
     });
@@ -571,7 +572,7 @@ describe('utils', function () {
       };
       assert.deepEqual(
         expected,
-        utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
+        prioritizeDeeplinkPaths(params, deeplinkPaths),
         'should be equal',
       );
     });
@@ -584,7 +585,7 @@ describe('utils', function () {
       };
       assert.deepEqual(
         expected,
-        utils.prioritizeDeeplinkPaths(params, deeplinkPaths),
+        prioritizeDeeplinkPaths(params, deeplinkPaths),
         'should be equal',
       );
     });
@@ -604,8 +605,8 @@ describe('utils', function () {
     }
 
     it('returns an empty object when there are no meta tags', function () {
-      assert.deepEqual({}, utils.processHostedDeepLinkData([]));
-      assert.deepEqual({}, utils.processHostedDeepLinkData(null));
+      assert.deepEqual({}, processHostedDeepLinkData([]));
+      assert.deepEqual({}, processHostedDeepLinkData(null));
     });
 
     it('ignores meta tags that have no name/property or no content', function () {
@@ -614,7 +615,7 @@ describe('utils', function () {
         meta({ content: 'appuri://path/ios' }), // missing name/property
         meta({ name: 'description', content: 'irrelevant' }),
       ];
-      assert.deepEqual({}, utils.processHostedDeepLinkData(metadata));
+      assert.deepEqual({}, processHostedDeepLinkData(metadata));
     });
 
     it('scrapes twitter:app:url:iphone into $ios_deeplink_path (path only, no scheme)', function () {
@@ -624,7 +625,7 @@ describe('utils', function () {
           content: 'aetvplus://showid/SERIES5053',
         }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('showid/SERIES5053', result.$ios_deeplink_path);
     });
 
@@ -635,7 +636,7 @@ describe('utils', function () {
           content: 'aetvplus://showid/SERIES5053',
         }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('showid/SERIES5053', result.$android_deeplink_path);
     });
 
@@ -650,7 +651,7 @@ describe('utils', function () {
           content: 'aetvplus://android/path',
         }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('ios/path', result.$ios_deeplink_path);
       assert.strictEqual('android/path', result.$android_deeplink_path);
     });
@@ -663,7 +664,7 @@ describe('utils', function () {
           content: 'appuri://applinks/android',
         }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('applinks/ios', result.$ios_deeplink_path);
       assert.strictEqual('applinks/android', result.$android_deeplink_path);
     });
@@ -679,7 +680,7 @@ describe('utils', function () {
           content: 'hosted://android/path',
         }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('ios/path', result.$ios_deeplink_path);
       assert.strictEqual('android/path', result.$android_deeplink_path);
     });
@@ -689,7 +690,7 @@ describe('utils', function () {
         meta({ name: 'branch:deeplink:custom_key', content: 'custom_value' }),
         meta({ name: 'branch:deeplink:another_key', content: 'another_value' }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('custom_value', result.custom_key);
       assert.strictEqual('another_value', result.another_key);
     });
@@ -703,7 +704,7 @@ describe('utils', function () {
         meta({ property: 'al:ios:url', content: 'applinks://ios' }),
         meta({ name: 'twitter:app:url:iphone', content: 'twitter://ios' }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('ios', result.$ios_deeplink_path);
     });
 
@@ -715,7 +716,7 @@ describe('utils', function () {
           content: 'twitter://android',
         }), // no hosted/applinks android
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('ios', result.$ios_deeplink_path);
       assert.strictEqual('android', result.$android_deeplink_path);
     });
@@ -729,7 +730,7 @@ describe('utils', function () {
           content: 'aetvplus://twitter/wins',
         }),
       ];
-      const result = utils.processHostedDeepLinkData(metadata);
+      const result = processHostedDeepLinkData(metadata);
       assert.strictEqual('twitter/wins', result.$ios_deeplink_path);
     });
   });
@@ -739,7 +740,7 @@ describe('utils', function () {
       const expected = '123abc';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink('/123abc'),
+        getEnv().clickIdAndSearchStringFromLink('/123abc'),
         'should be equal',
       );
     });
@@ -747,7 +748,7 @@ describe('utils', function () {
       const expected = '123abc';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink('/c/123abc'),
+        getEnv().clickIdAndSearchStringFromLink('/c/123abc'),
         'should be equal',
       );
     });
@@ -755,7 +756,7 @@ describe('utils', function () {
       const expected = '123abc?key1=val1';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink('/c/123abc?key1=val1'),
+        getEnv().clickIdAndSearchStringFromLink('/c/123abc?key1=val1'),
         'should be equal',
       );
     });
@@ -763,7 +764,7 @@ describe('utils', function () {
       const expected = '';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(''),
+        getEnv().clickIdAndSearchStringFromLink(''),
         'should be equal',
       );
     });
@@ -771,7 +772,7 @@ describe('utils', function () {
       const expected = '';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(''),
+        getEnv().clickIdAndSearchStringFromLink(''),
         'should be equal',
       );
     });
@@ -779,7 +780,7 @@ describe('utils', function () {
       const expected = '';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(undefined),
+        getEnv().clickIdAndSearchStringFromLink(undefined),
         'should be equal',
       );
     });
@@ -787,7 +788,7 @@ describe('utils', function () {
       const expected = '';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(null),
+        getEnv().clickIdAndSearchStringFromLink(null),
         'should be equal',
       );
     });
@@ -795,7 +796,7 @@ describe('utils', function () {
       const expected = '?test=test';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(
+        getEnv().clickIdAndSearchStringFromLink(
           'http://example.com:3000?test=test',
         ),
         'should be equal',
@@ -805,7 +806,7 @@ describe('utils', function () {
       const expected = '?test=test';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(
+        getEnv().clickIdAndSearchStringFromLink(
           'http://example.com:3000/?test=test',
         ),
         'should be equal',
@@ -815,7 +816,7 @@ describe('utils', function () {
       const expected = 'clickid?search=test';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(
+        getEnv().clickIdAndSearchStringFromLink(
           'http://example.com:3000/c/clickid?search=test#hash',
         ),
         'should be equal',
@@ -825,7 +826,7 @@ describe('utils', function () {
       const expected = 'clickid?search=test';
       assert.strictEqual(
         expected,
-        utils.getClickIdAndSearchStringFromLink(
+        getEnv().clickIdAndSearchStringFromLink(
           'http://example.com:3000/c/clickid/?search=test#hash',
         ),
         'should be equal',
@@ -844,7 +845,7 @@ describe('utils', function () {
       };
       assert.deepEqual(
         expected,
-        utils.convertObjectValuesToString(initial),
+        convertObjectValuesToString(initial),
         'objects values are not strings',
       );
     });
@@ -867,7 +868,7 @@ describe('utils', function () {
       };
       assert.deepEqual(
         expected,
-        utils.convertObjectValuesToString(initial),
+        convertObjectValuesToString(initial),
         'objects values are not strings',
       );
     });
@@ -875,7 +876,7 @@ describe('utils', function () {
       const initial = {};
       assert.deepEqual(
         {},
-        utils.convertObjectValuesToString(initial),
+        convertObjectValuesToString(initial),
         'should return empty object',
       );
     });
@@ -887,7 +888,7 @@ describe('utils', function () {
       const expected = '0';
       assert.strictEqual(
         expected,
-        utils.convertValueToString(initial),
+        convertValueToString(initial),
         '0 should be converted to "0"',
       );
     });
@@ -897,7 +898,7 @@ describe('utils', function () {
       const expected = 'true';
       assert.strictEqual(
         expected,
-        utils.convertValueToString(initial),
+        convertValueToString(initial),
         'true should be converted to "true"',
       );
     });
@@ -907,7 +908,7 @@ describe('utils', function () {
       const expected = 'null';
       assert.strictEqual(
         expected,
-        utils.convertValueToString(initial),
+        convertValueToString(initial),
         'null should be converted to "null"',
       );
     });
@@ -917,7 +918,7 @@ describe('utils', function () {
       const expected = '{"sku":"foo-sku-7","price":8.5,"quantity":4}';
       assert.strictEqual(
         expected,
-        utils.convertValueToString(initial),
+        convertValueToString(initial),
         'object should be stringified',
       );
     });
@@ -931,7 +932,7 @@ describe('utils', function () {
         '[{"sku":"foo-sku-7","price":8.5,"quantity":4},"testing"]';
       assert.strictEqual(
         expected,
-        utils.convertValueToString(initial),
+        convertValueToString(initial),
         'array should be stringified',
       );
     });
@@ -997,7 +998,7 @@ describe('utils', function () {
       let isSafari11 = false;
       popularBrowsers.forEach(function (ua) {
         setUserAgent(ua);
-        if (navigator.userAgent === ua && utils.isSafari11OrGreater()) {
+        if (navigator.userAgent === ua && isSafari11OrGreater()) {
           isSafari11 = true;
         }
       });
@@ -1026,7 +1027,7 @@ describe('utils', function () {
       let isSafari11 = true;
       safari11.forEach(function (ua) {
         setUserAgent(ua);
-        if (navigator.userAgent === ua && !utils.isSafari11OrGreater()) {
+        if (navigator.userAgent === ua && !isSafari11OrGreater()) {
           isSafari11 = false;
         }
       });
@@ -1060,10 +1061,10 @@ describe('utils', function () {
 
       const event_and_custom_data = {};
 
-      utils.merge(event_and_custom_data, event_data);
-      utils.merge(event_and_custom_data, custom_data);
+      merge(event_and_custom_data, event_data);
+      merge(event_and_custom_data, custom_data);
 
-      const extractedEventAndCustomData = utils.separateEventAndCustomData(
+      const extractedEventAndCustomData = separateEventAndCustomData(
         event_and_custom_data,
       );
       assert.deepEqual(
@@ -1078,18 +1079,18 @@ describe('utils', function () {
       );
     });
 
-    it('utils.isStandardEvent() should return true for standard events and false for custom events', function () {
+    it('isStandardEvent() should return true for standard events and false for custom events', function () {
       const standardEvent = 'ADD_TO_WISHLIST';
       const customEvent = 'ADD_TO_WISHLISTT';
 
       assert.strictEqual(
         true,
-        utils.isStandardEvent(standardEvent),
+        isStandardEvent(standardEvent),
         'should return true for ADD_TO_WISHLIST',
       );
       assert.strictEqual(
         false,
-        utils.isStandardEvent(customEvent),
+        isStandardEvent(customEvent),
         'should return false for ADD_TO_WISHLISTT',
       );
     });
@@ -1103,60 +1104,60 @@ describe('utils', function () {
       const type3 = 'string';
       assert.strictEqual(
         false,
-        utils.validateParameterType(null, type1),
+        validateParameterType(null, type1),
         'should return false',
       );
       assert.strictEqual(
         false,
-        utils.validateParameterType(parameter1, null),
+        validateParameterType(parameter1, null),
         'should return false',
       );
 
       assert.strictEqual(
         true,
-        utils.validateParameterType(parameter1, type1),
+        validateParameterType(parameter1, type1),
         'should return true',
       );
       assert.strictEqual(
         false,
-        utils.validateParameterType(parameter1, type2),
+        validateParameterType(parameter1, type2),
         'should return false',
       );
       assert.strictEqual(
         false,
-        utils.validateParameterType(parameter1, type3),
+        validateParameterType(parameter1, type3),
         'should return false',
       );
 
       assert.strictEqual(
         false,
-        utils.validateParameterType(parameter2, type1),
+        validateParameterType(parameter2, type1),
         'should return false',
       );
       assert.strictEqual(
         true,
-        utils.validateParameterType(parameter2, type2),
+        validateParameterType(parameter2, type2),
         'should return true',
       );
       assert.strictEqual(
         false,
-        utils.validateParameterType(parameter2, type3),
+        validateParameterType(parameter2, type3),
         'should return false',
       );
 
       assert.strictEqual(
         false,
-        utils.validateParameterType(parameter3, type1),
+        validateParameterType(parameter3, type1),
         'should return false',
       );
       assert.strictEqual(
         false,
-        utils.validateParameterType(parameter3, type2),
+        validateParameterType(parameter3, type2),
         'should return false',
       );
       assert.strictEqual(
         true,
-        utils.validateParameterType(parameter3, type3),
+        validateParameterType(parameter3, type3),
         'should return true',
       );
     });
@@ -1165,9 +1166,9 @@ describe('utils', function () {
   describe('mergeMetadataFromInitToHostedMetadata', function () {
     it.skip('override previous hosted_deeplink_data keys via user-supplied metadata object', function () {
       const additionalMetadata = {};
-      additionalMetadata.hosted_deeplink_data = utils.getHostedDeepLinkData();
+      additionalMetadata.hosted_deeplink_data = getEnv().hostedDeepLinkData();
       const userSuppliedMetadata = { watch_brand: 'Seiko', type: 'Presage' };
-      const response = utils.mergeHostedDeeplinkData(
+      const response = mergeHostedDeeplinkData(
         additionalMetadata.hosted_deeplink_data,
         userSuppliedMetadata,
       );
@@ -1182,9 +1183,9 @@ describe('utils', function () {
 
     it.skip('merge hosted_deeplink_data and user-supplied metadata', function () {
       const additionalMetadata = {};
-      additionalMetadata.hosted_deeplink_data = utils.getHostedDeepLinkData();
+      additionalMetadata.hosted_deeplink_data = getEnv().hostedDeepLinkData();
       const userSuppliedMetadata = { productA: '12345' };
-      const response = utils.mergeHostedDeeplinkData(
+      const response = mergeHostedDeeplinkData(
         additionalMetadata.hosted_deeplink_data,
         userSuppliedMetadata,
       );
@@ -1201,7 +1202,7 @@ describe('utils', function () {
     it('tests with metadata and without hosted_deeplink_data', function () {
       const additionalMetadata = {};
       const userSuppliedMetadata = { productA: '12345' };
-      const response = utils.mergeHostedDeeplinkData(
+      const response = mergeHostedDeeplinkData(
         additionalMetadata.hosted_deeplink_data,
         userSuppliedMetadata,
       );
@@ -1213,7 +1214,7 @@ describe('utils', function () {
       const additionalData = { 'root_key': '1234' };
       additionalData.hosted_deeplink_data = { productA: '12345' };
       const userSuppliedMetadata = { productB: '12345' };
-      utils.mergeHostedDeeplinkData(
+      mergeHostedDeeplinkData(
         additionalData.hosted_deeplink_data,
         userSuppliedMetadata,
       );
@@ -1228,7 +1229,7 @@ describe('utils', function () {
       const additionalData = {};
       additionalData.hosted_deeplink_data = { productA: '12345' };
       const userSuppliedMetadata = { productB: '12345' };
-      utils.mergeHostedDeeplinkData(
+      mergeHostedDeeplinkData(
         additionalData.hosted_deeplink_data,
         userSuppliedMetadata,
       );
@@ -1284,7 +1285,7 @@ describe('utils', function () {
   describe('delay function', function () {
     it('calls synchronously for a non-numeric delay argument', function () {
       let executed = false;
-      utils.delay(function () {
+      delay(function () {
         executed = true;
       }, NaN);
       // executed is true immediately after the call
@@ -1293,7 +1294,7 @@ describe('utils', function () {
 
     it('calls synchronously for a zero delay argument', function () {
       let executed = false;
-      utils.delay(function () {
+      delay(function () {
         executed = true;
       }, 0);
       // executed is true immediately after the call
@@ -1302,7 +1303,7 @@ describe('utils', function () {
 
     it('calls synchronously for a negative delay argument', function () {
       let executed = false;
-      utils.delay(function () {
+      delay(function () {
         executed = true;
       }, -25);
       // executed is true immediately after the call
@@ -1312,7 +1313,7 @@ describe('utils', function () {
     it('delays for any positive numeric argument', function () {
       let executed = false;
       vi.useFakeTimers();
-      utils.delay(function () {
+      delay(function () {
         executed = true;
       }, 100);
       // executed is still false immediately after the call
@@ -1389,35 +1390,35 @@ describe('utils', function () {
       setUserAgent(iOSBrowsers.firefox);
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), false);
+      assert.equal(isIOSWKWebView(), false);
     });
 
     it('should return false for Chrome', function () {
       setUserAgent(iOSBrowsers.chrome);
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), false);
+      assert.equal(isIOSWKWebView(), false);
     });
 
     it('should return false for Edge', function () {
       setUserAgent(iOSBrowsers.edge);
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), false);
+      assert.equal(isIOSWKWebView(), false);
     });
 
     it('should return false for Yandex', function () {
       setUserAgent(iOSBrowsers.yandex);
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), false);
+      assert.equal(isIOSWKWebView(), false);
     });
 
     it('should return false for Opera', function () {
       setUserAgent(iOSBrowsers.firefox);
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), false);
+      assert.equal(isIOSWKWebView(), false);
     });
 
     it('should return true when UA includes iPhone & window.webkitURL is defined', function () {
@@ -1426,7 +1427,7 @@ describe('utils', function () {
       );
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), true);
+      assert.equal(isIOSWKWebView(), true);
     });
 
     it('should return true when UA includes iPad & window.webkitURL is defined', function () {
@@ -1435,7 +1436,7 @@ describe('utils', function () {
       );
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), true);
+      assert.equal(isIOSWKWebView(), true);
     });
 
     it('should return true when UA includes iPod & window.webkitURL is defined', function () {
@@ -1445,7 +1446,7 @@ describe('utils', function () {
       );
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), true);
+      assert.equal(isIOSWKWebView(), true);
     });
 
     it('should return false when UA is not iOS but window.webkitURL is defined', function () {
@@ -1454,7 +1455,7 @@ describe('utils', function () {
       );
       window.webkitURL = function () {};
 
-      assert.equal(utils.isIOSWKWebView(), false);
+      assert.equal(isIOSWKWebView(), false);
     });
 
     it('should return false when UA is iOS but window.webkitURL is not defined', function () {
@@ -1463,7 +1464,7 @@ describe('utils', function () {
       );
       delete window.webkitURL;
 
-      assert.equal(utils.isIOSWKWebView(), false);
+      assert.equal(isIOSWKWebView(), false);
     });
   });
 
@@ -1474,7 +1475,7 @@ describe('utils', function () {
         'prop1': 'value1',
       };
       assert.deepEqual(
-        utils.addPropertyIfNotNullorEmpty(obj, 'prop2', ''),
+        addPropertyIfNotNullorEmpty(obj, 'prop2', ''),
         expectedObj,
         'Correctly added property to object',
       );
@@ -1485,7 +1486,7 @@ describe('utils', function () {
         'prop1': 'value1',
       };
       assert.deepEqual(
-        utils.addPropertyIfNotNullorEmpty(obj, 'prop2', null),
+        addPropertyIfNotNullorEmpty(obj, 'prop2', null),
         expectedObj,
         'Correctly added property to object',
       );
@@ -1497,7 +1498,7 @@ describe('utils', function () {
         'prop2': 'value2',
       };
       assert.deepEqual(
-        utils.addPropertyIfNotNullorEmpty(obj, 'prop2', 'value2'),
+        addPropertyIfNotNullorEmpty(obj, 'prop2', 'value2'),
         expectedObj,
         'Correctly added property to object',
       );
@@ -1508,7 +1509,7 @@ describe('utils', function () {
     it('should return empty if value is empty', function () {
       const versionNumber = '';
       assert.deepEqual(
-        utils.removeTrailingDotZeros(versionNumber),
+        removeTrailingDotZeros(versionNumber),
         versionNumber,
         'Correctly matched empty',
       );
@@ -1516,7 +1517,7 @@ describe('utils', function () {
     it('should return null if value is null', function () {
       const versionNumber = null;
       assert.deepEqual(
-        utils.removeTrailingDotZeros(versionNumber),
+        removeTrailingDotZeros(versionNumber),
         versionNumber,
         'Correctly matched null',
       );
@@ -1524,7 +1525,7 @@ describe('utils', function () {
     it('no dot- should not strip trailing dot zero', function () {
       const versionNumber = '10';
       assert.deepEqual(
-        utils.removeTrailingDotZeros(versionNumber),
+        removeTrailingDotZeros(versionNumber),
         versionNumber,
         'Correctly strip trailing zeros',
       );
@@ -1532,7 +1533,7 @@ describe('utils', function () {
     it('with dot and no zeros- should not strip trailing dot zero', function () {
       const versionNumber = '10.10';
       assert.deepEqual(
-        utils.removeTrailingDotZeros(versionNumber),
+        removeTrailingDotZeros(versionNumber),
         versionNumber,
         'Correctly strip trailing zeros',
       );
@@ -1540,7 +1541,7 @@ describe('utils', function () {
     it('single dot- should not strip trailing dot zero', function () {
       const versionNumber = '10.0';
       assert.deepEqual(
-        utils.removeTrailingDotZeros(versionNumber),
+        removeTrailingDotZeros(versionNumber),
         versionNumber,
         'Correctly strip trailing zeros',
       );
@@ -1549,7 +1550,7 @@ describe('utils', function () {
       const versionNumber = '10.0.0';
       const expected = '10';
       assert.deepEqual(
-        utils.removeTrailingDotZeros(versionNumber),
+        removeTrailingDotZeros(versionNumber),
         expected,
         'Correctly strip trailing zeros',
       );
@@ -1557,7 +1558,7 @@ describe('utils', function () {
     it('should not strip trailing dot zero', function () {
       const versionNumber = '10.0.1';
       assert.deepEqual(
-        utils.removeTrailingDotZeros(versionNumber),
+        removeTrailingDotZeros(versionNumber),
         versionNumber,
         'Correctly strip trailing zeros',
       );
@@ -1640,21 +1641,21 @@ describe('utils', function () {
     it('should return "android" for Android chrome user agent', function () {
       setUserAgent(userAgentsList.android_chrome.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.android_chrome.platform,
       );
     });
     it('should return "ios" for ios safari user agent', function () {
       setUserAgent(userAgentsList.iOS_safari.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.iOS_safari.platform,
       );
     });
     it('should return "ios" for ios chrome user agent', function () {
       setUserAgent(userAgentsList.iOS_chrome.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.iOS_chrome.platform,
       );
     });
@@ -1671,42 +1672,42 @@ describe('utils', function () {
         value: 1366,
       });
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.iOS_ipad_safari.platform,
       );
     });
     it('should return "desktop" for macOS safari user agent', function () {
       setUserAgent(userAgentsList.macOS_safari.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.macOS_safari.platform,
       );
     });
     it('should return "desktop" for macOS chrome user agent', function () {
       setUserAgent(userAgentsList.macOS_chrome.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.macOS_chrome.platform,
       );
     });
     it('should return "desktop" for windows edge user agent', function () {
       setUserAgent(userAgentsList.windows_edge.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.windows_edge.platform,
       );
     });
     it('should return "desktop" for windows chrome user agent', function () {
       setUserAgent(userAgentsList.windows_chrome.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.windows_chrome.platform,
       );
     });
     it('should return "desktop" for linux chrome user agent', function () {
       setUserAgent(userAgentsList.linux_chrome.ua);
       assert.equal(
-        utils.getPlatformByUserAgent(),
+        getPlatformByUserAgent(),
         userAgentsList.linux_chrome.platform,
       );
     });
@@ -1714,15 +1715,15 @@ describe('utils', function () {
 
   describe('shouldAddDMAParams', function () {
     it('should return true for valid endpoints', function () {
-      assert.equal(utils.shouldAddDMAParams('/v1/open'), true);
-      assert.equal(utils.shouldAddDMAParams('/v1/pageview'), true);
-      assert.equal(utils.shouldAddDMAParams('/v2/event/standard'), true);
-      assert.equal(utils.shouldAddDMAParams('/v2/event/custom'), true);
+      assert.equal(shouldAddDMAParams('/v1/open'), true);
+      assert.equal(shouldAddDMAParams('/v1/pageview'), true);
+      assert.equal(shouldAddDMAParams('/v2/event/standard'), true);
+      assert.equal(shouldAddDMAParams('/v2/event/custom'), true);
     });
 
     it('should return false for invalid endpoints', function () {
-      assert.equal(utils.shouldAddDMAParams('/v3/invalid'), false);
-      assert.equal(utils.shouldAddDMAParams('/v2/others'), false);
+      assert.equal(shouldAddDMAParams('/v3/invalid'), false);
+      assert.equal(shouldAddDMAParams('/v2/others'), false);
     });
   });
 
@@ -1734,7 +1735,7 @@ describe('utils', function () {
         adPersonalizationConsent: true,
         adUserDataUsageConsent: false,
       };
-      utils.setDMAParams(data, dmaObj, '/v1/open');
+      setDMAParams(data, dmaObj, '/v1/open');
       assert.deepEqual(data, {
         dma_eea: true,
         dma_ad_personalization: true,
@@ -1749,7 +1750,7 @@ describe('utils', function () {
       };
 
       const data2 = {};
-      utils.setDMAParams(data2, dmaObj, '/v2/event/standard');
+      setDMAParams(data2, dmaObj, '/v2/event/standard');
       assert.deepEqual(data2, {
         'user_data':
           '{"dma_eea":true,"dma_ad_personalization":true,"dma_ad_user_data":false}',
@@ -1763,7 +1764,7 @@ describe('utils', function () {
       };
 
       const data2 = {};
-      utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
+      setDMAParams(data2, dmaObj, '/v2/event/custom');
       assert.deepEqual(data2, {
         'user_data':
           '{"dma_eea":true,"dma_ad_personalization":true,"dma_ad_user_data":false}',
@@ -1780,7 +1781,7 @@ describe('utils', function () {
       data2.user_data = JSON.stringify({
         'test': true,
       });
-      utils.setDMAParams(data2, dmaObj, '/v2/event/custom');
+      setDMAParams(data2, dmaObj, '/v2/event/custom');
       assert.deepEqual(data2, {
         'user_data':
           '{"test":true,"dma_eea":true,"dma_ad_personalization":true,"dma_ad_user_data":false}',
@@ -1794,7 +1795,7 @@ describe('utils', function () {
       };
 
       const data2 = {};
-      utils.setDMAParams(data2, dmaObj, '/v1/pageview');
+      setDMAParams(data2, dmaObj, '/v1/pageview');
       assert.deepEqual(data2, {
         dma_eea: true,
         dma_ad_personalization: true,
@@ -1809,7 +1810,7 @@ describe('utils', function () {
         adUserDataUsageConsent: false,
       };
 
-      utils.setDMAParams(data, dmaObj, '/v1/invalid');
+      setDMAParams(data, dmaObj, '/v1/invalid');
       assert.deepEqual(data, {});
     });
     it('should not add DMA parameters for invalid endpoints: v1/dismiss', () => {
@@ -1820,67 +1821,67 @@ describe('utils', function () {
         adUserDataUsageConsent: false,
       };
 
-      utils.setDMAParams(data, dmaObj, '/v1/dismiss');
+      setDMAParams(data, dmaObj, '/v1/dismiss');
       assert.deepEqual(data, {});
     });
   });
   describe('isValidUrl', function () {
     // Invalid schemes
     it('should return false for invalid scheme htt', function () {
-      assert.equal(utils.isValidURL('htt://www.example.com'), false);
+      assert.equal(isValidURL('htt://www.example.com'), false);
     });
     it('should return false for missing scheme', function () {
-      assert.equal(utils.isValidURL('://www.example.com'), false);
+      assert.equal(isValidURL('://www.example.com'), false);
     });
 
     // Invalid domain names
     it('should return false for missing domain', function () {
-      assert.equal(utils.isValidURL('https://example'), false);
+      assert.equal(isValidURL('https://example'), false);
     });
     it('should return false for missing domain after dot', function () {
-      assert.equal(utils.isValidURL('https://example.'), false);
+      assert.equal(isValidURL('https://example.'), false);
     });
     it('should return false for missing domain before dot', function () {
-      assert.equal(utils.isValidURL('https://.example.com'), false);
+      assert.equal(isValidURL('https://.example.com'), false);
     });
 
     // Invalid domain names
     it('should return false for Invalid domain names', function () {
-      assert.equal(utils.isValidURL('www.example.com'), false);
+      assert.equal(isValidURL('www.example.com'), false);
     });
     it('should return false for Invalid domain names 2', function () {
-      assert.equal(utils.isValidURL('example.com'), false);
+      assert.equal(isValidURL('example.com'), false);
     });
     // Empty URL
     it('should return false for empty url', function () {
-      assert.equal(utils.isValidURL(''), false);
+      assert.equal(isValidURL(''), false);
     });
 
     it('should return false for Invalid domain names 2', function () {
-      assert.equal(utils.isValidURL(''), false);
+      assert.equal(isValidURL(''), false);
     });
 
     it('should return false for null', function () {
-      assert.equal(utils.isValidURL(null), false);
+      assert.equal(isValidURL(null), false);
     });
 
     it('should return false for undefined', function () {
-      assert.equal(utils.isValidURL(undefined), false);
+      assert.equal(isValidURL(undefined), false);
     });
 
     it('should return false for invalid path', function () {
       assert.equal(
-        utils.isValidURL('https://www.example.com/path with spaces'),
+        isValidURL('https://www.example.com/path with spaces'),
         false,
       );
     });
 
     it('should return true for valid url - https', function () {
-      assert.equal(utils.isValidURL('https://api2.branch.io'), true);
+      assert.equal(isValidURL('https://api2.branch.io'), true);
     });
 
     it('should return true for valid url - http', function () {
-      assert.equal(utils.isValidURL('http://api2.branch.io'), true);
+      assert.equal(isValidURL('http://api2.branch.io'), true);
     });
   });
 });

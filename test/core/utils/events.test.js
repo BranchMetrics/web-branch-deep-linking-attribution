@@ -1,4 +1,9 @@
-import { utils } from '../../../src/core/utils.js';
+import {
+  calculateDiffBetweenArrays,
+  isStandardEvent,
+  separateEventAndCustomData,
+  validateCommerceEventParams,
+} from '../../../src/lib/validation.js';
 
 // Characterization tests: these pin what the event helpers do today,
 // quirks included. Do not "fix" expectations here without a behavior change.
@@ -87,22 +92,20 @@ describe('events utils (characterization)', function () {
       ['uses strict equality', [1], ['1', 1], ['1']],
       ['ignores extra elements in original', ['a', 'b', 'c'], ['a'], []],
     ])('%s', function (_name, original, toCheck, expected) {
-      expect(utils.calculateDiffBetweenArrays(original, toCheck)).toEqual(
-        expected,
-      );
+      expect(calculateDiffBetweenArrays(original, toCheck)).toEqual(expected);
     });
 
     it('does not mutate its inputs', function () {
       const original = ['a'];
       const toCheck = ['a', 'b'];
-      utils.calculateDiffBetweenArrays(original, toCheck);
+      calculateDiffBetweenArrays(original, toCheck);
       expect(original).toEqual(['a']);
       expect(toCheck).toEqual(['a', 'b']);
     });
 
     it('throws when toCheck is not an array', function () {
       expect(function () {
-        utils.calculateDiffBetweenArrays(['a'], undefined);
+        calculateDiffBetweenArrays(['a'], undefined);
       }).toThrow(TypeError);
     });
   });
@@ -118,22 +121,22 @@ describe('events utils (characterization)', function () {
         ['a non-purchase name', 'add_to_cart'],
         ['purchase with whitespace', ' purchase'],
       ])('rejects %s', function (_name, event) {
-        expect(
-          utils.validateCommerceEventParams(event, fullCommerceData()),
-        ).toBe(MSG.missingPurchaseEvent);
+        expect(validateCommerceEventParams(event, fullCommerceData())).toBe(
+          MSG.missingPurchaseEvent,
+        );
       });
 
       it.each(['purchase', 'PURCHASE', 'Purchase'])(
         'accepts %j case-insensitively',
         function (event) {
           expect(
-            utils.validateCommerceEventParams(event, fullCommerceData()),
+            validateCommerceEventParams(event, fullCommerceData()),
           ).toBeNull();
         },
       );
 
       it('checks the event before commerce_data', function () {
-        expect(utils.validateCommerceEventParams('nope', undefined)).toBe(
+        expect(validateCommerceEventParams('nope', undefined)).toBe(
           MSG.missingPurchaseEvent,
         );
       });
@@ -149,26 +152,26 @@ describe('events utils (characterization)', function () {
         ['a number', 10],
         ['true', true],
       ])('rejects %s', function (_name, data) {
-        expect(utils.validateCommerceEventParams('purchase', data)).toBe(
+        expect(validateCommerceEventParams('purchase', data)).toBe(
           MSG.missingCommerceData,
         );
       });
 
       it('accepts every allowed root and product key', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', fullCommerceData()),
+          validateCommerceEventParams('purchase', fullCommerceData()),
         ).toBeNull();
       });
 
       it('accepts a minimal object without products', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', { revenue: 1 }),
+          validateCommerceEventParams('purchase', { revenue: 1 }),
         ).toBeNull();
       });
 
       it('reports invalid root keys in key order, comma separated', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             revenue: 1,
             foo: 1,
             bar: 2,
@@ -177,14 +180,14 @@ describe('events utils (characterization)', function () {
       });
 
       it('treats a non-empty array as an object with index keys', function () {
-        expect(utils.validateCommerceEventParams('purchase', ['a', 'b'])).toBe(
+        expect(validateCommerceEventParams('purchase', ['a', 'b'])).toBe(
           `${MSG.invalidKeysForRoot}0, 1`,
         );
       });
 
       it('reports invalid root keys before any products problem', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             foo: 1,
             products: 'not-an-array',
           }),
@@ -199,14 +202,14 @@ describe('events utils (characterization)', function () {
         ['null', null],
         ['undefined (own property present)', undefined],
       ])('rejects products that is %s', function (_name, products) {
-        expect(
-          utils.validateCommerceEventParams('purchase', { products }),
-        ).toBe(MSG.invalidProductListType);
+        expect(validateCommerceEventParams('purchase', { products })).toBe(
+          MSG.invalidProductListType,
+        );
       });
 
       it('accepts an empty products array', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', { products: [] }),
+          validateCommerceEventParams('purchase', { products: [] }),
         ).toBeNull();
       });
 
@@ -216,7 +219,7 @@ describe('events utils (characterization)', function () {
         ['a boolean', true],
       ])('rejects a product that is %s', function (_name, product) {
         expect(
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             products: [{ sku: 'a' }, product],
           }),
         ).toBe(MSG.invalidProductType);
@@ -224,7 +227,7 @@ describe('events utils (characterization)', function () {
 
       it('reports the product type error ahead of invalid product keys', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             products: [{ foo: 1 }, 'bad'],
           }),
         ).toBe(MSG.invalidProductType);
@@ -232,13 +235,13 @@ describe('events utils (characterization)', function () {
 
       it('accepts an array as a product (typeof is "object")', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', { products: [[]] }),
+          validateCommerceEventParams('purchase', { products: [[]] }),
         ).toBeNull();
       });
 
       it('reports index keys of a non-empty array product as invalid keys', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             products: [['x']],
           }),
         ).toBe(`${MSG.invalidKeysForProducts}0`);
@@ -249,7 +252,7 @@ describe('events utils (characterization)', function () {
         // type check, then Object.keys(null) throws instead of returning
         // the invalidProductType message.
         expect(function () {
-          utils.validateCommerceEventParams('purchase', { products: [null] });
+          validateCommerceEventParams('purchase', { products: [null] });
         }).toThrow(TypeError);
       });
 
@@ -258,7 +261,7 @@ describe('events utils (characterization)', function () {
         // execution continues to Object.keys(undefined), which throws before
         // the message can be returned.
         expect(function () {
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             products: [{ sku: 'a' }, undefined],
           });
         }).toThrow(TypeError);
@@ -266,7 +269,7 @@ describe('events utils (characterization)', function () {
 
       it('collects invalid keys across all products, keeping duplicates', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             products: [
               { sku: 'a', foo: 1 },
               { bar: 2, foo: 3 },
@@ -277,7 +280,7 @@ describe('events utils (characterization)', function () {
 
       it('does not allow root-only keys inside a product', function () {
         expect(
-          utils.validateCommerceEventParams('purchase', {
+          validateCommerceEventParams('purchase', {
             products: [{ sku: 'a', revenue: 1 }],
           }),
         ).toBe(`${MSG.invalidKeysForProducts}revenue`);
@@ -287,7 +290,7 @@ describe('events utils (characterization)', function () {
 
   describe('isStandardEvent', function () {
     it.each(STANDARD_EVENTS)('%s is standard', function (name) {
-      expect(utils.isStandardEvent(name)).toBe(true);
+      expect(isStandardEvent(name)).toBe(true);
     });
 
     it.each([
@@ -297,7 +300,7 @@ describe('events utils (characterization)', function () {
       'PURCHASE ',
       'VIEW_CONTENT',
     ])('%j is not standard (case-sensitive exact match)', function (name) {
-      expect(utils.isStandardEvent(name)).toBe(false);
+      expect(isStandardEvent(name)).toBe(false);
     });
 
     it.each([
@@ -306,7 +309,7 @@ describe('events utils (characterization)', function () {
       ['undefined', undefined],
       ['0', 0],
     ])('returns the falsy input itself for %s', function (_name, value) {
-      expect(utils.isStandardEvent(value)).toBe(value);
+      expect(isStandardEvent(value)).toBe(value);
     });
   });
 
@@ -316,7 +319,7 @@ describe('events utils (characterization)', function () {
       ['null', null],
       ['an empty object', {}],
     ])('returns null for %s', function (_name, value) {
-      expect(utils.separateEventAndCustomData(value)).toBeNull();
+      expect(separateEventAndCustomData(value)).toBeNull();
     });
 
     it('splits standard event data from custom data and stringifies custom values', function () {
@@ -338,7 +341,7 @@ describe('events utils (characterization)', function () {
         nothing: null,
       };
 
-      expect(utils.separateEventAndCustomData(input)).toEqual({
+      expect(separateEventAndCustomData(input)).toEqual({
         custom_data: {
           color: 'red',
           count: '3',
@@ -363,13 +366,13 @@ describe('events utils (characterization)', function () {
 
     it('mutates the input: custom keys are deleted and event_data is the same object', function () {
       const input = { revenue: 1, color: 'red' };
-      const result = utils.separateEventAndCustomData(input);
+      const result = separateEventAndCustomData(input);
       expect(result.event_data).toBe(input);
       expect(input).toEqual({ revenue: 1 });
     });
 
     it('does not stringify standard event data values', function () {
-      const result = utils.separateEventAndCustomData({ revenue: 1, tax: 2 });
+      const result = separateEventAndCustomData({ revenue: 1, tax: 2 });
       expect(result).toEqual({
         custom_data: {},
         event_data: { revenue: 1, tax: 2 },
@@ -377,7 +380,7 @@ describe('events utils (characterization)', function () {
     });
 
     it('returns an empty event_data object when everything is custom', function () {
-      const result = utils.separateEventAndCustomData({ a: 1, b: 'x' });
+      const result = separateEventAndCustomData({ a: 1, b: 'x' });
       expect(result).toEqual({
         custom_data: { a: '1', b: 'x' },
         event_data: {},
@@ -385,7 +388,7 @@ describe('events utils (characterization)', function () {
     });
 
     it('treats standard-looking keys case-sensitively', function () {
-      const result = utils.separateEventAndCustomData({ Revenue: 5 });
+      const result = separateEventAndCustomData({ Revenue: 5 });
       expect(result).toEqual({
         custom_data: { Revenue: '5' },
         event_data: {},
@@ -395,7 +398,7 @@ describe('events utils (characterization)', function () {
     it('throws for an undefined custom value', function () {
       // convertValueToString calls value.toString() on undefined.
       expect(function () {
-        utils.separateEventAndCustomData({ revenue: 1, missing: undefined });
+        separateEventAndCustomData({ revenue: 1, missing: undefined });
       }).toThrow(TypeError);
     });
   });

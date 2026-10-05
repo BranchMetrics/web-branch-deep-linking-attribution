@@ -2,8 +2,9 @@ import { Branch } from '../../src/branch.js';
 import { config } from '../../src/core/config.js';
 import { safejson } from '../../src/core/safejson.js';
 import { session } from '../../src/core/session.js';
-import { utils } from '../../src/core/utils.js';
+import { getEnv } from '../../src/env/env.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { merge } from '../../src/lib/objects.js';
 
 // Characterization tests for the identity/session-data methods: data, first,
 // setIdentity, logout, getBrowserFingerprintId, crossPlatformIds,
@@ -55,7 +56,7 @@ describe('Branch identity', function () {
     }
     requests[1].callback(
       null,
-      utils.merge(
+      merge(
         {
           browser_fingerprint_id: BFP_ID,
           identity_id: IDENTITY_ID,
@@ -70,13 +71,13 @@ describe('Branch identity', function () {
   }
 
   function baseUserData(extra) {
-    return utils.merge(
+    return merge(
       {
         http_origin: document.URL,
         user_agent: navigator.userAgent,
-        language: utils.getBrowserLanguageCode(),
-        screen_width: utils.getScreenWidth(),
-        screen_height: utils.getScreenHeight(),
+        language: getEnv().browserLanguageCode(),
+        screen_width: getEnv().screenWidth(),
+        screen_height: getEnv().screenHeight(),
         http_referrer: document.referrer,
         browser_fingerprint_id: BFP_ID,
         sdk: 'web',

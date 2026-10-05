@@ -1,9 +1,10 @@
 import { Branch } from '../../src/branch.js';
 import { config } from '../../src/core/config.js';
 import { safejson } from '../../src/core/safejson.js';
-import { utils } from '../../src/core/utils.js';
+import { getEnv } from '../../src/env/env.js';
 import { branch_view } from '../../src/journeys/branch_view.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { merge } from '../../src/lib/objects.js';
 
 // Characterization tests for branch.track, branch.logEvent and
 // branch.trackCommerceEvent. The network layer is stubbed at
@@ -64,13 +65,13 @@ describe('Branch events', function () {
   }
 
   function expectedUserData(extra) {
-    return utils.merge(
+    return merge(
       {
         http_origin: document.URL,
         user_agent: navigator.userAgent,
-        language: utils.getBrowserLanguageCode(),
-        screen_width: utils.getScreenWidth(),
-        screen_height: utils.getScreenHeight(),
+        language: getEnv().browserLanguageCode(),
+        screen_width: getEnv().screenWidth(),
+        screen_height: getEnv().screenHeight(),
         http_referrer: document.referrer,
         browser_fingerprint_id: BFP_ID,
         sdk: 'web',

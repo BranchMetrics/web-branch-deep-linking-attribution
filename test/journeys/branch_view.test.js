@@ -1,7 +1,6 @@
 import { createContext } from '../../src/core/context.js';
 import { session } from '../../src/core/session.js';
 import { storage as storageModule } from '../../src/core/storage.js';
-import { utils } from '../../src/core/utils.js';
 import { getEnv, setEnv } from '../../src/env/env.js';
 import { branch_view } from '../../src/journeys/branch_view.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
@@ -57,7 +56,6 @@ describe('displayJourney new render options wiring', function () {
 
 // Pristine copies of the module state the code under test mutates.
 const journeysUtilsSnapshot = Object.assign({}, journeys_utils);
-const utilsNavigationTimingSnapshot = utils.navigationTimingAPIEnabled;
 const branchViewKeysSnapshot = Object.keys(branch_view);
 
 const JOURNEY_ELEMENT_IDS = [
@@ -87,8 +85,6 @@ function restoreModuleState() {
   });
   Object.assign(journeys_utils, journeysUtilsSnapshot);
   journeys_utils.divToInjectParents = [];
-
-  utils.navigationTimingAPIEnabled = utilsNavigationTimingSnapshot;
 
   Object.keys(branch_view).forEach(function (key) {
     if (!branchViewKeysSnapshot.includes(key)) {
@@ -354,8 +350,8 @@ describe('branch_view.displayJourney', function () {
     store = new storageModule.BranchStorage(['local']);
     branch = makeJourneyBranch(store);
     journeys_utils.branch = branch;
+    // The fake env reports the navigation timing API as unavailable.
     setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.ios }));
-    utils.navigationTimingAPIEnabled = false;
     // The iframe rendering helpers are covered in journeys_utils tests; stub
     // them so these tests see only what branch_view passes along.
     spies = {};
@@ -589,9 +585,12 @@ describe('branch_view.displayJourney', function () {
   });
 
   it('records journey-load-time when the navigation timing API is enabled', async function () {
-    utils.navigationTimingAPIEnabled = true;
     setEnv(
-      makeFakeEnv({ ...getEnv(), timeSinceNavigationStart: () => '1234' }),
+      makeFakeEnv({
+        ...getEnv(),
+        navigationTimingAPIEnabled: () => true,
+        timeSinceNavigationStart: () => '1234',
+      }),
     );
     display(journeyHtml(METADATA));
     await waitForIframeLoad();
