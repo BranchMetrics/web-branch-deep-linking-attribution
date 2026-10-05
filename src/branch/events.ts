@@ -1,4 +1,4 @@
-import type { Branch } from './Branch.js';
+import type { Branch } from './branch.js';
 import { safejson } from '../core/safejson.js';
 import { mergeHostedDeeplinkData } from '../lib/hosted-data.js';
 import { getEnv } from '../env/env.js';

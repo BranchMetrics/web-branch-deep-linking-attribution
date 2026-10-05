@@ -1,4 +1,4 @@
-import type { Branch } from './Branch.js';
+import type { Branch } from './branch.js';
 import { safejson } from '../core/safejson.js';
 import { cleanLinkData } from '../core/url.js';
 import { generateDynamicBNCLink } from '../lib/url.js';

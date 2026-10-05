@@ -1,4 +1,4 @@
-import type { Branch } from './Branch.js';
+import type { Branch } from './branch.js';
 import { init_states, init_state_fail_codes } from './wrap.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';

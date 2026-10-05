@@ -1,4 +1,4 @@
-import type { Branch } from './Branch.js';
+import type { Branch } from './branch.js';
 import { safejson } from '../core/safejson.js';
 import { getPlatformByUserAgent } from '../core/platform.js';
 import { cleanBannerText, merge } from '../lib/objects.js';
