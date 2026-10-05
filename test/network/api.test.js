@@ -2,7 +2,8 @@ import { config } from '../../src/core/config.js';
 import { createContext } from '../../src/core/context.js';
 import { safejson } from '../../src/core/safejson.js';
 import { storage as branchStorage } from '../../src/core/storage.js';
-import { utils } from '../../src/core/utils.js';
+import { base64encode } from '../../src/lib/encoding.js';
+import { messages } from '../../src/lib/messages.js';
 import { Server } from '../../src/network/api.js';
 import { resources } from '../../src/network/resources.js';
 import { installFakeXHR } from '../fake-xhr.js';
@@ -162,7 +163,7 @@ describe('Server', function () {
         expect(requests.length, 'Request made').toBe(1);
 
         const encodedData = encodeURIComponent(
-          utils.base64encode(JSON.stringify(completeParams)),
+          base64encode(JSON.stringify(completeParams)),
         );
         expect(requests[0].src, 'Endpoint correct').toBe(
           config.api_endpoint +
@@ -329,7 +330,7 @@ describe('Server', function () {
         server.request(resources.link, testUtils.params(), storage, callback);
         expect(requests.length, 'Request made').toBe(1);
         const encodedData = encodeURIComponent(
-          utils.base64encode(JSON.stringify(testUtils.params())),
+          base64encode(JSON.stringify(testUtils.params())),
         );
         expect(requests[0].src, 'Endpoint correct').toBe(
           config.api_endpoint +
@@ -500,7 +501,7 @@ describe('Server', function () {
 
       requests[ctx.retries].triggerTimeout();
       expect(callback).toHaveBeenCalledTimes(1);
-      expect(callback.mock.calls[0][0].message).toBe(utils.messages.timeout);
+      expect(callback.mock.calls[0][0].message).toBe(messages.timeout);
     });
 
     it('returns a network error without retrying', function () {

@@ -1,5 +1,12 @@
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { getEnv } from '../env/env.js';
+import {
+  addPropertyIfNotNull,
+  addPropertyIfNotNullorEmpty,
+  merge,
+  removePropertiesFromObject,
+} from '../lib/objects.js';
+import { dismissEventToSourceMapping } from './constants.js';
 import { applyNonce } from '../core/context.js';
 import { resources } from '../network/resources.js';
 import { banner_utils } from '../banner/banner_utils.js';
@@ -1044,7 +1051,7 @@ journeys_utils._getDismissRequestData = function (
   dismissal_source,
 ) {
   const metadata = {};
-  const hostedDeeplinkData = utils.getHostedDeepLinkData();
+  const hostedDeeplinkData = getEnv().hostedDeepLinkData();
   if (hostedDeeplinkData && Object.keys(hostedDeeplinkData).length > 0) {
     metadata.hosted_deeplink_data = hostedDeeplinkData;
   }
@@ -1061,38 +1068,38 @@ journeys_utils._getDismissRequestData = function (
   );
 
   if (journeys_utils.journeyLinkData?.journey_link_data) {
-    utils.addPropertyIfNotNull(
+    addPropertyIfNotNull(
       dismissRequestData,
       'journey_id',
       journeys_utils.journeyLinkData.journey_link_data.journey_id,
     );
-    utils.addPropertyIfNotNull(
+    addPropertyIfNotNull(
       dismissRequestData,
       'journey_name',
       journeys_utils.decodeSymbols(
         journeys_utils.journeyLinkData.journey_link_data.journey_name,
       ),
     );
-    utils.addPropertyIfNotNull(
+    addPropertyIfNotNull(
       dismissRequestData,
       'view_id',
       journeys_utils.journeyLinkData.journey_link_data.view_id,
     );
-    utils.addPropertyIfNotNull(
+    addPropertyIfNotNull(
       dismissRequestData,
       'view_name',
       journeys_utils.decodeSymbols(
         journeys_utils.journeyLinkData.journey_link_data.view_name,
       ),
     );
-    utils.addPropertyIfNotNull(
+    addPropertyIfNotNull(
       dismissRequestData,
       'channel',
       journeys_utils.decodeSymbols(
         journeys_utils.journeyLinkData.journey_link_data.channel,
       ),
     );
-    utils.addPropertyIfNotNull(
+    addPropertyIfNotNull(
       dismissRequestData,
       'campaign',
       journeys_utils.decodeSymbols(
@@ -1100,7 +1107,7 @@ journeys_utils._getDismissRequestData = function (
       ),
     );
     try {
-      utils.addPropertyIfNotNull(
+      addPropertyIfNotNull(
         dismissRequestData,
         'tags',
         JSON.stringify(journeys_utils.journeyLinkData.journey_link_data.tags),
@@ -1110,7 +1117,7 @@ journeys_utils._getDismissRequestData = function (
     }
   }
 
-  utils.addPropertyIfNotNull(
+  addPropertyIfNotNull(
     dismissRequestData,
     'dismissal_source',
     dismissal_source,
@@ -1148,7 +1155,7 @@ journeys_utils._handleJourneyDismiss = function (
       journeys_utils.branch.removeListener(listener);
       const requestData = journeys_utils._getDismissRequestData(
         branch_view,
-        utils.dismissEventToSourceMapping[eventName],
+        dismissEventToSourceMapping[eventName],
       );
       journeys_utils.branch._api(
         resources.dismiss,
@@ -1188,9 +1195,9 @@ journeys_utils._getPageviewMetadata = function (
   additionalMetadata,
   ctx,
 ) {
-  let pageviewMetadata = utils.merge(
+  let pageviewMetadata = merge(
     {
-      'url': options?.url || utils.getWindowLocation(),
+      'url': options?.url || getEnv().windowLocation(),
       'user_agent': navigator.userAgent,
       'language': navigator.language,
       'screen_width': screen.width || -1,
@@ -1199,12 +1206,12 @@ journeys_utils._getPageviewMetadata = function (
     },
     additionalMetadata || {},
   );
-  pageviewMetadata = utils.addPropertyIfNotNullorEmpty(
+  pageviewMetadata = addPropertyIfNotNullorEmpty(
     pageviewMetadata,
     'model',
     ctx.userAgentData ? ctx.userAgentData.model : '',
   );
-  pageviewMetadata = utils.addPropertyIfNotNullorEmpty(
+  pageviewMetadata = addPropertyIfNotNullorEmpty(
     pageviewMetadata,
     'os_version',
     ctx.userAgentData ? ctx.userAgentData.platformVersion : '',
@@ -1406,12 +1413,9 @@ journeys_utils.setJourneyLinkData = function (linkData) {
       'open_app',
       'link_click_id',
     ];
-    utils.removePropertiesFromObject(
-      linkData,
-      journeyLinkDataPropertiesToFilterOut,
-    );
+    removePropertiesFromObject(linkData, journeyLinkDataPropertiesToFilterOut);
     data.journey_link_data = {};
-    utils.merge(data.journey_link_data, linkData);
+    merge(data.journey_link_data, linkData);
   }
   journeys_utils.journeyLinkData = data;
   journeys_utils.journeyType = data.journey_link_data.type || null;

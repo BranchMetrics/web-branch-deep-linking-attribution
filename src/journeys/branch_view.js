@@ -1,5 +1,13 @@
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
+import { getEnv } from '../env/env.js';
+import { addPropertyIfNotNull, merge } from '../lib/objects.js';
+import {
+  cleanLinkData,
+  getInitialReferrer,
+  getParameterByName,
+} from '../core/url.js';
+import { whiteListJourneysLanguageData } from '../lib/session_data.js';
 import { session } from '../core/session.js';
 import { banner_utils } from '../banner/banner_utils.js';
 import { journeys_utils } from './journeys_utils.js';
@@ -43,11 +51,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
   iframeContainer.id = 'branch-banner-iframe-embed';
   const iframe = journeys_utils.createIframe();
   iframe.onload = function () {
-    journeys_utils.addHtmlToIframe(
-      iframe,
-      html,
-      utils.getPlatformByUserAgent(),
-    );
+    journeys_utils.addHtmlToIframe(iframe, html, getPlatformByUserAgent());
     journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
     journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
     journeys_utils.addDynamicCtaText(iframe, ctaText);
@@ -100,7 +104,7 @@ branch_view.shouldDisplayJourney = function (
 ) {
   if (
     checkPreviousBanner() ||
-    utils.getPlatformByUserAgent() === 'other' ||
+    getPlatformByUserAgent() === 'other' ||
     !eventResponse.event_data ||
     !eventResponse.template
   ) {
@@ -209,9 +213,9 @@ branch_view.displayJourney = function (
         branch_view,
       );
 
-      if (utils.navigationTimingAPIEnabled) {
+      if (getEnv().navigationTimingAPIEnabled()) {
         journeys_utils.branch._ctx.instrumentation['journey-load-time'] =
-          utils.timeSinceNavigationStart();
+          getEnv().timeSinceNavigationStart();
       }
 
       document.body.removeChild(placeholder);
@@ -249,7 +253,7 @@ branch_view._getPageviewRequestData = function (
     options.disable_exit_animation || false;
 
   // starts object off with data from setBranchViewData() call
-  let obj = utils.merge({}, branch._branchViewData);
+  let obj = merge({}, branch._branchViewData);
   const sessionStorage = session.get(branch._storage) || {};
   const has_app = Object.prototype.hasOwnProperty.call(
     sessionStorage,
@@ -267,16 +271,14 @@ branch_view._getPageviewRequestData = function (
   const userLanguage =
     (
       options.user_language ||
-      utils.getBrowserLanguageCode() ||
+      getEnv().browserLanguageCode() ||
       'en'
     ).toLowerCase() || null;
-  const initialReferrer = utils.getInitialReferrer(branch._referringLink());
+  const initialReferrer = getInitialReferrer(branch._referringLink());
   const branchViewId =
-    options.branch_view_id ||
-    utils.getParameterByName('_branch_view_id') ||
-    null;
+    options.branch_view_id || getParameterByName('_branch_view_id') || null;
   const linkClickId = !options.make_new_link
-    ? utils.getClickIdAndSearchStringFromLink(branch._referringLink(true))
+    ? getEnv().clickIdAndSearchStringFromLink(branch._referringLink(true))
     : null;
   const SessionlinkClickId = Object.prototype.hasOwnProperty.call(
     sessionStorage,
@@ -288,23 +290,15 @@ branch_view._getPageviewRequestData = function (
   // adds root level keys for v1/event
   obj.event = !isDismissEvent ? 'pageview' : 'dismiss';
   obj.metadata = metadata;
-  obj = utils.addPropertyIfNotNull(obj, 'initial_referrer', initialReferrer);
+  obj = addPropertyIfNotNull(obj, 'initial_referrer', initialReferrer);
 
   // adds root level keys for v1/branchview
-  obj = utils.addPropertyIfNotNull(obj, 'branch_view_id', branchViewId);
-  obj = utils.addPropertyIfNotNull(obj, 'no_journeys', options.no_journeys);
-  obj = utils.addPropertyIfNotNull(obj, 'is_iframe', utils.isIframe());
-  obj = utils.addPropertyIfNotNull(
-    obj,
-    'journey_dismissals',
-    journeyDismissals,
-  );
-  obj = utils.addPropertyIfNotNull(obj, 'identity', identity);
-  obj = utils.addPropertyIfNotNull(
-    obj,
-    'session_link_click_id',
-    SessionlinkClickId,
-  );
+  obj = addPropertyIfNotNull(obj, 'branch_view_id', branchViewId);
+  obj = addPropertyIfNotNull(obj, 'no_journeys', options.no_journeys);
+  obj = addPropertyIfNotNull(obj, 'is_iframe', getEnv().isIframe());
+  obj = addPropertyIfNotNull(obj, 'journey_dismissals', journeyDismissals);
+  obj = addPropertyIfNotNull(obj, 'identity', identity);
+  obj = addPropertyIfNotNull(obj, 'session_link_click_id', SessionlinkClickId);
   obj.user_language = userLanguage;
   obj.open_app = options.open_app || false;
   obj.has_app_websdk = has_app;
@@ -317,9 +311,9 @@ branch_view._getPageviewRequestData = function (
   }
 
   // builds data object for v1/branchview
-  obj.data = utils.merge(utils.getHostedDeepLinkData(), obj.data);
-  obj.data = utils.merge(
-    utils.whiteListJourneysLanguageData(sessionStorage || {}),
+  obj.data = merge(getEnv().hostedDeepLinkData(), obj.data);
+  obj.data = merge(
+    whiteListJourneysLanguageData(sessionStorage || {}),
     obj.data,
   );
   if (linkClickId) {
@@ -332,6 +326,6 @@ branch_view._getPageviewRequestData = function (
     obj.data['+referrer'] = linkData['+referrer'];
   }
   obj.session_referring_link_data = sessionStorage.data || null;
-  obj = utils.cleanLinkData(obj);
+  obj = cleanLinkData(obj);
   return obj;
 };

@@ -2,7 +2,7 @@
  * This provides the markup, styles, and helper functions for all Banner UI Elements
  */
 
-import { utils } from '../core/utils.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
 import { banner_utils } from './banner_utils.js';
 import { banner_css } from './banner_css.js';
 import { banner_html } from './banner_html.js';
@@ -80,7 +80,7 @@ export const banner = function (branch, options, linkData, storage) {
     linkData.channel = linkData.channel || 'app banner';
 
     const doc = options.iframe ? element.contentWindow.document : document;
-    const platform = utils.getPlatformByUserAgent();
+    const platform = getPlatformByUserAgent();
     if (!['other', 'desktop'].includes(platform)) {
       options.deepview_type = 'banner';
       branch.deepview(linkData, options);

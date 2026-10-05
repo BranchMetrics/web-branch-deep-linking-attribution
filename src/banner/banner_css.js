@@ -1,4 +1,4 @@
-import { utils } from '../core/utils.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
 import { banner_utils } from './banner_utils.js';
 import { applyNonce } from '../core/context.js';
 
@@ -182,7 +182,7 @@ banner_css.css = function (options, element, ctx) {
   let style = banner_css.banner(options);
 
   // User agent specific styles
-  const userAgent = utils.getPlatformByUserAgent();
+  const userAgent = getPlatformByUserAgent();
   if ((userAgent === 'ios' || userAgent === 'ipad') && options.showiOS) {
     style += banner_css.mobile + banner_css.ios;
   } else if (userAgent === 'android' && options.showAndroid) {

@@ -4,9 +4,13 @@
  */
 
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { addPropertyIfNotNull, merge } from '../lib/objects.js';
+import { setDMAParams } from '../lib/dma.js';
+import { addEvent, isSafari11OrGreater } from '../core/platform.js';
+import { base64encode } from '../lib/encoding.js';
+import { calculateBrtt } from '../lib/brtt.js';
 import { applyNonce, log } from '../core/context.js';
-import { formatMessage } from '../lib/messages.js';
+import { formatMessage, messages } from '../lib/messages.js';
 
 /**
  * @param {import('../core/context.js').Context} ctx
@@ -79,7 +83,7 @@ Server.prototype.getUrl = function (resource, data) {
     } else if (data.instrumentation) {
       destinationObject.instrumentation = data.instrumentation;
     } else {
-      const msg = formatMessage(utils.messages.missingParam, [
+      const msg = formatMessage(messages.missingParam, [
         resource.endpoint,
         'branch_key or app_id',
       ]);
@@ -132,9 +136,9 @@ Server.prototype.getUrl = function (resource, data) {
     resource.endpoint === '/v1/pageview' ||
     resource.endpoint === '/v1/dismiss'
   ) {
-    utils.merge(d, data);
+    merge(d, data);
     if (d.branch_requestMetadata) {
-      d.metadata = utils.merge(d.metadata || {}, d.branch_requestMetadata);
+      d.metadata = merge(d.metadata || {}, d.branch_requestMetadata);
       delete d.branch_requestMetadata;
     }
   }
@@ -149,7 +153,7 @@ Server.prototype.getUrl = function (resource, data) {
     d.metadata = safejson.stringify(data.branch_requestMetadata);
   }
   if (data.branch_dma_data) {
-    utils.setDMAParams(d, data.branch_dma_data, resource.endpoint);
+    setDMAParams(d, data.branch_dma_data, resource.endpoint);
     if (d.branch_dma_data) {
       delete d.branch_dma_data;
     }
@@ -206,10 +210,10 @@ Server.prototype.createScript = function (src, onError, onLoad) {
   heads[0].appendChild(script);
 
   if (typeof onError === 'function') {
-    utils.addEvent(script, 'error', onError);
+    addEvent(script, 'error', onError);
   }
   if (typeof onLoad === 'function') {
-    utils.addEvent(script, 'load', onLoad);
+    addEvent(script, 'load', onLoad);
   }
 };
 
@@ -233,7 +237,7 @@ Server.prototype.jsonpRequest = function (
 		callbackString will evaluate to branch_callback_0. The backend expects branch_callback_1
 		for auto-open to work. This is why we have the fix below.
 	*/
-  if (this._jsonp_callback_index === 0 && utils.isSafari11OrGreater()) {
+  if (this._jsonp_callback_index === 0 && isSafari11OrGreater()) {
     this._jsonp_callback_index++;
   }
   const callbackString = 'branch_callback__' + this._jsonp_callback_index++;
@@ -242,17 +246,13 @@ Server.prototype.jsonpRequest = function (
     requestURL.indexOf('branch.io') >= 0 ? '&data=' : '&post_data=';
   const postData =
     requestMethod === 'POST'
-      ? encodeURIComponent(utils.base64encode(safejson.serialize(requestData)))
+      ? encodeURIComponent(base64encode(safejson.serialize(requestData)))
       : '';
 
   const timeoutTrigger = window.setTimeout(function () {
     window[callbackString] = function () {};
-    utils.addPropertyIfNotNull(
-      ctx.instrumentation,
-      brttTag,
-      utils.calculateBrtt(brtt),
-    );
-    callback(new Error(utils.messages.timeout), null, 504);
+    addPropertyIfNotNull(ctx.instrumentation, brttTag, calculateBrtt(brtt));
+    callback(new Error(messages.timeout), null, 504);
   }, ctx.timeout);
 
   window[callbackString] = function (data) {
@@ -270,14 +270,10 @@ Server.prototype.jsonpRequest = function (
     function onError() {
       // This occurs for all errors from these endpoints (/_r and /v1/deepview),
       // including 5xx and no connectivity.
-      callback(new Error(utils.messages.blockedByClient), null);
+      callback(new Error(messages.blockedByClient), null);
     },
     function onLoad() {
-      utils.addPropertyIfNotNull(
-        ctx.instrumentation,
-        brttTag,
-        utils.calculateBrtt(brtt),
-      );
+      addPropertyIfNotNull(ctx.instrumentation, brttTag, calculateBrtt(brtt));
       try {
         if (typeof this.remove === 'function') {
           this.remove();
@@ -333,12 +329,8 @@ Server.prototype.XHRRequest = function (
   };
 
   req.ontimeout = function () {
-    utils.addPropertyIfNotNull(
-      ctx.instrumentation,
-      brttTag,
-      utils.calculateBrtt(brtt),
-    );
-    callback(new Error(utils.messages.timeout), null, 504);
+    addPropertyIfNotNull(ctx.instrumentation, brttTag, calculateBrtt(brtt));
+    callback(new Error(messages.timeout), null, 504);
   };
   req.onerror = function (e) {
     const url = req.responseURL || 'Unknown';
@@ -358,11 +350,7 @@ Server.prototype.XHRRequest = function (
   req.onreadystatechange = function () {
     let data;
     if (req.readyState === 4) {
-      utils.addPropertyIfNotNull(
-        ctx.instrumentation,
-        brttTag,
-        utils.calculateBrtt(brtt),
-      );
+      addPropertyIfNotNull(ctx.instrumentation, brttTag, calculateBrtt(brtt));
       if (req.status === 200) {
         // Response value will be in "req.responseText" by default, unless
         // the "req.responseType" is "text" or null.
@@ -433,9 +421,7 @@ Server.prototype.request = function (resource, data, storage, callback) {
     Object.keys(ctx.instrumentation).length > 1
   ) {
     delete ctx.instrumentation['-brtt'];
-    data.instrumentation = safejson.stringify(
-      utils.merge({}, ctx.instrumentation),
-    );
+    data.instrumentation = safejson.stringify(merge({}, ctx.instrumentation));
     ctx.instrumentation = {};
   }
 
@@ -512,7 +498,7 @@ Server.prototype.request = function (resource, data, storage, callback) {
   ) {
     // If partners call functions that reach-out to blocked endpoints after init() finishes, then we should return an error with a message
     return ctx.userPreferences.allowErrorsInCallback
-      ? done(new Error(utils.messages.trackingDisabled), null, 300)
+      ? done(new Error(messages.trackingDisabled), null, 300)
       : done(null, {}, 200);
   }
 

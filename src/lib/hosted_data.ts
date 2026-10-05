@@ -2,7 +2,7 @@ import { merge } from './objects.js';
 import { extractMobileDeeplinkPath } from './url.js';
 
 /**
- * Used by utils.processHostedDeepLinkData() to prioritize deeplink paths found from various sources.
+ * Used by processHostedDeepLinkData() to prioritize deeplink paths found from various sources.
  * Returned params may include $ios_deeplink_path, $android_deeplink_path and $deeplink_path.
  */
 export function prioritizeDeeplinkPaths(params, deeplinkPaths) {
@@ -42,7 +42,7 @@ export function prioritizeDeeplinkPaths(params, deeplinkPaths) {
 }
 
 /**
- * Used by utils.getHostedDeepLinkData() to process page metadata.
+ * Used by the env hostedDeepLinkData() reader to process page metadata.
  */
 export function processHostedDeepLinkData(metadata) {
   const params: Record<string, any> = {};

@@ -3,10 +3,10 @@
 // effect; load it through CommonJS so its wrapper takes the `exports` branch.
 import { createRequire } from 'node:module';
 import { config } from '../src/core/config.js';
-import { utils } from '../src/core/utils.js';
+import { merge } from '../src/lib/objects.js';
 
-// testUtils.params() reads these as globals.
-window.utils = utils;
+// testUtils.params() reads these as globals (it only needs utils.merge).
+window.utils = { merge };
 window.sdk_version = 'web' + config.version;
 
 createRequire(import.meta.url)('./test-utils.js');

@@ -1,4 +1,4 @@
-import { utils } from '../core/utils.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
 import { session } from '../core/session.js';
 import { applyNonce } from '../core/context.js';
 
@@ -140,7 +140,7 @@ banner_html.iframe = function (options, action, callback, ctx) {
 
   iframe.onload = function () {
     let bodyClass;
-    const userAgent = utils.getPlatformByUserAgent();
+    const userAgent = getPlatformByUserAgent();
     if (userAgent === 'ios' || userAgent === 'ipad') {
       bodyClass = 'branch-banner-ios';
     } else if (userAgent === 'android') {
