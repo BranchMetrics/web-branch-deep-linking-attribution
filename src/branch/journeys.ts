@@ -4,7 +4,7 @@ import { getPlatformByUserAgent } from '../core/platform.js';
 import { cleanBannerText, merge } from '../lib/objects.js';
 import { getEnv } from '../env/env.js';
 import { banner } from '../banner/banner.js';
-import { journeys_utils } from '../journeys/journeys_utils.js';
+import { journeys_utils } from '../journeys/journeys-utils.js';
 
 /** =WEB
  * @function Branch.setBranchViewData

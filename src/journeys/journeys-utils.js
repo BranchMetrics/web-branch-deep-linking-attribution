@@ -9,7 +9,7 @@ import {
 import { dismissEventToSourceMapping } from './constants.js';
 import { applyNonce } from '../core/context.js';
 import { resources } from '../network/resources.js';
-import { banner_utils } from '../banner/banner_utils.js';
+import { banner_utils } from '../banner/banner-utils.js';
 
 export const journeys_utils = {};
 

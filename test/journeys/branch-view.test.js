@@ -2,8 +2,8 @@ import { createContext } from '../../src/core/context.js';
 import { session } from '../../src/core/session.js';
 import { storage as storageModule } from '../../src/core/storage.js';
 import { setEnv } from '../../src/env/env.js';
-import { branch_view } from '../../src/journeys/branch_view.js';
-import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { branch_view } from '../../src/journeys/branch-view.js';
+import { journeys_utils } from '../../src/journeys/journeys-utils.js';
 import { makeFakeEnv, UA_FOR_PLATFORM } from '../helpers/fake-env.js';
 
 describe('displayJourney new render options wiring', function () {
@@ -51,7 +51,7 @@ describe('displayJourney new render options wiring', function () {
   });
 });
 
-// Characterization tests for the rest of src/journeys/branch_view.js. They pin
+// Characterization tests for the rest of src/journeys/branch-view.js. They pin
 // the current behavior, quirks included.
 
 // Pristine copies of the module state the code under test mutates.
@@ -210,7 +210,7 @@ describe('branch_view.shouldDisplayJourney', function () {
         false,
       ),
     ).toBe(false);
-    // NOTE: possible bug: src/journeys/branch_view.js:120 resets
+    // NOTE: possible bug: src/journeys/branch-view.js:120 resets
     // branch_view.callback_index, which nothing reads; the counter that
     // _getPageviewRequestData uses is journeys_utils._callback_index.
     expect(branch_view.callback_index).toBe(1);
@@ -235,7 +235,7 @@ describe('branch_view.shouldDisplayJourney', function () {
   });
 
   it('throws when event_data has no branch_view_data outside test mode', function () {
-    // NOTE: possible bug: src/journeys/branch_view.js:115 reads
+    // NOTE: possible bug: src/journeys/branch-view.js:115 reads
     // event_data.branch_view_data.id without a guard, so a response whose
     // event_data lacks branch_view_data throws instead of returning false.
     expect(function () {
@@ -354,9 +354,9 @@ describe('branch_view.displayJourney', function () {
     try {
       fresh = {
         env: await import('../../src/env/env.js'),
-        branch_view: (await import('../../src/journeys/branch_view.js'))
+        branch_view: (await import('../../src/journeys/branch-view.js'))
           .branch_view,
-        journeys_utils: (await import('../../src/journeys/journeys_utils.js'))
+        journeys_utils: (await import('../../src/journeys/journeys-utils.js'))
           .journeys_utils,
       };
     } finally {
@@ -464,7 +464,7 @@ describe('branch_view.displayJourney', function () {
 
   it('throws when journeyLinkData is empty', function () {
     // NOTE: possible bug: displayJourney passes journeyLinkData straight to
-    // journeys_utils.setJourneyLinkData (src/journeys/branch_view.js:140),
+    // journeys_utils.setJourneyLinkData (src/journeys/branch-view.js:140),
     // which reads data.journey_link_data.type even when no link data was
     // given, so a null/empty journeyLinkData throws.
     expect(function () {

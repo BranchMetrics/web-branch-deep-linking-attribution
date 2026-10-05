@@ -3,7 +3,7 @@ import { config } from '../../src/core/config.js';
 import { safejson } from '../../src/core/safejson.js';
 import { session } from '../../src/core/session.js';
 import { getEnv } from '../../src/env/env.js';
-import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { journeys_utils } from '../../src/journeys/journeys-utils.js';
 import { merge } from '../../src/lib/objects.js';
 
 // Characterization tests for the identity/session-data methods: data, first,

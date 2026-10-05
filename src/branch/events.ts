@@ -1,6 +1,6 @@
 import type { Branch } from './Branch.js';
 import { safejson } from '../core/safejson.js';
-import { mergeHostedDeeplinkData } from '../lib/hosted_data.js';
+import { mergeHostedDeeplinkData } from '../lib/hosted-data.js';
 import { getEnv } from '../env/env.js';
 import { merge, validateParameterType } from '../lib/objects.js';
 import {
@@ -11,8 +11,8 @@ import {
 import { getUserData } from '../core/platform.js';
 import { getInitialReferrer } from '../core/url.js';
 import { resources } from '../network/resources.js';
-import { branch_view } from '../journeys/branch_view.js';
-import { journeys_utils } from '../journeys/journeys_utils.js';
+import { branch_view } from '../journeys/branch-view.js';
+import { journeys_utils } from '../journeys/journeys-utils.js';
 
 /**
  * @function Branch.track

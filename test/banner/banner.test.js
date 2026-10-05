@@ -1,5 +1,5 @@
 import { banner } from '../../src/banner/banner.js';
-import { banner_utils } from '../../src/banner/banner_utils.js';
+import { banner_utils } from '../../src/banner/banner-utils.js';
 import { Branch } from '../../src/branch.js';
 import { createContext } from '../../src/core/context.js';
 import { storage as storageModule } from '../../src/core/storage.js';

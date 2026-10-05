@@ -11,13 +11,13 @@ import {
 } from '../core/platform.js';
 import { processReferringLink } from '../lib/url.js';
 import { getInitialReferrer, getParamValue, hashValue } from '../core/url.js';
-import { whiteListSessionData } from '../lib/session_data.js';
-import { getAdditionalMetadata } from '../core/page_data.js';
-import { mergeHostedDeeplinkData } from '../lib/hosted_data.js';
+import { whiteListSessionData } from '../lib/session-data.js';
+import { getAdditionalMetadata } from '../core/page-data.js';
+import { mergeHostedDeeplinkData } from '../lib/hosted-data.js';
 import { resources } from '../network/resources.js';
 import { session } from '../core/session.js';
-import { branch_view } from '../journeys/branch_view.js';
-import { journeys_utils } from '../journeys/journeys_utils.js';
+import { branch_view } from '../journeys/branch-view.js';
+import { journeys_utils } from '../journeys/journeys-utils.js';
 
 /**
  * @function Branch.init

@@ -3,9 +3,9 @@
  */
 
 import { getPlatformByUserAgent } from '../core/platform.js';
-import { banner_utils } from './banner_utils.js';
-import { banner_css } from './banner_css.js';
-import { banner_html } from './banner_html.js';
+import { banner_utils } from './banner-utils.js';
+import { banner_css } from './banner-css.js';
+import { banner_html } from './banner-html.js';
 
 /**
  * @param {Object} branch

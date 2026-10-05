@@ -1,5 +1,5 @@
-import { banner_html } from '../src/banner/banner_html.js';
-import { banner_utils } from '../src/banner/banner_utils.js';
+import { banner_html } from '../src/banner/banner-html.js';
+import { banner_utils } from '../src/banner/banner-utils.js';
 import { Branch } from '../src/branch.js';
 import { config } from '../src/core/config.js';
 import { getPlatformByUserAgent } from '../src/core/platform.js';
