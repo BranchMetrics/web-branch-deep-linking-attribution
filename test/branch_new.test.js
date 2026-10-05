@@ -3,7 +3,7 @@ import { config } from '../src/core/config.js';
 import { createContext } from '../src/core/context.js';
 import { task_queue } from '../src/core/queue.js';
 import { safejson } from '../src/core/safejson.js';
-import { utils } from '../src/core/utils.js';
+import { httpMethod } from '../src/lib/http.js';
 import { Server } from '../src/network/api.js';
 
 describe('Branch - new', function () {
@@ -18,10 +18,6 @@ describe('Branch - new', function () {
     });
   });
   describe('setRequestMetaData', function () {
-    let addPropertyIfNotNullSpy;
-    beforeEach(function () {
-      addPropertyIfNotNullSpy = vi.spyOn(utils, 'addPropertyIfNotNull');
-    });
     it('test method exists', function () {
       expect(typeof branch_instance.setRequestMetaData).toBe('function');
     });
@@ -35,7 +31,6 @@ describe('Branch - new', function () {
         value,
       );
       assert.strictEqual(result, undefined);
-      expect(addPropertyIfNotNullSpy).toHaveBeenCalledOnce();
       assert.deepEqual(requestMetadata, { 'validKey': 'validValue' });
     });
 
@@ -66,7 +61,6 @@ describe('Branch - new', function () {
       );
       assert.strictEqual(result1, undefined);
       assert.strictEqual(result2, undefined);
-      expect(addPropertyIfNotNullSpy).not.toHaveBeenCalled();
       assert.deepEqual(requestMetadata, { 'key': 'value' });
     });
   });
@@ -74,12 +68,12 @@ describe('Branch - new', function () {
     const pageviewResource = {
       destination: config.api_endpoint,
       endpoint: '/v1/pageview',
-      method: utils.httpMethod.POST,
+      method: httpMethod.POST,
     };
     const dismissResource = {
       destination: config.api_endpoint,
       endpoint: '/v1/dismiss',
-      method: utils.httpMethod.POST,
+      method: httpMethod.POST,
     };
 
     it('should merge branch_requestMetadata directly into metadata for v1/pageview instead of dropping it', function () {

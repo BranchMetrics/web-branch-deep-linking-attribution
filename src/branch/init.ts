@@ -7,7 +7,18 @@ import {
 } from './core.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { getEnv } from '../env/env.js';
+import { delay, isKey, validateParameterType } from '../lib/objects.js';
+import {
+  getClientHints,
+  isIOSWKWebView,
+  isSafari11OrGreater,
+} from '../core/platform.js';
+import { processReferringLink } from '../lib/url.js';
+import { getInitialReferrer, getParamValue, hashValue } from '../core/url.js';
+import { whiteListSessionData } from '../lib/session_data.js';
+import { getAdditionalMetadata } from '../core/page_data.js';
+import { mergeHostedDeeplinkData } from '../lib/hosted_data.js';
 import { resources } from '../network/resources.js';
 import { session } from '../core/session.js';
 import { branch_view } from '../journeys/branch_view.js';
@@ -83,20 +94,21 @@ Branch.prototype.init = wrap(
     const self = this;
     const ctx = self._ctx;
 
-    if (utils.navigationTimingAPIEnabled) {
-      ctx.instrumentation['init-began-at'] = utils.timeSinceNavigationStart();
+    if (getEnv().navigationTimingAPIEnabled()) {
+      ctx.instrumentation['init-began-at'] =
+        getEnv().timeSinceNavigationStart();
     }
 
     self.init_state = init_states.INIT_PENDING;
 
-    if (utils.isKey(branch_key)) {
+    if (isKey(branch_key)) {
       self.branch_key = branch_key;
     } else {
       self.app_id = branch_key;
     }
 
     options =
-      options && utils.validateParameterType(options, 'object') ? options : {};
+      options && validateParameterType(options, 'object') ? options : {};
     self.init_options = options;
 
     ctx.retries =
@@ -128,7 +140,7 @@ Branch.prototype.init = wrap(
         ? options.extendedJourneysAssistExpiryTime
         : ctx.extendedJourneysAssistExpiryTime;
     ctx.userPreferences.allowErrorsInCallback = false;
-    utils.getClientHints(ctx);
+    getClientHints(ctx);
 
     if (ctx.userPreferences.trackingDisabled) {
       session.cleanApplicationAndSessionStorage(self);
@@ -160,10 +172,10 @@ Branch.prototype.init = wrap(
         self.sessionLink = data.link;
       }
       if (data.referring_link) {
-        data.referring_link = utils.processReferringLink(data.referring_link);
+        data.referring_link = processReferringLink(data.referring_link);
       }
       if (!data.click_id && data.referring_link) {
-        data.click_id = utils.getClickIdAndSearchStringFromLink(
+        data.click_id = getEnv().clickIdAndSearchStringFromLink(
           data.referring_link,
         );
       }
@@ -183,8 +195,8 @@ Branch.prototype.init = wrap(
         : null;
     const link_identifier =
       branchMatchIdFromOptions ||
-      utils.getParamValue('_branch_match_id') ||
-      utils.hashValue('r');
+      getParamValue('_branch_match_id') ||
+      hashValue('r');
     const freshInstall = !self.identity_id; // initialized from local storage above
     self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
     const fetchLatestBrowserFingerPrintID = function (cb) {
@@ -198,7 +210,7 @@ Branch.prototype.init = wrap(
         params_r._t = permData.browser_fingerprint_id;
       }
 
-      if (!utils.isSafari11OrGreater() && !utils.isIOSWKWebView()) {
+      if (!isSafari11OrGreater() && !isIOSWKWebView()) {
         self._api(
           resources._r,
           params_r,
@@ -246,27 +258,26 @@ Branch.prototype.init = wrap(
           self.init_state_fail_details = err.message;
         }
 
-        return done(err, data && utils.whiteListSessionData(data));
+        return done(err, data && whiteListSessionData(data));
       }
 
       try {
-        done(err, data && utils.whiteListSessionData(data));
+        done(err, data && whiteListSessionData(data));
       } catch (_e) {
         // pass
       } finally {
         self.renderFinalize();
       }
 
-      const additionalMetadata = utils.getAdditionalMetadata();
-      const metadata = utils.validateParameterType(options.metadata, 'object')
+      const additionalMetadata = getAdditionalMetadata();
+      const metadata = validateParameterType(options.metadata, 'object')
         ? options.metadata
         : null;
       if (metadata) {
-        const hostedDeeplinkDataWithMergedMetadata =
-          utils.mergeHostedDeeplinkData(
-            additionalMetadata.hosted_deeplink_data,
-            metadata,
-          );
+        const hostedDeeplinkDataWithMergedMetadata = mergeHostedDeeplinkData(
+          additionalMetadata.hosted_deeplink_data,
+          metadata,
+        );
         if (
           hostedDeeplinkDataWithMergedMetadata &&
           Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0
@@ -314,7 +325,7 @@ Branch.prototype.init = wrap(
                 if (
                   pageviewResponse.auto_branchify ||
                   (!branchMatchIdFromOptions &&
-                    utils.getParamValue('branchify_url') &&
+                    getParamValue('branchify_url') &&
                     self._referringLink())
                 ) {
                   const linkOptions = {
@@ -372,7 +383,7 @@ Branch.prototype.init = wrap(
     if (
       sessionData?.session_id &&
       !link_identifier &&
-      !utils.getParamValue('branchify_url')
+      !getParamValue('branchify_url')
     ) {
       // resets data in session storage to prevent previous link click data from being returned to Branch.init()
       session.update(self._storage, { 'data': '' });
@@ -397,16 +408,16 @@ Branch.prototype.init = wrap(
     }
 
     // Execute the /v1/open right away or after _open_delay_ms.
-    const open_delay = parseInt(utils.getParamValue('[?&]_open_delay_ms'), 10);
+    const open_delay = parseInt(getParamValue('[?&]_open_delay_ms'), 10);
 
-    if (!utils.isSafari11OrGreater() && !utils.isIOSWKWebView()) {
+    if (!isSafari11OrGreater() && !isIOSWKWebView()) {
       self._api(resources._r, params_r, function (err, browser_fingerprint_id) {
         if (err) {
           self.init_state_fail_code = init_state_fail_codes.BFP_NOT_FOUND;
           self.init_state_fail_details = err.message;
           return finishInit(err, null);
         }
-        utils.delay(function () {
+        delay(function () {
           self._api(
             resources.open,
             {
@@ -417,12 +428,10 @@ Branch.prototype.init = wrap(
               'alternative_browser_fingerprint_id':
                 permData.browser_fingerprint_id,
               'options': options,
-              'initial_referrer': utils.getInitialReferrer(
-                self._referringLink(),
-              ),
-              'current_url': utils.getCurrentUrl(),
-              'screen_height': utils.getScreenHeight(),
-              'screen_width': utils.getScreenWidth(),
+              'initial_referrer': getInitialReferrer(self._referringLink()),
+              'current_url': getEnv().currentUrl(),
+              'screen_height': getEnv().screenHeight(),
+              'screen_width': getEnv().screenWidth(),
               'model': ctx.userAgentData ? ctx.userAgentData.model : null,
               'os_version': ctx.userAgentData
                 ? ctx.userAgentData.platformVersion
@@ -452,7 +461,7 @@ Branch.prototype.init = wrap(
         }, open_delay);
       });
     } else {
-      utils.delay(function () {
+      delay(function () {
         self._api(
           resources.open,
           {
@@ -463,10 +472,10 @@ Branch.prototype.init = wrap(
             'alternative_browser_fingerprint_id':
               permData.browser_fingerprint_id,
             'options': options,
-            'initial_referrer': utils.getInitialReferrer(self._referringLink()),
-            'current_url': utils.getCurrentUrl(),
-            'screen_height': utils.getScreenHeight(),
-            'screen_width': utils.getScreenWidth(),
+            'initial_referrer': getInitialReferrer(self._referringLink()),
+            'current_url': getEnv().currentUrl(),
+            'screen_height': getEnv().screenHeight(),
+            'screen_width': getEnv().screenWidth(),
             'model': ctx.userAgentData ? ctx.userAgentData.model : null,
             'os_version': ctx.userAgentData
               ? ctx.userAgentData.platformVersion

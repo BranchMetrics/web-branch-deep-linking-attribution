@@ -1,7 +1,8 @@
 import { Branch, wrap, callback_params } from './core.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { addPropertyIfNotNull, isBoolean } from '../lib/objects.js';
+import { isValidURL } from '../lib/url.js';
 import { session } from '../core/session.js';
 
 /**
@@ -79,7 +80,7 @@ Branch.prototype.setDMAParamsForEEA = wrap(
   ) {
     try {
       const validateParam = (param, paramName) => {
-        if (!utils.isBoolean(param)) {
+        if (!isBoolean(param)) {
           console.warn(
             `setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`,
           );
@@ -138,7 +139,7 @@ Branch.prototype.setRequestMetaData = function (key: string, value: string) {
       delete this.requestMetadata[key];
     }
 
-    this.requestMetadata = utils.addPropertyIfNotNull(
+    this.requestMetadata = addPropertyIfNotNull(
       this.requestMetadata,
       key,
       value,
@@ -154,7 +155,7 @@ Branch.prototype.setRequestMetaData = function (key: string, value: string) {
  * Sets a custom base URL for all calls to the Branch API
  */
 Branch.prototype.setAPIUrl = function (url: string) {
-  if (!utils.isValidURL(url)) {
+  if (!isValidURL(url)) {
     console.error('setAPIUrl: Invalid URL format. Default URL will be set.');
     return;
   }

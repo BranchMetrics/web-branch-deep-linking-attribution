@@ -1,12 +1,12 @@
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
 import { task_queue } from '../core/queue.js';
-import { utils } from '../core/utils.js';
+import { shouldAddDMAParams } from '../lib/dma.js';
 import { session } from '../core/session.js';
 import { storage } from '../core/storage.js';
 import { Server } from '../network/api.js';
 import { createContext, log } from '../core/context.js';
-import { formatMessage } from '../lib/messages.js';
+import { formatMessage, messages } from '../lib/messages.js';
 
 /*globals Ti, BranchStorage, require */
 
@@ -87,10 +87,10 @@ export const wrap = function (
       if (!init) {
         let msg: string | undefined;
         if (self.init_state === init_states.INIT_PENDING) {
-          msg = formatMessage(utils.messages.initPending);
+          msg = formatMessage(messages.initPending);
         } else if (self.init_state === init_states.INIT_FAILED) {
           msg = formatMessage(
-            utils.messages.initFailed,
+            messages.initFailed,
             self.init_state_fail_code,
             self.init_state_fail_details,
           );
@@ -98,7 +98,7 @@ export const wrap = function (
           self.init_state === init_states.NO_INIT ||
           !self.init_state
         ) {
-          msg = formatMessage(utils.messages.nonInit);
+          msg = formatMessage(messages.nonInit);
         }
         if (msg) {
           log(self._ctx, msg);
@@ -224,7 +224,7 @@ Branch.prototype._api = function (
       }
     }
   }
-  if (utils.shouldAddDMAParams(resource.endpoint)) {
+  if (shouldAddDMAParams(resource.endpoint)) {
     const dmaData = this._storage.get('branch_dma_data', true);
     obj.branch_dma_data = dmaData ? safejson.parse(dmaData) : null;
   }

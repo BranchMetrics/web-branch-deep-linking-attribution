@@ -1,5 +1,6 @@
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { snakeToCamel } from '../lib/objects.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
 
 export const banner_utils = {};
 
@@ -56,7 +57,7 @@ banner_utils.getDate = function (days) {
 
 banner_utils.getBodyStyle = function (style) {
   if (document.body.currentStyle) {
-    return document.body.currentStyle[utils.snakeToCamel(style)];
+    return document.body.currentStyle[snakeToCamel(style)];
   } else {
     return window.getComputedStyle(document.body).getPropertyValue(style);
   }
@@ -178,13 +179,12 @@ banner_utils.shouldAppend = function (storage, options) {
     !document.getElementById('branch-banner') &&
     !document.getElementById('branch-banner-iframe') &&
     (hideBanner || forgetHide) &&
-    ((options.showAndroid && utils.getPlatformByUserAgent() === 'android') ||
-      (options.showiPad && utils.getPlatformByUserAgent() === 'ipad') ||
-      (options.showiOS && utils.getPlatformByUserAgent() === 'ios') ||
-      (options.showBlackberry &&
-        utils.getPlatformByUserAgent() === 'blackberry') ||
+    ((options.showAndroid && getPlatformByUserAgent() === 'android') ||
+      (options.showiPad && getPlatformByUserAgent() === 'ipad') ||
+      (options.showiOS && getPlatformByUserAgent() === 'ios') ||
+      (options.showBlackberry && getPlatformByUserAgent() === 'blackberry') ||
       (options.showWindowsPhone &&
-        utils.getPlatformByUserAgent() === 'windows_phone') ||
-      (options.showKindle && utils.getPlatformByUserAgent() === 'kindle'))
+        getPlatformByUserAgent() === 'windows_phone') ||
+      (options.showKindle && getPlatformByUserAgent() === 'kindle'))
   );
 };

@@ -1,6 +1,6 @@
 import { Branch } from '../../src/branch.js';
 import { config } from '../../src/core/config.js';
-import { utils } from '../../src/core/utils.js';
+import { isValidURL } from '../../src/lib/url.js';
 
 // Same URL rules as isValidURL, written without a regex, to check the pattern against.
 const ALNUM = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -109,7 +109,7 @@ const timeMs = function (fn) {
   return performance.now() - start;
 };
 
-describe('utils.isValidURL', function () {
+describe('isValidURL', function () {
   describe('accepts', function () {
     it.each([
       ['single-character label', 'https://a.io'],
@@ -147,7 +147,7 @@ describe('utils.isValidURL', function () {
       ['63-character label', `https://${'a'.repeat(63)}.com`],
       ['many labels', `https://${'a.'.repeat(100)}com`],
     ])('%s: %s', function (_name, url) {
-      expect(utils.isValidURL(url)).toBe(true);
+      expect(isValidURL(url)).toBe(true);
     });
   });
 
@@ -193,7 +193,7 @@ describe('utils.isValidURL', function () {
       ['two fragments', 'https://example.com#a#b'],
       ['embedded newline', 'https://example.com/path\nhttps://x.co'],
     ])('%s: %j', function (_name, url) {
-      expect(utils.isValidURL(url)).toBe(false);
+      expect(isValidURL(url)).toBe(false);
     });
   });
 
@@ -207,7 +207,7 @@ describe('utils.isValidURL', function () {
         for (const suffix of suffixes) {
           const url = `http://${host}${suffix}`;
           compared++;
-          if (utils.isValidURL(url) !== referenceIsValidURL(url)) {
+          if (isValidURL(url) !== referenceIsValidURL(url)) {
             mismatches.push(url);
           }
         }
@@ -246,7 +246,7 @@ describe('utils.isValidURL', function () {
         for (const host of ['https://ex.com', 'http://1.2.3.4']) {
           const url = host + tail;
           compared++;
-          if (utils.isValidURL(url) !== referenceIsValidURL(url)) {
+          if (isValidURL(url) !== referenceIsValidURL(url)) {
             mismatches.push(url);
           }
         }
@@ -293,7 +293,7 @@ describe('utils.isValidURL', function () {
           randomString(hostChars, 14) +
           pick(['', '.com', '.co.uk', '.1']) +
           randomString(tailChars, 10);
-        if (utils.isValidURL(url) !== referenceIsValidURL(url)) {
+        if (isValidURL(url) !== referenceIsValidURL(url)) {
           mismatches.push(url);
         }
       }
@@ -323,8 +323,8 @@ describe('utils.isValidURL', function () {
         `http://${'0'.repeat(28)}.com:x`,
       ],
     ])('rejects quickly: %s', function (_name, url) {
-      expect(timeMs(() => utils.isValidURL(url))).toBeLessThan(BUDGET_MS);
-      expect(utils.isValidURL(url)).toBe(false);
+      expect(timeMs(() => isValidURL(url))).toBeLessThan(BUDGET_MS);
+      expect(isValidURL(url)).toBe(false);
     });
 
     // Long inputs. Only shapes the old pattern also handled quickly, so these guard
@@ -343,8 +343,8 @@ describe('utils.isValidURL', function () {
       ],
       ['long valid host', `https://${'a-b1.'.repeat(2000)}com`, true],
     ])('handles long input quickly: %s', function (_name, url, expected) {
-      expect(timeMs(() => utils.isValidURL(url))).toBeLessThan(BUDGET_MS);
-      expect(utils.isValidURL(url)).toBe(expected);
+      expect(timeMs(() => isValidURL(url))).toBeLessThan(BUDGET_MS);
+      expect(isValidURL(url)).toBe(expected);
     });
   });
 

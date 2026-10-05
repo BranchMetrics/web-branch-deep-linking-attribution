@@ -41,7 +41,7 @@ function serializeString(s) {
 
 /**
  * JSON serializer. Unlike JSON.stringify, its output is always ASCII (every
- * non-ASCII character is \u-escaped, which utils.base64encode relies on for
+ * non-ASCII character is \u-escaped, which base64encode relies on for
  * surrogate pairs), undefined object values serialize as null instead of
  * being dropped, and toJSON() is ignored.
  */
