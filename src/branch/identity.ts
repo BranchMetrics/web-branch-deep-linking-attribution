@@ -3,6 +3,8 @@ import { safejson } from '../core/safejson.js';
 import { utils } from '../core/utils.js';
 import { resources } from '../network/resources.js';
 import { session } from '../core/session.js';
+import { log } from '../core/context.js';
+import { formatMessage } from '../lib/messages.js';
 
 /**
  * @function Branch.data
@@ -101,7 +103,9 @@ Branch.prototype.setIdentity = wrap(
       session.patch(self._storage, { 'identity': identity }, true);
       done(null, data);
     } else {
-      done(new Error(utils.message(utils.messages.missingIdentity)));
+      const msg = formatMessage(utils.messages.missingIdentity);
+      log(self._ctx, msg);
+      done(new Error(msg));
     }
   },
 );

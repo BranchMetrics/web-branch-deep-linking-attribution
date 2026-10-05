@@ -2,6 +2,7 @@ import { Branch, wrap, callback_params } from './core.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
 import { utils } from '../core/utils.js';
+import { session } from '../core/session.js';
 
 /**
  * @function Branch.disableTracking
@@ -27,8 +28,8 @@ Branch.prototype.disableTracking = wrap(
   callback_params.CALLBACK_ERR,
   function (done, disableTracking?: boolean | string) {
     if (disableTracking === false || disableTracking === 'false') {
-      utils.userPreferences.trackingDisabled = false;
-      utils.userPreferences.allowErrorsInCallback = false;
+      this._ctx.userPreferences.trackingDisabled = false;
+      this._ctx.userPreferences.allowErrorsInCallback = false;
       if (this.branch_key && this.init_options) {
         if (this.init_options.tracking_disabled === true) {
           delete this.init_options.tracking_disabled;
@@ -40,9 +41,9 @@ Branch.prototype.disableTracking = wrap(
       disableTracking === true ||
       disableTracking === 'true'
     ) {
-      utils.cleanApplicationAndSessionStorage(this);
-      utils.userPreferences.trackingDisabled = true;
-      utils.userPreferences.allowErrorsInCallback = true;
+      session.cleanApplicationAndSessionStorage(this);
+      this._ctx.userPreferences.trackingDisabled = true;
+      this._ctx.userPreferences.allowErrorsInCallback = true;
       this.closeBanner();
       this.closeJourney();
       // Branch will not re-initialize

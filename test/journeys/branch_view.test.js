@@ -1,3 +1,4 @@
+import { createContext } from '../../src/core/context.js';
 import { session } from '../../src/core/session.js';
 import { storage as storageModule } from '../../src/core/storage.js';
 import { utils } from '../../src/core/utils.js';
@@ -10,7 +11,7 @@ describe('displayJourney new render options wiring', function () {
   const assert = testUtils.unplanned();
 
   beforeEach(function () {
-    journeys_utils.branch = { _storage: {} };
+    journeys_utils.branch = { _storage: {}, _ctx: createContext() };
     journeys_utils.use_v2_renderer = false;
     journeys_utils.exitAnimationIsRunning = false;
   });
@@ -56,7 +57,6 @@ describe('displayJourney new render options wiring', function () {
 
 // Pristine copies of the module state the code under test mutates.
 const journeysUtilsSnapshot = Object.assign({}, journeys_utils);
-const utilsInstrumentationSnapshot = Object.assign({}, utils.instrumentation);
 const utilsNavigationTimingSnapshot = utils.navigationTimingAPIEnabled;
 const branchViewKeysSnapshot = Object.keys(branch_view);
 
@@ -88,10 +88,6 @@ function restoreModuleState() {
   Object.assign(journeys_utils, journeysUtilsSnapshot);
   journeys_utils.divToInjectParents = [];
 
-  Object.keys(utils.instrumentation).forEach(function (key) {
-    delete utils.instrumentation[key];
-  });
-  Object.assign(utils.instrumentation, utilsInstrumentationSnapshot);
   utils.navigationTimingAPIEnabled = utilsNavigationTimingSnapshot;
 
   Object.keys(branch_view).forEach(function (key) {
@@ -104,6 +100,7 @@ function restoreModuleState() {
 function makeJourneyBranch(store, overrides) {
   return Object.assign(
     {
+      _ctx: createContext(),
       _storage: store,
       _publishEvent: vi.fn(),
       _branchViewData: {},
@@ -598,13 +595,13 @@ describe('branch_view.displayJourney', function () {
     );
     display(journeyHtml(METADATA));
     await waitForIframeLoad();
-    expect(utils.instrumentation['journey-load-time']).toBe('1234');
+    expect(branch._ctx.instrumentation['journey-load-time']).toBe('1234');
   });
 
   it('does not record journey-load-time when the navigation timing API is disabled', async function () {
     display(journeyHtml(METADATA));
     await waitForIframeLoad();
-    expect(utils.instrumentation['journey-load-time']).toBeUndefined();
+    expect(branch._ctx.instrumentation['journey-load-time']).toBeUndefined();
   });
 
   describe('JSONP callback (window[callback_string])', function () {
@@ -635,16 +632,16 @@ describe('branch_view.displayJourney', function () {
       await waitForIframeLoad();
       const callback = window.branch_view_callback__test;
       callback({});
-      vi.advanceTimersByTime(utils.timeout);
+      vi.advanceTimersByTime(branch._ctx.timeout);
       expect(window.branch_view_callback__test).toBe(callback);
     });
 
-    it('is replaced by a no-op after utils.timeout', async function () {
+    it('is replaced by a no-op after ctx.timeout', async function () {
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
       display(journeyHtml(METADATA));
       await waitForIframeLoad();
       const callback = window.branch_view_callback__test;
-      vi.advanceTimersByTime(utils.timeout);
+      vi.advanceTimersByTime(branch._ctx.timeout);
       expect(window.branch_view_callback__test).not.toBe(callback);
       spies.finalHookups.mockClear();
       window.branch_view_callback__test({});

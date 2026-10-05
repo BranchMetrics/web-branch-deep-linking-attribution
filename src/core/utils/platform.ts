@@ -6,6 +6,7 @@ import {
   isSafari11OrGreater,
 } from '../../lib/ua.js';
 import { getEnv } from '../../env/env.js';
+import type { Context } from '../context.js';
 
 export const platform = {
   // Environment reads live in src/env/env.ts; these delegate to it.
@@ -58,6 +59,7 @@ export const platform = {
   // Used by logEvent() to send fields related to user's visit and device to v2/event standard and custom
   // Requires a reference to the branch object to access information such as browser_fingerprint_id
   getUserData: function (branch) {
+    const userAgentData = branch._ctx.userAgentData;
     let user_data: Record<string, any> = {};
     user_data = utils.addPropertyIfNotNull(
       user_data,
@@ -113,12 +115,12 @@ export const platform = {
     user_data = utils.addPropertyIfNotNullorEmpty(
       user_data,
       'model',
-      utils.userAgentData ? utils.userAgentData.model : '',
+      userAgentData ? userAgentData.model : '',
     );
     user_data = utils.addPropertyIfNotNullorEmpty(
       user_data,
       'os_version',
-      utils.userAgentData ? utils.userAgentData.platformVersion : '',
+      userAgentData ? userAgentData.platformVersion : '',
     );
     return user_data;
   },
@@ -129,30 +131,23 @@ export const platform = {
   isIframeAndFromSameOrigin: () =>
     getEnv().isIframe() && getEnv().isSameOriginFrame(),
 
-  // Creates a nonce attribute with the value stored in utils.nonce
-  addNonceAttribute: function (element) {
-    if (utils.nonce !== '') {
-      element.setAttribute('nonce', utils.nonce);
-    }
-  },
-
   /**
    * gets client hints for supported browsers.
    * This will be used for browsers that have reduced user agent
    */
-  getClientHints: function () {
+  getClientHints: function (ctx: Context) {
     const userAgentData =
       getEnv().userAgentData() as Navigator['userAgentData'];
     if (userAgentData) {
       const hints = ['model', 'platformVersion'];
       userAgentData.getHighEntropyValues(hints).then(function (data) {
-        utils.userAgentData = {
+        ctx.userAgentData = {
           'model': data.model,
           'platformVersion': utils.removeTrailingDotZeros(data.platformVersion),
         };
       });
     } else {
-      utils.userAgentData = null;
+      ctx.userAgentData = null;
     }
   },
 };

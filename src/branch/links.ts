@@ -321,7 +321,7 @@ Branch.prototype.deepview = wrap(
       function (err, data) {
         if (err) {
           // ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
-          if (!utils.userPreferences.trackingDisabled) {
+          if (!self._ctx.userPreferences.trackingDisabled) {
             self._deepviewCta = function () {
               self._windowRedirect(fallbackUrl);
             };
@@ -395,7 +395,7 @@ Branch.prototype.deepviewCta = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
     if (typeof this._deepviewCta === 'undefined') {
-      return utils.userPreferences.trackingDisabled
+      return this._ctx.userPreferences.trackingDisabled
         ? done(new Error(utils.messages.trackingDisabled), null)
         : done(new Error(utils.messages.deepviewNotCalled), null);
     }

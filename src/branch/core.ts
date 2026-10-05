@@ -5,6 +5,8 @@ import { utils } from '../core/utils.js';
 import { session } from '../core/session.js';
 import { storage } from '../core/storage.js';
 import { Server } from '../network/api.js';
+import { createContext, log } from '../core/context.js';
+import { formatMessage } from '../lib/messages.js';
 
 /*globals Ti, BranchStorage, require */
 
@@ -83,27 +85,24 @@ export const wrap = function (
         }
       };
       if (!init) {
+        let msg: string | undefined;
         if (self.init_state === init_states.INIT_PENDING) {
-          return done(
-            new Error(utils.message(utils.messages.initPending)),
-            null,
-          );
+          msg = formatMessage(utils.messages.initPending);
         } else if (self.init_state === init_states.INIT_FAILED) {
-          return done(
-            new Error(
-              utils.message(
-                utils.messages.initFailed,
-                self.init_state_fail_code,
-                self.init_state_fail_details,
-              ),
-            ),
-            null,
+          msg = formatMessage(
+            utils.messages.initFailed,
+            self.init_state_fail_code,
+            self.init_state_fail_details,
           );
         } else if (
           self.init_state === init_states.NO_INIT ||
           !self.init_state
         ) {
-          return done(new Error(utils.message(utils.messages.nonInit)), null);
+          msg = formatMessage(utils.messages.nonInit);
+        }
+        if (msg) {
+          log(self._ctx, msg);
+          return done(new Error(msg), null);
         }
       }
       args.unshift(done);
@@ -125,10 +124,13 @@ export const Branch = function () {
 
   const storageMethods = ['session', 'cookie', 'pojo'];
 
+  this._ctx = createContext();
+
   // @ts-expect-error -- TS 7 doesn't treat JS constructor functions as classes
   this._storage = new storage.BranchStorage(storageMethods);
+  this._storage.ctx = this._ctx;
 
-  this._server = new Server();
+  this._server = new Server(this._ctx);
 
   const sdk = 'web';
 
@@ -206,8 +208,8 @@ Branch.prototype._api = function (
     obj.browser_fingerprint_id = this.browser_fingerprint_id;
   }
   // Adds tracking_disabled to every post request when enabled
-  if (utils.userPreferences.trackingDisabled) {
-    obj.tracking_disabled = utils.userPreferences.trackingDisabled;
+  if (this._ctx.userPreferences.trackingDisabled) {
+    obj.tracking_disabled = this._ctx.userPreferences.trackingDisabled;
   }
   if (this.requestMetadata) {
     for (const metadata_key in this.requestMetadata) {
@@ -248,7 +250,7 @@ Branch.prototype._referringLink = function (forJourneys) {
   if (referringLink) {
     return referringLink;
   } else {
-    if (utils.userPreferences.enableExtendedJourneysAssist && forJourneys) {
+    if (this._ctx.userPreferences.enableExtendedJourneysAssist && forJourneys) {
       const localStorageData = session.get(this._storage, true);
       const referring_Link = localStorageData?.referring_link;
       const referringLinkExpiry = localStorageData?.referringLinkExpiry;

@@ -44,7 +44,7 @@ Branch.prototype.track = wrap(
 
     options = options || {};
 
-    utils.nonce = options.nonce ? options.nonce : utils.nonce;
+    self._ctx.nonce = options.nonce ? options.nonce : self._ctx.nonce;
 
     if (event === 'pageview') {
       const hostedDeeplinkDataWithMergedMetadata =
@@ -57,7 +57,7 @@ Branch.prototype.track = wrap(
       }
 
       const requestData = branch_view._getPageviewRequestData(
-        journeys_utils._getPageviewMetadata(options, metadata),
+        journeys_utils._getPageviewMetadata(options, metadata, self._ctx),
         options,
         self,
         false,

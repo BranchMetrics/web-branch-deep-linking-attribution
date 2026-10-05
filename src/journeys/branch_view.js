@@ -168,7 +168,7 @@ branch_view.displayJourney = function (
     const timeoutTrigger = window.setTimeout(function () {
       // @ts-expect-error -- JSONP callback on a dynamically named window property
       window[callbackString] = function () {};
-    }, utils.timeout);
+    }, journeys_utils.branch._ctx.timeout);
 
     // @ts-expect-error -- JSONP callback on a dynamically named window property
     window[callbackString] = function (data) {
@@ -210,7 +210,7 @@ branch_view.displayJourney = function (
       );
 
       if (utils.navigationTimingAPIEnabled) {
-        utils.instrumentation['journey-load-time'] =
+        journeys_utils.branch._ctx.instrumentation['journey-load-time'] =
           utils.timeSinceNavigationStart();
       }
 

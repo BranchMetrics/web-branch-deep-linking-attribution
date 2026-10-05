@@ -1,6 +1,7 @@
 import { banner } from '../../src/banner/banner.js';
 import { banner_utils } from '../../src/banner/banner_utils.js';
 import { Branch } from '../../src/branch.js';
+import { createContext } from '../../src/core/context.js';
 import { storage as storageModule } from '../../src/core/storage.js';
 import { setEnv } from '../../src/env/env.js';
 import { makeFakeEnv, UA_FOR_PLATFORM } from '../helpers/fake-env.js';
@@ -70,6 +71,7 @@ function makeOptions(overrides) {
 
 function makeBranchStub() {
   return {
+    _ctx: createContext(),
     _publishEvent: vi.fn(),
     deepview: vi.fn(),
     deepviewCta: vi.fn(),

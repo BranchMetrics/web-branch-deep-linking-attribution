@@ -1,5 +1,6 @@
 import { Branch } from '../src/branch.js';
 import { config } from '../src/core/config.js';
+import { createContext } from '../src/core/context.js';
 import { task_queue } from '../src/core/queue.js';
 import { safejson } from '../src/core/safejson.js';
 import { utils } from '../src/core/utils.js';
@@ -82,7 +83,7 @@ describe('Branch - new', function () {
     };
 
     it('should merge branch_requestMetadata directly into metadata for v1/pageview instead of dropping it', function () {
-      const server = new Server();
+      const server = new Server(createContext());
       const result = server.getUrl(pageviewResource, {
         branch_key: window.branch_sample_key,
         event: 'pageview',
@@ -109,7 +110,7 @@ describe('Branch - new', function () {
     });
 
     it('should merge branch_requestMetadata directly into metadata for v1/dismiss instead of dropping it', function () {
-      const server = new Server();
+      const server = new Server(createContext());
       const result = server.getUrl(dismissResource, {
         branch_key: window.branch_sample_key,
         event: 'dismiss',

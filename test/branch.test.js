@@ -694,7 +694,7 @@ describe('Branch', function () {
         branch.setIdentity(null, function (err, _res) {
           assert.strictEqual(
             err.message,
-            utils.message(utils.messages.missingIdentity),
+            utils.formatMessage(utils.messages.missingIdentity),
             'error matched for missing identity',
           );
         });

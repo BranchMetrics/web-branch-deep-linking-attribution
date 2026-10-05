@@ -75,7 +75,7 @@ export const banner = function (branch, options, linkData, storage) {
   const finalHookupsCallback = function (markup) {
     element = markup;
     // Add CSS
-    banner_css.css(options, element);
+    banner_css.css(options, element, branch._ctx);
     // Attach actions
     linkData.channel = linkData.channel || 'app banner';
 
@@ -153,7 +153,7 @@ export const banner = function (branch, options, linkData, storage) {
   };
 
   // Create markup
-  banner_html.markup(options, storage, finalHookupsCallback);
+  banner_html.markup(options, storage, finalHookupsCallback, branch._ctx);
 
   return closeBanner;
 };

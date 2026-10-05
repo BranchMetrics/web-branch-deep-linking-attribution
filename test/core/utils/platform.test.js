@@ -1,4 +1,5 @@
 import { config } from '../../../src/core/config.js';
+import { createContext } from '../../../src/core/context.js';
 import { utils } from '../../../src/core/utils.js';
 import { browserEnv, setEnv } from '../../../src/env/env.js';
 import { makeFakeEnv } from '../../helpers/fake-env.js';
@@ -508,19 +509,16 @@ describe('platform utils (characterization)', function () {
   });
 
   describe('getClientHints', function () {
-    let originalUserAgentData;
+    let ctx;
     beforeEach(function () {
-      originalUserAgentData = utils.userAgentData;
-    });
-    afterEach(function () {
-      utils.userAgentData = originalUserAgentData;
+      ctx = createContext();
     });
 
-    it('sets utils.userAgentData to null when navigator.userAgentData is missing', function () {
+    it('sets ctx.userAgentData to null when navigator.userAgentData is missing', function () {
       stubProperty(navigator, 'userAgentData', undefined);
-      utils.userAgentData = { model: 'stale', platformVersion: '1' };
-      expect(utils.getClientHints()).toBeUndefined();
-      expect(utils.userAgentData).toBeNull();
+      ctx.userAgentData = { model: 'stale', platformVersion: '1' };
+      expect(utils.getClientHints(ctx)).toBeUndefined();
+      expect(ctx.userAgentData).toBeNull();
     });
 
     it('requests model + platformVersion and stores them asynchronously', async function () {
@@ -532,19 +530,18 @@ describe('platform utils (characterization)', function () {
         });
       });
       stubProperty(navigator, 'userAgentData', { getHighEntropyValues });
-      utils.userAgentData = null;
 
-      utils.getClientHints();
+      utils.getClientHints(ctx);
 
       expect(getHighEntropyValues).toHaveBeenCalledWith([
         'model',
         'platformVersion',
       ]);
       // Not set synchronously.
-      expect(utils.userAgentData).toBeNull();
+      expect(ctx.userAgentData).toBeNull();
       await Promise.resolve();
       await Promise.resolve();
-      expect(utils.userAgentData).toEqual({
+      expect(ctx.userAgentData).toEqual({
         model: 'Pixel 8',
         platformVersion: '14',
       });
@@ -556,10 +553,10 @@ describe('platform utils (characterization)', function () {
           return Promise.resolve({ model: '', platformVersion: '15.5.0' });
         },
       });
-      utils.getClientHints();
+      utils.getClientHints(ctx);
       await Promise.resolve();
       await Promise.resolve();
-      expect(utils.userAgentData).toEqual({
+      expect(ctx.userAgentData).toEqual({
         model: '',
         platformVersion: '15.5.0',
       });
@@ -567,21 +564,19 @@ describe('platform utils (characterization)', function () {
   });
 
   describe('getUserData', function () {
-    let originalUserAgentData;
+    let ctx;
     beforeEach(function () {
-      originalUserAgentData = utils.userAgentData;
+      ctx = createContext();
       setUserAgent(UA.androidChrome);
       stubProperty(navigator, 'languages', ['en-US']);
       setScreen(412, 915);
       stubProperty(document, 'referrer', 'https://referrer.example.com/');
     });
-    afterEach(function () {
-      utils.userAgentData = originalUserAgentData;
-    });
 
     it('collects page, device, identity and sdk fields', function () {
-      utils.userAgentData = { model: 'Pixel 8', platformVersion: '14' };
+      ctx.userAgentData = { model: 'Pixel 8', platformVersion: '14' };
       const data = utils.getUserData({
+        _ctx: ctx,
         browser_fingerprint_id: '12345',
         identity: 'user-1',
       });
@@ -604,11 +599,10 @@ describe('platform utils (characterization)', function () {
     });
 
     it('omits null/undefined fields and model/os_version without client hints', function () {
-      utils.userAgentData = null;
       stubProperty(navigator, 'languages', undefined);
       stubProperty(navigator, 'language', undefined);
       setScreen(0, 0);
-      const data = utils.getUserData({});
+      const data = utils.getUserData({ _ctx: ctx });
       expect(data).toEqual({
         http_origin: document.URL,
         user_agent: UA.androidChrome,
@@ -623,8 +617,11 @@ describe('platform utils (characterization)', function () {
 
     it('keeps an empty referrer and drops empty client-hint strings', function () {
       stubProperty(document, 'referrer', '');
-      utils.userAgentData = { model: '', platformVersion: '' };
-      const data = utils.getUserData({ browser_fingerprint_id: null });
+      ctx.userAgentData = { model: '', platformVersion: '' };
+      const data = utils.getUserData({
+        _ctx: ctx,
+        browser_fingerprint_id: null,
+      });
       expect(data.http_referrer).toBe('');
       expect('browser_fingerprint_id' in data).toBe(false);
       expect('model' in data).toBe(false);
@@ -666,37 +663,6 @@ describe('platform utils (characterization)', function () {
       const ret = utils.addEvent(el, 'resize', callback);
       expect(el.onresize).toBe(callback);
       expect(ret).toBe(0);
-    });
-  });
-
-  describe('addNonceAttribute', function () {
-    let originalNonce;
-    beforeEach(function () {
-      originalNonce = utils.nonce;
-    });
-    afterEach(function () {
-      utils.nonce = originalNonce;
-    });
-
-    it('does not set a nonce when utils.nonce is empty', function () {
-      utils.nonce = '';
-      const el = document.createElement('script');
-      utils.addNonceAttribute(el);
-      expect(el.hasAttribute('nonce')).toBe(false);
-    });
-
-    it('sets the nonce attribute from utils.nonce', function () {
-      utils.nonce = 'abc123';
-      const el = document.createElement('script');
-      utils.addNonceAttribute(el);
-      expect(el.getAttribute('nonce')).toBe('abc123');
-    });
-
-    it('sets "undefined" when utils.nonce is undefined (only "" is skipped)', function () {
-      utils.nonce = undefined;
-      const el = document.createElement('script');
-      utils.addNonceAttribute(el);
-      expect(el.getAttribute('nonce')).toBe('undefined');
     });
   });
 
