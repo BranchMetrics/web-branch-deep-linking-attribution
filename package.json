@@ -26,7 +26,8 @@
     "typecheck": "tsc -p .",
     "test:bundle": "vitest run --config vitest.bundle.config.mjs",
     "test:behavior": "vitest run -c vitest.behavior.config.mjs",
-    "behavior:baseline": "sh scripts/behavior-baseline.sh"
+    "behavior:baseline": "sh scripts/behavior-baseline.sh",
+    "check:cycles": "node scripts/check-cycles.mjs"
   },
   "repository": {
     "type": "git",
