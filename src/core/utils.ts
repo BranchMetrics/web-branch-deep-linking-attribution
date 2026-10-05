@@ -28,7 +28,6 @@ import {
   extractDeeplinkPath,
   extractMobileDeeplinkPath,
   generateDynamicBNCLink,
-  getParamValue,
   isValidURL,
   processReferringLink,
   removeTrailingDotZeros,
@@ -37,7 +36,6 @@ import {
   getPlatformByUserAgent,
   isIOSWKWebView,
   isSafari11OrGreater,
-  isWebKitBrowser,
 } from '../lib/ua.js';
 import {
   calculateDiffBetweenArrays,
@@ -126,7 +124,6 @@ const lib = {
   isBase64Encoded,
   encodeBFPs,
   decodeBFPs,
-  getParamValue,
   extractDeeplinkPath,
   extractMobileDeeplinkPath,
   isValidURL,
@@ -135,7 +132,6 @@ const lib = {
   removeTrailingDotZeros,
   getPlatformByUserAgent,
   isSafari11OrGreater,
-  isWebKitBrowser,
   isIOSWKWebView,
   calculateDiffBetweenArrays,
   validateCommerceEventParams,
