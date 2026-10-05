@@ -2,7 +2,8 @@ import { banner } from '../../src/banner/banner.js';
 import { banner_utils } from '../../src/banner/banner_utils.js';
 import { Branch } from '../../src/branch.js';
 import { storage as storageModule } from '../../src/core/storage.js';
-import { utils } from '../../src/core/utils.js';
+import { setEnv } from '../../src/env/env.js';
+import { makeFakeEnv, UA_FOR_PLATFORM } from '../helpers/fake-env.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
@@ -82,7 +83,7 @@ function publishedEvents(branch) {
 }
 
 function mockPlatform(platform) {
-  return vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue(platform);
+  setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM[platform] }));
 }
 
 // Renders an iframe banner and resolves once the iframe has loaded and the
@@ -118,6 +119,7 @@ describe('banner', function () {
   afterEach(function () {
     vi.useRealTimers();
     vi.restoreAllMocks();
+    setEnv(null);
     removeBannerElements();
     document.body.className = '';
     document.body.removeAttribute('style');

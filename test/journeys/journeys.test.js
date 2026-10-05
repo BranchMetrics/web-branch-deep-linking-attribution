@@ -1,5 +1,6 @@
 import { Branch } from '../../src/branch.js';
-import { utils } from '../../src/core/utils.js';
+import { setEnv } from '../../src/env/env.js';
+import { makeFakeEnv, UA_FOR_PLATFORM } from '../helpers/fake-env.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
@@ -21,7 +22,7 @@ describe('Branch', function () {
       el?.parentNode?.removeChild(el);
     });
 
-    vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('ios');
+    setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.ios }));
 
     const branch = new Branch();
 
@@ -32,6 +33,7 @@ describe('Branch', function () {
 
   afterEach(function () {
     vi.restoreAllMocks();
+    setEnv(null);
   });
 
   describe('journeys', function () {

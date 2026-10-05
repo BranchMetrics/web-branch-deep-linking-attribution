@@ -1,4 +1,5 @@
 import type { Utils } from './utils.js';
+import { browserEnv } from '../env/env.js';
 
 /**
  * The one shared utils object. Submodules import it from here (a leaf), and
@@ -15,9 +16,7 @@ export const utils = {
   // Properties and function related to calculating Branch request roundtrip time
   instrumentation: {},
   userAgentData: null,
-  navigationTimingAPIEnabled:
-    typeof window !== 'undefined' &&
-    !!window.performance?.timing?.navigationStart,
+  navigationTimingAPIEnabled: browserEnv.navigationTimingAPIEnabled(),
   currentRequestBrttTag: '',
   dismissEventToSourceMapping: {
     'didClickJourneyClose': 'Button(X)',
