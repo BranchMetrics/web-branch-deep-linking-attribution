@@ -1,5 +1,7 @@
 import { safejson } from './safejson.js';
 import { utils } from './utils.js';
+import { decodeBFPs, encodeBFPs } from '../lib/encoding.js';
+import { merge as mergeObjects } from '../lib/objects.js';
 // Not referenced here: loads storage before session and utils, keeping the
 // module order in build.min.js.
 import './storage.js';
@@ -15,7 +17,7 @@ session.get = function (storage, first) {
   const sessionString = first ? 'branch_session_first' : 'branch_session';
   try {
     const data = safejson.parse(storage.get(sessionString, first)) || null;
-    return utils.decodeBFPs(data);
+    return decodeBFPs(data);
   } catch (_e) {
     return null;
   }
@@ -36,7 +38,7 @@ session.set = function (storage, data, first) {
     data.referringLinkExpiry =
       now.getTime() + utils.extendedJourneysAssistExpiryTime;
   }
-  data = utils.encodeBFPs(data);
+  data = encodeBFPs(data);
   storage.set('branch_session', safejson.serialize(data));
   if (first) {
     storage.set('branch_session_first', safejson.serialize(data), true);
@@ -53,7 +55,7 @@ session.update = function (storage, newData) {
   }
   const currentData = session.get(storage) || {};
   const data = safejson.serialize(
-    utils.encodeBFPs(utils.merge(currentData, newData)),
+    encodeBFPs(mergeObjects(currentData, newData)),
   );
   storage.set('branch_session', data);
 };
@@ -67,9 +69,7 @@ session.update = function (storage, newData) {
  */
 session.patch = function (storage, data, updateLocalStorage, removeNull) {
   const merge = function (source, patch) {
-    return utils.encodeBFPs(
-      utils.merge(safejson.parse(source), patch, removeNull),
-    );
+    return encodeBFPs(mergeObjects(safejson.parse(source), patch, removeNull));
   };
 
   const session = storage.get('branch_session', false) || {};
