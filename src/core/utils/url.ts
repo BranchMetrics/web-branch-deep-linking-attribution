@@ -1,35 +1,16 @@
-import { utils } from '../state.js';
 import { safejson } from '../safejson.js';
+import { getEnv } from '../../env/env.js';
 
 export const url = {
-  /*
-   * Getters for location.search and location.hash, so that we can stub this for testing
-   */
-  getLocationSearch: function () {
-    return utils.isIframeAndFromSameOrigin()
-      ? window.top.location.search
-      : window.location.search;
-  },
-
-  getLocationHash: function () {
-    return utils.isIframeAndFromSameOrigin()
-      ? window.top.location.hash
-      : window.location.hash;
-  },
-
-  /**
-   * Abstract away the window.location for better testing
-   */
-  getWindowLocation: function () {
-    return utils.isIframe() ? document.referrer : String(window.location);
-  },
+  // Environment reads live in src/env/env.ts; these delegate to it.
+  getWindowLocation: () => getEnv().windowLocation(),
 
   /**
    * Find debugging parameters
    */
   getParameterByName: function (name) {
     name = name.replace(/[\[\]]/g, '\\$&');
-    const url = utils.getWindowLocation();
+    const url = getEnv().windowLocation();
     const re = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
     const match = re.exec(url);
     if (!match?.[2]) {
@@ -62,32 +43,32 @@ export const url = {
       data.$og_redirect || data.$fallback_url || data.$desktop_url;
 
     if (!data.$canonical_url) {
-      data.$canonical_url = utils.getWindowLocation();
+      data.$canonical_url = getEnv().windowLocation();
     }
     if (!data.$og_title) {
       data.$og_title = hasOGRedirectOrFallback
         ? null
-        : utils.getOpenGraphContent('title');
+        : getEnv().openGraphContent('title');
     }
     if (!data.$og_description) {
       data.$og_description = hasOGRedirectOrFallback
         ? null
-        : utils.getOpenGraphContent('description');
+        : getEnv().openGraphContent('description');
     }
     if (!data.$og_image_url) {
       data.$og_image_url = hasOGRedirectOrFallback
         ? null
-        : utils.getOpenGraphContent('image');
+        : getEnv().openGraphContent('image');
     }
     if (!data.$og_video) {
       data.$og_video = hasOGRedirectOrFallback
         ? null
-        : utils.getOpenGraphContent('video');
+        : getEnv().openGraphContent('video');
     }
     if (!data.$og_type) {
       data.$og_type = hasOGRedirectOrFallback
         ? null
-        : utils.getOpenGraphContent('type');
+        : getEnv().openGraphContent('type');
     }
 
     if (typeof data.$desktop_url === 'string') {
@@ -106,30 +87,17 @@ export const url = {
     return linkData;
   },
 
-  /**
-   * @param link
-   */
-  getClickIdAndSearchStringFromLink: function (link: string) {
-    if (!link || typeof link !== 'string') {
-      return '';
-    }
-    const elem = document.createElement('a');
-    elem.href = link;
-    function notEmpty(data) {
-      return data !== '';
-    }
-    const pathname = elem.pathname?.split('/').filter(notEmpty);
-    return Array.isArray(pathname) && pathname.length
-      ? pathname[pathname.length - 1] + elem.search
-      : elem.search;
-  },
+  getClickIdAndSearchStringFromLink: (link: string) =>
+    getEnv().clickIdAndSearchStringFromLink(link),
 
   /**
    * @param key
    */
   hashValue: function (key: string) {
     try {
-      const match = utils.getLocationHash().match(new RegExp(key + ':([^&]*)'));
+      const match = getEnv()
+        .locationHash()
+        .match(new RegExp(key + ':([^&]*)'));
       if (match && match.length >= 1) {
         return match[1];
       }
@@ -141,8 +109,8 @@ export const url = {
    */
   getParamValue: function (key: string) {
     try {
-      const match = utils
-        .getLocationSearch()
+      const match = getEnv()
+        .locationSearch()
         .substring(1)
         .match(new RegExp(key + '=([^&]*)'));
       if (match && match.length >= 1) {
@@ -151,19 +119,8 @@ export const url = {
     } catch (_e) {}
   },
 
-  getInitialReferrer: function (referringLink) {
-    if (referringLink) {
-      return referringLink;
-    }
-    if (utils.isIframe()) {
-      return utils.isSameOriginFrame() ? window.top.document.referrer : '';
-    }
-    return document.referrer;
-  },
+  getInitialReferrer: (referringLink?: string) =>
+    referringLink || getEnv().initialReferrer(),
 
-  getCurrentUrl: function () {
-    return utils.isIframeAndFromSameOrigin()
-      ? window.top.location.href
-      : window.location.href;
-  },
+  getCurrentUrl: () => getEnv().currentUrl(),
 };
