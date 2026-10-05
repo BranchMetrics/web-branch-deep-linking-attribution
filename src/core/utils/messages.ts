@@ -1,4 +1,4 @@
-import { utils } from '../utils.js';
+import { utils } from '../state.js';
 import { formatMessage } from '../../lib/messages.js';
 
 export const messages = {
