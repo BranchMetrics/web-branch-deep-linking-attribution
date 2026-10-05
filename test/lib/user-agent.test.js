@@ -2,13 +2,13 @@ import {
   getPlatformByUserAgent,
   isIOSWKWebView,
   isSafari11OrGreater,
-} from '../../src/lib/ua.js';
+} from '../../src/lib/user-agent.js';
 import { UA } from '../behavior/fixtures.js';
 
 // Characterization tests: these pin what the ua helpers do today, quirks
 // included. Do not "fix" expectations here without a behavior change.
 
-describe('lib/ua', () => {
+describe('lib/user-agent', () => {
   describe('getPlatformByUserAgent', () => {
     const cases = [
       ['desktop Chrome', UA.desktopChrome, false, 'desktop'],
@@ -46,7 +46,16 @@ describe('lib/ua', () => {
     ];
 
     it.each(cases)('%s -> %s', (_name, ua, isPortraitScreen, expected) => {
-      expect(getPlatformByUserAgent(ua, isPortraitScreen)).toBe(expected);
+      expect(getPlatformByUserAgent(ua, () => isPortraitScreen)).toBe(expected);
+    });
+
+    it('only reads the screen on the Mac Safari 13+ path', () => {
+      const isPortraitScreen = vi.fn(() => false);
+      getPlatformByUserAgent(UA.androidChrome, isPortraitScreen);
+      getPlatformByUserAgent(UA.desktopChrome, isPortraitScreen);
+      expect(isPortraitScreen).not.toHaveBeenCalled();
+      getPlatformByUserAgent(UA.desktopSafari17, isPortraitScreen);
+      expect(isPortraitScreen).toHaveBeenCalledTimes(1);
     });
   });
 

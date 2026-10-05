@@ -45,13 +45,13 @@ function isGTEVersion(ua, v) {
   return false;
 }
 
-function isSafari13OrGreateriPad(ua, isPortraitScreen) {
+function isSafari13OrGreateriPad(ua, isPortraitScreen: () => boolean) {
   return (
     ua &&
     isSafariBrowser(ua) &&
     isMacintoshDesktop(ua) &&
     isGTEVersion(ua, 13) &&
-    isPortraitScreen
+    isPortraitScreen()
   );
 }
 
@@ -59,7 +59,12 @@ function isIOS(ua) {
   return ua && /(iPad|iPod|iPhone)/.test(ua);
 }
 
-export function getPlatformByUserAgent(ua: string, isPortraitScreen: boolean) {
+// isPortraitScreen is a thunk so the screen is only read on the Mac Safari 13+
+// path, as before.
+export function getPlatformByUserAgent(
+  ua: string,
+  isPortraitScreen: () => boolean,
+) {
   if (ua.match(/android/i)) {
     return 'android';
   }
