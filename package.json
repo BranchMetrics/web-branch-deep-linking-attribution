@@ -26,7 +26,8 @@
     "typecheck": "tsc -p .",
     "test:bundle": "vitest run --config vitest.bundle.config.mjs",
     "test:golden": "vitest run -c vitest.golden.config.mjs",
-    "golden:baseline": "sh scripts/golden-baseline.sh"
+    "golden:baseline": "sh scripts/golden-baseline.sh",
+    "check:cycles": "node scripts/check-cycles.mjs"
   },
   "repository": {
     "type": "git",

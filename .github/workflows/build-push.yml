@@ -63,6 +63,9 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+      - name: Check import cycles and layer boundaries
+        run: pnpm run check:cycles
+
       - name: Type check
         run: pnpm run typecheck
 
@@ -96,6 +99,9 @@ jobs:
 
       - name: Check the built bundle's public contract
         run: pnpm run test:bundle
+
+      - name: Check the built bundle against the golden traces
+        run: pnpm run test:golden
 
       - name: AWS, credentials setup
         if: ${{ github.ref == 'refs/heads/main' }}
