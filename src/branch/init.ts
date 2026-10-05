@@ -7,7 +7,7 @@ import {
 } from './core.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
-import { getEnv } from '../env/env.js';
+import { getEnv, navigationTimingAPIEnabled } from '../env/env.js';
 import { delay, isKey, validateParameterType } from '../lib/objects.js';
 import {
   getClientHints,
@@ -94,7 +94,7 @@ Branch.prototype.init = wrap(
     const self = this;
     const ctx = self._ctx;
 
-    if (getEnv().navigationTimingAPIEnabled()) {
+    if (navigationTimingAPIEnabled) {
       ctx.instrumentation['init-began-at'] =
         getEnv().timeSinceNavigationStart();
     }

@@ -174,6 +174,14 @@ export const browserEnv: Env = {
   },
 };
 
+/**
+ * Whether the navigation timing API was available when the SDK loaded.
+ * Evaluated once at load from the real browser (not getEnv()), so a page
+ * script that later replaces window.performance doesn't change it.
+ */
+export const navigationTimingAPIEnabled =
+  browserEnv.navigationTimingAPIEnabled();
+
 let current = browserEnv;
 
 export const getEnv = (): Env => current;
