@@ -136,6 +136,21 @@ export const url = {
     } catch (_e) {}
   },
 
+  /**
+   * @param key
+   */
+  getParamValue: function (key: string) {
+    try {
+      const match = utils
+        .getLocationSearch()
+        .substring(1)
+        .match(new RegExp(key + '=([^&]*)'));
+      if (match && match.length >= 1) {
+        return match[1];
+      }
+    } catch (_e) {}
+  },
+
   getInitialReferrer: function (referringLink) {
     if (referringLink) {
       return referringLink;
