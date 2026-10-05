@@ -93,7 +93,7 @@
     {
       "at": 2000,
       "event": "listener",
-      "name": "didClickJourneyClose",
+      "name": "didClickJourneyContinue",
       "data": {
         "banner_id": "jv1",
         "journey_link_data": {
@@ -114,7 +114,7 @@
     },
     {
       "at": 2000,
-      "click .branch-banner-close": true
+      "click .branch-banner-continue": true
     },
     {
       "at": 2270,
@@ -161,7 +161,7 @@
         "data": "{\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
         "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
         "source": "web-sdk",
-        "dismissal_source": "Button(X)",
+        "dismissal_source": "Dismiss Journey text",
         "branch_key": "key_live_goldenTraceFakeKey00000000000000",
         "session_id": "98807509250212102",
         "identity_id": "98807509250212101",
@@ -170,6 +170,14 @@
       },
       "responseType": "",
       "timeout": 5000
+    },
+    {
+      "at": 2271,
+      "navigate": "https://shop.example.com/after-dismiss"
+    },
+    {
+      "at": 2271,
+      "jsdomError": "Not implemented: navigation (except hash changes)"
     }
   ],
   "storage": {

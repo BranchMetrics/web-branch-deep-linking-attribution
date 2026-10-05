@@ -143,7 +143,7 @@
   "location": "https://shop.example.com/product/42",
   "dom": {
     "head": "<head></head>",
-    "body": "<body style=\"margin-top: 8px; transition: all 00.25s ease;\" class=\" \"></body>",
+    "body": "<body class=\" \" style=\"margin-top: 8px;\"></body>",
     "iframes": []
   }
 }

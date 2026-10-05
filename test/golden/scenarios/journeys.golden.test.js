@@ -85,6 +85,34 @@ describe('golden: journeys', () => {
     await snap('journeys/cta-click', p);
   });
 
+  it('$journeys_cta replaces the CTA link', async () => {
+    const p = journeyPage();
+    p.listen();
+    p.branch.setBranchViewData({
+      data: { $journeys_cta: 'https://shop.example.com/cta' },
+    });
+    p.branch.init(KEY);
+    await p.run(2000);
+    clickInJourney(p, '#branch-mobile-action');
+    await snap('journeys/journeys_cta-rewrite', p);
+  });
+
+  it('dismissRedirect sends the page on after a dismiss', async () => {
+    const p = journeyPage({
+      routes: {
+        '/v1/pageview': API.pageviewWithJourney(
+          {},
+          { dismissRedirect: 'https://shop.example.com/after-dismiss' },
+        ),
+      },
+    });
+    p.listen();
+    p.branch.init(KEY);
+    await p.run(2000);
+    clickInJourney(p, '.branch-banner-continue');
+    await snap('journeys/dismiss-redirect', p);
+  });
+
   it('setBranchViewData before init', async () => {
     const p = journeyPage();
     p.branch.setBranchViewData(

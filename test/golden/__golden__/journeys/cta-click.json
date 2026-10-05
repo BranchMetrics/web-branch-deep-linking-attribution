@@ -103,6 +103,10 @@
     },
     {
       "at": 2000,
+      "navigate": "https://bnc.lt/j/jv1-cta"
+    },
+    {
+      "at": 2000,
       "jsdomError": "Not implemented: navigation (except hash changes)"
     },
     {
@@ -159,7 +163,7 @@
   "location": "https://shop.example.com/product/42",
   "dom": {
     "head": "<head></head>",
-    "body": "<body style=\"margin-top: 8px; transition: all 00.25s ease;\" class=\" \"></body>",
+    "body": "<body class=\" \" style=\"margin-top: 8px;\"></body>",
     "iframes": []
   }
 }

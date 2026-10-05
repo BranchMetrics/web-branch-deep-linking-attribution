@@ -105,6 +105,11 @@
     },
     {
       "at": 100,
+      "navigate": "https://bnc.lt/d/abc",
+      "replace": true
+    },
+    {
+      "at": 100,
       "jsdomError": "Not implemented: navigation (except hash changes)"
     },
     {

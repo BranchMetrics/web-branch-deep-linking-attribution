@@ -39,10 +39,38 @@ const openBody = (extra = {}) => ({
 
 /**
  * A Journey template as /v1/pageview returns it. The server fills in the
- * callback the SDK sent as `callback_string`; its script hands the CTA back.
+ * callback the SDK sent as `callback_string`; the script hands back the CTA,
+ * which opens the link through validate(). The SDK extracts the metadata
+ * JSON, both CSS blocks and the script, writes the metadata's CTA text into
+ * #branch-mobile-action, and with $journeys_cta set rewrites the
+ * `validate(...);` call to point at that link.
  */
-export const journeyHtml = (callback) =>
-  `<html><head><style>#branch-banner-spacer {margin-bottom: 76px;}</style><script type="application/json">{"bannerHeight":"76px","position":"top","sticky":"absolute","globalDismissPeriod":7}</script><script type="text/javascript">window.${callback}(function () { window.top.location.replace("https://bnc.lt/j/jv1-cta"); });</script></head><body><div id="branch-banner"><a id="branch-mobile-action" href="https://bnc.lt/j/jv1-cta">Open</a><div class="branch-banner-continue">No thanks</div><div class="branch-banner-close">x</div></div></body></html>`;
+export const journeyHtml = (callback, metadata = {}) =>
+  [
+    '<html><head>',
+    '<style>#branch-banner-spacer {margin-bottom: 76px;}</style>',
+    `<script type="application/json">${JSON.stringify({
+      bannerHeight: '76px',
+      position: 'top',
+      sticky: 'absolute',
+      globalDismissPeriod: 7,
+      ctaText: { has_app: 'OPEN', no_app: 'GET' },
+      ...metadata,
+    })}</script>`,
+    '<style type="text/css" id="branch-css">.branch-banner-content { background-color: rgba(255, 255, 255, 1); height: 76px; }\n#branch-mobile-action { color: #fff; }</style>',
+    '<style type="text/css" id="branch-iframe-css">#branch-banner-iframe { border-radius: 4px; }</style>',
+    '<script type="text/javascript">',
+    'function validate(url) { window.top.location = url; }',
+    `window.${callback}(function () {`,
+    'validate("https://bnc.lt/j/jv1-cta");',
+    '});',
+    '</script>',
+    '</head><body><div id="branch-banner"><div class="branch-banner-content">',
+    '<a id="branch-mobile-action" href="#">Open</a>',
+    '<div class="branch-banner-continue">No thanks</div>',
+    '<div class="branch-banner-close">x</div>',
+    '</div></div></body></html>',
+  ].join('\n');
 
 export const API = {
   openBody,
@@ -71,13 +99,17 @@ export const API = {
       },
     };
   },
-  /** A /v1/pageview route that renders a Journey. */
-  pageviewWithJourney(extra = {}) {
+  /**
+   * A /v1/pageview route that renders a Journey. `extra` goes into
+   * branch_view_data, `metadata` into the template's metadata JSON.
+   */
+  pageviewWithJourney(extra = {}, metadata = {}) {
     return (req) => ({
       body: {
         branch_view_enabled: true,
         template: journeyHtml(
           new URLSearchParams(req.body).get('callback_string'),
+          metadata,
         ),
         event_data: { branch_view_data: { id: 'jv1', ...extra } },
         journey_link_data: { url: 'https://bnc.lt/j/jv1' },

@@ -107,6 +107,10 @@
     },
     {
       "at": 100,
+      "navigate": "https://bnc.lt/a/key_live_goldenTraceFakeKey00000000000000?tags=a&tags=b&channel=sms&feature=share&stage=new%20user&campaign=spring&source=web-sdk&data=eyIkZGVza3RvcF91cmwiOiJodHRwczovL3Nob3AuZXhhbXBsZS5jb20vZCIsImsiOiJ2IiwiJGNhbm9uaWNhbF91cmwiOiJodHRwczovL3Nob3AuZXhhbXBsZS5jb20vcHJvZHVjdC80MiIsIiRvZ190aXRsZSI6bnVsbCwiJG9nX2Rlc2NyaXB0aW9uIjpudWxsLCIkb2dfaW1hZ2VfdXJsIjpudWxsLCIkb2dfdmlkZW8iOm51bGwsIiRvZ190eXBlIjpudWxsfQ%3D%3D"
+    },
+    {
+      "at": 100,
       "jsdomError": "Not implemented: navigation (except hash changes)"
     },
     {

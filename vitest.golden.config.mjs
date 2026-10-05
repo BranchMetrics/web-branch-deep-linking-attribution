@@ -10,6 +10,12 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    include: ['test/golden/scenarios/**/*.golden.test.js'],
+    include: [
+      'test/golden/harness.test.js',
+      'test/golden/scenarios/**/*.golden.test.js',
+    ],
+    // Never write a missing snapshot: a renamed or deleted scenario must
+    // fail, not silently re-record. `-u` (golden-baseline.sh) overrides this.
+    update: 'none',
   },
 });

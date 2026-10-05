@@ -121,12 +121,12 @@
   },
   "location": "https://shop.example.com/product/42",
   "dom": {
-    "head": "<head><style type=\"text/css\" id=\"branch-iframe-css\">body { -webkit-transition: all 0.25s ease; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: 76px; z-index: 99999; -webkit-transition: all 0.25s ease; transition: all 00.25s ease; }\n#branch-banner-iframe { position: absolute; }\n@media only screen and (orientation: landscape) { body { margin-top: 76px; }\n#branch-banner-iframe { height: 76px; }</style></head>",
-    "body": "<body style=\"margin-top: 84px; transition: all 00.25s ease;\" class=\" branch-banner-is-active\"><iframe src=\"about:blank\" style=\"overflow: hidden; top: 0px;\" scrolling=\"no\" id=\"branch-banner-iframe\" class=\"branch-animation\" title=\"Branch Banner Frame\" aria-label=\"Branch Banner Frame\"></iframe><script id=\"branch-journey-cta\">window.branch_view_callback__1(function () { window.top.location.replace(\"https://bnc.lt/j/jv1-cta\"); });</script></body>",
+    "head": "<head><style type=\"text/css\" id=\"branch-iframe-css\">#branch-banner-iframe { border-radius: 4px; }</style></head>",
+    "body": "<body class=\" branch-banner-is-active\"><iframe src=\"about:blank\" style=\"overflow: hidden;\" scrolling=\"no\" id=\"branch-banner-iframe\" class=\"branch-animation\" title=\"Branch Banner Frame\" aria-label=\"Branch Banner Frame\"></iframe><script id=\"branch-journey-cta\">\nfunction validate(url) { window.top.location = url; }\nwindow.branch_view_callback__1(function () {\nvalidate(\"https://bnc.lt/j/jv1-cta\");\n});\n</script></body>",
     "iframes": [
       {
         "id": "branch-banner-iframe",
-        "html": "<html><head><style type=\"text/css\" id=\"branch-css\">undefined</style></head><body class=\"branch-banner-android\"><style>#branch-banner-spacer {margin-bottom: 76px;}</style><div id=\"branch-banner\"><a id=\"branch-mobile-action\" href=\"https://bnc.lt/j/jv1-cta\" aria-label=\"undefined\">undefined</a><div class=\"branch-banner-continue\">No thanks</div><div class=\"branch-banner-close\">x</div></div></body></html>"
+        "html": "<html><head><style type=\"text/css\" id=\"branch-css\">.branch-banner-content { background-color: rgba(255, 255, 255, 1); height: 76px; }\n#branch-mobile-action { color: #fff; }</style></head><body class=\"branch-banner-android\">\n<style>#branch-banner-spacer {margin-bottom: 76px;}</style>\n\n\n\n\n<div id=\"branch-banner\"><div class=\"branch-banner-content\">\n<a id=\"branch-mobile-action\" href=\"#\" aria-label=\"GET\">GET</a>\n<div class=\"branch-banner-continue\">No thanks</div>\n<div class=\"branch-banner-close\">x</div>\n</div></div></body></html>"
       }
     ]
   }

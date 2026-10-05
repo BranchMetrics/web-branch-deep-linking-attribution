@@ -5,12 +5,20 @@
  * everything observable. Imports nothing from src/.
  */
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { JSDOM, ResourceLoader, VirtualConsole } from 'jsdom';
 import { API, UA } from './fixtures.js';
 
 const BUNDLE_PATH = process.env.GOLDEN_BUNDLE || 'dist/build.min.js';
 const BUNDLE = readFileSync(BUNDLE_PATH, 'utf8');
 export const EPOCH = Date.UTC(2026, 0, 15, 12, 0, 0);
+
+// jsdom internals, resolved from jsdom itself, for observing navigation.
+const jsdomRequire = createRequire(
+  createRequire(import.meta.url).resolve('jsdom'),
+);
+const { implForWrapper } = jsdomRequire('./jsdom/living/generated/utils.js');
+const { serializeURL } = jsdomRequire('whatwg-url');
 
 /** Never fetches anything; only carries the user agent. */
 class NoNetworkLoader extends ResourceLoader {
@@ -230,6 +238,19 @@ export function createPage(opts = {}) {
   // Chrome and Safari both expose the legacy alias.
   if (/AppleWebKit/.test(win.navigator.userAgent)) win.webkitURL = win.URL;
   clock = installClock(win, (e) => push({ uncaught: clean(e) }));
+
+  // jsdom doesn't implement navigation, so record where the page would go.
+  // Every Location write (location = x, location.href = x, assign, replace)
+  // ends up in this one method.
+  const location = implForWrapper(win.location);
+  const locationNavigate = location._locationObjectNavigate;
+  location._locationObjectNavigate = function (url, flags = {}) {
+    push({
+      navigate: norm(serializeURL(url)),
+      ...(flags.replacement ? { replace: true } : {}),
+    });
+    return locationNavigate.call(this, url, flags);
+  };
   const routes = { ...API.defaults(), ...(opts.routes || {}) };
   const routeFor = (path, req) => {
     const spec = routes[path] || { status: 200, body: {} };
