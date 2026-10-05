@@ -326,23 +326,21 @@ describe('utils', function () {
 
   describe('getParamValue', function () {
     it('should return search param value', function () {
-      if (testUtils.go('?test=testsearch')) {
-        assert.strictEqual(
-          utils.getParamValue('test'),
-          'testsearch',
-          'Returns search param',
-        );
-      }
+      testUtils.go('?test=testsearch');
+      assert.strictEqual(
+        utils.getParamValue('test'),
+        'testsearch',
+        'Returns search param',
+      );
     });
 
     it('should return undefined if not set', function () {
-      if (testUtils.go('')) {
-        assert.strictEqual(
-          undefined,
-          utils.getParamValue('test'),
-          'returns undefined',
-        );
-      }
+      testUtils.go('');
+      assert.strictEqual(
+        undefined,
+        utils.getParamValue('test'),
+        'returns undefined',
+      );
     });
   });
 

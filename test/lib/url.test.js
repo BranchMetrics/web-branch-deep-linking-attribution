@@ -1,27 +1,12 @@
 import {
   extractDeeplinkPath,
   extractMobileDeeplinkPath,
-  getParamValue,
   isValidURL,
   processReferringLink,
   removeTrailingDotZeros,
 } from '../../src/lib/url.js';
 
 describe('lib/url', () => {
-  describe('getParamValue', () => {
-    it('returns the search param value', () => {
-      if (testUtils.go('?test=testsearch')) {
-        expect(getParamValue('test')).toBe('testsearch');
-      }
-    });
-
-    it('returns undefined if not set', () => {
-      if (testUtils.go('')) {
-        expect(getParamValue('test')).toBe(undefined);
-      }
-    });
-  });
-
   describe('extractDeeplinkPath', () => {
     it('strips protocol and domain', () => {
       expect(extractDeeplinkPath('https://domain.name/some/path')).toBe(

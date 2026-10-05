@@ -4,7 +4,6 @@ import {
   getPlatformByUserAgent,
   isIOSWKWebView,
   isSafari11OrGreater,
-  isWebKitBrowser,
 } from '../../lib/ua.js';
 
 export const platform = {
@@ -13,7 +12,11 @@ export const platform = {
     return (Date.now() - window.performance.timing.navigationStart).toString();
   },
 
-  getPlatformByUserAgent: () => getPlatformByUserAgent(navigator.userAgent),
+  getPlatformByUserAgent: () =>
+    getPlatformByUserAgent(
+      navigator.userAgent,
+      () => screen.height > screen.width,
+    ),
 
   /**
    * Returns true if browser is safari version 11 or greater
@@ -23,9 +26,12 @@ export const platform = {
   /**
    * Returns true if browser uses WebKit.
    */
-  isWebKitBrowser: () => isWebKitBrowser(navigator.userAgent),
+  isWebKitBrowser: function () {
+    return !!window.webkitURL;
+  },
 
-  isIOSWKWebView: () => isIOSWKWebView(navigator.userAgent),
+  isIOSWKWebView: () =>
+    isIOSWKWebView(navigator.userAgent, utils.isWebKitBrowser()),
 
   /**
    * Add event listeners to elements, taking older browsers into account

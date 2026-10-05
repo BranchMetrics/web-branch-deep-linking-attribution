@@ -1,5 +1,4 @@
 import { config } from '../core/config.js';
-import { utils } from '../core/utils.js';
 import { base64encode } from './encoding.js';
 
 export function generateDynamicBNCLink(branchKey, data) {
@@ -49,21 +48,6 @@ export function generateDynamicBNCLink(branchKey, data) {
     }
   }
   return fallbackUrl;
-}
-
-/**
- * @param key
- */
-export function getParamValue(key: string) {
-  try {
-    const match = utils
-      .getLocationSearch()
-      .substring(1)
-      .match(new RegExp(key + '=([^&]*)'));
-    if (match && match.length >= 1) {
-      return match[1];
-    }
-  } catch (_e) {}
 }
 
 /**
