@@ -1,6 +1,6 @@
 import { utils } from '../utils.js';
 
-export const dma = /** @satisfies {Record<string, unknown>} */ ({
+export const dma = {
   allowDMAParamURLMap: {
     '/v1/open': '',
     '/v1/pageview': '',
@@ -15,10 +15,10 @@ export const dma = /** @satisfies {Record<string, unknown>} */ ({
     );
   },
 
-  setDMAParams: function (data, dmaObj = {}, endPoint) {
+  setDMAParams: function (data, dmaObj: Record<string, any> = {}, endPoint) {
     const v1_DMAEndPoints = ['/v1/open', '/v1/pageview'];
     const v2_DMAEndPoints = ['/v2/event/standard', '/v2/event/custom'];
-    const dmaParams = {};
+    const dmaParams: Record<string, any> = {};
     dmaParams.dma_eea = dmaObj.eeaRegion;
     dmaParams.dma_ad_personalization = dmaObj.adPersonalizationConsent;
     dmaParams.dma_ad_user_data = dmaObj.adUserDataUsageConsent;
@@ -26,7 +26,7 @@ export const dma = /** @satisfies {Record<string, unknown>} */ ({
       Object.assign(data, dmaParams);
     } else if (v2_DMAEndPoints.includes(endPoint)) {
       try {
-        let user_data;
+        let user_data: Record<string, any>;
         if (!data.user_data) {
           user_data = {};
         } else {
@@ -41,4 +41,4 @@ export const dma = /** @satisfies {Record<string, unknown>} */ ({
       }
     }
   },
-});
+};

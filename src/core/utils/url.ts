@@ -2,7 +2,7 @@ import { utils } from '../utils.js';
 import { config } from '../config.js';
 import { safejson } from '../safejson.js';
 
-export const url = /** @satisfies {Record<string, unknown>} */ ({
+export const url = {
   generateDynamicBNCLink: function (branchKey, data) {
     if (!branchKey && !data) {
       return;
@@ -157,9 +157,9 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {String} link
+   * @param link
    */
-  getClickIdAndSearchStringFromLink: function (link) {
+  getClickIdAndSearchStringFromLink: function (link: string) {
     if (!link || typeof link !== 'string') {
       return '';
     }
@@ -175,9 +175,9 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {String} link
+   * @param link
    */
-  processReferringLink: function (link) {
+  processReferringLink: function (link: string) {
     return link
       ? link.substring(0, 4) !== 'http'
         ? config.link_service_endpoint + link
@@ -186,9 +186,9 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {string} key
+   * @param key
    */
-  hashValue: function (key) {
+  hashValue: function (key: string) {
     try {
       const match = utils.getLocationHash().match(new RegExp(key + ':([^&]*)'));
       if (match && match.length >= 1) {
@@ -198,9 +198,9 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {string} key
+   * @param key
    */
-  getParamValue: function (key) {
+  getParamValue: function (key: string) {
     try {
       const match = utils
         .getLocationSearch()
@@ -221,9 +221,9 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
    * and returns (for the above sample input cases):
    * - "some/path"
    *
-   * @param {string} url
+   * @param url
    */
-  extractDeeplinkPath: function (url) {
+  extractDeeplinkPath: function (url: string) {
     if (!url) {
       return null;
     }
@@ -243,9 +243,9 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
    * and returns (for the above sample input cases):
    * - "some/path"
    *
-   * @param {string} url
+   * @param url
    */
-  extractMobileDeeplinkPath: function (url) {
+  extractMobileDeeplinkPath: function (url: string) {
     if (!url) {
       return null;
     }
@@ -274,10 +274,10 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {String} url
+   * @param url
    * A utility function to validate url
    */
-  isValidURL: function (url) {
+  isValidURL: function (url: string) {
     if (!url || url.trim() === '') {
       return false;
     }
@@ -290,4 +290,4 @@ export const url = /** @satisfies {Record<string, unknown>} */ ({
     );
     return urlPattern.test(url);
   },
-});
+};

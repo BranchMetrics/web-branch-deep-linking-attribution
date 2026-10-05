@@ -1,13 +1,17 @@
 import { utils } from '../utils.js';
 import { safejson } from '../safejson.js';
 
-export const data = /** @satisfies {Record<string, unknown>} */ ({
+export const data = {
   /**
-   * @param {Object} to
-   * @param {Object} from
-   * @param {boolean=} removeNull delete null or undefined entries instead of inserting
+   * @param to
+   * @param from
+   * @param removeNull delete null or undefined entries instead of inserting
    */
-  merge: function (to, from, removeNull) {
+  merge: function (
+    to: Record<string, any>,
+    from: Record<string, any>,
+    removeNull?: boolean,
+  ) {
     if (!to || typeof to !== 'object') {
       to = {};
     }
@@ -30,16 +34,16 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {string} key_or_id
+   * @param key_or_id
    */
-  isKey: function (key_or_id) {
+  isKey: function (key_or_id: string) {
     return key_or_id.indexOf('key_') > -1;
   },
 
   /**
-   * @param {string} string
+   * @param string
    */
-  snakeToCamel: function (string) {
+  snakeToCamel: function (string: string) {
     const find = /(\-\w)/g;
     const convert = function (matches) {
       return matches[1].toUpperCase();
@@ -50,9 +54,9 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
   /**
    * Base64 encoding because ie9 does not have bota()
    *
-   * @param {string} input
+   * @param input
    */
-  base64encode: function (input) {
+  base64encode: function (input: string) {
     const utf8_encode = function (string) {
       string = string.replace(/\r\n/g, '\n');
       let utftext = '';
@@ -76,13 +80,13 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
     let output = '';
-    let chr1;
-    let chr2;
-    let chr3;
-    let enc1;
-    let enc2;
-    let enc3;
-    let enc4;
+    let chr1: number;
+    let chr2: number;
+    let chr3: number;
+    let enc1: number;
+    let enc2: number;
+    let enc3: number;
+    let enc4: number;
     let i = 0;
     input = utf8_encode(input);
 
@@ -112,9 +116,9 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
 
   /**
    * Decode Base64 if the string is encoded
-   * @param {string} str
+   * @param str
    */
-  base64Decode: function (str) {
+  base64Decode: function (str: string) {
     if (utils.isBase64Encoded(str)) {
       return atob(str);
     }
@@ -123,9 +127,9 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
 
   /**
    * Check if a String is a BASE64 encoded value
-   * @param {string} str
+   * @param str
    */
-  isBase64Encoded: function (str) {
+  isBase64Encoded: function (str: string) {
     if (typeof str !== 'string') {
       return false;
     }
@@ -142,9 +146,9 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
   /**
    * Encodes BFP in data object with Base64 encoding.
    * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
-   * @param {Object} data
+   * @param data
    */
-  encodeBFPs: function (data) {
+  encodeBFPs: function (data: Record<string, any>) {
     if (
       data?.browser_fingerprint_id &&
       !utils.isBase64Encoded(data.browser_fingerprint_id)
@@ -165,9 +169,9 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
   /**
    * Decodes BFPs in data object from Base64 encoding.
    * BFP is supposed to be Base64 encoded when stored in local storage/cookie.
-   * @param {Object} data
+   * @param data
    */
-  decodeBFPs: function (data) {
+  decodeBFPs: function (data: Record<string, any>) {
     if (data && utils.isBase64Encoded(data.browser_fingerprint_id)) {
       data.browser_fingerprint_id = atob(data.browser_fingerprint_id);
     }
@@ -272,10 +276,10 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
    * Execute operation immediately or after a timeout.
    * setTimeout(operation, 0) will enqueue the operation and may not execute
    * right away.
-   * @param {() => void} operation A function with no arguments to be executed after delay ms.
-   * @param {number} delay Operation will be executed after this number of ms. If 0, the operation is executed immediately, not using setTimeout.
+   * @param operation A function with no arguments to be executed after delay ms.
+   * @param delay Operation will be executed after this number of ms. If 0, the operation is executed immediately, not using setTimeout.
    */
-  delay: function (operation, delay) {
+  delay: function (operation: () => void, delay: number) {
     if (Number.isNaN(Number(delay)) || delay <= 0) {
       operation();
       return;
@@ -285,12 +289,16 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {Object} obj
-   * @param {string} key
-   * @param {string} value
+   * @param obj
+   * @param key
+   * @param value
    * A utility function to add a property to an object only if its value is not null, empty
    */
-  addPropertyIfNotNullorEmpty: function (obj, key, value) {
+  addPropertyIfNotNullorEmpty: function (
+    obj: Record<string, any>,
+    key: string,
+    value: string,
+  ) {
     if (typeof value === 'string' && !!value) {
       obj[key] = value;
     }
@@ -298,10 +306,10 @@ export const data = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {*} value
+   * @param value
    * Check if given value is boolean or not
    */
-  isBoolean: function (value) {
+  isBoolean: function (value: any) {
     return value === true || value === false;
   },
-});
+};

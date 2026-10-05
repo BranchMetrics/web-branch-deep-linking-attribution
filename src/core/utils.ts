@@ -12,7 +12,7 @@ import { session_data } from './utils/session_data.js';
 import { dma } from './utils/dma.js';
 import { data } from './utils/data.js';
 
-const state = /** @satisfies {Record<string, unknown>} */ ({
+const state = {
   debug: false,
   retries: 2, // Value specifying the number of times that a Branch API call can be re-attempted.
   retry_delay: 200, // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
@@ -41,14 +41,22 @@ const state = /** @satisfies {Record<string, unknown>} */ ({
    * The first theme in the list becomes the default theme if one is not specified
    */
   bannerThemes: ['light', 'dark'],
-});
+};
 
 /**
  * One shared object: other modules call and stub `utils.*`, and the parts
  * call each other through it.
- * @type {typeof state & typeof messages & typeof preferences & typeof url & typeof platform & typeof page_data & typeof events & typeof session_data & typeof dma & typeof data}
  */
-export const utils = Object.assign(
+export const utils: typeof state &
+  typeof messages &
+  typeof preferences &
+  typeof url &
+  typeof platform &
+  typeof page_data &
+  typeof events &
+  typeof session_data &
+  typeof dma &
+  typeof data = Object.assign(
   state,
   messages,
   preferences,

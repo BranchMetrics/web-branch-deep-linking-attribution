@@ -2,9 +2,9 @@ import { Branch } from './core.js';
 
 /** =WEB
  * @function Branch.addListener
- * @param {String} event - _optional_ - Specify which events you would like to listen for. If
+ * @param event - _optional_ - Specify which events you would like to listen for. If
  * not defined, the observer will recieve all events.
- * @param {(event: string, data: Object) => void} listener - _required_ - Listening function that will recieves an
+ * @param listener - _required_ - Listening function that will recieves an
  * event as a string and optional data as an object.
  *
  * The Branch Web SDK includes a simple event listener, that currently only publishes events for
@@ -34,7 +34,10 @@ import { Branch } from './core.js';
  * - *didCloseJourney*: Journey's close animation has completed and it is no longer visible to the user.
  * - *didCallJourneyClose*: Emitted when developer calls `branch.closeJourney()` to dismiss Journey.
  */
-Branch.prototype.addListener = function (event, listener) {
+Branch.prototype.addListener = function (
+  event: string | ((event: string, data: Object) => void),
+  listener?: (event: string, data: Object) => void,
+) {
   if (typeof event === 'function' && listener === undefined) {
     listener = event;
     event = null;
@@ -42,14 +45,14 @@ Branch.prototype.addListener = function (event, listener) {
   if (listener) {
     this._listeners.push({
       listener: listener,
-      event: event || null,
+      event: (event as string) || null,
     });
   }
 };
 
 /** =WEB
  * @function Branch.removeListener
- * @param {(event: string) => void} listener - _required_ - Reference to the listening function you
+ * @param listener - _required_ - Reference to the listening function you
  * would like to remove. *note*: this must be the same reference that was passed to
  * `branch.addListener()`, not an identical clone of the function.
  *
@@ -58,7 +61,7 @@ Branch.prototype.addListener = function (event, listener) {
  * just an identical clone of the function.
  *
  */
-Branch.prototype.removeListener = function (listener) {
+Branch.prototype.removeListener = function (listener: (event: string) => void) {
   if (listener) {
     this._listeners = this._listeners.filter(function (subscription) {
       return subscription.listener !== listener;

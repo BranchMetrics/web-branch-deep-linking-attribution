@@ -8,7 +8,7 @@ import { Server } from '../network/api.js';
 
 /*globals Ti, BranchStorage, require */
 
-let default_branch;
+let default_branch: any;
 
 /**
  * Enum for what parameters are in a wrapped Branch method
@@ -41,15 +41,19 @@ export const init_state_fail_codes = {
 };
 
 /***
- * @param {number} parameters
- * @param {(...args: any[]) => void} func
- * @param {boolean=} init
+ * @param parameters
+ * @param func
+ * @param init
  */
-export const wrap = function (parameters, func, init) {
+export const wrap = function (
+  parameters: number,
+  func: (...args: any[]) => void,
+  init?: boolean,
+) {
   const r = function (...callArgs) {
     const self = this;
-    let args;
-    let callback;
+    let args: any[];
+    let callback: Function | undefined;
     const lastArg = callArgs[callArgs.length - 1];
     if (
       parameters === callback_params.NO_CALLBACK ||
@@ -139,11 +143,15 @@ export const Branch = function () {
 };
 
 /***
- * @param {Object} resource
- * @param {Object.<string, *>} obj
- * @param {((err: Error | null, data?: any) => void)=} callback
+ * @param resource
+ * @param obj
+ * @param callback
  */
-Branch.prototype._api = function (resource, obj, callback) {
+Branch.prototype._api = function (
+  resource: Record<string, any>,
+  obj: Record<string, any>,
+  callback?: (err: Error | null, data?: any) => void,
+) {
   if (this.app_id) {
     obj.app_id = this.app_id;
   }
@@ -271,10 +279,13 @@ Branch.prototype._referringLink = function (forJourneys) {
 
 /***
  * @function Branch._publishEvent
- * @param {string} event
- * @param {Object} data - _optional_ - data to pass into listener callback.
+ * @param event
+ * @param data - _optional_ - data to pass into listener callback.
  */
-Branch.prototype._publishEvent = function (event, data) {
+Branch.prototype._publishEvent = function (
+  event: string,
+  data?: Record<string, any>,
+) {
   for (let i = 0; i < this._listeners.length; i++) {
     if (!this._listeners[i].event || this._listeners[i].event === event) {
       this._listeners[i].listener(event, data);
