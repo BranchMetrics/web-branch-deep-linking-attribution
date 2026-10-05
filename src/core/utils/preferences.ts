@@ -1,7 +1,7 @@
 import { utils } from '../utils.js';
 import { config } from '../config.js';
 
-export const preferences = /** @satisfies {Record<string, unknown>} */ ({
+export const preferences = {
   userPreferences: {
     trackingDisabled: false,
     enableExtendedJourneysAssist: false,
@@ -68,4 +68,4 @@ export const preferences = /** @satisfies {Record<string, unknown>} */ ({
       return false;
     },
   },
-});
+};

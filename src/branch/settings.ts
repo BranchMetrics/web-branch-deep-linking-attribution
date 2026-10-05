@@ -5,7 +5,7 @@ import { utils } from '../core/utils.js';
 
 /**
  * @function Branch.disableTracking
- * @param {Boolean} disableTracking - _optional_ - true disables tracking and false re-enables tracking.
+ * @param disableTracking - _optional_ - true disables tracking and false re-enables tracking.
  *
  * ##### Notes:
  * - disableTracking() without a parameter is a shorthand for disableTracking(true).
@@ -25,7 +25,7 @@ import { utils } from '../core/utils.js';
  */
 Branch.prototype.disableTracking = wrap(
   callback_params.CALLBACK_ERR,
-  function (done, disableTracking) {
+  function (done, disableTracking: boolean | string) {
     if (disableTracking === false || disableTracking === 'false') {
       utils.userPreferences.trackingDisabled = false;
       utils.userPreferences.allowErrorsInCallback = false;
@@ -63,14 +63,19 @@ Branch.prototype.setAPIResponseCallback = wrap(
 
 /***
  * @function Branch.setDMAParamsForEEA
- * @param {Boolean} eeaRegion - If European regulations, including the DMA, apply to this user and conversion.
- * @param {Boolean} adPersonalizationConsent - If End user has granted/denied ads personalization consent.
- * @param {Boolean} adUserDataUsageConsent - If User has granted/denied consent for 3P transmission of user level data for ads.
+ * @param eeaRegion - If European regulations, including the DMA, apply to this user and conversion.
+ * @param adPersonalizationConsent - If End user has granted/denied ads personalization consent.
+ * @param adUserDataUsageConsent - If User has granted/denied consent for 3P transmission of user level data for ads.
  * Sets the value of parameters required by Google Conversion APIs for DMA Compliance in EEA region.
  */
 Branch.prototype.setDMAParamsForEEA = wrap(
   callback_params.CALLBACK_ERR,
-  function (done, eeaRegion, adPersonalizationConsent, adUserDataUsageConsent) {
+  function (
+    done,
+    eeaRegion: boolean,
+    adPersonalizationConsent: boolean,
+    adUserDataUsageConsent: boolean,
+  ) {
     try {
       const validateParam = (param, paramName) => {
         if (!utils.isBoolean(param)) {
@@ -89,7 +94,7 @@ Branch.prototype.setDMAParamsForEEA = wrap(
         return;
       }
 
-      const dmaObj = {};
+      const dmaObj: Record<string, any> = {};
       dmaObj.eeaRegion = eeaRegion;
       dmaObj.adPersonalizationConsent = adPersonalizationConsent;
       dmaObj.adUserDataUsageConsent = adUserDataUsageConsent;
@@ -108,13 +113,13 @@ Branch.prototype.setDMAParamsForEEA = wrap(
 
 /***
  * @function Branch.setRequestMetaData
- * @param {String} key - Request metadata key
- * @param {String} value - Request metadata value
+ * @param key - Request metadata key
+ * @param value - Request metadata value
  * Sets request metadata that gets passed along with all the API calls, including
  * v1/pageview and v1/dismiss (merged directly into that request's metadata field,
  * same as every other endpoint).
  */
-Branch.prototype.setRequestMetaData = function (key, value) {
+Branch.prototype.setRequestMetaData = function (key: string, value: string) {
   try {
     if (
       typeof key === 'undefined' ||
@@ -144,10 +149,10 @@ Branch.prototype.setRequestMetaData = function (key, value) {
 
 /***
  * @function Branch.setAPIUrl
- * @param {String} url - url
+ * @param url - url
  * Sets a custom base URL for all calls to the Branch API
  */
-Branch.prototype.setAPIUrl = function (url) {
+Branch.prototype.setAPIUrl = function (url: string) {
   if (!utils.isValidURL(url)) {
     console.error('setAPIUrl: Invalid URL format. Default URL will be set.');
     return;

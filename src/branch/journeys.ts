@@ -6,7 +6,7 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
 
 /** =WEB
  * @function Branch.setBranchViewData
- * @param {Object} data - _required_ - object of all link data, same as Branch.link()
+ * @param data - _required_ - object of all link data, same as Branch.link()
  *
  * This function lets you set the deep link data dynamically for a given mobile web Journey. For
  * example, if you design a full page interstitial, and want the deep link data to be custom for each
@@ -34,7 +34,7 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
  * });
  * ```
  */
-function _setBranchViewData(context, done, data) {
+function _setBranchViewData(context, done, data: Record<string, any>) {
   data = data || {};
   try {
     context._branchViewData = safejson.parse(safejson.stringify(data));
@@ -54,7 +54,7 @@ Branch.prototype.setBranchViewData = wrap(
 
 /**
  * @function Branch.closeJourney
- * @param {((err: Error | null) => void)=} callback - _optional_
+ * @param callback - _optional_
  *
  * Journeys include a close button the user can click, but you may want to close the
  * Journey with a timeout, or via some other user interaction with your web app. In this case,

@@ -6,7 +6,7 @@ import { session } from '../core/session.js';
 
 /**
  * @function Branch.data
- * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read the
+ * @param callback - _optional_ - callback to read the
  * session data.
  *
  * Returns the same session information and any referring data, as
@@ -30,7 +30,7 @@ Branch.prototype.data = wrap(
 
 /**
  * @function Branch.first
- * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read the
+ * @param callback - _optional_ - callback to read the
  * session data.
  *
  * Returns the same session information and any referring data, as
@@ -52,9 +52,9 @@ Branch.prototype.first = wrap(
 
 /**
  * @function Branch.setIdentity
- * @param {string} identity - _required_ - a string uniquely identifying the user - often a user ID
+ * @param identity - _required_ - a string uniquely identifying the user - often a user ID
  * or email address.
- * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback that returns the user's
+ * @param callback - _optional_ - callback that returns the user's
  * Branch identity id and unique link.
  *
  * **Formerly `identify()`**
@@ -87,7 +87,7 @@ Branch.prototype.first = wrap(
  */
 Branch.prototype.setIdentity = wrap(
   callback_params.CALLBACK_ERR_DATA,
-  function (done, identity) {
+  function (done, identity: string) {
     const self = this;
     if (identity) {
       const data = {
@@ -108,7 +108,7 @@ Branch.prototype.setIdentity = wrap(
 
 /**
  * @function Branch.logout
- * @param {((err: Error | null) => void)=} callback - _optional_
+ * @param callback - _optional_
  *
  * Logs out the current session, replaces session IDs and identity IDs.
  *
@@ -157,7 +157,7 @@ Branch.prototype.getBrowserFingerprintId = wrap(
 
 /**
  * @function Branch.crossPlatformIds
- * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read CPIDs
+ * @param callback - _optional_ - callback to read CPIDs
  *
  * Returns CPIDs for current user.
  *
@@ -187,8 +187,8 @@ Branch.prototype.crossPlatformIds = wrap(
 
 /**
  * @function Branch.lastAttributedTouchData
- * @param {number} attribution_window - the number of days to look up attribution data for
- * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read last attributed touch data
+ * @param attribution_window - the number of days to look up attribution data for
+ * @param callback - _optional_ - callback to read last attributed touch data
  *
  * Returns last attributed touch data for current user. Last attributed touch data has the information associated with that user's last viewed impression or clicked link.
  *
@@ -204,7 +204,7 @@ Branch.prototype.crossPlatformIds = wrap(
  */
 Branch.prototype.lastAttributedTouchData = wrap(
   callback_params.CALLBACK_ERR_DATA,
-  function (done, attribution_window) {
+  function (done, attribution_window: number) {
     attribution_window = utils.validateParameterType(
       attribution_window,
       'number',
@@ -231,9 +231,11 @@ Branch.prototype.lastAttributedTouchData = wrap(
 
 /***
  * @function Branch.referringLink
- * @param {Boolean} withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
+ * @param withExtendedJourneysAssist - Boolean indicating whether or not to get ReferringLink for extended Journeys Assist scenario.defaults to false.
  * Gets the referring link from storage (session, local) wih link expiry applied if provided.
  */
-Branch.prototype.referringLink = function (withExtendedJourneysAssist) {
+Branch.prototype.referringLink = function (
+  withExtendedJourneysAssist: boolean,
+) {
   return this._referringLink(withExtendedJourneysAssist);
 };

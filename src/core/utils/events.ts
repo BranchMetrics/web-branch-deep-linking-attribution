@@ -58,7 +58,7 @@ const validateCommerceDataKeys = function (commerceData) {
   }
 
   let invalidKeysForProducts = [];
-  let invalidProductType;
+  let invalidProductType: string | undefined;
   if (Object.prototype.hasOwnProperty.call(commerceData, 'products')) {
     // make sure products is an array
     if (!Array.isArray(commerceData.products)) {
@@ -134,7 +134,7 @@ const BRANCH_STANDARD_EVENT_DATA = [
   'description',
 ];
 
-export const events = /** @satisfies {Record<string, unknown>} */ ({
+export const events = {
   /**
    * Returns an array which contains the difference in elements between the 'original' and 'toCheck' arrays.
    * If there is no difference, an empty array will be returned.
@@ -189,7 +189,7 @@ export const events = /** @satisfies {Record<string, unknown>} */ ({
       BRANCH_STANDARD_EVENT_DATA,
       Object.keys(eventAndCustomData),
     );
-    const customData = {};
+    const customData: Record<string, any> = {};
 
     for (let i = 0; i < customDataKeys.length; i++) {
       const key = customDataKeys[i];
@@ -201,4 +201,4 @@ export const events = /** @satisfies {Record<string, unknown>} */ ({
       'event_data': eventAndCustomData,
     };
   },
-});
+};
