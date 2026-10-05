@@ -172,7 +172,7 @@ banner_css.iframe_position = function (sticky, position) {
 };
 
 /**
- * @param {banner_utils.options} options
+ * @param {Object} options
  * @param {Object} element
  */
 banner_css.css = function (options, element) {

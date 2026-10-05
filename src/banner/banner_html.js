@@ -1,12 +1,10 @@
 import { utils } from '../core/utils.js';
 import { session } from '../core/session.js';
-import { storage } from '../core/storage.js';
-import { banner_utils } from './banner_utils.js';
 
 export const banner_html = {};
 
 /**
- * @param {banner_utils.options} options
+ * @param {Object} options
  * @param {string} action
  */
 banner_html.banner = function (options, action) {
@@ -95,8 +93,8 @@ banner_html.banner = function (options, action) {
 };
 
 /**
- * @param {banner_utils.options} options
- * @param {storage} storage
+ * @param {Object} options
+ * @param {Object} storage
  */
 banner_html.mobileAction = function (options, storage) {
   return (
@@ -125,7 +123,7 @@ banner_html.checkmark = function () {
 };
 
 /**
- * @param {banner_utils.options} options
+ * @param {Object} options
  */
 banner_html.iframe = function (options, action, callback) {
   const iframe = document.createElement('iframe');
@@ -160,7 +158,7 @@ banner_html.iframe = function (options, action, callback) {
 };
 
 /**
- * @param {banner_utils.options} options
+ * @param {Object} options
  */
 banner_html.div = function (options, action, doc) {
   doc = doc || document;
@@ -175,8 +173,8 @@ banner_html.div = function (options, action, doc) {
 };
 
 /**
- * @param {banner_utils.options} options
- * @param {storage} storage
+ * @param {Object} options
+ * @param {Object} storage
  */
 banner_html.markup = function (options, storage, callback) {
   const action =

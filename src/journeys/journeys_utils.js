@@ -31,7 +31,9 @@ if (window.innerHeight < window.innerWidth) {
 }
 
 // calculated later to determine how far to push down body content
+/** @type {number | string} */
 journeys_utils.bodyMarginTop = 0;
+/** @type {number | string} */
 journeys_utils.bodyMarginBottom = 0;
 
 // Running state of the exit animation
@@ -123,8 +125,10 @@ journeys_utils.setPositionAndHeight = function (html) {
     );
   if (relativeBannerHeightOrFalse) {
     const bannerHeightInPixels =
+      // @ts-expect-error -- numeric string such as '50', coerced by `/`
       (relativeBannerHeightOrFalse / 100) * journeys_utils.windowHeight + 'px';
     journeys_utils.bannerHeight = bannerHeightInPixels;
+    // @ts-expect-error -- numeric string such as '50', coerced by `<`
     if (relativeBannerHeightOrFalse < 100) {
       journeys_utils.isHalfPage = true;
     } else {
@@ -810,7 +814,7 @@ journeys_utils._findGlobalDismissPeriod = function (metadata) {
  * @param {string} templateId
  * @param {string} audienceRuleId
  * @param {Object} storage
- * @param {function()} cta
+ * @param {() => void} cta
  * @param {Object} banner
  *
  * hooks up the call to action and dismiss buttons
@@ -1270,8 +1274,10 @@ journeys_utils.animateBannerExit = function (
     journeys_utils.journeyLinkData,
   );
   if (journeys_utils.position === 'top') {
+    // @ts-expect-error -- 0 until measured; CSS accepts a bare 0
     document.body.style.marginTop = journeys_utils.bodyMarginTop;
   } else if (journeys_utils.position === 'bottom') {
+    // @ts-expect-error -- 0 until measured; CSS accepts a bare 0
     document.body.style.marginBottom = journeys_utils.bodyMarginBottom;
   }
   // removes timeout if animation is disabled, else the default timeout or the content's own

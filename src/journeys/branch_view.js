@@ -166,9 +166,11 @@ branch_view.displayJourney = function (
     html = journeys_utils.tryReplaceJourneyCtaLink(html);
 
     const timeoutTrigger = window.setTimeout(function () {
+      // @ts-expect-error -- JSONP callback on a dynamically named window property
       window[callbackString] = function () {};
     }, utils.timeout);
 
+    // @ts-expect-error -- JSONP callback on a dynamically named window property
     window[callbackString] = function (data) {
       window.clearTimeout(timeoutTrigger);
       if (failed) {

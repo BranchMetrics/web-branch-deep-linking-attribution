@@ -261,7 +261,7 @@ utils.message = function (message, params, failCode, failDetails) {
 
 /**
  * @param {Object} data
- * @return {utils.sessionData}
+ * @return {Object}
  */
 utils.whiteListSessionData = function (data) {
   return {
@@ -774,12 +774,13 @@ utils.decodeBFPs = function (data) {
 
 /**
  * Add event listeners to elements, taking older browsers into account
- * @param {Element} el
+ * @param {*} el
  * @param {string} eventType
  * @param {Function} callback
  * @param {boolean=} useCapture
  */
 utils.addEvent = function (el, eventType, callback, useCapture) {
+  /** @type {*} */
   let ret = 0;
 
   if (typeof el.addEventListener === 'function') {
@@ -849,7 +850,9 @@ utils.getOpenGraphContent = function (property, content) {
   property = String(property);
   content = content || null;
 
-  const el = document.querySelector('meta[property="og:' + property + '"]');
+  const el = /** @type {HTMLMetaElement | null} */ (
+    document.querySelector('meta[property="og:' + property + '"]')
+  );
   if (el?.content) {
     content = el.content;
   }
@@ -1150,12 +1153,16 @@ utils.getTitle = function () {
 };
 
 utils.getDescription = function () {
-  const el = document.querySelector('meta[name="description"]');
+  const el = /** @type {HTMLMetaElement | null} */ (
+    document.querySelector('meta[name="description"]')
+  );
   return el?.content ? el.content : null;
 };
 
 utils.getCanonicalURL = function () {
-  const el = document.querySelector('link[rel="canonical"]');
+  const el = /** @type {HTMLLinkElement | null} */ (
+    document.querySelector('link[rel="canonical"]')
+  );
   return el?.href ? el.href : null;
 };
 
@@ -1499,7 +1506,7 @@ utils.getBooleanOrNull = function (value) {
  * Execute operation immediately or after a timeout.
  * setTimeout(operation, 0) will enqueue the operation and may not execute
  * right away.
- * @param {function()} operation A function with no arguments to be executed after delay ms.
+ * @param {() => void} operation A function with no arguments to be executed after delay ms.
  * @param {number} delay Operation will be executed after this number of ms. If 0, the operation is executed immediately, not using setTimeout.
  */
 utils.delay = function (operation, delay) {
@@ -1593,7 +1600,7 @@ utils.setDMAParams = function (data, dmaObj = {}, endPoint) {
 };
 
 /**
- * @param {?} value
+ * @param {*} value
  * Check if given value is boolean or not
  */
 utils.isBoolean = function (value) {

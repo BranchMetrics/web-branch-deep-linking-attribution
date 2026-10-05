@@ -1,11 +1,13 @@
 import { safejson } from './safejson.js';
 import { utils } from './utils.js';
-import { storage } from './storage.js';
+// Not referenced here: loads storage before session and utils, keeping the
+// module order in build.min.js.
+import './storage.js';
 
 export const session = {};
 
 /**
- * @param {storage} storage
+ * @param {Object} storage
  * @param {boolean=} first
  * @return {Object}
  */
@@ -20,7 +22,7 @@ session.get = function (storage, first) {
 };
 
 /**
- * @param {storage} storage
+ * @param {Object} storage
  * @param {Object} data
  * @param {boolean=} first
  */
@@ -42,7 +44,7 @@ session.set = function (storage, data, first) {
 };
 
 /**
- * @param {storage} storage
+ * @param {Object} storage
  * @param {Object} newData
  */
 session.update = function (storage, newData) {
@@ -58,7 +60,7 @@ session.update = function (storage, newData) {
 
 /**
  * Patches a field in localStorage or sessionStorage or both.
- * @param {storage} storage
+ * @param {Object} storage
  * @param {Object} data
  * @param {boolean=} updateLocalStorage
  * @param {boolean=} removeNull delete null or undefined entries instead of inserting

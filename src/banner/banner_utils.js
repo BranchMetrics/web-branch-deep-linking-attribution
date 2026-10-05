@@ -1,6 +1,5 @@
 import { safejson } from '../core/safejson.js';
 import { utils } from '../core/utils.js';
-import { storage } from '../core/storage.js';
 
 export const banner_utils = {};
 
@@ -147,8 +146,8 @@ banner_utils.addCSSLengths = function (length1, length2) {
 };
 
 /**
- * @param {storage} storage
- * @param {banner_utils.options} options
+ * @param {Object} storage
+ * @param {Object} options
  * @return {boolean}
  */
 banner_utils.shouldAppend = function (storage, options) {
