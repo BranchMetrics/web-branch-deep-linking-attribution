@@ -1,4 +1,5 @@
 import { config } from '../../src/core/config.js';
+import { createContext } from '../../src/core/context.js';
 import { safejson } from '../../src/core/safejson.js';
 import { storage as branchStorage } from '../../src/core/storage.js';
 import { utils } from '../../src/core/utils.js';
@@ -9,7 +10,7 @@ import { installFakeXHR } from '../fake-xhr.js';
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
 describe('Server helpers', function () {
-  const server = new Server();
+  const server = new Server(createContext());
   const assert = testUtils.unplanned();
 
   it('serializeObject should work', function () {
@@ -85,7 +86,8 @@ describe('Server helpers', function () {
 });
 
 describe('Server', function () {
-  const server = new Server();
+  let ctx;
+  let server;
   const storage = new branchStorage.BranchStorage(['session', 'pojo']);
   let fakeXHR;
   const requests = [];
@@ -105,10 +107,12 @@ describe('Server', function () {
   };
 
   beforeEach(function () {
+    // A fresh context per test: no round-trip timings carried over from
+    // earlier requests (they get attached to /v1/url calls as
+    // `instrumentation`), and default retries and preferences.
+    ctx = createContext();
+    server = new Server(ctx);
     storage.clear();
-    // Round-trip timings recorded by earlier requests get attached to /v1/url
-    // calls as `instrumentation`; start every test with none.
-    utils.instrumentation = {};
     requests.length = 0;
     fakeXHR = installFakeXHR(function (request) {
       requests.push(request);
@@ -454,24 +458,14 @@ describe('Server', function () {
     });
 
     describe('API tests for trackingDisabled mode', function () {
-      let trackingDisabled;
-      let allowErrorsInCallback;
-
-      beforeEach(function () {
-        trackingDisabled = utils.userPreferences.trackingDisabled;
-        allowErrorsInCallback = utils.userPreferences.allowErrorsInCallback;
-      });
-
       afterEach(function () {
-        utils.userPreferences.trackingDisabled = trackingDisabled;
-        utils.userPreferences.allowErrorsInCallback = allowErrorsInCallback;
         localStorage.removeItem('branch_session');
       });
 
       it('Tests a v1/open request, includes correct data, tracking disabled and error callback enabled :: request should go through', function () {
         // This simulates a call to v1/open as part of the Branch initialization process
-        utils.userPreferences.trackingDisabled = true;
-        utils.userPreferences.allowErrorsInCallback = false;
+        ctx.userPreferences.trackingDisabled = true;
+        ctx.userPreferences.allowErrorsInCallback = false;
         localStorage.setItem('branch_session', {});
         server.request(
           resources.open,
@@ -492,19 +486,19 @@ describe('Server', function () {
       vi.spyOn(console, 'log').mockImplementation(function () {});
     });
 
-    it('retries a timeout utils.retries times, then returns a timeout error', function () {
+    it('retries a timeout ctx.retries times, then returns a timeout error', function () {
       const callback = vi.fn();
       let attempt;
       server.request(resources.open, testUtils.params({}), storage, callback);
 
-      for (attempt = 0; attempt < utils.retries; attempt++) {
+      for (attempt = 0; attempt < ctx.retries; attempt++) {
         requests[attempt].triggerTimeout();
         expect(callback).not.toHaveBeenCalled();
-        vi.advanceTimersByTime(utils.retry_delay);
+        vi.advanceTimersByTime(ctx.retry_delay);
       }
-      expect(requests.length).toBe(utils.retries + 1);
+      expect(requests.length).toBe(ctx.retries + 1);
 
-      requests[utils.retries].triggerTimeout();
+      requests[ctx.retries].triggerTimeout();
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback.mock.calls[0][0].message).toBe(utils.messages.timeout);
     });
@@ -514,7 +508,7 @@ describe('Server', function () {
       server.request(resources.open, testUtils.params({}), storage, callback);
 
       requests[0].error();
-      vi.advanceTimersByTime(utils.retry_delay * 10);
+      vi.advanceTimersByTime(ctx.retry_delay * 10);
 
       expect(requests.length).toBe(1);
       expect(callback).toHaveBeenCalledTimes(1);
@@ -562,12 +556,12 @@ describe('Server', function () {
       const callback = vi.fn();
       server.request(resources.qrCode, testUtils.params({}), storage, callback);
 
-      for (i = 0; i <= utils.retries; i++) {
+      for (i = 0; i <= ctx.retries; i++) {
         requests[i].respond(503, {}, new ArrayBuffer(0));
-        vi.advanceTimersByTime(utils.retry_delay);
+        vi.advanceTimersByTime(ctx.retry_delay);
       }
 
-      expect(requests.length).toBe(utils.retries + 1);
+      expect(requests.length).toBe(ctx.retries + 1);
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback.mock.calls[0][0].message).toContain('Status - 503');
     });

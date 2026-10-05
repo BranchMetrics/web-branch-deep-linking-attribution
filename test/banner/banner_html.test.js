@@ -1,4 +1,5 @@
 import { banner_html } from '../../src/banner/banner_html.js';
+import { createContext } from '../../src/core/context.js';
 
 describe('banner_html.iframe', function () {
   afterEach(function () {
@@ -23,6 +24,7 @@ describe('banner_html.iframe', function () {
         },
         'open',
         resolve,
+        createContext(),
       );
     });
     const doc = iframe.contentDocument;

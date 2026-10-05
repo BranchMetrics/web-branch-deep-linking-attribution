@@ -16,25 +16,12 @@ const IDENTITY_ID = '98807509250212102';
 
 describe('Branch events', function () {
   const requests = [];
-  let savedUtils;
   let savedJourneysBranch;
 
   beforeEach(function () {
     localStorage.clear();
     sessionStorage.clear();
     requests.length = 0;
-    savedUtils = {
-      nonce: utils.nonce,
-      debug: utils.debug,
-      retries: utils.retries,
-      retry_delay: utils.retry_delay,
-      timeout: utils.timeout,
-      extendedJourneysAssistExpiryTime: utils.extendedJourneysAssistExpiryTime,
-      trackingDisabled: utils.userPreferences.trackingDisabled,
-      enableExtendedJourneysAssist:
-        utils.userPreferences.enableExtendedJourneysAssist,
-      allowErrorsInCallback: utils.userPreferences.allowErrorsInCallback,
-    };
     savedJourneysBranch = journeys_utils.branch;
   });
 
@@ -42,18 +29,6 @@ describe('Branch events', function () {
     vi.restoreAllMocks();
     localStorage.clear();
     sessionStorage.clear();
-    utils.nonce = savedUtils.nonce;
-    utils.debug = savedUtils.debug;
-    utils.retries = savedUtils.retries;
-    utils.retry_delay = savedUtils.retry_delay;
-    utils.timeout = savedUtils.timeout;
-    utils.extendedJourneysAssistExpiryTime =
-      savedUtils.extendedJourneysAssistExpiryTime;
-    utils.userPreferences.trackingDisabled = savedUtils.trackingDisabled;
-    utils.userPreferences.enableExtendedJourneysAssist =
-      savedUtils.enableExtendedJourneysAssist;
-    utils.userPreferences.allowErrorsInCallback =
-      savedUtils.allowErrorsInCallback;
     journeys_utils.branch = savedJourneysBranch;
   });
 
@@ -127,7 +102,7 @@ describe('Branch events', function () {
         branch[method](...calls[method], cb);
         expect(cb).toHaveBeenCalledTimes(1);
         // NOTE: possible bug: wrap() passes init_state_fail_code as the
-        // `params` argument of utils.message and the fail details as the
+        // `params` argument of formatMessage and the fail details as the
         // failCode, so the code is lost and details are labelled "Failure Code".
         expect(cb.mock.calls[0][0].message).toBe(
           'Branch SDK initialization failed, so further methods cannot be called' +
@@ -234,13 +209,13 @@ describe('Branch events', function () {
       expect(cb).toHaveBeenCalledWith(null);
     });
 
-    it('sets utils.nonce from options.nonce and keeps it otherwise', function () {
+    it('sets ctx.nonce from options.nonce and keeps it otherwise', function () {
       const branch = makeBranch('ok');
-      utils.nonce = 'before';
+      branch._ctx.nonce = 'before';
       branch.track('pageview', {}, { nonce: 'abc123' });
-      expect(utils.nonce).toBe('abc123');
+      expect(branch._ctx.nonce).toBe('abc123');
       branch.track('pageview', {}, {});
-      expect(utils.nonce).toBe('abc123');
+      expect(branch._ctx.nonce).toBe('abc123');
     });
 
     it('includes options.branch_view_id and no_journeys in the request', function () {
@@ -256,7 +231,7 @@ describe('Branch events', function () {
 
     it('adds tracking_disabled when tracking is disabled', function () {
       const branch = makeBranch('ok');
-      utils.userPreferences.trackingDisabled = true;
+      branch._ctx.userPreferences.trackingDisabled = true;
       branch.track('pageview');
       expect(requests[0].obj.tracking_disabled).toBe(true);
     });
@@ -491,7 +466,7 @@ describe('Branch events', function () {
 
     it('adds tracking_disabled when tracking is disabled', function () {
       const branch = makeBranch('ok');
-      utils.userPreferences.trackingDisabled = true;
+      branch._ctx.userPreferences.trackingDisabled = true;
       branch.logEvent('PURCHASE');
       // The queue only advances once the pending request completes.
       requests[0].callback(null, {});

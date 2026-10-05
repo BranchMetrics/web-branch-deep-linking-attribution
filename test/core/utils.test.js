@@ -1,3 +1,4 @@
+import { createContext } from '../../src/core/context.js';
 import { utils } from '../../src/core/utils.js';
 import { browserEnv, setEnv } from '../../src/env/env.js';
 import { makeFakeEnv } from '../helpers/fake-env.js';
@@ -251,10 +252,10 @@ describe('utils', function () {
     });
   });
 
-  describe('message', function () {
+  describe('formatMessage', function () {
     it('should produce a missing param message', function () {
       assert.strictEqual(
-        utils.message(utils.messages.missingParam, ['endpoint', 'param']),
+        utils.formatMessage(utils.messages.missingParam, ['endpoint', 'param']),
         'API request endpoint missing parameter param',
         'Expected missing param message produced',
       );
@@ -262,7 +263,7 @@ describe('utils', function () {
 
     it('should produce an invalid param type message', function () {
       assert.strictEqual(
-        utils.message(utils.messages.invalidType, [
+        utils.formatMessage(utils.messages.invalidType, [
           'endpoint',
           'param',
           'type',
@@ -274,7 +275,7 @@ describe('utils', function () {
 
     it('should produce a Branch SDK not init message', function () {
       assert.strictEqual(
-        utils.message(utils.messages.nonInit),
+        utils.formatMessage(utils.messages.nonInit),
         'Branch SDK not initialized',
         'Expected Branch SDK not init message produced',
       );
@@ -282,7 +283,7 @@ describe('utils', function () {
 
     it('should produce a Branch SDK already init message', function () {
       assert.strictEqual(
-        utils.message(utils.messages.existingInit),
+        utils.formatMessage(utils.messages.existingInit),
         'Branch SDK already initialized',
         'Expected Branch SDK already initialized message produced',
       );
@@ -290,7 +291,7 @@ describe('utils', function () {
 
     it('should produce a missing app id', function () {
       assert.strictEqual(
-        utils.message(utils.messages.missingAppId),
+        utils.formatMessage(utils.messages.missingAppId),
         'Missing Branch app ID',
         'Expected Branch app id missing message produced',
       );
@@ -298,7 +299,7 @@ describe('utils', function () {
 
     it('should produce a call branch init first', function () {
       assert.strictEqual(
-        utils.message(utils.messages.callBranchInitFirst),
+        utils.formatMessage(utils.messages.callBranchInitFirst),
         'Branch.init must be called first',
         'Expected Branch must be called first message produced',
       );
@@ -306,7 +307,7 @@ describe('utils', function () {
 
     it('should produce a timeout message', function () {
       assert.strictEqual(
-        utils.message(utils.messages.timeout),
+        utils.formatMessage(utils.messages.timeout),
         'Request timed out',
         'Expected Request timed out message produced',
       );
@@ -314,7 +315,7 @@ describe('utils', function () {
 
     it('should produce a missing URL error', function () {
       assert.strictEqual(
-        utils.message(utils.messages.missingUrl),
+        utils.formatMessage(utils.messages.missingUrl),
         'Required argument: URL, is missing',
         'Expected Missing url message produced',
       );
@@ -322,7 +323,7 @@ describe('utils', function () {
 
     it('should produce a missing identity error', function () {
       assert.strictEqual(
-        utils.message(utils.messages.missingIdentity),
+        utils.formatMessage(utils.messages.missingIdentity),
         'setIdentity - required argument identity should have a non-null value',
         'Expected Missing identity message produced',
       );
@@ -1235,11 +1236,11 @@ describe('utils', function () {
       assert.deepEqual(expected, userSuppliedMetadata, 'should be equal');
     });
   });
-  describe('Tests for utils.userPreferences.shouldBlockRequest()', function () {
+  describe('Tests for ctx.userPreferences.shouldBlockRequest()', function () {
     it('should return true with v1/bogus as url endpoint', function () {
       assert.strictEqual(
         true,
-        utils.userPreferences.shouldBlockRequest(
+        createContext().userPreferences.shouldBlockRequest(
           'https://api2.branch.io/v1/bogus',
         ),
       );
@@ -1247,7 +1248,7 @@ describe('utils', function () {
     it('should return true with v1/open as url endpoint and no request data provided', function () {
       assert.strictEqual(
         true,
-        utils.userPreferences.shouldBlockRequest(
+        createContext().userPreferences.shouldBlockRequest(
           'https://api2.branch.io/v1/open',
         ),
       );
@@ -1255,7 +1256,7 @@ describe('utils', function () {
     it('should return false with v1/open as url endpoint and valid request data provided', function () {
       assert.strictEqual(
         false,
-        utils.userPreferences.shouldBlockRequest(
+        createContext().userPreferences.shouldBlockRequest(
           'https://api2.branch.io/v1/open',
           { link_identifier: '111111111111' },
         ),
@@ -1264,7 +1265,7 @@ describe('utils', function () {
     it('should return true with v1/xyz as url endpoint and with bogus request data', function () {
       assert.strictEqual(
         true,
-        utils.userPreferences.shouldBlockRequest(
+        createContext().userPreferences.shouldBlockRequest(
           'https://api2.branch.io/v1/xyz',
           { link_identifier: '111111111111' },
         ),
@@ -1273,7 +1274,7 @@ describe('utils', function () {
     it('should allow raw links', function () {
       assert.strictEqual(
         false,
-        utils.userPreferences.shouldBlockRequest(
+        createContext().userPreferences.shouldBlockRequest(
           'https://bnctestbed.app.link/abcdefg',
         ),
       );

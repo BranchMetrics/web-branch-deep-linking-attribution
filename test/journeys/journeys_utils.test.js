@@ -1,3 +1,4 @@
+import { createContext } from '../../src/core/context.js';
 import { utils } from '../../src/core/utils.js';
 import { setEnv } from '../../src/env/env.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
@@ -93,6 +94,10 @@ describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
 describe('addIframeOuterCSS generated CSS (no BE-supplied cssIframeContainer)', function () {
   const assert = testUtils.unplanned();
 
+  beforeEach(function () {
+    journeys_utils.branch = { _ctx: createContext() };
+  });
+
   afterEach(function () {
     const existing = document.getElementById('branch-iframe-css');
     if (existing?.parentNode) {
@@ -148,7 +153,7 @@ describe('animateBannerExit margin/position restore timing', function () {
     banner = document.createElement('div');
     document.body.appendChild(banner);
 
-    journeys_utils.branch = { _publishEvent: vi.fn() };
+    journeys_utils.branch = { _ctx: createContext(), _publishEvent: vi.fn() };
     journeys_utils.journeyLinkData = {};
     journeys_utils.divToInjectParents = [];
     journeys_utils.position = 'top';
@@ -199,6 +204,7 @@ describe('addIframeInnerCSS entrance and use_v2_renderer', function () {
   let iframe;
 
   beforeEach(function () {
+    journeys_utils.branch = { _ctx: createContext() };
     journeys_utils.position = 'top';
     journeys_utils.bannerHeight = '76px';
     journeys_utils.isHalfPage = false;
@@ -244,7 +250,7 @@ describe('animateBannerExit branch-banner exit class and use_v2_renderer', funct
     banner = document.createElement('iframe');
     document.body.appendChild(banner);
 
-    journeys_utils.branch = { _publishEvent: vi.fn() };
+    journeys_utils.branch = { _ctx: createContext(), _publishEvent: vi.fn() };
     journeys_utils.journeyLinkData = {};
     journeys_utils.divToInjectParents = [];
     journeys_utils.position = 'top';
@@ -404,7 +410,7 @@ describe('animationConfig support', function () {
     banner = document.createElement('iframe');
     document.body.appendChild(banner);
 
-    journeys_utils.branch = { _publishEvent: vi.fn() };
+    journeys_utils.branch = { _ctx: createContext(), _publishEvent: vi.fn() };
     journeys_utils.journeyLinkData = {};
     journeys_utils.use_v2_renderer = true;
     journeys_utils.entryAnimationDisabled = false;
@@ -523,6 +529,7 @@ function restoreJourneysState(snapshot) {
 
 function createFakeBranch() {
   return {
+    _ctx: createContext(),
     _publishEvent: vi.fn(),
     addListener: vi.fn(),
     removeListener: vi.fn(),
@@ -557,15 +564,11 @@ function isolateJourneysState() {
   let stateSnapshot;
   let headChildren;
   let bodyChildren;
-  let originalNonce;
-  let originalUserAgentData;
 
   beforeEach(function () {
     stateSnapshot = snapshotJourneysState();
     headChildren = Array.prototype.slice.call(document.head.childNodes);
     bodyChildren = Array.prototype.slice.call(document.body.childNodes);
-    originalNonce = utils.nonce;
-    originalUserAgentData = utils.userAgentData;
     journeys_utils.branch = createFakeBranch();
   });
 
@@ -590,8 +593,6 @@ function isolateJourneysState() {
       });
     document.body.removeAttribute('style');
     document.body.className = '';
-    utils.nonce = originalNonce;
-    utils.userAgentData = originalUserAgentData;
     restoreJourneysState(stateSnapshot);
   });
 }
@@ -785,7 +786,7 @@ describe('journeys_utils characterization: html blob parsing helpers', function 
   });
 
   it('getJsAndAddToParent appends the js as #branch-journey-cta with the nonce', function () {
-    utils.nonce = 'abc123';
+    journeys_utils.branch._ctx.nonce = 'abc123';
     journeys_utils.getJsAndAddToParent(blob);
     const script = document.getElementById('branch-journey-cta');
     expect(script.tagName).toBe('SCRIPT');
@@ -861,8 +862,8 @@ describe('journeys_utils characterization: createIframe and addHtmlToIframe', fu
     expect(iframe.hasAttribute('nonce')).toBe(false);
   });
 
-  it('createIframe adds the nonce when utils.nonce is set', function () {
-    utils.nonce = 'n0nce';
+  it('createIframe adds the nonce when ctx.nonce is set', function () {
+    journeys_utils.branch._ctx.nonce = 'n0nce';
     expect(journeys_utils.createIframe().getAttribute('nonce')).toBe('n0nce');
   });
 
@@ -1049,7 +1050,7 @@ describe('journeys_utils characterization: addIframeOuterCSS', function () {
   });
 
   it('adds the nonce to the style element', function () {
-    utils.nonce = 'xyz';
+    journeys_utils.branch._ctx.nonce = 'xyz';
     journeys_utils.addIframeOuterCSS(undefined, {});
     expect(
       document.getElementById('branch-iframe-css').getAttribute('nonce'),
@@ -1128,7 +1129,7 @@ describe('journeys_utils characterization: addIframeInnerCSS', function () {
   });
 
   it('writes the inner css into #branch-css inside the iframe with the nonce', function () {
-    utils.nonce = 'inner';
+    journeys_utils.branch._ctx.nonce = 'inner';
     const iframe = appendIframe('<div class="branch-banner-content"></div>');
     journeys_utils.addIframeInnerCSS(iframe, '.a { color: red; }');
     const style = iframe.contentWindow.document.getElementById('branch-css');
@@ -2067,10 +2068,10 @@ describe('journeys_utils characterization: dismiss request data', function () {
   });
 
   it('_getPageviewMetadata builds url/ua/screen data and merges extra metadata', function () {
-    utils.userAgentData = null;
     const result = journeys_utils._getPageviewMetadata(
       { url: 'https://example.com/x' },
       { extra: 1 },
+      createContext(),
     );
     expect(result).toEqual({
       url: 'https://example.com/x',
@@ -2084,8 +2085,9 @@ describe('journeys_utils characterization: dismiss request data', function () {
   });
 
   it('_getPageviewMetadata defaults url to the window location and adds userAgentData', function () {
-    utils.userAgentData = { model: 'Pixel 9', platformVersion: '15' };
-    const result = journeys_utils._getPageviewMetadata(null, null);
+    const ctx = createContext();
+    ctx.userAgentData = { model: 'Pixel 9', platformVersion: '15' };
+    const result = journeys_utils._getPageviewMetadata(null, null, ctx);
     expect(result.url).toBe(utils.getWindowLocation());
     expect(result.model).toBe('Pixel 9');
     expect(result.os_version).toBe('15');

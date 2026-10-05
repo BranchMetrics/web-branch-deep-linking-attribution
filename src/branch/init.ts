@@ -80,11 +80,12 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
 Branch.prototype.init = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, branch_key: string, options?: Record<string, any>) {
-    if (utils.navigationTimingAPIEnabled) {
-      utils.instrumentation['init-began-at'] = utils.timeSinceNavigationStart();
-    }
-
     const self = this;
+    const ctx = self._ctx;
+
+    if (utils.navigationTimingAPIEnabled) {
+      ctx.instrumentation['init-began-at'] = utils.timeSinceNavigationStart();
+    }
 
     self.init_state = init_states.INIT_PENDING;
 
@@ -98,39 +99,39 @@ Branch.prototype.init = wrap(
       options && utils.validateParameterType(options, 'object') ? options : {};
     self.init_options = options;
 
-    utils.retries =
+    ctx.retries =
       options?.retries && Number.isInteger(options.retries)
         ? options.retries
-        : utils.retries;
-    utils.retry_delay =
+        : ctx.retries;
+    ctx.retry_delay =
       options?.retry_delay && Number.isInteger(options.retry_delay)
         ? options.retry_delay
-        : utils.retry_delay;
-    utils.timeout =
+        : ctx.retry_delay;
+    ctx.timeout =
       options?.timeout && Number.isInteger(options.timeout)
         ? options.timeout
-        : utils.timeout;
-    utils.nonce = options?.nonce ? options.nonce : utils.nonce;
-    utils.debug = options?.enableLogging ? options.enableLogging : utils.debug;
+        : ctx.timeout;
+    ctx.nonce = options?.nonce ? options.nonce : ctx.nonce;
+    ctx.debug = options?.enableLogging ? options.enableLogging : ctx.debug;
 
-    utils.userPreferences.trackingDisabled =
+    ctx.userPreferences.trackingDisabled =
       options?.tracking_disabled && options.tracking_disabled === true
         ? true
         : false;
-    utils.userPreferences.enableExtendedJourneysAssist =
+    ctx.userPreferences.enableExtendedJourneysAssist =
       options?.enableExtendedJourneysAssist
         ? options.enableExtendedJourneysAssist
-        : utils.userPreferences.enableExtendedJourneysAssist;
-    utils.extendedJourneysAssistExpiryTime =
+        : ctx.userPreferences.enableExtendedJourneysAssist;
+    ctx.extendedJourneysAssistExpiryTime =
       options?.extendedJourneysAssistExpiryTime &&
       Number.isInteger(options.extendedJourneysAssistExpiryTime)
         ? options.extendedJourneysAssistExpiryTime
-        : utils.extendedJourneysAssistExpiryTime;
-    utils.userPreferences.allowErrorsInCallback = false;
-    utils.getClientHints();
+        : ctx.extendedJourneysAssistExpiryTime;
+    ctx.userPreferences.allowErrorsInCallback = false;
+    utils.getClientHints(ctx);
 
-    if (utils.userPreferences.trackingDisabled) {
-      utils.cleanApplicationAndSessionStorage(self);
+    if (ctx.userPreferences.trackingDisabled) {
+      session.cleanApplicationAndSessionStorage(self);
     }
 
     // initialize identity_id from storage
@@ -229,7 +230,7 @@ Branch.prototype.init = wrap(
       if (data) {
         data = setBranchValues(data);
 
-        if (!utils.userPreferences.trackingDisabled) {
+        if (!ctx.userPreferences.trackingDisabled) {
           data = restoreIdentityOnInstall(data);
           session.set(self._storage, data, freshInstall);
         }
@@ -275,7 +276,7 @@ Branch.prototype.init = wrap(
         }
       }
       const requestData = branch_view._getPageviewRequestData(
-        journeys_utils._getPageviewMetadata(options, additionalMetadata),
+        journeys_utils._getPageviewMetadata(options, additionalMetadata, ctx),
         options,
         self,
         false,
@@ -326,8 +327,8 @@ Branch.prototype.init = wrap(
                 journeys_utils.branch._publishEvent('willNotShowJourney');
               }
             }
-            if (utils.userPreferences.trackingDisabled) {
-              utils.userPreferences.allowErrorsInCallback = true;
+            if (ctx.userPreferences.trackingDisabled) {
+              ctx.userPreferences.allowErrorsInCallback = true;
             }
           },
         );
@@ -422,9 +423,9 @@ Branch.prototype.init = wrap(
               'current_url': utils.getCurrentUrl(),
               'screen_height': utils.getScreenHeight(),
               'screen_width': utils.getScreenWidth(),
-              'model': utils.userAgentData ? utils.userAgentData.model : null,
-              'os_version': utils.userAgentData
-                ? utils.userAgentData.platformVersion
+              'model': ctx.userAgentData ? ctx.userAgentData.model : null,
+              'os_version': ctx.userAgentData
+                ? ctx.userAgentData.platformVersion
                 : null,
             },
             function (err, data) {
@@ -466,9 +467,9 @@ Branch.prototype.init = wrap(
             'current_url': utils.getCurrentUrl(),
             'screen_height': utils.getScreenHeight(),
             'screen_width': utils.getScreenWidth(),
-            'model': utils.userAgentData ? utils.userAgentData.model : null,
-            'os_version': utils.userAgentData
-              ? utils.userAgentData.platformVersion
+            'model': ctx.userAgentData ? ctx.userAgentData.model : null,
+            'os_version': ctx.userAgentData
+              ? ctx.userAgentData.platformVersion
               : null,
           },
           function (err, data) {

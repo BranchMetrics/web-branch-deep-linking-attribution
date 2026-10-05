@@ -7,17 +7,7 @@ import { browserEnv } from '../env/env.js';
  * stubbable without an import cycle. Temporary: removed when utils is retired.
  */
 export const utils = {
-  debug: false,
-  retries: 2, // Value specifying the number of times that a Branch API call can be re-attempted.
-  retry_delay: 200, // Amount of time in milliseconds to wait before re-attempting a timed-out request to the Branch API.
-  timeout: 5000, // Duration in milliseconds that the system should wait for a response before considering any Branch API call to have timed out.
-  nonce: '', // Nonce value to allow for CSP whitelisting
-  extendedJourneysAssistExpiryTime: 604800000, // TTL value in milliseconds for the Referring Link. Defaults to 7 days
-  // Properties and function related to calculating Branch request roundtrip time
-  instrumentation: {},
-  userAgentData: null,
   navigationTimingAPIEnabled: browserEnv.navigationTimingAPIEnabled(),
-  currentRequestBrttTag: '',
   dismissEventToSourceMapping: {
     'didClickJourneyClose': 'Button(X)',
     'didClickJourneyContinue': 'Dismiss Journey text',
