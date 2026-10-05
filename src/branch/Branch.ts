@@ -26,7 +26,9 @@ import {
  * API table at the bottom of this file.
  *
  * All fields are `declare`d (type-only) so the class adds no own properties
- * beyond what the constructor assigns, in the same order as before.
+ * beyond what the constructor assigns. Compared to the old constructor
+ * function, the only new own property is `_ctx` (per-instance state that used
+ * to be module globals in utils), assigned between `_queue` and `_storage`.
  */
 // biome-ignore lint/suspicious/noUnsafeDeclarationMerging: the merged interface types the methods the API table assigns to Branch.prototype
 export class Branch {
