@@ -1,0 +1,120 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "jsonp": "/_r",
+      "origin": "https://app.link",
+      "query": {
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "callback": "branch_callback__0"
+      },
+      "nonce": null
+    },
+    {
+      "at": 1,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "browser_fingerprint_id": "79336952217731267",
+        "sdk": "web<VERSION>",
+        "options": "{}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 2,
+      "console": "log",
+      "args": [
+        "Error in API: URL - https://api2.branch.io/v1/open, Status - 500, Response - {\"error\":\"x\"}"
+      ]
+    },
+    {
+      "at": 202,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "browser_fingerprint_id": "79336952217731267",
+        "sdk": "web<VERSION>",
+        "options": "{}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 203,
+      "console": "log",
+      "args": [
+        "Error in API: URL - https://api2.branch.io/v1/open, Status - 500, Response - {\"error\":\"x\"}"
+      ]
+    },
+    {
+      "at": 403,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "browser_fingerprint_id": "79336952217731267",
+        "sdk": "web<VERSION>",
+        "options": "{}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 404,
+      "console": "log",
+      "args": [
+        "Error in API: URL - https://api2.branch.io/v1/open, Status - 500, Response - {\"error\":\"x\"}"
+      ]
+    },
+    {
+      "at": 404,
+      "callback": "init",
+      "args": [
+        {
+          "error": "Error in API: URL - https://api2.branch.io/v1/open, Status - 500, Response - {\"error\":\"x\"}"
+        },
+        null
+      ]
+    }
+  ],
+  "storage": {
+    "local": {},
+    "session": {},
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head></head>",
+    "body": "<body></body>",
+    "iframes": []
+  }
+}

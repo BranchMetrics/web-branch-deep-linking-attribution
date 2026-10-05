@@ -1,7 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
   "files": {
-    "includes": ["src/**", "test/**", "package.json", "biome.json"]
+    "includes": [
+      "src/**",
+      "test/**",
+      "!test/golden/__golden__",
+      "package.json",
+      "biome.json"
+    ]
   },
   "linter": {
     "rules": {

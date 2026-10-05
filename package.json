@@ -24,7 +24,9 @@
     "release": "rimraf dist && node scripts/build.mjs",
     "lint": "biome lint .",
     "typecheck": "tsc -p .",
-    "test:bundle": "vitest run --config vitest.bundle.config.mjs"
+    "test:bundle": "vitest run --config vitest.bundle.config.mjs",
+    "test:golden": "vitest run -c vitest.golden.config.mjs",
+    "golden:baseline": "sh scripts/golden-baseline.sh"
   },
   "repository": {
     "type": "git",
