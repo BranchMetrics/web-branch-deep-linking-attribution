@@ -1,0 +1,169 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "jsonp": "/_r",
+      "origin": "https://app.link",
+      "query": {
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "callback": "branch_callback__0"
+      },
+      "nonce": null
+    },
+    {
+      "at": 1,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "browser_fingerprint_id": "79336952217731267",
+        "sdk": "web<VERSION>",
+        "options": "{}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 2,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/pageview",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "event": "pageview",
+        "metadata": "{\"url\":\"https://shop.example.com/product/42\",\"user_agent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36\",\"language\":\"en-US\",\"screen_width\":-1,\"screen_height\":-1,\"window_device_pixel_ratio\":1}",
+        "initial_referrer": "",
+        "is_iframe": "false",
+        "user_language": "en",
+        "open_app": "false",
+        "has_app_websdk": "false",
+        "feature": "journeys",
+        "callback_string": "branch_view_callback__1",
+        "data": "{\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+        "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
+        "source": "web-sdk",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "session_id": "98807509250212102",
+        "identity_id": "98807509250212101",
+        "sdk": "web<VERSION>",
+        "browser_fingerprint_id": "79336952217731267"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 3,
+      "event": "listener",
+      "name": "willShowJourney",
+      "data": {
+        "bannerHeight": "76px",
+        "bannerPagePlacement": "top",
+        "banner_id": "jv1",
+        "isBannerInline": true,
+        "isBannerSticky": false,
+        "isFullPageBanner": false,
+        "journey_link_data": {
+          "url": "https://bnc.lt/j/jv1"
+        }
+      }
+    },
+    {
+      "at": 23,
+      "event": "listener",
+      "name": "didShowJourney",
+      "data": {
+        "banner_id": "jv1",
+        "journey_link_data": {
+          "url": "https://bnc.lt/j/jv1"
+        }
+      }
+    },
+    {
+      "at": 2000,
+      "event": "listener",
+      "name": "didClickJourneyCTA",
+      "data": {
+        "banner_id": "jv1",
+        "journey_link_data": {
+          "url": "https://bnc.lt/j/jv1"
+        }
+      }
+    },
+    {
+      "at": 2000,
+      "navigate": "https://bnc.lt/j/jv1-cta"
+    },
+    {
+      "at": 2000,
+      "jsdomError": "Not implemented: navigation (except hash changes)"
+    },
+    {
+      "at": 2000,
+      "event": "listener",
+      "name": "willCloseJourney",
+      "data": {
+        "banner_id": "jv1",
+        "journey_link_data": {
+          "url": "https://bnc.lt/j/jv1"
+        }
+      }
+    },
+    {
+      "at": 2000,
+      "click #branch-mobile-action": true
+    },
+    {
+      "at": 2000,
+      "jsdomError": "Not implemented: navigation (except hash changes)"
+    },
+    {
+      "at": 2270,
+      "event": "listener",
+      "name": "didCloseJourney",
+      "data": {
+        "banner_id": "jv1",
+        "journey_link_data": {
+          "url": "https://bnc.lt/j/jv1"
+        }
+      }
+    },
+    {
+      "at": 2270,
+      "event": "listener",
+      "name": "branch_internal_event_didCloseJourney",
+      "data": {
+        "banner_id": "jv1",
+        "journey_link_data": {
+          "url": "https://bnc.lt/j/jv1"
+        }
+      }
+    }
+  ],
+  "storage": {
+    "local": {
+      "branch_session_first": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}"
+    },
+    "session": {
+      "branch_session": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}"
+    },
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head></head>",
+    "body": "<body class=\" \" style=\"margin-top: 8px;\"></body>",
+    "iframes": []
+  }
+}

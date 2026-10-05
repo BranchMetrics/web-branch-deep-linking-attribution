@@ -1,0 +1,25 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "callback": "init",
+      "args": [
+        {
+          "error": "{\"message\":\"API request /_r missing parameter branch_key\",\"endpoint\":\"/_r\",\"data\":{\"sdk\":\"web<VERSION>\",\"app_id\":\"not-a-key\"}}"
+        },
+        null
+      ]
+    }
+  ],
+  "storage": {
+    "local": {},
+    "session": {},
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head></head>",
+    "body": "<body></body>",
+    "iframes": []
+  }
+}
