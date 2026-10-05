@@ -117,6 +117,117 @@ describe('env', function () {
     });
   });
 
+  describe('browserEnv inside an iframe', function () {
+    const restorers = [];
+
+    function stubProperty(obj, key, value) {
+      const original = Object.getOwnPropertyDescriptor(obj, key);
+      Object.defineProperty(obj, key, {
+        configurable: true,
+        get: function () {
+          return value;
+        },
+      });
+      restorers.push(function () {
+        if (original) {
+          Object.defineProperty(obj, key, original);
+        } else {
+          delete obj[key];
+        }
+      });
+    }
+
+    const sameOriginTop = {
+      location: {
+        search: '?top=1',
+        hash: '#top-hash',
+        href: 'https://top.example.com/page?top=1#top-hash',
+      },
+      document: { referrer: 'https://top-referrer.example.com/' },
+    };
+
+    function crossOriginTop() {
+      const top = {};
+      ['location', 'document'].forEach(function (key) {
+        Object.defineProperty(top, key, {
+          get: function () {
+            throw new Error('SecurityError: cross-origin frame');
+          },
+        });
+      });
+      return top;
+    }
+
+    beforeEach(function () {
+      testUtils.go('?own=1#own-hash');
+      stubProperty(document, 'referrer', 'https://frame-referrer.example.com/');
+    });
+
+    afterEach(function () {
+      while (restorers.length) {
+        restorers.pop()();
+      }
+    });
+
+    describe('same-origin frame', function () {
+      beforeEach(function () {
+        stubProperty(window, 'top', sameOriginTop);
+      });
+
+      it('is an iframe and same-origin', function () {
+        expect(browserEnv.isIframe()).toBe(true);
+        expect(browserEnv.isSameOriginFrame()).toBe(true);
+      });
+
+      it('windowLocation is the frame document.referrer', function () {
+        expect(browserEnv.windowLocation()).toBe(
+          'https://frame-referrer.example.com/',
+        );
+      });
+
+      it('locationSearch, locationHash and currentUrl come from window.top.location', function () {
+        expect(browserEnv.locationSearch()).toBe('?top=1');
+        expect(browserEnv.locationHash()).toBe('#top-hash');
+        expect(browserEnv.currentUrl()).toBe(
+          'https://top.example.com/page?top=1#top-hash',
+        );
+      });
+
+      it('initialReferrer is window.top.document.referrer', function () {
+        expect(browserEnv.initialReferrer()).toBe(
+          'https://top-referrer.example.com/',
+        );
+      });
+    });
+
+    describe('cross-origin frame', function () {
+      beforeEach(function () {
+        stubProperty(window, 'top', crossOriginTop());
+      });
+
+      it('is an iframe but not same-origin', function () {
+        expect(browserEnv.isIframe()).toBe(true);
+        expect(browserEnv.isSameOriginFrame()).toBe(false);
+      });
+
+      it('windowLocation is still the frame document.referrer', function () {
+        expect(browserEnv.windowLocation()).toBe(
+          'https://frame-referrer.example.com/',
+        );
+      });
+
+      it('locationSearch, locationHash and currentUrl fall back to the frame location', function () {
+        expect(browserEnv.locationSearch()).toBe('?own=1');
+        expect(browserEnv.locationHash()).toBe('#own-hash');
+        expect(browserEnv.currentUrl()).toBe(window.location.href);
+      });
+
+      it('initialReferrer is the empty string', function () {
+        expect(browserEnv.initialReferrer()).toBe('');
+      });
+    });
+  });
+
   describe('getEnv / setEnv', function () {
     it('returns browserEnv by default', function () {
       expect(getEnv()).toBe(browserEnv);
