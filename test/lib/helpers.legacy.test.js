@@ -1,5 +1,5 @@
 import { createContext } from '../../src/core/context.js';
-import { openGraphDataAsObject } from '../../src/core/page_data.js';
+import { openGraphDataAsObject } from '../../src/core/page-data.js';
 import {
   getPlatformByUserAgent,
   isIOSWKWebView,
@@ -13,7 +13,7 @@ import {
   mergeHostedDeeplinkData,
   prioritizeDeeplinkPaths,
   processHostedDeepLinkData,
-} from '../../src/lib/hosted_data.js';
+} from '../../src/lib/hosted-data.js';
 import { formatMessage, messages } from '../../src/lib/messages.js';
 import {
   addPropertyIfNotNullorEmpty,
@@ -23,7 +23,7 @@ import {
   merge,
   validateParameterType,
 } from '../../src/lib/objects.js';
-import { whiteListSessionData } from '../../src/lib/session_data.js';
+import { whiteListSessionData } from '../../src/lib/session-data.js';
 import {
   extractDeeplinkPath,
   extractMobileDeeplinkPath,

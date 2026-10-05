@@ -1,4 +1,4 @@
-import type { Branch } from './Branch.js';
+import type { Branch } from './branch.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
 import { addPropertyIfNotNull, isBoolean } from '../lib/objects.js';

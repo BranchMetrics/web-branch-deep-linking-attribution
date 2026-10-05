@@ -1,4 +1,4 @@
-import { Branch } from '../src/branch.js';
+import { Branch } from '../src/branch/branch.js';
 import { config } from '../src/core/config.js';
 import { createContext } from '../src/core/context.js';
 import { task_queue } from '../src/core/queue.js';

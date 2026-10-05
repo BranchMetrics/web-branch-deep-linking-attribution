@@ -1,6 +1,6 @@
 import { banner } from '../../src/banner/banner.js';
-import { banner_utils } from '../../src/banner/banner_utils.js';
-import { Branch } from '../../src/branch.js';
+import { banner_utils } from '../../src/banner/banner-utils.js';
+import { Branch } from '../../src/branch/branch.js';
 import { createContext } from '../../src/core/context.js';
 import { storage as storageModule } from '../../src/core/storage.js';
 import { setEnv } from '../../src/env/env.js';
@@ -805,8 +805,8 @@ describe('banner', function () {
       const el = document.getElementById('branch-banner');
       expect(el.querySelector('.title').textContent).toBe('Public');
       // NOTE: possible bug: Branch.prototype.banner builds bannerOptions
-      // without `theme` (src/branch.js banner(); src/branch/journeys.js after
-      // the split), so the theme option is dropped on the public API.
+      // without `theme` (banner() in src/branch/journeys.ts), so the theme
+      // option is dropped on the public API.
       expect(el.querySelector('.content').className).toBe('content');
       expect(el.style.bottom).toBe('0px');
       expect(events).toEqual(['willShowBanner', 'didShowBanner']);

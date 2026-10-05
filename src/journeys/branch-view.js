@@ -7,10 +7,10 @@ import {
   getInitialReferrer,
   getParameterByName,
 } from '../core/url.js';
-import { whiteListJourneysLanguageData } from '../lib/session_data.js';
+import { whiteListJourneysLanguageData } from '../lib/session-data.js';
 import { session } from '../core/session.js';
-import { banner_utils } from '../banner/banner_utils.js';
-import { journeys_utils } from './journeys_utils.js';
+import { banner_utils } from '../banner/banner-utils.js';
+import { journeys_utils } from './journeys-utils.js';
 
 export const branch_view = {};
 

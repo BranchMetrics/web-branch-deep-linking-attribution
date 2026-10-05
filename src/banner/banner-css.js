@@ -1,5 +1,5 @@
 import { getPlatformByUserAgent } from '../core/platform.js';
-import { banner_utils } from './banner_utils.js';
+import { banner_utils } from './banner-utils.js';
 import { applyNonce } from '../core/context.js';
 
 export const banner_css = {};

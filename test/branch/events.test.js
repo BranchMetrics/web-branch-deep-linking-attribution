@@ -1,9 +1,9 @@
-import { Branch } from '../../src/branch.js';
+import { Branch } from '../../src/branch/branch.js';
 import { config } from '../../src/core/config.js';
 import { safejson } from '../../src/core/safejson.js';
 import { getEnv } from '../../src/env/env.js';
-import { branch_view } from '../../src/journeys/branch_view.js';
-import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { branch_view } from '../../src/journeys/branch-view.js';
+import { journeys_utils } from '../../src/journeys/journeys-utils.js';
 import { merge } from '../../src/lib/objects.js';
 
 // Characterization tests for branch.track, branch.logEvent and
