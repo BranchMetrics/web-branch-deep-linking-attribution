@@ -2,8 +2,6 @@
  * Per-instance SDK runtime state. Each Branch creates one in its constructor
  * and hands it to its Server and storage; nothing here is module-global.
  */
-import type { Env } from '../env/env.js';
-import { getEnv } from '../env/env.js';
 import { config } from './config.js';
 
 export interface UserPreferences {
@@ -25,7 +23,6 @@ export interface Context {
   currentRequestBrttTag: string;
   userAgentData: { model: string; platformVersion: string } | null;
   userPreferences: UserPreferences;
-  env(): Env; // returns getEnv(), so tests can still swap env globally
 }
 
 export function createContext(): Context {
@@ -106,7 +103,6 @@ export function createContext(): Context {
         return false;
       },
     },
-    env: getEnv,
   };
   return ctx;
 }

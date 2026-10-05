@@ -1,7 +1,7 @@
 import { createContext } from '../../src/core/context.js';
 import { getEnv, setEnv } from '../../src/env/env.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
-import { makeFakeEnv } from '../helpers/fake-env.js';
+import { makeFakeEnv, useFakeEnv } from '../helpers/fake-env.js';
 
 describe('getRelativeHeightValueOrFalseFromBannerHeight', function () {
   const assert = testUtils.unplanned();
@@ -1876,9 +1876,7 @@ describe('journeys_utils characterization: finalHookups', function () {
 
 describe('journeys_utils characterization: _handleJourneyDismiss', function () {
   isolateJourneysState();
-  afterEach(function () {
-    setEnv(null);
-  });
+  useFakeEnv({ hostedDeepLinkData: () => ({}) });
   let banner;
   let exitSpy;
   let branchView;
@@ -1890,7 +1888,6 @@ describe('journeys_utils characterization: _handleJourneyDismiss', function () {
     exitSpy = vi
       .spyOn(journeys_utils, 'animateBannerExit')
       .mockImplementation(function () {});
-    setEnv(makeFakeEnv({ hostedDeepLinkData: () => ({}) }));
     journeys_utils.journeyLinkData = { banner_id: 'b1' };
     journeys_utils.journeyDismissed = false;
     branchView = {
