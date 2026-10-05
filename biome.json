@@ -131,6 +131,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noImportCycles": "error"
+          }
+        }
+      }
     }
   ]
 }

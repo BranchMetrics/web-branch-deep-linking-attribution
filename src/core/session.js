@@ -1,5 +1,5 @@
 import { safejson } from './safejson.js';
-import { utils } from './utils.js';
+import { utils } from './state.js';
 import { decodeBFPs, encodeBFPs } from '../lib/encoding.js';
 import { merge as mergeObjects } from '../lib/objects.js';
 // Not referenced here: loads storage before session and utils, keeping the
