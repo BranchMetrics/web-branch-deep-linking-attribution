@@ -20,6 +20,7 @@ import {
   globalDismissDeadline,
   recordViewDismiss,
 } from './dismissals.js';
+import { animationDurationMs, timeValueMsAt } from './css-animation.js';
 import { applyCtaOverride } from './cta-override.js';
 import { installCtaScript } from './cta-script.js';
 import { decodeSymbols } from '../lib/encoding.js';
@@ -1127,22 +1128,7 @@ journeys_utils.animateBannerExit = function (
  * Total CSS animation time on element (animation-delay + animation-duration), in ms.
  * 0 if no animation is applied.
  */
-journeys_utils._getAnimationDurationMs = function (element) {
-  const computedStyle =
-    element.ownerDocument.defaultView.getComputedStyle(element);
-  // Fall back to the `animation` shorthand for environments (incl. jsdom) that don't resolve
-  // it into the longhand properties: duration is the shorthand's 1st <time> value, delay the
-  // 2nd, per spec.
-  const duration =
-    journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
-    journeys_utils._timeValueMsAt(computedStyle.animation, 0) ||
-    0;
-  const delay =
-    journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
-    journeys_utils._timeValueMsAt(computedStyle.animation, 1) ||
-    0;
-  return duration + delay;
-};
+journeys_utils._getAnimationDurationMs = animationDurationMs;
 
 /***
  * @function journeys_utils._timeValueMsAt
@@ -1152,16 +1138,7 @@ journeys_utils._getAnimationDurationMs = function (element) {
  * The `<time>` token (e.g. "0.25s" or "250ms") at position index (0-based) found in cssValue, in
  * ms, or null if there aren't that many.
  */
-journeys_utils._timeValueMsAt = function (cssValue, index) {
-  const matches = (cssValue || '').match(/(-?[\d.]+)(ms|s)\b/g) || [];
-  const token = matches[index];
-  if (!token) {
-    return null;
-  }
-  const match = /(-?[\d.]+)(ms|s)/.exec(token);
-  const amount = parseFloat(match[1]);
-  return match[2] === 'ms' ? amount : amount * 1000;
-};
+journeys_utils._timeValueMsAt = timeValueMsAt;
 
 journeys_utils.setJourneyLinkData = function (linkData) {
   // v1 has always stripped these keys from the caller's object too; kept for parity.
