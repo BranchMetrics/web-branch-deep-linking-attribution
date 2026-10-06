@@ -20,6 +20,8 @@ import {
   globalDismissDeadline,
   recordViewDismiss,
 } from './dismissals.js';
+import { applyCtaOverride } from './cta-override.js';
+import { installCtaScript } from './cta-script.js';
 import { decodeSymbols } from '../lib/encoding.js';
 import {
   buildDismissRequestData,
@@ -212,11 +214,7 @@ journeys_utils.getCss = getCss;
 journeys_utils.getJsAndAddToParent = function (html) {
   const src = getJs(html);
   if (src !== undefined) {
-    const script = document.createElement('script');
-    script.id = 'branch-journey-cta';
-    applyNonce(journeys_utils.branch._ctx, script);
-    script.innerHTML = src;
-    document.body.appendChild(script);
+    installCtaScript(journeys_utils.branch._ctx, src);
   }
 };
 
@@ -1223,21 +1221,7 @@ journeys_utils.getJourneyCtaLink = function () {
 };
 
 journeys_utils.tryReplaceJourneyCtaLink = function (html) {
-  try {
-    if (journeys_utils.hasJourneyCtaLink()) {
-      const journeyLinkReplacePattern = /validate[(].+[)];/g;
-      const pattern = 'validate("' + journeys_utils.getJourneyCtaLink() + '")';
-      const replacedHtml = html.replace(journeyLinkReplacePattern, pattern);
-      return replacedHtml.replace(
-        'window.top.location.replace(',
-        'window.top.location = ',
-      );
-    }
-  } catch (_e) {
-    return html;
-  }
-
-  return html;
+  return applyCtaOverride(journeys_utils.branch, html);
 };
 
 journeys_utils.trySetJourneyUrls = function (
