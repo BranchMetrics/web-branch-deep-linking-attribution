@@ -12,6 +12,7 @@ import { getUserData } from '../core/platform.js';
 import { getInitialReferrer } from '../core/url.js';
 import { resources } from '../network/resources.js';
 import { branch_view } from '../journeys/branch-view.js';
+import { getPageviewMetadata } from '../journeys/dismiss-request.js';
 import { journeys_utils } from '../journeys/journeys-utils.js';
 
 /**
@@ -67,7 +68,7 @@ export function track(
     }
 
     const requestData = branch_view._getPageviewRequestData(
-      journeys_utils._getPageviewMetadata(options, metadata, self._ctx),
+      getPageviewMetadata(options, metadata, self._ctx),
       options,
       self,
       false,

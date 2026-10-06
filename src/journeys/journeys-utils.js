@@ -1,14 +1,7 @@
 import { safejson } from '../core/safejson.js';
-import { getEnv } from '../env/env.js';
-import {
-  addPropertyIfNotNull,
-  addPropertyIfNotNullorEmpty,
-  merge,
-  removePropertiesFromObject,
-} from '../lib/objects.js';
+import { removePropertiesFromObject } from '../lib/objects.js';
 import { dismissEventToSourceMapping } from './constants.js';
 import { applyNonce } from '../core/context.js';
-import { resources } from '../network/resources.js';
 import { banner_utils } from '../banner/banner-utils.js';
 import {
   cssRe,
@@ -27,6 +20,12 @@ import {
   globalDismissDeadline,
   recordViewDismiss,
 } from './dismissals.js';
+import { decodeSymbols } from '../lib/encoding.js';
+import {
+  buildDismissRequestData,
+  getPageviewMetadata,
+  sendDismiss,
+} from './dismiss-request.js';
 import { buildJourneyLinkData, FILTERED_LINK_KEYS } from './link-data.js';
 
 export const journeys_utils = {};
@@ -908,166 +907,17 @@ journeys_utils._setupDismissBehavior = function (
 
 journeys_utils._setJourneyDismiss = recordViewDismiss;
 
-journeys_utils.decodeSymbols = function (str) {
-  if (str === undefined || str === null) {
-    return null;
-  }
-  return str
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&brvbar;/g, '¦')
-    .replace(/&laquo;/g, '«')
-    .replace(/&acute;/g, '´')
-    .replace(/&middot;/g, '·')
-    .replace(/&raquo;/g, '»')
-    .replace(/&amp;/g, '&')
-    .replace(/&iquest;/g, '¿')
-    .replace(/&times;/g, '×')
-    .replace(/&divide;/g, '÷')
-    .replace(/&Agrave;/g, 'À')
-    .replace(/&Aacute;/g, 'Á')
-    .replace(/&Acirc;/g, 'Â')
-    .replace(/&Atilde;/g, 'Ã')
-    .replace(/&Auml;/g, 'Ä')
-    .replace(/&Aring;/g, 'Å')
-    .replace(/&AElig;/g, 'Æ')
-    .replace(/&Ccedil;/g, 'Ç')
-    .replace(/&Egrave;/g, 'È')
-    .replace(/&Eacute;/g, 'É')
-    .replace(/&Ecirc;/g, 'Ê')
-    .replace(/&Euml;/g, 'Ë')
-    .replace(/&Igrave;/g, 'Ì')
-    .replace(/&Iacute;/g, 'Í')
-    .replace(/&Icirc;/g, 'Î')
-    .replace(/&Iuml;/g, 'Ï')
-    .replace(/&ETH;/g, 'Ð')
-    .replace(/&Ntilde;/g, 'Ñ')
-    .replace(/&Ograve;/g, 'Ò')
-    .replace(/&Oacute;/g, 'Ó')
-    .replace(/&Ocirc;/g, 'Ô')
-    .replace(/&Otilde;/g, 'Õ')
-    .replace(/&Ouml;/g, 'Ö')
-    .replace(/&Oslash;/g, 'Ø')
-    .replace(/&Ugrave;/g, 'Ù')
-    .replace(/&Uacute;/g, 'Ú')
-    .replace(/&Ucirc;/g, 'Û')
-    .replace(/&Uuml;/g, 'Ü')
-    .replace(/&Yacute;/g, 'Ý')
-    .replace(/&THORN;/g, 'Þ')
-    .replace(/&szlig;/g, 'ß')
-    .replace(/&agrave;/g, 'à')
-    .replace(/&aacute;/g, 'á')
-    .replace(/&acirc;/g, 'â')
-    .replace(/&atilde;/g, 'ã')
-    .replace(/&auml;/g, 'ä')
-    .replace(/&aring;/g, 'å')
-    .replace(/&aelig;/g, 'æ')
-    .replace(/&ccedil;/g, 'ç')
-    .replace(/&egrave;/g, 'è')
-    .replace(/&eacute;/g, 'é')
-    .replace(/&ecirc;/g, 'ê')
-    .replace(/&euml;/g, 'ë')
-    .replace(/&igrave;/g, 'ì')
-    .replace(/&iacute;/g, 'í')
-    .replace(/&icirc;/g, 'î')
-    .replace(/&iuml;/g, 'ï')
-    .replace(/&eth;/g, 'ð')
-    .replace(/&ntilde;/g, 'ñ')
-    .replace(/&ograve;/g, 'ò')
-    .replace(/&oacute;/g, 'ó')
-    .replace(/&ocirc;/g, 'ô')
-    .replace(/&otilde;/g, 'õ')
-    .replace(/&ouml;/g, 'ö')
-    .replace(/&oslash;/g, 'ø')
-    .replace(/&ugrave;/g, 'ù')
-    .replace(/&uacute;/g, 'ú')
-    .replace(/&ucirc;/g, 'û')
-    .replace(/&uuml;/g, 'ü')
-    .replace(/&yacute;/g, 'ý')
-    .replace(/&thorn;/g, 'þ')
-    .replace(/&yuml;/g, 'ÿ');
-};
+journeys_utils.decodeSymbols = decodeSymbols;
 journeys_utils._getDismissRequestData = function (
   branch_view,
   dismissal_source,
 ) {
-  const metadata = {};
-  const hostedDeeplinkData = getEnv().hostedDeepLinkData();
-  if (hostedDeeplinkData && Object.keys(hostedDeeplinkData).length > 0) {
-    metadata.hosted_deeplink_data = hostedDeeplinkData;
-  }
-
-  const dismissRequestData = branch_view._getPageviewRequestData(
-    journeys_utils._getPageviewMetadata(
-      null,
-      metadata,
-      journeys_utils.branch._ctx,
-    ),
-    null,
-    journeys_utils.branch,
-    true,
-  );
-
-  if (journeys_utils.journeyLinkData?.journey_link_data) {
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'journey_id',
-      journeys_utils.journeyLinkData.journey_link_data.journey_id,
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'journey_name',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.journey_name,
-      ),
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'view_id',
-      journeys_utils.journeyLinkData.journey_link_data.view_id,
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'view_name',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.view_name,
-      ),
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'channel',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.channel,
-      ),
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'campaign',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.campaign,
-      ),
-    );
-    try {
-      addPropertyIfNotNull(
-        dismissRequestData,
-        'tags',
-        JSON.stringify(journeys_utils.journeyLinkData.journey_link_data.tags),
-      );
-    } catch (_e) {
-      dismissRequestData.tags = JSON.stringify([]);
-    }
-  }
-
-  addPropertyIfNotNull(
-    dismissRequestData,
-    'dismissal_source',
-    dismissal_source,
-  );
-
-  return dismissRequestData;
+  return buildDismissRequestData({
+    branch: journeys_utils.branch,
+    branchView: branch_view,
+    source: dismissal_source,
+    linkData: journeys_utils.journeyLinkData,
+  });
 };
 
 journeys_utils._handleJourneyDismiss = function (
@@ -1101,13 +951,12 @@ journeys_utils._handleJourneyDismiss = function (
         branch_view,
         dismissEventToSourceMapping[eventName],
       );
-      journeys_utils.branch._api(
-        resources.dismiss,
+      sendDismiss({
+        branch: journeys_utils.branch,
         requestData,
-        function (err, data) {
-          if (!err && metadata && metadata.dismissRedirect) {
-            window.location = metadata.dismissRedirect;
-          } else if (!err && typeof data === 'object' && data.template) {
+        dismissRedirect: metadata ? metadata.dismissRedirect : undefined,
+        onResponse: function (data) {
+          if (typeof data === 'object' && data.template) {
             if (branch_view.shouldDisplayJourney(data, null, false)) {
               branch_view.displayJourney(
                 data.template,
@@ -1125,7 +974,7 @@ journeys_utils._handleJourneyDismiss = function (
             }
           }
         },
-      );
+      });
     };
     journeys_utils.branch.addListener(
       'branch_internal_event_didCloseJourney',
@@ -1134,34 +983,7 @@ journeys_utils._handleJourneyDismiss = function (
   }
 };
 
-journeys_utils._getPageviewMetadata = function (
-  options,
-  additionalMetadata,
-  ctx,
-) {
-  let pageviewMetadata = merge(
-    {
-      'url': options?.url || getEnv().windowLocation(),
-      'user_agent': getEnv().userAgent(),
-      'language': getEnv().language(),
-      'screen_width': getEnv().screenWidth() || -1,
-      'screen_height': getEnv().screenHeight() || -1,
-      'window_device_pixel_ratio': getEnv().devicePixelRatio() || 1,
-    },
-    additionalMetadata || {},
-  );
-  pageviewMetadata = addPropertyIfNotNullorEmpty(
-    pageviewMetadata,
-    'model',
-    ctx.userAgentData ? ctx.userAgentData.model : '',
-  );
-  pageviewMetadata = addPropertyIfNotNullorEmpty(
-    pageviewMetadata,
-    'os_version',
-    ctx.userAgentData ? ctx.userAgentData.platformVersion : '',
-  );
-  return pageviewMetadata;
-};
+journeys_utils._getPageviewMetadata = getPageviewMetadata;
 
 /***
  * @function journeys_utils.animateBannerExit

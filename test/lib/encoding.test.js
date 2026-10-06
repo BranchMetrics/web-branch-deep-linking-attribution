@@ -1,5 +1,6 @@
 import {
   base64Decode,
+  decodeSymbols,
   base64encode,
   decodeBFPs,
   encodeBFPs,
@@ -66,5 +67,15 @@ describe('lib/encoding', () => {
         alternative_browser_fingerprint_id: 'abc123',
       });
     });
+  });
+});
+
+describe('decodeSymbols', () => {
+  it('decodes the HTML entities node-api escapes, and maps nullish to null', () => {
+    expect(
+      decodeSymbols('Tom &amp; Jerry &lt;3 &quot;hi&quot; caf&eacute;'),
+    ).toBe('Tom & Jerry <3 "hi" café');
+    expect(decodeSymbols(undefined)).toBeNull();
+    expect(decodeSymbols(null)).toBeNull();
   });
 });

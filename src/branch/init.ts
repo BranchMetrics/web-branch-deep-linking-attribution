@@ -17,6 +17,7 @@ import { mergeHostedDeeplinkData } from '../lib/hosted-data.js';
 import { resources } from '../network/resources.js';
 import { session } from '../core/session.js';
 import { branch_view } from '../journeys/branch-view.js';
+import { getPageviewMetadata } from '../journeys/dismiss-request.js';
 import { journeys_utils } from '../journeys/journeys-utils.js';
 
 /**
@@ -278,7 +279,7 @@ export function init(
       }
     }
     const requestData = branch_view._getPageviewRequestData(
-      journeys_utils._getPageviewMetadata(options, additionalMetadata, ctx),
+      getPageviewMetadata(options, additionalMetadata, ctx),
       options,
       self,
       false,
