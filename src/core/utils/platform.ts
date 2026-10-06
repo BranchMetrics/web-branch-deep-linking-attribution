@@ -62,7 +62,7 @@ function isIOS(ua) {
   return ua && /(iPad|iPod|iPhone)/.test(ua);
 }
 
-export const platform = /** @satisfies {Record<string, unknown>} */ ({
+export const platform = {
   timeSinceNavigationStart: function () {
     // in milliseconds
     return (Date.now() - window.performance.timing.navigationStart).toString();
@@ -115,7 +115,6 @@ export const platform = /** @satisfies {Record<string, unknown>} */ ({
 
   /**
    * Returns true if browser is safari version 11 or greater
-   * @return {boolean}
    */
   isSafari11OrGreater: function () {
     const ua = navigator.userAgent;
@@ -130,7 +129,6 @@ export const platform = /** @satisfies {Record<string, unknown>} */ ({
 
   /**
    * Returns true if browser uses WebKit.
-   * @return {boolean}
    */
   isWebKitBrowser: function () {
     return !!window.webkitURL;
@@ -152,14 +150,18 @@ export const platform = /** @satisfies {Record<string, unknown>} */ ({
 
   /**
    * Add event listeners to elements, taking older browsers into account
-   * @param {*} el
-   * @param {string} eventType
-   * @param {Function} callback
-   * @param {boolean=} useCapture
+   * @param el
+   * @param eventType
+   * @param callback
+   * @param useCapture
    */
-  addEvent: function (el, eventType, callback, useCapture) {
-    /** @type {*} */
-    let ret = 0;
+  addEvent: function (
+    el: any,
+    eventType: string,
+    callback: Function,
+    useCapture?: boolean,
+  ) {
+    let ret: any = 0;
 
     if (typeof el.addEventListener === 'function') {
       ret = el.addEventListener(eventType, callback, useCapture);
@@ -176,7 +178,7 @@ export const platform = /** @satisfies {Record<string, unknown>} */ ({
    * Returns the user's preferred language
    */
   getBrowserLanguageCode: function () {
-    let code;
+    let code: string | undefined;
     try {
       if (navigator.languages && navigator.languages.length > 0) {
         code = navigator.languages[0];
@@ -201,7 +203,7 @@ export const platform = /** @satisfies {Record<string, unknown>} */ ({
   // Used by logEvent() to send fields related to user's visit and device to v2/event standard and custom
   // Requires a reference to the branch object to access information such as browser_fingerprint_id
   getUserData: function (branch) {
-    let user_data = {};
+    let user_data: Record<string, any> = {};
     user_data = utils.addPropertyIfNotNull(
       user_data,
       'http_origin',
@@ -316,10 +318,10 @@ export const platform = /** @satisfies {Record<string, unknown>} */ ({
   },
 
   /**
-   * @param {String} versionNumber
+   * @param versionNumber
    * A utility function to remove trailing dot zeroes
    */
-  removeTrailingDotZeros: function (versionNumber) {
+  removeTrailingDotZeros: function (versionNumber: string) {
     if (!!versionNumber) {
       const dotZeroRegex = /^([1-9]\d*)\.(0\d*)(\.[0]\d*){1,}$/;
 
@@ -333,4 +335,4 @@ export const platform = /** @satisfies {Record<string, unknown>} */ ({
     }
     return versionNumber;
   },
-});
+};

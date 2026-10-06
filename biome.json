@@ -71,7 +71,12 @@
       }
     },
     {
-      "includes": ["src/**/*.js", "test/**/*.js", "!test/blob-*.js"],
+      "includes": [
+        "src/**/*.js",
+        "src/**/*.ts",
+        "test/**/*.js",
+        "!test/blob-*.js"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
@@ -84,7 +89,7 @@
       }
     },
     {
-      "includes": ["src/**/*.js"],
+      "includes": ["src/**/*.js", "src/**/*.ts"],
       "linter": {
         "rules": {
           "style": {

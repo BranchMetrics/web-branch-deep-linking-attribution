@@ -15,9 +15,9 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
 
 /**
  * @function Branch.init
- * @param {string} branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
- * @param {Object=} options - _optional_ - { }.
- * @param {((err: Error | null, data?: Object) => void)=} callback - _optional_ - callback to read the
+ * @param branch_key - _required_ - Your Branch [live key](http://dashboard.branch.io/settings), or (deprecated) your app id.
+ * @param options - _optional_ - { }.
+ * @param callback - _optional_ - callback to read the
  * session data.
  *
  * Adding the Branch script to your page automatically creates a window.branch
@@ -79,7 +79,7 @@ import { journeys_utils } from '../journeys/journeys_utils.js';
  */
 Branch.prototype.init = wrap(
   callback_params.CALLBACK_ERR_DATA,
-  function (done, branch_key, options) {
+  function (done, branch_key: string, options?: Record<string, any>) {
     if (utils.navigationTimingAPIEnabled) {
       utils.instrumentation['init-began-at'] = utils.timeSinceNavigationStart();
     }
@@ -187,7 +187,10 @@ Branch.prototype.init = wrap(
     const freshInstall = !self.identity_id; // initialized from local storage above
     self._branchViewEnabled = !!self._storage.get('branch_view_enabled');
     const fetchLatestBrowserFingerPrintID = function (cb) {
-      const params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
+      const params_r: Record<string, any> = {
+        'sdk': config.version,
+        'branch_key': self.branch_key,
+      };
       const currentSessionData = session.get(self._storage) || {};
       const permData = session.get(self._storage, true) || {};
       if (permData.browser_fingerprint_id) {
@@ -331,8 +334,8 @@ Branch.prototype.init = wrap(
       });
     };
     const attachVisibilityEvent = function () {
-      let hidden;
-      let changeEvent;
+      let hidden: string | undefined;
+      let changeEvent: string | undefined;
       if (typeof document.hidden !== 'undefined') {
         hidden = 'hidden';
         changeEvent = 'visibilitychange';
@@ -378,7 +381,10 @@ Branch.prototype.init = wrap(
       return;
     }
 
-    const params_r = { 'sdk': config.version, 'branch_key': self.branch_key };
+    const params_r: Record<string, any> = {
+      'sdk': config.version,
+      'branch_key': self.branch_key,
+    };
     const permData = session.get(self._storage, true) || {};
 
     if (permData.browser_fingerprint_id) {

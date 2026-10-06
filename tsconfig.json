@@ -12,7 +12,7 @@
     "erasableSyntaxOnly": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.js", "src/**/*.d.ts"],
+  "include": ["src/**/*.js", "src/**/*.ts"],
   // The loader snippet customers paste into their pages, not part of the bundle.
   "exclude": ["src/snippet/onpage.js"]
 }
