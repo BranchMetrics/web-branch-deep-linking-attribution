@@ -2,12 +2,14 @@ import { safejson } from '../core/safejson.js';
 
 // Regexes for the served template. audience-rule-service mirrors jsonRe, cssRe and
 // iframeCssRe in core/WebSdkContract.kt to validate templates; change both together.
-export const jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
-export const jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
+// [\s\S]*? matches the same strings as v1's (.|\s)*? but can't backtrack exponentially
+// on an unterminated tag (CodeQL js/redos).
+export const jsonRe = /<script type="application\/json">([\s\S]*?)<\/script>/;
+export const jsRe = /<script type="text\/javascript">([\s\S]*?)<\/script>/;
 export const cssRe =
-  /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
+  /<style type="text\/css" id="branch-css">([\s\S]*?)<\/style>/;
 export const iframeCssRe =
-  /<style type="text\/css" id="branch-iframe-css">((.|\s)*?)<\/style>/;
+  /<style type="text\/css" id="branch-iframe-css">([\s\S]*?)<\/style>/;
 
 function firstGroup(html: string, re: RegExp): string | undefined {
   const match = html.match(re);

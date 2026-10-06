@@ -49,4 +49,21 @@ describe('journeys/template', () => {
     expect(getCtaText({ ctaText: { no_app: 'Get' } }, true)).toBe('Get');
     expect(getCtaText(undefined, true)).toBeUndefined();
   });
+
+  it('captures multi-line blocks, including \r\n and unicode line separators', () => {
+    const css = '#a {\r\n  color: red;\u2028}\n';
+    expect(
+      getCss(`<style type="text/css" id="branch-css">${css}</style>`),
+    ).toBe(css);
+  });
+
+  it('gives up quickly on an unterminated tag full of whitespace', () => {
+    const html = `<script type="application/json">${' '.repeat(50000)}`;
+    const started = Date.now();
+    expect(getMetadata(html)).toBeUndefined();
+    expect(
+      getJs(`<script type="text/javascript">${' '.repeat(50000)}`),
+    ).toBeUndefined();
+    expect(Date.now() - started).toBeLessThan(500);
+  });
 });
