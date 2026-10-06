@@ -11,6 +11,7 @@ import { whiteListJourneysLanguageData } from '../lib/session-data.js';
 import { session } from '../core/session.js';
 import { banner_utils } from '../banner/banner-utils.js';
 import { journeys_utils } from './journeys-utils.js';
+import { isDismissedGlobally } from './dismissals.js';
 
 export const branch_view = {};
 
@@ -81,20 +82,7 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
  * @return      {boolean}
  */
 function _areJourneysDismissedGlobally(branch) {
-  const globalDismissEndTimestamp = branch._storage.get(
-    'globalJourneysDismiss',
-    true,
-  );
-
-  if (
-    globalDismissEndTimestamp === true ||
-    globalDismissEndTimestamp > Date.now()
-  ) {
-    return true;
-  }
-
-  branch._storage.remove('globalJourneysDismiss', true);
-  return false;
+  return isDismissedGlobally(branch._storage);
 }
 
 branch_view.shouldDisplayJourney = function (

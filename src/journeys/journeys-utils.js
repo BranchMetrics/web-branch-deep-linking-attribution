@@ -22,6 +22,11 @@ import {
   jsRe,
   removeScriptAndCss,
 } from './template.js';
+import {
+  addSecondsToNow,
+  globalDismissDeadline,
+  recordViewDismiss,
+} from './dismissals.js';
 import { buildJourneyLinkData, FILTERED_LINK_KEYS } from './link-data.js';
 
 export const journeys_utils = {};
@@ -767,19 +772,9 @@ journeys_utils._resetJourneysBannerPosition = function (
   }
 };
 
-journeys_utils._addSecondsToDate = function (seconds) {
-  const currentDate = new Date();
-  return currentDate.setSeconds(currentDate.getSeconds() + seconds);
-};
+journeys_utils._addSecondsToDate = addSecondsToNow;
 
-journeys_utils._findGlobalDismissPeriod = function (metadata) {
-  const globalDismissPeriod = metadata.globalDismissPeriod;
-  if (typeof globalDismissPeriod === 'number') {
-    return globalDismissPeriod === -1
-      ? true
-      : journeys_utils._addSecondsToDate(globalDismissPeriod);
-  }
-};
+journeys_utils._findGlobalDismissPeriod = globalDismissDeadline;
 
 /***
  * @function journeys_utils.finalHookups
@@ -911,22 +906,7 @@ journeys_utils._setupDismissBehavior = function (
   });
 };
 
-journeys_utils._setJourneyDismiss = function (
-  storage,
-  templateId,
-  audienceRuleId,
-) {
-  let journeyDismissals = storage.get('journeyDismissals', true);
-  journeyDismissals = journeyDismissals
-    ? safejson.parse(journeyDismissals)
-    : {};
-  journeyDismissals[audienceRuleId] = {
-    'view_id': templateId,
-    'dismiss_time': Date.now(),
-  };
-  storage.set('journeyDismissals', safejson.stringify(journeyDismissals), true);
-  return journeyDismissals;
-};
+journeys_utils._setJourneyDismiss = recordViewDismiss;
 
 journeys_utils.decodeSymbols = function (str) {
   if (str === undefined || str === null) {
