@@ -6,6 +6,8 @@ import { safejson } from '../src/core/safejson.js';
 import { session } from '../src/core/session.js';
 import { storage as branchStorage } from '../src/core/storage.js';
 import { utils } from '../src/core/utils.js';
+import { getEnv, setEnv } from '../src/env/env.js';
+import { makeFakeEnv, UA_FOR_PLATFORM } from './helpers/fake-env.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
 
@@ -77,6 +79,7 @@ describe('Branch', function () {
   afterEach(function () {
     setUserAgent(originalUa);
     vi.restoreAllMocks();
+    setEnv(null);
   });
 
   describe('init', function () {
@@ -994,7 +997,7 @@ describe('Branch', function () {
 
     it('should log that banner is not supported on desktop', function () {
       // set to desktop
-      vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('desktop');
+      setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.desktop }));
       vi.spyOn(console, 'warn').mockImplementation(function () {});
       const spy = vi.spyOn(console, 'info').mockImplementation(function () {});
       const branch = initBranch(true);
@@ -1036,10 +1039,6 @@ describe('Branch', function () {
         ['_t'],
       );
 
-      vi.spyOn(utils, 'getWindowLocation').mockReturnValue(windowLocation);
-
-      vi.spyOn(utils, 'getHostedDeepLinkData').mockReturnValue({});
-
       // check starting with 10th call since first 9 are called by openGraphDataAsObject
       const ogContentByCall = {
         10: ogTitle,
@@ -1049,9 +1048,15 @@ describe('Branch', function () {
         14: ogType,
       };
       let ogContentCalls = 0;
-      vi.spyOn(utils, 'getOpenGraphContent').mockImplementation(function () {
-        return ogContentByCall[ogContentCalls++];
-      });
+      setEnv(
+        makeFakeEnv({
+          windowLocation: () => windowLocation,
+          hostedDeepLinkData: () => ({}),
+          openGraphContent: function () {
+            return ogContentByCall[ogContentCalls++];
+          },
+        }),
+      );
 
       branch = initBranch(true);
       requests.length = 0;
@@ -1108,7 +1113,12 @@ describe('Branch', function () {
         const assert = testUtils.plan(2, done);
 
         // we're testing banner, which means we need to be mobile
-        vi.spyOn(utils, 'getPlatformByUserAgent').mockReturnValue('android');
+        setEnv(
+          makeFakeEnv({
+            ...getEnv(),
+            userAgent: () => UA_FOR_PLATFORM.android,
+          }),
+        );
 
         // allow the banner to be shown
         vi.spyOn(banner_utils, 'shouldAppend').mockReturnValue(true);

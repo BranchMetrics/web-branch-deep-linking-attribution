@@ -5,33 +5,25 @@ import {
   isIOSWKWebView,
   isSafari11OrGreater,
 } from '../../lib/ua.js';
+import { getEnv } from '../../env/env.js';
 
 export const platform = {
-  timeSinceNavigationStart: function () {
-    // in milliseconds
-    return (Date.now() - window.performance.timing.navigationStart).toString();
-  },
+  // Environment reads live in src/env/env.ts; these delegate to it.
+  timeSinceNavigationStart: () => getEnv().timeSinceNavigationStart(),
 
   getPlatformByUserAgent: () =>
     getPlatformByUserAgent(
-      navigator.userAgent,
-      () => screen.height > screen.width,
+      getEnv().userAgent(),
+      () => getEnv().screenHeight() > getEnv().screenWidth(),
     ),
 
   /**
    * Returns true if browser is safari version 11 or greater
    */
-  isSafari11OrGreater: () => isSafari11OrGreater(navigator.userAgent),
-
-  /**
-   * Returns true if browser uses WebKit.
-   */
-  isWebKitBrowser: function () {
-    return !!window.webkitURL;
-  },
+  isSafari11OrGreater: () => isSafari11OrGreater(getEnv().userAgent()),
 
   isIOSWKWebView: () =>
-    isIOSWKWebView(navigator.userAgent, utils.isWebKitBrowser()),
+    isIOSWKWebView(getEnv().userAgent(), getEnv().isWebKit()),
 
   /**
    * Add event listeners to elements, taking older browsers into account
@@ -59,31 +51,9 @@ export const platform = {
     return ret;
   },
 
-  /**
-   * Returns the user's preferred language
-   */
-  getBrowserLanguageCode: function () {
-    let code: string | undefined;
-    try {
-      if (navigator.languages && navigator.languages.length > 0) {
-        code = navigator.languages[0];
-      } else if (navigator.language) {
-        code = navigator.language;
-      }
-      code = code.substring(0, 2).toUpperCase();
-    } catch (_e) {
-      code = null;
-    }
-    return code;
-  },
-
-  getScreenHeight: function () {
-    return screen.height || 0;
-  },
-
-  getScreenWidth: function () {
-    return screen.width || 0;
-  },
+  getBrowserLanguageCode: () => getEnv().browserLanguageCode(),
+  getScreenHeight: () => getEnv().screenHeight(),
+  getScreenWidth: () => getEnv().screenWidth(),
 
   // Used by logEvent() to send fields related to user's visit and device to v2/event standard and custom
   // Requires a reference to the branch object to access information such as browser_fingerprint_id
@@ -97,22 +67,22 @@ export const platform = {
     user_data = utils.addPropertyIfNotNull(
       user_data,
       'user_agent',
-      navigator.userAgent,
+      getEnv().userAgent(),
     );
     user_data = utils.addPropertyIfNotNull(
       user_data,
       'language',
-      utils.getBrowserLanguageCode(),
+      getEnv().browserLanguageCode(),
     );
     user_data = utils.addPropertyIfNotNull(
       user_data,
       'screen_width',
-      utils.getScreenWidth(),
+      getEnv().screenWidth(),
     );
     user_data = utils.addPropertyIfNotNull(
       user_data,
       'screen_height',
-      utils.getScreenHeight(),
+      getEnv().screenHeight(),
     );
     user_data = utils.addPropertyIfNotNull(
       user_data,
@@ -153,29 +123,11 @@ export const platform = {
     return user_data;
   },
 
-  // Checks if page is in an iFrame
-  isIframe: function () {
-    return window.self !== window.top;
-  },
-
-  // Checks if page is on the same domain as its top most window
-  // Will throw a cross-origin frame access error if it is not
-  isSameOriginFrame: function () {
-    let sameOriginTest = 'true'; // without this minification of function doesn't work correctly
-    try {
-      if (window.top.location.search) {
-        sameOriginTest = 'true'; // without this minification of function doesn't work correctly
-      }
-    } catch (_err) {
-      return false;
-    }
-    return sameOriginTest === 'true'; // without this minification of function doesn't work correctly
-  },
+  isIframe: () => getEnv().isIframe(),
 
   // Checks if page is in an iFrame and on the same domain as its top most window
-  isIframeAndFromSameOrigin: function () {
-    return utils.isIframe() && utils.isSameOriginFrame();
-  },
+  isIframeAndFromSameOrigin: () =>
+    getEnv().isIframe() && getEnv().isSameOriginFrame(),
 
   // Creates a nonce attribute with the value stored in utils.nonce
   addNonceAttribute: function (element) {
@@ -189,9 +141,11 @@ export const platform = {
    * This will be used for browsers that have reduced user agent
    */
   getClientHints: function () {
-    if (navigator.userAgentData) {
+    const userAgentData =
+      getEnv().userAgentData() as Navigator['userAgentData'];
+    if (userAgentData) {
       const hints = ['model', 'platformVersion'];
-      navigator.userAgentData.getHighEntropyValues(hints).then(function (data) {
+      userAgentData.getHighEntropyValues(hints).then(function (data) {
         utils.userAgentData = {
           'model': data.model,
           'platformVersion': utils.removeTrailingDotZeros(data.platformVersion),

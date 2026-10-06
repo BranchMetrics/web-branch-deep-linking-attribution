@@ -1,4 +1,6 @@
 import { utils } from '../../src/core/utils.js';
+import { browserEnv, setEnv } from '../../src/env/env.js';
+import { makeFakeEnv } from '../helpers/fake-env.js';
 
 describe('utils', function () {
   const assert = testUtils.unplanned();
@@ -130,20 +132,23 @@ describe('utils', function () {
     const ogType = 'OGType';
 
     beforeEach(function () {
-      vi.spyOn(utils, 'getWindowLocation').mockReturnValue(windowLocation);
-
-      vi.spyOn(utils, 'getOpenGraphContent')
-        .mockImplementation(function () {})
-        .mockReturnValueOnce(ogTitle)
-        .mockReturnValueOnce(ogDescription)
-        .mockReturnValueOnce(ogImage)
-        .mockReturnValueOnce(ogVideo)
-        .mockReturnValueOnce(ogType);
+      setEnv(
+        makeFakeEnv({
+          windowLocation: () => windowLocation,
+          openGraphContent: vi
+            .fn()
+            .mockImplementation(function () {})
+            .mockReturnValueOnce(ogTitle)
+            .mockReturnValueOnce(ogDescription)
+            .mockReturnValueOnce(ogImage)
+            .mockReturnValueOnce(ogVideo)
+            .mockReturnValueOnce(ogType),
+        }),
+      );
     });
 
     afterEach(function () {
-      utils.getOpenGraphContent.mockRestore();
-      utils.getWindowLocation.mockRestore();
+      setEnv(null);
     });
 
     it('should accept empty linkData', function () {
@@ -1325,7 +1330,7 @@ describe('utils', function () {
       if (!window.webkitURL) {
         window.webkitURL = 'https://example.com';
       }
-      assert.equal(utils.isWebKitBrowser(), true);
+      assert.equal(browserEnv.isWebKit(), true);
     });
 
     it('returns false when window.webkitURL is not defined', function () {
@@ -1333,7 +1338,7 @@ describe('utils', function () {
       if (window.webkitURL) {
         delete window.webkitURL;
       }
-      assert.equal(utils.isWebKitBrowser(), false);
+      assert.equal(browserEnv.isWebKit(), false);
     });
 
     if (originalWebKitURL !== undefined) {
