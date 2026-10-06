@@ -69,6 +69,69 @@ describe('dist/build.min.js contract', function () {
     }
   });
 
+  it('keeps the same window.branch surface, own and inherited', function () {
+    const window = load();
+    const names = new Set();
+    for (
+      let o = window.branch;
+      o && o !== window.Object.prototype;
+      o = Object.getPrototypeOf(o)
+    ) {
+      for (const key of Object.getOwnPropertyNames(o)) {
+        names.add(key);
+      }
+    }
+    const surface = [...names]
+      .sort()
+      .map((key) => `${key}: ${typeof window.branch[key]}`);
+    expect(surface).toEqual([
+      '_api: function',
+      '_listeners: object',
+      '_publishEvent: function',
+      '_queue: function',
+      '_referringLink: function',
+      '_server: object',
+      '_storage: object',
+      '_windowRedirect: function',
+      'addListener: function',
+      'banner: function',
+      'closeBanner: function',
+      'closeJourney: function',
+      'constructor: function',
+      'crossPlatformIds: function',
+      'data: function',
+      'deepview: function',
+      'deepviewCta: function',
+      'disableTracking: function',
+      'first: function',
+      'getAPIUrl: function',
+      'getBrowserFingerprintId: function',
+      'init: function',
+      'init_state: number',
+      'init_state_fail_code: number',
+      'init_state_fail_details: object',
+      'lastAttributedTouchData: function',
+      'link: function',
+      'logEvent: function',
+      'logout: function',
+      'qrCode: function',
+      'referringLink: function',
+      'removeListener: function',
+      'renderFinalize: function',
+      'renderQueue: function',
+      'requestMetadata: object',
+      'sdk: string',
+      'setAPIResponseCallback: function',
+      'setAPIUrl: function',
+      'setBranchViewData: function',
+      'setDMAParamsForEEA: function',
+      'setIdentity: function',
+      'setRequestMetaData: function',
+      'track: function',
+      'trackCommerceEvent: function',
+    ]);
+  });
+
   it('replays calls queued by the on-page snippet', function () {
     const window = load(function (w) {
       w.branch = { _q: [['setAPIUrl', ['https://api.example.com']]], _v: 1 };

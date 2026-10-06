@@ -1,0 +1,136 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "sdk": "web<VERSION>",
+        "options": "{}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 1,
+      "console": "warn",
+      "args": [
+        "The \"banner\" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview"
+      ]
+    },
+    {
+      "at": 1,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/pageview",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "data": "{\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+        "event": "pageview",
+        "metadata": "{\"url\":\"https://shop.example.com/product/42\",\"user_agent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1\",\"language\":\"en-US\",\"screen_width\":-1,\"screen_height\":-1,\"window_device_pixel_ratio\":1}",
+        "initial_referrer": "",
+        "is_iframe": "false",
+        "user_language": "en",
+        "open_app": "false",
+        "has_app_websdk": "false",
+        "feature": "journeys",
+        "callback_string": "branch_view_callback__1",
+        "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
+        "source": "web-sdk",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "session_id": "98807509250212102",
+        "identity_id": "98807509250212101",
+        "sdk": "web<VERSION>",
+        "browser_fingerprint_id": "79336952217731267"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 1,
+      "jsonp": "/v1/deepview",
+      "origin": "https://api2.branch.io",
+      "query": {
+        "data": {
+          "append_deeplink_path": false,
+          "banner_options": {
+            "append_deeplink_path": false,
+            "buttonBackgroundColor": "",
+            "buttonBackgroundColorHover": "",
+            "buttonBorderColor": "",
+            "buttonBorderColorHover": "",
+            "buttonFontColor": "",
+            "buttonFontColorHover": "",
+            "customCSS": "",
+            "deepview_type": "banner",
+            "description": "d",
+            "disableHide": false,
+            "downloadAppButtonText": "Get",
+            "forgetHide": false,
+            "icon": "https://x/i.png",
+            "iframe": true,
+            "immediate": false,
+            "make_new_link": false,
+            "mobileSticky": false,
+            "openAppButtonText": "Open",
+            "open_app": false,
+            "position": "top",
+            "rating": null,
+            "respectDNT": false,
+            "reviewCount": null,
+            "showAndroid": true,
+            "showBlackberry": true,
+            "showKindle": true,
+            "showWindowsPhone": true,
+            "showiOS": true,
+            "showiPad": true,
+            "title": "App"
+          },
+          "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+          "browser_fingerprint_id": "79336952217731267",
+          "channel": "app banner",
+          "data": "{\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+          "deepview_type": "banner",
+          "identity_id": "98807509250212101",
+          "sdk": "web<VERSION>",
+          "session_id": "98807509250212102",
+          "source": "web-sdk"
+        },
+        "callback": "branch_callback__1"
+      },
+      "nonce": null
+    }
+  ],
+  "storage": {
+    "local": {
+      "branch_session_first": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}"
+    },
+    "session": {
+      "branch_session": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}"
+    },
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head><style type=\"text/css\" id=\"branch-iframe-css\">body { -webkit-transition: all 0.375s ease; transition: all 00.375s ease; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); width: 1px; min-width:100%; left: 0; right: 0; border: 0; height: 76px; z-index: 99999; -webkit-transition: all 0.25s ease; transition: all 00.25s ease; }\n#branch-banner-iframe { position: absolute; }\n</style></head>",
+    "body": "<body class=\" branch-banner-is-active\" style=\"margin-top: 84px;\"><iframe src=\"about:blank\" style=\"overflow: hidden; top: 0px;\" scrolling=\"no\" id=\"branch-banner-iframe\" class=\"branch-animation\"></iframe></body>",
+    "iframes": [
+      {
+        "id": "branch-banner-iframe",
+        "html": "<html><head><style type=\"text/css\" id=\"branch-css\">.branch-banner-is-active { -webkit-transition: all 0.375s ease; transition: all 00.375s ease; }\n#branch-banner { width:100%; z-index: 99999; font-family: Helvetica Neue, Sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-transition: all 0.25s ease; transition: all 00.25s ease; }\n#branch-banner .button{ border: 1px solid #ccc; background: #fff; color: #000; cursor: pointer; margin-top: 0px; font-size: 14px; display: inline-block; margin-left: 5px; font-weight: 400; text-decoration: none;  border-radius: 4px; padding: 6px 12px; transition: all .2s ease;}\n#branch-banner .button:hover {  border: 1px solid #BABABA; background: #E0E0E0; color: #000;}\n#branch-banner .button:focus { outline: none; }\n#branch-banner * { margin-right: 4px; position: relative; line-height: 1.2em; }\n#branch-banner-close { font-weight: 400; cursor: pointer; float: left; z-index: 2;padding: 0 5px 0 5px; margin-right: 0; }\n#branch-banner .content { width:100%; overflow: hidden; height: 76px; background: rgba(255, 255, 255, 0.95); color: #333; border-bottom: 1px solid #ddd; }\n#branch-banner-close { color: #000; font-size: 24px; top: 14px; opacity: .5; transition: opacity .3s ease; }\n#branch-banner-close:hover { opacity: 1; }\n#branch-banner .title { font-size: 18px; font-weight:bold; color: #555; }\n#branch-banner .description { font-size: 12px; font-weight: normal; color: #777; max-height: 30px; overflow: hidden; }\n#branch-banner .icon { float: left; padding-bottom: 40px; margin-right: 10px; margin-left: 5px; }\n#branch-banner .icon img { width: 63px; height: 63px; margin-right: 0; }\n#branch-banner .reviews { font-size:13px; margin: 1px 0 3px 0; color: #777; }\n#branch-banner .reviews .star { display:inline-block; position: relative; margin-right:0; }\n#branch-banner .reviews .star span { display: inline-block; margin-right: 0; color: #555; position: absolute; top: 0; left: 0; }\n#branch-banner .reviews .review-count { font-size:10px; }\n#branch-banner .reviews .star .half { width: 50%; overflow: hidden; display: block; }\n#branch-banner .content .left { padding: 6px 5px 6px 5px; }\n#branch-banner .vertically-align-middle { top: 50%; transform: translateY(-50%); -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); }\n#branch-banner .details > * { display: block; }\n#branch-banner .content .left { height: 63px; }\n#branch-banner .content .right { float: right; height: 63px; margin-bottom: 50px; padding-top: 22px; z-index: 1; }\n#branch-banner .right > div { float: left; }\n#branch-banner-action { top: 17px; }\n#branch-banner .content:after { content: \"\"; position: absolute; left: 0; right: 0; top: 100%; height: 1px; background: rgba(0, 0, 0, 0.2); }\n#branch-banner .theme-dark.content { background: rgba(51, 51, 51, 0.95); }\n#branch-banner .theme-dark #branch-banner-close{ color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n#branch-banner .theme-dark .details { text-shadow: 0 1px 1px rgba(0, 0, 0, .15); }\n#branch-banner .theme-dark .title { color: #fff; }\n#branch-banner .theme-dark .description { color: #fff; }\n#branch-banner .theme-dark .reviews { color: #888; }\n#branch-banner .theme-dark .reviews .star span{ color: #fff; }\n#branch-banner .theme-dark .reviews .review-count{ color: #fff; }\n#branch-banner { position: absolute; }\n#branch-banner .content .left .details .title { font-size: 12px; }\n#branch-mobile-action { white-space: nowrap; }\n#branch-banner .content .left .details .description { font-size: 11px; font-weight: normal; }\n@media only screen and (min-device-width: 320px) and (max-device-width: 350px) { #branch-banner .content .right { max-width: 120px; } }\n@media only screen and (min-device-width: 351px) and (max-device-width: 400px) and (orientation: landscape) { #branch-banner .content .right { max-width: 150px; } }\n@media only screen and (min-device-width: 401px) and (max-device-width: 480px) and (orientation: landscape) { #branch-banner .content .right { max-width: 180px; } }\nbody { margin: 0; }\n</style></head><body class=\"branch-banner-ios\"><div id=\"branch-banner\" class=\"branch-animation\"><div class=\"content\"><div class=\"right\"><div id=\"branch-banner-form-container\"><a id=\"branch-mobile-action\" class=\"button\" href=\"#\" target=\"_parent\">Get</a></div></div><div class=\"left\"><div id=\"branch-banner-close\" class=\"branch-animation\" aria-label=\"Close\">×</div><div class=\"icon\"><img src=\"https://x/i.png\" alt=\"Application icon\"></div><div class=\"details vertically-align-middle\"><div class=\"title\">App</div><div class=\"description\">d</div></div></div></div></div></body></html>"
+      }
+    ]
+  }
+}

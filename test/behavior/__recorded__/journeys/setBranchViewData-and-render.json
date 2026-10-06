@@ -1,0 +1,113 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "callback": "setBranchViewData",
+      "args": [
+        "<undefined>"
+      ]
+    },
+    {
+      "at": 0,
+      "jsonp": "/_r",
+      "origin": "https://app.link",
+      "query": {
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "callback": "branch_callback__0"
+      },
+      "nonce": null
+    },
+    {
+      "at": 1,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/open",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "browser_fingerprint_id": "79336952217731267",
+        "sdk": "web<VERSION>",
+        "options": "{}",
+        "current_url": "https://shop.example.com/product/42",
+        "screen_height": "0",
+        "screen_width": "0",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000"
+      },
+      "responseType": "",
+      "timeout": 5000
+    },
+    {
+      "at": 2,
+      "callback": "init",
+      "args": [
+        null,
+        {
+          "data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
+          "data_parsed": {
+            "+clicked_branch_link": false,
+            "+is_first_session": true
+          },
+          "developer_identity": null,
+          "has_app": false,
+          "identity": null,
+          "referring_identity": null,
+          "referring_link": null
+        }
+      ]
+    },
+    {
+      "at": 2,
+      "xhr": "POST",
+      "origin": "https://api2.branch.io",
+      "path": "/v1/pageview",
+      "query": {},
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body": {
+        "data": "{\"$deeplink_path\":\"x\",\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
+        "event": "pageview",
+        "metadata": "{\"url\":\"https://shop.example.com/product/42\",\"user_agent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36\",\"language\":\"en-US\",\"screen_width\":-1,\"screen_height\":-1,\"window_device_pixel_ratio\":1}",
+        "initial_referrer": "",
+        "is_iframe": "false",
+        "user_language": "en",
+        "open_app": "false",
+        "has_app_websdk": "false",
+        "feature": "journeys",
+        "callback_string": "branch_view_callback__1",
+        "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
+        "source": "web-sdk",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "session_id": "98807509250212102",
+        "identity_id": "98807509250212101",
+        "sdk": "web<VERSION>",
+        "browser_fingerprint_id": "79336952217731267"
+      },
+      "responseType": "",
+      "timeout": 5000
+    }
+  ],
+  "storage": {
+    "local": {
+      "branch_session_first": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}"
+    },
+    "session": {
+      "branch_session": "{\"identity_id\":\"98807509250212101\",\"session_id\":\"98807509250212102\",\"browser_fingerprint_id\":\"NzkzMzY5NTIyMTc3MzEyNjc=\",\"link\":\"https://bnc.lt/i/4LYQTXE0_k\",\"identity\":null,\"has_app\":false,\"data\":\"{\\\"+clicked_branch_link\\\":false,\\\"+is_first_session\\\":true}\"}"
+    },
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head><style type=\"text/css\" id=\"branch-iframe-css\">#branch-banner-iframe { border-radius: 4px; }</style></head>",
+    "body": "<body class=\" branch-banner-is-active\"><iframe src=\"about:blank\" style=\"overflow: hidden;\" scrolling=\"no\" id=\"branch-banner-iframe\" class=\"branch-animation\" title=\"Branch Banner Frame\" aria-label=\"Branch Banner Frame\"></iframe><script id=\"branch-journey-cta\">\nfunction validate(url) { window.top.location = url; }\nwindow.branch_view_callback__1(function () {\nvalidate(\"https://bnc.lt/j/jv1-cta\");\n});\n</script></body>",
+    "iframes": [
+      {
+        "id": "branch-banner-iframe",
+        "html": "<html><head><style type=\"text/css\" id=\"branch-css\">.branch-banner-content { background-color: rgba(255, 255, 255, 1); height: 76px; }\n#branch-mobile-action { color: #fff; }</style></head><body class=\"branch-banner-android\">\n<style>#branch-banner-spacer {margin-bottom: 76px;}</style>\n\n\n\n\n<div id=\"branch-banner\"><div class=\"branch-banner-content\">\n<a id=\"branch-mobile-action\" href=\"#\" aria-label=\"GET\">GET</a>\n<div class=\"branch-banner-continue\">No thanks</div>\n<div class=\"branch-banner-close\">x</div>\n</div></div></body></html>"
+      }
+    ]
+  }
+}

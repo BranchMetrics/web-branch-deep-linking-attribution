@@ -1,0 +1,88 @@
+{
+  "trace": [
+    {
+      "at": 0,
+      "jsonp": "/_r",
+      "origin": "https://app.link",
+      "query": {
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "callback": "branch_callback__0"
+      },
+      "nonce": null
+    },
+    {
+      "at": 1,
+      "callback": "init",
+      "args": [
+        {
+          "error": "Request blocked by client, probably adblock"
+        },
+        null
+      ]
+    },
+    {
+      "at": 5200,
+      "jsonp": "/_r",
+      "origin": "https://app.link",
+      "query": {
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "callback": "branch_callback__1"
+      },
+      "nonce": null
+    },
+    {
+      "at": 5201,
+      "callback": "init",
+      "args": [
+        {
+          "error": "Request blocked by client, probably adblock"
+        },
+        null
+      ]
+    },
+    {
+      "at": 10400,
+      "jsonp": "/_r",
+      "origin": "https://app.link",
+      "query": {
+        "sdk": "web<VERSION>",
+        "branch_key": "key_live_goldenTraceFakeKey00000000000000",
+        "callback": "branch_callback__2"
+      },
+      "nonce": null
+    },
+    {
+      "at": 10401,
+      "callback": "init",
+      "args": [
+        {
+          "error": "Request blocked by client, probably adblock"
+        },
+        null
+      ]
+    },
+    {
+      "at": 15400,
+      "callback": "init",
+      "args": [
+        {
+          "error": "Request timed out"
+        },
+        null
+      ]
+    }
+  ],
+  "storage": {
+    "local": {},
+    "session": {},
+    "cookie": []
+  },
+  "location": "https://shop.example.com/product/42",
+  "dom": {
+    "head": "<head><script type=\"text/javascript\" src=\"https://app.link/_r?callback=branch_callback__0\"></script><script type=\"text/javascript\" src=\"https://app.link/_r?callback=branch_callback__1\"></script><script type=\"text/javascript\" src=\"https://app.link/_r?callback=branch_callback__2\"></script></head>",
+    "body": "<body></body>",
+    "iframes": []
+  }
+}
