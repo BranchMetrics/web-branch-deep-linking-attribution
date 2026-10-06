@@ -10,6 +10,18 @@ import { dismissEventToSourceMapping } from './constants.js';
 import { applyNonce } from '../core/context.js';
 import { resources } from '../network/resources.js';
 import { banner_utils } from '../banner/banner-utils.js';
+import {
+  cssRe,
+  getCss,
+  getCtaText,
+  getIframeCss,
+  getJs,
+  getMetadata,
+  iframeCssRe,
+  jsonRe,
+  jsRe,
+  removeScriptAndCss,
+} from './template.js';
 
 export const journeys_utils = {};
 
@@ -53,12 +65,10 @@ journeys_utils.exitAnimationIsRunning = false;
 journeys_utils.use_v2_renderer = false;
 
 // Regex to find pieces of the html blob
-journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
-journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-journeys_utils.cssRe =
-  /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
-journeys_utils.iframeCssRe =
-  /<style type="text\/css" id="branch-iframe-css">((.|\s)*?)<\/style>/;
+journeys_utils.jsonRe = jsonRe;
+journeys_utils.jsRe = jsRe;
+journeys_utils.cssRe = cssRe;
+journeys_utils.iframeCssRe = iframeCssRe;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
@@ -149,41 +159,20 @@ journeys_utils.setPositionAndHeight = function (html) {
  * @function journeys_utils.getMetadata
  * @param {string} html
  */
-journeys_utils.getMetadata = function (html) {
-  const match = html.match(journeys_utils.jsonRe);
-  if (match) {
-    const src = match[1];
-    return safejson.parse(src);
-  }
-};
+journeys_utils.getMetadata = getMetadata;
 
 /***
  * @function journeys_utils.getIframeCss
  * @param {string} html
  */
-journeys_utils.getIframeCss = function (html) {
-  const match = html.match(journeys_utils.iframeCssRe);
-  if (match) {
-    return match[1];
-  }
-};
+journeys_utils.getIframeCss = getIframeCss;
 
 /***
  * @function journeys_utils.getCtaText
  * @param {Object} metadata
  * @param {boolean} hasApp
  */
-journeys_utils.getCtaText = function (metadata, hasApp) {
-  let ctaText;
-
-  if (hasApp && metadata?.ctaText?.has_app) {
-    ctaText = metadata.ctaText.has_app;
-  } else if (metadata?.ctaText?.no_app) {
-    ctaText = metadata.ctaText.no_app;
-  }
-
-  return ctaText;
-};
+journeys_utils.getCtaText = getCtaText;
 
 /***
  * @function journeys_utils.findInsertionDiv
@@ -207,12 +196,7 @@ journeys_utils.findInsertionDiv = function (_parent, metadata) {
  * @function journeys_utils.getCss
  * @param {string} html
  */
-journeys_utils.getCss = function (html) {
-  const match = html.match(journeys_utils.cssRe);
-  if (match) {
-    return match[1];
-  }
-};
+journeys_utils.getCss = getCss;
 
 /***
  * @function journeys_utils.getJsAndAddToParent
@@ -221,9 +205,8 @@ journeys_utils.getCss = function (html) {
  * take the js from template and add to document.body
  */
 journeys_utils.getJsAndAddToParent = function (html) {
-  const match = html.match(journeys_utils.jsRe);
-  if (match) {
-    const src = match[1];
+  const src = getJs(html);
+  if (src !== undefined) {
     const script = document.createElement('script');
     script.id = 'branch-journey-cta';
     applyNonce(journeys_utils.branch._ctx, script);
@@ -239,27 +222,7 @@ journeys_utils.getJsAndAddToParent = function (html) {
  * After extracting js and css from html blob, we should remove it.
  * We will use the remaining html to add to iframe
  */
-journeys_utils.removeScriptAndCss = function (html) {
-  const matchJson = html.match(journeys_utils.jsonRe);
-  const matchJs = html.match(journeys_utils.jsRe);
-  const matchCss = html.match(journeys_utils.cssRe);
-  const matchIframeCss = html.match(journeys_utils.iframeCssRe);
-
-  if (matchJson) {
-    html = html.replace(journeys_utils.jsonRe, '');
-  }
-  if (matchJs) {
-    html = html.replace(journeys_utils.jsRe, '');
-  }
-  if (matchCss) {
-    html = html.replace(journeys_utils.cssRe, '');
-  }
-  if (matchIframeCss) {
-    html = html.replace(journeys_utils.iframeCssRe, '');
-  }
-
-  return html;
-};
+journeys_utils.removeScriptAndCss = removeScriptAndCss;
 
 /***
  * @function journeys_utils.createIframe
