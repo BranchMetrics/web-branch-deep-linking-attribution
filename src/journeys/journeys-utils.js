@@ -22,6 +22,7 @@ import {
   jsRe,
   removeScriptAndCss,
 } from './template.js';
+import { buildJourneyLinkData, FILTERED_LINK_KEYS } from './link-data.js';
 
 export const journeys_utils = {};
 
@@ -1363,23 +1364,15 @@ journeys_utils._timeValueMsAt = function (cssValue, index) {
 };
 
 journeys_utils.setJourneyLinkData = function (linkData) {
-  const data = { 'banner_id': journeys_utils.branchViewId };
+  // v1 has always stripped these keys from the caller's object too; kept for parity.
   if (
     linkData &&
     typeof linkData === 'object' &&
     Object.keys(linkData || {}).length > 0
   ) {
-    const journeyLinkDataPropertiesToFilterOut = [
-      'browser_fingerprint_id',
-      'app_id',
-      'source',
-      'open_app',
-      'link_click_id',
-    ];
-    removePropertiesFromObject(linkData, journeyLinkDataPropertiesToFilterOut);
-    data.journey_link_data = {};
-    merge(data.journey_link_data, linkData);
+    removePropertiesFromObject(linkData, FILTERED_LINK_KEYS);
   }
+  const data = buildJourneyLinkData(journeys_utils.branchViewId, linkData);
   journeys_utils.journeyLinkData = data;
   journeys_utils.journeyType = data.journey_link_data.type || null;
   journeys_utils.isDesktopJourney = data.journey_link_data.type === 'desktop';
