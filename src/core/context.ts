@@ -23,7 +23,7 @@ export interface Context {
   extendedJourneysAssistExpiryTime: number;
   instrumentation: Record<string, string>;
   currentRequestBrttTag: string;
-  userAgentData: unknown;
+  userAgentData: { model: string; platformVersion: string } | null;
   userPreferences: UserPreferences;
   env(): Env; // returns getEnv(), so tests can still swap env globally
 }

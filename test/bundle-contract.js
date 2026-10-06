@@ -134,6 +134,58 @@ describe('dist/build.min.js contract', function () {
     ]);
   });
 
+  it('keeps window.branch.constructor callable with and without new', function () {
+    const window = load();
+    const Ctor = window.branch.constructor;
+
+    // Without `new`: returns one shared default instance, separate from
+    // window.branch (the pre-class constructor function did this).
+    const shared = Ctor();
+    expect(shared).not.toBe(window.branch);
+    expect(Ctor()).toBe(shared);
+    expect(typeof shared.init).toBe('function');
+
+    // With `new`: a fresh instance every time.
+    const fresh = new Ctor();
+    expect(fresh).not.toBe(window.branch);
+    expect(fresh).not.toBe(shared);
+    expect(fresh instanceof Ctor).toBe(true);
+    expect(window.branch instanceof Ctor).toBe(true);
+    expect(Object.keys(Object.getPrototypeOf(window.branch))).not.toContain(
+      'constructor',
+    );
+  });
+
+  it('re-initializes `this` in place when window.branch.constructor gets an instance', function () {
+    const window = load();
+    const branch = window.branch;
+    branch.setAPIUrl('https://api.example.com');
+    branch.addListener('evt', function () {});
+    const queue = branch._queue;
+
+    // Called as a method, the pre-class constructor reset window.branch itself.
+    expect(branch.constructor()).toBeUndefined();
+    expect(window.branch).toBe(branch);
+    expect(branch._queue).not.toBe(queue);
+    expect(branch._listeners).toEqual([]);
+    expect(branch.init_state).toBe(0);
+  });
+
+  it('supports ES5 subclassing through window.branch.constructor', function () {
+    const window = load();
+    const Base = window.branch.constructor;
+    function Sub() {
+      Base.call(this);
+    }
+    Sub.prototype = Object.create(Base.prototype);
+
+    const sub = new Sub();
+    expect(sub instanceof Base).toBe(true);
+    expect(Object.keys(sub)).toEqual(Object.keys(new Base()));
+    expect(typeof sub._queue).toBe('function');
+    expect(() => sub.link({}, function () {})).not.toThrow();
+  });
+
   it('replays calls queued by the on-page snippet', function () {
     const window = load(function (w) {
       w.branch = { _q: [['setAPIUrl', ['https://api.example.com']]], _v: 1 };

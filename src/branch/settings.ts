@@ -1,4 +1,4 @@
-import { Branch, wrap, callback_params } from './core.js';
+import type { Branch } from './Branch.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
 import { addPropertyIfNotNull, isBoolean } from '../lib/objects.js';
@@ -25,43 +25,39 @@ import { session } from '../core/session.js';
  * The do-not-track mode state is persistent: it is saved for the user across browser sessions for the web site.
  * ___
  */
-Branch.prototype.disableTracking = wrap(
-  callback_params.CALLBACK_ERR,
-  function (done, disableTracking?: boolean | string) {
-    if (disableTracking === false || disableTracking === 'false') {
-      this._ctx.userPreferences.trackingDisabled = false;
-      this._ctx.userPreferences.allowErrorsInCallback = false;
-      if (this.branch_key && this.init_options) {
-        if (this.init_options.tracking_disabled === true) {
-          delete this.init_options.tracking_disabled;
-        }
-        this.init(this.branch_key, this.init_options);
+export function disableTracking(
+  this: Branch,
+  done,
+  disableTracking?: boolean | string,
+) {
+  if (disableTracking === false || disableTracking === 'false') {
+    this._ctx.userPreferences.trackingDisabled = false;
+    this._ctx.userPreferences.allowErrorsInCallback = false;
+    if (this.branch_key && this.init_options) {
+      if (this.init_options.tracking_disabled === true) {
+        delete this.init_options.tracking_disabled;
       }
-    } else if (
-      disableTracking === undefined ||
-      disableTracking === true ||
-      disableTracking === 'true'
-    ) {
-      session.cleanApplicationAndSessionStorage(this);
-      this._ctx.userPreferences.trackingDisabled = true;
-      this._ctx.userPreferences.allowErrorsInCallback = true;
-      this.closeBanner();
-      this.closeJourney();
-      // Branch will not re-initialize
+      this.init(this.branch_key, this.init_options);
     }
-    done();
-  },
-  /* allowed before init */ true,
-);
+  } else if (
+    disableTracking === undefined ||
+    disableTracking === true ||
+    disableTracking === 'true'
+  ) {
+    session.cleanApplicationAndSessionStorage(this);
+    this._ctx.userPreferences.trackingDisabled = true;
+    this._ctx.userPreferences.allowErrorsInCallback = true;
+    this.closeBanner();
+    this.closeJourney();
+    // Branch will not re-initialize
+  }
+  done();
+}
 
-Branch.prototype.setAPIResponseCallback = wrap(
-  callback_params.NO_CALLBACK,
-  function (done, callback) {
-    this._server.onAPIResponse = callback;
-    done();
-  },
-  /* allowed before init */ true,
-);
+export function setAPIResponseCallback(this: Branch, done, callback) {
+  this._server.onAPIResponse = callback;
+  done();
+}
 
 /***
  * @function Branch.setDMAParamsForEEA
@@ -70,48 +66,45 @@ Branch.prototype.setAPIResponseCallback = wrap(
  * @param adUserDataUsageConsent - If User has granted/denied consent for 3P transmission of user level data for ads.
  * Sets the value of parameters required by Google Conversion APIs for DMA Compliance in EEA region.
  */
-Branch.prototype.setDMAParamsForEEA = wrap(
-  callback_params.CALLBACK_ERR,
-  function (
-    done,
-    eeaRegion: boolean,
-    adPersonalizationConsent: boolean,
-    adUserDataUsageConsent: boolean,
-  ) {
-    try {
-      const validateParam = (param, paramName) => {
-        if (!isBoolean(param)) {
-          console.warn(
-            `setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`,
-          );
-          return false;
-        }
-        return true;
-      };
-      const isValid =
-        validateParam(eeaRegion, 'eeaRegion') &&
-        validateParam(adPersonalizationConsent, 'adPersonalizationConsent') &&
-        validateParam(adUserDataUsageConsent, 'adUserDataUsageConsent');
-      if (!isValid) {
-        return;
+export function setDMAParamsForEEA(
+  this: Branch,
+  done,
+  eeaRegion: boolean,
+  adPersonalizationConsent: boolean,
+  adUserDataUsageConsent: boolean,
+) {
+  try {
+    const validateParam = (param, paramName) => {
+      if (!isBoolean(param)) {
+        console.warn(
+          `setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`,
+        );
+        return false;
       }
-
-      const dmaObj: Record<string, any> = {};
-      dmaObj.eeaRegion = eeaRegion;
-      dmaObj.adPersonalizationConsent = adPersonalizationConsent;
-      dmaObj.adUserDataUsageConsent = adUserDataUsageConsent;
-
-      this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
-    } catch (e) {
-      console.error(
-        'setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA',
-        e,
-      );
+      return true;
+    };
+    const isValid =
+      validateParam(eeaRegion, 'eeaRegion') &&
+      validateParam(adPersonalizationConsent, 'adPersonalizationConsent') &&
+      validateParam(adUserDataUsageConsent, 'adUserDataUsageConsent');
+    if (!isValid) {
+      return;
     }
-    done();
-  },
-  true,
-);
+
+    const dmaObj: Record<string, any> = {};
+    dmaObj.eeaRegion = eeaRegion;
+    dmaObj.adPersonalizationConsent = adPersonalizationConsent;
+    dmaObj.adUserDataUsageConsent = adUserDataUsageConsent;
+
+    this._storage.set('branch_dma_data', safejson.stringify(dmaObj), true);
+  } catch (e) {
+    console.error(
+      'setDMAParamsForEEA::An error occurred while setting DMA parameters for EEA',
+      e,
+    );
+  }
+  done();
+}
 
 /***
  * @function Branch.setRequestMetaData
@@ -121,7 +114,7 @@ Branch.prototype.setDMAParamsForEEA = wrap(
  * v1/pageview and v1/dismiss (merged directly into that request's metadata field,
  * same as every other endpoint).
  */
-Branch.prototype.setRequestMetaData = function (key: string, value: string) {
+export function setRequestMetaData(this: Branch, key: string, value: string) {
   try {
     if (
       typeof key === 'undefined' ||
@@ -147,26 +140,26 @@ Branch.prototype.setRequestMetaData = function (key: string, value: string) {
   } catch (e) {
     console.error('An error occured while setting request metadata', e);
   }
-};
+}
 
 /***
  * @function Branch.setAPIUrl
  * @param url - url
  * Sets a custom base URL for all calls to the Branch API
  */
-Branch.prototype.setAPIUrl = function (url: string) {
+export function setAPIUrl(this: Branch, url: string) {
   if (!isValidURL(url)) {
     console.error('setAPIUrl: Invalid URL format. Default URL will be set.');
     return;
   }
 
   config.api_endpoint = url;
-};
+}
 
 /***
  * @function Branch.getAPIUrl
  * returns the base URL for all calls to the Branch API
  */
-Branch.prototype.getAPIUrl = function () {
+export function getAPIUrl(this: Branch) {
   return config.api_endpoint;
-};
+}
