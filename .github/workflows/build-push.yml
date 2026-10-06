@@ -63,6 +63,9 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+      - name: Check import cycles and layer boundaries
+        run: pnpm run check:cycles
+
       - name: Type check
         run: pnpm run typecheck
 

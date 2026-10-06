@@ -1,6 +1,7 @@
 import { safejson } from '../core/safejson.js';
 import { snakeToCamel } from '../lib/objects.js';
 import { getPlatformByUserAgent } from '../core/platform.js';
+import { getEnv } from '../env/env.js';
 
 export const banner_utils = {};
 
@@ -154,7 +155,7 @@ banner_utils.addCSSLengths = function (length1, length2) {
 banner_utils.shouldAppend = function (storage, options) {
   let hideBanner = storage.get('hideBanner', true);
 
-  if (options.respectDNT && navigator && !!Number(navigator.doNotTrack)) {
+  if (options.respectDNT && !!Number(getEnv().doNotTrack())) {
     return false;
   }
   try {

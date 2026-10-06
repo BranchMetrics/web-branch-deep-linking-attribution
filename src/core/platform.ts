@@ -8,12 +8,12 @@ import {
   getPlatformByUserAgent as platformFromUserAgent,
   isIOSWKWebView as isIOSWKWebViewUserAgent,
   isSafari11OrGreater as isSafari11OrGreaterUserAgent,
-} from '../lib/ua.js';
+} from '../lib/user-agent.js';
 import { getEnv } from '../env/env.js';
 import type { Context } from './context.js';
 
-// UA checks against the current environment (the lib/ua.ts versions take the
-// user agent as an argument).
+// UA checks against the current environment (the lib/user-agent.ts versions
+// take the user agent as an argument).
 export const getPlatformByUserAgent = () =>
   platformFromUserAgent(
     getEnv().userAgent(),
@@ -60,7 +60,11 @@ export function addEvent(
 export function getUserData(branch) {
   const userAgentData = branch._ctx.userAgentData;
   let user_data: Record<string, any> = {};
-  user_data = addPropertyIfNotNull(user_data, 'http_origin', document.URL);
+  user_data = addPropertyIfNotNull(
+    user_data,
+    'http_origin',
+    getEnv().documentURL(),
+  );
   user_data = addPropertyIfNotNull(
     user_data,
     'user_agent',
@@ -84,7 +88,7 @@ export function getUserData(branch) {
   user_data = addPropertyIfNotNull(
     user_data,
     'http_referrer',
-    document.referrer,
+    getEnv().documentReferrer(),
   );
   user_data = addPropertyIfNotNull(
     user_data,

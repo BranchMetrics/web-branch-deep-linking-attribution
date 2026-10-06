@@ -1,5 +1,5 @@
-import { config } from '../../../src/core/config.js';
-import { createContext } from '../../../src/core/context.js';
+import { config } from '../../src/core/config.js';
+import { createContext } from '../../src/core/context.js';
 import {
   addEvent,
   getClientHints,
@@ -8,11 +8,11 @@ import {
   isIframeAndFromSameOrigin,
   isIOSWKWebView,
   isSafari11OrGreater,
-} from '../../../src/core/platform.js';
-import { browserEnv, getEnv, setEnv } from '../../../src/env/env.js';
-import { calculateBrtt } from '../../../src/lib/brtt.js';
-import { removeTrailingDotZeros } from '../../../src/lib/url.js';
-import { makeFakeEnv } from '../../helpers/fake-env.js';
+} from '../../src/core/platform.js';
+import { browserEnv, getEnv, setEnv } from '../../src/env/env.js';
+import { calculateBrtt } from '../../src/lib/brtt.js';
+import { removeTrailingDotZeros } from '../../src/lib/url.js';
+import { makeFakeEnv } from '../helpers/fake-env.js';
 
 // Characterization tests: these pin what the platform helpers do today,
 // quirks included. Do not "fix" expectations here without a behavior change.
@@ -137,7 +137,7 @@ afterEach(function () {
 
 // --- tests -------------------------------------------------------------------
 
-describe('platform utils (characterization)', function () {
+describe('core/platform (characterization)', function () {
   describe('getPlatformByUserAgent', function () {
     // Default screen is landscape (wider than tall) so the iPad heuristic
     // does not fire unless a row asks for a portrait screen.

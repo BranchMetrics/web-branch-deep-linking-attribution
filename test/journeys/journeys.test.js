@@ -1,4 +1,4 @@
-import { Branch } from '../../src/branch.js';
+import { Branch } from '../../src/branch/branch.js';
 import { setEnv } from '../../src/env/env.js';
 import { makeFakeEnv, UA_FOR_PLATFORM } from '../helpers/fake-env.js';
 

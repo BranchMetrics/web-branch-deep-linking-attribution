@@ -2,7 +2,7 @@ import {
   mergeHostedDeeplinkData,
   prioritizeDeeplinkPaths,
   processHostedDeepLinkData,
-} from '../../src/lib/hosted_data.js';
+} from '../../src/lib/hosted-data.js';
 
 function metaTag({ name, property, content }) {
   return {

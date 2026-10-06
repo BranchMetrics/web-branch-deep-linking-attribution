@@ -1,9 +1,12 @@
 /**
- * Every read of the browser environment (location, frames, navigator, screen,
- * performance timing, page meta tags) goes through here, so tests can swap in
- * a fake with setEnv(). Rendering code still touches the DOM directly.
+ * Environment queries go through here: every read of location, frames,
+ * document URL/referrer/cookies, navigator, screen, performance timing and
+ * page meta tags made by the SDK calls getEnv(), so tests can swap in a fake
+ * with setEnv(). Code that renders or mutates the DOM (creating banner and
+ * journey elements, styling and measuring them, iframes, event listeners,
+ * navigation) and the storage writes still use the DOM directly.
  */
-import { processHostedDeepLinkData } from '../lib/hosted_data.js';
+import { processHostedDeepLinkData } from '../lib/hosted-data.js';
 
 export interface Env {
   /** String(window.location), or document.referrer inside an iframe (legacy getWindowLocation). */
@@ -18,9 +21,23 @@ export interface Env {
   isWebKit(): boolean;
   userAgent(): string;
   userAgentData(): unknown; // navigator.userAgentData or null
+  /** navigator.language, raw. */
+  language(): string;
   browserLanguageCode(): string | null;
   screenHeight(): number;
   screenWidth(): number;
+  /** window.devicePixelRatio, raw (callers apply their own fallback). */
+  devicePixelRatio(): number;
+  /** document.URL */
+  documentURL(): string;
+  /** document.referrer, raw (unlike initialReferrer, no iframe handling). */
+  documentReferrer(): string;
+  /** document.cookie */
+  documentCookie(): string;
+  /** navigator.cookieEnabled */
+  cookieEnabled(): boolean;
+  /** navigator.doNotTrack, or the falsy navigator if there is none. */
+  doNotTrack(): string | null;
   /** Milliseconds since navigationStart, as a string (what the API sends). */
   timeSinceNavigationStart(): string;
   navigationTimingAPIEnabled(): boolean;
@@ -83,6 +100,7 @@ export const browserEnv: Env = {
   isWebKit: () => !!window.webkitURL,
   userAgent: () => navigator.userAgent,
   userAgentData: () => navigator.userAgentData || null,
+  language: () => navigator.language,
 
   /**
    * Returns the user's preferred language
@@ -104,6 +122,12 @@ export const browserEnv: Env = {
 
   screenHeight: () => screen.height || 0,
   screenWidth: () => screen.width || 0,
+  devicePixelRatio: () => window.devicePixelRatio,
+  documentURL: () => document.URL,
+  documentReferrer: () => document.referrer,
+  documentCookie: () => document.cookie,
+  cookieEnabled: () => navigator.cookieEnabled,
+  doNotTrack: () => navigator && navigator.doNotTrack,
 
   // in milliseconds
   timeSinceNavigationStart: () =>

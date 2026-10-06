@@ -3,7 +3,7 @@ import {
   isStandardEvent,
   separateEventAndCustomData,
   validateCommerceEventParams,
-} from '../../../src/lib/validation.js';
+} from '../../src/lib/validation.js';
 
 // Characterization tests: these pin what the event helpers do today,
 // quirks included. Do not "fix" expectations here without a behavior change.
@@ -81,7 +81,7 @@ afterEach(function () {
   vi.restoreAllMocks();
 });
 
-describe('events utils (characterization)', function () {
+describe('lib/validation event helpers (characterization)', function () {
   describe('calculateDiffBetweenArrays', function () {
     it.each([
       ['no difference', ['a', 'b'], ['b', 'a'], []],

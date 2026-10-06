@@ -5,7 +5,7 @@
  */
 
 import './core/polyfills.js';
-import { Branch, initBranch } from './branch.js';
+import { Branch, initBranch } from './branch/branch.js';
 
 // Backward compatibility for window.branch.constructor. Branch is now a class,
 // so calling it without `new` would throw. The old constructor function
