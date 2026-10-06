@@ -17,7 +17,7 @@ import { mergeHostedDeeplinkData } from '../lib/hosted-data.js';
 import { resources } from '../network/resources.js';
 import { session } from '../core/session.js';
 import { branch_view } from '../journeys/branch-view.js';
-import { getPageviewMetadata } from '../journeys/dismiss-request.js';
+import { getPageviewMetadata } from '../journeys/pageview-metadata.js';
 import { journeys_utils } from '../journeys/journeys-utils.js';
 
 /**

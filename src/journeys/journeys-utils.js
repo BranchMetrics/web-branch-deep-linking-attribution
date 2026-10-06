@@ -18,17 +18,15 @@ import {
 import {
   addSecondsToNow,
   globalDismissDeadline,
+  recordGlobalDismiss,
   recordViewDismiss,
 } from './dismissals.js';
 import { animationDurationMs, timeValueMsAt } from './css-animation.js';
 import { applyCtaOverride } from './cta-override.js';
 import { installCtaScript } from './cta-script.js';
 import { decodeSymbols } from '../lib/encoding.js';
-import {
-  buildDismissRequestData,
-  getPageviewMetadata,
-  sendDismiss,
-} from './dismiss-request.js';
+import { buildDismissRequestData, sendDismiss } from './dismiss-request.js';
+import { getPageviewMetadata } from './pageview-metadata.js';
 import { buildJourneyLinkData, FILTERED_LINK_KEYS } from './link-data.js';
 
 export const journeys_utils = {};
@@ -940,9 +938,7 @@ journeys_utils._handleJourneyDismiss = function (
   journeys_utils.animateBannerExit(banner);
 
   if (!testModeEnabled) {
-    if (globalDismissPeriod !== undefined) {
-      storage.set('globalJourneysDismiss', globalDismissPeriod, true);
-    }
+    recordGlobalDismiss(storage, globalDismissPeriod);
     journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
     const listener = function () {
       journeys_utils.branch.removeListener(listener);
