@@ -9,6 +9,11 @@ describe('journeys/css-animation', () => {
     expect(timeValueMsAt('0.25s ease 100ms', 1)).toBe(100);
     expect(timeValueMsAt('ease', 0)).toBeNull();
     expect(timeValueMsAt(undefined, 0)).toBeNull();
+    expect(timeValueMsAt('250ms', 0)).toBe(250);
+    expect(timeValueMsAt('slide 0.4s ease 0.3s', 1)).toBe(300);
+    expect(timeValueMsAt('-1s', 0)).toBe(-1000);
+    expect(timeValueMsAt('0.4s', 1)).toBeNull();
+    expect(timeValueMsAt('', 0)).toBeNull();
   });
 
   it('animationDurationMs adds duration and delay, 0 without animation', () => {

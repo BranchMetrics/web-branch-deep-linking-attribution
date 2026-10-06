@@ -29,7 +29,6 @@ export const init_state_fail_codes = {
   UNKNOWN_CAUSE: 1,
   OPEN_FAILED: 2,
   BFP_NOT_FOUND: 3,
-  HAS_APP_FAILED: 4,
 };
 
 /***

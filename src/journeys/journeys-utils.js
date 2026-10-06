@@ -1,32 +1,24 @@
-import { safejson } from '../core/safejson.js';
 import { removePropertiesFromObject } from '../lib/objects.js';
 import { dismissEventToSourceMapping } from './constants.js';
 import { applyNonce } from '../core/context.js';
 import { banner_utils } from '../banner/banner-utils.js';
 import {
-  cssRe,
   getCss,
   getCtaText,
   getIframeCss,
   getJs,
   getMetadata,
-  iframeCssRe,
-  jsonRe,
-  jsRe,
   removeScriptAndCss,
 } from './template.js';
 import {
-  addSecondsToNow,
   globalDismissDeadline,
   recordGlobalDismiss,
   recordViewDismiss,
 } from './dismissals.js';
-import { animationDurationMs, timeValueMsAt } from './css-animation.js';
+import { animationDurationMs } from './css-animation.js';
 import { applyCtaOverride } from './cta-override.js';
 import { installCtaScript } from './cta-script.js';
-import { decodeSymbols } from '../lib/encoding.js';
 import { buildDismissRequestData, sendDismiss } from './dismiss-request.js';
-import { getPageviewMetadata } from './pageview-metadata.js';
 import { buildJourneyLinkData, FILTERED_LINK_KEYS } from './link-data.js';
 
 export const journeys_utils = {};
@@ -71,10 +63,6 @@ journeys_utils.exitAnimationIsRunning = false;
 journeys_utils.use_v2_renderer = false;
 
 // Regex to find pieces of the html blob
-journeys_utils.jsonRe = jsonRe;
-journeys_utils.jsRe = jsRe;
-journeys_utils.cssRe = cssRe;
-journeys_utils.iframeCssRe = iframeCssRe;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
@@ -589,19 +577,6 @@ journeys_utils.addDynamicCtaText = function (iframe, ctaText) {
   }
 };
 
-/***
- * @function journeys_utils.centerOverlay
- * @param {Object} banner
- */
-journeys_utils.centerOverlay = function (banner) {
-  if (banner?.style) {
-    banner.style.bottom = '140px';
-    banner.style.width = '94%';
-    banner.style.borderRadius = '20px';
-    banner.style.margin = 'auto';
-  }
-};
-
 journeys_utils.getAnimationRoot = function (banner) {
   if (!banner) return null;
 
@@ -768,8 +743,6 @@ journeys_utils._resetJourneysBannerPosition = function (
   }
 };
 
-journeys_utils._addSecondsToDate = addSecondsToNow;
-
 journeys_utils._findGlobalDismissPeriod = globalDismissDeadline;
 
 /***
@@ -904,7 +877,6 @@ journeys_utils._setupDismissBehavior = function (
 
 journeys_utils._setJourneyDismiss = recordViewDismiss;
 
-journeys_utils.decodeSymbols = decodeSymbols;
 journeys_utils._getDismissRequestData = function (
   branch_view,
   dismissal_source,
@@ -977,8 +949,6 @@ journeys_utils._handleJourneyDismiss = function (
     );
   }
 };
-
-journeys_utils._getPageviewMetadata = getPageviewMetadata;
 
 /***
  * @function journeys_utils.animateBannerExit
@@ -1126,16 +1096,6 @@ journeys_utils.animateBannerExit = function (
  */
 journeys_utils._getAnimationDurationMs = animationDurationMs;
 
-/***
- * @function journeys_utils._timeValueMsAt
- * @param {string} cssValue
- * @param {number} index
- *
- * The `<time>` token (e.g. "0.25s" or "250ms") at position index (0-based) found in cssValue, in
- * ms, or null if there aren't that many.
- */
-journeys_utils._timeValueMsAt = timeValueMsAt;
-
 journeys_utils.setJourneyLinkData = function (linkData) {
   // Build before stripping: link data made only of filtered keys still gets an
   // empty journey_link_data, as in v1.
@@ -1143,84 +1103,10 @@ journeys_utils.setJourneyLinkData = function (linkData) {
   // v1 has always stripped these keys from the caller's object too; kept for parity.
   removePropertiesFromObject(linkData, FILTERED_LINK_KEYS);
   journeys_utils.journeyLinkData = data;
-  journeys_utils.journeyType = data.journey_link_data.type || null;
   journeys_utils.isDesktopJourney = data.journey_link_data.type === 'desktop';
   journeys_utils.journeyVariant = data.journey_link_data.variant || null;
 };
 
-journeys_utils.getValueForKeyInBranchViewData = function (key) {
-  if (!journeys_utils) {
-    return false;
-  }
-
-  if (!journeys_utils.branch) {
-    return false;
-  }
-
-  if (!journeys_utils.branch._branchViewData) {
-    return false;
-  }
-
-  if (!journeys_utils.branch._branchViewData.data) {
-    return false;
-  }
-
-  return journeys_utils.branch._branchViewData.data[key];
-};
-
-journeys_utils.hasJourneyCtaLink = function () {
-  if (!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')) {
-    return false;
-  }
-
-  return (
-    journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta').length > 0
-  );
-};
-
-journeys_utils.getBranchViewDataItemOrUndefined = function (name) {
-  if (journeys_utils.getValueForKeyInBranchViewData(name)) {
-    return journeys_utils.branch._branchViewData.data[name];
-  }
-  return undefined;
-};
-
-journeys_utils.getJourneyCtaLink = function () {
-  return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
-};
-
 journeys_utils.tryReplaceJourneyCtaLink = function (html) {
   return applyCtaOverride(journeys_utils.branch, html);
-};
-
-journeys_utils.trySetJourneyUrls = function (
-  linkElements,
-  urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url'],
-) {
-  if (!linkElements) {
-    return linkElements;
-  }
-
-  const assignUrls = function (data) {
-    return urls.reduce((value, url) => {
-      if (value[url]) {
-        return value;
-      }
-
-      const entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
-      if (entry) {
-        value[url] = entry;
-      }
-      return value;
-    }, data);
-  };
-
-  try {
-    const data = safejson.parse(linkElements.data);
-    linkElements.data = JSON.stringify(assignUrls(data));
-
-    return linkElements;
-  } catch (_e) {
-    return linkElements;
-  }
 };

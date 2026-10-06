@@ -12,6 +12,13 @@ describe('journeys/cta-override', () => {
   it('leaves html alone without $journeys_cta', () => {
     expect(applyCtaOverride({ _branchViewData: {} }, SCRIPT)).toBe(SCRIPT);
     expect(applyCtaOverride(null, SCRIPT)).toBe(SCRIPT);
+    // a non-string truthy value has no length
+    expect(
+      applyCtaOverride(
+        { _branchViewData: { data: { $journeys_cta: 5 } } },
+        SCRIPT,
+      ),
+    ).toBe(SCRIPT);
   });
 
   it('points every validate() at $journeys_cta and turns replace( into an assignment', () => {

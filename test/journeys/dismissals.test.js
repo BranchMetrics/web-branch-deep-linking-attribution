@@ -1,5 +1,6 @@
 import { storage as storageModule } from '../../src/core/storage.js';
 import {
+  addSecondsToNow,
   globalDismissDeadline,
   isDismissedGlobally,
   recordGlobalDismiss,
@@ -15,6 +16,10 @@ describe('journeys/dismissals', () => {
     vi.setSystemTime(new Date('2026-01-15T12:00:00Z'));
   });
   afterEach(() => vi.useRealTimers());
+
+  it('addSecondsToNow returns a ms timestamp seconds from now', () => {
+    expect(addSecondsToNow(60)).toBe(Date.now() + 60000);
+  });
 
   it('globalDismissDeadline maps -1 to true, seconds to a timestamp, other values to undefined', () => {
     expect(globalDismissDeadline({ globalDismissPeriod: -1 })).toBe(true);

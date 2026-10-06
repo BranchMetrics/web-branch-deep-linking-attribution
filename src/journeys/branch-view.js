@@ -108,8 +108,6 @@ branch_view.shouldDisplayJourney = function (
     options?.no_journeys ||
     _areJourneysDismissedGlobally(journeys_utils.branch)
   ) {
-    // resets the callback index so that auto-open works the next time a Journey is rendered
-    branch_view.callback_index = 1;
     return false;
   }
   return true;

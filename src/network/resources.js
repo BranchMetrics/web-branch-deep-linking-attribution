@@ -131,23 +131,10 @@ resources._r = {
   },
 };
 
-resources.linkClick = {
-  destination: '',
-  endpoint: '',
-  method: httpMethod.GET,
-  queryPart: {
-    'link_url': validator(true, validationTypes.STRING),
-  },
-  params: {
-    'click': validator(true, validationTypes.STRING),
-  },
-};
-
 resources.link = {
   destination: config.api_endpoint,
   endpoint: '/v1/url',
   method: httpMethod.POST,
-  ref: 'obj',
   params: defaults({
     'alias': validator(false, validationTypes.STRING),
     'campaign': validator(false, validationTypes.STRING),
@@ -167,7 +154,6 @@ resources.qrCode = {
   destination: config.api_endpoint,
   endpoint: '/v1/qr-code',
   method: httpMethod.POST,
-  ref: 'obj',
   params: defaults({
     'alias': validator(false, validationTypes.STRING),
     'campaign': validator(false, validationTypes.STRING),
