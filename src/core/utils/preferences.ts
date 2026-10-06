@@ -1,4 +1,4 @@
-import { utils } from '../utils.js';
+import { utils } from '../state.js';
 import { config } from '../config.js';
 
 export const preferences = {

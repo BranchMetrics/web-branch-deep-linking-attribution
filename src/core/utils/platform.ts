@@ -1,66 +1,10 @@
-import { utils } from '../utils.js';
+import { utils } from '../state.js';
 import { config } from '../config.js';
-
-function isSafariBrowser(ua) {
-  return !!/^((?!chrome|android|crios|firefox|fxios|edg|yabrowser).)*safari/i.test(
-    ua,
-  );
-}
-
-function isChromeBrowser(ua) {
-  return !!/(chrome|crios)/i.test(ua);
-}
-
-function isFirefoxBrowser(ua) {
-  return !!/(fxios|firefox)/i.test(ua);
-}
-
-function isEdgeBrowser(ua) {
-  return !!/edg/i.test(ua);
-}
-
-function isOperaBrowser(ua) {
-  return !!/(opt|opr)/i.test(ua);
-}
-
-function isYandexBrowser(ua) {
-  return !!/yabrowser/i.test(ua);
-}
-
-function isMacintoshDesktop(ua) {
-  return ua && ua.indexOf('Macintosh') > -1;
-}
-
-function isGTEVersion(ua, v) {
-  v = v || 11;
-
-  const match = /version\/([^ ]*)/i.exec(ua);
-  if (match?.[1]) {
-    try {
-      const version = parseFloat(match[1]);
-      if (version >= v) {
-        return true;
-      }
-    } catch (_e) {
-      return false;
-    }
-  }
-  return false;
-}
-
-function isSafari13OrGreateriPad(ua) {
-  return (
-    ua &&
-    isSafariBrowser(ua) &&
-    isMacintoshDesktop(ua) &&
-    isGTEVersion(ua, 13) &&
-    screen.height > screen.width
-  );
-}
-
-function isIOS(ua) {
-  return ua && /(iPad|iPod|iPhone)/.test(ua);
-}
+import {
+  getPlatformByUserAgent,
+  isIOSWKWebView,
+  isSafari11OrGreater,
+} from '../../lib/ua.js';
 
 export const platform = {
   timeSinceNavigationStart: function () {
@@ -68,64 +12,16 @@ export const platform = {
     return (Date.now() - window.performance.timing.navigationStart).toString();
   },
 
-  calculateBrtt: function (startTime) {
-    if (!startTime || typeof startTime !== 'number') {
-      return null;
-    }
-    return (Date.now() - startTime).toString();
-  },
-
-  getPlatformByUserAgent: function () {
-    const ua = navigator.userAgent;
-    if (ua.match(/android/i)) {
-      return 'android';
-    }
-    if (ua.match(/ipad/i) || isSafari13OrGreateriPad(ua)) {
-      return 'ipad';
-    }
-    if (ua.match(/i(os|p(hone|od))/i)) {
-      return 'ios';
-    }
-    if (ua.match(/\(BB[1-9][0-9]*\;/i)) {
-      return 'blackberry';
-    }
-    if (ua.match(/Windows Phone/i)) {
-      return 'windows_phone';
-    }
-    if (
-      ua.match(/Kindle/i) ||
-      ua.match(/Silk/i) ||
-      ua.match(/KFTT/i) ||
-      ua.match(/KFOT/i) ||
-      ua.match(/KFJWA/i) ||
-      ua.match(/KFJWI/i) ||
-      ua.match(/KFSOWI/i) ||
-      ua.match(/KFTHWA/i) ||
-      ua.match(/KFTHWI/i) ||
-      ua.match(/KFAPWA/i) ||
-      ua.match(/KFAPWI/i)
-    ) {
-      return 'kindle';
-    }
-    if (ua.match(/(Windows|Macintosh|Linux)/i)) {
-      return 'desktop';
-    }
-    return 'other';
-  },
+  getPlatformByUserAgent: () =>
+    getPlatformByUserAgent(
+      navigator.userAgent,
+      () => screen.height > screen.width,
+    ),
 
   /**
    * Returns true if browser is safari version 11 or greater
    */
-  isSafari11OrGreater: function () {
-    const ua = navigator.userAgent;
-    const isSafari = isSafariBrowser(ua);
-
-    if (isSafari) {
-      return isGTEVersion(ua, 11);
-    }
-
-    return false;
-  },
+  isSafari11OrGreater: () => isSafari11OrGreater(navigator.userAgent),
 
   /**
    * Returns true if browser uses WebKit.
@@ -134,19 +30,8 @@ export const platform = {
     return !!window.webkitURL;
   },
 
-  isIOSWKWebView: function () {
-    const ua = navigator.userAgent;
-    return (
-      utils.isWebKitBrowser() &&
-      ua &&
-      isIOS(ua) &&
-      !isChromeBrowser(ua) &&
-      !isFirefoxBrowser(ua) &&
-      !isEdgeBrowser(ua) &&
-      !isOperaBrowser(ua) &&
-      !isYandexBrowser(ua)
-    );
-  },
+  isIOSWKWebView: () =>
+    isIOSWKWebView(navigator.userAgent, utils.isWebKitBrowser()),
 
   /**
    * Add event listeners to elements, taking older browsers into account
@@ -315,24 +200,5 @@ export const platform = {
     } else {
       utils.userAgentData = null;
     }
-  },
-
-  /**
-   * @param versionNumber
-   * A utility function to remove trailing dot zeroes
-   */
-  removeTrailingDotZeros: function (versionNumber: string) {
-    if (!!versionNumber) {
-      const dotZeroRegex = /^([1-9]\d*)\.(0\d*)(\.[0]\d*){1,}$/;
-
-      if (versionNumber.indexOf('.') !== -1) {
-        const dotString = versionNumber.substring(
-          0,
-          versionNumber.indexOf('.'),
-        );
-        versionNumber = versionNumber.replace(dotZeroRegex, dotString);
-      }
-    }
-    return versionNumber;
   },
 };

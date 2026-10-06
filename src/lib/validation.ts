@@ -1,4 +1,4 @@
-import { utils } from '../utils.js';
+import { convertObjectValuesToString } from './objects.js';
 
 const validCommerceEvents = ['purchase'];
 
@@ -47,7 +47,7 @@ const validateCommerceDataKeys = function (commerceData) {
     'variant',
   ];
 
-  const invalidKeysInRoot = utils.calculateDiffBetweenArrays(
+  const invalidKeysInRoot = calculateDiffBetweenArrays(
     allowedInRoot,
     Object.keys(commerceData),
   );
@@ -70,10 +70,7 @@ const validateCommerceDataKeys = function (commerceData) {
         invalidProductType = commerceEventMessages.invalidProductType;
       }
       invalidKeysForProducts = invalidKeysForProducts.concat(
-        utils.calculateDiffBetweenArrays(
-          allowedInProducts,
-          Object.keys(product),
-        ),
+        calculateDiffBetweenArrays(allowedInProducts, Object.keys(product)),
       );
     });
 
@@ -134,71 +131,69 @@ const BRANCH_STANDARD_EVENT_DATA = [
   'description',
 ];
 
-export const events = {
-  /**
-   * Returns an array which contains the difference in elements between the 'original' and 'toCheck' arrays.
-   * If there is no difference, an empty array will be returned.
-   */
-  calculateDiffBetweenArrays: function (original, toCheck) {
-    const diff = [];
-    toCheck.forEach(function (element) {
-      if (original.indexOf(element) === -1) {
-        diff.push(element);
-      }
-    });
-    return diff;
-  },
-
-  /**
-   * Returns an error message if the partner passes in an invalid event or commerce_data to branch.trackCommerceEvent()
-   */
-  validateCommerceEventParams: function (event, commerce_data) {
-    if (
-      !event ||
-      typeof event !== 'string' ||
-      validCommerceEvents.indexOf(event.toLowerCase()) === -1
-    ) {
-      return commerceEventMessages.missingPurchaseEvent;
+/**
+ * Returns an array which contains the difference in elements between the 'original' and 'toCheck' arrays.
+ * If there is no difference, an empty array will be returned.
+ */
+export function calculateDiffBetweenArrays(original, toCheck) {
+  const diff = [];
+  toCheck.forEach(function (element) {
+    if (original.indexOf(element) === -1) {
+      diff.push(element);
     }
+  });
+  return diff;
+}
 
-    if (
-      !commerce_data ||
-      typeof commerce_data !== 'object' ||
-      Object.keys(commerce_data || {}).length === 0
-    ) {
-      return commerceEventMessages.missingCommerceData;
-    }
+/**
+ * Returns an error message if the partner passes in an invalid event or commerce_data to branch.trackCommerceEvent()
+ */
+export function validateCommerceEventParams(event, commerce_data) {
+  if (
+    !event ||
+    typeof event !== 'string' ||
+    validCommerceEvents.indexOf(event.toLowerCase()) === -1
+  ) {
+    return commerceEventMessages.missingPurchaseEvent;
+  }
 
-    const invalidKeysMessage = validateCommerceDataKeys(commerce_data);
-    if (invalidKeysMessage) {
-      return invalidKeysMessage;
-    }
+  if (
+    !commerce_data ||
+    typeof commerce_data !== 'object' ||
+    Object.keys(commerce_data || {}).length === 0
+  ) {
+    return commerceEventMessages.missingCommerceData;
+  }
 
+  const invalidKeysMessage = validateCommerceDataKeys(commerce_data);
+  if (invalidKeysMessage) {
+    return invalidKeysMessage;
+  }
+
+  return null;
+}
+
+export function isStandardEvent(eventName) {
+  return eventName && BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
+}
+
+export function separateEventAndCustomData(eventAndCustomData) {
+  if (!eventAndCustomData || Object.keys(eventAndCustomData).length === 0) {
     return null;
-  },
+  }
+  const customDataKeys = calculateDiffBetweenArrays(
+    BRANCH_STANDARD_EVENT_DATA,
+    Object.keys(eventAndCustomData),
+  );
+  const customData: Record<string, any> = {};
 
-  isStandardEvent: function (eventName) {
-    return eventName && BRANCH_STANDARD_EVENTS.indexOf(eventName) > -1;
-  },
-
-  separateEventAndCustomData: function (eventAndCustomData) {
-    if (!eventAndCustomData || Object.keys(eventAndCustomData).length === 0) {
-      return null;
-    }
-    const customDataKeys = utils.calculateDiffBetweenArrays(
-      BRANCH_STANDARD_EVENT_DATA,
-      Object.keys(eventAndCustomData),
-    );
-    const customData: Record<string, any> = {};
-
-    for (let i = 0; i < customDataKeys.length; i++) {
-      const key = customDataKeys[i];
-      customData[key] = eventAndCustomData[key];
-      delete eventAndCustomData[key];
-    }
-    return {
-      'custom_data': utils.convertObjectValuesToString(customData),
-      'event_data': eventAndCustomData,
-    };
-  },
-};
+  for (let i = 0; i < customDataKeys.length; i++) {
+    const key = customDataKeys[i];
+    customData[key] = eventAndCustomData[key];
+    delete eventAndCustomData[key];
+  }
+  return {
+    'custom_data': convertObjectValuesToString(customData),
+    'event_data': eventAndCustomData,
+  };
+}
