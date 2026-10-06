@@ -2217,6 +2217,21 @@ describe('journeys_utils characterization: setJourneyLinkData', function () {
     expect(journeys_utils.journeyVariant).toBeNull();
   });
 
+  it('keeps an empty journey_link_data when every key is filtered out', function () {
+    journeys_utils.branchViewId = 'v7';
+    const linkData = { app_id: 'app', source: 'web', link_click_id: 'lc' };
+    journeys_utils.setJourneyLinkData(linkData);
+
+    expect(journeys_utils.journeyLinkData).toEqual({
+      banner_id: 'v7',
+      journey_link_data: {},
+    });
+    expect(journeys_utils.journeyType).toBeNull();
+    expect(journeys_utils.isDesktopJourney).toBe(false);
+    expect(journeys_utils.journeyVariant).toBeNull();
+    expect(linkData).toEqual({});
+  });
+
   it('throws for empty or missing link data after setting journeyLinkData', function () {
     // NOTE: possible bug: data.journey_link_data is only created for non-empty
     // linkData, but is then dereferenced unconditionally (TypeError).

@@ -1137,15 +1137,11 @@ journeys_utils._getAnimationDurationMs = animationDurationMs;
 journeys_utils._timeValueMsAt = timeValueMsAt;
 
 journeys_utils.setJourneyLinkData = function (linkData) {
-  // v1 has always stripped these keys from the caller's object too; kept for parity.
-  if (
-    linkData &&
-    typeof linkData === 'object' &&
-    Object.keys(linkData || {}).length > 0
-  ) {
-    removePropertiesFromObject(linkData, FILTERED_LINK_KEYS);
-  }
+  // Build before stripping: link data made only of filtered keys still gets an
+  // empty journey_link_data, as in v1.
   const data = buildJourneyLinkData(journeys_utils.branchViewId, linkData);
+  // v1 has always stripped these keys from the caller's object too; kept for parity.
+  removePropertiesFromObject(linkData, FILTERED_LINK_KEYS);
   journeys_utils.journeyLinkData = data;
   journeys_utils.journeyType = data.journey_link_data.type || null;
   journeys_utils.isDesktopJourney = data.journey_link_data.type === 'desktop';
