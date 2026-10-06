@@ -1,8 +1,8 @@
 import {
   base64Decode,
-  decodeSymbols,
   base64encode,
   decodeBFPs,
+  decodeSymbols,
   encodeBFPs,
   isBase64Encoded,
 } from '../../src/lib/encoding.js';
