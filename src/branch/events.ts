@@ -1,6 +1,15 @@
 import { Branch, wrap, callback_params } from './core.js';
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { mergeHostedDeeplinkData } from '../lib/hosted_data.js';
+import { getEnv } from '../env/env.js';
+import { merge, validateParameterType } from '../lib/objects.js';
+import {
+  isStandardEvent,
+  separateEventAndCustomData,
+  validateCommerceEventParams,
+} from '../lib/validation.js';
+import { getUserData } from '../core/platform.js';
+import { getInitialReferrer } from '../core/url.js';
 import { resources } from '../network/resources.js';
 import { branch_view } from '../journeys/branch_view.js';
 import { journeys_utils } from '../journeys/journeys_utils.js';
@@ -44,11 +53,13 @@ Branch.prototype.track = wrap(
 
     options = options || {};
 
-    utils.nonce = options.nonce ? options.nonce : utils.nonce;
+    self._ctx.nonce = options.nonce ? options.nonce : self._ctx.nonce;
 
     if (event === 'pageview') {
-      const hostedDeeplinkDataWithMergedMetadata =
-        utils.mergeHostedDeeplinkData(utils.getHostedDeepLinkData(), metadata);
+      const hostedDeeplinkDataWithMergedMetadata = mergeHostedDeeplinkData(
+        getEnv().hostedDeepLinkData(),
+        metadata,
+      );
       if (
         hostedDeeplinkDataWithMergedMetadata &&
         Object.keys(hostedDeeplinkDataWithMergedMetadata).length > 0
@@ -57,7 +68,7 @@ Branch.prototype.track = wrap(
       }
 
       const requestData = branch_view._getPageviewRequestData(
-        journeys_utils._getPageviewMetadata(options, metadata),
+        journeys_utils._getPageviewMetadata(options, metadata, self._ctx),
         options,
         self,
         false,
@@ -224,28 +235,22 @@ Branch.prototype.track = wrap(
 Branch.prototype.logEvent = wrap(
   callback_params.CALLBACK_ERR,
   function (done, name, eventData, contentItems, customer_event_alias: string) {
-    name = utils.validateParameterType(name, 'string') ? name : null;
-    eventData = utils.validateParameterType(eventData, 'object')
-      ? eventData
-      : null;
-    customer_event_alias = utils.validateParameterType(
-      customer_event_alias,
-      'string',
-    )
+    name = validateParameterType(name, 'string') ? name : null;
+    eventData = validateParameterType(eventData, 'object') ? eventData : null;
+    customer_event_alias = validateParameterType(customer_event_alias, 'string')
       ? customer_event_alias
       : null;
-    const extractedEventAndCustomData =
-      utils.separateEventAndCustomData(eventData);
+    const extractedEventAndCustomData = separateEventAndCustomData(eventData);
 
-    if (utils.isStandardEvent(name)) {
-      contentItems = utils.validateParameterType(contentItems, 'array')
+    if (isStandardEvent(name)) {
+      contentItems = validateParameterType(contentItems, 'array')
         ? contentItems
         : null;
       this._api(
         resources.logStandardEvent,
         {
           'name': name,
-          'user_data': safejson.stringify(utils.getUserData(this)),
+          'user_data': safejson.stringify(getUserData(this)),
           'custom_data': safejson.stringify(
             extractedEventAndCustomData?.custom_data || {},
           ),
@@ -264,7 +269,7 @@ Branch.prototype.logEvent = wrap(
         resources.logCustomEvent,
         {
           'name': name,
-          'user_data': safejson.stringify(utils.getUserData(this)),
+          'user_data': safejson.stringify(getUserData(this)),
           'custom_data': safejson.stringify(
             extractedEventAndCustomData?.custom_data || {},
           ),
@@ -344,10 +349,7 @@ Branch.prototype.trackCommerceEvent = wrap(
   ) {
     const self = this;
     self.renderQueue(function () {
-      const validationError = utils.validateCommerceEventParams(
-        event,
-        commerce_data,
-      );
+      const validationError = validateCommerceEventParams(event, commerce_data);
       if (validationError) {
         return done(new Error(validationError));
       }
@@ -356,7 +358,7 @@ Branch.prototype.trackCommerceEvent = wrap(
         resources.commerceEvent,
         {
           'event': event,
-          'metadata': utils.merge(
+          'metadata': merge(
             {
               'url': document.URL,
               'user_agent': navigator.userAgent,
@@ -364,7 +366,7 @@ Branch.prototype.trackCommerceEvent = wrap(
             },
             metadata || {},
           ),
-          'initial_referrer': utils.getInitialReferrer(self._referringLink()),
+          'initial_referrer': getInitialReferrer(self._referringLink()),
           'commerce_data': commerce_data,
         },
         function (err, _data) {

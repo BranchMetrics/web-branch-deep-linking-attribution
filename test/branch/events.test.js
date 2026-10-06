@@ -1,9 +1,10 @@
 import { Branch } from '../../src/branch.js';
 import { config } from '../../src/core/config.js';
 import { safejson } from '../../src/core/safejson.js';
-import { utils } from '../../src/core/utils.js';
+import { getEnv } from '../../src/env/env.js';
 import { branch_view } from '../../src/journeys/branch_view.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
+import { merge } from '../../src/lib/objects.js';
 
 // Characterization tests for branch.track, branch.logEvent and
 // branch.trackCommerceEvent. The network layer is stubbed at
@@ -16,25 +17,12 @@ const IDENTITY_ID = '98807509250212102';
 
 describe('Branch events', function () {
   const requests = [];
-  let savedUtils;
   let savedJourneysBranch;
 
   beforeEach(function () {
     localStorage.clear();
     sessionStorage.clear();
     requests.length = 0;
-    savedUtils = {
-      nonce: utils.nonce,
-      debug: utils.debug,
-      retries: utils.retries,
-      retry_delay: utils.retry_delay,
-      timeout: utils.timeout,
-      extendedJourneysAssistExpiryTime: utils.extendedJourneysAssistExpiryTime,
-      trackingDisabled: utils.userPreferences.trackingDisabled,
-      enableExtendedJourneysAssist:
-        utils.userPreferences.enableExtendedJourneysAssist,
-      allowErrorsInCallback: utils.userPreferences.allowErrorsInCallback,
-    };
     savedJourneysBranch = journeys_utils.branch;
   });
 
@@ -42,18 +30,6 @@ describe('Branch events', function () {
     vi.restoreAllMocks();
     localStorage.clear();
     sessionStorage.clear();
-    utils.nonce = savedUtils.nonce;
-    utils.debug = savedUtils.debug;
-    utils.retries = savedUtils.retries;
-    utils.retry_delay = savedUtils.retry_delay;
-    utils.timeout = savedUtils.timeout;
-    utils.extendedJourneysAssistExpiryTime =
-      savedUtils.extendedJourneysAssistExpiryTime;
-    utils.userPreferences.trackingDisabled = savedUtils.trackingDisabled;
-    utils.userPreferences.enableExtendedJourneysAssist =
-      savedUtils.enableExtendedJourneysAssist;
-    utils.userPreferences.allowErrorsInCallback =
-      savedUtils.allowErrorsInCallback;
     journeys_utils.branch = savedJourneysBranch;
   });
 
@@ -89,13 +65,13 @@ describe('Branch events', function () {
   }
 
   function expectedUserData(extra) {
-    return utils.merge(
+    return merge(
       {
         http_origin: document.URL,
         user_agent: navigator.userAgent,
-        language: utils.getBrowserLanguageCode(),
-        screen_width: utils.getScreenWidth(),
-        screen_height: utils.getScreenHeight(),
+        language: getEnv().browserLanguageCode(),
+        screen_width: getEnv().screenWidth(),
+        screen_height: getEnv().screenHeight(),
         http_referrer: document.referrer,
         browser_fingerprint_id: BFP_ID,
         sdk: 'web',
@@ -127,7 +103,7 @@ describe('Branch events', function () {
         branch[method](...calls[method], cb);
         expect(cb).toHaveBeenCalledTimes(1);
         // NOTE: possible bug: wrap() passes init_state_fail_code as the
-        // `params` argument of utils.message and the fail details as the
+        // `params` argument of formatMessage and the fail details as the
         // failCode, so the code is lost and details are labelled "Failure Code".
         expect(cb.mock.calls[0][0].message).toBe(
           'Branch SDK initialization failed, so further methods cannot be called' +
@@ -234,13 +210,13 @@ describe('Branch events', function () {
       expect(cb).toHaveBeenCalledWith(null);
     });
 
-    it('sets utils.nonce from options.nonce and keeps it otherwise', function () {
+    it('sets ctx.nonce from options.nonce and keeps it otherwise', function () {
       const branch = makeBranch('ok');
-      utils.nonce = 'before';
+      branch._ctx.nonce = 'before';
       branch.track('pageview', {}, { nonce: 'abc123' });
-      expect(utils.nonce).toBe('abc123');
+      expect(branch._ctx.nonce).toBe('abc123');
       branch.track('pageview', {}, {});
-      expect(utils.nonce).toBe('abc123');
+      expect(branch._ctx.nonce).toBe('abc123');
     });
 
     it('includes options.branch_view_id and no_journeys in the request', function () {
@@ -256,7 +232,7 @@ describe('Branch events', function () {
 
     it('adds tracking_disabled when tracking is disabled', function () {
       const branch = makeBranch('ok');
-      utils.userPreferences.trackingDisabled = true;
+      branch._ctx.userPreferences.trackingDisabled = true;
       branch.track('pageview');
       expect(requests[0].obj.tracking_disabled).toBe(true);
     });
@@ -491,7 +467,7 @@ describe('Branch events', function () {
 
     it('adds tracking_disabled when tracking is disabled', function () {
       const branch = makeBranch('ok');
-      utils.userPreferences.trackingDisabled = true;
+      branch._ctx.userPreferences.trackingDisabled = true;
       branch.logEvent('PURCHASE');
       // The queue only advances once the pending request completes.
       requests[0].callback(null, {});

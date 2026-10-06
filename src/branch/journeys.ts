@@ -1,6 +1,8 @@
 import { Branch, wrap, callback_params } from './core.js';
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
+import { cleanBannerText, merge } from '../lib/objects.js';
+import { getEnv } from '../env/env.js';
 import { banner } from '../banner/banner.js';
 import { journeys_utils } from '../journeys/journeys_utils.js';
 
@@ -92,7 +94,7 @@ Branch.prototype.banner = wrap(
     const banner_deprecation_msg =
       'The "banner" method is deprecated and will be removed in future versions. Please use Branch Journeys instead. For more information and migration steps, visit: https://help.branch.io/using-branch/docs/journeys-overview';
     console.warn(banner_deprecation_msg);
-    const platform = utils.getPlatformByUserAgent();
+    const platform = getPlatformByUserAgent();
     if (['other', 'desktop'].includes(platform)) {
       console.info('banner functionality is not supported on this platform');
     } else {
@@ -106,9 +108,9 @@ Branch.prototype.banner = wrap(
         options.showAgain = options.forgetHide;
       }
       const bannerOptions = {
-        icon: utils.cleanBannerText(options.icon) || '',
-        title: utils.cleanBannerText(options.title) || '',
-        description: utils.cleanBannerText(options.description) || '',
+        icon: cleanBannerText(options.icon) || '',
+        title: cleanBannerText(options.title) || '',
+        description: cleanBannerText(options.description) || '',
         reviewCount:
           typeof options.reviewCount === 'number' && options.reviewCount > 0 // force greater than 0
             ? Math.floor(options.reviewCount)
@@ -122,10 +124,9 @@ Branch.prototype.banner = wrap(
             : // force increments of .5
               null,
         openAppButtonText:
-          utils.cleanBannerText(options.openAppButtonText) || 'View in app',
+          cleanBannerText(options.openAppButtonText) || 'View in app',
         downloadAppButtonText:
-          utils.cleanBannerText(options.downloadAppButtonText) ||
-          'Download App',
+          cleanBannerText(options.downloadAppButtonText) || 'Download App',
         iframe: typeof options.iframe === 'undefined' ? true : options.iframe,
         showiOS:
           typeof options.showiOS === 'undefined' ? true : options.showiOS,
@@ -180,7 +181,7 @@ Branch.prototype.banner = wrap(
         bannerOptions.showKindle = options.showMobile;
       }
 
-      data.data = utils.merge(utils.getHostedDeepLinkData(), data.data);
+      data.data = merge(getEnv().hostedDeepLinkData(), data.data);
 
       const self = this;
       self.renderQueue(function () {

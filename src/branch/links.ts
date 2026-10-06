@@ -1,6 +1,10 @@
 import { Branch, wrap, callback_params } from './core.js';
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { cleanLinkData } from '../core/url.js';
+import { generateDynamicBNCLink } from '../lib/url.js';
+import { convertObjectValuesToString, merge } from '../lib/objects.js';
+import { getEnv } from '../env/env.js';
+import { messages } from '../lib/messages.js';
 import { resources } from '../network/resources.js';
 
 /**
@@ -96,12 +100,12 @@ import { resources } from '../network/resources.js';
 Branch.prototype.link = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, data: Record<string, any>) {
-    const linkData = utils.cleanLinkData(data);
+    const linkData = cleanLinkData(data);
     const keyCopy = this.branch_key;
     this._api(resources.link, linkData, function (err, data) {
       if (err) {
         // if an error occurs or if tracking is disabled then return a dynamic link
-        return done(err, utils.generateDynamicBNCLink(keyCopy, linkData));
+        return done(err, generateDynamicBNCLink(keyCopy, linkData));
       }
       // biome-ignore lint/complexity/useOptionalChain: callers get null (not undefined) when data is null
       done(null, data && data.url);
@@ -175,13 +179,13 @@ Branch.prototype.qrCode = wrap(
     qrCodeSettings?: Record<string, any>,
     _options?: Record<string, any>,
   ) {
-    const data = utils.cleanLinkData(linkData);
+    const data = cleanLinkData(linkData);
     data.qr_code_settings = safejson.stringify(
-      utils.convertObjectValuesToString(qrCodeSettings || {}),
+      convertObjectValuesToString(qrCodeSettings || {}),
     );
     this._api(
       resources.qrCode,
-      utils.cleanLinkData(linkData),
+      cleanLinkData(linkData),
       function (error, rawBuffer) {
         function QrCode() {}
         if (!error) {
@@ -281,14 +285,11 @@ Branch.prototype.deepview = wrap(
       options.deepview_type = 'banner';
     }
 
-    data.data = utils.merge(utils.getHostedDeepLinkData(), data.data);
-    data = utils.isIframe() ? utils.merge({ 'is_iframe': true }, data) : data;
+    data.data = merge(getEnv().hostedDeepLinkData(), data.data);
+    data = getEnv().isIframe() ? merge({ 'is_iframe': true }, data) : data;
 
-    const cleanedData = utils.cleanLinkData(data);
-    const fallbackUrl = utils.generateDynamicBNCLink(
-      this.branch_key,
-      cleanedData,
-    );
+    const cleanedData = cleanLinkData(data);
+    const fallbackUrl = generateDynamicBNCLink(this.branch_key, cleanedData);
 
     if (
       options.open_app ||
@@ -303,7 +304,7 @@ Branch.prototype.deepview = wrap(
     const referringLink = self._referringLink();
     if (referringLink && !options.make_new_link) {
       cleanedData.link_click_id =
-        utils.getClickIdAndSearchStringFromLink(referringLink);
+        getEnv().clickIdAndSearchStringFromLink(referringLink);
     }
 
     // Not sent to the server: _api only sends keys listed in resources.deepview.params, and
@@ -321,7 +322,7 @@ Branch.prototype.deepview = wrap(
       function (err, data) {
         if (err) {
           // ensures that a partner cannot call branch._deepviewCta() if a user decides to disable tracking
-          if (!utils.userPreferences.trackingDisabled) {
+          if (!self._ctx.userPreferences.trackingDisabled) {
             self._deepviewCta = function () {
               self._windowRedirect(fallbackUrl);
             };
@@ -395,9 +396,9 @@ Branch.prototype.deepviewCta = wrap(
   callback_params.CALLBACK_ERR,
   function (done) {
     if (typeof this._deepviewCta === 'undefined') {
-      return utils.userPreferences.trackingDisabled
-        ? done(new Error(utils.messages.trackingDisabled), null)
-        : done(new Error(utils.messages.deepviewNotCalled), null);
+      return this._ctx.userPreferences.trackingDisabled
+        ? done(new Error(messages.trackingDisabled), null)
+        : done(new Error(messages.deepviewNotCalled), null);
     }
     if (window.event) {
       if (window.event.preventDefault) {

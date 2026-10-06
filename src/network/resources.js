@@ -4,7 +4,9 @@
  */
 
 import { config } from '../core/config.js';
-import { utils } from '../core/utils.js';
+import { merge } from '../lib/objects.js';
+import { httpMethod } from '../lib/http.js';
+import { formatMessage, messages } from '../lib/messages.js';
 
 export const resources = {};
 
@@ -20,22 +22,22 @@ const validationTypes = {
  * @param {boolean} required
  * @param {number|RegExp} type
  * @throws {Error}
- * @return {(endpoint: string, param: string, data: any) => (string|false)}
+ * @return {(endpoint: string, param: string, data: any, ctx: import('../core/context.js').Context) => (string|false)} the message, which getUrl logs
  */
 function validator(required, type) {
-  return function (endpoint, param, data) {
+  return function (endpoint, param, data, ctx) {
     // Ignores request validation when tracking is disabled because information will be intentionally missing from requests
-    if (utils.userPreferences.trackingDisabled) {
+    if (ctx.userPreferences.trackingDisabled) {
       return false;
     }
     // Ensure data is not a number before doing a !data otherwise the number can't be 0.
     if (typeof data !== 'number' && !data) {
       if (required) {
-        return utils.message(utils.messages.missingParam, [endpoint, param]);
+        return formatMessage(messages.missingParam, [endpoint, param]);
       }
     } else if (type === validationTypes.OBJECT) {
       if (typeof data !== 'object') {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(messages.invalidType, [
           endpoint,
           param,
           'an object',
@@ -43,7 +45,7 @@ function validator(required, type) {
       }
     } else if (type === validationTypes.ARRAY) {
       if (!Array.isArray(data)) {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(messages.invalidType, [
           endpoint,
           param,
           'an array',
@@ -51,7 +53,7 @@ function validator(required, type) {
       }
     } else if (type === validationTypes.NUMBER) {
       if (typeof data !== 'number') {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(messages.invalidType, [
           endpoint,
           param,
           'a number',
@@ -59,7 +61,7 @@ function validator(required, type) {
       }
     } else if (type === validationTypes.BOOLEAN) {
       if (typeof data !== 'boolean') {
-        return utils.message(utils.messages.invalidType, [
+        return formatMessage(messages.invalidType, [
           endpoint,
           param,
           'a boolean',
@@ -68,14 +70,10 @@ function validator(required, type) {
     }
     // String or regex validator
     else if (typeof data !== 'string') {
-      return utils.message(utils.messages.invalidType, [
-        endpoint,
-        param,
-        'a string',
-      ]);
+      return formatMessage(messages.invalidType, [endpoint, param, 'a string']);
       // @ts-expect-error -- `type` is a RegExp once it isn't a validationTypes value
     } else if (type !== validationTypes.STRING && !type.test(data)) {
-      return utils.message(utils.messages.invalidType, [
+      return formatMessage(messages.invalidType, [
         endpoint,
         param,
         'in the proper format',
@@ -93,13 +91,13 @@ function defaults(obj) {
     'sdk': validator(true, validationTypes.STRING),
     'session_id': validator(true, validationTypes.STRING),
   };
-  return utils.merge(obj, def);
+  return merge(obj, def);
 }
 
 resources.open = {
   destination: config.api_endpoint,
   endpoint: '/v1/open',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: {
     'browser_fingerprint_id': validator(false, validationTypes.STRING),
     'alternative_browser_fingerprint_id': validator(
@@ -124,7 +122,7 @@ resources.open = {
 resources._r = {
   destination: config.app_service_endpoint,
   endpoint: '/_r',
-  method: utils.httpMethod.GET,
+  method: httpMethod.GET,
   jsonp: true,
   params: {
     'sdk': validator(true, validationTypes.STRING),
@@ -136,7 +134,7 @@ resources._r = {
 resources.linkClick = {
   destination: '',
   endpoint: '',
-  method: utils.httpMethod.GET,
+  method: httpMethod.GET,
   queryPart: {
     'link_url': validator(true, validationTypes.STRING),
   },
@@ -148,7 +146,7 @@ resources.linkClick = {
 resources.link = {
   destination: config.api_endpoint,
   endpoint: '/v1/url',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   ref: 'obj',
   params: defaults({
     'alias': validator(false, validationTypes.STRING),
@@ -168,7 +166,7 @@ resources.link = {
 resources.qrCode = {
   destination: config.api_endpoint,
   endpoint: '/v1/qr-code',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   ref: 'obj',
   params: defaults({
     'alias': validator(false, validationTypes.STRING),
@@ -189,7 +187,7 @@ resources.deepview = {
   destination: config.api_endpoint,
   endpoint: '/v1/deepview',
   jsonp: true,
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: defaults({
     'campaign': validator(false, validationTypes.STRING),
     '_t': validator(false, validationTypes.STRING),
@@ -211,7 +209,7 @@ resources.deepview = {
 resources.logStandardEvent = {
   destination: config.api_endpoint,
   endpoint: '/v2/event/standard',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: {
     'name': validator(true, validationTypes.STRING),
     'user_data': validator(true, validationTypes.STRING),
@@ -225,7 +223,7 @@ resources.logStandardEvent = {
 resources.logCustomEvent = {
   destination: config.api_endpoint,
   endpoint: '/v2/event/custom',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: {
     'name': validator(true, validationTypes.STRING),
     'user_data': validator(true, validationTypes.STRING),
@@ -239,7 +237,7 @@ resources.logCustomEvent = {
 resources.pageview = {
   destination: config.api_endpoint,
   endpoint: '/v1/pageview',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: defaults({
     'event': validator(true, validationTypes.STRING),
     'metadata': validator(false, validationTypes.OBJECT),
@@ -267,7 +265,7 @@ resources.pageview = {
 resources.dismiss = {
   destination: config.api_endpoint,
   endpoint: '/v1/dismiss',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: defaults({
     'event': validator(true, validationTypes.STRING),
     'metadata': validator(false, validationTypes.OBJECT),
@@ -292,7 +290,7 @@ resources.dismiss = {
 resources.crossPlatformIds = {
   destination: config.api_endpoint,
   endpoint: '/v1/cpid',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: {
     'user_data': validator(true, validationTypes.STRING),
   },
@@ -301,7 +299,7 @@ resources.crossPlatformIds = {
 resources.lastAttributedTouchData = {
   destination: config.api_endpoint,
   endpoint: '/v1/cpid/latd',
-  method: utils.httpMethod.POST,
+  method: httpMethod.POST,
   params: {
     'user_data': validator(true, validationTypes.STRING),
   },

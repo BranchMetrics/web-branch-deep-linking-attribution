@@ -1,6 +1,17 @@
 import { config } from '../../../src/core/config.js';
-import { utils } from '../../../src/core/utils.js';
-import { browserEnv, setEnv } from '../../../src/env/env.js';
+import { createContext } from '../../../src/core/context.js';
+import {
+  addEvent,
+  getClientHints,
+  getPlatformByUserAgent,
+  getUserData,
+  isIframeAndFromSameOrigin,
+  isIOSWKWebView,
+  isSafari11OrGreater,
+} from '../../../src/core/platform.js';
+import { browserEnv, getEnv, setEnv } from '../../../src/env/env.js';
+import { calculateBrtt } from '../../../src/lib/brtt.js';
+import { removeTrailingDotZeros } from '../../../src/lib/url.js';
 import { makeFakeEnv } from '../../helpers/fake-env.js';
 
 // Characterization tests: these pin what the platform helpers do today,
@@ -176,7 +187,7 @@ describe('platform utils (characterization)', function () {
     it.each(cases)('%s -> %s', function (_name, ua, expected) {
       setUserAgent(ua);
       setScreen(1920, 1080);
-      expect(utils.getPlatformByUserAgent()).toBe(expected);
+      expect(getPlatformByUserAgent()).toBe(expected);
     });
 
     describe('iPadOS 13+ desktop-mode detection (Macintosh UA)', function () {
@@ -184,7 +195,7 @@ describe('platform utils (characterization)', function () {
         setUserAgent(UA.ipadDesktopModeSafari);
         stubProperty(navigator, 'maxTouchPoints', 5);
         setScreen(820, 1180);
-        expect(utils.getPlatformByUserAgent()).toBe('ipad');
+        expect(getPlatformByUserAgent()).toBe('ipad');
       });
 
       it('ignores navigator.maxTouchPoints: a portrait screen alone flips a Mac to ipad', function () {
@@ -194,32 +205,32 @@ describe('platform utils (characterization)', function () {
         setUserAgent(UA.ipadDesktopModeSafari);
         stubProperty(navigator, 'maxTouchPoints', 0);
         setScreen(1080, 1920);
-        expect(utils.getPlatformByUserAgent()).toBe('ipad');
+        expect(getPlatformByUserAgent()).toBe('ipad');
       });
 
       it('reports desktop for the iPad desktop-mode UA when the screen is landscape', function () {
         setUserAgent(UA.ipadDesktopModeSafari);
         stubProperty(navigator, 'maxTouchPoints', 5);
         setScreen(1180, 820);
-        expect(utils.getPlatformByUserAgent()).toBe('desktop');
+        expect(getPlatformByUserAgent()).toBe('desktop');
       });
 
       it('reports desktop for a square screen (height must be strictly greater)', function () {
         setUserAgent(UA.ipadDesktopModeSafari);
         setScreen(1024, 1024);
-        expect(utils.getPlatformByUserAgent()).toBe('desktop');
+        expect(getPlatformByUserAgent()).toBe('desktop');
       });
 
       it('reports desktop for Mac Safari below version 13 even on a portrait screen', function () {
         setUserAgent(UA.macSafari12);
         setScreen(820, 1180);
-        expect(utils.getPlatformByUserAgent()).toBe('desktop');
+        expect(getPlatformByUserAgent()).toBe('desktop');
       });
 
       it('reports desktop for Mac Chrome on a portrait screen (not Safari)', function () {
         setUserAgent(UA.macChrome);
         setScreen(820, 1180);
-        expect(utils.getPlatformByUserAgent()).toBe('desktop');
+        expect(getPlatformByUserAgent()).toBe('desktop');
       });
 
       it('reports ios for iPad desktop-mode Firefox (Mac UA containing "FxiOS")', function () {
@@ -227,7 +238,7 @@ describe('platform utils (characterization)', function () {
         // Safari-based iPad heuristic excludes Firefox, so this is 'ios'.
         setUserAgent(UA.ipadDesktopModeFirefox);
         setScreen(820, 1180);
-        expect(utils.getPlatformByUserAgent()).toBe('ios');
+        expect(getPlatformByUserAgent()).toBe('ios');
       });
 
       it('reports desktop when the Version/ token is not numeric', function () {
@@ -235,7 +246,7 @@ describe('platform utils (characterization)', function () {
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/abc Safari/605.1.15',
         );
         setScreen(820, 1180);
-        expect(utils.getPlatformByUserAgent()).toBe('desktop');
+        expect(getPlatformByUserAgent()).toBe('desktop');
       });
 
       it('reports desktop when the Version/ token is empty', function () {
@@ -243,7 +254,7 @@ describe('platform utils (characterization)', function () {
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/ Safari/605.1.15',
         );
         setScreen(820, 1180);
-        expect(utils.getPlatformByUserAgent()).toBe('desktop');
+        expect(getPlatformByUserAgent()).toBe('desktop');
       });
     });
 
@@ -254,7 +265,7 @@ describe('platform utils (characterization)', function () {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 KioskBrowser/1.0',
       );
       setScreen(1920, 1080);
-      expect(utils.getPlatformByUserAgent()).toBe('ios');
+      expect(getPlatformByUserAgent()).toBe('ios');
     });
   });
 
@@ -284,21 +295,21 @@ describe('platform utils (characterization)', function () {
 
     it.each(cases)('%s -> %s', function (_name, ua, expected) {
       setUserAgent(ua);
-      expect(utils.isSafari11OrGreater()).toBe(expected);
+      expect(isSafari11OrGreater()).toBe(expected);
     });
 
     it('treats Version 11.0 as the inclusive lower bound', function () {
       setUserAgent(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Safari/604.1.38',
       );
-      expect(utils.isSafari11OrGreater()).toBe(true);
+      expect(isSafari11OrGreater()).toBe(true);
     });
 
     it('treats Version 10.1 as below the bound', function () {
       setUserAgent(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.1 Safari/603.1.30',
       );
-      expect(utils.isSafari11OrGreater()).toBe(false);
+      expect(isSafari11OrGreater()).toBe(false);
     });
   });
 
@@ -336,25 +347,25 @@ describe('platform utils (characterization)', function () {
     it.each(cases)('%s with webkitURL -> %s', function (_name, ua, expected) {
       setUserAgent(ua);
       stubProperty(window, 'webkitURL', function () {});
-      expect(!!utils.isIOSWKWebView()).toBe(expected);
+      expect(!!isIOSWKWebView()).toBe(expected);
     });
 
     it('returns false when webkitURL is missing', function () {
       setUserAgent(UA.iosWKWebView);
       stubProperty(window, 'webkitURL', undefined);
-      expect(utils.isIOSWKWebView()).toBe(false);
+      expect(isIOSWKWebView()).toBe(false);
     });
 
     it('returns the falsy UA itself when the UA is empty', function () {
       setUserAgent('');
       stubProperty(window, 'webkitURL', function () {});
-      expect(utils.isIOSWKWebView()).toBe('');
+      expect(isIOSWKWebView()).toBe('');
     });
 
     it('returns true (boolean) for a WKWebView UA', function () {
       setUserAgent(UA.iosWKWebView);
       stubProperty(window, 'webkitURL', function () {});
-      expect(utils.isIOSWKWebView()).toBe(true);
+      expect(isIOSWKWebView()).toBe(true);
     });
 
     it('returns false when the "opt"/"opr" substring appears anywhere', function () {
@@ -362,7 +373,7 @@ describe('platform utils (characterization)', function () {
       // containing "opt" also exclude the UA.
       setUserAgent(`${UA.iosWKWebView} AppOptions/1.0`);
       stubProperty(window, 'webkitURL', function () {});
-      expect(utils.isIOSWKWebView()).toBe(false);
+      expect(isIOSWKWebView()).toBe(false);
     });
   });
 
@@ -370,61 +381,61 @@ describe('platform utils (characterization)', function () {
     it('uses the first entry of navigator.languages, upper-cased to 2 chars', function () {
       stubProperty(navigator, 'languages', ['fr-CA', 'en-US']);
       stubProperty(navigator, 'language', 'de-DE');
-      expect(utils.getBrowserLanguageCode()).toBe('FR');
+      expect(getEnv().browserLanguageCode()).toBe('FR');
     });
 
     it('falls back to navigator.language when languages is empty', function () {
       stubProperty(navigator, 'languages', []);
       stubProperty(navigator, 'language', 'de-DE');
-      expect(utils.getBrowserLanguageCode()).toBe('DE');
+      expect(getEnv().browserLanguageCode()).toBe('DE');
     });
 
     it('falls back to navigator.language when languages is undefined', function () {
       stubProperty(navigator, 'languages', undefined);
       stubProperty(navigator, 'language', 'ja');
-      expect(utils.getBrowserLanguageCode()).toBe('JA');
+      expect(getEnv().browserLanguageCode()).toBe('JA');
     });
 
     it('returns a 1-char code unchanged apart from case', function () {
       stubProperty(navigator, 'languages', ['x']);
-      expect(utils.getBrowserLanguageCode()).toBe('X');
+      expect(getEnv().browserLanguageCode()).toBe('X');
     });
 
     it('returns null when neither languages nor language is available', function () {
       stubProperty(navigator, 'languages', undefined);
       stubProperty(navigator, 'language', undefined);
-      expect(utils.getBrowserLanguageCode()).toBeNull();
+      expect(getEnv().browserLanguageCode()).toBeNull();
     });
 
     it('returns an empty string when languages[0] is empty', function () {
       stubProperty(navigator, 'languages', ['']);
       stubProperty(navigator, 'language', 'en-US');
-      expect(utils.getBrowserLanguageCode()).toBe('');
+      expect(getEnv().browserLanguageCode()).toBe('');
     });
   });
 
   describe('getScreenHeight / getScreenWidth', function () {
     it('returns screen dimensions', function () {
       setScreen(390, 844);
-      expect(utils.getScreenWidth()).toBe(390);
-      expect(utils.getScreenHeight()).toBe(844);
+      expect(getEnv().screenWidth()).toBe(390);
+      expect(getEnv().screenHeight()).toBe(844);
     });
 
     it('returns 0 for falsy dimensions', function () {
       setScreen(undefined, null);
-      expect(utils.getScreenWidth()).toBe(0);
-      expect(utils.getScreenHeight()).toBe(0);
+      expect(getEnv().screenWidth()).toBe(0);
+      expect(getEnv().screenHeight()).toBe(0);
     });
   });
 
   describe('isIframe / isSameOriginFrame / isIframeAndFromSameOrigin', function () {
     it('isIframe is false when window.top is window', function () {
-      expect(utils.isIframe()).toBe(false);
+      expect(getEnv().isIframe()).toBe(false);
     });
 
     it('isIframe is true when window.top is a different window', function () {
       stubProperty(window, 'top', { location: { search: '' } });
-      expect(utils.isIframe()).toBe(true);
+      expect(getEnv().isIframe()).toBe(true);
     });
 
     it('isSameOriginFrame is true when top.location.search is empty', function () {
@@ -449,12 +460,12 @@ describe('platform utils (characterization)', function () {
     });
 
     it('isIframeAndFromSameOrigin is false when not in an iframe', function () {
-      expect(utils.isIframeAndFromSameOrigin()).toBe(false);
+      expect(isIframeAndFromSameOrigin()).toBe(false);
     });
 
     it('isIframeAndFromSameOrigin is true for a same-origin iframe', function () {
       stubProperty(window, 'top', { location: { search: '' } });
-      expect(utils.isIframeAndFromSameOrigin()).toBe(true);
+      expect(isIframeAndFromSameOrigin()).toBe(true);
     });
 
     it('isIframeAndFromSameOrigin is false for a cross-origin iframe', function () {
@@ -465,7 +476,7 @@ describe('platform utils (characterization)', function () {
         },
       });
       stubProperty(window, 'top', crossOriginTop);
-      expect(utils.isIframeAndFromSameOrigin()).toBe(false);
+      expect(isIframeAndFromSameOrigin()).toBe(false);
     });
 
     it('isIframeAndFromSameOrigin goes through env.isIframe / env.isSameOriginFrame', function () {
@@ -473,7 +484,7 @@ describe('platform utils (characterization)', function () {
       setEnv(
         makeFakeEnv({ isIframe: () => true, isSameOriginFrame: sameOrigin }),
       );
-      expect(utils.isIframeAndFromSameOrigin()).toBe(true);
+      expect(isIframeAndFromSameOrigin()).toBe(true);
       expect(sameOrigin).toHaveBeenCalledTimes(1);
     });
   });
@@ -498,29 +509,26 @@ describe('platform utils (characterization)', function () {
     ];
 
     it.each(cases)('%j -> %j', function (input, expected) {
-      expect(utils.removeTrailingDotZeros(input)).toBe(expected);
+      expect(removeTrailingDotZeros(input)).toBe(expected);
     });
 
     it('returns null / undefined unchanged', function () {
-      expect(utils.removeTrailingDotZeros(null)).toBeNull();
-      expect(utils.removeTrailingDotZeros(undefined)).toBeUndefined();
+      expect(removeTrailingDotZeros(null)).toBeNull();
+      expect(removeTrailingDotZeros(undefined)).toBeUndefined();
     });
   });
 
   describe('getClientHints', function () {
-    let originalUserAgentData;
+    let ctx;
     beforeEach(function () {
-      originalUserAgentData = utils.userAgentData;
-    });
-    afterEach(function () {
-      utils.userAgentData = originalUserAgentData;
+      ctx = createContext();
     });
 
-    it('sets utils.userAgentData to null when navigator.userAgentData is missing', function () {
+    it('sets ctx.userAgentData to null when navigator.userAgentData is missing', function () {
       stubProperty(navigator, 'userAgentData', undefined);
-      utils.userAgentData = { model: 'stale', platformVersion: '1' };
-      expect(utils.getClientHints()).toBeUndefined();
-      expect(utils.userAgentData).toBeNull();
+      ctx.userAgentData = { model: 'stale', platformVersion: '1' };
+      expect(getClientHints(ctx)).toBeUndefined();
+      expect(ctx.userAgentData).toBeNull();
     });
 
     it('requests model + platformVersion and stores them asynchronously', async function () {
@@ -532,19 +540,18 @@ describe('platform utils (characterization)', function () {
         });
       });
       stubProperty(navigator, 'userAgentData', { getHighEntropyValues });
-      utils.userAgentData = null;
 
-      utils.getClientHints();
+      getClientHints(ctx);
 
       expect(getHighEntropyValues).toHaveBeenCalledWith([
         'model',
         'platformVersion',
       ]);
       // Not set synchronously.
-      expect(utils.userAgentData).toBeNull();
+      expect(ctx.userAgentData).toBeNull();
       await Promise.resolve();
       await Promise.resolve();
-      expect(utils.userAgentData).toEqual({
+      expect(ctx.userAgentData).toEqual({
         model: 'Pixel 8',
         platformVersion: '14',
       });
@@ -556,10 +563,10 @@ describe('platform utils (characterization)', function () {
           return Promise.resolve({ model: '', platformVersion: '15.5.0' });
         },
       });
-      utils.getClientHints();
+      getClientHints(ctx);
       await Promise.resolve();
       await Promise.resolve();
-      expect(utils.userAgentData).toEqual({
+      expect(ctx.userAgentData).toEqual({
         model: '',
         platformVersion: '15.5.0',
       });
@@ -567,21 +574,19 @@ describe('platform utils (characterization)', function () {
   });
 
   describe('getUserData', function () {
-    let originalUserAgentData;
+    let ctx;
     beforeEach(function () {
-      originalUserAgentData = utils.userAgentData;
+      ctx = createContext();
       setUserAgent(UA.androidChrome);
       stubProperty(navigator, 'languages', ['en-US']);
       setScreen(412, 915);
       stubProperty(document, 'referrer', 'https://referrer.example.com/');
     });
-    afterEach(function () {
-      utils.userAgentData = originalUserAgentData;
-    });
 
     it('collects page, device, identity and sdk fields', function () {
-      utils.userAgentData = { model: 'Pixel 8', platformVersion: '14' };
-      const data = utils.getUserData({
+      ctx.userAgentData = { model: 'Pixel 8', platformVersion: '14' };
+      const data = getUserData({
+        _ctx: ctx,
         browser_fingerprint_id: '12345',
         identity: 'user-1',
       });
@@ -604,11 +609,10 @@ describe('platform utils (characterization)', function () {
     });
 
     it('omits null/undefined fields and model/os_version without client hints', function () {
-      utils.userAgentData = null;
       stubProperty(navigator, 'languages', undefined);
       stubProperty(navigator, 'language', undefined);
       setScreen(0, 0);
-      const data = utils.getUserData({});
+      const data = getUserData({ _ctx: ctx });
       expect(data).toEqual({
         http_origin: document.URL,
         user_agent: UA.androidChrome,
@@ -623,8 +627,11 @@ describe('platform utils (characterization)', function () {
 
     it('keeps an empty referrer and drops empty client-hint strings', function () {
       stubProperty(document, 'referrer', '');
-      utils.userAgentData = { model: '', platformVersion: '' };
-      const data = utils.getUserData({ browser_fingerprint_id: null });
+      ctx.userAgentData = { model: '', platformVersion: '' };
+      const data = getUserData({
+        _ctx: ctx,
+        browser_fingerprint_id: null,
+      });
       expect(data.http_referrer).toBe('');
       expect('browser_fingerprint_id' in data).toBe(false);
       expect('model' in data).toBe(false);
@@ -637,7 +644,7 @@ describe('platform utils (characterization)', function () {
       const el = document.createElement('div');
       const callback = vi.fn();
       const spy = vi.spyOn(el, 'addEventListener');
-      const ret = utils.addEvent(el, 'click', callback, true);
+      const ret = addEvent(el, 'click', callback, true);
       expect(spy).toHaveBeenCalledWith('click', callback, true);
       expect(ret).toBeUndefined();
       el.dispatchEvent(new Event('click'));
@@ -647,7 +654,7 @@ describe('platform utils (characterization)', function () {
     it('falls back to attachEvent with an "on" prefix and returns its result', function () {
       const callback = function () {};
       const el = { attachEvent: vi.fn().mockReturnValue(true) };
-      const ret = utils.addEvent(el, 'load', callback);
+      const ret = addEvent(el, 'load', callback);
       expect(el.attachEvent).toHaveBeenCalledWith('onload', callback);
       expect(ret).toBe(true);
     });
@@ -655,7 +662,7 @@ describe('platform utils (characterization)', function () {
     it('falls back to assigning el["on" + type] and returns 0', function () {
       const callback = function () {};
       const el = {};
-      const ret = utils.addEvent(el, 'scroll', callback);
+      const ret = addEvent(el, 'scroll', callback);
       expect(el.onscroll).toBe(callback);
       expect(ret).toBe(0);
     });
@@ -663,40 +670,9 @@ describe('platform utils (characterization)', function () {
     it('ignores non-function addEventListener / attachEvent properties', function () {
       const callback = function () {};
       const el = { addEventListener: 'nope', attachEvent: null };
-      const ret = utils.addEvent(el, 'resize', callback);
+      const ret = addEvent(el, 'resize', callback);
       expect(el.onresize).toBe(callback);
       expect(ret).toBe(0);
-    });
-  });
-
-  describe('addNonceAttribute', function () {
-    let originalNonce;
-    beforeEach(function () {
-      originalNonce = utils.nonce;
-    });
-    afterEach(function () {
-      utils.nonce = originalNonce;
-    });
-
-    it('does not set a nonce when utils.nonce is empty', function () {
-      utils.nonce = '';
-      const el = document.createElement('script');
-      utils.addNonceAttribute(el);
-      expect(el.hasAttribute('nonce')).toBe(false);
-    });
-
-    it('sets the nonce attribute from utils.nonce', function () {
-      utils.nonce = 'abc123';
-      const el = document.createElement('script');
-      utils.addNonceAttribute(el);
-      expect(el.getAttribute('nonce')).toBe('abc123');
-    });
-
-    it('sets "undefined" when utils.nonce is undefined (only "" is skipped)', function () {
-      utils.nonce = undefined;
-      const el = document.createElement('script');
-      utils.addNonceAttribute(el);
-      expect(el.getAttribute('nonce')).toBe('undefined');
     });
   });
 
@@ -706,13 +682,13 @@ describe('platform utils (characterization)', function () {
         timing: { navigationStart: 1000 },
       });
       vi.spyOn(Date, 'now').mockReturnValue(3500);
-      expect(utils.timeSinceNavigationStart()).toBe('2500');
+      expect(getEnv().timeSinceNavigationStart()).toBe('2500');
     });
 
     it('throws when performance.timing is unavailable', function () {
       stubProperty(window, 'performance', {});
       expect(function () {
-        utils.timeSinceNavigationStart();
+        getEnv().timeSinceNavigationStart();
       }).toThrow(TypeError);
     });
   });
@@ -720,12 +696,12 @@ describe('platform utils (characterization)', function () {
   describe('calculateBrtt', function () {
     it('returns Date.now() - startTime as a string', function () {
       vi.spyOn(Date, 'now').mockReturnValue(10000);
-      expect(utils.calculateBrtt(9750)).toBe('250');
+      expect(calculateBrtt(9750)).toBe('250');
     });
 
     it('can return a negative duration for a future start time', function () {
       vi.spyOn(Date, 'now').mockReturnValue(10000);
-      expect(utils.calculateBrtt(10500)).toBe('-500');
+      expect(calculateBrtt(10500)).toBe('-500');
     });
 
     it.each([
@@ -735,7 +711,7 @@ describe('platform utils (characterization)', function () {
       ['a numeric string', '9750'],
       ['an object', {}],
     ])('returns null for %s', function (_name, value) {
-      expect(utils.calculateBrtt(value)).toBeNull();
+      expect(calculateBrtt(value)).toBeNull();
     });
   });
 });

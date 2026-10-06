@@ -1,5 +1,6 @@
-import { utils } from '../core/utils.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
 import { session } from '../core/session.js';
+import { applyNonce } from '../core/context.js';
 
 export const banner_html = {};
 
@@ -124,19 +125,22 @@ banner_html.checkmark = function () {
 
 /**
  * @param {Object} options
+ * @param {string} action
+ * @param {(iframe: HTMLIFrameElement) => void} callback
+ * @param {import('../core/context.js').Context} ctx
  */
-banner_html.iframe = function (options, action, callback) {
+banner_html.iframe = function (options, action, callback, ctx) {
   const iframe = document.createElement('iframe');
   iframe.src = 'about:blank'; // solves CORS issues, test in IE
   iframe.style.overflow = 'hidden';
   iframe.scrolling = 'no';
   iframe.id = 'branch-banner-iframe';
   iframe.className = 'branch-animation';
-  utils.addNonceAttribute(iframe);
+  applyNonce(ctx, iframe);
 
   iframe.onload = function () {
     let bodyClass;
-    const userAgent = utils.getPlatformByUserAgent();
+    const userAgent = getPlatformByUserAgent();
     if (userAgent === 'ios' || userAgent === 'ipad') {
       bodyClass = 'branch-banner-ios';
     } else if (userAgent === 'android') {
@@ -175,15 +179,17 @@ banner_html.div = function (options, action, doc) {
 /**
  * @param {Object} options
  * @param {Object} storage
+ * @param {(markup: any) => void} callback
+ * @param {import('../core/context.js').Context} ctx
  */
-banner_html.markup = function (options, storage, callback) {
+banner_html.markup = function (options, storage, callback, ctx) {
   const action =
     '<div id="branch-banner-form-container">' +
     banner_html.mobileAction(options, storage) +
     '</div>';
 
   if (options.iframe) {
-    banner_html.iframe(options, action, callback);
+    banner_html.iframe(options, action, callback, ctx);
   } else {
     const markup_div = banner_html.div(options, action, document);
     callback(markup_div);

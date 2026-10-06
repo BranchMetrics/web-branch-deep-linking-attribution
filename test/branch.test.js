@@ -2,11 +2,12 @@ import { banner_html } from '../src/banner/banner_html.js';
 import { banner_utils } from '../src/banner/banner_utils.js';
 import { Branch } from '../src/branch.js';
 import { config } from '../src/core/config.js';
+import { getPlatformByUserAgent } from '../src/core/platform.js';
 import { safejson } from '../src/core/safejson.js';
 import { session } from '../src/core/session.js';
 import { storage as branchStorage } from '../src/core/storage.js';
-import { utils } from '../src/core/utils.js';
 import { getEnv, setEnv } from '../src/env/env.js';
+import { formatMessage, messages } from '../src/lib/messages.js';
 import { makeFakeEnv, UA_FOR_PLATFORM } from './helpers/fake-env.js';
 
 /*globals branch_sample_key, session_id, identity_id, browser_fingerprint_id */
@@ -88,11 +89,6 @@ describe('Branch', function () {
       testUtils.withDone(function (done) {
         const branch = initBranch(false);
         const assert = testUtils.plan(7, done);
-        vi.spyOn(utils, 'whiteListSessionData').mockImplementation(
-          function (data) {
-            return data;
-          },
-        );
         const expectedResponse = {
           'session_id': '113636235674656786',
           'identity_id': '98807509250212101',
@@ -100,11 +96,17 @@ describe('Branch', function () {
           'has_app': true,
           'referring_link': null,
         };
-        // init() adds data_parsed to the response it hands to the callback.
-        const expectedCallbackResponse = utils.merge(
-          { 'data_parsed': {} },
-          expectedResponse,
-        );
+        // init() adds data_parsed, then hands the callback the whitelisted
+        // session fields only (session_id and identity_id are dropped).
+        const expectedCallbackResponse = {
+          'data': '',
+          'data_parsed': {},
+          'has_app': true,
+          'identity': 'Branch',
+          'developer_identity': 'Branch',
+          'referring_identity': null,
+          'referring_link': null,
+        };
 
         branch.init(branch_sample_key, function (err, res) {
           assert.deepEqual(
@@ -148,9 +150,9 @@ describe('Branch', function () {
             'alternative_browser_fingerprint_id': undefined,
             'sdk': 'web' + config.version,
             'options': {},
-            'current_url': utils.getCurrentUrl(),
-            'screen_height': utils.getScreenHeight(),
-            'screen_width': utils.getScreenWidth(),
+            'current_url': getEnv().currentUrl(),
+            'screen_height': getEnv().screenHeight(),
+            'screen_width': getEnv().screenWidth(),
             'identity': null,
             'model': null,
             'os_version': null,
@@ -168,11 +170,6 @@ describe('Branch', function () {
       testUtils.withDone(function (done) {
         const branch = initBranch(false);
         const assert = testUtils.plan(7, done);
-        vi.spyOn(utils, 'whiteListSessionData').mockImplementation(
-          function (data) {
-            return data;
-          },
-        );
         const expectedResponse = {
           'session_id': '113636235674656786',
           'identity_id': '98807509250212101',
@@ -181,15 +178,15 @@ describe('Branch', function () {
           'referring_link': '/c/ngJf86-h',
         };
         // init() expands the relative referring_link against the link service
-        // endpoint and adds click_id and data_parsed before invoking the callback.
+        // endpoint, and the whitelist passes it through to the callback.
         const expectedCallbackResponse = {
-          'session_id': '113636235674656786',
-          'identity_id': '98807509250212101',
-          'identity': 'Branch',
-          'has_app': true,
-          'referring_link': config.link_service_endpoint + '/c/ngJf86-h',
-          'click_id': 'ngJf86-h',
+          'data': '',
           'data_parsed': {},
+          'has_app': true,
+          'identity': 'Branch',
+          'developer_identity': 'Branch',
+          'referring_identity': null,
+          'referring_link': config.link_service_endpoint + '/c/ngJf86-h',
         };
 
         branch.init(branch_sample_key, function (err, res) {
@@ -234,9 +231,9 @@ describe('Branch', function () {
             'alternative_browser_fingerprint_id': undefined,
             'sdk': 'web' + config.version,
             'options': {},
-            'current_url': utils.getCurrentUrl(),
-            'screen_height': utils.getScreenHeight(),
-            'screen_width': utils.getScreenWidth(),
+            'current_url': getEnv().currentUrl(),
+            'screen_height': getEnv().screenHeight(),
+            'screen_width': getEnv().screenWidth(),
             'identity': null,
             'model': null,
             'os_version': null,
@@ -310,7 +307,7 @@ describe('Branch', function () {
               'hash session_id stored in local storage',
             );
             assert.strictEqual(
-              utils.getPlatformByUserAgent()
+              getPlatformByUserAgent()
                 ? '12345'
                 : JSON.parse(sessionStorage.getItem('branch_session')).click_id,
               '12345',
@@ -335,9 +332,9 @@ describe('Branch', function () {
               'alternative_browser_fingerprint_id': undefined,
               'sdk': 'web' + config.version,
               'options': {},
-              'current_url': utils.getCurrentUrl(),
-              'screen_height': utils.getScreenHeight(),
-              'screen_width': utils.getScreenWidth(),
+              'current_url': getEnv().currentUrl(),
+              'screen_height': getEnv().screenHeight(),
+              'screen_width': getEnv().screenWidth(),
               'identity': null,
               'model': null,
               'os_version': null,
@@ -365,7 +362,7 @@ describe('Branch', function () {
               'get param match id stored in local storage',
             );
             assert.strictEqual(
-              utils.getPlatformByUserAgent()
+              getPlatformByUserAgent()
                 ? '67890'
                 : JSON.parse(sessionStorage.getItem('branch_session')).click_id,
               '67890',
@@ -390,9 +387,9 @@ describe('Branch', function () {
               'alternative_browser_fingerprint_id': undefined,
               'sdk': 'web' + config.version,
               'options': {},
-              'current_url': utils.getCurrentUrl(),
-              'screen_height': utils.getScreenHeight(),
-              'screen_width': utils.getScreenWidth(),
+              'current_url': getEnv().currentUrl(),
+              'screen_height': getEnv().screenHeight(),
+              'screen_width': getEnv().screenWidth(),
               'identity': null,
               'model': null,
               'os_version': null,
@@ -562,9 +559,9 @@ describe('Branch', function () {
             'alternative_browser_fingerprint_id': undefined,
             'sdk': 'web' + config.version,
             'options': {},
-            'current_url': utils.getCurrentUrl(),
-            'screen_height': utils.getScreenHeight(),
-            'screen_width': utils.getScreenWidth(),
+            'current_url': getEnv().currentUrl(),
+            'screen_height': getEnv().screenHeight(),
+            'screen_width': getEnv().screenWidth(),
             'identity': null,
             'model': null,
             'os_version': null,
@@ -629,18 +626,25 @@ describe('Branch', function () {
           'has_app': false,
           'referring_link': '/c/ngJf86-h',
         };
-        vi.spyOn(utils, 'whiteListSessionData').mockImplementation(
-          function (data) {
-            return data;
-          },
-        );
         vi.spyOn(session, 'get').mockImplementation(function (_storage) {
           return whitelistedData;
         });
 
         branch.data(function (err, res) {
           assert.strictEqual(err, null, 'No error');
-          assert.deepEqual(res, whitelistedData, 'whitelisted data returned');
+          assert.deepEqual(
+            res,
+            {
+              'data': data,
+              'data_parsed': { 'key_1': 'value_1' },
+              'has_app': false,
+              'identity': 'identity',
+              'developer_identity': 'identity',
+              'referring_identity': 'referring_user',
+              'referring_link': '/c/ngJf86-h',
+            },
+            'whitelisted data returned',
+          );
         });
       }),
     );
@@ -694,7 +698,7 @@ describe('Branch', function () {
         branch.setIdentity(null, function (err, _res) {
           assert.strictEqual(
             err.message,
-            utils.message(utils.messages.missingIdentity),
+            formatMessage(messages.missingIdentity),
             'error matched for missing identity',
           );
         });

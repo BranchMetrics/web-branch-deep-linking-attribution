@@ -1,7 +1,7 @@
+import { createContext } from '../../src/core/context.js';
 import { session } from '../../src/core/session.js';
 import { storage as storageModule } from '../../src/core/storage.js';
-import { utils } from '../../src/core/utils.js';
-import { getEnv, setEnv } from '../../src/env/env.js';
+import { setEnv } from '../../src/env/env.js';
 import { branch_view } from '../../src/journeys/branch_view.js';
 import { journeys_utils } from '../../src/journeys/journeys_utils.js';
 import { makeFakeEnv, UA_FOR_PLATFORM } from '../helpers/fake-env.js';
@@ -10,7 +10,7 @@ describe('displayJourney new render options wiring', function () {
   const assert = testUtils.unplanned();
 
   beforeEach(function () {
-    journeys_utils.branch = { _storage: {} };
+    journeys_utils.branch = { _storage: {}, _ctx: createContext() };
     journeys_utils.use_v2_renderer = false;
     journeys_utils.exitAnimationIsRunning = false;
   });
@@ -56,8 +56,6 @@ describe('displayJourney new render options wiring', function () {
 
 // Pristine copies of the module state the code under test mutates.
 const journeysUtilsSnapshot = Object.assign({}, journeys_utils);
-const utilsInstrumentationSnapshot = Object.assign({}, utils.instrumentation);
-const utilsNavigationTimingSnapshot = utils.navigationTimingAPIEnabled;
 const branchViewKeysSnapshot = Object.keys(branch_view);
 
 const JOURNEY_ELEMENT_IDS = [
@@ -88,12 +86,6 @@ function restoreModuleState() {
   Object.assign(journeys_utils, journeysUtilsSnapshot);
   journeys_utils.divToInjectParents = [];
 
-  Object.keys(utils.instrumentation).forEach(function (key) {
-    delete utils.instrumentation[key];
-  });
-  Object.assign(utils.instrumentation, utilsInstrumentationSnapshot);
-  utils.navigationTimingAPIEnabled = utilsNavigationTimingSnapshot;
-
   Object.keys(branch_view).forEach(function (key) {
     if (!branchViewKeysSnapshot.includes(key)) {
       delete branch_view[key];
@@ -104,6 +96,7 @@ function restoreModuleState() {
 function makeJourneyBranch(store, overrides) {
   return Object.assign(
     {
+      _ctx: createContext(),
       _storage: store,
       _publishEvent: vi.fn(),
       _branchViewData: {},
@@ -327,8 +320,8 @@ describe('branch_view.displayJourney', function () {
     );
   }
 
-  function display(html, requestData, journeyLinkData, testMode) {
-    branch_view.displayJourney(
+  function display(html, requestData, journeyLinkData, testMode, view) {
+    (view || branch_view).displayJourney(
       html,
       Object.assign(
         {
@@ -345,6 +338,46 @@ describe('branch_view.displayJourney', function () {
     );
   }
 
+  // The navigation timing flag is read once, when src/env/env.ts loads. Load
+  // fresh copies of env, branch_view and journeys_utils with
+  // window.performance.timing stubbed, wire them up like beforeEach does, and
+  // return the fresh branch_view. The registry is reset again afterwards, and
+  // the file's own (static) imports are untouched, so nothing leaks into later
+  // tests.
+  async function loadBranchViewWithTiming(timing) {
+    Object.defineProperty(window.performance, 'timing', {
+      value: timing,
+      configurable: true,
+    });
+    vi.resetModules();
+    let fresh;
+    try {
+      fresh = {
+        env: await import('../../src/env/env.js'),
+        branch_view: (await import('../../src/journeys/branch_view.js'))
+          .branch_view,
+        journeys_utils: (await import('../../src/journeys/journeys_utils.js'))
+          .journeys_utils,
+      };
+    } finally {
+      delete window.performance.timing;
+      vi.resetModules();
+    }
+    fresh.env.setEnv(
+      makeFakeEnv({
+        userAgent: () => UA_FOR_PLATFORM.ios,
+        timeSinceNavigationStart: () => '1234',
+      }),
+    );
+    fresh.journeys_utils.branch = branch;
+    Object.keys(spies).forEach(function (name) {
+      spies[name] = vi
+        .spyOn(fresh.journeys_utils, name)
+        .mockImplementation(function () {});
+    });
+    return fresh;
+  }
+
   function waitForIframeLoad() {
     return vi.waitFor(function () {
       expect(spies.animateBannerEntrance).toHaveBeenCalled();
@@ -357,8 +390,8 @@ describe('branch_view.displayJourney', function () {
     store = new storageModule.BranchStorage(['local']);
     branch = makeJourneyBranch(store);
     journeys_utils.branch = branch;
+    // The fake env reports the navigation timing API as unavailable.
     setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.ios }));
-    utils.navigationTimingAPIEnabled = false;
     // The iframe rendering helpers are covered in journeys_utils tests; stub
     // them so these tests see only what branch_view passes along.
     spies = {};
@@ -592,19 +625,25 @@ describe('branch_view.displayJourney', function () {
   });
 
   it('records journey-load-time when the navigation timing API is enabled', async function () {
-    utils.navigationTimingAPIEnabled = true;
-    setEnv(
-      makeFakeEnv({ ...getEnv(), timeSinceNavigationStart: () => '1234' }),
-    );
-    display(journeyHtml(METADATA));
-    await waitForIframeLoad();
-    expect(utils.instrumentation['journey-load-time']).toBe('1234');
+    const fresh = await loadBranchViewWithTiming({ navigationStart: 1 });
+    try {
+      display(journeyHtml(METADATA), {}, undefined, false, fresh.branch_view);
+      await waitForIframeLoad();
+      expect(branch._ctx.instrumentation['journey-load-time']).toBe('1234');
+    } finally {
+      fresh.env.setEnv(null);
+    }
   });
 
   it('does not record journey-load-time when the navigation timing API is disabled', async function () {
-    display(journeyHtml(METADATA));
-    await waitForIframeLoad();
-    expect(utils.instrumentation['journey-load-time']).toBeUndefined();
+    const fresh = await loadBranchViewWithTiming(undefined);
+    try {
+      display(journeyHtml(METADATA), {}, undefined, false, fresh.branch_view);
+      await waitForIframeLoad();
+      expect(branch._ctx.instrumentation['journey-load-time']).toBeUndefined();
+    } finally {
+      fresh.env.setEnv(null);
+    }
   });
 
   describe('JSONP callback (window[callback_string])', function () {
@@ -635,16 +674,16 @@ describe('branch_view.displayJourney', function () {
       await waitForIframeLoad();
       const callback = window.branch_view_callback__test;
       callback({});
-      vi.advanceTimersByTime(utils.timeout);
+      vi.advanceTimersByTime(branch._ctx.timeout);
       expect(window.branch_view_callback__test).toBe(callback);
     });
 
-    it('is replaced by a no-op after utils.timeout', async function () {
+    it('is replaced by a no-op after ctx.timeout', async function () {
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
       display(journeyHtml(METADATA));
       await waitForIframeLoad();
       const callback = window.branch_view_callback__test;
-      vi.advanceTimersByTime(utils.timeout);
+      vi.advanceTimersByTime(branch._ctx.timeout);
       expect(window.branch_view_callback__test).not.toBe(callback);
       spies.finalHookups.mockClear();
       window.branch_view_callback__test({});

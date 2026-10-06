@@ -1,8 +1,12 @@
 import { Branch, wrap, callback_params } from './core.js';
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { whiteListSessionData } from '../lib/session_data.js';
+import { getUserData } from '../core/platform.js';
+import { addPropertyIfNotNull, validateParameterType } from '../lib/objects.js';
 import { resources } from '../network/resources.js';
 import { session } from '../core/session.js';
+import { log } from '../core/context.js';
+import { formatMessage, messages } from '../lib/messages.js';
 
 /**
  * @function Branch.data
@@ -20,7 +24,7 @@ import { session } from '../core/session.js';
 Branch.prototype.data = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
-    const data = utils.whiteListSessionData(session.get(this._storage));
+    const data = whiteListSessionData(session.get(this._storage));
     data.referring_link = this._referringLink();
     data.data_parsed =
       data.data && data.data.length !== 0 ? safejson.parse(data.data) : {};
@@ -46,7 +50,7 @@ Branch.prototype.data = wrap(
 Branch.prototype.first = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done) {
-    done(null, utils.whiteListSessionData(session.get(this._storage, true)));
+    done(null, whiteListSessionData(session.get(this._storage, true)));
   },
 );
 
@@ -101,7 +105,9 @@ Branch.prototype.setIdentity = wrap(
       session.patch(self._storage, { 'identity': identity }, true);
       done(null, data);
     } else {
-      done(new Error(utils.message(utils.messages.missingIdentity)));
+      const msg = formatMessage(messages.missingIdentity);
+      log(self._ctx, msg);
+      done(new Error(msg));
     }
   },
 );
@@ -176,7 +182,7 @@ Branch.prototype.crossPlatformIds = wrap(
     this._api(
       resources.crossPlatformIds,
       {
-        'user_data': safejson.stringify(utils.getUserData(this)),
+        'user_data': safejson.stringify(getUserData(this)),
       },
       function (err, data) {
         return done(err || null, data?.user_data || null);
@@ -205,18 +211,11 @@ Branch.prototype.crossPlatformIds = wrap(
 Branch.prototype.lastAttributedTouchData = wrap(
   callback_params.CALLBACK_ERR_DATA,
   function (done, attribution_window: number) {
-    attribution_window = utils.validateParameterType(
-      attribution_window,
-      'number',
-    )
+    attribution_window = validateParameterType(attribution_window, 'number')
       ? attribution_window
       : null;
-    const userData = utils.getUserData(this);
-    utils.addPropertyIfNotNull(
-      userData,
-      'attribution_window',
-      attribution_window,
-    );
+    const userData = getUserData(this);
+    addPropertyIfNotNull(userData, 'attribution_window', attribution_window);
     this._api(
       resources.lastAttributedTouchData,
       {

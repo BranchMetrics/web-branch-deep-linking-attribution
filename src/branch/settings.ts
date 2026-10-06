@@ -1,7 +1,9 @@
 import { Branch, wrap, callback_params } from './core.js';
 import { config } from '../core/config.js';
 import { safejson } from '../core/safejson.js';
-import { utils } from '../core/utils.js';
+import { addPropertyIfNotNull, isBoolean } from '../lib/objects.js';
+import { isValidURL } from '../lib/url.js';
+import { session } from '../core/session.js';
 
 /**
  * @function Branch.disableTracking
@@ -27,8 +29,8 @@ Branch.prototype.disableTracking = wrap(
   callback_params.CALLBACK_ERR,
   function (done, disableTracking?: boolean | string) {
     if (disableTracking === false || disableTracking === 'false') {
-      utils.userPreferences.trackingDisabled = false;
-      utils.userPreferences.allowErrorsInCallback = false;
+      this._ctx.userPreferences.trackingDisabled = false;
+      this._ctx.userPreferences.allowErrorsInCallback = false;
       if (this.branch_key && this.init_options) {
         if (this.init_options.tracking_disabled === true) {
           delete this.init_options.tracking_disabled;
@@ -40,9 +42,9 @@ Branch.prototype.disableTracking = wrap(
       disableTracking === true ||
       disableTracking === 'true'
     ) {
-      utils.cleanApplicationAndSessionStorage(this);
-      utils.userPreferences.trackingDisabled = true;
-      utils.userPreferences.allowErrorsInCallback = true;
+      session.cleanApplicationAndSessionStorage(this);
+      this._ctx.userPreferences.trackingDisabled = true;
+      this._ctx.userPreferences.allowErrorsInCallback = true;
       this.closeBanner();
       this.closeJourney();
       // Branch will not re-initialize
@@ -78,7 +80,7 @@ Branch.prototype.setDMAParamsForEEA = wrap(
   ) {
     try {
       const validateParam = (param, paramName) => {
-        if (!utils.isBoolean(param)) {
+        if (!isBoolean(param)) {
           console.warn(
             `setDMAParamsForEEA: ${paramName} must be boolean, but got ${param}`,
           );
@@ -137,7 +139,7 @@ Branch.prototype.setRequestMetaData = function (key: string, value: string) {
       delete this.requestMetadata[key];
     }
 
-    this.requestMetadata = utils.addPropertyIfNotNull(
+    this.requestMetadata = addPropertyIfNotNull(
       this.requestMetadata,
       key,
       value,
@@ -153,7 +155,7 @@ Branch.prototype.setRequestMetaData = function (key: string, value: string) {
  * Sets a custom base URL for all calls to the Branch API
  */
 Branch.prototype.setAPIUrl = function (url: string) {
-  if (!utils.isValidURL(url)) {
+  if (!isValidURL(url)) {
     console.error('setAPIUrl: Invalid URL format. Default URL will be set.');
     return;
   }

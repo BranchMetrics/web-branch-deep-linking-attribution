@@ -1,5 +1,6 @@
-import { utils } from '../core/utils.js';
+import { getPlatformByUserAgent } from '../core/platform.js';
 import { banner_utils } from './banner_utils.js';
+import { applyNonce } from '../core/context.js';
 
 export const banner_css = {};
 
@@ -174,13 +175,14 @@ banner_css.iframe_position = function (sticky, position) {
 /**
  * @param {Object} options
  * @param {Object} element
+ * @param {import('../core/context.js').Context} ctx
  */
-banner_css.css = function (options, element) {
+banner_css.css = function (options, element, ctx) {
   // Construct Banner CSS
   let style = banner_css.banner(options);
 
   // User agent specific styles
-  const userAgent = utils.getPlatformByUserAgent();
+  const userAgent = getPlatformByUserAgent();
   if ((userAgent === 'ios' || userAgent === 'ipad') && options.showiOS) {
     style += banner_css.mobile + banner_css.ios;
   } else if (userAgent === 'android' && options.showAndroid) {
@@ -200,7 +202,7 @@ banner_css.css = function (options, element) {
     const iFrameCSS = document.createElement('style');
     iFrameCSS.type = 'text/css';
     iFrameCSS.id = 'branch-iframe-css';
-    utils.addNonceAttribute(iFrameCSS);
+    applyNonce(ctx, iFrameCSS);
     iFrameCSS.innerHTML =
       banner_css.iframe +
       banner_css.iframe_position(options.mobileSticky, options.position);
@@ -213,7 +215,7 @@ banner_css.css = function (options, element) {
   css.type = 'text/css';
   css.id = 'branch-css';
   css.innerHTML = style;
-  utils.addNonceAttribute(css);
+  applyNonce(ctx, css);
 
   const doc = options.iframe ? element.contentWindow.document : document;
   const controlledHead = doc.head || doc.getElementsByTagName('head')[0];

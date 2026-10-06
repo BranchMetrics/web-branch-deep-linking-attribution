@@ -1,8 +1,7 @@
 import { safejson } from './safejson.js';
-import { utils } from './state.js';
 import { decodeBFPs, encodeBFPs } from '../lib/encoding.js';
 import { merge as mergeObjects } from '../lib/objects.js';
-// Not referenced here: loads storage before session and utils, keeping the
+// Not referenced here: loads storage before session, keeping the
 // module order in build.min.js.
 import './storage.js';
 
@@ -32,11 +31,11 @@ session.set = function (storage, data, first) {
   if (
     first &&
     data.referring_link &&
-    utils.userPreferences.enableExtendedJourneysAssist
+    storage.ctx.userPreferences.enableExtendedJourneysAssist
   ) {
     const now = new Date();
     data.referringLinkExpiry =
-      now.getTime() + utils.extendedJourneysAssistExpiryTime;
+      now.getTime() + storage.ctx.extendedJourneysAssistExpiryTime;
   }
   data = encodeBFPs(data);
   storage.set('branch_session', safejson.serialize(data));
@@ -83,4 +82,29 @@ session.patch = function (storage, data, updateLocalStorage, removeNull) {
       true,
     );
   }
+};
+
+// Removes PII when a user disables tracking
+session.cleanApplicationAndSessionStorage = function (branch) {
+  if (branch) {
+    // clears PII from global Branch object
+    branch.device_fingerprint_id = null;
+    branch.sessionLink = null;
+    branch.session_id = null;
+    branch.identity_id = null;
+    branch.identity = null;
+    branch.browser_fingerprint_id = null;
+
+    if (branch._deepviewCta) {
+      delete branch._deepviewCta;
+    }
+    if (branch._deepviewRequestForReplay) {
+      delete branch._deepviewRequestForReplay;
+    }
+    branch._storage.remove('branch_view_enabled');
+    const data = {};
+    // Sets an empty object for branch_session and branch_session_first in local/sessionStorage
+    session.set(branch._storage, data, true);
+  }
+  // a user will need to explicitly opt out from _s cookie
 };
