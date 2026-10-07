@@ -48,8 +48,6 @@ export function buildDismissRequestData(args: {
   return requestData;
 }
 
-// The response body is ignored: node-api's /v1/dismiss always answers 200 {}
-// since it stopped returning follow-up journeys (branch-backend #7501).
 export function sendDismiss(args: {
   branch: any;
   requestData: Record<string, any>;

@@ -1964,8 +1964,6 @@ describe('journeys_utils characterization: _handleJourneyDismiss', function () {
     expect(branchView.displayJourney).not.toHaveBeenCalled();
   });
 
-  // node-api stopped returning follow-up journeys from /v1/dismiss
-  // (branch-backend #7501), so a template in the response is ignored.
   it('does not display a journey from the dismiss response', function () {
     dismiss({}, false);
     const call = runDismissListener();
