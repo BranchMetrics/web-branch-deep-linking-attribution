@@ -14,9 +14,6 @@ banner_utils.animationDelay = 20;
 // Height of banner.
 banner_utils.bannerHeight = '76px';
 
-// How long to show red error state
-banner_utils.error_timeout = 2000;
-
 /**
  * @param {Object} element
  */

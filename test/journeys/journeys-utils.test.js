@@ -1,5 +1,5 @@
 import { createContext } from '../../src/core/context.js';
-import { getEnv, setEnv } from '../../src/env/env.js';
+import { setEnv } from '../../src/env/env.js';
 import { journeys_utils } from '../../src/journeys/journeys-utils.js';
 import { makeFakeEnv, useFakeEnv } from '../helpers/fake-env.js';
 
@@ -1204,7 +1204,7 @@ describe('journeys_utils characterization: addIframeInnerCSS', function () {
   });
 });
 
-describe('journeys_utils characterization: addDynamicCtaText and centerOverlay', function () {
+describe('journeys_utils characterization: addDynamicCtaText', function () {
   isolateJourneysState();
 
   it('addDynamicCtaText sets innerHTML and aria-label of #branch-mobile-action', function () {
@@ -1226,22 +1226,6 @@ describe('journeys_utils characterization: addDynamicCtaText and centerOverlay',
     expect(iframe.contentWindow.document.body.innerHTML).toBe(
       '<div id="other">same</div>',
     );
-  });
-
-  it('centerOverlay styles the banner as a floating card', function () {
-    const el = document.createElement('div');
-    journeys_utils.centerOverlay(el);
-    expect(el.style.bottom).toBe('140px');
-    expect(el.style.width).toBe('94%');
-    expect(el.style.borderRadius).toBe('20px');
-    expect(el.style.margin).toBe('auto');
-  });
-
-  it('centerOverlay ignores null and style-less inputs', function () {
-    expect(function () {
-      journeys_utils.centerOverlay(null);
-      journeys_utils.centerOverlay({});
-    }).not.toThrow();
   });
 });
 
@@ -1299,16 +1283,6 @@ describe('journeys_utils characterization: animation helpers', function () {
       journeys_utils.attachAnimation(null, false);
       journeys_utils.detachAnimation(null, false);
     }).not.toThrow();
-  });
-
-  it('_timeValueMsAt parses s and ms tokens by index', function () {
-    expect(journeys_utils._timeValueMsAt('0.25s', 0)).toBe(250);
-    expect(journeys_utils._timeValueMsAt('250ms', 0)).toBe(250);
-    expect(journeys_utils._timeValueMsAt('slide 0.4s ease 0.3s', 1)).toBe(300);
-    expect(journeys_utils._timeValueMsAt('-1s', 0)).toBe(-1000);
-    expect(journeys_utils._timeValueMsAt('0.4s', 1)).toBeNull();
-    expect(journeys_utils._timeValueMsAt('', 0)).toBeNull();
-    expect(journeys_utils._timeValueMsAt(undefined, 0)).toBeNull();
   });
 
   it('_getAnimationDurationMs is 0 when no animation is applied', function () {
@@ -1723,10 +1697,6 @@ describe('journeys_utils characterization: dismiss period and storage', function
     vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
   });
 
-  it('_addSecondsToDate returns a ms timestamp seconds from now', function () {
-    expect(journeys_utils._addSecondsToDate(60)).toBe(Date.now() + 60000);
-  });
-
   it('_findGlobalDismissPeriod maps -1 to true, numbers to a timestamp, others to undefined', function () {
     expect(
       journeys_utils._findGlobalDismissPeriod({ globalDismissPeriod: -1 }),
@@ -1994,56 +1964,14 @@ describe('journeys_utils characterization: _handleJourneyDismiss', function () {
     expect(branchView.displayJourney).not.toHaveBeenCalled();
   });
 
-  it('displays the follow-up journey from the dismiss response when allowed', function () {
+  it('does not display a journey from the dismiss response', function () {
     dismiss({}, false);
     const call = runDismissListener();
-    const data = {
+    call[2](null, {
       template: '<div>next</div>',
       event_data: { branch_view_data: { id: 'bv2' } },
-      journey_link_data: { j: 1 },
-      use_v2_renderer: true,
-      animationConfig: { surface: 'CONTENT' },
-    };
-    call[2](null, data);
-    expect(branchView.shouldDisplayJourney).toHaveBeenCalledWith(
-      data,
-      null,
-      false,
-    );
-    expect(branchView.displayJourney).toHaveBeenCalledWith(
-      '<div>next</div>',
-      call[1],
-      'bv2',
-      data.event_data.branch_view_data,
-      false,
-      { j: 1 },
-      { use_v2_renderer: true, animationConfig: { surface: 'CONTENT' } },
-    );
-  });
-
-  it('prefers requestData.branch_view_id over the response id', function () {
-    branchView._getPageviewRequestData = vi.fn(function () {
-      return { branch_view_id: 'fromRequest' };
     });
-    dismiss({}, false);
-    const call = runDismissListener();
-    call[2](null, {
-      template: 'x',
-      event_data: { branch_view_data: { id: 'bv2' } },
-    });
-    expect(branchView.displayJourney.mock.calls[0][2]).toBe('fromRequest');
-  });
-
-  it('does not display the follow-up journey when shouldDisplayJourney is false or no template', function () {
-    branchView.shouldDisplayJourney.mockReturnValue(false);
-    dismiss({}, false);
-    const call = runDismissListener();
-    call[2](null, {
-      template: 'x',
-      event_data: { branch_view_data: { id: 'bv2' } },
-    });
-    call[2](null, {});
-    call[2](null, 'not an object');
+    expect(branchView.shouldDisplayJourney).not.toHaveBeenCalled();
     expect(branchView.displayJourney).not.toHaveBeenCalled();
   });
 });
@@ -2061,32 +1989,6 @@ describe('journeys_utils characterization: dismiss request data', function () {
         return { metadata: metadata };
       }),
     };
-  });
-
-  it('_getPageviewMetadata builds url/ua/screen data and merges extra metadata', function () {
-    const result = journeys_utils._getPageviewMetadata(
-      { url: 'https://example.com/x' },
-      { extra: 1 },
-      createContext(),
-    );
-    expect(result).toEqual({
-      url: 'https://example.com/x',
-      user_agent: navigator.userAgent,
-      language: navigator.language,
-      screen_width: screen.width || -1,
-      screen_height: screen.height || -1,
-      window_device_pixel_ratio: window.devicePixelRatio || 1,
-      extra: 1,
-    });
-  });
-
-  it('_getPageviewMetadata defaults url to the window location and adds userAgentData', function () {
-    const ctx = createContext();
-    ctx.userAgentData = { model: 'Pixel 9', platformVersion: '15' };
-    const result = journeys_utils._getPageviewMetadata(null, null, ctx);
-    expect(result.url).toBe(getEnv().windowLocation());
-    expect(result.model).toBe('Pixel 9');
-    expect(result.os_version).toBe('15');
   });
 
   it('_getDismissRequestData without journey_link_data only adds the dismissal source', function () {
@@ -2145,31 +2047,6 @@ describe('journeys_utils characterization: dismiss request data', function () {
     expect('journey_id' in result).toBe(false);
     expect('journey_name' in result).toBe(false);
   });
-
-  it('decodeSymbols returns null for null/undefined and decodes known entities', function () {
-    expect(journeys_utils.decodeSymbols(undefined)).toBeNull();
-    expect(journeys_utils.decodeSymbols(null)).toBeNull();
-    expect(
-      journeys_utils.decodeSymbols(
-        '&lt;&gt;&amp;&quot;&apos;&brvbar;&laquo;&acute;&middot;&raquo;&iquest;&times;&divide;',
-      ),
-    ).toBe('<>&"\'¦«´·»¿×÷');
-    expect(
-      journeys_utils.decodeSymbols(
-        '&Agrave;&AElig;&Ntilde;&szlig;&eacute;&yuml;',
-      ),
-    ).toBe('ÀÆÑßéÿ');
-    expect(journeys_utils.decodeSymbols('&unknown;')).toBe('&unknown;');
-  });
-
-  it('decodeSymbols double-decodes escaped entities', function () {
-    // NOTE: possible bug: &amp; is decoded before most entities (and twice), so
-    // literal text like "&amp;quot;" or "&amp;amp;" is decoded two levels deep.
-    expect(journeys_utils.decodeSymbols('&amp;quot;')).toBe('"');
-    expect(journeys_utils.decodeSymbols('&amp;amp;')).toBe('&');
-    // but &lt; runs before &amp;, so this one is only decoded once
-    expect(journeys_utils.decodeSymbols('&amp;lt;')).toBe('&lt;');
-  });
 });
 
 describe('journeys_utils characterization: setJourneyLinkData', function () {
@@ -2197,7 +2074,6 @@ describe('journeys_utils characterization: setJourneyLinkData', function () {
         journey_id: 'j1',
       },
     });
-    expect(journeys_utils.journeyType).toBe('desktop');
     expect(journeys_utils.isDesktopJourney).toBe(true);
     expect(journeys_utils.journeyVariant).toBe('overlay');
     // NOTE: possible bug: the caller's object is mutated (filtered keys deleted).
@@ -2210,11 +2086,24 @@ describe('journeys_utils characterization: setJourneyLinkData', function () {
     expect(journeys_utils.journeyLinkData.journey_link_data).not.toBe(linkData);
   });
 
-  it('defaults journeyType and journeyVariant to null for mobile journeys', function () {
+  it('defaults isDesktopJourney to false and journeyVariant to null for mobile journeys', function () {
     journeys_utils.setJourneyLinkData({ journey_id: 'j1' });
-    expect(journeys_utils.journeyType).toBeNull();
     expect(journeys_utils.isDesktopJourney).toBe(false);
     expect(journeys_utils.journeyVariant).toBeNull();
+  });
+
+  it('keeps an empty journey_link_data when every key is filtered out', function () {
+    journeys_utils.branchViewId = 'v7';
+    const linkData = { app_id: 'app', source: 'web', link_click_id: 'lc' };
+    journeys_utils.setJourneyLinkData(linkData);
+
+    expect(journeys_utils.journeyLinkData).toEqual({
+      banner_id: 'v7',
+      journey_link_data: {},
+    });
+    expect(journeys_utils.isDesktopJourney).toBe(false);
+    expect(journeys_utils.journeyVariant).toBeNull();
+    expect(linkData).toEqual({});
   });
 
   it('throws for empty or missing link data after setting journeyLinkData', function () {
@@ -2237,45 +2126,6 @@ describe('journeys_utils characterization: branch view data and CTA links', func
   function setBranchViewData(data) {
     journeys_utils.branch = { _branchViewData: { data: data } };
   }
-
-  it('getValueForKeyInBranchViewData returns false until branch view data exists', function () {
-    journeys_utils.branch = null;
-    expect(journeys_utils.getValueForKeyInBranchViewData('k')).toBe(false);
-    journeys_utils.branch = {};
-    expect(journeys_utils.getValueForKeyInBranchViewData('k')).toBe(false);
-    journeys_utils.branch = { _branchViewData: {} };
-    expect(journeys_utils.getValueForKeyInBranchViewData('k')).toBe(false);
-    setBranchViewData({ k: 'v' });
-    expect(journeys_utils.getValueForKeyInBranchViewData('k')).toBe('v');
-    expect(journeys_utils.getValueForKeyInBranchViewData('missing')).toBe(
-      undefined,
-    );
-  });
-
-  it('getBranchViewDataItemOrUndefined returns undefined for falsy values', function () {
-    setBranchViewData({ zero: 0, empty: '', yes: 'y' });
-    expect(journeys_utils.getBranchViewDataItemOrUndefined('zero')).toBe(
-      undefined,
-    );
-    expect(journeys_utils.getBranchViewDataItemOrUndefined('empty')).toBe(
-      undefined,
-    );
-    expect(journeys_utils.getBranchViewDataItemOrUndefined('yes')).toBe('y');
-  });
-
-  it('hasJourneyCtaLink / getJourneyCtaLink read $journeys_cta', function () {
-    setBranchViewData({});
-    expect(journeys_utils.hasJourneyCtaLink()).toBe(false);
-    expect(journeys_utils.getJourneyCtaLink()).toBeUndefined();
-
-    setBranchViewData({ $journeys_cta: 'https://cta.example' });
-    expect(journeys_utils.hasJourneyCtaLink()).toBe(true);
-    expect(journeys_utils.getJourneyCtaLink()).toBe('https://cta.example');
-
-    // non-string truthy value has no length
-    setBranchViewData({ $journeys_cta: 5 });
-    expect(journeys_utils.hasJourneyCtaLink()).toBe(false);
-  });
 
   it('tryReplaceJourneyCtaLink returns html unchanged without a CTA link', function () {
     setBranchViewData({});
@@ -2305,35 +2155,5 @@ describe('journeys_utils characterization: branch view data and CTA links', func
   it('tryReplaceJourneyCtaLink returns the input when replacing throws', function () {
     setBranchViewData({ $journeys_cta: 'https://cta.example' });
     expect(journeys_utils.tryReplaceJourneyCtaLink(null)).toBeNull();
-  });
-
-  it('trySetJourneyUrls fills missing urls from branch view data, keeping existing ones', function () {
-    setBranchViewData({
-      $ios_url: 'https://ios.from.bvd',
-      $android_url: 'https://android.from.bvd',
-    });
-    const linkElements = { data: JSON.stringify({ $ios_url: 'keep' }) };
-    const result = journeys_utils.trySetJourneyUrls(linkElements);
-    expect(result).toBe(linkElements);
-    expect(JSON.parse(result.data)).toEqual({
-      $ios_url: 'keep',
-      $android_url: 'https://android.from.bvd',
-    });
-  });
-
-  it('trySetJourneyUrls honours a custom url list', function () {
-    setBranchViewData({ $custom: 'c', $ios_url: 'i' });
-    const result = journeys_utils.trySetJourneyUrls({ data: '{}' }, [
-      '$custom',
-    ]);
-    expect(JSON.parse(result.data)).toEqual({ $custom: 'c' });
-  });
-
-  it('trySetJourneyUrls returns falsy input and unparseable data untouched', function () {
-    expect(journeys_utils.trySetJourneyUrls(null)).toBeNull();
-    expect(journeys_utils.trySetJourneyUrls(undefined)).toBeUndefined();
-    const bad = { data: 'not json' };
-    expect(journeys_utils.trySetJourneyUrls(bad)).toBe(bad);
-    expect(bad.data).toBe('not json');
   });
 });

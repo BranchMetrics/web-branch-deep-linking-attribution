@@ -7,12 +7,8 @@ export const messages = {
     ' and a Branch method was called outside of the queue order',
   initFailed:
     'Branch SDK initialization failed, so further methods cannot be called',
-  existingInit: 'Branch SDK already initialized',
-  missingAppId: 'Missing Branch app ID',
-  callBranchInitFirst: 'Branch.init must be called first',
   timeout: 'Request timed out',
   blockedByClient: 'Request blocked by client, probably adblock',
-  missingUrl: 'Required argument: URL, is missing',
   trackingDisabled:
     'Requested operation cannot be completed since tracking is disabled',
   deepviewNotCalled:

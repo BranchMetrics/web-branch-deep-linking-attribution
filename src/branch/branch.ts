@@ -115,51 +115,31 @@ function _api(
   if (this.branch_key) {
     obj.branch_key = this.branch_key;
   }
-  if (
-    (resource.params?.session_id || resource.queryPart?.session_id) &&
-    this.session_id
-  ) {
+  if (resource.params?.session_id && this.session_id) {
     obj.session_id = this.session_id;
   }
-  if (
-    (resource.params?.identity_id || resource.queryPart?.identity_id) &&
-    this.identity_id
-  ) {
+  if (resource.params?.identity_id && this.identity_id) {
     obj.identity_id = this.identity_id;
   }
 
   if (resource.endpoint.indexOf('/v1/') < 0) {
-    if (
-      (resource.params?.developer_identity ||
-        resource.queryPart?.developer_identity) &&
-      this.identity
-    ) {
+    if (resource.params?.developer_identity && this.identity) {
       obj.developer_identity = this.identity;
     }
   } else {
-    if (
-      (resource.params?.identity || resource.queryPart?.identity) &&
-      this.identity
-    ) {
+    if (resource.params?.identity && this.identity) {
       obj.identity = this.identity;
     }
   }
 
-  if (
-    (resource.params?.link_click_id || resource.queryPart?.link_click_id) &&
-    this.link_click_id
-  ) {
+  if (resource.params?.link_click_id && this.link_click_id) {
     obj.link_click_id = this.link_click_id;
   }
-  if ((resource.params?.sdk || resource.queryPart?.sdk) && this.sdk) {
+  if (resource.params?.sdk && this.sdk) {
     obj.sdk = this.sdk;
   }
 
-  if (
-    (resource.params?.browser_fingerprint_id ||
-      resource.queryPart?.browser_fingerprint_id) &&
-    this.browser_fingerprint_id
-  ) {
+  if (resource.params?.browser_fingerprint_id && this.browser_fingerprint_id) {
     obj.browser_fingerprint_id = this.browser_fingerprint_id;
   }
   // Adds tracking_disabled to every post request when enabled

@@ -2,6 +2,7 @@ import {
   base64Decode,
   base64encode,
   decodeBFPs,
+  decodeSymbols,
   encodeBFPs,
   isBase64Encoded,
 } from '../../src/lib/encoding.js';
@@ -66,5 +67,36 @@ describe('lib/encoding', () => {
         alternative_browser_fingerprint_id: 'abc123',
       });
     });
+  });
+});
+
+describe('decodeSymbols', () => {
+  it('decodes the HTML entities node-api escapes, and maps nullish to null', () => {
+    expect(
+      decodeSymbols('Tom &amp; Jerry &lt;3 &quot;hi&quot; caf&eacute;'),
+    ).toBe('Tom & Jerry <3 "hi" café');
+    expect(decodeSymbols(undefined)).toBeNull();
+    expect(decodeSymbols(null)).toBeNull();
+  });
+
+  it('decodes the full entity table and leaves unknown entities alone', () => {
+    expect(
+      decodeSymbols(
+        '&lt;&gt;&amp;&quot;&apos;&brvbar;&laquo;&acute;&middot;&raquo;&iquest;&times;&divide;',
+      ),
+    ).toBe('<>&"\'¦«´·»¿×÷');
+    expect(decodeSymbols('&Agrave;&AElig;&Ntilde;&szlig;&eacute;&yuml;')).toBe(
+      'ÀÆÑßéÿ',
+    );
+    expect(decodeSymbols('&unknown;')).toBe('&unknown;');
+  });
+
+  it('double-decodes escaped entities', () => {
+    // NOTE: possible bug: &amp; is decoded before most entities (and twice), so
+    // literal text like "&amp;quot;" or "&amp;amp;" is decoded two levels deep.
+    expect(decodeSymbols('&amp;quot;')).toBe('"');
+    expect(decodeSymbols('&amp;amp;')).toBe('&');
+    // but &lt; runs before &amp;, so this one is only decoded once
+    expect(decodeSymbols('&amp;lt;')).toBe('&lt;');
   });
 });

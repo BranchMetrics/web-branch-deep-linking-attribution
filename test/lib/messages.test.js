@@ -30,7 +30,7 @@ describe('lib/messages', () => {
   describe('messages', () => {
     it('contains the expected message templates', () => {
       expect(messages.nonInit).toBe('Branch SDK not initialized');
-      expect(messages.missingUrl).toBe('Required argument: URL, is missing');
+      expect(messages.timeout).toBe('Request timed out');
     });
   });
 });

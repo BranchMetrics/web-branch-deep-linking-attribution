@@ -298,43 +298,11 @@ describe('legacy helpers (lib, core/url, core/platform, env)', function () {
       );
     });
 
-    it('should produce a Branch SDK already init message', function () {
-      assert.strictEqual(
-        formatMessage(messages.existingInit),
-        'Branch SDK already initialized',
-        'Expected Branch SDK already initialized message produced',
-      );
-    });
-
-    it('should produce a missing app id', function () {
-      assert.strictEqual(
-        formatMessage(messages.missingAppId),
-        'Missing Branch app ID',
-        'Expected Branch app id missing message produced',
-      );
-    });
-
-    it('should produce a call branch init first', function () {
-      assert.strictEqual(
-        formatMessage(messages.callBranchInitFirst),
-        'Branch.init must be called first',
-        'Expected Branch must be called first message produced',
-      );
-    });
-
     it('should produce a timeout message', function () {
       assert.strictEqual(
         formatMessage(messages.timeout),
         'Request timed out',
         'Expected Request timed out message produced',
-      );
-    });
-
-    it('should produce a missing URL error', function () {
-      assert.strictEqual(
-        formatMessage(messages.missingUrl),
-        'Required argument: URL, is missing',
-        'Expected Missing url message produced',
       );
     });
 

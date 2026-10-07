@@ -141,7 +141,6 @@ describe('branch_view.shouldDisplayJourney', function () {
     expect(branch_view.shouldDisplayJourney(journeyResponse(), {}, false)).toBe(
       true,
     );
-    expect(branch_view.callback_index).toBeUndefined();
   });
 
   ['branch-banner', 'branch-banner-iframe', 'branch-banner-container'].forEach(
@@ -201,7 +200,7 @@ describe('branch_view.shouldDisplayJourney', function () {
     expect(store.get('globalJourneysDismiss', true)).toBe(true);
   });
 
-  it('returns false without a branch_view_data id and sets branch_view.callback_index = 1', function () {
+  it('returns false without a branch_view_data id and leaves the callback index alone', function () {
     journeys_utils._callback_index = 7;
     expect(
       branch_view.shouldDisplayJourney(
@@ -210,10 +209,6 @@ describe('branch_view.shouldDisplayJourney', function () {
         false,
       ),
     ).toBe(false);
-    // NOTE: possible bug: src/journeys/branch-view.js:120 resets
-    // branch_view.callback_index, which nothing reads; the counter that
-    // _getPageviewRequestData uses is journeys_utils._callback_index.
-    expect(branch_view.callback_index).toBe(1);
     expect(journeys_utils._callback_index).toBe(7);
   });
 
@@ -225,7 +220,6 @@ describe('branch_view.shouldDisplayJourney', function () {
         false,
       ),
     ).toBe(false);
-    expect(branch_view.callback_index).toBe(1);
   });
 
   it('accepts null options', function () {
@@ -254,7 +248,6 @@ describe('branch_view.shouldDisplayJourney', function () {
         branch_view.shouldDisplayJourney(journeyResponse(), {}, false),
       ).toBe(false);
       expect(store.get('globalJourneysDismiss', true)).toBe(true);
-      expect(branch_view.callback_index).toBe(1);
     });
 
     it('returns false while the dismiss period has not ended', function () {

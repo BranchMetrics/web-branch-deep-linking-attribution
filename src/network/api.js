@@ -66,7 +66,7 @@ Server.prototype.getUrl = function (resource, data) {
   let v;
   let err;
   const ctx = this._ctx;
-  let url = resource.destination + resource.endpoint;
+  const url = resource.destination + resource.endpoint;
   const branch_id = /^[0-9]{15,20}$/;
   const branch_key = /key_(live|test)_[A-Za-z0-9]{32}/;
 
@@ -91,23 +91,6 @@ Server.prototype.getUrl = function (resource, data) {
       throw Error(msg);
     }
   };
-
-  if (typeof resource.queryPart !== 'undefined') {
-    for (k in resource.queryPart) {
-      if (!Object.prototype.hasOwnProperty.call(resource.queryPart, k)) {
-        continue;
-      }
-      err =
-        typeof resource.queryPart[k] === 'function'
-          ? resource.queryPart[k](resource.endpoint, k, data[k], ctx)
-          : err;
-      if (err) {
-        log(ctx, err);
-        return { error: err };
-      }
-      url += '/' + data[k];
-    }
-  }
 
   const d = {};
   // TODO: Add validation for v1/pageview and v1/dismiss, move setBranchViewData into a separate location so that it is isolated

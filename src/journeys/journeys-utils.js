@@ -1,15 +1,25 @@
-import { safejson } from '../core/safejson.js';
-import { getEnv } from '../env/env.js';
-import {
-  addPropertyIfNotNull,
-  addPropertyIfNotNullorEmpty,
-  merge,
-  removePropertiesFromObject,
-} from '../lib/objects.js';
+import { removePropertiesFromObject } from '../lib/objects.js';
 import { dismissEventToSourceMapping } from './constants.js';
 import { applyNonce } from '../core/context.js';
-import { resources } from '../network/resources.js';
 import { banner_utils } from '../banner/banner-utils.js';
+import {
+  getCss,
+  getCtaText,
+  getIframeCss,
+  getJs,
+  getMetadata,
+  removeScriptAndCss,
+} from './template.js';
+import {
+  globalDismissDeadline,
+  recordGlobalDismiss,
+  recordViewDismiss,
+} from './dismissals.js';
+import { animationDurationMs } from './css-animation.js';
+import { applyCtaOverride } from './cta-override.js';
+import { installCtaScript } from './cta-script.js';
+import { buildDismissRequestData, sendDismiss } from './dismiss-request.js';
+import { buildJourneyLinkData, FILTERED_LINK_KEYS } from './link-data.js';
 
 export const journeys_utils = {};
 
@@ -53,12 +63,6 @@ journeys_utils.exitAnimationIsRunning = false;
 journeys_utils.use_v2_renderer = false;
 
 // Regex to find pieces of the html blob
-journeys_utils.jsonRe = /<script type="application\/json">((.|\s)*?)<\/script>/;
-journeys_utils.jsRe = /<script type="text\/javascript">((.|\s)*?)<\/script>/;
-journeys_utils.cssRe =
-  /<style type="text\/css" id="branch-css">((.|\s)*?)<\/style>/;
-journeys_utils.iframeCssRe =
-  /<style type="text\/css" id="branch-iframe-css">((.|\s)*?)<\/style>/;
 journeys_utils.spacerRe = /#branch-banner-spacer {((.|\s)*?)}/;
 journeys_utils.findMarginRe = /margin-bottom: (.*?);/;
 
@@ -149,41 +153,20 @@ journeys_utils.setPositionAndHeight = function (html) {
  * @function journeys_utils.getMetadata
  * @param {string} html
  */
-journeys_utils.getMetadata = function (html) {
-  const match = html.match(journeys_utils.jsonRe);
-  if (match) {
-    const src = match[1];
-    return safejson.parse(src);
-  }
-};
+journeys_utils.getMetadata = getMetadata;
 
 /***
  * @function journeys_utils.getIframeCss
  * @param {string} html
  */
-journeys_utils.getIframeCss = function (html) {
-  const match = html.match(journeys_utils.iframeCssRe);
-  if (match) {
-    return match[1];
-  }
-};
+journeys_utils.getIframeCss = getIframeCss;
 
 /***
  * @function journeys_utils.getCtaText
  * @param {Object} metadata
  * @param {boolean} hasApp
  */
-journeys_utils.getCtaText = function (metadata, hasApp) {
-  let ctaText;
-
-  if (hasApp && metadata?.ctaText?.has_app) {
-    ctaText = metadata.ctaText.has_app;
-  } else if (metadata?.ctaText?.no_app) {
-    ctaText = metadata.ctaText.no_app;
-  }
-
-  return ctaText;
-};
+journeys_utils.getCtaText = getCtaText;
 
 /***
  * @function journeys_utils.findInsertionDiv
@@ -207,12 +190,7 @@ journeys_utils.findInsertionDiv = function (_parent, metadata) {
  * @function journeys_utils.getCss
  * @param {string} html
  */
-journeys_utils.getCss = function (html) {
-  const match = html.match(journeys_utils.cssRe);
-  if (match) {
-    return match[1];
-  }
-};
+journeys_utils.getCss = getCss;
 
 /***
  * @function journeys_utils.getJsAndAddToParent
@@ -221,14 +199,9 @@ journeys_utils.getCss = function (html) {
  * take the js from template and add to document.body
  */
 journeys_utils.getJsAndAddToParent = function (html) {
-  const match = html.match(journeys_utils.jsRe);
-  if (match) {
-    const src = match[1];
-    const script = document.createElement('script');
-    script.id = 'branch-journey-cta';
-    applyNonce(journeys_utils.branch._ctx, script);
-    script.innerHTML = src;
-    document.body.appendChild(script);
+  const src = getJs(html);
+  if (src !== undefined) {
+    installCtaScript(journeys_utils.branch._ctx, src);
   }
 };
 
@@ -239,27 +212,7 @@ journeys_utils.getJsAndAddToParent = function (html) {
  * After extracting js and css from html blob, we should remove it.
  * We will use the remaining html to add to iframe
  */
-journeys_utils.removeScriptAndCss = function (html) {
-  const matchJson = html.match(journeys_utils.jsonRe);
-  const matchJs = html.match(journeys_utils.jsRe);
-  const matchCss = html.match(journeys_utils.cssRe);
-  const matchIframeCss = html.match(journeys_utils.iframeCssRe);
-
-  if (matchJson) {
-    html = html.replace(journeys_utils.jsonRe, '');
-  }
-  if (matchJs) {
-    html = html.replace(journeys_utils.jsRe, '');
-  }
-  if (matchCss) {
-    html = html.replace(journeys_utils.cssRe, '');
-  }
-  if (matchIframeCss) {
-    html = html.replace(journeys_utils.iframeCssRe, '');
-  }
-
-  return html;
-};
+journeys_utils.removeScriptAndCss = removeScriptAndCss;
 
 /***
  * @function journeys_utils.createIframe
@@ -624,19 +577,6 @@ journeys_utils.addDynamicCtaText = function (iframe, ctaText) {
   }
 };
 
-/***
- * @function journeys_utils.centerOverlay
- * @param {Object} banner
- */
-journeys_utils.centerOverlay = function (banner) {
-  if (banner?.style) {
-    banner.style.bottom = '140px';
-    banner.style.width = '94%';
-    banner.style.borderRadius = '20px';
-    banner.style.margin = 'auto';
-  }
-};
-
 journeys_utils.getAnimationRoot = function (banner) {
   if (!banner) return null;
 
@@ -803,19 +743,7 @@ journeys_utils._resetJourneysBannerPosition = function (
   }
 };
 
-journeys_utils._addSecondsToDate = function (seconds) {
-  const currentDate = new Date();
-  return currentDate.setSeconds(currentDate.getSeconds() + seconds);
-};
-
-journeys_utils._findGlobalDismissPeriod = function (metadata) {
-  const globalDismissPeriod = metadata.globalDismissPeriod;
-  if (typeof globalDismissPeriod === 'number') {
-    return globalDismissPeriod === -1
-      ? true
-      : journeys_utils._addSecondsToDate(globalDismissPeriod);
-  }
-};
+journeys_utils._findGlobalDismissPeriod = globalDismissDeadline;
 
 /***
  * @function journeys_utils.finalHookups
@@ -947,183 +875,18 @@ journeys_utils._setupDismissBehavior = function (
   });
 };
 
-journeys_utils._setJourneyDismiss = function (
-  storage,
-  templateId,
-  audienceRuleId,
-) {
-  let journeyDismissals = storage.get('journeyDismissals', true);
-  journeyDismissals = journeyDismissals
-    ? safejson.parse(journeyDismissals)
-    : {};
-  journeyDismissals[audienceRuleId] = {
-    'view_id': templateId,
-    'dismiss_time': Date.now(),
-  };
-  storage.set('journeyDismissals', safejson.stringify(journeyDismissals), true);
-  return journeyDismissals;
-};
+journeys_utils._setJourneyDismiss = recordViewDismiss;
 
-journeys_utils.decodeSymbols = function (str) {
-  if (str === undefined || str === null) {
-    return null;
-  }
-  return str
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&brvbar;/g, '¦')
-    .replace(/&laquo;/g, '«')
-    .replace(/&acute;/g, '´')
-    .replace(/&middot;/g, '·')
-    .replace(/&raquo;/g, '»')
-    .replace(/&amp;/g, '&')
-    .replace(/&iquest;/g, '¿')
-    .replace(/&times;/g, '×')
-    .replace(/&divide;/g, '÷')
-    .replace(/&Agrave;/g, 'À')
-    .replace(/&Aacute;/g, 'Á')
-    .replace(/&Acirc;/g, 'Â')
-    .replace(/&Atilde;/g, 'Ã')
-    .replace(/&Auml;/g, 'Ä')
-    .replace(/&Aring;/g, 'Å')
-    .replace(/&AElig;/g, 'Æ')
-    .replace(/&Ccedil;/g, 'Ç')
-    .replace(/&Egrave;/g, 'È')
-    .replace(/&Eacute;/g, 'É')
-    .replace(/&Ecirc;/g, 'Ê')
-    .replace(/&Euml;/g, 'Ë')
-    .replace(/&Igrave;/g, 'Ì')
-    .replace(/&Iacute;/g, 'Í')
-    .replace(/&Icirc;/g, 'Î')
-    .replace(/&Iuml;/g, 'Ï')
-    .replace(/&ETH;/g, 'Ð')
-    .replace(/&Ntilde;/g, 'Ñ')
-    .replace(/&Ograve;/g, 'Ò')
-    .replace(/&Oacute;/g, 'Ó')
-    .replace(/&Ocirc;/g, 'Ô')
-    .replace(/&Otilde;/g, 'Õ')
-    .replace(/&Ouml;/g, 'Ö')
-    .replace(/&Oslash;/g, 'Ø')
-    .replace(/&Ugrave;/g, 'Ù')
-    .replace(/&Uacute;/g, 'Ú')
-    .replace(/&Ucirc;/g, 'Û')
-    .replace(/&Uuml;/g, 'Ü')
-    .replace(/&Yacute;/g, 'Ý')
-    .replace(/&THORN;/g, 'Þ')
-    .replace(/&szlig;/g, 'ß')
-    .replace(/&agrave;/g, 'à')
-    .replace(/&aacute;/g, 'á')
-    .replace(/&acirc;/g, 'â')
-    .replace(/&atilde;/g, 'ã')
-    .replace(/&auml;/g, 'ä')
-    .replace(/&aring;/g, 'å')
-    .replace(/&aelig;/g, 'æ')
-    .replace(/&ccedil;/g, 'ç')
-    .replace(/&egrave;/g, 'è')
-    .replace(/&eacute;/g, 'é')
-    .replace(/&ecirc;/g, 'ê')
-    .replace(/&euml;/g, 'ë')
-    .replace(/&igrave;/g, 'ì')
-    .replace(/&iacute;/g, 'í')
-    .replace(/&icirc;/g, 'î')
-    .replace(/&iuml;/g, 'ï')
-    .replace(/&eth;/g, 'ð')
-    .replace(/&ntilde;/g, 'ñ')
-    .replace(/&ograve;/g, 'ò')
-    .replace(/&oacute;/g, 'ó')
-    .replace(/&ocirc;/g, 'ô')
-    .replace(/&otilde;/g, 'õ')
-    .replace(/&ouml;/g, 'ö')
-    .replace(/&oslash;/g, 'ø')
-    .replace(/&ugrave;/g, 'ù')
-    .replace(/&uacute;/g, 'ú')
-    .replace(/&ucirc;/g, 'û')
-    .replace(/&uuml;/g, 'ü')
-    .replace(/&yacute;/g, 'ý')
-    .replace(/&thorn;/g, 'þ')
-    .replace(/&yuml;/g, 'ÿ');
-};
 journeys_utils._getDismissRequestData = function (
   branch_view,
   dismissal_source,
 ) {
-  const metadata = {};
-  const hostedDeeplinkData = getEnv().hostedDeepLinkData();
-  if (hostedDeeplinkData && Object.keys(hostedDeeplinkData).length > 0) {
-    metadata.hosted_deeplink_data = hostedDeeplinkData;
-  }
-
-  const dismissRequestData = branch_view._getPageviewRequestData(
-    journeys_utils._getPageviewMetadata(
-      null,
-      metadata,
-      journeys_utils.branch._ctx,
-    ),
-    null,
-    journeys_utils.branch,
-    true,
-  );
-
-  if (journeys_utils.journeyLinkData?.journey_link_data) {
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'journey_id',
-      journeys_utils.journeyLinkData.journey_link_data.journey_id,
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'journey_name',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.journey_name,
-      ),
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'view_id',
-      journeys_utils.journeyLinkData.journey_link_data.view_id,
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'view_name',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.view_name,
-      ),
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'channel',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.channel,
-      ),
-    );
-    addPropertyIfNotNull(
-      dismissRequestData,
-      'campaign',
-      journeys_utils.decodeSymbols(
-        journeys_utils.journeyLinkData.journey_link_data.campaign,
-      ),
-    );
-    try {
-      addPropertyIfNotNull(
-        dismissRequestData,
-        'tags',
-        JSON.stringify(journeys_utils.journeyLinkData.journey_link_data.tags),
-      );
-    } catch (_e) {
-      dismissRequestData.tags = JSON.stringify([]);
-    }
-  }
-
-  addPropertyIfNotNull(
-    dismissRequestData,
-    'dismissal_source',
-    dismissal_source,
-  );
-
-  return dismissRequestData;
+  return buildDismissRequestData({
+    branch: journeys_utils.branch,
+    branchView: branch_view,
+    source: dismissal_source,
+    linkData: journeys_utils.journeyLinkData,
+  });
 };
 
 journeys_utils._handleJourneyDismiss = function (
@@ -1147,9 +910,7 @@ journeys_utils._handleJourneyDismiss = function (
   journeys_utils.animateBannerExit(banner);
 
   if (!testModeEnabled) {
-    if (globalDismissPeriod !== undefined) {
-      storage.set('globalJourneysDismiss', globalDismissPeriod, true);
-    }
+    recordGlobalDismiss(storage, globalDismissPeriod);
     journeys_utils._setJourneyDismiss(storage, templateId, audienceRuleId);
     const listener = function () {
       journeys_utils.branch.removeListener(listener);
@@ -1157,66 +918,17 @@ journeys_utils._handleJourneyDismiss = function (
         branch_view,
         dismissEventToSourceMapping[eventName],
       );
-      journeys_utils.branch._api(
-        resources.dismiss,
+      sendDismiss({
+        branch: journeys_utils.branch,
         requestData,
-        function (err, data) {
-          if (!err && metadata && metadata.dismissRedirect) {
-            window.location = metadata.dismissRedirect;
-          } else if (!err && typeof data === 'object' && data.template) {
-            if (branch_view.shouldDisplayJourney(data, null, false)) {
-              branch_view.displayJourney(
-                data.template,
-                requestData,
-                requestData.branch_view_id ||
-                  data.event_data.branch_view_data.id,
-                data.event_data.branch_view_data,
-                false,
-                data.journey_link_data,
-                {
-                  use_v2_renderer: data.use_v2_renderer,
-                  animationConfig: data.animationConfig,
-                },
-              );
-            }
-          }
-        },
-      );
+        dismissRedirect: metadata ? metadata.dismissRedirect : undefined,
+      });
     };
     journeys_utils.branch.addListener(
       'branch_internal_event_didCloseJourney',
       listener,
     );
   }
-};
-
-journeys_utils._getPageviewMetadata = function (
-  options,
-  additionalMetadata,
-  ctx,
-) {
-  let pageviewMetadata = merge(
-    {
-      'url': options?.url || getEnv().windowLocation(),
-      'user_agent': getEnv().userAgent(),
-      'language': getEnv().language(),
-      'screen_width': getEnv().screenWidth() || -1,
-      'screen_height': getEnv().screenHeight() || -1,
-      'window_device_pixel_ratio': getEnv().devicePixelRatio() || 1,
-    },
-    additionalMetadata || {},
-  );
-  pageviewMetadata = addPropertyIfNotNullorEmpty(
-    pageviewMetadata,
-    'model',
-    ctx.userAgentData ? ctx.userAgentData.model : '',
-  );
-  pageviewMetadata = addPropertyIfNotNullorEmpty(
-    pageviewMetadata,
-    'os_version',
-    ctx.userAgentData ? ctx.userAgentData.platformVersion : '',
-  );
-  return pageviewMetadata;
 };
 
 /***
@@ -1363,153 +1075,19 @@ journeys_utils.animateBannerExit = function (
  * Total CSS animation time on element (animation-delay + animation-duration), in ms.
  * 0 if no animation is applied.
  */
-journeys_utils._getAnimationDurationMs = function (element) {
-  const computedStyle =
-    element.ownerDocument.defaultView.getComputedStyle(element);
-  // Fall back to the `animation` shorthand for environments (incl. jsdom) that don't resolve
-  // it into the longhand properties: duration is the shorthand's 1st <time> value, delay the
-  // 2nd, per spec.
-  const duration =
-    journeys_utils._timeValueMsAt(computedStyle.animationDuration, 0) ||
-    journeys_utils._timeValueMsAt(computedStyle.animation, 0) ||
-    0;
-  const delay =
-    journeys_utils._timeValueMsAt(computedStyle.animationDelay, 0) ||
-    journeys_utils._timeValueMsAt(computedStyle.animation, 1) ||
-    0;
-  return duration + delay;
-};
-
-/***
- * @function journeys_utils._timeValueMsAt
- * @param {string} cssValue
- * @param {number} index
- *
- * The `<time>` token (e.g. "0.25s" or "250ms") at position index (0-based) found in cssValue, in
- * ms, or null if there aren't that many.
- */
-journeys_utils._timeValueMsAt = function (cssValue, index) {
-  const matches = (cssValue || '').match(/(-?[\d.]+)(ms|s)\b/g) || [];
-  const token = matches[index];
-  if (!token) {
-    return null;
-  }
-  const match = /(-?[\d.]+)(ms|s)/.exec(token);
-  const amount = parseFloat(match[1]);
-  return match[2] === 'ms' ? amount : amount * 1000;
-};
+journeys_utils._getAnimationDurationMs = animationDurationMs;
 
 journeys_utils.setJourneyLinkData = function (linkData) {
-  const data = { 'banner_id': journeys_utils.branchViewId };
-  if (
-    linkData &&
-    typeof linkData === 'object' &&
-    Object.keys(linkData || {}).length > 0
-  ) {
-    const journeyLinkDataPropertiesToFilterOut = [
-      'browser_fingerprint_id',
-      'app_id',
-      'source',
-      'open_app',
-      'link_click_id',
-    ];
-    removePropertiesFromObject(linkData, journeyLinkDataPropertiesToFilterOut);
-    data.journey_link_data = {};
-    merge(data.journey_link_data, linkData);
-  }
+  // Build before stripping: link data made only of filtered keys still gets an
+  // empty journey_link_data, as in v1.
+  const data = buildJourneyLinkData(journeys_utils.branchViewId, linkData);
+  // v1 has always stripped these keys from the caller's object too; kept for parity.
+  removePropertiesFromObject(linkData, FILTERED_LINK_KEYS);
   journeys_utils.journeyLinkData = data;
-  journeys_utils.journeyType = data.journey_link_data.type || null;
   journeys_utils.isDesktopJourney = data.journey_link_data.type === 'desktop';
   journeys_utils.journeyVariant = data.journey_link_data.variant || null;
 };
 
-journeys_utils.getValueForKeyInBranchViewData = function (key) {
-  if (!journeys_utils) {
-    return false;
-  }
-
-  if (!journeys_utils.branch) {
-    return false;
-  }
-
-  if (!journeys_utils.branch._branchViewData) {
-    return false;
-  }
-
-  if (!journeys_utils.branch._branchViewData.data) {
-    return false;
-  }
-
-  return journeys_utils.branch._branchViewData.data[key];
-};
-
-journeys_utils.hasJourneyCtaLink = function () {
-  if (!journeys_utils.getValueForKeyInBranchViewData('$journeys_cta')) {
-    return false;
-  }
-
-  return (
-    journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta').length > 0
-  );
-};
-
-journeys_utils.getBranchViewDataItemOrUndefined = function (name) {
-  if (journeys_utils.getValueForKeyInBranchViewData(name)) {
-    return journeys_utils.branch._branchViewData.data[name];
-  }
-  return undefined;
-};
-
-journeys_utils.getJourneyCtaLink = function () {
-  return journeys_utils.getBranchViewDataItemOrUndefined('$journeys_cta');
-};
-
 journeys_utils.tryReplaceJourneyCtaLink = function (html) {
-  try {
-    if (journeys_utils.hasJourneyCtaLink()) {
-      const journeyLinkReplacePattern = /validate[(].+[)];/g;
-      const pattern = 'validate("' + journeys_utils.getJourneyCtaLink() + '")';
-      const replacedHtml = html.replace(journeyLinkReplacePattern, pattern);
-      return replacedHtml.replace(
-        'window.top.location.replace(',
-        'window.top.location = ',
-      );
-    }
-  } catch (_e) {
-    return html;
-  }
-
-  return html;
-};
-
-journeys_utils.trySetJourneyUrls = function (
-  linkElements,
-  urls = ['$android_url', '$ios_url', '$fallback_url', '$desktop_url'],
-) {
-  if (!linkElements) {
-    return linkElements;
-  }
-
-  const assignUrls = function (data) {
-    return urls.reduce((value, url) => {
-      if (value[url]) {
-        return value;
-      }
-
-      const entry = journeys_utils.getBranchViewDataItemOrUndefined(url);
-      if (entry) {
-        value[url] = entry;
-      }
-      return value;
-    }, data);
-  };
-
-  try {
-    const data = safejson.parse(linkElements.data);
-    linkElements.data = JSON.stringify(assignUrls(data));
-
-    return linkElements;
-  } catch (_e) {
-    return linkElements;
-  }
+  return applyCtaOverride(journeys_utils.branch, html);
 };
