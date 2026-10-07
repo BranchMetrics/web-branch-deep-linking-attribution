@@ -58,22 +58,31 @@ describe('journeys/dismiss-request', () => {
     });
   });
 
-  it('sendDismiss hands the response on success and ignores errors', () => {
-    const responses = [];
-    const branch = { _api: vi.fn((_r, _d, cb) => cb(null, { ok: true })) };
-    sendDismiss({
-      branch,
-      requestData: {},
-      onResponse: (d) => responses.push(d),
-    });
-    expect(responses).toEqual([{ ok: true }]);
+  it('sendDismiss posts to /v1/dismiss and redirects only on success', () => {
+    const originalLocation = window.location;
+    const requestData = { event: 'dismiss' };
 
     const failing = { _api: vi.fn((_r, _d, cb) => cb(new Error('x'))) };
     sendDismiss({
       branch: failing,
-      requestData: {},
-      onResponse: (d) => responses.push(d),
+      requestData,
+      dismissRedirect: 'https://example.com/after-dismiss',
     });
-    expect(responses).toHaveLength(1);
+    expect(failing._api.mock.calls[0][0].endpoint).toBe('/v1/dismiss');
+    expect(failing._api.mock.calls[0][1]).toBe(requestData);
+    expect(window.location).toBe(originalLocation);
+
+    const branch = { _api: vi.fn((_r, _d, cb) => cb(null, {})) };
+    try {
+      sendDismiss({
+        branch,
+        requestData,
+        dismissRedirect: 'https://example.com/after-dismiss',
+      });
+      // a plain `window.location = url` assignment; jsdom overwrites the global
+      expect(String(window.location)).toBe('https://example.com/after-dismiss');
+    } finally {
+      window.location = originalLocation;
+    }
   });
 });

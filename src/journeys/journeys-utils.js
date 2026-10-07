@@ -922,25 +922,6 @@ journeys_utils._handleJourneyDismiss = function (
         branch: journeys_utils.branch,
         requestData,
         dismissRedirect: metadata ? metadata.dismissRedirect : undefined,
-        onResponse: function (data) {
-          if (typeof data === 'object' && data.template) {
-            if (branch_view.shouldDisplayJourney(data, null, false)) {
-              branch_view.displayJourney(
-                data.template,
-                requestData,
-                requestData.branch_view_id ||
-                  data.event_data.branch_view_data.id,
-                data.event_data.branch_view_data,
-                false,
-                data.journey_link_data,
-                {
-                  use_v2_renderer: data.use_v2_renderer,
-                  animationConfig: data.animationConfig,
-                },
-              );
-            }
-          }
-        },
       });
     };
     journeys_utils.branch.addListener(

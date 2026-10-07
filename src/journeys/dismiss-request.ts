@@ -48,25 +48,17 @@ export function buildDismissRequestData(args: {
   return requestData;
 }
 
-// node-api's /v1/dismiss always answers 200 {} today (routeDismiss.js); onResponse keeps
-// v1's follow-up-journey branch alive without v2 depending on it.
+// The response body is ignored: node-api's /v1/dismiss always answers 200 {}
+// since it stopped returning follow-up journeys (branch-backend #7501).
 export function sendDismiss(args: {
   branch: any;
   requestData: Record<string, any>;
   dismissRedirect?: string;
-  onResponse?: (data: any) => void;
 }): void {
-  const { branch, requestData, dismissRedirect, onResponse } = args;
-  branch._api(resources.dismiss, requestData, function (err, data) {
-    if (err) {
-      return;
-    }
-    if (dismissRedirect) {
+  const { branch, requestData, dismissRedirect } = args;
+  branch._api(resources.dismiss, requestData, function (err) {
+    if (!err && dismissRedirect) {
       (window as any).location = dismissRedirect;
-      return;
-    }
-    if (onResponse) {
-      onResponse(data);
     }
   });
 }

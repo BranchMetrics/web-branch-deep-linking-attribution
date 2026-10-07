@@ -1964,56 +1964,16 @@ describe('journeys_utils characterization: _handleJourneyDismiss', function () {
     expect(branchView.displayJourney).not.toHaveBeenCalled();
   });
 
-  it('displays the follow-up journey from the dismiss response when allowed', function () {
+  // node-api stopped returning follow-up journeys from /v1/dismiss
+  // (branch-backend #7501), so a template in the response is ignored.
+  it('does not display a journey from the dismiss response', function () {
     dismiss({}, false);
     const call = runDismissListener();
-    const data = {
+    call[2](null, {
       template: '<div>next</div>',
       event_data: { branch_view_data: { id: 'bv2' } },
-      journey_link_data: { j: 1 },
-      use_v2_renderer: true,
-      animationConfig: { surface: 'CONTENT' },
-    };
-    call[2](null, data);
-    expect(branchView.shouldDisplayJourney).toHaveBeenCalledWith(
-      data,
-      null,
-      false,
-    );
-    expect(branchView.displayJourney).toHaveBeenCalledWith(
-      '<div>next</div>',
-      call[1],
-      'bv2',
-      data.event_data.branch_view_data,
-      false,
-      { j: 1 },
-      { use_v2_renderer: true, animationConfig: { surface: 'CONTENT' } },
-    );
-  });
-
-  it('prefers requestData.branch_view_id over the response id', function () {
-    branchView._getPageviewRequestData = vi.fn(function () {
-      return { branch_view_id: 'fromRequest' };
     });
-    dismiss({}, false);
-    const call = runDismissListener();
-    call[2](null, {
-      template: 'x',
-      event_data: { branch_view_data: { id: 'bv2' } },
-    });
-    expect(branchView.displayJourney.mock.calls[0][2]).toBe('fromRequest');
-  });
-
-  it('does not display the follow-up journey when shouldDisplayJourney is false or no template', function () {
-    branchView.shouldDisplayJourney.mockReturnValue(false);
-    dismiss({}, false);
-    const call = runDismissListener();
-    call[2](null, {
-      template: 'x',
-      event_data: { branch_view_data: { id: 'bv2' } },
-    });
-    call[2](null, {});
-    call[2](null, 'not an object');
+    expect(branchView.shouldDisplayJourney).not.toHaveBeenCalled();
     expect(branchView.displayJourney).not.toHaveBeenCalled();
   });
 });
