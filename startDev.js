@@ -66,7 +66,7 @@ async function writeExampleHtml(config) {
     const replacements = {
         'key_place_holder': config.sdkKey,
         'api_place_holder': config.APIEndpoint,
-        'script_place_holder': './dist/build.min.js',
+        'script_place_holder': './dist/build.js',
     };
 
     await processTemplate(templateFile, outputFile, replacements);
@@ -105,7 +105,7 @@ async function executeBuild(config) {
     const server = await createServer({
         configFile: false,
         root: __dirname,
-        server: { port: Number(config.port), strictPort: true },
+        server: { host: true, port: Number(config.port), strictPort: true },
         plugins: [reloadOnBundleChange()],
     });
     await server.listen();
