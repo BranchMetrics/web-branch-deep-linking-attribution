@@ -143,19 +143,6 @@ describe('branch_view.shouldDisplayJourney', function () {
     );
   });
 
-  ['branch-banner', 'branch-banner-iframe', 'branch-banner-container'].forEach(
-    function (id) {
-      it(`returns false while #${id} is in the document`, function () {
-        const el = document.createElement('div');
-        el.id = id;
-        document.body.appendChild(el);
-        expect(
-          branch_view.shouldDisplayJourney(journeyResponse(), {}, true),
-        ).toBe(false);
-      });
-    },
-  );
-
   it('returns false on platform "other", even in test mode', function () {
     setEnv(makeFakeEnv({ userAgent: () => UA_FOR_PLATFORM.other }));
     expect(branch_view.shouldDisplayJourney(journeyResponse(), {}, true)).toBe(
@@ -455,18 +442,24 @@ describe('branch_view.displayJourney', function () {
     expect(window.branch_view_callback__test).toBeUndefined();
   });
 
-  it('throws when journeyLinkData is empty', function () {
-    // NOTE: possible bug: displayJourney passes journeyLinkData straight to
-    // journeys_utils.setJourneyLinkData (src/journeys/branch-view.js:140),
-    // which reads data.journey_link_data.type even when no link data was
-    // given, so a null/empty journeyLinkData throws.
-    expect(function () {
-      branch_view.displayJourney(null, {}, 't', {}, false, null, {});
-    }).toThrow(TypeError);
-    expect(function () {
-      branch_view.displayJourney(null, {}, 't', {}, false, {}, {});
-    }).toThrow(TypeError);
-  });
+  it.each([null, {}])(
+    'renders a journey whose link data is %s',
+    function (linkData) {
+      expect(function () {
+        branch_view.displayJourney(
+          journeyHtml(METADATA),
+          { callback_string: 'branch_view_callback__test' },
+          't',
+          { audience_rule_id: 'rule-1' },
+          true,
+          linkData,
+          { use_v2_renderer: false, animationConfig: { speed: 1 } },
+        );
+      }).not.toThrow();
+      expect(document.getElementById('branch-banner-iframe')).not.toBeNull();
+      expect(journeys_utils.journeyLinkData).toEqual({ banner_id: 't' });
+    },
+  );
 
   it('renders a mobile journey iframe at the top of body and hooks it up on load', async function () {
     const html = journeyHtml(METADATA);

@@ -47,13 +47,11 @@ export function track(
   metadata?: Record<string, any>,
   options?: Record<string, any>,
 ) {
-  const self = this;
-
   metadata = metadata || {};
 
   options = options || {};
 
-  self._ctx.nonce = options.nonce ? options.nonce : self._ctx.nonce;
+  this._ctx.nonce = options.nonce ? options.nonce : this._ctx.nonce;
 
   if (event === 'pageview') {
     const hostedDeeplinkDataWithMergedMetadata = mergeHostedDeeplinkData(
@@ -68,38 +66,22 @@ export function track(
     }
 
     const requestData = branch_view._getPageviewRequestData(
-      getPageviewMetadata(options, metadata, self._ctx),
+      getPageviewMetadata(options, metadata, this._ctx),
       options,
-      self,
+      this,
       false,
     );
-    self._api(resources.pageview, requestData, function (...responseArgs) {
+    this._api(resources.pageview, requestData, function (...responseArgs) {
       const [err, pageviewResponse] = responseArgs;
       if (!err && typeof pageviewResponse === 'object') {
-        const journeyInTestMode = requestData.branch_view_id ? true : false;
-        if (
-          branch_view.shouldDisplayJourney(
-            pageviewResponse,
-            options,
-            journeyInTestMode,
-          )
-        ) {
-          branch_view.displayJourney(
-            pageviewResponse.template,
-            requestData,
-            requestData.branch_view_id ||
-              pageviewResponse.event_data.branch_view_data.id,
-            pageviewResponse.event_data.branch_view_data,
-            journeyInTestMode,
-            pageviewResponse.journey_link_data,
-            {
-              use_v2_renderer: pageviewResponse.use_v2_renderer,
-              animationConfig: pageviewResponse.animationConfig,
-            },
-          );
-        } else {
-          journeys_utils.branch._publishEvent('willNotShowJourney');
-        }
+        branch_view.showJourneyFromResponse(
+          pageviewResponse,
+          requestData,
+          options,
+          function () {
+            journeys_utils.branch._publishEvent('willNotShowJourney');
+          },
+        );
       }
       if (typeof done === 'function') {
         done.apply(this, responseArgs);

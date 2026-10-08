@@ -1,0 +1,6 @@
+/* A document-level face for the font-link test. The file doesn't exist: the test only
+   needs text inside the shadow root to request it. */
+@font-face {
+  font-family: "Branch Hoist Test";
+  src: url(./missing-branch-hoist-test.woff2) format("woff2");
+}
