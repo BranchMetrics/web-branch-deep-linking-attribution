@@ -290,43 +290,28 @@ export function init(
         requestData,
         function (err, pageviewResponse) {
           if (!err && typeof pageviewResponse === 'object') {
-            const journeyInTestMode = requestData.branch_view_id ? true : false;
-            if (
-              branch_view.shouldDisplayJourney(
-                pageviewResponse,
-                options,
-                journeyInTestMode,
-              )
-            ) {
-              branch_view.displayJourney(
-                pageviewResponse.template,
-                requestData,
-                requestData.branch_view_id ||
-                  pageviewResponse.event_data.branch_view_data.id,
-                pageviewResponse.event_data.branch_view_data,
-                journeyInTestMode,
-                pageviewResponse.journey_link_data,
-                {
-                  use_v2_renderer: pageviewResponse.use_v2_renderer,
-                  animationConfig: pageviewResponse.animationConfig,
-                },
-              );
-            } else {
-              if (
-                pageviewResponse.auto_branchify ||
-                (!branchMatchIdFromOptions &&
-                  getParamValue('branchify_url') &&
-                  self._referringLink())
-              ) {
-                const linkOptions = {
-                  'make_new_link': false,
-                  'open_app': true,
-                  'auto_branchify': true,
-                };
-                this.branch.deepview({}, linkOptions);
-              }
-              journeys_utils.branch._publishEvent('willNotShowJourney');
-            }
+            // Arrow function: deepview below needs this callback's `this`.
+            branch_view.showJourneyFromResponse(
+              pageviewResponse,
+              requestData,
+              options,
+              () => {
+                if (
+                  pageviewResponse.auto_branchify ||
+                  (!branchMatchIdFromOptions &&
+                    getParamValue('branchify_url') &&
+                    self._referringLink())
+                ) {
+                  const linkOptions = {
+                    'make_new_link': false,
+                    'open_app': true,
+                    'auto_branchify': true,
+                  };
+                  this.branch.deepview({}, linkOptions);
+                }
+                journeys_utils.branch._publishEvent('willNotShowJourney');
+              },
+            );
           }
           if (ctx.userPreferences.trackingDisabled) {
             ctx.userPreferences.allowErrorsInCallback = true;
@@ -495,12 +480,11 @@ export function init(
  * currently private method, which may be opened to the public in the future
  */
 export function renderQueue(this: Branch, done, render) {
-  const self = this;
-  if (self._renderFinalized) {
+  if (this._renderFinalized) {
     render();
   } else {
-    self._renderQueue = self._renderQueue || [];
-    self._renderQueue.push(render);
+    this._renderQueue = this._renderQueue || [];
+    this._renderQueue.push(render);
   }
   done(null, null);
 }
@@ -509,13 +493,12 @@ export function renderQueue(this: Branch, done, render) {
  * currently private method, which may be opened to the public in the future
  */
 export function renderFinalize(this: Branch, done) {
-  const self = this;
-  if (self._renderQueue && self._renderQueue.length > 0) {
-    self._renderQueue.forEach(function (callback) {
+  if (this._renderQueue && this._renderQueue.length > 0) {
+    this._renderQueue.forEach(function (callback) {
       callback.call(this);
     });
-    delete self._renderQueue;
+    delete this._renderQueue;
   }
-  self._renderFinalized = true;
+  this._renderFinalized = true;
   done(null, null);
 }

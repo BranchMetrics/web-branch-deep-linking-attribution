@@ -73,6 +73,22 @@ export const wrap = function (
           next();
         }
       };
+      // Lets a method call the caller's callback later; done() then only advances the queue.
+      // Called outside done's try/finally, a throw would stall a queue or skip other
+      // callers, so it's rethrown on its own task.
+      done.takeCallback = function () {
+        const taken = callback as Function;
+        callback = () => {};
+        return (...results: any[]) => {
+          try {
+            taken(...results);
+          } catch (e) {
+            setTimeout(() => {
+              throw e;
+            }, 0);
+          }
+        };
+      };
       if (!init) {
         let msg: string | undefined;
         if (self.init_state === init_states.INIT_PENDING) {

@@ -239,6 +239,8 @@ export function createPage(opts = {}) {
   const win = dom.window;
   // Chrome and Safari both expose the legacy alias.
   if (/AppleWebKit/.test(win.navigator.userAgent)) win.webkitURL = win.URL;
+  // Every browser Journeys v2 renders in has cascade layers; jsdom lacks the interface.
+  win.CSSLayerBlockRule ??= function CSSLayerBlockRule() {};
   clock = installClock(win, (e) => push({ uncaught: clean(e) }));
 
   // jsdom doesn't implement navigation, so record where the page would go.

@@ -1,6 +1,7 @@
 import { storage as storageModule } from '../../src/core/storage.js';
 import {
   addSecondsToNow,
+  dismissedSince,
   globalDismissDeadline,
   isDismissedGlobally,
   recordGlobalDismiss,
@@ -50,5 +51,51 @@ describe('journeys/dismissals', () => {
       'rule-2': { view_id: 'view-2', dismiss_time: Date.now() },
     });
     expect(JSON.parse(store.get('journeyDismissals', true))).toEqual(all);
+  });
+
+  describe('dismissedSince', () => {
+    // What the request carried: the stored dismissals when it was built.
+    const snapshot = () => store.get('journeyDismissals', true);
+
+    it('is true for a view dismissed after the snapshot, matched by view or audience rule', () => {
+      const sent = snapshot();
+      recordViewDismiss(store, 'view-1', 'rule-1');
+      expect(dismissedSince(store, sent, 'view-1', 'rule-1')).toBe(true);
+      expect(dismissedSince(store, sent, 'view-2', 'rule-1')).toBe(true);
+      expect(dismissedSince(store, sent, 'view-1', undefined)).toBe(true);
+      expect(dismissedSince(store, sent, 'view-2', 'rule-2')).toBe(false);
+    });
+
+    it('is false when the snapshot already had the dismissal, which the server applied', () => {
+      recordViewDismiss(store, 'view-1', 'rule-1');
+      expect(dismissedSince(store, snapshot(), 'view-1', 'rule-1')).toBe(false);
+    });
+
+    it('is true when the view was dismissed again after the snapshot', () => {
+      recordViewDismiss(store, 'view-1', 'rule-1');
+      const sent = snapshot();
+      vi.advanceTimersByTime(1000);
+      recordViewDismiss(store, 'view-1', 'rule-1');
+      expect(dismissedSince(store, sent, 'view-1', 'rule-1')).toBe(true);
+    });
+
+    it('treats a missing or unreadable snapshot or store as empty', () => {
+      expect(dismissedSince(store, undefined, 'view-1', 'rule-1')).toBe(false);
+      recordViewDismiss(store, 'view-1', 'rule-1');
+      expect(dismissedSince(store, 'not json', 'view-1', 'rule-1')).toBe(true);
+      store.set('journeyDismissals', 'not json', true);
+      expect(dismissedSince(store, undefined, 'view-1', 'rule-1')).toBe(false);
+    });
+
+    it('skips malformed stored entries', () => {
+      store.set(
+        'journeyDismissals',
+        JSON.stringify({ 'rule-0': null, 'rule-2': 5 }),
+        true,
+      );
+      expect(dismissedSince(store, undefined, 'view-1', 'rule-0')).toBe(false);
+      recordViewDismiss(store, 'view-1', 'rule-1');
+      expect(dismissedSince(store, undefined, 'view-1', 'rule-1')).toBe(true);
+    });
   });
 });

@@ -1,7 +1,7 @@
 import {
   animationDurationMs,
   timeValueMsAt,
-} from '../../src/journeys/css-animation.js';
+} from '../../../../src/journeys/v2/renderer/css-animation.js';
 
 describe('journeys/css-animation', () => {
   it('timeValueMsAt parses s and ms tokens by index', () => {
@@ -23,5 +23,20 @@ describe('journeys/css-animation', () => {
     el.style.animation = 'x 0.25s ease 0.1s both';
     expect(animationDurationMs(el)).toBe(350);
     el.remove();
+  });
+
+  it('uses a real 0s longhand instead of falling back to the shorthand', () => {
+    const fake = {
+      ownerDocument: {
+        defaultView: {
+          getComputedStyle: () => ({
+            animationDuration: '0s',
+            animationDelay: '0.2s',
+            animation: 'x 1s ease 0.5s',
+          }),
+        },
+      },
+    };
+    expect(animationDurationMs(fake)).toBe(200);
   });
 });

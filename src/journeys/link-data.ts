@@ -26,3 +26,21 @@ export function buildJourneyLinkData(
   }
   return data;
 }
+
+export function showJourneyEventData(
+  linkData: Record<string, any>,
+  layout: {
+    bannerHeight: string;
+    isFullPage: boolean;
+    position: string;
+    sticky: string;
+  },
+): Record<string, any> {
+  const eventData = Object.assign({}, linkData);
+  eventData.bannerHeight = layout.bannerHeight;
+  eventData.isFullPageBanner = layout.isFullPage;
+  eventData.bannerPagePlacement = layout.position;
+  eventData.isBannerInline = layout.sticky === 'absolute';
+  eventData.isBannerSticky = layout.sticky === 'fixed';
+  return eventData;
+}
