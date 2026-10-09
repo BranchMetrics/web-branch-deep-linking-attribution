@@ -156,4 +156,44 @@ describe('behavior: journeys', () => {
     await p.run(2000);
     await snap('journeys/render-desktop', p);
   });
+
+  it('v2: renders a shadow DOM journey and dismisses it', async () => {
+    const v2Template = (callback) =>
+      '<html><head><style type="text/css" id="branch-css">#branch-banner { position: fixed; left: 0; right: 0; bottom: 0; }</style>' +
+      '<style type="text/css" id="branch-iframe-css">#branch-banner-iframe { border: 0; z-index: 99999; position: fixed; top: 0; bottom: 0; height: 100vh; }</style></head>' +
+      '<body><div id="branch-banner"><div class="branch-banner-content">' +
+      '<div class="branch-banner-close" role="button" tabindex="0">x</div>' +
+      '<div id="branch-mobile-action" role="button" tabindex="0">Get</div></div></div>' +
+      `<script type="text/javascript">if (typeof ${callback} === 'function') { ${callback}(function () {}); }</script>` +
+      '<script type="application/json">{"bannerHeight":"100vh","position":"bottom","sticky":"fixed","offsetY":"0","isIntrinsic":true,"ctaText":{"has_app":"Open","no_app":"Get"}}</script>' +
+      '</body></html>';
+    const p = createPage({
+      ua: UA.androidChrome,
+      routes: {
+        '/v1/pageview': (req) => ({
+          body: {
+            branch_view_enabled: true,
+            use_v2_renderer: true,
+            template: v2Template(
+              new URLSearchParams(req.body).get('callback_string'),
+            ),
+            event_data: { branch_view_data: { id: 'jv2' } },
+            journey_link_data: { type: 'mobile', url: 'https://bnc.lt/j/jv2' },
+          },
+        }),
+      },
+    });
+    p.listen();
+    p.branch.init(KEY);
+    await p.run(2000);
+    p.record('click close in shadow root', () => {
+      const el = p.win.document
+        .getElementById('branch-journey-host')
+        ?.shadowRoot.querySelector('.branch-banner-close');
+      el?.click();
+      return !!el;
+    });
+    await p.run(2000);
+    await snap('journeys/v2-show-and-dismiss', p);
+  });
 });

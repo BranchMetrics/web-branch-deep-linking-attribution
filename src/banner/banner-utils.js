@@ -2,6 +2,7 @@ import { safejson } from '../core/safejson.js';
 import { snakeToCamel } from '../lib/objects.js';
 import { getPlatformByUserAgent } from '../core/platform.js';
 import { getEnv } from '../env/env.js';
+import { HOST_ID } from '../journeys/v2/renderer/index.js';
 
 export const banner_utils = {};
 
@@ -176,6 +177,8 @@ banner_utils.shouldAppend = function (storage, options) {
   return (
     !document.getElementById('branch-banner') &&
     !document.getElementById('branch-banner-iframe') &&
+    // A v2 journey's #branch-banner is inside this host's shadow root.
+    !document.getElementById(HOST_ID) &&
     (hideBanner || forgetHide) &&
     ((options.showAndroid && getPlatformByUserAgent() === 'android') ||
       (options.showiPad && getPlatformByUserAgent() === 'ipad') ||

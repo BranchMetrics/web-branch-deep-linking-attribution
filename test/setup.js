@@ -8,5 +8,7 @@ import { merge } from '../src/lib/objects.js';
 // testUtils.params() reads these as globals (it only needs utils.merge).
 window.utils = { merge };
 window.sdk_version = 'web' + config.version;
+// Every browser Journeys v2 renders in has cascade layers; jsdom lacks the interface.
+window.CSSLayerBlockRule ??= function CSSLayerBlockRule() {};
 
 createRequire(import.meta.url)('./test-utils.js');

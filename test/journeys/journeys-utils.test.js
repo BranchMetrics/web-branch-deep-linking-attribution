@@ -2106,18 +2106,16 @@ describe('journeys_utils characterization: setJourneyLinkData', function () {
     expect(linkData).toEqual({});
   });
 
-  it('throws for empty or missing link data after setting journeyLinkData', function () {
-    // NOTE: possible bug: data.journey_link_data is only created for non-empty
-    // linkData, but is then dereferenced unconditionally (TypeError).
-    journeys_utils.branchViewId = 'v9';
-    expect(function () {
-      journeys_utils.setJourneyLinkData({});
-    }).toThrow(TypeError);
-    expect(journeys_utils.journeyLinkData).toEqual({ banner_id: 'v9' });
-    expect(function () {
-      journeys_utils.setJourneyLinkData(undefined);
-    }).toThrow(TypeError);
-  });
+  it.each([null, undefined, {}])(
+    'accepts %s link data without throwing',
+    function (linkData) {
+      journeys_utils.branchViewId = 'view-9';
+      expect(() => journeys_utils.setJourneyLinkData(linkData)).not.toThrow();
+      expect(journeys_utils.journeyLinkData).toEqual({ banner_id: 'view-9' });
+      expect(journeys_utils.isDesktopJourney).toBe(false);
+      expect(journeys_utils.journeyVariant).toBeNull();
+    },
+  );
 });
 
 describe('journeys_utils characterization: branch view data and CTA links', function () {

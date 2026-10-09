@@ -66,6 +66,7 @@ async function writeExampleHtml(config) {
     const replacements = {
         'key_place_holder': config.sdkKey,
         'api_place_holder': config.APIEndpoint,
+        // The bundle executeBuild watches; build.min.js is only rebuilt by `pnpm build`.
         'script_place_holder': './dist/build.js',
     };
 
