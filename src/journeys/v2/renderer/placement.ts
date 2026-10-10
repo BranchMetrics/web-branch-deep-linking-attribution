@@ -23,15 +23,18 @@ export interface PlacementState {
 }
 
 // The body push and scroll lock, in one <style> so teardown leaves nothing behind. A
-// margin, not a spacer element, so it works with any body layout.
+// margin, not a spacer element, so it works with any body layout. !important beats page
+// classes and later CSS-in-JS.
 function pageCss(page: PageState, pushSize?: string) {
   const { push, lockScroll } = page;
   const declarations = [
     push && `transition: margin-${push.side} 0.25s ease;`,
-    push && pushSize && `margin-${push.side}: ${pushSize};`,
-    lockScroll && 'overflow: hidden;',
+    push && pushSize && `margin-${push.side}: ${pushSize} !important;`,
+    lockScroll && 'overflow: hidden !important;',
   ].filter(Boolean);
-  return `body { ${declarations.join(' ')} }`;
+  const body = `body { ${declarations.join(' ')} }`;
+  // Overflow set on html stops body's from reaching the viewport.
+  return lockScroll ? `html { overflow: hidden !important; } ${body}` : body;
 }
 
 // Banner height plus offset. The offset comes from the placement, not the banner's

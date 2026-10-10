@@ -55,7 +55,7 @@ describe('journeys/v2 placement', () => {
     expect(style.parentElement).toBe(document.head);
     expect(style.getAttribute('nonce')).toBe('n0nce');
     expect(style.textContent).toBe(
-      'body { transition: margin-top 0.25s ease; margin-top: 76px; }',
+      'body { transition: margin-top 0.25s ease; margin-top: 76px !important; }',
     );
     collapsePush(state);
     expect(style.textContent).toBe(
@@ -71,7 +71,7 @@ describe('journeys/v2 placement', () => {
       placement: { ...STANDARD.placement, offsetY: { value: 2, unit: 'vh' } },
     });
     expect(pageCss()).toBe(
-      'body { transition: margin-top 0.25s ease; margin-top: calc(76px + 2vh); }',
+      'body { transition: margin-top 0.25s ease; margin-top: calc(76px + 2vh) !important; }',
     );
   });
 
@@ -95,7 +95,7 @@ describe('journeys/v2 placement', () => {
       setHeight(mounted.banner, 90);
       observer.callback();
       expect(pageCss()).toBe(
-        'body { transition: margin-top 0.25s ease; margin-top: 90px; }',
+        'body { transition: margin-top 0.25s ease; margin-top: 90px !important; }',
       );
       collapsePush(state);
       expect(observer.disconnect).toHaveBeenCalled();
@@ -114,7 +114,7 @@ describe('journeys/v2 placement', () => {
       60,
     );
     expect(document.getElementById('branch-journey-page').textContent).toBe(
-      'body { transition: margin-bottom 0.25s ease; margin-bottom: 60px; }',
+      'body { transition: margin-bottom 0.25s ease; margin-bottom: 60px !important; }',
     );
   });
 
@@ -181,7 +181,9 @@ describe('journeys/v2 placement', () => {
     const { state } = place({});
     const style = document.getElementById('branch-journey-page');
     expect(style.getAttribute('nonce')).toBe('n0nce');
-    expect(style.textContent).toBe('body { overflow: hidden; }');
+    expect(style.textContent).toBe(
+      'html { overflow: hidden !important; } body { overflow: hidden !important; }',
+    );
     expect(document.body.classList.contains('branch-banner-is-active')).toBe(
       true,
     );
@@ -189,7 +191,9 @@ describe('journeys/v2 placement', () => {
       true,
     );
     collapsePush(state);
-    expect(style.textContent).toBe('body { overflow: hidden; }');
+    expect(style.textContent).toBe(
+      'html { overflow: hidden !important; } body { overflow: hidden !important; }',
+    );
     releasePlacement(state);
     expect(document.getElementById('branch-journey-page')).toBeNull();
     expect(document.body.classList.contains('branch-banner-is-active')).toBe(
@@ -220,7 +224,9 @@ describe('journeys/v2 placement', () => {
       setHeight(mounted.banner, 90);
       observers[0].callback();
       expect(document.getElementById('nav').style.marginTop).toBe('90px');
-      expect(pageCss()).toBe('body { overflow: hidden; }');
+      expect(pageCss()).toBe(
+        'html { overflow: hidden !important; } body { overflow: hidden !important; }',
+      );
     } finally {
       window.ResizeObserver = original;
     }
@@ -229,7 +235,7 @@ describe('journeys/v2 placement', () => {
   it('pushes and locks scroll together when a full-page creative pushes', () => {
     place({ geometry: { css: '', push: { side: 'top' } } });
     expect(pageCss()).toBe(
-      'body { transition: margin-top 0.25s ease; margin-top: 76px; overflow: hidden; }',
+      'html { overflow: hidden !important; } body { transition: margin-top 0.25s ease; margin-top: 76px !important; overflow: hidden !important; }',
     );
   });
 
