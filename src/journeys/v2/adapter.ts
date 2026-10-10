@@ -45,6 +45,7 @@ const DIMENSION_RE = /^(-?\d+(?:\.\d+)?)(px|%|vh|svh|dvh|vw|svw|em|rem)?$/;
 const GOOGLE_FONTS_HOST = 'fonts.googleapis.com';
 const IFRAME_SELECTOR = '#branch-banner-iframe';
 const DEFAULT_Z_INDEX = 99999;
+const STYLE_ELEMENT_RE = /<style\b[^>]*>[\s\S]*?<\/style\s*>/gi;
 
 export function parseDimension(value: unknown): Dimension | null {
   if (typeof value !== 'string' && typeof value !== 'number') {
@@ -222,7 +223,11 @@ function build(
     return 'unknown-iframe-css';
   }
 
-  const doc = new DOMParser().parseFromString(html, 'text/html');
+  // Chromium reports a CSP violation for every <style> DOMParser sees.
+  const doc = new DOMParser().parseFromString(
+    html.replace(STYLE_ELEMENT_RE, ''),
+    'text/html',
+  );
   if (!doc.getElementById('branch-banner')) {
     return 'no-branch-banner';
   }

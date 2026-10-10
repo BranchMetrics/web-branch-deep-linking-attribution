@@ -42,3 +42,5 @@ test-results.xml
 
 lefthook-local.yml
 .vitest
+/test-results/
+/playwright-report/
