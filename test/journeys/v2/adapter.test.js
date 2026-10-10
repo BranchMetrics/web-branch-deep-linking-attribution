@@ -2,6 +2,7 @@ import { parseDimension, toPayload } from '../../../src/journeys/v2/adapter.js';
 import { isFullPage } from '../../../src/journeys/v2/renderer/index.js';
 import {
   adapterInput,
+  SAMPLE_BODY,
   SAMPLE_CSS,
   STANDARD_IFRAME_CSS,
   STANDARD_METADATA,
@@ -145,6 +146,26 @@ describe('journeys/v2 adapter', () => {
         branch,
       ),
     ).toEqual({ fallback: 'unsupported-stylesheet' });
+  });
+
+  it('parses the markup without its <style> blocks, still reading the creative CSS from #branch-css', () => {
+    const parse = vi.spyOn(DOMParser.prototype, 'parseFromString');
+    try {
+      const { payload } = toPayload(
+        adapterInput({
+          html: templateHtml({
+            body: `<style>.inline { color: red; }</style>${SAMPLE_BODY}`,
+          }),
+        }),
+        branch,
+      );
+      expect(parse).toHaveBeenCalledTimes(1);
+      expect(parse.mock.calls[0][0]).not.toMatch(/<style/i);
+      expect(payload.render.creative.css.trim()).toBe(SAMPLE_CSS);
+      expect(payload.render.creative.html).toContain('id="branch-banner"');
+    } finally {
+      parse.mockRestore();
+    }
   });
 
   describe('@import in creative CSS (the documented custom-font method)', () => {

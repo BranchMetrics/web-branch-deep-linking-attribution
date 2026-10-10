@@ -31,11 +31,12 @@ export function supportsCssLayers(): boolean {
 
 // Layers: branch-renderer < reset < creative < unlayered animation. The renderer's rules
 // are !important in the first layer, which beats everything, even creative !important.
-// The html wrapper resets inherited page styles; `all` doesn't cover direction.
+// The html wrapper resets inherited page styles. `all` skips direction, and WebKit's
+// `initial` keeps the inherited font-family.
 const RESET_CSS = [
   '@layer branch-renderer, reset, creative;',
   `@layer branch-renderer {\n:host, .${HTML_CLASS}, .${BODY_CLASS} { display: contents !important; }\n}`,
-  `@layer reset {\n.${HTML_CLASS} { all: initial; direction: ltr; }\n*, *::before, *::after { box-sizing: border-box; }\n}`,
+  `@layer reset {\n.${HTML_CLASS} { all: initial; direction: ltr; font-family: serif; }\n*, *::before, *::after { box-sizing: border-box; }\n}`,
 ].join('\n');
 
 function important(declarations: string): string {

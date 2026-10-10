@@ -96,7 +96,7 @@ describe('journeys/v2 mount', () => {
     );
     const reset = css.indexOf('@layer reset {');
     expect(css.slice(reset)).toMatch(
-      /^@layer reset \{\n\.branch-journey-html \{ all: initial; direction: ltr; \}/,
+      /^@layer reset \{\n\.branch-journey-html \{ all: initial; direction: ltr; font-family: serif; \}/,
     );
     expect(css).toContain(
       '@layer creative {\n#branch-banner { color: red; }\n}',
