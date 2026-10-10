@@ -191,9 +191,13 @@ describe('journeys/v2 renderer isolation from the host page', () => {
       '<p>page</p>',
     );
     await show(makeRenderPayload({ ...TOP, animation: SLIDE }));
-    expect(
-      getComputedStyle(shadow().getElementById('branch-banner')).opacity,
-    ).toBe('1');
+    await expect
+      .poll(
+        () =>
+          getComputedStyle(shadow().getElementById('branch-banner')).opacity,
+        { timeout: 2000 },
+      )
+      .toBe('1');
   });
 
   it('pushes the page past a class margin on body (Tailwind m-0, WordPress body.home)', async () => {
