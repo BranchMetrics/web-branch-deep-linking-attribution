@@ -111,6 +111,45 @@ const close = () => new Promise((resolve) => journey.close(resolve));
 const shadow = () => document.getElementById('branch-journey-host').shadowRoot;
 const marginTop = () => getComputedStyle(document.body).marginTop;
 
+const FONT = 'http://127.0.0.1:9/css2?family=Branch+Test+Sans:wght@400';
+const HOST =
+  '<div id="branch-journey-host" style="display: contents !important;"></div>';
+const NAV_HTML = '<div class="branch-journeys-top"></div>';
+const MAIN = '<main>m</main>';
+
+function attrs(el) {
+  return Object.fromEntries(
+    Array.from(el.attributes)
+      .filter((a) => a.name !== 'class' || a.value !== '')
+      .map((a) => [a.name, a.value]),
+  );
+}
+
+function pageSnapshot() {
+  return {
+    html: attrs(document.documentElement),
+    body: attrs(document.body),
+    head: Array.from(document.head.children, (el) => el.outerHTML),
+    bodyChildren: Array.from(document.body.children, (el) => el.outerHTML),
+  };
+}
+
+async function expectPageChanges(payload, expected) {
+  setPage(
+    '',
+    `<nav id="nav" style="position: fixed;">${NAV_HTML}</nav>${MAIN}`,
+  );
+  const before = pageSnapshot();
+  const windowKeys = Object.keys(window);
+  await show(payload);
+  expect(pageSnapshot()).toEqual(expected(before));
+  expect(Object.keys(window).filter((k) => !windowKeys.includes(k))).toEqual(
+    [],
+  );
+  await close();
+  expect(pageSnapshot()).toEqual(before);
+}
+
 function creativeStyles() {
   return Array.from(shadow().querySelectorAll('[id]')).map((el) => {
     const style = getComputedStyle(el);
@@ -274,5 +313,53 @@ describe('journeys/v2 renderer isolation from the host page', () => {
       .poll(() => pageState().marginTop, { timeout: 2000 })
       .toBe(before.marginTop);
     expect(pageState()).toEqual(before);
+  });
+
+  it('changes only the expected parts of the page for a pushing banner with an injector and a font', async () => {
+    await expectPageChanges(
+      makeRenderPayload({
+        ...TOP,
+        placement: {
+          ...TOP.placement,
+          injectorSelector: '.branch-journeys-top',
+        },
+        fonts: [FONT],
+      }),
+      (before) => ({
+        html: before.html,
+        body: { ...before.body, class: 'branch-banner-is-active' },
+        head: [
+          ...before.head,
+          `<link rel="stylesheet" href="${FONT}" data-branch-journey-font="">`,
+          '<style id="branch-journey-page">body { transition: margin-top 0.25s ease; margin-top: 76px !important; }</style>',
+        ],
+        bodyChildren: [
+          HOST,
+          `<nav id="nav" style="position: fixed; margin-top: 76px;">${NAV_HTML}</nav>`,
+          MAIN,
+        ],
+      }),
+    );
+  });
+
+  it('changes only the expected parts of the page for a full-page desktop journey', async () => {
+    await expectPageChanges(
+      makeRenderPayload({
+        creative: { deviceType: 'desktop' },
+        placement: { injectorSelector: '.branch-journeys-top' },
+      }),
+      (before) => ({
+        html: before.html,
+        body: {
+          ...before.body,
+          class: 'branch-banner-no-scroll branch-banner-is-active',
+        },
+        head: [
+          ...before.head,
+          '<style id="branch-journey-page">html { overflow: hidden !important; } body { overflow: hidden !important; }</style>',
+        ],
+        bodyChildren: [...before.bodyChildren, HOST],
+      }),
+    );
   });
 });
