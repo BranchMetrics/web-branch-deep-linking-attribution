@@ -109,6 +109,19 @@ jobs:
       - name: Check the built bundle against the behavior traces
         run: pnpm run test:behavior
 
+      - name: Run end-to-end journey tests against the built bundle
+        run: pnpm run test:e2e
+
+      - name: Upload the end-to-end report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
       - name: AWS, credentials setup
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: aws-actions/configure-aws-credentials@v4
