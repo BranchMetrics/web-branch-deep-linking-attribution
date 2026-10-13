@@ -47,11 +47,13 @@ export function track(
   metadata?: Record<string, any>,
   options?: Record<string, any>,
 ) {
+  const self = this;
+
   metadata = metadata || {};
 
   options = options || {};
 
-  this._ctx.nonce = options.nonce ? options.nonce : this._ctx.nonce;
+  self._ctx.nonce = options.nonce ? options.nonce : self._ctx.nonce;
 
   if (event === 'pageview') {
     const hostedDeeplinkDataWithMergedMetadata = mergeHostedDeeplinkData(
@@ -66,12 +68,12 @@ export function track(
     }
 
     const requestData = branch_view._getPageviewRequestData(
-      getPageviewMetadata(options, metadata, this._ctx),
+      getPageviewMetadata(options, metadata, self._ctx),
       options,
-      this,
+      self,
       false,
     );
-    this._api(resources.pageview, requestData, function (...responseArgs) {
+    self._api(resources.pageview, requestData, function (...responseArgs) {
       const [err, pageviewResponse] = responseArgs;
       if (!err && typeof pageviewResponse === 'object') {
         branch_view.showJourneyFromResponse(

@@ -480,11 +480,12 @@ export function init(
  * currently private method, which may be opened to the public in the future
  */
 export function renderQueue(this: Branch, done, render) {
-  if (this._renderFinalized) {
+  const self = this;
+  if (self._renderFinalized) {
     render();
   } else {
-    this._renderQueue = this._renderQueue || [];
-    this._renderQueue.push(render);
+    self._renderQueue = self._renderQueue || [];
+    self._renderQueue.push(render);
   }
   done(null, null);
 }
@@ -493,12 +494,13 @@ export function renderQueue(this: Branch, done, render) {
  * currently private method, which may be opened to the public in the future
  */
 export function renderFinalize(this: Branch, done) {
-  if (this._renderQueue && this._renderQueue.length > 0) {
-    this._renderQueue.forEach(function (callback) {
+  const self = this;
+  if (self._renderQueue && self._renderQueue.length > 0) {
+    self._renderQueue.forEach(function (callback) {
       callback.call(this);
     });
-    delete this._renderQueue;
+    delete self._renderQueue;
   }
-  this._renderFinalized = true;
+  self._renderFinalized = true;
   done(null, null);
 }
