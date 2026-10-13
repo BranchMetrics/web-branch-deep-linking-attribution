@@ -168,6 +168,38 @@ describe('journeys/v2 adapter', () => {
     }
   });
 
+  it('strips every <style> block, in any case and with attributes, keeping the markup between them', () => {
+    const parse = vi.spyOn(DOMParser.prototype, 'parseFromString');
+    try {
+      const { payload } = toPayload(
+        adapterInput({
+          html: templateHtml({
+            body: `<STYLE media="screen">.a { color: red; }</style ><div id="between"></div><style>.b { color: blue; }</style>${SAMPLE_BODY}`,
+          }),
+        }),
+        branch,
+      );
+      expect(parse.mock.calls[0][0]).not.toMatch(/<style/i);
+      expect(payload.render.creative.html).toContain('id="between"');
+      expect(payload.render.creative.html).toContain('id="branch-banner"');
+    } finally {
+      parse.mockRestore();
+    }
+  });
+
+  it('falls back to v1 for a <style> that is never closed', () => {
+    expect(
+      toPayload(
+        adapterInput({
+          html: templateHtml({
+            body: `<style>.a { color: red; }${SAMPLE_BODY}`,
+          }),
+        }),
+        branch,
+      ),
+    ).toEqual({ fallback: 'no-branch-banner' });
+  });
+
   describe('@import in creative CSS (the documented custom-font method)', () => {
     const SOURCE_SANS =
       'https://fonts.googleapis.com/css?family=Source+Sans+Pro:600,900';
