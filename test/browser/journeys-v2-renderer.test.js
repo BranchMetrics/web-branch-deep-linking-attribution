@@ -156,7 +156,7 @@ describe('journeys/v2 renderer in a real browser', () => {
   it('keeps page styles out of the creative, even !important ones on div', async () => {
     document.documentElement.setAttribute('dir', 'rtl');
     setPage(
-      'body { color: red; font: italic 30px serif; letter-spacing: 5px; } div { display: flex !important; position: relative !important; transform: scale(.5) !important; color: lime !important; margin: 40px !important; }',
+      'body { color: red; font: italic 30px monospace; letter-spacing: 5px; } div { display: flex !important; position: relative !important; transform: scale(.5) !important; color: lime !important; margin: 40px !important; }',
       '<p>page</p>',
     );
     await show(makeRenderPayload(STANDARD_TOP));
@@ -167,6 +167,7 @@ describe('journeys/v2 renderer in a real browser', () => {
     );
     expect(button.color).toBe('rgb(0, 0, 0)');
     expect(button.fontStyle).toBe('normal');
+    expect(button.fontFamily).toBe('system-ui, serif');
     expect(button.letterSpacing).toBe('normal');
     expect(button.direction).toBe('ltr');
     expect(rect(shadow().getElementById('branch-banner'))).toEqual({

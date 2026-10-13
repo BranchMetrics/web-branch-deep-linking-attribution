@@ -36,7 +36,7 @@ export function supportsCssLayers(): boolean {
 const RESET_CSS = [
   '@layer branch-renderer, reset, creative;',
   `@layer branch-renderer {\n:host, .${HTML_CLASS}, .${BODY_CLASS} { display: contents !important; }\n}`,
-  `@layer reset {\n.${HTML_CLASS} { all: initial; direction: ltr; font-family: serif; }\n*, *::before, *::after { box-sizing: border-box; }\n}`,
+  `@layer reset {\n.${HTML_CLASS} { all: initial; direction: ltr; font-family: system-ui, serif; }\n*, *::before, *::after { box-sizing: border-box; }\n}`,
 ].join('\n');
 
 function important(declarations: string): string {
