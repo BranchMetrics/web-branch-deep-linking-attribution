@@ -15,7 +15,7 @@ import {
   recordGlobalDismiss,
   recordViewDismiss,
 } from './dismissals.js';
-import { animationDurationMs } from './css-animation.js';
+import { animationDurationMs } from './v2/renderer/index.js';
 import { applyCtaOverride } from './cta-override.js';
 import { installCtaScript } from './cta-script.js';
 import { buildDismissRequestData, sendDismiss } from './dismiss-request.js';
@@ -1084,8 +1084,8 @@ journeys_utils.setJourneyLinkData = function (linkData) {
   // v1 has always stripped these keys from the caller's object too; kept for parity.
   removePropertiesFromObject(linkData, FILTERED_LINK_KEYS);
   journeys_utils.journeyLinkData = data;
-  journeys_utils.isDesktopJourney = data.journey_link_data.type === 'desktop';
-  journeys_utils.journeyVariant = data.journey_link_data.variant || null;
+  journeys_utils.isDesktopJourney = data.journey_link_data?.type === 'desktop';
+  journeys_utils.journeyVariant = data.journey_link_data?.variant || null;
 };
 
 journeys_utils.tryReplaceJourneyCtaLink = function (html) {

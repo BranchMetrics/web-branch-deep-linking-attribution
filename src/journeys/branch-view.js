@@ -11,20 +11,35 @@ import { whiteListJourneysLanguageData } from '../lib/session-data.js';
 import { session } from '../core/session.js';
 import { banner_utils } from '../banner/banner-utils.js';
 import { journeys_utils } from './journeys-utils.js';
-import { isDismissedGlobally } from './dismissals.js';
+import { dismissedSince, isDismissedGlobally } from './dismissals.js';
+import { showJourneyEventData } from './link-data.js';
+import { prepareV2, showV2, v2JourneyState, whenV2Closed } from './v2/index.js';
 
 export const branch_view = {};
 
-function checkPreviousBanner() {
-  // if banner already exists, don't add another
-  if (
-    document.getElementById('branch-banner') ||
+// A v1 journey's or branch.banner()'s iframe, or branch.banner({iframe: false})'s div.
+function sdkBannerShown() {
+  return !!(
     document.getElementById('branch-banner-iframe') ||
+    document.querySelector('#branch-banner.branch-animation')
+  );
+}
+
+// v1 also treats any page #branch-banner or #branch-banner-container as a banner.
+function checkPreviousBanner() {
+  return !!(
+    sdkBannerShown() ||
+    document.getElementById('branch-banner') ||
     document.getElementById('branch-banner-container')
-  ) {
-    return true;
+  );
+}
+
+function animationFlag(options, key) {
+  const value = options?.[key];
+  if (typeof value === 'boolean') {
+    return value;
   }
-  return false;
+  return !!journeys_utils.branch?.init_options?.[key];
 }
 
 /**
@@ -56,13 +71,15 @@ function renderHtmlBlob(parent, html, hasApp, iframeLoadedCallback) {
     journeys_utils.addIframeOuterCSS(cssIframeContainer, metadata);
     journeys_utils.addIframeInnerCSS(iframe, cssInsideIframe);
     journeys_utils.addDynamicCtaText(iframe, ctaText);
-    const eventData = Object.assign({}, journeys_utils.journeyLinkData);
-    eventData.bannerHeight = journeys_utils.bannerHeight;
-    eventData.isFullPageBanner = journeys_utils.isFullPage;
-    eventData.bannerPagePlacement = journeys_utils.position;
-    eventData.isBannerInline = journeys_utils.sticky === 'absolute';
-    eventData.isBannerSticky = journeys_utils.sticky === 'fixed';
-    journeys_utils.branch._publishEvent('willShowJourney', eventData);
+    journeys_utils.branch._publishEvent(
+      'willShowJourney',
+      showJourneyEventData(journeys_utils.journeyLinkData, {
+        bannerHeight: journeys_utils.bannerHeight,
+        isFullPage: journeys_utils.isFullPage,
+        position: journeys_utils.position,
+        sticky: journeys_utils.sticky,
+      }),
+    );
 
     journeys_utils.animateBannerEntrance(iframe, cssIframeContainer);
     iframeLoadedCallback(iframe);
@@ -91,7 +108,6 @@ branch_view.shouldDisplayJourney = function (
   journeyInTestMode,
 ) {
   if (
-    checkPreviousBanner() ||
     getPlatformByUserAgent() === 'other' ||
     !eventResponse.event_data ||
     !eventResponse.template
@@ -111,6 +127,113 @@ branch_view.shouldDisplayJourney = function (
     return false;
   }
   return true;
+};
+
+/**
+ * Shows the journey in a pageview response, or calls onNotShown:
+ * 1. A journey the user dismissed after the request was built is dropped: the server
+ *    couldn't apply that dismissal.
+ * 2. A shown v2 journey blocks it; a closing one defers it until closed.
+ * 3. Eligibility: shouldDisplayJourney.
+ * 4. v2 when requested, not blocked by a v1 journey's iframe, and the adapter accepts it.
+ * 5. Otherwise v1, unless any existing banner element blocks it.
+ * @param {Object} response
+ * @param {Object} requestData
+ * @param {Object} options - the init or track options
+ * @param {Function} onNotShown
+ */
+branch_view.showJourneyFromResponse = function (
+  response,
+  requestData,
+  options,
+  onNotShown,
+) {
+  const testMode = !!requestData.branch_view_id;
+  const branchViewData = response.event_data?.branch_view_data;
+  if (
+    !testMode &&
+    branchViewData &&
+    dismissedSince(
+      journeys_utils.branch._storage,
+      requestData.journey_dismissals,
+      branchViewData.id,
+      branchViewData.audience_rule_id,
+    )
+  ) {
+    onNotShown();
+    return;
+  }
+  const v2State = v2JourneyState();
+  if (v2State === 'closing') {
+    whenV2Closed(function () {
+      branch_view.showJourneyFromResponse(
+        response,
+        requestData,
+        options,
+        onNotShown,
+      );
+    });
+    return;
+  }
+  if (
+    v2State === 'shown' ||
+    !branch_view.shouldDisplayJourney(response, options, testMode)
+  ) {
+    onNotShown();
+    return;
+  }
+
+  const templateId = requestData.branch_view_id || branchViewData.id;
+  if (response.use_v2_renderer) {
+    // Checked before parsing. Only the SDK's own banners block v2.
+    if (sdkBannerShown()) {
+      onNotShown();
+      return;
+    }
+    const payload = prepareV2(
+      {
+        html: response.template,
+        requestData,
+        templateId,
+        branchViewData,
+        journeyLinkData: response.journey_link_data,
+        animationConfig: response.animationConfig,
+      },
+      journeys_utils.branch,
+    );
+    if (
+      payload &&
+      showV2(payload, {
+        branch: journeys_utils.branch,
+        branchView: branch_view,
+        hasApp: !!requestData.has_app_websdk,
+        testMode,
+        entryAnimationDisabled: animationFlag(
+          options,
+          'disable_entry_animation',
+        ),
+        exitAnimationDisabled: animationFlag(options, 'disable_exit_animation'),
+      })
+    ) {
+      return;
+    }
+  }
+  if (checkPreviousBanner()) {
+    onNotShown();
+    return;
+  }
+  branch_view.displayJourney(
+    response.template,
+    requestData,
+    templateId,
+    branchViewData,
+    testMode,
+    response.journey_link_data,
+    {
+      use_v2_renderer: response.use_v2_renderer,
+      animationConfig: response.animationConfig,
+    },
+  );
 };
 
 branch_view.displayJourney = function (

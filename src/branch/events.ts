@@ -76,30 +76,14 @@ export function track(
     self._api(resources.pageview, requestData, function (...responseArgs) {
       const [err, pageviewResponse] = responseArgs;
       if (!err && typeof pageviewResponse === 'object') {
-        const journeyInTestMode = requestData.branch_view_id ? true : false;
-        if (
-          branch_view.shouldDisplayJourney(
-            pageviewResponse,
-            options,
-            journeyInTestMode,
-          )
-        ) {
-          branch_view.displayJourney(
-            pageviewResponse.template,
-            requestData,
-            requestData.branch_view_id ||
-              pageviewResponse.event_data.branch_view_data.id,
-            pageviewResponse.event_data.branch_view_data,
-            journeyInTestMode,
-            pageviewResponse.journey_link_data,
-            {
-              use_v2_renderer: pageviewResponse.use_v2_renderer,
-              animationConfig: pageviewResponse.animationConfig,
-            },
-          );
-        } else {
-          journeys_utils.branch._publishEvent('willNotShowJourney');
-        }
+        branch_view.showJourneyFromResponse(
+          pageviewResponse,
+          requestData,
+          options,
+          function () {
+            journeys_utils.branch._publishEvent('willNotShowJourney');
+          },
+        );
       }
       if (typeof done === 'function') {
         done.apply(this, responseArgs);

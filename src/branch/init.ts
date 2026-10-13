@@ -290,43 +290,28 @@ export function init(
         requestData,
         function (err, pageviewResponse) {
           if (!err && typeof pageviewResponse === 'object') {
-            const journeyInTestMode = requestData.branch_view_id ? true : false;
-            if (
-              branch_view.shouldDisplayJourney(
-                pageviewResponse,
-                options,
-                journeyInTestMode,
-              )
-            ) {
-              branch_view.displayJourney(
-                pageviewResponse.template,
-                requestData,
-                requestData.branch_view_id ||
-                  pageviewResponse.event_data.branch_view_data.id,
-                pageviewResponse.event_data.branch_view_data,
-                journeyInTestMode,
-                pageviewResponse.journey_link_data,
-                {
-                  use_v2_renderer: pageviewResponse.use_v2_renderer,
-                  animationConfig: pageviewResponse.animationConfig,
-                },
-              );
-            } else {
-              if (
-                pageviewResponse.auto_branchify ||
-                (!branchMatchIdFromOptions &&
-                  getParamValue('branchify_url') &&
-                  self._referringLink())
-              ) {
-                const linkOptions = {
-                  'make_new_link': false,
-                  'open_app': true,
-                  'auto_branchify': true,
-                };
-                this.branch.deepview({}, linkOptions);
-              }
-              journeys_utils.branch._publishEvent('willNotShowJourney');
-            }
+            // Arrow function: deepview below needs this callback's `this`.
+            branch_view.showJourneyFromResponse(
+              pageviewResponse,
+              requestData,
+              options,
+              () => {
+                if (
+                  pageviewResponse.auto_branchify ||
+                  (!branchMatchIdFromOptions &&
+                    getParamValue('branchify_url') &&
+                    self._referringLink())
+                ) {
+                  const linkOptions = {
+                    'make_new_link': false,
+                    'open_app': true,
+                    'auto_branchify': true,
+                  };
+                  this.branch.deepview({}, linkOptions);
+                }
+                journeys_utils.branch._publishEvent('willNotShowJourney');
+              },
+            );
           }
           if (ctx.userPreferences.trackingDisabled) {
             ctx.userPreferences.allowErrorsInCallback = true;

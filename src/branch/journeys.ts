@@ -5,6 +5,7 @@ import { cleanBannerText, merge } from '../lib/objects.js';
 import { getEnv } from '../env/env.js';
 import { banner } from '../banner/banner.js';
 import { journeys_utils } from '../journeys/journeys-utils.js';
+import { closeV2Journey, v2JourneyState } from '../journeys/v2/index.js';
 
 /** =WEB
  * @function Branch.setBranchViewData
@@ -67,6 +68,16 @@ export function setBranchViewData(this: Branch, done, data) {
  */
 export function closeJourney(this: Branch, done) {
   const self = this;
+  // v2: the callback waits for didCloseJourney, but done() runs now since the close is
+  // itself queued and holding the queue would deadlock it.
+  if (v2JourneyState() !== 'none') {
+    const callback = done.takeCallback();
+    self.renderQueue(function () {
+      closeV2Journey(self, callback);
+    });
+    done();
+    return;
+  }
   self.renderQueue(function () {
     if (journeys_utils.banner && journeys_utils.isJourneyDisplayed) {
       self._publishEvent('didCallJourneyClose', journeys_utils.journeyLinkData);

@@ -17,6 +17,7 @@ const BANNER_IDS = [
   'branch-css',
   'branch-iframe-css',
   'branch-banner-modal-background',
+  'branch-journey-host',
 ];
 
 function removeBannerElements() {
@@ -177,6 +178,19 @@ describe('banner', function () {
       document.body.appendChild(existing);
       expect(banner(branch, makeOptions(), {}, store)).toBeNull();
       expect(document.querySelectorAll('#branch-banner').length).toBe(1);
+    });
+
+    it('does not render while a v2 journey is in the document', function () {
+      mockPlatform('ios');
+      const host = document.createElement('div');
+      host.id = 'branch-journey-host';
+      const journey = document.createElement('div');
+      journey.id = 'branch-banner';
+      host.attachShadow({ mode: 'open' }).appendChild(journey);
+      document.body.appendChild(host);
+      expect(banner(branch, makeOptions(), {}, store)).toBeNull();
+      expect(publishedEvents(branch)).toEqual(['willNotShowBanner']);
+      expect(document.getElementById('branch-banner')).toBeNull();
     });
 
     it('does not render while hideBanner=true is stored', function () {
