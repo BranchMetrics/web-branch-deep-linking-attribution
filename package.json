@@ -53,7 +53,7 @@
     "@vitest/coverage-v8": "^5.0.1",
     "inquirer": "^14.2.2",
     "jsdom": "^26.1.0",
-    "lefthook": "2.1.14",
+    "lefthook": "2.2.2",
     "playwright": "^1.63.0",
     "pngjs": "7.0.0",
     "rimraf": "^6.1.3",
