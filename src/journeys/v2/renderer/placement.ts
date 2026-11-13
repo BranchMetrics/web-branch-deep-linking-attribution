@@ -1,4 +1,3 @@
-import { dimensionCss, isFullPage } from './dimension.js';
 import { setNonce } from './nonce.js';
 import type { Dimension, RenderPayload } from './types.js';
 
@@ -6,8 +5,10 @@ const PAGE_STYLE_ID = 'branch-journey-page';
 const ACTIVE_CLASS = 'branch-banner-is-active';
 // v1's scroll-lock class; page code may rely on it.
 const NO_SCROLL_CLASS = 'branch-banner-no-scroll';
+// The documented customer hook: a top banner pushes down each marked element's parent.
+const TOP_ELEMENT_SELECTOR = '.branch-journeys-top';
 
-type Push = NonNullable<RenderPayload['geometry']['push']>;
+type Push = NonNullable<RenderPayload['page']['push']>;
 
 interface PageState {
   style: HTMLStyleElement;
@@ -37,27 +38,23 @@ function pageCss(page: PageState, pushSize?: string) {
   return lockScroll ? `html { overflow: hidden !important; } ${body}` : body;
 }
 
-// Banner height plus offset. The offset comes from the placement, not the banner's
+// Banner height plus offset. The offset comes from the payload, not the banner's
 // position, which the push itself can move.
-function pushSize(height: string, offsetY?: Dimension): string {
-  return offsetY?.value ? `calc(${height} + ${dimensionCss(offsetY)})` : height;
+function pushSize(height: string, offset?: Dimension): string {
+  return offset?.value
+    ? `calc(${height} + ${offset.value}${offset.unit})`
+    : height;
 }
 
 function injectorParents(
   doc: Document,
   payload: RenderPayload,
 ): PlacementState['parents'] {
-  const selector = payload.placement.injectorSelector;
-  if (!selector) {
+  if (!payload.page.shiftTopElements) {
     return [];
   }
-  let injectors: Element[];
-  try {
-    injectors = Array.from(doc.querySelectorAll(selector));
-  } catch (_e) {
-    return [];
-  }
-  const fullPage = isFullPage(payload.placement);
+  const injectors = Array.from(doc.querySelectorAll(TOP_ELEMENT_SELECTOR));
+  const { fullPage } = payload.presentation;
   const pushed: PlacementState['parents'] = [];
   for (const injector of injectors) {
     const parent = injector.parentElement;
@@ -85,9 +82,7 @@ export function applyPlacement(
 ): PlacementState {
   const doc = opts.document;
   const state: PlacementState = { document: doc, page: null, parents: [] };
-  const { push } = payload.geometry;
-  const lockScroll =
-    isFullPage(payload.placement) && payload.placement.sticky === 'fixed';
+  const { push, lockScroll } = payload.page;
   // State is recorded step by step so a failure can undo what was applied.
   try {
     // Before the page style is added, so its computed-style reads don't force a restyle.
@@ -100,7 +95,7 @@ export function applyPlacement(
       doc.head.appendChild(style);
     }
     // Not payload: the observer would keep the creative's HTML and CSS alive.
-    const { offsetY } = payload.placement;
+    const offset = push?.offset;
     let lastHeight = '';
     const update = () => {
       // Read before writing to avoid extra layouts.
@@ -113,7 +108,7 @@ export function applyPlacement(
       lastHeight = height;
       const page = state.page;
       if (page) {
-        page.style.textContent = pageCss(page, pushSize(height, offsetY));
+        page.style.textContent = pageCss(page, pushSize(height, offset));
       }
       for (const { el } of state.parents) {
         el.style.marginTop = height;

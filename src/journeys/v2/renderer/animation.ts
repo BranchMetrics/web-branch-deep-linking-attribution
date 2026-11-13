@@ -1,4 +1,3 @@
-import { animationDurationMs } from './css-animation.js';
 import type { RenderPayload } from './types.js';
 
 const SETTLE_MS = 20;
@@ -8,35 +7,58 @@ export interface Wait {
   cancel(): void;
 }
 
-// Calls done once, on animationend or after the computed duration plus a grace period.
-// With no animation it waits briefly so the browser paints.
+// Only animations that end: an infinite one (e.g. a pulsing CTA) would never settle.
+function finiteAnimations(
+  el: HTMLElement,
+): Array<{ animation: Animation; endMs: number }> {
+  if (typeof el.getAnimations !== 'function') {
+    return [];
+  }
+  return el
+    .getAnimations()
+    .map((animation) => ({
+      animation,
+      endMs: animation.effect?.getComputedTiming().endTime,
+    }))
+    .filter(
+      (a): a is { animation: Animation; endMs: number } =>
+        typeof a.endMs === 'number' && Number.isFinite(a.endMs),
+    );
+}
+
+// Calls done once, always asynchronously (callers assign the returned Wait first), when
+// el's own animations finish. Call it right after the class change that starts them.
+// With none it waits briefly so the browser paints.
 export function waitForAnimation(
   el: HTMLElement | null,
   done: () => void,
 ): Wait {
-  const ms = el ? animationDurationMs(el) : 0;
-  if (!el || ms === 0) {
-    const settle = setTimeout(done, SETTLE_MS);
-    return { cancel: () => clearTimeout(settle) };
-  }
-  let finished = false;
-  const stop = () => {
-    if (finished) {
-      return false;
-    }
-    finished = true;
-    clearTimeout(timer);
-    el.removeEventListener('animationend', finish);
-    return true;
-  };
-  const finish = (event?: Event) => {
-    if ((!event || event.target === el) && stop()) {
+  let over = false;
+  const finish = () => {
+    if (!over) {
+      over = true;
+      clearTimeout(timer);
       done();
     }
   };
-  el.addEventListener('animationend', finish);
-  const timer = setTimeout(finish, ms + FALLBACK_GRACE_MS);
-  return { cancel: stop };
+  const animations = el ? finiteAnimations(el) : [];
+  let timer: ReturnType<typeof setTimeout>;
+  if (animations.length === 0) {
+    timer = setTimeout(finish, SETTLE_MS);
+  } else {
+    // Background tabs may never resolve finished.
+    const endMs = Math.max(...animations.map((a) => a.endMs));
+    timer = setTimeout(finish, endMs + FALLBACK_GRACE_MS);
+    Promise.allSettled(animations.map((a) => a.animation.finished)).then(
+      finish,
+    );
+  }
+  return {
+    cancel() {
+      over = true;
+      clearTimeout(timer);
+    },
+  };
 }
 
 export function enter(

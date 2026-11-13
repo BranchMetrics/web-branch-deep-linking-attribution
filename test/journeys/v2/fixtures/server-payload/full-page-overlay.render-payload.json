@@ -1,0 +1,44 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "mobile",
+      "html" : "<div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"ig50f\" class=\"branch-banner-content\"><div id=\"i34ys\"><div id=\"ixgwg\">Check out our App</div><div id=\"ivlg3\">Experience excellence when you switch from web to our app, click below to download</div><div id=\"branch-mobile-action\" role=\"button\" tabindex=\"0\" aria-label=\"Open the App\" class=\"branch-banner-button\">Open the App</div><div role=\"button\" tabindex=\"0\" id=\"i7fxn\" class=\"branch-banner-close\">Continue on Web</div></div><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"i0akl\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"ivtyg\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div><img id=\"iby1k\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/d26462bd-08c5-49dd-bf0d-1b2505c918f1.png\"></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#ig50f{width:100vw;height:100vh;display:flex;align-items:center;flex-direction:column;background-size:auto;background-color:#580DB5;background-image:linear-gradient(180deg, #580DB500 0%, #1C0439FF 100%);background-repeat:repeat;background-position:left top;background-attachment:scroll;}#branch-banner{overflow:hidden;}#ivtyg{width:100%;height:100%;}#i0akl{top:24px;color:#FFFFFFB3;right:24px;width:24px;cursor:pointer;height:24px;display:flex;padding:4px;position:absolute;align-items:center;justify-content:center;}#iby1k{width:184px;height:177px;margin:100px 0px 75px 0px;}#i34ys{gap:18px;width:100%;bottom:0px;display:flex;padding:26px 45px 26px 45px;position:fixed;flex-grow:1;min-width:50px;align-self:stretch;min-height:50px;align-items:center;border-radius:20px 20px 0px 0px;flex-direction:column;background-color:#FFFFFFFF;}#ixgwg{color:#070E39FF;margin:0;padding:0;font-size:24px;font-family:system-ui;font-weight:500;}#ivlg3{color:#070E39FF;width:235px;margin:0;padding:0;font-size:16px;text-align:center;font-family:system-ui;font-weight:400;line-height:24px;}#branch-mobile-action{color:#FAFAFA;cursor:pointer;display:flex;padding:13px 16px 13px 16px;font-size:16px;align-self:stretch;align-items:center;font-family:system-ui;font-weight:400;border-radius:2px 2px 2px 2px;justify-content:center;background-color:#580DB5;}#i7fxn{color:#00B8DBFF;cursor:pointer;font-size:16px;font-family:system-ui;text-decoration:underline;}\n\n"
+    },
+    "box" : {
+      "style" : {
+        "position" : "fixed",
+        "left" : "0",
+        "right" : "0",
+        "top" : "0",
+        "bottom" : "0",
+        "min-width" : "100%",
+        "height" : "auto"
+      }
+    },
+    "page" : {
+      "lockScroll" : true,
+      "shiftTopElements" : true
+    },
+    "presentation" : {
+      "fullPage" : true,
+      "modal" : true
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-journey-fade-in 0.25s ease both;\n}\n@keyframes branch-journey-fade-in { from { opacity: 0; } to { opacity: 1; } }\n.branch-banner-exit {\n    animation: branch-journey-fade-out 0.25s ease both;\n}\n@keyframes branch-journey-fade-out { from { opacity: 1; } to { opacity: 0; } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Open the App",
+      "noApp" : "Get the App"
+    },
+    "showEvent" : {
+      "position" : "top",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

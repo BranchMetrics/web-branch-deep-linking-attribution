@@ -1,15 +1,22 @@
-import { API, KEY, UA } from '../fixtures.js';
+import { API, journeyPayload, KEY, UA } from '../fixtures.js';
 import { createPage, nextPage } from '../harness.js';
 
 // v2 must match v1 but for what comparable() drops.
 
+// Answers like the server: banner_payload only when the request asks.
 const pageview =
-  (v2, extra = {}, metadata = {}, edit = (t) => t) =>
+  (v2, extra = {}, metadata = {}, edit = (t) => t, { payload = true } = {}) =>
   (req) => {
     const res = API.pageviewWithJourney(extra, metadata)(req);
     res.body.template = edit(res.body.template);
     if (v2) {
       res.body.use_v2_renderer = true;
+      const params = new URLSearchParams(req.body);
+      if (payload && params.get('banner_payload') === '1') {
+        const journey = journeyPayload(params.get('callback_string'), metadata);
+        journey.render.creative.html = edit(journey.render.creative.html);
+        res.body.banner_payload = journey;
+      }
     }
     return res;
   };
@@ -294,58 +301,61 @@ describe('behavior: journeys v2 matches v1', () => {
 });
 
 describe('behavior: journeys v2', () => {
-  const fallbackReason = (trace) => {
-    const url = trace.find((e) => e.path === '/v1/url');
-    return JSON.parse(url?.body.instrumentation ?? '{}')['journey-v2-fallback'];
-  };
-
-  async function showAndLink(p) {
+  async function showAndTrack(p) {
     p.branch.init(KEY);
     await p.run(2000);
-    p.branch.link({}, p.cb('link'));
+    p.branch.track('pageview');
     return p.finish();
   }
 
-  it('falls back to v1 for a template it cannot adapt, and reports why', async () => {
+  const pageviewBody = (trace) =>
+    trace.find((e) => e.path === '/v1/pageview')?.body;
+
+  // The server sends no payload for a creative it can't build one for, e.g. one with
+  // @font-face.
+  it('renders v1 from the template when the server sends no payload', async () => {
     const withFontFace = (t) =>
       t.replace(
         '<style type="text/css" id="branch-css">',
         '$&@font-face { font-family: X; src: url(x.woff); }\n',
       );
-    const result = await showAndLink(
+    const result = await showAndTrack(
       journeyPage(true, {
-        routes: { '/v1/pageview': pageview(true, {}, {}, withFontFace) },
+        routes: {
+          '/v1/pageview': pageview(true, {}, {}, withFontFace, {
+            payload: false,
+          }),
+        },
       }),
     );
     expect(result.dom.body).not.toContain('branch-journey-host');
     expect(result.dom.iframes.map((f) => f.id)).toEqual([
       'branch-banner-iframe',
     ]);
-    expect(fallbackReason(result.trace)).toBe('font-face');
   });
 
-  it('falls back to v1 in a browser without cascade layers', async () => {
-    const result = await showAndLink(
+  it("doesn't ask for a payload in a browser without cascade layers, and renders v1", async () => {
+    const result = await showAndTrack(
       journeyPage(true, {
         before: (win) => {
           delete win.CSSLayerBlockRule;
         },
       }),
     );
+    expect(pageviewBody(result.trace)).not.toHaveProperty('banner_payload');
     expect(result.dom.iframes.map((f) => f.id)).toEqual([
       'branch-banner-iframe',
     ]);
-    expect(fallbackReason(result.trace)).toBe('no-css-layers');
   });
 
-  it('reports no fallback when it renders', async () => {
-    const result = await showAndLink(journeyPage(true));
+  it('asks for the payload and renders v2 from it', async () => {
+    const result = await showAndTrack(journeyPage(true));
+    expect(pageviewBody(result.trace).banner_payload).toBe('1');
     expect(result.dom.body).toContain('branch-journey-host');
-    expect(fallbackReason(result.trace)).toBeUndefined();
   });
 
   it('falls back to v1 when the page breaks attachShadow', async () => {
-    const result = await showAndLink(
+    const result = await showAndTrack(
       journeyPage(true, {
         before: (win) => {
           win.Element.prototype.attachShadow = () => {
@@ -359,7 +369,6 @@ describe('behavior: journeys v2', () => {
     expect(result.dom.iframes.map((f) => f.id)).toEqual([
       'branch-banner-iframe',
     ]);
-    expect(fallbackReason(result.trace)).toBe('render-error');
   });
 
   it('shows and closes on a page that extends Object and Array prototypes (Prototype, MooTools)', async () => {

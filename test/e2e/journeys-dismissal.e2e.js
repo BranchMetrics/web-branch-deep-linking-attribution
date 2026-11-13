@@ -11,6 +11,11 @@ const DISMISSED_FOREVER = {
       '"position":"top"',
       '"position":"top","globalDismissPeriod":-1',
     ),
+  payload: (callback) => {
+    const payload = TOP.payload(callback);
+    payload.dismissal.globalPeriodSeconds = -1;
+    return payload;
+  },
 };
 
 test.describe('@mobile', () => {

@@ -1,7 +1,10 @@
 import type { JourneyLinkData } from '../link-data.js';
 import type { RenderPayload } from './renderer/index.js';
 
-// What the backend should eventually send; adapter.ts builds it until then.
+// The banner_payload format this SDK reads.
+export const BANNER_PAYLOAD_VERSION = 1;
+
+// The server sends render, dismissal and cta.script; response.ts adds the rest.
 export interface JourneyPayload {
   render: RenderPayload;
   view: { id: string; audienceRuleId?: string };

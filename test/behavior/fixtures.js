@@ -45,32 +45,85 @@ const openBody = (extra = {}) => ({
  * #branch-mobile-action, and with $journeys_cta set rewrites the
  * `validate(...);` call to point at that link.
  */
+const JOURNEY_METADATA = {
+  bannerHeight: '76px',
+  position: 'top',
+  sticky: 'absolute',
+  globalDismissPeriod: 7,
+  ctaText: { has_app: 'OPEN', no_app: 'GET' },
+};
+const JOURNEY_CSS =
+  '.branch-banner-content { background-color: rgba(255, 255, 255, 1); height: 76px; }\n#branch-mobile-action { color: #fff; }';
+const JOURNEY_BODY = [
+  '<div id="branch-banner"><div class="branch-banner-content">',
+  '<a id="branch-mobile-action" href="#">Open</a>',
+  '<div class="branch-banner-continue">No thanks</div>',
+  '<div class="branch-banner-close">x</div>',
+  '</div></div>',
+].join('\n');
+
+/** The CTA script node-api fills in for the SDK's `callback_string`. */
+export const journeyScript = (callback) =>
+  [
+    'function validate(url) { window.top.location = url; }',
+    `window.${callback}(function () {`,
+    'validate("https://bnc.lt/j/jv1-cta");',
+    '});',
+  ].join('\n');
+
 export const journeyHtml = (callback, metadata = {}) =>
   [
     '<html><head>',
     '<style>#branch-banner-spacer {margin-bottom: 76px;}</style>',
     `<script type="application/json">${JSON.stringify({
-      bannerHeight: '76px',
-      position: 'top',
-      sticky: 'absolute',
-      globalDismissPeriod: 7,
-      ctaText: { has_app: 'OPEN', no_app: 'GET' },
+      ...JOURNEY_METADATA,
       ...metadata,
     })}</script>`,
-    '<style type="text/css" id="branch-css">.branch-banner-content { background-color: rgba(255, 255, 255, 1); height: 76px; }\n#branch-mobile-action { color: #fff; }</style>',
+    `<style type="text/css" id="branch-css">${JOURNEY_CSS}</style>`,
     '<style type="text/css" id="branch-iframe-css">#branch-banner-iframe { border-radius: 4px; }</style>',
     '<script type="text/javascript">',
-    'function validate(url) { window.top.location = url; }',
-    `window.${callback}(function () {`,
-    'validate("https://bnc.lt/j/jv1-cta");',
-    '});',
+    journeyScript(callback),
     '</script>',
-    '</head><body><div id="branch-banner"><div class="branch-banner-content">',
-    '<a id="branch-mobile-action" href="#">Open</a>',
-    '<div class="branch-banner-continue">No thanks</div>',
-    '<div class="branch-banner-close">x</div>',
-    '</div></div></body></html>',
+    `</head><body>${JOURNEY_BODY}</body></html>`,
   ].join('\n');
+
+/** banner_payload for journeyHtml(callback, metadata): the same creative, ready to render,
+ * as audience-rule-service builds it. */
+export const journeyPayload = (callback, metadata = {}) => {
+  const m = { ...JOURNEY_METADATA, ...metadata };
+  const height = /^([\d.]+)(vh|svh|dvh|%)$/.exec(m.bannerHeight);
+  const fullPage = !!height && Number(height[1]) >= 100;
+  return {
+    version: 1,
+    render: {
+      creative: {
+        deviceType: 'mobile',
+        html: JOURNEY_BODY,
+        css: JOURNEY_CSS,
+      },
+      box: { style: { 'border-radius': '4px' } },
+      page: {
+        lockScroll: fullPage && m.sticky === 'fixed',
+        shiftTopElements: m.position === 'top',
+      },
+      // JOURNEY_BODY has no dismiss background.
+      presentation: { fullPage, modal: fullPage },
+      animation: {
+        enterClass: 'branch-banner-enter',
+        exitClass: 'branch-banner-exit',
+        css: '',
+      },
+      fonts: [],
+      ctaText: { hasApp: m.ctaText.has_app, noApp: m.ctaText.no_app },
+      showEvent: { position: m.position, sticky: m.sticky },
+    },
+    dismissal: {
+      globalPeriodSeconds: m.globalDismissPeriod,
+      redirectUrl: m.dismissRedirect,
+    },
+    cta: { script: journeyScript(callback) },
+  };
+};
 
 export const API = {
   openBody,

@@ -1,4 +1,4 @@
-import { type A11yHandle, installA11y, isModal } from './a11y.js';
+import { type A11yHandle, installA11y } from './a11y.js';
 import { enter, exit, type Wait } from './animation.js';
 import { ensureFonts, removeFonts } from './fonts.js';
 import { bindControls } from './interactions.js';
@@ -17,16 +17,12 @@ import type {
 } from './types.js';
 
 // The only entry point for code outside renderer/ (enforced by check-cycles.mjs).
-export { animationDurationMs } from './css-animation.js';
-export { isFullPage, isRelative } from './dimension.js';
 export {
   HOST_ID,
   supportsCssLayers,
   supportsShadowDom,
 } from './mount.js';
 export type {
-  Dimension,
-  PlacementUnit,
   Platform,
   RenderAction,
   RenderedJourney,
@@ -96,12 +92,11 @@ export function render(
         opts.onRemoved?.();
       }
     });
-    if (payload.creative.wcag) {
-      a11y = installA11y(mounted.root, {
-        modal: isModal(payload, mounted.root),
-        onEscape: () => report('close'),
-      });
-    }
+    a11y = installA11y(mounted.root, {
+      // Only modal creatives trap Tab; trapping inline banners fails WCAG 2.1.2.
+      modal: payload.presentation.modal,
+      onEscape: () => report('close'),
+    });
     enterWait = enter(
       mounted.banner,
       payload.animation,

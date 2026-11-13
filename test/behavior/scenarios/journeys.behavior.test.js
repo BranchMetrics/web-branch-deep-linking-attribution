@@ -158,29 +158,62 @@ describe('behavior: journeys', () => {
   });
 
   it('v2: renders a shadow DOM journey and dismisses it', async () => {
-    const v2Template = (callback) =>
-      '<html><head><style type="text/css" id="branch-css">#branch-banner { position: fixed; left: 0; right: 0; bottom: 0; }</style>' +
-      '<style type="text/css" id="branch-iframe-css">#branch-banner-iframe { border: 0; z-index: 99999; position: fixed; top: 0; bottom: 0; height: 100vh; }</style></head>' +
-      '<body><div id="branch-banner"><div class="branch-banner-content">' +
+    const v2Script = (callback) =>
+      `if (typeof ${callback} === 'function') { ${callback}(function () {}); }`;
+    const v2Body =
+      '<div id="branch-banner"><div class="branch-banner-content">' +
       '<div class="branch-banner-close" role="button" tabindex="0">x</div>' +
-      '<div id="branch-mobile-action" role="button" tabindex="0">Get</div></div></div>' +
-      `<script type="text/javascript">if (typeof ${callback} === 'function') { ${callback}(function () {}); }</script>` +
+      '<div id="branch-mobile-action" role="button" tabindex="0">Get</div></div></div>';
+    const v2Placement = 'position: fixed; left: 0; right: 0; bottom: 0;';
+    const v2Css = `#branch-banner { ${v2Placement} }`;
+    const v2Template = (callback) =>
+      `<html><head><style type="text/css" id="branch-css">${v2Css}</style>` +
+      '<style type="text/css" id="branch-iframe-css">#branch-banner-iframe { border: 0; z-index: 99999; position: fixed; top: 0; bottom: 0; height: 100vh; }</style></head>' +
+      `<body>${v2Body}` +
+      `<script type="text/javascript">${v2Script(callback)}</script>` +
       '<script type="application/json">{"bannerHeight":"100vh","position":"bottom","sticky":"fixed","offsetY":"0","isIntrinsic":true,"ctaText":{"has_app":"Open","no_app":"Get"}}</script>' +
       '</body></html>';
+    const v2Payload = (callback) => ({
+      version: 1,
+      render: {
+        creative: {
+          deviceType: 'mobile',
+          html: v2Body,
+          css: v2Css,
+        },
+        box: { style: {} },
+        page: { lockScroll: true, shiftTopElements: false },
+        presentation: { fullPage: true, modal: true },
+        animation: {
+          enterClass: 'branch-banner-enter',
+          exitClass: 'branch-banner-exit',
+          css: '',
+        },
+        fonts: [],
+        ctaText: { hasApp: 'Open', noApp: 'Get' },
+        showEvent: { position: 'bottom', sticky: 'fixed' },
+      },
+      dismissal: {},
+      cta: { script: v2Script(callback) },
+    });
     const p = createPage({
       ua: UA.androidChrome,
       routes: {
-        '/v1/pageview': (req) => ({
-          body: {
+        '/v1/pageview': (req) => {
+          const params = new URLSearchParams(req.body);
+          const callback = params.get('callback_string');
+          const body = {
             branch_view_enabled: true,
             use_v2_renderer: true,
-            template: v2Template(
-              new URLSearchParams(req.body).get('callback_string'),
-            ),
+            template: v2Template(callback),
             event_data: { branch_view_data: { id: 'jv2' } },
             journey_link_data: { type: 'mobile', url: 'https://bnc.lt/j/jv2' },
-          },
-        }),
+          };
+          if (params.get('banner_payload') === '1') {
+            body.banner_payload = v2Payload(callback);
+          }
+          return { body };
+        },
       },
     });
     p.listen();
