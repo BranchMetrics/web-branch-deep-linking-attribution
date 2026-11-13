@@ -1,9 +1,14 @@
-import { BODY_CLASS, HTML_CLASS, scopeDocumentSelectors } from './css-scope.js';
 import { remToPx } from './css-units.js';
 import { setNonce } from './nonce.js';
+import { cleanCreativeHtml } from './sanitize.js';
 import type { Platform, RenderPayload } from './types.js';
 
 export const HOST_ID = 'branch-journey-host';
+// Stand-ins for v1's iframe <html> and <body>, for the reset below. The creative's own
+// html, :root and body rules match nothing here; in every creative so far they are
+// margin resets for the iframe, which these boxless wrappers don't need.
+export const HTML_CLASS = 'branch-journey-html';
+export const BODY_CLASS = 'branch-journey-root';
 
 export interface Mounted {
   host: HTMLElement;
@@ -29,36 +34,31 @@ export function supportsCssLayers(): boolean {
   return !!view && 'CSSLayerBlockRule' in view;
 }
 
-// Layers: branch-renderer < reset < creative < unlayered animation. The renderer's rules
-// are !important in the first layer, which beats everything, even creative !important.
-// The html wrapper resets inherited page styles. `all` skips direction, and WebKit's
-// `initial` keeps the inherited font-family.
+// Layers: branch-renderer < reset < creative < branch-box < unlayered animation. The
+// first layer's !important rules beat everything, even creative !important. The box is
+// normal declarations in the last layer: it beats the creative's normal CSS, and the
+// page's ::part(banner) rules, from the outer tree, beat it. The html wrapper resets
+// inherited page styles. `all` skips direction, and WebKit's `initial` keeps the
+// inherited font-family.
 const RESET_CSS = [
-  '@layer branch-renderer, reset, creative;',
+  '@layer branch-renderer, reset, creative, branch-box;',
   `@layer branch-renderer {\n:host, .${HTML_CLASS}, .${BODY_CLASS} { display: contents !important; }\n}`,
   `@layer reset {\n.${HTML_CLASS} { all: initial; direction: ltr; font-family: system-ui, serif; }\n*, *::before, *::after { box-sizing: border-box; }\n}`,
 ].join('\n');
 
-function important(declarations: string): string {
-  return declarations
-    .split(';')
-    .map((d) => d.trim().replace(/\s*!\s*important$/i, ''))
-    .filter(Boolean)
-    .map((d) => `${d} !important;`)
-    .join(' ');
-}
+const BANNER_Z_INDEX = 99999;
 
 export function shadowCss(payload: RenderPayload, rootPx = 16): string {
-  const { zIndex, css: geometryCss } = payload.geometry;
-  const creativeCss = remToPx(
-    scopeDocumentSelectors(payload.creative.css),
-    rootPx,
-  );
-  const geometry = important(`z-index: ${zIndex}; ${geometryCss}`);
+  const creativeCss = remToPx(payload.creative.css, rootPx);
+  const box = Object.entries(payload.box.style)
+    .map(([property, value]) => ` ${property}: ${value};`)
+    .join('');
   return [
     RESET_CSS,
-    `@layer branch-renderer {\n#branch-banner { ${geometry} }\n.branch-banner-dismiss-background { z-index: ${zIndex - 1} !important; }\n}`,
+    // In the first layer so an intrinsic creative's own placement rule wins.
+    `@layer branch-renderer {\n#branch-banner { position: relative; }\n}`,
     `@layer creative {\n${creativeCss}\n}`,
+    `@layer branch-box {\n#branch-banner { z-index: ${BANNER_Z_INDEX};${box} }\n.branch-banner-dismiss-background { z-index: ${BANNER_Z_INDEX - 1}; }\n}`,
     payload.animation.css,
   ]
     .filter(Boolean)
@@ -77,7 +77,7 @@ function rootFontPx(doc: Document, rootEl: HTMLElement): number {
   }
 }
 
-function ctaText(payload: RenderPayload, hasApp: boolean): string | undefined {
+function ctaText(payload: RenderPayload, hasApp: boolean): string {
   const { hasApp: openText, noApp: getText } = payload.ctaText;
   return hasApp && openText ? openText : getText;
 }
@@ -99,14 +99,14 @@ function nameBanner(banner: HTMLElement): void {
   banner.setAttribute('aria-label', BANNER_LABEL);
 }
 
-// v1 parity: no shadow around a transparent creative (e.g. a floating button). Inline
-// !important is the only thing that beats the renderer layer.
+// v1 parity: no shadow around a transparent creative (e.g. a floating button). Inline,
+// so it beats the box layer while a page ::part(banner) rule still beats it.
 function dropShadowWhenTransparent(
   doc: Document,
   banner: HTMLElement,
   payload: RenderPayload,
 ): void {
-  if (!/(^|;)\s*box-shadow\s*:/i.test(payload.geometry.css)) {
+  if (!('box-shadow' in payload.box.style)) {
     return;
   }
   const content = banner.querySelector('.branch-banner-content');
@@ -118,7 +118,7 @@ function dropShadowWhenTransparent(
       content,
     ).backgroundColor;
     if (isTransparent(bg)) {
-      banner.style.setProperty('box-shadow', 'none', 'important');
+      banner.style.setProperty('box-shadow', 'none');
     }
   } catch (_e) {}
 }
@@ -173,7 +173,7 @@ export function mount(payload: RenderPayload, opts: MountOptions): Mounted {
       payload,
       usesRem ? rootFontPx(doc, wrapper) : undefined,
     );
-    wrapper.innerHTML = payload.creative.html;
+    wrapper.appendChild(cleanCreativeHtml(doc, payload.creative.html));
 
     const text = ctaText(payload, opts.hasApp);
     const button = root.getElementById('branch-mobile-action');
@@ -183,6 +183,8 @@ export function mount(payload: RenderPayload, opts: MountOptions): Mounted {
     }
 
     const banner = root.getElementById('branch-banner') as HTMLElement;
+    // The documented customer hook for styling the banner: ::part(banner).
+    banner.setAttribute('part', 'banner');
     nameBanner(banner);
     dropShadowWhenTransparent(doc, banner, payload);
     return { host, root, banner };

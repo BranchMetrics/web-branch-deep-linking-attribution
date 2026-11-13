@@ -17,30 +17,27 @@ export interface Dimension {
 export interface RenderPayload {
   creative: {
     deviceType: 'mobile' | 'desktop';
-    variant?: string;
     html: string;
-    // As written for v1's iframe; the renderer adapts it to the shadow root.
+    // As written for v1's iframe; its html, :root and body rules match nothing in the
+    // shadow root (see mount.ts).
     css: string;
-    wcag: boolean;
   };
-  placement: {
-    sticky: 'absolute' | 'fixed';
-    anchorY: 'top' | 'bottom';
-    bannerHeight: Dimension;
-    offsetY?: Dimension;
-    isIntrinsic: boolean;
-    injectorSelector?: string;
+  // #branch-banner's box: v1's iframe CSS, property to value, in order. Empty for
+  // intrinsic creatives, whose placement rule stays in the creative CSS as in v1.
+  box: { style: Record<string, string> };
+  page: {
+    // The distance is measured: banner height plus offset.
+    push?: { side: 'top' | 'bottom'; offset?: Dimension };
+    lockScroll: boolean;
+    shiftTopElements: boolean;
   };
-  // #branch-banner's box (v1's iframe CSS). css is empty for intrinsic creatives.
-  geometry: {
-    css: string;
-    zIndex: number;
-    // The distance is measured: banner height plus placement.offsetY.
-    push?: { side: 'top' | 'bottom' };
-  };
+  presentation: { fullPage: boolean; modal: boolean };
   animation: { enterClass: string; exitClass: string; css: string };
-  fonts: string[];
-  ctaText: { hasApp?: string; noApp?: string };
+  fonts: Array<{ family: string; url: string }>;
+  ctaText: { hasApp: string; noApp: string };
+  // Only for willShowJourney's v1-era fields (bannerPagePlacement, isBannerInline,
+  // isBannerSticky); the renderer ignores it. To go once page CSS variables replace them.
+  showEvent: { position: 'top' | 'bottom'; sticky: 'absolute' | 'fixed' };
 }
 
 export type Platform = 'ios' | 'android' | 'other';

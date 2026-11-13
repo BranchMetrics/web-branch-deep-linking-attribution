@@ -1,0 +1,46 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "mobile",
+      "html" : "<div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"i09eq\" class=\"branch-banner-content\"><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"ia85n\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"i0omf\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div><img id=\"i70ck\" alt=\"App Icon\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/0276061f-edd8-498f-93b9-1d0615b6ef43.png\"><div id=\"iyr9n\"><div id=\"i1ra2\">YOUR APP</div><div id=\"ixj2e\">Insert a description of your app here.</div><div id=\"i6nsn\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"itbmg\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"iyrpk\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"ini3d\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"irv8c\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"iul3j\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg></div></div><div id=\"branch-mobile-action\" role=\"button\" tabindex=\"0\" aria-label=\"Open\" class=\"branch-banner-button\">Open</div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#i09eq{gap:8px;width:100%;display:flex;padding:12px 14px 12px 14px;min-width:100px;min-height:50px;align-items:center;align-content:center;background-color:#580DB5;}#branch-banner{overflow:hidden;}#i0omf{width:100%;height:100%;}#ia85n{color:#FFFFFFFF;width:24px;cursor:pointer;height:24px;display:flex;padding:4px;align-items:center;justify-content:center;}#iyr9n{gap:4px;display:flex;flex-grow:1;min-width:50px;min-height:50px;align-items:flex-start;flex-shrink:0;flex-direction:column;}#i1ra2{color:#FFFFFFFF;margin:0;padding:0;font-size:14px;font-family:system-ui;font-weight:400;}#ixj2e{color:#FFFFFFFF;margin:0;padding:0;font-size:9px;font-family:system-ui;font-weight:400;}#i6nsn{color:#FFFFFFFF;font-size:12px;}#i70ck{width:50px;height:50px;box-shadow:0 3px 7px 0 #00000051 ;border-radius:8px 8px 8px 8px;}#branch-mobile-action{color:#580DB5FF;cursor:pointer;height:28px;display:flex;padding:0px 16px;font-size:10px;align-items:center;font-family:system-ui;font-weight:500;border-radius:500px 500px 500px 500px;justify-content:center;background-color:#FFFFFFFF;}#itbmg{width:1em;height:1em;}#iyrpk{width:1em;height:1em;}#ini3d{width:1em;height:1em;}#irv8c{width:1em;height:1em;}#iul3j{width:1em;height:1em;}\n\n"
+    },
+    "box" : {
+      "style" : {
+        "box-shadow" : "0 0 5px rgba(0, 0, 0, .35)",
+        "position" : "fixed",
+        "left" : "0",
+        "right" : "0",
+        "top" : "0",
+        "min-width" : "100%"
+      }
+    },
+    "page" : {
+      "push" : {
+        "side" : "top"
+      },
+      "lockScroll" : false,
+      "shiftTopElements" : true
+    },
+    "presentation" : {
+      "fullPage" : false,
+      "modal" : false
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-slide-in-top 0.25s ease both;\n}\n@keyframes branch-slide-in-top { from { transform: translateY(-100%); } to { transform: translate(0); } }\n.branch-banner-exit {\n    animation: branch-slide-out-top 0.25s ease both;\n}\n@keyframes branch-slide-out-top { from { transform: translate(0); } to { transform: translateY(-100%); } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Open",
+      "noApp" : "Get"
+    },
+    "showEvent" : {
+      "position" : "top",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

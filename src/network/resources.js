@@ -239,6 +239,7 @@ resources.pageview = {
     'is_iframe': validator(false, validationTypes.BOOLEAN),
     'data': validator(false, validationTypes.OBJECT),
     'callback_string': validator(false, validationTypes.STRING),
+    'banner_payload': validator(false, validationTypes.NUMBER),
     'audience_rule_id': validator(false, validationTypes.STRING),
     'journey_dismissals': validator(false, validationTypes.OBJECT),
     'identity_id': validator(false, validationTypes.STRING),

@@ -8,13 +8,9 @@ import {
 import { task_queue } from '../../../src/core/queue.js';
 import { branch_view } from '../../../src/journeys/branch-view.js';
 import { journeys_utils } from '../../../src/journeys/journeys-utils.js';
-import {
-  prepareV2,
-  resetV2ForTests,
-  showV2,
-} from '../../../src/journeys/v2/index.js';
+import { resetV2ForTests, showV2 } from '../../../src/journeys/v2/index.js';
 import { useFakeEnv } from '../../helpers/fake-env.js';
-import { adapterInput, makeBranch } from './fixtures.js';
+import { makeBranch, sampleJourneyPayload } from './fixtures.js';
 
 // What branch.closeJourney is: the body behind the SDK's command queue.
 const closeJourney = wrap(callback_params.CALLBACK_ERR, closeJourneyBody);
@@ -32,10 +28,9 @@ describe('closeJourney with a v2 journey', () => {
   });
 
   function show(branch) {
-    showV2(prepareV2(adapterInput(), branch), {
+    showV2(sampleJourneyPayload(), {
       branch,
       branchView: branch_view,
-      hasApp: false,
       testMode: false,
       entryAnimationDisabled: false,
       exitAnimationDisabled: false,
@@ -45,7 +40,7 @@ describe('closeJourney with a v2 journey', () => {
   it('calls back once, after didCloseJourney', () => {
     const branch = makeBranch();
     show(branch);
-    // The fixture's 0.25s slide; jsdom fires no animationend, so the 50ms grace ends it.
+    // jsdom has no getAnimations, so the entrance settles at once.
     vi.advanceTimersByTime(300);
     const cb = vi.fn();
     closeJourney.call(branch, cb);

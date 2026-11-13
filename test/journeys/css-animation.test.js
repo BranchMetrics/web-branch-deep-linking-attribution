@@ -1,7 +1,7 @@
 import {
   animationDurationMs,
   timeValueMsAt,
-} from '../../../../src/journeys/v2/renderer/css-animation.js';
+} from '../../src/journeys/css-animation.js';
 
 describe('journeys/css-animation', () => {
   it('timeValueMsAt parses s and ms tokens by index', () => {

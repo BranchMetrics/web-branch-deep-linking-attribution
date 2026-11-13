@@ -1,24 +1,18 @@
 import { log } from '../../core/context.js';
-import {
-  type AdapterInput,
-  type FallbackReason,
-  toPayload,
-} from './adapter.js';
 import { Journey, type JourneyDeps, NOT_SHOWN_ERROR } from './journey.js';
-import type { JourneyPayload } from './payload.js';
+import { BANNER_PAYLOAD_VERSION, type JourneyPayload } from './payload.js';
 import { supportsCssLayers, supportsShadowDom } from './renderer/index.js';
 
 type RenderDeps = Omit<JourneyDeps, 'onFinished'>;
 
-const FALLBACK_INSTRUMENTATION_KEY = 'journey-v2-fallback';
-
 let active: Journey | null = null;
 let waiting: Array<() => void> = [];
 
-// Sent with the next /v1/url request's instrumentation.
-function recordFallback(branch: any, reason: FallbackReason): void {
-  log(branch._ctx, `Journeys v2 fell back to v1: ${reason}`);
-  branch._ctx.instrumentation[FALLBACK_INSTRUMENTATION_KEY] = reason;
+// Browsers that can't run v2 don't ask, so the server sends them only the template.
+export function bannerPayloadVersion(): number | undefined {
+  return supportsShadowDom() && supportsCssLayers()
+    ? BANNER_PAYLOAD_VERSION
+    : undefined;
 }
 
 // A journey whose host was removed out of band (SPA re-render) is discarded first, in
@@ -51,28 +45,7 @@ function runWaiting(): void {
   }
 }
 
-// Null (fallback recorded) means render with v1.
-export function prepareV2(
-  input: AdapterInput,
-  branch: any,
-): JourneyPayload | null {
-  let reason: FallbackReason | null = null;
-  if (!supportsShadowDom()) {
-    reason = 'no-shadow-dom';
-  } else if (!supportsCssLayers()) {
-    reason = 'no-css-layers';
-  } else {
-    const result = toPayload(input, branch);
-    if ('payload' in result) {
-      return result.payload;
-    }
-    reason = result.fallback;
-  }
-  recordFallback(branch, reason);
-  return null;
-}
-
-// False (fallback recorded) means render with v1. See Journey.show().
+// False (fallback logged) means render with v1. See Journey.show().
 export function showV2(payload: JourneyPayload, deps: RenderDeps): boolean {
   const journey = new Journey(payload, {
     ...deps,
@@ -86,7 +59,7 @@ export function showV2(payload: JourneyPayload, deps: RenderDeps): boolean {
   active = journey;
   const handled = journey.show(payload);
   if (!handled) {
-    recordFallback(deps.branch, 'render-error');
+    log(deps.branch._ctx, 'Journeys v2 fell back to v1: render-error');
   }
   return handled;
 }

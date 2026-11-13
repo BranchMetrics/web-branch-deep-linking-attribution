@@ -1,11 +1,6 @@
 import { server, userEvent } from 'vitest/browser';
-import { toPayload } from '../../src/journeys/v2/adapter.js';
 import { render } from '../../src/journeys/v2/renderer/index.js';
-import {
-  adapterInput,
-  makeRenderPayload,
-  templateHtml,
-} from '../journeys/v2/fixtures.js';
+import { makeRenderPayload } from '../journeys/v2/fixtures.js';
 
 // What jsdom can't check: the cascade between page and shadow CSS, page layout and
 // positioning. Each test sets up the host page, shows a journey and measures it.
@@ -15,19 +10,36 @@ const STANDARD_TOP = {
     html: '<div id="branch-banner"><div class="branch-banner-content"><div id="branch-mobile-action">Get</div></div></div>',
     // The content decides the banner's height.
     css: '#branch-banner { background: #eee; } .branch-banner-content { height: 76px; }',
-    wcag: false,
   },
-  placement: {
-    sticky: 'absolute',
-    anchorY: 'top',
-    bannerHeight: { value: 76, unit: 'px' },
-    isIntrinsic: false,
+  page: { push: { side: 'top' }, lockScroll: false },
+  presentation: { fullPage: false },
+  showEvent: { position: 'top', sticky: 'absolute' },
+  // What the server sends: the iframe's box minus its fixed height.
+  box: {
+    style: {
+      position: 'absolute',
+      left: '0',
+      right: '0',
+      top: '0',
+      'min-width': '100%',
+    },
   },
-  geometry: {
-    // What the adapter emits: the iframe's box minus its fixed height.
-    css: 'position: absolute; left: 0; right: 0; top: 0; min-width: 100%;',
-    zIndex: 99999,
-    push: { side: 'top' },
+};
+
+// A 76px top banner whose content is 60px tall.
+const CONTENT_SIZED_TOP = {
+  creative: { css: '.branch-banner-content { height: 60px; }' },
+  page: { lockScroll: false },
+  presentation: { fullPage: false },
+  showEvent: { position: 'top', sticky: 'absolute' },
+  box: {
+    style: {
+      position: 'absolute',
+      left: '0',
+      right: '0',
+      top: '0',
+      'min-width': '100%',
+    },
   },
 };
 
@@ -45,7 +57,6 @@ function show(payload) {
   return new Promise((resolve) => {
     journey = render(payload, {
       platform: 'android',
-      hasApp: false,
       onAction() {},
       onShown: resolve,
     });
@@ -56,7 +67,6 @@ function showWith(payload, opts) {
   return new Promise((resolve) => {
     journey = render(payload, {
       platform: 'android',
-      hasApp: false,
       onAction() {},
       ...opts,
       onShown: resolve,
@@ -105,10 +115,17 @@ describe('journeys/v2 renderer in a real browser', () => {
           ...STANDARD_TOP.creative,
           css: '#branch-banner { height: 200px; background: #eee; }',
         },
-        placement: { ...STANDARD_TOP.placement, sticky: 'fixed' },
-        geometry: {
-          css: 'position: fixed; left: 0; right: 0; top: 0; bottom: 0; height: auto;',
-          zIndex: 99999,
+        showEvent: { ...STANDARD_TOP.showEvent, sticky: 'fixed' },
+        page: { lockScroll: false },
+        box: {
+          style: {
+            position: 'fixed',
+            left: '0',
+            right: '0',
+            top: '0',
+            bottom: '0',
+            height: 'auto',
+          },
         },
       }),
     );
@@ -177,24 +194,29 @@ describe('journeys/v2 renderer in a real browser', () => {
     });
   });
 
-  it("applies the creative's body rules, as v1's iframe body did", async () => {
-    const result = toPayload(
-      adapterInput({
-        html: templateHtml({
-          css: 'body { font-family: monospace; color: rgb(1, 2, 3); } #branch-banner { position: fixed; left: 0; right: 0; bottom: 0; }',
-        }),
+  // A shadow root has no html or body. Every creative's rules for them are margin resets
+  // for v1's iframe; any others are ignored in v2, and none reach the page.
+  it("ignores the creative's html, :root and body rules, wherever they are", async () => {
+    setPage('', '<p id="page">page</p>');
+    await show(
+      makeRenderPayload({
+        ...STANDARD_TOP,
+        creative: {
+          ...STANDARD_TOP.creative,
+          // Minified, as GrapesJS writes media rules.
+          css: `${STANDARD_TOP.creative.css}html{color:rgb(1, 2, 3)}:root{--c:rgb(4, 5, 6)}#branch-mobile-action{background-color:var(--c, rgb(7, 8, 9))}@media (max-width:480px){body{font-family:monospace}}`,
+        },
       }),
-      { _branchViewData: {} },
     );
-    await show({
-      ...result.payload.render,
-      animation: { ...result.payload.render.animation, css: '' },
-    });
     const button = getComputedStyle(
       shadow().getElementById('branch-mobile-action'),
     );
-    expect(button.fontFamily).toBe('monospace');
-    expect(button.color).toBe('rgb(1, 2, 3)');
+    expect(button.color).not.toBe('rgb(1, 2, 3)');
+    expect(button.backgroundColor).toBe('rgb(7, 8, 9)');
+    expect(button.fontFamily).not.toBe('monospace');
+    const page = getComputedStyle(document.getElementById('page'));
+    expect(page.color).not.toBe('rgb(1, 2, 3)');
+    expect(page.fontFamily).not.toBe('monospace');
   });
 
   it("resolves the creative's rem against the user's default size, not the page root", async () => {
@@ -204,8 +226,7 @@ describe('journeys/v2 renderer in a real browser', () => {
         ...STANDARD_TOP,
         creative: {
           ...STANDARD_TOP.creative,
-          // A monospace root has a smaller `medium`; rem must not be read after it applies.
-          css: 'body { font-family: monospace; } #branch-banner { padding: 1rem; }',
+          css: '#branch-banner { padding: 1rem; }',
         },
       }),
     );
@@ -215,32 +236,12 @@ describe('journeys/v2 renderer in a real browser', () => {
   });
 
   it('sizes the banner from its content, not the height the backend sent, and reports that height', async () => {
-    const result = toPayload(
-      adapterInput({
-        html: templateHtml({
-          metadata: {
-            bannerHeight: '76px',
-            position: 'top',
-            sticky: 'absolute',
-            isIntrinsic: false,
-            ctaText: { no_app: 'Get' },
-          },
-          css: '.branch-banner-content { height: 60px; }',
-          iframeCss:
-            '#branch-banner-iframe { border: 0; z-index: 99999; position: absolute; left: 0; right: 0; top: 0; min-width: 100%; height:76px; }',
-        }),
-      }),
-      { _branchViewData: {} },
-    );
-    await show({
-      ...result.payload.render,
-      animation: { ...result.payload.render.animation, css: '' },
-    });
+    await show(makeRenderPayload(CONTENT_SIZED_TOP));
     expect(rect(shadow().getElementById('branch-banner')).height).toBe(60);
     expect(journey.bannerHeight()).toBe(60);
   });
 
-  it('keeps its own rules over any creative rule, whatever the specificity or !important', async () => {
+  it('keeps its own rules over any creative rule, and the box over any normal one, whatever the specificity', async () => {
     setPage(
       'body { margin: 0; display: grid; grid-template-rows: auto 1fr auto; min-height: 100vh; } header { height: 50px; } footer { height: 40px; }',
       '<header>h</header><main>m</main><footer>f</footer>',
@@ -252,7 +253,7 @@ describe('journeys/v2 renderer in a real browser', () => {
         ...STANDARD_TOP,
         creative: {
           ...STANDARD_TOP.creative,
-          css: `${STANDARD_TOP.creative.css} body.branch-journey-root, html { display: flex !important; } div#branch-banner#branch-banner { position: static !important; top: 300px !important; z-index: 1 !important; }`,
+          css: `${STANDARD_TOP.creative.css} body.branch-journey-root, html { display: flex !important; } div#branch-banner#branch-banner { position: static; top: 300px; z-index: 1; }`,
         },
       }),
     );
@@ -266,25 +267,58 @@ describe('journeys/v2 renderer in a real browser', () => {
     expect(main.getBoundingClientRect().height).toBe(before);
   });
 
-  it("applies the creative's html and body rules wherever they are, as v1's iframe did", async () => {
+  it("places an intrinsic creative by its own rule over the renderer's default position", async () => {
+    setPage('body { margin: 0; }', '');
     await show(
       makeRenderPayload({
         ...STANDARD_TOP,
         creative: {
           ...STANDARD_TOP.creative,
-          // Minified, as GrapesJS writes media rules; html's color inherits through body.
-          css: `${STANDARD_TOP.creative.css}html{color:rgb(1, 2, 3)}@media (max-width:480px){body{font-family:monospace}}`,
+          css: `${STANDARD_TOP.creative.css}\n#branch-banner {\n    position: fixed;\n    left: 0; right: 0;\n    bottom: 0;\n}`,
         },
+        box: { style: {} },
+        page: { lockScroll: false },
       }),
     );
-    const button = getComputedStyle(
-      shadow().getElementById('branch-mobile-action'),
-    );
-    expect(button.color).toBe('rgb(1, 2, 3)');
-    expect(button.fontFamily).toBe('monospace');
+    const banner = shadow().getElementById('branch-banner');
+    expect(getComputedStyle(banner).position).toBe('fixed');
+    expect(banner.getBoundingClientRect().bottom).toBe(window.innerHeight);
   });
 
-  it("drops the geometry's box-shadow only when the content has no background", async () => {
+  it('lets the page restyle the box through ::part(banner)', async () => {
+    setPage(
+      '#branch-journey-host::part(banner) { z-index: 5; position: absolute; top: 40px; }',
+      '',
+    );
+    await show(
+      makeRenderPayload({
+        ...STANDARD_TOP,
+        box: { style: { ...STANDARD_TOP.box.style, position: 'fixed' } },
+      }),
+    );
+    const banner = shadow().getElementById('branch-banner');
+    expect(getComputedStyle(banner).zIndex).toBe('5');
+    expect(getComputedStyle(banner).position).toBe('absolute');
+    expect(rect(banner).top).toBe(40);
+  });
+
+  it("keeps the box over the creative's own normal rules for #branch-banner", async () => {
+    await show(
+      makeRenderPayload({
+        ...STANDARD_TOP,
+        creative: {
+          ...STANDARD_TOP.creative,
+          css: `${STANDARD_TOP.creative.css} #branch-banner { height: 300px; }`,
+        },
+        box: { style: { ...STANDARD_TOP.box.style, height: '50px' } },
+      }),
+    );
+    expect(
+      getComputedStyle(shadow().getElementById('branch-banner')).height,
+    ).toBe('50px');
+  });
+
+  it("drops the box's box-shadow only when the content has no background", async () => {
     const shadowed = (contentCss) =>
       makeRenderPayload({
         ...STANDARD_TOP,
@@ -292,9 +326,11 @@ describe('journeys/v2 renderer in a real browser', () => {
           ...STANDARD_TOP.creative,
           css: `.branch-banner-content { height: 76px; ${contentCss} }`,
         },
-        geometry: {
-          ...STANDARD_TOP.geometry,
-          css: `box-shadow: 0 0 5px rgba(0, 0, 0, 0.35); ${STANDARD_TOP.geometry.css}`,
+        box: {
+          style: {
+            'box-shadow': '0 0 5px rgba(0, 0, 0, 0.35)',
+            ...STANDARD_TOP.box.style,
+          },
         },
       });
     await show(shadowed('background: transparent;'));
@@ -312,12 +348,7 @@ describe('journeys/v2 renderer in a real browser', () => {
     setPage('', '<input id="search">');
     const search = document.getElementById('search');
     search.focus();
-    await show(
-      makeRenderPayload({
-        ...STANDARD_TOP,
-        creative: { ...STANDARD_TOP.creative, wcag: true },
-      }),
-    );
+    await show(makeRenderPayload(STANDARD_TOP));
     expect(document.activeElement).toBe(search);
     await close();
     expect(document.activeElement).toBe(search);
@@ -327,7 +358,7 @@ describe('journeys/v2 renderer in a real browser', () => {
     setPage('', '<input id="search">');
     const search = document.getElementById('search');
     search.focus();
-    // The default fixture is a full-page WCAG creative: modal.
+    // The default fixture is a full-page creative: modal.
     await show(makeRenderPayload());
     expect(document.activeElement.id).toBe('branch-journey-host');
     expect(shadow().activeElement).not.toBeNull();
@@ -350,27 +381,12 @@ describe('journeys/v2 renderer in a real browser', () => {
       'body { margin: 0; } header { height: 50px; }',
       '<header>h</header>',
     );
-    const result = toPayload(
-      adapterInput({
-        html: templateHtml({
-          metadata: {
-            bannerHeight: '76px',
-            position: 'top',
-            sticky: 'absolute',
-            isIntrinsic: false,
-            ctaText: { no_app: 'Get' },
-          },
-          css: '.branch-banner-content { height: 60px; }',
-          iframeCss:
-            'body { transition: 0.25s; margin-top: 76px; }\n#branch-banner-iframe { border: 0; z-index: 99999; position: absolute; left: 0; right: 0; top: 0; min-width: 100%; height:76px; }',
-        }),
+    await show(
+      makeRenderPayload({
+        ...CONTENT_SIZED_TOP,
+        page: { ...CONTENT_SIZED_TOP.page, push: { side: 'top' } },
       }),
-      { _branchViewData: {} },
     );
-    await show({
-      ...result.payload.render,
-      animation: { ...result.payload.render.animation, css: '' },
-    });
     await expectTop(document.querySelector('header'), 60);
   });
 
@@ -382,13 +398,12 @@ describe('journeys/v2 renderer in a real browser', () => {
     await show(
       makeRenderPayload({
         ...STANDARD_TOP,
-        placement: {
-          ...STANDARD_TOP.placement,
-          offsetY: { value: 10, unit: 'px' },
+        box: {
+          style: { position: 'absolute', left: '0', right: '0', top: '10px' },
         },
-        geometry: {
-          ...STANDARD_TOP.geometry,
-          css: 'position: absolute; left: 0; right: 0; top: 10px;',
+        page: {
+          ...STANDARD_TOP.page,
+          push: { side: 'top', offset: { value: 10, unit: 'px' } },
         },
       }),
     );
@@ -438,6 +453,51 @@ describe('journeys/v2 renderer behavior across engines', () => {
     expect(elapsed).toBeLessThan(1000);
   });
 
+  it('reports shown asynchronously, after render returns', async () => {
+    for (const animation of [SLIDE, { css: '' }]) {
+      let returned = false;
+      const shown = new Promise((resolve) => {
+        journey = render(makeRenderPayload({ ...STANDARD_TOP, animation }), {
+          platform: 'android',
+          onAction() {},
+          onShown: () => resolve(returned),
+        });
+      });
+      returned = true;
+      expect(await shown).toBe(true);
+      journey.discard();
+    }
+  });
+
+  it("doesn't wait for an infinite creative animation, on the banner or inside it", async () => {
+    const start = performance.now();
+    await show(
+      makeRenderPayload({
+        ...STANDARD_TOP,
+        creative: {
+          ...STANDARD_TOP.creative,
+          css: `${STANDARD_TOP.creative.css} @keyframes t-pulse { to { opacity: 0.5; } } #branch-mobile-action { animation: t-pulse 0.1s infinite; }`,
+        },
+        animation: {
+          css: `${SLIDE.css} #branch-banner.branch-banner-enter { animation: t-in 0.2s linear both, t-pulse 0.1s infinite; }`,
+        },
+      }),
+    );
+    expect(performance.now() - start).toBeLessThan(1000);
+  });
+
+  it('never reports shown once discarded mid-entrance', async () => {
+    const onShown = vi.fn();
+    journey = render(makeRenderPayload({ ...STANDARD_TOP, animation: SLIDE }), {
+      platform: 'android',
+      onAction() {},
+      onShown,
+    });
+    journey.discard();
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    expect(onShown).not.toHaveBeenCalled();
+  });
+
   it('keeps the journey on the page until the exit animation ends', async () => {
     await show(makeRenderPayload({ ...STANDARD_TOP, animation: SLIDE }));
     const start = performance.now();
@@ -466,14 +526,16 @@ describe('journeys/v2 renderer behavior across engines', () => {
     await show(
       makeRenderPayload({
         ...STANDARD_TOP,
-        placement: {
-          ...STANDARD_TOP.placement,
-          sticky: 'fixed',
-          anchorY: 'bottom',
-        },
-        geometry: {
-          css: 'position: fixed; left: 50%; bottom: 0; translate: -50% 0; width: 200px;',
-          zIndex: 99999,
+        showEvent: { position: 'bottom', sticky: 'fixed' },
+        page: { lockScroll: false },
+        box: {
+          style: {
+            position: 'fixed',
+            left: '50%',
+            bottom: '0',
+            translate: '-50% 0',
+            width: '200px',
+          },
         },
         animation: {
           css:
@@ -508,11 +570,12 @@ describe('journeys/v2 renderer behavior across engines', () => {
   describe('font links', () => {
     // Port 9 refuses at once: no network, and a failed font load is harmless.
     const URL = 'http://127.0.0.1:9/css2?family=Branch+Test+Sans:wght@400';
+    const FONT = { family: 'Branch Test Sans', url: URL };
     const fontLinks = () =>
       document.head.querySelectorAll('link[data-branch-journey-font]');
 
     it('adds a nonce-tagged link for the journey and removes it after the exit', async () => {
-      await showWith(makeRenderPayload({ ...STANDARD_TOP, fonts: [URL] }), {
+      await showWith(makeRenderPayload({ ...STANDARD_TOP, fonts: [FONT] }), {
         nonce: 'n0nce',
       });
       const [link] = fontLinks();
@@ -546,7 +609,7 @@ describe('journeys/v2 renderer behavior across engines', () => {
               ...STANDARD_TOP.creative,
               css: `${STANDARD_TOP.creative.css} #branch-mobile-action { font-family: '${family}', monospace; }`,
             },
-            fonts: [local],
+            fonts: [{ family, url: local }],
           }),
         );
         await vi.waitFor(() => expect(requested()).toBe(true), {
@@ -559,12 +622,29 @@ describe('journeys/v2 renderer behavior across engines', () => {
       const face = new FontFace('Branch Test Sans', 'local(Arial)');
       document.fonts.add(face);
       try {
-        const bare = 'http://127.0.0.1:9/css2?family=Branch+Test+Sans';
+        const bare = {
+          family: FONT.family,
+          url: 'http://127.0.0.1:9/css2?family=Branch+Test+Sans',
+        };
         await show(makeRenderPayload({ ...STANDARD_TOP, fonts: [bare] }));
         expect(fontLinks()).toHaveLength(0);
       } finally {
         document.fonts.delete(face);
       }
+    });
+
+    it('links each font the page lacks, once per URL', async () => {
+      const other = {
+        family: 'Branch Other Sans',
+        url: 'http://127.0.0.1:9/css2?family=Branch+Other+Sans',
+      };
+      await show(
+        makeRenderPayload({ ...STANDARD_TOP, fonts: [FONT, other, FONT] }),
+      );
+      expect(Array.from(fontLinks(), (link) => link.href)).toEqual([
+        URL,
+        other.url,
+      ]);
     });
   });
 

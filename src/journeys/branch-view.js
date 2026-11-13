@@ -13,7 +13,13 @@ import { banner_utils } from '../banner/banner-utils.js';
 import { journeys_utils } from './journeys-utils.js';
 import { dismissedSince, isDismissedGlobally } from './dismissals.js';
 import { showJourneyEventData } from './link-data.js';
-import { prepareV2, showV2, v2JourneyState, whenV2Closed } from './v2/index.js';
+import {
+  bannerPayloadVersion,
+  showV2,
+  v2JourneyState,
+  whenV2Closed,
+} from './v2/index.js';
+import { bannerPayloadFrom } from './v2/response.js';
 
 export const branch_view = {};
 
@@ -135,9 +141,11 @@ branch_view.shouldDisplayJourney = function (
  *    couldn't apply that dismissal.
  * 2. A shown v2 journey blocks it; a closing one defers it until closed.
  * 3. Eligibility: shouldDisplayJourney.
- * 4. v2 when requested, not blocked by a v1 journey's iframe, and the adapter accepts it.
- * 5. Otherwise v1, unless any existing banner element blocks it.
- * @param {Object} response
+ * 4. v2 when the response has the payload this request asked for, unless one of the
+ *    SDK's own banners is up.
+ * 5. Otherwise, or if v2 fails to render, v1 from the template, unless any existing
+ *    banner element blocks it.
+ * @param {import('./v2/response.js').PageviewResponse} response
  * @param {Object} requestData
  * @param {Object} options - the init or track options
  * @param {Function} onNotShown
@@ -184,25 +192,19 @@ branch_view.showJourneyFromResponse = function (
   }
 
   const templateId = requestData.branch_view_id || branchViewData.id;
-  if (response.use_v2_renderer) {
-    // Checked before parsing. Only the SDK's own banners block v2.
+  const payload = bannerPayloadFrom(
+    response,
+    requestData,
+    { templateId, audienceRuleId: branchViewData?.audience_rule_id },
+    journeys_utils.branch,
+  );
+  if (payload) {
+    // Only the SDK's own banners block v2.
     if (sdkBannerShown()) {
       onNotShown();
       return;
     }
-    const payload = prepareV2(
-      {
-        html: response.template,
-        requestData,
-        templateId,
-        branchViewData,
-        journeyLinkData: response.journey_link_data,
-        animationConfig: response.animationConfig,
-      },
-      journeys_utils.branch,
-    );
     if (
-      payload &&
       showV2(payload, {
         branch: journeys_utils.branch,
         branchView: branch_view,
@@ -414,6 +416,9 @@ branch_view._getPageviewRequestData = function (
   obj.feature = 'journeys';
   obj.callback_string =
     'branch_view_callback__' + journeys_utils._callback_index++;
+  if (!isDismissEvent) {
+    obj = addPropertyIfNotNull(obj, 'banner_payload', bannerPayloadVersion());
+  }
 
   if (!obj.data) {
     obj.data = {};

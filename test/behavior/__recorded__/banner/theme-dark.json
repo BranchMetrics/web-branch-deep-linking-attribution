@@ -47,6 +47,7 @@
         "has_app_websdk": "false",
         "feature": "journeys",
         "callback_string": "branch_view_callback__1",
+        "banner_payload": "1",
         "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
         "source": "web-sdk",
         "branch_key": "key_live_goldenTraceFakeKey00000000000000",

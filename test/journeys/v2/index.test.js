@@ -6,15 +6,16 @@ import {
 import { journeys_utils } from '../../../src/journeys/journeys-utils.js';
 import {
   closeV2Journey,
-  prepareV2,
   resetV2ForTests,
   showV2,
   v2JourneyState,
 } from '../../../src/journeys/v2/index.js';
 import { UA, useFakeEnv } from '../../helpers/fake-env.js';
 import {
-  adapterInput,
   makeBranch as makeFixtureBranch,
+  SAMPLE_ANIMATION,
+  sampleJourneyPayload,
+  sampleServerPayload,
   templateHtml,
 } from './fixtures.js';
 
@@ -23,21 +24,17 @@ const makeBranch = (initOptions = {}) =>
 const deps = (branch) => ({
   branch,
   branchView: branch_view,
-  hasApp: false,
   testMode: false,
   entryAnimationDisabled: false,
   exitAnimationDisabled: false,
 });
-const renderV2 = (input, d) => {
-  const payload = prepareV2(input, d.branch);
-  return !!payload && showV2(payload, d);
-};
+const renderV2 = (d) => showV2(sampleJourneyPayload(), d);
 const hosts = () => document.querySelectorAll('#branch-journey-host').length;
 const iframe = () => document.getElementById('branch-banner-iframe');
 // Long enough for any entrance or exit to settle (a 0.25s slide plus its grace).
 const SETTLE = 300;
 
-describe('journeys/v2 prepareV2, showV2 and the journey state', () => {
+describe('journeys/v2 showV2 and the journey state', () => {
   useFakeEnv({ userAgent: () => UA.iphoneChrome });
   beforeEach(() => {
     vi.useFakeTimers();
@@ -49,27 +46,10 @@ describe('journeys/v2 prepareV2, showV2 and the journey state', () => {
     document.body.className = '';
   });
 
-  it('prepares nothing without attachShadow or when the adapter rejects the template', () => {
-    const original = Element.prototype.attachShadow;
-    delete Element.prototype.attachShadow;
-    try {
-      expect(prepareV2(adapterInput(), makeBranch())).toBeNull();
-    } finally {
-      Element.prototype.attachShadow = original;
-    }
-    expect(
-      prepareV2(
-        adapterInput({ html: templateHtml({ script: null }) }),
-        makeBranch(),
-      ),
-    ).toBeNull();
-    expect(hosts()).toBe(0);
-  });
-
   it('shows a prepared journey and reports it as shown, then closing', () => {
     const branch = makeBranch();
     expect(v2JourneyState()).toBe('none');
-    expect(renderV2(adapterInput(), deps(branch))).toBe(true);
+    expect(renderV2(deps(branch))).toBe(true);
     expect(hosts()).toBe(1);
     expect(v2JourneyState()).toBe('shown');
     vi.advanceTimersByTime(SETTLE);
@@ -81,7 +61,7 @@ describe('journeys/v2 prepareV2, showV2 and the journey state', () => {
 
   it('recovers when an SPA wipes the body: closeJourney is a silent error, next render works', () => {
     const branch = makeBranch();
-    renderV2(adapterInput(), deps(branch));
+    renderV2(deps(branch));
     vi.advanceTimersByTime(20);
     document.body.innerHTML = '';
     const published = branch._publishEvent.mock.calls.length;
@@ -90,12 +70,12 @@ describe('journeys/v2 prepareV2, showV2 and the journey state', () => {
     expect(cb).toHaveBeenCalledWith('Journey already dismissed.');
     expect(branch._publishEvent.mock.calls.length).toBe(published);
     expect(v2JourneyState()).toBe('none');
-    expect(renderV2(adapterInput(), deps(branch))).toBe(true);
+    expect(renderV2(deps(branch))).toBe(true);
     expect(hosts()).toBe(1);
   });
 
   it('cleans up as soon as an SPA removes the host, without waiting for the next call', async () => {
-    renderV2(adapterInput(), deps(makeBranch()));
+    renderV2(deps(makeBranch()));
     vi.advanceTimersByTime(20);
     document.body.innerHTML = '';
     await Promise.resolve();
@@ -106,7 +86,7 @@ describe('journeys/v2 prepareV2, showV2 and the journey state', () => {
   // The exit's timer still finishes the close, which sends the dismissal.
   it('a user dismiss survives the host being removed during the exit', () => {
     const branch = makeBranch();
-    renderV2(adapterInput(), deps(branch));
+    renderV2(deps(branch));
     vi.advanceTimersByTime(SETTLE);
     document
       .getElementById('branch-journey-host')
@@ -123,71 +103,24 @@ describe('journeys/v2 prepareV2, showV2 and the journey state', () => {
     expect(v2JourneyState()).toBe('none');
   });
 
-  it('logs and records the reason when it falls back to v1', () => {
+  it('records and logs render-error when mounting fails before the CTA script runs', () => {
     const branch = makeBranch();
     branch._ctx.debug = true;
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-    try {
-      expect(
-        prepareV2(
-          adapterInput({ html: templateHtml({ script: null }) }),
-          branch,
-        ),
-      ).toBeNull();
-      expect(branch._ctx.instrumentation['journey-v2-fallback']).toBe(
-        'no-cta-script',
-      );
-      expect(log).toHaveBeenCalledWith(
-        'Journeys v2 fell back to v1: no-cta-script',
-      );
-    } finally {
-      log.mockRestore();
-    }
-  });
-
-  it('records no-shadow-dom without calling the adapter', () => {
-    const branch = makeBranch();
-    const original = Element.prototype.attachShadow;
-    delete Element.prototype.attachShadow;
-    try {
-      expect(prepareV2(adapterInput(), branch)).toBeNull();
-    } finally {
-      Element.prototype.attachShadow = original;
-    }
-    expect(branch._ctx.instrumentation['journey-v2-fallback']).toBe(
-      'no-shadow-dom',
-    );
-  });
-
-  it('records no-css-layers without calling the adapter', () => {
-    const branch = makeBranch();
-    const original = window.CSSLayerBlockRule;
-    delete window.CSSLayerBlockRule;
-    try {
-      expect(prepareV2(adapterInput(), branch)).toBeNull();
-    } finally {
-      window.CSSLayerBlockRule = original;
-    }
-    expect(branch._ctx.instrumentation['journey-v2-fallback']).toBe(
-      'no-css-layers',
-    );
-  });
-
-  it('records render-error when mounting fails before the CTA script runs', () => {
-    const branch = makeBranch();
     const spy = vi
       .spyOn(document.body.classList, 'add')
       .mockImplementation(() => {
         throw new Error('boom');
       });
     try {
-      expect(renderV2(adapterInput(), deps(branch))).toBe(false);
+      expect(renderV2(deps(branch))).toBe(false);
+      expect(log).toHaveBeenCalledWith(
+        'Journeys v2 fell back to v1: render-error',
+      );
     } finally {
       spy.mockRestore();
+      log.mockRestore();
     }
-    expect(branch._ctx.instrumentation['journey-v2-fallback']).toBe(
-      'render-error',
-    );
     expect(hosts()).toBe(0);
   });
 
@@ -203,13 +136,10 @@ describe('journeys/v2 prepareV2, showV2 and the journey state', () => {
         return append(node);
       });
     try {
-      expect(renderV2(adapterInput(), deps(branch))).toBe(false);
+      expect(renderV2(deps(branch))).toBe(false);
     } finally {
       spy.mockRestore();
     }
-    expect(branch._ctx.instrumentation['journey-v2-fallback']).toBe(
-      'render-error',
-    );
     expect(hosts()).toBe(0);
     expect(v2JourneyState()).toBe('none');
   });
@@ -229,11 +159,18 @@ describe('branch_view.showJourneyFromResponse', () => {
     journeys_utils.exitAnimationIsRunning = false;
   });
 
-  const response = ({ v2 = true, html = templateHtml() } = {}) => ({
+  const response = ({
+    v2 = true,
+    payload = v2,
+    html = templateHtml(),
+    journey = sampleServerPayload(),
+  } = {}) => ({
     template: html,
     event_data: { branch_view_data: { id: 'view-1', audience_rule_id: 'r1' } },
     journey_link_data: { type: 'mobile' },
     use_v2_renderer: v2,
+    animationConfig: v2 ? SAMPLE_ANIMATION : undefined,
+    ...(payload ? { banner_payload: journey } : {}),
   });
   // Returns the onNotShown spy. The request carries no journey_dismissals unless given,
   // i.e. it was built before any dismissal.
@@ -244,6 +181,7 @@ describe('branch_view.showJourneyFromResponse', () => {
       {
         callback_string: 'branch_view_callback__1',
         has_app_websdk: false,
+        banner_payload: 1,
         ...request,
       },
       options,
@@ -268,11 +206,72 @@ describe('branch_view.showJourneyFromResponse', () => {
     expect(iframe()).toBeNull();
   });
 
-  it('renders with v1 when the adapter rejects the template', () => {
-    const notShown = show(response({ html: templateHtml({ script: null }) }));
+  it('renders v1 from the template when use_v2_renderer comes without a payload', () => {
+    const notShown = show(response({ payload: false }));
     expect(notShown).not.toHaveBeenCalled();
     expect(hosts()).toBe(0);
     expect(iframe()).not.toBeNull();
+  });
+
+  it("renders v1 from the template when the request didn't ask for a payload", () => {
+    show(response(), {}, { banner_payload: undefined });
+    expect(hosts()).toBe(0);
+    expect(iframe()).not.toBeNull();
+  });
+
+  it('renders v1 from the template when the payload has no CTA script', () => {
+    const journey = sampleServerPayload();
+    delete journey.cta;
+    const notShown = show(response({ journey }));
+    expect(notShown).not.toHaveBeenCalled();
+    expect(hosts()).toBe(0);
+    expect(iframe()).not.toBeNull();
+  });
+
+  // v2 mounts before it runs the CTA script, so the fallback runs it only once and an
+  // open_app journey can't open the app twice. The fallback animates as v1 does today.
+  it('falls back to v1 from the template on render-error, running the CTA script once', () => {
+    const journey = sampleServerPayload();
+    journey.render.creative.html =
+      '<div class="branch-banner-content">no banner</div>';
+    const notShown = show(response({ journey }));
+    expect(notShown).not.toHaveBeenCalled();
+    expect(hosts()).toBe(0);
+    expect(iframe()).not.toBeNull();
+    expect(document.querySelectorAll('#branch-journey-cta')).toHaveLength(1);
+    expect(journeys_utils.use_v2_renderer).toBe(true);
+    expect(journeys_utils.animationConfig).toEqual(SAMPLE_ANIMATION);
+  });
+
+  it('gives the v1 fallback the animation it gets today', async () => {
+    vi.useRealTimers();
+    const journey = sampleServerPayload();
+    journey.render.creative.html =
+      '<div class="branch-banner-content">no banner</div>';
+    show(response({ journey }));
+    // jsdom loads the iframe asynchronously; its onload adds the CSS and the enter class.
+    await vi.waitFor(() => {
+      const doc = iframe().contentWindow.document;
+      expect(doc.getElementById('branch-css')?.innerHTML).toContain(
+        SAMPLE_ANIMATION.generatedCss,
+      );
+      expect(
+        doc
+          .getElementById('branch-banner')
+          ?.classList.contains(SAMPLE_ANIMATION.classes.enter),
+      ).toBe(true);
+    });
+  });
+
+  it("runs the payload's CTA script with $journeys_cta applied", () => {
+    journeys_utils.branch._branchViewData = {
+      data: { $journeys_cta: 'https://shop.example.com/cta' },
+    };
+    show();
+    expect(hosts()).toBe(1);
+    expect(document.getElementById('branch-journey-cta').innerHTML).toContain(
+      'validate("https://shop.example.com/cta")',
+    );
   });
 
   it('applies init-time disable_entry_animation when the call passes none', () => {
@@ -316,7 +315,7 @@ describe('branch_view.showJourneyFromResponse', () => {
 
     it('blocks a v2-flagged journey that falls back to v1, as it would any v1 journey', () => {
       document.body.innerHTML = '<div id="branch-banner"></div>';
-      const notShown = show(response({ html: templateHtml({ script: null }) }));
+      const notShown = show(response({ payload: false }));
       expect(notShown).toHaveBeenCalledTimes(1);
       expect(iframe()).toBeNull();
       expect(document.querySelectorAll('#branch-banner')).toHaveLength(1);
@@ -365,6 +364,7 @@ describe('branch_view.showJourneyFromResponse', () => {
         'didCloseJourney',
         'closeCallback',
         'willShowJourney',
+        'didShowJourney',
       ]);
     });
 
@@ -447,6 +447,7 @@ describe('branch_view.showJourneyFromResponse', () => {
           {
             branch_view_id: 'view-1',
             callback_string: 'branch_view_callback__1',
+            banner_payload: 1,
           },
           {},
           vi.fn(),
@@ -497,6 +498,12 @@ describe('branch_view.showJourneyFromResponse', () => {
         recordViewDismiss(journeys_utils.branch._storage, 'view-1', 'r1');
         expect(show(response({ v2: false }))).toHaveBeenCalledTimes(1);
         expect(iframe()).toBeNull();
+      });
+
+      it('still shows a different v1 journey after a v1 dismissal, as v1 always has', () => {
+        recordViewDismiss(journeys_utils.branch._storage, 'view-9', 'r9');
+        expect(show(response({ v2: false }))).not.toHaveBeenCalled();
+        expect(iframe()).not.toBeNull();
       });
 
       it('shows it if the request already carried the dismissal, which the server applied', () => {

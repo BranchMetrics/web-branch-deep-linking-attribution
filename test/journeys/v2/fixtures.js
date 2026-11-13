@@ -56,19 +56,6 @@ export const SAMPLE_ANIMATION = {
   type: 'SLIDE',
 };
 
-export const STANDARD_METADATA = {
-  bannerHeight: '76px',
-  position: 'top',
-  sticky: 'absolute',
-  offsetY: '0',
-  isIntrinsic: false,
-  injectorSelector: '.branch-journeys-top',
-  ctaText: { has_app: 'Open', no_app: 'Get' },
-};
-
-export const STANDARD_IFRAME_CSS =
-  'body { -webkit-transition: all 0.25s ease; transition: 0.25s; margin-top: 76px; }\n#branch-banner-iframe { box-shadow: 0 0 5px rgba(0, 0, 0, .35); border: 0; z-index: 99999; position: absolute; left: 0; right: 0; top: 0; min-width: 100%; height:76px; }';
-
 export function templateHtml({
   metadata = SAMPLE_METADATA,
   css = SAMPLE_CSS,
@@ -89,51 +76,32 @@ export function templateHtml({
   return `<html>\n<head>\n${links}\n<style type="text/css" id="branch-css">\n${css}\n</style>\n<style type="text/css" id="branch-iframe-css">\n${iframeCss}\n</style>\n</head>\n<body>\n${body}\n${scriptTag}${metadataTag}\n</body>\n</html>`;
 }
 
-export function adapterInput(overrides = {}) {
-  return {
-    html: templateHtml(),
-    requestData: {
-      callback_string: 'branch_view_callback__1',
-      has_app_websdk: false,
-    },
-    templateId: 'view-1',
-    branchViewData: { audience_rule_id: 'rule-1' },
-    journeyLinkData: {
-      type: 'mobile',
-      view_id: 'view-1',
-      browser_fingerprint_id: 'bfp',
-    },
-    animationConfig: SAMPLE_ANIMATION,
-    ...overrides,
-  };
-}
-
-/** A complete JourneyPayload with no animation. Override keys match the old flat shape:
- * creative, placement, geometry, animation, fonts, cta ({ text, script, callbackString }),
- * view, dismissal, linkData. */
+/** A complete JourneyPayload with no animation: an intrinsic full-page bottom creative.
+ * Override keys: creative, box, page, presentation, showEvent, animation, fonts, ctaText,
+ * cta ({ script, callbackString }), view, dismissal, linkData. presentation.modal
+ * defaults to the server's rule. */
 export function makePayload(overrides = {}) {
   const o = overrides;
+  const creative = {
+    deviceType: 'mobile',
+    html: SAMPLE_BODY.replace('<meta name="accessibility" content="wcag">', ''),
+    css: '',
+    ...o.creative,
+  };
+  const fullPage = o.presentation?.fullPage ?? true;
   return {
     render: {
-      creative: {
-        deviceType: 'mobile',
-        html: SAMPLE_BODY.replace(
-          '<meta name="accessibility" content="wcag">',
-          '',
-        ),
-        css: '#branch-banner { position: fixed; left: 0; right: 0; bottom: 0; }',
-        wcag: true,
-        ...o.creative,
+      creative,
+      box: {
+        style: { position: 'fixed', left: '0', right: '0', bottom: '0' },
+        ...o.box,
       },
-      placement: {
-        sticky: 'fixed',
-        anchorY: 'bottom',
-        bannerHeight: { value: 100, unit: 'vh' },
-        offsetY: { value: 0, unit: 'px' },
-        isIntrinsic: true,
-        ...o.placement,
+      page: { lockScroll: true, shiftTopElements: false, ...o.page },
+      presentation: {
+        fullPage,
+        modal: serverModal(creative, fullPage),
+        ...o.presentation,
       },
-      geometry: { css: '', zIndex: 99999, ...o.geometry },
       animation: {
         enterClass: 'branch-banner-enter',
         exitClass: 'branch-banner-exit',
@@ -141,11 +109,8 @@ export function makePayload(overrides = {}) {
         ...o.animation,
       },
       fonts: o.fonts || [],
-      ctaText: {
-        hasApp: 'Open The App',
-        noApp: 'Get The App',
-        ...o.cta?.text,
-      },
+      ctaText: { hasApp: 'Open', noApp: 'Get', ...o.ctaText },
+      showEvent: { position: 'bottom', sticky: 'fixed', ...o.showEvent },
     },
     view: { id: 'view-1', audienceRuleId: 'rule-1', ...o.view },
     cta: {
@@ -160,6 +125,60 @@ export function makePayload(overrides = {}) {
   };
 }
 
+export function serverModal(creative, fullPage) {
+  return (
+    creative.deviceType === 'desktop' ||
+    fullPage ||
+    /class="[^"]*\bbranch-banner-dismiss-background\b/.test(creative.html)
+  );
+}
+
 export function makeRenderPayload(overrides = {}) {
   return makePayload(overrides).render;
+}
+
+const WCAG_META = '<meta name="accessibility" content="wcag">';
+
+/** banner_payload for templateHtml() with SAMPLE_ANIMATION: what the server sends for
+ * the same creative. */
+export function sampleServerPayload() {
+  return {
+    version: 1,
+    render: {
+      creative: {
+        deviceType: 'mobile',
+        html: SAMPLE_BODY.replace(WCAG_META, ''),
+        css: `\n${SAMPLE_CSS}\n`,
+      },
+      // Intrinsic: the placement rule stays in creative.css.
+      box: { style: {} },
+      page: { lockScroll: true, shiftTopElements: false },
+      presentation: { fullPage: true, modal: true },
+      animation: {
+        enterClass: 'branch-banner-enter',
+        exitClass: 'branch-banner-exit',
+        css: SAMPLE_ANIMATION.generatedCss,
+      },
+      fonts: [],
+      ctaText: { hasApp: 'Open The App', noApp: 'Get The App' },
+      showEvent: { position: 'bottom', sticky: 'fixed' },
+    },
+    dismissal: {},
+    cta: { script: SAMPLE_SCRIPT },
+  };
+}
+
+/** sampleServerPayload() as the SDK completes it for a pageview response. */
+export function sampleJourneyPayload() {
+  const { render, dismissal, cta } = sampleServerPayload();
+  return {
+    render,
+    dismissal,
+    cta: { script: cta.script, callbackString: 'branch_view_callback__1' },
+    view: { id: 'view-1', audienceRuleId: 'rule-1' },
+    linkData: {
+      banner_id: 'view-1',
+      journey_link_data: { type: 'mobile', view_id: 'view-1' },
+    },
+  };
 }

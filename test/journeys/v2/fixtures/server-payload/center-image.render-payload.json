@@ -1,0 +1,36 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "mobile",
+      "html" : "<div id=\"branch-banner-dismiss-background\" class=\"branch-banner-dismiss-background\"></div><div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"i2ke6\" class=\"branch-banner-content\"><img id=\"ir77b\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/52f32811-95a8-45ec-a0e6-cb0e60231665.png\"><div id=\"i45g3\"><div id=\"i7lm1\">Enter your description or title here.</div><div id=\"iwt5w\">Enter your secondary text here.</div><div id=\"iawyv\"><img id=\"iae0z\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/071373e3-6304-4017-a2e5-20221ca5d502.png\"><div id=\"branch-mobile-action\" role=\"button\" tabindex=\"0\" aria-label=\"Get the App\" class=\"branch-banner-button\">Get the App</div></div><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"ic63n\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"i69tl\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div></div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#branch-banner-dismiss-background{top:0;left:0;width:100vw;height:100vh;position:fixed;background-color:rgba(0, 0, 0, 0.2);}#i2ke6{width:340px;height:233px;display:flex;padding:0px 0px 0px 0px;max-width:340px;min-width:300px;box-shadow:0px 4px 10px 0px rgba(0, 0, 0, 0.2) ;min-height:233px;border-radius:8px 8px 8px 8px;background-color:#E9D9FCFF;}#branch-banner{overflow:hidden;}#ir77b{width:146px;border-radius:8px 0px 0px 8px;}#i45g3{width:100%;margin:30px 13px 0px 25px;display:flex;min-width:50px;min-height:50px;align-items:center;flex-direction:column;}#i7lm1{color:#27272AFF;margin:0px 0px 0px 0px;padding:0;font-size:20px;font-family:system-ui;font-weight:500;}#iwt5w{color:#580DB5FF;margin:3px 0px 9px 0px;padding:0;font-size:16px;font-family:system-ui;font-weight:400;}#iawyv{width:100%;margin:0px 0px 0px 0px;display:flex;padding:0px 20px 0px 0px;min-width:50px;min-height:50px;align-items:center;align-content:center;flex-direction:row;justify-content:space-between;}#iae0z{width:30px;height:30px;box-shadow:0 3px 7.35px 0 #0000001E ;}#branch-mobile-action{color:#FAFAFA;cursor:pointer;height:28px;display:flex;padding:0px 16px;font-size:12px;align-items:center;font-family:system-ui;font-weight:500;border-radius:999px 999px 999px 999px;justify-content:center;background-color:#580DB5;}#i69tl{width:100%;height:100%;}#ic63n{top:13px;color:#27272A;right:13px;width:24px;cursor:pointer;height:24px;display:flex;padding:4px;position:absolute;align-items:center;justify-content:center;}\n#branch-banner {\n    position: fixed;\n    left:50%;\n    top:50%;\n    translate: -50% -50%;\n}\n"
+    },
+    "box" : {
+      "style" : { }
+    },
+    "page" : {
+      "lockScroll" : true,
+      "shiftTopElements" : false
+    },
+    "presentation" : {
+      "fullPage" : true,
+      "modal" : true
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-journey-fade-in 0.25s ease both;\n}\n@keyframes branch-journey-fade-in { from { opacity: 0; } to { opacity: 1; } }\n.branch-banner-exit {\n    animation: branch-journey-fade-out 0.25s ease both;\n}\n@keyframes branch-journey-fade-out { from { opacity: 1; } to { opacity: 0; } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Get the App",
+      "noApp" : "Get the App"
+    },
+    "showEvent" : {
+      "position" : "bottom",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

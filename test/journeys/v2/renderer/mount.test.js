@@ -17,7 +17,6 @@ describe('journeys/v2 mount', () => {
     document.body.innerHTML = '<p id="page">page</p>';
     const { host, root, banner } = mount(makeRenderPayload(), {
       ...view,
-      hasApp: false,
     });
     expect(document.body.firstElementChild).toBe(host);
     expect(host.id).toBe(HOST_ID);
@@ -30,99 +29,9 @@ describe('journeys/v2 mount', () => {
     expect(banner).toBe(root.getElementById('branch-banner'));
   });
 
-  it('appends the host for desktop journeys', () => {
-    document.body.innerHTML = '<p id="page">page</p>';
-    const { host } = mount(
-      makeRenderPayload({ creative: { deviceType: 'desktop' } }),
-      { ...view, hasApp: false },
-    );
-    expect(document.body.lastElementChild).toBe(host);
-  });
-
-  it('puts one nonce-tagged style in the shadow root with the geometry on #branch-banner', () => {
+  it('sets CTA text as text, never markup, picking hasApp only when the app is installed', () => {
     const payload = makeRenderPayload({
-      geometry: { css: 'position: absolute; top: 0;' },
-      animation: { css: '.branch-banner-enter { animation: x 1s; }' },
-    });
-    const { root } = mount(payload, { ...view, hasApp: false });
-    const styles = root.querySelectorAll('style');
-    expect(styles).toHaveLength(1);
-    expect(styles[0].getAttribute('nonce')).toBe('n0nce');
-    const css = styles[0].textContent;
-    expect(css).toContain(
-      '#branch-banner { z-index: 99999 !important; position: absolute !important; top: 0 !important; }',
-    );
-    expect(css).toContain('.branch-banner-enter { animation: x 1s; }');
-  });
-
-  it('keeps the iframe stacking level for every creative, scrim just below the banner', () => {
-    const css = shadowCss(makeRenderPayload());
-    expect(css).toContain('#branch-banner { z-index: 99999 !important; }');
-    expect(css).toContain(
-      '.branch-banner-dismiss-background { z-index: 99998 !important; }',
-    );
-  });
-
-  it("doesn't double an !important the geometry already has", () => {
-    const css = shadowCss(
-      makeRenderPayload({ geometry: { css: 'top: 0 !important;' } }),
-    );
-    expect(css).toContain('top: 0 !important;');
-    expect(css).not.toContain('!important !important');
-  });
-
-  it('wraps the creative in box-less html and body stand-ins', () => {
-    const { root } = mount(makeRenderPayload(), { ...view, hasApp: false });
-    const body = root.getElementById('branch-banner').parentElement;
-    expect(body.className).toBe('branch-journey-root branch-banner-android');
-    expect(body.parentElement.className).toBe('branch-journey-html');
-    expect(body.parentElement.parentNode).toBe(root);
-    expect(shadowCss(makeRenderPayload())).toContain(
-      ':host, .branch-journey-html, .branch-journey-root { display: contents !important; }',
-    );
-  });
-
-  it('layers the css: renderer rules first and important, then the reset, then the creative', () => {
-    const payload = makeRenderPayload({
-      creative: { css: '#branch-banner { color: red; }' },
-      geometry: { css: 'top: 0;' },
-      animation: { css: '.branch-banner-exit { animation: out 1s; }' },
-    });
-    const css = shadowCss(payload);
-    // Important declarations reverse the layer order: the first layer's beat every
-    // other rule in the shadow root, creative !important ones included.
-    expect(css.startsWith('@layer branch-renderer, reset, creative;')).toBe(
-      true,
-    );
-    const reset = css.indexOf('@layer reset {');
-    expect(css.slice(reset)).toMatch(
-      /^@layer reset \{\n\.branch-journey-html \{ all: initial; direction: ltr; font-family: system-ui, serif; \}/,
-    );
-    expect(css).toContain(
-      '@layer creative {\n#branch-banner { color: red; }\n}',
-    );
-    // The animation stays unlayered: it beats the creative's normal rules.
-    expect(
-      css.trimEnd().endsWith('.branch-banner-exit { animation: out 1s; }'),
-    ).toBe(true);
-  });
-
-  it("maps the creative's html, :root and body selectors onto the stand-ins", () => {
-    const css = shadowCss(
-      makeRenderPayload({
-        creative: {
-          css: 'body {margin: 0;}@media (max-width: 480px){body{font-size:12px;}}html,body{color:red}:root{--x:1}',
-        },
-      }),
-    );
-    expect(css).toContain(
-      '.branch-journey-root {margin: 0;}@media (max-width: 480px){.branch-journey-root{font-size:12px;}}.branch-journey-html,.branch-journey-root{color:red}.branch-journey-html{--x:1}',
-    );
-  });
-
-  it('sets CTA text as text, never markup, picking has_app only when the app is installed', () => {
-    const payload = makeRenderPayload({
-      cta: { text: { hasApp: 'Open', noApp: '<b>Get</b>' } },
+      ctaText: { hasApp: 'Open', noApp: '<b>Get</b>' },
     });
     let { root } = mount(payload, { ...view, hasApp: false });
     const button = root.getElementById('branch-mobile-action');
@@ -136,9 +45,108 @@ describe('journeys/v2 mount', () => {
     );
   });
 
+  it('appends the host for desktop journeys', () => {
+    document.body.innerHTML = '<p id="page">page</p>';
+    const { host } = mount(
+      makeRenderPayload({ creative: { deviceType: 'desktop' } }),
+      view,
+    );
+    expect(document.body.lastElementChild).toBe(host);
+  });
+
+  it('puts one nonce-tagged style in the shadow root with the box on #branch-banner', () => {
+    const payload = makeRenderPayload({
+      box: { style: { position: 'absolute', top: '0' } },
+      animation: { css: '.branch-banner-enter { animation: x 1s; }' },
+    });
+    const { root } = mount(payload, view);
+    const styles = root.querySelectorAll('style');
+    expect(styles).toHaveLength(1);
+    expect(styles[0].getAttribute('nonce')).toBe('n0nce');
+    const css = styles[0].textContent;
+    expect(css).toContain(
+      '@layer branch-box {\n#branch-banner { z-index: 99999; position: absolute; top: 0; }',
+    );
+    expect(css).toContain('.branch-banner-enter { animation: x 1s; }');
+  });
+
+  it('keeps the iframe stacking level for every creative, scrim just below the banner', () => {
+    const css = shadowCss(makeRenderPayload({ box: { style: {} } }));
+    expect(css).toContain(
+      '@layer branch-box {\n#branch-banner { z-index: 99999; }\n.branch-banner-dismiss-background { z-index: 99998; }\n}',
+    );
+  });
+
+  it('exposes #branch-banner to page CSS as ::part(banner)', () => {
+    const { banner } = mount(makeRenderPayload(), view);
+    expect(banner.getAttribute('part')).toBe('banner');
+  });
+
+  it('wraps the creative in box-less html and body stand-ins', () => {
+    const { root } = mount(makeRenderPayload(), view);
+    const body = root.getElementById('branch-banner').parentElement;
+    expect(body.className).toBe('branch-journey-root branch-banner-android');
+    expect(body.parentElement.className).toBe('branch-journey-html');
+    expect(body.parentElement.parentNode).toBe(root);
+    expect(shadowCss(makeRenderPayload())).toContain(
+      ':host, .branch-journey-html, .branch-journey-root { display: contents !important; }',
+    );
+  });
+
+  it('layers the css: renderer rules, the reset, the creative, then the box', () => {
+    const payload = makeRenderPayload({
+      creative: { css: '#branch-banner { color: red; }' },
+      box: { style: { top: '0' } },
+      animation: { css: '.branch-banner-exit { animation: out 1s; }' },
+    });
+    const css = shadowCss(payload);
+    // Important declarations reverse the layer order: the first layer's beat every
+    // other rule in the shadow root, creative !important ones included.
+    expect(
+      css.startsWith('@layer branch-renderer, reset, creative, branch-box;'),
+    ).toBe(true);
+    // Not important, so an intrinsic creative's placement rule beats it.
+    expect(css).toContain(
+      '@layer branch-renderer {\n#branch-banner { position: relative; }\n}',
+    );
+    const reset = css.indexOf('@layer reset {');
+    expect(css.slice(reset)).toMatch(
+      /^@layer reset \{\n\.branch-journey-html \{ all: initial; direction: ltr; font-family: system-ui, serif; \}/,
+    );
+    expect(css).toContain(
+      '@layer creative {\n#branch-banner { color: red; }\n}\n@layer branch-box {\n#branch-banner { z-index: 99999; top: 0; }',
+    );
+    // The animation stays unlayered: it beats the creative's normal rules.
+    expect(
+      css.trimEnd().endsWith('.branch-banner-exit { animation: out 1s; }'),
+    ).toBe(true);
+  });
+
+  it("uses the creative's selectors as the server sent them", () => {
+    const css = 'body {margin: 0;}html{--x:1}:root{--y:2}';
+    expect(shadowCss(makeRenderPayload({ creative: { css } }))).toContain(css);
+  });
+
+  it('drops script-capable markup from the creative before inserting it', () => {
+    const { root } = mount(
+      makeRenderPayload({
+        creative: {
+          html:
+            '<div id="branch-banner"><img id="i" src="a.png" onerror="alert(1)">' +
+            '<a id="l" href="javascript:alert(2)">x</a><script>alert(3)</script></div>',
+        },
+      }),
+      view,
+    );
+    expect(root.getElementById('i').hasAttribute('onerror')).toBe(false);
+    expect(root.getElementById('i').getAttribute('src')).toBe('a.png');
+    expect(root.getElementById('l').hasAttribute('href')).toBe(false);
+    expect(root.querySelector('script')).toBeNull();
+  });
+
   it('styles the host only through the CSSOM (no setAttribute("style"))', () => {
     const spy = vi.spyOn(Element.prototype, 'setAttribute');
-    mount(makeRenderPayload(), { ...view, hasApp: false });
+    mount(makeRenderPayload(), view);
     expect(spy.mock.calls.some(([name]) => name === 'style')).toBe(false);
     spy.mockRestore();
   });
@@ -147,7 +155,6 @@ describe('journeys/v2 mount', () => {
     const { root } = mount(makeRenderPayload(), {
       document,
       platform: 'ios',
-      hasApp: false,
     });
     expect(root.querySelector('.branch-banner-ios')).not.toBeNull();
   });
@@ -165,13 +172,13 @@ describe('journeys/v2 mount', () => {
       const { root } = mount(
         makeRenderPayload({
           creative: { css: '#branch-banner { padding: 1rem; }' },
-          geometry: { css: 'height: 5rem;' },
+          box: { style: { height: '5rem' } },
         }),
-        { document, platform: 'android', hasApp: false },
+        { document, platform: 'android' },
       );
       const css = root.querySelector('style').textContent;
       expect(css).toContain('#branch-banner { padding: 18px; }');
-      expect(css).toContain('height: 5rem !important;');
+      expect(css).toContain('height: 5rem;');
     } finally {
       spy.mockRestore();
       document.documentElement.style.fontSize = '';
@@ -193,7 +200,6 @@ describe('journeys/v2 mount', () => {
         mount(makeRenderPayload(), {
           document,
           platform: 'android',
-          hasApp: false,
         }),
       ).toThrow('no styles');
     } finally {
@@ -209,7 +215,6 @@ describe('journeys/v2 mount', () => {
     const { banner } = mount(makeRenderPayload({ creative: { html: BARE } }), {
       document,
       platform: 'android',
-      hasApp: false,
     });
     expect(banner.getAttribute('role')).toBe('region');
     expect(banner.getAttribute('aria-label')).toBe('Branch Banner');
@@ -220,7 +225,6 @@ describe('journeys/v2 mount', () => {
     const { banner } = mount(makeRenderPayload(), {
       document,
       platform: 'android',
-      hasApp: false,
     });
     expect(banner.hasAttribute('role')).toBe(false);
     expect(banner.hasAttribute('aria-label')).toBe(false);
@@ -234,7 +238,6 @@ describe('journeys/v2 mount', () => {
     const { banner } = mount(makeRenderPayload({ creative: { html } }), {
       document,
       platform: 'android',
-      hasApp: false,
     });
     expect(banner.hasAttribute('role')).toBe(false);
     expect(banner.hasAttribute('aria-label')).toBe(false);
@@ -249,7 +252,7 @@ describe('journeys/v2 mount', () => {
     expect(isTransparent('')).toBe(false);
   });
 
-  it("drops the geometry's box-shadow when the content has no background (v1 parity)", () => {
+  it("drops the box's box-shadow when the content has no background (v1 parity)", () => {
     const spy = vi.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
       fontSize: '16px',
       backgroundColor: 'rgba(0, 0, 0, 0)',
@@ -257,14 +260,15 @@ describe('journeys/v2 mount', () => {
     }));
     try {
       const shadowed = makeRenderPayload({
-        geometry: { css: 'box-shadow: 0 0 5px black; top: 0;' },
+        box: { style: { 'box-shadow': '0 0 5px black', top: '0' } },
       });
-      const { banner } = mount(shadowed, { ...view, hasApp: false });
+      const { banner } = mount(shadowed, view);
       expect(banner.style.getPropertyValue('box-shadow')).toBe('none');
-      expect(banner.style.getPropertyPriority('box-shadow')).toBe('important');
+      // Not important: a page ::part(banner) rule still beats it.
+      expect(banner.style.getPropertyPriority('box-shadow')).toBe('');
       document.body.innerHTML = '';
-      // No geometry shadow: the creative's own box-shadow is never touched.
-      const plain = mount(makeRenderPayload(), { ...view, hasApp: false });
+      // No box shadow: the creative's own box-shadow is never touched.
+      const plain = mount(makeRenderPayload(), view);
       expect(plain.banner.style.getPropertyValue('box-shadow')).toBe('');
     } finally {
       spy.mockRestore();

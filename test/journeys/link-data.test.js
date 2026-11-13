@@ -17,6 +17,7 @@ describe('journeys/link-data', () => {
       source: 'web-sdk',
       open_app: false,
       link_click_id: 'lc',
+      banner_payload: 1,
     };
     const before = { ...raw };
     expect(buildJourneyLinkData('view-1', raw)).toEqual({

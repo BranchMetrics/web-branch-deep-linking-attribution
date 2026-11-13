@@ -51,6 +51,18 @@ branch.init('key_live_YOUR_KEY', function (err, data) {});
 
 See [Basic Integration] for the full setup.
 
+## Styling a Journey from your page
+
+In browsers that support shadow DOM and CSS cascade layers, Journeys created in the banner builder render inside a shadow root on `#branch-journey-host`, so your page's CSS doesn't leak into the banner. To adjust the banner's outer box, such as its stacking order or offset, target it with `::part(banner)`:
+
+```css
+#branch-journey-host::part(banner) {
+  z-index: 1000; /* e.g. to sit above a sticky header */
+}
+```
+
+These rules take precedence over the banner's own position, size and z-index. The banner's content is styled in the Branch dashboard and can't be targeted from the page. In other browsers, and for older Journeys, the banner renders in an iframe and these rules have no effect.
+
 ## Running locally
 Requires Node 24 and pnpm (both provided by the nix dev shell).
 

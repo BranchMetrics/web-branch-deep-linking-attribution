@@ -1,0 +1,41 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "desktop",
+      "html" : "<div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"iw267\" class=\"branch-banner-content\"><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"imwnj\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"i2h33\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div><div id=\"i7az9\"><div id=\"iy4s9\">Scan the QR Code to Download our App</div><div id=\"ip13k\">Enter your description or body text in place of this filler.</div><div id=\"ituli\" class=\"branch-qr-container\"><img role=\"presentation\" alt=\"QRcode\" title=\"code\" src=\"{{$journeys_desktop_qr_code}}\" id=\"imadg\" class=\"branch-banner-image-qrcode\"></div></div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#iw267{width:300px;height:600px;padding:28px;min-width:300px;border-radius:8px 8px 8px 8px;background-color:#410986FF;}#branch-banner{overflow:hidden;}#i7az9{display:flex;padding:55px 0px 0px 0px;min-width:50px;min-height:50px;align-items:center;flex-direction:column;}#iy4s9{color:#FFFFFF;margin:0;padding:0px 5px 0px 5px;font-size:30px;text-align:center;font-family:system-ui;font-weight:400;}#ip13k{color:#FFFFFF;margin:11px 0px 52px 0px;padding:0;font-size:16px;text-align:center;font-family:system-ui;font-weight:400;}#imadg{width:100%;height:100%;}#ituli{width:198px;height:198px;padding:6px 6px 6px 6px;overflow:hidden;border-radius:8px 8px 8px 8px;background-color:#FFFFFFFF;}#i2h33{width:100%;height:100%;}#imwnj{top:19px;color:#FAFAFAB3;right:17px;width:25px;cursor:pointer;height:25px;display:flex;position:absolute;align-items:center;justify-content:center;}\n\n"
+    },
+    "box" : {
+      "style" : {
+        "position" : "fixed",
+        "right" : "26px",
+        "bottom" : "27px",
+        "width" : "300px"
+      }
+    },
+    "page" : {
+      "lockScroll" : false,
+      "shiftTopElements" : false
+    },
+    "presentation" : {
+      "fullPage" : false,
+      "modal" : true
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-journey-fade-in 0.25s ease both;\n}\n@keyframes branch-journey-fade-in { from { opacity: 0; } to { opacity: 1; } }\n.branch-banner-exit {\n    animation: branch-journey-fade-out 0.25s ease both;\n}\n@keyframes branch-journey-fade-out { from { opacity: 1; } to { opacity: 0; } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Open",
+      "noApp" : "Get"
+    },
+    "showEvent" : {
+      "position" : "bottom",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

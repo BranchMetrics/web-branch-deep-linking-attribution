@@ -735,6 +735,7 @@ describe('branch_view._getPageviewRequestData', function () {
       has_app_websdk: false,
       feature: 'journeys',
       callback_string: 'branch_view_callback__5',
+      banner_payload: 1,
       session_referring_link_data: null,
       source: 'web-sdk',
     });
@@ -751,6 +752,46 @@ describe('branch_view._getPageviewRequestData', function () {
     );
     expect(obj.event).toBe('dismiss');
     expect(obj.metadata).toEqual({ a: 1 });
+  });
+
+  it("doesn't ask for the journey payload in dismiss requests", function () {
+    const obj = branch_view._getPageviewRequestData(
+      {},
+      {},
+      makeJourneyBranch(store),
+      true,
+    );
+    expect(obj).not.toHaveProperty('banner_payload');
+  });
+
+  it("doesn't ask for the journey payload without shadow DOM", function () {
+    const original = Element.prototype.attachShadow;
+    delete Element.prototype.attachShadow;
+    try {
+      const obj = branch_view._getPageviewRequestData(
+        {},
+        {},
+        makeJourneyBranch(store),
+      );
+      expect(obj).not.toHaveProperty('banner_payload');
+    } finally {
+      Element.prototype.attachShadow = original;
+    }
+  });
+
+  it("doesn't ask for the journey payload without cascade layers", function () {
+    const original = window.CSSLayerBlockRule;
+    delete window.CSSLayerBlockRule;
+    try {
+      const obj = branch_view._getPageviewRequestData(
+        {},
+        {},
+        makeJourneyBranch(store),
+      );
+      expect(obj).not.toHaveProperty('banner_payload');
+    } finally {
+      window.CSSLayerBlockRule = original;
+    }
   });
 
   it('applies the options', function () {

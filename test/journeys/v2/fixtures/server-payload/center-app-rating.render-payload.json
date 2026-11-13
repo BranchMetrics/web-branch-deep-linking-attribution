@@ -1,0 +1,36 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "mobile",
+      "html" : "<div id=\"branch-banner-dismiss-background\" class=\"branch-banner-dismiss-background\"></div><div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"iplyj\" class=\"branch-banner-content\"><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"branch-banner-close1\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"ink7f\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div><div id=\"icyv3\"><img id=\"inq8r\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/a1216c30-84a6-45c7-a6fc-9a76182618f6.png\"><div id=\"its4h\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"ib4gp\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"iizqm\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"iosyp\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"i06um\"><path d=\"M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\"></path></svg><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" class=\"branch-banner-rating-star\" id=\"igh6u\"><path d=\"M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z\"></path></svg></div><div id=\"iny06\">Enter your description or title here.</div><div id=\"inmel\">Enter your secondary text here.</div><div id=\"branch-mobile-action\" role=\"button\" tabindex=\"0\" aria-label=\"Get the App\" class=\"branch-banner-button\">Get the App</div><div role=\"button\" tabindex=\"0\" id=\"iygbi\" class=\"branch-banner-close\">Continue on Web</div></div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#iplyj{width:340px;padding:8px;max-width:340px;min-width:300px;box-shadow:0px 0px 10px 0px rgba(0, 0, 0, 0.2);min-height:250px;font-family:system-ui;border-radius:8px 8px 8px 8px;background-color:#FFFFFF;}#branch-banner{overflow:hidden;}#icyv3{display:flex;min-width:50px;min-height:50px;align-items:center;flex-direction:column;}#iny06{color:#000000;width:228px;margin:20px 0px 0px 0px;padding:0;font-size:20px;text-align:center;font-family:system-ui;font-weight:400;line-height:28px;}#inmel{color:#000000;margin:0;padding:0;font-size:12px;font-family:system-ui;font-weight:400;}#branch-mobile-action{color:#FAFAFA;width:300px;cursor:pointer;height:28px;margin:15px 0px 0px 0px;display:flex;padding:0px 16px;font-size:12px;align-items:center;font-family:system-ui;font-weight:300;border-radius:4px 4px 4px 4px;justify-content:center;background-color:#580DB5;}#ink7f{width:1em;height:1em;}#branch-banner-close1{top:13px;color:#27272A;right:13px;width:16px;cursor:pointer;height:16px;display:flex;position:absolute;font-size:18px;align-items:center;justify-content:center;}#inq8r{width:50px;height:50px;margin:14px 0px 10px 0px;}#branch-banner-dismiss-background{top:0;left:0;width:100vw;height:100vh;position:fixed;background-color:rgba(0, 0, 0, 0.2);}#its4h{color:#27272A;display:flex;font-size:12px;}#iygbi{color:#9B53F3FF;cursor:pointer;margin:9px 0px 9px 0px;font-size:12px;font-family:system-ui;font-weight:400;text-decoration:underline;}#ib4gp{width:1em;height:1em;}#iizqm{width:1em;height:1em;}#iosyp{width:1em;height:1em;}#i06um{width:1em;height:1em;}#igh6u{width:1em;height:1em;}\n#branch-banner {\n    position: fixed;\n    left:50%;\n    top:50%;\n    translate: -50% -50%;\n}\n"
+    },
+    "box" : {
+      "style" : { }
+    },
+    "page" : {
+      "lockScroll" : true,
+      "shiftTopElements" : false
+    },
+    "presentation" : {
+      "fullPage" : true,
+      "modal" : true
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-journey-fade-in 0.25s ease both;\n}\n@keyframes branch-journey-fade-in { from { opacity: 0; } to { opacity: 1; } }\n.branch-banner-exit {\n    animation: branch-journey-fade-out 0.25s ease both;\n}\n@keyframes branch-journey-fade-out { from { opacity: 1; } to { opacity: 0; } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Get the App",
+      "noApp" : "Get the App"
+    },
+    "showEvent" : {
+      "position" : "bottom",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

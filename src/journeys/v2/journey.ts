@@ -12,7 +12,6 @@ import { showJourneyEventData } from '../link-data.js';
 import { type CtaHandle, startCta } from './cta.js';
 import type { JourneyPayload } from './payload.js';
 import {
-  isFullPage,
   type Platform,
   type RenderAction,
   type RenderedJourney,
@@ -242,13 +241,13 @@ export class Journey {
   }
 
   private showEventData(payload: JourneyPayload): Record<string, any> {
-    const placement = payload.render.placement;
+    const { presentation, showEvent } = payload.render;
     return showJourneyEventData(this.linkDataCopy(), {
-      // px, as v1 reported it, not the placement's own unit.
+      // px, as v1 reported it, not the creative's own unit.
       bannerHeight: `${(this.rendered as RenderedJourney).bannerHeight()}px`,
-      isFullPage: isFullPage(placement),
-      position: placement.anchorY,
-      sticky: placement.sticky,
+      isFullPage: presentation.fullPage,
+      position: showEvent.position,
+      sticky: showEvent.sticky,
     });
   }
 }

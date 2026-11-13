@@ -4,25 +4,107 @@
 export const CTA_URL = 'https://example.app.link/e2e';
 const ICON = 'https://cdn.branch.io/e2e/icon.png';
 
-function template({ css, iframeCss, body, metadata }) {
-  return (callback) =>
-    [
-      '<html>',
-      ' <head>',
-      `  <style type="text/css" id="branch-css">* { box-sizing: border-box; } body {margin: 0;}${css}</style>`,
-      `  <style type="text/css" id="branch-iframe-css">${iframeCss}</style>`,
-      ' </head>',
-      ' <body>',
-      body,
-      '<script type="text/javascript">',
-      'function validate(url) { return url; }',
-      `(function(root) { var cta = function() { window.top.location = validate("${CTA_URL}"); };`,
-      `if (typeof ${callback} === 'function') { ${callback}(cta); } })(window);`,
-      '</script>',
-      `<script type="application/json">${JSON.stringify(metadata)}</script>`,
-      ' </body>',
-      '</html>',
-    ].join('\n');
+const BASE_CSS = '* { box-sizing: border-box; } body {margin: 0;}';
+const WCAG_META = '<meta name="accessibility" content="wcag">';
+
+export function ctaScript(callback) {
+  return [
+    'function validate(url) { return url; }',
+    `(function(root) { var cta = function() { window.top.location = validate("${CTA_URL}"); };`,
+    `if (typeof ${callback} === 'function') { ${callback}(cta); } })(window);`,
+  ].join('\n');
+}
+
+const dimension = (value) => {
+  const [, amount, unit] = /^(-?[\d.]+)(px|vh)?$/.exec(value);
+  return { value: parseFloat(amount), unit: unit || 'px' };
+};
+
+const isFullPage = (metadata) => {
+  const height = dimension(metadata.bannerHeight);
+  return height.unit === 'vh' && height.value >= 100;
+};
+
+// One creative in both response shapes: `html` is the template (v1, and the v2 fallback),
+// `payload` the banner_payload. `box` is #branch-banner's box, which the server derives
+// from the same placement as the template's iframe CSS ("" for intrinsic creatives, whose
+// placement rule stays in the creative CSS).
+function journey({
+  device,
+  animation,
+  css,
+  iframeCss,
+  body,
+  metadata,
+  box,
+  push,
+}) {
+  return {
+    device,
+    animation,
+    html: (callback) =>
+      [
+        '<html>',
+        ' <head>',
+        `  <style type="text/css" id="branch-css">${BASE_CSS}${css}</style>`,
+        `  <style type="text/css" id="branch-iframe-css">${iframeCss}</style>`,
+        ' </head>',
+        ' <body>',
+        body,
+        '<script type="text/javascript">',
+        ctaScript(callback),
+        '</script>',
+        `<script type="application/json">${JSON.stringify(metadata)}</script>`,
+        ' </body>',
+        '</html>',
+      ].join('\n'),
+    payload: (callback) => {
+      const offset = dimension(metadata.offsetY);
+      const fullPage = isFullPage(metadata);
+      return {
+        version: 1,
+        render: {
+          creative: {
+            deviceType: device,
+            html: body.replace(WCAG_META, ''),
+            css: BASE_CSS + css,
+          },
+          box,
+          // The server's rules for the fields v1 kept in the template metadata.
+          page: {
+            ...(push && {
+              push: { ...push, ...(offset.value !== 0 && { offset }) },
+            }),
+            lockScroll: fullPage && metadata.sticky === 'fixed',
+            shiftTopElements: metadata.position === 'top',
+          },
+          presentation: {
+            fullPage,
+            modal:
+              device === 'desktop' ||
+              fullPage ||
+              body.includes('class="branch-banner-dismiss-background"'),
+          },
+          animation: {
+            enterClass: animation.classes.enter,
+            exitClass: animation.classes.exit,
+            css: animation.generatedCss,
+          },
+          fonts: [],
+          ctaText: {
+            hasApp: metadata.ctaText.has_app,
+            noApp: metadata.ctaText.no_app,
+          },
+          showEvent: { position: metadata.position, sticky: metadata.sticky },
+        },
+        dismissal: {
+          globalPeriodSeconds: metadata.globalDismissPeriod,
+          redirectUrl: metadata.dismissRedirect,
+        },
+        cta: { script: ctaScript(callback) },
+      };
+    },
+  };
 }
 
 const FONT = 'font-family:system-ui;';
@@ -72,9 +154,21 @@ const FADE = animation(
 
 export const TEMPLATES = {
   'top-banner': {
-    device: 'mobile',
-    animation: slide('IFRAME', 'top', 'translateY(-100%)'),
-    html: template({
+    ...journey({
+      device: 'mobile',
+      animation: slide('IFRAME', 'top', 'translateY(-100%)'),
+
+      box: {
+        style: {
+          position: 'fixed',
+          left: '0',
+          right: '0',
+          top: '0',
+          'min-width': '100%',
+        },
+      },
+      push: { side: 'top' },
+
       css:
         `#i1{display:flex;align-items:center;height:76px;padding:0 12px;background-color:#F4EDFD;box-shadow:0 1px 3px rgba(0,0,0,0.2);}` +
         `#i2{width:48px;height:48px;border-radius:10px;}` +
@@ -103,18 +197,28 @@ export const TEMPLATES = {
   },
 
   'floating-button': {
-    device: 'mobile',
-    // The backend's centering value is a whole declaration, which makes these keyframes
-    // invalid, so centered buttons don't slide in production.
-    animation: slide(
-      'IFRAME',
-      'bottom',
-      'translateY(calc(100% + 24px))',
-      'translate: -50% 0;',
-    ),
     // v1 clips the shadow at the iframe's edge; v2 draws all of it (~4.5%).
     allowedDiff: 0.06,
-    html: template({
+    ...journey({
+      device: 'mobile',
+      // The backend's centering value is a whole declaration, which makes these keyframes
+      // invalid, so centered buttons don't slide in production.
+      animation: slide(
+        'IFRAME',
+        'bottom',
+        'translateY(calc(100% + 24px))',
+        'translate: -50% 0;',
+      ),
+      box: {
+        style: {
+          position: 'fixed',
+          left: '50%',
+          bottom: '24px',
+          translate: '-50% 0',
+          width: '220px',
+        },
+      },
+
       css:
         `#i1{display:flex;align-items:center;justify-content:center;height:50px;border-radius:999px;background-color:#580DB5;box-shadow:0 4px 10px rgba(0,0,0,0.25);}` +
         `#branch-mobile-action{color:#FAFAFA;font-size:15px;font-weight:500;${FONT}}`,
@@ -137,9 +241,12 @@ export const TEMPLATES = {
   },
 
   'center-modal': {
-    device: 'mobile',
-    animation: FADE,
-    html: template({
+    ...journey({
+      device: 'mobile',
+      animation: FADE,
+
+      box: { style: {} },
+
       css:
         '#branch-banner-dismiss-background{top:0;left:0;width:100vw;height:100vh;position:fixed;background-color:rgba(0, 0, 0, 0.2);}' +
         '#branch-banner{position:fixed;left:50%;top:50%;transform:translate(-50%, -50%);}' +
@@ -170,9 +277,22 @@ export const TEMPLATES = {
   },
 
   'full-page': {
-    device: 'mobile',
-    animation: FADE,
-    html: template({
+    ...journey({
+      device: 'mobile',
+      animation: FADE,
+
+      box: {
+        style: {
+          position: 'fixed',
+          left: '0',
+          right: '0',
+          top: '0',
+          'min-width': '100%',
+          height: '100vh',
+        },
+      },
+      push: { side: 'top' },
+
       css:
         `#i1{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:24px;background-color:#580DB5;color:#FAFAFA;text-align:center;${FONT}}` +
         '#i2{width:96px;height:96px;border-radius:20px;}#i3{margin:20px 0 8px;font-size:26px;font-weight:600;}#i4{margin:0 0 28px;font-size:16px;}' +
@@ -202,9 +322,19 @@ export const TEMPLATES = {
   },
 
   'desktop-corner-card': {
-    device: 'desktop',
-    animation: slide('IFRAME', 'bottom', 'translateY(100%)'),
-    html: template({
+    ...journey({
+      device: 'desktop',
+      animation: slide('IFRAME', 'bottom', 'translateY(100%)'),
+
+      box: {
+        style: {
+          position: 'fixed',
+          right: '24px',
+          bottom: '0',
+          width: '300px',
+        },
+      },
+
       css:
         `#i1{display:flex;flex-direction:column;align-items:center;height:218px;padding:20px;border-radius:12px 12px 0 0;background-color:#FFFFFF;box-shadow:0 0 10px rgba(0,0,0,0.2);${FONT}}` +
         '#i2{width:56px;height:56px;border-radius:12px;}#i3{margin:12px 0 4px;font-size:17px;font-weight:600;color:#27272A;}#i4{margin:0 0 14px;font-size:13px;color:#52525B;}' +
