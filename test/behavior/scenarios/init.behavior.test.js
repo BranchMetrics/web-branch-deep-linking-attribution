@@ -116,6 +116,14 @@ describe('behavior: init', () => {
     await snap('init/open-returns-alternative-bfp', p);
   });
 
+  it('iOS WKWebView skips /_r', async () => {
+    const p = createPage({ ua: UA.iosWKWebView });
+    p.branch.init(KEY);
+    const { trace } = await p.finish();
+    expect(trace.some((e) => e.jsonp === '/_r')).toBe(false);
+    expect(trace.some((e) => e.path === '/v1/open')).toBe(true);
+  });
+
   it('_open_delay_ms delays /v1/open', async () => {
     const p = createPage({
       url: 'https://shop.example.com/p?_open_delay_ms=300',
