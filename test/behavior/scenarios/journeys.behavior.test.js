@@ -1,6 +1,17 @@
 import { API, KEY, UA } from '../fixtures.js';
 import { createPage, nextPage, snap } from '../harness.js';
 
+const journeyNonces = (p) => {
+  const doc = p.win.document;
+  const iframe = doc.getElementById('branch-banner-iframe');
+  return [
+    doc.getElementById('branch-iframe-css'),
+    iframe,
+    doc.getElementById('branch-journey-cta'),
+    iframe.contentDocument.getElementById('branch-css'),
+  ].map((el) => el.getAttribute('nonce'));
+};
+
 const journeyPage = (opts = {}) =>
   createPage({
     ua: UA.androidChrome,
@@ -47,7 +58,7 @@ describe('behavior: journeys', () => {
     const p = journeyPage();
     p.branch.init(KEY, { nonce: 'n0nce' });
     await p.run(2000);
-    await snap('journeys/nonce-init-option', p);
+    expect(journeyNonces(p)).toEqual(Array(4).fill('n0nce'));
   });
 
   it('nonce track option re-renders the Journey with the nonce', async () => {
@@ -58,7 +69,7 @@ describe('behavior: journeys', () => {
     await p.run(2000);
     p.branch.track('pageview', {}, { nonce: 'n0nce' });
     await p.run(2000);
-    await snap('journeys/nonce-track-option', p);
+    expect(journeyNonces(p)).toEqual(Array(4).fill('n0nce'));
   });
 
   it('closeJourney when none is shown', async () => {
