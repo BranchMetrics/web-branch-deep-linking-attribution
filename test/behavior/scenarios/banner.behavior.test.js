@@ -38,6 +38,23 @@ describe('behavior: banner', () => {
     await snap('banner/theme-dark', p);
   });
 
+  it('rating, review count, no close button and bottom position', async () => {
+    const p = createPage({ ua: UA.androidChrome });
+    p.branch.init(KEY);
+    p.branch.banner(
+      {
+        ...options(),
+        rating: 3.5,
+        reviewCount: 99999,
+        disableHide: true,
+        position: 'bottom',
+      },
+      { data: {} },
+    );
+    await p.run(2000);
+    await snap('banner/options', p);
+  });
+
   it('not supported on desktop', async () => {
     const p = createPage();
     p.branch.init(KEY);
