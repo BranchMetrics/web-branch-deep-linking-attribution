@@ -52,7 +52,13 @@ describe('behavior: banner', () => {
       { data: {} },
     );
     await p.run(2000);
-    await snap('banner/options', p);
+    const iframe = p.win.document.getElementById('branch-banner-iframe');
+    const banner = iframe.contentDocument;
+    expect(iframe.style.bottom).toBe('0px');
+    expect(banner.querySelectorAll('.star > .full')).toHaveLength(3);
+    expect(banner.querySelectorAll('.star > .half')).toHaveLength(1);
+    expect(banner.querySelector('.review-count').textContent).toBe('99999');
+    expect(banner.getElementById('branch-banner-close')).toBeNull();
   });
 
   it('not supported on desktop', async () => {
