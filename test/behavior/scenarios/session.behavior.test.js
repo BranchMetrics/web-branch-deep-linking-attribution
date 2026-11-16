@@ -42,6 +42,31 @@ describe('behavior: session', () => {
     await snap('session/first-null-storage', p);
   });
 
+  it('first() and data() after two link clicks', async () => {
+    const click = (n) => ({
+      url: `https://shop.example.com/p?_branch_match_id=${n}`,
+      routes: {
+        '/v1/open': {
+          body: API.openBody({
+            referring_link: `https://bnc.lt/link${n}`,
+            data: JSON.stringify({
+              '+clicked_branch_link': true,
+              '~campaign': `Campaign${n}`,
+            }),
+          }),
+        },
+      },
+    });
+    const first = createPage(click(1));
+    first.branch.init(KEY, first.cb('init'));
+    await first.finish();
+    const p = nextPage(first, click(2));
+    p.branch.init(KEY, p.cb('init'));
+    p.branch.first(p.cb('first'));
+    p.branch.data(p.cb('data'));
+    await snap('session/first-and-data-after-two-clicks', p);
+  });
+
   it('referringLink with extended journeys assist', async () => {
     const options = () => ({
       enableExtendedJourneysAssist: true,
