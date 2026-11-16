@@ -43,6 +43,24 @@ describe('behavior: journeys', () => {
     await snap('journeys/closeJourney', p);
   });
 
+  it('nonce init option', async () => {
+    const p = journeyPage();
+    p.branch.init(KEY, { nonce: 'n0nce' });
+    await p.run(2000);
+    await snap('journeys/nonce-init-option', p);
+  });
+
+  it('nonce track option re-renders the Journey with the nonce', async () => {
+    const p = journeyPage();
+    p.branch.init(KEY);
+    await p.run(2000);
+    p.branch.closeJourney();
+    await p.run(2000);
+    p.branch.track('pageview', {}, { nonce: 'n0nce' });
+    await p.run(2000);
+    await snap('journeys/nonce-track-option', p);
+  });
+
   it('closeJourney when none is shown', async () => {
     const p = createPage();
     p.branch.init(KEY);
