@@ -4,12 +4,21 @@ import { createPage, nextPage, snap } from '../harness.js';
 const journeyNonces = (p) => {
   const doc = p.win.document;
   const iframe = doc.getElementById('branch-banner-iframe');
-  return [
-    doc.getElementById('branch-iframe-css'),
-    iframe,
-    doc.getElementById('branch-journey-cta'),
-    iframe.contentDocument.getElementById('branch-css'),
-  ].map((el) => el.getAttribute('nonce'));
+  return Object.fromEntries(
+    [
+      doc.getElementById('branch-iframe-css'),
+      doc.getElementById('branch-journey-cta'),
+      iframe,
+      iframe.contentDocument.getElementById('branch-css'),
+    ].map((el) => [el.id, el.getAttribute('nonce')]),
+  );
+};
+
+const allNonced = {
+  'branch-iframe-css': 'n0nce',
+  'branch-journey-cta': 'n0nce',
+  'branch-banner-iframe': 'n0nce',
+  'branch-css': 'n0nce',
 };
 
 const journeyPage = (opts = {}) =>
@@ -58,7 +67,7 @@ describe('behavior: journeys', () => {
     const p = journeyPage();
     p.branch.init(KEY, { nonce: 'n0nce' });
     await p.run(2000);
-    expect(journeyNonces(p)).toEqual(Array(4).fill('n0nce'));
+    expect(journeyNonces(p)).toEqual(allNonced);
   });
 
   it('nonce track option re-renders the Journey with the nonce', async () => {
@@ -69,7 +78,7 @@ describe('behavior: journeys', () => {
     await p.run(2000);
     p.branch.track('pageview', {}, { nonce: 'n0nce' });
     await p.run(2000);
-    expect(journeyNonces(p)).toEqual(Array(4).fill('n0nce'));
+    expect(journeyNonces(p)).toEqual(allNonced);
   });
 
   it('closeJourney when none is shown', async () => {
