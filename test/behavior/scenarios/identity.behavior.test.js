@@ -1,5 +1,5 @@
 import { KEY } from '../fixtures.js';
-import { createPage, snap } from '../harness.js';
+import { createPage, nextPage, snap } from '../harness.js';
 
 describe('behavior: identity', () => {
   it('setIdentity', async () => {
@@ -9,6 +9,20 @@ describe('behavior: identity', () => {
     p.branch.setIdentity('user-1', p.cb('setIdentity'));
     p.branch.logEvent('LOGIN');
     await snap('identity/setIdentity', p);
+  });
+
+  it('setIdentity carries into a new tab', async () => {
+    const first = createPage();
+    first.branch.init(KEY);
+    first.branch.setIdentity('user-1');
+    await first.finish();
+    // A new tab: only localStorage carries the identity.
+    const p = nextPage(first);
+    p.win.sessionStorage.clear();
+    p.listen();
+    p.branch.init(KEY);
+    p.branch.logEvent('LOGIN');
+    await snap('identity/setIdentity-new-tab', p);
   });
 
   it('setIdentity with an empty identity', async () => {
