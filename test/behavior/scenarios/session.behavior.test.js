@@ -58,13 +58,18 @@ describe('behavior: session', () => {
       },
     });
     const first = createPage(click(1));
-    first.branch.init(KEY, first.cb('init'));
+    first.branch.init(KEY);
     await first.finish();
     const p = nextPage(first, click(2));
-    p.branch.init(KEY, p.cb('init'));
+    p.branch.init(KEY);
     p.branch.first(p.cb('first'));
     p.branch.data(p.cb('data'));
-    await snap('session/first-and-data-after-two-clicks', p);
+    const { trace } = await p.finish();
+    const result = (name) => trace.find((e) => e.callback === name).args[1];
+    expect(result('first').referring_link).toBe('https://bnc.lt/link1');
+    expect(JSON.parse(result('first').data)['~campaign']).toBe('Campaign1');
+    expect(result('data').referring_link).toBe('https://bnc.lt/link2');
+    expect(result('data').data_parsed['~campaign']).toBe('Campaign2');
   });
 
   it('referringLink with extended journeys assist', async () => {
