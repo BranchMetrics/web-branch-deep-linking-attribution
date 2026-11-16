@@ -28,6 +28,24 @@ describe('behavior: init', () => {
     await snap('init/branch-match-id', p);
   });
 
+  it('branch_match_id init option', async () => {
+    const p = createPage();
+    p.branch.init(KEY, { branch_match_id: '987654321' });
+    const { trace } = await p.finish();
+    const open = trace.find((e) => e.path === '/v1/open').body;
+    expect(open.link_identifier).toBe('987654321');
+  });
+
+  it('branch_match_id init option wins over _branch_match_id', async () => {
+    const p = createPage({
+      url: 'https://shop.example.com/p?_branch_match_id=123456789',
+    });
+    p.branch.init(KEY, { branch_match_id: '987654321' });
+    const { trace } = await p.finish();
+    const open = trace.find((e) => e.path === '/v1/open').body;
+    expect(open.link_identifier).toBe('987654321');
+  });
+
   it('click from hash link (#r:)', async () => {
     const p = createPage({ url: 'https://shop.example.com/p#r:abcdefgh' });
     p.branch.init(KEY, p.cb('init'));
