@@ -42,6 +42,36 @@ describe('behavior: session', () => {
     await snap('session/first-null-storage', p);
   });
 
+  it('first() and data() after two link clicks', async () => {
+    const click = (n) => ({
+      url: `https://shop.example.com/p?_branch_match_id=${n}`,
+      routes: {
+        '/v1/open': {
+          body: API.openBody({
+            referring_link: `https://bnc.lt/link${n}`,
+            data: JSON.stringify({
+              '+clicked_branch_link': true,
+              '~campaign': `Campaign${n}`,
+            }),
+          }),
+        },
+      },
+    });
+    const first = createPage(click(1));
+    first.branch.init(KEY);
+    await first.finish();
+    const p = nextPage(first, click(2));
+    p.branch.init(KEY);
+    p.branch.first(p.cb('first'));
+    p.branch.data(p.cb('data'));
+    const { trace } = await p.finish();
+    const result = (name) => trace.find((e) => e.callback === name).args[1];
+    expect(result('first').referring_link).toBe('https://bnc.lt/link1');
+    expect(JSON.parse(result('first').data)['~campaign']).toBe('Campaign1');
+    expect(result('data').referring_link).toBe('https://bnc.lt/link2');
+    expect(result('data').data_parsed['~campaign']).toBe('Campaign2');
+  });
+
   it('referringLink with extended journeys assist', async () => {
     const options = () => ({
       enableExtendedJourneysAssist: true,

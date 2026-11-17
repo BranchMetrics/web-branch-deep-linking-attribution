@@ -38,6 +38,29 @@ describe('behavior: banner', () => {
     await snap('banner/theme-dark', p);
   });
 
+  it('rating, review count, no close button and bottom position', async () => {
+    const p = createPage({ ua: UA.androidChrome });
+    p.branch.init(KEY);
+    p.branch.banner(
+      {
+        ...options(),
+        rating: 3.5,
+        reviewCount: 99999,
+        disableHide: true,
+        position: 'bottom',
+      },
+      { data: {} },
+    );
+    await p.run(2000);
+    const iframe = p.win.document.getElementById('branch-banner-iframe');
+    const banner = iframe.contentDocument;
+    expect(iframe.style.bottom).toBe('0px');
+    expect(banner.querySelectorAll('.star > .full')).toHaveLength(3);
+    expect(banner.querySelectorAll('.star > .half')).toHaveLength(1);
+    expect(banner.querySelector('.review-count').textContent).toBe('99999');
+    expect(banner.getElementById('branch-banner-close')).toBeNull();
+  });
+
   it('not supported on desktop', async () => {
     const p = createPage();
     p.branch.init(KEY);

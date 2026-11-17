@@ -52,6 +52,19 @@ test.describe('@mobile', () => {
     }
   });
 
+  test('a top banner shown again after closeJourney pushes the page down again', async ({
+    page,
+  }) => {
+    await openShop(page, { template: TEMPLATES['top-banner'] });
+    const header = page.locator('header');
+    await expect.poll(async () => (await box(header)).top).toBe(76);
+    await page.evaluate(() => window.branch.closeJourney());
+    await expect.poll(async () => (await box(header)).top).toBe(0);
+    await page.evaluate(() => window.branch.track('pageview'));
+    await expect(host(page)).toBeAttached();
+    await expect.poll(async () => (await box(header)).top).toBe(76);
+  });
+
   test('a floating button stays at its offset while the page scrolls', async ({
     page,
   }) => {

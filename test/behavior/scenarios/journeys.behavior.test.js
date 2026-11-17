@@ -1,6 +1,26 @@
 import { API, KEY, UA } from '../fixtures.js';
 import { createPage, nextPage, snap } from '../harness.js';
 
+const journeyNonces = (p) => {
+  const doc = p.win.document;
+  const iframe = doc.getElementById('branch-banner-iframe');
+  return Object.fromEntries(
+    [
+      doc.getElementById('branch-iframe-css'),
+      doc.getElementById('branch-journey-cta'),
+      iframe,
+      iframe.contentDocument.getElementById('branch-css'),
+    ].map((el) => [el.id, el.getAttribute('nonce')]),
+  );
+};
+
+const allNonced = {
+  'branch-iframe-css': 'n0nce',
+  'branch-journey-cta': 'n0nce',
+  'branch-banner-iframe': 'n0nce',
+  'branch-css': 'n0nce',
+};
+
 const journeyPage = (opts = {}) =>
   createPage({
     ua: UA.androidChrome,
@@ -41,6 +61,24 @@ describe('behavior: journeys', () => {
     await p.run(2000);
     p.branch.closeJourney(p.cb('closeJourney'));
     await snap('journeys/closeJourney', p);
+  });
+
+  it('nonce init option', async () => {
+    const p = journeyPage();
+    p.branch.init(KEY, { nonce: 'n0nce' });
+    await p.run(2000);
+    expect(journeyNonces(p)).toEqual(allNonced);
+  });
+
+  it('nonce track option re-renders the Journey with the nonce', async () => {
+    const p = journeyPage();
+    p.branch.init(KEY);
+    await p.run(2000);
+    p.branch.closeJourney();
+    await p.run(2000);
+    p.branch.track('pageview', {}, { nonce: 'n0nce' });
+    await p.run(2000);
+    expect(journeyNonces(p)).toEqual(allNonced);
   });
 
   it('closeJourney when none is shown', async () => {

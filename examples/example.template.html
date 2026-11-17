@@ -319,6 +319,7 @@
 						<button class="btn btn-info" onclick="callData()">.data()</button>
 						<button class="btn btn-info" onclick="callLogout()">Logout</button>
 						<button class="btn btn-info" onclick="callFirst()">.first()</button>
+						<button class="btn btn-info" onclick="callLastAttributedTouchData()">.lastAttributedTouchData()</button>
 					</div>
 					<h4>Identity</h4>
 					<div class="group">
@@ -468,6 +469,13 @@
 		function callFirst() {
 			request.html('branch.first();');
 			branch.first(function(err, data) {
+				response.html(err || JSON.stringify(data));
+			});
+		}
+
+		function callLastAttributedTouchData() {
+			request.html('branch.lastAttributedTouchData(7);');
+			branch.lastAttributedTouchData(7, function(err, data) {
 				response.html(err || JSON.stringify(data));
 			});
 		}

@@ -40,6 +40,21 @@ describe('behavior: links', () => {
     await snap('links/qrCode', p);
   });
 
+  it('qrCode sends center_logo_url', async () => {
+    const p = createPage();
+    p.branch.init(KEY);
+    p.branch.qrCode(
+      linkData(),
+      { center_logo_url: 'https://cdn.example.com/logo.png' },
+      () => {},
+    );
+    const { trace } = await p.finish();
+    const request = trace.find((e) => e.path === '/v1/qr-code');
+    expect(JSON.parse(request.body.qr_code_settings).center_logo_url).toBe(
+      'https://cdn.example.com/logo.png',
+    );
+  });
+
   it('deepview then deepviewCta', async () => {
     const p = createPage({ ua: UA.androidChrome });
     p.listen();
