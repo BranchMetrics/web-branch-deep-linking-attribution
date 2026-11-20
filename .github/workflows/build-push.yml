@@ -9,7 +9,7 @@ jobs:
     name: run tests, build and push
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6.1.0
@@ -21,7 +21,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install branch-github-actions
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: BranchMetrics/branch-github-actions
           ref: master
