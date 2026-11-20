@@ -115,12 +115,21 @@ export async function openShop(
       return route.fulfill(json(API.openBody()));
     }
     if (path === '/v1/pageview') {
+      const callback = body.get('callback_string');
+      // Like the server: banner_payload only for v2 creatives, when asked.
+      const shape =
+        v2 && body.get('banner_payload') === '1'
+          ? {
+              banner_payload: template.payload(callback),
+            }
+          : {};
       return route.fulfill(
         json({
           branch_view_enabled: true,
           use_v2_renderer: v2,
-          template: template.html(body.get('callback_string')),
+          template: template.html(callback),
           animationConfig: template.animation,
+          ...shape,
           event_data: { branch_view_data: { id: 'e2e' } },
           journey_link_data: {
             type: template.device,

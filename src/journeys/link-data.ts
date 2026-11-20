@@ -7,6 +7,8 @@ export const FILTERED_LINK_KEYS = [
   'source',
   'open_app',
   'link_click_id',
+  // The request's banner_payload capability, which an older node-api echoes back.
+  'banner_payload',
 ];
 
 export interface JourneyLinkData {

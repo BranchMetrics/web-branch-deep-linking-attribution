@@ -70,6 +70,7 @@
         "has_app_websdk": "false",
         "feature": "journeys",
         "callback_string": "branch_view_callback__1",
+        "banner_payload": "1",
         "data": "{\"product\":\"42\",\"$ios_deeplink_path\":\"product/42\",\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":\"Shoe\",\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
         "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
         "source": "web-sdk",

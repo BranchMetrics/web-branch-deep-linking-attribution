@@ -1,0 +1,42 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "mobile",
+      "html" : "<div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"ibllt\" class=\"branch-banner-content\"><div id=\"branch-mobile-action\" role=\"button\" tabindex=\"0\" aria-label=\"Open the App\" class=\"branch-banner-button\">Open the App</div><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"i8e5e\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"igd2x\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#ibllt{gap:4px;display:flex;padding:0;min-width:50px;min-height:50px;align-items:center;align-content:center;justify-content:center;background-color:none;}#branch-banner{overflow:hidden;}#branch-mobile-action{color:#FAFAFA;cursor:pointer;height:40px;display:flex;padding:0px 20px 0px 20px;font-size:16px;align-items:center;font-family:system-ui;font-weight:300;border-radius:30px 4px 4px 30px;justify-content:center;background-color:#580DB5;}#igd2x{width:100%;height:100%;}#i8e5e{color:#FFFFFFB3;width:40px;cursor:pointer;height:40px;display:flex;padding:12px 12px 12px 12px;align-items:center;border-radius:4px 30px 30px 4px;justify-content:center;background-color:#580DB5FF;}\n\n"
+    },
+    "box" : {
+      "style" : {
+        "position" : "fixed",
+        "left" : "0",
+        "right" : "0",
+        "bottom" : "24px",
+        "min-width" : "100%"
+      }
+    },
+    "page" : {
+      "lockScroll" : false,
+      "shiftTopElements" : false
+    },
+    "presentation" : {
+      "fullPage" : false,
+      "modal" : false
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-slide-in-bottom 0.25s ease both;\n}\n@keyframes branch-slide-in-bottom { from { transform: translateY(calc(100% + 24px)); } to { transform: translate(0); } }\n.branch-banner-exit {\n    animation: branch-slide-out-bottom 0.25s ease both;\n}\n@keyframes branch-slide-out-bottom { from { transform: translate(0); } to { transform: translateY(calc(100% + 24px)); } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Open the App",
+      "noApp" : "Get the App"
+    },
+    "showEvent" : {
+      "position" : "bottom",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

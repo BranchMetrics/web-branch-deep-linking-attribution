@@ -1,21 +1,8 @@
-import { isFullPage } from './dimension.js';
-import type { RenderPayload } from './types.js';
-
 const FOCUSABLE =
   'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"]), [role="button"]';
 // Where a modal's focus starts: the dialog itself, so screen readers announce its name
 // and read its content before the controls (the builder's WCAG markup has one).
 const DIALOG = '[role="dialog"], [role="alertdialog"]';
-
-// Only modal creatives trap Tab; trapping inline banners fails WCAG 2.1.2.
-export function isModal(payload: RenderPayload, root: ParentNode): boolean {
-  return (
-    (payload.creative.deviceType === 'desktop' &&
-      payload.creative.variant === 'overlay') ||
-    isFullPage(payload.placement) ||
-    !!root.querySelector('.branch-banner-dismiss-background')
-  );
-}
 
 export interface A11yHandle {
   focusFirst(): void;

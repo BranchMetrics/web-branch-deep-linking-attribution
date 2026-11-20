@@ -1,0 +1,44 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "mobile",
+      "html" : "<div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"iz3ry\" class=\"branch-banner-content\"><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"iptxg\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"i3hn8\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div><img id=\"ijfjv\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/d26462bd-08c5-49dd-bf0d-1b2505c918f1.png\"><div id=\"ijy19\"><div id=\"itw2d\">We are better<br>on the app</div><div id=\"ix70z\">Enter a description for<br>your app here.</div></div><div id=\"isnw6\"></div><div id=\"ifuxk\"><div id=\"branch-mobile-action\" role=\"button\" tabindex=\"0\" aria-label=\"Open the App\" class=\"branch-banner-button\">Open the App</div><div role=\"button\" tabindex=\"0\" id=\"ias3c\" class=\"branch-banner-close\">Continue on Web</div></div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#iz3ry{width:100vw;height:100vh;margin:0 0px 0px 0px;display:flex;padding:24px;align-items:stretch;flex-direction:column;background-size:auto;background-color:#580DB5;background-image:linear-gradient(180deg, #00000066 0%, #00000000 100%);background-repeat:repeat;background-position:left top;background-attachment:scroll;}#branch-banner{overflow:hidden;}#i3hn8{width:100%;height:100%;}#iptxg{top:24px;color:#FFFFFFB3;right:24px;width:24px;cursor:pointer;height:24px;display:flex;padding:4px;position:absolute;align-items:center;justify-content:center;}#ijfjv{width:184px;height:177px;margin:100px 0px 60px 0px;align-self:center;}#ijy19{gap:8px;display:flex;min-width:50px;min-height:50px;align-items:center;flex-direction:column;}#itw2d{color:#FFFFFFFF;margin:0;padding:0;font-size:30px;text-align:center;font-family:system-ui;font-weight:400;line-height:36px;}#ix70z{color:#FFFFFFFF;margin:0;padding:0;font-size:18px;text-align:center;font-family:system-ui;font-weight:300;line-height:28px;}#isnw6{display:flex;flex-grow:1;min-width:50px;align-items:center;flex-direction:column;}#ifuxk{gap:8px;display:flex;min-width:50px;min-height:50px;align-items:stretch;flex-direction:column;}#branch-mobile-action{color:#580DB5FF;cursor:pointer;display:flex;padding:12px 16px 12px 16px;font-size:12px;align-items:center;font-family:system-ui;font-weight:500;border-radius:2px 2px 2px 2px;justify-content:center;background-color:#FFFFFFFF;}#ias3c{color:#FFFFFFCC;cursor:pointer;font-size:14px;text-align:center;font-family:system-ui;font-weight:300;text-decoration:underline;}\n\n"
+    },
+    "box" : {
+      "style" : {
+        "position" : "fixed",
+        "left" : "0",
+        "right" : "0",
+        "top" : "0",
+        "bottom" : "0",
+        "min-width" : "100%",
+        "height" : "auto"
+      }
+    },
+    "page" : {
+      "lockScroll" : true,
+      "shiftTopElements" : true
+    },
+    "presentation" : {
+      "fullPage" : true,
+      "modal" : true
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-journey-fade-in 0.25s ease both;\n}\n@keyframes branch-journey-fade-in { from { opacity: 0; } to { opacity: 1; } }\n.branch-banner-exit {\n    animation: branch-journey-fade-out 0.25s ease both;\n}\n@keyframes branch-journey-fade-out { from { opacity: 1; } to { opacity: 0; } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Open the App",
+      "noApp" : "Get the App"
+    },
+    "showEvent" : {
+      "position" : "top",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

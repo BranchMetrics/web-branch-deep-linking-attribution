@@ -8,17 +8,10 @@ import { makeRenderPayload } from '../fixtures.js';
 
 const view = { document, nonce: 'n0nce', platform: 'android' };
 const STANDARD = {
-  placement: {
-    sticky: 'absolute',
-    anchorY: 'top',
-    bannerHeight: { value: 76, unit: 'px' },
-    isIntrinsic: false,
-    injectorSelector: '.branch-journeys-top',
-  },
-  geometry: {
-    css: 'position: absolute; top: 0;',
-    push: { side: 'top' },
-  },
+  page: { push: { side: 'top' }, lockScroll: false, shiftTopElements: true },
+  presentation: { fullPage: false },
+  showEvent: { position: 'top', sticky: 'absolute' },
+  box: { style: { position: 'absolute', top: '0' } },
 };
 
 // jsdom has no layout, so the banner's measured height is stubbed.
@@ -31,7 +24,7 @@ function setHeight(banner, px) {
 
 function place(overrides, height = 76) {
   const payload = makeRenderPayload(overrides);
-  const mounted = mount(payload, { ...view, hasApp: false });
+  const mounted = mount(payload, view);
   setHeight(mounted.banner, height);
   return {
     mounted,
@@ -68,7 +61,10 @@ describe('journeys/v2 placement', () => {
   it("adds the banner's offset from the edge to its measured height", () => {
     place({
       ...STANDARD,
-      placement: { ...STANDARD.placement, offsetY: { value: 2, unit: 'vh' } },
+      page: {
+        ...STANDARD.page,
+        push: { side: 'top', offset: { value: 2, unit: 'vh' } },
+      },
     });
     expect(pageCss()).toBe(
       'body { transition: margin-top 0.25s ease; margin-top: calc(76px + 2vh) !important; }',
@@ -109,7 +105,8 @@ describe('journeys/v2 placement', () => {
     place(
       {
         ...STANDARD,
-        geometry: { css: '', push: { side: 'bottom' } },
+        box: { style: {} },
+        page: { ...STANDARD.page, push: { side: 'bottom' } },
       },
       60,
     );
@@ -156,7 +153,7 @@ describe('journeys/v2 placement', () => {
         '<nav id="nav"><div class="branch-journeys-top"></div></nav>';
       const { mounted, state } = place({
         ...STANDARD,
-        geometry: { css: 'position: absolute; top: 0;' },
+        page: { lockScroll: false, shiftTopElements: true },
       });
       expect(document.getElementById('branch-journey-page')).toBeNull();
       setHeight(mounted.banner, 90);
@@ -170,10 +167,21 @@ describe('journeys/v2 placement', () => {
     }
   });
 
+  it('shifts no top elements unless the payload asks', () => {
+    document.body.innerHTML =
+      '<nav id="nav"><div class="branch-journeys-top"></div></nav>';
+    const { state } = place({
+      ...STANDARD,
+      page: { ...STANDARD.page, shiftTopElements: false },
+    });
+    expect(state.parents).toHaveLength(0);
+    expect(document.getElementById('nav').style.marginTop).toBe('');
+  });
+
   it('skips fixed injector parents under a full-page creative', () => {
     document.body.innerHTML =
       '<nav id="nav" style="position: fixed"><div class="branch-journeys-top"></div></nav>';
-    place({ placement: { injectorSelector: '.branch-journeys-top' } });
+    place({ page: { shiftTopElements: true } });
     expect(document.getElementById('nav').style.marginTop).toBe('');
   });
 
@@ -219,7 +227,7 @@ describe('journeys/v2 placement', () => {
       document.body.innerHTML =
         '<nav id="nav"><div class="branch-journeys-top"></div></nav>';
       const { mounted } = place({
-        placement: { injectorSelector: '.branch-journeys-top' },
+        page: { shiftTopElements: true },
       });
       setHeight(mounted.banner, 90);
       observers[0].callback();
@@ -233,14 +241,17 @@ describe('journeys/v2 placement', () => {
   });
 
   it('pushes and locks scroll together when a full-page creative pushes', () => {
-    place({ geometry: { css: '', push: { side: 'top' } } });
+    place({ box: { style: {} }, page: { push: { side: 'top' } } });
     expect(pageCss()).toBe(
       'html { overflow: hidden !important; } body { transition: margin-top 0.25s ease; margin-top: 76px !important; overflow: hidden !important; }',
     );
   });
 
   it('adds no page style for partial-height creatives that push nothing', () => {
-    place({ placement: { bannerHeight: { value: 50, unit: 'vh' } } });
+    place({
+      page: { lockScroll: false },
+      presentation: { fullPage: false },
+    });
     expect(document.getElementById('branch-journey-page')).toBeNull();
     expect(document.body.classList.contains('branch-banner-no-scroll')).toBe(
       false,
@@ -254,10 +265,8 @@ describe('journeys/v2 placement', () => {
     );
     const { mounted } = place({
       creative: { html },
-      placement: {
-        bannerHeight: { value: 50, unit: 'vh' },
-        isIntrinsic: false,
-      },
+      page: { lockScroll: false },
+      presentation: { fullPage: false },
     });
     expect(
       mounted.root.querySelector('.branch-banner-content').style.height,

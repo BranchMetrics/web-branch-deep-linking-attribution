@@ -54,6 +54,7 @@
         "has_app_websdk": "false",
         "feature": "journeys",
         "callback_string": "branch_view_callback__1",
+        "banner_payload": "1",
         "data": "{\"link_click_id\":\"abc\",\"$canonical_url\":\"https://shop.example.com/product/42\",\"$og_title\":null,\"$og_description\":null,\"$og_image_url\":null,\"$og_video\":null,\"$og_type\":null}",
         "session_referring_link_data": "{\"+clicked_branch_link\":false,\"+is_first_session\":true}",
         "source": "web-sdk",

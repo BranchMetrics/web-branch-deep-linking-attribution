@@ -13,13 +13,27 @@ function start(overrides = {}, opts = {}) {
   const doc = opts.document || document;
   const journey = render(makeRenderPayload(overrides), {
     platform: 'android',
-    hasApp: false,
     onAction: (a) => actions.push(a),
     onShown,
     ...opts,
   });
   const root = doc.getElementById('branch-journey-host').shadowRoot;
   return { journey, actions, onShown, root, doc };
+}
+
+// jsdom has no getAnimations: this stands in for a 1s entrance still running.
+function withRunningEntrance(run) {
+  HTMLElement.prototype.getAnimations = () => [
+    {
+      effect: { getComputedTiming: () => ({ endTime: 1000 }) },
+      finished: new Promise(() => {}),
+    },
+  ];
+  try {
+    return run();
+  } finally {
+    delete HTMLElement.prototype.getAnimations;
+  }
 }
 
 describe('journeys/v2/renderer render()', () => {
@@ -104,9 +118,7 @@ describe('journeys/v2/renderer render()', () => {
 
   // The exit keyframes assume a fully shown banner; started mid-entrance they jump.
   it('closing during the entrance skips the exit animation and tears down at once', () => {
-    const { journey, root } = start({
-      animation: { css: '#branch-banner { animation: x 1s; }' },
-    });
+    const { journey, root } = withRunningEntrance(() => start());
     const banner = root.getElementById('branch-banner');
     vi.advanceTimersByTime(500);
     const onClosed = vi.fn();
@@ -115,6 +127,20 @@ describe('journeys/v2/renderer render()', () => {
     expect(banner.classList.contains('branch-banner-exit')).toBe(false);
     expect(document.getElementById('branch-journey-host')).toBeNull();
     expect(journey.isLive()).toBe(false);
+  });
+
+  it('discarding mid-entrance never reports the journey shown', async () => {
+    const { journey, onShown } = withRunningEntrance(() => start());
+    journey.discard();
+    await vi.runAllTimersAsync();
+    expect(onShown).not.toHaveBeenCalled();
+  });
+
+  it('reports shown asynchronously even with nothing to wait for', () => {
+    const { onShown } = start();
+    expect(onShown).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(20);
+    expect(onShown).toHaveBeenCalledTimes(1);
   });
 
   it('discard tears down at once with no callbacks', () => {
@@ -197,6 +223,35 @@ describe('journeys/v2/renderer render()', () => {
     });
   });
 
+  it('traps Tab exactly when presentation.modal says so, whatever the markup', () => {
+    const tabFromLast = (root) => {
+      const controls = root.querySelectorAll('[role="button"]');
+      const last = controls[controls.length - 1];
+      last.focus();
+      const event = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      });
+      last.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    // The default creative has a scrim and is full page, yet isn't trapped when not modal.
+    const inline = start({ presentation: { modal: false } });
+    expect(tabFromLast(inline.root)).toBe(false);
+    inline.journey.discard();
+    const html = makeRenderPayload().creative.html.replace(
+      '<div id="branch-banner-dismiss-background" class="branch-banner-dismiss-background"></div>',
+      '',
+    );
+    const modal = start({
+      creative: { html },
+      presentation: { fullPage: false, modal: true },
+    });
+    expect(tabFromLast(modal.root)).toBe(true);
+  });
+
   it('renders into the document it is given, not the global one', () => {
     const doc = frameDocument();
     const { journey } = start({}, { document: doc });
@@ -216,7 +271,6 @@ describe('journeys/v2/renderer render()', () => {
       expect(() =>
         render(makeRenderPayload(), {
           platform: 'android',
-          hasApp: false,
           onAction() {},
         }),
       ).toThrow('placement failed');
@@ -226,8 +280,10 @@ describe('journeys/v2/renderer render()', () => {
     expect(document.getElementById('branch-journey-host')).toBeNull();
   });
 
-  const PLEX =
-    'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap';
+  const PLEX = {
+    family: 'IBM Plex Sans',
+    url: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap',
+  };
   const fontLinks = () =>
     document.head.querySelectorAll('link[data-branch-journey-font]');
 
@@ -263,15 +319,15 @@ describe('journeys/v2/renderer render()', () => {
       expect(() =>
         render(
           makeRenderPayload({
-            placement: {
-              bannerHeight: { value: 76, unit: 'px' },
-              sticky: 'absolute',
-              anchorY: 'top',
-              injectorSelector: '.branch-journeys-top',
+            page: {
+              push: { side: 'top' },
+              lockScroll: false,
+              shiftTopElements: true,
             },
-            geometry: { push: { side: 'top' } },
+            presentation: { fullPage: false },
+            showEvent: { position: 'top', sticky: 'absolute' },
           }),
-          { platform: 'android', hasApp: false, onAction() {} },
+          { platform: 'android', onAction() {} },
         ),
       ).toThrow('placement failed');
     } finally {

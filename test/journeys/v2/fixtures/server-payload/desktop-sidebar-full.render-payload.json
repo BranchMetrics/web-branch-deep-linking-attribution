@@ -1,0 +1,43 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "desktop",
+      "html" : "<div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"ibdha\" class=\"branch-banner-content\"><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"issko\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"iq7nv\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div><div id=\"iw5e4\"><img id=\"ijxza\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/388eb863-aa24-43d4-858e-c33e56a27b5b.png\"><div id=\"ietnk\">Scan the QR Code to Download our App</div><div id=\"iuwal\">Enter your description or body text in place of this filler.</div><div id=\"iqmt2\" class=\"branch-qr-container\"><img role=\"presentation\" alt=\"QRcode\" title=\"code\" src=\"{{$journeys_desktop_qr_code}}\" id=\"ihlgq\" class=\"branch-banner-image-qrcode\"></div></div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#ibdha{height:100vh;padding:28px;min-width:300px;background-color:#410986FF;}#iq7nv{width:100%;height:100%;}#issko{top:35px;color:#FAFAFAB3;right:29px;width:25px;cursor:pointer;height:25px;display:flex;position:absolute;align-items:center;justify-content:center;}#iw5e4{display:flex;min-width:50px;min-height:50px;align-items:center;flex-direction:column;}#ijxza{width:126px;height:126px;margin:0px 0px 30px 0px;}#iuwal{color:#FFFFFFFF;margin:0px 0px 64px 0px;padding:0px 4px 0px 4px;font-size:16px;max-width:243px;text-align:center;font-family:system-ui;font-weight:400;}#ietnk{color:#FFFFFFFF;margin:0px 0px 33px 0px;padding:0px 4px 0px 4px;font-size:30px;max-width:243px;text-align:center;font-family:system-ui;font-weight:400;}#ihlgq{width:100%;height:100%;}#iqmt2{width:198px;height:198px;margin:0px 0px 0 0px;padding:6px 6px 6px 6px;overflow:hidden;border-radius:8px 8px 8px 8px;background-color:#FFFFFFFF;}\n\n"
+    },
+    "box" : {
+      "style" : {
+        "position" : "fixed",
+        "right" : "0",
+        "top" : "0",
+        "bottom" : "0",
+        "width" : "300px",
+        "height" : "auto"
+      }
+    },
+    "page" : {
+      "lockScroll" : true,
+      "shiftTopElements" : true
+    },
+    "presentation" : {
+      "fullPage" : true,
+      "modal" : true
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-journey-fade-in 0.25s ease both;\n}\n@keyframes branch-journey-fade-in { from { opacity: 0; } to { opacity: 1; } }\n.branch-banner-exit {\n    animation: branch-journey-fade-out 0.25s ease both;\n}\n@keyframes branch-journey-fade-out { from { opacity: 1; } to { opacity: 0; } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Open",
+      "noApp" : "Get"
+    },
+    "showEvent" : {
+      "position" : "top",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

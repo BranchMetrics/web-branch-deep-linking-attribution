@@ -34,6 +34,7 @@
       "origin": "https://api2.branch.io",
       "query": {
         "data": {
+          "banner_payload": 1,
           "branch_dma_data": null,
           "branch_key": "key_live_goldenTraceFakeKey00000000000000",
           "browser_fingerprint_id": "79336952217731267",

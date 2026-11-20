@@ -25,7 +25,6 @@ function start(payloadOverrides = {}, depsOverrides = {}) {
   const journey = new Journey(payload, {
     branch,
     branchView,
-    hasApp: false,
     testMode: false,
     entryAnimationDisabled: false,
     exitAnimationDisabled: false,
@@ -270,7 +269,12 @@ describe('journeys/v2 Journey', () => {
   it('show() fails cleanly before the CTA script runs, leaving nothing behind', () => {
     const { shown, journey, onFinished } = start(
       {
-        fonts: ['https://fonts.googleapis.com/css2?family=Roboto'],
+        fonts: [
+          {
+            family: 'Roboto',
+            url: 'https://fonts.googleapis.com/css2?family=Roboto',
+          },
+        ],
       },
       {
         branch: Object.assign(makeBranch(), { _ctx: undefined }),

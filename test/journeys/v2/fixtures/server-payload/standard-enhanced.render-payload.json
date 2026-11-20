@@ -1,0 +1,46 @@
+{
+  "version" : 1,
+  "render" : {
+    "creative" : {
+      "deviceType" : "mobile",
+      "html" : "<div id=\"branch-banner\" tabindex=\"-1\" class=\"branch-animation\"><main tabindex=\"-1\" role=\"dialog\" aria-label=\"Branch Banner\" id=\"i9l8f\" class=\"branch-banner-content\"><div id=\"ifoev\"><img id=\"ioznc\" src=\"https://cdn.branch.io/user-uploads/stage/banner-image-uploads/1b849626-0402-4385-ae6e-17c0f2e19c24.png\"><div id=\"ic468\"><div id=\"ifnsk\">YOUR APP</div><div id=\"ibx4m\">Insert a description of your app here.</div></div></div><div role=\"button\" tabindex=\"0\" aria-label=\"Close banner\" id=\"i6kw8\" class=\"branch-banner-close\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" id=\"ijzuj\"><path d=\"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg></div><div id=\"branch-mobile-action\" role=\"button\" tabindex=\"0\" aria-label=\"Open App\" class=\"branch-banner-button\">Open App</div></main></div>",
+      "css" : "* { box-sizing: border-box; } body {margin: 0;}#i9l8f{gap:20px;width:100%;display:flex;padding:16px 16px 16px 16px;min-width:100px;min-height:50px;align-items:stretch;align-content:stretch;flex-direction:column;background-color:#580DB5;}#branch-banner{overflow:hidden;}#ijzuj{width:100%;height:100%;}#i6kw8{top:8px;color:#FFFFFFCC;right:8px;width:24px;cursor:pointer;height:24px;display:flex;padding:4px;position:absolute;align-items:center;justify-content:center;}#ifoev{gap:16px;display:flex;max-width:100%;min-width:50px;min-height:50px;align-items:center;flex-direction:row;}#ioznc{width:50px;height:50px;box-shadow:0 3px 7px 0 #00000033 ;border-radius:8px 8px 8px 8px;}#ic468{gap:2px;display:flex;flex-grow:1;min-width:50px;min-height:50px;align-items:flex-start;flex-shrink:0;flex-direction:column;justify-content:center;}#ifnsk{color:#FFFFFFFF;margin:0;padding:0;font-size:14px;font-family:system-ui;font-weight:400;}#ibx4m{color:#FFFFFFFF;margin:0;padding:0;font-size:11px;font-family:system-ui;font-weight:400;}#branch-mobile-action{color:#580DB5FF;cursor:pointer;height:28px;display:flex;padding:0px 16px;font-size:12px;align-items:center;font-family:system-ui;font-weight:500;border-radius:500px 500px 500px 500px;justify-content:center;background-color:#FFFFFFFF;}\n\n"
+    },
+    "box" : {
+      "style" : {
+        "box-shadow" : "0 0 5px rgba(0, 0, 0, .35)",
+        "position" : "fixed",
+        "left" : "0",
+        "right" : "0",
+        "top" : "0",
+        "min-width" : "100%"
+      }
+    },
+    "page" : {
+      "push" : {
+        "side" : "top"
+      },
+      "lockScroll" : false,
+      "shiftTopElements" : true
+    },
+    "presentation" : {
+      "fullPage" : false,
+      "modal" : false
+    },
+    "animation" : {
+      "enterClass" : "branch-banner-enter",
+      "exitClass" : "branch-banner-exit",
+      "css" : ".branch-banner-enter {\n    animation: branch-slide-in-top 0.25s ease both;\n}\n@keyframes branch-slide-in-top { from { transform: translateY(-100%); } to { transform: translate(0); } }\n.branch-banner-exit {\n    animation: branch-slide-out-top 0.25s ease both;\n}\n@keyframes branch-slide-out-top { from { transform: translate(0); } to { transform: translateY(-100%); } }"
+    },
+    "fonts" : [ ],
+    "ctaText" : {
+      "hasApp" : "Open App",
+      "noApp" : "Get App"
+    },
+    "showEvent" : {
+      "position" : "top",
+      "sticky" : "fixed"
+    }
+  },
+  "dismissal" : { }
+}

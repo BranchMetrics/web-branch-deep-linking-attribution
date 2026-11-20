@@ -6,18 +6,18 @@ const TOP = {
   creative: {
     html: '<div id="branch-banner"><div class="branch-banner-content"><div id="branch-mobile-action">Get</div></div></div>',
     css: '#branch-banner { background: #eee; } .branch-banner-content { height: 76px; }',
-    wcag: false,
   },
-  placement: {
-    sticky: 'absolute',
-    anchorY: 'top',
-    bannerHeight: { value: 76, unit: 'px' },
-    isIntrinsic: false,
-  },
-  geometry: {
-    css: 'position: absolute; left: 0; right: 0; top: 0; min-width: 100%;',
-    zIndex: 99999,
-    push: { side: 'top' },
+  page: { push: { side: 'top' }, lockScroll: false },
+  presentation: { fullPage: false },
+  showEvent: { position: 'top', sticky: 'absolute' },
+  box: {
+    style: {
+      position: 'absolute',
+      left: '0',
+      right: '0',
+      top: '0',
+      'min-width': '100%',
+    },
   },
 };
 
@@ -100,7 +100,6 @@ function show(payload) {
   return new Promise((resolve) => {
     journey = render(payload, {
       platform: 'android',
-      hasApp: false,
       onAction() {},
       onShown: resolve,
     });
@@ -271,7 +270,7 @@ describe('journeys/v2 renderer isolation from the host page', () => {
     setPage('main { height: 3000px; }', '<main>m</main>');
     document.body.style.overflow = 'hidden';
     // Full-page and fixed, so it locks scroll; and it pushes.
-    await show(makeRenderPayload({ geometry: { push: { side: 'top' } } }));
+    await show(makeRenderPayload({ page: { push: { side: 'top' } } }));
     document.body.style.marginTop = '10px';
     await close();
     expect(getComputedStyle(document.body).overflow).toBe('hidden');
@@ -306,7 +305,6 @@ describe('journeys/v2 renderer isolation from the host page', () => {
     }
     render(makeRenderPayload({ ...TOP, animation: SLIDE }), {
       platform: 'android',
-      hasApp: false,
       onAction() {},
     }).discard();
     await expect
@@ -319,11 +317,8 @@ describe('journeys/v2 renderer isolation from the host page', () => {
     await expectPageChanges(
       makeRenderPayload({
         ...TOP,
-        placement: {
-          ...TOP.placement,
-          injectorSelector: '.branch-journeys-top',
-        },
-        fonts: [FONT],
+        page: { ...TOP.page, shiftTopElements: true },
+        fonts: [{ family: 'Branch Test Sans', url: FONT }],
       }),
       (before) => ({
         html: before.html,
@@ -346,7 +341,7 @@ describe('journeys/v2 renderer isolation from the host page', () => {
     await expectPageChanges(
       makeRenderPayload({
         creative: { deviceType: 'desktop' },
-        placement: { injectorSelector: '.branch-journeys-top' },
+        page: { shiftTopElements: true },
       }),
       (before) => ({
         html: before.html,

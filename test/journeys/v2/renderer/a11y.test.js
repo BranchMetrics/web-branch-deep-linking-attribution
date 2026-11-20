@@ -1,8 +1,4 @@
-import {
-  installA11y,
-  isModal,
-} from '../../../../src/journeys/v2/renderer/a11y.js';
-import { makeRenderPayload } from '../fixtures.js';
+import { installA11y } from '../../../../src/journeys/v2/renderer/a11y.js';
 
 function shadow(html) {
   const host = document.createElement('div');
@@ -189,27 +185,5 @@ describe('journeys/v2 a11y', () => {
     const handle = installA11y(root, { modal: true });
     expect(() => handle.focusFirst()).not.toThrow();
     expect(() => key(root.querySelector('p'), 'Tab')).not.toThrow();
-  });
-
-  it('isModal for overlays, full page and scrims only', () => {
-    const scrim = shadow(
-      '<div class="branch-banner-dismiss-background"></div>',
-    );
-    const plain = shadow('<div></div>');
-    const partial = makeRenderPayload({
-      placement: { bannerHeight: { value: 76, unit: 'px' } },
-    });
-    expect(isModal(partial, scrim)).toBe(true);
-    expect(isModal(partial, plain)).toBe(false);
-    expect(isModal(makeRenderPayload(), plain)).toBe(true);
-    expect(
-      isModal(
-        makeRenderPayload({
-          creative: { deviceType: 'desktop', variant: 'overlay' },
-          placement: { bannerHeight: { value: 76, unit: 'px' } },
-        }),
-        plain,
-      ),
-    ).toBe(true);
   });
 });

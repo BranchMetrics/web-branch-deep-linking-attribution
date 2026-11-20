@@ -1,27 +1,10 @@
 import { setNonce } from './nonce.js';
+import type { RenderPayload } from './types.js';
 
 // Chrome ignores @font-face in a shadow root, so font links go in the document head
-// for the journey's lifetime. Bare families the page already declares are skipped.
+// for the journey's lifetime. A family the page already has is the page's own and
+// wins, unless the URL names weights or styles, which the page's family may lack.
 const FONT_LINK_ATTR = 'data-branch-journey-font';
-
-// variants: the URL names weights or styles, which the page's same-named family may lack.
-export function fontFamilies(
-  url: string,
-): Array<{ name: string; variants: boolean }> {
-  try {
-    // The css (v1) API puts several families in one parameter, separated by |.
-    return new URL(url).searchParams
-      .getAll('family')
-      .flatMap((param) => param.split('|'))
-      .map((family) => {
-        const [name, variants] = family.split(':');
-        return { name: name.trim(), variants: variants !== undefined };
-      })
-      .filter((family) => family.name);
-  } catch (_e) {
-    return [];
-  }
-}
 
 function normalize(family: string): string {
   return family.replace(/["']/g, '').trim().toLowerCase();
@@ -40,20 +23,24 @@ function pageDeclaresFamily(doc: Document, family: string): boolean {
   return false;
 }
 
+function namesVariants(url: string): boolean {
+  try {
+    return new URL(url).searchParams
+      .getAll('family')
+      .some((family) => family.includes(':'));
+  } catch (_e) {
+    return true;
+  }
+}
+
 export function ensureFonts(
-  urls: string[],
+  fonts: RenderPayload['fonts'],
   opts: { document: Document; nonce?: string },
 ): HTMLLinkElement[] {
   const doc = opts.document;
   const added: HTMLLinkElement[] = [];
-  for (const url of urls) {
-    const families = fontFamilies(url);
-    if (
-      families.length > 0 &&
-      families.every(
-        (family) => !family.variants && pageDeclaresFamily(doc, family.name),
-      )
-    ) {
+  for (const { family, url } of fonts) {
+    if (!namesVariants(url) && pageDeclaresFamily(doc, family)) {
       continue;
     }
     const alreadyLinked = Array.from(

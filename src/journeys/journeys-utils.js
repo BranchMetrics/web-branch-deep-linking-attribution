@@ -15,7 +15,7 @@ import {
   recordGlobalDismiss,
   recordViewDismiss,
 } from './dismissals.js';
-import { animationDurationMs } from './v2/renderer/index.js';
+import { animationDurationMs } from './css-animation.js';
 import { applyCtaOverride } from './cta-override.js';
 import { installCtaScript } from './cta-script.js';
 import { buildDismissRequestData, sendDismiss } from './dismiss-request.js';
@@ -57,9 +57,10 @@ journeys_utils.bodyMarginBottom = 0;
 // Running state of the exit animation
 journeys_utils.exitAnimationIsRunning = false;
 
-// Set from event_data.branch_view_data.is_new_animation (see branch_view.displayJourney): true
-// when the creative animates #branch-banner itself via CSS, so the SDK must not also move the
-// iframe for entrance/exit.
+// The response's use_v2_renderer (see branch_view.displayJourney). Despite the name, this is
+// v1's animation switch, not the renderer choice (banner_payload is): true when the creative
+// animates #branch-banner itself, so the iframe runs the creative's entrance and exit instead
+// of being slid in and out.
 journeys_utils.use_v2_renderer = false;
 
 // Regex to find pieces of the html blob
