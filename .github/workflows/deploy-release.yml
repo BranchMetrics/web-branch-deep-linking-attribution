@@ -37,7 +37,7 @@ jobs:
           token: ${{ secrets.BRANCHLET_ACCESS_TOKEN_PUBLIC }}
 
       - name: Get next release version
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         id: next-version
         with:
           result-encoding: string
@@ -79,7 +79,7 @@ jobs:
         run: pnpm publish --no-git-checks
 
       - name: Create Github Release
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           GE_NEXT_VERSION: ${{ steps.next-version.outputs.result }}
           INPUT_SHA: ${{ env.INPUT_SHA }}
